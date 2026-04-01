@@ -192,10 +192,13 @@ impl LuaUserData for LuaAIWorld {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
         add_type_methods::<Self>(methods);
 
-        /// Adds agent to the collection.
+        /// Registers a new agent named `name` in this world and returns its handle.
         ///
         /// # Parameters
-        /// - `name` — `string`.
+        /// - `name` — `string`: Unique identifier for the new agent.
+        ///
+        /// # Returns
+        /// An `Agent` handle ready for further configuration.
         methods.add_method("addAgent", |_, this, name: String| {
             let mut w = this.inner.borrow_mut();
             w.add_agent(&name).map_err(LuaError::RuntimeError)?;
@@ -205,13 +208,13 @@ impl LuaUserData for LuaAIWorld {
             })
         });
 
-        /// Returns the agent.
+        /// Looks up a registered agent by name.
         ///
         /// # Parameters
-        /// - `name` — `string`.
+        /// - `name` — `string`: Name of the agent to retrieve.
         ///
         /// # Returns
-        /// The current agent.
+        /// The `Agent` handle, or `nil` if no agent with that name exists.
         methods.add_method("getAgent", |_, this, name: String| {
             let w = this.inner.borrow();
             if w.get_agent_index(&name).is_some() {
@@ -224,10 +227,10 @@ impl LuaUserData for LuaAIWorld {
             }
         });
 
-        /// Removes agent from the collection.
+        /// Removes and destroys the given agent from this world.
         ///
         /// # Parameters
-        /// - `agent` — `userdata`.
+        /// - `agent` — `Agent`: Handle of the agent to remove, obtained from `addAgent`.
         methods.add_method("removeAgent", |_, this, agent: LuaAnyUserData| {
             let a = agent.borrow::<LuaAgent>()?;
             let mut w = this.inner.borrow_mut();
@@ -235,21 +238,18 @@ impl LuaUserData for LuaAIWorld {
             Ok(())
         });
 
-        /// Returns the agent count.
+        /// Returns the number of agents currently registered in this world.
         ///
         /// # Returns
-        /// The current agent count.
+        /// `integer` — total agent count.
         methods.add_method("getAgentCount", |_, this, ()| {
             Ok(this.inner.borrow().agent_count())
         });
 
-        /// Returns the global blackboard.
-        ///
-        /// # Parameters
-        /// - `dt` — `number`.
+        /// Returns a snapshot of the shared world-level blackboard.
         ///
         /// # Returns
-        /// The current global blackboard.
+        /// A `Blackboard` containing data visible to all agents in this world.
         methods.add_method("getGlobalBlackboard", |_, this, ()| {
             let w = this.inner.borrow();
             Ok(LuaBlackboard {
@@ -257,10 +257,10 @@ impl LuaUserData for LuaAIWorld {
             })
         });
 
-        /// Advances the simulation by `dt` seconds.
+        /// Advances all agents in the world by `dt` seconds, integrating velocity into position.
         ///
         /// # Parameters
-        /// - `dt` — `number`.
+        /// - `dt` — `number`: Elapsed seconds since the last frame.
         methods.add_method("update", |_, this, dt: f32| {
             let mut w = this.inner.borrow_mut();
             for agent in &mut w.agents {
@@ -276,21 +276,17 @@ impl LuaUserData for LuaAgent {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
         add_type_methods::<Self>(methods);
 
-        /// Returns the name.
-        ///
-        /// # Parameters
-        /// - `x` — `number`.
-        /// - `y` — `number`.
+        /// Returns the unique name this agent was registered under.
         ///
         /// # Returns
-        /// The current name.
+        /// `string` — agent name.
         methods.add_method("getName", |_, this, ()| Ok(this.name.clone()));
 
-        /// Sets the position.
+        /// Teleports the agent to world-space coordinates (`x`, `y`).
         ///
         /// # Parameters
-        /// - `x` — `number`.
-        /// - `y` — `number`.
+        /// - `x` — `number`: Horizontal world-space position.
+        /// - `y` — `number`: Vertical world-space position.
         methods.add_method("setPosition", |_, this, (x, y): (f32, f32)| {
             let mut w = this.world.borrow_mut();
             if let Some(idx) = w.get_agent_index(&this.name) {
@@ -299,10 +295,10 @@ impl LuaUserData for LuaAgent {
             Ok(())
         });
 
-        /// Returns the position.
+        /// Returns the agent's current world-space position.
         ///
         /// # Returns
-        /// The current position.
+        /// Two numbers `x, y` representing world-space coordinates.
         methods.add_method("getPosition", |_, this, ()| {
             let w = this.world.borrow();
             if let Some(idx) = w.get_agent_index(&this.name) {
@@ -312,11 +308,11 @@ impl LuaUserData for LuaAgent {
             }
         });
 
-        /// Sets the velocity.
+        /// Sets the agent's velocity vector in world units per second.
         ///
         /// # Parameters
-        /// - `x` — `number`.
-        /// - `y` — `number`.
+        /// - `x` — `number`: Horizontal component.
+        /// - `y` — `number`: Vertical component.
         methods.add_method("setVelocity", |_, this, (x, y): (f32, f32)| {
             let mut w = this.world.borrow_mut();
             if let Some(idx) = w.get_agent_index(&this.name) {
@@ -325,10 +321,10 @@ impl LuaUserData for LuaAgent {
             Ok(())
         });
 
-        /// Returns the velocity.
+        /// Returns the agent's current velocity vector.
         ///
         /// # Returns
-        /// The current velocity.
+        /// Two numbers `vx, vy` in world units/second.
         methods.add_method("getVelocity", |_, this, ()| {
             let w = this.world.borrow();
             if let Some(idx) = w.get_agent_index(&this.name) {
@@ -338,10 +334,10 @@ impl LuaUserData for LuaAgent {
             }
         });
 
-        /// Sets the max speed.
+        /// Sets the maximum movement speed cap in world units/second.
         ///
         /// # Parameters
-        /// - `v` — `number`.
+        /// - `v` — `number`: New speed limit (world units/sec).
         methods.add_method("setMaxSpeed", |_, this, v: f32| {
             let mut w = this.world.borrow_mut();
             if let Some(idx) = w.get_agent_index(&this.name) {
@@ -350,10 +346,10 @@ impl LuaUserData for LuaAgent {
             Ok(())
         });
 
-        /// Returns the max speed.
+        /// Returns the maximum movement speed cap in world units/second.
         ///
         /// # Returns
-        /// The current max speed.
+        /// `number` — speed cap.
         methods.add_method("getMaxSpeed", |_, this, ()| {
             let w = this.world.borrow();
             if let Some(idx) = w.get_agent_index(&this.name) {
@@ -363,10 +359,10 @@ impl LuaUserData for LuaAgent {
             }
         });
 
-        /// Sets the max force.
+        /// Sets the maximum steering force that can be applied per frame.
         ///
         /// # Parameters
-        /// - `v` — `number`.
+        /// - `v` — `number`: New force cap.
         methods.add_method("setMaxForce", |_, this, v: f32| {
             let mut w = this.world.borrow_mut();
             if let Some(idx) = w.get_agent_index(&this.name) {
@@ -375,10 +371,10 @@ impl LuaUserData for LuaAgent {
             Ok(())
         });
 
-        /// Returns the max force.
+        /// Returns the maximum steering force cap.
         ///
         /// # Returns
-        /// The current max force.
+        /// `number` — force cap.
         methods.add_method("getMaxForce", |_, this, ()| {
             let w = this.world.borrow();
             if let Some(idx) = w.get_agent_index(&this.name) {
@@ -388,10 +384,10 @@ impl LuaUserData for LuaAgent {
             }
         });
 
-        /// Sets the priority.
+        /// Sets the scheduling priority; higher-priority agents are processed first during `update`.
         ///
         /// # Parameters
-        /// - `p` — `integer`.
+        /// - `p` — `integer`: Priority value, higher = earlier processing.
         methods.add_method("setPriority", |_, this, p: i32| {
             let mut w = this.world.borrow_mut();
             if let Some(idx) = w.get_agent_index(&this.name) {
@@ -400,10 +396,10 @@ impl LuaUserData for LuaAgent {
             Ok(())
         });
 
-        /// Returns the priority.
+        /// Returns the agent's scheduling priority level.
         ///
         /// # Returns
-        /// The current priority.
+        /// `integer` — priority.
         methods.add_method("getPriority", |_, this, ()| {
             let w = this.world.borrow();
             if let Some(idx) = w.get_agent_index(&this.name) {
@@ -413,10 +409,10 @@ impl LuaUserData for LuaAgent {
             }
         });
 
-        /// Sets the decision model.
+        /// Switches the agent's active decision model at runtime. Valid values: `"fsm"`, `"bt"`, `"utility"`, `"goap"`.
         ///
         /// # Parameters
-        /// - `model` — `string`.
+        /// - `model` — `string`: Decision model identifier.
         methods.add_method("setDecisionModel", |_, this, model: String| {
             let mut w = this.world.borrow_mut();
             if let Some(idx) = w.get_agent_index(&this.name) {
@@ -427,10 +423,10 @@ impl LuaUserData for LuaAgent {
             Ok(())
         });
 
-        /// Returns the decision model.
+        /// Returns the name of the agent's current decision model.
         ///
         /// # Returns
-        /// The current decision model.
+        /// `string` — e.g. `"fsm"`, `"bt"`, `"utility"`, `"goap"`.
         methods.add_method("getDecisionModel", |_, this, ()| {
             let w = this.world.borrow();
             if let Some(idx) = w.get_agent_index(&this.name) {
@@ -440,10 +436,10 @@ impl LuaUserData for LuaAgent {
             }
         });
 
-        /// Adds tag to the collection.
+        /// Adds a string tag to this agent's tag set (idempotent).
         ///
         /// # Parameters
-        /// - `tag` — `string`.
+        /// - `tag` — `string`: Tag to add.
         methods.add_method("addTag", |_, this, tag: String| {
             let mut w = this.world.borrow_mut();
             if let Some(idx) = w.get_agent_index(&this.name) {
@@ -452,10 +448,10 @@ impl LuaUserData for LuaAgent {
             Ok(())
         });
 
-        /// Removes tag from the collection.
+        /// Removes a string tag from this agent's tag set (no-op if absent).
         ///
         /// # Parameters
-        /// - `tag` — `string`.
+        /// - `tag` — `string`: Tag to remove.
         methods.add_method("removeTag", |_, this, tag: String| {
             let mut w = this.world.borrow_mut();
             if let Some(idx) = w.get_agent_index(&this.name) {
@@ -464,10 +460,10 @@ impl LuaUserData for LuaAgent {
             Ok(())
         });
 
-        /// Returns `true` if tag.
+        /// Returns `true` if this agent's tag set contains `tag`.
         ///
         /// # Parameters
-        /// - `tag` — `string`.
+        /// - `tag` — `string`: Tag to test.
         ///
         /// # Returns
         /// `boolean`.
@@ -480,10 +476,10 @@ impl LuaUserData for LuaAgent {
             }
         });
 
-        /// Returns the blackboard.
+        /// Returns this agent's private blackboard for reading or writing typed data.
         ///
         /// # Returns
-        /// The current blackboard.
+        /// A `Blackboard` scoped to this agent.
         methods.add_method("getBlackboard", |_, this, ()| {
             let w = this.world.borrow();
             if let Some(idx) = w.get_agent_index(&this.name) {
@@ -503,11 +499,11 @@ impl LuaUserData for LuaBlackboard {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
         add_type_methods::<Self>(methods);
 
-        /// Sets the number.
+        /// Stores a floating-point value under `key` on this blackboard.
         ///
         /// # Parameters
-        /// - `key` — `string`.
-        /// - `value` — `number`.
+        /// - `key` — `string`: Key to write.
+        /// - `value` — `number`: Value to store.
         methods.add_method("setNumber", |_, this, (key, value): (String, f64)| {
             this.inner.borrow_mut().set_number(&key, value);
             Ok(())
@@ -520,11 +516,11 @@ impl LuaUserData for LuaBlackboard {
             },
         );
 
-        /// Sets the bool.
+        /// Stores a boolean value under `key` on this blackboard.
         ///
         /// # Parameters
-        /// - `key` — `string`.
-        /// - `value` — `boolean`.
+        /// - `key` — `string`: Key to write.
+        /// - `value` — `boolean`: Value to store.
         methods.add_method("setBool", |_, this, (key, value): (String, bool)| {
             this.inner.borrow_mut().set_bool(&key, value);
             Ok(())
@@ -537,11 +533,11 @@ impl LuaUserData for LuaBlackboard {
             },
         );
 
-        /// Sets the string.
+        /// Stores a string value under `key` on this blackboard.
         ///
         /// # Parameters
-        /// - `key` — `string`.
-        /// - `value` — `string`.
+        /// - `key` — `string`: Key to write.
+        /// - `value` — `string`: Value to store.
         methods.add_method("setString", |_, this, (key, value): (String, String)| {
             this.inner.borrow_mut().set_string(&key, &value);
             Ok(())
@@ -555,10 +551,10 @@ impl LuaUserData for LuaBlackboard {
             },
         );
 
-        /// Returns `true` if the condition is met.
+        /// Returns `true` if a value is stored under `key` in this blackboard.
         ///
         /// # Parameters
-        /// - `key` — `string`.
+        /// - `key` — `string`: Key to check.
         ///
         /// # Returns
         /// `boolean`.
@@ -566,19 +562,16 @@ impl LuaUserData for LuaBlackboard {
             Ok(this.inner.borrow().has(&key))
         });
 
-        /// Removes the entry from the collection.
+        /// Deletes the entry at `key` from this blackboard (no-op if absent).
         ///
         /// # Parameters
-        /// - `key` — `string`.
+        /// - `key` — `string`: Key to delete.
         methods.add_method("remove", |_, this, key: String| {
             this.inner.borrow_mut().remove(&key);
             Ok(())
         });
 
-        /// Removes all entries.
-        ///
-        /// # Returns
-        /// The result.
+        /// Removes all entries from this blackboard.
         methods.add_method("clear", |_, this, ()| {
             this.inner.borrow_mut().clear();
             Ok(())
@@ -609,11 +602,10 @@ impl LuaUserData for LuaStateMachine {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
         add_type_methods::<Self>(methods);
 
-        /// Adds state to the collection.
+        /// Registers a new named state in this FSM.
         ///
         /// # Parameters
-        /// - `name` — `string`.
-        /// - `opts` — `table`.
+        /// - `name` — `string`: Unique name for the state.
         methods.add_method("addState", |lua, this, (name, opts): (String, LuaTable)| {
             let on_enter: Option<LuaFunction> = opts.get("onEnter").ok();
             let on_update: Option<LuaFunction> = opts.get("onUpdate").ok();
@@ -703,10 +695,10 @@ impl LuaUserData for LuaBehaviorTree {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
         add_type_methods::<Self>(methods);
 
-        /// Sets the root.
+        /// Sets the top-level root node of this behavior tree.
         ///
         /// # Parameters
-        /// - `node_ud` — `userdata`.
+        /// - `node` — `BTNode`: Root `BTNode` returned by one of the node constructors.
         methods.add_method("setRoot", |_, this, node_ud: LuaAnyUserData| {
             let node = node_ud.borrow::<LuaBTNode>()?;
             let taken = std::mem::replace(
@@ -1333,10 +1325,13 @@ impl LuaUserData for LuaQLearner {
             Ok(this.inner.borrow().choose_action(s) + 1)
         });
 
-        /// Best action on this QLearner.
+        /// Returns the action with the highest Q-value for `state`.
         ///
         /// # Parameters
-        /// - `state` — `integer`.
+        /// - `state` — `string`: State to query.
+        ///
+        /// # Returns
+        /// `string` — best-known action name.
         methods.add_method("bestAction", |_, this, state: usize| {
             let s = state.saturating_sub(1);
             Ok(this.inner.borrow().best_action(s) + 1)
@@ -1697,22 +1692,19 @@ impl LuaUserData for LuaInfluenceMap {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
         add_type_methods::<Self>(methods);
 
-        /// Adds layer to the collection.
+        /// Adds a named influence layer to this map.
         ///
         /// # Parameters
-        /// - `name` — `string`.
+        /// - `name` — `string`: Layer identifier.
         methods.add_method("addLayer", |_, this, name: String| {
             this.inner.borrow_mut().add_layer(&name);
             Ok(())
         });
 
-        /// Returns `true` if layer.
+        /// Returns `true` if a layer with `name` exists in this map.
         ///
         /// # Parameters
-        /// - `layer` — `string`.
-        /// - `x` — `integer`.
-        /// - `y` — `integer`.
-        /// - `value` — `number`.
+        /// - `name` — `string`: Layer identifier to test.
         ///
         /// # Returns
         /// `boolean`.
@@ -1887,28 +1879,28 @@ impl LuaUserData for LuaSquad {
             Ok(this.inner.borrow().name.clone())
         });
 
-        /// Adds member to the collection.
+        /// Adds an agent identified by `name` to this squad.
         ///
         /// # Parameters
-        /// - `name` — `string`.
+        /// - `name` — `string`: Name of the agent to enlist.
         methods.add_method("addMember", |_, this, name: String| {
             this.inner.borrow_mut().members.push(name);
             Ok(())
         });
 
-        /// Removes member from the collection.
+        /// Removes the agent identified by `name` from this squad.
         ///
         /// # Parameters
-        /// - `name` — `string`.
+        /// - `name` — `string`: Name of the agent to remove.
         methods.add_method("removeMember", |_, this, name: String| {
             this.inner.borrow_mut().members.retain(|m| m != &name);
             Ok(())
         });
 
-        /// Returns the member count.
+        /// Returns the number of agents currently in this squad.
         ///
         /// # Returns
-        /// The current member count.
+        /// `integer` — member count.
         methods.add_method("getMemberCount", |_, this, ()| {
             Ok(this.inner.borrow().members.len())
         });
@@ -2067,10 +2059,7 @@ impl LuaUserData for LuaCommandQueue {
             Ok(this.inner.borrow_mut().cancel_current())
         });
 
-        /// Removes all entries.
-        ///
-        /// # Returns
-        /// The result.
+        /// Discards all queued commands.
         methods.add_method("clear", |_, this, ()| {
             this.inner.borrow_mut().clear();
             Ok(())
@@ -2082,7 +2071,7 @@ impl LuaUserData for LuaCommandQueue {
         /// The current count.
         methods.add_method("getCount", |_, this, ()| Ok(this.inner.borrow().count()));
 
-        /// Returns `true` if empty.
+        /// Returns `true` if there are no commands queued.
         ///
         /// # Returns
         /// `boolean`.

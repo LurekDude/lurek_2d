@@ -23,176 +23,132 @@ impl LuaUserData for LuaRecipe {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
         add_type_methods(methods);
 
-        /// Returns the id.
-        ///
-        /// # Parameters
-        /// - `v` — `string`.
+        /// Returns the unique string identifier of this recipe.
         ///
         /// # Returns
-        /// The current id.
+        /// `string` — recipe ID.
         methods.add_method("getId", |_, this, ()| Ok(this.0.borrow().id.clone()));
-        /// Returns the name.
-        ///
-        /// # Parameters
-        /// - `v` — `string`.
+        /// Returns the human-readable display name of this recipe.
         ///
         /// # Returns
-        /// The current name.
+        /// `string`.
         methods.add_method("getName", |_, this, ()| Ok(this.0.borrow().name.clone()));
-        /// Sets the name.
+        /// Sets the display name of this recipe.
         ///
         /// # Parameters
-        /// - `v` — `string`.
+        /// - `name` — `string`: New display name.
         methods.add_method("setName", |_, this, v: String| { this.0.borrow_mut().name = v; Ok(()) });
-        /// Returns the type.
-        ///
-        /// # Parameters
-        /// - `v` — `number`.
+        /// Returns the recipe type tag (e.g. `'smelt'`, `'craft'`).
         ///
         /// # Returns
-        /// The current type.
+        /// `string` — recipe type.
         methods.add_method("getType", |_, this, ()| Ok(this.0.borrow().recipe_type.clone()));
-        /// Returns the time.
-        ///
-        /// # Parameters
-        /// - `name` — `string`.
-        /// - `level` — `integer` optional.
+        /// Returns the base crafting duration in seconds.
         ///
         /// # Returns
-        /// The current time.
+        /// `number` — duration in seconds.
         methods.add_method("getTime", |_, this, ()| Ok(this.0.borrow().time));
-        /// Sets the time.
+        /// Sets the base crafting duration in seconds.
         ///
         /// # Parameters
-        /// - `name` — `string`.
-        /// - `level` — `integer` optional.
+        /// - `time` — `number`: New duration in seconds.
         methods.add_method("setTime", |_, this, v: f64| { this.0.borrow_mut().time = v; Ok(()) });
-        /// Returns the station level.
-        ///
-        /// # Parameters
-        /// - `name` — `string`.
-        /// - `level` — `integer` optional.
+        /// Returns the minimum station level required to craft this recipe.
         ///
         /// # Returns
-        /// The current station level.
+        /// `integer` — required station level.
         methods.add_method("getStationLevel", |_, this, ()| Ok(this.0.borrow().station_level));
-        /// Sets the station level.
+        /// Sets the minimum station level required to craft this recipe.
         ///
         /// # Parameters
-        /// - `name` — `string`.
-        /// - `level` — `integer` optional.
+        /// - `level` — `integer`: Minimum station level.
         methods.add_method("setStationLevel", |_, this, v: u32| { this.0.borrow_mut().station_level = v; Ok(()) });
-        /// Returns the station type.
-        ///
-        /// # Parameters
-        /// - `name` — `string`.
-        /// - `level` — `integer` optional.
+        /// Returns the station type string required to craft this recipe.
         ///
         /// # Returns
-        /// The current station type.
+        /// `string` — station type.
         methods.add_method("getStationType", |_, this, ()| Ok(this.0.borrow().station_type.clone()));
-        /// Sets the station type.
+        /// Sets which station type is required for this recipe.
         ///
         /// # Parameters
-        /// - `name` — `string`.
-        /// - `level` — `integer` optional.
+        /// - `type` — `string`: Station type identifier.
         methods.add_method("setStationType", |_, this, v: String| { this.0.borrow_mut().station_type = v; Ok(()) });
-        /// Returns the skill.
-        ///
-        /// # Parameters
-        /// - `name` — `string`.
-        /// - `level` — `integer` optional.
+        /// Returns the skill name gated on this recipe, or an empty string if none.
         ///
         /// # Returns
-        /// The current skill.
+        /// `string` — required skill name, or `''`.
         methods.add_method("getSkill", |_, this, ()| Ok(this.0.borrow().skill.clone()));
-        /// Sets the skill.
+        /// Sets the skill required to unlock and use this recipe.
         ///
         /// # Parameters
-        /// - `name` — `string`.
-        /// - `level` — `integer` optional.
+        /// - `skill` — `string`: Skill name.
         methods.add_method("setSkill", |_, this, (name, level): (String, Option<u32>)| {
             let mut b = this.0.borrow_mut();
             b.skill = name;
             b.skill_level = level.unwrap_or(0);
             Ok(())
         });
-        /// Returns the skill xp.
-        ///
-        /// # Parameters
-        /// - `v` — `number`.
+        /// Returns the XP awarded to the required skill when this recipe is completed.
         ///
         /// # Returns
-        /// The current skill xp.
+        /// `number` — XP awarded.
         methods.add_method("getSkillXp", |_, this, ()| Ok(this.0.borrow().skill_xp));
-        /// Sets the skill xp.
+        /// Sets the skill XP awarded on completion.
         ///
         /// # Parameters
-        /// - `v` — `number`.
+        /// - `xp` — `number`: XP amount.
         methods.add_method("setSkillXp", |_, this, v: f64| { this.0.borrow_mut().skill_xp = v; Ok(()) });
-        /// Returns the description.
-        ///
-        /// # Parameters
-        /// - `v` — `string`.
+        /// Returns the lore/description text for this recipe.
         ///
         /// # Returns
-        /// The current description.
+        /// `string`.
         methods.add_method("getDescription", |_, this, ()| Ok(this.0.borrow().description.clone()));
-        /// Sets the description.
+        /// Sets the description text shown in crafting UI.
         ///
         /// # Parameters
-        /// - `v` — `string`.
+        /// - `desc` — `string`: Description string.
         methods.add_method("setDescription", |_, this, v: String| { this.0.borrow_mut().description = v; Ok(()) });
-        /// Returns `true` if enabled.
-        ///
-        /// # Parameters
-        /// - `v` — `boolean`.
+        /// Returns `true` if this recipe is currently craftable (not disabled).
         ///
         /// # Returns
         /// `boolean`.
         methods.add_method("isEnabled", |_, this, ()| Ok(this.0.borrow().enabled));
-        /// Sets the enabled.
+        /// Enables or disables this recipe. Disabled recipes cannot be enqueued.
         ///
         /// # Parameters
-        /// - `v` — `boolean`.
+        /// - `enabled` — `boolean`: `true` to enable.
         methods.add_method("setEnabled", |_, this, v: bool| { this.0.borrow_mut().enabled = v; Ok(()) });
-        /// Returns `true` if tag.
+        /// Returns `true` if this recipe carries the given tag.
         ///
         /// # Parameters
-        /// - `tag` — `string`.
+        /// - `tag` — `string`: Tag to test.
         ///
         /// # Returns
         /// `boolean`.
         methods.add_method("hasTag", |_, this, tag: String| Ok(this.0.borrow().has_tag(&tag)));
-        /// Adds tag to the collection.
+        /// Attaches a string tag to this recipe.
         ///
         /// # Parameters
-        /// - `tag` — `string`.
+        /// - `tag` — `string`: Tag to add.
         methods.add_method("addTag", |_, this, tag: String| {
             this.0.borrow_mut().tags.push(tag); Ok(())
         });
 
-        /// Returns the tags.
-        ///
-        /// # Parameters
-        /// - `item_type` — `string`.
-        /// - `qty` — `integer`.
-        /// - `consumed` — `boolean` optional.
+        /// Returns a list of all tags attached to this recipe.
         ///
         /// # Returns
-        /// The current tags.
+        /// `table` of `string` tags.
         methods.add_method("getTags", |lua, this, ()| {
             let tags = this.0.borrow().get_tags().to_vec();
             let t = lua.create_table()?;
             for (i, tag) in tags.into_iter().enumerate() { t.set(i + 1, tag)?; }
             Ok(t)
         });
-        /// Adds ingredient to the collection.
+        /// Adds an ingredient requirement to this recipe.
         ///
         /// # Parameters
-        /// - `item_type` — `string`.
-        /// - `qty` — `integer`.
-        /// - `consumed` — `boolean` optional.
+        /// - `id` — `string`: Item ID of the ingredient.
+        /// - `count` — `integer`: Number of units required.
         methods.add_method("addIngredient", |_, this, (item_type, qty, consumed): (String, u32, Option<bool>)| {
             let mut ing = Ingredient::new(item_type, qty);
             ing.consumed = consumed.unwrap_or(true);
@@ -200,12 +156,11 @@ impl LuaUserData for LuaRecipe {
             Ok(())
         });
 
-        /// Adds output to the collection.
+        /// Adds an output item produced when this recipe is completed.
         ///
         /// # Parameters
-        /// - `item_type` — `string`.
-        /// - `qty` — `integer`.
-        /// - `quality` — `string` optional.
+        /// - `id` — `string`: Item ID of the output.
+        /// - `count` — `integer`: Number of units produced.
         methods.add_method("addOutput", |_, this, (item_type, qty, quality): (String, u32, Option<String>)| {
             let mut out = RecipeOutput::new(item_type, qty);
             if let Some(q) = quality { out.quality = Quality::from_str(&q).unwrap_or(Quality::Normal); }
@@ -213,10 +168,10 @@ impl LuaUserData for LuaRecipe {
             Ok(())
         });
 
-        /// Returns the ingredients.
+        /// Returns a list of all ingredient requirements as `{id, count}` tables.
         ///
         /// # Returns
-        /// The current ingredients.
+        /// `table` of `{id: string, count: integer}` tables.
         methods.add_method("getIngredients", |lua, this, ()| {
             let borrow = this.0.borrow();
             let t = lua.create_table()?;
@@ -242,10 +197,10 @@ impl LuaUserData for LuaRecipe {
             Ok(t)
         });
 
-        /// Returns the outputs.
+        /// Returns a list of all output items as `{id, count}` tables.
         ///
         /// # Returns
-        /// The current outputs.
+        /// `table` of `{id: string, count: integer}` tables.
         methods.add_method("getOutputs", |lua, this, ()| {
             let borrow = this.0.borrow();
             let t = lua.create_table()?;
@@ -289,59 +244,56 @@ impl LuaUserData for LuaRecipeRegistry {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
         add_type_methods(methods);
 
-        /// Adds an entry to the collection.
+        /// Registers a recipe in this registry. Raises an error if a recipe with the same ID already exists.
         ///
         /// # Parameters
-        /// - `recipe` — `userdata`.
+        /// - `recipe` — `Recipe`: Recipe object to register.
         methods.add_method("add", |_, this, recipe: LuaAnyUserData| {
             let r = recipe.borrow::<LuaRecipe>()?.0.borrow().clone();
             this.0.borrow_mut().add(r);
             Ok(())
         });
-        /// Returns the current value.
+        /// Returns the registered recipe with the given ID, or `nil` if none exists.
         ///
         /// # Parameters
-        /// - `id` — `string`.
+        /// - `id` — `string`: Recipe ID to look up.
         ///
         /// # Returns
-        /// The current get.
+        /// `Recipe` or `nil`.
         methods.add_method("get", |_, this, id: String| {
             let borrow = this.0.borrow();
             let r = borrow.get(&id).cloned();
             drop(borrow);
             Ok(r.map(|r| LuaRecipe(Rc::new(RefCell::new(r)))))
         });
-        /// Removes the entry from the collection.
+        /// Removes the recipe with the given ID from this registry.
         ///
         /// # Parameters
-        /// - `id` — `string`.
+        /// - `id` — `string`: Recipe ID to remove.
         methods.add_method("remove", |_, this, id: String| {
             Ok(this.0.borrow_mut().remove(&id))
         });
-        /// Returns the number of items.
-        ///
-        /// # Parameters
-        /// - `item_type` — `string`.
+        /// Returns the total number of registered recipes.
         ///
         /// # Returns
         /// `integer`.
         methods.add_method("count", |_, this, ()| Ok(this.0.borrow().count()));
-        /// Returns the ids.
-        ///
-        /// # Parameters
-        /// - `item_type` — `string`.
+        /// Returns a list of all registered recipe IDs.
         ///
         /// # Returns
-        /// The current ids.
+        /// `table` of `string` IDs.
         methods.add_method("getIds", |lua, this, ()| {
             let borrow = this.0.borrow();
             let t = lua.create_sequence_from(borrow.ids().iter().cloned())?;
             Ok(t)
         });
-        /// Find by output on this RecipeRegistry.
+        /// Returns all recipes that produce an item with the given ID.
         ///
         /// # Parameters
-        /// - `item_type` — `string`.
+        /// - `item_id` — `string`: Output item ID to search for.
+        ///
+        /// # Returns
+        /// `table` of `Recipe` objects.
         methods.add_method("findByOutput", |lua, this, item_type: String| {
             let borrow = this.0.borrow();
             let ids: Vec<String> = borrow.find_by_output(&item_type).iter().map(|s| s.to_string()).collect();
@@ -349,10 +301,13 @@ impl LuaUserData for LuaRecipeRegistry {
             let t = lua.create_sequence_from(ids.into_iter())?;
             Ok(t)
         });
-        /// Find by ingredient on this RecipeRegistry.
+        /// Returns all recipes that consume an item with the given ID as an ingredient.
         ///
         /// # Parameters
-        /// - `item_type` — `string`.
+        /// - `item_id` — `string`: Ingredient item ID to search for.
+        ///
+        /// # Returns
+        /// `table` of `Recipe` objects.
         methods.add_method("findByIngredient", |lua, this, item_type: String| {
             let borrow = this.0.borrow();
             let ids: Vec<String> = borrow.find_by_ingredient(&item_type).iter().map(|s| s.to_string()).collect();
@@ -360,20 +315,26 @@ impl LuaUserData for LuaRecipeRegistry {
             let t = lua.create_sequence_from(ids.into_iter())?;
             Ok(t)
         });
-        /// Find by tag on this RecipeRegistry.
+        /// Returns all recipes that carry the given tag.
         ///
         /// # Parameters
-        /// - `tag` — `string`.
+        /// - `tag` — `string`: Tag string to match.
+        ///
+        /// # Returns
+        /// `table` of `Recipe` objects.
         methods.add_method("findByTag", |lua, this, tag: String| {
             let ids = this.0.borrow().find_by_tag(&tag).iter().map(|s| s.to_string()).collect::<Vec<_>>();
             let t = lua.create_table()?;
             for (i, id) in ids.into_iter().enumerate() { t.set(i + 1, id)?; }
             Ok(t)
         });
-        /// For station on this RecipeRegistry.
+        /// Returns all recipes that require the given station type.
         ///
         /// # Parameters
-        /// - `station_type` — `string`.
+        /// - `station_type` — `string`: Station type identifier.
+        ///
+        /// # Returns
+        /// `table` of `Recipe` objects.
         methods.add_method("forStation", |lua, this, station_type: String| {
             let borrow = this.0.borrow();
             let ids: Vec<String> = borrow.for_station(&station_type).iter().map(|s| s.to_string()).collect();
@@ -400,70 +361,55 @@ impl LuaUserData for LuaStation {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
         add_type_methods(methods);
 
-        /// Returns the type.
-        ///
-        /// # Parameters
-        /// - `v` — `integer`.
+        /// Returns the station type identifier string.
         ///
         /// # Returns
-        /// The current type.
+        /// `string`.
         methods.add_method("getType", |_, this, ()| Ok(this.0.borrow().station_type.clone()));
-        /// Returns the level.
-        ///
-        /// # Parameters
-        /// - `v` — `integer`.
+        /// Returns the current upgrade level of this station.
         ///
         /// # Returns
-        /// The current level.
+        /// `integer` — level.
         methods.add_method("getLevel", |_, this, ()| Ok(this.0.borrow().level));
-        /// Sets the level.
+        /// Sets the station's upgrade level, affecting which recipes it can process.
         ///
         /// # Parameters
-        /// - `v` — `integer`.
+        /// - `level` — `integer`: New station level.
         methods.add_method("setLevel", |_, this, v: u32| { this.0.borrow_mut().level = v; Ok(()) });
-        /// Returns the name.
-        ///
-        /// # Parameters
-        /// - `v` — `string`.
+        /// Returns the display name of this station.
         ///
         /// # Returns
-        /// The current name.
+        /// `string`.
         methods.add_method("getName", |_, this, ()| Ok(this.0.borrow().name.clone()));
-        /// Sets the name.
+        /// Sets the display name of this station.
         ///
         /// # Parameters
-        /// - `v` — `string`.
+        /// - `name` — `string`: New display name.
         methods.add_method("setName", |_, this, v: String| { this.0.borrow_mut().name = v; Ok(()) });
-        /// Returns the speed multiplier.
-        ///
-        /// # Parameters
-        /// - `v` — `number`.
+        /// Returns the crafting speed multiplier. `1.0` is normal speed.
         ///
         /// # Returns
-        /// The current speed multiplier.
+        /// `number`.
         methods.add_method("getSpeedMultiplier", |_, this, ()| Ok(this.0.borrow().speed_multiplier));
-        /// Sets the speed multiplier.
+        /// Sets the crafting speed multiplier. Values above `1.0` reduce effective recipe time.
         ///
         /// # Parameters
-        /// - `v` — `number`.
+        /// - `mult` — `number`: Speed multiplier (e.g. `2.0` for double speed).
         methods.add_method("setSpeedMultiplier", |_, this, v: f64| { this.0.borrow_mut().speed_multiplier = v; Ok(()) });
-        /// Returns `true` if active.
-        ///
-        /// # Parameters
-        /// - `v` — `boolean`.
+        /// Returns `true` if this station is operational and can process recipes.
         ///
         /// # Returns
         /// `boolean`.
         methods.add_method("isActive", |_, this, ()| Ok(this.0.borrow().active));
-        /// Sets the active.
+        /// Enables or disables this station.
         ///
         /// # Parameters
-        /// - `v` — `boolean`.
+        /// - `active` — `boolean`: `true` to enable.
         methods.add_method("setActive", |_, this, v: bool| { this.0.borrow_mut().active = v; Ok(()) });
-        /// Returns `true` if process.
+        /// Returns `true` if this station can currently process the given recipe (level and type match).
         ///
         /// # Parameters
-        /// - `recipe` — `userdata`.
+        /// - `recipe` — `Recipe`: Recipe to check against this station's type and level.
         ///
         /// # Returns
         /// `boolean`.
@@ -472,10 +418,13 @@ impl LuaUserData for LuaStation {
             let recipe_inner = rb.0.borrow();
             Ok(this.0.borrow().can_process(&recipe_inner))
         });
-        /// Effective time on this Station.
+        /// Returns the effective crafting time for `recipe` after applying this station's speed multiplier.
         ///
         /// # Parameters
-        /// - `recipe` — `userdata`.
+        /// - `recipe` — `Recipe`: The recipe to evaluate.
+        ///
+        /// # Returns
+        /// `number` — effective time in seconds.
         methods.add_method("effectiveTime", |_, this, recipe: LuaAnyUserData| {
             let rb = recipe.borrow::<LuaRecipe>()?;
             let recipe_inner = rb.0.borrow();
@@ -500,55 +449,43 @@ impl LuaUserData for LuaCraftSkill {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
         add_type_methods(methods);
 
-        /// Returns the name.
-        ///
-        /// # Parameters
-        /// - `level` — `integer`.
+        /// Returns the skill's name identifier.
         ///
         /// # Returns
-        /// The current name.
+        /// `string`.
         methods.add_method("getName", |_, this, ()| Ok(this.0.borrow().name.clone()));
-        /// Returns the xp.
-        ///
-        /// # Parameters
-        /// - `level` — `integer`.
+        /// Returns the total accumulated XP for this skill.
         ///
         /// # Returns
-        /// The current xp.
+        /// `number` — total XP.
         methods.add_method("getXp", |_, this, ()| Ok(this.0.borrow().xp));
-        /// Returns the level.
-        ///
-        /// # Parameters
-        /// - `level` — `integer`.
+        /// Returns the current level derived from total XP.
         ///
         /// # Returns
-        /// The current level.
+        /// `integer` — current level.
         methods.add_method("getLevel", |_, this, ()| Ok(this.0.borrow().level));
-        /// Returns the xp to next.
-        ///
-        /// # Parameters
-        /// - `level` — `integer`.
+        /// Returns the XP required to reach the next level.
         ///
         /// # Returns
-        /// The current xp to next.
+        /// `number` — XP needed.
         methods.add_method("getXpToNext", |_, this, ()| Ok(this.0.borrow().get_xp_to_next()));
-        /// Sets the level.
+        /// Sets the skill directly to the given level, adjusting XP accordingly.
         ///
         /// # Parameters
-        /// - `level` — `integer`.
+        /// - `level` — `integer`: Target level.
         methods.add_method("setLevel", |_, this, level: u32| {
             this.0.borrow_mut().set_level(level);
             Ok(())
         });
-        /// Adds xp to the collection.
+        /// Adds `xp` to this skill's total, potentially triggering level-ups.
         ///
         /// # Parameters
-        /// - `amount` — `number`.
+        /// - `xp` — `number`: XP to add.
         methods.add_method("addXp", |_, this, amount: f64| Ok(this.0.borrow_mut().add_xp(amount)));
-        /// Returns `true` if use.
+        /// Returns `true` if this skill's level meets the minimum required to use the given recipe.
         ///
         /// # Parameters
-        /// - `recipe` — `userdata`.
+        /// - `recipe` — `Recipe`: Recipe to check skill requirement against.
         ///
         /// # Returns
         /// `boolean`.

@@ -31,7 +31,7 @@ impl LuaUserData for LuaSource {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
         add_type_methods::<Self>(methods);
 
-        /// Plays the audio source from the beginning.
+        /// Starts or resumes playback from the current seek position.
         methods.add_method("play", |_, this, ()| {
             let mut st = this.state.borrow_mut();
             let key = ensure_source_exists(&st.mixer, this.key, "Source:play")?;
@@ -40,7 +40,7 @@ impl LuaUserData for LuaSource {
             Ok(())
         });
 
-        /// Stops playback of the audio source.
+        /// Stops playback and resets the seek position to the beginning.
         methods.add_method("stop", |_, this, ()| {
             let mut st = this.state.borrow_mut();
             let key = ensure_source_exists(&st.mixer, this.key, "Source:stop")?;
@@ -48,7 +48,7 @@ impl LuaUserData for LuaSource {
             Ok(())
         });
 
-        /// Pauses the audio source at its current position.
+        /// Pauses playback. Call `play()` to resume.
         methods.add_method("pause", |_, this, ()| {
             let mut st = this.state.borrow_mut();
             let key = ensure_source_exists(&st.mixer, this.key, "Source:pause")?;
@@ -64,7 +64,10 @@ impl LuaUserData for LuaSource {
             Ok(())
         });
 
-        /// Sets the playback volume (0.0 - 1.0) of the source.
+        /// Sets playback volume. `1.0` is full volume; `0.0` is silent.
+        ///
+        /// # Parameters
+        /// - `volume` — `number`: Volume multiplier (0–1).
         methods.add_method("setVolume", |_, this, vol: f32| {
             let mut st = this.state.borrow_mut();
             let key = ensure_source_exists(&st.mixer, this.key, "Source:setVolume")?;
@@ -72,14 +75,20 @@ impl LuaUserData for LuaSource {
             Ok(())
         });
 
-        /// Returns the current volume of the audio source.
+        /// Returns the current volume multiplier.
+        ///
+        /// # Returns
+        /// `number` — volume (0–1).
         methods.add_method("getVolume", |_, this, ()| {
             let st = this.state.borrow();
             let key = ensure_source_exists(&st.mixer, this.key, "Source:getVolume")?;
             Ok(st.mixer.get_volume(key))
         });
 
-        /// Sets the pitch (playback speed) multiplier of the source.
+        /// Sets the playback pitch multiplier. `1.0` is normal pitch; `2.0` doubles frequency.
+        ///
+        /// # Parameters
+        /// - `pitch` — `number`: Pitch multiplier.
         methods.add_method("setPitch", |_, this, pitch: f32| {
             let mut st = this.state.borrow_mut();
             let key = ensure_source_exists(&st.mixer, this.key, "Source:setPitch")?;
@@ -87,14 +96,20 @@ impl LuaUserData for LuaSource {
             Ok(())
         });
 
-        /// Returns the current pitch multiplier of the source.
+        /// Returns the current pitch multiplier.
+        ///
+        /// # Returns
+        /// `number` — pitch multiplier.
         methods.add_method("getPitch", |_, this, ()| {
             let st = this.state.borrow();
             let key = ensure_source_exists(&st.mixer, this.key, "Source:getPitch")?;
             Ok(st.mixer.get_pitch(key))
         });
 
-        /// Enables or disables looping playback for the source.
+        /// Enables or disables looping. When enabled, the source restarts automatically when it reaches the end.
+        ///
+        /// # Parameters
+        /// - `loop` — `boolean`: `true` to enable looping.
         methods.add_method("setLooping", |_, this, looping: bool| {
             let mut st = this.state.borrow_mut();
             let key = ensure_source_exists(&st.mixer, this.key, "Source:setLooping")?;
@@ -102,28 +117,40 @@ impl LuaUserData for LuaSource {
             Ok(())
         });
 
-        /// Returns whether the audio source is set to loop.
+        /// Returns `true` if this source is set to loop.
+        ///
+        /// # Returns
+        /// `boolean`.
         methods.add_method("isLooping", |_, this, ()| {
             let st = this.state.borrow();
             let key = ensure_source_exists(&st.mixer, this.key, "Source:isLooping")?;
             Ok(st.mixer.is_looping(key))
         });
 
-        /// Returns whether the audio source is currently playing.
+        /// Returns `true` if this source is currently playing.
+        ///
+        /// # Returns
+        /// `boolean`.
         methods.add_method("isPlaying", |_, this, ()| {
             let st = this.state.borrow();
             let key = ensure_source_exists(&st.mixer, this.key, "Source:isPlaying")?;
             Ok(st.mixer.is_playing(key))
         });
 
-        /// Returns whether the audio source is currently paused.
+        /// Returns `true` if playback is currently paused.
+        ///
+        /// # Returns
+        /// `boolean`.
         methods.add_method("isPaused", |_, this, ()| {
             let st = this.state.borrow();
             let key = ensure_source_exists(&st.mixer, this.key, "Source:isPaused")?;
             Ok(st.mixer.is_paused(key))
         });
 
-        /// Returns whether the audio source is stopped.
+        /// Returns `true` if playback has stopped (either manually or after the audio ended).
+        ///
+        /// # Returns
+        /// `boolean`.
         methods.add_method("isStopped", |_, this, ()| {
             let st = this.state.borrow();
             let key = ensure_source_exists(&st.mixer, this.key, "Source:isStopped")?;
@@ -174,7 +201,10 @@ impl LuaUserData for LuaSource {
             }
         });
 
-        /// Returns the total duration of the audio source in seconds.
+        /// Returns the total duration of this audio source in seconds.
+        ///
+        /// # Returns
+        /// `number` — total duration in seconds.
         methods.add_method("getDuration", |_, this, ()| {
             let st = this.state.borrow();
             let key = ensure_source_exists(&st.mixer, this.key, "Source:getDuration")?;
@@ -182,13 +212,19 @@ impl LuaUserData for LuaSource {
         });
 
         /// Returns the current playback position in seconds.
+        ///
+        /// # Returns
+        /// `number` — current position in seconds.
         methods.add_method("tell", |_, this, ()| {
             let st = this.state.borrow();
             let key = ensure_source_exists(&st.mixer, this.key, "Source:tell")?;
             Ok(st.mixer.get_tell(key))
         });
 
-        /// Seeks to the given time position (in seconds) in the source.
+        /// Seeks playback to `offset` seconds from the start.
+        ///
+        /// # Parameters
+        /// - `offset` — `number`: Target position in seconds.
         methods.add_method("seek", |_, this, pos: f32| {
             let mut st = this.state.borrow_mut();
             let key = ensure_source_exists(&st.mixer, this.key, "Source:seek")?;

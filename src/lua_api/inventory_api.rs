@@ -908,11 +908,10 @@ impl LuaUserData for LuaInventory {
 
         // ── Subsystems ────────────────────────────────────────────────────
 
-        /// Returns `true` if item.
+        /// Returns `true` if at least one unit of `id` is in this inventory.
         ///
         /// # Parameters
-        /// - `item_type` — `string`.
-        /// - `qty` — `integer` optional.
+        /// - `id` — `string`: Item identifier to test.
         ///
         /// # Returns
         /// `boolean`.

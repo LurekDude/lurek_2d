@@ -56,11 +56,11 @@ impl LuaUserData for LuaDepthSorter {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
         add_type_methods(methods);
 
-        /// Registers a draw callback with a numeric depth for sorted rendering order.
+        /// Registers a draw callback at the given depth layer. Higher `depth` values draw in front.
         ///
         /// # Parameters
-        /// - `callback` — Function to call when this entry is flushed.
-        /// - `depth` — Numeric depth; lower values are drawn first.
+        /// - `callback` — `function`: Draw callback `function()` called when flushing this layer.
+        /// - `depth` — `number`: Depth value determining draw order (lower = drawn first).
         methods.add_method("add", |lua, this, (callback, depth): (LuaFunction, f32)| {
             let key = lua.create_registry_value(callback)?;
             let mut cbs = this.callbacks.borrow_mut();
@@ -70,11 +70,10 @@ impl LuaUserData for LuaDepthSorter {
             Ok(())
         });
 
-        /// Registers a drawable object (with a :draw() method) at the given depth.
+        /// Registers a table object with a `draw` method at the given depth.
         ///
         /// # Parameters
-        /// - `obj` — Object implementing a :draw() method.
-        /// - `depth` — Numeric depth value for sort ordering.
+        /// - `obj` — `table`: Object with a `draw()` method. Uses `obj.depth` if no explicit depth is provided.
         methods.add_method("addObject", |lua, this, obj: LuaTable| {
             let depth: f32 = obj.get::<_, f32>("depth").unwrap_or(0.0);
             let key = lua.create_registry_value(obj)?;
@@ -85,13 +84,13 @@ impl LuaUserData for LuaDepthSorter {
             Ok(())
         });
 
-        /// Sorts the queued draw entries by depth value without flushing them.
+        /// Sorts all registered callbacks and objects by their depth values (ascending).
         methods.add_method("sort", |_, this, ()| {
             this.inner.borrow_mut().sort();
             Ok(())
         });
 
-        /// Calls all queued draw callbacks in ascending depth order, then clears the queue.
+        /// Calls all registered draw callbacks and object `draw()` methods in sorted depth order, then clears the list.
         methods.add_method("flush", |lua, this, ()| {
             let entries: Vec<(usize, bool)> = {
                 let mut sorter = this.inner.borrow_mut();
@@ -124,17 +123,17 @@ impl LuaUserData for LuaDepthSorter {
             Ok(())
         });
 
-        /// Removes all registered callbacks and objects from the depth sorter queue.
+        /// Removes all registered callbacks and objects without calling them.
         methods.add_method("clear", |_, this, ()| {
             this.inner.borrow_mut().clear();
             this.callbacks.borrow_mut().clear();
             Ok(())
         });
 
-        /// Returns the number of callbacks and objects currently queued for rendering.
+        /// Returns the number of callbacks and objects currently registered.
         ///
         /// # Returns
-        /// Queue length as an integer.
+        /// `integer` — number of registered draw entries.
         methods.add_method("getCount", |_, this, ()| {
             Ok(this.inner.borrow().get_count())
         });

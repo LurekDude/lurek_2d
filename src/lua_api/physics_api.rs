@@ -41,7 +41,10 @@ impl LuaUserData for LuaWorld {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
         add_type_methods::<Self>(methods);
 
-        /// Advances the physics simulation by the given timestep in seconds.
+        /// Advances the physics simulation by `dt` seconds, resolving collisions and integrating forces.
+        ///
+        /// # Parameters
+        /// - `dt` — `number`: Elapsed simulation time in seconds.
         methods.add_method("step", |lua, this, dt: f32| {
             // Step the world
             {
@@ -119,7 +122,10 @@ impl LuaUserData for LuaWorld {
             Ok(())
         });
 
-        /// Returns the global gravity vector (gx, gy).
+        /// Returns the current world gravity vector.
+        ///
+        /// # Returns
+        /// Two numbers `gx, gy`.
         methods.add_method("getGravity", |_, this, ()| {
             let ws = this.worlds.borrow();
             if let Some(world) = ws.get(this.index) {
@@ -129,7 +135,11 @@ impl LuaUserData for LuaWorld {
             Ok((0.0f32, 0.0f32))
         });
 
-        /// Sets the global gravity vector for the world.
+        /// Sets world gravity. Default is `(0, 9.81)` (downward).
+        ///
+        /// # Parameters
+        /// - `x` — `number`: Horizontal gravity component.
+        /// - `y` — `number`: Vertical gravity component.
         methods.add_method("setGravity", |_, this, (gx, gy): (f32, f32)| {
             let mut ws = this.worlds.borrow_mut();
             if let Some(world) = ws.get_mut(this.index) {
@@ -238,10 +248,10 @@ impl LuaUserData for LuaBody {
             }
         });
 
-        /// Returns the (x, y) world-space position of the body's center of mass.
+        /// Returns the body's current world-space position.
         ///
         /// # Returns
-        /// x, y position in world units.
+        /// Two numbers `x, y` in world units.
         methods.add_method("getPosition", |_, this, ()| {
             let ws = this.worlds.borrow();
             if let Some(world) = ws.get(this.world_index) {
@@ -252,11 +262,11 @@ impl LuaUserData for LuaBody {
             Ok((0.0f32, 0.0f32))
         });
 
-        /// Teleports the body to the given (x, y) world-space coordinates.
+        /// Teleports the body to the given world-space position (bypasses collision detection).
         ///
         /// # Parameters
-        /// - `x` — Target X in world units.
-        /// - `y` — Target Y in world units.
+        /// - `x` — `number`: Target X position.
+        /// - `y` — `number`: Target Y position.
         methods.add_method("setPosition", |_, this, (x, y): (f32, f32)| {
             let mut ws = this.worlds.borrow_mut();
             if let Some(world) = ws.get_mut(this.world_index) {
@@ -294,10 +304,10 @@ impl LuaUserData for LuaBody {
             Ok(())
         });
 
-        /// Returns the current rotation angle of the body in radians.
+        /// Returns the body's current rotation angle in radians.
         ///
         /// # Returns
-        /// Rotation angle in radians.
+        /// `number` — angle in radians.
         methods.add_method("getAngle", |_, this, ()| {
             let ws = this.worlds.borrow();
             if let Some(world) = ws.get(this.world_index) {
@@ -306,10 +316,10 @@ impl LuaUserData for LuaBody {
             Ok(0.0f32)
         });
 
-        /// Sets the body's rotation to the given angle in radians.
+        /// Sets the body's rotation to `angle` radians (bypasses physics).
         ///
         /// # Parameters
-        /// - `angle` — Rotation angle in radians.
+        /// - `angle` — `number`: Target angle in radians.
         methods.add_method("setAngle", |_, this, angle: f32| {
             let mut ws = this.worlds.borrow_mut();
             if let Some(world) = ws.get_mut(this.world_index) {
@@ -346,7 +356,11 @@ impl LuaUserData for LuaBody {
             Ok(())
         });
 
-        /// Applies a force vector to a body at its center of mass.
+        /// Applies a continuous force (accumulates until the next physics step) to the body's centre of mass.
+        ///
+        /// # Parameters
+        /// - `fx` — `number`: Horizontal force component.
+        /// - `fy` — `number`: Vertical force component.
         methods.add_method("applyForce", |_, this, (fx, fy): (f32, f32)| {
             let mut ws = this.worlds.borrow_mut();
             if let Some(world) = ws.get_mut(this.world_index) {
@@ -355,7 +369,11 @@ impl LuaUserData for LuaBody {
             Ok(())
         });
 
-        /// Applies an instantaneous impulse to a body.
+        /// Applies an instantaneous impulse directly to the body's centre of mass.
+        ///
+        /// # Parameters
+        /// - `ix` — `number`: Horizontal impulse.
+        /// - `iy` — `number`: Vertical impulse.
         methods.add_method("applyImpulse", |_, this, (ix, iy): (f32, f32)| {
             let mut ws = this.worlds.borrow_mut();
             if let Some(world) = ws.get_mut(this.world_index) {

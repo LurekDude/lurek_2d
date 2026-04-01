@@ -86,7 +86,7 @@ These functions are called by the engine automatically:
 
 Applies the given Transform object to the current transform stack.
 
-*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L1442)*
+*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L1469)*
 
 ---
 
@@ -106,7 +106,7 @@ Draws a filled or outlined arc segment centered at (x, y) with the given radius.
 Draws an arc.
 Lua API: luna.graphics.arc(mode, x, y, radius, angle1, angle2, segments?)
 
-*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L1569)*
+*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L1596)*
 
 ---
 
@@ -124,7 +124,7 @@ Draws a filled or outlined circle centered at (x, y) with the given radius.
 Draws a circle.
 Lua API: luna.graphics.circle(mode, x, y, r)
 
-*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L793)*
+*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L820)*
 
 ---
 
@@ -136,7 +136,7 @@ Lua API: luna.graphics.clear(r?, g?, b?)
 
 **Parameters:** `r`, `g`, `b`
 
-*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L1145)*
+*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L1172)*
 
 ---
 
@@ -148,7 +148,7 @@ Lua API: luna.graphics.draw(image_id, x, y)
 
 **Parameters:** `id_val`, `x`, `y`
 
-*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L979)*
+*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L1006)*
 
 ---
 
@@ -164,7 +164,7 @@ Draws all sprites in a SpriteBatch using a single efficient GPU draw call.
 Luna graphics API function.
 Lua API: luna.graphics.drawBatch(batch_id)
 
-*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L2236)*
+*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L2263)*
 
 ---
 
@@ -172,7 +172,7 @@ Lua API: luna.graphics.drawBatch(batch_id)
 
 Draws an off-screen canvas to the current render target.
 
-*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L1759)*
+*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L1786)*
 
 ---
 
@@ -182,7 +182,7 @@ Draws an image with a full affine transform.
 
 Lua API: luna.graphics.drawEx(image_id, x, y, r?, sx?, sy?, ox?, oy?)
 
-*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L1655)*
+*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L1682)*
 
 ---
 
@@ -196,7 +196,7 @@ Draws the given custom Mesh geometry with the current transform and color.
 - `x` — Optional X position offset in pixels.
 - `y` — Optional Y position offset in pixels.
 
-*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L3184)*
+*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L3211)*
 
 ---
 
@@ -212,7 +212,7 @@ Draws a nine-slice image stretched to fill the given rectangle.
 - `w` — Destination width.
 - `h` — Destination height.
 
-*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L3535)*
+*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L3562)*
 
 ---
 
@@ -222,7 +222,7 @@ Draws a quad region of an image with an affine transform.
 
 Lua API: luna.graphics.drawQuad(image_id, quad, x, y, r?, sx?, sy?, ox?, oy?)
 
-*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L1706)*
+*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L1733)*
 
 ---
 
@@ -241,7 +241,7 @@ Draws a filled or outlined ellipse centered at (x, y) with given horizontal and 
 Draws an ellipse.
 Lua API: luna.graphics.ellipse(mode, x, y, rx, ry)
 
-*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L828)*
+*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L855)*
 
 ---
 
@@ -251,7 +251,7 @@ Returns the current background color.
 
 Lua API: luna.graphics.getBackgroundColor()
 
-*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L692)*
+*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L719)*
 
 ---
 
@@ -263,7 +263,7 @@ Returns the name of the currently active blend mode.
 Luna graphics API function.
 Lua API: luna.graphics.getBlendMode()
 
-*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L2301)*
+*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L2328)*
 
 ---
 
@@ -275,7 +275,7 @@ Returns the current world-space camera translate offset (cx, cy).
 Luna graphics API function.
 Lua API: luna.graphics.getCameraPosition()
 
-*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L2366)*
+*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L2393)*
 
 ---
 
@@ -287,7 +287,7 @@ Returns the current camera rotation angle in radians.
 Luna graphics API function.
 Lua API: luna.graphics.getCameraRotation()
 
-*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L2409)*
+*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L2436)*
 
 ---
 
@@ -299,7 +299,7 @@ Returns the current camera zoom (scale) factor applied to the world.
 Luna graphics API function.
 Lua API: luna.graphics.getCameraZoom()
 
-*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L2389)*
+*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L2416)*
 
 ---
 
@@ -307,7 +307,7 @@ Lua API: luna.graphics.getCameraZoom()
 
 Returns the ID of the currently active render canvas, or nil.
 
-*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L1491)*
+*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L1518)*
 
 ---
 
@@ -317,7 +317,7 @@ Returns the dimensions (w, h) of the current canvas.
 
 **Parameters:** `id_val`
 
-*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L2814)*
+*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L2841)*
 
 ---
 
@@ -327,7 +327,7 @@ Returns the current drawing color (r, g, b, a).
 
 Lua API: luna.graphics.getColor()
 
-*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L1275)*
+*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L1302)*
 
 ---
 
@@ -335,7 +335,7 @@ Lua API: luna.graphics.getColor()
 
 Returns the active color channel write mask.
 
-*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L2781)*
+*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L2808)*
 
 ---
 
@@ -343,7 +343,7 @@ Returns the active color channel write mask.
 
 Returns the default texture filter mode.
 
-*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L2845)*
+*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L2872)*
 
 ---
 
@@ -353,7 +353,7 @@ Returns the window dimensions (width, height).
 
 Lua API: luna.graphics.getDimensions()
 
-*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L1251)*
+*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L1278)*
 
 ---
 
@@ -363,7 +363,7 @@ Returns the currently active font ID.
 
 Lua API: luna.graphics.getFont()
 
-*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L1913)*
+*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L1940)*
 
 ---
 
@@ -375,7 +375,7 @@ Returns the active font's ascent — distance in pixels from baseline to the top
 
 **Returns:** Ascent value in pixels as a number.
 
-*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L1991)*
+*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L2018)*
 
 ---
 
@@ -387,7 +387,7 @@ Returns the active font's descent — distance in pixels from the baseline to th
 
 **Returns:** Descent value in pixels as a number.
 
-*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L2012)*
+*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L2039)*
 
 ---
 
@@ -399,7 +399,7 @@ Lua API: luna.graphics.getFontHeight(font_id)
 
 **Parameters:** `id_val`
 
-*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L1970)*
+*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L1997)*
 
 ---
 
@@ -411,7 +411,7 @@ Returns the line height in pixels of the currently active font.
 
 **Returns:** Line height in pixels.
 
-*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L2056)*
+*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L2083)*
 
 ---
 
@@ -423,7 +423,7 @@ Lua API: luna.graphics.getFontWidth(font_id, text)
 
 **Parameters:** `id_val`, `text`
 
-*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L1941)*
+*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L1968)*
 
 ---
 
@@ -433,7 +433,7 @@ Returns the wrap mode of the active font.
 
 **Parameters:** `text`, `limit`
 
-*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L2620)*
+*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L2647)*
 
 ---
 
@@ -443,7 +443,7 @@ Returns the window height in pixels.
 
 Lua API: luna.graphics.getHeight()
 
-*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L1232)*
+*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L1259)*
 
 ---
 
@@ -455,7 +455,7 @@ Returns the current line width in pixels used for 'line' mode drawing.
 Returns the current line width.
 Lua API: luna.graphics.getLineWidth()
 
-*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L1194)*
+*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L1221)*
 
 ---
 
@@ -469,7 +469,7 @@ Returns the texture ID currently bound to the given mesh for rendering.
 
 **Returns:** Texture ID, or nil if no texture is bound.
 
-*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L3363)*
+*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L3390)*
 
 ---
 
@@ -479,7 +479,7 @@ Returns position and UV data for a vertex in a Mesh.
 
 **Parameters:** `id`, `index`
 
-*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L3292)*
+*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L3319)*
 
 ---
 
@@ -489,7 +489,7 @@ Returns the total number of vertices in a Mesh.
 
 **Parameters:** `id`
 
-*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L3312)*
+*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L3339)*
 
 ---
 
@@ -497,7 +497,7 @@ Returns the total number of vertices in a Mesh.
 
 Returns the current point-sprite size.
 
-*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L2580)*
+*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L2607)*
 
 ---
 
@@ -505,7 +505,7 @@ Returns the current point-sprite size.
 
 Returns the active scissor rectangle (x, y, w, h), or nil.
 
-*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L2692)*
+*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L2719)*
 
 ---
 
@@ -513,7 +513,7 @@ Returns the active scissor rectangle (x, y, w, h), or nil.
 
 Returns the currently active Shader ID, or nil.
 
-*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L3016)*
+*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L3043)*
 
 ---
 
@@ -521,7 +521,7 @@ Returns the currently active Shader ID, or nil.
 
 Returns the current depth of the transform stack.
 
-*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L1461)*
+*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L1488)*
 
 ---
 
@@ -529,7 +529,7 @@ Returns the current depth of the transform stack.
 
 Returns a table of renderer statistics (draw calls, triangles, etc.).
 
-*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L2862)*
+*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L2889)*
 
 ---
 
@@ -539,7 +539,7 @@ Returns the window width in pixels.
 
 Lua API: luna.graphics.getWidth()
 
-*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L1213)*
+*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L1240)*
 
 ---
 
@@ -549,7 +549,7 @@ Returns whether the current shader has a uniform with the given name.
 
 **Parameters:** `id`, `name`
 
-*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L3091)*
+*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L3118)*
 
 ---
 
@@ -559,7 +559,7 @@ Intersects the current scissor rectangle with the given rectangle.
 
 **Parameters:** `x`, `y`, `w`, `h`
 
-*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L2711)*
+*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L2738)*
 
 ---
 
@@ -567,7 +567,7 @@ Intersects the current scissor rectangle with the given rectangle.
 
 Returns whether wireframe rendering mode is active.
 
-*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L2804)*
+*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L2831)*
 
 ---
 
@@ -584,7 +584,7 @@ Draws a straight line from (x1, y1) to (x2, y2) using the current color.
 Draws a line between two points.
 Lua API: luna.graphics.line(x1, y1, x2, y2)
 
-*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L955)*
+*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L982)*
 
 ---
 
@@ -594,7 +594,7 @@ Creates an off-screen render canvas and returns its ID.
 
 **Parameters:** `width`, `height`
 
-*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L1106)*
+*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L1133)*
 
 ---
 
@@ -606,7 +606,7 @@ Lua API: luna.graphics.newFont(path, size?)
 
 **Parameters:** `path`, `size`
 
-*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L1848)*
+*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L1875)*
 
 ---
 
@@ -618,7 +618,7 @@ Lua API: luna.graphics.newImage(path) Loads an image file or creates from ImageD
 
 **Parameters:** `arg`
 
-*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L1055)*
+*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L1082)*
 
 ---
 
@@ -628,7 +628,7 @@ Creates a custom Mesh from vertex data and returns its ID.
 
 **Parameters:** `verts`, `mode`
 
-*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L3134)*
+*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L3161)*
 
 ---
 
@@ -646,7 +646,7 @@ Creates a nine-slice definition from an image and border insets.
 
 **Returns:** A NineSlice UserData object.
 
-*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L3471)*
+*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L3498)*
 
 ---
 
@@ -658,7 +658,7 @@ Lua API: luna.graphics.newQuad(x, y, w, h, sw, sh)
 
 **Parameters:** `x`, `y`, `w`, `h`, `sw`, `sh`
 
-*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L1617)*
+*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L1644)*
 
 ---
 
@@ -668,7 +668,7 @@ Compiles a custom WGSL shader program and returns its ID.
 
 **Parameters:** `code`
 
-*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L2974)*
+*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L3001)*
 
 ---
 
@@ -685,7 +685,7 @@ Creates a new SpriteBatch for efficiently drawing many sprites sharing one textu
 Luna graphics API function.
 Lua API: luna.graphics.newSpriteBatch(image_id, max_sprites?)
 
-*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L2093)*
+*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L2120)*
 
 ---
 
@@ -693,7 +693,7 @@ Lua API: luna.graphics.newSpriteBatch(image_id, max_sprites?)
 
 Resets the transform to the identity (no translation, rotation, or scale).
 
-*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L1431)*
+*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L1458)*
 
 ---
 
@@ -705,7 +705,7 @@ Draws a list of (x, y) points using the current point size and color.
 
 - `...` — Alternating x, y coordinate pairs, or a flat numeric table.
 
-*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L2526)*
+*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L2553)*
 
 ---
 
@@ -720,7 +720,7 @@ Draws a filled or outlined polygon from a flat list of (x, y) vertex coordinates
 Draws a polygon.
 Lua API: luna.graphics.polygon(mode, x1, y1, x2, y2, ...)
 
-*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L906)*
+*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L933)*
 
 ---
 
@@ -732,7 +732,7 @@ Lua API: luna.graphics.polyline(x1, y1, x2, y2, ...)
 
 **Parameters:** `args`
 
-*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L1811)*
+*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L1838)*
 
 ---
 
@@ -742,7 +742,7 @@ Pops the top transform matrix from the stack.
 
 Lua API: luna.graphics.pop()
 
-*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L1328)*
+*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L1355)*
 
 ---
 
@@ -761,7 +761,7 @@ Draws the given text string at (x, y) using the active font and foreground color
 Draws text at the given position.
 Lua API: luna.graphics.print(text, x, y, scale?)
 
-*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L1010)*
+*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L1037)*
 
 ---
 
@@ -771,7 +771,7 @@ Draws word-wrapped text within a given width.
 
 **Parameters:** `text`, `x`, `y`, `limit`, `align`
 
-*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L2588)*
+*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L2615)*
 
 ---
 
@@ -781,7 +781,7 @@ Pushes the current transform matrix onto the transform stack.
 
 Lua API: luna.graphics.push()
 
-*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L1304)*
+*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L1331)*
 
 ---
 
@@ -801,7 +801,7 @@ Draws a filled or outlined rectangle at (x, y) with given width and height.
 Draws a rectangle.
 Lua API: luna.graphics.rectangle(mode, x, y, w, h, rx?, ry?)
 
-*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L726)*
+*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L753)*
 
 ---
 
@@ -813,7 +813,7 @@ Releases a GPU resource handle and returns its memory to the pool early.
 
 - `handle` — Resource ID to release (texture, canvas, shader, etc.).
 
-*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L2441)*
+*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L2468)*
 
 ---
 
@@ -825,7 +825,7 @@ Releases the sprite batch resource and frees its GPU instance buffer.
 
 - `batch` — SpriteBatch ID returned by newSpriteBatch.
 
-*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L2506)*
+*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L2533)*
 
 ---
 
@@ -837,7 +837,7 @@ Releases the canvas render target and frees its GPU framebuffer memory.
 
 - `canvas` — Canvas ID returned by newCanvas.
 
-*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L2483)*
+*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L2510)*
 
 ---
 
@@ -849,7 +849,7 @@ Releases the font resource for the given ID and frees its GPU atlas memory.
 
 - `font` — Font ID returned by newFont.
 
-*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L2461)*
+*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L2488)*
 
 ---
 
@@ -861,7 +861,7 @@ Releases the custom mesh resource and frees the GPU vertex buffer.
 
 - `mesh` — Mesh ID returned by newMesh.
 
-*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L3446)*
+*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L3473)*
 
 ---
 
@@ -873,7 +873,7 @@ Releases the compiled shader program and frees its GPU pipeline object.
 
 - `shader` — Shader ID returned by newShader.
 
-*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L3111)*
+*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L3138)*
 
 ---
 
@@ -881,7 +881,7 @@ Releases the compiled shader program and frees its GPU pipeline object.
 
 Resets all graphics state to defaults: transform, color (1,1,1,1), shader, and scissor.
 
-*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L1512)*
+*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L1539)*
 
 ---
 
@@ -893,7 +893,7 @@ Luna graphics API function.
 
 Lua API: luna.graphics.resetCamera()
 
-*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L2426)*
+*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L2453)*
 
 ---
 
@@ -905,7 +905,7 @@ Lua API: luna.graphics.rotate(angle)
 
 **Parameters:** `angle`
 
-*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L1378)*
+*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L1405)*
 
 ---
 
@@ -920,7 +920,7 @@ Concatenates a scale factor onto the current transform matrix.
 Scales the current transform.
 Lua API: luna.graphics.scale(sx, sy?)
 
-*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L1404)*
+*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L1431)*
 
 ---
 
@@ -933,7 +933,7 @@ Sends a named uniform variable value to the currently active shader program.
 - `name` — Uniform variable name as defined in the WGSL shader.
 - `value` — Value to send (number, table of numbers, or boolean).
 
-*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L3034)*
+*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L3061)*
 
 ---
 
@@ -950,7 +950,7 @@ Sets the RGBA color used to clear the framebuffer at the start of each draw fram
 Sets the background (clear) color.
 Lua API: luna.graphics.setBackgroundColor(r, g, b)
 
-*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L669)*
+*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L696)*
 
 ---
 
@@ -964,7 +964,7 @@ Sets the blend equation used when drawing new pixels over the existing framebuff
 Luna graphics API function.
 Lua API: luna.graphics.setBlendMode(mode)
 
-*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L2263)*
+*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L2290)*
 
 ---
 
@@ -981,7 +981,7 @@ Sets the camera transform: position, rotation, and zoom applied to all draw call
 Luna graphics API function.
 Lua API: luna.graphics.setCamera(x, y, zoom?, rotation?)
 
-*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L2334)*
+*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L2361)*
 
 ---
 
@@ -991,7 +991,7 @@ Redirects all drawing to the given canvas (or screen if nil).
 
 **Parameters:** `args`
 
-*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L1469)*
+*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L1496)*
 
 ---
 
@@ -1003,7 +1003,7 @@ Lua API: luna.graphics.setColor(r, g, b, a?)
 
 **Parameters:** `r`, `g`, `b`, `a`
 
-*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L640)*
+*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L667)*
 
 ---
 
@@ -1018,7 +1018,7 @@ Sets which RGBA channels are written to the render target for subsequent draw ca
 - `b` — Write to the blue channel.
 - `a` — Write to the alpha channel.
 
-*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L2745)*
+*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L2772)*
 
 ---
 
@@ -1028,7 +1028,7 @@ Sets the default texture filter mode ('linear' or 'nearest').
 
 **Parameters:** `min`, `mag`, `anisotropy`
 
-*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L2832)*
+*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L2859)*
 
 ---
 
@@ -1040,7 +1040,7 @@ Lua API: luna.graphics.setFont(font_id)
 
 **Parameters:** `id_val`
 
-*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L1884)*
+*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L1911)*
 
 ---
 
@@ -1052,7 +1052,7 @@ Sets the line height multiplier for the active font used in multi-line text rend
 
 - `height` — Line height factor (1.0 = default spacing).
 
-*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L2033)*
+*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L2060)*
 
 ---
 
@@ -1064,7 +1064,7 @@ Lua API: luna.graphics.setLineWidth(width)
 
 **Parameters:** `w`
 
-*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L1169)*
+*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L1196)*
 
 ---
 
@@ -1077,7 +1077,7 @@ Sets the vertex topology mode used when drawing a mesh ('triangles', 'fan', 'str
 - `mesh` — Mesh ID returned by newMesh.
 - `mode` — Topology string: 'triangles', 'fan', 'strip', or 'points'.
 
-*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L3384)*
+*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L3411)*
 
 ---
 
@@ -1090,7 +1090,7 @@ Binds a texture to the given mesh so it is sampled during rendering.
 - `mesh` — Mesh ID returned by newMesh.
 - `texture` — Texture ID to bind, or nil to clear.
 
-*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L3333)*
+*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L3360)*
 
 ---
 
@@ -1100,7 +1100,7 @@ Updates position and UV data for a single vertex in a Mesh.
 
 **Parameters:** `id`, `index`, `data`
 
-*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L3218)*
+*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L3245)*
 
 ---
 
@@ -1113,7 +1113,7 @@ Sets an index array defining the vertex drawing order for a custom mesh.
 - `mesh` — Mesh ID returned by newMesh.
 - `map` — Table of 1-based vertex indices specifying the draw order.
 
-*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L3416)*
+*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L3443)*
 
 ---
 
@@ -1126,7 +1126,7 @@ Uploads a new flat vertex array to replace the mesh's current geometry.
 - `mesh` — Mesh ID returned by newMesh.
 - `vertices` — Table of vertex attribute tables or a flat number array.
 
-*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L3253)*
+*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L3280)*
 
 ---
 
@@ -1138,7 +1138,7 @@ Sets the diameter in pixels used when drawing point primitives.
 
 - `size` — Point diameter in pixels.
 
-*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L2567)*
+*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L2594)*
 
 ---
 
@@ -1146,7 +1146,7 @@ Sets the diameter in pixels used when drawing point primitives.
 
 Restricts drawing to the given rectangle; clears scissor if no args.
 
-*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L2653)*
+*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L2680)*
 
 ---
 
@@ -1156,7 +1156,7 @@ Activates a custom WGSL shader for subsequent draw calls.
 
 **Parameters:** `id`
 
-*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L2988)*
+*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L3015)*
 
 ---
 
@@ -1164,7 +1164,7 @@ Activates a custom WGSL shader for subsequent draw calls.
 
 Configures the stencil test for subsequent draw calls.
 
-*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L2935)*
+*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L2962)*
 
 ---
 
@@ -1174,7 +1174,7 @@ Enables or disables wireframe rendering mode.
 
 **Parameters:** `enabled`
 
-*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L2791)*
+*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L2818)*
 
 ---
 
@@ -1184,7 +1184,7 @@ Applies a shear transform to the current matrix.
 
 **Parameters:** `kx`, `ky`
 
-*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L1418)*
+*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L1445)*
 
 ---
 
@@ -1205,7 +1205,7 @@ Appends a new sprite to the batch with the given position and transform properti
 Luna graphics API function.
 Lua API: luna.graphics.spriteBatchAdd(batch_id, x, y, r?, sx?, sy?, ox?, oy?, quad_x?, quad_y?, quad_w?, quad_h?)
 
-*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L2140)*
+*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L2167)*
 
 ---
 
@@ -1219,7 +1219,7 @@ Removes all sprites from the batch, resetting its count to zero.
 Luna graphics API function.
 Lua API: luna.graphics.spriteBatchClear(batch_id)
 
-*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L2203)*
+*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L2230)*
 
 ---
 
@@ -1227,7 +1227,7 @@ Lua API: luna.graphics.spriteBatchClear(batch_id)
 
 Draws to the stencil buffer using the given Lua draw function.
 
-*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L2899)*
+*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L2926)*
 
 ---
 
@@ -1239,7 +1239,7 @@ Lua API: luna.graphics.translate(x, y)
 
 **Parameters:** `x`, `y`
 
-*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L1354)*
+*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L1381)*
 
 ---
 
@@ -1256,7 +1256,7 @@ Draws a filled or outlined triangle with three (x, y) vertex coordinates.
 Draws a triangle.
 Lua API: luna.graphics.triangle(mode, x1, y1, x2, y2, x3, y3)
 
-*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L867)*
+*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L894)*
 
 ---
 
@@ -1264,25 +1264,31 @@ Lua API: luna.graphics.triangle(mode, x1, y1, x2, y2, x3, y3)
 
 #### `Canvas:getDimensions()`
 
-Returns the render target dimensions (width, height).
+Returns the canvas width and height in pixels.
 
-*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L433)*
+**Returns:** Two integers `width, height`.
+
+*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L460)*
 
 ---
 
 #### `Canvas:getHeight()`
 
-Returns the render target height in pixels.
+Returns the canvas height in pixels.
 
-*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L421)*
+**Returns:** `integer` — pixel height.
+
+*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L445)*
 
 ---
 
 #### `Canvas:getWidth()`
 
-Returns the render target width in pixels.
+Returns the canvas width in pixels.
 
-*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L409)*
+**Returns:** `integer` — pixel width.
+
+*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L430)*
 
 ---
 
@@ -1290,29 +1296,31 @@ Returns the render target width in pixels.
 
 #### `Font:getAscent()`
 
-Returns the font ascent — the distance in pixels from the baseline to the top of capital letters.
+Returns the ascent (distance from baseline to the top of the tallest glyph) in pixels.
 
-**Returns:** Ascent in pixels as a positive number.
+**Returns:** `number` — ascent in pixels.
 
-*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L251)*
+*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L269)*
 
 ---
 
 #### `Font:getDescent()`
 
-Returns the font descent — the distance in pixels from the baseline to the bottom of descenders.
+Returns the descent (distance below the baseline for descenders) in pixels.
 
-**Returns:** Descent in pixels as a positive number.
+**Returns:** `number` — descent in pixels.
 
-*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L266)*
+*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L284)*
 
 ---
 
 #### `Font:getHeight()`
 
-Returns the render target height in pixels.
+Returns the line height of this font at its loaded size, in pixels.
 
-*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L205)*
+**Returns:** `integer` — line height in pixels.
+
+*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L223)*
 
 ---
 
@@ -1322,17 +1330,21 @@ Returns the line height in pixels used when advancing to the next line of text.
 
 **Returns:** Line height in pixels.
 
-*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L220)*
+*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L238)*
 
 ---
 
 #### `Font:getWidth(text)`
 
-Returns the render target width in pixels.
+Measures the rendered width of `text` using this font's current size.
 
-**Parameters:** `text`
+**Parameters:**
 
-*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L193)*
+- `text` — `string`: The string to measure.
+
+**Returns:** `number` — rendered width in pixels.
+
+*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L208)*
 
 ---
 
@@ -1344,7 +1356,7 @@ Sets the line height multiplier used when laying out multi-line text.
 
 - `height` — Line height factor (1.0 = normal, >1.0 = extra spacing).
 
-*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L235)*
+*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L253)*
 
 ---
 
@@ -1352,35 +1364,41 @@ Sets the line height multiplier used when laying out multi-line text.
 
 #### `Image:getDimensions()`
 
-Returns the render target dimensions (width, height).
+Returns image width and height in pixels.
 
-*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L65)*
+**Returns:** Two integers `width, height`.
+
+*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L74)*
 
 ---
 
 #### `Image:getFilter()`
 
-Returns the current texture magnification and minification filter modes.
+Returns the current min and mag texture filters.
 
-**Returns:** Two strings: mag filter ('linear'/'nearest') and min filter ('linear'/'nearest').
+**Returns:** Two strings `min, mag`.
 
-*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L80)*
+*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L89)*
 
 ---
 
 #### `Image:getHeight()`
 
-Returns the render target height in pixels.
+Returns the image height in pixels.
 
-*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L53)*
+**Returns:** `integer` — pixel height.
+
+*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L59)*
 
 ---
 
 #### `Image:getWidth()`
 
-Returns the render target width in pixels.
+Returns the image width in pixels.
 
-*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L41)*
+**Returns:** `integer` — pixel width.
+
+*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L44)*
 
 ---
 
@@ -1390,7 +1408,7 @@ Returns the current texture wrap mode for the horizontal and vertical axes.
 
 **Returns:** Two strings: horizontal wrap and vertical wrap ('clamp', 'repeat', or 'mirror').
 
-*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L88)*
+*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L97)*
 
 ---
 
@@ -1407,7 +1425,7 @@ Draws to the current render target.
 - `w` — `number`.
 - `h` — `number`.
 
-*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L149)*
+*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L158)*
 
 ---
 
@@ -1417,7 +1435,7 @@ Returns the insets.
 
 **Returns:** The current insets.
 
-*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L124)*
+*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L133)*
 
 ---
 
@@ -1434,7 +1452,7 @@ Returns the texture size.
 
 **Returns:** The current texture size.
 
-*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L138)*
+*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L147)*
 
 ---
 
@@ -1444,7 +1462,7 @@ Returns the texture size.
 
 Removes all sprites from this batch and resets the sprite count to zero.
 
-*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L317)*
+*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L335)*
 
 ---
 
@@ -1454,7 +1472,7 @@ Returns the maximum number of sprites this batch was allocated to hold.
 
 **Returns:** Buffer capacity as an integer.
 
-*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L375)*
+*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L393)*
 
 ---
 
@@ -1464,7 +1482,7 @@ Returns the number of sprites currently added to this batch.
 
 **Returns:** Current sprite count as an integer.
 
-*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L305)*
+*Source: [src/lua_api/graphics_api.rs](src/lua_api/graphics_api.rs#L323)*
 
 ---
 
@@ -1486,7 +1504,7 @@ Camera2D, Animation, Trail, DecalSurface, and PaletteLUT.
 
 *(undocumented)*
 
-*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L2435)*
+*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L2426)*
 
 ---
 
@@ -1496,7 +1514,7 @@ Camera2D, Animation, Trail, DecalSurface, and PaletteLUT.
 
 **Parameters:** `w`, `h`
 
-*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L2422)*
+*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L2413)*
 
 ---
 
@@ -1506,7 +1524,7 @@ Camera2D, Animation, Trail, DecalSurface, and PaletteLUT.
 
 **Parameters:** `col_count`, `screen_w`, `screen_h`
 
-*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L2410)*
+*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L2401)*
 
 ---
 
@@ -1514,7 +1532,7 @@ Camera2D, Animation, Trail, DecalSurface, and PaletteLUT.
 
 *(undocumented)*
 
-*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L2334)*
+*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L2325)*
 
 ---
 
@@ -1522,7 +1540,7 @@ Camera2D, Animation, Trail, DecalSurface, and PaletteLUT.
 
 *(undocumented)*
 
-*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L2390)*
+*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L2381)*
 
 ---
 
@@ -1532,7 +1550,7 @@ Camera2D, Animation, Trail, DecalSurface, and PaletteLUT.
 
 **Parameters:** `tile_w`, `tile_h`
 
-*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L2400)*
+*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L2391)*
 
 ---
 
@@ -1542,7 +1560,7 @@ Camera2D, Animation, Trail, DecalSurface, and PaletteLUT.
 
 **Parameters:** `x`, `y`, `radius`
 
-*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L2314)*
+*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L2305)*
 
 ---
 
@@ -1550,7 +1568,7 @@ Camera2D, Animation, Trail, DecalSurface, and PaletteLUT.
 
 *(undocumented)*
 
-*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L2380)*
+*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L2371)*
 
 ---
 
@@ -1560,7 +1578,7 @@ Camera2D, Animation, Trail, DecalSurface, and PaletteLUT.
 
 **Parameters:** `tex_w`, `tex_h`, `frame_w`, `frame_h`
 
-*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L2366)*
+*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L2357)*
 
 ---
 
@@ -1570,7 +1588,7 @@ Camera2D, Animation, Trail, DecalSurface, and PaletteLUT.
 
 **Parameters:** `w`, `h`, `padding`
 
-*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L2324)*
+*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L2315)*
 
 ---
 
@@ -1580,7 +1598,7 @@ Camera2D, Animation, Trail, DecalSurface, and PaletteLUT.
 
 **Parameters:** `w`, `h`, `mode`
 
-*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L2344)*
+*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L2335)*
 
 ---
 
@@ -1590,7 +1608,7 @@ Camera2D, Animation, Trail, DecalSurface, and PaletteLUT.
 
 **Parameters:** `w`, `h`, `mode`
 
-*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L2355)*
+*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L2346)*
 
 ---
 
@@ -1607,7 +1625,7 @@ Adds frame to the collection.
 - `w` — `number`.
 - `h` — `number`.
 
-*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L1829)*
+*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L1820)*
 
 ---
 
@@ -1621,7 +1639,7 @@ Returns the clip count.
 
 **Returns:** The current clip count.
 
-*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L1976)*
+*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L1967)*
 
 ---
 
@@ -1631,7 +1649,7 @@ Returns the current clip.
 
 **Returns:** The current current clip.
 
-*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L1917)*
+*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L1908)*
 
 ---
 
@@ -1641,7 +1659,7 @@ Returns the current frame.
 
 **Returns:** The current current frame.
 
-*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L1910)*
+*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L1901)*
 
 ---
 
@@ -1651,7 +1669,7 @@ Returns the current quad.
 
 **Returns:** The current current quad.
 
-*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L1894)*
+*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L1885)*
 
 ---
 
@@ -1665,7 +1683,7 @@ Returns the frame count.
 
 **Returns:** The current frame count.
 
-*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L1966)*
+*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L1957)*
 
 ---
 
@@ -1675,7 +1693,7 @@ Returns the speed.
 
 **Returns:** The current speed.
 
-*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L1956)*
+*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L1947)*
 
 ---
 
@@ -1689,7 +1707,7 @@ Returns `true` if looping.
 
 **Returns:** `boolean`.
 
-*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L1941)*
+*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L1932)*
 
 ---
 
@@ -1703,7 +1721,7 @@ Returns `true` if playing.
 
 **Returns:** `boolean`.
 
-*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L1931)*
+*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L1922)*
 
 ---
 
@@ -1713,7 +1731,7 @@ Pauses playback.
 
 **Returns:** The result.
 
-*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L1867)*
+*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L1858)*
 
 ---
 
@@ -1725,7 +1743,7 @@ Starts playback.
 
 - `name` — `string`.
 
-*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L1852)*
+*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L1843)*
 
 ---
 
@@ -1737,7 +1755,7 @@ Resumes paused playback.
 
 - `dt` — `number`.
 
-*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L1875)*
+*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L1866)*
 
 ---
 
@@ -1749,7 +1767,7 @@ Sets the frame.
 
 - `index` — `integer`.
 
-*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L1984)*
+*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L1975)*
 
 ---
 
@@ -1761,7 +1779,7 @@ Sets the speed.
 
 - `f` — `number`.
 
-*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L1948)*
+*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L1939)*
 
 ---
 
@@ -1771,7 +1789,7 @@ Stops playback.
 
 **Returns:** The result.
 
-*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L1859)*
+*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L1850)*
 
 ---
 
@@ -1783,7 +1801,7 @@ Advances the simulation by `dt` seconds.
 
 - `dt` — `number`.
 
-*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L1883)*
+*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L1874)*
 
 ---
 
@@ -1795,7 +1813,7 @@ Returns the bounds.
 
 **Returns:** The current bounds.
 
-*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L1624)*
+*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L1615)*
 
 ---
 
@@ -1805,7 +1823,7 @@ Returns the dead zone.
 
 **Returns:** The current dead zone.
 
-*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L1713)*
+*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L1704)*
 
 ---
 
@@ -1820,7 +1838,7 @@ Returns the follow smooth.
 
 **Returns:** The current follow smooth.
 
-*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L1761)*
+*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L1752)*
 
 ---
 
@@ -1834,7 +1852,7 @@ Returns the look ahead.
 
 **Returns:** The current look ahead.
 
-*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L1788)*
+*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L1779)*
 
 ---
 
@@ -1848,7 +1866,7 @@ Returns the position.
 
 **Returns:** The current position.
 
-*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L1553)*
+*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L1544)*
 
 ---
 
@@ -1865,7 +1883,7 @@ Returns the rotation.
 
 **Returns:** The current rotation.
 
-*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L1590)*
+*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L1581)*
 
 ---
 
@@ -1875,7 +1893,7 @@ Returns the target.
 
 **Returns:** The current target.
 
-*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L1735)*
+*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L1726)*
 
 ---
 
@@ -1892,7 +1910,7 @@ Returns the viewport.
 
 **Returns:** The current viewport.
 
-*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L1610)*
+*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L1601)*
 
 ---
 
@@ -1907,7 +1925,7 @@ Returns the visible area.
 
 **Returns:** The current visible area.
 
-*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L1697)*
+*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L1688)*
 
 ---
 
@@ -1921,7 +1939,7 @@ Returns the zoom.
 
 **Returns:** The current zoom.
 
-*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L1571)*
+*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L1562)*
 
 ---
 
@@ -1936,7 +1954,7 @@ Returns `true` if bounds.
 
 **Returns:** `boolean`.
 
-*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L1652)*
+*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L1643)*
 
 ---
 
@@ -1949,7 +1967,7 @@ Look at on this Camera2D.
 - `x` — `number`.
 - `y` — `number`.
 
-*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L1669)*
+*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L1660)*
 
 ---
 
@@ -1962,7 +1980,7 @@ Move on this Camera2D.
 - `dx` — `number`.
 - `dy` — `number`.
 
-*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L1660)*
+*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L1651)*
 
 ---
 
@@ -1975,7 +1993,7 @@ Removes bounds from the collection.
 - `dx` — `number`.
 - `dy` — `number`.
 
-*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L1640)*
+*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L1631)*
 
 ---
 
@@ -1988,7 +2006,7 @@ Sets the dead zone.
 - `w` — `number`.
 - `h` — `number`.
 
-*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L1705)*
+*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L1696)*
 
 ---
 
@@ -2001,7 +2019,7 @@ Sets the follow smooth.
 - `intensity` — `number`.
 - `duration` — `number`.
 
-*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L1749)*
+*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L1740)*
 
 ---
 
@@ -2013,7 +2031,7 @@ Sets the look ahead.
 
 - `mul` — `number`.
 
-*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L1777)*
+*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L1768)*
 
 ---
 
@@ -2026,7 +2044,7 @@ Sets the position.
 - `x` — `number`.
 - `y` — `number`.
 
-*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L1542)*
+*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L1533)*
 
 ---
 
@@ -2038,7 +2056,7 @@ Sets the rotation.
 
 - `r` — `number`.
 
-*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L1576)*
+*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L1567)*
 
 ---
 
@@ -2051,7 +2069,7 @@ Sets the target.
 - `x` — `number`.
 - `y` — `number`.
 
-*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L1727)*
+*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L1718)*
 
 ---
 
@@ -2063,7 +2081,7 @@ Sets the zoom.
 
 - `z` — `number`.
 
-*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L1560)*
+*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L1551)*
 
 ---
 
@@ -2076,7 +2094,7 @@ Shake on this Camera2D.
 - `intensity` — `number`.
 - `duration` — `number`.
 
-*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L1769)*
+*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L1760)*
 
 ---
 
@@ -2089,7 +2107,7 @@ To screen coords on this Camera2D.
 - `wx` — `number`.
 - `wy` — `number`.
 
-*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L1686)*
+*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L1677)*
 
 ---
 
@@ -2102,7 +2120,7 @@ To world coords on this Camera2D.
 - `sx` — `number`.
 - `sy` — `number`.
 
-*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L1678)*
+*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L1669)*
 
 ---
 
@@ -2114,7 +2132,7 @@ Advances the simulation by `dt` seconds.
 
 - `dt` — `number`.
 
-*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L1795)*
+*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L1786)*
 
 ---
 
@@ -2126,7 +2144,7 @@ Returns the column count.
 
 **Returns:** The current column count.
 
-*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L1498)*
+*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L1489)*
 
 ---
 
@@ -2140,7 +2158,7 @@ Returns the depth at.
 
 **Returns:** The current depth at.
 
-*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L1475)*
+*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L1466)*
 
 ---
 
@@ -2150,7 +2168,7 @@ Returns the depth buffer.
 
 **Returns:** The current depth buffer.
 
-*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L1486)*
+*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L1477)*
 
 ---
 
@@ -2160,7 +2178,7 @@ Returns the screen height.
 
 **Returns:** The current screen height.
 
-*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L1512)*
+*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L1503)*
 
 ---
 
@@ -2170,7 +2188,7 @@ Returns the screen width.
 
 **Returns:** The current screen width.
 
-*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L1505)*
+*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L1496)*
 
 ---
 
@@ -2182,7 +2200,7 @@ Returns the dimensions.
 
 **Returns:** The current dimensions.
 
-*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L2187)*
+*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L2178)*
 
 ---
 
@@ -2192,7 +2210,7 @@ Returns the height.
 
 **Returns:** The current height.
 
-*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L2201)*
+*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L2192)*
 
 ---
 
@@ -2202,7 +2220,7 @@ Returns the width.
 
 **Returns:** The current width.
 
-*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L2194)*
+*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L2185)*
 
 ---
 
@@ -2214,7 +2232,7 @@ Removes all entries.
 
 **Returns:** The result.
 
-*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L357)*
+*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L345)*
 
 ---
 
@@ -2224,7 +2242,7 @@ Flushes pending data.
 
 **Returns:** The result.
 
-*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L343)*
+*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L331)*
 
 ---
 
@@ -2234,7 +2252,7 @@ Returns the count.
 
 **Returns:** The current count.
 
-*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L368)*
+*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L356)*
 
 ---
 
@@ -2247,7 +2265,7 @@ Queue on this DrawLayer.
 - `z` — `number`.
 - `func` — `function`.
 
-*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L334)*
+*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L322)*
 
 ---
 
@@ -2263,7 +2281,7 @@ Auto range on this GraphRenderer.
 - `pts` — `table`.
 - `color` — `table` optional.
 
-*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L1011)*
+*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L1002)*
 
 ---
 
@@ -2275,7 +2293,7 @@ Clear series on this GraphRenderer.
 
 - `b` — `boolean`.
 
-*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L1079)*
+*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L1070)*
 
 ---
 
@@ -2285,7 +2303,7 @@ Returns the cursor value.
 
 **Returns:** The current cursor value.
 
-*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L1166)*
+*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L1157)*
 
 ---
 
@@ -2295,7 +2313,7 @@ Returns the range.
 
 **Returns:** The current range.
 
-*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L1002)*
+*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L993)*
 
 ---
 
@@ -2312,7 +2330,7 @@ Returns the viewport.
 
 **Returns:** The current viewport.
 
-*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L988)*
+*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L979)*
 
 ---
 
@@ -2324,7 +2342,7 @@ Removes series from the collection.
 
 - `name` — `string`.
 
-*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L1071)*
+*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L1062)*
 
 ---
 
@@ -2337,7 +2355,7 @@ Sets the cursor position.
 - `x` — `number`.
 - `y` — `number`.
 
-*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L1158)*
+*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L1149)*
 
 ---
 
@@ -2349,7 +2367,7 @@ Sets the show axes.
 
 - `b` — `boolean`.
 
-*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L1095)*
+*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L1086)*
 
 ---
 
@@ -2361,7 +2379,7 @@ Sets the show grid.
 
 - `b` — `boolean`.
 
-*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L1087)*
+*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L1078)*
 
 ---
 
@@ -2376,7 +2394,7 @@ Sets the show labels.
 - `b` — `number`.
 - `a` — `number` optional.
 
-*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L1106)*
+*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L1097)*
 
 ---
 
@@ -2389,7 +2407,7 @@ Sets the title.
 - `x_label` — `string`.
 - `y_label` — `string`.
 
-*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L1142)*
+*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L1133)*
 
 ---
 
@@ -2407,7 +2425,7 @@ Returns the chunk size.
 
 **Returns:** The current chunk size.
 
-*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L1286)*
+*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L1277)*
 
 ---
 
@@ -2421,7 +2439,7 @@ Returns the map size.
 
 **Returns:** The current map size.
 
-*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L1264)*
+*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L1255)*
 
 ---
 
@@ -2436,7 +2454,7 @@ Returns the tile.
 
 **Returns:** The current tile.
 
-*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L1247)*
+*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L1238)*
 
 ---
 
@@ -2446,7 +2464,7 @@ Returns the tileset columns.
 
 **Returns:** The current tileset columns.
 
-*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L1387)*
+*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L1378)*
 
 ---
 
@@ -2460,7 +2478,7 @@ Returns the total chunks.
 
 **Returns:** The current total chunks.
 
-*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L1372)*
+*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L1363)*
 
 ---
 
@@ -2474,7 +2492,7 @@ Returns the visible chunks.
 
 **Returns:** The current visible chunks.
 
-*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L1362)*
+*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L1353)*
 
 ---
 
@@ -2484,7 +2502,7 @@ Invalidate all on this LargeMapRenderer.
 
 **Returns:** The result.
 
-*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L1351)*
+*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L1342)*
 
 ---
 
@@ -2497,7 +2515,7 @@ Invalidate chunk on this LargeMapRenderer.
 - `cx` — `integer`.
 - `cy` — `integer`.
 
-*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L1343)*
+*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L1334)*
 
 ---
 
@@ -2511,7 +2529,7 @@ Returns `true` if l o d enabled.
 
 **Returns:** `boolean`.
 
-*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L1323)*
+*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L1314)*
 
 ---
 
@@ -2525,7 +2543,7 @@ Sets the camera.
 - `y` — `number`.
 - `zoom` — `number`.
 
-*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L1295)*
+*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L1286)*
 
 ---
 
@@ -2539,7 +2557,7 @@ Sets the chunk size.
 - `y` — `number`.
 - `zoom` — `number`.
 
-*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L1273)*
+*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L1264)*
 
 ---
 
@@ -2551,7 +2569,7 @@ Sets the l o d enabled.
 
 - `b` — `boolean`.
 
-*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L1312)*
+*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L1303)*
 
 ---
 
@@ -2564,7 +2582,7 @@ Sets the l o d thresholds.
 - `cx` — `integer`.
 - `cy` — `integer`.
 
-*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L1331)*
+*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L1322)*
 
 ---
 
@@ -2578,7 +2596,7 @@ Sets the tile.
 - `y` — `integer`.
 - `tile_id` — `integer`.
 
-*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L1232)*
+*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L1223)*
 
 ---
 
@@ -2590,7 +2608,7 @@ Sets the tileset columns.
 
 - `cols` — `integer`.
 
-*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L1379)*
+*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L1370)*
 
 ---
 
@@ -2603,7 +2621,7 @@ Sets the viewport.
 - `w` — `number`.
 - `h` — `number`.
 
-*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L1304)*
+*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L1295)*
 
 ---
 
@@ -2611,15 +2629,11 @@ Sets the viewport.
 
 #### `Light2D:getColor()`
 
-Returns the color.
+Returns the current light color.
 
-**Parameters:**
+**Returns:** Four numbers `r, g, b, a`.
 
-- `i` — `number`.
-
-**Returns:** The current color.
-
-*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L158)*
+*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L146)*
 
 ---
 
@@ -2633,60 +2647,51 @@ Returns the intensity.
 
 **Returns:** The current intensity.
 
-*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L177)*
+*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L165)*
 
 ---
 
 #### `Light2D:getPosition()`
 
-Returns the position.
+Returns the light position in world space.
 
-**Parameters:**
+**Returns:** Two numbers `x, y`.
 
-- `r` — `number`.
-
-**Returns:** The current position.
-
-*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L120)*
+*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L117)*
 
 ---
 
 #### `Light2D:getRadius(r, g, b, [a])`
 
-Returns the radius.
+Returns the current light radius in world units.
 
-**Parameters:**
+**Parameters:** `r`, `g`, `b`, `a`
 
-- `r` — `number`.
-- `g` — `number`.
-- `b` — `number`.
-- `a` — `number` optional.
+**Returns:** `number`.
 
-**Returns:** The current radius.
-
-*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L141)*
+*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L132)*
 
 ---
 
 #### `Light2D:isEnabled()`
 
-Returns `true` if enabled.
+Returns `true` if this light is currently enabled.
 
 **Returns:** `boolean`.
 
-*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L192)*
+*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L180)*
 
 ---
 
 #### `Light2D:setEnabled(b)`
 
-Sets the enabled.
+Enables or disables this light. Disabled lights contribute no illumination.
 
 **Parameters:**
 
-- `b` — `boolean`.
+- `enabled` — `boolean`: `true` to enable.
 
-*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L184)*
+*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L172)*
 
 ---
 
@@ -2698,18 +2703,18 @@ Sets the intensity.
 
 - `i` — `number`.
 
-*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L166)*
+*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L154)*
 
 ---
 
 #### `Light2D:setPosition(x, y)`
 
-Sets the position.
+Sets the light source position in world space.
 
 **Parameters:**
 
-- `x` — `number`.
-- `y` — `number`.
+- `x` — `number`: World X coordinate.
+- `y` — `number`: World Y coordinate.
 
 *Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L109)*
 
@@ -2717,13 +2722,13 @@ Sets the position.
 
 #### `Light2D:setRadius(r)`
 
-Sets the radius.
+Sets the falloff radius of this light. Pixels beyond the radius receive no illumination.
 
 **Parameters:**
 
-- `r` — `number`.
+- `radius` — `number`: Radius in world units.
 
-*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L127)*
+*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L124)*
 
 ---
 
@@ -2735,7 +2740,7 @@ Removes all entries.
 
 **Returns:** The result.
 
-*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L2291)*
+*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L2282)*
 
 ---
 
@@ -2745,7 +2750,7 @@ Returns the color count.
 
 **Returns:** The current color count.
 
-*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L2226)*
+*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L2217)*
 
 ---
 
@@ -2759,7 +2764,7 @@ Returns the from color.
 
 **Returns:** The current from color.
 
-*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L2258)*
+*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L2249)*
 
 ---
 
@@ -2773,7 +2778,7 @@ Returns the to color.
 
 **Returns:** The current to color.
 
-*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L2276)*
+*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L2267)*
 
 ---
 
@@ -2785,7 +2790,7 @@ Removes all entries.
 
 **Returns:** The result.
 
-*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L945)*
+*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L936)*
 
 ---
 
@@ -2795,7 +2800,7 @@ Clear highlight on this PolygonMap.
 
 **Returns:** The result.
 
-*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L937)*
+*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L928)*
 
 ---
 
@@ -2805,7 +2810,7 @@ Returns the bounding box.
 
 **Returns:** The current bounding box.
 
-*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L885)*
+*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L876)*
 
 ---
 
@@ -2820,7 +2825,7 @@ Returns the region at.
 
 **Returns:** The current region at.
 
-*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L826)*
+*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L817)*
 
 ---
 
@@ -2834,7 +2839,7 @@ Returns the region center.
 
 **Returns:** The current region center.
 
-*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L872)*
+*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L863)*
 
 ---
 
@@ -2848,7 +2853,7 @@ Returns the region color.
 
 **Returns:** The current region color.
 
-*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L803)*
+*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L794)*
 
 ---
 
@@ -2858,7 +2863,7 @@ Returns the region names.
 
 **Returns:** The current region names.
 
-*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L837)*
+*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L828)*
 
 ---
 
@@ -2872,7 +2877,7 @@ Returns the region vertices.
 
 **Returns:** The current region vertices.
 
-*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L852)*
+*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L843)*
 
 ---
 
@@ -2884,7 +2889,7 @@ Highlight on this PolygonMap.
 
 - `name` — `string`.
 
-*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L929)*
+*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L920)*
 
 ---
 
@@ -2900,7 +2905,7 @@ Removes region from the collection.
 - `b` — `number`.
 - `a` — `number` optional.
 
-*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L783)*
+*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L774)*
 
 ---
 
@@ -2915,7 +2920,7 @@ Sets the outline width.
 - `b` — `number`.
 - `a` — `number` optional.
 
-*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L912)*
+*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L903)*
 
 ---
 
@@ -2932,7 +2937,7 @@ Returns the column.
 
 **Returns:** The current column.
 
-*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L644)*
+*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L635)*
 
 ---
 
@@ -2946,7 +2951,7 @@ Returns the direction frames.
 
 **Returns:** The current direction frames.
 
-*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L720)*
+*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L711)*
 
 ---
 
@@ -2960,17 +2965,17 @@ Returns the frame.
 
 **Returns:** The current frame.
 
-*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L589)*
+*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L580)*
 
 ---
 
 #### `SpriteSheet:getFrameCount()`
 
-Returns the frame count.
+Returns the total number of frames in this sprite sheet.
 
-**Returns:** The current frame count.
+**Returns:** `integer`.
 
-*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L600)*
+*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L591)*
 
 ---
 
@@ -2984,7 +2989,7 @@ Returns the frame size.
 
 **Returns:** The current frame size.
 
-*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L610)*
+*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L601)*
 
 ---
 
@@ -2998,7 +3003,7 @@ Returns the grid size.
 
 **Returns:** The current grid size.
 
-*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L620)*
+*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L611)*
 
 ---
 
@@ -3012,7 +3017,7 @@ Returns the group.
 
 **Returns:** The current group.
 
-*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L681)*
+*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L672)*
 
 ---
 
@@ -3022,7 +3027,7 @@ Returns the group names.
 
 **Returns:** The current group names.
 
-*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L692)*
+*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L683)*
 
 ---
 
@@ -3037,7 +3042,7 @@ Returns the range.
 
 **Returns:** The current range.
 
-*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L657)*
+*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L648)*
 
 ---
 
@@ -3051,7 +3056,7 @@ Returns the row.
 
 **Returns:** The current row.
 
-*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L631)*
+*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L622)*
 
 ---
 
@@ -3063,7 +3068,7 @@ Removes all entries.
 
 **Returns:** The result.
 
-*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L302)*
+*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L290)*
 
 ---
 
@@ -3073,21 +3078,21 @@ Returns the dimensions.
 
 **Returns:** The current dimensions.
 
-*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L256)*
+*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L244)*
 
 ---
 
 #### `TextureAtlas:getRegion(name)`
 
-Returns the region.
+Returns the pixel bounds of the named region.
 
 **Parameters:**
 
-- `name` — `string`.
+- `name` — `string`: Region name.
 
-**Returns:** The current region.
+**Returns:** `table` with `x`, `y`, `w`, `h` fields, or `nil` if not found.
 
-*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L233)*
+*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L221)*
 
 ---
 
@@ -3097,7 +3102,7 @@ Returns the region count.
 
 **Returns:** The current region count.
 
-*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L249)*
+*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L237)*
 
 ---
 
@@ -3107,7 +3112,7 @@ Returns the regions.
 
 **Returns:** The current regions.
 
-*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L263)*
+*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L251)*
 
 ---
 
@@ -3121,7 +3126,7 @@ Pack on this TextureAtlas.
 - `w` — `integer`.
 - `h` — `integer`.
 
-*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L223)*
+*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L211)*
 
 ---
 
@@ -3133,7 +3138,7 @@ Removes all entries.
 
 **Returns:** The result.
 
-*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L2123)*
+*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L2114)*
 
 ---
 
@@ -3147,7 +3152,7 @@ Returns the lifetime.
 
 **Returns:** The current lifetime.
 
-*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L2108)*
+*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L2099)*
 
 ---
 
@@ -3157,7 +3162,7 @@ Returns the point count.
 
 **Returns:** The current point count.
 
-*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L2131)*
+*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L2122)*
 
 ---
 
@@ -3174,7 +3179,7 @@ Returns the width.
 
 **Returns:** The current width.
 
-*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L2144)*
+*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L2135)*
 
 ---
 
@@ -3187,7 +3192,7 @@ Adds point to the collection.
 - `x` — `number`.
 - `y` — `number`.
 
-*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L2071)*
+*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L2062)*
 
 ---
 
@@ -3199,7 +3204,7 @@ Sets the lifetime.
 
 - `lt` — `number`.
 
-*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L2097)*
+*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L2088)*
 
 ---
 
@@ -3211,7 +3216,7 @@ Sets the min distance.
 
 - `d` — `number`.
 
-*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L2115)*
+*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L2106)*
 
 ---
 
@@ -3224,7 +3229,7 @@ Sets the width.
 - `start` — `number`.
 - `end` — `number` optional.
 
-*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L2089)*
+*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L2080)*
 
 ---
 
@@ -3237,7 +3242,7 @@ Advances the simulation by `dt` seconds.
 - `start` — `number`.
 - `end` — `number` optional.
 
-*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L2080)*
+*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L2071)*
 
 ---
 
@@ -3253,27 +3258,27 @@ Returns the game dimensions.
 
 **Returns:** The current game dimensions.
 
-*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L421)*
+*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L409)*
 
 ---
 
 #### `Viewport:getOffset()`
 
-Returns the offset.
+Returns the current viewport scroll offset.
 
-**Returns:** The current offset.
+**Returns:** Two numbers `ox, oy`.
 
-*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L411)*
+*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L399)*
 
 ---
 
 #### `Viewport:getScale()`
 
-Returns the scale.
+Returns the current content scale factor.
 
-**Returns:** The current scale.
+**Returns:** `number`.
 
-*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L404)*
+*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L392)*
 
 ---
 
@@ -3287,7 +3292,7 @@ Returns the scale mode.
 
 **Returns:** The current scale mode.
 
-*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L431)*
+*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L419)*
 
 ---
 
@@ -3300,7 +3305,7 @@ Resize on this Viewport.
 - `w` — `number`.
 - `h` — `number`.
 
-*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L396)*
+*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L384)*
 
 ---
 
@@ -3313,7 +3318,7 @@ Sets the scale mode.
 - `sx` — `number`.
 - `sy` — `number`.
 
-*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L439)*
+*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L427)*
 
 ---
 
@@ -3326,20 +3331,22 @@ To game on this Viewport.
 - `sx` — `number`.
 - `sy` — `number`.
 
-*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L450)*
+*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L438)*
 
 ---
 
 #### `Viewport:toScreen(gx, gy)`
 
-To screen on this Viewport.
+Converts world-space coordinates to screen-space pixel coordinates.
 
 **Parameters:**
 
-- `gx` — `number`.
-- `gy` — `number`.
+- `wx` — `number`: World X.
+- `wy` — `number`: World Y.
 
-*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L458)*
+**Returns:** Two numbers `sx, sy` in screen pixels.
+
+*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L449)*
 
 ---
 
@@ -3351,7 +3358,7 @@ Returns the game dimensions.
 
 **Returns:** The current game dimensions.
 
-*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L496)*
+*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L487)*
 
 ---
 
@@ -3366,7 +3373,7 @@ Returns the mode.
 
 **Returns:** The current mode.
 
-*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L532)*
+*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L523)*
 
 ---
 
@@ -3376,7 +3383,7 @@ Returns the offset.
 
 **Returns:** The current offset.
 
-*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L510)*
+*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L501)*
 
 ---
 
@@ -3391,7 +3398,7 @@ Returns the scale.
 
 **Returns:** The current scale.
 
-*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L521)*
+*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L512)*
 
 ---
 
@@ -3401,7 +3408,7 @@ Returns the scaled dimensions.
 
 **Returns:** The current scaled dimensions.
 
-*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L503)*
+*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L494)*
 
 ---
 
@@ -3414,7 +3421,7 @@ Resize on this ViewportScale.
 - `w` — `number`.
 - `h` — `number`.
 
-*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L488)*
+*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L479)*
 
 ---
 
@@ -3427,7 +3434,7 @@ To game coords on this ViewportScale.
 - `sx` — `number`.
 - `sy` — `number`.
 
-*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L540)*
+*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L531)*
 
 ---
 
@@ -3440,7 +3447,7 @@ To screen coords on this ViewportScale.
 - `gx` — `number`.
 - `gy` — `number`.
 
-*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L548)*
+*Source: [src/lua_api/graphics_ext_api.rs](src/lua_api/graphics_ext_api.rs#L539)*
 
 ---
 
@@ -6294,7 +6301,7 @@ Removes any active filter from the audio source.
 
 **Parameters:** `id_val`
 
-*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L1419)*
+*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L1455)*
 
 ---
 
@@ -6304,7 +6311,7 @@ Creates an independent copy of an audio source.
 
 **Parameters:** `id_val`
 
-*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L1142)*
+*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L1178)*
 
 ---
 
@@ -6314,7 +6321,7 @@ Fades the audio source in from silence over the given duration.
 
 **Parameters:** `id_val`, `dur`
 
-*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L1431)*
+*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L1467)*
 
 ---
 
@@ -6322,7 +6329,7 @@ Fades the audio source in from silence over the given duration.
 
 Returns the number of currently playing audio sources.
 
-*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L1108)*
+*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L1144)*
 
 ---
 
@@ -6332,7 +6339,7 @@ Returns the total duration of the audio source in seconds.
 
 **Parameters:** `id_val`
 
-*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L1335)*
+*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L1371)*
 
 ---
 
@@ -6342,7 +6349,7 @@ Returns the current fade-in duration.
 
 **Parameters:** `id_val`
 
-*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L1443)*
+*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L1479)*
 
 ---
 
@@ -6352,7 +6359,7 @@ Returns the current high-pass filter cutoff frequency.
 
 **Parameters:** `id_val`
 
-*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L1408)*
+*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L1444)*
 
 ---
 
@@ -6360,7 +6367,7 @@ Returns the current high-pass filter cutoff frequency.
 
 Returns the current 2D listener position (x, y).
 
-*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L1282)*
+*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L1318)*
 
 ---
 
@@ -6370,7 +6377,7 @@ Returns the current low-pass filter cutoff frequency.
 
 **Parameters:** `id_val`
 
-*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L1397)*
+*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L1433)*
 
 ---
 
@@ -6380,7 +6387,7 @@ Returns the current master volume scale (0.0 - 1.0) applied to all audio output.
 
 **Returns:** Master volume as a float in [0.0, 1.0].
 
-*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L1100)*
+*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L1136)*
 
 ---
 
@@ -6388,7 +6395,7 @@ Returns the current master volume scale (0.0 - 1.0) applied to all audio output.
 
 Returns the maximum number of simultaneous audio sources.
 
-*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L1268)*
+*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L1304)*
 
 ---
 
@@ -6396,7 +6403,7 @@ Returns the maximum number of simultaneous audio sources.
 
 Returns the current peak level of the audio source.
 
-*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L1302)*
+*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L1338)*
 
 ---
 
@@ -6406,7 +6413,7 @@ Returns the current stereo panning of the source.
 
 **Parameters:** `id_val`
 
-*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L1074)*
+*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L1110)*
 
 ---
 
@@ -6416,7 +6423,7 @@ Returns the current pitch multiplier of the source.
 
 **Parameters:** `id_val`
 
-*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L974)*
+*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L1010)*
 
 ---
 
@@ -6426,7 +6433,7 @@ Returns the bus name the source is assigned to.
 
 **Parameters:** `id_val`
 
-*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L1251)*
+*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L1287)*
 
 ---
 
@@ -6434,7 +6441,7 @@ Returns the bus name the source is assigned to.
 
 Returns the number of currently registered audio sources.
 
-*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L1116)*
+*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L1152)*
 
 ---
 
@@ -6444,7 +6451,7 @@ Returns the type string ('static' or 'stream') of the source.
 
 **Parameters:** `id_val`
 
-*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L1124)*
+*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L1160)*
 
 ---
 
@@ -6454,7 +6461,7 @@ Returns the current volume of the audio source.
 
 **Parameters:** `id_val`
 
-*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L920)*
+*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L956)*
 
 ---
 
@@ -6464,7 +6471,7 @@ Returns whether the audio source is set to loop.
 
 **Parameters:** `id_val`
 
-*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L1035)*
+*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L1071)*
 
 ---
 
@@ -6474,7 +6481,7 @@ Returns whether the audio source is currently paused.
 
 **Parameters:** `id_val`
 
-*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L998)*
+*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L1034)*
 
 ---
 
@@ -6484,7 +6491,7 @@ Returns whether the audio source is currently playing.
 
 **Parameters:** `id_val`
 
-*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L986)*
+*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L1022)*
 
 ---
 
@@ -6494,7 +6501,7 @@ Returns whether the audio source is stopped.
 
 **Parameters:** `id_val`
 
-*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L1010)*
+*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L1046)*
 
 ---
 
@@ -6504,7 +6511,7 @@ Creates a named audio bus for grouping sources.
 
 **Parameters:** `name`
 
-*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L1213)*
+*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L1249)*
 
 ---
 
@@ -6514,7 +6521,7 @@ Creates a software MIDI synthesizer player.
 
 **Parameters:** `path`
 
-*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L1313)*
+*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L1349)*
 
 ---
 
@@ -6524,7 +6531,7 @@ Loads an audio file and returns a source handle.
 
 **Parameters:** `args`
 
-*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L843)*
+*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L879)*
 
 ---
 
@@ -6534,7 +6541,7 @@ Pauses the audio source at its current position.
 
 **Parameters:** `id_val`
 
-*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L932)*
+*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L968)*
 
 ---
 
@@ -6542,7 +6549,7 @@ Pauses the audio source at its current position.
 
 Pauses all currently playing audio sources.
 
-*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L1162)*
+*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L1198)*
 
 ---
 
@@ -6552,7 +6559,7 @@ Plays the audio source from the beginning.
 
 **Parameters:** `id_val`
 
-*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L880)*
+*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L916)*
 
 ---
 
@@ -6562,7 +6569,7 @@ Plays the audio source in a continuous loop.
 
 **Parameters:** `id_val`
 
-*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L1047)*
+*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L1083)*
 
 ---
 
@@ -6572,7 +6579,7 @@ Releases the audio source and frees its memory.
 
 **Parameters:** `id_val`
 
-*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L1195)*
+*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L1231)*
 
 ---
 
@@ -6584,7 +6591,7 @@ Resumes playback of a paused audio source from its current position.
 
 - `source` — Audio source ID to resume.
 
-*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L948)*
+*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L984)*
 
 ---
 
@@ -6592,7 +6599,7 @@ Resumes playback of a paused audio source from its current position.
 
 Resumes playback on every audio source that is currently paused.
 
-*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L1184)*
+*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L1220)*
 
 ---
 
@@ -6602,7 +6609,7 @@ Seeks to the given time position (in seconds) in the source.
 
 **Parameters:** `id_val`, `pos`
 
-*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L1359)*
+*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L1395)*
 
 ---
 
@@ -6612,7 +6619,7 @@ Applies a high-pass filter to the audio source.
 
 **Parameters:** `id_val`, `cutoff_hz`
 
-*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L1385)*
+*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L1421)*
 
 ---
 
@@ -6622,7 +6629,7 @@ Sets the 2D listener position for spatial audio.
 
 **Parameters:** `x`, `y`
 
-*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L1272)*
+*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L1308)*
 
 ---
 
@@ -6632,7 +6639,7 @@ Enables or disables looping playback for the source.
 
 **Parameters:** `id_val`, `looping`
 
-*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L1022)*
+*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L1058)*
 
 ---
 
@@ -6642,7 +6649,7 @@ Applies a low-pass filter to the audio source.
 
 **Parameters:** `id_val`, `cutoff_hz`
 
-*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L1373)*
+*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L1409)*
 
 ---
 
@@ -6652,7 +6659,7 @@ Sets the global master volume (0.0 - 1.0).
 
 **Parameters:** `vol`
 
-*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L1086)*
+*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L1122)*
 
 ---
 
@@ -6662,7 +6669,7 @@ Enables or disables peak metering on the audio source.
 
 **Parameters:** `scale`
 
-*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L1292)*
+*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L1328)*
 
 ---
 
@@ -6672,7 +6679,7 @@ Sets the stereo panning (-1.0 left to 1.0 right) of the source.
 
 **Parameters:** `id_val`, `pan`
 
-*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L1061)*
+*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L1097)*
 
 ---
 
@@ -6682,7 +6689,7 @@ Sets the pitch (playback speed) multiplier of the source.
 
 **Parameters:** `id_val`, `pitch`
 
-*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L961)*
+*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L997)*
 
 ---
 
@@ -6692,7 +6699,7 @@ Assigns the source to a named audio bus.
 
 **Parameters:** `id_val`, `bus_val`
 
-*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L1228)*
+*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L1264)*
 
 ---
 
@@ -6702,7 +6709,7 @@ Sets the playback volume (0.0 - 1.0) of the source.
 
 **Parameters:** `id_val`, `vol`
 
-*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L907)*
+*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L943)*
 
 ---
 
@@ -6712,7 +6719,7 @@ Stops playback of the audio source.
 
 **Parameters:** `id_val`
 
-*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L894)*
+*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L930)*
 
 ---
 
@@ -6720,7 +6727,7 @@ Stops playback of the audio source.
 
 Stops all currently playing audio sources.
 
-*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L1173)*
+*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L1209)*
 
 ---
 
@@ -6730,7 +6737,7 @@ Returns the current playback position in seconds.
 
 **Parameters:** `id_val`
 
-*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L1347)*
+*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L1383)*
 
 ---
 
@@ -6740,7 +6747,7 @@ Returns the current playback position in seconds.
 
 Returns the name of this audio bus.
 
-*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L272)*
+*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L308)*
 
 ---
 
@@ -6748,7 +6755,7 @@ Returns the name of this audio bus.
 
 Returns the pitch multiplier of this bus.
 
-*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L310)*
+*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L346)*
 
 ---
 
@@ -6758,7 +6765,7 @@ Returns the current volume scale of this audio mixer bus.
 
 **Returns:** Volume scale in the range 0.0 (silent) to 1.0 (full volume).
 
-*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L295)*
+*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L331)*
 
 ---
 
@@ -6766,7 +6773,7 @@ Returns the current volume scale of this audio mixer bus.
 
 Returns whether this bus is currently paused.
 
-*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L334)*
+*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L370)*
 
 ---
 
@@ -6774,7 +6781,7 @@ Returns whether this bus is currently paused.
 
 Pauses all audio sources that are currently playing through this bus.
 
-*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L316)*
+*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L352)*
 
 ---
 
@@ -6782,7 +6789,7 @@ Pauses all audio sources that are currently playing through this bus.
 
 Resumes all paused sources on this bus.
 
-*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L325)*
+*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L361)*
 
 ---
 
@@ -6792,7 +6799,7 @@ Sets the pitch multiplier for all sources on this bus.
 
 **Parameters:** `pitch`
 
-*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L301)*
+*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L337)*
 
 ---
 
@@ -6802,7 +6809,7 @@ Sets the volume for all sources routed to this bus.
 
 **Parameters:** `vol`
 
-*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L283)*
+*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L319)*
 
 ---
 
@@ -6814,7 +6821,7 @@ Returns the audio bus that this MIDI player's output is routed through.
 
 **Returns:** Bus object, or nil if no bus is assigned.
 
-*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L517)*
+*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L553)*
 
 ---
 
@@ -6824,7 +6831,7 @@ Returns the number of MIDI channels present in the loaded sequence.
 
 **Returns:** Channel count as an integer.
 
-*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L669)*
+*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L705)*
 
 ---
 
@@ -6838,7 +6845,7 @@ Returns the General MIDI instrument index for the given MIDI channel.
 
 **Returns:** GM instrument index (0-127).
 
-*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L657)*
+*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L693)*
 
 ---
 
@@ -6852,7 +6859,7 @@ Returns the current volume scale applied to the given MIDI channel.
 
 **Returns:** Volume scale in [0.0, 1.0].
 
-*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L605)*
+*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L641)*
 
 ---
 
@@ -6862,7 +6869,7 @@ Returns the total duration of the audio source in seconds.
 
 **Parameters:** `looping`
 
-*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L469)*
+*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L505)*
 
 ---
 
@@ -6872,7 +6879,7 @@ Returns the file path of the MIDI file currently loaded into the player.
 
 **Returns:** Path string, or nil if no file is loaded.
 
-*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L398)*
+*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L434)*
 
 ---
 
@@ -6882,7 +6889,7 @@ Returns the total number of note events in the loaded MIDI sequence.
 
 **Returns:** Note count as an integer.
 
-*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L750)*
+*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L786)*
 
 ---
 
@@ -6892,7 +6899,7 @@ Returns the original tempo written in the MIDI file, in beats per minute.
 
 **Returns:** Tempo in BPM.
 
-*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L556)*
+*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L592)*
 
 ---
 
@@ -6902,7 +6909,7 @@ Returns the file path of the SoundFont (.sf2) currently loaded into the player.
 
 **Returns:** Path string, or nil if using built-in defaults.
 
-*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L416)*
+*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L452)*
 
 ---
 
@@ -6912,7 +6919,7 @@ Returns the current playback tempo in beats per minute.
 
 **Returns:** Tempo as a number in BPM.
 
-*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L547)*
+*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L583)*
 
 ---
 
@@ -6922,7 +6929,7 @@ Returns the current tempo scale factor applied on top of the original BPM.
 
 **Returns:** Tempo scale as a number (1.0 = original tempo).
 
-*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L573)*
+*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L609)*
 
 ---
 
@@ -6932,7 +6939,7 @@ Returns the ticks-per-beat (PPQ) resolution defined in the MIDI file header.
 
 **Returns:** Ticks per beat as an integer.
 
-*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L581)*
+*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L617)*
 
 ---
 
@@ -6942,7 +6949,7 @@ Returns the total number of tracks in the loaded MIDI sequence.
 
 **Returns:** Track count as an integer.
 
-*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L696)*
+*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L732)*
 
 ---
 
@@ -6956,7 +6963,7 @@ Returns the name string of the given MIDI track from the sequence metadata.
 
 **Returns:** Track name string, or nil if no name is set.
 
-*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L707)*
+*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L743)*
 
 ---
 
@@ -6964,7 +6971,7 @@ Returns the name string of the given MIDI track from the sequence metadata.
 
 Returns the current volume of the audio source.
 
-*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L492)*
+*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L528)*
 
 ---
 
@@ -6978,7 +6985,7 @@ Returns whether the given MIDI channel is currently muted.
 
 **Returns:** true if the channel is muted, false otherwise.
 
-*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L632)*
+*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L668)*
 
 ---
 
@@ -6988,7 +6995,7 @@ Returns whether a MIDI file or data string has been successfully loaded.
 
 **Returns:** true if a sequence is loaded and ready to play.
 
-*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L390)*
+*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L426)*
 
 ---
 
@@ -6996,7 +7003,7 @@ Returns whether a MIDI file or data string has been successfully loaded.
 
 Returns whether the audio source is set to loop.
 
-*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L480)*
+*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L516)*
 
 ---
 
@@ -7006,7 +7013,7 @@ Returns whether the audio source is currently paused.
 
 **Parameters:** `secs`
 
-*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L455)*
+*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L491)*
 
 ---
 
@@ -7014,7 +7021,7 @@ Returns whether the audio source is currently paused.
 
 Returns whether the audio source is currently playing.
 
-*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L450)*
+*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L486)*
 
 ---
 
@@ -7028,7 +7035,7 @@ Returns whether the given track index is currently muted.
 
 **Returns:** true if the track is muted, false otherwise.
 
-*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L738)*
+*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L774)*
 
 ---
 
@@ -7040,7 +7047,7 @@ Loads a MIDI file from the given path and prepares it for playback.
 
 - `path` — File path to the .mid MIDI file.
 
-*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L369)*
+*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L405)*
 
 ---
 
@@ -7052,7 +7059,7 @@ Loads MIDI data from a Lua string directly into the player.
 
 - `data` — Raw MIDI bytes as a Lua string.
 
-*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L380)*
+*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L416)*
 
 ---
 
@@ -7060,7 +7067,7 @@ Loads MIDI data from a Lua string directly into the player.
 
 Pauses the audio source at its current position.
 
-*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L438)*
+*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L474)*
 
 ---
 
@@ -7068,7 +7075,7 @@ Pauses the audio source at its current position.
 
 Plays the audio source from the beginning.
 
-*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L429)*
+*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L465)*
 
 ---
 
@@ -7078,7 +7085,7 @@ Seeks to the given time position (in seconds) in the source.
 
 **Parameters:** `secs`
 
-*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L460)*
+*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L496)*
 
 ---
 
@@ -7090,7 +7097,7 @@ Routes the MIDI player's synthesizer output through the given audio bus.
 
 - `bus` — Bus object or bus name string.
 
-*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L498)*
+*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L534)*
 
 ---
 
@@ -7103,7 +7110,7 @@ Mutes or unmutes the given MIDI channel for selective playback.
 - `channel` — 1-based MIDI channel (1-16).
 - `muted` — true to silence the channel, false to unmute.
 
-*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L618)*
+*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L654)*
 
 ---
 
@@ -7116,7 +7123,7 @@ Sets the volume scale for the specified MIDI channel.
 - `channel` — 1-based MIDI channel (1-16).
 - `volume` — Volume scale in [0.0, 1.0].
 
-*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L591)*
+*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L627)*
 
 ---
 
@@ -7126,7 +7133,7 @@ Enables or disables looping playback for the source.
 
 **Parameters:** `looping`
 
-*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L474)*
+*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L510)*
 
 ---
 
@@ -7138,7 +7145,7 @@ Registers a callback invoked when the MIDI sequence finishes playing.
 
 - `callback` — Function called with no arguments when playback ends.
 
-*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L777)*
+*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L813)*
 
 ---
 
@@ -7150,7 +7157,7 @@ Registers a callback invoked for each MIDI note-off event during playback.
 
 - `callback` — Function called as callback(channel, note, velocity).
 
-*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L768)*
+*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L804)*
 
 ---
 
@@ -7162,7 +7169,7 @@ Registers a callback invoked for each MIDI note-on event during playback.
 
 - `callback` — Function called as callback(channel, note, velocity).
 
-*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L759)*
+*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L795)*
 
 ---
 
@@ -7174,7 +7181,7 @@ Loads a SoundFont (.sf2) file into this player for instrument rendering.
 
 - `path` — File path to the .sf2 SoundFont file.
 
-*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L407)*
+*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L443)*
 
 ---
 
@@ -7186,7 +7193,7 @@ Sets the playback tempo in beats per minute.
 
 - `bpm` — Tempo in beats per minute (e.g. 120).
 
-*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L533)*
+*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L569)*
 
 ---
 
@@ -7198,7 +7205,7 @@ Sets a multiplier applied to the original MIDI tempo during playback.
 
 - `scale` — Tempo scale factor (1.0 = original speed, 2.0 = double speed).
 
-*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L564)*
+*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L600)*
 
 ---
 
@@ -7211,7 +7218,7 @@ Mutes or unmutes a specific track by index for selective rendering.
 - `track` — 1-based track index.
 - `muted` — true to silence the track, false to enable it.
 
-*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L724)*
+*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L760)*
 
 ---
 
@@ -7221,7 +7228,7 @@ Sets the playback volume (0.0 - 1.0) of the source.
 
 **Parameters:** `vol`
 
-*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L486)*
+*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L522)*
 
 ---
 
@@ -7234,7 +7241,7 @@ Solos the given MIDI channel so it is the only one producing sound.
 - `channel` — 1-based MIDI channel (1-16).
 - `solo` — true to solo, false to clear solo.
 
-*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L678)*
+*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L714)*
 
 ---
 
@@ -7242,7 +7249,7 @@ Solos the given MIDI channel so it is the only one producing sound.
 
 Stops playback of the audio source.
 
-*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L444)*
+*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L480)*
 
 ---
 
@@ -7250,7 +7257,7 @@ Stops playback of the audio source.
 
 Returns the current playback position in seconds.
 
-*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L466)*
+*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L502)*
 
 ---
 
@@ -7258,7 +7265,7 @@ Returns the current playback position in seconds.
 
 Clears the solo flag on every track so all tracks are audible.
 
-*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L686)*
+*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L722)*
 
 ---
 
@@ -7266,7 +7273,7 @@ Clears the solo flag on every track so all tracks are audible.
 
 Reverts the player to using the built-in default SoundFont for rendering.
 
-*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L422)*
+*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L458)*
 
 ---
 
@@ -7276,7 +7283,7 @@ Reverts the player to using the built-in default SoundFont for rendering.
 
 Removes any active filter from the audio source.
 
-*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L226)*
+*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L262)*
 
 ---
 
@@ -7284,7 +7291,7 @@ Removes any active filter from the audio source.
 
 Creates an independent copy of an audio source.
 
-*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L149)*
+*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L176)*
 
 ---
 
@@ -7294,15 +7301,17 @@ Fades the audio source in from silence over the given duration.
 
 **Parameters:** `duration_secs`
 
-*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L233)*
+*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L269)*
 
 ---
 
 #### `Source:getDuration()`
 
-Returns the total duration of the audio source in seconds.
+Returns the total duration of this audio source in seconds.
 
-*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L178)*
+**Returns:** `number` — total duration in seconds.
+
+*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L208)*
 
 ---
 
@@ -7310,7 +7319,7 @@ Returns the total duration of the audio source in seconds.
 
 Returns the current fade-in duration.
 
-*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L240)*
+*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L276)*
 
 ---
 
@@ -7318,7 +7327,7 @@ Returns the current fade-in duration.
 
 Returns the current high-pass filter cutoff frequency.
 
-*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L220)*
+*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L256)*
 
 ---
 
@@ -7326,7 +7335,7 @@ Returns the current high-pass filter cutoff frequency.
 
 Returns the current low-pass filter cutoff frequency.
 
-*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L214)*
+*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L250)*
 
 ---
 
@@ -7334,15 +7343,17 @@ Returns the current low-pass filter cutoff frequency.
 
 Returns the current stereo panning of the source.
 
-*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L142)*
+*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L169)*
 
 ---
 
 #### `Source:getPitch()`
 
-Returns the current pitch multiplier of the source.
+Returns the current pitch multiplier.
 
-*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L91)*
+**Returns:** `number` — pitch multiplier.
+
+*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L103)*
 
 ---
 
@@ -7352,53 +7363,63 @@ Returns the type of this audio source: 'static', 'stream', or 'queue'.
 
 **Returns:** Source type string.
 
-*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L166)*
+*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L193)*
 
 ---
 
 #### `Source:getVolume()`
 
-Returns the current volume of the audio source.
+Returns the current volume multiplier.
 
-*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L76)*
+**Returns:** `number` — volume (0–1).
+
+*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L82)*
 
 ---
 
 #### `Source:isLooping()`
 
-Returns whether the audio source is set to loop.
+Returns `true` if this source is set to loop.
 
-*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L106)*
+**Returns:** `boolean`.
+
+*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L124)*
 
 ---
 
 #### `Source:isPaused()`
 
-Returns whether the audio source is currently paused.
+Returns `true` if playback is currently paused.
 
-*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L120)*
+**Returns:** `boolean`.
+
+*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L144)*
 
 ---
 
 #### `Source:isPlaying()`
 
-Returns whether the audio source is currently playing.
+Returns `true` if this source is currently playing.
 
-*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L113)*
+**Returns:** `boolean`.
+
+*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L134)*
 
 ---
 
 #### `Source:isStopped()`
 
-Returns whether the audio source is stopped.
+Returns `true` if playback has stopped (either manually or after the audio ended).
 
-*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L127)*
+**Returns:** `boolean`.
+
+*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L154)*
 
 ---
 
 #### `Source:pause()`
 
-Pauses the audio source at its current position.
+Pauses playback. Call `play()` to resume.
 
 *Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L52)*
 
@@ -7406,7 +7427,7 @@ Pauses the audio source at its current position.
 
 #### `Source:play()`
 
-Plays the audio source from the beginning.
+Starts or resumes playback from the current seek position.
 
 *Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L35)*
 
@@ -7422,11 +7443,13 @@ Resumes playback of this audio source from its current paused position.
 
 #### `Source:seek(pos)`
 
-Seeks to the given time position (in seconds) in the source.
+Seeks playback to `offset` seconds from the start.
 
-**Parameters:** `pos`
+**Parameters:**
 
-*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L192)*
+- `offset` — `number`: Target position in seconds.
+
+*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L228)*
 
 ---
 
@@ -7436,17 +7459,19 @@ Applies a high-pass filter to the audio source.
 
 **Parameters:** `cutoff_hz`
 
-*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L207)*
+*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L243)*
 
 ---
 
 #### `Source:setLooping(looping)`
 
-Enables or disables looping playback for the source.
+Enables or disables looping. When enabled, the source restarts automatically when it reaches the end.
 
-**Parameters:** `looping`
+**Parameters:**
 
-*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L98)*
+- `loop` — `boolean`: `true` to enable looping.
+
+*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L113)*
 
 ---
 
@@ -7456,7 +7481,7 @@ Applies a low-pass filter to the audio source.
 
 **Parameters:** `cutoff_hz`
 
-*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L200)*
+*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L236)*
 
 ---
 
@@ -7466,33 +7491,37 @@ Sets the stereo panning (-1.0 left to 1.0 right) of the source.
 
 **Parameters:** `pan`
 
-*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L134)*
+*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L161)*
 
 ---
 
 #### `Source:setPitch(pitch)`
 
-Sets the pitch (playback speed) multiplier of the source.
+Sets the playback pitch multiplier. `1.0` is normal pitch; `2.0` doubles frequency.
 
-**Parameters:** `pitch`
+**Parameters:**
 
-*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L83)*
+- `pitch` — `number`: Pitch multiplier.
+
+*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L92)*
 
 ---
 
 #### `Source:setVolume(vol)`
 
-Sets the playback volume (0.0 - 1.0) of the source.
+Sets playback volume. `1.0` is full volume; `0.0` is silent.
 
-**Parameters:** `vol`
+**Parameters:**
 
-*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L68)*
+- `volume` — `number`: Volume multiplier (0–1).
+
+*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L71)*
 
 ---
 
 #### `Source:stop()`
 
-Stops playback of the audio source.
+Stops playback and resets the seek position to the beginning.
 
 *Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L44)*
 
@@ -7502,7 +7531,9 @@ Stops playback of the audio source.
 
 Returns the current playback position in seconds.
 
-*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L185)*
+**Returns:** `number` — current position in seconds.
+
+*Source: [src/lua_api/audio_api.rs](src/lua_api/audio_api.rs#L218)*
 
 ---
 
@@ -7527,7 +7558,7 @@ Adds a distance joint that maintains a fixed separation between two body anchor 
 
 **Returns:** New joint ID.
 
-*Source: [src/lua_api/physics_api.rs](src/lua_api/physics_api.rs#L1442)*
+*Source: [src/lua_api/physics_api.rs](src/lua_api/physics_api.rs#L1460)*
 
 ---
 
@@ -7544,7 +7575,7 @@ Adds a friction joint that resists relative movement and rotation between two bo
 
 **Returns:** New joint ID.
 
-*Source: [src/lua_api/physics_api.rs](src/lua_api/physics_api.rs#L1814)*
+*Source: [src/lua_api/physics_api.rs](src/lua_api/physics_api.rs#L1832)*
 
 ---
 
@@ -7561,7 +7592,7 @@ Adds a gear joint that couples two revolute or prismatic joints so they move in 
 
 **Returns:** New joint ID.
 
-*Source: [src/lua_api/physics_api.rs](src/lua_api/physics_api.rs#L1955)*
+*Source: [src/lua_api/physics_api.rs](src/lua_api/physics_api.rs#L1973)*
 
 ---
 
@@ -7577,7 +7608,7 @@ Adds a motor joint that drives one body toward a target position relative to ano
 
 **Returns:** New joint ID.
 
-*Source: [src/lua_api/physics_api.rs](src/lua_api/physics_api.rs#L1850)*
+*Source: [src/lua_api/physics_api.rs](src/lua_api/physics_api.rs#L1868)*
 
 ---
 
@@ -7593,7 +7624,7 @@ Adds a mouse joint that applies a spring force pulling a body toward a target po
 
 **Returns:** New joint ID.
 
-*Source: [src/lua_api/physics_api.rs](src/lua_api/physics_api.rs#L1875)*
+*Source: [src/lua_api/physics_api.rs](src/lua_api/physics_api.rs#L1893)*
 
 ---
 
@@ -7611,7 +7642,7 @@ Adds a prismatic joint that constrains two bodies to slide along a single axis.
 
 **Returns:** New joint ID.
 
-*Source: [src/lua_api/physics_api.rs](src/lua_api/physics_api.rs#L1480)*
+*Source: [src/lua_api/physics_api.rs](src/lua_api/physics_api.rs#L1498)*
 
 ---
 
@@ -7632,7 +7663,7 @@ Adds a pulley joint linking two bodies through a rope of fixed total length.
 
 **Returns:** New joint ID.
 
-*Source: [src/lua_api/physics_api.rs](src/lua_api/physics_api.rs#L1929)*
+*Source: [src/lua_api/physics_api.rs](src/lua_api/physics_api.rs#L1947)*
 
 ---
 
@@ -7649,7 +7680,7 @@ Adds a revolute joint that constrains two bodies to rotate around a shared ancho
 
 **Returns:** New joint ID.
 
-*Source: [src/lua_api/physics_api.rs](src/lua_api/physics_api.rs#L1414)*
+*Source: [src/lua_api/physics_api.rs](src/lua_api/physics_api.rs#L1432)*
 
 ---
 
@@ -7668,7 +7699,7 @@ Adds a rope joint that enforces a maximum distance between two body anchor point
 
 **Returns:** New joint ID.
 
-*Source: [src/lua_api/physics_api.rs](src/lua_api/physics_api.rs#L1545)*
+*Source: [src/lua_api/physics_api.rs](src/lua_api/physics_api.rs#L1563)*
 
 ---
 
@@ -7685,7 +7716,7 @@ Adds a weld joint that rigidly fixes the relative position and angle of two bodi
 
 **Returns:** New joint ID.
 
-*Source: [src/lua_api/physics_api.rs](src/lua_api/physics_api.rs#L1516)*
+*Source: [src/lua_api/physics_api.rs](src/lua_api/physics_api.rs#L1534)*
 
 ---
 
@@ -7703,7 +7734,7 @@ Adds a wheel joint combining a revolute motor and a prismatic spring for vehicle
 
 **Returns:** New joint ID.
 
-*Source: [src/lua_api/physics_api.rs](src/lua_api/physics_api.rs#L1779)*
+*Source: [src/lua_api/physics_api.rs](src/lua_api/physics_api.rs#L1797)*
 
 ---
 
@@ -7717,7 +7748,7 @@ Applies an instantaneous angular impulse to the body, changing its spin velocity
 - `body` — Target body ID.
 - `impulse` — Angular impulse magnitude in N·m·s.
 
-*Source: [src/lua_api/physics_api.rs](src/lua_api/physics_api.rs#L2396)*
+*Source: [src/lua_api/physics_api.rs](src/lua_api/physics_api.rs#L2414)*
 
 ---
 
@@ -7727,7 +7758,7 @@ Applies a force vector to a body at its center of mass.
 
 **Parameters:** `world_id_val`, `body_id_val`, `fx`, `fy`
 
-*Source: [src/lua_api/physics_api.rs](src/lua_api/physics_api.rs#L811)*
+*Source: [src/lua_api/physics_api.rs](src/lua_api/physics_api.rs#L829)*
 
 ---
 
@@ -7742,7 +7773,7 @@ Applies a world-space force at a given point on the body, potentially adding tor
 - `fx`, `fy` — Force vector in Newtons.
 - `px`, `py` — World-space point of application.
 
-*Source: [src/lua_api/physics_api.rs](src/lua_api/physics_api.rs#L2365)*
+*Source: [src/lua_api/physics_api.rs](src/lua_api/physics_api.rs#L2383)*
 
 ---
 
@@ -7752,7 +7783,7 @@ Applies an instantaneous impulse to a body.
 
 **Parameters:** `world_id_val`, `body_id_val`, `ix`, `iy`
 
-*Source: [src/lua_api/physics_api.rs](src/lua_api/physics_api.rs#L1597)*
+*Source: [src/lua_api/physics_api.rs](src/lua_api/physics_api.rs#L1615)*
 
 ---
 
@@ -7762,7 +7793,7 @@ Applies a rotational torque to a body.
 
 **Parameters:** `world_id_val`, `body_id_val`, `torque`
 
-*Source: [src/lua_api/physics_api.rs](src/lua_api/physics_api.rs#L829)*
+*Source: [src/lua_api/physics_api.rs](src/lua_api/physics_api.rs#L847)*
 
 ---
 
@@ -7772,7 +7803,7 @@ Removes a body from the physics world.
 
 **Parameters:** `world_id_val`, `body_id_val`
 
-*Source: [src/lua_api/physics_api.rs](src/lua_api/physics_api.rs#L1169)*
+*Source: [src/lua_api/physics_api.rs](src/lua_api/physics_api.rs#L1187)*
 
 ---
 
@@ -7785,7 +7816,7 @@ Removes the given joint from the world and frees its resources.
 - `world` — World ID that owns the joint.
 - `joint` — Joint ID to destroy.
 
-*Source: [src/lua_api/physics_api.rs](src/lua_api/physics_api.rs#L1191)*
+*Source: [src/lua_api/physics_api.rs](src/lua_api/physics_api.rs#L1209)*
 
 ---
 
@@ -7795,7 +7826,7 @@ Destroys a physics world and frees all associated resources.
 
 **Parameters:** `world_id_val`
 
-*Source: [src/lua_api/physics_api.rs](src/lua_api/physics_api.rs#L2483)*
+*Source: [src/lua_api/physics_api.rs](src/lua_api/physics_api.rs#L2501)*
 
 ---
 
@@ -7810,7 +7841,7 @@ Returns the angular damping coefficient of the body that slows its rotation over
 
 **Returns:** Angular damping coefficient as a non-negative number.
 
-*Source: [src/lua_api/physics_api.rs](src/lua_api/physics_api.rs#L2341)*
+*Source: [src/lua_api/physics_api.rs](src/lua_api/physics_api.rs#L2359)*
 
 ---
 
@@ -7825,7 +7856,7 @@ Returns the current angular velocity of the body in radians per second.
 
 **Returns:** Angular velocity in radians per second.
 
-*Source: [src/lua_api/physics_api.rs](src/lua_api/physics_api.rs#L877)*
+*Source: [src/lua_api/physics_api.rs](src/lua_api/physics_api.rs#L895)*
 
 ---
 
@@ -7839,7 +7870,7 @@ Returns a table of all body IDs currently registered in the physics world.
 
 **Returns:** Table of body ID integers.
 
-*Source: [src/lua_api/physics_api.rs](src/lua_api/physics_api.rs#L2441)*
+*Source: [src/lua_api/physics_api.rs](src/lua_api/physics_api.rs#L2459)*
 
 ---
 
@@ -7854,7 +7885,7 @@ Returns the body object table for the given body ID within the world.
 
 **Returns:** Body property table, or nil if the ID is not found.
 
-*Source: [src/lua_api/physics_api.rs](src/lua_api/physics_api.rs#L617)*
+*Source: [src/lua_api/physics_api.rs](src/lua_api/physics_api.rs#L635)*
 
 ---
 
@@ -7864,7 +7895,7 @@ Returns the current rotation angle (radians) of a physics body.
 
 **Parameters:** `world_id_val`, `body_id_val`
 
-*Source: [src/lua_api/physics_api.rs](src/lua_api/physics_api.rs#L734)*
+*Source: [src/lua_api/physics_api.rs](src/lua_api/physics_api.rs#L752)*
 
 ---
 
@@ -7879,7 +7910,7 @@ Returns all active contact manifolds where this body touches another body.
 
 **Returns:** Table of contact records for this body's current collisions.
 
-*Source: [src/lua_api/physics_api.rs](src/lua_api/physics_api.rs#L2209)*
+*Source: [src/lua_api/physics_api.rs](src/lua_api/physics_api.rs#L2227)*
 
 ---
 
@@ -7889,7 +7920,7 @@ Returns the number of bodies in the world.
 
 **Parameters:** `world_id_val`
 
-*Source: [src/lua_api/physics_api.rs](src/lua_api/physics_api.rs#L1106)*
+*Source: [src/lua_api/physics_api.rs](src/lua_api/physics_api.rs#L1124)*
 
 ---
 
@@ -7899,7 +7930,7 @@ Returns the mass of a physics body.
 
 **Parameters:** `world_id_val`, `body_id_val`
 
-*Source: [src/lua_api/physics_api.rs](src/lua_api/physics_api.rs#L770)*
+*Source: [src/lua_api/physics_api.rs](src/lua_api/physics_api.rs#L788)*
 
 ---
 
@@ -7909,7 +7940,7 @@ Returns the type string of the given body.
 
 **Parameters:** `world_id_val`, `body_id_val`
 
-*Source: [src/lua_api/physics_api.rs](src/lua_api/physics_api.rs#L1036)*
+*Source: [src/lua_api/physics_api.rs](src/lua_api/physics_api.rs#L1054)*
 
 ---
 
@@ -7923,7 +7954,7 @@ Returns all collision pairs currently overlapping in the physics world.
 
 **Returns:** Table of {bodyA, bodyB, nx, ny, overlap} collision records.
 
-*Source: [src/lua_api/physics_api.rs](src/lua_api/physics_api.rs#L1214)*
+*Source: [src/lua_api/physics_api.rs](src/lua_api/physics_api.rs#L1232)*
 
 ---
 
@@ -7937,7 +7968,7 @@ Returns a table of all currently active collision contact manifolds in the world
 
 **Returns:** Table of contact records, each with body1, body2, nx, ny, and overlap fields.
 
-*Source: [src/lua_api/physics_api.rs](src/lua_api/physics_api.rs#L2157)*
+*Source: [src/lua_api/physics_api.rs](src/lua_api/physics_api.rs#L2175)*
 
 ---
 
@@ -7947,7 +7978,7 @@ Returns the global gravity vector (gx, gy).
 
 **Parameters:** `world_id_val`
 
-*Source: [src/lua_api/physics_api.rs](src/lua_api/physics_api.rs#L1090)*
+*Source: [src/lua_api/physics_api.rs](src/lua_api/physics_api.rs#L1108)*
 
 ---
 
@@ -7962,7 +7993,7 @@ Returns the per-body gravity scale factor applied to the world gravity vector.
 
 **Returns:** Gravity scale as a number (1.0 = normal gravity, 0.0 = no gravity).
 
-*Source: [src/lua_api/physics_api.rs](src/lua_api/physics_api.rs#L2266)*
+*Source: [src/lua_api/physics_api.rs](src/lua_api/physics_api.rs#L2284)*
 
 ---
 
@@ -7977,7 +8008,7 @@ Returns the two body IDs connected by the given joint.
 
 **Returns:** body1 ID and body2 ID.
 
-*Source: [src/lua_api/physics_api.rs](src/lua_api/physics_api.rs#L1580)*
+*Source: [src/lua_api/physics_api.rs](src/lua_api/physics_api.rs#L1598)*
 
 ---
 
@@ -7991,7 +8022,7 @@ Returns the total number of joints currently active in the physics world.
 
 **Returns:** Joint count as an integer.
 
-*Source: [src/lua_api/physics_api.rs](src/lua_api/physics_api.rs#L2420)*
+*Source: [src/lua_api/physics_api.rs](src/lua_api/physics_api.rs#L2438)*
 
 ---
 
@@ -8006,7 +8037,7 @@ Returns the lower and upper angular or linear limits set on the joint.
 
 **Returns:** lower limit and upper limit values.
 
-*Source: [src/lua_api/physics_api.rs](src/lua_api/physics_api.rs#L2070)*
+*Source: [src/lua_api/physics_api.rs](src/lua_api/physics_api.rs#L2088)*
 
 ---
 
@@ -8021,7 +8052,7 @@ Returns the target motor speed of a revolute or prismatic joint.
 
 **Returns:** Motor speed in rad/s (revolute) or m/s (prismatic).
 
-*Source: [src/lua_api/physics_api.rs](src/lua_api/physics_api.rs#L2003)*
+*Source: [src/lua_api/physics_api.rs](src/lua_api/physics_api.rs#L2021)*
 
 ---
 
@@ -8036,7 +8067,7 @@ Returns a string describing the type of the given joint.
 
 **Returns:** Type string such as 'revolute', 'prismatic', 'distance', etc.
 
-*Source: [src/lua_api/physics_api.rs](src/lua_api/physics_api.rs#L2093)*
+*Source: [src/lua_api/physics_api.rs](src/lua_api/physics_api.rs#L2111)*
 
 ---
 
@@ -8050,7 +8081,7 @@ Returns a table of all joint IDs currently active in the physics world.
 
 **Returns:** Table of joint ID integers.
 
-*Source: [src/lua_api/physics_api.rs](src/lua_api/physics_api.rs#L2465)*
+*Source: [src/lua_api/physics_api.rs](src/lua_api/physics_api.rs#L2483)*
 
 ---
 
@@ -8065,7 +8096,7 @@ Returns the linear damping coefficient that gradually slows the body's movement.
 
 **Returns:** Linear damping coefficient as a non-negative number.
 
-*Source: [src/lua_api/physics_api.rs](src/lua_api/physics_api.rs#L2316)*
+*Source: [src/lua_api/physics_api.rs](src/lua_api/physics_api.rs#L2334)*
 
 ---
 
@@ -8079,7 +8110,7 @@ Returns the current pixels-per-meter scale set on the physics world.
 
 **Returns:** Pixels-per-meter as a number.
 
-*Source: [src/lua_api/physics_api.rs](src/lua_api/physics_api.rs#L2134)*
+*Source: [src/lua_api/physics_api.rs](src/lua_api/physics_api.rs#L2152)*
 
 ---
 
@@ -8094,7 +8125,7 @@ Returns whether continuous collision detection (CCD) is enabled on the body.
 
 **Returns:** true if CCD is active, false otherwise.
 
-*Source: [src/lua_api/physics_api.rs](src/lua_api/physics_api.rs#L1017)*
+*Source: [src/lua_api/physics_api.rs](src/lua_api/physics_api.rs#L1035)*
 
 ---
 
@@ -8109,7 +8140,7 @@ Returns whether the body's rotation is locked and prevented from changing.
 
 **Returns:** true if rotation is fixed, false if it is free.
 
-*Source: [src/lua_api/physics_api.rs](src/lua_api/physics_api.rs#L2291)*
+*Source: [src/lua_api/physics_api.rs](src/lua_api/physics_api.rs#L2309)*
 
 ---
 
@@ -8124,7 +8155,7 @@ Returns whether the body is allowed to enter a sleep state when inactive.
 
 **Returns:** true if sleeping is permitted, false if the body is always active.
 
-*Source: [src/lua_api/physics_api.rs](src/lua_api/physics_api.rs#L1151)*
+*Source: [src/lua_api/physics_api.rs](src/lua_api/physics_api.rs#L1169)*
 
 ---
 
@@ -8134,7 +8165,7 @@ Creates a rigid body in the given world.
 
 **Parameters:** `world_id_val`, `x`, `y`, `btype`
 
-*Source: [src/lua_api/physics_api.rs](src/lua_api/physics_api.rs#L558)*
+*Source: [src/lua_api/physics_api.rs](src/lua_api/physics_api.rs#L576)*
 
 ---
 
@@ -8150,7 +8181,7 @@ Creates a static chain body from a list of connected edge segments.
 
 **Returns:** New body ID.
 
-*Source: [src/lua_api/physics_api.rs](src/lua_api/physics_api.rs#L1723)*
+*Source: [src/lua_api/physics_api.rs](src/lua_api/physics_api.rs#L1741)*
 
 ---
 
@@ -8168,7 +8199,7 @@ Creates a circle-shaped physics body at the given world position.
 
 **Returns:** New body ID.
 
-*Source: [src/lua_api/physics_api.rs](src/lua_api/physics_api.rs#L689)*
+*Source: [src/lua_api/physics_api.rs](src/lua_api/physics_api.rs#L707)*
 
 ---
 
@@ -8184,7 +8215,7 @@ Creates a single-segment edge body connecting two points in world space.
 
 **Returns:** New body ID.
 
-*Source: [src/lua_api/physics_api.rs](src/lua_api/physics_api.rs#L1672)*
+*Source: [src/lua_api/physics_api.rs](src/lua_api/physics_api.rs#L1690)*
 
 ---
 
@@ -8202,7 +8233,7 @@ Creates a convex polygon body defined by a list of local-space vertices.
 
 **Returns:** New body ID.
 
-*Source: [src/lua_api/physics_api.rs](src/lua_api/physics_api.rs#L1628)*
+*Source: [src/lua_api/physics_api.rs](src/lua_api/physics_api.rs#L1646)*
 
 ---
 
@@ -8210,7 +8241,7 @@ Creates a convex polygon body defined by a list of local-space vertices.
 
 Creates a new regular polygon body.
 
-*Source: [src/lua_api/physics_api.rs](src/lua_api/physics_api.rs#L2498)*
+*Source: [src/lua_api/physics_api.rs](src/lua_api/physics_api.rs#L2516)*
 
 ---
 
@@ -8220,7 +8251,7 @@ Creates a new physics simulation world.
 
 **Parameters:** `gx`, `gy`
 
-*Source: [src/lua_api/physics_api.rs](src/lua_api/physics_api.rs#L539)*
+*Source: [src/lua_api/physics_api.rs](src/lua_api/physics_api.rs#L557)*
 
 ---
 
@@ -8238,7 +8269,7 @@ Returns all bodies whose axis-aligned bounding boxes overlap the given query rec
 
 **Returns:** Table of body IDs whose AABBs intersect the query box.
 
-*Source: [src/lua_api/physics_api.rs](src/lua_api/physics_api.rs#L1374)*
+*Source: [src/lua_api/physics_api.rs](src/lua_api/physics_api.rs#L1392)*
 
 ---
 
@@ -8256,7 +8287,7 @@ Casts a ray from the origin in the given direction and returns the first body hi
 
 **Returns:** Body ID, hit x, hit y, and surface normal nx, ny; or nil if no hit.
 
-*Source: [src/lua_api/physics_api.rs](src/lua_api/physics_api.rs#L1265)*
+*Source: [src/lua_api/physics_api.rs](src/lua_api/physics_api.rs#L1283)*
 
 ---
 
@@ -8274,7 +8305,7 @@ Casts a ray and returns every body it intersects, sorted by distance.
 
 **Returns:** Table of {body, x, y, nx, ny, fraction} hit records ordered by fraction.
 
-*Source: [src/lua_api/physics_api.rs](src/lua_api/physics_api.rs#L1317)*
+*Source: [src/lua_api/physics_api.rs](src/lua_api/physics_api.rs#L1335)*
 
 ---
 
@@ -8288,7 +8319,7 @@ Sets the angular damping coefficient that gradually reduces the body's spin.
 - `body` — Body ID.
 - `damping` — Non-negative damping coefficient.
 
-*Source: [src/lua_api/physics_api.rs](src/lua_api/physics_api.rs#L946)*
+*Source: [src/lua_api/physics_api.rs](src/lua_api/physics_api.rs#L964)*
 
 ---
 
@@ -8302,7 +8333,7 @@ Sets the angular velocity of the body to the given value in radians per second.
 - `body` — Body ID.
 - `omega` — Angular velocity in radians per second.
 
-*Source: [src/lua_api/physics_api.rs](src/lua_api/physics_api.rs#L852)*
+*Source: [src/lua_api/physics_api.rs](src/lua_api/physics_api.rs#L870)*
 
 ---
 
@@ -8312,7 +8343,7 @@ Sets the rotation angle (radians) of a physics body.
 
 **Parameters:** `world_id_val`, `body_id_val`, `angle`
 
-*Source: [src/lua_api/physics_api.rs](src/lua_api/physics_api.rs#L752)*
+*Source: [src/lua_api/physics_api.rs](src/lua_api/physics_api.rs#L770)*
 
 ---
 
@@ -8326,7 +8357,7 @@ Overrides the simulated mass of the body with the given value.
 - `body` — Body ID.
 - `mass` — New mass in physics units.
 
-*Source: [src/lua_api/physics_api.rs](src/lua_api/physics_api.rs#L793)*
+*Source: [src/lua_api/physics_api.rs](src/lua_api/physics_api.rs#L811)*
 
 ---
 
@@ -8336,7 +8367,7 @@ Sets the position of a physics body.
 
 **Parameters:** `world_id_val`, `body_id_val`, `x`, `y`
 
-*Source: [src/lua_api/physics_api.rs](src/lua_api/physics_api.rs#L716)*
+*Source: [src/lua_api/physics_api.rs](src/lua_api/physics_api.rs#L734)*
 
 ---
 
@@ -8351,7 +8382,7 @@ Sets the width and height dimensions of the body's collision shape.
 - `width` — New shape width in world units.
 - `height` — New shape height in world units.
 
-*Source: [src/lua_api/physics_api.rs](src/lua_api/physics_api.rs#L589)*
+*Source: [src/lua_api/physics_api.rs](src/lua_api/physics_api.rs#L607)*
 
 ---
 
@@ -8361,7 +8392,7 @@ Sets the body type: 'dynamic', 'static', or 'kinematic'.
 
 **Parameters:** `world_id_val`, `body_id_val`, `btype`
 
-*Source: [src/lua_api/physics_api.rs](src/lua_api/physics_api.rs#L1054)*
+*Source: [src/lua_api/physics_api.rs](src/lua_api/physics_api.rs#L1072)*
 
 ---
 
@@ -8371,7 +8402,7 @@ Sets the linear velocity of a physics body.
 
 **Parameters:** `world_id_val`, `body_id_val`, `vx`, `vy`
 
-*Source: [src/lua_api/physics_api.rs](src/lua_api/physics_api.rs#L642)*
+*Source: [src/lua_api/physics_api.rs](src/lua_api/physics_api.rs#L660)*
 
 ---
 
@@ -8385,7 +8416,7 @@ Enables continuous collision detection (CCD) on a body to prevent tunneling at h
 - `body` — Body ID to configure.
 - `enable` — true to enable CCD, false to disable.
 
-*Source: [src/lua_api/physics_api.rs](src/lua_api/physics_api.rs#L992)*
+*Source: [src/lua_api/physics_api.rs](src/lua_api/physics_api.rs#L1010)*
 
 ---
 
@@ -8399,7 +8430,7 @@ Locks or unlocks the body's rotation axis so it cannot spin in the simulation.
 - `body` — Body ID.
 - `fixed` — true to prevent rotation, false to allow it.
 
-*Source: [src/lua_api/physics_api.rs](src/lua_api/physics_api.rs#L900)*
+*Source: [src/lua_api/physics_api.rs](src/lua_api/physics_api.rs#L918)*
 
 ---
 
@@ -8409,7 +8440,7 @@ Sets the global gravity vector for the world.
 
 **Parameters:** `world_id_val`, `gx`, `gy`
 
-*Source: [src/lua_api/physics_api.rs](src/lua_api/physics_api.rs#L1075)*
+*Source: [src/lua_api/physics_api.rs](src/lua_api/physics_api.rs#L1093)*
 
 ---
 
@@ -8423,7 +8454,7 @@ Sets a per-body multiplier applied to the world gravity vector for this body.
 - `body` — Body ID.
 - `scale` — Gravity scale (1.0 = full gravity, 0.0 = weightless).
 
-*Source: [src/lua_api/physics_api.rs](src/lua_api/physics_api.rs#L969)*
+*Source: [src/lua_api/physics_api.rs](src/lua_api/physics_api.rs#L987)*
 
 ---
 
@@ -8438,7 +8469,7 @@ Sets the lower and upper angular or linear limits on a constrained joint.
 - `lower` — Lower limit value (angle in radians or distance).
 - `upper` — Upper limit value.
 
-*Source: [src/lua_api/physics_api.rs](src/lua_api/physics_api.rs#L2046)*
+*Source: [src/lua_api/physics_api.rs](src/lua_api/physics_api.rs#L2064)*
 
 ---
 
@@ -8452,7 +8483,7 @@ Enables or disables the angular/linear limit constraints on a joint.
 - `joint` — Joint ID.
 - `enabled` — true to enforce limits, false to disable them.
 
-*Source: [src/lua_api/physics_api.rs](src/lua_api/physics_api.rs#L2023)*
+*Source: [src/lua_api/physics_api.rs](src/lua_api/physics_api.rs#L2041)*
 
 ---
 
@@ -8466,7 +8497,7 @@ Sets the target motor speed for a motorized revolute or prismatic joint.
 - `joint` — Joint ID.
 - `speed` — Target speed in rad/s (revolute) or m/s (prismatic).
 
-*Source: [src/lua_api/physics_api.rs](src/lua_api/physics_api.rs#L1979)*
+*Source: [src/lua_api/physics_api.rs](src/lua_api/physics_api.rs#L1997)*
 
 ---
 
@@ -8480,7 +8511,7 @@ Sets the linear damping coefficient that gradually slows the body's movement.
 - `body` — Body ID.
 - `damping` — Non-negative damping coefficient.
 
-*Source: [src/lua_api/physics_api.rs](src/lua_api/physics_api.rs#L923)*
+*Source: [src/lua_api/physics_api.rs](src/lua_api/physics_api.rs#L941)*
 
 ---
 
@@ -8492,7 +8523,7 @@ Sets the pixels-per-meter ratio used to convert physics world units to screen pi
 
 - `meter` — Number of pixels that represent one physics meter.
 
-*Source: [src/lua_api/physics_api.rs](src/lua_api/physics_api.rs#L2113)*
+*Source: [src/lua_api/physics_api.rs](src/lua_api/physics_api.rs#L2131)*
 
 ---
 
@@ -8507,7 +8538,7 @@ Updates the target world-space point that the mouse joint pulls the body toward.
 - `x` — New target X in world units.
 - `y` — New target Y in world units.
 
-*Source: [src/lua_api/physics_api.rs](src/lua_api/physics_api.rs#L1899)*
+*Source: [src/lua_api/physics_api.rs](src/lua_api/physics_api.rs#L1917)*
 
 ---
 
@@ -8521,7 +8552,7 @@ Sets whether the body is allowed to enter a sleep state when it comes to rest.
 - `body` — Body ID.
 - `allowed` — true to allow sleeping, false to keep the body always awake.
 
-*Source: [src/lua_api/physics_api.rs](src/lua_api/physics_api.rs#L1126)*
+*Source: [src/lua_api/physics_api.rs](src/lua_api/physics_api.rs#L1144)*
 
 ---
 
@@ -8531,7 +8562,7 @@ Advances the physics simulation by the given timestep in seconds.
 
 **Parameters:** `world_id_val`, `dt`
 
-*Source: [src/lua_api/physics_api.rs](src/lua_api/physics_api.rs#L662)*
+*Source: [src/lua_api/physics_api.rs](src/lua_api/physics_api.rs#L680)*
 
 ---
 
@@ -8547,27 +8578,33 @@ Adds a collision fixture to the body using the given shape definition table.
 
 **Returns:** Fixture ID for the newly attached fixture.
 
-*Source: [src/lua_api/physics_api.rs](src/lua_api/physics_api.rs#L394)*
+*Source: [src/lua_api/physics_api.rs](src/lua_api/physics_api.rs#L412)*
 
 ---
 
 #### `Body:applyForce(fx, fy)`
 
-Applies a force vector to a body at its center of mass.
+Applies a continuous force (accumulates until the next physics step) to the body's centre of mass.
 
-**Parameters:** `fx`, `fy`
+**Parameters:**
 
-*Source: [src/lua_api/physics_api.rs](src/lua_api/physics_api.rs#L350)*
+- `fx` — `number`: Horizontal force component.
+- `fy` — `number`: Vertical force component.
+
+*Source: [src/lua_api/physics_api.rs](src/lua_api/physics_api.rs#L364)*
 
 ---
 
 #### `Body:applyImpulse(ix, iy)`
 
-Applies an instantaneous impulse to a body.
+Applies an instantaneous impulse directly to the body's centre of mass.
 
-**Parameters:** `ix`, `iy`
+**Parameters:**
 
-*Source: [src/lua_api/physics_api.rs](src/lua_api/physics_api.rs#L359)*
+- `ix` — `number`: Horizontal impulse.
+- `iy` — `number`: Vertical impulse.
+
+*Source: [src/lua_api/physics_api.rs](src/lua_api/physics_api.rs#L377)*
 
 ---
 
@@ -8575,17 +8612,17 @@ Applies an instantaneous impulse to a body.
 
 Destroys the body and removes it from its parent physics world immediately.
 
-*Source: [src/lua_api/physics_api.rs](src/lua_api/physics_api.rs#L377)*
+*Source: [src/lua_api/physics_api.rs](src/lua_api/physics_api.rs#L395)*
 
 ---
 
 #### `Body:getAngle()`
 
-Returns the current rotation angle of the body in radians.
+Returns the body's current rotation angle in radians.
 
-**Returns:** Rotation angle in radians.
+**Returns:** `number` — angle in radians.
 
-*Source: [src/lua_api/physics_api.rs](src/lua_api/physics_api.rs#L301)*
+*Source: [src/lua_api/physics_api.rs](src/lua_api/physics_api.rs#L311)*
 
 ---
 
@@ -8593,7 +8630,7 @@ Returns the current rotation angle of the body in radians.
 
 Returns the type string of the given body.
 
-*Source: [src/lua_api/physics_api.rs](src/lua_api/physics_api.rs#L368)*
+*Source: [src/lua_api/physics_api.rs](src/lua_api/physics_api.rs#L386)*
 
 ---
 
@@ -8603,7 +8640,7 @@ Returns the number of collision fixtures currently attached to the body.
 
 **Returns:** Fixture count as an integer.
 
-*Source: [src/lua_api/physics_api.rs](src/lua_api/physics_api.rs#L453)*
+*Source: [src/lua_api/physics_api.rs](src/lua_api/physics_api.rs#L471)*
 
 ---
 
@@ -8613,17 +8650,17 @@ Returns the total simulated mass of the body in physics units.
 
 **Returns:** Mass as a number in physics units.
 
-*Source: [src/lua_api/physics_api.rs](src/lua_api/physics_api.rs#L325)*
+*Source: [src/lua_api/physics_api.rs](src/lua_api/physics_api.rs#L335)*
 
 ---
 
 #### `Body:getPosition()`
 
-Returns the (x, y) world-space position of the body's center of mass.
+Returns the body's current world-space position.
 
-**Returns:** x, y position in world units.
+**Returns:** Two numbers `x, y` in world units.
 
-*Source: [src/lua_api/physics_api.rs](src/lua_api/physics_api.rs#L245)*
+*Source: [src/lua_api/physics_api.rs](src/lua_api/physics_api.rs#L255)*
 
 ---
 
@@ -8633,32 +8670,32 @@ Returns the current linear velocity vector of the body.
 
 **Returns:** vx, vy velocity in world units per second.
 
-*Source: [src/lua_api/physics_api.rs](src/lua_api/physics_api.rs#L272)*
+*Source: [src/lua_api/physics_api.rs](src/lua_api/physics_api.rs#L282)*
 
 ---
 
 #### `Body:setAngle(angle)`
 
-Sets the body's rotation to the given angle in radians.
+Sets the body's rotation to `angle` radians (bypasses physics).
 
 **Parameters:**
 
-- `angle` — Rotation angle in radians.
+- `angle` — `number`: Target angle in radians.
 
-*Source: [src/lua_api/physics_api.rs](src/lua_api/physics_api.rs#L313)*
+*Source: [src/lua_api/physics_api.rs](src/lua_api/physics_api.rs#L323)*
 
 ---
 
 #### `Body:setPosition(x, y)`
 
-Teleports the body to the given (x, y) world-space coordinates.
+Teleports the body to the given world-space position (bypasses collision detection).
 
 **Parameters:**
 
-- `x` — Target X in world units.
-- `y` — Target Y in world units.
+- `x` — `number`: Target X position.
+- `y` — `number`: Target Y position.
 
-*Source: [src/lua_api/physics_api.rs](src/lua_api/physics_api.rs#L260)*
+*Source: [src/lua_api/physics_api.rs](src/lua_api/physics_api.rs#L270)*
 
 ---
 
@@ -8671,7 +8708,7 @@ Resizes the body's primary collision shape to the given width and height.
 - `width` — New shape width in world units.
 - `height` — New shape height in world units.
 
-*Source: [src/lua_api/physics_api.rs](src/lua_api/physics_api.rs#L338)*
+*Source: [src/lua_api/physics_api.rs](src/lua_api/physics_api.rs#L348)*
 
 ---
 
@@ -8684,7 +8721,7 @@ Sets the body's linear velocity to the given (vx, vy) world-space vector.
 - `vx` — Velocity along the X axis in world units per second.
 - `vy` — Velocity along the Y axis in world units per second.
 
-*Source: [src/lua_api/physics_api.rs](src/lua_api/physics_api.rs#L287)*
+*Source: [src/lua_api/physics_api.rs](src/lua_api/physics_api.rs#L297)*
 
 ---
 
@@ -8694,7 +8731,7 @@ Sets the body's linear velocity to the given (vx, vy) world-space vector.
 
 Returns the number of bodies in the world.
 
-*Source: [src/lua_api/physics_api.rs](src/lua_api/physics_api.rs#L165)*
+*Source: [src/lua_api/physics_api.rs](src/lua_api/physics_api.rs#L175)*
 
 ---
 
@@ -8704,15 +8741,17 @@ Returns a table of all currently active collision pairs in this physics world.
 
 **Returns:** Table of {bodyA, bodyB, nx, ny, overlap} collision records.
 
-*Source: [src/lua_api/physics_api.rs](src/lua_api/physics_api.rs#L177)*
+*Source: [src/lua_api/physics_api.rs](src/lua_api/physics_api.rs#L187)*
 
 ---
 
 #### `World:getGravity()`
 
-Returns the global gravity vector (gx, gy).
+Returns the current world gravity vector.
 
-*Source: [src/lua_api/physics_api.rs](src/lua_api/physics_api.rs#L123)*
+**Returns:** Two numbers `gx, gy`.
+
+*Source: [src/lua_api/physics_api.rs](src/lua_api/physics_api.rs#L129)*
 
 ---
 
@@ -8724,7 +8763,7 @@ Returns whether bodies in this world are allowed to enter a sleep state.
 
 **Returns:** true if sleeping is permitted globally, false if all bodies stay awake.
 
-*Source: [src/lua_api/physics_api.rs](src/lua_api/physics_api.rs#L156)*
+*Source: [src/lua_api/physics_api.rs](src/lua_api/physics_api.rs#L166)*
 
 ---
 
@@ -8737,27 +8776,32 @@ Registers collision begin/end callback functions for this physics world.
 - `beginContact` — Called with (body1, body2) when two bodies start touching.
 - `endContact` — Called with (body1, body2) when they separate.
 
-*Source: [src/lua_api/physics_api.rs](src/lua_api/physics_api.rs#L110)*
+*Source: [src/lua_api/physics_api.rs](src/lua_api/physics_api.rs#L113)*
 
 ---
 
 #### `World:setGravity(gx, gy)`
 
-Sets the global gravity vector for the world.
+Sets world gravity. Default is `(0, 9.81)` (downward).
 
-**Parameters:** `gx`, `gy`
+**Parameters:**
 
-*Source: [src/lua_api/physics_api.rs](src/lua_api/physics_api.rs#L133)*
+- `x` — `number`: Horizontal gravity component.
+- `y` — `number`: Vertical gravity component.
+
+*Source: [src/lua_api/physics_api.rs](src/lua_api/physics_api.rs#L143)*
 
 ---
 
 #### `World:step(dt)`
 
-Advances the physics simulation by the given timestep in seconds.
+Advances the physics simulation by `dt` seconds, resolving collisions and integrating forces.
 
-**Parameters:** `dt`
+**Parameters:**
 
-*Source: [src/lua_api/physics_api.rs](src/lua_api/physics_api.rs#L45)*
+- `dt` — `number`: Elapsed simulation time in seconds.
+
+*Source: [src/lua_api/physics_api.rs](src/lua_api/physics_api.rs#L48)*
 
 ---
 
@@ -10413,7 +10457,7 @@ Get or create a named global channel (singleton, shared across threads).
 
 **Parameters:** `name`
 
-*Source: [src/lua_api/thread_api.rs](src/lua_api/thread_api.rs#L120)*
+*Source: [src/lua_api/thread_api.rs](src/lua_api/thread_api.rs#L126)*
 
 ---
 
@@ -10421,7 +10465,7 @@ Get or create a named global channel (singleton, shared across threads).
 
 Create an unnamed thread-safe channel for inter-thread communication.
 
-*Source: [src/lua_api/thread_api.rs](src/lua_api/thread_api.rs#L107)*
+*Source: [src/lua_api/thread_api.rs](src/lua_api/thread_api.rs#L113)*
 
 ---
 
@@ -10433,7 +10477,7 @@ The thread gets its own Lua VM and can communicate via channels.
 
 **Parameters:** `code`
 
-*Source: [src/lua_api/thread_api.rs](src/lua_api/thread_api.rs#L95)*
+*Source: [src/lua_api/thread_api.rs](src/lua_api/thread_api.rs#L101)*
 
 ---
 
@@ -10441,35 +10485,39 @@ The thread gets its own Lua VM and can communicate via channels.
 
 #### `ThreadHandle:getError()`
 
-Returns the last error from the thread, or nil.
+Returns the error message if the thread terminated with a Lua error, or `nil` if it completed normally.
 
-*Source: [src/lua_api/thread_api.rs](src/lua_api/thread_api.rs#L65)*
+**Returns:** `string` — error message, or `nil`.
+
+*Source: [src/lua_api/thread_api.rs](src/lua_api/thread_api.rs#L71)*
 
 ---
 
 #### `ThreadHandle:isRunning()`
 
-Returns whether the thread is currently executing.
+Returns `true` if the thread is currently executing.
 
-*Source: [src/lua_api/thread_api.rs](src/lua_api/thread_api.rs#L59)*
+**Returns:** `boolean`.
+
+*Source: [src/lua_api/thread_api.rs](src/lua_api/thread_api.rs#L62)*
 
 ---
 
 #### `ThreadHandle:start(args)`
 
-Starts a thread, passing optional arguments.
+Launches the background thread, passing optional arguments to the Lua script via `...`.
 
-**Parameters:** `args`
+**Parameters:**
 
-*Source: [src/lua_api/thread_api.rs](src/lua_api/thread_api.rs#L38)*
+- `...` — `any`: Optional arguments forwarded to the thread script as Lua values.
+
+*Source: [src/lua_api/thread_api.rs](src/lua_api/thread_api.rs#L41)*
 
 ---
 
 #### `ThreadHandle:wait()`
 
-Blocks the calling coroutine until the background thread finishes.
-
-**Returns:** The thread's return value, or nil plus an error string on failure.
+Blocks the calling coroutine until this thread finishes execution.
 
 *Source: [src/lua_api/thread_api.rs](src/lua_api/thread_api.rs#L52)*
 
@@ -10495,7 +10543,7 @@ Squad, and CommandQueue.
 
 **Parameters:** `callback`
 
-*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L2286)*
+*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L2275)*
 
 ---
 
@@ -10503,7 +10551,7 @@ Squad, and CommandQueue.
 
 *(undocumented)*
 
-*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L2177)*
+*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L2166)*
 
 ---
 
@@ -10511,7 +10559,7 @@ Squad, and CommandQueue.
 
 *(undocumented)*
 
-*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L2155)*
+*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L2144)*
 
 ---
 
@@ -10519,7 +10567,7 @@ Squad, and CommandQueue.
 
 *(undocumented)*
 
-*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L2403)*
+*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L2392)*
 
 ---
 
@@ -10529,7 +10577,7 @@ Squad, and CommandQueue.
 
 **Parameters:** `callback`
 
-*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L2298)*
+*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L2287)*
 
 ---
 
@@ -10539,7 +10587,7 @@ Squad, and CommandQueue.
 
 **Parameters:** `grid_ud`
 
-*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L2332)*
+*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L2321)*
 
 ---
 
@@ -10547,7 +10595,7 @@ Squad, and CommandQueue.
 
 *(undocumented)*
 
-*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L2370)*
+*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L2359)*
 
 ---
 
@@ -10557,7 +10605,7 @@ Squad, and CommandQueue.
 
 **Parameters:** `w`, `h`, `cs`
 
-*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L2381)*
+*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L2370)*
 
 ---
 
@@ -10565,7 +10613,7 @@ Squad, and CommandQueue.
 
 *(undocumented)*
 
-*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L2236)*
+*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L2225)*
 
 ---
 
@@ -10575,7 +10623,7 @@ Squad, and CommandQueue.
 
 **Parameters:** `sp`, `fp`
 
-*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L2217)*
+*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L2206)*
 
 ---
 
@@ -10585,7 +10633,7 @@ Squad, and CommandQueue.
 
 **Parameters:** `w`, `h`, `cs`
 
-*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L2321)*
+*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L2310)*
 
 ---
 
@@ -10595,7 +10643,7 @@ Squad, and CommandQueue.
 
 **Parameters:** `sc`, `ac`
 
-*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L2348)*
+*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L2337)*
 
 ---
 
@@ -10605,7 +10653,7 @@ Squad, and CommandQueue.
 
 **Parameters:** `count`
 
-*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L2252)*
+*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L2241)*
 
 ---
 
@@ -10613,7 +10661,7 @@ Squad, and CommandQueue.
 
 *(undocumented)*
 
-*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L2189)*
+*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L2178)*
 
 ---
 
@@ -10621,7 +10669,7 @@ Squad, and CommandQueue.
 
 *(undocumented)*
 
-*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L2203)*
+*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L2192)*
 
 ---
 
@@ -10631,7 +10679,7 @@ Squad, and CommandQueue.
 
 **Parameters:** `name`
 
-*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L2392)*
+*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L2381)*
 
 ---
 
@@ -10639,7 +10687,7 @@ Squad, and CommandQueue.
 
 *(undocumented)*
 
-*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L2166)*
+*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L2155)*
 
 ---
 
@@ -10647,7 +10695,7 @@ Squad, and CommandQueue.
 
 *(undocumented)*
 
-*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L2310)*
+*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L2299)*
 
 ---
 
@@ -10655,7 +10703,7 @@ Squad, and CommandQueue.
 
 *(undocumented)*
 
-*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L2270)*
+*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L2259)*
 
 ---
 
@@ -10663,7 +10711,7 @@ Squad, and CommandQueue.
 
 *(undocumented)*
 
-*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L2359)*
+*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L2348)*
 
 ---
 
@@ -10671,7 +10719,7 @@ Squad, and CommandQueue.
 
 *(undocumented)*
 
-*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L2144)*
+*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L2133)*
 
 ---
 
@@ -10679,49 +10727,47 @@ Squad, and CommandQueue.
 
 #### `AIWorld:addAgent(name)`
 
-Adds agent to the collection.
+Registers a new agent named `name` in this world and returns its handle.
 
 **Parameters:**
 
-- `name` — `string`.
+- `name` — `string`: Unique identifier for the new agent.
 
-*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L199)*
+**Returns:** An `Agent` handle ready for further configuration.
+
+*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L202)*
 
 ---
 
 #### `AIWorld:getAgent(name)`
 
-Returns the agent.
+Looks up a registered agent by name.
 
 **Parameters:**
 
-- `name` — `string`.
+- `name` — `string`: Name of the agent to retrieve.
 
-**Returns:** The current agent.
+**Returns:** The `Agent` handle, or `nil` if no agent with that name exists.
 
-*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L215)*
+*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L218)*
 
 ---
 
 #### `AIWorld:getAgentCount()`
 
-Returns the agent count.
+Returns the number of agents currently registered in this world.
 
-**Returns:** The current agent count.
+**Returns:** `integer` — total agent count.
 
-*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L242)*
+*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L245)*
 
 ---
 
 #### `AIWorld:getGlobalBlackboard()`
 
-Returns the global blackboard.
+Returns a snapshot of the shared world-level blackboard.
 
-**Parameters:**
-
-- `dt` — `number`.
-
-**Returns:** The current global blackboard.
+**Returns:** A `Blackboard` containing data visible to all agents in this world.
 
 *Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L253)*
 
@@ -10729,23 +10775,23 @@ Returns the global blackboard.
 
 #### `AIWorld:removeAgent(agent)`
 
-Removes agent from the collection.
+Removes and destroys the given agent from this world.
 
 **Parameters:**
 
-- `agent` — `userdata`.
+- `agent` — `Agent`: Handle of the agent to remove, obtained from `addAgent`.
 
-*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L231)*
+*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L234)*
 
 ---
 
 #### `AIWorld:update(dt)`
 
-Advances the simulation by `dt` seconds.
+Advances all agents in the world by `dt` seconds, integrating velocity into position.
 
 **Parameters:**
 
-- `dt` — `number`.
+- `dt` — `number`: Elapsed seconds since the last frame.
 
 *Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L264)*
 
@@ -10755,198 +10801,193 @@ Advances the simulation by `dt` seconds.
 
 #### `Agent:addTag(tag)`
 
-Adds tag to the collection.
+Adds a string tag to this agent's tag set (idempotent).
 
 **Parameters:**
 
-- `tag` — `string`.
+- `tag` — `string`: Tag to add.
 
-*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L447)*
+*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L443)*
 
 ---
 
 #### `Agent:getBlackboard()`
 
-Returns the blackboard.
+Returns this agent's private blackboard for reading or writing typed data.
 
-**Returns:** The current blackboard.
+**Returns:** A `Blackboard` scoped to this agent.
 
-*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L487)*
+*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L483)*
 
 ---
 
 #### `Agent:getDecisionModel()`
 
-Returns the decision model.
+Returns the name of the agent's current decision model.
 
-**Returns:** The current decision model.
+**Returns:** `string` — e.g. `"fsm"`, `"bt"`, `"utility"`, `"goap"`.
 
-*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L434)*
+*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L430)*
 
 ---
 
 #### `Agent:getMaxForce()`
 
-Returns the max force.
+Returns the maximum steering force cap.
 
-**Returns:** The current max force.
+**Returns:** `number` — force cap.
 
-*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L382)*
+*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L378)*
 
 ---
 
 #### `Agent:getMaxSpeed()`
 
-Returns the max speed.
+Returns the maximum movement speed cap in world units/second.
 
-**Returns:** The current max speed.
+**Returns:** `number` — speed cap.
 
-*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L357)*
+*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L353)*
 
 ---
 
 #### `Agent:getName()`
 
-Returns the name.
+Returns the unique name this agent was registered under.
 
-**Parameters:**
+**Returns:** `string` — agent name.
 
-- `x` — `number`.
-- `y` — `number`.
-
-**Returns:** The current name.
-
-*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L287)*
+*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L283)*
 
 ---
 
 #### `Agent:getPosition()`
 
-Returns the position.
+Returns the agent's current world-space position.
 
-**Returns:** The current position.
+**Returns:** Two numbers `x, y` representing world-space coordinates.
 
-*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L306)*
+*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L302)*
 
 ---
 
 #### `Agent:getPriority()`
 
-Returns the priority.
+Returns the agent's scheduling priority level.
 
-**Returns:** The current priority.
+**Returns:** `integer` — priority.
 
-*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L407)*
+*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L403)*
 
 ---
 
 #### `Agent:getVelocity()`
 
-Returns the velocity.
+Returns the agent's current velocity vector.
 
-**Returns:** The current velocity.
+**Returns:** Two numbers `vx, vy` in world units/second.
 
-*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L332)*
+*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L328)*
 
 ---
 
 #### `Agent:hasTag(tag)`
 
-Returns `true` if tag.
+Returns `true` if this agent's tag set contains `tag`.
 
 **Parameters:**
 
-- `tag` — `string`.
+- `tag` — `string`: Tag to test.
 
 **Returns:** `boolean`.
 
-*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L474)*
+*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L470)*
 
 ---
 
 #### `Agent:removeTag(tag)`
 
-Removes tag from the collection.
+Removes a string tag from this agent's tag set (no-op if absent).
 
 **Parameters:**
 
-- `tag` — `string`.
+- `tag` — `string`: Tag to remove.
 
-*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L459)*
+*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L455)*
 
 ---
 
 #### `Agent:setDecisionModel(model)`
 
-Sets the decision model.
+Switches the agent's active decision model at runtime. Valid values: `"fsm"`, `"bt"`, `"utility"`, `"goap"`.
 
 **Parameters:**
 
-- `model` — `string`.
+- `model` — `string`: Decision model identifier.
 
-*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L420)*
+*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L416)*
 
 ---
 
 #### `Agent:setMaxForce(v)`
 
-Sets the max force.
+Sets the maximum steering force that can be applied per frame.
 
 **Parameters:**
 
-- `v` — `number`.
+- `v` — `number`: New force cap.
 
-*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L370)*
+*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L366)*
 
 ---
 
 #### `Agent:setMaxSpeed(v)`
 
-Sets the max speed.
+Sets the maximum movement speed cap in world units/second.
 
 **Parameters:**
 
-- `v` — `number`.
+- `v` — `number`: New speed limit (world units/sec).
 
-*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L345)*
+*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L341)*
 
 ---
 
 #### `Agent:setPosition(x, y)`
 
-Sets the position.
+Teleports the agent to world-space coordinates (`x`, `y`).
 
 **Parameters:**
 
-- `x` — `number`.
-- `y` — `number`.
+- `x` — `number`: Horizontal world-space position.
+- `y` — `number`: Vertical world-space position.
 
-*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L294)*
+*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L290)*
 
 ---
 
 #### `Agent:setPriority(p)`
 
-Sets the priority.
+Sets the scheduling priority; higher-priority agents are processed first during `update`.
 
 **Parameters:**
 
-- `p` — `integer`.
+- `p` — `integer`: Priority value, higher = earlier processing.
 
-*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L395)*
+*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L391)*
 
 ---
 
 #### `Agent:setVelocity(x, y)`
 
-Sets the velocity.
+Sets the agent's velocity vector in world units per second.
 
 **Parameters:**
 
-- `x` — `number`.
-- `y` — `number`.
+- `x` — `number`: Horizontal component.
+- `y` — `number`: Vertical component.
 
-*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L320)*
+*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L316)*
 
 ---
 
@@ -10960,7 +11001,7 @@ Adds child to the collection.
 
 - `child_ud` — `userdata`.
 
-*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L741)*
+*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L733)*
 
 ---
 
@@ -10970,7 +11011,7 @@ Returns the child count.
 
 **Returns:** The current child count.
 
-*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L771)*
+*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L763)*
 
 ---
 
@@ -10980,7 +11021,7 @@ Returns the count.
 
 **Returns:** The current count.
 
-*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L841)*
+*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L833)*
 
 ---
 
@@ -10990,7 +11031,7 @@ Returns the node type.
 
 **Returns:** The current node type.
 
-*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L878)*
+*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L870)*
 
 ---
 
@@ -11002,7 +11043,7 @@ Resets state to initial values.
 
 - `child_ud` — `userdata`.
 
-*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L786)*
+*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L778)*
 
 ---
 
@@ -11014,7 +11055,7 @@ Sets the child.
 
 - `child_ud` — `userdata`.
 
-*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L795)*
+*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L787)*
 
 ---
 
@@ -11026,7 +11067,7 @@ Sets the count.
 
 - `n` — `integer`.
 
-*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L829)*
+*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L821)*
 
 ---
 
@@ -11038,7 +11079,7 @@ Sets the failure policy.
 
 - `policy` — `string`.
 
-*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L866)*
+*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L858)*
 
 ---
 
@@ -11050,7 +11091,7 @@ Sets the success policy.
 
 - `policy` — `string`.
 
-*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L854)*
+*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L846)*
 
 ---
 
@@ -11062,19 +11103,19 @@ Returns the last status.
 
 **Returns:** The current last status.
 
-*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L727)*
+*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L719)*
 
 ---
 
 #### `BehaviorTree:setRoot(node_ud)`
 
-Sets the root.
+Sets the top-level root node of this behavior tree.
 
 **Parameters:**
 
-- `node_ud` — `userdata`.
+- `node` — `BTNode`: Root `BTNode` returned by one of the node constructors.
 
-*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L710)*
+*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L702)*
 
 ---
 
@@ -11082,11 +11123,9 @@ Sets the root.
 
 #### `Blackboard:clear()`
 
-Removes all entries.
+Removes all entries from this blackboard.
 
-**Returns:** The result.
-
-*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L582)*
+*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L575)*
 
 ---
 
@@ -11096,7 +11135,7 @@ Returns the keys.
 
 **Returns:** The current keys.
 
-*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L591)*
+*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L584)*
 
 ---
 
@@ -11106,72 +11145,72 @@ Returns the size.
 
 **Returns:** The current size.
 
-*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L604)*
+*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L597)*
 
 ---
 
 #### `Blackboard:has(key)`
 
-Returns `true` if the condition is met.
+Returns `true` if a value is stored under `key` in this blackboard.
 
 **Parameters:**
 
-- `key` — `string`.
+- `key` — `string`: Key to check.
 
 **Returns:** `boolean`.
 
-*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L565)*
+*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L561)*
 
 ---
 
 #### `Blackboard:remove(key)`
 
-Removes the entry from the collection.
+Deletes the entry at `key` from this blackboard (no-op if absent).
 
 **Parameters:**
 
-- `key` — `string`.
+- `key` — `string`: Key to delete.
 
-*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L573)*
+*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L569)*
 
 ---
 
 #### `Blackboard:setBool(key, value)`
 
-Sets the bool.
+Stores a boolean value under `key` on this blackboard.
 
 **Parameters:**
 
-- `key` — `string`.
-- `value` — `boolean`.
+- `key` — `string`: Key to write.
+- `value` — `boolean`: Value to store.
 
-*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L528)*
+*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L524)*
 
 ---
 
 #### `Blackboard:setNumber(key, value)`
 
-Sets the number.
+Stores a floating-point value under `key` on this blackboard.
 
 **Parameters:**
 
-- `key` — `string`.
-- `value` — `number`.
+- `key` — `string`: Key to write.
+- `value` — `number`: Value to store.
 
-*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L511)*
+*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L507)*
 
 ---
 
 #### `Blackboard:setString(key, value)`
 
-Sets the string.
+Stores a string value under `key` on this blackboard.
 
 **Parameters:**
 
-- `key` — `string`.
-- `value` — `string`.
+- `key` — `string`: Key to write.
+- `value` — `string`: Value to store.
 
-*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L545)*
+*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L541)*
 
 ---
 
@@ -11183,17 +11222,15 @@ Cancel current on this CommandQueue.
 
 **Returns:** The result.
 
-*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L2066)*
+*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L2058)*
 
 ---
 
 #### `CommandQueue:clear()`
 
-Removes all entries.
+Discards all queued commands.
 
-**Returns:** The result.
-
-*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L2074)*
+*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L2063)*
 
 ---
 
@@ -11203,7 +11240,7 @@ Returns the count.
 
 **Returns:** The current count.
 
-*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L2083)*
+*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L2072)*
 
 ---
 
@@ -11213,7 +11250,7 @@ Returns the current target.
 
 **Returns:** The current current target.
 
-*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L2103)*
+*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L2092)*
 
 ---
 
@@ -11223,17 +11260,17 @@ Returns the current type.
 
 **Returns:** The current current type.
 
-*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L2095)*
+*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L2084)*
 
 ---
 
 #### `CommandQueue:isEmpty()`
 
-Returns `true` if empty.
+Returns `true` if there are no commands queued.
 
 **Returns:** `boolean`.
 
-*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L2089)*
+*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L2078)*
 
 ---
 
@@ -11250,7 +11287,7 @@ Returns the direction.
 
 **Returns:** The current direction.
 
-*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L1270)*
+*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L1262)*
 
 ---
 
@@ -11265,7 +11302,7 @@ Returns the distance.
 
 **Returns:** The current distance.
 
-*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L1284)*
+*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L1276)*
 
 ---
 
@@ -11275,7 +11312,7 @@ Returns the goal.
 
 **Returns:** The current goal.
 
-*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L1313)*
+*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L1305)*
 
 ---
 
@@ -11285,7 +11322,7 @@ Returns the height.
 
 **Returns:** The current height.
 
-*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L1299)*
+*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L1291)*
 
 ---
 
@@ -11295,7 +11332,7 @@ Returns the width.
 
 **Returns:** The current width.
 
-*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L1294)*
+*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L1286)*
 
 ---
 
@@ -11305,7 +11342,7 @@ Returns `true` if goal.
 
 **Returns:** `boolean`.
 
-*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L1305)*
+*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L1297)*
 
 ---
 
@@ -11318,7 +11355,7 @@ Sets the goal.
 - `x` — `integer`.
 - `y` — `integer`.
 
-*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L1255)*
+*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L1247)*
 
 ---
 
@@ -11330,7 +11367,7 @@ Returns the action count.
 
 **Returns:** The current action count.
 
-*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L1682)*
+*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L1677)*
 
 ---
 
@@ -11340,7 +11377,7 @@ Returns the goal count.
 
 **Returns:** The current goal count.
 
-*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L1690)*
+*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L1685)*
 
 ---
 
@@ -11348,13 +11385,13 @@ Returns the goal count.
 
 #### `InfluenceMap:addLayer(name)`
 
-Adds layer to the collection.
+Adds a named influence layer to this map.
 
 **Parameters:**
 
-- `name` — `string`.
+- `name` — `string`: Layer identifier.
 
-*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L1704)*
+*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L1699)*
 
 ---
 
@@ -11366,7 +11403,7 @@ Clear all on this InfluenceMap.
 
 - `layer` — `string`.
 
-*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L1799)*
+*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L1791)*
 
 ---
 
@@ -11378,7 +11415,7 @@ Clear layer on this InfluenceMap.
 
 - `layer` — `string`.
 
-*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L1790)*
+*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L1782)*
 
 ---
 
@@ -11391,7 +11428,7 @@ Decay on this InfluenceMap.
 - `layer` — `string`.
 - `factor` — `number`.
 
-*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L1781)*
+*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L1773)*
 
 ---
 
@@ -11401,7 +11438,7 @@ Returns the cell size.
 
 **Returns:** The current cell size.
 
-*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L1869)*
+*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L1861)*
 
 ---
 
@@ -11411,7 +11448,7 @@ Returns the height.
 
 **Returns:** The current height.
 
-*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L1864)*
+*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L1856)*
 
 ---
 
@@ -11425,7 +11462,7 @@ Returns the max position.
 
 **Returns:** The current max position.
 
-*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L1811)*
+*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L1803)*
 
 ---
 
@@ -11443,7 +11480,7 @@ Returns the min position.
 
 **Returns:** The current min position.
 
-*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L1826)*
+*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L1818)*
 
 ---
 
@@ -11453,24 +11490,21 @@ Returns the width.
 
 **Returns:** The current width.
 
-*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L1859)*
+*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L1851)*
 
 ---
 
 #### `InfluenceMap:hasLayer(name)`
 
-Returns `true` if layer.
+Returns `true` if a layer with `name` exists in this map.
 
 **Parameters:**
 
-- `layer` — `string`.
-- `x` — `integer`.
-- `y` — `integer`.
-- `value` — `number`.
+- `name` — `string`: Layer identifier to test.
 
 **Returns:** `boolean`.
 
-*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L1719)*
+*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L1711)*
 
 ---
 
@@ -11488,7 +11522,7 @@ Returns the cell size.
 
 **Returns:** The current cell size.
 
-*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L1125)*
+*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L1117)*
 
 ---
 
@@ -11503,7 +11537,7 @@ Returns the cost.
 
 **Returns:** The current cost.
 
-*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L1174)*
+*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L1166)*
 
 ---
 
@@ -11519,7 +11553,7 @@ Returns the height.
 
 **Returns:** The current height.
 
-*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L1115)*
+*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L1107)*
 
 ---
 
@@ -11529,7 +11563,7 @@ Returns the width.
 
 **Returns:** The current width.
 
-*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L1105)*
+*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L1097)*
 
 ---
 
@@ -11544,7 +11578,7 @@ Returns `true` if walkable.
 
 **Returns:** `boolean`.
 
-*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L1147)*
+*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L1139)*
 
 ---
 
@@ -11558,7 +11592,7 @@ Sets the cost.
 - `y` — `integer`.
 - `cost` — `number`.
 
-*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L1159)*
+*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L1151)*
 
 ---
 
@@ -11566,13 +11600,15 @@ Sets the cost.
 
 #### `QLearner:bestAction(state)`
 
-Best action on this QLearner.
+Returns the action with the highest Q-value for `state`.
 
 **Parameters:**
 
-- `state` — `integer`.
+- `state` — `string`: State to query.
 
-*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L1340)*
+**Returns:** `string` — best-known action name.
+
+*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L1335)*
 
 ---
 
@@ -11584,7 +11620,7 @@ Choose action on this QLearner.
 
 - `state` — `integer`.
 
-*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L1331)*
+*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L1323)*
 
 ---
 
@@ -11596,7 +11632,7 @@ Populates this object from a serialized string.
 
 - `json` — `string`.
 
-*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L1520)*
+*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L1515)*
 
 ---
 
@@ -11606,7 +11642,7 @@ End episode on this QLearner.
 
 **Returns:** The result.
 
-*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L1399)*
+*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L1394)*
 
 ---
 
@@ -11620,7 +11656,7 @@ Returns the action count.
 
 **Returns:** The current action count.
 
-*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L1427)*
+*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L1422)*
 
 ---
 
@@ -11637,7 +11673,7 @@ Returns the best action.
 
 **Returns:** The current best action.
 
-*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L1355)*
+*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L1350)*
 
 ---
 
@@ -11651,7 +11687,7 @@ Returns the discount factor.
 
 **Returns:** The current discount factor.
 
-*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L1467)*
+*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L1462)*
 
 ---
 
@@ -11661,7 +11697,7 @@ Returns the episode count.
 
 **Returns:** The current episode count.
 
-*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L1408)*
+*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L1403)*
 
 ---
 
@@ -11671,7 +11707,7 @@ Returns the exploration decay.
 
 **Returns:** The current exploration decay.
 
-*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L1504)*
+*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L1499)*
 
 ---
 
@@ -11685,7 +11721,7 @@ Returns the exploration rate.
 
 **Returns:** The current exploration rate.
 
-*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L1487)*
+*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L1482)*
 
 ---
 
@@ -11699,7 +11735,7 @@ Returns the learning rate.
 
 **Returns:** The current learning rate.
 
-*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L1447)*
+*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L1442)*
 
 ---
 
@@ -11714,7 +11750,7 @@ Returns the q value.
 
 **Returns:** The current q value.
 
-*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L1379)*
+*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L1374)*
 
 ---
 
@@ -11724,7 +11760,7 @@ Returns the state count.
 
 **Returns:** The current state count.
 
-*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L1416)*
+*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L1411)*
 
 ---
 
@@ -11736,7 +11772,7 @@ Serializes this object to a string representation.
 
 - `json` — `string`.
 
-*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L1512)*
+*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L1507)*
 
 ---
 
@@ -11748,7 +11784,7 @@ Sets the discount factor.
 
 - `v` — `number`.
 
-*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L1455)*
+*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L1450)*
 
 ---
 
@@ -11760,7 +11796,7 @@ Sets the exploration decay.
 
 - `v` — `number`.
 
-*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L1495)*
+*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L1490)*
 
 ---
 
@@ -11772,7 +11808,7 @@ Sets the exploration rate.
 
 - `v` — `number`.
 
-*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L1475)*
+*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L1470)*
 
 ---
 
@@ -11784,7 +11820,7 @@ Sets the learning rate.
 
 - `v` — `number`.
 
-*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L1435)*
+*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L1430)*
 
 ---
 
@@ -11792,13 +11828,13 @@ Sets the learning rate.
 
 #### `Squad:addMember(name)`
 
-Adds member to the collection.
+Adds an agent identified by `name` to this squad.
 
 **Parameters:**
 
-- `name` — `string`.
+- `name` — `string`: Name of the agent to enlist.
 
-*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L1894)*
+*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L1886)*
 
 ---
 
@@ -11808,7 +11844,7 @@ Returns the blackboard.
 
 **Returns:** The current blackboard.
 
-*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L1998)*
+*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L1990)*
 
 ---
 
@@ -11818,7 +11854,7 @@ Returns the formation.
 
 **Returns:** The current formation.
 
-*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L1966)*
+*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L1958)*
 
 ---
 
@@ -11834,7 +11870,7 @@ Returns the formation spacing.
 
 **Returns:** The current formation spacing.
 
-*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L1979)*
+*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L1971)*
 
 ---
 
@@ -11849,17 +11885,17 @@ Returns the leader.
 
 **Returns:** The current leader.
 
-*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L1946)*
+*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L1938)*
 
 ---
 
 #### `Squad:getMemberCount()`
 
-Returns the member count.
+Returns the number of agents currently in this squad.
 
-**Returns:** The current member count.
+**Returns:** `integer` — member count.
 
-*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L1912)*
+*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L1904)*
 
 ---
 
@@ -11869,7 +11905,7 @@ Returns the members.
 
 **Returns:** The current members.
 
-*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L1920)*
+*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L1912)*
 
 ---
 
@@ -11883,19 +11919,19 @@ Returns the name.
 
 **Returns:** The current name.
 
-*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L1886)*
+*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L1878)*
 
 ---
 
 #### `Squad:removeMember(name)`
 
-Removes member from the collection.
+Removes the agent identified by `name` from this squad.
 
 **Parameters:**
 
-- `name` — `string`.
+- `name` — `string`: Name of the agent to remove.
 
-*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L1903)*
+*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L1895)*
 
 ---
 
@@ -11907,7 +11943,7 @@ Sets the leader.
 
 - `name` — `string`.
 
-*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L1933)*
+*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L1925)*
 
 ---
 
@@ -11915,14 +11951,13 @@ Sets the leader.
 
 #### `StateMachine:addState(name, opts)`
 
-Adds state to the collection.
+Registers a new named state in this FSM.
 
 **Parameters:**
 
-- `name` — `string`.
-- `opts` — `table`.
+- `name` — `string`: Unique name for the state.
 
-*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L617)*
+*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L609)*
 
 ---
 
@@ -11934,7 +11969,7 @@ Force state on this StateMachine.
 
 - `name` — `string`.
 
-*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L685)*
+*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L677)*
 
 ---
 
@@ -11948,7 +11983,7 @@ Returns the current state.
 
 **Returns:** The current current state.
 
-*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L677)*
+*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L669)*
 
 ---
 
@@ -11958,7 +11993,7 @@ Returns the time in state.
 
 **Returns:** The current time in state.
 
-*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L696)*
+*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L688)*
 
 ---
 
@@ -11970,7 +12005,7 @@ Sets the initial state.
 
 - `name` — `string`.
 
-*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L661)*
+*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L653)*
 
 ---
 
@@ -11986,7 +12021,7 @@ Returns the behavior count.
 
 **Returns:** The current behavior count.
 
-*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L1050)*
+*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L1042)*
 
 ---
 
@@ -11996,7 +12031,7 @@ Returns the combine mode.
 
 **Returns:** The current combine mode.
 
-*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L1067)*
+*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L1059)*
 
 ---
 
@@ -12006,7 +12041,7 @@ Returns the last steering.
 
 **Returns:** The current last steering.
 
-*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L1075)*
+*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L1067)*
 
 ---
 
@@ -12018,7 +12053,7 @@ Sets the combine mode.
 
 - `mode` — `string`.
 
-*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L1058)*
+*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L1050)*
 
 ---
 
@@ -12030,7 +12065,7 @@ Evaluates all conditions and returns a decision.
 
 **Returns:** The result.
 
-*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L1552)*
+*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L1547)*
 
 ---
 
@@ -12040,7 +12075,7 @@ Returns the action count.
 
 **Returns:** The current action count.
 
-*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L1581)*
+*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L1576)*
 
 ---
 
@@ -12050,7 +12085,7 @@ Returns the last action.
 
 **Returns:** The current last action.
 
-*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L1589)*
+*Source: [src/lua_api/ai_api.rs](src/lua_api/ai_api.rs#L1584)*
 
 ---
 
@@ -14651,7 +14686,7 @@ luna.tilemap.fromScreenHex(sx, sy, size)
 
 **Parameters:** `sx`, `sy`, `size`
 
-*Source: [src/lua_api/tilemap_api.rs](src/lua_api/tilemap_api.rs#L2519)*
+*Source: [src/lua_api/tilemap_api.rs](src/lua_api/tilemap_api.rs#L2525)*
 
 ---
 
@@ -14661,7 +14696,7 @@ luna.tilemap.fromScreenIso(sx, sy, tileW, tileH)
 
 **Parameters:** `sx`, `sy`, `tile_w`, `tile_h`
 
-*Source: [src/lua_api/tilemap_api.rs](src/lua_api/tilemap_api.rs#L2481)*
+*Source: [src/lua_api/tilemap_api.rs](src/lua_api/tilemap_api.rs#L2487)*
 
 ---
 
@@ -14677,7 +14712,7 @@ Returns all hex cell coordinates within a given radius of center (q, r).
 
 **Returns:** Table of {q, r} coordinates for every cell within the radius.
 
-*Source: [src/lua_api/tilemap_api.rs](src/lua_api/tilemap_api.rs#L2671)*
+*Source: [src/lua_api/tilemap_api.rs](src/lua_api/tilemap_api.rs#L2677)*
 
 ---
 
@@ -14687,7 +14722,7 @@ luna.tilemap.hexDistance(q1, r1, q2, r2)
 
 **Parameters:** `q1`, `r1`, `q2`, `r2`
 
-*Source: [src/lua_api/tilemap_api.rs](src/lua_api/tilemap_api.rs#L2559)*
+*Source: [src/lua_api/tilemap_api.rs](src/lua_api/tilemap_api.rs#L2565)*
 
 ---
 
@@ -14697,7 +14732,7 @@ luna.tilemap.hexLine(q1, r1, q2, r2)
 
 **Parameters:** `q1`, `r1`, `q2`, `r2`
 
-*Source: [src/lua_api/tilemap_api.rs](src/lua_api/tilemap_api.rs#L2583)*
+*Source: [src/lua_api/tilemap_api.rs](src/lua_api/tilemap_api.rs#L2589)*
 
 ---
 
@@ -14712,7 +14747,7 @@ Returns the six hex grid coordinates adjacent to the cell at (q, r).
 
 **Returns:** Table of six {q, r} neighbor coordinate tables.
 
-*Source: [src/lua_api/tilemap_api.rs](src/lua_api/tilemap_api.rs#L2535)*
+*Source: [src/lua_api/tilemap_api.rs](src/lua_api/tilemap_api.rs#L2541)*
 
 ---
 
@@ -14722,7 +14757,7 @@ luna.tilemap.hexReflect(q, r, centerQ, centerR, axis)
 
 **Parameters:** `q`, `r`, `center_q`, `center_r`, `axis`
 
-*Source: [src/lua_api/tilemap_api.rs](src/lua_api/tilemap_api.rs#L2706)*
+*Source: [src/lua_api/tilemap_api.rs](src/lua_api/tilemap_api.rs#L2712)*
 
 ---
 
@@ -14738,7 +14773,7 @@ Returns all hex cell coordinates forming the ring at exactly the given radius fr
 
 **Returns:** Table of {q, r} coordinates for each cell on the ring.
 
-*Source: [src/lua_api/tilemap_api.rs](src/lua_api/tilemap_api.rs#L2615)*
+*Source: [src/lua_api/tilemap_api.rs](src/lua_api/tilemap_api.rs#L2621)*
 
 ---
 
@@ -14748,7 +14783,7 @@ luna.tilemap.hexRotate(q, r, centerQ, centerR, steps)
 
 **Parameters:** `q`, `r`, `center_q`, `center_r`, `steps`
 
-*Source: [src/lua_api/tilemap_api.rs](src/lua_api/tilemap_api.rs#L2695)*
+*Source: [src/lua_api/tilemap_api.rs](src/lua_api/tilemap_api.rs#L2701)*
 
 ---
 
@@ -14763,7 +14798,7 @@ Rounds fractional hex coordinates (q, r) to the nearest integer hex cell center.
 
 **Returns:** Rounded integer q and r coordinates.
 
-*Source: [src/lua_api/tilemap_api.rs](src/lua_api/tilemap_api.rs#L2574)*
+*Source: [src/lua_api/tilemap_api.rs](src/lua_api/tilemap_api.rs#L2580)*
 
 ---
 
@@ -14773,7 +14808,7 @@ luna.tilemap.hexSpiral(q, r, radius)
 
 **Parameters:** `q`, `r`, `radius`
 
-*Source: [src/lua_api/tilemap_api.rs](src/lua_api/tilemap_api.rs#L2639)*
+*Source: [src/lua_api/tilemap_api.rs](src/lua_api/tilemap_api.rs#L2645)*
 
 ---
 
@@ -14783,7 +14818,7 @@ luna.tilemap.isoDirectionFromAngle(angle)
 
 **Parameters:** `angle`
 
-*Source: [src/lua_api/tilemap_api.rs](src/lua_api/tilemap_api.rs#L2504)*
+*Source: [src/lua_api/tilemap_api.rs](src/lua_api/tilemap_api.rs#L2510)*
 
 ---
 
@@ -14793,7 +14828,7 @@ luna.tilemap.isoDirectionName(direction)
 
 **Parameters:** `direction`
 
-*Source: [src/lua_api/tilemap_api.rs](src/lua_api/tilemap_api.rs#L2498)*
+*Source: [src/lua_api/tilemap_api.rs](src/lua_api/tilemap_api.rs#L2504)*
 
 ---
 
@@ -14803,7 +14838,7 @@ luna.tilemap.isoRotate(direction, steps)
 
 **Parameters:** `direction`, `steps`
 
-*Source: [src/lua_api/tilemap_api.rs](src/lua_api/tilemap_api.rs#L2490)*
+*Source: [src/lua_api/tilemap_api.rs](src/lua_api/tilemap_api.rs#L2496)*
 
 ---
 
@@ -14813,7 +14848,7 @@ luna.tilemap.loadTMX(xmlString) -> table with TmxMap fields, or nil+err
 
 **Parameters:** `xml`
 
-*Source: [src/lua_api/tilemap_api.rs](src/lua_api/tilemap_api.rs#L2114)*
+*Source: [src/lua_api/tilemap_api.rs](src/lua_api/tilemap_api.rs#L2120)*
 
 ---
 
@@ -14823,7 +14858,7 @@ luna.tilemap.newAutoTileSheet(tileW, tileH, layout)
 
 **Parameters:** `tile_w`, `tile_h`, `layout_str`
 
-*Source: [src/lua_api/tilemap_api.rs](src/lua_api/tilemap_api.rs#L2083)*
+*Source: [src/lua_api/tilemap_api.rs](src/lua_api/tilemap_api.rs#L2089)*
 
 ---
 
@@ -14833,7 +14868,7 @@ luna.tilemap.newChunkMap(chunkSize) -> ChunkMap
 
 **Parameters:** `chunk_size`
 
-*Source: [src/lua_api/tilemap_api.rs](src/lua_api/tilemap_api.rs#L2104)*
+*Source: [src/lua_api/tilemap_api.rs](src/lua_api/tilemap_api.rs#L2110)*
 
 ---
 
@@ -14843,7 +14878,7 @@ luna.tilemap.newIsoMap(width, height, tileW, tileH, levelHeight)
 
 **Parameters:** `width`, `height`, `tile_w`, `tile_h`, `level_height`
 
-*Source: [src/lua_api/tilemap_api.rs](src/lua_api/tilemap_api.rs#L2717)*
+*Source: [src/lua_api/tilemap_api.rs](src/lua_api/tilemap_api.rs#L2723)*
 
 ---
 
@@ -14853,7 +14888,7 @@ luna.tilemap.newMapBlock(width, height, layers, segmentSize)
 
 **Parameters:** `width`, `height`, `layers`, `segment_size`
 
-*Source: [src/lua_api/tilemap_api.rs](src/lua_api/tilemap_api.rs#L2346)*
+*Source: [src/lua_api/tilemap_api.rs](src/lua_api/tilemap_api.rs#L2352)*
 
 ---
 
@@ -14861,7 +14896,7 @@ luna.tilemap.newMapBlock(width, height, layers, segmentSize)
 
 luna.tilemap.newMapGen(group, sizeOrW, hOrSegSize, segSize)
 
-*Source: [src/lua_api/tilemap_api.rs](src/lua_api/tilemap_api.rs#L2395)*
+*Source: [src/lua_api/tilemap_api.rs](src/lua_api/tilemap_api.rs#L2401)*
 
 ---
 
@@ -14875,7 +14910,7 @@ Creates a named group layer for organizing child layers inside a tile map.
 
 **Returns:** New group layer object.
 
-*Source: [src/lua_api/tilemap_api.rs](src/lua_api/tilemap_api.rs#L2369)*
+*Source: [src/lua_api/tilemap_api.rs](src/lua_api/tilemap_api.rs#L2375)*
 
 ---
 
@@ -14889,7 +14924,7 @@ Creates a script object attached to a tile map layer for custom logic.
 
 **Returns:** New script component object.
 
-*Source: [src/lua_api/tilemap_api.rs](src/lua_api/tilemap_api.rs#L2385)*
+*Source: [src/lua_api/tilemap_api.rs](src/lua_api/tilemap_api.rs#L2391)*
 
 ---
 
@@ -14899,7 +14934,7 @@ luna.tilemap.newTileMap(tileW, tileH, chunkSize)
 
 **Parameters:** `tile_w`, `tile_h`, `chunk_size`
 
-*Source: [src/lua_api/tilemap_api.rs](src/lua_api/tilemap_api.rs#L2069)*
+*Source: [src/lua_api/tilemap_api.rs](src/lua_api/tilemap_api.rs#L2075)*
 
 ---
 
@@ -14907,7 +14942,7 @@ luna.tilemap.newTileMap(tileW, tileH, chunkSize)
 
 luna.tilemap.newTileSet(firstGid, tileCount, columns, tileW, tileH, spacing, margin)
 
-*Source: [src/lua_api/tilemap_api.rs](src/lua_api/tilemap_api.rs#L2040)*
+*Source: [src/lua_api/tilemap_api.rs](src/lua_api/tilemap_api.rs#L2046)*
 
 ---
 
@@ -14917,7 +14952,7 @@ luna.tilemap.toScreenHex(q, r, size)
 
 **Parameters:** `q`, `r`, `size`
 
-*Source: [src/lua_api/tilemap_api.rs](src/lua_api/tilemap_api.rs#L2510)*
+*Source: [src/lua_api/tilemap_api.rs](src/lua_api/tilemap_api.rs#L2516)*
 
 ---
 
@@ -14927,7 +14962,7 @@ luna.tilemap.toScreenIso(tx, ty, tileW, tileH)
 
 **Parameters:** `tx`, `ty`, `tile_w`, `tile_h`
 
-*Source: [src/lua_api/tilemap_api.rs](src/lua_api/tilemap_api.rs#L2472)*
+*Source: [src/lua_api/tilemap_api.rs](src/lua_api/tilemap_api.rs#L2478)*
 
 ---
 
@@ -14939,7 +14974,7 @@ luna.tilemap.AutoTileSheet:getBitmaskForTile(index)
 
 **Parameters:** `index`
 
-*Source: [src/lua_api/tilemap_api.rs](src/lua_api/tilemap_api.rs#L921)*
+*Source: [src/lua_api/tilemap_api.rs](src/lua_api/tilemap_api.rs#L927)*
 
 ---
 
@@ -14949,7 +14984,7 @@ luna.tilemap.AutoTileSheet:getComposite48GridQuad(index) -> {x,y,width,height}
 
 **Parameters:** `index`
 
-*Source: [src/lua_api/tilemap_api.rs](src/lua_api/tilemap_api.rs#L962)*
+*Source: [src/lua_api/tilemap_api.rs](src/lua_api/tilemap_api.rs#L968)*
 
 ---
 
@@ -14959,7 +14994,7 @@ luna.tilemap.AutoTileSheet:getGridQuad(index, cols) -> {x,y,width,height}
 
 **Parameters:** `index`, `cols`
 
-*Source: [src/lua_api/tilemap_api.rs](src/lua_api/tilemap_api.rs#L951)*
+*Source: [src/lua_api/tilemap_api.rs](src/lua_api/tilemap_api.rs#L957)*
 
 ---
 
@@ -14967,7 +15002,7 @@ luna.tilemap.AutoTileSheet:getGridQuad(index, cols) -> {x,y,width,height}
 
 luna.tilemap.AutoTileSheet:getLayout()
 
-*Source: [src/lua_api/tilemap_api.rs](src/lua_api/tilemap_api.rs#L884)*
+*Source: [src/lua_api/tilemap_api.rs](src/lua_api/tilemap_api.rs#L890)*
 
 ---
 
@@ -14977,7 +15012,7 @@ luna.tilemap.AutoTileSheet:getQuad(index)
 
 **Parameters:** `index`
 
-*Source: [src/lua_api/tilemap_api.rs](src/lua_api/tilemap_api.rs#L940)*
+*Source: [src/lua_api/tilemap_api.rs](src/lua_api/tilemap_api.rs#L946)*
 
 ---
 
@@ -14987,7 +15022,7 @@ luna.tilemap.AutoTileSheet:getQuarterDstRects(x, y) -> {[1],...[4]}
 
 **Parameters:** `x`, `y`
 
-*Source: [src/lua_api/tilemap_api.rs](src/lua_api/tilemap_api.rs#L983)*
+*Source: [src/lua_api/tilemap_api.rs](src/lua_api/tilemap_api.rs#L989)*
 
 ---
 
@@ -14997,7 +15032,7 @@ luna.tilemap.AutoTileSheet:getQuarterRects(bitmask) -> {[1]={x,y,w,h},...[4]=...
 
 **Parameters:** `bitmask`
 
-*Source: [src/lua_api/tilemap_api.rs](src/lua_api/tilemap_api.rs#L973)*
+*Source: [src/lua_api/tilemap_api.rs](src/lua_api/tilemap_api.rs#L979)*
 
 ---
 
@@ -15005,7 +15040,7 @@ luna.tilemap.AutoTileSheet:getQuarterRects(bitmask) -> {[1]={x,y,w,h},...[4]=...
 
 luna.tilemap.AutoTileSheet:getTileCount()
 
-*Source: [src/lua_api/tilemap_api.rs](src/lua_api/tilemap_api.rs#L894)*
+*Source: [src/lua_api/tilemap_api.rs](src/lua_api/tilemap_api.rs#L900)*
 
 ---
 
@@ -15015,7 +15050,7 @@ luna.tilemap.AutoTileSheet:getTileForBitmask(bitmask)
 
 **Parameters:** `bitmask`
 
-*Source: [src/lua_api/tilemap_api.rs](src/lua_api/tilemap_api.rs#L931)*
+*Source: [src/lua_api/tilemap_api.rs](src/lua_api/tilemap_api.rs#L937)*
 
 ---
 
@@ -15023,7 +15058,7 @@ luna.tilemap.AutoTileSheet:getTileForBitmask(bitmask)
 
 luna.tilemap.AutoTileSheet:getTileHeight()
 
-*Source: [src/lua_api/tilemap_api.rs](src/lua_api/tilemap_api.rs#L904)*
+*Source: [src/lua_api/tilemap_api.rs](src/lua_api/tilemap_api.rs#L910)*
 
 ---
 
@@ -15031,7 +15066,7 @@ luna.tilemap.AutoTileSheet:getTileHeight()
 
 luna.tilemap.AutoTileSheet:getTileWidth()
 
-*Source: [src/lua_api/tilemap_api.rs](src/lua_api/tilemap_api.rs#L899)*
+*Source: [src/lua_api/tilemap_api.rs](src/lua_api/tilemap_api.rs#L905)*
 
 ---
 
@@ -15043,7 +15078,7 @@ luna.tilemap.ChunkMap:chunkTileRange(cx, cy) -> x0,y0,x1,y1
 
 **Parameters:** `cx`, `cy`
 
-*Source: [src/lua_api/tilemap_api.rs](src/lua_api/tilemap_api.rs#L2017)*
+*Source: [src/lua_api/tilemap_api.rs](src/lua_api/tilemap_api.rs#L2023)*
 
 ---
 
@@ -15053,7 +15088,7 @@ luna.tilemap.ChunkMap:clearTile(x, y)
 
 **Parameters:** `x`, `y`
 
-*Source: [src/lua_api/tilemap_api.rs](src/lua_api/tilemap_api.rs#L1937)*
+*Source: [src/lua_api/tilemap_api.rs](src/lua_api/tilemap_api.rs#L1943)*
 
 ---
 
@@ -15061,7 +15096,7 @@ luna.tilemap.ChunkMap:clearTile(x, y)
 
 luna.tilemap.ChunkMap:getChunkSize()
 
-*Source: [src/lua_api/tilemap_api.rs](src/lua_api/tilemap_api.rs#L1964)*
+*Source: [src/lua_api/tilemap_api.rs](src/lua_api/tilemap_api.rs#L1970)*
 
 ---
 
@@ -15069,7 +15104,7 @@ luna.tilemap.ChunkMap:getChunkSize()
 
 luna.tilemap.ChunkMap:getLoadedChunks() -> [{cx,cy}, ...]
 
-*Source: [src/lua_api/tilemap_api.rs](src/lua_api/tilemap_api.rs#L1969)*
+*Source: [src/lua_api/tilemap_api.rs](src/lua_api/tilemap_api.rs#L1975)*
 
 ---
 
@@ -15079,7 +15114,7 @@ luna.tilemap.ChunkMap:getTile(x, y) -- 0-based tile coords
 
 **Parameters:** `x`, `y`
 
-*Source: [src/lua_api/tilemap_api.rs](src/lua_api/tilemap_api.rs#L1926)*
+*Source: [src/lua_api/tilemap_api.rs](src/lua_api/tilemap_api.rs#L1932)*
 
 ---
 
@@ -15089,7 +15124,7 @@ luna.tilemap.ChunkMap:loadChunk(cx, cy)
 
 **Parameters:** `cx`, `cy`
 
-*Source: [src/lua_api/tilemap_api.rs](src/lua_api/tilemap_api.rs#L1952)*
+*Source: [src/lua_api/tilemap_api.rs](src/lua_api/tilemap_api.rs#L1958)*
 
 ---
 
@@ -15099,7 +15134,7 @@ luna.tilemap.ChunkMap:setTile(x, y, gid) -- 0-based tile coords
 
 **Parameters:** `x`, `y`, `gid`
 
-*Source: [src/lua_api/tilemap_api.rs](src/lua_api/tilemap_api.rs#L1931)*
+*Source: [src/lua_api/tilemap_api.rs](src/lua_api/tilemap_api.rs#L1937)*
 
 ---
 
@@ -15109,7 +15144,7 @@ luna.tilemap.ChunkMap:unloadChunk(cx, cy)
 
 **Parameters:** `cx`, `cy`
 
-*Source: [src/lua_api/tilemap_api.rs](src/lua_api/tilemap_api.rs#L1958)*
+*Source: [src/lua_api/tilemap_api.rs](src/lua_api/tilemap_api.rs#L1964)*
 
 ---
 
@@ -15123,7 +15158,7 @@ Adds an elevation level layer to the isometric map for multi-height rendering.
 
 - `level` — Level definition table or level index integer.
 
-*Source: [src/lua_api/tilemap_api.rs](src/lua_api/tilemap_api.rs#L1736)*
+*Source: [src/lua_api/tilemap_api.rs](src/lua_api/tilemap_api.rs#L1742)*
 
 ---
 
@@ -15133,7 +15168,7 @@ Returns the height of the isometric map in tile rows.
 
 **Returns:** Map height in tile rows.
 
-*Source: [src/lua_api/tilemap_api.rs](src/lua_api/tilemap_api.rs#L1838)*
+*Source: [src/lua_api/tilemap_api.rs](src/lua_api/tilemap_api.rs#L1844)*
 
 ---
 
@@ -15141,7 +15176,7 @@ Returns the height of the isometric map in tile rows.
 
 luna.tilemap.IsoMap:getLevelCount()
 
-*Source: [src/lua_api/tilemap_api.rs](src/lua_api/tilemap_api.rs#L1742)*
+*Source: [src/lua_api/tilemap_api.rs](src/lua_api/tilemap_api.rs#L1748)*
 
 ---
 
@@ -15149,7 +15184,7 @@ luna.tilemap.IsoMap:getLevelCount()
 
 luna.tilemap.IsoMap:getLevelHeight()
 
-*Source: [src/lua_api/tilemap_api.rs](src/lua_api/tilemap_api.rs#L1852)*
+*Source: [src/lua_api/tilemap_api.rs](src/lua_api/tilemap_api.rs#L1858)*
 
 ---
 
@@ -15157,7 +15192,7 @@ luna.tilemap.IsoMap:getLevelHeight()
 
 luna.tilemap.IsoMap:getTileHeight()
 
-*Source: [src/lua_api/tilemap_api.rs](src/lua_api/tilemap_api.rs#L1847)*
+*Source: [src/lua_api/tilemap_api.rs](src/lua_api/tilemap_api.rs#L1853)*
 
 ---
 
@@ -15167,7 +15202,7 @@ Returns the width in pixels of a single isometric tile.
 
 **Returns:** Tile width in pixels.
 
-*Source: [src/lua_api/tilemap_api.rs](src/lua_api/tilemap_api.rs#L1844)*
+*Source: [src/lua_api/tilemap_api.rs](src/lua_api/tilemap_api.rs#L1850)*
 
 ---
 
@@ -15177,7 +15212,7 @@ Returns the width of the isometric map in tile columns.
 
 **Returns:** Map width in tile columns.
 
-*Source: [src/lua_api/tilemap_api.rs](src/lua_api/tilemap_api.rs#L1832)*
+*Source: [src/lua_api/tilemap_api.rs](src/lua_api/tilemap_api.rs#L1838)*
 
 ---
 
@@ -15187,7 +15222,7 @@ luna.tilemap.IsoMap:isLevelVisible(levelIdx)
 
 **Parameters:** `idx`
 
-*Source: [src/lua_api/tilemap_api.rs](src/lua_api/tilemap_api.rs#L1761)*
+*Source: [src/lua_api/tilemap_api.rs](src/lua_api/tilemap_api.rs#L1767)*
 
 ---
 
@@ -15199,7 +15234,7 @@ Returns (tx, ty) as 1-based floats.
 
 **Parameters:** `sx`, `sy`
 
-*Source: [src/lua_api/tilemap_api.rs](src/lua_api/tilemap_api.rs#L1873)*
+*Source: [src/lua_api/tilemap_api.rs](src/lua_api/tilemap_api.rs#L1879)*
 
 ---
 
@@ -15209,7 +15244,7 @@ luna.tilemap.IsoMap:setOrigin(x, y)
 
 **Parameters:** `x`, `y`
 
-*Source: [src/lua_api/tilemap_api.rs](src/lua_api/tilemap_api.rs#L1821)*
+*Source: [src/lua_api/tilemap_api.rs](src/lua_api/tilemap_api.rs#L1827)*
 
 ---
 
@@ -15221,7 +15256,7 @@ All parameters are 1-based; returns (screen_x, screen_y).
 
 **Parameters:** `tx`, `ty`, `tz`
 
-*Source: [src/lua_api/tilemap_api.rs](src/lua_api/tilemap_api.rs#L1861)*
+*Source: [src/lua_api/tilemap_api.rs](src/lua_api/tilemap_api.rs#L1867)*
 
 ---
 
@@ -15231,7 +15266,7 @@ All parameters are 1-based; returns (screen_x, screen_y).
 
 luna.tilemap.MapBlock:getDimensions()
 
-*Source: [src/lua_api/tilemap_api.rs](src/lua_api/tilemap_api.rs#L1071)*
+*Source: [src/lua_api/tilemap_api.rs](src/lua_api/tilemap_api.rs#L1077)*
 
 ---
 
@@ -15241,7 +15276,7 @@ Returns the height of this map block section in tile coordinates.
 
 **Returns:** Height in tiles.
 
-*Source: [src/lua_api/tilemap_api.rs](src/lua_api/tilemap_api.rs#L1066)*
+*Source: [src/lua_api/tilemap_api.rs](src/lua_api/tilemap_api.rs#L1072)*
 
 ---
 
@@ -15251,7 +15286,7 @@ luna.tilemap.MapBlock:getHeightInSegments()
 
 **Parameters:** `edge_str`
 
-*Source: [src/lua_api/tilemap_api.rs](src/lua_api/tilemap_api.rs#L1092)*
+*Source: [src/lua_api/tilemap_api.rs](src/lua_api/tilemap_api.rs#L1098)*
 
 ---
 
@@ -15259,7 +15294,7 @@ luna.tilemap.MapBlock:getHeightInSegments()
 
 luna.tilemap.MapBlock:getLayerCount()
 
-*Source: [src/lua_api/tilemap_api.rs](src/lua_api/tilemap_api.rs#L1077)*
+*Source: [src/lua_api/tilemap_api.rs](src/lua_api/tilemap_api.rs#L1083)*
 
 ---
 
@@ -15271,7 +15306,7 @@ Returns the name string assigned to this map block in the tile editor.
 
 **Returns:** Block name string.
 
-*Source: [src/lua_api/tilemap_api.rs](src/lua_api/tilemap_api.rs#L1112)*
+*Source: [src/lua_api/tilemap_api.rs](src/lua_api/tilemap_api.rs#L1118)*
 
 ---
 
@@ -15281,7 +15316,7 @@ luna.tilemap.MapBlock:getSegmentCount(edge)
 
 **Parameters:** `edge_str`
 
-*Source: [src/lua_api/tilemap_api.rs](src/lua_api/tilemap_api.rs#L1097)*
+*Source: [src/lua_api/tilemap_api.rs](src/lua_api/tilemap_api.rs#L1103)*
 
 ---
 
@@ -15289,7 +15324,7 @@ luna.tilemap.MapBlock:getSegmentCount(edge)
 
 luna.tilemap.MapBlock:getSegmentSize()
 
-*Source: [src/lua_api/tilemap_api.rs](src/lua_api/tilemap_api.rs#L1082)*
+*Source: [src/lua_api/tilemap_api.rs](src/lua_api/tilemap_api.rs#L1088)*
 
 ---
 
@@ -15299,7 +15334,7 @@ luna.tilemap.MapBlock:getSide(edge, segment)
 
 **Parameters:** `edge_str`, `segment`
 
-*Source: [src/lua_api/tilemap_api.rs](src/lua_api/tilemap_api.rs#L1044)*
+*Source: [src/lua_api/tilemap_api.rs](src/lua_api/tilemap_api.rs#L1050)*
 
 ---
 
@@ -15309,7 +15344,7 @@ luna.tilemap.MapBlock:getTile(layer, x, y)
 
 **Parameters:** `layer`, `x`, `y`
 
-*Source: [src/lua_api/tilemap_api.rs](src/lua_api/tilemap_api.rs#L1019)*
+*Source: [src/lua_api/tilemap_api.rs](src/lua_api/tilemap_api.rs#L1025)*
 
 ---
 
@@ -15319,7 +15354,7 @@ Returns the numeric weight used by procedural generators when placing this block
 
 **Returns:** Weight as a number.
 
-*Source: [src/lua_api/tilemap_api.rs](src/lua_api/tilemap_api.rs#L1126)*
+*Source: [src/lua_api/tilemap_api.rs](src/lua_api/tilemap_api.rs#L1132)*
 
 ---
 
@@ -15329,7 +15364,7 @@ Returns the width of this map block section in tile coordinates.
 
 **Returns:** Width in tiles.
 
-*Source: [src/lua_api/tilemap_api.rs](src/lua_api/tilemap_api.rs#L1058)*
+*Source: [src/lua_api/tilemap_api.rs](src/lua_api/tilemap_api.rs#L1064)*
 
 ---
 
@@ -15337,7 +15372,7 @@ Returns the width of this map block section in tile coordinates.
 
 luna.tilemap.MapBlock:getWidthInSegments()
 
-*Source: [src/lua_api/tilemap_api.rs](src/lua_api/tilemap_api.rs#L1087)*
+*Source: [src/lua_api/tilemap_api.rs](src/lua_api/tilemap_api.rs#L1093)*
 
 ---
 
@@ -15347,7 +15382,7 @@ luna.tilemap.MapBlock:setName(name)
 
 **Parameters:** `name`
 
-*Source: [src/lua_api/tilemap_api.rs](src/lua_api/tilemap_api.rs#L1103)*
+*Source: [src/lua_api/tilemap_api.rs](src/lua_api/tilemap_api.rs#L1109)*
 
 ---
 
@@ -15357,7 +15392,7 @@ luna.tilemap.MapBlock:setWeight(weight)
 
 **Parameters:** `weight`
 
-*Source: [src/lua_api/tilemap_api.rs](src/lua_api/tilemap_api.rs#L1117)*
+*Source: [src/lua_api/tilemap_api.rs](src/lua_api/tilemap_api.rs#L1123)*
 
 ---
 
@@ -15367,7 +15402,7 @@ luna.tilemap.MapBlock:setWeight(weight)
 
 Removes all zone definitions from this map generator's zone list.
 
-*Source: [src/lua_api/tilemap_api.rs](src/lua_api/tilemap_api.rs#L1688)*
+*Source: [src/lua_api/tilemap_api.rs](src/lua_api/tilemap_api.rs#L1694)*
 
 ---
 
@@ -15375,7 +15410,7 @@ Removes all zone definitions from this map generator's zone list.
 
 luna.tilemap.MapGen:getGridDimensions()
 
-*Source: [src/lua_api/tilemap_api.rs](src/lua_api/tilemap_api.rs#L1570)*
+*Source: [src/lua_api/tilemap_api.rs](src/lua_api/tilemap_api.rs#L1576)*
 
 ---
 
@@ -15383,7 +15418,7 @@ luna.tilemap.MapGen:getGridDimensions()
 
 luna.tilemap.MapGen:getGridHeight()
 
-*Source: [src/lua_api/tilemap_api.rs](src/lua_api/tilemap_api.rs#L1565)*
+*Source: [src/lua_api/tilemap_api.rs](src/lua_api/tilemap_api.rs#L1571)*
 
 ---
 
@@ -15393,7 +15428,7 @@ Returns the width of the generation grid in block-sized units.
 
 **Returns:** Grid width in block columns.
 
-*Source: [src/lua_api/tilemap_api.rs](src/lua_api/tilemap_api.rs#L1560)*
+*Source: [src/lua_api/tilemap_api.rs](src/lua_api/tilemap_api.rs#L1566)*
 
 ---
 
@@ -15403,7 +15438,7 @@ Returns the layer stacking mode used by this generator.
 
 **Returns:** Layer mode string such as 'stack' or 'replace'.
 
-*Source: [src/lua_api/tilemap_api.rs](src/lua_api/tilemap_api.rs#L1713)*
+*Source: [src/lua_api/tilemap_api.rs](src/lua_api/tilemap_api.rs#L1719)*
 
 ---
 
@@ -15411,7 +15446,7 @@ Returns the layer stacking mode used by this generator.
 
 luna.tilemap.MapGen:getOrientation()
 
-*Source: [src/lua_api/tilemap_api.rs](src/lua_api/tilemap_api.rs#L1618)*
+*Source: [src/lua_api/tilemap_api.rs](src/lua_api/tilemap_api.rs#L1624)*
 
 ---
 
@@ -15421,7 +15456,7 @@ luna.tilemap.MapGen:getPlacementCount()
 
 **Parameters:** `orientation`
 
-*Source: [src/lua_api/tilemap_api.rs](src/lua_api/tilemap_api.rs#L1597)*
+*Source: [src/lua_api/tilemap_api.rs](src/lua_api/tilemap_api.rs#L1603)*
 
 ---
 
@@ -15431,7 +15466,7 @@ luna.tilemap.MapGen:getSegmentSize()
 
 **Parameters:** `w`, `h`
 
-*Source: [src/lua_api/tilemap_api.rs](src/lua_api/tilemap_api.rs#L1576)*
+*Source: [src/lua_api/tilemap_api.rs](src/lua_api/tilemap_api.rs#L1582)*
 
 ---
 
@@ -15439,7 +15474,7 @@ luna.tilemap.MapGen:getSegmentSize()
 
 luna.tilemap.MapGen:getTilePixelHeight()
 
-*Source: [src/lua_api/tilemap_api.rs](src/lua_api/tilemap_api.rs#L1592)*
+*Source: [src/lua_api/tilemap_api.rs](src/lua_api/tilemap_api.rs#L1598)*
 
 ---
 
@@ -15447,7 +15482,7 @@ luna.tilemap.MapGen:getTilePixelHeight()
 
 luna.tilemap.MapGen:getTilePixelWidth()
 
-*Source: [src/lua_api/tilemap_api.rs](src/lua_api/tilemap_api.rs#L1587)*
+*Source: [src/lua_api/tilemap_api.rs](src/lua_api/tilemap_api.rs#L1593)*
 
 ---
 
@@ -15461,7 +15496,7 @@ Returns the zone definition table at the given 1-based index.
 
 **Returns:** Zone definition table.
 
-*Source: [src/lua_api/tilemap_api.rs](src/lua_api/tilemap_api.rs#L1656)*
+*Source: [src/lua_api/tilemap_api.rs](src/lua_api/tilemap_api.rs#L1662)*
 
 ---
 
@@ -15471,7 +15506,7 @@ Returns the total number of zone definitions registered in this generator.
 
 **Returns:** Zone count as an integer.
 
-*Source: [src/lua_api/tilemap_api.rs](src/lua_api/tilemap_api.rs#L1645)*
+*Source: [src/lua_api/tilemap_api.rs](src/lua_api/tilemap_api.rs#L1651)*
 
 ---
 
@@ -15481,7 +15516,7 @@ luna.tilemap.MapGen:setLayerMode(mode)
 
 **Parameters:** `mode`
 
-*Source: [src/lua_api/tilemap_api.rs](src/lua_api/tilemap_api.rs#L1694)*
+*Source: [src/lua_api/tilemap_api.rs](src/lua_api/tilemap_api.rs#L1700)*
 
 ---
 
@@ -15491,7 +15526,7 @@ luna.tilemap.MapGen:setOrientation(orientation)
 
 **Parameters:** `orientation`
 
-*Source: [src/lua_api/tilemap_api.rs](src/lua_api/tilemap_api.rs#L1602)*
+*Source: [src/lua_api/tilemap_api.rs](src/lua_api/tilemap_api.rs#L1608)*
 
 ---
 
@@ -15501,7 +15536,7 @@ luna.tilemap.MapGen:setTileSize(w, h)
 
 **Parameters:** `w`, `h`
 
-*Source: [src/lua_api/tilemap_api.rs](src/lua_api/tilemap_api.rs#L1581)*
+*Source: [src/lua_api/tilemap_api.rs](src/lua_api/tilemap_api.rs#L1587)*
 
 ---
 
@@ -15513,7 +15548,7 @@ luna.tilemap.MapGroup:addBlock(block)
 
 **Parameters:** `block_ud`
 
-*Source: [src/lua_api/tilemap_api.rs](src/lua_api/tilemap_api.rs#L1141)*
+*Source: [src/lua_api/tilemap_api.rs](src/lua_api/tilemap_api.rs#L1147)*
 
 ---
 
@@ -15523,7 +15558,7 @@ luna.tilemap.MapGroup:addScript(script)
 
 **Parameters:** `script_ud`
 
-*Source: [src/lua_api/tilemap_api.rs](src/lua_api/tilemap_api.rs#L1184)*
+*Source: [src/lua_api/tilemap_api.rs](src/lua_api/tilemap_api.rs#L1190)*
 
 ---
 
@@ -15533,7 +15568,7 @@ luna.tilemap.MapGroup:getBlock(index)
 
 **Parameters:** `index`
 
-*Source: [src/lua_api/tilemap_api.rs](src/lua_api/tilemap_api.rs#L1149)*
+*Source: [src/lua_api/tilemap_api.rs](src/lua_api/tilemap_api.rs#L1155)*
 
 ---
 
@@ -15543,7 +15578,7 @@ luna.tilemap.MapGroup:getBlockCount()
 
 **Parameters:** `index`
 
-*Source: [src/lua_api/tilemap_api.rs](src/lua_api/tilemap_api.rs#L1168)*
+*Source: [src/lua_api/tilemap_api.rs](src/lua_api/tilemap_api.rs#L1174)*
 
 ---
 
@@ -15555,7 +15590,7 @@ Returns the display name string of this map group layer.
 
 **Returns:** Group layer name string.
 
-*Source: [src/lua_api/tilemap_api.rs](src/lua_api/tilemap_api.rs#L1219)*
+*Source: [src/lua_api/tilemap_api.rs](src/lua_api/tilemap_api.rs#L1225)*
 
 ---
 
@@ -15565,7 +15600,7 @@ luna.tilemap.MapGroup:getScript(index)
 
 **Parameters:** `index`
 
-*Source: [src/lua_api/tilemap_api.rs](src/lua_api/tilemap_api.rs#L1192)*
+*Source: [src/lua_api/tilemap_api.rs](src/lua_api/tilemap_api.rs#L1198)*
 
 ---
 
@@ -15573,7 +15608,7 @@ luna.tilemap.MapGroup:getScript(index)
 
 luna.tilemap.MapGroup:getScriptCount()
 
-*Source: [src/lua_api/tilemap_api.rs](src/lua_api/tilemap_api.rs#L1211)*
+*Source: [src/lua_api/tilemap_api.rs](src/lua_api/tilemap_api.rs#L1217)*
 
 ---
 
@@ -15583,7 +15618,7 @@ luna.tilemap.MapGroup:removeBlock(index)
 
 **Parameters:** `index`
 
-*Source: [src/lua_api/tilemap_api.rs](src/lua_api/tilemap_api.rs#L1173)*
+*Source: [src/lua_api/tilemap_api.rs](src/lua_api/tilemap_api.rs#L1179)*
 
 ---
 
@@ -15593,7 +15628,7 @@ luna.tilemap.MapGroup:setName(name)
 
 **Parameters:** `name`
 
-*Source: [src/lua_api/tilemap_api.rs](src/lua_api/tilemap_api.rs#L1224)*
+*Source: [src/lua_api/tilemap_api.rs](src/lua_api/tilemap_api.rs#L1230)*
 
 ---
 
@@ -15605,7 +15640,7 @@ luna.tilemap.MapScript:addStep(stepTable)
 
 **Parameters:** `step_table`
 
-*Source: [src/lua_api/tilemap_api.rs](src/lua_api/tilemap_api.rs#L1452)*
+*Source: [src/lua_api/tilemap_api.rs](src/lua_api/tilemap_api.rs#L1458)*
 
 ---
 
@@ -15613,7 +15648,7 @@ luna.tilemap.MapScript:addStep(stepTable)
 
 luna.tilemap.MapScript:clearSteps()
 
-*Source: [src/lua_api/tilemap_api.rs](src/lua_api/tilemap_api.rs#L1489)*
+*Source: [src/lua_api/tilemap_api.rs](src/lua_api/tilemap_api.rs#L1495)*
 
 ---
 
@@ -15623,7 +15658,7 @@ Returns the identifier name assigned to this map script component.
 
 **Returns:** Script name string.
 
-*Source: [src/lua_api/tilemap_api.rs](src/lua_api/tilemap_api.rs#L1504)*
+*Source: [src/lua_api/tilemap_api.rs](src/lua_api/tilemap_api.rs#L1510)*
 
 ---
 
@@ -15633,7 +15668,7 @@ luna.tilemap.MapScript:getStep(index)
 
 **Parameters:** `index`
 
-*Source: [src/lua_api/tilemap_api.rs](src/lua_api/tilemap_api.rs#L1459)*
+*Source: [src/lua_api/tilemap_api.rs](src/lua_api/tilemap_api.rs#L1465)*
 
 ---
 
@@ -15643,7 +15678,7 @@ luna.tilemap.MapScript:getStepCount()
 
 **Parameters:** `index`
 
-*Source: [src/lua_api/tilemap_api.rs](src/lua_api/tilemap_api.rs#L1473)*
+*Source: [src/lua_api/tilemap_api.rs](src/lua_api/tilemap_api.rs#L1479)*
 
 ---
 
@@ -15653,7 +15688,7 @@ luna.tilemap.MapScript:removeStep(index)
 
 **Parameters:** `index`
 
-*Source: [src/lua_api/tilemap_api.rs](src/lua_api/tilemap_api.rs#L1478)*
+*Source: [src/lua_api/tilemap_api.rs](src/lua_api/tilemap_api.rs#L1484)*
 
 ---
 
@@ -15663,7 +15698,7 @@ luna.tilemap.MapScript:setName(name)
 
 **Parameters:** `name`
 
-*Source: [src/lua_api/tilemap_api.rs](src/lua_api/tilemap_api.rs#L1495)*
+*Source: [src/lua_api/tilemap_api.rs](src/lua_api/tilemap_api.rs#L1501)*
 
 ---
 
@@ -15713,7 +15748,7 @@ luna.tilemap.TileMap:fill(layerIdx, gid)
 
 luna.tilemap.TileMap:getChunkSize()
 
-*Source: [src/lua_api/tilemap_api.rs](src/lua_api/tilemap_api.rs#L728)*
+*Source: [src/lua_api/tilemap_api.rs](src/lua_api/tilemap_api.rs#L734)*
 
 ---
 
@@ -15781,7 +15816,7 @@ luna.tilemap.TileMap:getLayerVisible(layerIdx)
 
 luna.tilemap.TileMap:getOrientation() -> "topdown"|"sideview"
 
-*Source: [src/lua_api/tilemap_api.rs](src/lua_api/tilemap_api.rs#L733)*
+*Source: [src/lua_api/tilemap_api.rs](src/lua_api/tilemap_api.rs#L739)*
 
 ---
 
@@ -15799,15 +15834,17 @@ luna.tilemap.TileMap:getTile(layerIdx, x, y)
 
 luna.tilemap.TileMap:getTileDimensions()
 
-*Source: [src/lua_api/tilemap_api.rs](src/lua_api/tilemap_api.rs#L722)*
+*Source: [src/lua_api/tilemap_api.rs](src/lua_api/tilemap_api.rs#L728)*
 
 ---
 
 #### `TileMap:getTileHeight()`
 
-luna.tilemap.TileMap:getTileHeight()
+Returns the height of a single tile in pixels.
 
-*Source: [src/lua_api/tilemap_api.rs](src/lua_api/tilemap_api.rs#L717)*
+**Returns:** `integer` — tile pixel height.
+
+*Source: [src/lua_api/tilemap_api.rs](src/lua_api/tilemap_api.rs#L723)*
 
 ---
 
@@ -15831,9 +15868,11 @@ luna.tilemap.TileMap:getTileSetCount()
 
 #### `TileMap:getTileWidth()`
 
-luna.tilemap.TileMap:getTileWidth()
+Returns the width of a single tile in pixels.
 
-*Source: [src/lua_api/tilemap_api.rs](src/lua_api/tilemap_api.rs#L712)*
+**Returns:** `integer` — tile pixel width.
+
+*Source: [src/lua_api/tilemap_api.rs](src/lua_api/tilemap_api.rs#L715)*
 
 ---
 
@@ -15853,7 +15892,7 @@ luna.tilemap.TileMap:isSolid(layerIdx, tx, ty)
 
 **Parameters:** `layer`, `tx`, `ty`
 
-*Source: [src/lua_api/tilemap_api.rs](src/lua_api/tilemap_api.rs#L759)*
+*Source: [src/lua_api/tilemap_api.rs](src/lua_api/tilemap_api.rs#L765)*
 
 ---
 
@@ -15863,7 +15902,7 @@ luna.tilemap.TileMap:setOrientation(mode)
 
 **Parameters:** `mode`
 
-*Source: [src/lua_api/tilemap_api.rs](src/lua_api/tilemap_api.rs#L741)*
+*Source: [src/lua_api/tilemap_api.rs](src/lua_api/tilemap_api.rs#L747)*
 
 ---
 
@@ -16030,7 +16069,7 @@ Exposes Card, Deck, Zone, StackManager, DeckBuilder, and CardPool to Lua.
 
 *(undocumented)*
 
-*Source: [src/lua_api/cardgame_api.rs](src/lua_api/cardgame_api.rs#L1033)*
+*Source: [src/lua_api/cardgame_api.rs](src/lua_api/cardgame_api.rs#L989)*
 
 ---
 
@@ -16040,7 +16079,7 @@ Exposes Card, Deck, Zone, StackManager, DeckBuilder, and CardPool to Lua.
 
 **Parameters:** `name`, `opts`
 
-*Source: [src/lua_api/cardgame_api.rs](src/lua_api/cardgame_api.rs#L964)*
+*Source: [src/lua_api/cardgame_api.rs](src/lua_api/cardgame_api.rs#L920)*
 
 ---
 
@@ -16050,7 +16089,7 @@ Exposes Card, Deck, Zone, StackManager, DeckBuilder, and CardPool to Lua.
 
 **Parameters:** `name`
 
-*Source: [src/lua_api/cardgame_api.rs](src/lua_api/cardgame_api.rs#L988)*
+*Source: [src/lua_api/cardgame_api.rs](src/lua_api/cardgame_api.rs#L944)*
 
 ---
 
@@ -16058,7 +16097,7 @@ Exposes Card, Deck, Zone, StackManager, DeckBuilder, and CardPool to Lua.
 
 *(undocumented)*
 
-*Source: [src/lua_api/cardgame_api.rs](src/lua_api/cardgame_api.rs#L1024)*
+*Source: [src/lua_api/cardgame_api.rs](src/lua_api/cardgame_api.rs#L980)*
 
 ---
 
@@ -16068,7 +16107,7 @@ Exposes Card, Deck, Zone, StackManager, DeckBuilder, and CardPool to Lua.
 
 **Parameters:** `card_type`
 
-*Source: [src/lua_api/cardgame_api.rs](src/lua_api/cardgame_api.rs#L916)*
+*Source: [src/lua_api/cardgame_api.rs](src/lua_api/cardgame_api.rs#L872)*
 
 ---
 
@@ -16078,7 +16117,7 @@ Exposes Card, Deck, Zone, StackManager, DeckBuilder, and CardPool to Lua.
 
 **Parameters:** `name`
 
-*Source: [src/lua_api/cardgame_api.rs](src/lua_api/cardgame_api.rs#L956)*
+*Source: [src/lua_api/cardgame_api.rs](src/lua_api/cardgame_api.rs#L912)*
 
 ---
 
@@ -16088,7 +16127,7 @@ Exposes Card, Deck, Zone, StackManager, DeckBuilder, and CardPool to Lua.
 
 **Parameters:** `name`
 
-*Source: [src/lua_api/cardgame_api.rs](src/lua_api/cardgame_api.rs#L924)*
+*Source: [src/lua_api/cardgame_api.rs](src/lua_api/cardgame_api.rs#L880)*
 
 ---
 
@@ -16096,7 +16135,7 @@ Exposes Card, Deck, Zone, StackManager, DeckBuilder, and CardPool to Lua.
 
 *(undocumented)*
 
-*Source: [src/lua_api/cardgame_api.rs](src/lua_api/cardgame_api.rs#L948)*
+*Source: [src/lua_api/cardgame_api.rs](src/lua_api/cardgame_api.rs#L904)*
 
 ---
 
@@ -16104,7 +16143,7 @@ Exposes Card, Deck, Zone, StackManager, DeckBuilder, and CardPool to Lua.
 
 *(undocumented)*
 
-*Source: [src/lua_api/cardgame_api.rs](src/lua_api/cardgame_api.rs#L940)*
+*Source: [src/lua_api/cardgame_api.rs](src/lua_api/cardgame_api.rs#L896)*
 
 ---
 
@@ -16114,7 +16153,7 @@ Exposes Card, Deck, Zone, StackManager, DeckBuilder, and CardPool to Lua.
 
 **Parameters:** `name`, `capacity`
 
-*Source: [src/lua_api/cardgame_api.rs](src/lua_api/cardgame_api.rs#L932)*
+*Source: [src/lua_api/cardgame_api.rs](src/lua_api/cardgame_api.rs#L888)*
 
 ---
 
@@ -16122,373 +16161,334 @@ Exposes Card, Deck, Zone, StackManager, DeckBuilder, and CardPool to Lua.
 
 #### `Card:addCounter(kind, amount)`
 
-Adds counter to the collection.
+Increments the named counter by `amount` (default `1`).
 
 **Parameters:**
 
-- `kind` — `string`.
-- `amount` — `integer`.
+- `name` — `string`: Counter name.
+- `amount` — `integer`: Amount to add (optional, default `1`).
 
-*Source: [src/lua_api/cardgame_api.rs](src/lua_api/cardgame_api.rs#L159)*
+*Source: [src/lua_api/cardgame_api.rs](src/lua_api/cardgame_api.rs#L145)*
 
 ---
 
 #### `Card:addTag(tag)`
 
-Adds tag to the collection.
+Attaches a tag to this card.
 
 **Parameters:**
 
-- `tag` — `string`.
+- `tag` — `string`: Tag to add.
 
-*Source: [src/lua_api/cardgame_api.rs](src/lua_api/cardgame_api.rs#L117)*
+*Source: [src/lua_api/cardgame_api.rs](src/lua_api/cardgame_api.rs#L107)*
 
 ---
 
 #### `Card:clone()`
 
-Returns a deep copy of this object.
+Creates and returns a deep copy of this card with identical stats, tags, and counters.
 
-**Returns:** The result.
+**Returns:** `Card` — the new copy.
 
-*Source: [src/lua_api/cardgame_api.rs](src/lua_api/cardgame_api.rs#L307)*
+*Source: [src/lua_api/cardgame_api.rs](src/lua_api/cardgame_api.rs#L271)*
 
 ---
 
 #### `Card:getAllCounters()`
 
-Returns the all counters.
+Returns a key-value table of all counters on this card.
 
-**Returns:** The current all counters.
+**Returns:** `table` of `{name: integer}` counter pairs.
 
-*Source: [src/lua_api/cardgame_api.rs](src/lua_api/cardgame_api.rs#L295)*
+*Source: [src/lua_api/cardgame_api.rs](src/lua_api/cardgame_api.rs#L259)*
 
 ---
 
 #### `Card:getCardType()`
 
-Returns the card type.
+Returns the type identifier string for this card.
 
-**Parameters:**
+**Returns:** `string`.
 
-- `name` — `string`.
-
-**Returns:** The current card type.
-
-*Source: [src/lua_api/cardgame_api.rs](src/lua_api/cardgame_api.rs#L40)*
+*Source: [src/lua_api/cardgame_api.rs](src/lua_api/cardgame_api.rs#L37)*
 
 ---
 
 #### `Card:getCategory()`
 
-Returns the category.
+Returns the category tag for this card (e.g. `'spell'`, `'creature'`).
 
-**Parameters:**
+**Returns:** `string`.
 
-- `cat` — `string`.
-
-**Returns:** The current category.
-
-*Source: [src/lua_api/cardgame_api.rs](src/lua_api/cardgame_api.rs#L66)*
+*Source: [src/lua_api/cardgame_api.rs](src/lua_api/cardgame_api.rs#L57)*
 
 ---
 
 #### `Card:getController()`
 
-Returns the controller.
+Returns the controller identifier (the player currently controlling this card).
 
-**Parameters:**
-
-- `v` — `string`.
-
-**Returns:** The current controller.
-
-*Source: [src/lua_api/cardgame_api.rs](src/lua_api/cardgame_api.rs#L245)*
-
----
-
-#### `Card:getCounter(kind)`
-
-Returns the counter.
-
-**Parameters:**
-
-- `kind` — `string`.
-
-**Returns:** The current counter.
-
-*Source: [src/lua_api/cardgame_api.rs](src/lua_api/cardgame_api.rs#L169)*
-
----
-
-#### `Card:getMeta(key)`
-
-Returns the meta.
-
-**Parameters:**
-
-- `k` — `string`.
-- `v` — `string`.
-
-**Returns:** The current meta.
-
-*Source: [src/lua_api/cardgame_api.rs](src/lua_api/cardgame_api.rs#L274)*
-
----
-
-#### `Card:getName(name)`
-
-Returns the name.
-
-**Parameters:**
-
-- `name` — `string`.
-
-**Returns:** The current name.
-
-*Source: [src/lua_api/cardgame_api.rs](src/lua_api/cardgame_api.rs#L50)*
-
----
-
-#### `Card:getOwner(v)`
-
-Returns the owner.
-
-**Parameters:**
-
-- `v` — `string`.
-
-**Returns:** The current owner.
-
-*Source: [src/lua_api/cardgame_api.rs](src/lua_api/cardgame_api.rs#L229)*
-
----
-
-#### `Card:getStat(name)`
-
-Returns the stat.
-
-**Parameters:**
-
-- `name` — `string`.
-- `value` — `number`.
-
-**Returns:** The current stat.
-
-*Source: [src/lua_api/cardgame_api.rs](src/lua_api/cardgame_api.rs#L87)*
-
----
-
-#### `Card:getStats()`
-
-Returns the stats.
-
-**Returns:** The current stats.
-
-*Source: [src/lua_api/cardgame_api.rs](src/lua_api/cardgame_api.rs#L103)*
-
----
-
-#### `Card:getTags()`
-
-Returns the tags.
-
-**Parameters:**
-
-- `kind` — `string`.
-- `amount` — `integer`.
-
-**Returns:** The current tags.
-
-*Source: [src/lua_api/cardgame_api.rs](src/lua_api/cardgame_api.rs#L147)*
-
----
-
-#### `Card:getZone()`
-
-Returns the zone.
-
-**Parameters:**
-
-- `key` — `string`.
-
-**Returns:** The current zone.
-
-*Source: [src/lua_api/cardgame_api.rs](src/lua_api/cardgame_api.rs#L263)*
-
----
-
-#### `Card:hasTag(tag)`
-
-Returns `true` if tag.
-
-**Parameters:**
-
-- `tag` — `string`.
-
-**Returns:** `boolean`.
-
-*Source: [src/lua_api/cardgame_api.rs](src/lua_api/cardgame_api.rs#L136)*
-
----
-
-#### `Card:isFaceUp(v)`
-
-Returns `true` if face up.
-
-**Parameters:**
-
-- `v` — `boolean`.
-
-**Returns:** `boolean`.
+**Returns:** `string` or `nil`.
 
 *Source: [src/lua_api/cardgame_api.rs](src/lua_api/cardgame_api.rs#L213)*
 
 ---
 
-#### `Card:isTapped()`
+#### `Card:getCounter(kind)`
 
-Returns `true` if tapped.
+Returns the current value of the named counter.
 
 **Parameters:**
 
-- `v` — `boolean`.
+- `name` — `string`: Counter name.
+
+**Returns:** `integer` — counter value.
+
+*Source: [src/lua_api/cardgame_api.rs](src/lua_api/cardgame_api.rs#L155)*
+
+---
+
+#### `Card:getMeta(key)`
+
+Returns the metadata value for `key`, or `nil` if not set.
+
+**Parameters:**
+
+- `key` — `string`: Metadata key.
+
+**Returns:** The stored value or `nil`.
+
+*Source: [src/lua_api/cardgame_api.rs](src/lua_api/cardgame_api.rs#L238)*
+
+---
+
+#### `Card:getName(name)`
+
+Returns the display name of this card.
+
+**Parameters:** `name`
+
+**Returns:** `string`.
+
+*Source: [src/lua_api/cardgame_api.rs](src/lua_api/cardgame_api.rs#L44)*
+
+---
+
+#### `Card:getOwner(v)`
+
+Returns the owner identifier string, or `nil` if unowned.
+
+**Parameters:** `v`
+
+**Returns:** `string` or `nil`.
+
+*Source: [src/lua_api/cardgame_api.rs](src/lua_api/cardgame_api.rs#L200)*
+
+---
+
+#### `Card:getStat(name)`
+
+Returns the value of the named numeric stat.
+
+**Parameters:**
+
+- `key` — `string`: Stat name (e.g. `'attack'`, `'defense'`).
+
+**Returns:** `number` — stat value, or `0` if not set.
+
+*Source: [src/lua_api/cardgame_api.rs](src/lua_api/cardgame_api.rs#L77)*
+
+---
+
+#### `Card:getStats()`
+
+Returns all numeric stats as a key-value table.
+
+**Returns:** `table` of `{stat: number}` pairs.
+
+*Source: [src/lua_api/cardgame_api.rs](src/lua_api/cardgame_api.rs#L93)*
+
+---
+
+#### `Card:getTags()`
+
+Returns a list of all tags attached to this card.
+
+**Returns:** `table` of `string` tags.
+
+*Source: [src/lua_api/cardgame_api.rs](src/lua_api/cardgame_api.rs#L133)*
+
+---
+
+#### `Card:getZone()`
+
+Returns the name of the zone this card currently occupies.
+
+**Returns:** `string` — zone name.
+
+*Source: [src/lua_api/cardgame_api.rs](src/lua_api/cardgame_api.rs#L228)*
+
+---
+
+#### `Card:hasTag(tag)`
+
+Returns `true` if this card carries the given tag.
+
+**Parameters:**
+
+- `tag` — `string`: Tag to test.
 
 **Returns:** `boolean`.
 
-*Source: [src/lua_api/cardgame_api.rs](src/lua_api/cardgame_api.rs#L205)*
+*Source: [src/lua_api/cardgame_api.rs](src/lua_api/cardgame_api.rs#L126)*
+
+---
+
+#### `Card:isFaceUp(v)`
+
+Returns `true` if this card is face-up (visible).
+
+**Parameters:** `v`
+
+**Returns:** `boolean`.
+
+*Source: [src/lua_api/cardgame_api.rs](src/lua_api/cardgame_api.rs#L187)*
+
+---
+
+#### `Card:isTapped()`
+
+Returns `true` if this card is currently tapped.
+
+**Returns:** `boolean`.
+
+*Source: [src/lua_api/cardgame_api.rs](src/lua_api/cardgame_api.rs#L182)*
 
 ---
 
 #### `Card:removeCounters(kind)`
 
-Removes counters from the collection.
+Removes all counters of the given name.
 
 **Parameters:**
 
-- `kind` — `string`.
+- `name` — `string`: Counter name to clear.
 
-*Source: [src/lua_api/cardgame_api.rs](src/lua_api/cardgame_api.rs#L176)*
+*Source: [src/lua_api/cardgame_api.rs](src/lua_api/cardgame_api.rs#L162)*
 
 ---
 
 #### `Card:removeTag(tag)`
 
-Removes tag from the collection.
+Removes a tag from this card.
 
 **Parameters:**
 
-- `tag` — `string`.
+- `tag` — `string`: Tag to remove.
 
-*Source: [src/lua_api/cardgame_api.rs](src/lua_api/cardgame_api.rs#L125)*
+*Source: [src/lua_api/cardgame_api.rs](src/lua_api/cardgame_api.rs#L115)*
 
 ---
 
 #### `Card:setCategory(cat)`
 
-Sets the category.
+Sets the category tag for this card.
 
 **Parameters:**
 
-- `cat` — `string`.
+- `category` — `string`: New category.
 
-*Source: [src/lua_api/cardgame_api.rs](src/lua_api/cardgame_api.rs#L73)*
+*Source: [src/lua_api/cardgame_api.rs](src/lua_api/cardgame_api.rs#L64)*
 
 ---
 
 #### `Card:setController(v)`
 
-Sets the controller.
+Sets the controller for this card.
 
 **Parameters:**
 
-- `v` — `string`.
+- `controller` — `string`: Controller identifier.
 
-*Source: [src/lua_api/cardgame_api.rs](src/lua_api/cardgame_api.rs#L252)*
+*Source: [src/lua_api/cardgame_api.rs](src/lua_api/cardgame_api.rs#L220)*
 
 ---
 
 #### `Card:setFaceUp(v)`
 
-Sets the face up.
+Sets whether this card is face-up (`true`) or face-down (`false`).
 
 **Parameters:**
 
-- `v` — `boolean`.
+- `face_up` — `boolean`: Face state.
 
-*Source: [src/lua_api/cardgame_api.rs](src/lua_api/cardgame_api.rs#L218)*
+*Source: [src/lua_api/cardgame_api.rs](src/lua_api/cardgame_api.rs#L192)*
 
 ---
 
 #### `Card:setMeta(k, v)`
 
-Sets the meta.
+Stores an arbitrary metadata value on this card.
 
 **Parameters:**
 
-- `k` — `string`.
-- `v` — `string`.
+- `key` — `string`: Metadata key.
+- `value` — `any`: Value to store.
 
-*Source: [src/lua_api/cardgame_api.rs](src/lua_api/cardgame_api.rs#L285)*
+*Source: [src/lua_api/cardgame_api.rs](src/lua_api/cardgame_api.rs#L249)*
 
 ---
 
 #### `Card:setName(name)`
 
-Sets the name.
+Sets the card's display name.
 
 **Parameters:**
 
-- `name` — `string`.
+- `name` — `string`: New name.
 
-*Source: [src/lua_api/cardgame_api.rs](src/lua_api/cardgame_api.rs#L55)*
+*Source: [src/lua_api/cardgame_api.rs](src/lua_api/cardgame_api.rs#L49)*
 
 ---
 
 #### `Card:setOwner(v)`
 
-Sets the owner.
+Sets the owner identifier for this card.
 
 **Parameters:**
 
-- `v` — `string`.
+- `owner` — `string`: Owner identifier.
 
-*Source: [src/lua_api/cardgame_api.rs](src/lua_api/cardgame_api.rs#L234)*
+*Source: [src/lua_api/cardgame_api.rs](src/lua_api/cardgame_api.rs#L205)*
 
 ---
 
 #### `Card:setStat(name, value)`
 
-Sets the stat.
+Sets a numeric stat on this card.
 
 **Parameters:**
 
-- `name` — `string`.
-- `value` — `number`.
+- `key` — `string`: Stat name.
+- `value` — `number`: Stat value.
 
-*Source: [src/lua_api/cardgame_api.rs](src/lua_api/cardgame_api.rs#L95)*
+*Source: [src/lua_api/cardgame_api.rs](src/lua_api/cardgame_api.rs#L85)*
 
 ---
 
 #### `Card:tap()`
 
-Tap on this Card.
+Marks this card as tapped. A tapped card cannot be tapped again until untapped.
 
-**Returns:** The result.
-
-*Source: [src/lua_api/cardgame_api.rs](src/lua_api/cardgame_api.rs#L186)*
+*Source: [src/lua_api/cardgame_api.rs](src/lua_api/cardgame_api.rs#L169)*
 
 ---
 
 #### `Card:untap()`
 
-Untap on this Card.
+Removes the tapped state from this card.
 
-**Parameters:**
-
-- `v` — `boolean`.
-
-*Source: [src/lua_api/cardgame_api.rs](src/lua_api/cardgame_api.rs#L194)*
+*Source: [src/lua_api/cardgame_api.rs](src/lua_api/cardgame_api.rs#L174)*
 
 ---
 
@@ -16503,7 +16503,7 @@ Adds an entry to the collection.
 - `ct` — `string`.
 - `weight` — `integer` optional.
 
-*Source: [src/lua_api/cardgame_api.rs](src/lua_api/cardgame_api.rs#L858)*
+*Source: [src/lua_api/cardgame_api.rs](src/lua_api/cardgame_api.rs#L814)*
 
 ---
 
@@ -16515,7 +16515,7 @@ Draws to the current render target.
 
 - `n` — `integer` optional.
 
-*Source: [src/lua_api/cardgame_api.rs](src/lua_api/cardgame_api.rs#L899)*
+*Source: [src/lua_api/cardgame_api.rs](src/lua_api/cardgame_api.rs#L855)*
 
 ---
 
@@ -16530,7 +16530,7 @@ Returns the name.
 
 **Returns:** The current name.
 
-*Source: [src/lua_api/cardgame_api.rs](src/lua_api/cardgame_api.rs#L852)*
+*Source: [src/lua_api/cardgame_api.rs](src/lua_api/cardgame_api.rs#L808)*
 
 ---
 
@@ -16540,7 +16540,7 @@ Returns the size.
 
 **Returns:** The current size.
 
-*Source: [src/lua_api/cardgame_api.rs](src/lua_api/cardgame_api.rs#L874)*
+*Source: [src/lua_api/cardgame_api.rs](src/lua_api/cardgame_api.rs#L830)*
 
 ---
 
@@ -16554,7 +16554,7 @@ Returns the total weight.
 
 **Returns:** The current total weight.
 
-*Source: [src/lua_api/cardgame_api.rs](src/lua_api/cardgame_api.rs#L892)*
+*Source: [src/lua_api/cardgame_api.rs](src/lua_api/cardgame_api.rs#L848)*
 
 ---
 
@@ -16564,7 +16564,7 @@ Returns the types.
 
 **Returns:** The current types.
 
-*Source: [src/lua_api/cardgame_api.rs](src/lua_api/cardgame_api.rs#L879)*
+*Source: [src/lua_api/cardgame_api.rs](src/lua_api/cardgame_api.rs#L835)*
 
 ---
 
@@ -16576,7 +16576,7 @@ Removes the entry from the collection.
 
 - `ct` — `string`.
 
-*Source: [src/lua_api/cardgame_api.rs](src/lua_api/cardgame_api.rs#L866)*
+*Source: [src/lua_api/cardgame_api.rs](src/lua_api/cardgame_api.rs#L822)*
 
 ---
 
@@ -16584,171 +16584,175 @@ Removes the entry from the collection.
 
 #### `Deck:countByType(card_type)`
 
-Returns the number of by type.
+Returns the count of cards matching the given type.
 
 **Parameters:**
 
-- `card_type` — `string`.
+- `card_type` — `string`: Card type to count.
 
 **Returns:** `integer`.
 
-*Source: [src/lua_api/cardgame_api.rs](src/lua_api/cardgame_api.rs#L444)*
+*Source: [src/lua_api/cardgame_api.rs](src/lua_api/cardgame_api.rs#L414)*
 
 ---
 
 #### `Deck:draw()`
 
-Draws to the current render target.
+Removes and returns the top card of the deck, or `nil` if empty.
 
-**Returns:** The result.
+**Returns:** `Card` or `nil`.
 
-*Source: [src/lua_api/cardgame_api.rs](src/lua_api/cardgame_api.rs#L383)*
+*Source: [src/lua_api/cardgame_api.rs](src/lua_api/cardgame_api.rs#L344)*
 
 ---
 
 #### `Deck:drawBottom()`
 
-Draw bottom on this Deck.
+Removes and returns the bottom card of the deck, or `nil` if empty.
 
-**Returns:** The result.
+**Returns:** `Card` or `nil`.
 
-*Source: [src/lua_api/cardgame_api.rs](src/lua_api/cardgame_api.rs#L391)*
+*Source: [src/lua_api/cardgame_api.rs](src/lua_api/cardgame_api.rs#L352)*
 
 ---
 
 #### `Deck:getCards()`
 
-Returns the cards.
+Returns the full ordered list of cards in this deck (top to bottom).
 
-**Returns:** The current cards.
+**Returns:** `table` of `Card` objects.
 
-*Source: [src/lua_api/cardgame_api.rs](src/lua_api/cardgame_api.rs#L461)*
+*Source: [src/lua_api/cardgame_api.rs](src/lua_api/cardgame_api.rs#L434)*
 
 ---
 
 #### `Deck:getName()`
 
-Returns the name.
+Returns the deck's name.
 
-**Returns:** The current name.
+**Returns:** `string`.
 
-*Source: [src/lua_api/cardgame_api.rs](src/lua_api/cardgame_api.rs#L335)*
+*Source: [src/lua_api/cardgame_api.rs](src/lua_api/cardgame_api.rs#L299)*
 
 ---
 
 #### `Deck:getSize()`
 
-Returns the size.
+Returns the number of cards currently in this deck.
 
-**Returns:** The current size.
+**Returns:** `integer`.
 
-*Source: [src/lua_api/cardgame_api.rs](src/lua_api/cardgame_api.rs#L340)*
+*Source: [src/lua_api/cardgame_api.rs](src/lua_api/cardgame_api.rs#L304)*
 
 ---
 
 #### `Deck:insertAt(card, index)`
 
-Adds at to the collection.
+Inserts `card` at position `index` (1-based). Use index `1` for top, or the deck size for bottom.
 
 **Parameters:**
 
-- `card` — `userdata`.
-- `index` — `integer`.
+- `index` — `integer`: 1-based insertion position.
+- `card` — `Card`: Card to insert.
 
-*Source: [src/lua_api/cardgame_api.rs](src/lua_api/cardgame_api.rs#L372)*
+*Source: [src/lua_api/cardgame_api.rs](src/lua_api/cardgame_api.rs#L333)*
 
 ---
 
 #### `Deck:isEmpty()`
 
-Returns `true` if empty.
+Returns `true` if the deck contains no cards.
 
 **Returns:** `boolean`.
 
-*Source: [src/lua_api/cardgame_api.rs](src/lua_api/cardgame_api.rs#L345)*
+*Source: [src/lua_api/cardgame_api.rs](src/lua_api/cardgame_api.rs#L309)*
 
 ---
 
 #### `Deck:moveWithin(from, to)`
 
-Move within on this Deck.
+Moves the card at `from` to `to` (both 1-based), shifting other cards to fill the gap.
 
 **Parameters:**
 
-- `from` — `integer`.
-- `to` — `integer`.
+- `from` — `integer`: Source position.
+- `to` — `integer`: Destination position.
 
-*Source: [src/lua_api/cardgame_api.rs](src/lua_api/cardgame_api.rs#L475)*
+*Source: [src/lua_api/cardgame_api.rs](src/lua_api/cardgame_api.rs#L448)*
 
 ---
 
 #### `Deck:peek()`
 
-Peek on this Deck.
+Returns the top card without removing it, or `nil` if empty.
 
-**Parameters:**
+**Returns:** `Card` or `nil`.
 
-- `index` — `integer`.
-
-*Source: [src/lua_api/cardgame_api.rs](src/lua_api/cardgame_api.rs#L399)*
+*Source: [src/lua_api/cardgame_api.rs](src/lua_api/cardgame_api.rs#L360)*
 
 ---
 
 #### `Deck:removeAt(index)`
 
-Removes at from the collection.
+Removes and returns the card at 1-based `index`.
 
 **Parameters:**
 
-- `index` — `integer`.
+- `index` — `integer`: 1-based position.
 
-*Source: [src/lua_api/cardgame_api.rs](src/lua_api/cardgame_api.rs#L409)*
+**Returns:** `Card` or `nil`.
+
+*Source: [src/lua_api/cardgame_api.rs](src/lua_api/cardgame_api.rs#L373)*
 
 ---
 
 #### `Deck:revealTop(n)`
 
-Reveal top on this Deck.
+Returns the top `n` cards without removing them.
 
 **Parameters:**
 
-- `n` — `integer`.
+- `n` — `integer`: Number of cards to reveal.
 
-*Source: [src/lua_api/cardgame_api.rs](src/lua_api/cardgame_api.rs#L451)*
+**Returns:** `table` of `Card` objects (may be fewer than `n` if the deck is small).
+
+*Source: [src/lua_api/cardgame_api.rs](src/lua_api/cardgame_api.rs#L424)*
 
 ---
 
 #### `Deck:searchByTag(tag)`
 
-Search by tag on this Deck.
+Returns a list of all cards in this deck that carry the given tag.
 
 **Parameters:**
 
-- `tag` — `string`.
+- `tag` — `string`: Tag to search for.
 
-*Source: [src/lua_api/cardgame_api.rs](src/lua_api/cardgame_api.rs#L419)*
+**Returns:** `table` of `Card` objects.
+
+*Source: [src/lua_api/cardgame_api.rs](src/lua_api/cardgame_api.rs#L386)*
 
 ---
 
 #### `Deck:searchByType(ct)`
 
-Search by type on this Deck.
+Returns a list of all cards of the given type.
 
 **Parameters:**
 
-- `ct` — `string`.
+- `card_type` — `string`: Card type identifier to match.
 
-*Source: [src/lua_api/cardgame_api.rs](src/lua_api/cardgame_api.rs#L429)*
+**Returns:** `table` of `Card` objects.
+
+*Source: [src/lua_api/cardgame_api.rs](src/lua_api/cardgame_api.rs#L399)*
 
 ---
 
 #### `Deck:shuffle()`
 
-Randomly reorders the collection.
+Shuffles the deck in-place using a Fisher–Yates shuffle.
 
-**Returns:** The result.
-
-*Source: [src/lua_api/cardgame_api.rs](src/lua_api/cardgame_api.rs#L350)*
+*Source: [src/lua_api/cardgame_api.rs](src/lua_api/cardgame_api.rs#L311)*
 
 ---
 
@@ -16762,7 +16766,7 @@ Adds banned type to the collection.
 
 - `ct` — `string`.
 
-*Source: [src/lua_api/cardgame_api.rs](src/lua_api/cardgame_api.rs#L798)*
+*Source: [src/lua_api/cardgame_api.rs](src/lua_api/cardgame_api.rs#L754)*
 
 ---
 
@@ -16774,7 +16778,7 @@ Adds required type to the collection.
 
 - `ct` — `string`.
 
-*Source: [src/lua_api/cardgame_api.rs](src/lua_api/cardgame_api.rs#L790)*
+*Source: [src/lua_api/cardgame_api.rs](src/lua_api/cardgame_api.rs#L746)*
 
 ---
 
@@ -16788,7 +16792,7 @@ Returns the max cards.
 
 **Returns:** The current max cards.
 
-*Source: [src/lua_api/cardgame_api.rs](src/lua_api/cardgame_api.rs#L769)*
+*Source: [src/lua_api/cardgame_api.rs](src/lua_api/cardgame_api.rs#L725)*
 
 ---
 
@@ -16802,7 +16806,7 @@ Returns the max copies.
 
 **Returns:** The current max copies.
 
-*Source: [src/lua_api/cardgame_api.rs](src/lua_api/cardgame_api.rs#L785)*
+*Source: [src/lua_api/cardgame_api.rs](src/lua_api/cardgame_api.rs#L741)*
 
 ---
 
@@ -16816,7 +16820,7 @@ Returns the min cards.
 
 **Returns:** The current min cards.
 
-*Source: [src/lua_api/cardgame_api.rs](src/lua_api/cardgame_api.rs#L753)*
+*Source: [src/lua_api/cardgame_api.rs](src/lua_api/cardgame_api.rs#L709)*
 
 ---
 
@@ -16830,7 +16834,7 @@ Returns `true` if valid.
 
 **Returns:** `boolean`.
 
-*Source: [src/lua_api/cardgame_api.rs](src/lua_api/cardgame_api.rs#L820)*
+*Source: [src/lua_api/cardgame_api.rs](src/lua_api/cardgame_api.rs#L776)*
 
 ---
 
@@ -16842,7 +16846,7 @@ Sets the max cards.
 
 - `v` — `integer`.
 
-*Source: [src/lua_api/cardgame_api.rs](src/lua_api/cardgame_api.rs#L758)*
+*Source: [src/lua_api/cardgame_api.rs](src/lua_api/cardgame_api.rs#L714)*
 
 ---
 
@@ -16854,7 +16858,7 @@ Sets the max copies.
 
 - `v` — `integer`.
 
-*Source: [src/lua_api/cardgame_api.rs](src/lua_api/cardgame_api.rs#L774)*
+*Source: [src/lua_api/cardgame_api.rs](src/lua_api/cardgame_api.rs#L730)*
 
 ---
 
@@ -16866,7 +16870,7 @@ Sets the min cards.
 
 - `v` — `integer`.
 
-*Source: [src/lua_api/cardgame_api.rs](src/lua_api/cardgame_api.rs#L742)*
+*Source: [src/lua_api/cardgame_api.rs](src/lua_api/cardgame_api.rs#L698)*
 
 ---
 
@@ -16878,7 +16882,7 @@ Validate on this DeckBuilder.
 
 - `deck` — `userdata`.
 
-*Source: [src/lua_api/cardgame_api.rs](src/lua_api/cardgame_api.rs#L806)*
+*Source: [src/lua_api/cardgame_api.rs](src/lua_api/cardgame_api.rs#L762)*
 
 ---
 
@@ -16886,85 +16890,76 @@ Validate on this DeckBuilder.
 
 #### `StackManager:clear()`
 
-Removes all entries.
+Discards all pending effects on the stack.
 
-**Parameters:**
-
-- `kind` — `string`.
-
-*Source: [src/lua_api/cardgame_api.rs](src/lua_api/cardgame_api.rs#L707)*
+*Source: [src/lua_api/cardgame_api.rs](src/lua_api/cardgame_api.rs#L660)*
 
 ---
 
 #### `StackManager:findByKind(kind)`
 
-Find by kind on this StackManager.
+Returns all effects on the stack matching the given kind identifier.
 
 **Parameters:**
 
-- `kind` — `string`.
+- `kind` — `string`: Effect kind to search for.
 
-*Source: [src/lua_api/cardgame_api.rs](src/lua_api/cardgame_api.rs#L715)*
+**Returns:** `table` of effect tables.
+
+*Source: [src/lua_api/cardgame_api.rs](src/lua_api/cardgame_api.rs#L671)*
 
 ---
 
 #### `StackManager:getSize()`
 
-Returns the size.
+Returns the number of effects currently on the stack.
 
-**Parameters:**
+**Returns:** `integer`.
 
-- `kind` — `string`.
-
-**Returns:** The current size.
-
-*Source: [src/lua_api/cardgame_api.rs](src/lua_api/cardgame_api.rs#L702)*
+*Source: [src/lua_api/cardgame_api.rs](src/lua_api/cardgame_api.rs#L658)*
 
 ---
 
 #### `StackManager:isEmpty()`
 
-Returns `true` if empty.
-
-**Parameters:**
-
-- `kind` — `string`.
+Returns `true` if the stack holds no pending effects.
 
 **Returns:** `boolean`.
 
-*Source: [src/lua_api/cardgame_api.rs](src/lua_api/cardgame_api.rs#L694)*
+*Source: [src/lua_api/cardgame_api.rs](src/lua_api/cardgame_api.rs#L653)*
 
 ---
 
 #### `StackManager:peek()`
 
-Peek on this StackManager.
+Returns the top effect without resolving it.
 
-**Returns:** The result.
+**Returns:** `table` with `kind` and `data` fields, or `nil`.
 
-*Source: [src/lua_api/cardgame_api.rs](src/lua_api/cardgame_api.rs#L672)*
+*Source: [src/lua_api/cardgame_api.rs](src/lua_api/cardgame_api.rs#L634)*
 
 ---
 
 #### `StackManager:push(kind)`
 
-Adds an entry to the collection.
+Places an effect or action on top of the stack.
 
 **Parameters:**
 
-- `kind` — `string`.
+- `kind` — `string`: Effect kind identifier.
+- `data` — `table`: Effect data table.
 
-*Source: [src/lua_api/cardgame_api.rs](src/lua_api/cardgame_api.rs#L643)*
+*Source: [src/lua_api/cardgame_api.rs](src/lua_api/cardgame_api.rs#L605)*
 
 ---
 
 #### `StackManager:resolve()`
 
-Resolve on this StackManager.
+Removes and returns the top effect from the stack, resolving it.
 
-**Returns:** The result.
+**Returns:** `table` with `kind` and `data` fields, or `nil` if the stack is empty.
 
-*Source: [src/lua_api/cardgame_api.rs](src/lua_api/cardgame_api.rs#L651)*
+*Source: [src/lua_api/cardgame_api.rs](src/lua_api/cardgame_api.rs#L613)*
 
 ---
 
@@ -16972,145 +16967,125 @@ Resolve on this StackManager.
 
 #### `Zone:add(card)`
 
-Adds an entry to the collection.
+Adds `card` to this zone. Raises an error if the zone is at capacity.
 
 **Parameters:**
 
-- `card` — `userdata`.
+- `card` — `Card`: Card to add.
 
-*Source: [src/lua_api/cardgame_api.rs](src/lua_api/cardgame_api.rs#L543)*
+*Source: [src/lua_api/cardgame_api.rs](src/lua_api/cardgame_api.rs#L501)*
 
 ---
 
 #### `Zone:canAdd()`
 
-Returns `true` if add.
-
-**Parameters:**
-
-- `card` — `userdata`.
+Returns `true` if another card can be added (capacity not yet reached).
 
 **Returns:** `boolean`.
 
-*Source: [src/lua_api/cardgame_api.rs](src/lua_api/cardgame_api.rs#L537)*
+*Source: [src/lua_api/cardgame_api.rs](src/lua_api/cardgame_api.rs#L495)*
 
 ---
 
 #### `Zone:countByType(card_type)`
 
-Returns the number of by type.
+Returns the count of cards with the given type in this zone.
 
 **Parameters:**
 
-- `card_type` — `string`.
+- `card_type` — `string`: Type to count.
 
 **Returns:** `integer`.
 
-*Source: [src/lua_api/cardgame_api.rs](src/lua_api/cardgame_api.rs#L565)*
+*Source: [src/lua_api/cardgame_api.rs](src/lua_api/cardgame_api.rs#L526)*
 
 ---
 
 #### `Zone:findByType(ct)`
 
-Find by type on this Zone.
+Returns all cards of the given type in this zone.
 
 **Parameters:**
 
-- `ct` — `string`.
+- `card_type` — `string`: Type to search for.
 
-*Source: [src/lua_api/cardgame_api.rs](src/lua_api/cardgame_api.rs#L585)*
+**Returns:** `table` of `Card` objects.
+
+*Source: [src/lua_api/cardgame_api.rs](src/lua_api/cardgame_api.rs#L546)*
 
 ---
 
 #### `Zone:getAllTypes()`
 
-Returns the all types.
+Returns a deduplicated list of all card type strings present in this zone.
 
-**Parameters:**
+**Returns:** `table` of `string` type names.
 
-- `ct` — `string`.
-
-**Returns:** The current all types.
-
-*Source: [src/lua_api/cardgame_api.rs](src/lua_api/cardgame_api.rs#L575)*
+*Source: [src/lua_api/cardgame_api.rs](src/lua_api/cardgame_api.rs#L533)*
 
 ---
 
 #### `Zone:getCapacity()`
 
-Returns the capacity.
+Returns the maximum number of cards this zone can hold (`0` = unlimited).
 
-**Parameters:**
+**Returns:** `integer`.
 
-- `card` — `userdata`.
-
-**Returns:** The current capacity.
-
-*Source: [src/lua_api/cardgame_api.rs](src/lua_api/cardgame_api.rs#L529)*
+*Source: [src/lua_api/cardgame_api.rs](src/lua_api/cardgame_api.rs#L490)*
 
 ---
 
 #### `Zone:getCards()`
 
-Returns the cards.
+Returns the full ordered list of cards in this zone.
 
-**Returns:** The current cards.
+**Returns:** `table` of `Card` objects.
 
-*Source: [src/lua_api/cardgame_api.rs](src/lua_api/cardgame_api.rs#L593)*
+*Source: [src/lua_api/cardgame_api.rs](src/lua_api/cardgame_api.rs#L554)*
 
 ---
 
 #### `Zone:getName()`
 
-Returns the name.
+Returns the zone's name identifier.
 
-**Parameters:**
+**Returns:** `string`.
 
-- `card` — `userdata`.
-
-**Returns:** The current name.
-
-*Source: [src/lua_api/cardgame_api.rs](src/lua_api/cardgame_api.rs#L505)*
+*Source: [src/lua_api/cardgame_api.rs](src/lua_api/cardgame_api.rs#L475)*
 
 ---
 
 #### `Zone:getSize()`
 
-Returns the size.
+Returns the number of cards currently in this zone.
 
-**Parameters:**
+**Returns:** `integer`.
 
-- `card` — `userdata`.
-
-**Returns:** The current size.
-
-*Source: [src/lua_api/cardgame_api.rs](src/lua_api/cardgame_api.rs#L513)*
+*Source: [src/lua_api/cardgame_api.rs](src/lua_api/cardgame_api.rs#L480)*
 
 ---
 
 #### `Zone:isEmpty()`
 
-Returns `true` if empty.
-
-**Parameters:**
-
-- `card` — `userdata`.
+Returns `true` if this zone holds no cards.
 
 **Returns:** `boolean`.
 
-*Source: [src/lua_api/cardgame_api.rs](src/lua_api/cardgame_api.rs#L521)*
+*Source: [src/lua_api/cardgame_api.rs](src/lua_api/cardgame_api.rs#L485)*
 
 ---
 
 #### `Zone:removeAt(index)`
 
-Removes at from the collection.
+Removes and returns the card at 1-based `index`.
 
 **Parameters:**
 
-- `index` — `integer`.
+- `index` — `integer`: 1-based position.
 
-*Source: [src/lua_api/cardgame_api.rs](src/lua_api/cardgame_api.rs#L554)*
+**Returns:** `Card` or `nil`.
+
+*Source: [src/lua_api/cardgame_api.rs](src/lua_api/cardgame_api.rs#L515)*
 
 ---
 
@@ -17132,7 +17107,7 @@ Creates a new action instance.
 - `name` — `string`.
 - `duration` — `integer` optional.
 
-*Source: [src/lua_api/combat_api.rs](src/lua_api/combat_api.rs#L770)*
+*Source: [src/lua_api/combat_api.rs](src/lua_api/combat_api.rs#L695)*
 
 ---
 
@@ -17144,7 +17119,7 @@ Creates a new battle instance.
 
 - `name` — `string` optional.
 
-*Source: [src/lua_api/combat_api.rs](src/lua_api/combat_api.rs#L787)*
+*Source: [src/lua_api/combat_api.rs](src/lua_api/combat_api.rs#L712)*
 
 ---
 
@@ -17156,7 +17131,7 @@ Creates a new combatant instance.
 
 - `name` — `string`.
 
-*Source: [src/lua_api/combat_api.rs](src/lua_api/combat_api.rs#L761)*
+*Source: [src/lua_api/combat_api.rs](src/lua_api/combat_api.rs#L686)*
 
 ---
 
@@ -17169,7 +17144,7 @@ Creates a new status effect instance.
 - `name` — `string`.
 - `duration` — `integer` optional.
 
-*Source: [src/lua_api/combat_api.rs](src/lua_api/combat_api.rs#L779)*
+*Source: [src/lua_api/combat_api.rs](src/lua_api/combat_api.rs#L704)*
 
 ---
 
@@ -17177,161 +17152,139 @@ Creates a new status effect instance.
 
 #### `CombatAction:getAccuracy(v)`
 
-Returns the accuracy.
+Returns the hit chance as a percentage (0–100).
 
-**Parameters:**
+**Parameters:** `v`
 
-- `v` — `number`.
+**Returns:** `number` — accuracy percentage.
 
-**Returns:** The current accuracy.
-
-*Source: [src/lua_api/combat_api.rs](src/lua_api/combat_api.rs#L130)*
+*Source: [src/lua_api/combat_api.rs](src/lua_api/combat_api.rs#L106)*
 
 ---
 
 #### `CombatAction:getBaseDamage(v)`
 
-Returns the base damage.
+Returns the base damage dealt by this action before modifiers.
 
-**Parameters:**
+**Parameters:** `v`
 
-- `v` — `number`.
+**Returns:** `number`.
 
-**Returns:** The current base damage.
-
-*Source: [src/lua_api/combat_api.rs](src/lua_api/combat_api.rs#L104)*
+*Source: [src/lua_api/combat_api.rs](src/lua_api/combat_api.rs#L86)*
 
 ---
 
 #### `CombatAction:getCooldown(v)`
 
-Returns the cooldown.
+Returns the maximum cooldown in turns before this action can be used again.
 
-**Parameters:**
+**Parameters:** `v`
 
-- `v` — `integer`.
+**Returns:** `integer` — max cooldown turns.
 
-**Returns:** The current cooldown.
-
-*Source: [src/lua_api/combat_api.rs](src/lua_api/combat_api.rs#L143)*
+*Source: [src/lua_api/combat_api.rs](src/lua_api/combat_api.rs#L116)*
 
 ---
 
 #### `CombatAction:getCostMp(v)`
 
-Returns the cost mp.
+Returns the MP cost to use this action.
 
-**Parameters:**
+**Parameters:** `v`
 
-- `v` — `number`.
+**Returns:** `integer` — MP cost.
 
-**Returns:** The current cost mp.
-
-*Source: [src/lua_api/combat_api.rs](src/lua_api/combat_api.rs#L177)*
+*Source: [src/lua_api/combat_api.rs](src/lua_api/combat_api.rs#L138)*
 
 ---
 
 #### `CombatAction:getCurrentCooldown()`
 
-Returns the current cooldown.
+Returns the remaining cooldown turns until this action is ready.
 
-**Parameters:**
+**Returns:** `integer` — turns remaining.
 
-- `v` — `number`.
-
-**Returns:** The current current cooldown.
-
-*Source: [src/lua_api/combat_api.rs](src/lua_api/combat_api.rs#L156)*
+*Source: [src/lua_api/combat_api.rs](src/lua_api/combat_api.rs#L126)*
 
 ---
 
 #### `CombatAction:getDamageType(v)`
 
-Returns the damage type.
+Returns the damage type string (e.g. `'physical'`, `'fire'`).
 
-**Parameters:**
+**Parameters:** `v`
 
-- `v` — `string`.
-
-**Returns:** The current damage type.
-
-*Source: [src/lua_api/combat_api.rs](src/lua_api/combat_api.rs#L117)*
-
----
-
-#### `CombatAction:getName()`
-
-Returns the name.
-
-**Parameters:**
-
-- `v` — `number`.
-
-**Returns:** The current name.
+**Returns:** `string`.
 
 *Source: [src/lua_api/combat_api.rs](src/lua_api/combat_api.rs#L96)*
 
 ---
 
+#### `CombatAction:getName()`
+
+Returns the action's name identifier.
+
+**Returns:** `string`.
+
+*Source: [src/lua_api/combat_api.rs](src/lua_api/combat_api.rs#L81)*
+
+---
+
 #### `CombatAction:isReady()`
 
-Returns `true` if ready.
-
-**Parameters:**
-
-- `v` — `number`.
+Returns `true` if the current cooldown has reached zero.
 
 **Returns:** `boolean`.
 
-*Source: [src/lua_api/combat_api.rs](src/lua_api/combat_api.rs#L164)*
+*Source: [src/lua_api/combat_api.rs](src/lua_api/combat_api.rs#L131)*
 
 ---
 
 #### `CombatAction:setAccuracy(v)`
 
-Sets the accuracy.
+Sets the hit chance percentage.
 
 **Parameters:**
 
-- `v` — `number`.
+- `accuracy` — `number`: Hit chance (0–100).
 
-*Source: [src/lua_api/combat_api.rs](src/lua_api/combat_api.rs#L135)*
+*Source: [src/lua_api/combat_api.rs](src/lua_api/combat_api.rs#L111)*
 
 ---
 
 #### `CombatAction:setBaseDamage(v)`
 
-Sets the base damage.
+Sets the base damage for this action.
 
 **Parameters:**
 
-- `v` — `number`.
+- `damage` — `number`: New base damage value.
 
-*Source: [src/lua_api/combat_api.rs](src/lua_api/combat_api.rs#L109)*
+*Source: [src/lua_api/combat_api.rs](src/lua_api/combat_api.rs#L91)*
 
 ---
 
 #### `CombatAction:setCooldown(v)`
 
-Sets the cooldown.
+Sets the maximum cooldown for this action.
 
 **Parameters:**
 
-- `v` — `integer`.
+- `turns` — `integer`: Cooldown in turns.
 
-*Source: [src/lua_api/combat_api.rs](src/lua_api/combat_api.rs#L148)*
+*Source: [src/lua_api/combat_api.rs](src/lua_api/combat_api.rs#L121)*
 
 ---
 
 #### `CombatAction:setCostMp(v)`
 
-Sets the cost mp.
+Sets the MP cost for this action.
 
 **Parameters:**
 
-- `v` — `number`.
+- `cost` — `integer`: New MP cost.
 
-*Source: [src/lua_api/combat_api.rs](src/lua_api/combat_api.rs#L182)*
+*Source: [src/lua_api/combat_api.rs](src/lua_api/combat_api.rs#L143)*
 
 ---
 
@@ -17341,21 +17294,17 @@ Sets the damage type.
 
 **Parameters:**
 
-- `v` — `string`.
+- `dtype` — `string`: Damage type string.
 
-*Source: [src/lua_api/combat_api.rs](src/lua_api/combat_api.rs#L122)*
+*Source: [src/lua_api/combat_api.rs](src/lua_api/combat_api.rs#L101)*
 
 ---
 
 #### `CombatAction:tickCooldown()`
 
-Tick cooldown on this CombatAction.
+Decrements the current cooldown by 1 (minimum 0).
 
-**Parameters:**
-
-- `v` — `number`.
-
-*Source: [src/lua_api/combat_api.rs](src/lua_api/combat_api.rs#L169)*
+*Source: [src/lua_api/combat_api.rs](src/lua_api/combat_api.rs#L133)*
 
 ---
 
@@ -17369,7 +17318,7 @@ Adds combatant to the collection.
 
 - `combatant` — `userdata`.
 
-*Source: [src/lua_api/combat_api.rs](src/lua_api/combat_api.rs#L548)*
+*Source: [src/lua_api/combat_api.rs](src/lua_api/combat_api.rs#L473)*
 
 ---
 
@@ -17381,7 +17330,7 @@ Adds to log to the collection.
 
 - `msg` — `string`.
 
-*Source: [src/lua_api/combat_api.rs](src/lua_api/combat_api.rs#L681)*
+*Source: [src/lua_api/combat_api.rs](src/lua_api/combat_api.rs#L606)*
 
 ---
 
@@ -17393,7 +17342,7 @@ Adds to log to the collection.
 
 - `msg` — `string`.
 
-*Source: [src/lua_api/combat_api.rs](src/lua_api/combat_api.rs#L718)*
+*Source: [src/lua_api/combat_api.rs](src/lua_api/combat_api.rs#L643)*
 
 ---
 
@@ -17407,7 +17356,7 @@ Attack on this CombatBattle.
 - `action` — `string`.
 - `target` — `string`.
 
-*Source: [src/lua_api/combat_api.rs](src/lua_api/combat_api.rs#L603)*
+*Source: [src/lua_api/combat_api.rs](src/lua_api/combat_api.rs#L528)*
 
 ---
 
@@ -17419,7 +17368,7 @@ Force end on this CombatBattle.
 
 - `winner` — `string` optional.
 
-*Source: [src/lua_api/combat_api.rs](src/lua_api/combat_api.rs#L696)*
+*Source: [src/lua_api/combat_api.rs](src/lua_api/combat_api.rs#L621)*
 
 ---
 
@@ -17431,7 +17380,7 @@ Force end on this CombatBattle.
 
 - `winner` — `string` optional.
 
-*Source: [src/lua_api/combat_api.rs](src/lua_api/combat_api.rs#L733)*
+*Source: [src/lua_api/combat_api.rs](src/lua_api/combat_api.rs#L658)*
 
 ---
 
@@ -17441,7 +17390,7 @@ Returns the alive names.
 
 **Returns:** The current alive names.
 
-*Source: [src/lua_api/combat_api.rs](src/lua_api/combat_api.rs#L657)*
+*Source: [src/lua_api/combat_api.rs](src/lua_api/combat_api.rs#L582)*
 
 ---
 
@@ -17451,7 +17400,7 @@ Returns the all names.
 
 **Returns:** The current all names.
 
-*Source: [src/lua_api/combat_api.rs](src/lua_api/combat_api.rs#L741)*
+*Source: [src/lua_api/combat_api.rs](src/lua_api/combat_api.rs#L666)*
 
 ---
 
@@ -17465,7 +17414,7 @@ Returns the combatant.
 
 **Returns:** The current combatant.
 
-*Source: [src/lua_api/combat_api.rs](src/lua_api/combat_api.rs#L561)*
+*Source: [src/lua_api/combat_api.rs](src/lua_api/combat_api.rs#L486)*
 
 ---
 
@@ -17479,7 +17428,7 @@ Returns the count.
 
 **Returns:** The current count.
 
-*Source: [src/lua_api/combat_api.rs](src/lua_api/combat_api.rs#L518)*
+*Source: [src/lua_api/combat_api.rs](src/lua_api/combat_api.rs#L443)*
 
 ---
 
@@ -17489,7 +17438,7 @@ Returns the current combatant.
 
 **Returns:** The current current combatant.
 
-*Source: [src/lua_api/combat_api.rs](src/lua_api/combat_api.rs#L580)*
+*Source: [src/lua_api/combat_api.rs](src/lua_api/combat_api.rs#L505)*
 
 ---
 
@@ -17503,7 +17452,7 @@ Returns the log.
 
 **Returns:** The current log.
 
-*Source: [src/lua_api/combat_api.rs](src/lua_api/combat_api.rs#L670)*
+*Source: [src/lua_api/combat_api.rs](src/lua_api/combat_api.rs#L595)*
 
 ---
 
@@ -17517,7 +17466,7 @@ Returns the log.
 
 **Returns:** The current log.
 
-*Source: [src/lua_api/combat_api.rs](src/lua_api/combat_api.rs#L707)*
+*Source: [src/lua_api/combat_api.rs](src/lua_api/combat_api.rs#L632)*
 
 ---
 
@@ -17531,7 +17480,7 @@ Returns the name.
 
 **Returns:** The current name.
 
-*Source: [src/lua_api/combat_api.rs](src/lua_api/combat_api.rs#L510)*
+*Source: [src/lua_api/combat_api.rs](src/lua_api/combat_api.rs#L435)*
 
 ---
 
@@ -17545,7 +17494,7 @@ Returns the turn count.
 
 **Returns:** The current turn count.
 
-*Source: [src/lua_api/combat_api.rs](src/lua_api/combat_api.rs#L526)*
+*Source: [src/lua_api/combat_api.rs](src/lua_api/combat_api.rs#L451)*
 
 ---
 
@@ -17559,7 +17508,7 @@ Returns the winner.
 
 **Returns:** The current winner.
 
-*Source: [src/lua_api/combat_api.rs](src/lua_api/combat_api.rs#L542)*
+*Source: [src/lua_api/combat_api.rs](src/lua_api/combat_api.rs#L467)*
 
 ---
 
@@ -17573,7 +17522,7 @@ Returns `true` if over.
 
 **Returns:** `boolean`.
 
-*Source: [src/lua_api/combat_api.rs](src/lua_api/combat_api.rs#L534)*
+*Source: [src/lua_api/combat_api.rs](src/lua_api/combat_api.rs#L459)*
 
 ---
 
@@ -17587,7 +17536,7 @@ Next turn on this CombatBattle.
 - `action` — `string`.
 - `target` — `string`.
 
-*Source: [src/lua_api/combat_api.rs](src/lua_api/combat_api.rs#L593)*
+*Source: [src/lua_api/combat_api.rs](src/lua_api/combat_api.rs#L518)*
 
 ---
 
@@ -17599,7 +17548,7 @@ Removes combatant from the collection.
 
 - `name` — `string`.
 
-*Source: [src/lua_api/combat_api.rs](src/lua_api/combat_api.rs#L689)*
+*Source: [src/lua_api/combat_api.rs](src/lua_api/combat_api.rs#L614)*
 
 ---
 
@@ -17611,7 +17560,7 @@ Removes combatant from the collection.
 
 - `name` — `string`.
 
-*Source: [src/lua_api/combat_api.rs](src/lua_api/combat_api.rs#L726)*
+*Source: [src/lua_api/combat_api.rs](src/lua_api/combat_api.rs#L651)*
 
 ---
 
@@ -17621,7 +17570,7 @@ Sort initiative on this CombatBattle.
 
 **Returns:** The result.
 
-*Source: [src/lua_api/combat_api.rs](src/lua_api/combat_api.rs#L572)*
+*Source: [src/lua_api/combat_api.rs](src/lua_api/combat_api.rs#L497)*
 
 ---
 
@@ -17629,412 +17578,377 @@ Sort initiative on this CombatBattle.
 
 #### `Combatant:addAction(action)`
 
-Adds action to the collection.
+Registers a `CombatAction` that this combatant can use in battle.
 
 **Parameters:**
 
-- `action` — `userdata`.
+- `action` — `CombatAction`: Action to add.
 
-*Source: [src/lua_api/combat_api.rs](src/lua_api/combat_api.rs#L437)*
+*Source: [src/lua_api/combat_api.rs](src/lua_api/combat_api.rs#L366)*
 
 ---
 
 #### `Combatant:addStatus(name, [duration])`
 
-Adds status to the collection.
+Applies a named status effect, optionally stacking on an existing one.
 
 **Parameters:**
 
-- `name` — `string`.
-- `duration` — `integer` optional.
+- `name` — `string`: Status effect name.
+- `duration` — `integer`: Duration in turns.
+- `stacks` — `integer`: Stack count (optional, default `1`).
 
-*Source: [src/lua_api/combat_api.rs](src/lua_api/combat_api.rs#L372)*
+*Source: [src/lua_api/combat_api.rs](src/lua_api/combat_api.rs#L304)*
 
 ---
 
 #### `Combatant:getHp(v)`
 
-Returns the hp.
+Returns current HP.
 
-**Parameters:**
+**Parameters:** `v`
 
-- `v` — `number`.
+**Returns:** `number`.
 
-**Returns:** The current hp.
-
-*Source: [src/lua_api/combat_api.rs](src/lua_api/combat_api.rs#L230)*
+*Source: [src/lua_api/combat_api.rs](src/lua_api/combat_api.rs#L182)*
 
 ---
 
 #### `Combatant:getLevel()`
 
-Returns the level.
+Returns the combatant's experience level.
 
-**Parameters:**
+**Returns:** `integer`.
 
-- `amount` — `number`.
-- `dtype` — `string` optional.
-
-**Returns:** The current level.
-
-*Source: [src/lua_api/combat_api.rs](src/lua_api/combat_api.rs#L300)*
+*Source: [src/lua_api/combat_api.rs](src/lua_api/combat_api.rs#L232)*
 
 ---
 
 #### `Combatant:getMaxHp(v)`
 
-Returns the max hp.
+Returns maximum HP.
 
-**Parameters:**
+**Parameters:** `v`
 
-- `v` — `number`.
+**Returns:** `number`.
 
-**Returns:** The current max hp.
-
-*Source: [src/lua_api/combat_api.rs](src/lua_api/combat_api.rs#L243)*
+*Source: [src/lua_api/combat_api.rs](src/lua_api/combat_api.rs#L192)*
 
 ---
 
-#### `Combatant:getMaxMp()`
+#### `Combatant:getMaxMp(v)`
 
-Returns the max mp.
+Returns maximum MP.
 
-**Parameters:**
+**Parameters:** `v`
 
-- `amount` — `number`.
-- `dtype` — `string` optional.
+**Returns:** `number`.
 
-**Returns:** The current max mp.
-
-*Source: [src/lua_api/combat_api.rs](src/lua_api/combat_api.rs#L270)*
+*Source: [src/lua_api/combat_api.rs](src/lua_api/combat_api.rs#L212)*
 
 ---
 
 #### `Combatant:getMeta(key)`
 
-Returns the meta.
+Returns metadata value for `key`, or `nil` if not set.
 
 **Parameters:**
 
-- `k` — `string`.
-- `v` — `string`.
+- `key` — `string`: Metadata key.
 
-**Returns:** The current meta.
+**Returns:** The stored value or `nil`.
 
-*Source: [src/lua_api/combat_api.rs](src/lua_api/combat_api.rs#L470)*
+*Source: [src/lua_api/combat_api.rs](src/lua_api/combat_api.rs#L395)*
 
 ---
 
 #### `Combatant:getMp(v)`
 
-Returns the mp.
+Returns current MP.
 
-**Parameters:**
+**Parameters:** `v`
 
-- `v` — `number`.
+**Returns:** `number`.
 
-**Returns:** The current mp.
-
-*Source: [src/lua_api/combat_api.rs](src/lua_api/combat_api.rs#L256)*
+*Source: [src/lua_api/combat_api.rs](src/lua_api/combat_api.rs#L202)*
 
 ---
 
 #### `Combatant:getName()`
 
-Returns the name.
+Returns the combatant's display name.
 
-**Parameters:**
+**Returns:** `string`.
 
-- `v` — `string`.
-
-**Returns:** The current name.
-
-*Source: [src/lua_api/combat_api.rs](src/lua_api/combat_api.rs#L209)*
+*Source: [src/lua_api/combat_api.rs](src/lua_api/combat_api.rs#L167)*
 
 ---
 
 #### `Combatant:getResistance(dtype)`
 
-Returns the resistance.
+Returns the resistance percentage for `dtype` (0–100). `100` means immune.
 
 **Parameters:**
 
-- `dtype` — `string`.
-- `v` — `number`.
+- `dtype` — `string`: Damage type.
 
-**Returns:** The current resistance.
-
-*Source: [src/lua_api/combat_api.rs](src/lua_api/combat_api.rs#L354)*
-
----
-
-#### `Combatant:getSpeed()`
-
-Returns the speed.
-
-**Parameters:**
-
-- `amount` — `number`.
-- `dtype` — `string` optional.
-
-**Returns:** The current speed.
+**Returns:** `number` — resistance percentage.
 
 *Source: [src/lua_api/combat_api.rs](src/lua_api/combat_api.rs#L285)*
 
 ---
 
-#### `Combatant:getStat(name)`
+#### `Combatant:getSpeed(v)`
 
-Returns the stat.
+Returns the initiative speed value used to determine turn order.
 
-**Parameters:**
+**Parameters:** `v`
 
-- `name` — `string`.
-- `v` — `number`.
-
-**Returns:** The current stat.
-
-*Source: [src/lua_api/combat_api.rs](src/lua_api/combat_api.rs#L337)*
-
----
-
-#### `Combatant:getStatuses()`
-
-Returns the statuses.
-
-**Returns:** The current statuses.
-
-*Source: [src/lua_api/combat_api.rs](src/lua_api/combat_api.rs#L407)*
-
----
-
-#### `Combatant:getTeam(v)`
-
-Returns the team.
-
-**Parameters:**
-
-- `v` — `string`.
-
-**Returns:** The current team.
-
-*Source: [src/lua_api/combat_api.rs](src/lua_api/combat_api.rs#L217)*
-
----
-
-#### `Combatant:hasAction(name)`
-
-Returns `true` if action.
-
-**Parameters:**
-
-- `name` — `string`.
-
-**Returns:** `boolean`.
-
-*Source: [src/lua_api/combat_api.rs](src/lua_api/combat_api.rs#L449)*
-
----
-
-#### `Combatant:hasStatus(name)`
-
-Returns `true` if status.
-
-**Parameters:**
-
-- `name` — `string`.
-
-**Returns:** `boolean`.
-
-*Source: [src/lua_api/combat_api.rs](src/lua_api/combat_api.rs#L391)*
-
----
-
-#### `Combatant:heal(amount)`
-
-Heal on this Combatant.
-
-**Parameters:**
-
-- `name` — `string`.
-- `v` — `number`.
-
-*Source: [src/lua_api/combat_api.rs](src/lua_api/combat_api.rs#L325)*
-
----
-
-#### `Combatant:isAlive()`
-
-Returns `true` if alive.
-
-**Parameters:**
-
-- `amount` — `number`.
-- `dtype` — `string` optional.
-
-**Returns:** `boolean`.
-
-*Source: [src/lua_api/combat_api.rs](src/lua_api/combat_api.rs#L309)*
-
----
-
-#### `Combatant:removeStatus(name)`
-
-Removes status from the collection.
-
-**Parameters:**
-
-- `name` — `string`.
-
-*Source: [src/lua_api/combat_api.rs](src/lua_api/combat_api.rs#L381)*
-
----
-
-#### `Combatant:setHp(v)`
-
-Sets the hp.
-
-**Parameters:**
-
-- `v` — `number`.
-
-*Source: [src/lua_api/combat_api.rs](src/lua_api/combat_api.rs#L235)*
-
----
-
-#### `Combatant:setMaxHp(v)`
-
-Sets the max hp.
-
-**Parameters:**
-
-- `v` — `number`.
-
-*Source: [src/lua_api/combat_api.rs](src/lua_api/combat_api.rs#L248)*
-
----
-
-#### `Combatant:setMaxMp(v)`
-
-Sets the max mp.
-
-**Parameters:**
-
-- `amount` — `number`.
-- `dtype` — `string` optional.
-
-*Source: [src/lua_api/combat_api.rs](src/lua_api/combat_api.rs#L276)*
-
----
-
-#### `Combatant:setMeta(k, v)`
-
-Sets the meta.
-
-**Parameters:**
-
-- `k` — `string`.
-- `v` — `string`.
-
-*Source: [src/lua_api/combat_api.rs](src/lua_api/combat_api.rs#L481)*
-
----
-
-#### `Combatant:setMp(v)`
-
-Sets the mp.
-
-**Parameters:**
-
-- `v` — `number`.
-
-*Source: [src/lua_api/combat_api.rs](src/lua_api/combat_api.rs#L261)*
-
----
-
-#### `Combatant:setResistance(dtype, v)`
-
-Sets the resistance.
-
-**Parameters:**
-
-- `dtype` — `string`.
-- `v` — `number`.
-
-*Source: [src/lua_api/combat_api.rs](src/lua_api/combat_api.rs#L362)*
-
----
-
-#### `Combatant:setSpeed(v)`
-
-Sets the speed.
-
-**Parameters:**
-
-- `amount` — `number`.
-- `dtype` — `string` optional.
-
-*Source: [src/lua_api/combat_api.rs](src/lua_api/combat_api.rs#L291)*
-
----
-
-#### `Combatant:setStat(name, v)`
-
-Sets the stat.
-
-**Parameters:**
-
-- `name` — `string`.
-- `v` — `number`.
-
-*Source: [src/lua_api/combat_api.rs](src/lua_api/combat_api.rs#L343)*
-
----
-
-#### `Combatant:setTeam(v)`
-
-Sets the team.
-
-**Parameters:**
-
-- `v` — `string`.
+**Returns:** `number`.
 
 *Source: [src/lua_api/combat_api.rs](src/lua_api/combat_api.rs#L222)*
 
 ---
 
-#### `Combatant:takeDamage(amount, [dtype])`
+#### `Combatant:getStat(name)`
 
-Take damage on this Combatant.
+Returns the value of a named stat (e.g. `'strength'`, `'agility'`).
 
 **Parameters:**
 
-- `amount` — `number`.
-- `dtype` — `string` optional.
+- `key` — `string`: Stat name.
 
-*Source: [src/lua_api/combat_api.rs](src/lua_api/combat_api.rs#L316)*
+**Returns:** `number` — stat value, or `0` if not set.
+
+*Source: [src/lua_api/combat_api.rs](src/lua_api/combat_api.rs#L269)*
+
+---
+
+#### `Combatant:getStatuses()`
+
+Returns a list of all active `StatusEffect` objects on this combatant.
+
+**Returns:** `table` of `StatusEffect` objects.
+
+*Source: [src/lua_api/combat_api.rs](src/lua_api/combat_api.rs#L336)*
+
+---
+
+#### `Combatant:getTeam(v)`
+
+Returns the team identifier for this combatant.
+
+**Parameters:** `v`
+
+**Returns:** `string` — team name.
+
+*Source: [src/lua_api/combat_api.rs](src/lua_api/combat_api.rs#L172)*
+
+---
+
+#### `Combatant:hasAction(name)`
+
+Returns `true` if this combatant has an action with the given name.
+
+**Parameters:**
+
+- `name` — `string`: Action name.
+
+**Returns:** `boolean`.
+
+*Source: [src/lua_api/combat_api.rs](src/lua_api/combat_api.rs#L378)*
+
+---
+
+#### `Combatant:hasStatus(name)`
+
+Returns `true` if this combatant is affected by the named status.
+
+**Parameters:**
+
+- `name` — `string`: Status name to check.
+
+**Returns:** `boolean`.
+
+*Source: [src/lua_api/combat_api.rs](src/lua_api/combat_api.rs#L323)*
+
+---
+
+#### `Combatant:heal(amount)`
+
+Increases current HP by `amount`, clamped at maxHp.
+
+**Parameters:**
+
+- `amount` — `number`: Amount to heal.
+
+**Returns:** `number` — actual HP restored.
+
+*Source: [src/lua_api/combat_api.rs](src/lua_api/combat_api.rs#L258)*
+
+---
+
+#### `Combatant:isAlive()`
+
+Returns `true` if current HP is greater than zero.
+
+**Returns:** `boolean`.
+
+*Source: [src/lua_api/combat_api.rs](src/lua_api/combat_api.rs#L237)*
+
+---
+
+#### `Combatant:removeStatus(name)`
+
+Removes the status effect with the given name.
+
+**Parameters:**
+
+- `name` — `string`: Status effect name to remove.
+
+*Source: [src/lua_api/combat_api.rs](src/lua_api/combat_api.rs#L313)*
+
+---
+
+#### `Combatant:setHp(v)`
+
+Sets current HP, clamped to [0, maxHp].
+
+**Parameters:**
+
+- `hp` — `number`: New HP value.
+
+*Source: [src/lua_api/combat_api.rs](src/lua_api/combat_api.rs#L187)*
+
+---
+
+#### `Combatant:setMaxHp(v)`
+
+Sets the maximum HP and clamps current HP if needed.
+
+**Parameters:**
+
+- `max_hp` — `number`: New max HP.
+
+*Source: [src/lua_api/combat_api.rs](src/lua_api/combat_api.rs#L197)*
+
+---
+
+#### `Combatant:setMaxMp(v)`
+
+Sets the maximum MP.
+
+**Parameters:**
+
+- `max_mp` — `number`: New max MP.
+
+*Source: [src/lua_api/combat_api.rs](src/lua_api/combat_api.rs#L217)*
+
+---
+
+#### `Combatant:setMeta(k, v)`
+
+Stores an arbitrary metadata value on this combatant.
+
+**Parameters:**
+
+- `key` — `string`: Key.
+- `value` — `any`: Value.
+
+*Source: [src/lua_api/combat_api.rs](src/lua_api/combat_api.rs#L406)*
+
+---
+
+#### `Combatant:setMp(v)`
+
+Sets current MP, clamped to [0, maxMp].
+
+**Parameters:**
+
+- `mp` — `number`: New MP value.
+
+*Source: [src/lua_api/combat_api.rs](src/lua_api/combat_api.rs#L207)*
+
+---
+
+#### `Combatant:setResistance(dtype, v)`
+
+Sets resistance for a damage type.
+
+**Parameters:**
+
+- `dtype` — `string`: Damage type.
+- `pct` — `number`: Resistance percentage (0–100).
+
+*Source: [src/lua_api/combat_api.rs](src/lua_api/combat_api.rs#L293)*
+
+---
+
+#### `Combatant:setSpeed(v)`
+
+Sets the initiative speed value.
+
+**Parameters:**
+
+- `speed` — `number`: New speed value.
+
+*Source: [src/lua_api/combat_api.rs](src/lua_api/combat_api.rs#L227)*
+
+---
+
+#### `Combatant:setStat(name, v)`
+
+Sets a named stat value.
+
+**Parameters:**
+
+- `key` — `string`: Stat name.
+- `value` — `number`: New value.
+
+*Source: [src/lua_api/combat_api.rs](src/lua_api/combat_api.rs#L275)*
+
+---
+
+#### `Combatant:setTeam(v)`
+
+Assigns this combatant to a team.
+
+**Parameters:**
+
+- `team` — `string`: Team identifier.
+
+*Source: [src/lua_api/combat_api.rs](src/lua_api/combat_api.rs#L177)*
+
+---
+
+#### `Combatant:takeDamage(amount, [dtype])`
+
+Applies `amount` damage of `dtype`, reduced by resistances, and returns net damage dealt.
+
+**Parameters:**
+
+- `amount` — `number`: Incoming damage before resistance.
+- `dtype` — `string`: Damage type (e.g. `'fire'`, `'physical'`).
+
+**Returns:** `number` — net damage after resistance.
+
+*Source: [src/lua_api/combat_api.rs](src/lua_api/combat_api.rs#L247)*
 
 ---
 
 #### `Combatant:tickCooldowns()`
 
-Tick cooldowns on this Combatant.
+Decrements all active action cooldowns by one turn.
 
-**Parameters:**
-
-- `key` — `string`.
-
-*Source: [src/lua_api/combat_api.rs](src/lua_api/combat_api.rs#L456)*
+*Source: [src/lua_api/combat_api.rs](src/lua_api/combat_api.rs#L382)*
 
 ---
 
 #### `Combatant:tickStatuses()`
 
-Tick statuses on this Combatant.
+Decrements all active status effect durations by one turn and removes any that expire.
 
-**Returns:** The result.
-
-*Source: [src/lua_api/combat_api.rs](src/lua_api/combat_api.rs#L398)*
+*Source: [src/lua_api/combat_api.rs](src/lua_api/combat_api.rs#L327)*
 
 ---
 
@@ -18042,87 +17956,77 @@ Tick statuses on this Combatant.
 
 #### `StatusEffect:getDuration(v)`
 
-Returns the duration.
+Returns the remaining duration in turns.
 
-**Parameters:**
+**Parameters:** `v`
 
-- `v` — `integer`.
+**Returns:** `integer` — turns remaining.
 
-**Returns:** The current duration.
-
-*Source: [src/lua_api/combat_api.rs](src/lua_api/combat_api.rs#L41)*
+*Source: [src/lua_api/combat_api.rs](src/lua_api/combat_api.rs#L35)*
 
 ---
 
 #### `StatusEffect:getName()`
 
-Returns the name.
+Returns the status effect's name identifier (e.g. `'poison'`, `'burn'`).
 
-**Parameters:**
+**Returns:** `string`.
 
-- `v` — `integer`.
-
-**Returns:** The current name.
-
-*Source: [src/lua_api/combat_api.rs](src/lua_api/combat_api.rs#L33)*
+*Source: [src/lua_api/combat_api.rs](src/lua_api/combat_api.rs#L30)*
 
 ---
 
 #### `StatusEffect:getStacks(v)`
 
-Returns the stacks.
+Returns the current stack count of this status effect.
 
-**Parameters:**
+**Parameters:** `v`
 
-- `v` — `integer`.
+**Returns:** `integer` — stack count.
 
-**Returns:** The current stacks.
-
-*Source: [src/lua_api/combat_api.rs](src/lua_api/combat_api.rs#L54)*
+*Source: [src/lua_api/combat_api.rs](src/lua_api/combat_api.rs#L45)*
 
 ---
 
 #### `StatusEffect:isExpired()`
 
-Returns `true` if expired.
+Returns `true` if this effect's duration has reached zero.
 
 **Returns:** `boolean`.
 
-*Source: [src/lua_api/combat_api.rs](src/lua_api/combat_api.rs#L64)*
+*Source: [src/lua_api/combat_api.rs](src/lua_api/combat_api.rs#L55)*
 
 ---
 
 #### `StatusEffect:setDuration(v)`
 
-Sets the duration.
+Sets the remaining duration in turns.
 
 **Parameters:**
 
-- `v` — `integer`.
+- `turns` — `integer`: New duration.
 
-*Source: [src/lua_api/combat_api.rs](src/lua_api/combat_api.rs#L46)*
+*Source: [src/lua_api/combat_api.rs](src/lua_api/combat_api.rs#L40)*
 
 ---
 
 #### `StatusEffect:setStacks(v)`
 
-Sets the stacks.
+Sets the stack count directly.
 
 **Parameters:**
 
-- `v` — `integer`.
+- `stacks` — `integer`: New stack count.
 
-*Source: [src/lua_api/combat_api.rs](src/lua_api/combat_api.rs#L59)*
+*Source: [src/lua_api/combat_api.rs](src/lua_api/combat_api.rs#L50)*
 
 ---
 
 #### `StatusEffect:tickTurn()`
 
-Tick turn on this StatusEffect.
+Decrements the duration by 1 and removes the effect if it expires.
 
-**Returns:** The result.
-
-*Source: [src/lua_api/combat_api.rs](src/lua_api/combat_api.rs#L69)*
+*Source: [src/lua_api/combat_api.rs](src/lua_api/combat_api.rs#L57)*
 
 ---
 
@@ -18143,7 +18047,7 @@ Creates a new craft queue instance.
 
 - `max_jobs` — `integer` optional.
 
-*Source: [src/lua_api/crafting_api.rs](src/lua_api/crafting_api.rs#L949)*
+*Source: [src/lua_api/crafting_api.rs](src/lua_api/crafting_api.rs#L886)*
 
 ---
 
@@ -18155,7 +18059,7 @@ Creates a new craft skill instance.
 
 - `name` — `string`.
 
-*Source: [src/lua_api/crafting_api.rs](src/lua_api/crafting_api.rs#L941)*
+*Source: [src/lua_api/crafting_api.rs](src/lua_api/crafting_api.rs#L878)*
 
 ---
 
@@ -18168,7 +18072,7 @@ Creates a new recipe instance.
 - `id` — `string`.
 - `recipe_type` — `string` optional.
 
-*Source: [src/lua_api/crafting_api.rs](src/lua_api/crafting_api.rs#L914)*
+*Source: [src/lua_api/crafting_api.rs](src/lua_api/crafting_api.rs#L851)*
 
 ---
 
@@ -18181,7 +18085,7 @@ Creates a new registry instance.
 - `station_type` — `string`.
 - `level` — `integer` optional.
 
-*Source: [src/lua_api/crafting_api.rs](src/lua_api/crafting_api.rs#L924)*
+*Source: [src/lua_api/crafting_api.rs](src/lua_api/crafting_api.rs#L861)*
 
 ---
 
@@ -18194,7 +18098,7 @@ Creates a new station instance.
 - `station_type` — `string`.
 - `level` — `integer` optional.
 
-*Source: [src/lua_api/crafting_api.rs](src/lua_api/crafting_api.rs#L933)*
+*Source: [src/lua_api/crafting_api.rs](src/lua_api/crafting_api.rs#L870)*
 
 ---
 
@@ -18206,7 +18110,7 @@ Creates a new upgrade tree instance.
 
 - `name` — `string` optional.
 
-*Source: [src/lua_api/crafting_api.rs](src/lua_api/crafting_api.rs#L957)*
+*Source: [src/lua_api/crafting_api.rs](src/lua_api/crafting_api.rs#L894)*
 
 ---
 
@@ -18220,7 +18124,7 @@ Cancels the current operation.
 
 - `id` — `integer`.
 
-*Source: [src/lua_api/crafting_api.rs](src/lua_api/crafting_api.rs#L592)*
+*Source: [src/lua_api/crafting_api.rs](src/lua_api/crafting_api.rs#L529)*
 
 ---
 
@@ -18230,7 +18134,7 @@ Removes all entries.
 
 **Returns:** The result.
 
-*Source: [src/lua_api/crafting_api.rs](src/lua_api/crafting_api.rs#L698)*
+*Source: [src/lua_api/crafting_api.rs](src/lua_api/crafting_api.rs#L635)*
 
 ---
 
@@ -18242,7 +18146,7 @@ Collect completed on this CraftQueue.
 
 - `id` — `integer`.
 
-*Source: [src/lua_api/crafting_api.rs](src/lua_api/crafting_api.rs#L608)*
+*Source: [src/lua_api/crafting_api.rs](src/lua_api/crafting_api.rs#L545)*
 
 ---
 
@@ -18252,7 +18156,7 @@ Returns the number of items.
 
 **Returns:** `integer`.
 
-*Source: [src/lua_api/crafting_api.rs](src/lua_api/crafting_api.rs#L674)*
+*Source: [src/lua_api/crafting_api.rs](src/lua_api/crafting_api.rs#L611)*
 
 ---
 
@@ -18266,7 +18170,7 @@ Enqueue on this CraftQueue.
 - `time` — `number`.
 - `qty` — `integer` optional.
 
-*Source: [src/lua_api/crafting_api.rs](src/lua_api/crafting_api.rs#L585)*
+*Source: [src/lua_api/crafting_api.rs](src/lua_api/crafting_api.rs#L522)*
 
 ---
 
@@ -18276,7 +18180,7 @@ Returns the all jobs.
 
 **Returns:** The current all jobs.
 
-*Source: [src/lua_api/crafting_api.rs](src/lua_api/crafting_api.rs#L706)*
+*Source: [src/lua_api/crafting_api.rs](src/lua_api/crafting_api.rs#L643)*
 
 ---
 
@@ -18286,7 +18190,7 @@ Returns the ids.
 
 **Returns:** The current ids.
 
-*Source: [src/lua_api/crafting_api.rs](src/lua_api/crafting_api.rs#L689)*
+*Source: [src/lua_api/crafting_api.rs](src/lua_api/crafting_api.rs#L626)*
 
 ---
 
@@ -18300,7 +18204,7 @@ Returns the job.
 
 **Returns:** The current job.
 
-*Source: [src/lua_api/crafting_api.rs](src/lua_api/crafting_api.rs#L620)*
+*Source: [src/lua_api/crafting_api.rs](src/lua_api/crafting_api.rs#L557)*
 
 ---
 
@@ -18310,7 +18214,7 @@ Returns the max jobs.
 
 **Returns:** The current max jobs.
 
-*Source: [src/lua_api/crafting_api.rs](src/lua_api/crafting_api.rs#L684)*
+*Source: [src/lua_api/crafting_api.rs](src/lua_api/crafting_api.rs#L621)*
 
 ---
 
@@ -18320,7 +18224,7 @@ Returns `true` if full.
 
 **Returns:** `boolean`.
 
-*Source: [src/lua_api/crafting_api.rs](src/lua_api/crafting_api.rs#L679)*
+*Source: [src/lua_api/crafting_api.rs](src/lua_api/crafting_api.rs#L616)*
 
 ---
 
@@ -18333,7 +18237,7 @@ Sets the job paused.
 - `id` — `integer`.
 - `paused` — `boolean`.
 
-*Source: [src/lua_api/crafting_api.rs](src/lua_api/crafting_api.rs#L748)*
+*Source: [src/lua_api/crafting_api.rs](src/lua_api/crafting_api.rs#L685)*
 
 ---
 
@@ -18345,7 +18249,7 @@ Advances the simulation by `dt` seconds.
 
 - `dt` — `number`.
 
-*Source: [src/lua_api/crafting_api.rs](src/lua_api/crafting_api.rs#L599)*
+*Source: [src/lua_api/crafting_api.rs](src/lua_api/crafting_api.rs#L536)*
 
 ---
 
@@ -18353,95 +18257,81 @@ Advances the simulation by `dt` seconds.
 
 #### `CraftSkill:addXp(amount)`
 
-Adds xp to the collection.
+Adds `xp` to this skill's total, potentially triggering level-ups.
 
 **Parameters:**
 
-- `amount` — `number`.
+- `xp` — `number`: XP to add.
 
-*Source: [src/lua_api/crafting_api.rs](src/lua_api/crafting_api.rs#L547)*
+*Source: [src/lua_api/crafting_api.rs](src/lua_api/crafting_api.rs#L484)*
 
 ---
 
 #### `CraftSkill:canUse(recipe)`
 
-Returns `true` if use.
+Returns `true` if this skill's level meets the minimum required to use the given recipe.
 
 **Parameters:**
 
-- `recipe` — `userdata`.
+- `recipe` — `Recipe`: Recipe to check skill requirement against.
 
 **Returns:** `boolean`.
 
-*Source: [src/lua_api/crafting_api.rs](src/lua_api/crafting_api.rs#L555)*
+*Source: [src/lua_api/crafting_api.rs](src/lua_api/crafting_api.rs#L492)*
 
 ---
 
 #### `CraftSkill:getLevel()`
 
-Returns the level.
+Returns the current level derived from total XP.
 
-**Parameters:**
+**Returns:** `integer` — current level.
 
-- `level` — `integer`.
-
-**Returns:** The current level.
-
-*Source: [src/lua_api/crafting_api.rs](src/lua_api/crafting_api.rs#L526)*
+*Source: [src/lua_api/crafting_api.rs](src/lua_api/crafting_api.rs#L466)*
 
 ---
 
 #### `CraftSkill:getName()`
 
-Returns the name.
+Returns the skill's name identifier.
 
-**Parameters:**
+**Returns:** `string`.
 
-- `level` — `integer`.
-
-**Returns:** The current name.
-
-*Source: [src/lua_api/crafting_api.rs](src/lua_api/crafting_api.rs#L510)*
+*Source: [src/lua_api/crafting_api.rs](src/lua_api/crafting_api.rs#L456)*
 
 ---
 
 #### `CraftSkill:getXp()`
 
-Returns the xp.
+Returns the total accumulated XP for this skill.
 
-**Parameters:**
+**Returns:** `number` — total XP.
 
-- `level` — `integer`.
-
-**Returns:** The current xp.
-
-*Source: [src/lua_api/crafting_api.rs](src/lua_api/crafting_api.rs#L518)*
+*Source: [src/lua_api/crafting_api.rs](src/lua_api/crafting_api.rs#L461)*
 
 ---
 
 #### `CraftSkill:getXpToNext(level)`
 
-Returns the xp to next.
+Returns the XP required to reach the next level.
 
-**Parameters:**
+**Parameters:** `level`
 
-- `level` — `integer`.
+**Returns:** `number` — XP needed.
 
-**Returns:** The current xp to next.
-
-*Source: [src/lua_api/crafting_api.rs](src/lua_api/crafting_api.rs#L534)*
+*Source: [src/lua_api/crafting_api.rs](src/lua_api/crafting_api.rs#L471)*
 
 ---
 
 #### `CraftSkill:setLevel(level)`
 
-Sets the level.
+Sets the skill directly to the given level, adjusting XP accordingly.
 
 **Parameters:**
 
-- `level` — `integer`.
+- `level` — `integer`: Target level.
 
-*Source: [src/lua_api/crafting_api.rs](src/lua_api/crafting_api.rs#L539)*
+*Source: [src/lua_api/crafting_api.rs](src/lua_api/crafting_api.rs#L476)*
 
 ---
 
@@ -18449,335 +18339,295 @@ Sets the level.
 
 #### `Recipe:addIngredient(item_type, qty, [consumed])`
 
-Adds ingredient to the collection.
+Adds an ingredient requirement to this recipe.
 
 **Parameters:**
 
-- `item_type` — `string`.
-- `qty` — `integer`.
-- `consumed` — `boolean` optional.
+- `id` — `string`: Item ID of the ingredient.
+- `count` — `integer`: Number of units required.
 
-*Source: [src/lua_api/crafting_api.rs](src/lua_api/crafting_api.rs#L196)*
+*Source: [src/lua_api/crafting_api.rs](src/lua_api/crafting_api.rs#L152)*
 
 ---
 
 #### `Recipe:addOutput(item_type, qty, [quality])`
 
-Adds output to the collection.
+Adds an output item produced when this recipe is completed.
 
 **Parameters:**
 
-- `item_type` — `string`.
-- `qty` — `integer`.
-- `quality` — `string` optional.
+- `id` — `string`: Item ID of the output.
+- `count` — `integer`: Number of units produced.
 
-*Source: [src/lua_api/crafting_api.rs](src/lua_api/crafting_api.rs#L209)*
+*Source: [src/lua_api/crafting_api.rs](src/lua_api/crafting_api.rs#L164)*
 
 ---
 
 #### `Recipe:addTag(tag)`
 
-Adds tag to the collection.
+Attaches a string tag to this recipe.
 
 **Parameters:**
 
-- `tag` — `string`.
+- `tag` — `string`: Tag to add.
 
-*Source: [src/lua_api/crafting_api.rs](src/lua_api/crafting_api.rs#L171)*
+*Source: [src/lua_api/crafting_api.rs](src/lua_api/crafting_api.rs#L133)*
 
 ---
 
 #### `Recipe:getDescription(v)`
 
-Returns the description.
+Returns the lore/description text for this recipe.
 
-**Parameters:**
+**Parameters:** `v`
 
-- `v` — `string`.
+**Returns:** `string`.
 
-**Returns:** The current description.
-
-*Source: [src/lua_api/crafting_api.rs](src/lua_api/crafting_api.rs#L140)*
+*Source: [src/lua_api/crafting_api.rs](src/lua_api/crafting_api.rs#L105)*
 
 ---
 
 #### `Recipe:getId()`
 
-Returns the id.
+Returns the unique string identifier of this recipe.
 
-**Parameters:**
+**Returns:** `string` — recipe ID.
 
-- `v` — `string`.
-
-**Returns:** The current id.
-
-*Source: [src/lua_api/crafting_api.rs](src/lua_api/crafting_api.rs#L33)*
+*Source: [src/lua_api/crafting_api.rs](src/lua_api/crafting_api.rs#L30)*
 
 ---
 
 #### `Recipe:getIngredients()`
 
-Returns the ingredients.
+Returns a list of all ingredient requirements as `{id, count}` tables.
 
-**Returns:** The current ingredients.
+**Returns:** `table` of `{id: string, count: integer}` tables.
 
-*Source: [src/lua_api/crafting_api.rs](src/lua_api/crafting_api.rs#L220)*
+*Source: [src/lua_api/crafting_api.rs](src/lua_api/crafting_api.rs#L175)*
 
 ---
 
 #### `Recipe:getName(v)`
 
-Returns the name.
+Returns the human-readable display name of this recipe.
 
-**Parameters:**
+**Parameters:** `v`
 
-- `v` — `string`.
+**Returns:** `string`.
 
-**Returns:** The current name.
-
-*Source: [src/lua_api/crafting_api.rs](src/lua_api/crafting_api.rs#L41)*
+*Source: [src/lua_api/crafting_api.rs](src/lua_api/crafting_api.rs#L35)*
 
 ---
 
 #### `Recipe:getOutputs()`
 
-Returns the outputs.
+Returns a list of all output items as `{id, count}` tables.
 
-**Returns:** The current outputs.
+**Returns:** `table` of `{id: string, count: integer}` tables.
 
-*Source: [src/lua_api/crafting_api.rs](src/lua_api/crafting_api.rs#L249)*
+*Source: [src/lua_api/crafting_api.rs](src/lua_api/crafting_api.rs#L204)*
 
 ---
 
-#### `Recipe:getSkill()`
+#### `Recipe:getSkill(name, [level])`
 
-Returns the skill.
+Returns the skill name gated on this recipe, or an empty string if none.
 
-**Parameters:**
+**Parameters:** `name`, `level`
 
-- `name` — `string`.
-- `level` — `integer` optional.
+**Returns:** `string` — required skill name, or `''`.
 
-**Returns:** The current skill.
-
-*Source: [src/lua_api/crafting_api.rs](src/lua_api/crafting_api.rs#L108)*
+*Source: [src/lua_api/crafting_api.rs](src/lua_api/crafting_api.rs#L80)*
 
 ---
 
 #### `Recipe:getSkillXp(v)`
 
-Returns the skill xp.
+Returns the XP awarded to the required skill when this recipe is completed.
 
-**Parameters:**
+**Parameters:** `v`
 
-- `v` — `number`.
+**Returns:** `number` — XP awarded.
 
-**Returns:** The current skill xp.
-
-*Source: [src/lua_api/crafting_api.rs](src/lua_api/crafting_api.rs#L127)*
+*Source: [src/lua_api/crafting_api.rs](src/lua_api/crafting_api.rs#L95)*
 
 ---
 
-#### `Recipe:getStationLevel()`
+#### `Recipe:getStationLevel(v)`
 
-Returns the station level.
+Returns the minimum station level required to craft this recipe.
 
-**Parameters:**
+**Parameters:** `v`
 
-- `name` — `string`.
-- `level` — `integer` optional.
+**Returns:** `integer` — required station level.
 
-**Returns:** The current station level.
-
-*Source: [src/lua_api/crafting_api.rs](src/lua_api/crafting_api.rs#L78)*
+*Source: [src/lua_api/crafting_api.rs](src/lua_api/crafting_api.rs#L60)*
 
 ---
 
-#### `Recipe:getStationType()`
+#### `Recipe:getStationType(v)`
 
-Returns the station type.
+Returns the station type string required to craft this recipe.
 
-**Parameters:**
+**Parameters:** `v`
 
-- `name` — `string`.
-- `level` — `integer` optional.
+**Returns:** `string` — station type.
 
-**Returns:** The current station type.
-
-*Source: [src/lua_api/crafting_api.rs](src/lua_api/crafting_api.rs#L93)*
+*Source: [src/lua_api/crafting_api.rs](src/lua_api/crafting_api.rs#L70)*
 
 ---
 
 #### `Recipe:getTags()`
 
-Returns the tags.
+Returns a list of all tags attached to this recipe.
 
-**Parameters:**
+**Returns:** `table` of `string` tags.
 
-- `item_type` — `string`.
-- `qty` — `integer`.
-- `consumed` — `boolean` optional.
-
-**Returns:** The current tags.
-
-*Source: [src/lua_api/crafting_api.rs](src/lua_api/crafting_api.rs#L184)*
+*Source: [src/lua_api/crafting_api.rs](src/lua_api/crafting_api.rs#L141)*
 
 ---
 
-#### `Recipe:getTime()`
+#### `Recipe:getTime(v)`
 
-Returns the time.
+Returns the base crafting duration in seconds.
 
-**Parameters:**
+**Parameters:** `v`
 
-- `name` — `string`.
-- `level` — `integer` optional.
+**Returns:** `number` — duration in seconds.
 
-**Returns:** The current time.
-
-*Source: [src/lua_api/crafting_api.rs](src/lua_api/crafting_api.rs#L63)*
+*Source: [src/lua_api/crafting_api.rs](src/lua_api/crafting_api.rs#L50)*
 
 ---
 
 #### `Recipe:getType()`
 
-Returns the type.
+Returns the recipe type tag (e.g. `'smelt'`, `'craft'`).
 
-**Parameters:**
+**Returns:** `string` — recipe type.
 
-- `v` — `number`.
-
-**Returns:** The current type.
-
-*Source: [src/lua_api/crafting_api.rs](src/lua_api/crafting_api.rs#L54)*
+*Source: [src/lua_api/crafting_api.rs](src/lua_api/crafting_api.rs#L45)*
 
 ---
 
 #### `Recipe:hasTag(tag)`
 
-Returns `true` if tag.
+Returns `true` if this recipe carries the given tag.
 
 **Parameters:**
 
-- `tag` — `string`.
+- `tag` — `string`: Tag to test.
 
 **Returns:** `boolean`.
 
-*Source: [src/lua_api/crafting_api.rs](src/lua_api/crafting_api.rs#L166)*
+*Source: [src/lua_api/crafting_api.rs](src/lua_api/crafting_api.rs#L128)*
 
 ---
 
 #### `Recipe:isEnabled(v)`
 
-Returns `true` if enabled.
+Returns `true` if this recipe is currently craftable (not disabled).
 
-**Parameters:**
-
-- `v` — `boolean`.
+**Parameters:** `v`
 
 **Returns:** `boolean`.
 
-*Source: [src/lua_api/crafting_api.rs](src/lua_api/crafting_api.rs#L153)*
+*Source: [src/lua_api/crafting_api.rs](src/lua_api/crafting_api.rs#L115)*
 
 ---
 
 #### `Recipe:setDescription(v)`
 
-Sets the description.
+Sets the description text shown in crafting UI.
 
 **Parameters:**
 
-- `v` — `string`.
+- `desc` — `string`: Description string.
 
-*Source: [src/lua_api/crafting_api.rs](src/lua_api/crafting_api.rs#L145)*
+*Source: [src/lua_api/crafting_api.rs](src/lua_api/crafting_api.rs#L110)*
 
 ---
 
 #### `Recipe:setEnabled(v)`
 
-Sets the enabled.
+Enables or disables this recipe. Disabled recipes cannot be enqueued.
 
 **Parameters:**
 
-- `v` — `boolean`.
+- `enabled` — `boolean`: `true` to enable.
 
-*Source: [src/lua_api/crafting_api.rs](src/lua_api/crafting_api.rs#L158)*
+*Source: [src/lua_api/crafting_api.rs](src/lua_api/crafting_api.rs#L120)*
 
 ---
 
 #### `Recipe:setName(v)`
 
-Sets the name.
+Sets the display name of this recipe.
 
 **Parameters:**
 
-- `v` — `string`.
+- `name` — `string`: New display name.
 
-*Source: [src/lua_api/crafting_api.rs](src/lua_api/crafting_api.rs#L46)*
+*Source: [src/lua_api/crafting_api.rs](src/lua_api/crafting_api.rs#L40)*
 
 ---
 
 #### `Recipe:setSkill(name, [level])`
 
-Sets the skill.
+Sets the skill required to unlock and use this recipe.
 
 **Parameters:**
 
-- `name` — `string`.
-- `level` — `integer` optional.
+- `skill` — `string`: Skill name.
 
-*Source: [src/lua_api/crafting_api.rs](src/lua_api/crafting_api.rs#L114)*
+*Source: [src/lua_api/crafting_api.rs](src/lua_api/crafting_api.rs#L85)*
 
 ---
 
 #### `Recipe:setSkillXp(v)`
 
-Sets the skill xp.
+Sets the skill XP awarded on completion.
 
 **Parameters:**
 
-- `v` — `number`.
+- `xp` — `number`: XP amount.
 
-*Source: [src/lua_api/crafting_api.rs](src/lua_api/crafting_api.rs#L132)*
+*Source: [src/lua_api/crafting_api.rs](src/lua_api/crafting_api.rs#L100)*
 
 ---
 
 #### `Recipe:setStationLevel(v)`
 
-Sets the station level.
+Sets the minimum station level required to craft this recipe.
 
 **Parameters:**
 
-- `name` — `string`.
-- `level` — `integer` optional.
+- `level` — `integer`: Minimum station level.
 
-*Source: [src/lua_api/crafting_api.rs](src/lua_api/crafting_api.rs#L84)*
+*Source: [src/lua_api/crafting_api.rs](src/lua_api/crafting_api.rs#L65)*
 
 ---
 
 #### `Recipe:setStationType(v)`
 
-Sets the station type.
+Sets which station type is required for this recipe.
 
 **Parameters:**
 
-- `name` — `string`.
-- `level` — `integer` optional.
+- `type` — `string`: Station type identifier.
 
-*Source: [src/lua_api/crafting_api.rs](src/lua_api/crafting_api.rs#L99)*
+*Source: [src/lua_api/crafting_api.rs](src/lua_api/crafting_api.rs#L75)*
 
 ---
 
 #### `Recipe:setTime(v)`
 
-Sets the time.
+Sets the base crafting duration in seconds.
 
 **Parameters:**
 
-- `name` — `string`.
-- `level` — `integer` optional.
+- `time` — `number`: New duration in seconds.
 
-*Source: [src/lua_api/crafting_api.rs](src/lua_api/crafting_api.rs#L69)*
+*Source: [src/lua_api/crafting_api.rs](src/lua_api/crafting_api.rs#L55)*
 
 ---
 
@@ -18785,115 +18635,115 @@ Sets the time.
 
 #### `RecipeRegistry:add(recipe)`
 
-Adds an entry to the collection.
+Registers a recipe in this registry. Raises an error if a recipe with the same ID already exists.
 
 **Parameters:**
 
-- `recipe` — `userdata`.
+- `recipe` — `Recipe`: Recipe object to register.
 
-*Source: [src/lua_api/crafting_api.rs](src/lua_api/crafting_api.rs#L296)*
+*Source: [src/lua_api/crafting_api.rs](src/lua_api/crafting_api.rs#L251)*
 
 ---
 
 #### `RecipeRegistry:count()`
 
-Returns the number of items.
-
-**Parameters:**
-
-- `item_type` — `string`.
+Returns the total number of registered recipes.
 
 **Returns:** `integer`.
 
-*Source: [src/lua_api/crafting_api.rs](src/lua_api/crafting_api.rs#L328)*
+*Source: [src/lua_api/crafting_api.rs](src/lua_api/crafting_api.rs#L280)*
 
 ---
 
 #### `RecipeRegistry:findByIngredient(item_type)`
 
-Find by ingredient on this RecipeRegistry.
+Returns all recipes that consume an item with the given ID as an ingredient.
 
 **Parameters:**
 
-- `item_type` — `string`.
+- `item_id` — `string`: Ingredient item ID to search for.
 
-*Source: [src/lua_api/crafting_api.rs](src/lua_api/crafting_api.rs#L356)*
+**Returns:** `table` of `Recipe` objects.
+
+*Source: [src/lua_api/crafting_api.rs](src/lua_api/crafting_api.rs#L311)*
 
 ---
 
 #### `RecipeRegistry:findByOutput(item_type)`
 
-Find by output on this RecipeRegistry.
+Returns all recipes that produce an item with the given ID.
 
 **Parameters:**
 
-- `item_type` — `string`.
+- `item_id` — `string`: Output item ID to search for.
 
-*Source: [src/lua_api/crafting_api.rs](src/lua_api/crafting_api.rs#L345)*
+**Returns:** `table` of `Recipe` objects.
+
+*Source: [src/lua_api/crafting_api.rs](src/lua_api/crafting_api.rs#L297)*
 
 ---
 
 #### `RecipeRegistry:findByTag(tag)`
 
-Find by tag on this RecipeRegistry.
+Returns all recipes that carry the given tag.
 
 **Parameters:**
 
-- `tag` — `string`.
+- `tag` — `string`: Tag string to match.
 
-*Source: [src/lua_api/crafting_api.rs](src/lua_api/crafting_api.rs#L367)*
+**Returns:** `table` of `Recipe` objects.
+
+*Source: [src/lua_api/crafting_api.rs](src/lua_api/crafting_api.rs#L325)*
 
 ---
 
 #### `RecipeRegistry:forStation(station_type)`
 
-For station on this RecipeRegistry.
+Returns all recipes that require the given station type.
 
 **Parameters:**
 
-- `station_type` — `string`.
+- `station_type` — `string`: Station type identifier.
 
-*Source: [src/lua_api/crafting_api.rs](src/lua_api/crafting_api.rs#L377)*
+**Returns:** `table` of `Recipe` objects.
+
+*Source: [src/lua_api/crafting_api.rs](src/lua_api/crafting_api.rs#L338)*
 
 ---
 
 #### `RecipeRegistry:get(id)`
 
-Returns the current value.
+Returns the registered recipe with the given ID, or `nil` if none exists.
 
 **Parameters:**
 
-- `id` — `string`.
+- `id` — `string`: Recipe ID to look up.
 
-**Returns:** The current get.
+**Returns:** `Recipe` or `nil`.
 
-*Source: [src/lua_api/crafting_api.rs](src/lua_api/crafting_api.rs#L308)*
+*Source: [src/lua_api/crafting_api.rs](src/lua_api/crafting_api.rs#L263)*
 
 ---
 
 #### `RecipeRegistry:getIds()`
 
-Returns the ids.
+Returns a list of all registered recipe IDs.
 
-**Parameters:**
+**Returns:** `table` of `string` IDs.
 
-- `item_type` — `string`.
-
-**Returns:** The current ids.
-
-*Source: [src/lua_api/crafting_api.rs](src/lua_api/crafting_api.rs#L336)*
+*Source: [src/lua_api/crafting_api.rs](src/lua_api/crafting_api.rs#L285)*
 
 ---
 
 #### `RecipeRegistry:remove(id)`
 
-Removes the entry from the collection.
+Removes the recipe with the given ID from this registry.
 
 **Parameters:**
 
-- `id` — `string`.
+- `id` — `string`: Recipe ID to remove.
 
-*Source: [src/lua_api/crafting_api.rs](src/lua_api/crafting_api.rs#L318)*
+*Source: [src/lua_api/crafting_api.rs](src/lua_api/crafting_api.rs#L273)*
 
 ---
 
@@ -18901,145 +18751,135 @@ Removes the entry from the collection.
 
 #### `Station:canProcess(recipe)`
 
-Returns `true` if process.
+Returns `true` if this station can currently process the given recipe (level and type match).
 
 **Parameters:**
 
-- `recipe` — `userdata`.
+- `recipe` — `Recipe`: Recipe to check against this station's type and level.
 
 **Returns:** `boolean`.
 
-*Source: [src/lua_api/crafting_api.rs](src/lua_api/crafting_api.rs#L470)*
+*Source: [src/lua_api/crafting_api.rs](src/lua_api/crafting_api.rs#L416)*
 
 ---
 
 #### `Station:effectiveTime(recipe)`
 
-Effective time on this Station.
+Returns the effective crafting time for `recipe` after applying this station's speed multiplier.
 
 **Parameters:**
 
-- `recipe` — `userdata`.
+- `recipe` — `Recipe`: The recipe to evaluate.
 
-*Source: [src/lua_api/crafting_api.rs](src/lua_api/crafting_api.rs#L479)*
+**Returns:** `number` — effective time in seconds.
+
+*Source: [src/lua_api/crafting_api.rs](src/lua_api/crafting_api.rs#L428)*
 
 ---
 
 #### `Station:getLevel(v)`
 
-Returns the level.
+Returns the current upgrade level of this station.
 
-**Parameters:**
+**Parameters:** `v`
 
-- `v` — `integer`.
+**Returns:** `integer` — level.
 
-**Returns:** The current level.
-
-*Source: [src/lua_api/crafting_api.rs](src/lua_api/crafting_api.rs#L418)*
+*Source: [src/lua_api/crafting_api.rs](src/lua_api/crafting_api.rs#L373)*
 
 ---
 
 #### `Station:getName(v)`
 
-Returns the name.
+Returns the display name of this station.
 
-**Parameters:**
+**Parameters:** `v`
 
-- `v` — `string`.
+**Returns:** `string`.
 
-**Returns:** The current name.
-
-*Source: [src/lua_api/crafting_api.rs](src/lua_api/crafting_api.rs#L431)*
+*Source: [src/lua_api/crafting_api.rs](src/lua_api/crafting_api.rs#L383)*
 
 ---
 
 #### `Station:getSpeedMultiplier(v)`
 
-Returns the speed multiplier.
+Returns the crafting speed multiplier. `1.0` is normal speed.
 
-**Parameters:**
+**Parameters:** `v`
 
-- `v` — `number`.
+**Returns:** `number`.
 
-**Returns:** The current speed multiplier.
-
-*Source: [src/lua_api/crafting_api.rs](src/lua_api/crafting_api.rs#L444)*
+*Source: [src/lua_api/crafting_api.rs](src/lua_api/crafting_api.rs#L393)*
 
 ---
 
 #### `Station:getType()`
 
-Returns the type.
+Returns the station type identifier string.
 
-**Parameters:**
+**Returns:** `string`.
 
-- `v` — `integer`.
-
-**Returns:** The current type.
-
-*Source: [src/lua_api/crafting_api.rs](src/lua_api/crafting_api.rs#L410)*
+*Source: [src/lua_api/crafting_api.rs](src/lua_api/crafting_api.rs#L368)*
 
 ---
 
 #### `Station:isActive(v)`
 
-Returns `true` if active.
+Returns `true` if this station is operational and can process recipes.
 
-**Parameters:**
-
-- `v` — `boolean`.
+**Parameters:** `v`
 
 **Returns:** `boolean`.
 
-*Source: [src/lua_api/crafting_api.rs](src/lua_api/crafting_api.rs#L457)*
+*Source: [src/lua_api/crafting_api.rs](src/lua_api/crafting_api.rs#L403)*
 
 ---
 
 #### `Station:setActive(v)`
 
-Sets the active.
+Enables or disables this station.
 
 **Parameters:**
 
-- `v` — `boolean`.
+- `active` — `boolean`: `true` to enable.
 
-*Source: [src/lua_api/crafting_api.rs](src/lua_api/crafting_api.rs#L462)*
+*Source: [src/lua_api/crafting_api.rs](src/lua_api/crafting_api.rs#L408)*
 
 ---
 
 #### `Station:setLevel(v)`
 
-Sets the level.
+Sets the station's upgrade level, affecting which recipes it can process.
 
 **Parameters:**
 
-- `v` — `integer`.
+- `level` — `integer`: New station level.
 
-*Source: [src/lua_api/crafting_api.rs](src/lua_api/crafting_api.rs#L423)*
+*Source: [src/lua_api/crafting_api.rs](src/lua_api/crafting_api.rs#L378)*
 
 ---
 
 #### `Station:setName(v)`
 
-Sets the name.
+Sets the display name of this station.
 
 **Parameters:**
 
-- `v` — `string`.
+- `name` — `string`: New display name.
 
-*Source: [src/lua_api/crafting_api.rs](src/lua_api/crafting_api.rs#L436)*
+*Source: [src/lua_api/crafting_api.rs](src/lua_api/crafting_api.rs#L388)*
 
 ---
 
 #### `Station:setSpeedMultiplier(v)`
 
-Sets the speed multiplier.
+Sets the crafting speed multiplier. Values above `1.0` reduce effective recipe time.
 
 **Parameters:**
 
-- `v` — `number`.
+- `mult` — `number`: Speed multiplier (e.g. `2.0` for double speed).
 
-*Source: [src/lua_api/crafting_api.rs](src/lua_api/crafting_api.rs#L449)*
+*Source: [src/lua_api/crafting_api.rs](src/lua_api/crafting_api.rs#L398)*
 
 ---
 
@@ -19055,7 +18895,7 @@ Adds node to the collection.
 - `name` — `string`.
 - `prereqs` — `table` optional.
 
-*Source: [src/lua_api/crafting_api.rs](src/lua_api/crafting_api.rs#L797)*
+*Source: [src/lua_api/crafting_api.rs](src/lua_api/crafting_api.rs#L734)*
 
 ---
 
@@ -19069,7 +18909,7 @@ Returns `true` if unlock.
 
 **Returns:** `boolean`.
 
-*Source: [src/lua_api/crafting_api.rs](src/lua_api/crafting_api.rs#L814)*
+*Source: [src/lua_api/crafting_api.rs](src/lua_api/crafting_api.rs#L751)*
 
 ---
 
@@ -19085,7 +18925,7 @@ Returns the number of items.
 
 **Returns:** `integer`.
 
-*Source: [src/lua_api/crafting_api.rs](src/lua_api/crafting_api.rs#L790)*
+*Source: [src/lua_api/crafting_api.rs](src/lua_api/crafting_api.rs#L727)*
 
 ---
 
@@ -19101,7 +18941,7 @@ Returns the name.
 
 **Returns:** The current name.
 
-*Source: [src/lua_api/crafting_api.rs](src/lua_api/crafting_api.rs#L780)*
+*Source: [src/lua_api/crafting_api.rs](src/lua_api/crafting_api.rs#L717)*
 
 ---
 
@@ -19115,7 +18955,7 @@ Returns the node cost.
 
 **Returns:** The current node cost.
 
-*Source: [src/lua_api/crafting_api.rs](src/lua_api/crafting_api.rs#L887)*
+*Source: [src/lua_api/crafting_api.rs](src/lua_api/crafting_api.rs#L824)*
 
 ---
 
@@ -19130,7 +18970,7 @@ Returns the node ids.
 
 **Returns:** The current node ids.
 
-*Source: [src/lua_api/crafting_api.rs](src/lua_api/crafting_api.rs#L860)*
+*Source: [src/lua_api/crafting_api.rs](src/lua_api/crafting_api.rs#L797)*
 
 ---
 
@@ -19140,7 +18980,7 @@ Returns the unlocked ids.
 
 **Returns:** The current unlocked ids.
 
-*Source: [src/lua_api/crafting_api.rs](src/lua_api/crafting_api.rs#L846)*
+*Source: [src/lua_api/crafting_api.rs](src/lua_api/crafting_api.rs#L783)*
 
 ---
 
@@ -19154,7 +18994,7 @@ Returns `true` if unlocked.
 
 **Returns:** `boolean`.
 
-*Source: [src/lua_api/crafting_api.rs](src/lua_api/crafting_api.rs#L831)*
+*Source: [src/lua_api/crafting_api.rs](src/lua_api/crafting_api.rs#L768)*
 
 ---
 
@@ -19166,7 +19006,7 @@ Reset node on this UpgradeTree.
 
 - `id` — `string`.
 
-*Source: [src/lua_api/crafting_api.rs](src/lua_api/crafting_api.rs#L839)*
+*Source: [src/lua_api/crafting_api.rs](src/lua_api/crafting_api.rs#L776)*
 
 ---
 
@@ -19179,7 +19019,7 @@ Sets the node cost.
 - `id` — `string`.
 - `cost_table` — `table`.
 
-*Source: [src/lua_api/crafting_api.rs](src/lua_api/crafting_api.rs#L870)*
+*Source: [src/lua_api/crafting_api.rs](src/lua_api/crafting_api.rs#L807)*
 
 ---
 
@@ -19191,7 +19031,7 @@ Unlock on this UpgradeTree.
 
 - `id` — `string`.
 
-*Source: [src/lua_api/crafting_api.rs](src/lua_api/crafting_api.rs#L821)*
+*Source: [src/lua_api/crafting_api.rs](src/lua_api/crafting_api.rs#L758)*
 
 ---
 
@@ -20637,12 +20477,12 @@ Adds system to the collection.
 
 #### `Universe:addTag(id, tag)`
 
-Adds tag to the collection.
+Attaches a string tag to the entity, enabling fast tag-based group queries.
 
 **Parameters:**
 
-- `id` — `integer`.
-- `tag` — `string`.
+- `id` — `integer`: Entity ID.
+- `tag` — `string`: Tag label to add.
 
 *Source: [src/lua_api/entity_api.rs](src/lua_api/entity_api.rs#L284)*
 
@@ -20927,12 +20767,12 @@ Returns `true` if blueprint.
 
 #### `Universe:hasTag(id, tag)`
 
-Returns `true` if tag.
+Returns `true` if the entity carries the given tag.
 
 **Parameters:**
 
-- `id` — `integer`.
-- `tag` — `string`.
+- `id` — `integer`: Entity ID.
+- `tag` — `string`: Tag to test.
 
 **Returns:** `boolean`.
 
@@ -20942,11 +20782,11 @@ Returns `true` if tag.
 
 #### `Universe:isAlive(id)`
 
-Returns `true` if alive.
+Returns `true` if the entity `id` is currently active in the universe.
 
 **Parameters:**
 
-- `id` — `integer`.
+- `id` — `integer`: Entity ID to test.
 
 **Returns:** `boolean`.
 
@@ -20956,11 +20796,11 @@ Returns `true` if alive.
 
 #### `Universe:kill(id)`
 
-Kill on this Universe.
+Destroys the entity with the given `id`, freeing its slot for reuse.
 
 **Parameters:**
 
-- `id` — `integer`.
+- `id` — `integer`: Entity ID returned by `spawn`.
 
 *Source: [src/lua_api/entity_api.rs](src/lua_api/entity_api.rs#L46)*
 
@@ -21078,12 +20918,12 @@ Removes system from the collection.
 
 #### `Universe:removeTag(id, tag)`
 
-Removes tag from the collection.
+Removes a string tag from the entity.
 
 **Parameters:**
 
-- `id` — `integer`.
-- `tag` — `string`.
+- `id` — `integer`: Entity ID.
+- `tag` — `string`: Tag to remove.
 
 *Source: [src/lua_api/entity_api.rs](src/lua_api/entity_api.rs#L294)*
 
@@ -21104,11 +20944,9 @@ Sets the layer.
 
 #### `Universe:spawn()`
 
-Creates a new Universe instance.
+Creates a new entity in this universe and returns its numeric ID.
 
-**Parameters:**
-
-- `id` — `integer`.
+**Returns:** `integer` — entity ID.
 
 *Source: [src/lua_api/entity_api.rs](src/lua_api/entity_api.rs#L40)*
 
@@ -21144,7 +20982,7 @@ UserData objects for building RPG-style inventory systems in Lua.
 
 **Parameters:** `name`, `mode_str`, `slot_count`
 
-*Source: [src/lua_api/inventory_api.rs](src/lua_api/inventory_api.rs#L1047)*
+*Source: [src/lua_api/inventory_api.rs](src/lua_api/inventory_api.rs#L1046)*
 
 ---
 
@@ -21152,7 +20990,7 @@ UserData objects for building RPG-style inventory systems in Lua.
 
 *(undocumented)*
 
-*Source: [src/lua_api/inventory_api.rs](src/lua_api/inventory_api.rs#L1063)*
+*Source: [src/lua_api/inventory_api.rs](src/lua_api/inventory_api.rs#L1062)*
 
 ---
 
@@ -21162,7 +21000,7 @@ UserData objects for building RPG-style inventory systems in Lua.
 
 **Parameters:** `item_type`
 
-*Source: [src/lua_api/inventory_api.rs](src/lua_api/inventory_api.rs#L1012)*
+*Source: [src/lua_api/inventory_api.rs](src/lua_api/inventory_api.rs#L1011)*
 
 ---
 
@@ -21172,7 +21010,7 @@ UserData objects for building RPG-style inventory systems in Lua.
 
 **Parameters:** `name`
 
-*Source: [src/lua_api/inventory_api.rs](src/lua_api/inventory_api.rs#L1070)*
+*Source: [src/lua_api/inventory_api.rs](src/lua_api/inventory_api.rs#L1069)*
 
 ---
 
@@ -21182,7 +21020,7 @@ UserData objects for building RPG-style inventory systems in Lua.
 
 **Parameters:** `item_ud`, `qty`, `max_qty`
 
-*Source: [src/lua_api/inventory_api.rs](src/lua_api/inventory_api.rs#L1020)*
+*Source: [src/lua_api/inventory_api.rs](src/lua_api/inventory_api.rs#L1019)*
 
 ---
 
@@ -21192,7 +21030,7 @@ UserData objects for building RPG-style inventory systems in Lua.
 
 **Parameters:** `slot_type`, `state`
 
-*Source: [src/lua_api/inventory_api.rs](src/lua_api/inventory_api.rs#L1038)*
+*Source: [src/lua_api/inventory_api.rs](src/lua_api/inventory_api.rs#L1037)*
 
 ---
 
@@ -21442,7 +21280,7 @@ Returns the number of item.
 
 **Returns:** `integer`.
 
-*Source: [src/lua_api/inventory_api.rs](src/lua_api/inventory_api.rs#L930)*
+*Source: [src/lua_api/inventory_api.rs](src/lua_api/inventory_api.rs#L929)*
 
 ---
 
@@ -21454,7 +21292,7 @@ Disable subsystem on this Inventory.
 
 - `name` — `string`.
 
-*Source: [src/lua_api/inventory_api.rs](src/lua_api/inventory_api.rs#L954)*
+*Source: [src/lua_api/inventory_api.rs](src/lua_api/inventory_api.rs#L953)*
 
 ---
 
@@ -21466,7 +21304,7 @@ Enable subsystem on this Inventory.
 
 - `name` — `string`.
 
-*Source: [src/lua_api/inventory_api.rs](src/lua_api/inventory_api.rs#L945)*
+*Source: [src/lua_api/inventory_api.rs](src/lua_api/inventory_api.rs#L944)*
 
 ---
 
@@ -21554,16 +21392,15 @@ Returns the item set names.
 
 #### `Inventory:hasItem(item_type, [qty])`
 
-Returns `true` if item.
+Returns `true` if at least one unit of `id` is in this inventory.
 
 **Parameters:**
 
-- `item_type` — `string`.
-- `qty` — `integer` optional.
+- `id` — `string`: Item identifier to test.
 
 **Returns:** `boolean`.
 
-*Source: [src/lua_api/inventory_api.rs](src/lua_api/inventory_api.rs#L919)*
+*Source: [src/lua_api/inventory_api.rs](src/lua_api/inventory_api.rs#L918)*
 
 ---
 
@@ -21577,7 +21414,7 @@ Returns `true` if subsystem enabled.
 
 **Returns:** `boolean`.
 
-*Source: [src/lua_api/inventory_api.rs](src/lua_api/inventory_api.rs#L966)*
+*Source: [src/lua_api/inventory_api.rs](src/lua_api/inventory_api.rs#L965)*
 
 ---
 
@@ -21614,7 +21451,7 @@ Removes from any from the collection.
 - `item_type` — `string`.
 - `qty` — `integer`.
 
-*Source: [src/lua_api/inventory_api.rs](src/lua_api/inventory_api.rs#L938)*
+*Source: [src/lua_api/inventory_api.rs](src/lua_api/inventory_api.rs#L937)*
 
 ---
 
@@ -26063,7 +25900,7 @@ Unreserve on this ResourceManager.
 
 *(undocumented)*
 
-*Source: [src/lua_api/savegame_api.rs](src/lua_api/savegame_api.rs#L267)*
+*Source: [src/lua_api/savegame_api.rs](src/lua_api/savegame_api.rs#L250)*
 
 ---
 
@@ -26071,103 +25908,89 @@ Unreserve on this ResourceManager.
 
 #### `mlua:collect()`
 
-Collect on this SaveManager.
+Snapshots all registered tables into an in-memory serializable form, ready for disk write.
 
-**Returns:** The result.
+**Returns:** `table` — the collected save data.
 
-*Source: [src/lua_api/savegame_api.rs](src/lua_api/savegame_api.rs#L108)*
+*Source: [src/lua_api/savegame_api.rs](src/lua_api/savegame_api.rs#L104)*
 
 ---
 
 #### `mlua:disableAutoSave()`
 
-Disable auto save on this SaveManager.
+Disables automatic periodic saving.
 
-**Parameters:**
-
-- `dt` — `number`.
-
-*Source: [src/lua_api/savegame_api.rs](src/lua_api/savegame_api.rs#L200)*
+*Source: [src/lua_api/savegame_api.rs](src/lua_api/savegame_api.rs#L186)*
 
 ---
 
 #### `mlua:getSchemaVersion()`
 
-Returns the schema version.
+Returns the schema version currently set on this save manager.
 
-**Parameters:**
+**Returns:** `integer` — schema version.
 
-- `from_ver` — `integer`.
-- `func` — `function`.
-
-**Returns:** The current schema version.
-
-*Source: [src/lua_api/savegame_api.rs](src/lua_api/savegame_api.rs#L86)*
+*Source: [src/lua_api/savegame_api.rs](src/lua_api/savegame_api.rs#L82)*
 
 ---
 
 #### `mlua:getSummary()`
 
-Returns the summary.
+Returns the summary string set by `setSummary`, or an empty string if none was set.
 
-**Returns:** The current summary.
+**Returns:** `string` — save slot summary.
 
-*Source: [src/lua_api/savegame_api.rs](src/lua_api/savegame_api.rs#L228)*
+*Source: [src/lua_api/savegame_api.rs](src/lua_api/savegame_api.rs#L214)*
 
 ---
 
 #### `mlua:isDirty(interval, slot)`
 
-Returns `true` if dirty.
+Returns `true` if the save data has been modified since the last write.
 
-**Parameters:**
-
-- `interval` — `number`.
-- `slot` — `string`.
+**Parameters:** `interval`, `slot`
 
 **Returns:** `boolean`.
 
-*Source: [src/lua_api/savegame_api.rs](src/lua_api/savegame_api.rs#L185)*
+*Source: [src/lua_api/savegame_api.rs](src/lua_api/savegame_api.rs#L174)*
 
 ---
 
 #### `mlua:markDirty()`
 
-Mark dirty on this SaveManager.
+Marks the save as dirty, ensuring it will be written on the next autosave tick.
 
-**Returns:** The result.
-
-*Source: [src/lua_api/savegame_api.rs](src/lua_api/savegame_api.rs#L172)*
+*Source: [src/lua_api/savegame_api.rs](src/lua_api/savegame_api.rs#L165)*
 
 ---
 
 #### `mlua:reset()`
 
-Resets state to initial values.
+Clears all registered tables back to their initial state and marks the save dirty.
 
-**Returns:** The result.
-
-*Source: [src/lua_api/savegame_api.rs](src/lua_api/savegame_api.rs#L235)*
+*Source: [src/lua_api/savegame_api.rs](src/lua_api/savegame_api.rs#L218)*
 
 ---
 
 #### `mlua:restore`
 
-Restore on this SaveManager.
+Restores all registered tables from a previously collected save data table.
 
-**Returns:** The result.
+**Parameters:**
 
-*Source: [src/lua_api/savegame_api.rs](src/lua_api/savegame_api.rs#L142)*
+- `data` — `table`: Save data table as returned by `collect()`.
+
+*Source: [src/lua_api/savegame_api.rs](src/lua_api/savegame_api.rs#L138)*
 
 ---
 
 #### `mlua:setSchemaVersion(version)`
 
-Sets the schema version.
+Sets the schema version stored in the save file. Increment when save format changes.
 
 **Parameters:**
 
-- `version` — `integer`.
+- `version` — `integer`: New schema version number.
 
 *Source: [src/lua_api/savegame_api.rs](src/lua_api/savegame_api.rs#L73)*
 
@@ -26175,23 +25998,23 @@ Sets the schema version.
 
 #### `mlua:setSummary(summary)`
 
-Sets the summary.
+Sets a human-readable summary string stored alongside the save data (e.g. for save-slot UI).
 
 **Parameters:**
 
-- `summary` — `string`.
+- `summary` — `string`: Display text for this save slot.
 
-*Source: [src/lua_api/savegame_api.rs](src/lua_api/savegame_api.rs#L219)*
+*Source: [src/lua_api/savegame_api.rs](src/lua_api/savegame_api.rs#L205)*
 
 ---
 
 #### `mlua:unregister(name)`
 
-Removes the entry from the collection.
+Removes a previously registered save slot by name.
 
 **Parameters:**
 
-- `name` — `string`.
+- `name` — `string`: Slot name to remove.
 
 *Source: [src/lua_api/savegame_api.rs](src/lua_api/savegame_api.rs#L57)*
 
@@ -26199,13 +26022,13 @@ Removes the entry from the collection.
 
 #### `mlua:update(dt)`
 
-Advances the simulation by `dt` seconds.
+Ticks the autosave timer. Must be called from `luna.update(dt)` when autosave is enabled.
 
 **Parameters:**
 
-- `dt` — `number`.
+- `dt` — `number`: Elapsed seconds since the last frame.
 
-*Source: [src/lua_api/savegame_api.rs](src/lua_api/savegame_api.rs#L209)*
+*Source: [src/lua_api/savegame_api.rs](src/lua_api/savegame_api.rs#L195)*
 
 ---
 
@@ -26229,7 +26052,7 @@ compositing each frame.
 
 *(undocumented)*
 
-*Source: [src/lua_api/scene_api.rs](src/lua_api/scene_api.rs#L305)*
+*Source: [src/lua_api/scene_api.rs](src/lua_api/scene_api.rs#L304)*
 
 ---
 
@@ -26237,7 +26060,7 @@ compositing each frame.
 
 *(undocumented)*
 
-*Source: [src/lua_api/scene_api.rs](src/lua_api/scene_api.rs#L378)*
+*Source: [src/lua_api/scene_api.rs](src/lua_api/scene_api.rs#L377)*
 
 ---
 
@@ -26245,7 +26068,7 @@ compositing each frame.
 
 *(undocumented)*
 
-*Source: [src/lua_api/scene_api.rs](src/lua_api/scene_api.rs#L421)*
+*Source: [src/lua_api/scene_api.rs](src/lua_api/scene_api.rs#L420)*
 
 ---
 
@@ -26255,7 +26078,7 @@ compositing each frame.
 
 **Parameters:** `key`
 
-*Source: [src/lua_api/scene_api.rs](src/lua_api/scene_api.rs#L551)*
+*Source: [src/lua_api/scene_api.rs](src/lua_api/scene_api.rs#L550)*
 
 ---
 
@@ -26265,7 +26088,7 @@ compositing each frame.
 
 **Parameters:** `name`
 
-*Source: [src/lua_api/scene_api.rs](src/lua_api/scene_api.rs#L481)*
+*Source: [src/lua_api/scene_api.rs](src/lua_api/scene_api.rs#L480)*
 
 ---
 
@@ -26273,7 +26096,7 @@ compositing each frame.
 
 *(undocumented)*
 
-*Source: [src/lua_api/scene_api.rs](src/lua_api/scene_api.rs#L522)*
+*Source: [src/lua_api/scene_api.rs](src/lua_api/scene_api.rs#L521)*
 
 ---
 
@@ -26281,7 +26104,7 @@ compositing each frame.
 
 *(undocumented)*
 
-*Source: [src/lua_api/scene_api.rs](src/lua_api/scene_api.rs#L403)*
+*Source: [src/lua_api/scene_api.rs](src/lua_api/scene_api.rs#L402)*
 
 ---
 
@@ -26289,7 +26112,7 @@ compositing each frame.
 
 *(undocumented)*
 
-*Source: [src/lua_api/scene_api.rs](src/lua_api/scene_api.rs#L452)*
+*Source: [src/lua_api/scene_api.rs](src/lua_api/scene_api.rs#L451)*
 
 ---
 
@@ -26299,7 +26122,7 @@ compositing each frame.
 
 **Parameters:** `key`
 
-*Source: [src/lua_api/scene_api.rs](src/lua_api/scene_api.rs#L567)*
+*Source: [src/lua_api/scene_api.rs](src/lua_api/scene_api.rs#L566)*
 
 ---
 
@@ -26309,7 +26132,7 @@ compositing each frame.
 
 **Parameters:** `name`
 
-*Source: [src/lua_api/scene_api.rs](src/lua_api/scene_api.rs#L499)*
+*Source: [src/lua_api/scene_api.rs](src/lua_api/scene_api.rs#L498)*
 
 ---
 
@@ -26317,7 +26140,7 @@ compositing each frame.
 
 *(undocumented)*
 
-*Source: [src/lua_api/scene_api.rs](src/lua_api/scene_api.rs#L412)*
+*Source: [src/lua_api/scene_api.rs](src/lua_api/scene_api.rs#L411)*
 
 ---
 
@@ -26325,7 +26148,7 @@ compositing each frame.
 
 *(undocumented)*
 
-*Source: [src/lua_api/scene_api.rs](src/lua_api/scene_api.rs#L443)*
+*Source: [src/lua_api/scene_api.rs](src/lua_api/scene_api.rs#L442)*
 
 ---
 
@@ -26333,7 +26156,7 @@ compositing each frame.
 
 *(undocumented)*
 
-*Source: [src/lua_api/scene_api.rs](src/lua_api/scene_api.rs#L592)*
+*Source: [src/lua_api/scene_api.rs](src/lua_api/scene_api.rs#L591)*
 
 ---
 
@@ -26343,7 +26166,7 @@ compositing each frame.
 
 **Parameters:** `transition`, `duration`
 
-*Source: [src/lua_api/scene_api.rs](src/lua_api/scene_api.rs#L232)*
+*Source: [src/lua_api/scene_api.rs](src/lua_api/scene_api.rs#L231)*
 
 ---
 
@@ -26353,7 +26176,7 @@ compositing each frame.
 
 **Parameters:** `name`
 
-*Source: [src/lua_api/scene_api.rs](src/lua_api/scene_api.rs#L326)*
+*Source: [src/lua_api/scene_api.rs](src/lua_api/scene_api.rs#L325)*
 
 ---
 
@@ -26363,7 +26186,7 @@ compositing each frame.
 
 **Parameters:** `scene`, `transition`, `duration`
 
-*Source: [src/lua_api/scene_api.rs](src/lua_api/scene_api.rs#L194)*
+*Source: [src/lua_api/scene_api.rs](src/lua_api/scene_api.rs#L193)*
 
 ---
 
@@ -26373,7 +26196,7 @@ compositing each frame.
 
 **Parameters:** `name`, `scene`
 
-*Source: [src/lua_api/scene_api.rs](src/lua_api/scene_api.rs#L465)*
+*Source: [src/lua_api/scene_api.rs](src/lua_api/scene_api.rs#L464)*
 
 ---
 
@@ -26383,7 +26206,7 @@ compositing each frame.
 
 **Parameters:** `key`
 
-*Source: [src/lua_api/scene_api.rs](src/lua_api/scene_api.rs#L576)*
+*Source: [src/lua_api/scene_api.rs](src/lua_api/scene_api.rs#L575)*
 
 ---
 
@@ -26393,7 +26216,7 @@ compositing each frame.
 
 **Parameters:** `key`, `value`
 
-*Source: [src/lua_api/scene_api.rs](src/lua_api/scene_api.rs#L535)*
+*Source: [src/lua_api/scene_api.rs](src/lua_api/scene_api.rs#L534)*
 
 ---
 
@@ -26403,7 +26226,7 @@ compositing each frame.
 
 **Parameters:** `scene`, `transition`, `duration`
 
-*Source: [src/lua_api/scene_api.rs](src/lua_api/scene_api.rs#L267)*
+*Source: [src/lua_api/scene_api.rs](src/lua_api/scene_api.rs#L266)*
 
 ---
 
@@ -26413,7 +26236,7 @@ compositing each frame.
 
 **Parameters:** `name`
 
-*Source: [src/lua_api/scene_api.rs](src/lua_api/scene_api.rs#L510)*
+*Source: [src/lua_api/scene_api.rs](src/lua_api/scene_api.rs#L509)*
 
 ---
 
@@ -26423,7 +26246,7 @@ compositing each frame.
 
 **Parameters:** `dt`
 
-*Source: [src/lua_api/scene_api.rs](src/lua_api/scene_api.rs#L357)*
+*Source: [src/lua_api/scene_api.rs](src/lua_api/scene_api.rs#L356)*
 
 ---
 
@@ -26431,12 +26254,12 @@ compositing each frame.
 
 #### `DepthSorter:add(callback, depth)`
 
-Registers a draw callback with a numeric depth for sorted rendering order.
+Registers a draw callback at the given depth layer. Higher `depth` values draw in front.
 
 **Parameters:**
 
-- `callback` — Function to call when this entry is flushed.
-- `depth` — Numeric depth; lower values are drawn first.
+- `callback` — `function`: Draw callback `function()` called when flushing this layer.
+- `depth` — `number`: Depth value determining draw order (lower = drawn first).
 
 *Source: [src/lua_api/scene_api.rs](src/lua_api/scene_api.rs#L64)*
 
@@ -26444,48 +26267,47 @@ Registers a draw callback with a numeric depth for sorted rendering order.
 
 #### `DepthSorter:addObject(obj)`
 
-Registers a drawable object (with a :draw() method) at the given depth.
+Registers a table object with a `draw` method at the given depth.
 
 **Parameters:**
 
-- `obj` — Object implementing a :draw() method.
-- `depth` — Numeric depth value for sort ordering.
+- `obj` — `table`: Object with a `draw()` method. Uses `obj.depth` if no explicit depth is provided.
 
-*Source: [src/lua_api/scene_api.rs](src/lua_api/scene_api.rs#L78)*
+*Source: [src/lua_api/scene_api.rs](src/lua_api/scene_api.rs#L77)*
 
 ---
 
 #### `DepthSorter:clear()`
 
-Removes all registered callbacks and objects from the depth sorter queue.
+Removes all registered callbacks and objects without calling them.
 
-*Source: [src/lua_api/scene_api.rs](src/lua_api/scene_api.rs#L128)*
+*Source: [src/lua_api/scene_api.rs](src/lua_api/scene_api.rs#L127)*
 
 ---
 
 #### `DepthSorter:flush()`
 
-Calls all queued draw callbacks in ascending depth order, then clears the queue.
+Calls all registered draw callbacks and object `draw()` methods in sorted depth order, then clears the list.
 
-*Source: [src/lua_api/scene_api.rs](src/lua_api/scene_api.rs#L95)*
+*Source: [src/lua_api/scene_api.rs](src/lua_api/scene_api.rs#L94)*
 
 ---
 
 #### `DepthSorter:getCount()`
 
-Returns the number of callbacks and objects currently queued for rendering.
+Returns the number of callbacks and objects currently registered.
 
-**Returns:** Queue length as an integer.
+**Returns:** `integer` — number of registered draw entries.
 
-*Source: [src/lua_api/scene_api.rs](src/lua_api/scene_api.rs#L138)*
+*Source: [src/lua_api/scene_api.rs](src/lua_api/scene_api.rs#L137)*
 
 ---
 
 #### `DepthSorter:sort()`
 
-Sorts the queued draw entries by depth value without flushing them.
+Sorts all registered callbacks and objects by their depth values (ascending).
 
-*Source: [src/lua_api/scene_api.rs](src/lua_api/scene_api.rs#L89)*
+*Source: [src/lua_api/scene_api.rs](src/lua_api/scene_api.rs#L88)*
 
 ---
 

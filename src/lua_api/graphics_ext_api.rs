@@ -101,43 +101,34 @@ impl LuaUserData for LuaLight2D {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
         add_type_methods::<Self>(methods);
 
-        /// Sets the position.
+        /// Sets the light source position in world space.
         ///
         /// # Parameters
-        /// - `x` — `number`.
-        /// - `y` — `number`.
+        /// - `x` — `number`: World X coordinate.
+        /// - `y` — `number`: World Y coordinate.
         methods.add_method("setPosition", |_, this, (x, y): (f32, f32)| {
             this.inner.borrow_mut().set_position(x, y);
             Ok(())
         });
-        /// Returns the position.
-        ///
-        /// # Parameters
-        /// - `r` — `number`.
+        /// Returns the light position in world space.
         ///
         /// # Returns
-        /// The current position.
+        /// Two numbers `x, y`.
         methods.add_method("getPosition", |_, this, ()| {
             Ok(this.inner.borrow().get_position())
         });
-        /// Sets the radius.
+        /// Sets the falloff radius of this light. Pixels beyond the radius receive no illumination.
         ///
         /// # Parameters
-        /// - `r` — `number`.
+        /// - `radius` — `number`: Radius in world units.
         methods.add_method("setRadius", |_, this, r: f32| {
             this.inner.borrow_mut().set_radius(r);
             Ok(())
         });
-        /// Returns the radius.
-        ///
-        /// # Parameters
-        /// - `r` — `number`.
-        /// - `g` — `number`.
-        /// - `b` — `number`.
-        /// - `a` — `number` optional.
+        /// Returns the current light radius in world units.
         ///
         /// # Returns
-        /// The current radius.
+        /// `number`.
         methods.add_method("getRadius", |_, this, ()| {
             Ok(this.inner.borrow().get_radius())
         });
@@ -148,13 +139,10 @@ impl LuaUserData for LuaLight2D {
                 Ok(())
             },
         );
-        /// Returns the color.
-        ///
-        /// # Parameters
-        /// - `i` — `number`.
+        /// Returns the current light color.
         ///
         /// # Returns
-        /// The current color.
+        /// Four numbers `r, g, b, a`.
         methods.add_method("getColor", |_, this, ()| {
             let c = this.inner.borrow().get_color();
             Ok((c.r, c.g, c.b, c.a))
@@ -177,15 +165,15 @@ impl LuaUserData for LuaLight2D {
         methods.add_method("getIntensity", |_, this, ()| {
             Ok(this.inner.borrow().get_intensity())
         });
-        /// Sets the enabled.
+        /// Enables or disables this light. Disabled lights contribute no illumination.
         ///
         /// # Parameters
-        /// - `b` — `boolean`.
+        /// - `enabled` — `boolean`: `true` to enable.
         methods.add_method("setEnabled", |_, this, b: bool| {
             this.inner.borrow_mut().set_enabled(b);
             Ok(())
         });
-        /// Returns `true` if enabled.
+        /// Returns `true` if this light is currently enabled.
         ///
         /// # Returns
         /// `boolean`.
@@ -223,13 +211,13 @@ impl LuaUserData for LuaTextureAtlas {
         methods.add_method("pack", |_, this, (name, w, h): (String, u32, u32)| {
             Ok(this.inner.borrow_mut().pack(&name, w, h))
         });
-        /// Returns the region.
+        /// Returns the pixel bounds of the named region.
         ///
         /// # Parameters
-        /// - `name` — `string`.
+        /// - `name` — `string`: Region name.
         ///
         /// # Returns
-        /// The current region.
+        /// `table` with `x`, `y`, `w`, `h` fields, or `nil` if not found.
         methods.add_method("getRegion", |_lua, this, name: String| {
             let atlas = this.inner.borrow();
             match atlas.get_region(&name) {
@@ -397,17 +385,17 @@ impl LuaUserData for LuaViewport {
             this.inner.borrow_mut().resize(w, h);
             Ok(())
         });
-        /// Returns the scale.
+        /// Returns the current content scale factor.
         ///
         /// # Returns
-        /// The current scale.
+        /// `number`.
         methods.add_method("getScale", |_, this, ()| {
             Ok(this.inner.borrow().get_scale())
         });
-        /// Returns the offset.
+        /// Returns the current viewport scroll offset.
         ///
         /// # Returns
-        /// The current offset.
+        /// Two numbers `ox, oy`.
         methods.add_method("getOffset", |_, this, ()| {
             Ok(this.inner.borrow().get_offset())
         });
@@ -450,11 +438,14 @@ impl LuaUserData for LuaViewport {
         methods.add_method("toGame", |_, this, (sx, sy): (f32, f32)| {
             Ok(this.inner.borrow().to_game(sx, sy))
         });
-        /// To screen on this Viewport.
+        /// Converts world-space coordinates to screen-space pixel coordinates.
         ///
         /// # Parameters
-        /// - `gx` — `number`.
-        /// - `gy` — `number`.
+        /// - `wx` — `number`: World X.
+        /// - `wy` — `number`: World Y.
+        ///
+        /// # Returns
+        /// Two numbers `sx, sy` in screen pixels.
         methods.add_method("toScreen", |_, this, (gx, gy): (f32, f32)| {
             Ok(this.inner.borrow().to_screen(gx, gy))
         });
@@ -593,10 +584,10 @@ impl LuaUserData for LuaSpriteSheet {
                 None => Ok(LuaValue::Nil),
             }
         });
-        /// Returns the frame count.
+        /// Returns the total number of frames in this sprite sheet.
         ///
         /// # Returns
-        /// The current frame count.
+        /// `integer`.
         methods.add_method("getFrameCount", |_, this, ()| {
             Ok(this.inner.borrow().get_frame_count())
         });

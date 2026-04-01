@@ -708,12 +708,18 @@ impl LuaUserData for LuaTileMap {
 
         // -- Dimension Getters ------------------------------------------------
 
-        /// luna.tilemap.TileMap:getTileWidth()
+        /// Returns the width of a single tile in pixels.
+        ///
+        /// # Returns
+        /// `integer` — tile pixel width.
         methods.add_method("getTileWidth", |_, this, ()| {
             Ok(this.inner.borrow().get_tile_width())
         });
 
-        /// luna.tilemap.TileMap:getTileHeight()
+        /// Returns the height of a single tile in pixels.
+        ///
+        /// # Returns
+        /// `integer` — tile pixel height.
         methods.add_method("getTileHeight", |_, this, ()| {
             Ok(this.inner.borrow().get_tile_height())
         });

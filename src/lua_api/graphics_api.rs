@@ -37,7 +37,10 @@ impl LuaUserData for LuaImage {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
         add_type_methods::<Self>(methods);
 
-        /// Returns the render target width in pixels.
+        /// Returns the image width in pixels.
+        ///
+        /// # Returns
+        /// `integer` — pixel width.
         methods.add_method("getWidth", |_, this, ()| {
             let st = this.state.borrow();
             if let Some(tex) = st.textures.get(this.key) {
@@ -49,7 +52,10 @@ impl LuaUserData for LuaImage {
             }
         });
 
-        /// Returns the render target height in pixels.
+        /// Returns the image height in pixels.
+        ///
+        /// # Returns
+        /// `integer` — pixel height.
         methods.add_method("getHeight", |_, this, ()| {
             let st = this.state.borrow();
             if let Some(tex) = st.textures.get(this.key) {
@@ -61,7 +67,10 @@ impl LuaUserData for LuaImage {
             }
         });
 
-        /// Returns the render target dimensions (width, height).
+        /// Returns image width and height in pixels.
+        ///
+        /// # Returns
+        /// Two integers `width, height`.
         methods.add_method("getDimensions", |_, this, ()| {
             let st = this.state.borrow();
             if let Some(tex) = st.textures.get(this.key) {
@@ -73,10 +82,10 @@ impl LuaUserData for LuaImage {
             }
         });
 
-        /// Returns the current texture magnification and minification filter modes.
+        /// Returns the current min and mag texture filters.
         ///
         /// # Returns
-        /// Two strings: mag filter ('linear'/'nearest') and min filter ('linear'/'nearest').
+        /// Two strings `min, mag`.
         methods.add_method("getFilter", |_, _this, ()| {
             Ok(("linear".to_string(), "linear".to_string()))
         });
@@ -189,7 +198,13 @@ impl LuaUserData for LuaFont {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
         add_type_methods::<Self>(methods);
 
-        /// Returns the render target width in pixels.
+        /// Measures the rendered width of `text` using this font's current size.
+        ///
+        /// # Parameters
+        /// - `text` — `string`: The string to measure.
+        ///
+        /// # Returns
+        /// `number` — rendered width in pixels.
         methods.add_method("getWidth", |_, this, text: String| {
             let mut st = this.state.borrow_mut();
             if let Some(font) = st.fonts.get_mut(this.key) {
@@ -201,7 +216,10 @@ impl LuaUserData for LuaFont {
             }
         });
 
-        /// Returns the render target height in pixels.
+        /// Returns the line height of this font at its loaded size, in pixels.
+        ///
+        /// # Returns
+        /// `integer` — line height in pixels.
         methods.add_method("getHeight", |_, this, ()| {
             let st = this.state.borrow();
             if let Some(font) = st.fonts.get(this.key) {
@@ -244,10 +262,10 @@ impl LuaUserData for LuaFont {
             }
         });
 
-        /// Returns the font ascent — the distance in pixels from the baseline to the top of capital letters.
+        /// Returns the ascent (distance from baseline to the top of the tallest glyph) in pixels.
         ///
         /// # Returns
-        /// Ascent in pixels as a positive number.
+        /// `number` — ascent in pixels.
         methods.add_method("getAscent", |_, this, ()| {
             let st = this.state.borrow();
             if let Some(font) = st.fonts.get(this.key) {
@@ -259,10 +277,10 @@ impl LuaUserData for LuaFont {
             }
         });
 
-        /// Returns the font descent — the distance in pixels from the baseline to the bottom of descenders.
+        /// Returns the descent (distance below the baseline for descenders) in pixels.
         ///
         /// # Returns
-        /// Descent in pixels as a positive number.
+        /// `number` — descent in pixels.
         methods.add_method("getDescent", |_, this, ()| {
             let st = this.state.borrow();
             if let Some(font) = st.fonts.get(this.key) {
@@ -405,7 +423,10 @@ impl LuaUserData for LuaCanvas {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
         add_type_methods::<Self>(methods);
 
-        /// Returns the render target width in pixels.
+        /// Returns the canvas width in pixels.
+        ///
+        /// # Returns
+        /// `integer` — pixel width.
         methods.add_method("getWidth", |_, this, ()| {
             let st = this.state.borrow();
             if let Some(canvas) = st.canvases.get(this.key) {
@@ -417,7 +438,10 @@ impl LuaUserData for LuaCanvas {
             }
         });
 
-        /// Returns the render target height in pixels.
+        /// Returns the canvas height in pixels.
+        ///
+        /// # Returns
+        /// `integer` — pixel height.
         methods.add_method("getHeight", |_, this, ()| {
             let st = this.state.borrow();
             if let Some(canvas) = st.canvases.get(this.key) {
@@ -429,7 +453,10 @@ impl LuaUserData for LuaCanvas {
             }
         });
 
-        /// Returns the render target dimensions (width, height).
+        /// Returns the canvas width and height in pixels.
+        ///
+        /// # Returns
+        /// Two integers `width, height`.
         methods.add_method("getDimensions", |_, this, ()| {
             let st = this.state.borrow();
             if let Some(canvas) = st.canvases.get(this.key) {

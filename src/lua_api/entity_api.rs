@@ -33,24 +33,24 @@ impl LuaUserData for LuaUniverse {
 
         // === Entity Lifecycle ===
 
-        /// Creates a new Universe instance.
+        /// Creates a new entity in this universe and returns its numeric ID.
         ///
-        /// # Parameters
-        /// - `id` — `integer`.
+        /// # Returns
+        /// `integer` — entity ID.
         methods.add_method("spawn", |_, this, ()| Ok(this.inner.borrow_mut().spawn()));
 
-        /// Kill on this Universe.
+        /// Destroys the entity with the given `id`, freeing its slot for reuse.
         ///
         /// # Parameters
-        /// - `id` — `integer`.
+        /// - `id` — `integer`: Entity ID returned by `spawn`.
         methods.add_method("kill", |lua, this, id: u32| {
             this.inner.borrow_mut().kill(id, lua)
         });
 
-        /// Returns `true` if alive.
+        /// Returns `true` if the entity `id` is currently active in the universe.
         ///
         /// # Parameters
-        /// - `id` — `integer`.
+        /// - `id` — `integer`: Entity ID to test.
         ///
         /// # Returns
         /// `boolean`.
@@ -276,31 +276,31 @@ impl LuaUserData for LuaUniverse {
 
         // === String Tags ===
 
-        /// Adds tag to the collection.
+        /// Attaches a string tag to the entity, enabling fast tag-based group queries.
         ///
         /// # Parameters
-        /// - `id` — `integer`.
-        /// - `tag` — `string`.
+        /// - `id` — `integer`: Entity ID.
+        /// - `tag` — `string`: Tag label to add.
         methods.add_method("addTag", |_, this, (id, tag): (u32, String)| {
             this.inner.borrow_mut().add_tag(id, &tag);
             Ok(())
         });
 
-        /// Removes tag from the collection.
+        /// Removes a string tag from the entity.
         ///
         /// # Parameters
-        /// - `id` — `integer`.
-        /// - `tag` — `string`.
+        /// - `id` — `integer`: Entity ID.
+        /// - `tag` — `string`: Tag to remove.
         methods.add_method("removeTag", |_, this, (id, tag): (u32, String)| {
             this.inner.borrow_mut().remove_tag(id, &tag);
             Ok(())
         });
 
-        /// Returns `true` if tag.
+        /// Returns `true` if the entity carries the given tag.
         ///
         /// # Parameters
-        /// - `id` — `integer`.
-        /// - `tag` — `string`.
+        /// - `id` — `integer`: Entity ID.
+        /// - `tag` — `string`: Tag to test.
         ///
         /// # Returns
         /// `boolean`.

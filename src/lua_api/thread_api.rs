@@ -34,7 +34,10 @@ impl LuaUserData for LuaThreadHandle {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
         add_type_methods::<Self>(methods);
 
-        /// Starts a thread, passing optional arguments.
+        /// Launches the background thread, passing optional arguments to the Lua script via `...`.
+        ///
+        /// # Parameters
+        /// - `...` — `any`: Optional arguments forwarded to the thread script as Lua values.
         methods.add_method("start", |_, this, args: LuaMultiValue| {
             let channel_args: Vec<_> = args
                 .into_iter()
@@ -45,23 +48,26 @@ impl LuaUserData for LuaThreadHandle {
             Ok(())
         });
 
-        /// Blocks the calling coroutine until the background thread finishes.
-        ///
-        /// # Returns
-        /// The thread's return value, or nil plus an error string on failure.
+        /// Blocks the calling coroutine until this thread finishes execution.
         methods.add_method("wait", |_, this, ()| {
             let mut thread = this.inner.lock().unwrap();
             thread.wait();
             Ok(())
         });
 
-        /// Returns whether the thread is currently executing.
+        /// Returns `true` if the thread is currently executing.
+        ///
+        /// # Returns
+        /// `boolean`.
         methods.add_method("isRunning", |_, this, ()| {
             let thread = this.inner.lock().unwrap();
             Ok(thread.is_running())
         });
 
-        /// Returns the last error from the thread, or nil.
+        /// Returns the error message if the thread terminated with a Lua error, or `nil` if it completed normally.
+        ///
+        /// # Returns
+        /// `string` — error message, or `nil`.
         methods.add_method("getError", |_, this, ()| {
             let thread = this.inner.lock().unwrap();
             Ok(thread.get_error())

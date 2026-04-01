@@ -50,10 +50,10 @@ impl mlua::UserData for LuaSaveManager {
             },
         );
 
-        /// Removes the entry from the collection.
+        /// Removes a previously registered save slot by name.
         ///
         /// # Parameters
-        /// - `name` — `string`.
+        /// - `name` — `string`: Slot name to remove.
         methods.add_method_mut("unregister", |lua, this, name: String| {
             this.manager.unregister(&name);
             if let Some(key) = this.collectors.remove(&name) {
@@ -66,23 +66,19 @@ impl mlua::UserData for LuaSaveManager {
         });
 
         // -- schema --
-        /// Sets the schema version.
+        /// Sets the schema version stored in the save file. Increment when save format changes.
         ///
         /// # Parameters
-        /// - `version` — `integer`.
+        /// - `version` — `integer`: New schema version number.
         methods.add_method_mut("setSchemaVersion", |_, this, version: i32| {
             this.manager.set_schema_version(version);
             Ok(())
         });
 
-        /// Returns the schema version.
-        ///
-        /// # Parameters
-        /// - `from_ver` — `integer`.
-        /// - `func` — `function`.
+        /// Returns the schema version currently set on this save manager.
         ///
         /// # Returns
-        /// The current schema version.
+        /// `integer` — schema version.
         methods.add_method("getSchemaVersion", |_, this, ()| {
             Ok(this.manager.schema_version())
         });
@@ -101,10 +97,10 @@ impl mlua::UserData for LuaSaveManager {
         );
 
         // -- collect (in-memory only) --
-        /// Collect on this SaveManager.
+        /// Snapshots all registered tables into an in-memory serializable form, ready for disk write.
         ///
         /// # Returns
-        /// The result.
+        /// `table` — the collected save data.
         methods.add_method("collect", |lua, this, ()| {
             let result = lua.create_table()?;
             for name in this.manager.registered_names() {
@@ -135,10 +131,10 @@ impl mlua::UserData for LuaSaveManager {
         });
 
         // -- restore (from table, runs restorers + migrations) --
-        /// Restore on this SaveManager.
+        /// Restores all registered tables from a previously collected save data table.
         ///
-        /// # Returns
-        /// The result.
+        /// # Parameters
+        /// - `data` — `table`: Save data table as returned by `collect()`.
         methods.add_method_mut("restore", |lua, this, mut data: LuaTable| {
             // Run migrations if needed
             let saved_ver: i32 = data.get("__schema_version").unwrap_or(0);
@@ -165,20 +161,13 @@ impl mlua::UserData for LuaSaveManager {
         });
 
         // -- dirty tracking --
-        /// Mark dirty on this SaveManager.
-        ///
-        /// # Returns
-        /// The result.
+        /// Marks the save as dirty, ensuring it will be written on the next autosave tick.
         methods.add_method_mut("markDirty", |_, this, ()| {
             this.manager.mark_dirty();
             Ok(())
         });
 
-        /// Returns `true` if dirty.
-        ///
-        /// # Parameters
-        /// - `interval` — `number`.
-        /// - `slot` — `string`.
+        /// Returns `true` if the save data has been modified since the last write.
         ///
         /// # Returns
         /// `boolean`.
@@ -193,45 +182,39 @@ impl mlua::UserData for LuaSaveManager {
             },
         );
 
-        /// Disable auto save on this SaveManager.
-        ///
-        /// # Parameters
-        /// - `dt` — `number`.
+        /// Disables automatic periodic saving.
         methods.add_method_mut("disableAutoSave", |_, this, ()| {
             this.manager.disable_auto_save();
             Ok(())
         });
 
-        /// Advances the simulation by `dt` seconds.
+        /// Ticks the autosave timer. Must be called from `luna.update(dt)` when autosave is enabled.
         ///
         /// # Parameters
-        /// - `dt` — `number`.
+        /// - `dt` — `number`: Elapsed seconds since the last frame.
         methods.add_method_mut("update", |_, this, dt: f64| {
             let trigger = this.manager.update(dt);
             Ok(trigger)
         });
 
         // -- summary --
-        /// Sets the summary.
+        /// Sets a human-readable summary string stored alongside the save data (e.g. for save-slot UI).
         ///
         /// # Parameters
-        /// - `summary` — `string`.
+        /// - `summary` — `string`: Display text for this save slot.
         methods.add_method_mut("setSummary", |_, this, summary: String| {
             this.summary = summary;
             Ok(())
         });
 
-        /// Returns the summary.
+        /// Returns the summary string set by `setSummary`, or an empty string if none was set.
         ///
         /// # Returns
-        /// The current summary.
+        /// `string` — save slot summary.
         methods.add_method("getSummary", |_, this, ()| Ok(this.summary.clone()));
 
         // -- reset --
-        /// Resets state to initial values.
-        ///
-        /// # Returns
-        /// The result.
+        /// Clears all registered tables back to their initial state and marks the save dirty.
         methods.add_method_mut("reset", |lua, this, ()| {
             for (_, key) in this.collectors.drain() {
                 lua.remove_registry_value(key)?;

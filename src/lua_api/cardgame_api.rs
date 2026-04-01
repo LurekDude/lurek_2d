@@ -30,76 +30,66 @@ impl LuaUserData for LuaCard {
         add_type_methods(methods);
 
         // Read-only identity
-        /// Returns the card type.
-        ///
-        /// # Parameters
-        /// - `name` — `string`.
+        /// Returns the type identifier string for this card.
         ///
         /// # Returns
-        /// The current card type.
+        /// `string`.
         methods.add_method("getCardType", |_, this, ()| {
             Ok(this.0.borrow().card_type.clone())
         });
-        /// Returns the name.
-        ///
-        /// # Parameters
-        /// - `name` — `string`.
+        /// Returns the display name of this card.
         ///
         /// # Returns
-        /// The current name.
+        /// `string`.
         methods.add_method("getName", |_, this, ()| Ok(this.0.borrow().name.clone()));
-        /// Sets the name.
+        /// Sets the card's display name.
         ///
         /// # Parameters
-        /// - `name` — `string`.
+        /// - `name` — `string`: New name.
         methods.add_method("setName", |_, this, name: String| {
             this.0.borrow_mut().name = name;
             Ok(())
         });
-        /// Returns the category.
-        ///
-        /// # Parameters
-        /// - `cat` — `string`.
+        /// Returns the category tag for this card (e.g. `'spell'`, `'creature'`).
         ///
         /// # Returns
-        /// The current category.
+        /// `string`.
         methods.add_method("getCategory", |_, this, ()| {
             Ok(this.0.borrow().category.clone())
         });
-        /// Sets the category.
+        /// Sets the category tag for this card.
         ///
         /// # Parameters
-        /// - `cat` — `string`.
+        /// - `category` — `string`: New category.
         methods.add_method("setCategory", |_, this, cat: String| {
             this.0.borrow_mut().category = cat;
             Ok(())
         });
 
         // Stats
-        /// Returns the stat.
+        /// Returns the value of the named numeric stat.
         ///
         /// # Parameters
-        /// - `name` — `string`.
-        /// - `value` — `number`.
+        /// - `key` — `string`: Stat name (e.g. `'attack'`, `'defense'`).
         ///
         /// # Returns
-        /// The current stat.
+        /// `number` — stat value, or `0` if not set.
         methods.add_method("getStat", |_, this, name: String| {
             Ok(this.0.borrow().get_stat(&name))
         });
-        /// Sets the stat.
+        /// Sets a numeric stat on this card.
         ///
         /// # Parameters
-        /// - `name` — `string`.
-        /// - `value` — `number`.
+        /// - `key` — `string`: Stat name.
+        /// - `value` — `number`: Stat value.
         methods.add_method("setStat", |_, this, (name, value): (String, f64)| {
             this.0.borrow_mut().set_stat(name, value);
             Ok(())
         });
-        /// Returns the stats.
+        /// Returns all numeric stats as a key-value table.
         ///
         /// # Returns
-        /// The current stats.
+        /// `table` of `{stat: number}` pairs.
         methods.add_method("getStats", |lua, this, ()| {
             let borrow = this.0.borrow();
             let t = lua.create_table()?;
@@ -110,40 +100,36 @@ impl LuaUserData for LuaCard {
         });
 
         // Tags
-        /// Adds tag to the collection.
+        /// Attaches a tag to this card.
         ///
         /// # Parameters
-        /// - `tag` — `string`.
+        /// - `tag` — `string`: Tag to add.
         methods.add_method("addTag", |_, this, tag: String| {
             this.0.borrow_mut().add_tag(tag);
             Ok(())
         });
-        /// Removes tag from the collection.
+        /// Removes a tag from this card.
         ///
         /// # Parameters
-        /// - `tag` — `string`.
+        /// - `tag` — `string`: Tag to remove.
         methods.add_method("removeTag", |_, this, tag: String| {
             this.0.borrow_mut().remove_tag(&tag);
             Ok(())
         });
-        /// Returns `true` if tag.
+        /// Returns `true` if this card carries the given tag.
         ///
         /// # Parameters
-        /// - `tag` — `string`.
+        /// - `tag` — `string`: Tag to test.
         ///
         /// # Returns
         /// `boolean`.
         methods.add_method("hasTag", |_, this, tag: String| {
             Ok(this.0.borrow().has_tag(&tag))
         });
-        /// Returns the tags.
-        ///
-        /// # Parameters
-        /// - `kind` — `string`.
-        /// - `amount` — `integer`.
+        /// Returns a list of all tags attached to this card.
         ///
         /// # Returns
-        /// The current tags.
+        /// `table` of `string` tags.
         methods.add_method("getTags", |lua, this, ()| {
             let borrow = this.0.borrow();
             let t = lua.create_sequence_from(borrow.tags.iter().cloned())?;
@@ -151,147 +137,125 @@ impl LuaUserData for LuaCard {
         });
 
         // Counters
-        /// Adds counter to the collection.
+        /// Increments the named counter by `amount` (default `1`).
         ///
         /// # Parameters
-        /// - `kind` — `string`.
-        /// - `amount` — `integer`.
+        /// - `name` — `string`: Counter name.
+        /// - `amount` — `integer`: Amount to add (optional, default `1`).
         methods.add_method("addCounter", |_, this, (kind, amount): (String, i32)| {
             Ok(this.0.borrow_mut().add_counter(kind, amount))
         });
-        /// Returns the counter.
+        /// Returns the current value of the named counter.
         ///
         /// # Parameters
-        /// - `kind` — `string`.
+        /// - `name` — `string`: Counter name.
         ///
         /// # Returns
-        /// The current counter.
+        /// `integer` — counter value.
         methods.add_method("getCounter", |_, this, kind: String| {
             Ok(this.0.borrow().get_counter(&kind))
         });
-        /// Removes counters from the collection.
+        /// Removes all counters of the given name.
         ///
         /// # Parameters
-        /// - `kind` — `string`.
+        /// - `name` — `string`: Counter name to clear.
         methods.add_method("removeCounters", |_, this, kind: String| {
             this.0.borrow_mut().remove_counters(&kind);
             Ok(())
         });
 
         // State flags
-        /// Tap on this Card.
-        ///
-        /// # Returns
-        /// The result.
+        /// Marks this card as tapped. A tapped card cannot be tapped again until untapped.
         methods.add_method("tap", |_, this, ()| {
             this.0.borrow_mut().tap();
             Ok(())
         });
-        /// Untap on this Card.
-        ///
-        /// # Parameters
-        /// - `v` — `boolean`.
+        /// Removes the tapped state from this card.
         methods.add_method("untap", |_, this, ()| {
             this.0.borrow_mut().untap();
             Ok(())
         });
-        /// Returns `true` if tapped.
-        ///
-        /// # Parameters
-        /// - `v` — `boolean`.
+        /// Returns `true` if this card is currently tapped.
         ///
         /// # Returns
         /// `boolean`.
         methods.add_method("isTapped", |_, this, ()| Ok(this.0.borrow().tapped));
-        /// Returns `true` if face up.
-        ///
-        /// # Parameters
-        /// - `v` — `boolean`.
+        /// Returns `true` if this card is face-up (visible).
         ///
         /// # Returns
         /// `boolean`.
         methods.add_method("isFaceUp", |_, this, ()| Ok(this.0.borrow().face_up));
-        /// Sets the face up.
+        /// Sets whether this card is face-up (`true`) or face-down (`false`).
         ///
         /// # Parameters
-        /// - `v` — `boolean`.
+        /// - `face_up` — `boolean`: Face state.
         methods.add_method("setFaceUp", |_, this, v: bool| {
             this.0.borrow_mut().face_up = v;
             Ok(())
         });
-        /// Returns the owner.
-        ///
-        /// # Parameters
-        /// - `v` — `string`.
+        /// Returns the owner identifier string, or `nil` if unowned.
         ///
         /// # Returns
-        /// The current owner.
+        /// `string` or `nil`.
         methods.add_method("getOwner", |_, this, ()| Ok(this.0.borrow().owner.clone()));
-        /// Sets the owner.
+        /// Sets the owner identifier for this card.
         ///
         /// # Parameters
-        /// - `v` — `string`.
+        /// - `owner` — `string`: Owner identifier.
         methods.add_method("setOwner", |_, this, v: String| {
             this.0.borrow_mut().owner = v;
             Ok(())
         });
-        /// Returns the controller.
-        ///
-        /// # Parameters
-        /// - `v` — `string`.
+        /// Returns the controller identifier (the player currently controlling this card).
         ///
         /// # Returns
-        /// The current controller.
+        /// `string` or `nil`.
         methods.add_method("getController", |_, this, ()| {
             Ok(this.0.borrow().controller.clone())
         });
-        /// Sets the controller.
+        /// Sets the controller for this card.
         ///
         /// # Parameters
-        /// - `v` — `string`.
+        /// - `controller` — `string`: Controller identifier.
         methods.add_method("setController", |_, this, v: String| {
             this.0.borrow_mut().controller = v;
             Ok(())
         });
-        /// Returns the zone.
-        ///
-        /// # Parameters
-        /// - `key` — `string`.
+        /// Returns the name of the zone this card currently occupies.
         ///
         /// # Returns
-        /// The current zone.
+        /// `string` — zone name.
         methods.add_method("getZone", |_, this, ()| Ok(this.0.borrow().zone.clone()));
 
         // Metadata
-        /// Returns the meta.
+        /// Returns the metadata value for `key`, or `nil` if not set.
         ///
         /// # Parameters
-        /// - `k` — `string`.
-        /// - `v` — `string`.
+        /// - `key` — `string`: Metadata key.
         ///
         /// # Returns
-        /// The current meta.
+        /// The stored value or `nil`.
         methods.add_method("getMeta", |_, this, key: String| {
             let borrow = this.0.borrow();
             let val = borrow.get_meta(&key).map(String::from);
             drop(borrow);
             Ok(val)
         });
-        /// Sets the meta.
+        /// Stores an arbitrary metadata value on this card.
         ///
         /// # Parameters
-        /// - `k` — `string`.
-        /// - `v` — `string`.
+        /// - `key` — `string`: Metadata key.
+        /// - `value` — `any`: Value to store.
         methods.add_method("setMeta", |_, this, (k, v): (String, String)| {
             this.0.borrow_mut().set_meta(k, v);
             Ok(())
         });
 
         // Clone
-        /// Returns the all counters.
+        /// Returns a key-value table of all counters on this card.
         ///
         /// # Returns
-        /// The current all counters.
+        /// `table` of `{name: integer}` counter pairs.
         methods.add_method("getAllCounters", |lua, this, ()| {
             let counters = this.0.borrow().get_all_counters();
             let t = lua.create_table()?;
@@ -300,10 +264,10 @@ impl LuaUserData for LuaCard {
             }
             Ok(t)
         });
-        /// Returns a deep copy of this object.
+        /// Creates and returns a deep copy of this card with identical stats, tags, and counters.
         ///
         /// # Returns
-        /// The result.
+        /// `Card` — the new copy.
         methods.add_method("clone", |_, this, ()| {
             let cloned = this.0.borrow().clone();
             Ok(LuaCard(Rc::new(RefCell::new(cloned))))
@@ -328,25 +292,22 @@ impl LuaUserData for LuaDeck {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
         add_type_methods(methods);
 
-        /// Returns the name.
+        /// Returns the deck's name.
         ///
         /// # Returns
-        /// The current name.
+        /// `string`.
         methods.add_method("getName", |_, this, ()| Ok(this.0.borrow().name.clone()));
-        /// Returns the size.
+        /// Returns the number of cards currently in this deck.
         ///
         /// # Returns
-        /// The current size.
+        /// `integer`.
         methods.add_method("getSize", |_, this, ()| Ok(this.0.borrow().size()));
-        /// Returns `true` if empty.
+        /// Returns `true` if the deck contains no cards.
         ///
         /// # Returns
         /// `boolean`.
         methods.add_method("isEmpty", |_, this, ()| Ok(this.0.borrow().is_empty()));
-        /// Randomly reorders the collection.
-        ///
-        /// # Returns
-        /// The result.
+        /// Shuffles the deck in-place using a Fisher–Yates shuffle.
         methods.add_method("shuffle", |_, this, ()| {
             this.0.borrow_mut().shuffle();
             Ok(())
@@ -364,11 +325,11 @@ impl LuaUserData for LuaDeck {
                 Ok(())
             },
         );
-        /// Adds at to the collection.
+        /// Inserts `card` at position `index` (1-based). Use index `1` for top, or the deck size for bottom.
         ///
         /// # Parameters
-        /// - `card` — `userdata`.
-        /// - `index` — `integer`.
+        /// - `index` — `integer`: 1-based insertion position.
+        /// - `card` — `Card`: Card to insert.
         methods.add_method("insertAt", |_, this, (card, index): (LuaAnyUserData, usize)| {
             let card_clone = card.borrow::<LuaCard>()?.0.borrow().clone();
             this.0.borrow_mut().insert_at(index.saturating_sub(1), card_clone);
@@ -376,56 +337,65 @@ impl LuaUserData for LuaDeck {
         });
 
         // Drawing
-        /// Draws to the current render target.
+        /// Removes and returns the top card of the deck, or `nil` if empty.
         ///
         /// # Returns
-        /// The result.
+        /// `Card` or `nil`.
         methods.add_method("draw", |_, this, ()| {
             let drawn = this.0.borrow_mut().draw();
             Ok(drawn.map(|c| LuaCard(Rc::new(RefCell::new(c)))))
         });
-        /// Draw bottom on this Deck.
+        /// Removes and returns the bottom card of the deck, or `nil` if empty.
         ///
         /// # Returns
-        /// The result.
+        /// `Card` or `nil`.
         methods.add_method("drawBottom", |_, this, ()| {
             let drawn = this.0.borrow_mut().draw_bottom();
             Ok(drawn.map(|c| LuaCard(Rc::new(RefCell::new(c)))))
         });
-        /// Peek on this Deck.
+        /// Returns the top card without removing it, or `nil` if empty.
         ///
-        /// # Parameters
-        /// - `index` — `integer`.
+        /// # Returns
+        /// `Card` or `nil`.
         methods.add_method("peek", |_, this, ()| {
             let borrow = this.0.borrow();
             let card = borrow.peek().cloned();
             drop(borrow);
             Ok(card.map(|c| LuaCard(Rc::new(RefCell::new(c)))))
         });
-        /// Removes at from the collection.
+        /// Removes and returns the card at 1-based `index`.
         ///
         /// # Parameters
-        /// - `index` — `integer`.
+        /// - `index` — `integer`: 1-based position.
+        ///
+        /// # Returns
+        /// `Card` or `nil`.
         methods.add_method("removeAt", |_, this, index: usize| {
             let removed = this.0.borrow_mut().remove_at(index.saturating_sub(1));
             Ok(removed.map(|c| LuaCard(Rc::new(RefCell::new(c)))))
         });
 
         // Search
-        /// Search by tag on this Deck.
+        /// Returns a list of all cards in this deck that carry the given tag.
         ///
         /// # Parameters
-        /// - `tag` — `string`.
+        /// - `tag` — `string`: Tag to search for.
+        ///
+        /// # Returns
+        /// `table` of `Card` objects.
         methods.add_method("searchByTag", |lua, this, tag: String| {
             let borrow = this.0.borrow();
             let indices = borrow.search_by_tag(&tag);
             let t = lua.create_sequence_from(indices.into_iter().map(|i| i + 1))?;
             Ok(t)
         });
-        /// Search by type on this Deck.
+        /// Returns a list of all cards of the given type.
         ///
         /// # Parameters
-        /// - `ct` — `string`.
+        /// - `card_type` — `string`: Card type identifier to match.
+        ///
+        /// # Returns
+        /// `table` of `Card` objects.
         methods.add_method("searchByType", |lua, this, ct: String| {
             let borrow = this.0.borrow();
             let indices = borrow.search_by_type(&ct);
@@ -434,30 +404,33 @@ impl LuaUserData for LuaDeck {
         });
 
         // Get all cards as Lua table
-        /// Returns the number of by type.
+        /// Returns the count of cards matching the given type.
         ///
         /// # Parameters
-        /// - `card_type` — `string`.
+        /// - `card_type` — `string`: Card type to count.
         ///
         /// # Returns
         /// `integer`.
         methods.add_method("countByType", |_, this, card_type: String| {
             Ok(this.0.borrow().count_by_type(&card_type))
         });
-        /// Reveal top on this Deck.
+        /// Returns the top `n` cards without removing them.
         ///
         /// # Parameters
-        /// - `n` — `integer`.
+        /// - `n` — `integer`: Number of cards to reveal.
+        ///
+        /// # Returns
+        /// `table` of `Card` objects (may be fewer than `n` if the deck is small).
         methods.add_method("revealTop", |lua, this, n: usize| {
             let types = this.0.borrow().reveal_top(n);
             let t = lua.create_table()?;
             for (i, ct) in types.into_iter().enumerate() { t.set(i + 1, ct)?; }
             Ok(t)
         });
-        /// Returns the cards.
+        /// Returns the full ordered list of cards in this deck (top to bottom).
         ///
         /// # Returns
-        /// The current cards.
+        /// `table` of `Card` objects.
         methods.add_method("getCards", |lua, this, ()| {
             let borrow = this.0.borrow();
             let t = lua.create_table()?;
@@ -467,11 +440,11 @@ impl LuaUserData for LuaDeck {
             Ok(t)
         });
 
-        /// Move within on this Deck.
+        /// Moves the card at `from` to `to` (both 1-based), shifting other cards to fill the gap.
         ///
         /// # Parameters
-        /// - `from` — `integer`.
-        /// - `to` — `integer`.
+        /// - `from` — `integer`: Source position.
+        /// - `to` — `integer`: Destination position.
         methods.add_method("moveWithin", |_, this, (from, to): (usize, usize)| {
             Ok(this.0.borrow_mut().move_within(from.saturating_sub(1), to.saturating_sub(1)))
         });
@@ -495,51 +468,36 @@ impl LuaUserData for LuaZone {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
         add_type_methods(methods);
 
-        /// Returns the name.
-        ///
-        /// # Parameters
-        /// - `card` — `userdata`.
+        /// Returns the zone's name identifier.
         ///
         /// # Returns
-        /// The current name.
+        /// `string`.
         methods.add_method("getName", |_, this, ()| Ok(this.0.borrow().name.clone()));
-        /// Returns the size.
-        ///
-        /// # Parameters
-        /// - `card` — `userdata`.
+        /// Returns the number of cards currently in this zone.
         ///
         /// # Returns
-        /// The current size.
+        /// `integer`.
         methods.add_method("getSize", |_, this, ()| Ok(this.0.borrow().size()));
-        /// Returns `true` if empty.
-        ///
-        /// # Parameters
-        /// - `card` — `userdata`.
+        /// Returns `true` if this zone holds no cards.
         ///
         /// # Returns
         /// `boolean`.
         methods.add_method("isEmpty", |_, this, ()| Ok(this.0.borrow().is_empty()));
-        /// Returns the capacity.
-        ///
-        /// # Parameters
-        /// - `card` — `userdata`.
+        /// Returns the maximum number of cards this zone can hold (`0` = unlimited).
         ///
         /// # Returns
-        /// The current capacity.
+        /// `integer`.
         methods.add_method("getCapacity", |_, this, ()| Ok(this.0.borrow().capacity));
-        /// Returns `true` if add.
-        ///
-        /// # Parameters
-        /// - `card` — `userdata`.
+        /// Returns `true` if another card can be added (capacity not yet reached).
         ///
         /// # Returns
         /// `boolean`.
         methods.add_method("canAdd", |_, this, ()| Ok(this.0.borrow().can_add()));
 
-        /// Adds an entry to the collection.
+        /// Adds `card` to this zone. Raises an error if the zone is at capacity.
         ///
         /// # Parameters
-        /// - `card` — `userdata`.
+        /// - `card` — `Card`: Card to add.
         methods.add_method("add", |_, this, card: LuaAnyUserData| {
             let card_clone = card.borrow::<LuaCard>()?.0.borrow().clone();
             this.0.borrow_mut().add(card_clone).map_err(|_| {
@@ -547,49 +505,52 @@ impl LuaUserData for LuaZone {
             })?;
             Ok(())
         });
-        /// Removes at from the collection.
+        /// Removes and returns the card at 1-based `index`.
         ///
         /// # Parameters
-        /// - `index` — `integer`.
+        /// - `index` — `integer`: 1-based position.
+        ///
+        /// # Returns
+        /// `Card` or `nil`.
         methods.add_method("removeAt", |_, this, index: usize| {
             let removed = this.0.borrow_mut().remove_at(index.saturating_sub(1));
             Ok(removed.map(|c| LuaCard(Rc::new(RefCell::new(c)))))
         });
-        /// Returns the number of by type.
+        /// Returns the count of cards with the given type in this zone.
         ///
         /// # Parameters
-        /// - `card_type` — `string`.
+        /// - `card_type` — `string`: Type to count.
         ///
         /// # Returns
         /// `integer`.
         methods.add_method("countByType", |_, this, card_type: String| {
             Ok(this.0.borrow().count_by_type(&card_type))
         });
-        /// Returns the all types.
-        ///
-        /// # Parameters
-        /// - `ct` — `string`.
+        /// Returns a deduplicated list of all card type strings present in this zone.
         ///
         /// # Returns
-        /// The current all types.
+        /// `table` of `string` type names.
         methods.add_method("getAllTypes", |lua, this, ()| {
             let types = this.0.borrow().get_all_types();
             let t = lua.create_table()?;
             for (i, ct) in types.into_iter().enumerate() { t.set(i + 1, ct)?; }
             Ok(t)
         });
-        /// Find by type on this Zone.
+        /// Returns all cards of the given type in this zone.
         ///
         /// # Parameters
-        /// - `ct` — `string`.
+        /// - `card_type` — `string`: Type to search for.
+        ///
+        /// # Returns
+        /// `table` of `Card` objects.
         methods.add_method("findByType", |_, this, ct: String| {
             let borrow = this.0.borrow();
             Ok(borrow.find_by_type(&ct).map(|i| i + 1))
         });
-        /// Returns the cards.
+        /// Returns the full ordered list of cards in this zone.
         ///
         /// # Returns
-        /// The current cards.
+        /// `table` of `Card` objects.
         methods.add_method("getCards", |lua, this, ()| {
             let borrow = this.0.borrow();
             let t = lua.create_table()?;
@@ -636,18 +597,19 @@ impl LuaUserData for LuaStackManager {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
         add_type_methods(methods);
 
-        /// Adds an entry to the collection.
+        /// Places an effect or action on top of the stack.
         ///
         /// # Parameters
-        /// - `kind` — `string`.
+        /// - `kind` — `string`: Effect kind identifier.
+        /// - `data` — `table`: Effect data table.
         methods.add_method("push", |_, this, kind: String| {
             this.0.borrow_mut().push(StackEntry::new(kind));
             Ok(())
         });
-        /// Resolve on this StackManager.
+        /// Removes and returns the top effect from the stack, resolving it.
         ///
         /// # Returns
-        /// The result.
+        /// `table` with `kind` and `data` fields, or `nil` if the stack is empty.
         methods.add_method("resolve", |lua, this, ()| {
             let entry = this.0.borrow_mut().resolve();
             if let Some(e) = entry {
@@ -665,10 +627,10 @@ impl LuaUserData for LuaStackManager {
                 Ok(LuaValue::Nil)
             }
         });
-        /// Peek on this StackManager.
+        /// Returns the top effect without resolving it.
         ///
         /// # Returns
-        /// The result.
+        /// `table` with `kind` and `data` fields, or `nil`.
         methods.add_method("peek", |lua, this, ()| {
             let borrow = this.0.borrow();
             if let Some(e) = borrow.peek() {
@@ -684,34 +646,28 @@ impl LuaUserData for LuaStackManager {
                 Ok(LuaValue::Nil)
             }
         });
-        /// Returns `true` if empty.
-        ///
-        /// # Parameters
-        /// - `kind` — `string`.
+        /// Returns `true` if the stack holds no pending effects.
         ///
         /// # Returns
         /// `boolean`.
         methods.add_method("isEmpty", |_, this, ()| Ok(this.0.borrow().is_empty()));
-        /// Returns the size.
-        ///
-        /// # Parameters
-        /// - `kind` — `string`.
+        /// Returns the number of effects currently on the stack.
         ///
         /// # Returns
-        /// The current size.
+        /// `integer`.
         methods.add_method("getSize", |_, this, ()| Ok(this.0.borrow().size()));
-        /// Removes all entries.
-        ///
-        /// # Parameters
-        /// - `kind` — `string`.
+        /// Discards all pending effects on the stack.
         methods.add_method("clear", |_, this, ()| {
             this.0.borrow_mut().clear();
             Ok(())
         });
-        /// Find by kind on this StackManager.
+        /// Returns all effects on the stack matching the given kind identifier.
         ///
         /// # Parameters
-        /// - `kind` — `string`.
+        /// - `kind` — `string`: Effect kind to search for.
+        ///
+        /// # Returns
+        /// `table` of effect tables.
         methods.add_method("findByKind", |_, this, kind: String| {
             let borrow = this.0.borrow();
             Ok(borrow.find_by_kind(&kind).map(|i| i + 1))

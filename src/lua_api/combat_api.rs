@@ -23,49 +23,37 @@ impl LuaUserData for LuaStatusEffect {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
         add_type_methods(methods);
 
-        /// Returns the name.
-        ///
-        /// # Parameters
-        /// - `v` — `integer`.
+        /// Returns the status effect's name identifier (e.g. `'poison'`, `'burn'`).
         ///
         /// # Returns
-        /// The current name.
+        /// `string`.
         methods.add_method("getName", |_, this, ()| Ok(this.0.borrow().name.clone()));
-        /// Returns the duration.
-        ///
-        /// # Parameters
-        /// - `v` — `integer`.
+        /// Returns the remaining duration in turns.
         ///
         /// # Returns
-        /// The current duration.
+        /// `integer` — turns remaining.
         methods.add_method("getDuration", |_, this, ()| Ok(this.0.borrow().duration));
-        /// Sets the duration.
+        /// Sets the remaining duration in turns.
         ///
         /// # Parameters
-        /// - `v` — `integer`.
+        /// - `turns` — `integer`: New duration.
         methods.add_method("setDuration", |_, this, v: i32| { this.0.borrow_mut().duration = v; Ok(()) });
-        /// Returns the stacks.
-        ///
-        /// # Parameters
-        /// - `v` — `integer`.
+        /// Returns the current stack count of this status effect.
         ///
         /// # Returns
-        /// The current stacks.
+        /// `integer` — stack count.
         methods.add_method("getStacks", |_, this, ()| Ok(this.0.borrow().stacks));
-        /// Sets the stacks.
+        /// Sets the stack count directly.
         ///
         /// # Parameters
-        /// - `v` — `integer`.
+        /// - `stacks` — `integer`: New stack count.
         methods.add_method("setStacks", |_, this, v: u32| { this.0.borrow_mut().stacks = v; Ok(()) });
-        /// Returns `true` if expired.
+        /// Returns `true` if this effect's duration has reached zero.
         ///
         /// # Returns
         /// `boolean`.
         methods.add_method("isExpired", |_, this, ()| Ok(this.0.borrow().is_expired()));
-        /// Tick turn on this StatusEffect.
-        ///
-        /// # Returns
-        /// The result.
+        /// Decrements the duration by 1 and removes the effect if it expires.
         methods.add_method("tickTurn", |_, this, ()| Ok(this.0.borrow_mut().tick_turn()));
     }
 }
@@ -86,99 +74,72 @@ impl LuaUserData for LuaCombatAction {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
         add_type_methods(methods);
 
-        /// Returns the name.
-        ///
-        /// # Parameters
-        /// - `v` — `number`.
+        /// Returns the action's name identifier.
         ///
         /// # Returns
-        /// The current name.
+        /// `string`.
         methods.add_method("getName", |_, this, ()| Ok(this.0.borrow().name.clone()));
-        /// Returns the base damage.
-        ///
-        /// # Parameters
-        /// - `v` — `number`.
+        /// Returns the base damage dealt by this action before modifiers.
         ///
         /// # Returns
-        /// The current base damage.
+        /// `number`.
         methods.add_method("getBaseDamage", |_, this, ()| Ok(this.0.borrow().base_damage));
-        /// Sets the base damage.
+        /// Sets the base damage for this action.
         ///
         /// # Parameters
-        /// - `v` — `number`.
+        /// - `damage` — `number`: New base damage value.
         methods.add_method("setBaseDamage", |_, this, v: f64| { this.0.borrow_mut().base_damage = v; Ok(()) });
-        /// Returns the damage type.
-        ///
-        /// # Parameters
-        /// - `v` — `string`.
+        /// Returns the damage type string (e.g. `'physical'`, `'fire'`).
         ///
         /// # Returns
-        /// The current damage type.
+        /// `string`.
         methods.add_method("getDamageType", |_, this, ()| Ok(this.0.borrow().damage_type.clone()));
         /// Sets the damage type.
         ///
         /// # Parameters
-        /// - `v` — `string`.
+        /// - `dtype` — `string`: Damage type string.
         methods.add_method("setDamageType", |_, this, v: String| { this.0.borrow_mut().damage_type = v; Ok(()) });
-        /// Returns the accuracy.
-        ///
-        /// # Parameters
-        /// - `v` — `number`.
+        /// Returns the hit chance as a percentage (0–100).
         ///
         /// # Returns
-        /// The current accuracy.
+        /// `number` — accuracy percentage.
         methods.add_method("getAccuracy", |_, this, ()| Ok(this.0.borrow().accuracy));
-        /// Sets the accuracy.
+        /// Sets the hit chance percentage.
         ///
         /// # Parameters
-        /// - `v` — `number`.
+        /// - `accuracy` — `number`: Hit chance (0–100).
         methods.add_method("setAccuracy", |_, this, v: f64| { this.0.borrow_mut().accuracy = v.clamp(0.0, 1.0); Ok(()) });
-        /// Returns the cooldown.
-        ///
-        /// # Parameters
-        /// - `v` — `integer`.
+        /// Returns the maximum cooldown in turns before this action can be used again.
         ///
         /// # Returns
-        /// The current cooldown.
+        /// `integer` — max cooldown turns.
         methods.add_method("getCooldown", |_, this, ()| Ok(this.0.borrow().cooldown));
-        /// Sets the cooldown.
+        /// Sets the maximum cooldown for this action.
         ///
         /// # Parameters
-        /// - `v` — `integer`.
+        /// - `turns` — `integer`: Cooldown in turns.
         methods.add_method("setCooldown", |_, this, v: u32| { this.0.borrow_mut().cooldown = v; Ok(()) });
-        /// Returns the current cooldown.
-        ///
-        /// # Parameters
-        /// - `v` — `number`.
+        /// Returns the remaining cooldown turns until this action is ready.
         ///
         /// # Returns
-        /// The current current cooldown.
+        /// `integer` — turns remaining.
         methods.add_method("getCurrentCooldown", |_, this, ()| Ok(this.0.borrow().current_cooldown));
-        /// Returns `true` if ready.
-        ///
-        /// # Parameters
-        /// - `v` — `number`.
+        /// Returns `true` if the current cooldown has reached zero.
         ///
         /// # Returns
         /// `boolean`.
         methods.add_method("isReady", |_, this, ()| Ok(this.0.borrow().is_ready()));
-        /// Tick cooldown on this CombatAction.
-        ///
-        /// # Parameters
-        /// - `v` — `number`.
+        /// Decrements the current cooldown by 1 (minimum 0).
         methods.add_method("tickCooldown", |_, this, ()| { this.0.borrow_mut().tick_cooldown(); Ok(()) });
-        /// Returns the cost mp.
-        ///
-        /// # Parameters
-        /// - `v` — `number`.
+        /// Returns the MP cost to use this action.
         ///
         /// # Returns
-        /// The current cost mp.
+        /// `integer` — MP cost.
         methods.add_method("getCostMp", |_, this, ()| Ok(this.0.borrow().cost_mp));
-        /// Sets the cost mp.
+        /// Sets the MP cost for this action.
         ///
         /// # Parameters
-        /// - `v` — `number`.
+        /// - `cost` — `integer`: New MP cost.
         methods.add_method("setCostMp", |_, this, v: f64| { this.0.borrow_mut().cost_mp = v; Ok(()) });
     }
 }
@@ -199,211 +160,179 @@ impl LuaUserData for LuaCombatant {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
         add_type_methods(methods);
 
-        /// Returns the name.
-        ///
-        /// # Parameters
-        /// - `v` — `string`.
+        /// Returns the combatant's display name.
         ///
         /// # Returns
-        /// The current name.
+        /// `string`.
         methods.add_method("getName", |_, this, ()| Ok(this.0.borrow().name.clone()));
-        /// Returns the team.
-        ///
-        /// # Parameters
-        /// - `v` — `string`.
+        /// Returns the team identifier for this combatant.
         ///
         /// # Returns
-        /// The current team.
+        /// `string` — team name.
         methods.add_method("getTeam", |_, this, ()| Ok(this.0.borrow().team.clone()));
-        /// Sets the team.
+        /// Assigns this combatant to a team.
         ///
         /// # Parameters
-        /// - `v` — `string`.
+        /// - `team` — `string`: Team identifier.
         methods.add_method("setTeam", |_, this, v: String| { this.0.borrow_mut().team = v; Ok(()) });
-        /// Returns the hp.
-        ///
-        /// # Parameters
-        /// - `v` — `number`.
+        /// Returns current HP.
         ///
         /// # Returns
-        /// The current hp.
+        /// `number`.
         methods.add_method("getHp", |_, this, ()| Ok(this.0.borrow().hp));
-        /// Sets the hp.
+        /// Sets current HP, clamped to [0, maxHp].
         ///
         /// # Parameters
-        /// - `v` — `number`.
+        /// - `hp` — `number`: New HP value.
         methods.add_method("setHp", |_, this, v: f64| { this.0.borrow_mut().hp = v; Ok(()) });
-        /// Returns the max hp.
-        ///
-        /// # Parameters
-        /// - `v` — `number`.
+        /// Returns maximum HP.
         ///
         /// # Returns
-        /// The current max hp.
+        /// `number`.
         methods.add_method("getMaxHp", |_, this, ()| Ok(this.0.borrow().max_hp));
-        /// Sets the max hp.
+        /// Sets the maximum HP and clamps current HP if needed.
         ///
         /// # Parameters
-        /// - `v` — `number`.
+        /// - `max_hp` — `number`: New max HP.
         methods.add_method("setMaxHp", |_, this, v: f64| { this.0.borrow_mut().max_hp = v; Ok(()) });
-        /// Returns the mp.
-        ///
-        /// # Parameters
-        /// - `v` — `number`.
+        /// Returns current MP.
         ///
         /// # Returns
-        /// The current mp.
+        /// `number`.
         methods.add_method("getMp", |_, this, ()| Ok(this.0.borrow().mp));
-        /// Sets the mp.
+        /// Sets current MP, clamped to [0, maxMp].
         ///
         /// # Parameters
-        /// - `v` — `number`.
+        /// - `mp` — `number`: New MP value.
         methods.add_method("setMp", |_, this, v: f64| { this.0.borrow_mut().mp = v; Ok(()) });
-        /// Returns the max mp.
-        ///
-        /// # Parameters
-        /// - `amount` — `number`.
-        /// - `dtype` — `string` optional.
+        /// Returns maximum MP.
         ///
         /// # Returns
-        /// The current max mp.
+        /// `number`.
         methods.add_method("getMaxMp", |_, this, ()| Ok(this.0.borrow().max_mp));
-        /// Sets the max mp.
+        /// Sets the maximum MP.
         ///
         /// # Parameters
-        /// - `amount` — `number`.
-        /// - `dtype` — `string` optional.
+        /// - `max_mp` — `number`: New max MP.
         methods.add_method("setMaxMp", |_, this, v: f64| { this.0.borrow_mut().max_mp = v; Ok(()) });
-        /// Returns the speed.
-        ///
-        /// # Parameters
-        /// - `amount` — `number`.
-        /// - `dtype` — `string` optional.
+        /// Returns the initiative speed value used to determine turn order.
         ///
         /// # Returns
-        /// The current speed.
+        /// `number`.
         methods.add_method("getSpeed", |_, this, ()| Ok(this.0.borrow().speed));
-        /// Sets the speed.
+        /// Sets the initiative speed value.
         ///
         /// # Parameters
-        /// - `amount` — `number`.
-        /// - `dtype` — `string` optional.
+        /// - `speed` — `number`: New speed value.
         methods.add_method("setSpeed", |_, this, v: f64| { this.0.borrow_mut().speed = v; Ok(()) });
-        /// Returns the level.
-        ///
-        /// # Parameters
-        /// - `amount` — `number`.
-        /// - `dtype` — `string` optional.
+        /// Returns the combatant's experience level.
         ///
         /// # Returns
-        /// The current level.
+        /// `integer`.
         methods.add_method("getLevel", |_, this, ()| Ok(this.0.borrow().level));
-        /// Returns `true` if alive.
-        ///
-        /// # Parameters
-        /// - `amount` — `number`.
-        /// - `dtype` — `string` optional.
+        /// Returns `true` if current HP is greater than zero.
         ///
         /// # Returns
         /// `boolean`.
         methods.add_method("isAlive", |_, this, ()| Ok(this.0.borrow().is_alive()));
 
-        /// Take damage on this Combatant.
+        /// Applies `amount` damage of `dtype`, reduced by resistances, and returns net damage dealt.
         ///
         /// # Parameters
-        /// - `amount` — `number`.
-        /// - `dtype` — `string` optional.
+        /// - `amount` — `number`: Incoming damage before resistance.
+        /// - `dtype` — `string`: Damage type (e.g. `'fire'`, `'physical'`).
+        ///
+        /// # Returns
+        /// `number` — net damage after resistance.
         methods.add_method("takeDamage", |_, this, (amount, dtype): (f64, Option<String>)| {
             let dtype = dtype.unwrap_or_else(|| "physical".to_string());
             Ok(this.0.borrow_mut().take_damage(amount, &dtype))
         });
-        /// Heal on this Combatant.
+        /// Increases current HP by `amount`, clamped at maxHp.
         ///
         /// # Parameters
-        /// - `name` — `string`.
-        /// - `v` — `number`.
+        /// - `amount` — `number`: Amount to heal.
+        ///
+        /// # Returns
+        /// `number` — actual HP restored.
         methods.add_method("heal", |_, this, amount: f64| {
             Ok(this.0.borrow_mut().heal(amount))
         });
 
-        /// Returns the stat.
+        /// Returns the value of a named stat (e.g. `'strength'`, `'agility'`).
         ///
         /// # Parameters
-        /// - `name` — `string`.
-        /// - `v` — `number`.
+        /// - `key` — `string`: Stat name.
         ///
         /// # Returns
-        /// The current stat.
+        /// `number` — stat value, or `0` if not set.
         methods.add_method("getStat", |_, this, name: String| Ok(this.0.borrow().get_stat(&name)));
-        /// Sets the stat.
+        /// Sets a named stat value.
         ///
         /// # Parameters
-        /// - `name` — `string`.
-        /// - `v` — `number`.
+        /// - `key` — `string`: Stat name.
+        /// - `value` — `number`: New value.
         methods.add_method("setStat", |_, this, (name, v): (String, f64)| {
             this.0.borrow_mut().set_stat(name, v); Ok(())
         });
-        /// Returns the resistance.
+        /// Returns the resistance percentage for `dtype` (0–100). `100` means immune.
         ///
         /// # Parameters
-        /// - `dtype` — `string`.
-        /// - `v` — `number`.
+        /// - `dtype` — `string`: Damage type.
         ///
         /// # Returns
-        /// The current resistance.
+        /// `number` — resistance percentage.
         methods.add_method("getResistance", |_, this, dtype: String| {
             Ok(*this.0.borrow().resistances.get(&dtype).unwrap_or(&1.0))
         });
-        /// Sets the resistance.
+        /// Sets resistance for a damage type.
         ///
         /// # Parameters
-        /// - `dtype` — `string`.
-        /// - `v` — `number`.
+        /// - `dtype` — `string`: Damage type.
+        /// - `pct` — `number`: Resistance percentage (0–100).
         methods.add_method("setResistance", |_, this, (dtype, v): (String, f64)| {
             this.0.borrow_mut().resistances.insert(dtype, v); Ok(())
         });
 
         // Status effects
-        /// Adds status to the collection.
+        /// Applies a named status effect, optionally stacking on an existing one.
         ///
         /// # Parameters
-        /// - `name` — `string`.
-        /// - `duration` — `integer` optional.
+        /// - `name` — `string`: Status effect name.
+        /// - `duration` — `integer`: Duration in turns.
+        /// - `stacks` — `integer`: Stack count (optional, default `1`).
         methods.add_method("addStatus", |_, this, (name, duration): (String, Option<i32>)| {
             let effect = StatusEffect::new(name, duration.unwrap_or(-1));
             this.0.borrow_mut().add_status(effect);
             Ok(())
         });
-        /// Removes status from the collection.
+        /// Removes the status effect with the given name.
         ///
         /// # Parameters
-        /// - `name` — `string`.
+        /// - `name` — `string`: Status effect name to remove.
         methods.add_method("removeStatus", |_, this, name: String| {
             this.0.borrow_mut().remove_status(&name); Ok(())
         });
-        /// Returns `true` if status.
+        /// Returns `true` if this combatant is affected by the named status.
         ///
         /// # Parameters
-        /// - `name` — `string`.
+        /// - `name` — `string`: Status name to check.
         ///
         /// # Returns
         /// `boolean`.
         methods.add_method("hasStatus", |_, this, name: String| {
             Ok(this.0.borrow().has_status(&name))
         });
-        /// Tick statuses on this Combatant.
-        ///
-        /// # Returns
-        /// The result.
+        /// Decrements all active status effect durations by one turn and removes any that expire.
         methods.add_method("tickStatuses", |lua, this, ()| {
             let expired = this.0.borrow_mut().tick_statuses();
             let t = lua.create_sequence_from(expired.into_iter())?;
             Ok(t)
         });
-        /// Returns the statuses.
+        /// Returns a list of all active `StatusEffect` objects on this combatant.
         ///
         /// # Returns
-        /// The current statuses.
+        /// `table` of `StatusEffect` objects.
         methods.add_method("getStatuses", |lua, this, ()| {
             let borrow = this.0.borrow();
             let t = lua.create_table()?;
@@ -430,54 +359,50 @@ impl LuaUserData for LuaCombatant {
         });
 
         // Actions
-        /// Adds action to the collection.
+        /// Registers a `CombatAction` that this combatant can use in battle.
         ///
         /// # Parameters
-        /// - `action` — `userdata`.
+        /// - `action` — `CombatAction`: Action to add.
         methods.add_method("addAction", |_, this, action: LuaAnyUserData| {
             let action_clone = action.borrow::<LuaCombatAction>()?.0.borrow().clone();
             this.0.borrow_mut().add_action(action_clone);
             Ok(())
         });
-        /// Returns `true` if action.
+        /// Returns `true` if this combatant has an action with the given name.
         ///
         /// # Parameters
-        /// - `name` — `string`.
+        /// - `name` — `string`: Action name.
         ///
         /// # Returns
         /// `boolean`.
         methods.add_method("hasAction", |_, this, name: String| {
             Ok(this.0.borrow().get_action(&name).is_some())
         });
-        /// Tick cooldowns on this Combatant.
-        ///
-        /// # Parameters
-        /// - `key` — `string`.
+        /// Decrements all active action cooldowns by one turn.
         methods.add_method("tickCooldowns", |_, this, ()| {
             let mut borrow = this.0.borrow_mut();
             for action in &mut borrow.actions { action.tick_cooldown(); }
             Ok(())
         });
 
-        /// Returns the meta.
+        /// Returns metadata value for `key`, or `nil` if not set.
         ///
         /// # Parameters
-        /// - `k` — `string`.
-        /// - `v` — `string`.
+        /// - `key` — `string`: Metadata key.
         ///
         /// # Returns
-        /// The current meta.
+        /// The stored value or `nil`.
         methods.add_method("getMeta", |_, this, key: String| {
             let borrow = this.0.borrow();
             let val = borrow.metadata.get(&key).cloned();
             drop(borrow);
             Ok(val)
         });
-        /// Sets the meta.
+        /// Stores an arbitrary metadata value on this combatant.
         ///
         /// # Parameters
-        /// - `k` — `string`.
-        /// - `v` — `string`.
+        /// - `key` — `string`: Key.
+        /// - `value` — `any`: Value.
         methods.add_method("setMeta", |_, this, (k, v): (String, String)| {
             this.0.borrow_mut().metadata.insert(k, v); Ok(())
         });
