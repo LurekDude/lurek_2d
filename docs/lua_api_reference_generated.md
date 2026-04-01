@@ -17107,7 +17107,7 @@ Creates a new action instance.
 - `name` — `string`.
 - `duration` — `integer` optional.
 
-*Source: [src/lua_api/combat_api.rs](src/lua_api/combat_api.rs#L695)*
+*Source: [src/lua_api/combat_api.rs](src/lua_api/combat_api.rs#L669)*
 
 ---
 
@@ -17119,7 +17119,7 @@ Creates a new battle instance.
 
 - `name` — `string` optional.
 
-*Source: [src/lua_api/combat_api.rs](src/lua_api/combat_api.rs#L712)*
+*Source: [src/lua_api/combat_api.rs](src/lua_api/combat_api.rs#L686)*
 
 ---
 
@@ -17131,7 +17131,7 @@ Creates a new combatant instance.
 
 - `name` — `string`.
 
-*Source: [src/lua_api/combat_api.rs](src/lua_api/combat_api.rs#L686)*
+*Source: [src/lua_api/combat_api.rs](src/lua_api/combat_api.rs#L660)*
 
 ---
 
@@ -17144,7 +17144,7 @@ Creates a new status effect instance.
 - `name` — `string`.
 - `duration` — `integer` optional.
 
-*Source: [src/lua_api/combat_api.rs](src/lua_api/combat_api.rs#L704)*
+*Source: [src/lua_api/combat_api.rs](src/lua_api/combat_api.rs#L678)*
 
 ---
 
@@ -17318,7 +17318,7 @@ Adds combatant to the collection.
 
 - `combatant` — `userdata`.
 
-*Source: [src/lua_api/combat_api.rs](src/lua_api/combat_api.rs#L473)*
+*Source: [src/lua_api/combat_api.rs](src/lua_api/combat_api.rs#L487)*
 
 ---
 
@@ -17330,19 +17330,7 @@ Adds to log to the collection.
 
 - `msg` — `string`.
 
-*Source: [src/lua_api/combat_api.rs](src/lua_api/combat_api.rs#L606)*
-
----
-
-#### `CombatBattle:addToLog(msg)`
-
-Adds to log to the collection.
-
-**Parameters:**
-
-- `msg` — `string`.
-
-*Source: [src/lua_api/combat_api.rs](src/lua_api/combat_api.rs#L643)*
+*Source: [src/lua_api/combat_api.rs](src/lua_api/combat_api.rs#L620)*
 
 ---
 
@@ -17356,7 +17344,7 @@ Attack on this CombatBattle.
 - `action` — `string`.
 - `target` — `string`.
 
-*Source: [src/lua_api/combat_api.rs](src/lua_api/combat_api.rs#L528)*
+*Source: [src/lua_api/combat_api.rs](src/lua_api/combat_api.rs#L542)*
 
 ---
 
@@ -17368,19 +17356,7 @@ Force end on this CombatBattle.
 
 - `winner` — `string` optional.
 
-*Source: [src/lua_api/combat_api.rs](src/lua_api/combat_api.rs#L621)*
-
----
-
-#### `CombatBattle:forceEnd(winner)`
-
-Force end on this CombatBattle.
-
-**Parameters:**
-
-- `winner` — `string` optional.
-
-*Source: [src/lua_api/combat_api.rs](src/lua_api/combat_api.rs#L658)*
+*Source: [src/lua_api/combat_api.rs](src/lua_api/combat_api.rs#L635)*
 
 ---
 
@@ -17390,17 +17366,15 @@ Returns the alive names.
 
 **Returns:** The current alive names.
 
-*Source: [src/lua_api/combat_api.rs](src/lua_api/combat_api.rs#L582)*
+*Source: [src/lua_api/combat_api.rs](src/lua_api/combat_api.rs#L596)*
 
 ---
 
 #### `CombatBattle:getAllNames()`
 
-Returns the all names.
+Returns all combatant names in the battle (alive and dead).
 
-**Returns:** The current all names.
-
-*Source: [src/lua_api/combat_api.rs](src/lua_api/combat_api.rs#L666)*
+*Source: [src/lua_api/combat_api.rs](src/lua_api/combat_api.rs#L640)*
 
 ---
 
@@ -17414,7 +17388,7 @@ Returns the combatant.
 
 **Returns:** The current combatant.
 
-*Source: [src/lua_api/combat_api.rs](src/lua_api/combat_api.rs#L486)*
+*Source: [src/lua_api/combat_api.rs](src/lua_api/combat_api.rs#L500)*
 
 ---
 
@@ -17428,7 +17402,7 @@ Returns the count.
 
 **Returns:** The current count.
 
-*Source: [src/lua_api/combat_api.rs](src/lua_api/combat_api.rs#L443)*
+*Source: [src/lua_api/combat_api.rs](src/lua_api/combat_api.rs#L457)*
 
 ---
 
@@ -17438,7 +17412,7 @@ Returns the current combatant.
 
 **Returns:** The current current combatant.
 
-*Source: [src/lua_api/combat_api.rs](src/lua_api/combat_api.rs#L505)*
+*Source: [src/lua_api/combat_api.rs](src/lua_api/combat_api.rs#L519)*
 
 ---
 
@@ -17452,21 +17426,7 @@ Returns the log.
 
 **Returns:** The current log.
 
-*Source: [src/lua_api/combat_api.rs](src/lua_api/combat_api.rs#L595)*
-
----
-
-#### `CombatBattle:getLog()`
-
-Returns the log.
-
-**Parameters:**
-
-- `msg` — `string`.
-
-**Returns:** The current log.
-
-*Source: [src/lua_api/combat_api.rs](src/lua_api/combat_api.rs#L632)*
+*Source: [src/lua_api/combat_api.rs](src/lua_api/combat_api.rs#L609)*
 
 ---
 
@@ -17480,7 +17440,7 @@ Returns the name.
 
 **Returns:** The current name.
 
-*Source: [src/lua_api/combat_api.rs](src/lua_api/combat_api.rs#L435)*
+*Source: [src/lua_api/combat_api.rs](src/lua_api/combat_api.rs#L449)*
 
 ---
 
@@ -17494,7 +17454,7 @@ Returns the turn count.
 
 **Returns:** The current turn count.
 
-*Source: [src/lua_api/combat_api.rs](src/lua_api/combat_api.rs#L451)*
+*Source: [src/lua_api/combat_api.rs](src/lua_api/combat_api.rs#L465)*
 
 ---
 
@@ -17508,7 +17468,7 @@ Returns the winner.
 
 **Returns:** The current winner.
 
-*Source: [src/lua_api/combat_api.rs](src/lua_api/combat_api.rs#L467)*
+*Source: [src/lua_api/combat_api.rs](src/lua_api/combat_api.rs#L481)*
 
 ---
 
@@ -17522,7 +17482,7 @@ Returns `true` if over.
 
 **Returns:** `boolean`.
 
-*Source: [src/lua_api/combat_api.rs](src/lua_api/combat_api.rs#L459)*
+*Source: [src/lua_api/combat_api.rs](src/lua_api/combat_api.rs#L473)*
 
 ---
 
@@ -17536,7 +17496,7 @@ Next turn on this CombatBattle.
 - `action` — `string`.
 - `target` — `string`.
 
-*Source: [src/lua_api/combat_api.rs](src/lua_api/combat_api.rs#L518)*
+*Source: [src/lua_api/combat_api.rs](src/lua_api/combat_api.rs#L532)*
 
 ---
 
@@ -17548,19 +17508,7 @@ Removes combatant from the collection.
 
 - `name` — `string`.
 
-*Source: [src/lua_api/combat_api.rs](src/lua_api/combat_api.rs#L614)*
-
----
-
-#### `CombatBattle:removeCombatant(name)`
-
-Removes combatant from the collection.
-
-**Parameters:**
-
-- `name` — `string`.
-
-*Source: [src/lua_api/combat_api.rs](src/lua_api/combat_api.rs#L651)*
+*Source: [src/lua_api/combat_api.rs](src/lua_api/combat_api.rs#L628)*
 
 ---
 
@@ -17570,7 +17518,7 @@ Sort initiative on this CombatBattle.
 
 **Returns:** The result.
 
-*Source: [src/lua_api/combat_api.rs](src/lua_api/combat_api.rs#L497)*
+*Source: [src/lua_api/combat_api.rs](src/lua_api/combat_api.rs#L511)*
 
 ---
 
@@ -17602,6 +17550,14 @@ Applies a named status effect, optionally stacking on an existing one.
 
 ---
 
+#### `Combatant:getActionNames()`
+
+Returns a list of action names owned by this combatant.
+
+*Source: [src/lua_api/combat_api.rs](src/lua_api/combat_api.rs#L414)*
+
+---
+
 #### `Combatant:getHp(v)`
 
 Returns current HP.
@@ -17611,6 +17567,14 @@ Returns current HP.
 **Returns:** `number`.
 
 *Source: [src/lua_api/combat_api.rs](src/lua_api/combat_api.rs#L182)*
+
+---
+
+#### `Combatant:getHpPercent()`
+
+Returns hp as a fraction of max hp (0.0..=1.0).
+
+*Source: [src/lua_api/combat_api.rs](src/lua_api/combat_api.rs#L410)*
 
 ---
 
@@ -17674,6 +17638,14 @@ Returns current MP.
 
 ---
 
+#### `Combatant:getMpPercent()`
+
+Returns mp as a fraction of max mp (0.0..=1.0).
+
+*Source: [src/lua_api/combat_api.rs](src/lua_api/combat_api.rs#L412)*
+
+---
+
 #### `Combatant:getName()`
 
 Returns the combatant's display name.
@@ -17721,6 +17693,14 @@ Returns the value of a named stat (e.g. `'strength'`, `'agility'`).
 **Returns:** `number` — stat value, or `0` if not set.
 
 *Source: [src/lua_api/combat_api.rs](src/lua_api/combat_api.rs#L269)*
+
+---
+
+#### `Combatant:getStatusNames()`
+
+Returns a list of active status effect names on this combatant.
+
+*Source: [src/lua_api/combat_api.rs](src/lua_api/combat_api.rs#L419)*
 
 ---
 
