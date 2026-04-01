@@ -1,0 +1,169 @@
+[package]
+name = "luna2d"
+version = "0.4.0"
+edition = "2021"
+description = "Luna2D — A cross-platform 2D game engine powered by Rust and Lua"
+license = "MIT"
+authors = ["Luna2D Team"]
+readme = "README.md"
+
+[features]
+# LuaJIT — default scripting backend; JIT compilation for x86_64 desktop (Windows/Linux/macOS).
+default = ["lua-jit"]
+lua-jit = ["mlua/luajit", "mlua/vendored"]
+# Lua 5.4 fallback — use on platforms where LuaJIT is unavailable (WASM, some ARM targets).
+lua54 = ["mlua/lua54", "mlua/vendored"]
+
+[dependencies]
+# GPU-accelerated rendering
+# default-features disabled to drop `webgpu` (WGSL-output for browsers, not needed on desktop).
+# `vulkan-portability` adds the Vulkan backend required for Linux and as a fallback on Windows/macOS.
+wgpu = { version = "22", default-features = false, features = ["wgsl", "dx12", "metal", "vulkan-portability"] }
+
+# Windowing and input (replaces minifb)
+winit = "0.30"
+
+# Safe cast for GPU vertex buffers
+bytemuck = { version = "1", features = ["derive"] }
+
+# Blocking executor for wgpu async init
+pollster = "0.3"
+
+# Lua scripting via mlua.
+# Default: LuaJIT (JIT compiler, 2–5× faster, Lua 5.1 compatible).
+# Fallback: enable the `lua54` Cargo feature for platforms where JIT is unsupported
+#           (WASM/wasm32, some ARM bare-metal future targets).
+# Build with LuaJIT:  cargo build                        (default)
+# Build with Lua 5.4: cargo build --no-default-features --features lua54
+mlua = { version = "0.9", default-features = false }
+
+# Image loading (minimal features for fast compile)
+image = { version = "0.24", default-features = false, features = ["png", "jpeg", "bmp"] }
+
+# Audio playback (WAV, MP3, OGG, FLAC)
+rodio = "0.17"
+
+# MIDI file parsing
+midly = "0.5"
+
+# TTF/OTF font parsing and glyph rasterization
+fontdue = "0.9"
+
+# Logging
+log = "0.4"
+# Disable auto-color (termcolor), humantime, and regex — all unnecessary in a release binary.
+env_logger = { version = "0.10", default-features = false, features = ["humantime"] }
+
+# Error handling (derive macros for idiomatic Rust errors)
+thiserror = "1"
+
+# Fast, high-quality random number generation
+fastrand = "2"
+
+# 2D rigid-body physics engine
+rapier2d = "0.32"
+
+# Gamepad hardware input (cross-platform, includes bundled SDL_GameControllerDB)
+gilrs = "0.11"
+
+# Generational ID-based resource pools
+slotmap = "1"
+
+# Data compression
+flate2 = "1"
+lz4_flex = "0.11"
+
+# Cryptographic hashing
+sha2 = "0.10"
+sha1 = "0.10"
+md-5 = "0.10"
+
+# Encoding
+base64 = "0.22"
+hex = "0.4"
+
+# XML parsing for TMX Tiled map format
+roxmltree = "0.20"
+
+# Serialization framework (config, save data, game state)
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+
+# TOML parsing and encoding
+toml = "0.8"
+
+# Platform-specific directories (save data, config paths)
+directories = "5"
+
+# Cross-platform system info (CPU count, memory size)
+sysinfo = { version = "0.30", default-features = false }
+
+# Cross-platform preferred locale detection
+sys-locale = "0.3"
+
+# Cross-platform clipboard access
+arboard = "3"
+
+# Cross-platform native file/message dialogs
+rfd = "0.14"
+
+[dev-dependencies]
+tempfile = "3"
+
+[target.'cfg(windows)'.dependencies]
+# Windows message box for panic handler
+windows-sys = { version = "0.59", features = ["Win32_UI_WindowsAndMessaging"] }
+
+[build-dependencies]
+# Windows .exe icon + version-info embedding (only active on Windows targets)
+winresource = "0.1"
+
+[[bin]]
+name = "luna2d"
+path = "src/main.rs"
+
+[lib]
+name = "luna2d"
+path = "src/lib.rs"
+
+[profile.dev]
+# opt-level 1 keeps game code debuggable while feeling reasonably smooth.
+# incremental = true speeds up rebuilds; debug = true keeps full DWARF info
+# so the debugger can inspect every variable and step through code.
+opt-level = 1
+incremental = true
+debug = true
+
+# Optimize all dependencies even in debug mode (common fast-iteration pattern)
+# Gives near-release performance for deps while keeping game code debuggable
+[profile.dev.package."*"]
+opt-level = 3
+
+[profile.release]
+# Maximum throughput: full inlining, LTO across all codegen units, strip all
+# debug symbols, and abort on panic (no unwinding overhead). overflow checks
+# are disabled for extra speed -- the debug build catches those first.
+opt-level = 3
+lto = true
+codegen-units = 1
+strip = "symbols"
+panic = "abort"
+overflow-checks = false
+debug = false
+
+
+[[test]]
+name = "compute_stress_tests"
+path = "tests/stress/compute_stress_tests.rs"
+
+[[test]]
+name = "data_stress_tests"
+path = "tests/stress/data_stress_tests.rs"
+
+[[test]]
+name = "image_stress_tests"
+path = "tests/stress/image_stress_tests.rs"
+
+[[test]]
+name = "physics_stress_tests"
+path = "tests/stress/physics_stress_tests.rs"

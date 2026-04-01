@@ -1,0 +1,75 @@
+-- Luna2D Stress Test: Heavy Compute Operations
+-- Tests NdArray at scale: large matrix ops, reductions, broadcasting
+
+describe("compute stress: large array creation", function()
+    it("creates and fills a 1000-element array", function()
+        local arr = luna.compute.zeros({1000}, "float32")
+        local shape = arr:getShape()
+        expect_equal(1, #shape, "1D array")
+        expect_equal(1000, shape[1], "correct size")
+        expect_equal(1000, arr:getSize(), "total elements")
+    end)
+
+    it("creates a 100x100 matrix", function()
+        local arr = luna.compute.ones({100, 100}, "float32")
+        expect_equal(10000, arr:getSize(), "100x100 = 10000 elements")
+
+        -- Verify all ones
+        local sum = arr:sum()
+        expect_near(10000, sum, 0.1, "sum of ones = 10000")
+    end)
+
+    it("range creates large sequence", function()
+        local arr = luna.compute.range(0, 5000, 1, "float32")
+        expect_equal(5000, arr:getSize(), "5000 element range")
+    end)
+end)
+
+describe("compute stress: element-wise operations", function()
+    it("adds two 10000-element arrays", function()
+        local a = luna.compute.ones({10000}, "float32")
+        local b = luna.compute.ones({10000}, "float32")
+        local c = a:add(b)
+        expect_equal(10000, c:getSize(), "result size matches")
+
+        -- Check sum is doubled
+        local sum = c:sum()
+        expect_near(20000, sum, 1.0, "1+1 summed 10000 times")
+    end)
+
+    it("multiplies large arrays element-wise", function()
+        local a = luna.compute.range(1, 1001, 1, "float32")
+        local b = luna.compute.range(1, 1001, 1, "float32")
+        local c = a:mul(b)
+        expect_equal(1000, c:getSize(), "result has 1000 elements")
+    end)
+
+    it("chains multiple operations", function()
+        local a = luna.compute.ones({5000}, "float32")
+        -- Chain: add → mul → sub
+        local b = a:add(a)       -- 2
+        local c = b:mul(b)       -- 4
+        local d = c:sub(a)       -- 3
+        local sum = d:sum()
+        expect_near(15000, sum, 1.0, "chain ops result")
+    end)
+end)
+
+describe("compute stress: reductions", function()
+    it("sum of large array", function()
+        local arr = luna.compute.ones({10000}, "float32")
+        expect_near(10000, arr:sum(), 1.0, "sum of 10000 ones")
+    end)
+
+    it("min/max of range", function()
+        local arr = luna.compute.range(1, 10001, 1, "float32")
+        expect_near(1, arr:min(), 0.1, "min of range")
+        expect_near(10000, arr:max(), 0.1, "max of range")
+    end)
+
+    it("mean of uniform array", function()
+        local arr = luna.compute.ones({5000}, "float32")
+        local mean = arr:mean()
+        expect_near(1.0, mean, 0.001, "mean of ones")
+    end)
+end)

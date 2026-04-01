@@ -1,0 +1,1838 @@
+//! Registers the `luna.ai.*` game AI toolkit API.
+//!
+//! Provides factory functions and UserData wrappers for AI subsystems:
+//! AIWorld, Agent, Blackboard, StateMachine, BehaviorTree, SteeringManager,
+//! PathGrid, FlowField, QLearner, UtilityAI, GOAPPlanner, InfluenceMap,
+//! Squad, and CommandQueue.
+
+use std::cell::RefCell;
+use std::collections::HashMap;
+use std::rc::Rc;
+
+use mlua::prelude::*;
+
+use crate::ai::*;
+use crate::lua_api::lua_types::{add_type_methods, LunaType};
+
+// ---------------------------------------------------------------------------
+// UserData wrappers
+// ---------------------------------------------------------------------------
+
+/// Lua wrapper for an AI world that owns agents and a global blackboard.
+#[derive(Clone)]
+struct LuaAIWorld {
+    inner: Rc<RefCell<AIWorld>>,
+}
+
+impl LunaType for LuaAIWorld {
+    const TYPE_NAME: &'static str = "AIWorld";
+    const TYPE_HIERARCHY: &'static [&'static str] = &["Object"];
+}
+
+/// Lua wrapper for a single AI agent, accessed by name through the owning world.
+#[derive(Clone)]
+struct LuaAgent {
+    world: Rc<RefCell<AIWorld>>,
+    name: String,
+}
+
+impl LunaType for LuaAgent {
+    const TYPE_NAME: &'static str = "Agent";
+    const TYPE_HIERARCHY: &'static [&'static str] = &["Object"];
+}
+
+/// Lua wrapper for a typed key-value blackboard.
+#[derive(Clone)]
+struct LuaBlackboard {
+    inner: Rc<RefCell<Blackboard>>,
+}
+
+impl LunaType for LuaBlackboard {
+    const TYPE_NAME: &'static str = "Blackboard";
+    const TYPE_HIERARCHY: &'static [&'static str] = &["Object"];
+}
+
+/// Lua wrapper for a finite state machine.
+#[derive(Clone)]
+struct LuaStateMachine {
+    inner: Rc<RefCell<StateMachine>>,
+}
+
+impl LunaType for LuaStateMachine {
+    const TYPE_NAME: &'static str = "StateMachine";
+    const TYPE_HIERARCHY: &'static [&'static str] = &["Object"];
+}
+
+/// Lua wrapper for a behavior tree.
+#[derive(Clone)]
+struct LuaBehaviorTree {
+    inner: Rc<RefCell<BehaviorTree>>,
+}
+
+impl LunaType for LuaBehaviorTree {
+    const TYPE_NAME: &'static str = "BehaviorTree";
+    const TYPE_HIERARCHY: &'static [&'static str] = &["Object"];
+}
+
+/// Lua wrapper for a single behavior tree node (recursive structure).
+#[derive(Clone)]
+struct LuaBTNode {
+    inner: Rc<RefCell<BTNode>>,
+}
+
+impl LunaType for LuaBTNode {
+    const TYPE_NAME: &'static str = "BTNode";
+    const TYPE_HIERARCHY: &'static [&'static str] = &["Object"];
+}
+
+/// Lua wrapper for a Reynolds-style steering manager.
+#[derive(Clone)]
+struct LuaSteeringManager {
+    inner: Rc<RefCell<SteeringManager>>,
+}
+
+impl LunaType for LuaSteeringManager {
+    const TYPE_NAME: &'static str = "SteeringManager";
+    const TYPE_HIERARCHY: &'static [&'static str] = &["Object"];
+}
+
+/// Lua wrapper for an A* navigation grid.
+#[derive(Clone)]
+struct LuaPathGrid {
+    inner: Rc<RefCell<PathGrid>>,
+}
+
+impl LunaType for LuaPathGrid {
+    const TYPE_NAME: &'static str = "PathGrid";
+    const TYPE_HIERARCHY: &'static [&'static str] = &["Object"];
+}
+
+/// Lua wrapper for a BFS flow field.
+#[derive(Clone)]
+struct LuaFlowField {
+    inner: Rc<RefCell<FlowField>>,
+}
+
+impl LunaType for LuaFlowField {
+    const TYPE_NAME: &'static str = "FlowField";
+    const TYPE_HIERARCHY: &'static [&'static str] = &["Object"];
+}
+
+/// Lua wrapper for a tabular Q-learner.
+#[derive(Clone)]
+struct LuaQLearner {
+    inner: Rc<RefCell<QLearner>>,
+}
+
+impl LunaType for LuaQLearner {
+    const TYPE_NAME: &'static str = "QLearner";
+    const TYPE_HIERARCHY: &'static [&'static str] = &["Object"];
+}
+
+/// Lua wrapper for a multi-axis utility scorer.
+#[derive(Clone)]
+struct LuaUtilityAI {
+    inner: Rc<RefCell<UtilityAI>>,
+}
+
+impl LunaType for LuaUtilityAI {
+    const TYPE_NAME: &'static str = "UtilityAI";
+    const TYPE_HIERARCHY: &'static [&'static str] = &["Object"];
+}
+
+/// Lua wrapper for an A* GOAP planner.
+#[derive(Clone)]
+struct LuaGOAPPlanner {
+    inner: Rc<RefCell<GOAPPlanner>>,
+}
+
+impl LunaType for LuaGOAPPlanner {
+    const TYPE_NAME: &'static str = "GOAPPlanner";
+    const TYPE_HIERARCHY: &'static [&'static str] = &["Object"];
+}
+
+/// Lua wrapper for a multi-layer influence map.
+#[derive(Clone)]
+struct LuaInfluenceMap {
+    inner: Rc<RefCell<InfluenceMap>>,
+}
+
+impl LunaType for LuaInfluenceMap {
+    const TYPE_NAME: &'static str = "InfluenceMap";
+    const TYPE_HIERARCHY: &'static [&'static str] = &["Object"];
+}
+
+/// Lua wrapper for a formation-based squad.
+#[derive(Clone)]
+struct LuaSquad {
+    inner: Rc<RefCell<Squad>>,
+}
+
+impl LunaType for LuaSquad {
+    const TYPE_NAME: &'static str = "Squad";
+    const TYPE_HIERARCHY: &'static [&'static str] = &["Object"];
+}
+
+/// Lua wrapper for an RTS-style command queue.
+#[derive(Clone)]
+struct LuaCommandQueue {
+    inner: Rc<RefCell<CommandQueue>>,
+}
+
+impl LunaType for LuaCommandQueue {
+    const TYPE_NAME: &'static str = "CommandQueue";
+    const TYPE_HIERARCHY: &'static [&'static str] = &["Object"];
+}
+
+// ---------------------------------------------------------------------------
+// UserData implementations
+// ---------------------------------------------------------------------------
+
+impl LuaUserData for LuaAIWorld {
+    fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
+        add_type_methods::<Self>(methods);
+
+        methods.add_method("addAgent", |_, this, name: String| {
+            let mut w = this.inner.borrow_mut();
+            w.add_agent(&name).map_err(LuaError::RuntimeError)?;
+            Ok(LuaAgent {
+                world: this.inner.clone(),
+                name,
+            })
+        });
+
+        methods.add_method("getAgent", |_, this, name: String| {
+            let w = this.inner.borrow();
+            if w.get_agent_index(&name).is_some() {
+                Ok(Some(LuaAgent {
+                    world: this.inner.clone(),
+                    name,
+                }))
+            } else {
+                Ok(None)
+            }
+        });
+
+        methods.add_method("removeAgent", |_, this, agent: LuaAnyUserData| {
+            let a = agent.borrow::<LuaAgent>()?;
+            let mut w = this.inner.borrow_mut();
+            w.remove_agent(&a.name);
+            Ok(())
+        });
+
+        methods.add_method("getAgentCount", |_, this, ()| {
+            Ok(this.inner.borrow().agent_count())
+        });
+
+        methods.add_method("getGlobalBlackboard", |_, this, ()| {
+            let w = this.inner.borrow();
+            Ok(LuaBlackboard {
+                inner: Rc::new(RefCell::new(w.global_blackboard().clone())),
+            })
+        });
+
+        methods.add_method("update", |_, this, dt: f32| {
+            let mut w = this.inner.borrow_mut();
+            for agent in &mut w.agents {
+                agent.position.0 += agent.velocity.0 * dt;
+                agent.position.1 += agent.velocity.1 * dt;
+            }
+            Ok(())
+        });
+    }
+}
+
+impl LuaUserData for LuaAgent {
+    fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
+        add_type_methods::<Self>(methods);
+
+        methods.add_method("getName", |_, this, ()| Ok(this.name.clone()));
+
+        methods.add_method("setPosition", |_, this, (x, y): (f32, f32)| {
+            let mut w = this.world.borrow_mut();
+            if let Some(idx) = w.get_agent_index(&this.name) {
+                w.agents[idx].position = (x, y);
+            }
+            Ok(())
+        });
+
+        methods.add_method("getPosition", |_, this, ()| {
+            let w = this.world.borrow();
+            if let Some(idx) = w.get_agent_index(&this.name) {
+                Ok(w.agents[idx].position)
+            } else {
+                Ok((0.0, 0.0))
+            }
+        });
+
+        methods.add_method("setVelocity", |_, this, (x, y): (f32, f32)| {
+            let mut w = this.world.borrow_mut();
+            if let Some(idx) = w.get_agent_index(&this.name) {
+                w.agents[idx].velocity = (x, y);
+            }
+            Ok(())
+        });
+
+        methods.add_method("getVelocity", |_, this, ()| {
+            let w = this.world.borrow();
+            if let Some(idx) = w.get_agent_index(&this.name) {
+                Ok(w.agents[idx].velocity)
+            } else {
+                Ok((0.0, 0.0))
+            }
+        });
+
+        methods.add_method("setMaxSpeed", |_, this, v: f32| {
+            let mut w = this.world.borrow_mut();
+            if let Some(idx) = w.get_agent_index(&this.name) {
+                w.agents[idx].max_speed = v;
+            }
+            Ok(())
+        });
+
+        methods.add_method("getMaxSpeed", |_, this, ()| {
+            let w = this.world.borrow();
+            if let Some(idx) = w.get_agent_index(&this.name) {
+                Ok(w.agents[idx].max_speed)
+            } else {
+                Ok(100.0)
+            }
+        });
+
+        methods.add_method("setMaxForce", |_, this, v: f32| {
+            let mut w = this.world.borrow_mut();
+            if let Some(idx) = w.get_agent_index(&this.name) {
+                w.agents[idx].max_force = v;
+            }
+            Ok(())
+        });
+
+        methods.add_method("getMaxForce", |_, this, ()| {
+            let w = this.world.borrow();
+            if let Some(idx) = w.get_agent_index(&this.name) {
+                Ok(w.agents[idx].max_force)
+            } else {
+                Ok(200.0)
+            }
+        });
+
+        methods.add_method("setPriority", |_, this, p: i32| {
+            let mut w = this.world.borrow_mut();
+            if let Some(idx) = w.get_agent_index(&this.name) {
+                w.agents[idx].priority = p;
+            }
+            Ok(())
+        });
+
+        methods.add_method("getPriority", |_, this, ()| {
+            let w = this.world.borrow();
+            if let Some(idx) = w.get_agent_index(&this.name) {
+                Ok(w.agents[idx].priority)
+            } else {
+                Ok(0)
+            }
+        });
+
+        methods.add_method("setDecisionModel", |_, this, model: String| {
+            let mut w = this.world.borrow_mut();
+            if let Some(idx) = w.get_agent_index(&this.name) {
+                if let Some(dm) = DecisionModel::parse_str(&model) {
+                    w.agents[idx].decision_model = dm;
+                }
+            }
+            Ok(())
+        });
+
+        methods.add_method("getDecisionModel", |_, this, ()| {
+            let w = this.world.borrow();
+            if let Some(idx) = w.get_agent_index(&this.name) {
+                Ok(w.agents[idx].decision_model.as_str().to_string())
+            } else {
+                Ok("fsm".to_string())
+            }
+        });
+
+        methods.add_method("addTag", |_, this, tag: String| {
+            let mut w = this.world.borrow_mut();
+            if let Some(idx) = w.get_agent_index(&this.name) {
+                w.agents[idx].tags.insert(tag);
+            }
+            Ok(())
+        });
+
+        methods.add_method("removeTag", |_, this, tag: String| {
+            let mut w = this.world.borrow_mut();
+            if let Some(idx) = w.get_agent_index(&this.name) {
+                w.agents[idx].tags.remove(&tag);
+            }
+            Ok(())
+        });
+
+        methods.add_method("hasTag", |_, this, tag: String| {
+            let w = this.world.borrow();
+            if let Some(idx) = w.get_agent_index(&this.name) {
+                Ok(w.agents[idx].tags.contains(&tag))
+            } else {
+                Ok(false)
+            }
+        });
+
+        methods.add_method("getBlackboard", |_, this, ()| {
+            let w = this.world.borrow();
+            if let Some(idx) = w.get_agent_index(&this.name) {
+                Ok(LuaBlackboard {
+                    inner: Rc::new(RefCell::new(w.agents[idx].blackboard.clone())),
+                })
+            } else {
+                Ok(LuaBlackboard {
+                    inner: Rc::new(RefCell::new(Blackboard::new())),
+                })
+            }
+        });
+    }
+}
+
+impl LuaUserData for LuaBlackboard {
+    fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
+        add_type_methods::<Self>(methods);
+
+        methods.add_method("setNumber", |_, this, (key, value): (String, f64)| {
+            this.inner.borrow_mut().set_number(&key, value);
+            Ok(())
+        });
+
+        methods.add_method(
+            "getNumber",
+            |_, this, (key, default): (String, Option<f64>)| {
+                Ok(this.inner.borrow().get_number(&key, default.unwrap_or(0.0)))
+            },
+        );
+
+        methods.add_method("setBool", |_, this, (key, value): (String, bool)| {
+            this.inner.borrow_mut().set_bool(&key, value);
+            Ok(())
+        });
+
+        methods.add_method(
+            "getBool",
+            |_, this, (key, default): (String, Option<bool>)| {
+                Ok(this.inner.borrow().get_bool(&key, default.unwrap_or(false)))
+            },
+        );
+
+        methods.add_method("setString", |_, this, (key, value): (String, String)| {
+            this.inner.borrow_mut().set_string(&key, &value);
+            Ok(())
+        });
+
+        methods.add_method(
+            "getString",
+            |_, this, (key, default): (String, Option<String>)| {
+                let def = default.unwrap_or_default();
+                Ok(this.inner.borrow().get_string(&key, &def))
+            },
+        );
+
+        methods.add_method("has", |_, this, key: String| {
+            Ok(this.inner.borrow().has(&key))
+        });
+
+        methods.add_method("remove", |_, this, key: String| {
+            this.inner.borrow_mut().remove(&key);
+            Ok(())
+        });
+
+        methods.add_method("clear", |_, this, ()| {
+            this.inner.borrow_mut().clear();
+            Ok(())
+        });
+
+        methods.add_method("getKeys", |lua, this, ()| {
+            let keys = this.inner.borrow().keys();
+            let tbl = lua.create_table()?;
+            for (i, k) in keys.iter().enumerate() {
+                tbl.set(i as i64 + 1, k.as_str())?;
+            }
+            Ok(tbl)
+        });
+
+        methods.add_method("getSize", |_, this, ()| Ok(this.inner.borrow().size()));
+    }
+}
+
+impl LuaUserData for LuaStateMachine {
+    fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
+        add_type_methods::<Self>(methods);
+
+        methods.add_method("addState", |lua, this, (name, opts): (String, LuaTable)| {
+            let on_enter: Option<LuaFunction> = opts.get("onEnter").ok();
+            let on_update: Option<LuaFunction> = opts.get("onUpdate").ok();
+            let on_exit: Option<LuaFunction> = opts.get("onExit").ok();
+
+            let enter_key = on_enter.map(|f| lua.create_registry_value(f)).transpose()?;
+            let update_key = on_update
+                .map(|f| lua.create_registry_value(f))
+                .transpose()?;
+            let exit_key = on_exit.map(|f| lua.create_registry_value(f)).transpose()?;
+
+            let mut fsm = this.inner.borrow_mut();
+            fsm.states.insert(
+                name,
+                StateCallbacks {
+                    on_enter: enter_key,
+                    on_update: update_key,
+                    on_exit: exit_key,
+                },
+            );
+            Ok(())
+        });
+
+        methods.add_method(
+            "addTransition",
+            |lua, this, (from, to, guard, priority): (String, String, Option<LuaFunction>, Option<i32>)| {
+                let guard_key = guard
+                    .map(|f| lua.create_registry_value(f))
+                    .transpose()?;
+                let mut fsm = this.inner.borrow_mut();
+                fsm.add_transition(Transition {
+                    from,
+                    to,
+                    guard: guard_key,
+                    priority: priority.unwrap_or(0),
+                });
+                Ok(())
+            },
+        );
+
+        methods.add_method("setInitialState", |_, this, name: String| {
+            let mut fsm = this.inner.borrow_mut();
+            fsm.initial_state = Some(name.clone());
+            if fsm.current_state.is_none() {
+                fsm.current_state = Some(name);
+            }
+            Ok(())
+        });
+
+        methods.add_method("getCurrentState", |_, this, ()| {
+            Ok(this.inner.borrow().current_state().map(|s| s.to_string()))
+        });
+
+        methods.add_method("forceState", |_, this, name: String| {
+            let mut fsm = this.inner.borrow_mut();
+            fsm.current_state = Some(name);
+            fsm.time_in_state = 0.0;
+            Ok(())
+        });
+
+        methods.add_method("getTimeInState", |_, this, ()| {
+            Ok(this.inner.borrow().time_in_state())
+        });
+    }
+}
+
+impl LuaUserData for LuaBehaviorTree {
+    fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
+        add_type_methods::<Self>(methods);
+
+        methods.add_method("setRoot", |_, this, node_ud: LuaAnyUserData| {
+            let node = node_ud.borrow::<LuaBTNode>()?;
+            let taken = std::mem::replace(
+                &mut *node.inner.borrow_mut(),
+                BTNode::Sequence {
+                    children: Vec::new(),
+                    running_idx: 0,
+                },
+            );
+            this.inner.borrow_mut().root = Some(taken);
+            Ok(())
+        });
+
+        methods.add_method("getLastStatus", |_, this, ()| {
+            Ok(this.inner.borrow().last_status.as_str().to_string())
+        });
+    }
+}
+
+impl LuaUserData for LuaBTNode {
+    fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
+        add_type_methods::<Self>(methods);
+
+        methods.add_method("addChild", |_, this, child_ud: LuaAnyUserData| {
+            let child = child_ud.borrow::<LuaBTNode>()?;
+            let taken = std::mem::replace(
+                &mut *child.inner.borrow_mut(),
+                BTNode::Sequence {
+                    children: Vec::new(),
+                    running_idx: 0,
+                },
+            );
+            let mut node = this.inner.borrow_mut();
+            match &mut *node {
+                BTNode::Selector { children, .. }
+                | BTNode::Sequence { children, .. }
+                | BTNode::Parallel { children, .. } => {
+                    children.push(taken);
+                }
+                _ => {
+                    return Err(LuaError::RuntimeError(
+                        "addChild is only valid for Selector, Sequence, or Parallel nodes"
+                            .to_string(),
+                    ));
+                }
+            }
+            Ok(())
+        });
+
+        methods.add_method("getChildCount", |_, this, ()| {
+            let node = this.inner.borrow();
+            let count = match &*node {
+                BTNode::Selector { children, .. }
+                | BTNode::Sequence { children, .. }
+                | BTNode::Parallel { children, .. } => children.len(),
+                _ => 0,
+            };
+            Ok(count)
+        });
+
+        methods.add_method("reset", |_, this, ()| {
+            this.inner.borrow_mut().reset();
+            Ok(())
+        });
+
+        methods.add_method("setChild", |_, this, child_ud: LuaAnyUserData| {
+            let child = child_ud.borrow::<LuaBTNode>()?;
+            let taken = std::mem::replace(
+                &mut *child.inner.borrow_mut(),
+                BTNode::Sequence {
+                    children: Vec::new(),
+                    running_idx: 0,
+                },
+            );
+            let mut node = this.inner.borrow_mut();
+            match &mut *node {
+                BTNode::Inverter { child } => {
+                    **child = taken;
+                }
+                BTNode::Repeater { child, .. } => {
+                    **child = taken;
+                }
+                BTNode::Succeeder { child } => {
+                    **child = taken;
+                }
+                _ => {
+                    return Err(LuaError::RuntimeError(
+                        "setChild is only valid for Inverter, Repeater, or Succeeder nodes"
+                            .to_string(),
+                    ));
+                }
+            }
+            Ok(())
+        });
+
+        methods.add_method("setCount", |_, this, n: u32| {
+            let mut node = this.inner.borrow_mut();
+            if let BTNode::Repeater { count, .. } = &mut *node {
+                *count = n;
+            }
+            Ok(())
+        });
+
+        methods.add_method("getCount", |_, this, ()| {
+            let node = this.inner.borrow();
+            if let BTNode::Repeater { count, .. } = &*node {
+                Ok(*count)
+            } else {
+                Ok(0)
+            }
+        });
+
+        methods.add_method("setSuccessPolicy", |_, this, policy: String| {
+            let mut node = this.inner.borrow_mut();
+            if let BTNode::Parallel { success_policy, .. } = &mut *node {
+                *success_policy = ParallelPolicy::parse_str(&policy);
+            }
+            Ok(())
+        });
+
+        methods.add_method("setFailurePolicy", |_, this, policy: String| {
+            let mut node = this.inner.borrow_mut();
+            if let BTNode::Parallel { failure_policy, .. } = &mut *node {
+                *failure_policy = ParallelPolicy::parse_str(&policy);
+            }
+            Ok(())
+        });
+
+        methods.add_method("getNodeType", |_, this, ()| {
+            let node = this.inner.borrow();
+            let name = match &*node {
+                BTNode::Selector { .. } => "selector",
+                BTNode::Sequence { .. } => "sequence",
+                BTNode::Parallel { .. } => "parallel",
+                BTNode::Inverter { .. } => "inverter",
+                BTNode::Repeater { .. } => "repeater",
+                BTNode::Succeeder { .. } => "succeeder",
+                BTNode::Action { .. } => "action",
+                BTNode::Condition { .. } => "condition",
+            };
+            Ok(name.to_string())
+        });
+    }
+}
+
+impl LuaUserData for LuaSteeringManager {
+    fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
+        add_type_methods::<Self>(methods);
+
+        methods.add_method(
+            "addSeek",
+            |_, this, (tx, ty, weight): (f32, f32, Option<f32>)| {
+                this.inner
+                    .borrow_mut()
+                    .behaviors
+                    .push(SteeringBehaviorType::Seek {
+                        target: (tx, ty),
+                        base: SteeringBase {
+                            weight: weight.unwrap_or(1.0),
+                            enabled: true,
+                        },
+                    });
+                Ok(())
+            },
+        );
+
+        methods.add_method(
+            "addFlee",
+            |_, this, (tx, ty, panic_dist, weight): (f32, f32, Option<f32>, Option<f32>)| {
+                this.inner
+                    .borrow_mut()
+                    .behaviors
+                    .push(SteeringBehaviorType::Flee {
+                        target: (tx, ty),
+                        panic_dist: panic_dist.unwrap_or(200.0),
+                        base: SteeringBase {
+                            weight: weight.unwrap_or(1.0),
+                            enabled: true,
+                        },
+                    });
+                Ok(())
+            },
+        );
+
+        methods.add_method(
+            "addArrive",
+            |_, this, (tx, ty, slowing, weight): (f32, f32, Option<f32>, Option<f32>)| {
+                this.inner
+                    .borrow_mut()
+                    .behaviors
+                    .push(SteeringBehaviorType::Arrive {
+                        target: (tx, ty),
+                        slowing_radius: slowing.unwrap_or(50.0),
+                        base: SteeringBase {
+                            weight: weight.unwrap_or(1.0),
+                            enabled: true,
+                        },
+                    });
+                Ok(())
+            },
+        );
+
+        methods.add_method(
+            "addWander",
+            |_,
+             this,
+             (radius, dist, jitter, weight): (
+                Option<f32>,
+                Option<f32>,
+                Option<f32>,
+                Option<f32>,
+            )| {
+                this.inner
+                    .borrow_mut()
+                    .behaviors
+                    .push(SteeringBehaviorType::Wander {
+                        wander_radius: radius.unwrap_or(20.0),
+                        wander_distance: dist.unwrap_or(40.0),
+                        wander_jitter: jitter.unwrap_or(5.0),
+                        wander_angle: 0.0,
+                        base: SteeringBase {
+                            weight: weight.unwrap_or(1.0),
+                            enabled: true,
+                        },
+                    });
+                Ok(())
+            },
+        );
+
+        methods.add_method(
+            "addPursue",
+            |_, this, (target_name, weight): (Option<String>, Option<f32>)| {
+                this.inner
+                    .borrow_mut()
+                    .behaviors
+                    .push(SteeringBehaviorType::Pursue {
+                        target_name,
+                        base: SteeringBase {
+                            weight: weight.unwrap_or(1.0),
+                            enabled: true,
+                        },
+                    });
+                Ok(())
+            },
+        );
+
+        methods.add_method(
+            "addEvade",
+            |_, this, (threat_name, weight): (Option<String>, Option<f32>)| {
+                this.inner
+                    .borrow_mut()
+                    .behaviors
+                    .push(SteeringBehaviorType::Evade {
+                        threat_name,
+                        base: SteeringBase {
+                            weight: weight.unwrap_or(1.0),
+                            enabled: true,
+                        },
+                    });
+                Ok(())
+            },
+        );
+
+        methods.add_method(
+            "addFlock",
+            #[allow(clippy::type_complexity)]
+            |_,
+             this,
+             (neighbor_radius, sep_w, align_w, coh_w, weight): (
+                Option<f32>,
+                Option<f32>,
+                Option<f32>,
+                Option<f32>,
+                Option<f32>,
+            )| {
+                this.inner
+                    .borrow_mut()
+                    .behaviors
+                    .push(SteeringBehaviorType::Flock {
+                        neighbor_radius: neighbor_radius.unwrap_or(100.0),
+                        sep_weight: sep_w.unwrap_or(1.5),
+                        align_weight: align_w.unwrap_or(1.0),
+                        coh_weight: coh_w.unwrap_or(1.0),
+                        neighbor_names: Vec::new(),
+                        base: SteeringBase {
+                            weight: weight.unwrap_or(1.0),
+                            enabled: true,
+                        },
+                    });
+                Ok(())
+            },
+        );
+
+        methods.add_method("getBehaviorCount", |_, this, ()| {
+            Ok(this.inner.borrow().behaviors.len())
+        });
+
+        methods.add_method("setCombineMode", |_, this, mode: String| {
+            this.inner.borrow_mut().combine_mode = CombineMode::parse_str(&mode);
+            Ok(())
+        });
+
+        methods.add_method("getCombineMode", |_, this, ()| {
+            Ok(this.inner.borrow().combine_mode.as_str().to_string())
+        });
+
+        methods.add_method("getLastSteering", |_, this, ()| {
+            Ok(this.inner.borrow().last_force)
+        });
+
+        methods.add_method(
+            "calculate",
+            |_,
+             this,
+             (px, py, vx, vy, max_speed, max_force, dt): (f32, f32, f32, f32, f32, f32, f32)| {
+                let force = this.inner.borrow_mut().calculate(
+                    (px, py),
+                    (vx, vy),
+                    max_speed,
+                    max_force,
+                    dt,
+                );
+                Ok(force)
+            },
+        );
+    }
+}
+
+impl LuaUserData for LuaPathGrid {
+    fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
+        add_type_methods::<Self>(methods);
+
+        methods.add_method("getWidth", |_, this, ()| Ok(this.inner.borrow().width));
+        methods.add_method("getHeight", |_, this, ()| Ok(this.inner.borrow().height));
+        methods.add_method("getCellSize", |_, this, ()| {
+            Ok(this.inner.borrow().cell_size)
+        });
+
+        methods.add_method(
+            "setWalkable",
+            |_, this, (x, y, walkable): (usize, usize, bool)| {
+                let lx = x.saturating_sub(1);
+                let ly = y.saturating_sub(1);
+                this.inner.borrow_mut().set_walkable(lx, ly, walkable);
+                Ok(())
+            },
+        );
+
+        methods.add_method("isWalkable", |_, this, (x, y): (usize, usize)| {
+            let lx = x.saturating_sub(1);
+            let ly = y.saturating_sub(1);
+            Ok(this.inner.borrow().is_walkable(lx, ly))
+        });
+
+        methods.add_method("setCost", |_, this, (x, y, cost): (usize, usize, f32)| {
+            let lx = x.saturating_sub(1);
+            let ly = y.saturating_sub(1);
+            this.inner.borrow_mut().set_cost(lx, ly, cost);
+            Ok(())
+        });
+
+        methods.add_method("getCost", |_, this, (x, y): (usize, usize)| {
+            let lx = x.saturating_sub(1);
+            let ly = y.saturating_sub(1);
+            Ok(this.inner.borrow().get_cost(lx, ly))
+        });
+
+        methods.add_method(
+            "findPath",
+            |lua, this, (sx, sy, gx, gy): (usize, usize, usize, usize)| {
+                let lsx = sx.saturating_sub(1);
+                let lsy = sy.saturating_sub(1);
+                let lgx = gx.saturating_sub(1);
+                let lgy = gy.saturating_sub(1);
+                let grid = this.inner.borrow();
+                match grid.find_path(lsx, lsy, lgx, lgy) {
+                    Some(path) => {
+                        let tbl = lua.create_table()?;
+                        for (i, (wx, wy)) in path.iter().enumerate() {
+                            let pt = lua.create_table()?;
+                            pt.set("x", *wx)?;
+                            pt.set("y", *wy)?;
+                            tbl.set(i as i64 + 1, pt)?;
+                        }
+                        Ok(LuaValue::Table(tbl))
+                    }
+                    None => Ok(LuaValue::Nil),
+                }
+            },
+        );
+
+        methods.add_method(
+            "findPathSmoothed",
+            |lua, this, (sx, sy, gx, gy): (usize, usize, usize, usize)| {
+                let lsx = sx.saturating_sub(1);
+                let lsy = sy.saturating_sub(1);
+                let lgx = gx.saturating_sub(1);
+                let lgy = gy.saturating_sub(1);
+                let grid = this.inner.borrow();
+                match grid.find_path_smoothed(lsx, lsy, lgx, lgy) {
+                    Some(path) => {
+                        let tbl = lua.create_table()?;
+                        for (i, (wx, wy)) in path.iter().enumerate() {
+                            let pt = lua.create_table()?;
+                            pt.set("x", *wx)?;
+                            pt.set("y", *wy)?;
+                            tbl.set(i as i64 + 1, pt)?;
+                        }
+                        Ok(LuaValue::Table(tbl))
+                    }
+                    None => Ok(LuaValue::Nil),
+                }
+            },
+        );
+    }
+}
+
+impl LuaUserData for LuaFlowField {
+    fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
+        add_type_methods::<Self>(methods);
+
+        methods.add_method("setGoal", |_, this, (x, y): (usize, usize)| {
+            let lx = x.saturating_sub(1);
+            let ly = y.saturating_sub(1);
+            this.inner.borrow_mut().set_goal(lx, ly);
+            Ok(())
+        });
+
+        methods.add_method("getDirection", |_, this, (x, y): (usize, usize)| {
+            let lx = x.saturating_sub(1);
+            let ly = y.saturating_sub(1);
+            Ok(this.inner.borrow().get_direction(lx, ly))
+        });
+
+        methods.add_method("getDistance", |_, this, (x, y): (usize, usize)| {
+            let lx = x.saturating_sub(1);
+            let ly = y.saturating_sub(1);
+            Ok(this.inner.borrow().get_distance(lx, ly))
+        });
+
+        methods.add_method("getWidth", |_, this, ()| Ok(this.inner.borrow().width));
+        methods.add_method("getHeight", |_, this, ()| Ok(this.inner.borrow().height));
+
+        methods.add_method("hasGoal", |_, this, ()| {
+            Ok(this.inner.borrow().goal.is_some())
+        });
+
+        methods.add_method("getGoal", |_, this, ()| match this.inner.borrow().goal {
+            Some((gx, gy)) => Ok((
+                LuaValue::Integer((gx + 1) as i64),
+                LuaValue::Integer((gy + 1) as i64),
+            )),
+            None => Ok((LuaValue::Nil, LuaValue::Nil)),
+        });
+    }
+}
+
+impl LuaUserData for LuaQLearner {
+    fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
+        add_type_methods::<Self>(methods);
+
+        methods.add_method("chooseAction", |_, this, state: usize| {
+            let s = state.saturating_sub(1);
+            Ok(this.inner.borrow().choose_action(s) + 1)
+        });
+
+        methods.add_method("bestAction", |_, this, state: usize| {
+            let s = state.saturating_sub(1);
+            Ok(this.inner.borrow().best_action(s) + 1)
+        });
+
+        methods.add_method("getBestAction", |_, this, state: usize| {
+            let s = state.saturating_sub(1);
+            Ok(this.inner.borrow().best_action(s) + 1)
+        });
+
+        methods.add_method(
+            "learn",
+            |_, this, (state, action, reward, next_state): (usize, usize, f64, usize)| {
+                let s = state.saturating_sub(1);
+                let a = action.saturating_sub(1);
+                let ns = next_state.saturating_sub(1);
+                this.inner.borrow_mut().learn(s, a, reward, ns);
+                Ok(())
+            },
+        );
+
+        methods.add_method("getQValue", |_, this, (state, action): (usize, usize)| {
+            let s = state.saturating_sub(1);
+            let a = action.saturating_sub(1);
+            Ok(this.inner.borrow().get_q(s, a))
+        });
+
+        methods.add_method(
+            "setQValue",
+            |_, this, (state, action, value): (usize, usize, f64)| {
+                let s = state.saturating_sub(1);
+                let a = action.saturating_sub(1);
+                this.inner.borrow_mut().set_q(s, a, value);
+                Ok(())
+            },
+        );
+
+        methods.add_method("endEpisode", |_, this, ()| {
+            this.inner.borrow_mut().end_episode();
+            Ok(())
+        });
+
+        methods.add_method("getEpisodeCount", |_, this, ()| {
+            Ok(this.inner.borrow().episode_count)
+        });
+
+        methods.add_method("getStateCount", |_, this, ()| {
+            Ok(this.inner.borrow().state_count)
+        });
+
+        methods.add_method("getActionCount", |_, this, ()| {
+            Ok(this.inner.borrow().action_count)
+        });
+
+        methods.add_method("setLearningRate", |_, this, v: f64| {
+            this.inner.borrow_mut().alpha = v;
+            Ok(())
+        });
+
+        methods.add_method("getLearningRate", |_, this, ()| {
+            Ok(this.inner.borrow().alpha)
+        });
+
+        methods.add_method("setDiscountFactor", |_, this, v: f64| {
+            this.inner.borrow_mut().gamma = v;
+            Ok(())
+        });
+
+        methods.add_method("getDiscountFactor", |_, this, ()| {
+            Ok(this.inner.borrow().gamma)
+        });
+
+        methods.add_method("setExplorationRate", |_, this, v: f64| {
+            this.inner.borrow_mut().epsilon = v;
+            Ok(())
+        });
+
+        methods.add_method("getExplorationRate", |_, this, ()| {
+            Ok(this.inner.borrow().epsilon)
+        });
+
+        methods.add_method("setExplorationDecay", |_, this, v: f64| {
+            this.inner.borrow_mut().epsilon_decay = v;
+            Ok(())
+        });
+
+        methods.add_method("getExplorationDecay", |_, this, ()| {
+            Ok(this.inner.borrow().epsilon_decay)
+        });
+
+        methods.add_method("serialize", |_, this, ()| {
+            Ok(this.inner.borrow().serialize())
+        });
+
+        methods.add_method("deserialize", |_, this, json: String| {
+            this.inner
+                .borrow_mut()
+                .deserialize(&json)
+                .map_err(LuaError::RuntimeError)?;
+            Ok(())
+        });
+    }
+}
+
+impl LuaUserData for LuaUtilityAI {
+    fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
+        add_type_methods::<Self>(methods);
+
+        methods.add_method(
+            "addAction",
+            |lua, this, (name, scorer_fn, weight): (String, LuaFunction, Option<f64>)| {
+                let key = lua.create_registry_value(scorer_fn)?;
+                this.inner.borrow_mut().actions.push(UAAction {
+                    name,
+                    scorer: key,
+                    considerations: Vec::new(),
+                    momentum_bonus: weight.unwrap_or(1.0),
+                });
+                Ok(())
+            },
+        );
+
+        methods.add_method("evaluate", |lua, this, ()| {
+            let mut ai = this.inner.borrow_mut();
+            if ai.actions.is_empty() {
+                return Ok(LuaValue::Nil);
+            }
+            let mut best_idx = 0;
+            let mut best_score = f64::NEG_INFINITY;
+            let mut scores = Vec::with_capacity(ai.actions.len());
+            for (i, action) in ai.actions.iter().enumerate() {
+                let func: LuaFunction = lua.registry_value(&action.scorer)?;
+                let score: f64 = func.call(())?;
+                let weighted = score * action.momentum_bonus;
+                scores.push(weighted);
+                if weighted > best_score {
+                    best_score = weighted;
+                    best_idx = i;
+                }
+            }
+            ai.last_scores = scores;
+            ai.last_action = Some(best_idx);
+            Ok(LuaValue::String(
+                lua.create_string(&ai.actions[best_idx].name)?,
+            ))
+        });
+
+        methods.add_method("getActionCount", |_, this, ()| {
+            Ok(this.inner.borrow().actions.len())
+        });
+
+        methods.add_method("getLastAction", |_, this, ()| {
+            let ai = this.inner.borrow();
+            Ok(ai.last_action.map(|i| ai.actions[i].name.clone()))
+        });
+    }
+}
+
+impl LuaUserData for LuaGOAPPlanner {
+    fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
+        add_type_methods::<Self>(methods);
+
+        methods.add_method(
+            "addAction",
+            |lua, this, (name, cost, callback): (String, Option<f64>, Option<LuaFunction>)| {
+                let cb_key = callback.map(|f| lua.create_registry_value(f)).transpose()?;
+                this.inner.borrow_mut().actions.push(GOAPAction {
+                    name,
+                    cost: cost.unwrap_or(1.0),
+                    callback: cb_key,
+                    preconditions: HashMap::new(),
+                    effects: HashMap::new(),
+                });
+                Ok(())
+            },
+        );
+
+        methods.add_method(
+            "setPrecondition",
+            |_, this, (action_name, key, value): (String, String, bool)| {
+                let mut planner = this.inner.borrow_mut();
+                if let Some(action) = planner.actions.iter_mut().find(|a| a.name == action_name) {
+                    action.preconditions.insert(key, value);
+                }
+                Ok(())
+            },
+        );
+
+        methods.add_method(
+            "setEffect",
+            |_, this, (action_name, key, value): (String, String, bool)| {
+                let mut planner = this.inner.borrow_mut();
+                if let Some(action) = planner.actions.iter_mut().find(|a| a.name == action_name) {
+                    action.effects.insert(key, value);
+                }
+                Ok(())
+            },
+        );
+
+        methods.add_method(
+            "addGoal",
+            |_, this, (name, priority): (String, Option<f64>)| {
+                this.inner.borrow_mut().goals.push(GOAPGoal {
+                    name,
+                    priority: priority.unwrap_or(1.0),
+                    state: HashMap::new(),
+                });
+                Ok(())
+            },
+        );
+
+        methods.add_method(
+            "setGoalState",
+            |_, this, (goal_name, key, value): (String, String, bool)| {
+                let mut planner = this.inner.borrow_mut();
+                if let Some(goal) = planner.goals.iter_mut().find(|g| g.name == goal_name) {
+                    goal.state.insert(key, value);
+                }
+                Ok(())
+            },
+        );
+
+        methods.add_method(
+            "plan",
+            |lua, this, (world_state_tbl, max_depth): (LuaTable, Option<usize>)| {
+                let mut world_state = HashMap::new();
+                for pair in world_state_tbl.pairs::<String, bool>() {
+                    let (k, v) = pair?;
+                    world_state.insert(k, v);
+                }
+                let planner = this.inner.borrow();
+                let plan = planner.plan(&world_state, max_depth.unwrap_or(10));
+                let tbl = lua.create_table()?;
+                for (i, name) in plan.iter().enumerate() {
+                    tbl.set(i as i64 + 1, name.as_str())?;
+                }
+                Ok(tbl)
+            },
+        );
+
+        methods.add_method("getActionCount", |_, this, ()| {
+            Ok(this.inner.borrow().actions.len())
+        });
+
+        methods.add_method("getGoalCount", |_, this, ()| {
+            Ok(this.inner.borrow().goals.len())
+        });
+    }
+}
+
+impl LuaUserData for LuaInfluenceMap {
+    fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
+        add_type_methods::<Self>(methods);
+
+        methods.add_method("addLayer", |_, this, name: String| {
+            this.inner.borrow_mut().add_layer(&name);
+            Ok(())
+        });
+
+        methods.add_method("hasLayer", |_, this, name: String| {
+            Ok(this.inner.borrow().has_layer(&name))
+        });
+
+        methods.add_method(
+            "setInfluence",
+            |_, this, (layer, x, y, value): (String, usize, usize, f32)| {
+                let lx = x.saturating_sub(1);
+                let ly = y.saturating_sub(1);
+                this.inner.borrow_mut().set_influence(&layer, lx, ly, value);
+                Ok(())
+            },
+        );
+
+        methods.add_method(
+            "getInfluence",
+            |_, this, (layer, x, y): (String, usize, usize)| {
+                let lx = x.saturating_sub(1);
+                let ly = y.saturating_sub(1);
+                Ok(this.inner.borrow().get_influence(&layer, lx, ly))
+            },
+        );
+
+        methods.add_method(
+            "stampInfluence",
+            |_,
+             this,
+             (layer, wx, wy, radius, value, falloff): (
+                String,
+                f32,
+                f32,
+                f32,
+                f32,
+                Option<f32>,
+            )| {
+                this.inner.borrow_mut().stamp_influence(
+                    &layer,
+                    wx,
+                    wy,
+                    radius,
+                    value,
+                    falloff.unwrap_or(1.0),
+                );
+                Ok(())
+            },
+        );
+
+        methods.add_method(
+            "propagate",
+            |_, this, (layer, momentum): (String, Option<f32>)| {
+                this.inner
+                    .borrow_mut()
+                    .propagate(&layer, momentum.unwrap_or(0.5));
+                Ok(())
+            },
+        );
+
+        methods.add_method("decay", |_, this, (layer, factor): (String, f32)| {
+            this.inner.borrow_mut().decay(&layer, factor);
+            Ok(())
+        });
+
+        methods.add_method("clearLayer", |_, this, layer: String| {
+            this.inner.borrow_mut().clear_layer(&layer);
+            Ok(())
+        });
+
+        methods.add_method("clearAll", |_, this, ()| {
+            this.inner.borrow_mut().clear_all();
+            Ok(())
+        });
+
+        methods.add_method("getMaxPosition", |_, this, layer: String| {
+            Ok(this.inner.borrow().max_position(&layer))
+        });
+
+        methods.add_method("getMinPosition", |_, this, layer: String| {
+            Ok(this.inner.borrow().min_position(&layer))
+        });
+
+        methods.add_method(
+            "queryRect",
+            |_, this, (layer, wx, wy, ww, wh): (String, f32, f32, f32, f32)| {
+                Ok(this.inner.borrow().query_rect(&layer, wx, wy, ww, wh))
+            },
+        );
+
+        methods.add_method(
+            "blend",
+            |_,
+             this,
+             (layer_a, weight_a, layer_b, weight_b, dest): (
+                String,
+                f32,
+                String,
+                f32,
+                String,
+            )| {
+                this.inner
+                    .borrow_mut()
+                    .blend(&layer_a, weight_a, &layer_b, weight_b, &dest);
+                Ok(())
+            },
+        );
+
+        methods.add_method("getWidth", |_, this, ()| Ok(this.inner.borrow().width));
+        methods.add_method("getHeight", |_, this, ()| Ok(this.inner.borrow().height));
+        methods.add_method("getCellSize", |_, this, ()| {
+            Ok(this.inner.borrow().cell_size)
+        });
+    }
+}
+
+impl LuaUserData for LuaSquad {
+    fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
+        add_type_methods::<Self>(methods);
+
+        methods.add_method("getName", |_, this, ()| {
+            Ok(this.inner.borrow().name.clone())
+        });
+
+        methods.add_method("addMember", |_, this, name: String| {
+            this.inner.borrow_mut().members.push(name);
+            Ok(())
+        });
+
+        methods.add_method("removeMember", |_, this, name: String| {
+            this.inner.borrow_mut().members.retain(|m| m != &name);
+            Ok(())
+        });
+
+        methods.add_method("getMemberCount", |_, this, ()| {
+            Ok(this.inner.borrow().members.len())
+        });
+
+        methods.add_method("getMembers", |lua, this, ()| {
+            let sq = this.inner.borrow();
+            let tbl = lua.create_table()?;
+            for (i, m) in sq.members.iter().enumerate() {
+                tbl.set(i as i64 + 1, m.as_str())?;
+            }
+            Ok(tbl)
+        });
+
+        methods.add_method("setLeader", |_, this, name: String| {
+            this.inner.borrow_mut().leader = Some(name);
+            Ok(())
+        });
+
+        methods.add_method("getLeader", |_, this, ()| {
+            Ok(this.inner.borrow().leader.clone())
+        });
+
+        methods.add_method(
+            "setFormation",
+            |_, this, (ftype, spacing): (String, Option<f32>)| {
+                let mut sq = this.inner.borrow_mut();
+                sq.formation = FormationType::parse_str(&ftype);
+                if let Some(s) = spacing {
+                    sq.formation_spacing = s;
+                }
+                Ok(())
+            },
+        );
+
+        methods.add_method("getFormation", |_, this, ()| {
+            Ok(this.inner.borrow().formation.as_str().to_string())
+        });
+
+        methods.add_method("getFormationSpacing", |_, this, ()| {
+            Ok(this.inner.borrow().formation_spacing)
+        });
+
+        methods.add_method(
+            "getFormationPosition",
+            |_, this, (member_idx, leader_x, leader_y): (usize, f32, f32)| {
+                let idx = member_idx.saturating_sub(1);
+                Ok(this
+                    .inner
+                    .borrow()
+                    .get_formation_position(idx, (leader_x, leader_y)))
+            },
+        );
+
+        methods.add_method("getBlackboard", |_, this, ()| {
+            let sq = this.inner.borrow();
+            Ok(LuaBlackboard {
+                inner: Rc::new(RefCell::new(sq.blackboard.clone())),
+            })
+        });
+    }
+}
+
+impl LuaUserData for LuaCommandQueue {
+    fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
+        add_type_methods::<Self>(methods);
+
+        methods.add_method(
+            "enqueue",
+            |lua, this, (kind, callback, opts): (String, LuaFunction, Option<LuaTable>)| {
+                let key = lua.create_registry_value(callback)?;
+                let (tx, ty, priority, interruptible) = parse_command_opts(&opts)?;
+                this.inner.borrow_mut().enqueue(Command {
+                    kind,
+                    callback: key,
+                    target_x: tx,
+                    target_y: ty,
+                    priority,
+                    interruptible,
+                });
+                Ok(())
+            },
+        );
+
+        methods.add_method(
+            "pushFront",
+            |lua, this, (kind, callback, opts): (String, LuaFunction, Option<LuaTable>)| {
+                let key = lua.create_registry_value(callback)?;
+                let (tx, ty, priority, interruptible) = parse_command_opts(&opts)?;
+                this.inner.borrow_mut().push_front(Command {
+                    kind,
+                    callback: key,
+                    target_x: tx,
+                    target_y: ty,
+                    priority,
+                    interruptible,
+                });
+                Ok(())
+            },
+        );
+
+        methods.add_method(
+            "replace",
+            |lua, this, (kind, callback, opts): (String, LuaFunction, Option<LuaTable>)| {
+                let key = lua.create_registry_value(callback)?;
+                let (tx, ty, priority, interruptible) = parse_command_opts(&opts)?;
+                this.inner.borrow_mut().replace(Command {
+                    kind,
+                    callback: key,
+                    target_x: tx,
+                    target_y: ty,
+                    priority,
+                    interruptible,
+                });
+                Ok(())
+            },
+        );
+
+        methods.add_method("cancelCurrent", |_, this, ()| {
+            Ok(this.inner.borrow_mut().cancel_current())
+        });
+
+        methods.add_method("clear", |_, this, ()| {
+            this.inner.borrow_mut().clear();
+            Ok(())
+        });
+
+        methods.add_method("getCount", |_, this, ()| Ok(this.inner.borrow().count()));
+
+        methods.add_method("isEmpty", |_, this, ()| Ok(this.inner.borrow().is_empty()));
+
+        methods.add_method("getCurrentType", |_, this, ()| {
+            Ok(this.inner.borrow().current_type().map(|s| s.to_string()))
+        });
+
+        methods.add_method("getCurrentTarget", |_, this, ()| {
+            Ok(this.inner.borrow().current_target())
+        });
+    }
+}
+
+// ---------------------------------------------------------------------------
+// Helpers
+// ---------------------------------------------------------------------------
+
+/// Parses optional command options table into (target_x, target_y, priority, interruptible).
+fn parse_command_opts(opts: &Option<LuaTable>) -> LuaResult<(f32, f32, i32, bool)> {
+    match opts {
+        Some(tbl) => {
+            let tx: f32 = tbl.get("targetX").unwrap_or(0.0);
+            let ty: f32 = tbl.get("targetY").unwrap_or(0.0);
+            let priority: i32 = tbl.get("priority").unwrap_or(0);
+            let interruptible: bool = tbl.get("interruptible").unwrap_or(true);
+            Ok((tx, ty, priority, interruptible))
+        }
+        None => Ok((0.0, 0.0, 0, true)),
+    }
+}
+
+// ---------------------------------------------------------------------------
+// Registration
+// ---------------------------------------------------------------------------
+
+/// Registers the `luna.ai.*` game AI toolkit API.
+///
+/// # Parameters
+/// - `lua` — `&Lua`.
+/// - `luna` — `&LuaTable`.
+///
+/// # Returns
+/// `LuaResult<()>`.
+pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
+    let ai = lua.create_table()?;
+
+    // luna.ai.newWorld()
+    // Creates a new AI world container that owns agents and a global blackboard.
+    ai.set(
+        "newWorld",
+        lua.create_function(|_, ()| {
+            Ok(LuaAIWorld {
+                inner: Rc::new(RefCell::new(AIWorld::new())),
+            })
+        })?,
+    )?;
+
+    // luna.ai.newBlackboard()
+    // Creates a new typed key-value blackboard for sharing AI state.
+    ai.set(
+        "newBlackboard",
+        lua.create_function(|_, ()| {
+            Ok(LuaBlackboard {
+                inner: Rc::new(RefCell::new(Blackboard::new())),
+            })
+        })?,
+    )?;
+
+    // luna.ai.newStateMachine()
+    // Creates a new finite state machine with guarded transitions.
+    ai.set(
+        "newStateMachine",
+        lua.create_function(|_, ()| {
+            Ok(LuaStateMachine {
+                inner: Rc::new(RefCell::new(StateMachine::new())),
+            })
+        })?,
+    )?;
+
+    // luna.ai.newBehaviorTree()
+    // Creates a new behavior tree container.
+    ai.set(
+        "newBehaviorTree",
+        lua.create_function(|_, ()| {
+            Ok(LuaBehaviorTree {
+                inner: Rc::new(RefCell::new(BehaviorTree::new())),
+            })
+        })?,
+    )?;
+
+    // BT node factories
+    // luna.ai.newSelector()
+    // Creates a BT selector node (tries children until one succeeds).
+    ai.set(
+        "newSelector",
+        lua.create_function(|_, ()| {
+            Ok(LuaBTNode {
+                inner: Rc::new(RefCell::new(BTNode::Selector {
+                    children: Vec::new(),
+                    running_idx: 0,
+                })),
+            })
+        })?,
+    )?;
+
+    // luna.ai.newSequence()
+    // Creates a BT sequence node (runs children until one fails).
+    ai.set(
+        "newSequence",
+        lua.create_function(|_, ()| {
+            Ok(LuaBTNode {
+                inner: Rc::new(RefCell::new(BTNode::Sequence {
+                    children: Vec::new(),
+                    running_idx: 0,
+                })),
+            })
+        })?,
+    )?;
+
+    // luna.ai.newParallel(successPolicy, failurePolicy)
+    // Creates a BT parallel node (ticks all children simultaneously).
+    ai.set(
+        "newParallel",
+        lua.create_function(|_, (sp, fp): (Option<String>, Option<String>)| {
+            Ok(LuaBTNode {
+                inner: Rc::new(RefCell::new(BTNode::Parallel {
+                    children: Vec::new(),
+                    success_policy: sp
+                        .map(|s| ParallelPolicy::parse_str(&s))
+                        .unwrap_or(ParallelPolicy::RequireOne),
+                    failure_policy: fp
+                        .map(|s| ParallelPolicy::parse_str(&s))
+                        .unwrap_or(ParallelPolicy::RequireOne),
+                })),
+            })
+        })?,
+    )?;
+
+    // luna.ai.newInverter()
+    // Creates a BT inverter decorator (swaps success/failure).
+    ai.set(
+        "newInverter",
+        lua.create_function(|_, ()| {
+            Ok(LuaBTNode {
+                inner: Rc::new(RefCell::new(BTNode::Inverter {
+                    child: Box::new(BTNode::Sequence {
+                        children: Vec::new(),
+                        running_idx: 0,
+                    }),
+                })),
+            })
+        })?,
+    )?;
+
+    // luna.ai.newRepeater(count)
+    // Creates a BT repeater decorator (repeats child N times, 0=infinite).
+    ai.set(
+        "newRepeater",
+        lua.create_function(|_, count: Option<u32>| {
+            Ok(LuaBTNode {
+                inner: Rc::new(RefCell::new(BTNode::Repeater {
+                    child: Box::new(BTNode::Sequence {
+                        children: Vec::new(),
+                        running_idx: 0,
+                    }),
+                    count: count.unwrap_or(0),
+                    done: 0,
+                })),
+            })
+        })?,
+    )?;
+
+    // luna.ai.newSucceeder()
+    // Creates a BT succeeder decorator (always returns success).
+    ai.set(
+        "newSucceeder",
+        lua.create_function(|_, ()| {
+            Ok(LuaBTNode {
+                inner: Rc::new(RefCell::new(BTNode::Succeeder {
+                    child: Box::new(BTNode::Sequence {
+                        children: Vec::new(),
+                        running_idx: 0,
+                    }),
+                })),
+            })
+        })?,
+    )?;
+
+    // luna.ai.newAction(callback)
+    // Creates a BT action leaf node with a Lua callback.
+    ai.set(
+        "newAction",
+        lua.create_function(|lua, callback: LuaFunction| {
+            let key = lua.create_registry_value(callback)?;
+            Ok(LuaBTNode {
+                inner: Rc::new(RefCell::new(BTNode::Action { callback: key })),
+            })
+        })?,
+    )?;
+
+    // luna.ai.newCondition(callback)
+    // Creates a BT condition leaf node with a Lua predicate.
+    ai.set(
+        "newCondition",
+        lua.create_function(|lua, callback: LuaFunction| {
+            let key = lua.create_registry_value(callback)?;
+            Ok(LuaBTNode {
+                inner: Rc::new(RefCell::new(BTNode::Condition { callback: key })),
+            })
+        })?,
+    )?;
+
+    // luna.ai.newSteeringManager()
+    // Creates a new steering behavior manager for combining movement forces.
+    ai.set(
+        "newSteeringManager",
+        lua.create_function(|_, ()| {
+            Ok(LuaSteeringManager {
+                inner: Rc::new(RefCell::new(SteeringManager::new())),
+            })
+        })?,
+    )?;
+
+    // luna.ai.newPathGrid(width, height, cellSize)
+    // Creates a new A-star pathfinding grid.
+    ai.set(
+        "newPathGrid",
+        lua.create_function(|_, (w, h, cs): (usize, usize, f32)| {
+            Ok(LuaPathGrid {
+                inner: Rc::new(RefCell::new(PathGrid::new(w, h, cs))),
+            })
+        })?,
+    )?;
+
+    // luna.ai.newFlowField(pathGrid)
+    // Creates a BFS flow field from a PathGrid.
+    ai.set(
+        "newFlowField",
+        lua.create_function(|_, grid_ud: LuaAnyUserData| {
+            let grid = grid_ud.borrow::<LuaPathGrid>()?;
+            let g = grid.inner.borrow();
+            let walkable: Vec<bool> = (0..g.width * g.height)
+                .map(|i| g.is_walkable(i % g.width, i / g.width))
+                .collect();
+            Ok(LuaFlowField {
+                inner: Rc::new(RefCell::new(FlowField::new(g.width, g.height, walkable))),
+            })
+        })?,
+    )?;
+
+    // luna.ai.newQLearner(stateCount, actionCount)
+    // Creates a tabular Q-learning agent.
+    ai.set(
+        "newQLearner",
+        lua.create_function(|_, (sc, ac): (usize, usize)| {
+            Ok(LuaQLearner {
+                inner: Rc::new(RefCell::new(QLearner::new(sc, ac))),
+            })
+        })?,
+    )?;
+
+    // luna.ai.newUtilityAI()
+    // Creates a new utility AI evaluator with response-curve-scored actions.
+    ai.set(
+        "newUtilityAI",
+        lua.create_function(|_, ()| {
+            Ok(LuaUtilityAI {
+                inner: Rc::new(RefCell::new(UtilityAI::new())),
+            })
+        })?,
+    )?;
+
+    // luna.ai.newGOAPPlanner()
+    // Creates a new goal-oriented action planning solver.
+    ai.set(
+        "newGOAPPlanner",
+        lua.create_function(|_, ()| {
+            Ok(LuaGOAPPlanner {
+                inner: Rc::new(RefCell::new(GOAPPlanner::new())),
+            })
+        })?,
+    )?;
+
+    // luna.ai.newInfluenceMap(width, height, cellSize)
+    // Creates a multi-layer influence map grid.
+    ai.set(
+        "newInfluenceMap",
+        lua.create_function(|_, (w, h, cs): (usize, usize, f32)| {
+            Ok(LuaInfluenceMap {
+                inner: Rc::new(RefCell::new(InfluenceMap::new(w, h, cs))),
+            })
+        })?,
+    )?;
+
+    // luna.ai.newSquad(name)
+    // Creates a named squad for group formation positioning.
+    ai.set(
+        "newSquad",
+        lua.create_function(|_, name: String| {
+            Ok(LuaSquad {
+                inner: Rc::new(RefCell::new(Squad::new(&name))),
+            })
+        })?,
+    )?;
+
+    // luna.ai.newCommandQueue()
+    // Creates an RTS-style command queue for sequencing agent orders.
+    ai.set(
+        "newCommandQueue",
+        lua.create_function(|_, ()| {
+            Ok(LuaCommandQueue {
+                inner: Rc::new(RefCell::new(CommandQueue::new())),
+            })
+        })?,
+    )?;
+
+    luna.set("ai", ai)?;
+    Ok(())
+}

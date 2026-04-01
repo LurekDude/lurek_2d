@@ -1,0 +1,10 @@
+{
+    "recommendations": [
+        // Rust
+        "rust-lang.rust-analyzer",   // Rust language server, cargo integration, launch.json support
+        "ms-vscode.cpptools",        // C/C++ extension — provides the cppvsdbg debug adapter used in launch.json
+        // Editing
+        "tamasfe.even-better-toml",  // Syntax highlighting + validation for Cargo.toml
+        "sumneko.lua"                // Lua language server — IntelliSense for game scripts
+    ]
+}

@@ -1,0 +1,1281 @@
+//! Integration tests for the `luna.particle.*` Lua API and particle system.
+
+use std::cell::RefCell;
+use std::path::PathBuf;
+use std::rc::Rc;
+
+use luna2d::lua_api::{create_lua_vm, SharedState};
+use luna2d::particle::{
+    interpolate_colors, interpolate_sizes, AreaDistribution, EmissionShape, InsertMode,
+    ParticleConfig, ParticleSystem, RelativeMode,
+};
+
+fn make_vm() -> (Rc<RefCell<SharedState>>, mlua::Lua) {
+    let state = Rc::new(RefCell::new(SharedState::new(
+        800,
+        600,
+        "test",
+        PathBuf::from("."),
+    )));
+    let lua = create_lua_vm(state.clone()).unwrap();
+    (state, lua)
+}
+
+fn assert_lua_error_contains(result: mlua::Result<()>, expected: &str) {
+    let err = result.expect_err("expected Lua script to fail");
+    let message = err.to_string();
+    assert!(
+        message.contains(expected),
+        "expected Lua error to contain '{expected}', got '{message}'"
+    );
+}
+
+// ── Existing tests (updated for new API) ────────────────────────────────
+
+#[test]
+fn test_phase01_released_particle_handle_reuse_reports_invalid_system() {
+    let (_state, lua) = make_vm();
+    let result = lua
+        .load(
+            r#"
+            local released = luna.particle.newSystem({ emissionRate = 10 })
+            assert(type(released) == "userdata")
+            assert(luna.particle.release(released) == true)
+
+            local replacement = luna.particle.newSystem({ emissionRate = 20 })
+            assert(type(replacement) == "userdata")
+
+            luna.particle.getCount(released)
+            "#,
+        )
+        .exec();
+
+    assert_lua_error_contains(result, "invalid or already-released particle system handle");
+}
+
+#[test]
+fn test_phase01_released_particle_long_tail_accessors_report_invalid_system() {
+    let cases = [
+        (
+            "luna.particle.getEmitterLifetime(released)",
+            "luna.particle.getEmitterLifetime: invalid or already-released particle system handle",
+        ),
+        (
+            "luna.particle.getDirection(released)",
+            "luna.particle.getDirection: invalid or already-released particle system handle",
+        ),
+        (
+            "luna.particle.getSpread(released)",
+            "luna.particle.getSpread: invalid or already-released particle system handle",
+        ),
+        (
+            "luna.particle.getLinearAcceleration(released)",
+            "luna.particle.getLinearAcceleration: invalid or already-released particle system handle",
+        ),
+        (
+            "luna.particle.getRadialAcceleration(released)",
+            "luna.particle.getRadialAcceleration: invalid or already-released particle system handle",
+        ),
+        (
+            "luna.particle.getTangentialAcceleration(released)",
+            "luna.particle.getTangentialAcceleration: invalid or already-released particle system handle",
+        ),
+        (
+            "luna.particle.getSizes(released)",
+            "luna.particle.getSizes: invalid or already-released particle system handle",
+        ),
+        (
+            "luna.particle.getColors(released)",
+            "luna.particle.getColors: invalid or already-released particle system handle",
+        ),
+        (
+            "luna.particle.getInsertMode(released)",
+            "luna.particle.getInsertMode: invalid or already-released particle system handle",
+        ),
+        (
+            "luna.particle.getBufferSize(released)",
+            "luna.particle.getBufferSize: invalid or already-released particle system handle",
+        ),
+    ];
+
+    for (expression, expected_error) in cases {
+        let (_state, lua) = make_vm();
+        let script = format!(
+            r#"
+            local released = luna.particle.newSystem({{ emissionRate = 10 }})
+            assert(type(released) == "userdata")
+            assert(luna.particle.release(released) == true)
+
+            {expression}
+            "#,
+        );
+        let result = lua.load(&script).exec();
+        assert_lua_error_contains(result, expected_error);
+    }
+}
+
+#[test]
+fn test_phase01_released_particle_long_tail_mutators_report_invalid_system() {
+    let cases = [
+        (
+            "luna.particle.setEmitterLifetime(released, 5.0)",
+            "luna.particle.setEmitterLifetime: invalid or already-released particle system handle",
+        ),
+        (
+            "luna.particle.setDirection(released, 1.25)",
+            "luna.particle.setDirection: invalid or already-released particle system handle",
+        ),
+        (
+            "luna.particle.setSizes(released, 1, 2)",
+            "luna.particle.setSizes: invalid or already-released particle system handle",
+        ),
+    ];
+
+    for (expression, expected_error) in cases {
+        let (_state, lua) = make_vm();
+        let script = format!(
+            r#"
+            local released = luna.particle.newSystem({{ emissionRate = 10 }})
+            assert(type(released) == "userdata")
+            assert(luna.particle.release(released) == true)
+
+            {expression}
+            "#,
+        );
+        let result = lua.load(&script).exec();
+        assert_lua_error_contains(result, expected_error);
+    }
+}
+
+#[test]
+fn test_particle_new_system_default() {
+    let (state, lua) = make_vm();
+    lua.load("local id = luna.particle.newSystem(); assert(type(id) == 'userdata')")
+        .exec()
+        .unwrap();
+    let st = state.borrow();
+    assert_eq!(st.particle_systems.len(), 1);
+    assert!(st.particle_systems.values().next().unwrap().is_active());
+}
+
+#[test]
+fn test_particle_new_system_with_config() {
+    let (state, lua) = make_vm();
+    lua.load(
+        r#"
+        local id = luna.particle.newSystem({
+            maxParticles = 100,
+            emissionRate = 50,
+            lifetimeMin = 0.5,
+            lifetimeMax = 1.5,
+            speedMin = 10,
+            speedMax = 200,
+            gravityY = 100,
+            sizeStart = 8,
+            sizeEnd = 2,
+        })
+        assert(type(id) == 'userdata')
+        "#,
+    )
+    .exec()
+    .unwrap();
+    let st = state.borrow();
+    let ps = st.particle_systems.values().next().unwrap();
+    assert_eq!(ps.config.max_particles, 100);
+    assert!((ps.config.emission_rate - 50.0).abs() < 1e-5);
+    assert!((ps.config.gravity_y - 100.0).abs() < 1e-5);
+    // sizeStart/sizeEnd backward compat -> sizes vec
+    assert_eq!(ps.config.sizes.len(), 2);
+    assert!((ps.config.sizes[0] - 8.0).abs() < 1e-5);
+    assert!((ps.config.sizes[1] - 2.0).abs() < 1e-5);
+}
+
+#[test]
+fn test_particle_update_and_count() {
+    let (_state, lua) = make_vm();
+    lua.load(
+        r#"
+        local id = luna.particle.newSystem({ emissionRate = 100 })
+        luna.particle.update(id, 1.0)
+        local count = luna.particle.getCount(id)
+        assert(count > 0, "Expected particles after update, got " .. tostring(count))
+        "#,
+    )
+    .exec()
+    .unwrap();
+}
+
+#[test]
+fn test_particle_stop_and_start() {
+    let (_state, lua) = make_vm();
+    lua.load(
+        r#"
+        local id = luna.particle.newSystem({ emissionRate = 1000, lifetimeMin = 10, lifetimeMax = 10 })
+        luna.particle.update(id, 0.1)
+        local c1 = luna.particle.getCount(id)
+        assert(c1 > 0)
+        luna.particle.stop(id)
+        local frozen = luna.particle.getCount(id)
+        luna.particle.update(id, 0.1)
+        local c2 = luna.particle.getCount(id)
+        assert(c2 <= frozen, "Expected no new particles after stop")
+        luna.particle.start(id)
+        luna.particle.update(id, 0.1)
+        local c3 = luna.particle.getCount(id)
+        assert(c3 >= c2, "Expected new particles after start")
+        "#,
+    )
+    .exec()
+    .unwrap();
+}
+
+#[test]
+fn test_particle_reset() {
+    let (_state, lua) = make_vm();
+    lua.load(
+        r#"
+        local id = luna.particle.newSystem({ emissionRate = 100 })
+        luna.particle.update(id, 1.0)
+        assert(luna.particle.getCount(id) > 0)
+        luna.particle.reset(id)
+        assert(luna.particle.getCount(id) == 0)
+        "#,
+    )
+    .exec()
+    .unwrap();
+}
+
+#[test]
+fn test_particle_set_position() {
+    let (state, lua) = make_vm();
+    lua.load(
+        r#"
+        local id = luna.particle.newSystem()
+        luna.particle.setPosition(id, 100, 200)
+        "#,
+    )
+    .exec()
+    .unwrap();
+    let st = state.borrow();
+    let ps = st.particle_systems.values().next().unwrap();
+    assert!((ps.emitter_x - 100.0).abs() < 1e-5);
+    assert!((ps.emitter_y - 200.0).abs() < 1e-5);
+}
+
+#[test]
+fn test_particle_set_emission_rate() {
+    let (state, lua) = make_vm();
+    lua.load(
+        r#"
+        local id = luna.particle.newSystem({ emissionRate = 10 })
+        luna.particle.setEmissionRate(id, 500)
+        "#,
+    )
+    .exec()
+    .unwrap();
+    let st = state.borrow();
+    assert!(
+        (st.particle_systems
+            .values()
+            .next()
+            .unwrap()
+            .config
+            .emission_rate
+            - 500.0)
+            .abs()
+            < 1e-5
+    );
+}
+
+#[test]
+fn test_particle_draw_generates_commands() {
+    let (state, lua) = make_vm();
+    lua.load(
+        r#"
+        local id = luna.particle.newSystem({ emissionRate = 100 })
+        luna.particle.update(id, 1.0)
+        luna.particle.draw(id)
+        "#,
+    )
+    .exec()
+    .unwrap();
+    let st = state.borrow();
+    assert!(st.draw_commands.len() > 0);
+    assert_eq!(st.draw_commands.len() % 2, 0);
+}
+
+#[test]
+fn test_particle_multiple_systems() {
+    let (state, lua) = make_vm();
+    lua.load(
+        r#"
+        local id0 = luna.particle.newSystem({ emissionRate = 10 })
+        local id1 = luna.particle.newSystem({ emissionRate = 20 })
+        assert(type(id0) == "userdata", "first system should return userdata")
+        assert(type(id1) == "userdata", "second system should return userdata")
+        assert(id0 ~= id1, "different systems should have different ids")
+        "#,
+    )
+    .exec()
+    .unwrap();
+    assert_eq!(state.borrow().particle_systems.len(), 2);
+}
+
+// ── Phase 12: New Rust-level tests ──────────────────────────────────────
+
+#[test]
+fn test_multi_stop_size_interpolation() {
+    // 3-stop: [10, 20, 5]
+    let sizes = [10.0, 20.0, 5.0];
+    assert!((interpolate_sizes(&sizes, 0.0, 0.0) - 10.0).abs() < 1e-5);
+    assert!((interpolate_sizes(&sizes, 0.5, 0.0) - 20.0).abs() < 1e-5);
+    assert!((interpolate_sizes(&sizes, 1.0, 0.0) - 5.0).abs() < 1e-5);
+    // Midpoints
+    assert!((interpolate_sizes(&sizes, 0.25, 0.0) - 15.0).abs() < 1e-5);
+    assert!((interpolate_sizes(&sizes, 0.75, 0.0) - 12.5).abs() < 1e-5);
+}
+
+#[test]
+fn test_multi_stop_color_interpolation() {
+    let colors = [
+        [1.0, 0.0, 0.0, 1.0], // red
+        [0.0, 1.0, 0.0, 1.0], // green
+        [0.0, 0.0, 1.0, 1.0], // blue
+    ];
+    let c0 = interpolate_colors(&colors, 0.0);
+    assert!((c0[0] - 1.0).abs() < 1e-5); // red
+    let c_mid = interpolate_colors(&colors, 0.5);
+    assert!((c_mid[1] - 1.0).abs() < 1e-5); // green
+    let c1 = interpolate_colors(&colors, 1.0);
+    assert!((c1[2] - 1.0).abs() < 1e-5); // blue
+                                         // Quarter: between red and green
+    let c_q = interpolate_colors(&colors, 0.25);
+    assert!((c_q[0] - 0.5).abs() < 1e-5);
+    assert!((c_q[1] - 0.5).abs() < 1e-5);
+}
+
+#[test]
+fn test_burst_emit() {
+    let mut cfg = ParticleConfig::default();
+    cfg.max_particles = 1000;
+    cfg.lifetime_min = 10.0;
+    cfg.lifetime_max = 10.0;
+    let mut sys = ParticleSystem::new(cfg);
+    sys.emit(50);
+    assert_eq!(sys.count(), 50);
+}
+
+#[test]
+fn test_burst_emit_respects_max() {
+    let mut cfg = ParticleConfig::default();
+    cfg.max_particles = 10;
+    cfg.lifetime_min = 10.0;
+    cfg.lifetime_max = 10.0;
+    let mut sys = ParticleSystem::new(cfg);
+    sys.emit(100);
+    assert_eq!(sys.count(), 10);
+}
+
+#[test]
+fn test_emitter_lifetime_auto_stop() {
+    let mut cfg = ParticleConfig::default();
+    cfg.emitter_lifetime = 0.5;
+    cfg.emission_rate = 100.0;
+    cfg.lifetime_min = 10.0;
+    cfg.lifetime_max = 10.0;
+    let mut sys = ParticleSystem::new(cfg);
+    assert!(sys.is_active());
+    // Update past the emitter lifetime
+    sys.update(0.6);
+    assert!(sys.is_stopped());
+    // Should not emit more after stopping
+    let count_after_stop = sys.count();
+    sys.update(1.0);
+    assert!(sys.count() <= count_after_stop);
+}
+
+#[test]
+fn test_pause_freezes_particles() {
+    let mut cfg = ParticleConfig::default();
+    cfg.emission_rate = 100.0;
+    cfg.lifetime_min = 10.0;
+    cfg.lifetime_max = 10.0;
+    cfg.speed_min = 100.0;
+    cfg.speed_max = 100.0;
+    let mut sys = ParticleSystem::new(cfg);
+    sys.update(0.1); // emit some
+    let count_before = sys.count();
+    let positions: Vec<(f32, f32)> = sys.particles.iter().map(|p| (p.x, p.y)).collect();
+
+    sys.pause();
+    sys.update(1.0); // should do nothing
+
+    assert_eq!(sys.count(), count_before); // same count
+    for (i, p) in sys.particles.iter().enumerate() {
+        assert!((p.x - positions[i].0).abs() < 1e-5, "expected frozen x");
+        assert!((p.y - positions[i].1).abs() < 1e-5, "expected frozen y");
+    }
+}
+
+#[test]
+fn test_clone_copies_config_not_particles() {
+    let mut cfg = ParticleConfig::default();
+    cfg.emission_rate = 100.0;
+    cfg.lifetime_min = 10.0;
+    cfg.lifetime_max = 10.0;
+    let mut sys = ParticleSystem::new(cfg);
+    sys.update(1.0);
+    assert!(sys.count() > 0);
+
+    let cloned = sys.clone_config();
+    assert_eq!(cloned.count(), 0);
+    assert!((cloned.config.emission_rate - 100.0).abs() < 1e-5);
+}
+
+#[test]
+fn test_area_emission_ellipse() {
+    let mut cfg = ParticleConfig::default();
+    cfg.area_distribution = AreaDistribution::Ellipse;
+    cfg.area_width = 100.0;
+    cfg.area_height = 50.0;
+    cfg.emission_rate = 1000.0;
+    cfg.speed_min = 0.0;
+    cfg.speed_max = 0.0;
+    cfg.lifetime_min = 100.0;
+    cfg.lifetime_max = 100.0;
+    let mut sys = ParticleSystem::new(cfg);
+    sys.emit(200);
+
+    for p in &sys.particles {
+        let nx = p.x / 50.0; // half-width
+        let ny = p.y / 25.0; // half-height
+        let d = nx * nx + ny * ny;
+        assert!(
+            d <= 1.0 + 1e-3,
+            "particle ({}, {}) outside ellipse: d={}",
+            p.x,
+            p.y,
+            d
+        );
+    }
+}
+
+#[test]
+fn test_radial_acceleration() {
+    let mut cfg = ParticleConfig::default();
+    cfg.radial_accel_min = 100.0;
+    cfg.radial_accel_max = 100.0;
+    cfg.emission_rate = 0.0; // manual emit only
+    cfg.speed_min = 50.0;
+    cfg.speed_max = 50.0;
+    cfg.direction = 0.0; // rightward
+    cfg.spread = 0.0;
+    cfg.gravity_x = 0.0;
+    cfg.gravity_y = 0.0;
+    cfg.lifetime_min = 10.0;
+    cfg.lifetime_max = 10.0;
+    let mut sys = ParticleSystem::new(cfg);
+    sys.emit(1);
+
+    // First small step to move particle away from the origin (dist must be > 0
+    // for radial/tangential accel to apply).
+    sys.update(0.1);
+    let speed_after_move = (sys.particles[0].vx.powi(2) + sys.particles[0].vy.powi(2)).sqrt();
+
+    // Now a larger step where radial accel can act
+    sys.update(1.0);
+    let final_speed = (sys.particles[0].vx.powi(2) + sys.particles[0].vy.powi(2)).sqrt();
+
+    // Radial accel should increase speed away from origin
+    assert!(
+        final_speed > speed_after_move,
+        "expected speed increase from radial accel: {} > {}",
+        final_speed,
+        speed_after_move
+    );
+}
+
+#[test]
+fn test_tangential_acceleration() {
+    let mut cfg = ParticleConfig::default();
+    cfg.tangential_accel_min = 200.0;
+    cfg.tangential_accel_max = 200.0;
+    cfg.emission_rate = 0.0;
+    cfg.speed_min = 50.0;
+    cfg.speed_max = 50.0;
+    cfg.direction = 0.0; // rightward
+    cfg.spread = 0.0;
+    cfg.gravity_x = 0.0;
+    cfg.gravity_y = 0.0;
+    cfg.lifetime_min = 10.0;
+    cfg.lifetime_max = 10.0;
+    let mut sys = ParticleSystem::new(cfg);
+    sys.emit(1);
+
+    // First small step to move particle away from origin
+    sys.update(0.1);
+    let vy_after_move = sys.particles[0].vy;
+
+    // Now tangential accel can act (perpendicular to radial direction)
+    sys.update(0.5);
+    let final_vy = sys.particles[0].vy;
+
+    assert!(
+        (final_vy - vy_after_move).abs() > 1.0,
+        "expected vy change from tangential accel: {} -> {}",
+        vy_after_move,
+        final_vy
+    );
+}
+
+#[test]
+fn test_linear_damping() {
+    let mut cfg = ParticleConfig::default();
+    cfg.linear_damping_min = 5.0;
+    cfg.linear_damping_max = 5.0;
+    cfg.emission_rate = 0.0;
+    cfg.speed_min = 100.0;
+    cfg.speed_max = 100.0;
+    cfg.direction = 0.0;
+    cfg.spread = 0.0;
+    cfg.gravity_x = 0.0;
+    cfg.gravity_y = 0.0;
+    cfg.lifetime_min = 10.0;
+    cfg.lifetime_max = 10.0;
+    let mut sys = ParticleSystem::new(cfg);
+    sys.emit(1);
+
+    let initial_speed = (sys.particles[0].vx.powi(2) + sys.particles[0].vy.powi(2)).sqrt();
+    sys.update(1.0);
+    let final_speed = (sys.particles[0].vx.powi(2) + sys.particles[0].vy.powi(2)).sqrt();
+
+    assert!(
+        final_speed < initial_speed,
+        "expected velocity decrease from damping: {} < {}",
+        final_speed,
+        initial_speed
+    );
+}
+
+#[test]
+fn test_relative_rotation() {
+    let mut cfg = ParticleConfig::default();
+    cfg.relative_rotation = true;
+    cfg.emission_rate = 0.0;
+    cfg.speed_min = 100.0;
+    cfg.speed_max = 100.0;
+    cfg.direction = std::f32::consts::FRAC_PI_4; // 45 degrees
+    cfg.spread = 0.0;
+    cfg.gravity_x = 0.0;
+    cfg.gravity_y = 0.0;
+    cfg.lifetime_min = 10.0;
+    cfg.lifetime_max = 10.0;
+    let mut sys = ParticleSystem::new(cfg);
+    sys.emit(1);
+    sys.update(0.1);
+
+    let expected_angle = sys.particles[0].vy.atan2(sys.particles[0].vx);
+    assert!(
+        (sys.particles[0].rotation - expected_angle).abs() < 1e-5,
+        "rotation {} should match velocity direction {}",
+        sys.particles[0].rotation,
+        expected_angle
+    );
+}
+
+#[test]
+fn test_insert_mode_top() {
+    let mut cfg = ParticleConfig::default();
+    cfg.insert_mode = InsertMode::Top;
+    cfg.emission_rate = 0.0;
+    cfg.lifetime_min = 10.0;
+    cfg.lifetime_max = 10.0;
+    let mut sys = ParticleSystem::new(cfg);
+    sys.emit(3);
+    assert_eq!(sys.count(), 3);
+    // Top insert: last emitted should be at the end
+    // Verify they're all present
+    assert!(!sys.is_empty());
+}
+
+#[test]
+fn test_emitter_state_transitions() {
+    let mut sys = ParticleSystem::new(ParticleConfig::default());
+    assert!(sys.is_active());
+    assert!(!sys.is_paused());
+    assert!(!sys.is_stopped());
+
+    sys.pause();
+    assert!(sys.is_paused());
+    assert!(!sys.is_active());
+
+    sys.resume();
+    assert!(sys.is_active());
+
+    sys.stop();
+    assert!(sys.is_stopped());
+
+    sys.start();
+    assert!(sys.is_active());
+}
+
+#[test]
+fn test_move_to_updates_position() {
+    let mut sys = ParticleSystem::new(ParticleConfig::default());
+    assert!((sys.emitter_x - 0.0).abs() < 1e-5);
+    assert!((sys.emitter_y - 0.0).abs() < 1e-5);
+    sys.move_to(100.0, 200.0);
+    assert!((sys.emitter_x - 100.0).abs() < 1e-5);
+    assert!((sys.emitter_y - 200.0).abs() < 1e-5);
+    assert!((sys.prev_emitter_x - 0.0).abs() < 1e-5);
+    assert!((sys.prev_emitter_y - 0.0).abs() < 1e-5);
+}
+
+#[test]
+fn test_backward_compat_size_start_end() {
+    let (_state, lua) = make_vm();
+    lua.load(
+        r#"
+        local id = luna.particle.newSystem({
+            sizeStart = 10,
+            sizeEnd = 2,
+        })
+        -- Sizes should be populated from sizeStart/sizeEnd
+        local sizes = luna.particle.getSizes(id)
+        assert(sizes ~= nil, "sizes should not be nil")
+        assert(math.abs(sizes[1] - 10) < 0.001, "first size should be 10, got " .. tostring(sizes[1]))
+        assert(math.abs(sizes[2] - 2) < 0.001, "second size should be 2, got " .. tostring(sizes[2]))
+        "#,
+    )
+    .exec()
+    .unwrap();
+}
+
+#[test]
+fn test_backward_compat_color_start_end() {
+    let (_state, lua) = make_vm();
+    lua.load(
+        r#"
+        local id = luna.particle.newSystem({
+            colorStart = {1, 0, 0, 1},
+            colorEnd = {0, 0, 1, 0.5},
+        })
+        local colors = luna.particle.getColors(id)
+        assert(colors ~= nil)
+        assert(math.abs(colors[1][1] - 1) < 0.001, "start red should be 1")
+        assert(math.abs(colors[1][2] - 0) < 0.001, "start green should be 0")
+        assert(math.abs(colors[2][3] - 1) < 0.001, "end blue should be 1")
+        assert(math.abs(colors[2][4] - 0.5) < 0.001, "end alpha should be 0.5")
+        "#,
+    )
+    .exec()
+    .unwrap();
+}
+
+// ── Phase 12: Lua API tests for new functions ───────────────────────────
+
+#[test]
+fn test_lua_pause_resume() {
+    let (_state, lua) = make_vm();
+    lua.load(
+        r#"
+        local id = luna.particle.newSystem({ emissionRate = 100 })
+        assert(luna.particle.isActive(id))
+        luna.particle.pause(id)
+        assert(luna.particle.isPaused(id))
+        assert(not luna.particle.isActive(id))
+        luna.particle.start(id)
+        assert(luna.particle.isActive(id))
+        "#,
+    )
+    .exec()
+    .unwrap();
+}
+
+#[test]
+fn test_lua_emit_burst() {
+    let (_state, lua) = make_vm();
+    lua.load(
+        r#"
+        local id = luna.particle.newSystem({
+            maxParticles = 1000,
+            emissionRate = 0,
+            lifetimeMin = 10,
+            lifetimeMax = 10,
+        })
+        luna.particle.emit(id, 50)
+        assert(luna.particle.getCount(id) == 50, "Expected 50 particles, got " .. luna.particle.getCount(id))
+        "#,
+    )
+    .exec()
+    .unwrap();
+}
+
+#[test]
+fn test_lua_clone_system() {
+    let (_state, lua) = make_vm();
+    lua.load(
+        r#"
+        local id = luna.particle.newSystem({
+            emissionRate = 100,
+            lifetimeMin = 10,
+            lifetimeMax = 10,
+        })
+        luna.particle.update(id, 0.5)
+        assert(luna.particle.getCount(id) > 0)
+        local cloned = luna.particle.clone(id)
+        assert(cloned ~= id)
+        assert(luna.particle.getCount(cloned) == 0, "Cloned system should have 0 particles")
+        assert(luna.particle.getEmissionRate(cloned) == 100, "Cloned should have same emission rate")
+        "#,
+    )
+    .exec()
+    .unwrap();
+}
+
+#[test]
+fn test_lua_get_set_position() {
+    let (_state, lua) = make_vm();
+    lua.load(
+        r#"
+        local id = luna.particle.newSystem()
+        luna.particle.setPosition(id, 42, 84)
+        local x, y = luna.particle.getPosition(id)
+        assert(math.abs(x - 42) < 0.001)
+        assert(math.abs(y - 84) < 0.001)
+        "#,
+    )
+    .exec()
+    .unwrap();
+}
+
+#[test]
+fn test_lua_move_to() {
+    let (_state, lua) = make_vm();
+    lua.load(
+        r#"
+        local id = luna.particle.newSystem()
+        luna.particle.moveTo(id, 50, 75)
+        local x, y = luna.particle.getPosition(id)
+        assert(math.abs(x - 50) < 0.001)
+        assert(math.abs(y - 75) < 0.001)
+        "#,
+    )
+    .exec()
+    .unwrap();
+}
+
+#[test]
+fn test_lua_is_empty_is_full() {
+    let (_state, lua) = make_vm();
+    lua.load(
+        r#"
+        local id = luna.particle.newSystem({
+            maxParticles = 5,
+            emissionRate = 0,
+            lifetimeMin = 10,
+            lifetimeMax = 10,
+        })
+        assert(luna.particle.isEmpty(id), "should start empty")
+        assert(not luna.particle.isFull(id))
+        luna.particle.emit(id, 5)
+        assert(not luna.particle.isEmpty(id))
+        assert(luna.particle.isFull(id), "should be full at max")
+        "#,
+    )
+    .exec()
+    .unwrap();
+}
+
+#[test]
+fn test_lua_lifetime_getters_setters() {
+    let (_state, lua) = make_vm();
+    lua.load(
+        r#"
+        local id = luna.particle.newSystem()
+        luna.particle.setParticleLifetime(id, 0.5, 3.0)
+        local min, max = luna.particle.getParticleLifetime(id)
+        assert(math.abs(min - 0.5) < 0.001)
+        assert(math.abs(max - 3.0) < 0.001)
+        luna.particle.setEmitterLifetime(id, 5.0)
+        assert(math.abs(luna.particle.getEmitterLifetime(id) - 5.0) < 0.001)
+        "#,
+    )
+    .exec()
+    .unwrap();
+}
+
+#[test]
+fn test_lua_speed_direction_spread() {
+    let (_state, lua) = make_vm();
+    lua.load(
+        r#"
+        local id = luna.particle.newSystem()
+        luna.particle.setSpeed(id, 10, 200)
+        local smin, smax = luna.particle.getSpeed(id)
+        assert(math.abs(smin - 10) < 0.001)
+        assert(math.abs(smax - 200) < 0.001)
+        luna.particle.setDirection(id, 1.5)
+        assert(math.abs(luna.particle.getDirection(id) - 1.5) < 0.001)
+        luna.particle.setSpread(id, 0.5)
+        assert(math.abs(luna.particle.getSpread(id) - 0.5) < 0.001)
+        "#,
+    )
+    .exec()
+    .unwrap();
+}
+
+#[test]
+fn test_lua_acceleration_setters() {
+    let (_state, lua) = make_vm();
+    lua.load(
+        r#"
+        local id = luna.particle.newSystem()
+        luna.particle.setLinearAcceleration(id, -10, -20, 10, 20)
+        local xmin, ymin, xmax, ymax = luna.particle.getLinearAcceleration(id)
+        assert(math.abs(xmin - (-10)) < 0.001)
+        assert(math.abs(ymax - 20) < 0.001)
+        luna.particle.setRadialAcceleration(id, 5, 50)
+        local rmin, rmax = luna.particle.getRadialAcceleration(id)
+        assert(math.abs(rmin - 5) < 0.001)
+        assert(math.abs(rmax - 50) < 0.001)
+        luna.particle.setTangentialAcceleration(id, -30, 30)
+        local tmin, tmax = luna.particle.getTangentialAcceleration(id)
+        assert(math.abs(tmin - (-30)) < 0.001)
+        assert(math.abs(tmax - 30) < 0.001)
+        luna.particle.setLinearDamping(id, 1, 3)
+        local dmin, dmax = luna.particle.getLinearDamping(id)
+        assert(math.abs(dmin - 1) < 0.001)
+        assert(math.abs(dmax - 3) < 0.001)
+        "#,
+    )
+    .exec()
+    .unwrap();
+}
+
+#[test]
+fn test_lua_sizes_api() {
+    let (_state, lua) = make_vm();
+    lua.load(
+        r#"
+        local id = luna.particle.newSystem()
+        luna.particle.setSizes(id, 1, 5, 10, 2)
+        local sizes = luna.particle.getSizes(id)
+        assert(#sizes == 4)
+        assert(math.abs(sizes[1] - 1) < 0.001)
+        assert(math.abs(sizes[4] - 2) < 0.001)
+        "#,
+    )
+    .exec()
+    .unwrap();
+}
+
+#[test]
+fn test_lua_colors_api() {
+    let (_state, lua) = make_vm();
+    lua.load(
+        r#"
+        local id = luna.particle.newSystem()
+        luna.particle.setColors(id, {1, 0, 0, 1}, {0, 1, 0, 0.5}, {0, 0, 1, 0})
+        local colors = luna.particle.getColors(id)
+        assert(#colors == 3)
+        assert(math.abs(colors[1][1] - 1) < 0.001, "first color red")
+        assert(math.abs(colors[2][2] - 1) < 0.001, "second color green")
+        assert(math.abs(colors[3][3] - 1) < 0.001, "third color blue")
+        "#,
+    )
+    .exec()
+    .unwrap();
+}
+
+#[test]
+fn test_lua_rotation_spin_variation() {
+    let (_state, lua) = make_vm();
+    lua.load(
+        r#"
+        local id = luna.particle.newSystem()
+        luna.particle.setRotation(id, 0, 6.28)
+        local rmin, rmax = luna.particle.getRotation(id)
+        assert(math.abs(rmin - 0) < 0.001)
+        assert(math.abs(rmax - 6.28) < 0.001)
+        luna.particle.setSpin(id, -5, 5)
+        local smin, smax = luna.particle.getSpin(id)
+        assert(math.abs(smin - (-5)) < 0.001)
+        assert(math.abs(smax - 5) < 0.001)
+        luna.particle.setSpinVariation(id, 0.5)
+        assert(math.abs(luna.particle.getSpinVariation(id) - 0.5) < 0.001)
+        luna.particle.setSizeVariation(id, 0.8)
+        assert(math.abs(luna.particle.getSizeVariation(id) - 0.8) < 0.001)
+        "#,
+    )
+    .exec()
+    .unwrap();
+}
+
+#[test]
+fn test_lua_relative_rotation_api() {
+    let (_state, lua) = make_vm();
+    lua.load(
+        r#"
+        local id = luna.particle.newSystem()
+        assert(not luna.particle.hasRelativeRotation(id))
+        luna.particle.setRelativeRotation(id, true)
+        assert(luna.particle.hasRelativeRotation(id))
+        "#,
+    )
+    .exec()
+    .unwrap();
+}
+
+#[test]
+fn test_lua_emission_area() {
+    let (_state, lua) = make_vm();
+    lua.load(
+        r#"
+        local id = luna.particle.newSystem()
+        luna.particle.setEmissionArea(id, "ellipse", 100, 50, 0.5, true)
+        local dist, w, h, angle, rel = luna.particle.getEmissionArea(id)
+        assert(dist == "ellipse")
+        assert(math.abs(w - 100) < 0.001)
+        assert(math.abs(h - 50) < 0.001)
+        assert(math.abs(angle - 0.5) < 0.001)
+        assert(rel == true)
+        "#,
+    )
+    .exec()
+    .unwrap();
+}
+
+#[test]
+fn test_lua_insert_mode() {
+    let (_state, lua) = make_vm();
+    lua.load(
+        r#"
+        local id = luna.particle.newSystem()
+        assert(luna.particle.getInsertMode(id) == "top")
+        luna.particle.setInsertMode(id, "bottom")
+        assert(luna.particle.getInsertMode(id) == "bottom")
+        luna.particle.setInsertMode(id, "random")
+        assert(luna.particle.getInsertMode(id) == "random")
+        "#,
+    )
+    .exec()
+    .unwrap();
+}
+
+#[test]
+fn test_lua_buffer_size() {
+    let (_state, lua) = make_vm();
+    lua.load(
+        r#"
+        local id = luna.particle.newSystem({ maxParticles = 100 })
+        assert(luna.particle.getBufferSize(id) == 100)
+        luna.particle.setBufferSize(id, 50)
+        assert(luna.particle.getBufferSize(id) == 50)
+        "#,
+    )
+    .exec()
+    .unwrap();
+}
+
+#[test]
+fn test_lua_offset() {
+    let (_state, lua) = make_vm();
+    lua.load(
+        r#"
+        local id = luna.particle.newSystem()
+        luna.particle.setOffset(id, 16, 16)
+        local ox, oy = luna.particle.getOffset(id)
+        assert(math.abs(ox - 16) < 0.001)
+        assert(math.abs(oy - 16) < 0.001)
+        "#,
+    )
+    .exec()
+    .unwrap();
+}
+
+// ── Phase 30 — Particle System Extended ────────────────────────────────
+
+#[test]
+fn test_lua_gravity_api() {
+    let (_state, lua) = make_vm();
+    lua.load(
+        r#"
+        local id = luna.particle.newSystem({ gravityX = 10, gravityY = 20 })
+        local gx, gy = luna.particle.getGravity(id)
+        assert(math.abs(gx - 10) < 0.001)
+        assert(math.abs(gy - 20) < 0.001)
+        luna.particle.setGravity(id, -5, 100)
+        gx, gy = luna.particle.getGravity(id)
+        assert(math.abs(gx - (-5)) < 0.001)
+        assert(math.abs(gy - 100) < 0.001)
+        "#,
+    )
+    .exec()
+    .unwrap();
+}
+
+#[test]
+fn test_lua_alphas_api() {
+    let (_state, lua) = make_vm();
+    lua.load(
+        r#"
+        local id = luna.particle.newSystem()
+        luna.particle.setAlphas(id, 1.0, 0.5, 0.0)
+        local alphas = luna.particle.getAlphas(id)
+        assert(#alphas == 3)
+        assert(math.abs(alphas[1] - 1.0) < 0.001)
+        assert(math.abs(alphas[2] - 0.5) < 0.001)
+        assert(math.abs(alphas[3] - 0.0) < 0.001)
+        "#,
+    )
+    .exec()
+    .unwrap();
+}
+
+#[test]
+fn test_lua_alphas_config() {
+    let (_state, lua) = make_vm();
+    lua.load(
+        r#"
+        local id = luna.particle.newSystem({
+            alphaKeyframes = {1.0, 0.8, 0.3, 0.0}
+        })
+        local alphas = luna.particle.getAlphas(id)
+        assert(#alphas == 4)
+        assert(math.abs(alphas[1] - 1.0) < 0.001)
+        assert(math.abs(alphas[4] - 0.0) < 0.001)
+        "#,
+    )
+    .exec()
+    .unwrap();
+}
+
+#[test]
+fn test_lua_emission_shape_api() {
+    let (_state, lua) = make_vm();
+    lua.load(
+        r#"
+        local id = luna.particle.newSystem()
+        -- Default is point
+        local shape = luna.particle.getEmissionShape(id)
+        assert(shape.type == "point")
+
+        -- Set to circle
+        luna.particle.setEmissionShape(id, "circle", { radius = 25.0, fill = false })
+        shape = luna.particle.getEmissionShape(id)
+        assert(shape.type == "circle")
+        assert(math.abs(shape.radius - 25.0) < 0.001)
+        assert(shape.fill == false)
+
+        -- Set to rectangle
+        luna.particle.setEmissionShape(id, "rectangle", { width = 100, height = 50 })
+        shape = luna.particle.getEmissionShape(id)
+        assert(shape.type == "rectangle")
+        assert(math.abs(shape.width - 100) < 0.001)
+        assert(math.abs(shape.height - 50) < 0.001)
+
+        -- Set to ring
+        luna.particle.setEmissionShape(id, "ring", { innerRadius = 5, outerRadius = 15 })
+        shape = luna.particle.getEmissionShape(id)
+        assert(shape.type == "ring")
+        assert(math.abs(shape.innerRadius - 5) < 0.001)
+        assert(math.abs(shape.outerRadius - 15) < 0.001)
+
+        -- Set back to point
+        luna.particle.setEmissionShape(id, "point")
+        shape = luna.particle.getEmissionShape(id)
+        assert(shape.type == "point")
+        "#,
+    )
+    .exec()
+    .unwrap();
+}
+
+#[test]
+fn test_lua_emission_shape_config() {
+    let (_state, lua) = make_vm();
+    lua.load(
+        r#"
+        local id = luna.particle.newSystem({
+            emissionShape = "circle",
+            emissionShapeRadius = 30.0,
+            emissionShapeFill = true
+        })
+        local shape = luna.particle.getEmissionShape(id)
+        assert(shape.type == "circle")
+        assert(math.abs(shape.radius - 30.0) < 0.001)
+        assert(shape.fill == true)
+        "#,
+    )
+    .exec()
+    .unwrap();
+}
+
+#[test]
+fn test_lua_relative_mode_api() {
+    let (_state, lua) = make_vm();
+    lua.load(
+        r#"
+        local id = luna.particle.newSystem()
+        -- Default is detached
+        assert(luna.particle.getRelativeMode(id) == "detached")
+
+        luna.particle.setRelativeMode(id, "attached")
+        assert(luna.particle.getRelativeMode(id) == "attached")
+
+        luna.particle.setRelativeMode(id, "detached")
+        assert(luna.particle.getRelativeMode(id) == "detached")
+        "#,
+    )
+    .exec()
+    .unwrap();
+}
+
+#[test]
+fn test_lua_relative_mode_config() {
+    let (_state, lua) = make_vm();
+    lua.load(
+        r#"
+        local id = luna.particle.newSystem({
+            relativeMode = "attached"
+        })
+        assert(luna.particle.getRelativeMode(id) == "attached")
+        "#,
+    )
+    .exec()
+    .unwrap();
+}
+
+#[test]
+fn test_oo_gravity_api() {
+    let (_state, lua) = make_vm();
+    lua.load(
+        r#"
+        local ps = luna.particle.newSystem()
+        ps:setGravity(0, 9.8)
+        local gx, gy = ps:getGravity()
+        assert(math.abs(gx) < 0.001)
+        assert(math.abs(gy - 9.8) < 0.001)
+        "#,
+    )
+    .exec()
+    .unwrap();
+}
+
+#[test]
+fn test_oo_alphas_api() {
+    let (_state, lua) = make_vm();
+    lua.load(
+        r#"
+        local ps = luna.particle.newSystem()
+        ps:setAlphas(1.0, 0.0)
+        local alphas = ps:getAlphas()
+        assert(#alphas == 2)
+        assert(math.abs(alphas[1] - 1.0) < 0.001)
+        assert(math.abs(alphas[2]) < 0.001)
+        "#,
+    )
+    .exec()
+    .unwrap();
+}
+
+#[test]
+fn test_oo_emission_shape_api() {
+    let (_state, lua) = make_vm();
+    lua.load(
+        r#"
+        local ps = luna.particle.newSystem()
+        ps:setEmissionShape("line", { length = 40, angle = 1.57 })
+        local shape = ps:getEmissionShape()
+        assert(shape.type == "line")
+        assert(math.abs(shape.length - 40) < 0.001)
+        assert(math.abs(shape.angle - 1.57) < 0.001)
+        "#,
+    )
+    .exec()
+    .unwrap();
+}
+
+#[test]
+fn test_oo_relative_mode_api() {
+    let (_state, lua) = make_vm();
+    lua.load(
+        r#"
+        local ps = luna.particle.newSystem()
+        ps:setRelativeMode("attached")
+        assert(ps:getRelativeMode() == "attached")
+        ps:setRelativeMode("detached")
+        assert(ps:getRelativeMode() == "detached")
+        "#,
+    )
+    .exec()
+    .unwrap();
+}
+
+#[test]
+fn test_oo_clone_method() {
+    let (_state, lua) = make_vm();
+    lua.load(
+        r#"
+        local ps = luna.particle.newSystem({
+            emissionRate = 42,
+            gravityX = 5,
+            gravityY = 10
+        })
+        ps:setAlphas(1.0, 0.5, 0.0)
+        ps:setEmissionShape("circle", { radius = 20 })
+        ps:setRelativeMode("attached")
+
+        local cloned = ps:clone()
+        -- Clone is a separate system
+        assert(cloned ~= ps)
+
+        -- Check copied properties
+        local gx, gy = cloned:getGravity()
+        assert(math.abs(gx - 5) < 0.001)
+        assert(math.abs(gy - 10) < 0.001)
+
+        local alphas = cloned:getAlphas()
+        assert(#alphas == 3)
+
+        local shape = cloned:getEmissionShape()
+        assert(shape.type == "circle")
+        assert(math.abs(shape.radius - 20) < 0.001)
+
+        assert(cloned:getRelativeMode() == "attached")
+        "#,
+    )
+    .exec()
+    .unwrap();
+}
+
+#[test]
+fn test_emission_shape_enum_derive() {
+    // Verify PartialEq works for EmissionShape
+    assert_eq!(EmissionShape::Point, EmissionShape::Point);
+    assert_ne!(
+        EmissionShape::Point,
+        EmissionShape::Circle {
+            radius: 10.0,
+            fill: true
+        }
+    );
+    assert_eq!(
+        EmissionShape::Circle {
+            radius: 5.0,
+            fill: false
+        },
+        EmissionShape::Circle {
+            radius: 5.0,
+            fill: false
+        }
+    );
+}
+
+#[test]
+fn test_relative_mode_enum_derive() {
+    assert_eq!(RelativeMode::Detached, RelativeMode::Detached);
+    assert_eq!(RelativeMode::Attached, RelativeMode::Attached);
+    assert_ne!(RelativeMode::Detached, RelativeMode::Attached);
+}

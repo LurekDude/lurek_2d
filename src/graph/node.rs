@@ -1,0 +1,622 @@
+//! Graph node — a vertex with capacity, flow control, conversion rules, and queuing.
+
+use std::collections::{HashMap, HashSet, VecDeque};
+use std::str::FromStr;
+
+/// What happens when items arrive at a full node.
+///
+/// # Variants
+/// - `Reject` — Reject variant.
+/// - `Destroy` — Destroy variant.
+/// - `Queue` — Queue variant.
+#[derive(Debug, Clone, PartialEq)]
+pub enum OverflowPolicy {
+    /// Refuse the incoming item (it stays where it is).
+    Reject,
+    /// Destroy the incoming item.
+    Destroy,
+    /// Place the item in the node's queue.
+    Queue,
+}
+
+impl OverflowPolicy {
+    /// Canonical lowercase string representation.
+    ///
+    /// # Returns
+    /// `&str`.
+    pub fn to_str(&self) -> &str {
+        match self {
+            Self::Reject => "reject",
+            Self::Destroy => "destroy",
+            Self::Queue => "queue",
+        }
+    }
+}
+
+impl FromStr for OverflowPolicy {
+    type Err = String;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s {
+            "reject" => Ok(Self::Reject),
+            "destroy" => Ok(Self::Destroy),
+            "queue" => Ok(Self::Queue),
+            _ => Err(format!("unknown overflow policy: '{s}'")),
+        }
+    }
+}
+
+/// How a node participates in automatic item flow.
+///
+/// # Variants
+/// - `Passive` — Passive variant.
+/// - `Push` — Push variant.
+/// - `Pull` — Pull variant.
+/// - `Both` — Both variant.
+#[derive(Debug, Clone, PartialEq)]
+pub enum FlowMode {
+    /// Does not push or pull.
+    Passive,
+    /// Actively sends items along outgoing edges.
+    Push,
+    /// Actively pulls items from incoming edges.
+    Pull,
+    /// Both push and pull.
+    Both,
+}
+
+impl FlowMode {
+    /// Canonical lowercase string representation.
+    ///
+    /// # Returns
+    /// `&str`.
+    pub fn to_str(&self) -> &str {
+        match self {
+            Self::Passive => "passive",
+            Self::Push => "push",
+            Self::Pull => "pull",
+            Self::Both => "both",
+        }
+    }
+}
+
+impl FromStr for FlowMode {
+    type Err = String;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s {
+            "passive" => Ok(Self::Passive),
+            "push" => Ok(Self::Push),
+            "pull" => Ok(Self::Pull),
+            "both" => Ok(Self::Both),
+            _ => Err(format!("unknown flow mode: '{s}'")),
+        }
+    }
+}
+
+/// A rule that converts N input items of one type into M output items of another.
+///
+/// # Fields
+/// - `in_type` — `String`.
+/// - `out_type` — `String`.
+/// - `in_count` — `u32`.
+/// - `out_count` — `u32`.
+#[derive(Debug, Clone)]
+pub struct ConversionRule {
+    /// Input item type to consume.
+    pub in_type: String,
+    /// Output item type to produce.
+    pub out_type: String,
+    /// Number of input items consumed per conversion.
+    pub in_count: u32,
+    /// Number of output items produced per conversion.
+    pub out_count: u32,
+}
+
+/// A supply declaration on a node.
+///
+/// # Fields
+/// - `item_type` — `String`.
+/// - `quantity` — `i32`.
+#[derive(Debug, Clone)]
+pub struct Supply {
+    /// Item type this node can supply.
+    pub item_type: String,
+    /// Total quantity available. `-1` means unlimited.
+    pub quantity: i32,
+}
+
+/// A demand declaration on a node.
+///
+/// # Fields
+/// - `item_type` — `String`.
+/// - `quantity` — `i32`.
+/// - `priority` — `i32`.
+#[derive(Debug, Clone)]
+pub struct Demand {
+    /// Item type this node needs.
+    pub item_type: String,
+    /// Quantity demanded.
+    pub quantity: i32,
+    /// Priority for demand fulfillment (higher = more urgent).
+    pub priority: i32,
+}
+
+/// A vertex in the graph with capacity, flow control, conversion, and queuing.
+///
+/// # Fields
+/// - `id` — `u64`.
+/// - `node_type` — `String`.
+/// - `capacity` — `i32`.
+/// - `active` — `bool`.
+/// - `overflow_policy` — `OverflowPolicy`.
+/// - `flow_mode` — `FlowMode`.
+/// - `push_rate` — `f64`.
+/// - `pull_rate` — `f64`.
+/// - `push_filter` — `Option<String>`.
+/// - `pull_filter` — `Option<String>`.
+/// - `process_time` — `f64`.
+/// - `queue_enabled` — `bool`.
+/// - `queue_capacity` — `i32`.
+/// - `queue` — `VecDeque<u64>`.
+/// - `items` — `Vec<u64>`.
+/// - `conversions` — `HashMap<String, ConversionRule>`.
+/// - `demands` — `Vec<Demand>`.
+/// - `supplies` — `Vec<Supply>`.
+/// - `tags` — `HashSet<String>`.
+/// - `push_timer` — `f64`.
+/// - `pull_timer` — `f64`.
+/// - `process_accumulator` — `f64`.
+pub struct Node {
+    /// Unique identifier.
+    pub id: u64,
+    /// Application-defined type tag.
+    pub node_type: String,
+    /// Max items this node can hold. `-1` = unlimited.
+    pub capacity: i32,
+    /// Whether this node participates in simulation.
+    pub active: bool,
+    /// What happens when items arrive at a full node.
+    pub overflow_policy: OverflowPolicy,
+    /// How this node participates in automatic flow.
+    pub flow_mode: FlowMode,
+    /// Items pushed per second. Default `1.0`.
+    pub push_rate: f64,
+    /// Items pulled per second. Default `1.0`.
+    pub pull_rate: f64,
+    /// Push filter — `None` means all types allowed.
+    pub push_filter: Option<String>,
+    /// Pull filter — `None` means all types allowed.
+    pub pull_filter: Option<String>,
+    /// Processing time in seconds before queued items are dequeued.
+    pub process_time: f64,
+    /// Whether the queue is enabled.
+    pub queue_enabled: bool,
+    /// Max queue size. `-1` = unlimited.
+    pub queue_capacity: i32,
+    /// Item IDs waiting in the queue.
+    pub queue: VecDeque<u64>,
+    /// Item IDs currently at this node.
+    pub items: Vec<u64>,
+    /// Conversion rules keyed by input type.
+    pub conversions: HashMap<String, ConversionRule>,
+    /// Demand declarations.
+    pub demands: Vec<Demand>,
+    /// Supply declarations.
+    pub supplies: Vec<Supply>,
+    /// Freeform tags for filtering and grouping.
+    pub tags: HashSet<String>,
+    /// Accumulated time for push rate limiting.
+    pub(crate) push_timer: f64,
+    /// Accumulated time for pull rate limiting.
+    pub(crate) pull_timer: f64,
+    /// Accumulated time for queue processing.
+    pub(crate) process_accumulator: f64,
+}
+
+impl Node {
+    /// Create a new node with defaults.
+    ///
+    /// # Parameters
+    /// - `id` — `u64`.
+    /// - `node_type` — `&str`.
+    /// - `capacity` — `i32`.
+    ///
+    /// # Returns
+    /// `Self`.
+    pub fn new(id: u64, node_type: &str, capacity: i32) -> Self {
+        Self {
+            id,
+            node_type: node_type.to_string(),
+            capacity,
+            active: true,
+            overflow_policy: OverflowPolicy::Reject,
+            flow_mode: FlowMode::Passive,
+            push_rate: 1.0,
+            pull_rate: 1.0,
+            push_filter: None,
+            pull_filter: None,
+            process_time: 0.0,
+            queue_enabled: false,
+            queue_capacity: -1,
+            queue: VecDeque::new(),
+            items: Vec::new(),
+            conversions: HashMap::new(),
+            demands: Vec::new(),
+            supplies: Vec::new(),
+            tags: HashSet::new(),
+            push_timer: 0.0,
+            pull_timer: 0.0,
+            process_accumulator: 0.0,
+        }
+    }
+
+    /// Get the node type.
+    ///
+    /// # Returns
+    /// `&str`.
+    pub fn get_type(&self) -> &str {
+        &self.node_type
+    }
+
+    /// Set the node type.
+    ///
+    /// # Parameters
+    /// - `t` — `&str`.
+    pub fn set_type(&mut self, t: &str) {
+        self.node_type = t.to_string();
+    }
+
+    /// Get the capacity (`-1` = unlimited).
+    ///
+    /// # Returns
+    /// `i32`.
+    pub fn get_capacity(&self) -> i32 {
+        self.capacity
+    }
+
+    /// Set the capacity.
+    ///
+    /// # Parameters
+    /// - `c` — `i32`.
+    pub fn set_capacity(&mut self, c: i32) {
+        self.capacity = c;
+    }
+
+    /// Whether the node is at capacity.
+    ///
+    /// # Returns
+    /// `bool`.
+    pub fn is_full(&self) -> bool {
+        if self.capacity < 0 {
+            false
+        } else {
+            self.items.len() >= self.capacity as usize
+        }
+    }
+
+    /// Number of items currently at this node.
+    ///
+    /// # Returns
+    /// `usize`.
+    pub fn item_count(&self) -> usize {
+        self.items.len()
+    }
+
+    // --- Tags ---
+
+    /// Add a tag.
+    ///
+    /// # Parameters
+    /// - `tag` — `&str`.
+    pub fn add_tag(&mut self, tag: &str) {
+        self.tags.insert(tag.to_string());
+    }
+
+    /// Remove a tag. Returns whether it was present.
+    ///
+    /// # Parameters
+    /// - `tag` — `&str`.
+    ///
+    /// # Returns
+    /// `bool`.
+    pub fn remove_tag(&mut self, tag: &str) -> bool {
+        self.tags.remove(tag)
+    }
+
+    /// Check if a tag is present.
+    ///
+    /// # Parameters
+    /// - `tag` — `&str`.
+    ///
+    /// # Returns
+    /// `bool`.
+    pub fn has_tag(&self, tag: &str) -> bool {
+        self.tags.contains(tag)
+    }
+
+    /// Remove all tags.
+    pub fn clear_tags(&mut self) {
+        self.tags.clear();
+    }
+
+    /// Get all tags as a sorted vector.
+    ///
+    /// # Returns
+    /// `Vec<String>`.
+    pub fn get_tags(&self) -> Vec<String> {
+        let mut v: Vec<String> = self.tags.iter().cloned().collect();
+        v.sort();
+        v
+    }
+
+    // --- Supply ---
+
+    /// Add a supply declaration.
+    ///
+    /// # Parameters
+    /// - `item_type` — `&str`.
+    /// - `quantity` — `i32`.
+    pub fn add_supply(&mut self, item_type: &str, quantity: i32) {
+        self.supplies.push(Supply {
+            item_type: item_type.to_string(),
+            quantity,
+        });
+    }
+
+    /// Remove supply declarations for the given item type. Returns whether any were removed.
+    ///
+    /// # Parameters
+    /// - `item_type` — `&str`.
+    ///
+    /// # Returns
+    /// `bool`.
+    pub fn remove_supply(&mut self, item_type: &str) -> bool {
+        let before = self.supplies.len();
+        self.supplies.retain(|s| s.item_type != item_type);
+        self.supplies.len() < before
+    }
+
+    /// Remove all supply declarations.
+    pub fn clear_supplies(&mut self) {
+        self.supplies.clear();
+    }
+
+    /// Get the supply for a given item type.
+    ///
+    /// # Parameters
+    /// - `item_type` — `&str`.
+    ///
+    /// # Returns
+    /// `Option<&Supply>`.
+    pub fn get_supply(&self, item_type: &str) -> Option<&Supply> {
+        self.supplies.iter().find(|s| s.item_type == item_type)
+    }
+
+    /// Get the available supply quantity for a type (returns 0 if not found).
+    ///
+    /// # Parameters
+    /// - `item_type` — `&str`.
+    ///
+    /// # Returns
+    /// `i32`.
+    pub fn get_available_supply(&self, item_type: &str) -> i32 {
+        self.supplies
+            .iter()
+            .filter(|s| s.item_type == item_type)
+            .map(|s| s.quantity)
+            .sum()
+    }
+
+    // --- Demand ---
+
+    /// Add a demand declaration.
+    ///
+    /// # Parameters
+    /// - `item_type` — `&str`.
+    /// - `quantity` — `i32`.
+    /// - `priority` — `i32`.
+    pub fn add_demand(&mut self, item_type: &str, quantity: i32, priority: i32) {
+        self.demands.push(Demand {
+            item_type: item_type.to_string(),
+            quantity,
+            priority,
+        });
+    }
+
+    /// Remove demand declarations for the given item type. Returns whether any were removed.
+    ///
+    /// # Parameters
+    /// - `item_type` — `&str`.
+    ///
+    /// # Returns
+    /// `bool`.
+    pub fn remove_demand(&mut self, item_type: &str) -> bool {
+        let before = self.demands.len();
+        self.demands.retain(|d| d.item_type != item_type);
+        self.demands.len() < before
+    }
+
+    /// Remove all demand declarations.
+    pub fn clear_demands(&mut self) {
+        self.demands.clear();
+    }
+
+    /// Get the demand for a given item type.
+    ///
+    /// # Parameters
+    /// - `item_type` — `&str`.
+    ///
+    /// # Returns
+    /// `Option<&Demand>`.
+    pub fn get_demand(&self, item_type: &str) -> Option<&Demand> {
+        self.demands.iter().find(|d| d.item_type == item_type)
+    }
+
+    // --- Conversion ---
+
+    /// Set a conversion rule (keyed by input type).
+    ///
+    /// # Parameters
+    /// - `rule` — `ConversionRule`.
+    pub fn set_conversion(&mut self, rule: ConversionRule) {
+        self.conversions.insert(rule.in_type.clone(), rule);
+    }
+
+    /// Remove a conversion rule by input type. Returns whether it was present.
+    ///
+    /// # Parameters
+    /// - `in_type` — `&str`.
+    ///
+    /// # Returns
+    /// `bool`.
+    pub fn clear_conversion(&mut self, in_type: &str) -> bool {
+        self.conversions.remove(in_type).is_some()
+    }
+
+    /// Remove all conversion rules.
+    pub fn clear_all_conversions(&mut self) {
+        self.conversions.clear();
+    }
+
+    // --- Queue ---
+
+    /// Push an item ID onto the back of the queue.
+    ///
+    /// # Parameters
+    /// - `item_id` — `u64`.
+    ///
+    /// # Returns
+    /// `bool`.
+    pub fn enqueue(&mut self, item_id: u64) -> bool {
+        if self.queue_capacity >= 0 && self.queue.len() >= self.queue_capacity as usize {
+            return false;
+        }
+        self.queue.push_back(item_id);
+        true
+    }
+
+    /// Pop an item ID from the front of the queue.
+    ///
+    /// # Returns
+    /// `Option<u64>`.
+    pub fn dequeue(&mut self) -> Option<u64> {
+        self.queue.pop_front()
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn new_node_defaults() {
+        let n = Node::new(1, "factory", 10);
+        assert_eq!(n.id, 1);
+        assert_eq!(n.get_type(), "factory");
+        assert_eq!(n.get_capacity(), 10);
+        assert!(n.active);
+        assert!(!n.is_full());
+        assert_eq!(n.item_count(), 0);
+        assert_eq!(n.overflow_policy, OverflowPolicy::Reject);
+        assert_eq!(n.flow_mode, FlowMode::Passive);
+    }
+
+    #[test]
+    fn unlimited_capacity_never_full() {
+        let n = Node::new(1, "sink", -1);
+        assert!(!n.is_full());
+    }
+
+    #[test]
+    fn is_full_check() {
+        let mut n = Node::new(1, "bin", 2);
+        n.items.push(100);
+        assert!(!n.is_full());
+        n.items.push(101);
+        assert!(n.is_full());
+    }
+
+    #[test]
+    fn tags_crud() {
+        let mut n = Node::new(1, "t", 5);
+        n.add_tag("hot");
+        n.add_tag("red");
+        assert!(n.has_tag("hot"));
+        assert!(!n.has_tag("cold"));
+        assert_eq!(n.get_tags(), vec!["hot", "red"]);
+        n.remove_tag("hot");
+        assert!(!n.has_tag("hot"));
+        n.clear_tags();
+        assert!(n.get_tags().is_empty());
+    }
+
+    #[test]
+    fn supply_demand() {
+        let mut n = Node::new(1, "mine", -1);
+        n.add_supply("ore", 100);
+        assert_eq!(n.get_available_supply("ore"), 100);
+        assert_eq!(n.get_available_supply("gold"), 0);
+        n.add_demand("food", 10, 5);
+        assert!(n.get_demand("food").is_some());
+        assert_eq!(n.get_demand("food").unwrap().priority, 5);
+        n.remove_supply("ore");
+        assert_eq!(n.get_available_supply("ore"), 0);
+        n.remove_demand("food");
+        assert!(n.get_demand("food").is_none());
+    }
+
+    #[test]
+    fn conversion_rule() {
+        let mut n = Node::new(1, "smelter", 5);
+        n.set_conversion(ConversionRule {
+            in_type: "ore".into(),
+            out_type: "ingot".into(),
+            in_count: 2,
+            out_count: 1,
+        });
+        assert!(n.conversions.contains_key("ore"));
+        n.clear_conversion("ore");
+        assert!(!n.conversions.contains_key("ore"));
+    }
+
+    #[test]
+    fn queue_operations() {
+        let mut n = Node::new(1, "q", 5);
+        n.queue_capacity = 2;
+        assert!(n.enqueue(10));
+        assert!(n.enqueue(11));
+        assert!(!n.enqueue(12)); // full
+        assert_eq!(n.dequeue(), Some(10));
+        assert_eq!(n.dequeue(), Some(11));
+        assert_eq!(n.dequeue(), None);
+    }
+
+    #[test]
+    fn overflow_policy_parse() {
+        assert_eq!(
+            OverflowPolicy::from_str("reject").unwrap(),
+            OverflowPolicy::Reject
+        );
+        assert_eq!(
+            OverflowPolicy::from_str("destroy").unwrap(),
+            OverflowPolicy::Destroy
+        );
+        assert_eq!(
+            OverflowPolicy::from_str("queue").unwrap(),
+            OverflowPolicy::Queue
+        );
+        assert!(OverflowPolicy::from_str("bad").is_err());
+        assert_eq!(OverflowPolicy::Reject.to_str(), "reject");
+    }
+
+    #[test]
+    fn flow_mode_parse() {
+        assert_eq!(FlowMode::from_str("passive").unwrap(), FlowMode::Passive);
+        assert_eq!(FlowMode::from_str("push").unwrap(), FlowMode::Push);
+        assert_eq!(FlowMode::from_str("pull").unwrap(), FlowMode::Pull);
+        assert_eq!(FlowMode::from_str("both").unwrap(), FlowMode::Both);
+        assert!(FlowMode::from_str("bad").is_err());
+        assert_eq!(FlowMode::Both.to_str(), "both");
+    }
+}

@@ -1,0 +1,53 @@
+{
+  "name": "luna2d-vscode",
+  "displayName": "Luna2D",
+  "description": "AI-first IDE support for Luna2D game engine",
+  "version": "0.1.0",
+  "publisher": "luna2d",
+  "engines": {
+    "vscode": "^1.90.0"
+  },
+  "categories": [
+    "Programming Languages",
+    "Other"
+  ],
+  "activationEvents": [
+    "workspaceContains:**/main.lua",
+    "workspaceContains:Cargo.toml"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "luna2d.runExample",
+        "title": "Luna2D: Run Example"
+      },
+      {
+        "command": "luna2d.listExamples",
+        "title": "Luna2D: List Examples"
+      },
+      {
+        "command": "luna2d.checkBuild",
+        "title": "Luna2D: Check Build"
+      },
+      {
+        "command": "luna2d.getApiDoc",
+        "title": "Luna2D: Get API Documentation"
+      }
+    ]
+  },
+  "scripts": {
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "package": "npx @vscode/vsce package"
+  },
+  "devDependencies": {
+    "@types/vscode": "^1.90.0",
+    "@types/node": "^20.0.0",
+    "typescript": "^5.4.0",
+    "@vscode/vsce": "^2.26.0"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.0"
+  }
+}

@@ -1,0 +1,335 @@
+//! Multi-layer spatial float grid for strategic area analysis.
+
+use std::collections::HashMap;
+
+/// Multi-layer spatial float grid for influence mapping.
+///
+/// # Fields
+/// - `width` — `usize`.
+/// - `height` — `usize`.
+/// - `cell_size` — `f32`.
+/// - `layers` — `HashMap<String, Vec<f32>>`.
+///
+/// Stores named float layers of shape width × height.
+/// Supports stamping, propagation (diffusion), decay, and spatial queries.
+pub struct InfluenceMap {
+    /// Grid width in cells.
+    pub width: usize,
+    /// Grid height in cells.
+    pub height: usize,
+    /// World-space size of each cell.
+    pub cell_size: f32,
+    /// Named float layers, each of length width × height.
+    pub(crate) layers: HashMap<String, Vec<f32>>,
+}
+
+impl InfluenceMap {
+    /// Creates a new empty influence map with the given dimensions.
+    ///
+    /// # Parameters
+    /// - `width` — `usize`.
+    /// - `height` — `usize`.
+    /// - `cell_size` — `f32`.
+    ///
+    /// # Returns
+    /// `Self`.
+    pub fn new(width: usize, height: usize, cell_size: f32) -> Self {
+        Self {
+            width,
+            height,
+            cell_size,
+            layers: HashMap::new(),
+        }
+    }
+
+    /// Adds a new named layer initialized to zero.
+    ///
+    /// # Parameters
+    /// - `name` — `&str`.
+    pub fn add_layer(&mut self, name: &str) {
+        self.layers
+            .insert(name.to_string(), vec![0.0; self.width * self.height]);
+    }
+
+    /// Returns whether a layer exists.
+    ///
+    /// # Parameters
+    /// - `name` — `&str`.
+    ///
+    /// # Returns
+    /// `bool`.
+    pub fn has_layer(&self, name: &str) -> bool {
+        self.layers.contains_key(name)
+    }
+
+    /// Sets influence at a grid cell (0-based).
+    ///
+    /// # Parameters
+    /// - `layer` — `&str`.
+    /// - `x` — `usize`.
+    /// - `y` — `usize`.
+    /// - `value` — `f32`.
+    pub fn set_influence(&mut self, layer: &str, x: usize, y: usize, value: f32) {
+        if let Some(data) = self.layers.get_mut(layer) {
+            if x < self.width && y < self.height {
+                data[y * self.width + x] = value;
+            }
+        }
+    }
+
+    /// Gets influence at a grid cell (0-based). Returns 0 for out-of-bounds.
+    ///
+    /// # Parameters
+    /// - `layer` — `&str`.
+    /// - `x` — `usize`.
+    /// - `y` — `usize`.
+    ///
+    /// # Returns
+    /// `f32`.
+    pub fn get_influence(&self, layer: &str, x: usize, y: usize) -> f32 {
+        if let Some(data) = self.layers.get(layer) {
+            if x < self.width && y < self.height {
+                return data[y * self.width + x];
+            }
+        }
+        0.0
+    }
+
+    /// Stamps circular influence in world-space coordinates with linear falloff.
+    ///
+    /// # Parameters
+    /// - `layer` — `&str`.
+    /// - `wx` — `f32`.
+    /// - `wy` — `f32`.
+    /// - `radius` — `f32`.
+    /// - `value` — `f32`.
+    /// - `falloff` — `f32`.
+    pub fn stamp_influence(
+        &mut self,
+        layer: &str,
+        wx: f32,
+        wy: f32,
+        radius: f32,
+        value: f32,
+        falloff: f32,
+    ) {
+        let data = match self.layers.get_mut(layer) {
+            Some(d) => d,
+            None => return,
+        };
+        let cx = (wx / self.cell_size) as i32;
+        let cy = (wy / self.cell_size) as i32;
+        let cell_radius = (radius / self.cell_size).ceil() as i32;
+
+        for dy in -cell_radius..=cell_radius {
+            for dx in -cell_radius..=cell_radius {
+                let nx = cx + dx;
+                let ny = cy + dy;
+                if nx < 0 || ny < 0 || nx >= self.width as i32 || ny >= self.height as i32 {
+                    continue;
+                }
+                let px = (nx as f32 + 0.5) * self.cell_size;
+                let py = (ny as f32 + 0.5) * self.cell_size;
+                let dist = ((px - wx) * (px - wx) + (py - wy) * (py - wy)).sqrt();
+                if dist <= radius {
+                    let factor = 1.0 - (dist / radius) * falloff;
+                    let idx = ny as usize * self.width + nx as usize;
+                    data[idx] += value * factor.max(0.0);
+                }
+            }
+        }
+    }
+
+    /// 3×3 averaging diffusion. newVal = old * momentum + avg * (1 - momentum).
+    ///
+    /// # Parameters
+    /// - `layer` — `&str`.
+    /// - `momentum` — `f32`.
+    pub fn propagate(&mut self, layer: &str, momentum: f32) {
+        let data = match self.layers.get(layer) {
+            Some(d) => d.clone(),
+            None => return,
+        };
+        let out = match self.layers.get_mut(layer) {
+            Some(d) => d,
+            None => return,
+        };
+
+        for y in 0..self.height {
+            for x in 0..self.width {
+                let mut sum = 0.0f32;
+                let mut count = 0u32;
+                for dy in -1i32..=1 {
+                    for dx in -1i32..=1 {
+                        let nx = x as i32 + dx;
+                        let ny = y as i32 + dy;
+                        if nx >= 0
+                            && ny >= 0
+                            && (nx as usize) < self.width
+                            && (ny as usize) < self.height
+                        {
+                            sum += data[ny as usize * self.width + nx as usize];
+                            count += 1;
+                        }
+                    }
+                }
+                let avg = sum / count as f32;
+                let idx = y * self.width + x;
+                out[idx] = data[idx] * momentum + avg * (1.0 - momentum);
+            }
+        }
+    }
+
+    /// Multiplies every cell in a layer by the decay factor.
+    ///
+    /// # Parameters
+    /// - `layer` — `&str`.
+    /// - `factor` — `f32`.
+    pub fn decay(&mut self, layer: &str, factor: f32) {
+        if let Some(data) = self.layers.get_mut(layer) {
+            for v in data.iter_mut() {
+                *v *= factor;
+            }
+        }
+    }
+
+    /// Clears all cells in a layer to zero.
+    ///
+    /// # Parameters
+    /// - `layer` — `&str`.
+    pub fn clear_layer(&mut self, layer: &str) {
+        if let Some(data) = self.layers.get_mut(layer) {
+            for v in data.iter_mut() {
+                *v = 0.0;
+            }
+        }
+    }
+
+    /// Clears all layers to zero.
+    pub fn clear_all(&mut self) {
+        for data in self.layers.values_mut() {
+            for v in data.iter_mut() {
+                *v = 0.0;
+            }
+        }
+    }
+
+    /// Returns the world-space position of the cell with the highest value.
+    ///
+    /// # Parameters
+    /// - `layer` — `&str`.
+    ///
+    /// # Returns
+    /// `(f32, f32)`.
+    pub fn max_position(&self, layer: &str) -> (f32, f32) {
+        if let Some(data) = self.layers.get(layer) {
+            let mut best_idx = 0;
+            let mut best_val = f32::NEG_INFINITY;
+            for (i, &v) in data.iter().enumerate() {
+                if v > best_val {
+                    best_val = v;
+                    best_idx = i;
+                }
+            }
+            let x = best_idx % self.width;
+            let y = best_idx / self.width;
+            (
+                (x as f32 + 0.5) * self.cell_size,
+                (y as f32 + 0.5) * self.cell_size,
+            )
+        } else {
+            (0.0, 0.0)
+        }
+    }
+
+    /// Returns the world-space position of the cell with the lowest value.
+    ///
+    /// # Parameters
+    /// - `layer` — `&str`.
+    ///
+    /// # Returns
+    /// `(f32, f32)`.
+    pub fn min_position(&self, layer: &str) -> (f32, f32) {
+        if let Some(data) = self.layers.get(layer) {
+            let mut best_idx = 0;
+            let mut best_val = f32::INFINITY;
+            for (i, &v) in data.iter().enumerate() {
+                if v < best_val {
+                    best_val = v;
+                    best_idx = i;
+                }
+            }
+            let x = best_idx % self.width;
+            let y = best_idx / self.width;
+            (
+                (x as f32 + 0.5) * self.cell_size,
+                (y as f32 + 0.5) * self.cell_size,
+            )
+        } else {
+            (0.0, 0.0)
+        }
+    }
+
+    /// Sums influence within a world-space rectangle.
+    ///
+    /// # Parameters
+    /// - `layer` — `&str`.
+    /// - `wx` — `f32`.
+    /// - `wy` — `f32`.
+    /// - `ww` — `f32`.
+    /// - `wh` — `f32`.
+    ///
+    /// # Returns
+    /// `f32`.
+    pub fn query_rect(&self, layer: &str, wx: f32, wy: f32, ww: f32, wh: f32) -> f32 {
+        let data = match self.layers.get(layer) {
+            Some(d) => d,
+            None => return 0.0,
+        };
+        let min_x = ((wx / self.cell_size).floor() as i32).max(0) as usize;
+        let min_y = ((wy / self.cell_size).floor() as i32).max(0) as usize;
+        let max_x = (((wx + ww) / self.cell_size).ceil() as usize).min(self.width);
+        let max_y = (((wy + wh) / self.cell_size).ceil() as usize).min(self.height);
+
+        let mut sum = 0.0f32;
+        for y in min_y..max_y {
+            for x in min_x..max_x {
+                sum += data[y * self.width + x];
+            }
+        }
+        sum
+    }
+
+    /// Blends two layers into a destination: dest = wA * A + wB * B.
+    ///
+    /// # Parameters
+    /// - `layer_a` — `&str`.
+    /// - `weight_a` — `f32`.
+    /// - `layer_b` — `&str`.
+    /// - `weight_b` — `f32`.
+    /// - `dest` — `&str`.
+    pub fn blend(
+        &mut self,
+        layer_a: &str,
+        weight_a: f32,
+        layer_b: &str,
+        weight_b: f32,
+        dest: &str,
+    ) {
+        let a = match self.layers.get(layer_a) {
+            Some(d) => d.clone(),
+            None => return,
+        };
+        let b = match self.layers.get(layer_b) {
+            Some(d) => d.clone(),
+            None => return,
+        };
+        let out = match self.layers.get_mut(dest) {
+            Some(d) => d,
+            None => return,
+        };
+        for i in 0..out.len() {
+            out[i] = weight_a * a[i] + weight_b * b[i];
+        }
+    }
+}

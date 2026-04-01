@@ -1,0 +1,342 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        // ─── 🔨 BUILD ─────────────────────────────────────────────────────────
+        {
+            "label": "Build: Debug",
+            "detail": "🔨 Compile the Luna2D engine in debug mode — fast compile with full debug symbols. Default build task (Ctrl+Shift+B).",
+            "type": "cargo",
+            "command": "build",
+            "group": { "kind": "build", "isDefault": true },
+            "problemMatcher": ["$rustc"]
+        },
+        {
+            "label": "Build: Release",
+            "detail": "🔨 Compile with opt-level 3 + LTO enabled. Use this for distribution builds and performance measurement.",
+            "type": "cargo",
+            "command": "build",
+            "args": ["--release"],
+            "group": "build",
+            "problemMatcher": ["$rustc"]
+        },
+        {
+            "label": "Build: Check (fast)",
+            "detail": "⚡ Type-check and resolve the crate without producing a binary — much faster than a full build. Use during active development.",
+            "type": "cargo",
+            "command": "check",
+            "group": "build",
+            "problemMatcher": ["$rustc"]
+        },
+        // ─── ▶️  RUN EXAMPLES (cargo run) ────────────────────────────────────
+        // Pick-example tasks — use these to choose which game to run.
+        // The Tasks picker will ask you to select an example from the list.
+        {
+            "label": "Run Debug: Pick Example",
+            "detail": "🐛 Build (debug) and run a chosen example — pick from the list.",
+            "type": "shell",
+            "command": "cargo run -- ${input:exampleGame}",
+            "group": "build",
+            "problemMatcher": ["$rustc"]
+        },
+        {
+            "label": "Run Release: Pick Example",
+            "detail": "🚀 Build (release, LTO) and run a chosen example — pick from the list.",
+            "type": "shell",
+            "command": "cargo run --release -- ${input:exampleGame}",
+            "group": "build",
+            "problemMatcher": ["$rustc"]
+        },
+        // ─── 🧪 TEST ──────────────────────────────────────────────────────────
+        {
+            "label": "Test: All",
+            "detail": "🧪 Run the full test suite (unit + integration). All tests must pass before committing. Default test task.",
+            "type": "cargo",
+            "command": "test",
+            "group": { "kind": "test", "isDefault": true },
+            "problemMatcher": ["$rustc"]
+        },
+        {
+            "label": "Test: All (verbose)",
+            "detail": "🧪 Run the full test suite and print captured stdout/stderr for every test case (--nocapture).",
+            "type": "cargo",
+            "command": "test",
+            "args": ["--", "--nocapture"],
+            "group": "test",
+            "problemMatcher": ["$rustc"]
+        },
+        {
+            "label": "Test: Math module",
+            "detail": "🧮 Run only math-related tests — Vec2, Mat3, Rect, distance, clamp, and fast math helpers.",
+            "type": "cargo",
+            "command": "test",
+            "args": ["--test", "math_tests"],
+            "group": "test",
+            "problemMatcher": ["$rustc"]
+        },
+        {
+            "label": "Test: Physics module",
+            "detail": "⚙️  Run only physics integration tests — bodies, world stepping, and AABB collision resolution.",
+            "type": "cargo",
+            "command": "test",
+            "args": ["--test", "physics_tests"],
+            "group": "test",
+            "problemMatcher": ["$rustc"]
+        },
+        {
+            "label": "Test: Graphics module",
+            "detail": "🎨 Run only graphics integration tests — color, camera transforms, and draw command processing.",
+            "type": "cargo",
+            "command": "test",
+            "args": ["--test", "graphics_tests"],
+            "group": "test",
+            "problemMatcher": ["$rustc"]
+        },
+        {
+            "label": "Test: Lua bindings",
+            "detail": "🌙 Run only Lua binding tests — exercises the full luna.* API surface headlessly (no window).",
+            "type": "cargo",
+            "command": "test",
+            "args": ["--test", "lua_tests"],
+            "group": "test",
+            "problemMatcher": ["$rustc"]
+        },
+        {
+            "label": "Test: Audio module",
+            "detail": "🎵 Run only audio integration tests — source loading and mixer state (no playback in CI).",
+            "type": "cargo",
+            "command": "test",
+            "args": ["--test", "audio_tests"],
+            "group": "test",
+            "problemMatcher": ["$rustc"]
+        },
+        {
+            "label": "Test: Input module",
+            "detail": "🎮 Run only input integration tests — keyboard and mouse state machine.",
+            "type": "cargo",
+            "command": "test",
+            "args": ["--test", "input_tests"],
+            "group": "test",
+            "problemMatcher": ["$rustc"]
+        },
+        // ─── 🔍 QUALITY GATES ─────────────────────────────────────────────────
+        {
+            "label": "Lint: Clippy",
+            "detail": "🔍 Run Clippy lints against all targets. Must report 0 warnings before any commit.",
+            "type": "cargo",
+            "command": "clippy",
+            "group": "build",
+            "problemMatcher": ["$rustc"]
+        },
+        {
+            "label": "Lint: Clippy (deny warnings)",
+            "detail": "🚫 Run Clippy in CI-strict mode (-D warnings) — every warning is a compile error. Use before pushing.",
+            "type": "cargo",
+            "command": "clippy",
+            "args": ["--", "-D", "warnings"],
+            "group": "build",
+            "problemMatcher": ["$rustc"]
+        },
+        {
+            "label": "Format: Apply",
+            "detail": "📐 Auto-format all Rust source files with rustfmt (rewrites in place). Safe to run at any time.",
+            "type": "shell",
+            "command": "cargo fmt",
+            "problemMatcher": []
+        },
+        {
+            "label": "Format: Check",
+            "detail": "📐 Verify all files are already correctly formatted without modifying them. Used in CI and the full quality gate.",
+            "type": "shell",
+            "command": "cargo fmt --check",
+            "problemMatcher": []
+        },
+        {
+            "label": "Quality Gate: Full",
+            "detail": "✅ Run the complete quality gate: fmt check → clippy → all tests. All three must pass before any push to main.",
+            "dependsOrder": "sequence",
+            "dependsOn": ["Format: Check", "Lint: Clippy", "Test: All"],
+            "group": "test",
+            "problemMatcher": ["$rustc"]
+        },
+        // ─── 📖 LUA API DOCUMENTATION ─────────────────────────────────────────
+        {
+            "label": "Lua API: Generate Reference",
+            "detail": "📝 Run tools/gen_lua_api.py to regenerate docs/lua_api_reference_generated.md from docstrings in src/lua_api/*.rs",
+            "type": "shell",
+            "command": "python tools/gen_lua_api.py",
+            "problemMatcher": []
+        },
+        {
+            "label": "Lua API: Check Coverage",
+            "detail": "✓ Run tools/gen_lua_api.py --check to validate all 77 Lua functions have docstrings. Exit code 1 if any missing.",
+            "type": "shell",
+            "command": "python tools/gen_lua_api.py --check",
+            "problemMatcher": []
+        },
+        {
+            "label": "Lua API: Add Docstrings (Setup)",
+            "detail": "🔧 Run tools/add_lua_docstrings.py to auto-add /// docstrings from inline comments. Run once during project setup.",
+            "type": "shell",
+            "command": "python tools/add_lua_docstrings.py",
+            "problemMatcher": []
+        },
+        // ─── 📖 DOCUMENTATION ─────────────────────────────────────────────────
+        {
+            "label": "Docs: Open in Browser",
+            "detail": "📖 Generate rustdoc for luna2d and open the HTML output in the default browser (cargo doc --open).",
+            "type": "shell",
+            "command": "cargo doc --open --no-deps",
+            "problemMatcher": []
+        },
+        {
+            "label": "Docs: Collect API (Python)",
+            "detail": "📝 Run tools/collect_docs.py to scan src/ and regenerate docs/api_generated.md with all public API items and doc comments.",
+            "type": "shell",
+            "command": "python tools/collect_docs.py",
+            "problemMatcher": []
+        },
+        {
+            "label": "Docs: Report Missing Docs",
+            "detail": "📋 Run tools/collect_docs.py --report-missing to list every public item that lacks a /// doc comment.",
+            "type": "shell",
+            "command": "python tools/collect_docs.py --report-missing",
+            "problemMatcher": []
+        },
+        {
+            "label": "Docs: Suggest Missing Docstrings",
+            "detail": "💡 Run tools/collect_docs.py --suggest to print starter /// doc lines for every undocumented public item.",
+            "type": "shell",
+            "command": "python tools/collect_docs.py --suggest",
+            "problemMatcher": []
+        },
+        // ─── 📦 INSTALL ───────────────────────────────────────────────────────
+        {
+            "label": "Install: Local (Windows)",
+            "detail": "📦 Build release binary and install luna.exe to %USERPROFILE%\\bin. Copies examples/ too. Run once — then use 'Run (Installed):' tasks.",
+            "type": "shell",
+            "command": "powershell -ExecutionPolicy Bypass -File tools/install.ps1",
+            "problemMatcher": []
+        },
+        {
+            "label": "Install: Local (Linux / macOS)",
+            "detail": "📦 Build release binary and install luna2d to /usr/local/bin. Copies examples/ folder. May require sudo.",
+            "type": "shell",
+            "command": "bash tools/install.sh",
+            "problemMatcher": []
+        },
+        {
+            "label": "Uninstall: Local (Windows)",
+            "detail": "🗑️  Remove luna.exe from %USERPROFILE%\\bin and the installed examples/ folder.",
+            "type": "shell",
+            "command": "powershell -ExecutionPolicy Bypass -File tools/install.ps1 --uninstall",
+            "problemMatcher": []
+        },
+        // ─── 🌙 RUN WITH INSTALLED BINARY ────────────────────────────────────
+        // Requires 'Install: Local (Windows)' to have been run at least once.
+        {
+            "label": "Run (Installed): Hello World",
+            "detail": "🌙 Run examples/hello_world with the installed luna2d binary (no recompile). Run 'Install: Local (Windows)' first.",
+            "type": "shell",
+            "command": "luna examples/hello_world",
+            "problemMatcher": []
+        },
+        {
+            "label": "Run (Installed): Physics Demo",
+            "detail": "🌙 Run examples/physics_demo with the installed luna2d binary (no recompile).",
+            "type": "shell",
+            "command": "luna examples/physics_demo",
+            "problemMatcher": []
+        },
+        {
+            "label": "Run (Installed): Sprites",
+            "detail": "🌙 Run examples/sprites with the installed luna2d binary (no recompile).",
+            "type": "shell",
+            "command": "luna examples/sprites",
+            "problemMatcher": []
+        },
+        {
+            "label": "Run (Installed): Splash Screen",
+            "detail": "🌙 Launch the installed luna2d binary with no game argument — displays the Luna2D splash screen.",
+            "type": "shell",
+            "command": "luna",
+            "problemMatcher": []
+        },
+        // ─── 🎨 ASSETS ────────────────────────────────────────────────────────
+        {
+            "label": "Assets: Generate Splash",
+            "detail": "🎨 Run tools/gen_splash.py to (re)generate assets/splash.png (800×600 moon/space theme). Requires: pip install Pillow.",
+            "type": "shell",
+            "command": "python tools/gen_splash.py",
+            "problemMatcher": []
+        },
+        {
+            "label": "Assets: Generate Icon",
+            "detail": "🎨 Run tools/gen_icon.py to (re)generate assets/icon.ico (multi-size) and assets/icon.png (256×256). Requires Pillow.",
+            "type": "shell",
+            "command": "python tools/gen_icon.py",
+            "problemMatcher": []
+        },
+        {
+            "label": "Assets: Generate All",
+            "detail": "🎨 Regenerate both the splash PNG and the icon files in one step. Re-build afterwards to embed them.",
+            "dependsOrder": "sequence",
+            "dependsOn": ["Assets: Generate Splash", "Assets: Generate Icon"],
+            "problemMatcher": []
+        },
+        // ─── 🚀 DISTRIBUTION ──────────────────────────────────────────────────
+        {
+            "label": "Dist: Package Windows",
+            "detail": "🚀 Release build → dist/luna2d-windows-x86_64/ folder + .zip archive. Output is ready to distribute to end users.",
+            "type": "shell",
+            "command": "powershell -ExecutionPolicy Bypass -File tools/dist.ps1",
+            "problemMatcher": []
+        },
+        {
+            "label": "Dist: Package Windows (skip build)",
+            "detail": "🚀 Re-package using an already-compiled release binary — skips cargo build. Faster for iteration.",
+            "type": "shell",
+            "command": "powershell -ExecutionPolicy Bypass -File tools/dist.ps1 -SkipBuild",
+            "problemMatcher": []
+        },
+        {
+            "label": "Dist: Package Linux / macOS",
+            "detail": "🚀 Release build → dist/luna2d-<os>-<arch>/ folder + .tar.gz archive. Run in WSL or a Linux/macOS shell.",
+            "type": "shell",
+            "command": "bash tools/dist.sh",
+            "problemMatcher": []
+        },
+        {
+            "label": "Dist: NSIS Installer (Windows)",
+            "detail": "📦 Build a Windows installer from tools/installer.nsi → dist/luna2d-0.4.0-setup.exe. Requires NSIS 3.x on PATH.",
+            "type": "shell",
+            "command": "makensis tools/installer.nsi",
+            "problemMatcher": []
+        },
+        // ─── 🤖 CAG VALIDATION ────────────────────────────────────────────────
+        {
+            "label": "CAG: Validate All",
+            "detail": "🤖 Run tools/cag_validate.py to check all agent, skill, prompt, and instruction files for schema compliance.",
+            "type": "shell",
+            "command": "python tools/cag_validate.py",
+            "problemMatcher": []
+        }
+    ],
+    // ─── INPUTS ───────────────────────────────────────────────────────────────
+    // Used by "Run Debug: Pick Example" and "Run Release: Pick Example" tasks.
+    "inputs": [
+        {
+            "id": "exampleGame",
+            "type": "pickString",
+            "description": "Choose an example game to run",
+            "options": [
+                { "label": "Hello World",   "value": "examples/hello_world"  },
+                { "label": "Physics Demo",  "value": "examples/physics_demo" },
+                { "label": "Sprites",       "value": "examples/sprites"      },
+                { "label": "Platformer",    "value": "examples/platformer"   },
+                { "label": "Scene Demo",    "value": "examples/scene_demo"   },
+                { "label": "Demo Game",     "value": "examples/demo_game"    }
+            ],
+            "default": "examples/hello_world"
+        }
+    ]
+}

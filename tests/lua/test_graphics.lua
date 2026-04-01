@@ -1,0 +1,239 @@
+-- Luna2D Graphics API Tests (headless - tests API existence and parameters only)
+
+describe("luna.graphics module exists", function()
+    it("luna.graphics is a table", function()
+        expect_type("table", luna.graphics)
+    end)
+end)
+
+describe("luna.graphics color functions", function()
+    it("setColor is a function", function()
+        expect_type("function", luna.graphics.setColor)
+    end)
+
+    it("setColor accepts 3 args", function()
+        expect_no_error(function()
+            luna.graphics.setColor(1, 0, 0)
+        end)
+    end)
+
+    it("setColor accepts 4 args", function()
+        expect_no_error(function()
+            luna.graphics.setColor(1, 0, 0, 0.5)
+        end)
+    end)
+
+    it("setBackgroundColor is a function", function()
+        expect_type("function", luna.graphics.setBackgroundColor)
+    end)
+
+    it("setBackgroundColor accepts 3 args", function()
+        expect_no_error(function()
+            luna.graphics.setBackgroundColor(0.1, 0.1, 0.1)
+        end)
+    end)
+end)
+
+describe("luna.graphics shape functions", function()
+    it("rectangle is a function", function()
+        expect_type("function", luna.graphics.rectangle)
+    end)
+
+    it("rectangle fill mode", function()
+        expect_no_error(function()
+            luna.graphics.rectangle("fill", 10, 10, 100, 50)
+        end)
+    end)
+
+    it("rectangle line mode", function()
+        expect_no_error(function()
+            luna.graphics.rectangle("line", 10, 10, 100, 50)
+        end)
+    end)
+
+    it("circle is a function", function()
+        expect_type("function", luna.graphics.circle)
+    end)
+
+    it("circle fill mode", function()
+        expect_no_error(function()
+            luna.graphics.circle("fill", 50, 50, 25)
+        end)
+    end)
+
+    it("line is a function", function()
+        expect_type("function", luna.graphics.line)
+    end)
+
+    it("line accepts 4 args", function()
+        expect_no_error(function()
+            luna.graphics.line(0, 0, 100, 100)
+        end)
+    end)
+end)
+
+describe("luna.graphics text functions", function()
+    it("print is a function", function()
+        expect_type("function", luna.graphics.print)
+    end)
+
+    it("print accepts text and position", function()
+        expect_no_error(function()
+            luna.graphics.print("Hello", 10, 10)
+        end)
+    end)
+end)
+
+describe("luna.graphics image functions", function()
+    it("newImage is a function", function()
+        expect_type("function", luna.graphics.newImage)
+    end)
+
+    it("draw is a function", function()
+        expect_type("function", luna.graphics.draw)
+    end)
+end)
+
+describe("luna.graphics advanced shapes", function()
+    it("ellipse is a function", function()
+        expect_type("function", luna.graphics.ellipse)
+    end)
+
+    it("ellipse fill mode", function()
+        expect_no_error(function()
+            luna.graphics.ellipse("fill", 100, 100, 50, 30)
+        end)
+    end)
+
+    it("polygon is a function", function()
+        expect_type("function", luna.graphics.polygon)
+    end)
+
+    it("polygon fill mode with vertices", function()
+        expect_no_error(function()
+            luna.graphics.polygon("fill", 0, 0, 100, 0, 50, 100)
+        end)
+    end)
+
+    it("triangle is a function", function()
+        expect_type("function", luna.graphics.triangle)
+    end)
+
+    it("triangle fill mode", function()
+        expect_no_error(function()
+            luna.graphics.triangle("fill", 0, 0, 100, 0, 50, 80)
+        end)
+    end)
+
+    it("setLineWidth is a function", function()
+        expect_type("function", luna.graphics.setLineWidth)
+    end)
+
+    it("getLineWidth is a function", function()
+        expect_type("function", luna.graphics.getLineWidth)
+    end)
+
+    it("setLineWidth and getLineWidth roundtrip", function()
+        luna.graphics.setLineWidth(3.0)
+        expect_near(3.0, luna.graphics.getLineWidth())
+        luna.graphics.setLineWidth(1.0) -- reset
+    end)
+
+    it("getDimensions returns two numbers", function()
+        local w, h = luna.graphics.getDimensions()
+        expect_type("number", w)
+        expect_type("number", h)
+        expect_true(w > 0, "width > 0")
+        expect_true(h > 0, "height > 0")
+    end)
+end)
+
+-- =========================================================================
+-- Font metrics
+-- =========================================================================
+describe("font metrics", function()
+    it("getFontLineHeight is a function", function()
+        expect_type("function", luna.graphics.getFontLineHeight)
+    end)
+
+    it("setFontLineHeight is a function", function()
+        expect_type("function", luna.graphics.setFontLineHeight)
+    end)
+
+    it("getFontAscent is a function", function()
+        expect_type("function", luna.graphics.getFontAscent)
+    end)
+
+    it("getFontDescent is a function", function()
+        expect_type("function", luna.graphics.getFontDescent)
+    end)
+end)
+
+-- ── Nine-Slice Tests ────────────────────────────────────────────────────
+
+describe("luna.graphics nine-slice", function()
+    it("newNineSlice is a function", function()
+        expect_type("function", luna.graphics.newNineSlice)
+    end)
+
+    it("drawNineSlice is a function", function()
+        expect_type("function", luna.graphics.drawNineSlice)
+    end)
+
+    it("creates a NineSlice from an image", function()
+        local img = luna.graphics.newImage("assets/icon.png")
+        local ns = luna.graphics.newNineSlice(img, 10, 10, 10, 10)
+        expect_type("userdata", ns)
+    end)
+
+    it("NineSlice:getInsets returns correct values", function()
+        local img = luna.graphics.newImage("assets/icon.png")
+        local ns = luna.graphics.newNineSlice(img, 12, 8, 15, 6)
+        local t, r, b, l = ns:getInsets()
+        expect_near(12, t)
+        expect_near(8, r)
+        expect_near(15, b)
+        expect_near(6, l)
+    end)
+
+    it("NineSlice:getTextureSize returns image dimensions", function()
+        local img = luna.graphics.newImage("assets/icon.png")
+        local ns = luna.graphics.newNineSlice(img, 5, 5, 5, 5)
+        local w, h = ns:getTextureSize()
+        assert(w > 0, "texture width should be positive")
+        assert(h > 0, "texture height should be positive")
+    end)
+
+    it("drawNineSlice accepts NineSlice and rect", function()
+        local img = luna.graphics.newImage("assets/icon.png")
+        local ns = luna.graphics.newNineSlice(img, 10, 10, 10, 10)
+        expect_no_error(function()
+            luna.graphics.drawNineSlice(ns, 50, 50, 300, 200)
+        end)
+    end)
+
+    it("NineSlice:draw method works", function()
+        local img = luna.graphics.newImage("assets/icon.png")
+        local ns = luna.graphics.newNineSlice(img, 5, 5, 5, 5)
+        expect_no_error(function()
+            ns:draw(10, 20, 400, 300)
+        end)
+    end)
+
+    it("NineSlice:typeOf returns NineSlice", function()
+        local img = luna.graphics.newImage("assets/icon.png")
+        local ns = luna.graphics.newNineSlice(img, 5, 5, 5, 5)
+        assert(ns:typeOf("NineSlice"), "should be NineSlice type")
+        assert(ns:typeOf("Object"), "should be Object type")
+    end)
+
+    it("rejects negative border insets", function()
+        local img = luna.graphics.newImage("assets/icon.png")
+        local ok = pcall(function()
+            luna.graphics.newNineSlice(img, -5, 10, 10, 10)
+        end)
+        assert(not ok, "negative insets should error")
+    end)
+end)
+
+test_summary()

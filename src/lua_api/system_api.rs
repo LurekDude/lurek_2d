@@ -1,0 +1,599 @@
+use mlua::prelude::*;
+use std::cell::RefCell;
+use std::rc::Rc;
+
+use super::SharedState;
+use crate::engine::log_messages;
+
+/// Returns the number of logical processors available.
+///
+/// # Returns
+/// Logical CPU count; at least 1.
+pub fn get_processor_count() -> usize {
+    std::thread::available_parallelism()
+        .map(|n| n.get())
+        .unwrap_or(1)
+}
+
+/// Returns total system RAM in MiB using the `sysinfo` crate.
+///
+/// # Returns
+/// Physical memory in MiB (e.g. 16384 for 16 GB).
+pub fn get_memory_size() -> u64 {
+    use sysinfo::System;
+    let sys = System::new_with_specifics(
+        sysinfo::RefreshKind::new().with_memory(sysinfo::MemoryRefreshKind::everything()),
+    );
+    sys.total_memory() / (1024 * 1024)
+}
+
+/// Opens a URL in the default browser/application.
+///
+/// Only `http://`, `https://`, and `mailto:` schemes are allowed.
+///
+/// # Parameters
+/// - `url` — the URL string to open
+///
+/// # Returns
+/// `true` if the command was spawned successfully; `false` if the scheme is
+/// rejected or the spawn failed.
+pub fn open_url(url: &str) -> bool {
+    let url_lower = url.to_lowercase();
+    if !url_lower.starts_with("http://")
+        && !url_lower.starts_with("https://")
+        && !url_lower.starts_with("mailto:")
+    {
+        log::warn!("openURL rejected: only http, https, and mailto schemes allowed");
+        return false;
+    }
+
+    #[cfg(target_os = "windows")]
+    {
+        std::process::Command::new("cmd")
+            .args(["/C", "start", "", url])
+            .spawn()
+            .is_ok()
+    }
+    #[cfg(target_os = "macos")]
+    {
+        std::process::Command::new("open").arg(url).spawn().is_ok()
+    }
+    #[cfg(target_os = "linux")]
+    {
+        std::process::Command::new("xdg-open")
+            .arg(url)
+            .spawn()
+            .is_ok()
+    }
+    #[cfg(not(any(target_os = "windows", target_os = "macos", target_os = "linux")))]
+    {
+        let _ = url;
+        false
+    }
+}
+
+/// Returns the user's preferred locale strings.
+///
+/// # Returns
+/// A `Vec<String>` with at least one locale tag (e.g. `"en_US"`).
+pub fn get_preferred_locales() -> Vec<String> {
+    let locales: Vec<String> = sys_locale::get_locales().map(|l| l.to_string()).collect();
+    if locales.is_empty() {
+        if let Ok(lang) = std::env::var("LANG") {
+            vec![lang.split('.').next().unwrap_or("en_US").to_string()]
+        } else {
+            vec!["en_US".to_string()]
+        }
+    } else {
+        locales
+    }
+}
+
+/// Power state of the device.
+///
+/// # Variants
+/// - `Unknown` — cannot determine power state
+/// - `Battery` — running on battery
+/// - `NoBattery` — no battery (desktop plugged in)
+/// - `Charging` — battery is charging
+/// - `Charged` — battery is fully charged
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub enum PowerState {
+    /// Cannot determine power state.
+    Unknown,
+    /// Running on battery.
+    Battery,
+    /// No battery (desktop plugged in).
+    NoBattery,
+    /// Battery is charging.
+    Charging,
+    /// Battery is fully charged.
+    Charged,
+}
+
+impl PowerState {
+    /// Returns the string representation used in Lua.
+    ///
+    /// # Returns
+    /// One of `"unknown"`, `"battery"`, `"nobattery"`, `"charging"`, or `"charged"`.
+    pub fn as_str(&self) -> &'static str {
+        match self {
+            PowerState::Unknown => "unknown",
+            PowerState::Battery => "battery",
+            PowerState::NoBattery => "nobattery",
+            PowerState::Charging => "charging",
+            PowerState::Charged => "charged",
+        }
+    }
+}
+
+/// Returns power/battery information: (state, percent, seconds).
+///
+/// On desktop platforms this returns `(Unknown, None, None)`.
+///
+/// # Returns
+/// A tuple of `(PowerState, Option<u32>, Option<u32>)` — the power state,
+/// remaining battery percentage (0–100), and remaining seconds on battery.
+pub fn get_power_info() -> (PowerState, Option<u32>, Option<u32>) {
+    (PowerState::Unknown, None, None)
+}
+
+/// Registers `luna.system.*` platform query functions into the Lua VM.
+///
+/// # Parameters
+/// - `lua` — The active Lua VM instance.
+/// - `luna` — The `luna` global table to attach functions to.
+///
+/// # Returns
+/// `LuaResult<()>` — Ok if all functions were registered successfully; Lua error otherwise.
+pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> LuaResult<()> {
+    let system = lua.create_table()?;
+
+    // luna.system.getOS() -> string
+    /// Returns the host operating system name ('Windows', 'Linux', 'macOS').
+    system.set(
+        "getOS",
+        lua.create_function(|_, ()| {
+            Ok(if cfg!(target_os = "windows") {
+                "Windows"
+            } else if cfg!(target_os = "linux") {
+                "Linux"
+            } else if cfg!(target_os = "macos") {
+                "macOS"
+            } else if cfg!(target_os = "android") {
+                "Android"
+            } else if cfg!(target_os = "ios") {
+                "iOS"
+            } else {
+                "Unknown"
+            })
+        })?,
+    )?;
+
+    // luna.system.getVersion() -> string
+    /// Returns the Luna2D engine version string.
+    system.set(
+        "getVersion",
+        lua.create_function(|_, ()| Ok(env!("CARGO_PKG_VERSION").to_string()))?,
+    )?;
+
+    // luna.system.getProcessorCount() -> integer
+    /// Returns the number of logical CPU cores available.
+    system.set(
+        "getProcessorCount",
+        lua.create_function(|_, ()| Ok(get_processor_count()))?,
+    )?;
+
+    // luna.system.getMemorySize() -> integer (MiB)
+    /// Returns the total amount of installed system RAM in megabytes.
+    ///
+    /// # Returns
+    /// RAM size in megabytes as an integer.
+    system.set(
+        "getMemorySize",
+        lua.create_function(|_, ()| Ok(get_memory_size()))?,
+    )?;
+
+    // luna.system.openURL(url) -> bool
+    /// Opens a URL in the system's default browser.
+    system.set(
+        "openURL",
+        lua.create_function(|_, url: String| Ok(open_url(&url)))?,
+    )?;
+
+    // luna.system.getPreferredLocales() -> table of strings
+    /// Returns an ordered list of the user's preferred locale strings (e.g. 'en-US').
+    ///
+    /// # Returns
+    /// Table of locale strings ordered from most to least preferred.
+    system.set(
+        "getPreferredLocales",
+        lua.create_function(|_, ()| Ok(get_preferred_locales()))?,
+    )?;
+
+    // luna.system.getPowerInfo() -> state, percent_or_nil, seconds_or_nil
+    /// Returns battery state, percentage charged, and estimated time remaining.
+    ///
+    /// # Returns
+    /// Table with fields state ('battery','charging','charged','unknown'), percent, and seconds.
+    system.set(
+        "getPowerInfo",
+        lua.create_function(|_, ()| {
+            let (state, percent, seconds) = get_power_info();
+            Ok((state.as_str().to_string(), percent, seconds))
+        })?,
+    )?;
+
+    // luna.system.getInfo() -> table { engine, version, lua_version, renderer, os, processors, memory }
+    /// Returns a table of system information including OS name, CPU model, and installed RAM.
+    ///
+    /// # Returns
+    /// Table with fields os, cpu, cores, and ram.
+    system.set(
+        "getInfo",
+        lua.create_function(|lua, ()| {
+            let info = lua.create_table()?;
+            /// Engine.
+            info.set("engine", "Luna2D")?;
+            /// Version.
+            info.set("version", env!("CARGO_PKG_VERSION"))?;
+            /// Lua_version.
+            info.set("lua_version", "Lua 5.4")?;
+            /// Renderer.
+            info.set("renderer", "wgpu")?;
+            /// Os.
+            info.set(
+                "os",
+                if cfg!(target_os = "windows") {
+                    "Windows"
+                } else if cfg!(target_os = "linux") {
+                    "Linux"
+                } else if cfg!(target_os = "macos") {
+                    "macOS"
+                } else {
+                    "Unknown"
+                },
+            )?;
+            /// Processors.
+            info.set("processors", get_processor_count())?;
+            /// Memory.
+            info.set("memory", get_memory_size())?;
+            Ok(info)
+        })?,
+    )?;
+
+    // luna.system.setClipboardText(text) — writes text to the system clipboard.
+    /// Replaces the system clipboard contents with the given string.
+    system.set(
+        "setClipboardText",
+        lua.create_function(|_, text: String| {
+            match arboard::Clipboard::new() {
+                Ok(mut cb) => {
+                    if let Err(e) = cb.set_text(text) {
+                        log::warn!("luna.system.setClipboardText: {}", e);
+                    }
+                }
+                Err(e) => {
+                    log::warn!("luna.system.setClipboardText: clipboard unavailable: {}", e);
+                }
+            }
+            Ok(())
+        })?,
+    )?;
+
+    // luna.system.getClipboardText() -> string — reads text from the system clipboard.
+    /// Returns the current contents of the system clipboard.
+    system.set(
+        "getClipboardText",
+        lua.create_function(|_, ()| match arboard::Clipboard::new() {
+            Ok(mut cb) => match cb.get_text() {
+                Ok(text) => Ok(text),
+                Err(e) => {
+                    log::warn!("luna.system.getClipboardText: {}", e);
+                    Ok(String::new())
+                }
+            },
+            Err(e) => {
+                log::warn!("luna.system.getClipboardText: clipboard unavailable: {}", e);
+                Ok(String::new())
+            }
+        })?,
+    )?;
+
+    // Clone for getLastError below (before state is consumed by getDebugOverlay)
+    let state_for_error = state.clone();
+
+    // luna.system.setDebugOverlay(enabled)
+    /// Shows or hides the FPS/draw-call debug overlay.
+    let s = state.clone();
+    system.set(
+        "setDebugOverlay",
+        lua.create_function(move |_, enabled: bool| {
+            s.borrow_mut().debug_overlay_enabled = enabled;
+            Ok(())
+        })?,
+    )?;
+
+    // luna.system.getDebugOverlay() -> bool
+    let s = state;
+    /// Returns whether the debug overlay is currently visible.
+    system.set(
+        "getDebugOverlay",
+        lua.create_function(move |_, ()| Ok(s.borrow().debug_overlay_enabled))?,
+    )?;
+
+    // -----------------------------------------------------------------------
+    // Structured logging API
+    // -----------------------------------------------------------------------
+
+    #[allow(unused_doc_comments)]
+    /// Sets the minimum severity level for runtime log messages.
+    ///
+    /// # Parameters
+    /// - `level` — One of 'debug', 'info', 'warn', or 'error'.
+    // luna.system.setLogLevel(level)
+    system.set(
+        "setLogLevel",
+        lua.create_function(|_, level: String| {
+            log_messages::set_log_level(&level);
+            Ok(())
+        })?,
+    )?;
+
+    #[allow(unused_doc_comments)]
+    /// Returns the name of the current minimum log level for runtime messages.
+    ///
+    /// # Returns
+    /// One of 'debug', 'info', 'warn', or 'error'.
+    // luna.system.getLogLevel()
+    system.set(
+        "getLogLevel",
+        lua.create_function(|_, ()| Ok(log_messages::get_log_level().to_string()))?,
+    )?;
+
+    #[allow(unused_doc_comments)]
+    /// Emit a log message from Lua at the specified level.
+    // luna.system.log(level, message)
+    system.set(
+        "log",
+        lua.create_function(|_, (level, message): (String, String)| {
+            match level.to_lowercase().as_str() {
+                "error" => log::error!("[Lua] {}", message),
+                "warn" | "warning" => log::warn!("[Lua] {}", message),
+                "info" => log::info!("[Lua] {}", message),
+                "debug" => log::debug!("[Lua] {}", message),
+                "trace" => log::trace!("[Lua] {}", message),
+                _ => log::info!("[Lua] {}", message),
+            }
+            Ok(())
+        })?,
+    )?;
+
+    #[allow(unused_doc_comments)]
+    /// Get the last engine error as a structured table, or nil.
+    // luna.system.getLastError()
+    {
+        /// Returns the last unhandled error message, or nil.
+        let s = state_for_error.clone();
+        system.set(
+            "getLastError",
+            lua.create_function(move |lua, ()| {
+                let state = s.borrow();
+                if let Some(ref err_info) = state.last_error {
+                    let tbl = lua.create_table()?;
+                    /// Message.
+                    tbl.set("message", err_info.message.as_str())?;
+                    /// Code.
+                    tbl.set("code", err_info.code.as_str())?;
+                    /// Category.
+                    tbl.set("category", err_info.category.as_str())?;
+                    if let Some(ref hint) = err_info.hint {
+                        /// Hint.
+                        tbl.set("hint", hint.as_str())?;
+                    }
+                    Ok(mlua::Value::Table(tbl))
+                } else {
+                    Ok(mlua::Value::Nil)
+                }
+            })?,
+        )?;
+    }
+
+    // luna.system.getArch() -> string
+    /// Returns the CPU architecture string for the current machine.
+    ///
+    /// # Returns
+    /// One of 'x86_64', 'aarch64', 'arm', etc.
+    system.set(
+        "getArch",
+        lua.create_function(|_, ()| Ok(std::env::consts::ARCH.to_string()))?,
+    )?;
+
+    // luna.system.getEnv(name) -> string|nil
+    /// Returns the value of the named OS environment variable, or nil if not set.
+    ///
+    /// # Parameters
+    /// - `name` — Environment variable name (case-sensitive on Linux/macOS).
+    ///
+    /// # Returns
+    /// String value of the variable, or nil if it is not set.
+    system.set(
+        "getEnv",
+        lua.create_function(|_, name: String| match std::env::var(&name) {
+            Ok(val) => Ok(Some(val)),
+            Err(_) => Ok(None),
+        })?,
+    )?;
+
+    // luna.system.getArgs() -> table
+    /// Returns the command-line arguments as a table.
+    system.set(
+        "getArgs",
+        lua.create_function(|lua, ()| {
+            let args: Vec<String> = std::env::args().collect();
+            let tbl = lua.create_table()?;
+            for (i, arg) in args.iter().enumerate() {
+                tbl.set(i as i64 + 1, arg.as_str())?;
+            }
+            Ok(tbl)
+        })?,
+    )?;
+
+    // luna.system.parseArgs([argTable]) -> { flags={}, options={}, positional={} }
+    /// Parses a command-line argument string and returns a structured key/value table.
+    ///
+    /// # Parameters
+    /// - `args` — Argument string or table (e.g. '--flag=value --bool').
+    ///
+    /// # Returns
+    /// Table mapping flag names to their values or true for boolean flags.
+    system.set(
+        "parseArgs",
+        lua.create_function(|lua, args: Option<LuaTable>| {
+            let raw_args: Vec<String> = if let Some(tbl) = args {
+                let mut v = Vec::new();
+                for i in 1..=tbl.len()? {
+                    if let Ok(s) = tbl.get::<_, String>(i) {
+                        v.push(s);
+                    }
+                }
+                v
+            } else {
+                std::env::args().collect()
+            };
+
+            let flags = lua.create_table()?;
+            let options = lua.create_table()?;
+            let positional = lua.create_table()?;
+            let mut pos_idx = 1i64;
+            let mut end_of_options = false;
+            let mut i = 0;
+
+            while i < raw_args.len() {
+                let arg = &raw_args[i];
+                if end_of_options {
+                    positional.set(pos_idx, arg.as_str())?;
+                    pos_idx += 1;
+                } else if arg == "--" {
+                    end_of_options = true;
+                } else if let Some(rest) = arg.strip_prefix("--") {
+                    if let Some(eq_pos) = rest.find('=') {
+                        let key = &rest[..eq_pos];
+                        let val = &rest[eq_pos + 1..];
+                        options.set(key, val)?;
+                    } else if i + 1 < raw_args.len() && !raw_args[i + 1].starts_with('-') {
+                        options.set(rest, raw_args[i + 1].as_str())?;
+                        i += 1;
+                    } else {
+                        flags.set(rest, true)?;
+                    }
+                } else if let Some(rest) = arg.strip_prefix('-') {
+                    if !rest.is_empty() {
+                        flags.set(rest, true)?;
+                    }
+                } else {
+                    positional.set(pos_idx, arg.as_str())?;
+                    pos_idx += 1;
+                }
+                i += 1;
+            }
+
+            let result = lua.create_table()?;
+            /// Flags.
+            result.set("flags", flags)?;
+            /// Options.
+            result.set("options", options)?;
+            /// Positional.
+            result.set("positional", positional)?;
+            Ok(result)
+        })?,
+    )?;
+
+    // luna.system.runBatch(tasks [, opts]) -> results table
+    /// Runs a list of shell commands in parallel and returns immediately without blocking.
+    ///
+    /// # Parameters
+    /// - `commands` — Table of command strings to execute concurrently.
+    ///
+    /// # Returns
+    /// A batch handle ID used to retrieve results with getBatchResults.
+    system.set(
+        "runBatch",
+        lua.create_function(|lua, (tasks, opts): (LuaTable, Option<LuaTable>)| {
+            let stop_on_error = opts
+                .as_ref()
+                .and_then(|o| o.get::<_, bool>("stopOnError").ok())
+                .unwrap_or(false);
+
+            let results = lua.create_table()?;
+            let mut had_error = false;
+
+            for pair in tasks.pairs::<String, LuaFunction>() {
+                let (name, func) = pair?;
+                if had_error && stop_on_error {
+                    let entry = lua.create_table()?;
+                    /// Status.
+                    entry.set("status", "skipped")?;
+                    /// Time.
+                    entry.set("time", 0.0)?;
+                    results.set(name, entry)?;
+                    continue;
+                }
+
+                let start = std::time::Instant::now();
+                let entry = lua.create_table()?;
+                match func.call::<_, LuaMultiValue>(()) {
+                    Ok(_) => {
+                        /// Status.
+                        entry.set("status", "passed")?;
+                    }
+                    Err(e) => {
+                        /// Status.
+                        entry.set("status", "failed")?;
+                        /// Error.
+                        entry.set("error", e.to_string())?;
+                        had_error = true;
+                    }
+                }
+                /// Time.
+                entry.set("time", start.elapsed().as_secs_f64())?;
+                results.set(name, entry)?;
+            }
+
+            Ok(results)
+        })?,
+    )?;
+
+    // luna.system.getBatchResults(results) -> passed, failed, skipped
+    /// Returns the output table from the most recently completed runBatch call.
+    ///
+    /// # Parameters
+    /// - `handle` — Batch handle returned by runBatch.
+    ///
+    /// # Returns
+    /// Table mapping each command to its stdout string, or nil if not yet done.
+    system.set(
+        "getBatchResults",
+        lua.create_function(|_, results: LuaTable| {
+            let mut passed = 0i64;
+            let mut failed = 0i64;
+            let mut skipped = 0i64;
+            for pair in results.pairs::<LuaValue, LuaTable>() {
+                let (_, entry) = pair?;
+                if let Ok(s) = entry.get::<_, String>("status") {
+                    match s.as_str() {
+                        "passed" => passed += 1,
+                        "failed" => failed += 1,
+                        "skipped" => skipped += 1,
+                        _ => {}
+                    }
+                }
+            }
+            Ok((passed, failed, skipped))
+        })?,
+    )?;
+
+    /// System.
+    luna.set("system", system)?;
+    Ok(())
+}

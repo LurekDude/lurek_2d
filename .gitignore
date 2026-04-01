@@ -1,0 +1,31 @@
+# Build artifacts
+/build/
+/target/
+/dist/
+
+# Session and planning artifacts
+/work/
+
+# Transient developer logs
+/logs/
+
+# Local research and draft docs
+/docs/competition/
+/docs/future/
+/docs/references/
+
+# Root diagnostics and runtime logs
+/cargo_check_err.txt
+/clippy_out.txt
+/clippy_output.txt
+/luna2d.log
+/tools/__pycache__/
+
+# Machine-specific VS Code settings
+/.vscode/settings.json
+
+# Reference repositories (cloned for analysis)
+/references/
+
+# Wiki sub-repository (published to GitHub Wiki)
+/wiki/
