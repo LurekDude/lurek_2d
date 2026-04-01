@@ -169,10 +169,10 @@ def _cheatsheet_line(call: str, ret: str, desc: str, indent: int = 2) -> str:
     # Truncate description to keep lines readable
     if len(desc) > 90:
         desc = desc[:87] + "..."
-    # Align: call (55 chars) + rettype (24 chars) + desc
-    ret_part = f"  -> {ret:<18}" if ret else " " * 22
+    # Compact format: call + rettype + desc (no excessive padding)
+    ret_part = f"  -> {ret}" if ret else ""
     desc_part = f"  -- {desc}" if desc else ""
-    line = f"{pad}{call:<55}{ret_part}{desc_part}"
+    line = f"{pad}{call}{ret_part}{desc_part}"
     return line.rstrip()
 
 
