@@ -65,6 +65,10 @@ pub mod entity;
 pub mod event;
 /// Sandboxed game filesystem (GameFS).
 pub mod filesystem;
+/// Card game engine: deck building, hand management, card types, and effects.
+pub mod cardgame;
+/// Turn-based and real-time combat system: combatants, actions, abilities, and battle resolution.
+pub mod combat;
 /// Directed graph with item flow simulation, pathfinding, and supply/demand.
 pub mod graph;
 /// 2D GPU rendering pipeline, draw commands, and graphics types.
@@ -73,6 +77,8 @@ pub mod graphics;
 pub mod image;
 /// Keyboard, mouse, and gamepad input state.
 pub mod input;
+/// Item and container inventory system with slots, stacks, equipment, and item sets.
+pub mod inventory;
 /// Lua VM creation and the luna.* API bindings.
 pub mod lua_api;
 /// Foundational math types: Vec2, Mat3, Rect.
@@ -80,6 +86,14 @@ pub mod math;
 pub mod pathfinding;
 /// Mod management framework: metadata, dependencies, load ordering, hooks.
 pub mod modding;
+/// Quest and objective tracking system with stages, conditions, and rewards.
+pub mod quest;
+/// Resource economy system: named resources with capacity, flow rates, and decay.
+pub mod resource;
+/// Character statistics system: attributes, modifiers, leveling, and derived stats.
+pub mod stats;
+/// Crafting system: recipes, ingredients, stations, and upgrade trees.
+pub mod crafting;
 /// Emitter-based 2D particle effects.
 pub mod particle;
 /// Physics simulation with rigid bodies (rect and circle shapes), collision events, sensors, and layer filtering.

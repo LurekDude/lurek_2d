@@ -139,3 +139,124 @@ fn signal_default_trait() {
     let sig = Signal::default();
     assert_eq!(sig.get_total_count(), 0);
 }
+
+// ── Additional EventQueue edge cases ────────────────────────────────────────
+
+#[test]
+fn event_queue_new_is_empty() {
+    let queue = EventQueue::new();
+    assert!(queue.is_empty());
+    assert_eq!(queue.len(), 0);
+}
+
+#[test]
+fn event_queue_poll_empty_returns_none() {
+    let mut queue = EventQueue::new();
+    assert!(queue.poll().is_none());
+}
+
+#[test]
+fn event_queue_len_grows_with_push() {
+    let mut queue = EventQueue::new();
+    queue.push_event("a", vec![]);
+    assert_eq!(queue.len(), 1);
+    queue.push_event("b", vec![]);
+    assert_eq!(queue.len(), 2);
+}
+
+#[test]
+fn event_queue_len_shrinks_with_poll() {
+    let mut queue = EventQueue::new();
+    queue.push_event("x", vec![]);
+    queue.push_event("y", vec![]);
+    let _ = queue.poll();
+    assert_eq!(queue.len(), 1);
+    assert!(!queue.is_empty());
+}
+
+#[test]
+fn event_queue_args_num_variant() {
+    let mut queue = EventQueue::new();
+    queue.push(Event {
+        name: "score".to_string(),
+        args: vec![EventArg::Num(99.5)],
+    });
+    let ev = queue.poll().unwrap();
+    match &ev.args[0] {
+        EventArg::Num(n) => assert!((*n - 99.5).abs() < 1e-9),
+        other => panic!("unexpected arg: {other:?}"),
+    }
+}
+
+#[test]
+fn event_queue_args_bool_variant() {
+    let mut queue = EventQueue::new();
+    queue.push(Event {
+        name: "flag".to_string(),
+        args: vec![EventArg::Bool(true), EventArg::Bool(false)],
+    });
+    let ev = queue.poll().unwrap();
+    assert!(matches!(&ev.args[0], EventArg::Bool(true)));
+    assert!(matches!(&ev.args[1], EventArg::Bool(false)));
+}
+
+#[test]
+fn event_queue_args_nil_variant() {
+    let mut queue = EventQueue::new();
+    queue.push(Event {
+        name: "empty_arg".to_string(),
+        args: vec![EventArg::Nil],
+    });
+    let ev = queue.poll().unwrap();
+    assert!(matches!(&ev.args[0], EventArg::Nil));
+}
+
+#[test]
+fn event_queue_preserves_event_name_exactly() {
+    let mut queue = EventQueue::new();
+    queue.push_event("keypressed:space", vec![]);
+    assert_eq!(queue.poll().unwrap().name, "keypressed:space");
+}
+
+#[test]
+fn event_queue_clear_makes_empty() {
+    let mut queue = EventQueue::new();
+    for _ in 0..10 {
+        queue.push_event("ev", vec![]);
+    }
+    queue.clear();
+    assert!(queue.is_empty());
+    assert_eq!(queue.len(), 0);
+}
+
+// ── Signal edge cases ────────────────────────────────────────────────────────
+
+#[test]
+fn signal_subscribe_different_names_tracked_independently() {
+    let mut sig = Signal::new();
+    sig.subscribe("alpha");
+    sig.subscribe("beta");
+    sig.subscribe("alpha");
+    assert_eq!(sig.get_count("alpha"), 2);
+    assert_eq!(sig.get_count("beta"), 1);
+    assert_eq!(sig.get_total_count(), 3);
+}
+
+#[test]
+fn signal_remove_all_handles_for_name() {
+    let mut sig = Signal::new();
+    let h1 = sig.subscribe("ev");
+    let h2 = sig.subscribe("ev");
+    assert!(sig.remove(h1));
+    assert!(sig.remove(h2));
+    assert_eq!(sig.get_count("ev"), 0);
+    assert!(sig.get_handles("ev").is_empty());
+}
+
+#[test]
+fn signal_handles_are_unique_across_names() {
+    let mut sig = Signal::new();
+    let h1 = sig.subscribe("click");
+    let h2 = sig.subscribe("hover");
+    assert_ne!(h1, h2);
+}

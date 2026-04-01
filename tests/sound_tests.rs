@@ -135,3 +135,82 @@ fn test_lua_set_midi_soundfont_missing_file() {
         .exec();
     assert!(result.is_err());
 }
+
+// ── Additional SoundData coverage ──────────────────────────────────────────
+
+#[test]
+fn sound_data_bit_depth_defaults_to_32() {
+    let sd = SoundData::new(100, 44100, 1);
+    assert_eq!(sd.bit_depth(), 32);
+}
+
+#[test]
+fn sound_data_as_samples_length_matches_sample_count() {
+    let sd = SoundData::new(50, 44100, 1);
+    assert_eq!(sd.as_samples().len(), 50);
+}
+
+#[test]
+fn sound_data_as_samples_initially_zeroed() {
+    let sd = SoundData::new(20, 44100, 2);
+    assert!(sd.as_samples().iter().all(|&s| s == 0.0));
+}
+
+#[test]
+fn sound_data_as_samples_reflects_set_sample() {
+    let mut sd = SoundData::new(10, 48000, 1);
+    sd.set_sample(3, 0.5);
+    assert!((sd.as_samples()[3] - 0.5).abs() < 1e-6);
+}
+
+#[test]
+fn sound_data_set_sample_out_of_bounds_returns_false() {
+    let mut sd = SoundData::new(10, 44100, 1);
+    assert!(!sd.set_sample(10, 0.0)); // index == len
+    assert!(!sd.set_sample(100, 0.0));
+}
+
+#[test]
+fn sound_data_get_sample_out_of_bounds_returns_none() {
+    let sd = SoundData::new(5, 44100, 1);
+    assert!(sd.get_sample(5).is_none());
+    assert!(sd.get_sample(99).is_none());
+}
+
+#[test]
+fn sound_data_sample_clamp_positive_extreme() {
+    let mut sd = SoundData::new(5, 44100, 1);
+    sd.set_sample(0, 999.0);
+    assert!((sd.get_sample(0).unwrap() - 1.0).abs() < 1e-6);
+}
+
+#[test]
+fn sound_data_sample_clamp_negative_extreme() {
+    let mut sd = SoundData::new(5, 44100, 1);
+    sd.set_sample(0, -999.0);
+    assert!((sd.get_sample(0).unwrap() - (-1.0)).abs() < 1e-6);
+}
+
+#[test]
+fn sound_data_zero_samples_duration_is_zero() {
+    let sd = SoundData::new(0, 44100, 1);
+    assert!((sd.duration()).abs() < 1e-9);
+}
+
+#[test]
+fn sound_data_multichannel_channel_count() {
+    let sd = SoundData::new(100, 48000, 6); // 5.1 surround
+    assert_eq!(sd.channel_count(), 6);
+}
+
+#[test]
+fn sound_data_sample_rate_stored_correctly() {
+    let sd = SoundData::new(1, 22050, 1);
+    assert_eq!(sd.sample_rate(), 22050);
+}
+
+#[test]
+fn sound_data_from_file_invalid_path_returns_error() {
+    let result = SoundData::from_file("nonexistent_file_xyz_12345.wav");
+    assert!(result.is_err());
+}

@@ -544,3 +544,153 @@ fn resource_manager_spend_all_rollback() {
     .exec()
     .unwrap();
 }
+
+// ── Additional resource coverage ─────────────────────────────────────────────
+
+#[test]
+fn resource_interest_rate_tick() {
+    let lua = make_vm();
+    lua.load(
+        r#"
+        local rm = luna.resource.newManager()
+        rm:newResource("gold", 1000.0)
+        rm:setValue("gold", 100.0)
+        rm:setInterestRate("gold", 0.1)  -- 10% interest per tick
+        rm:tick(1.0)
+        local val = rm:getValue("gold")
+        -- 100 + 10% of 100 = 110
+        assert(math.abs(val - 110.0) < 0.01, "interest applied, got " .. val)
+        "#,
+    )
+    .exec()
+    .unwrap();
+}
+
+#[test]
+fn resource_decay_percent_tick() {
+    let lua = make_vm();
+    lua.load(
+        r#"
+        local rm = luna.resource.newManager()
+        rm:newResource("food", 100.0)
+        rm:setValue("food", 100.0)
+        rm:setDecayPercent("food", 0.1)  -- 10% decay per tick
+        rm:tick(1.0)
+        local val = rm:getValue("food")
+        -- 100 - 10% of 100 = 90
+        assert(math.abs(val - 90.0) < 0.01, "decay percent applied, got " .. val)
+        "#,
+    )
+    .exec()
+    .unwrap();
+}
+
+#[test]
+fn resource_net_rate_includes_flow_upkeep_and_decay() {
+    let lua = make_vm();
+    lua.load(
+        r#"
+        local rm = luna.resource.newManager()
+        rm:newResource("mana", 100.0)
+        rm:setFlowRate("mana", 5.0)   -- +5/s
+        rm:setDecayRate("mana", 2.0)  -- -2/s
+        rm:setUpkeep("mana", 1.0)     -- -1/s upkeep
+        local net = rm:getNetRate("mana")
+        -- net = 5 - 2 - 1 = 2
+        assert(math.abs(net - 2.0) < 0.01, "net rate = 2, got " .. net)
+        "#,
+    )
+    .exec()
+    .unwrap();
+}
+
+#[test]
+fn resource_get_resource_names_returns_all() {
+    let lua = make_vm();
+    lua.load(
+        r#"
+        local rm = luna.resource.newManager()
+        rm:newResource("gold", 100.0)
+        rm:newResource("wood", 200.0)
+        local names = rm:getResourceNames()
+        assert(#names == 2, "expected 2 resources, got " .. #names)
+        "#,
+    )
+    .exec()
+    .unwrap();
+}
+
+#[test]
+fn resource_has_resource_true_and_false() {
+    let lua = make_vm();
+    lua.load(
+        r#"
+        local rm = luna.resource.newManager()
+        rm:newResource("stone", 50.0)
+        assert(rm:hasResource("stone") == true, "stone should exist")
+        assert(rm:hasResource("diamond") == false, "diamond should not exist")
+        "#,
+    )
+    .exec()
+    .unwrap();
+}
+
+#[test]
+fn resource_reserve_and_unreserve_affects_available() {
+    let lua = make_vm();
+    lua.load(
+        r#"
+        local rm = luna.resource.newManager()
+        rm:newResource("silver", 100.0)
+        rm:setValue("silver", 80.0)
+        rm:reserve("silver", 30.0)
+        local avail = rm:getAvailable("silver")
+        local reserved = rm:getReserved("silver")
+        assert(math.abs(avail - 50.0) < 0.01, "available = 50, got " .. avail)
+        assert(math.abs(reserved - 30.0) < 0.01, "reserved = 30, got " .. reserved)
+        rm:unreserve("silver", 10.0)
+        assert(math.abs(rm:getAvailable("silver") - 60.0) < 0.01, "available = 60 after unreserve")
+        "#,
+    )
+    .exec()
+    .unwrap();
+}
+
+#[test]
+fn resource_group_operations() {
+    let lua = make_vm();
+    lua.load(
+        r#"
+        local rm = luna.resource.newManager()
+        rm:newResource("copper", 500.0)
+        rm:newResource("tin", 500.0)
+        rm:setValue("copper", 100.0)
+        rm:setValue("tin", 50.0)
+        rm:setGroup("copper", "metals")
+        rm:setGroup("tin", "metals")
+        local total = rm:totalByGroup("metals")
+        assert(math.abs(total - 150.0) < 0.01, "group total = 150, got " .. total)
+        "#,
+    )
+    .exec()
+    .unwrap();
+}
+
+#[test]
+fn resource_overflow_wrap_policy() {
+    let lua = make_vm();
+    lua.load(
+        r#"
+        local rm = luna.resource.newManager()
+        rm:newResource("energy", 100.0)
+        rm:setValue("energy", 90.0)
+        rm:setOverflow("energy", "wrap")
+        rm:add("energy", 20.0)  -- would exceed capacity
+        local val = rm:getValue("energy")
+        -- wrap: (90 + 20) mod 100 = 10
+        assert(math.abs(val - 10.0) < 0.01, "overflow wrap applied, got " .. val)
+        "#,
+    )
+    .exec()
+    .unwrap();
+}

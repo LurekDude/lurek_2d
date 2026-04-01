@@ -627,3 +627,109 @@ fn sheet_recover_action_points() {
         assert(math.abs(capped - 10.0) < 0.01, "capped at max 10")
     "#).exec().unwrap();
 }
+
+// ── Additional stats coverage ────────────────────────────────────────────────
+
+#[test]
+fn sheet_update_ticks_regen() {
+    let lua = make_vm();
+    lua.load(r#"
+        local sheet = luna.stats.newSheet()
+        sheet:define("hp", 50.0)
+        sheet:setMax("hp", 100.0)
+        sheet:setRegen("hp", 10.0)  -- 10 hp/s
+        sheet:update(1.0)
+        local hp = sheet:get("hp")
+        assert(math.abs(hp - 60.0) < 0.01, "hp should be 60 after 1s regen, got " .. hp)
+    "#).exec().unwrap();
+}
+
+#[test]
+fn sheet_snapshot_restore_roundtrip() {
+    let lua = make_vm();
+    lua.load(r#"
+        local sheet = luna.stats.newSheet()
+        sheet:define("str", 15.0)
+        sheet:define("agi", 12.0)
+        local snap = sheet:snapshot()
+        -- change values
+        sheet:setBase("str", 99.0)
+        sheet:setBase("agi", 1.0)
+        -- restore
+        sheet:restore(snap)
+        assert(math.abs(sheet:get("str") - 15.0) < 0.01, "str restored")
+        assert(math.abs(sheet:get("agi") - 12.0) < 0.01, "agi restored")
+    "#).exec().unwrap();
+}
+
+#[test]
+fn sheet_set_and_get_xp_and_level() {
+    let lua = make_vm();
+    lua.load(r#"
+        local sheet = luna.stats.newSheet()
+        sheet:setXP(0.0)
+        sheet:setLevel(5)
+        assert(sheet:getLevel() == 5, "level is 5")
+    "#).exec().unwrap();
+}
+
+#[test]
+fn sheet_begin_turn_restores_action_points() {
+    let lua = make_vm();
+    lua.load(r#"
+        local sheet = luna.stats.newSheet()
+        sheet:setActionPoints(4.0)
+        sheet:spendActionPoints(3.0)
+        assert(math.abs(sheet:getActionPoints() - 1.0) < 0.01, "1 AP left")
+        sheet:beginTurn()
+        assert(math.abs(sheet:getActionPoints() - 4.0) < 0.01, "AP restored after beginTurn")
+    "#).exec().unwrap();
+}
+
+#[test]
+fn sheet_setmin_clamps_value() {
+    let lua = make_vm();
+    lua.load(r#"
+        local sheet = luna.stats.newSheet()
+        sheet:define("armor", 5.0)
+        sheet:setMin("armor", 0.0)
+        sheet:setBase("armor", -10.0)  -- below minimum
+        local val = sheet:get("armor")
+        assert(val >= 0.0, "armor clamped to min, got " .. val)
+    "#).exec().unwrap();
+}
+
+#[test]
+fn sheet_setmax_clamps_value() {
+    let lua = make_vm();
+    lua.load(r#"
+        local sheet = luna.stats.newSheet()
+        sheet:define("speed", 10.0)
+        sheet:setMax("speed", 20.0)
+        sheet:setBase("speed", 50.0)  -- above maximum
+        local val = sheet:get("speed")
+        assert(val <= 20.0, "speed clamped to max, got " .. val)
+    "#).exec().unwrap();
+}
+
+#[test]
+fn sheet_has_trait_returns_false_if_not_added() {
+    let lua = make_vm();
+    lua.load(r#"
+        local sheet = luna.stats.newSheet()
+        assert(sheet:hasTrait("warrior") == false, "trait not present")
+    "#).exec().unwrap();
+}
+
+#[test]
+fn sheet_record_use_increments_count() {
+    let lua = make_vm();
+    lua.load(r#"
+        local sheet = luna.stats.newSheet()
+        sheet:recordUse("fireball")
+        sheet:recordUse("fireball")
+        sheet:recordUse("fireball")
+        assert(sheet:getUseCount("fireball") == 3, "use count is 3")
+        assert(sheet:getUseCount("unknown") == 0, "unknown is 0")
+    "#).exec().unwrap();
+}

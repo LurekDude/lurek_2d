@@ -909,3 +909,173 @@ fn easing_in_out_curves_are_symmetric() {
         );
     }
 }
+
+// ── Vec2 missing-coverage tests ─────────────────────────────────────────────
+
+#[test]
+fn vec2_zero_is_origin() {
+    let v = Vec2::zero();
+    assert!((v.x).abs() < f32::EPSILON);
+    assert!((v.y).abs() < f32::EPSILON);
+}
+
+#[test]
+fn vec2_splat_sets_both_components() {
+    let v = Vec2::splat(7.0);
+    assert!((v.x - 7.0).abs() < f32::EPSILON);
+    assert!((v.y - 7.0).abs() < f32::EPSILON);
+}
+
+#[test]
+fn vec2_length_squared_matches_length_squared() {
+    let v = Vec2::new(3.0, 4.0);
+    assert!((v.length_squared() - 25.0).abs() < 1e-5);
+}
+
+#[test]
+fn vec2_angle_of_unit_right() {
+    let v = Vec2::new(1.0, 0.0);
+    assert!((v.angle()).abs() < 1e-5); // angle = 0
+}
+
+#[test]
+fn vec2_angle_of_unit_up() {
+    let v = Vec2::new(0.0, 1.0);
+    assert!((v.angle() - std::f32::consts::FRAC_PI_2).abs() < 1e-5);
+}
+
+#[test]
+fn vec2_negate() {
+    let v = -Vec2::new(3.0, -5.0);
+    assert!((v.x - (-3.0)).abs() < f32::EPSILON);
+    assert!((v.y - 5.0).abs() < f32::EPSILON);
+}
+
+#[test]
+fn vec2_scalar_div() {
+    let v = Vec2::new(6.0, 9.0) / 3.0;
+    assert!((v.x - 2.0).abs() < f32::EPSILON);
+    assert!((v.y - 3.0).abs() < f32::EPSILON);
+}
+
+#[test]
+fn vec2_add_assign() {
+    let mut v = Vec2::new(1.0, 2.0);
+    v += Vec2::new(3.0, 4.0);
+    assert!((v.x - 4.0).abs() < f32::EPSILON);
+    assert!((v.y - 6.0).abs() < f32::EPSILON);
+}
+
+#[test]
+fn vec2_sub_assign() {
+    let mut v = Vec2::new(5.0, 7.0);
+    v -= Vec2::new(2.0, 3.0);
+    assert!((v.x - 3.0).abs() < f32::EPSILON);
+    assert!((v.y - 4.0).abs() < f32::EPSILON);
+}
+
+#[test]
+fn vec2_mul_assign() {
+    let mut v = Vec2::new(2.0, 3.0);
+    v *= 4.0;
+    assert!((v.x - 8.0).abs() < f32::EPSILON);
+    assert!((v.y - 12.0).abs() < f32::EPSILON);
+}
+
+#[test]
+fn vec2_normalize_zero_returns_zero() {
+    // normalizing the zero vector should not panic; it returns the zero vector per impl
+    let v = Vec2::zero().normalize();
+    // length is either 0 or NaN-free (implementation returns original if length ≈ 0)
+    assert!(!v.x.is_nan());
+    assert!(!v.y.is_nan());
+}
+
+// ── Rect missing-coverage tests ─────────────────────────────────────────────
+
+#[test]
+fn rect_center_is_midpoint() {
+    let r = Rect::new(2.0, 4.0, 6.0, 8.0);
+    let c = r.center();
+    assert!((c.x - 5.0).abs() < 1e-5);
+    assert!((c.y - 8.0).abs() < 1e-5);
+}
+
+#[test]
+fn rect_area_width_times_height() {
+    let r = Rect::new(0.0, 0.0, 3.0, 5.0);
+    assert!((r.area() - 15.0).abs() < 1e-5);
+}
+
+#[test]
+fn rect_intersects_overlapping() {
+    let a = Rect::new(0.0, 0.0, 4.0, 4.0);
+    let b = Rect::new(2.0, 2.0, 4.0, 4.0);
+    assert!(a.intersects(&b));
+    assert!(b.intersects(&a));
+}
+
+#[test]
+fn rect_intersects_touching_edge_no_overlap() {
+    let a = Rect::new(0.0, 0.0, 2.0, 2.0);
+    let b = Rect::new(2.0, 0.0, 2.0, 2.0); // shares right/left edge — AABB exclusive
+    // The implementation uses strict less-than (<), so touching edges do NOT intersect
+    assert!(!a.intersects(&b));
+}
+
+#[test]
+fn rect_intersects_separated_returns_false() {
+    let a = Rect::new(0.0, 0.0, 2.0, 2.0);
+    let b = Rect::new(5.0, 5.0, 2.0, 2.0);
+    assert!(!a.intersects(&b));
+}
+
+#[test]
+fn rect_contains_inside_point() {
+    let r = Rect::new(1.0, 1.0, 4.0, 4.0);
+    assert!(r.contains(2.0, 2.0));
+}
+
+#[test]
+fn rect_contains_corner_point() {
+    let r = Rect::new(0.0, 0.0, 5.0, 5.0);
+    assert!(r.contains(0.0, 0.0)); // top-left corner
+}
+
+// ── Mat3 from_rotation and from_scale ───────────────────────────────────────
+
+#[test]
+fn mat3_from_rotation_90_degrees() {
+    let m = Mat3::from_rotation(std::f32::consts::FRAC_PI_2);
+    let p = Vec2::new(1.0, 0.0);
+    let q = m.transform_point(p);
+    assert!((q.x).abs() < 1e-5); // cos(90°) ≈ 0
+    assert!((q.y - 1.0).abs() < 1e-5); // sin(90°) ≈ 1
+}
+
+#[test]
+fn mat3_from_rotation_identity_at_zero() {
+    let m = Mat3::from_rotation(0.0);
+    let p = Vec2::new(3.0, 7.0);
+    let q = m.transform_point(p);
+    assert!((q.x - 3.0).abs() < 1e-5);
+    assert!((q.y - 7.0).abs() < 1e-5);
+}
+
+#[test]
+fn mat3_from_scale_doubles_vector() {
+    let m = Mat3::from_scale(Vec2::new(2.0, 3.0));
+    let p = Vec2::new(4.0, 5.0);
+    let q = m.transform_point(p);
+    assert!((q.x - 8.0).abs() < 1e-5);
+    assert!((q.y - 15.0).abs() < 1e-5);
+}
+
+#[test]
+fn mat3_from_scale_identity_at_one_one() {
+    let m = Mat3::from_scale(Vec2::new(1.0, 1.0));
+    let p = Vec2::new(9.0, 2.0);
+    let q = m.transform_point(p);
+    assert!((q.x - 9.0).abs() < 1e-5);
+    assert!((q.y - 2.0).abs() < 1e-5);
+}
