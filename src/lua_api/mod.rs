@@ -230,6 +230,20 @@ pub mod timer_api;
 pub mod lua_types;
 /// Registers the `luna.window.*` window management API.
 pub mod window_api;
+/// Registers the `luna.cardgame.*` card game API.
+pub mod cardgame_api;
+/// Registers the `luna.combat.*` combat system API.
+pub mod combat_api;
+/// Registers the `luna.resource.*` resource management API.
+pub mod resource_api;
+/// Registers the `luna.stats.*` character stats API.
+pub mod stats_api;
+/// Registers the `luna.inventory.*` inventory system API.
+pub mod inventory_api;
+/// Registers the `luna.quest.*` quest tracking API.
+pub mod quest_api;
+/// Registers the `luna.crafting.*` crafting system API.
+pub mod crafting_api;
 
 /// Structured error information for the last engine error.
 ///
@@ -480,6 +494,13 @@ pub fn create_lua_vm(state: Rc<RefCell<SharedState>>) -> LuaResult<Lua> {
     entity_api::register(&lua, &luna)?;
     modding_api::register(&lua, &luna, state.clone())?;
     savegame_api::register(&lua, &luna, state.clone())?;
+    cardgame_api::register(&lua, &luna)?;
+    combat_api::register(&lua, &luna)?;
+    resource_api::register(&lua, &luna)?;
+    stats_api::register(&lua, &luna)?;
+    inventory_api::register(&lua, &luna)?;
+    quest_api::register(&lua, &luna)?;
+    crafting_api::register(&lua, &luna)?;
 
     /// Luna on this Object.
     ///
