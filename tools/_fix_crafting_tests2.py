@@ -297,7 +297,7 @@ else:
     with open(FILE, 'w', encoding='utf-8') as f:
         f.write(content)
     print(f"crafting_tests.rs fixed")
-    
+
     # Verify no Lua-style -- comments outside r# blocks remain in unexpected places
     lines = content.split('\n')
     in_raw = False

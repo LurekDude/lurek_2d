@@ -1,6 +1,6 @@
 """Fix remaining 3 failing crafting tests:
 1. recipe_skill_requirements: setSkillLevel doesn't exist, use setSkill(name, level)
-2. craft_skill_level_up: addXp(100.0) doesn't level up (needs 200), use 200.0  
+2. craft_skill_level_up: addXp(100.0) doesn't level up (needs 200), use 200.0
 3. craft_skill_can_use_recipe: uses recipe created with setSkillLevel (doesn't exist)
 """
 

@@ -229,8 +229,7 @@ impl Resource {
 
     /// Computes the net rate: flowRate - decayRate - upkeep + (value * interest) - (value * decay%).
     pub fn net_rate(&self) -> f64 {
-        self.flow_rate - self.decay_rate - self.upkeep
-            + (self.value * self.interest_rate)
+        self.flow_rate - self.decay_rate - self.upkeep + (self.value * self.interest_rate)
             - (self.value * self.decay_percent)
     }
 
@@ -699,7 +698,11 @@ impl ResourceManager {
         let total_cost = amount + fee;
 
         // Check source can afford
-        let from_avail = self.resources.get(from).map(|r| r.available()).unwrap_or(0.0);
+        let from_avail = self
+            .resources
+            .get(from)
+            .map(|r| r.available())
+            .unwrap_or(0.0);
         if from_avail < total_cost {
             return false;
         }
@@ -744,12 +747,11 @@ impl ResourceManager {
             return false;
         }
 
-        self.resources.get_mut(give_name).unwrap().spend(give_amount);
-        other
-            .resources
-            .get_mut(get_name)
+        self.resources
+            .get_mut(give_name)
             .unwrap()
-            .spend(get_amount);
+            .spend(give_amount);
+        other.resources.get_mut(get_name).unwrap().spend(get_amount);
 
         if let Some(r) = self.resources.get_mut(get_name) {
             r.add(get_amount);
@@ -774,25 +776,38 @@ impl ResourceManager {
     /// Returns value as a percentage of capacity (0.0–100.0). Returns 0 if capacity <= 0.
     pub fn percent(&self, name: &str) -> f64 {
         if let Some(r) = self.resources.get(name) {
-            if r.capacity <= 0.0 { return 0.0; }
+            if r.capacity <= 0.0 {
+                return 0.0;
+            }
             (r.value / r.capacity * 100.0).clamp(0.0, 100.0)
-        } else { 0.0 }
+        } else {
+            0.0
+        }
     }
 
     /// Returns true when the named resource value has reached its capacity.
     pub fn is_full(&self, name: &str) -> bool {
-        self.resources.get(name).map(|r| r.value >= r.capacity).unwrap_or(false)
+        self.resources
+            .get(name)
+            .map(|r| r.value >= r.capacity)
+            .unwrap_or(false)
     }
 
     /// Returns true when the named resource value is at or below its minimum.
     pub fn is_empty(&self, name: &str) -> bool {
-        self.resources.get(name).map(|r| r.value <= r.minimum).unwrap_or(true)
+        self.resources
+            .get(name)
+            .map(|r| r.value <= r.minimum)
+            .unwrap_or(true)
     }
 
     /// Returns true only if every (name, amount) pair can be afforded simultaneously.
     pub fn can_afford_all(&self, needs: &[(&str, f64)]) -> bool {
         needs.iter().all(|(name, amount)| {
-            self.resources.get(*name).map(|r| r.can_afford(*amount)).unwrap_or(false)
+            self.resources
+                .get(*name)
+                .map(|r| r.can_afford(*amount))
+                .unwrap_or(false)
         })
     }
 
@@ -800,9 +815,14 @@ impl ResourceManager {
     /// resource cannot afford its portion.
     pub fn spend_all(&mut self, needs: &[(&str, f64)]) -> bool {
         let ok = needs.iter().all(|(name, amount)| {
-            self.resources.get(*name).map(|r| r.can_afford(*amount)).unwrap_or(false)
+            self.resources
+                .get(*name)
+                .map(|r| r.can_afford(*amount))
+                .unwrap_or(false)
         });
-        if !ok { return false; }
+        if !ok {
+            return false;
+        }
         for (name, amount) in needs {
             if let Some(r) = self.resources.get_mut(*name) {
                 r.spend(*amount);

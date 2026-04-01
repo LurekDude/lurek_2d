@@ -434,18 +434,22 @@ fn resource_reset() {
 #[test]
 fn resource_error_unknown_resource() {
     let lua = make_vm();
-    let result = lua.load(r#"
+    let result = lua
+        .load(
+            r#"
         local mgr = luna.resource.newManager()
         mgr:getValue("nonexistent")
-        "#)
-    .exec();
+        "#,
+        )
+        .exec();
     assert!(result.is_err(), "accessing unknown resource should error");
 }
 
 #[test]
 fn resource_manager_get_percent() {
     let lua = make_vm();
-    lua.load(r#"
+    lua.load(
+        r#"
         local rm = luna.resource.newManager()
         rm:newResource("mana", 100.0)
         rm:setValue("mana", 75.0)
@@ -455,13 +459,17 @@ fn resource_manager_get_percent() {
         assert(math.abs(rm:getPercent("mana") - 0.0) < 0.01, "0%")
         rm:setValue("mana", 100.0)
         assert(math.abs(rm:getPercent("mana") - 100.0) < 0.01, "100%")
-    "#).exec().unwrap();
+    "#,
+    )
+    .exec()
+    .unwrap();
 }
 
 #[test]
 fn resource_manager_is_full_empty() {
     let lua = make_vm();
-    lua.load(r#"
+    lua.load(
+        r#"
         local rm = luna.resource.newManager()
         rm:newResource("stamina", 50.0)
         rm:setValue("stamina", 50.0)
@@ -471,13 +479,17 @@ fn resource_manager_is_full_empty() {
         rm:setValue("stamina", 25.0)
         assert(not rm:isFull("stamina"), "not full at 50%")
         assert(not rm:isEmpty("stamina"), "not empty at 50%")
-    "#).exec().unwrap();
+    "#,
+    )
+    .exec()
+    .unwrap();
 }
 
 #[test]
 fn resource_manager_can_afford_all() {
     let lua = make_vm();
-    lua.load(r#"
+    lua.load(
+        r#"
         local rm = luna.resource.newManager()
         rm:newResource("gold", 100.0)
         rm:newResource("wood", 50.0)
@@ -486,13 +498,17 @@ fn resource_manager_can_afford_all() {
         assert(rm:canAffordAll({gold=50, wood=20}), "can afford both")
         assert(not rm:canAffordAll({gold=90, wood=20}), "cannot afford gold")
         assert(not rm:canAffordAll({gold=50, wood=40}), "cannot afford wood")
-    "#).exec().unwrap();
+    "#,
+    )
+    .exec()
+    .unwrap();
 }
 
 #[test]
 fn resource_manager_spend_all() {
     let lua = make_vm();
-    lua.load(r#"
+    lua.load(
+        r#"
         local rm = luna.resource.newManager()
         rm:newResource("gold", 100.0)
         rm:newResource("iron", 50.0)
@@ -502,13 +518,17 @@ fn resource_manager_spend_all() {
         assert(ok, "spend succeeded")
         assert(math.abs(rm:getValue("gold") - 30.0) < 0.01, "gold spent")
         assert(math.abs(rm:getValue("iron") - 10.0) < 0.01, "iron spent")
-    "#).exec().unwrap();
+    "#,
+    )
+    .exec()
+    .unwrap();
 }
 
 #[test]
 fn resource_manager_spend_all_rollback() {
     let lua = make_vm();
-    lua.load(r#"
+    lua.load(
+        r#"
         local rm = luna.resource.newManager()
         rm:newResource("gold", 100.0)
         rm:newResource("iron", 10.0)
@@ -519,5 +539,8 @@ fn resource_manager_spend_all_rollback() {
         assert(not ok, "spend failed")
         assert(math.abs(rm:getValue("gold") - 60.0) < 0.01, "gold unchanged")
         assert(math.abs(rm:getValue("iron") - 5.0) < 0.01, "iron unchanged")
-    "#).exec().unwrap();
+    "#,
+    )
+    .exec()
+    .unwrap();
 }

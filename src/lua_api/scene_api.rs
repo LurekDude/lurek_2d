@@ -599,6 +599,10 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
         })?,
     )?;
 
+    /// Scene on this DepthSorter.
+    ///
+    /// # Returns
+    /// The result.
     luna.set("scene", scene_table)?;
     Ok(())
 }

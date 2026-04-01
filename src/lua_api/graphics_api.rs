@@ -117,14 +117,35 @@ impl LuaUserData for LuaNineSlice {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
         add_type_methods::<Self>(methods);
 
+        /// Returns the insets.
+        ///
+        /// # Returns
+        /// The current insets.
         methods.add_method("getInsets", |_, this, ()| {
             Ok((this.top, this.right, this.bottom, this.left))
         });
 
+        /// Returns the texture size.
+        ///
+        /// # Parameters
+        /// - `x` — `number`.
+        /// - `y` — `number`.
+        /// - `w` — `number`.
+        /// - `h` — `number`.
+        ///
+        /// # Returns
+        /// The current texture size.
         methods.add_method("getTextureSize", |_, this, ()| {
             Ok((this.tex_width, this.tex_height))
         });
 
+        /// Draws to the current render target.
+        ///
+        /// # Parameters
+        /// - `x` — `number`.
+        /// - `y` — `number`.
+        /// - `w` — `number`.
+        /// - `h` — `number`.
         methods.add_method("draw", |_, this, (x, y, w, h): (f32, f32, f32, f32)| {
             let mut st = this.state.borrow_mut();
             st.draw_commands.push(DrawCommand::DrawNineSlice {

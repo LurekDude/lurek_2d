@@ -55,6 +55,12 @@ impl LuaUserData for LuaEventBus {
         add_type_methods(methods);
 
         // on(event, callback, priority?) -> subscriptionId
+        /// Registers an event listener callback.
+        ///
+        /// # Parameters
+        /// - `event` — `string`.
+        /// - `callback` — `function`.
+        /// - `priority` — `integer` optional.
         methods.add_method("on", |lua, this, (event, callback, priority): (String, LuaFunction, Option<i64>)| {
             let priority = priority.unwrap_or(0);
             let key = lua.create_registry_value(callback)?;
@@ -68,6 +74,10 @@ impl LuaUserData for LuaEventBus {
         });
 
         // off(subscriptionId)
+        /// Removes a previously registered event listener.
+        ///
+        /// # Parameters
+        /// - `id` — `integer`.
         methods.add_method("off", |lua, this, id: u64| {
             let mut inner = this.inner.borrow_mut();
             for subs in inner.listeners.values_mut() {
@@ -81,6 +91,10 @@ impl LuaUserData for LuaEventBus {
         });
 
         // emit(event, ...)
+        /// Emits an event.
+        ///
+        /// # Parameters
+        /// - `args` — `LuaMultiValue`.
         methods.add_method("emit", |lua, this, args: LuaMultiValue| {
             let mut args_iter = args.into_iter();
             let event: String = match args_iter.next() {
@@ -115,6 +129,10 @@ impl LuaUserData for LuaEventBus {
         });
 
         // clear(event)
+        /// Removes all entries.
+        ///
+        /// # Parameters
+        /// - `event` — `string`.
         methods.add_method("clear", |lua, this, event: String| {
             let mut inner = this.inner.borrow_mut();
             if let Some(subs) = inner.listeners.remove(&event) {
@@ -126,6 +144,10 @@ impl LuaUserData for LuaEventBus {
         });
 
         // clearAll()
+        /// Clear all on this EventBus.
+        ///
+        /// # Returns
+        /// The result.
         methods.add_method("clearAll", |lua, this, ()| {
             let mut inner = this.inner.borrow_mut();
             let all: Vec<(String, Vec<Subscription>)> = inner.listeners.drain().collect();
@@ -138,6 +160,13 @@ impl LuaUserData for LuaEventBus {
         });
 
         // getListenerCount(event) -> int
+        /// Returns the listener count.
+        ///
+        /// # Parameters
+        /// - `event` — `string`.
+        ///
+        /// # Returns
+        /// The current listener count.
         methods.add_method("getListenerCount", |_lua, this, event: String| {
             let inner = this.inner.borrow();
             let count = inner
@@ -149,6 +178,10 @@ impl LuaUserData for LuaEventBus {
         });
 
         // getEvents() -> table<string>
+        /// Returns the events.
+        ///
+        /// # Returns
+        /// The current events.
         methods.add_method("getEvents", |lua, this, ()| {
             let inner = this.inner.borrow();
             let names: Vec<String> = inner
@@ -201,6 +234,10 @@ impl LuaUserData for LuaObjectPool {
         add_type_methods(methods);
 
         // add(object)
+        /// Adds an entry to the collection.
+        ///
+        /// # Parameters
+        /// - `value` — `any`.
         methods.add_method("add", |lua, this, value: LuaValue| {
             let key = lua.create_registry_value(value)?;
             this.inner.borrow_mut().available.push(key);
@@ -208,6 +245,10 @@ impl LuaUserData for LuaObjectPool {
         });
 
         // acquire() -> any | nil
+        /// Acquire on this ObjectPool.
+        ///
+        /// # Returns
+        /// The result.
         methods.add_method("acquire", |lua, this, ()| {
             let mut inner = this.inner.borrow_mut();
             if let Some(key) = inner.available.pop() {
@@ -221,6 +262,10 @@ impl LuaUserData for LuaObjectPool {
         });
 
         // release(object)
+        /// Releases the underlying resource handle.
+        ///
+        /// # Parameters
+        /// - `value` — `any`.
         methods.add_method("release", |lua, this, value: LuaValue| {
             let key = lua.create_registry_value(value)?;
             let mut inner = this.inner.borrow_mut();
@@ -232,22 +277,38 @@ impl LuaUserData for LuaObjectPool {
         });
 
         // getActiveCount() -> int
+        /// Returns the active count.
+        ///
+        /// # Returns
+        /// The current active count.
         methods.add_method("getActiveCount", |_lua, this, ()| {
             Ok(this.inner.borrow().active_count)
         });
 
         // getAvailableCount() -> int
+        /// Returns the available count.
+        ///
+        /// # Returns
+        /// The current available count.
         methods.add_method("getAvailableCount", |_lua, this, ()| {
             Ok(this.inner.borrow().available.len())
         });
 
         // getTotalCount() -> int
+        /// Returns the total count.
+        ///
+        /// # Returns
+        /// The current total count.
         methods.add_method("getTotalCount", |_lua, this, ()| {
             let inner = this.inner.borrow();
             Ok(inner.active_count + inner.available.len())
         });
 
         // clearAll()
+        /// Clear all on this ObjectPool.
+        ///
+        /// # Returns
+        /// The result.
         methods.add_method("clearAll", |lua, this, ()| {
             let mut inner = this.inner.borrow_mut();
             for key in inner.available.drain(..) {
@@ -301,6 +362,12 @@ impl LuaUserData for LuaCommandStack {
         add_type_methods(methods);
 
         // execute(name, execFn, undoFn?)
+        /// Execute on this CommandStack.
+        ///
+        /// # Parameters
+        /// - `name` — `string`.
+        /// - `exec_fn` — `function`.
+        /// - `undo_fn` — `function` optional.
         methods.add_method("execute", |lua, this, (name, exec_fn, undo_fn): (String, LuaFunction, Option<LuaFunction>)| {
             // Truncate any redo history
             let mut inner = this.inner.borrow_mut();
@@ -333,6 +400,10 @@ impl LuaUserData for LuaCommandStack {
         });
 
         // undo() -> boolean
+        /// Undo on this CommandStack.
+        ///
+        /// # Returns
+        /// The result.
         methods.add_method("undo", |lua, this, ()| {
             let inner = this.inner.borrow();
             if inner.cursor == 0 {
@@ -354,6 +425,10 @@ impl LuaUserData for LuaCommandStack {
         });
 
         // redo() -> boolean
+        /// Redo on this CommandStack.
+        ///
+        /// # Returns
+        /// The result.
         methods.add_method("redo", |lua, this, ()| {
             let inner = this.inner.borrow();
             if inner.cursor >= inner.history.len() {
@@ -370,6 +445,10 @@ impl LuaUserData for LuaCommandStack {
         });
 
         // canUndo() -> boolean
+        /// Returns `true` if undo.
+        ///
+        /// # Returns
+        /// `boolean`.
         methods.add_method("canUndo", |_lua, this, ()| {
             let inner = this.inner.borrow();
             if inner.cursor == 0 {
@@ -379,17 +458,29 @@ impl LuaUserData for LuaCommandStack {
         });
 
         // canRedo() -> boolean
+        /// Returns `true` if redo.
+        ///
+        /// # Returns
+        /// `boolean`.
         methods.add_method("canRedo", |_lua, this, ()| {
             let inner = this.inner.borrow();
             Ok(inner.cursor < inner.history.len())
         });
 
         // getHistorySize() -> int
+        /// Returns the history size.
+        ///
+        /// # Returns
+        /// The current history size.
         methods.add_method("getHistorySize", |_lua, this, ()| {
             Ok(this.inner.borrow().history.len())
         });
 
         // getCurrentName() -> string | nil
+        /// Returns the current name.
+        ///
+        /// # Returns
+        /// The current current name.
         methods.add_method("getCurrentName", |_lua, this, ()| {
             let inner = this.inner.borrow();
             if inner.cursor == 0 {
@@ -400,6 +491,10 @@ impl LuaUserData for LuaCommandStack {
         });
 
         // clearAll()
+        /// Clear all on this CommandStack.
+        ///
+        /// # Returns
+        /// The result.
         methods.add_method("clearAll", |lua, this, ()| {
             let mut inner = this.inner.borrow_mut();
             for entry in inner.history.drain(..) {
@@ -447,6 +542,11 @@ impl LuaUserData for LuaServiceLocator {
         add_type_methods(methods);
 
         // provide(name, value)
+        /// Provide on this ServiceLocator.
+        ///
+        /// # Parameters
+        /// - `name` — `string`.
+        /// - `value` — `any`.
         methods.add_method("provide", |lua, this, (name, value): (String, LuaValue)| {
             let key = lua.create_registry_value(value)?;
             let mut inner = this.inner.borrow_mut();
@@ -457,6 +557,10 @@ impl LuaUserData for LuaServiceLocator {
         });
 
         // locate(name) -> any | nil
+        /// Locate on this ServiceLocator.
+        ///
+        /// # Parameters
+        /// - `name` — `string`.
         methods.add_method("locate", |lua, this, name: String| {
             let inner = this.inner.borrow();
             match inner.services.get(&name) {
@@ -469,11 +573,22 @@ impl LuaUserData for LuaServiceLocator {
         });
 
         // has(name) -> boolean
+        /// Returns `true` if the condition is met.
+        ///
+        /// # Parameters
+        /// - `name` — `string`.
+        ///
+        /// # Returns
+        /// `boolean`.
         methods.add_method("has", |_lua, this, name: String| {
             Ok(this.inner.borrow().services.contains_key(&name))
         });
 
         // remove(name)
+        /// Removes the entry from the collection.
+        ///
+        /// # Parameters
+        /// - `name` — `string`.
         methods.add_method("remove", |lua, this, name: String| {
             let mut inner = this.inner.borrow_mut();
             if let Some(key) = inner.services.remove(&name) {
@@ -483,6 +598,10 @@ impl LuaUserData for LuaServiceLocator {
         });
 
         // getServices() -> table<string>
+        /// Returns the services.
+        ///
+        /// # Returns
+        /// The current services.
         methods.add_method("getServices", |lua, this, ()| {
             let inner = this.inner.borrow();
             let table = lua.create_table()?;
@@ -493,6 +612,10 @@ impl LuaUserData for LuaServiceLocator {
         });
 
         // clearAll()
+        /// Clear all on this ServiceLocator.
+        ///
+        /// # Returns
+        /// The result.
         methods.add_method("clearAll", |lua, this, ()| {
             let mut inner = this.inner.borrow_mut();
             let entries: Vec<(String, LuaRegistryKey)> = inner.services.drain().collect();
@@ -537,6 +660,11 @@ impl LuaUserData for LuaFactory {
         add_type_methods(methods);
 
         // register(typeName, constructor)
+        /// Adds an entry to the collection.
+        ///
+        /// # Parameters
+        /// - `type_name` — `string`.
+        /// - `ctor` — `function`.
         methods.add_method("register", |lua, this, (type_name, ctor): (String, LuaFunction)| {
             let key = lua.create_registry_value(ctor)?;
             let mut inner = this.inner.borrow_mut();
@@ -547,6 +675,10 @@ impl LuaUserData for LuaFactory {
         });
 
         // create(typeName, ...) -> any
+        /// Creates a new Factory instance.
+        ///
+        /// # Parameters
+        /// - `args` — `LuaMultiValue`.
         methods.add_method("create", |lua, this, args: LuaMultiValue| {
             let mut args_iter = args.into_iter();
             let type_name: String = match args_iter.next() {
@@ -567,11 +699,22 @@ impl LuaUserData for LuaFactory {
         });
 
         // has(typeName) -> boolean
+        /// Returns `true` if the condition is met.
+        ///
+        /// # Parameters
+        /// - `type_name` — `string`.
+        ///
+        /// # Returns
+        /// `boolean`.
         methods.add_method("has", |_lua, this, type_name: String| {
             Ok(this.inner.borrow().constructors.contains_key(&type_name))
         });
 
         // getTypes() -> table<string>
+        /// Returns the types.
+        ///
+        /// # Returns
+        /// The current types.
         methods.add_method("getTypes", |lua, this, ()| {
             let inner = this.inner.borrow();
             let table = lua.create_table()?;
@@ -582,6 +725,10 @@ impl LuaUserData for LuaFactory {
         });
 
         // remove(typeName)
+        /// Removes the entry from the collection.
+        ///
+        /// # Parameters
+        /// - `type_name` — `string`.
         methods.add_method("remove", |lua, this, type_name: String| {
             let mut inner = this.inner.borrow_mut();
             if let Some(key) = inner.constructors.remove(&type_name) {
@@ -591,6 +738,10 @@ impl LuaUserData for LuaFactory {
         });
 
         // clearAll()
+        /// Clear all on this Factory.
+        ///
+        /// # Returns
+        /// The result.
         methods.add_method("clearAll", |lua, this, ()| {
             let mut inner = this.inner.borrow_mut();
             let entries: Vec<(String, LuaRegistryKey)> = inner.constructors.drain().collect();
@@ -644,6 +795,11 @@ impl LuaUserData for LuaSimpleState {
         add_type_methods(methods);
 
         // addState(name, callbacks?)
+        /// Adds state to the collection.
+        ///
+        /// # Parameters
+        /// - `name` — `string`.
+        /// - `callbacks` — `table` optional.
         methods.add_method("addState", |lua, this, (name, callbacks): (String, Option<LuaTable>)| {
             let mut enter_key = None;
             let mut exit_key = None;
@@ -678,6 +834,10 @@ impl LuaUserData for LuaSimpleState {
         });
 
         // transitionTo(name) -> boolean
+        /// Transition to on this SimpleState.
+        ///
+        /// # Parameters
+        /// - `name` — `string`.
         methods.add_method("transitionTo", |lua, this, name: String| {
             let inner = this.inner.borrow();
             if !inner.states.contains_key(&name) {
@@ -717,6 +877,10 @@ impl LuaUserData for LuaSimpleState {
         });
 
         // update(dt)
+        /// Advances the simulation by `dt` seconds.
+        ///
+        /// # Parameters
+        /// - `dt` — `number`.
         methods.add_method("update", |lua, this, dt: f64| {
             let inner = this.inner.borrow();
             if let Some(ref current) = inner.current {
@@ -733,16 +897,34 @@ impl LuaUserData for LuaSimpleState {
         });
 
         // getCurrent() -> string | nil
+        /// Returns the current.
+        ///
+        /// # Parameters
+        /// - `name` — `string`.
+        ///
+        /// # Returns
+        /// The current current.
         methods.add_method("getCurrent", |_lua, this, ()| {
             Ok(this.inner.borrow().current.clone())
         });
 
         // hasState(name) -> boolean
+        /// Returns `true` if state.
+        ///
+        /// # Parameters
+        /// - `name` — `string`.
+        ///
+        /// # Returns
+        /// `boolean`.
         methods.add_method("hasState", |_lua, this, name: String| {
             Ok(this.inner.borrow().states.contains_key(&name))
         });
 
         // getStates() -> table<string>
+        /// Returns the states.
+        ///
+        /// # Returns
+        /// The current states.
         methods.add_method("getStates", |lua, this, ()| {
             let inner = this.inner.borrow();
             let table = lua.create_table()?;
@@ -753,6 +935,10 @@ impl LuaUserData for LuaSimpleState {
         });
 
         // clearAll()
+        /// Clear all on this SimpleState.
+        ///
+        /// # Returns
+        /// The result.
         methods.add_method("clearAll", |lua, this, ()| {
             let mut inner = this.inner.borrow_mut();
             for (_name, cbs) in inner.states.drain() {
@@ -834,6 +1020,10 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
         })?,
     )?;
 
+    /// Patterns on this SimpleState.
+    ///
+    /// # Returns
+    /// The result.
     luna.set("patterns", patterns)?;
     Ok(())
 }

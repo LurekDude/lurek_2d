@@ -31,27 +31,62 @@ impl LuaUserData for LuaItem {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
         add_type_methods::<Self>(methods);
 
+        /// Returns the type.
+        ///
+        /// # Parameters
+        /// - `t` — `string`.
+        ///
+        /// # Returns
+        /// The current type.
         methods.add_method("getType", |_, this, ()| {
             Ok(this.0.borrow().item_type.clone())
         });
 
+        /// Sets the type.
+        ///
+        /// # Parameters
+        /// - `t` — `string`.
         methods.add_method("setType", |_, this, t: String| {
             this.0.borrow_mut().item_type = t;
             Ok(())
         });
 
+        /// Returns the weight.
+        ///
+        /// # Parameters
+        /// - `w` — `number`.
+        ///
+        /// # Returns
+        /// The current weight.
         methods.add_method("getWeight", |_, this, ()| Ok(this.0.borrow().weight));
 
+        /// Sets the weight.
+        ///
+        /// # Parameters
+        /// - `w` — `number`.
         methods.add_method("setWeight", |_, this, w: f64| {
             this.0.borrow_mut().weight = w;
             Ok(())
         });
 
+        /// Returns the size.
+        ///
+        /// # Parameters
+        /// - `w` — `integer`.
+        /// - `h` — `integer`.
+        ///
+        /// # Returns
+        /// The current size.
         methods.add_method("getSize", |_, this, ()| {
             let it = this.0.borrow();
             Ok((it.size_w, it.size_h))
         });
 
+        /// Sets the size.
+        ///
+        /// # Parameters
+        /// - `w` — `integer`.
+        /// - `h` — `integer`.
         methods.add_method("setSize", |_, this, (w, h): (u32, u32)| {
             let mut it = this.0.borrow_mut();
             it.size_w = w;
@@ -59,28 +94,58 @@ impl LuaUserData for LuaItem {
             Ok(())
         });
 
+        /// Returns the stack limit.
+        ///
+        /// # Parameters
+        /// - `n` — `integer`.
+        ///
+        /// # Returns
+        /// The current stack limit.
         methods.add_method("getStackLimit", |_, this, ()| {
             Ok(this.0.borrow().stack_limit)
         });
 
+        /// Sets the stack limit.
+        ///
+        /// # Parameters
+        /// - `n` — `integer`.
         methods.add_method("setStackLimit", |_, this, n: u32| {
             this.0.borrow_mut().stack_limit = n.max(1);
             Ok(())
         });
 
+        /// Adds tag to the collection.
+        ///
+        /// # Parameters
+        /// - `tag` — `string`.
         methods.add_method("addTag", |_, this, tag: String| {
             this.0.borrow_mut().add_tag(tag);
             Ok(())
         });
 
+        /// Removes tag from the collection.
+        ///
+        /// # Parameters
+        /// - `tag` — `string`.
         methods.add_method("removeTag", |_, this, tag: String| {
             Ok(this.0.borrow_mut().remove_tag(&tag))
         });
 
+        /// Returns `true` if tag.
+        ///
+        /// # Parameters
+        /// - `tag` — `string`.
+        ///
+        /// # Returns
+        /// `boolean`.
         methods.add_method("hasTag", |_, this, tag: String| {
             Ok(this.0.borrow().has_tag(&tag))
         });
 
+        /// Returns the tags.
+        ///
+        /// # Returns
+        /// The current tags.
         methods.add_method("getTags", |lua, this, ()| {
             let it = this.0.borrow();
             let tbl = lua.create_table()?;
@@ -90,6 +155,10 @@ impl LuaUserData for LuaItem {
             Ok(tbl)
         });
 
+        /// Returns a deep copy of this object.
+        ///
+        /// # Returns
+        /// The result.
         methods.add_method("clone", |_, this, ()| {
             Ok(LuaItem(Rc::new(RefCell::new(this.0.borrow().clone()))))
         });
@@ -113,37 +182,75 @@ impl LuaUserData for LuaItemStack {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
         add_type_methods::<Self>(methods);
 
+        /// Returns the item.
+        ///
+        /// # Returns
+        /// The current item.
         methods.add_method("getItem", |_, this, ()| {
             let stack = this.0.borrow();
             Ok(LuaItem(Rc::new(RefCell::new(stack.item.clone()))))
         });
 
+        /// Returns the quantity.
+        ///
+        /// # Parameters
+        /// - `n` — `integer`.
+        ///
+        /// # Returns
+        /// The current quantity.
         methods.add_method("getQuantity", |_, this, ()| {
             Ok(this.0.borrow().quantity)
         });
 
+        /// Sets the quantity.
+        ///
+        /// # Parameters
+        /// - `n` — `integer`.
         methods.add_method("setQuantity", |_, this, n: u32| {
             let mut s = this.0.borrow_mut();
             s.quantity = n.min(s.max_quantity);
             Ok(())
         });
 
+        /// Returns the max quantity.
+        ///
+        /// # Returns
+        /// The current max quantity.
         methods.add_method("getMaxQuantity", |_, this, ()| {
             Ok(this.0.borrow().max_quantity)
         });
 
+        /// Returns `true` if full.
+        ///
+        /// # Parameters
+        /// - `n` — `integer`.
+        ///
+        /// # Returns
+        /// `boolean`.
         methods.add_method("isFull", |_, this, ()| {
             Ok(this.0.borrow().is_full())
         });
 
+        /// Adds an entry to the collection.
+        ///
+        /// # Parameters
+        /// - `n` — `integer`.
         methods.add_method("add", |_, this, n: u32| {
             Ok(this.0.borrow_mut().add(n))
         });
 
+        /// Removes the entry from the collection.
+        ///
+        /// # Parameters
+        /// - `n` — `integer`.
         methods.add_method("remove", |_, this, n: u32| {
             Ok(this.0.borrow_mut().remove(n))
         });
 
+        /// Split on this ItemStack.
+        ///
+        /// # Parameters
+        /// - `n` — `integer`.
         methods.add_method("split", |_, this, n: u32| {
             let split = this.0.borrow_mut().split(n);
             match split {
@@ -152,12 +259,20 @@ impl LuaUserData for LuaItemStack {
             }
         });
 
+        /// Merge on this ItemStack.
+        ///
+        /// # Parameters
+        /// - `other` — `userdata`.
         methods.add_method("merge", |_, this, other: LuaAnyUserData| {
             let other_stack = other.borrow::<LuaItemStack>()?;
             let leftover = this.0.borrow_mut().merge(&mut other_stack.0.borrow_mut());
             Ok(leftover)
         });
 
+        /// Returns a deep copy of this object.
+        ///
+        /// # Returns
+        /// The result.
         methods.add_method("clone", |_, this, ()| {
             Ok(LuaItemStack(Rc::new(RefCell::new(this.0.borrow().clone()))))
         });
@@ -181,19 +296,41 @@ impl LuaUserData for LuaSlot {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
         add_type_methods::<Self>(methods);
 
+        /// Returns the type.
+        ///
+        /// # Parameters
+        /// - `t` — `string`.
+        ///
+        /// # Returns
+        /// The current type.
         methods.add_method("getType", |_, this, ()| {
             Ok(this.0.borrow().slot_type.clone())
         });
 
+        /// Sets the type.
+        ///
+        /// # Parameters
+        /// - `t` — `string`.
         methods.add_method("setType", |_, this, t: String| {
             this.0.borrow_mut().slot_type = t;
             Ok(())
         });
 
+        /// Returns the state.
+        ///
+        /// # Parameters
+        /// - `s` — `string`.
+        ///
+        /// # Returns
+        /// The current state.
         methods.add_method("getState", |_, this, ()| {
             Ok(this.0.borrow().state.as_str().to_string())
         });
 
+        /// Sets the state.
+        ///
+        /// # Parameters
+        /// - `s` — `string`.
         methods.add_method("setState", |_, this, s: String| {
             if let Some(st) = SlotState::from_str(&s) {
                 this.0.borrow_mut().state = st;
@@ -205,10 +342,18 @@ impl LuaUserData for LuaSlot {
             }
         });
 
+        /// Returns `true` if empty.
+        ///
+        /// # Returns
+        /// `boolean`.
         methods.add_method("isEmpty", |_, this, ()| {
             Ok(this.0.borrow().is_empty())
         });
 
+        /// Returns the stack.
+        ///
+        /// # Returns
+        /// The current stack.
         methods.add_method("getStack", |_, this, ()| {
             let slot = this.0.borrow();
             match &slot.stack {
@@ -217,28 +362,56 @@ impl LuaUserData for LuaSlot {
             }
         });
 
+        /// Sets the stack.
+        ///
+        /// # Parameters
+        /// - `stack_ud` — `userdata`.
         methods.add_method("setStack", |_, this, stack_ud: LuaAnyUserData| {
             let stack = stack_ud.borrow::<LuaItemStack>()?;
             let placed = this.0.borrow_mut().set_stack(stack.0.borrow().clone());
             Ok(placed)
         });
 
+        /// Removes all entries.
+        ///
+        /// # Parameters
+        /// - `item_ud` — `userdata`.
         methods.add_method("clear", |_, this, ()| {
             this.0.borrow_mut().clear();
             Ok(())
         });
 
+        /// Returns `true` if accept.
+        ///
+        /// # Parameters
+        /// - `item_ud` — `userdata`.
+        ///
+        /// # Returns
+        /// `boolean`.
         methods.add_method("canAccept", |_, this, item_ud: LuaAnyUserData| {
             let item = item_ud.borrow::<LuaItem>()?;
             let item_ref = item.0.borrow();
             Ok(this.0.borrow().can_accept(&*item_ref))
         });
 
+        /// Returns the capacity.
+        ///
+        /// # Parameters
+        /// - `w` — `integer`.
+        /// - `h` — `integer`.
+        ///
+        /// # Returns
+        /// The current capacity.
         methods.add_method("getCapacity", |_, this, ()| {
             let s = this.0.borrow();
             Ok((s.capacity_w, s.capacity_h))
         });
 
+        /// Sets the capacity.
+        ///
+        /// # Parameters
+        /// - `w` — `integer`.
+        /// - `h` — `integer`.
         methods.add_method("setCapacity", |_, this, (w, h): (u32, u32)| {
             let mut s = this.0.borrow_mut();
             s.capacity_w = w;
@@ -265,36 +438,77 @@ impl LuaUserData for LuaContainer {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
         add_type_methods::<Self>(methods);
 
+        /// Returns the name.
+        ///
+        /// # Returns
+        /// The current name.
         methods.add_method("getName", |_, this, ()| {
             Ok(this.0.borrow().name.clone())
         });
 
+        /// Returns the mode.
+        ///
+        /// # Returns
+        /// The current mode.
         methods.add_method("getMode", |_, this, ()| {
             Ok(this.0.borrow().mode.as_str().to_string())
         });
 
+        /// Returns the slot count.
+        ///
+        /// # Returns
+        /// The current slot count.
         methods.add_method("getSlotCount", |_, this, ()| {
             Ok(this.0.borrow().slot_count())
         });
 
+        /// Returns the max slots.
+        ///
+        /// # Parameters
+        /// - `n` — `integer`.
+        ///
+        /// # Returns
+        /// The current max slots.
         methods.add_method("getMaxSlots", |_, this, ()| {
             Ok(this.0.borrow().max_slots)
         });
 
+        /// Sets the max slots.
+        ///
+        /// # Parameters
+        /// - `n` — `integer`.
         methods.add_method("setMaxSlots", |_, this, n: u32| {
             this.0.borrow_mut().max_slots = n;
             Ok(())
         });
 
+        /// Returns the weight limit.
+        ///
+        /// # Parameters
+        /// - `w` — `number`.
+        ///
+        /// # Returns
+        /// The current weight limit.
         methods.add_method("getWeightLimit", |_, this, ()| {
             Ok(this.0.borrow().weight_limit)
         });
 
+        /// Sets the weight limit.
+        ///
+        /// # Parameters
+        /// - `w` — `number`.
         methods.add_method("setWeightLimit", |_, this, w: f64| {
             this.0.borrow_mut().weight_limit = w;
             Ok(())
         });
 
+        /// Returns the current weight.
+        ///
+        /// # Parameters
+        /// - `index` — `integer`.
+        ///
+        /// # Returns
+        /// The current current weight.
         methods.add_method("getCurrentWeight", |_, this, ()| {
             Ok(this.0.borrow().current_weight())
         });
@@ -313,6 +527,10 @@ impl LuaUserData for LuaContainer {
             }
         });
 
+        /// Adds slot to the collection.
+        ///
+        /// # Parameters
+        /// - `opts` — `table` optional.
         methods.add_method("addSlot", |_, this, opts: Option<LuaTable>| {
             let (slot_type, state_str) = if let Some(t) = opts {
                 let st: String = t.get::<_, String>("type").unwrap_or_else(|_| "any".into());
@@ -328,6 +546,10 @@ impl LuaUserData for LuaContainer {
             Ok(this.0.borrow().slot_count())
         });
 
+        /// Removes slot from the collection.
+        ///
+        /// # Parameters
+        /// - `index` — `integer`.
         methods.add_method("removeSlot", |_, this, index: usize| {
             if index < 1 {
                 return Err(LuaError::RuntimeError(
@@ -338,10 +560,20 @@ impl LuaUserData for LuaContainer {
             Ok(())
         });
 
+        /// Expand on this Container.
+        ///
+        /// # Parameters
+        /// - `item_ud` — `userdata`.
+        /// - `qty` — `integer` optional.
         methods.add_method("expand", |_, this, n: u32| {
             Ok(this.0.borrow_mut().expand(n))
         });
 
+        /// Adds item to the collection.
+        ///
+        /// # Parameters
+        /// - `item_ud` — `userdata`.
+        /// - `qty` — `integer` optional.
         methods.add_method("addItem", |_, this, (item_ud, qty): (LuaAnyUserData, Option<u32>)| {
             let item = item_ud.borrow::<LuaItem>()?;
             let item_clone = item.0.borrow().clone();
@@ -349,26 +581,63 @@ impl LuaUserData for LuaContainer {
             Ok(this.0.borrow_mut().add_item(item_clone, quantity))
         });
 
+        /// Returns `true` if item.
+        ///
+        /// # Parameters
+        /// - `item_type` — `string`.
+        /// - `qty` — `integer` optional.
+        ///
+        /// # Returns
+        /// `boolean`.
         methods.add_method("hasItem", |_, this, (item_type, qty): (String, Option<u32>)| {
             Ok(this.0.borrow().has_item(&item_type, qty.unwrap_or(1)))
         });
+        /// Returns the number of item.
+        ///
+        /// # Parameters
+        /// - `item_type` — `string`.
+        /// - `qty` — `integer`.
+        ///
+        /// # Returns
+        /// `integer`.
         methods.add_method("countItem", |_, this, item_type: String| {
             Ok(this.0.borrow().count_item(&item_type))
         });
+        /// Removes item from the collection.
+        ///
+        /// # Parameters
+        /// - `item_type` — `string`.
+        /// - `qty` — `integer`.
         methods.add_method("removeItem", |_, this, (item_type, qty): (String, u32)| {
             Ok(this.0.borrow_mut().remove_item(&item_type, qty))
         });
+        /// To list on this Container.
+        ///
+        /// # Returns
+        /// The result.
         methods.add_method("toList", |lua, this, ()| {
             let items = this.0.borrow().to_item_list();
             let t = lua.create_table()?;
             for (i, (item_type, qty)) in items.into_iter().enumerate() {
                 let entry = lua.create_table()?;
+                /// Item type on this Container.
+                ///
+                /// # Returns
+                /// The result.
                 entry.set("itemType", item_type)?;
+                /// Quantity on this Container.
+                ///
+                /// # Returns
+                /// The result.
                 entry.set("quantity", qty)?;
                 t.set(i + 1, entry)?;
             }
             Ok(t)
         });
+        /// Returns the slots.
+        ///
+        /// # Returns
+        /// The current slots.
         methods.add_method("getSlots", |lua, this, ()| {
             let tbl = lua.create_table()?;
             let c = this.0.borrow();
@@ -397,6 +666,14 @@ impl LuaUserData for LuaItemSet {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
         add_type_methods::<Self>(methods);
 
+        /// Returns the name.
+        ///
+        /// # Parameters
+        /// - `tag` — `string`.
+        /// - `slot_filter` — `string` optional.
+        ///
+        /// # Returns
+        /// The current name.
         methods.add_method("getName", |_, this, ()| {
             Ok(this.0.borrow().name.clone())
         });
@@ -410,12 +687,24 @@ impl LuaUserData for LuaItemSet {
             },
         );
 
+        /// Returns the requirements.
+        ///
+        /// # Returns
+        /// The current requirements.
         methods.add_method("getRequirements", |lua, this, ()| {
             let set = this.0.borrow();
             let tbl = lua.create_table()?;
             for (i, req) in set.requirements.iter().enumerate() {
                 let r = lua.create_table()?;
+                /// Tag on this ItemSet.
+                ///
+                /// # Returns
+                /// The result.
                 r.set("tag", req.tag.clone())?;
+                /// Slot filter on this ItemSet.
+                ///
+                /// # Returns
+                /// The result.
                 r.set("slotFilter", req.slot_filter.clone())?;
                 tbl.set(i + 1, r)?;
             }
@@ -454,6 +743,13 @@ impl LuaUserData for LuaInventory {
             },
         );
 
+        /// Returns the container.
+        ///
+        /// # Parameters
+        /// - `name` — `string`.
+        ///
+        /// # Returns
+        /// The current container.
         methods.add_method("getContainer", |_, this, name: String| {
             let inv = this.0.borrow();
             match inv.get_container(&name) {
@@ -462,10 +758,18 @@ impl LuaUserData for LuaInventory {
             }
         });
 
+        /// Removes container from the collection.
+        ///
+        /// # Parameters
+        /// - `name` — `string`.
         methods.add_method("removeContainer", |_, this, name: String| {
             Ok(this.0.borrow_mut().remove_container(&name))
         });
 
+        /// Returns the container names.
+        ///
+        /// # Returns
+        /// The current container names.
         methods.add_method("getContainerNames", |lua, this, ()| {
             let inv = this.0.borrow();
             let tbl = lua.create_table()?;
@@ -488,6 +792,13 @@ impl LuaUserData for LuaInventory {
             },
         );
 
+        /// Returns the equip slot.
+        ///
+        /// # Parameters
+        /// - `name` — `string`.
+        ///
+        /// # Returns
+        /// The current equip slot.
         methods.add_method("getEquipSlot", |_, this, name: String| {
             let inv = this.0.borrow();
             match inv.get_equip_slot(&name) {
@@ -496,10 +807,18 @@ impl LuaUserData for LuaInventory {
             }
         });
 
+        /// Removes equip slot from the collection.
+        ///
+        /// # Parameters
+        /// - `name` — `string`.
         methods.add_method("removeEquipSlot", |_, this, name: String| {
             Ok(this.0.borrow_mut().remove_equip_slot(&name))
         });
 
+        /// Returns the equip slot names.
+        ///
+        /// # Returns
+        /// The current equip slot names.
         methods.add_method("getEquipSlotNames", |lua, this, ()| {
             let inv = this.0.borrow();
             let tbl = lua.create_table()?;
@@ -518,6 +837,10 @@ impl LuaUserData for LuaInventory {
             },
         );
 
+        /// Unequip on this Inventory.
+        ///
+        /// # Parameters
+        /// - `slot_name` — `string`.
         methods.add_method("unequip", |_, this, slot_name: String| {
             let item = this.0.borrow_mut().unequip(&slot_name);
             match item {
@@ -526,6 +849,13 @@ impl LuaUserData for LuaInventory {
             }
         });
 
+        /// Returns the equipped.
+        ///
+        /// # Parameters
+        /// - `slot_name` — `string`.
+        ///
+        /// # Returns
+        /// The current equipped.
         methods.add_method("getEquipped", |_, this, slot_name: String| {
             let inv = this.0.borrow();
             match inv.get_equip_slot(&slot_name) {
@@ -539,12 +869,20 @@ impl LuaUserData for LuaInventory {
 
         // ── Item sets ─────────────────────────────────────────────────────
 
+        /// Adds item set to the collection.
+        ///
+        /// # Parameters
+        /// - `set_ud` — `userdata`.
         methods.add_method("addItemSet", |_, this, set_ud: LuaAnyUserData| {
             let set = set_ud.borrow::<LuaItemSet>()?;
             this.0.borrow_mut().add_item_set(set.0.borrow().clone());
             Ok(())
         });
 
+        /// Returns the active sets.
+        ///
+        /// # Returns
+        /// The current active sets.
         methods.add_method("getActiveSets", |lua, this, ()| {
             let inv = this.0.borrow();
             let active = inv.get_active_sets();
@@ -555,6 +893,10 @@ impl LuaUserData for LuaInventory {
             Ok(tbl)
         });
 
+        /// Returns the item set names.
+        ///
+        /// # Returns
+        /// The current item set names.
         methods.add_method("getItemSetNames", |lua, this, ()| {
             let inv = this.0.borrow();
             let tbl = lua.create_table()?;
@@ -566,25 +908,61 @@ impl LuaUserData for LuaInventory {
 
         // ── Subsystems ────────────────────────────────────────────────────
 
+        /// Returns `true` if item.
+        ///
+        /// # Parameters
+        /// - `item_type` — `string`.
+        /// - `qty` — `integer` optional.
+        ///
+        /// # Returns
+        /// `boolean`.
         methods.add_method("hasItem", |_, this, (item_type, qty): (String, Option<u32>)| {
             Ok(this.0.borrow().has_item(&item_type, qty.unwrap_or(1)))
         });
+        /// Returns the number of item.
+        ///
+        /// # Parameters
+        /// - `item_type` — `string`.
+        /// - `qty` — `integer`.
+        ///
+        /// # Returns
+        /// `integer`.
         methods.add_method("countItem", |_, this, item_type: String| {
             Ok(this.0.borrow().count_item(&item_type))
         });
+        /// Removes from any from the collection.
+        ///
+        /// # Parameters
+        /// - `item_type` — `string`.
+        /// - `qty` — `integer`.
         methods.add_method("removeFromAny", |_, this, (item_type, qty): (String, u32)| {
             Ok(this.0.borrow_mut().remove_from_any(&item_type, qty))
         });
+        /// Enable subsystem on this Inventory.
+        ///
+        /// # Parameters
+        /// - `name` — `string`.
         methods.add_method("enableSubsystem", |_, this, name: String| {
             this.0.borrow_mut().enable_subsystem(&name);
             Ok(())
         });
 
+        /// Disable subsystem on this Inventory.
+        ///
+        /// # Parameters
+        /// - `name` — `string`.
         methods.add_method("disableSubsystem", |_, this, name: String| {
             this.0.borrow_mut().disable_subsystem(&name);
             Ok(())
         });
 
+        /// Returns `true` if subsystem enabled.
+        ///
+        /// # Parameters
+        /// - `name` — `string`.
+        ///
+        /// # Returns
+        /// `boolean`.
         methods.add_method("isSubsystemEnabled", |_, this, name: String| {
             Ok(this.0.borrow().is_subsystem_enabled(&name))
         });
@@ -696,6 +1074,10 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
         })?,
     )?;
 
+    /// Inventory on this Inventory.
+    ///
+    /// # Returns
+    /// The result.
     luna.set("inventory", module)?;
     Ok(())
 }

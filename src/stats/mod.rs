@@ -36,7 +36,11 @@ pub struct Buff {
 impl Buff {
     /// Create a new permanent buff.
     pub fn new(stat: &str, add: f64, mul: f64, duration: f64, source: &str) -> Self {
-        let remaining = if duration < 0.0 { f64::NEG_INFINITY } else { duration };
+        let remaining = if duration < 0.0 {
+            f64::NEG_INFINITY
+        } else {
+            duration
+        };
         Self {
             stat: stat.to_string(),
             add,
@@ -197,7 +201,10 @@ pub enum LevelThresholds {
 impl LevelThresholds {
     /// Default: 100 XP per level.
     pub fn default_linear() -> Self {
-        Self::Linear { base: 100.0, increment: 100.0 }
+        Self::Linear {
+            base: 100.0,
+            increment: 100.0,
+        }
     }
 
     /// Get the XP threshold for the given level (level 1 = index 0 → returns threshold for level 2).
@@ -205,7 +212,11 @@ impl LevelThresholds {
         match self {
             Self::Table(v) => {
                 let idx = (level as usize).saturating_sub(1);
-                if idx < v.len() { v[idx] } else { f64::INFINITY }
+                if idx < v.len() {
+                    v[idx]
+                } else {
+                    f64::INFINITY
+                }
             }
             Self::Linear { base, increment } => base + (level as f64 - 1.0) * increment,
         }
@@ -277,7 +288,8 @@ impl Sheet {
 
     /// Define a named attribute with the given base value.
     pub fn define(&mut self, name: &str, base: f64) {
-        self.attributes.insert(name.to_string(), Attribute::new(base));
+        self.attributes
+            .insert(name.to_string(), Attribute::new(base));
     }
 
     /// Get the effective value of an attribute (base + buffs, clamped).
@@ -292,7 +304,9 @@ impl Sheet {
             }
         }
         let effective = (attr.base + add_sum) * mul_product;
-        let clamped = effective.max(attr.min).min(attr.max.unwrap_or(f64::INFINITY));
+        let clamped = effective
+            .max(attr.min)
+            .min(attr.max.unwrap_or(f64::INFINITY));
         Some(clamped)
     }
 
@@ -417,7 +431,8 @@ impl Sheet {
 
     /// Count active buffs. If `stat` is Some, count only buffs targeting that stat.
     pub fn get_buff_count(&self, stat: Option<&str>) -> usize {
-        self.buffs.values()
+        self.buffs
+            .values()
             .filter(|b| stat.map_or(true, |s| b.stat == s))
             .count()
     }
@@ -428,7 +443,9 @@ impl Sheet {
         if let Some(ap) = self.action_points.as_mut() {
             ap.current = (ap.current + amount).min(ap.max);
             ap.current
-        } else { 0.0 }
+        } else {
+            0.0
+        }
     }
 
     pub fn update(&mut self, dt: f64) {
@@ -571,12 +588,7 @@ impl StatsRegistry {
     }
 
     /// Apply archetypes (race + class) to a new Sheet.
-    pub fn apply_archetypes(
-        &self,
-        sheet: &mut Sheet,
-        race: Option<&str>,
-        class: Option<&str>,
-    ) {
+    pub fn apply_archetypes(&self, sheet: &mut Sheet, race: Option<&str>, class: Option<&str>) {
         for name in [race, class].into_iter().flatten() {
             let (bases, trait_names) = if let Some(r) = self.races.get(name) {
                 r
@@ -593,7 +605,11 @@ impl StatsRegistry {
             for tn in trait_names {
                 if let Some(tdef) = self.traits.get(tn) {
                     let handles = sheet.apply_trait_buffs(tn, tdef);
-                    sheet.active_traits.entry(tn.clone()).or_default().extend(handles);
+                    sheet
+                        .active_traits
+                        .entry(tn.clone())
+                        .or_default()
+                        .extend(handles);
                 }
             }
         }

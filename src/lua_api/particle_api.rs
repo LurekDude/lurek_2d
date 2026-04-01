@@ -115,6 +115,10 @@ impl LuaUserData for LuaParticleSystem {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
         add_type_methods::<Self>(methods);
 
+        /// Advances the simulation by `dt` seconds.
+        ///
+        /// # Parameters
+        /// - `dt` — `number`.
         methods.add_method("update", |_, this, dt: f32| {
             let mut st = this.state.borrow_mut();
             ensure_particle_exists(&st.particle_systems, this.key, "ParticleSystem:update")?;
@@ -124,6 +128,10 @@ impl LuaUserData for LuaParticleSystem {
             Ok(())
         });
 
+        /// Begins execution.
+        ///
+        /// # Returns
+        /// The result.
         methods.add_method("start", |_, this, ()| {
             let mut st = this.state.borrow_mut();
             ensure_particle_exists(&st.particle_systems, this.key, "ParticleSystem:start")?;
@@ -133,6 +141,10 @@ impl LuaUserData for LuaParticleSystem {
             Ok(())
         });
 
+        /// Stops playback.
+        ///
+        /// # Returns
+        /// The result.
         methods.add_method("stop", |_, this, ()| {
             let mut st = this.state.borrow_mut();
             ensure_particle_exists(&st.particle_systems, this.key, "ParticleSystem:stop")?;
@@ -142,6 +154,10 @@ impl LuaUserData for LuaParticleSystem {
             Ok(())
         });
 
+        /// Pauses playback.
+        ///
+        /// # Returns
+        /// The result.
         methods.add_method("pause", |_, this, ()| {
             let mut st = this.state.borrow_mut();
             ensure_particle_exists(&st.particle_systems, this.key, "ParticleSystem:pause")?;
@@ -151,6 +167,10 @@ impl LuaUserData for LuaParticleSystem {
             Ok(())
         });
 
+        /// Resets state to initial values.
+        ///
+        /// # Returns
+        /// The result.
         methods.add_method("reset", |_, this, ()| {
             let mut st = this.state.borrow_mut();
             ensure_particle_exists(&st.particle_systems, this.key, "ParticleSystem:reset")?;
@@ -160,6 +180,10 @@ impl LuaUserData for LuaParticleSystem {
             Ok(())
         });
 
+        /// Returns the count.
+        ///
+        /// # Returns
+        /// The current count.
         methods.add_method("getCount", |_, this, ()| {
             let st = this.state.borrow();
             ensure_particle_exists(&st.particle_systems, this.key, "ParticleSystem:getCount")?;
@@ -170,6 +194,10 @@ impl LuaUserData for LuaParticleSystem {
                 .unwrap_or(0))
         });
 
+        /// Returns `true` if active.
+        ///
+        /// # Returns
+        /// `boolean`.
         methods.add_method("isActive", |_, this, ()| {
             let st = this.state.borrow();
             ensure_particle_exists(&st.particle_systems, this.key, "ParticleSystem:isActive")?;
@@ -180,6 +208,10 @@ impl LuaUserData for LuaParticleSystem {
                 .unwrap_or(false))
         });
 
+        /// Returns `true` if paused.
+        ///
+        /// # Returns
+        /// `boolean`.
         methods.add_method("isPaused", |_, this, ()| {
             let st = this.state.borrow();
             ensure_particle_exists(&st.particle_systems, this.key, "ParticleSystem:isPaused")?;
@@ -190,6 +222,10 @@ impl LuaUserData for LuaParticleSystem {
                 .unwrap_or(false))
         });
 
+        /// Returns `true` if stopped.
+        ///
+        /// # Returns
+        /// `boolean`.
         methods.add_method("isStopped", |_, this, ()| {
             let st = this.state.borrow();
             ensure_particle_exists(&st.particle_systems, this.key, "ParticleSystem:isStopped")?;
@@ -200,6 +236,11 @@ impl LuaUserData for LuaParticleSystem {
                 .unwrap_or(true))
         });
 
+        /// Sets the position.
+        ///
+        /// # Parameters
+        /// - `x` — `number`.
+        /// - `y` — `number`.
         methods.add_method("setPosition", |_, this, (x, y): (f32, f32)| {
             let mut st = this.state.borrow_mut();
             ensure_particle_exists(&st.particle_systems, this.key, "ParticleSystem:setPosition")?;
@@ -210,6 +251,10 @@ impl LuaUserData for LuaParticleSystem {
             Ok(())
         });
 
+        /// Returns the position.
+        ///
+        /// # Returns
+        /// The current position.
         methods.add_method("getPosition", |_, this, ()| {
             let st = this.state.borrow();
             ensure_particle_exists(&st.particle_systems, this.key, "ParticleSystem:getPosition")?;
@@ -219,6 +264,10 @@ impl LuaUserData for LuaParticleSystem {
             }
         });
 
+        /// Emits an event.
+        ///
+        /// # Parameters
+        /// - `count` — `integer`.
         methods.add_method("emit", |_, this, count: u32| {
             let mut st = this.state.borrow_mut();
             ensure_particle_exists(&st.particle_systems, this.key, "ParticleSystem:emit")?;
@@ -228,6 +277,10 @@ impl LuaUserData for LuaParticleSystem {
             Ok(())
         });
 
+        /// Sets the emission rate.
+        ///
+        /// # Parameters
+        /// - `rate` — `number`.
         methods.add_method("setEmissionRate", |_, this, rate: f32| {
             let mut st = this.state.borrow_mut();
             ensure_particle_exists(
@@ -241,6 +294,10 @@ impl LuaUserData for LuaParticleSystem {
             Ok(())
         });
 
+        /// Returns a deep copy of this object.
+        ///
+        /// # Returns
+        /// The result.
         methods.add_method("clone", |_, this, ()| {
             let mut st = this.state.borrow_mut();
             ensure_particle_exists(&st.particle_systems, this.key, "ParticleSystem:clone")?;
@@ -256,6 +313,11 @@ impl LuaUserData for LuaParticleSystem {
             })
         });
 
+        /// Sets the gravity.
+        ///
+        /// # Parameters
+        /// - `gx` — `number`.
+        /// - `gy` — `number`.
         methods.add_method("setGravity", |_, this, (gx, gy): (f32, f32)| {
             let mut st = this.state.borrow_mut();
             ensure_particle_exists(&st.particle_systems, this.key, "ParticleSystem:setGravity")?;
@@ -266,6 +328,10 @@ impl LuaUserData for LuaParticleSystem {
             Ok(())
         });
 
+        /// Returns the gravity.
+        ///
+        /// # Returns
+        /// The current gravity.
         methods.add_method("getGravity", |_, this, ()| {
             let st = this.state.borrow();
             ensure_particle_exists(&st.particle_systems, this.key, "ParticleSystem:getGravity")?;
@@ -275,6 +341,10 @@ impl LuaUserData for LuaParticleSystem {
             }
         });
 
+        /// Sets the alphas.
+        ///
+        /// # Parameters
+        /// - `args` — `LuaMultiValue`.
         methods.add_method("setAlphas", |_, this, args: LuaMultiValue| {
             let mut st = this.state.borrow_mut();
             ensure_particle_exists(&st.particle_systems, this.key, "ParticleSystem:setAlphas")?;
@@ -290,6 +360,10 @@ impl LuaUserData for LuaParticleSystem {
             Ok(())
         });
 
+        /// Returns the alphas.
+        ///
+        /// # Returns
+        /// The current alphas.
         methods.add_method("getAlphas", |lua, this, ()| {
             let st = this.state.borrow();
             ensure_particle_exists(&st.particle_systems, this.key, "ParticleSystem:getAlphas")?;
@@ -322,6 +396,10 @@ impl LuaUserData for LuaParticleSystem {
             },
         );
 
+        /// Returns the emission shape.
+        ///
+        /// # Returns
+        /// The current emission shape.
         methods.add_method("getEmissionShape", |lua, this, ()| {
             let st = this.state.borrow();
             ensure_particle_exists(
@@ -339,6 +417,10 @@ impl LuaUserData for LuaParticleSystem {
             }
         });
 
+        /// Sets the relative mode.
+        ///
+        /// # Parameters
+        /// - `mode` — `string`.
         methods.add_method("setRelativeMode", |_, this, mode: String| {
             let mut st = this.state.borrow_mut();
             ensure_particle_exists(
@@ -356,6 +438,10 @@ impl LuaUserData for LuaParticleSystem {
             Ok(())
         });
 
+        /// Returns the relative mode.
+        ///
+        /// # Returns
+        /// The current relative mode.
         methods.add_method("getRelativeMode", |_, this, ()| {
             let st = this.state.borrow();
             ensure_particle_exists(
@@ -476,12 +562,28 @@ fn emission_shape_to_lua<'lua>(lua: &'lua Lua, shape: &EmissionShape) -> LuaResu
         }
         EmissionShape::Circle { radius, fill } => {
             t.set("type", "circle")?;
+            /// Radius on this ParticleSystem.
+            ///
+            /// # Returns
+            /// The result.
             t.set("radius", *radius)?;
+            /// Fill on this ParticleSystem.
+            ///
+            /// # Returns
+            /// The result.
             t.set("fill", *fill)?;
         }
         EmissionShape::Rectangle { width, height } => {
             t.set("type", "rectangle")?;
+            /// Width on this ParticleSystem.
+            ///
+            /// # Returns
+            /// The result.
             t.set("width", *width)?;
+            /// Height on this ParticleSystem.
+            ///
+            /// # Returns
+            /// The result.
             t.set("height", *height)?;
         }
         EmissionShape::Ring {
@@ -489,12 +591,28 @@ fn emission_shape_to_lua<'lua>(lua: &'lua Lua, shape: &EmissionShape) -> LuaResu
             outer_radius,
         } => {
             t.set("type", "ring")?;
+            /// Inner radius on this ParticleSystem.
+            ///
+            /// # Returns
+            /// The result.
             t.set("innerRadius", *inner_radius)?;
+            /// Outer radius on this ParticleSystem.
+            ///
+            /// # Returns
+            /// The result.
             t.set("outerRadius", *outer_radius)?;
         }
         EmissionShape::Line { length, angle } => {
             t.set("type", "line")?;
+            /// Returns the number of items.
+            ///
+            /// # Returns
+            /// `integer`.
             t.set("length", *length)?;
+            /// Angle on this ParticleSystem.
+            ///
+            /// # Returns
+            /// The result.
             t.set("angle", *angle)?;
         }
         EmissionShape::Cone {
@@ -503,8 +621,20 @@ fn emission_shape_to_lua<'lua>(lua: &'lua Lua, shape: &EmissionShape) -> LuaResu
             spread,
         } => {
             t.set("type", "cone")?;
+            /// Radius on this ParticleSystem.
+            ///
+            /// # Returns
+            /// The result.
             t.set("radius", *radius)?;
+            /// Angle on this ParticleSystem.
+            ///
+            /// # Returns
+            /// The result.
             t.set("angle", *angle)?;
+            /// Spread on this ParticleSystem.
+            ///
+            /// # Returns
+            /// The result.
             t.set("spread", *spread)?;
         }
         EmissionShape::Star {
@@ -513,8 +643,20 @@ fn emission_shape_to_lua<'lua>(lua: &'lua Lua, shape: &EmissionShape) -> LuaResu
             inner_radius,
         } => {
             t.set("type", "star")?;
+            /// Points on this ParticleSystem.
+            ///
+            /// # Returns
+            /// The result.
             t.set("points", *points)?;
+            /// Outer radius on this ParticleSystem.
+            ///
+            /// # Returns
+            /// The result.
             t.set("outerRadius", *outer_radius)?;
+            /// Inner radius on this ParticleSystem.
+            ///
+            /// # Returns
+            /// The result.
             t.set("innerRadius", *inner_radius)?;
         }
         EmissionShape::Spiral {
@@ -522,7 +664,15 @@ fn emission_shape_to_lua<'lua>(lua: &'lua Lua, shape: &EmissionShape) -> LuaResu
             radius,
         } => {
             t.set("type", "spiral")?;
+            /// Revolutions on this ParticleSystem.
+            ///
+            /// # Returns
+            /// The result.
             t.set("revolutions", *revolutions)?;
+            /// Radius on this ParticleSystem.
+            ///
+            /// # Returns
+            /// The result.
             t.set("radius", *radius)?;
         }
     }
@@ -2304,6 +2454,10 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
         )?;
     }
 
+    /// Particle on this ParticleSystem.
+    ///
+    /// # Returns
+    /// The result.
     luna.set("particle", particle)?;
     Ok(())
 }

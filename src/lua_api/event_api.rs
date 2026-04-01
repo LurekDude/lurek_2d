@@ -251,6 +251,10 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
         })?,
     )?;
 
+    /// Event on this Signal.
+    ///
+    /// # Returns
+    /// The result.
     luna.set("event", event)?;
     Ok(())
 }

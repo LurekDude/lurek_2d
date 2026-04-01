@@ -26,6 +26,3 @@
 
 # Reference repositories (cloned for analysis)
 /references/
-
-# Wiki sub-repository (published to GitHub Wiki)
-/wiki/

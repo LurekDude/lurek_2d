@@ -62,6 +62,10 @@ macro_rules! dispatch_arith {
 impl mlua::UserData for NdArray {
     fn add_methods<'lua, M: mlua::UserDataMethods<'lua, Self>>(methods: &mut M) {
         // -- Inspection --
+        /// Returns the shape.
+        ///
+        /// # Returns
+        /// The current shape.
         methods.add_method("getShape", |lua, this, ()| {
             let table = lua.create_table()?;
             for (i, &dim) in this.shape().iter().enumerate() {
@@ -70,17 +74,46 @@ impl mlua::UserData for NdArray {
             Ok(table)
         });
 
+        /// Returns the dimensions.
+        ///
+        /// # Returns
+        /// The current dimensions.
         methods.add_method("getDimensions", |_, this, ()| Ok(this.ndim()));
 
+        /// Returns the size.
+        ///
+        /// # Returns
+        /// The current size.
         methods.add_method("getSize", |_, this, ()| Ok(this.size()));
 
+        /// Returns the data type.
+        ///
+        /// # Parameters
+        /// - `args` — `LuaMultiValue`.
+        ///
+        /// # Returns
+        /// The current data type.
         methods.add_method("getDataType", |_, this, ()| {
             Ok(this.dtype().name().to_string())
         });
 
+        /// Returns `true` if on g p u.
+        ///
+        /// # Parameters
+        /// - `args` — `LuaMultiValue`.
+        ///
+        /// # Returns
+        /// `boolean`.
         methods.add_method("isOnGPU", |_, _this, ()| Ok(false));
 
         // -- Element access (1-based) --
+        /// Returns the current value.
+        ///
+        /// # Parameters
+        /// - `args` — `LuaMultiValue`.
+        ///
+        /// # Returns
+        /// The current get.
         methods.add_method("get", |_, this, args: LuaMultiValue| {
             let indices: Vec<usize> = args
                 .iter()
@@ -107,6 +140,10 @@ impl mlua::UserData for NdArray {
             Ok(this.get_f64(flat))
         });
 
+        /// Sets the value.
+        ///
+        /// # Parameters
+        /// - `args` — `LuaMultiValue`.
         methods.add_method_mut("set", |_, this, args: LuaMultiValue| {
             let args_vec: Vec<LuaValue> = args.into_vec();
             if args_vec.len() < 2 {
@@ -149,6 +186,10 @@ impl mlua::UserData for NdArray {
             Ok(())
         });
 
+        /// To table on this Object.
+        ///
+        /// # Returns
+        /// The result.
         methods.add_method("toTable", |lua, this, ()| {
             let table = lua.create_table()?;
             for i in 0..this.size() {
@@ -158,19 +199,35 @@ impl mlua::UserData for NdArray {
         });
 
         // -- Shape manipulation --
+        /// Reshape on this Object.
+        ///
+        /// # Parameters
+        /// - `shape` — `any`.
         methods.add_method("reshape", |lua, this, shape: LuaValue| {
             let s = parse_shape(shape)?;
             let result = ops::reshape(this, &s).map_err(LuaError::RuntimeError)?;
             lua.create_userdata(result)
         });
 
+        /// Returns a deep copy of this object.
+        ///
+        /// # Parameters
+        /// - `val` — `number`.
         methods.add_method("clone", |lua, this, ()| lua.create_userdata(this.clone()));
 
+        /// Transpose on this Object.
+        ///
+        /// # Parameters
+        /// - `val` — `number`.
         methods.add_method("transpose", |lua, this, ()| {
             let result = ops::transpose_2d(this).map_err(LuaError::RuntimeError)?;
             lua.create_userdata(result)
         });
 
+        /// Fill on this Object.
+        ///
+        /// # Parameters
+        /// - `val` — `number`.
         methods.add_method_mut("fill", |_, this, val: f64| {
             ops::fill(this, val);
             Ok(())
@@ -182,26 +239,48 @@ impl mlua::UserData for NdArray {
         dispatch_arith!(methods, "mul", ops::mul, ops::mul_scalar);
         dispatch_arith!(methods, "div", ops::div, ops::div_scalar);
 
+        /// Pow on this Object.
+        ///
+        /// # Parameters
+        /// - `exp` — `number`.
         methods.add_method("pow", |lua, this, exp: f64| {
             let result = ops::pow_scalar(this, exp).map_err(LuaError::RuntimeError)?;
             lua.create_userdata(result)
         });
 
+        /// Sqrt on this Object.
+        ///
+        /// # Returns
+        /// The result.
         methods.add_method("sqrt", |lua, this, ()| {
             let result = ops::sqrt(this).map_err(LuaError::RuntimeError)?;
             lua.create_userdata(result)
         });
 
+        /// Abs on this Object.
+        ///
+        /// # Returns
+        /// The result.
         methods.add_method("abs", |lua, this, ()| {
             let result = ops::abs(this).map_err(LuaError::RuntimeError)?;
             lua.create_userdata(result)
         });
 
+        /// Neg on this Object.
+        ///
+        /// # Parameters
+        /// - `min` — `number`.
+        /// - `max` — `number`.
         methods.add_method("neg", |lua, this, ()| {
             let result = ops::neg(this).map_err(LuaError::RuntimeError)?;
             lua.create_userdata(result)
         });
 
+        /// Clamps the value within the allowed range.
+        ///
+        /// # Parameters
+        /// - `min` — `number`.
+        /// - `max` — `number`.
         methods.add_method("clamp", |lua, this, (min, max): (f64, f64)| {
             let result = ops::clamp(this, min, max).map_err(LuaError::RuntimeError)?;
             lua.create_userdata(result)
@@ -216,6 +295,11 @@ impl mlua::UserData for NdArray {
         dispatch_arith!(methods, "lte", ops::lte, ops::lte_scalar);
 
         // -- Masking --
+        /// Threshold on this Object.
+        ///
+        /// # Parameters
+        /// - `mask` — `userdata`.
+        /// - `other` — `userdata`.
         methods.add_method("threshold", |lua, this, val: f64| {
             let result = ops::threshold(this, val).map_err(LuaError::RuntimeError)?;
             lua.create_userdata(result)
@@ -233,17 +317,41 @@ impl mlua::UserData for NdArray {
         );
 
         // -- Counting --
+        /// Returns the number of non zero.
+        ///
+        /// # Returns
+        /// `integer`.
         methods.add_method("countNonZero", |_, this, ()| Ok(ops::count_nonzero(this)));
 
+        /// Argmin on this Object.
+        ///
+        /// # Returns
+        /// The result.
         methods.add_method("argmin", |_, this, ()| Ok(ops::argmin(this) + 1));
 
+        /// Argmax on this Object.
+        ///
+        /// # Parameters
+        /// - `axis` — `integer` optional.
         methods.add_method("argmax", |_, this, ()| Ok(ops::argmax(this) + 1));
 
+        /// Any on this Object.
+        ///
+        /// # Parameters
+        /// - `axis` — `integer` optional.
         methods.add_method("any", |_, this, ()| Ok(ops::any(this)));
 
+        /// All on this Object.
+        ///
+        /// # Parameters
+        /// - `axis` — `integer` optional.
         methods.add_method("all", |_, this, ()| Ok(ops::all(this)));
 
         // -- Reductions --
+        /// Sum on this Object.
+        ///
+        /// # Parameters
+        /// - `axis` — `integer` optional.
         methods.add_method("sum", |lua, this, axis: Option<i64>| match axis {
             None => Ok(LuaValue::Number(ops::sum(this))),
             Some(a) => {
@@ -252,6 +360,10 @@ impl mlua::UserData for NdArray {
             }
         });
 
+        /// Mean on this Object.
+        ///
+        /// # Parameters
+        /// - `axis` — `integer` optional.
         methods.add_method("mean", |lua, this, axis: Option<i64>| match axis {
             None => Ok(LuaValue::Number(ops::mean(this))),
             Some(a) => {
@@ -260,6 +372,10 @@ impl mlua::UserData for NdArray {
             }
         });
 
+        /// Min on this Object.
+        ///
+        /// # Parameters
+        /// - `axis` — `integer` optional.
         methods.add_method("min", |lua, this, axis: Option<i64>| match axis {
             None => Ok(LuaValue::Number(ops::min_val(this))),
             Some(a) => {
@@ -268,6 +384,10 @@ impl mlua::UserData for NdArray {
             }
         });
 
+        /// Max on this Object.
+        ///
+        /// # Parameters
+        /// - `axis` — `integer` optional.
         methods.add_method("max", |lua, this, axis: Option<i64>| match axis {
             None => Ok(LuaValue::Number(ops::max_val(this))),
             Some(a) => {
@@ -277,63 +397,109 @@ impl mlua::UserData for NdArray {
         });
 
         // -- Linear algebra --
+        /// Matmul on this Object.
+        ///
+        /// # Parameters
+        /// - `other` — `userdata`.
         methods.add_method("matmul", |lua, this, other: LuaAnyUserData| {
             let other_arr = other.borrow::<NdArray>()?;
             let result = spatial::matmul(this, &other_arr).map_err(LuaError::RuntimeError)?;
             lua.create_userdata(result)
         });
 
+        /// Dot on this Object.
+        ///
+        /// # Parameters
+        /// - `other` — `userdata`.
         methods.add_method("dot", |_, this, other: LuaAnyUserData| {
             let other_arr = other.borrow::<NdArray>()?;
             spatial::dot(this, &other_arr).map_err(LuaError::RuntimeError)
         });
 
         // -- Bitwise (int32 only) --
+        /// Bitwise and on this Object.
+        ///
+        /// # Parameters
+        /// - `other` — `userdata`.
         methods.add_method("bitwiseAnd", |lua, this, other: LuaAnyUserData| {
             let other_arr = other.borrow::<NdArray>()?;
             let result = ops::bitwise_and(this, &other_arr).map_err(LuaError::RuntimeError)?;
             lua.create_userdata(result)
         });
 
+        /// Bitwise or on this Object.
+        ///
+        /// # Parameters
+        /// - `other` — `userdata`.
         methods.add_method("bitwiseOr", |lua, this, other: LuaAnyUserData| {
             let other_arr = other.borrow::<NdArray>()?;
             let result = ops::bitwise_or(this, &other_arr).map_err(LuaError::RuntimeError)?;
             lua.create_userdata(result)
         });
 
+        /// Bitwise xor on this Object.
+        ///
+        /// # Parameters
+        /// - `other` — `userdata`.
         methods.add_method("bitwiseXor", |lua, this, other: LuaAnyUserData| {
             let other_arr = other.borrow::<NdArray>()?;
             let result = ops::bitwise_xor(this, &other_arr).map_err(LuaError::RuntimeError)?;
             lua.create_userdata(result)
         });
 
+        /// Bitwise not on this Object.
+        ///
+        /// # Parameters
+        /// - `amount` — `integer`.
         methods.add_method("bitwiseNot", |lua, this, ()| {
             let result = ops::bitwise_not(this).map_err(LuaError::RuntimeError)?;
             lua.create_userdata(result)
         });
 
+        /// Bitwise l shift on this Object.
+        ///
+        /// # Parameters
+        /// - `amount` — `integer`.
         methods.add_method("bitwiseLShift", |lua, this, amount: u32| {
             let result = ops::bitwise_lshift(this, amount).map_err(LuaError::RuntimeError)?;
             lua.create_userdata(result)
         });
 
+        /// Bitwise r shift on this Object.
+        ///
+        /// # Parameters
+        /// - `amount` — `integer`.
         methods.add_method("bitwiseRShift", |lua, this, amount: u32| {
             let result = ops::bitwise_rshift(this, amount).map_err(LuaError::RuntimeError)?;
             lua.create_userdata(result)
         });
 
         // -- 2D Spatial (indices are 1-based in Lua) --
+        /// Convolve2 d on this Object.
+        ///
+        /// # Parameters
+        /// - `kernel` — `userdata`.
         methods.add_method("convolve2D", |lua, this, kernel: LuaAnyUserData| {
             let kernel_arr = kernel.borrow::<NdArray>()?;
             let result = spatial::convolve2d(this, &kernel_arr).map_err(LuaError::RuntimeError)?;
             lua.create_userdata(result)
         });
 
+        /// Dilate on this Object.
+        ///
+        /// # Parameters
+        /// - `radius` — `integer`.
         methods.add_method("dilate", |lua, this, radius: usize| {
             let result = spatial::dilate(this, radius).map_err(LuaError::RuntimeError)?;
             lua.create_userdata(result)
         });
 
+        /// Erode on this Object.
+        ///
+        /// # Parameters
+        /// - `row` — `integer`.
+        /// - `col` — `integer`.
+        /// - `val` — `number`.
         methods.add_method("erode", |lua, this, radius: usize| {
             let result = spatial::erode(this, radius).map_err(LuaError::RuntimeError)?;
             lua.create_userdata(result)
@@ -455,6 +621,10 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
         )?,
     )?;
 
+    /// Compute on this Object.
+    ///
+    /// # Returns
+    /// The result.
     luna.set("compute", compute)?;
     Ok(())
 }

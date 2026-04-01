@@ -33,12 +33,27 @@ impl LuaUserData for LuaUniverse {
 
         // === Entity Lifecycle ===
 
+        /// Creates a new Universe instance.
+        ///
+        /// # Parameters
+        /// - `id` — `integer`.
         methods.add_method("spawn", |_, this, ()| Ok(this.inner.borrow_mut().spawn()));
 
+        /// Kill on this Universe.
+        ///
+        /// # Parameters
+        /// - `id` — `integer`.
         methods.add_method("kill", |lua, this, id: u32| {
             this.inner.borrow_mut().kill(id, lua)
         });
 
+        /// Returns `true` if alive.
+        ///
+        /// # Parameters
+        /// - `id` — `integer`.
+        ///
+        /// # Returns
+        /// `boolean`.
         methods.add_method("isAlive", |_, this, id: u32| {
             Ok(this.inner.borrow().is_alive(id))
         });
@@ -52,24 +67,56 @@ impl LuaUserData for LuaUniverse {
             },
         );
 
+        /// Returns the current value.
+        ///
+        /// # Parameters
+        /// - `id` — `integer`.
+        /// - `name` — `string`.
+        ///
+        /// # Returns
+        /// The current get.
         methods.add_method("get", |lua, this, (id, name): (u32, String)| {
             this.inner.borrow().get_component(lua, id, &name)
         });
 
+        /// Returns `true` if the condition is met.
+        ///
+        /// # Parameters
+        /// - `id` — `integer`.
+        /// - `name` — `string`.
+        ///
+        /// # Returns
+        /// `boolean`.
         methods.add_method("has", |lua, this, (id, name): (u32, String)| {
             this.inner.borrow().has_component(lua, id, &name)
         });
 
+        /// Removes the entry from the collection.
+        ///
+        /// # Parameters
+        /// - `id` — `integer`.
+        /// - `name` — `string`.
         methods.add_method("remove", |lua, this, (id, name): (u32, String)| {
             this.inner.borrow().remove_component(lua, id, &name)
         });
 
+        /// Returns the components.
+        ///
+        /// # Parameters
+        /// - `id` — `integer`.
+        ///
+        /// # Returns
+        /// The current components.
         methods.add_method("getComponents", |lua, this, id: u32| {
             this.inner.borrow().get_component_names(lua, id)
         });
 
         // === Querying ===
 
+        /// Runs a query and returns matching results.
+        ///
+        /// # Parameters
+        /// - `args` — `LuaMultiValue`.
         methods.add_method("query", |lua, this, args: LuaMultiValue| {
             let names: Vec<String> = args
                 .into_iter()
@@ -88,24 +135,47 @@ impl LuaUserData for LuaUniverse {
             },
         );
 
+        /// Returns the entities.
+        ///
+        /// # Returns
+        /// The current entities.
         methods.add_method("getEntities", |_, this, ()| {
             Ok(this.inner.borrow().get_entities())
         });
 
+        /// Returns the entity count.
+        ///
+        /// # Parameters
+        /// - `system` — `table`.
+        ///
+        /// # Returns
+        /// The current entity count.
         methods.add_method("getEntityCount", |_, this, ()| {
             Ok(this.inner.borrow().get_entity_count())
         });
 
         // === System Management ===
 
+        /// Adds system to the collection.
+        ///
+        /// # Parameters
+        /// - `system` — `table`.
         methods.add_method("addSystem", |lua, this, system: LuaTable| {
             this.inner.borrow_mut().add_system(lua, system)
         });
 
+        /// Removes system from the collection.
+        ///
+        /// # Parameters
+        /// - `system` — `table`.
         methods.add_method("removeSystem", |lua, this, system: LuaTable| {
             this.inner.borrow_mut().remove_system(lua, system)
         });
 
+        /// Advances the simulation by `dt` seconds.
+        ///
+        /// # Parameters
+        /// - `dt` — `number`.
         methods.add_method("update", |lua, this, dt: f64| {
             let count = this.inner.borrow().get_system_count(lua)?;
             if count == 0 {
@@ -122,6 +192,10 @@ impl LuaUserData for LuaUniverse {
             Ok(())
         });
 
+        /// Draws to the current render target.
+        ///
+        /// # Returns
+        /// The result.
         methods.add_method("draw", |lua, this, ()| {
             let count = this.inner.borrow().get_system_count(lua)?;
             if count == 0 {
@@ -138,6 +212,10 @@ impl LuaUserData for LuaUniverse {
             Ok(())
         });
 
+        /// Emits an event.
+        ///
+        /// # Parameters
+        /// - `args` — `LuaMultiValue`.
         methods.add_method("emit", |lua, this, args: LuaMultiValue| {
             let mut args_iter = args.into_iter();
             let event: String = match args_iter.next() {
@@ -171,84 +249,187 @@ impl LuaUserData for LuaUniverse {
             Ok(())
         });
 
+        /// Returns the system count.
+        ///
+        /// # Returns
+        /// The current system count.
         methods.add_method("getSystemCount", |lua, this, ()| {
             this.inner.borrow().get_system_count(lua)
         });
 
         // === Lifecycle/Reset ===
 
+        /// Removes all entries.
+        ///
+        /// # Returns
+        /// The result.
         methods.add_method("clear", |lua, this, ()| this.inner.borrow_mut().clear(lua));
 
+        /// Releases the underlying resource handle.
+        ///
+        /// # Parameters
+        /// - `id` — `integer`.
+        /// - `tag` — `string`.
         methods.add_method("release", |lua, this, ()| {
             this.inner.borrow_mut().clear(lua)
         });
 
         // === String Tags ===
 
+        /// Adds tag to the collection.
+        ///
+        /// # Parameters
+        /// - `id` — `integer`.
+        /// - `tag` — `string`.
         methods.add_method("addTag", |_, this, (id, tag): (u32, String)| {
             this.inner.borrow_mut().add_tag(id, &tag);
             Ok(())
         });
 
+        /// Removes tag from the collection.
+        ///
+        /// # Parameters
+        /// - `id` — `integer`.
+        /// - `tag` — `string`.
         methods.add_method("removeTag", |_, this, (id, tag): (u32, String)| {
             this.inner.borrow_mut().remove_tag(id, &tag);
             Ok(())
         });
 
+        /// Returns `true` if tag.
+        ///
+        /// # Parameters
+        /// - `id` — `integer`.
+        /// - `tag` — `string`.
+        ///
+        /// # Returns
+        /// `boolean`.
         methods.add_method("hasTag", |_, this, (id, tag): (u32, String)| {
             Ok(this.inner.borrow().has_tag(id, &tag))
         });
 
+        /// Returns the tags.
+        ///
+        /// # Parameters
+        /// - `id` — `integer`.
+        ///
+        /// # Returns
+        /// The current tags.
         methods.add_method("getTags", |_, this, id: u32| {
             Ok(this.inner.borrow().get_tags(id))
         });
 
+        /// Returns the entities by tag.
+        ///
+        /// # Parameters
+        /// - `id` — `integer`.
+        /// - `layer` — `integer`.
+        ///
+        /// # Returns
+        /// The current entities by tag.
         methods.add_method("getEntitiesByTag", |_, this, tag: String| {
             Ok(this.inner.borrow().get_entities_by_tag(&tag))
         });
 
         // === Layer System ===
 
+        /// Sets the layer.
+        ///
+        /// # Parameters
+        /// - `id` — `integer`.
+        /// - `layer` — `integer`.
         methods.add_method("setLayer", |_, this, (id, layer): (u32, i32)| {
             this.inner.borrow_mut().set_layer(id, layer);
             Ok(())
         });
 
+        /// Returns the layer.
+        ///
+        /// # Parameters
+        /// - `id` — `integer`.
+        ///
+        /// # Returns
+        /// The current layer.
         methods.add_method("getLayer", |_, this, id: u32| {
             Ok(this.inner.borrow().get_layer(id))
         });
 
+        /// Returns the entities by layer.
+        ///
+        /// # Parameters
+        /// - `layer` — `integer`.
+        ///
+        /// # Returns
+        /// The current entities by layer.
         methods.add_method("getEntitiesByLayer", |_, this, layer: i32| {
             Ok(this.inner.borrow().get_entities_by_layer(layer))
         });
 
+        /// Returns the entities sorted.
+        ///
+        /// # Parameters
+        /// - `name` — `string`.
+        ///
+        /// # Returns
+        /// The current entities sorted.
         methods.add_method("getEntitiesSorted", |_, this, ()| {
             Ok(this.inner.borrow().get_entities_sorted())
         });
 
         // === Bitmap Tags ===
 
+        /// Define tag on this Universe.
+        ///
+        /// # Parameters
+        /// - `id` — `integer`.
+        /// - `name` — `string`.
         methods.add_method("defineTag", |_, this, name: String| {
             this.inner.borrow_mut().define_tag(&name)
         });
 
+        /// Bitmap tag on this Universe.
+        ///
+        /// # Parameters
+        /// - `id` — `integer`.
+        /// - `name` — `string`.
         methods.add_method("bitmapTag", |_, this, (id, name): (u32, String)| {
             this.inner.borrow_mut().bitmap_tag(id, &name)
         });
 
+        /// Bitmap untag on this Universe.
+        ///
+        /// # Parameters
+        /// - `id` — `integer`.
+        /// - `name` — `string`.
         methods.add_method("bitmapUntag", |_, this, (id, name): (u32, String)| {
             this.inner.borrow_mut().bitmap_untag(id, &name);
             Ok(())
         });
 
+        /// Returns `true` if bitmap tag.
+        ///
+        /// # Parameters
+        /// - `id` — `integer`.
+        /// - `name` — `string`.
+        ///
+        /// # Returns
+        /// `boolean`.
         methods.add_method("hasBitmapTag", |_, this, (id, name): (u32, String)| {
             Ok(this.inner.borrow().has_bitmap_tag(id, &name))
         });
 
+        /// Query bitmap tag on this Universe.
+        ///
+        /// # Parameters
+        /// - `name` — `string`.
         methods.add_method("queryBitmapTag", |_, this, name: String| {
             Ok(this.inner.borrow().query_bitmap_tag(&name))
         });
 
+        /// Query bitmap any on this Universe.
+        ///
+        /// # Parameters
+        /// - `names` — `table`.
         methods.add_method("queryBitmapAny", |_, this, names: LuaTable| {
             let name_vec: Vec<String> = names
                 .sequence_values::<String>()
@@ -256,6 +437,10 @@ impl LuaUserData for LuaUniverse {
             Ok(this.inner.borrow().query_bitmap_any(&name_vec))
         });
 
+        /// Query bitmap all on this Universe.
+        ///
+        /// # Parameters
+        /// - `names` — `table`.
         methods.add_method("queryBitmapAll", |_, this, names: LuaTable| {
             let name_vec: Vec<String> = names
                 .sequence_values::<String>()
@@ -263,6 +448,13 @@ impl LuaUserData for LuaUniverse {
             Ok(this.inner.borrow().query_bitmap_all(&name_vec))
         });
 
+        /// Returns the bitmap tag bit.
+        ///
+        /// # Parameters
+        /// - `name` — `string`.
+        ///
+        /// # Returns
+        /// The current bitmap tag bit.
         methods.add_method("getBitmapTagBit", |_, this, name: String| {
             Ok(this.inner.borrow().get_bitmap_tag_bit(&name))
         });
@@ -296,18 +488,40 @@ impl LuaUserData for LuaUniverse {
             },
         );
 
+        /// Returns `true` if blueprint.
+        ///
+        /// # Parameters
+        /// - `name` — `string`.
+        ///
+        /// # Returns
+        /// `boolean`.
         methods.add_method("hasBlueprint", |lua, this, name: String| {
             this.inner.borrow().has_blueprint(lua, &name)
         });
 
+        /// Removes blueprint from the collection.
+        ///
+        /// # Parameters
+        /// - `name` — `string`.
         methods.add_method("removeBlueprint", |lua, this, name: String| {
             this.inner.borrow().remove_blueprint(lua, &name)
         });
 
+        /// List blueprints on this Universe.
+        ///
+        /// # Parameters
+        /// - `name` — `string`.
         methods.add_method("listBlueprints", |lua, this, ()| {
             this.inner.borrow().list_blueprints(lua)
         });
 
+        /// Returns the blueprint components.
+        ///
+        /// # Parameters
+        /// - `name` — `string`.
+        ///
+        /// # Returns
+        /// The current blueprint components.
         methods.add_method("getBlueprintComponents", |lua, this, name: String| {
             this.inner.borrow().get_blueprint_components(lua, &name)
         });
@@ -338,6 +552,10 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
         })?,
     )?;
 
+    /// Entity on this Universe.
+    ///
+    /// # Returns
+    /// The result.
     luna.set("entity", entity)?;
     Ok(())
 }

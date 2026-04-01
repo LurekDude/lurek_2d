@@ -481,6 +481,10 @@ pub fn create_lua_vm(state: Rc<RefCell<SharedState>>) -> LuaResult<Lua> {
     modding_api::register(&lua, &luna, state.clone())?;
     savegame_api::register(&lua, &luna, state.clone())?;
 
+    /// Luna on this Object.
+    ///
+    /// # Returns
+    /// The result.
     lua.globals().set("luna", luna)?;
 
     Ok(lua)

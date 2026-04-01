@@ -154,14 +154,34 @@ impl DevtoolsState {
 /// Convert a ProfileZone tree to a Lua table.
 fn zone_to_table<'lua>(lua: &'lua Lua, zone: &ProfileZone) -> LuaResult<LuaTable<'lua>> {
     let tbl = lua.create_table()?;
+    /// Name on this Object.
+    ///
+    /// # Returns
+    /// The result.
     tbl.set("name", zone.name.clone())?;
+    /// Time on this Object.
+    ///
+    /// # Returns
+    /// The result.
     tbl.set("time", zone.time())?;
+    /// Self time on this Object.
+    ///
+    /// # Returns
+    /// The result.
     tbl.set("selfTime", zone.self_time())?;
+    /// Start time on this Object.
+    ///
+    /// # Returns
+    /// The result.
     tbl.set("startTime", zone.start_time)?;
     let children = lua.create_table()?;
     for (i, child) in zone.children.iter().enumerate() {
         children.set(i + 1, zone_to_table(lua, child)?)?;
     }
+    /// Children on this Object.
+    ///
+    /// # Returns
+    /// The result.
     tbl.set("children", children)?;
     Ok(tbl)
 }
@@ -267,10 +287,30 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
             let tbl = lua.create_table()?;
             for (i, entry) in entries.iter().enumerate() {
                 let e = lua.create_table()?;
+                /// Level on this Object.
+                ///
+                /// # Returns
+                /// The result.
                 e.set("level", entry.level.clone())?;
+                /// Timestamp on this Object.
+                ///
+                /// # Returns
+                /// The result.
                 e.set("timestamp", entry.timestamp)?;
+                /// Message on this Object.
+                ///
+                /// # Returns
+                /// The result.
                 e.set("message", entry.message.clone())?;
+                /// Source on this Object.
+                ///
+                /// # Returns
+                /// The result.
                 e.set("source", entry.source.clone())?;
+                /// Line on this Object.
+                ///
+                /// # Returns
+                /// The result.
                 e.set("line", entry.line)?;
                 tbl.set(i + 1, e)?;
             }
@@ -456,13 +496,45 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
             let st = s.borrow();
             let tbl = lua.create_table()?;
             if st.frame_history.is_empty() {
+                /// Fps on this Object.
+                ///
+                /// # Returns
+                /// The result.
                 tbl.set("fps", 0.0)?;
+                /// Dt on this Object.
+                ///
+                /// # Returns
+                /// The result.
                 tbl.set("dt", 0.0)?;
+                /// Avg on this Object.
+                ///
+                /// # Returns
+                /// The result.
                 tbl.set("avg", 0.0)?;
+                /// Min on this Object.
+                ///
+                /// # Returns
+                /// The result.
                 tbl.set("min", 0.0)?;
+                /// Max on this Object.
+                ///
+                /// # Returns
+                /// The result.
                 tbl.set("max", 0.0)?;
+                /// P50 on this Object.
+                ///
+                /// # Returns
+                /// The result.
                 tbl.set("p50", 0.0)?;
+                /// P95 on this Object.
+                ///
+                /// # Returns
+                /// The result.
                 tbl.set("p95", 0.0)?;
+                /// P99 on this Object.
+                ///
+                /// # Returns
+                /// The result.
                 tbl.set("p99", 0.0)?;
                 return Ok(tbl);
             }
@@ -475,13 +547,45 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
                 let idx = ((p / 100.0) * (n as f64 - 1.0)).round() as usize;
                 sorted[idx.min(n - 1)]
             };
+            /// Fps on this Object.
+            ///
+            /// # Returns
+            /// The result.
             tbl.set("fps", if avg > 0.0 { 1.0 / avg } else { 0.0 })?;
+            /// Dt on this Object.
+            ///
+            /// # Returns
+            /// The result.
             tbl.set("dt", *sorted.last().unwrap_or(&0.0))?;
+            /// Avg on this Object.
+            ///
+            /// # Returns
+            /// The result.
             tbl.set("avg", avg)?;
+            /// Min on this Object.
+            ///
+            /// # Returns
+            /// The result.
             tbl.set("min", sorted[0])?;
+            /// Max on this Object.
+            ///
+            /// # Returns
+            /// The result.
             tbl.set("max", sorted[n - 1])?;
+            /// P50 on this Object.
+            ///
+            /// # Returns
+            /// The result.
             tbl.set("p50", percentile(50.0))?;
+            /// P95 on this Object.
+            ///
+            /// # Returns
+            /// The result.
             tbl.set("p95", percentile(95.0))?;
+            /// P99 on this Object.
+            ///
+            /// # Returns
+            /// The result.
             tbl.set("p99", percentile(99.0))?;
             Ok(tbl)
         })?,
@@ -686,6 +790,10 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
         lua.create_function(move |_, ()| Ok(s.borrow().console_open))?,
     )?;
 
+    /// Devtools on this Object.
+    ///
+    /// # Returns
+    /// The result.
     luna.set("devtools", dt)?;
     Ok(())
 }

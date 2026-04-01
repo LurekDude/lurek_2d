@@ -32,20 +32,40 @@ impl LuaUserData for LuaResourceManager {
 
         // ── Resource CRUD ──
 
+        /// Creates a new resource instance.
+        ///
+        /// # Parameters
+        /// - `name` — `string`.
+        /// - `capacity` — `number`.
         methods.add_method("newResource", |_, this, (name, capacity): (String, f64)| {
             this.inner.borrow_mut().new_resource(&name, capacity);
             Ok(())
         });
 
+        /// Returns `true` if resource.
+        ///
+        /// # Parameters
+        /// - `name` — `string`.
+        ///
+        /// # Returns
+        /// `boolean`.
         methods.add_method("hasResource", |_, this, name: String| {
             Ok(this.inner.borrow().has_resource(&name))
         });
 
+        /// Removes resource from the collection.
+        ///
+        /// # Parameters
+        /// - `name` — `string`.
         methods.add_method("removeResource", |_, this, name: String| {
             this.inner.borrow_mut().remove_resource(&name);
             Ok(())
         });
 
+        /// Returns the resource names.
+        ///
+        /// # Returns
+        /// The current resource names.
         methods.add_method("getResourceNames", |lua, this, ()| {
             let mgr = this.inner.borrow();
             let names = mgr.resource_names();
@@ -58,6 +78,13 @@ impl LuaUserData for LuaResourceManager {
 
         // ── Resource value get/set ──
 
+        /// Returns the value.
+        ///
+        /// # Parameters
+        /// - `name` — `string`.
+        ///
+        /// # Returns
+        /// The current value.
         methods.add_method("getValue", |_, this, name: String| {
             let mgr = this.inner.borrow();
             match mgr.get_resource(&name) {
@@ -68,6 +95,11 @@ impl LuaUserData for LuaResourceManager {
             }
         });
 
+        /// Sets the value.
+        ///
+        /// # Parameters
+        /// - `name` — `string`.
+        /// - `value` — `number`.
         methods.add_method("setValue", |_, this, (name, value): (String, f64)| {
             let mut mgr = this.inner.borrow_mut();
             match mgr.get_resource_mut(&name) {
@@ -81,6 +113,13 @@ impl LuaUserData for LuaResourceManager {
             }
         });
 
+        /// Returns the capacity.
+        ///
+        /// # Parameters
+        /// - `name` — `string`.
+        ///
+        /// # Returns
+        /// The current capacity.
         methods.add_method("getCapacity", |_, this, name: String| {
             let mgr = this.inner.borrow();
             match mgr.get_resource(&name) {
@@ -91,6 +130,11 @@ impl LuaUserData for LuaResourceManager {
             }
         });
 
+        /// Sets the capacity.
+        ///
+        /// # Parameters
+        /// - `name` — `string`.
+        /// - `cap` — `number`.
         methods.add_method("setCapacity", |_, this, (name, cap): (String, f64)| {
             let mut mgr = this.inner.borrow_mut();
             match mgr.get_resource_mut(&name) {
@@ -104,6 +148,13 @@ impl LuaUserData for LuaResourceManager {
             }
         });
 
+        /// Returns the minimum.
+        ///
+        /// # Parameters
+        /// - `name` — `string`.
+        ///
+        /// # Returns
+        /// The current minimum.
         methods.add_method("getMinimum", |_, this, name: String| {
             let mgr = this.inner.borrow();
             match mgr.get_resource(&name) {
@@ -114,6 +165,11 @@ impl LuaUserData for LuaResourceManager {
             }
         });
 
+        /// Sets the minimum.
+        ///
+        /// # Parameters
+        /// - `name` — `string`.
+        /// - `min` — `number`.
         methods.add_method("setMinimum", |_, this, (name, min): (String, f64)| {
             let mut mgr = this.inner.borrow_mut();
             match mgr.get_resource_mut(&name) {
@@ -129,6 +185,13 @@ impl LuaUserData for LuaResourceManager {
 
         // ── Flow and rate accessors ──
 
+        /// Returns the flow rate.
+        ///
+        /// # Parameters
+        /// - `name` — `string`.
+        ///
+        /// # Returns
+        /// The current flow rate.
         methods.add_method("getFlowRate", |_, this, name: String| {
             let mgr = this.inner.borrow();
             match mgr.get_resource(&name) {
@@ -139,6 +202,11 @@ impl LuaUserData for LuaResourceManager {
             }
         });
 
+        /// Sets the flow rate.
+        ///
+        /// # Parameters
+        /// - `name` — `string`.
+        /// - `rate` — `number`.
         methods.add_method("setFlowRate", |_, this, (name, rate): (String, f64)| {
             let mut mgr = this.inner.borrow_mut();
             match mgr.get_resource_mut(&name) {
@@ -152,6 +220,13 @@ impl LuaUserData for LuaResourceManager {
             }
         });
 
+        /// Returns the decay rate.
+        ///
+        /// # Parameters
+        /// - `name` — `string`.
+        ///
+        /// # Returns
+        /// The current decay rate.
         methods.add_method("getDecayRate", |_, this, name: String| {
             let mgr = this.inner.borrow();
             match mgr.get_resource(&name) {
@@ -162,6 +237,11 @@ impl LuaUserData for LuaResourceManager {
             }
         });
 
+        /// Sets the decay rate.
+        ///
+        /// # Parameters
+        /// - `name` — `string`.
+        /// - `rate` — `number`.
         methods.add_method("setDecayRate", |_, this, (name, rate): (String, f64)| {
             let mut mgr = this.inner.borrow_mut();
             match mgr.get_resource_mut(&name) {
@@ -175,6 +255,13 @@ impl LuaUserData for LuaResourceManager {
             }
         });
 
+        /// Returns the decay percent.
+        ///
+        /// # Parameters
+        /// - `name` — `string`.
+        ///
+        /// # Returns
+        /// The current decay percent.
         methods.add_method("getDecayPercent", |_, this, name: String| {
             let mgr = this.inner.borrow();
             match mgr.get_resource(&name) {
@@ -185,22 +272,31 @@ impl LuaUserData for LuaResourceManager {
             }
         });
 
-        methods.add_method(
-            "setDecayPercent",
-            |_, this, (name, pct): (String, f64)| {
-                let mut mgr = this.inner.borrow_mut();
-                match mgr.get_resource_mut(&name) {
-                    Some(r) => {
-                        r.set_decay_percent(pct);
-                        Ok(())
-                    }
-                    None => Err(LuaError::RuntimeError(format!(
-                        "luna.resource: no resource '{name}'"
-                    ))),
+        /// Sets the decay percent.
+        ///
+        /// # Parameters
+        /// - `name` — `string`.
+        /// - `pct` — `number`.
+        methods.add_method("setDecayPercent", |_, this, (name, pct): (String, f64)| {
+            let mut mgr = this.inner.borrow_mut();
+            match mgr.get_resource_mut(&name) {
+                Some(r) => {
+                    r.set_decay_percent(pct);
+                    Ok(())
                 }
-            },
-        );
+                None => Err(LuaError::RuntimeError(format!(
+                    "luna.resource: no resource '{name}'"
+                ))),
+            }
+        });
 
+        /// Returns the interest rate.
+        ///
+        /// # Parameters
+        /// - `name` — `string`.
+        ///
+        /// # Returns
+        /// The current interest rate.
         methods.add_method("getInterestRate", |_, this, name: String| {
             let mgr = this.inner.borrow();
             match mgr.get_resource(&name) {
@@ -211,22 +307,31 @@ impl LuaUserData for LuaResourceManager {
             }
         });
 
-        methods.add_method(
-            "setInterestRate",
-            |_, this, (name, rate): (String, f64)| {
-                let mut mgr = this.inner.borrow_mut();
-                match mgr.get_resource_mut(&name) {
-                    Some(r) => {
-                        r.set_interest_rate(rate);
-                        Ok(())
-                    }
-                    None => Err(LuaError::RuntimeError(format!(
-                        "luna.resource: no resource '{name}'"
-                    ))),
+        /// Sets the interest rate.
+        ///
+        /// # Parameters
+        /// - `name` — `string`.
+        /// - `rate` — `number`.
+        methods.add_method("setInterestRate", |_, this, (name, rate): (String, f64)| {
+            let mut mgr = this.inner.borrow_mut();
+            match mgr.get_resource_mut(&name) {
+                Some(r) => {
+                    r.set_interest_rate(rate);
+                    Ok(())
                 }
-            },
-        );
+                None => Err(LuaError::RuntimeError(format!(
+                    "luna.resource: no resource '{name}'"
+                ))),
+            }
+        });
 
+        /// Returns the upkeep.
+        ///
+        /// # Parameters
+        /// - `name` — `string`.
+        ///
+        /// # Returns
+        /// The current upkeep.
         methods.add_method("getUpkeep", |_, this, name: String| {
             let mgr = this.inner.borrow();
             match mgr.get_resource(&name) {
@@ -237,6 +342,11 @@ impl LuaUserData for LuaResourceManager {
             }
         });
 
+        /// Sets the upkeep.
+        ///
+        /// # Parameters
+        /// - `name` — `string`.
+        /// - `upkeep` — `number`.
         methods.add_method("setUpkeep", |_, this, (name, upkeep): (String, f64)| {
             let mut mgr = this.inner.borrow_mut();
             match mgr.get_resource_mut(&name) {
@@ -250,6 +360,13 @@ impl LuaUserData for LuaResourceManager {
             }
         });
 
+        /// Returns the net rate.
+        ///
+        /// # Parameters
+        /// - `name` — `string`.
+        ///
+        /// # Returns
+        /// The current net rate.
         methods.add_method("getNetRate", |_, this, name: String| {
             let mgr = this.inner.borrow();
             match mgr.get_resource(&name) {
@@ -262,6 +379,13 @@ impl LuaUserData for LuaResourceManager {
 
         // ── Overflow policy ──
 
+        /// Returns the overflow.
+        ///
+        /// # Parameters
+        /// - `name` — `string`.
+        ///
+        /// # Returns
+        /// The current overflow.
         methods.add_method("getOverflow", |_, this, name: String| {
             let mgr = this.inner.borrow();
             match mgr.get_resource(&name) {
@@ -290,6 +414,13 @@ impl LuaUserData for LuaResourceManager {
 
         // ── Group ──
 
+        /// Returns the group.
+        ///
+        /// # Parameters
+        /// - `name` — `string`.
+        ///
+        /// # Returns
+        /// The current group.
         methods.add_method("getGroup", |_, this, name: String| {
             let mgr = this.inner.borrow();
             match mgr.get_resource(&name) {
@@ -300,6 +431,11 @@ impl LuaUserData for LuaResourceManager {
             }
         });
 
+        /// Sets the group.
+        ///
+        /// # Parameters
+        /// - `name` — `string`.
+        /// - `group` — `string`.
         methods.add_method("setGroup", |_, this, (name, group): (String, String)| {
             let mut mgr = this.inner.borrow_mut();
             match mgr.get_resource_mut(&name) {
@@ -315,6 +451,13 @@ impl LuaUserData for LuaResourceManager {
 
         // ── Flags ──
 
+        /// Returns `true` if enabled.
+        ///
+        /// # Parameters
+        /// - `name` — `string`.
+        ///
+        /// # Returns
+        /// `boolean`.
         methods.add_method("isEnabled", |_, this, name: String| {
             let mgr = this.inner.borrow();
             match mgr.get_resource(&name) {
@@ -325,6 +468,11 @@ impl LuaUserData for LuaResourceManager {
             }
         });
 
+        /// Sets the enabled.
+        ///
+        /// # Parameters
+        /// - `name` — `string`.
+        /// - `v` — `boolean`.
         methods.add_method("setEnabled", |_, this, (name, v): (String, bool)| {
             let mut mgr = this.inner.borrow_mut();
             match mgr.get_resource_mut(&name) {
@@ -338,6 +486,13 @@ impl LuaUserData for LuaResourceManager {
             }
         });
 
+        /// Returns `true` if visible.
+        ///
+        /// # Parameters
+        /// - `name` — `string`.
+        ///
+        /// # Returns
+        /// `boolean`.
         methods.add_method("isVisible", |_, this, name: String| {
             let mgr = this.inner.borrow();
             match mgr.get_resource(&name) {
@@ -348,6 +503,11 @@ impl LuaUserData for LuaResourceManager {
             }
         });
 
+        /// Sets the visible.
+        ///
+        /// # Parameters
+        /// - `name` — `string`.
+        /// - `v` — `boolean`.
         methods.add_method("setVisible", |_, this, (name, v): (String, bool)| {
             let mut mgr = this.inner.borrow_mut();
             match mgr.get_resource_mut(&name) {
@@ -361,6 +521,13 @@ impl LuaUserData for LuaResourceManager {
             }
         });
 
+        /// Returns `true` if locked.
+        ///
+        /// # Parameters
+        /// - `name` — `string`.
+        ///
+        /// # Returns
+        /// `boolean`.
         methods.add_method("isLocked", |_, this, name: String| {
             let mgr = this.inner.borrow();
             match mgr.get_resource(&name) {
@@ -371,6 +538,11 @@ impl LuaUserData for LuaResourceManager {
             }
         });
 
+        /// Sets the locked.
+        ///
+        /// # Parameters
+        /// - `name` — `string`.
+        /// - `v` — `boolean`.
         methods.add_method("setLocked", |_, this, (name, v): (String, bool)| {
             let mut mgr = this.inner.borrow_mut();
             match mgr.get_resource_mut(&name) {
@@ -386,6 +558,11 @@ impl LuaUserData for LuaResourceManager {
 
         // ── Operations ──
 
+        /// Adds an entry to the collection.
+        ///
+        /// # Parameters
+        /// - `name` — `string`.
+        /// - `amount` — `number`.
         methods.add_method("add", |_, this, (name, amount): (String, f64)| {
             let mut mgr = this.inner.borrow_mut();
             match mgr.get_resource_mut(&name) {
@@ -396,6 +573,11 @@ impl LuaUserData for LuaResourceManager {
             }
         });
 
+        /// Spend on this ResourceManager.
+        ///
+        /// # Parameters
+        /// - `name` — `string`.
+        /// - `amount` — `number`.
         methods.add_method("spend", |_, this, (name, amount): (String, f64)| {
             let mut mgr = this.inner.borrow_mut();
             match mgr.get_resource_mut(&name) {
@@ -406,6 +588,14 @@ impl LuaUserData for LuaResourceManager {
             }
         });
 
+        /// Returns `true` if afford.
+        ///
+        /// # Parameters
+        /// - `name` — `string`.
+        /// - `amount` — `number`.
+        ///
+        /// # Returns
+        /// `boolean`.
         methods.add_method("canAfford", |_, this, (name, amount): (String, f64)| {
             let mgr = this.inner.borrow();
             match mgr.get_resource(&name) {
@@ -416,6 +606,13 @@ impl LuaUserData for LuaResourceManager {
             }
         });
 
+        /// Returns the available.
+        ///
+        /// # Parameters
+        /// - `name` — `string`.
+        ///
+        /// # Returns
+        /// The current available.
         methods.add_method("getAvailable", |_, this, name: String| {
             let mgr = this.inner.borrow();
             match mgr.get_resource(&name) {
@@ -426,6 +623,11 @@ impl LuaUserData for LuaResourceManager {
             }
         });
 
+        /// Reserve on this ResourceManager.
+        ///
+        /// # Parameters
+        /// - `name` — `string`.
+        /// - `amount` — `number`.
         methods.add_method("reserve", |_, this, (name, amount): (String, f64)| {
             let mut mgr = this.inner.borrow_mut();
             match mgr.get_resource_mut(&name) {
@@ -439,6 +641,11 @@ impl LuaUserData for LuaResourceManager {
             }
         });
 
+        /// Unreserve on this ResourceManager.
+        ///
+        /// # Parameters
+        /// - `name` — `string`.
+        /// - `amount` — `number`.
         methods.add_method("unreserve", |_, this, (name, amount): (String, f64)| {
             let mut mgr = this.inner.borrow_mut();
             match mgr.get_resource_mut(&name) {
@@ -452,6 +659,13 @@ impl LuaUserData for LuaResourceManager {
             }
         });
 
+        /// Returns the reserved.
+        ///
+        /// # Parameters
+        /// - `name` — `string`.
+        ///
+        /// # Returns
+        /// The current reserved.
         methods.add_method("getReserved", |_, this, name: String| {
             let mgr = this.inner.borrow();
             match mgr.get_resource(&name) {
@@ -464,11 +678,19 @@ impl LuaUserData for LuaResourceManager {
 
         // ── Tick / Turn ──
 
+        /// Advances internal state by one logic tick.
+        ///
+        /// # Parameters
+        /// - `dt` — `number`.
         methods.add_method("tick", |_, this, dt: f64| {
             this.inner.borrow_mut().tick(dt);
             Ok(())
         });
 
+        /// Turn on this ResourceManager.
+        ///
+        /// # Returns
+        /// The result.
         methods.add_method("turn", |_, this, ()| {
             this.inner.borrow_mut().turn();
             Ok(())
@@ -495,21 +717,53 @@ impl LuaUserData for LuaResourceManager {
 
         // ── Group queries ──
 
+        /// Total by group on this ResourceManager.
+        ///
+        /// # Parameters
+        /// - `group` — `string`.
         methods.add_method("totalByGroup", |_, this, group: String| {
             Ok(this.inner.borrow().total_by_group(&group))
         });
 
         // ── Reset ──
 
+        /// Returns the percent.
+        ///
+        /// # Parameters
+        /// - `name` — `string`.
+        ///
+        /// # Returns
+        /// The current percent.
         methods.add_method("getPercent", |_, this, name: String| {
             Ok(this.inner.borrow().percent(&name))
         });
+        /// Returns `true` if full.
+        ///
+        /// # Parameters
+        /// - `name` — `string`.
+        ///
+        /// # Returns
+        /// `boolean`.
         methods.add_method("isFull", |_, this, name: String| {
             Ok(this.inner.borrow().is_full(&name))
         });
+        /// Returns `true` if empty.
+        ///
+        /// # Parameters
+        /// - `name` — `string`.
+        ///
+        /// # Returns
+        /// `boolean`.
         methods.add_method("isEmpty", |_, this, name: String| {
             Ok(this.inner.borrow().is_empty(&name))
         });
+        /// Returns `true` if afford all.
+        ///
+        /// # Parameters
+        /// - `tbl` — `table`.
+        ///
+        /// # Returns
+        /// `boolean`.
         methods.add_method("canAffordAll", |_, this, tbl: LuaTable| {
             let mut needs: Vec<(String, f64)> = Vec::new();
             for pair in tbl.pairs::<String, f64>() {
@@ -519,6 +773,10 @@ impl LuaUserData for LuaResourceManager {
             let refs: Vec<(&str, f64)> = needs.iter().map(|(k, v)| (k.as_str(), *v)).collect();
             Ok(this.inner.borrow().can_afford_all(&refs))
         });
+        /// Spend all on this ResourceManager.
+        ///
+        /// # Parameters
+        /// - `tbl` — `table`.
         methods.add_method("spendAll", |_, this, tbl: LuaTable| {
             let mut needs: Vec<(String, f64)> = Vec::new();
             for pair in tbl.pairs::<String, f64>() {
@@ -528,6 +786,10 @@ impl LuaUserData for LuaResourceManager {
             let refs: Vec<(&str, f64)> = needs.iter().map(|(k, v)| (k.as_str(), *v)).collect();
             Ok(this.inner.borrow_mut().spend_all(&refs))
         });
+        /// Resets state to initial values.
+        ///
+        /// # Returns
+        /// The result.
         methods.add_method("reset", |_, this, ()| {
             this.inner.borrow_mut().reset();
             Ok(())
@@ -552,6 +814,10 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
         })?,
     )?;
 
+    /// Resource on this ResourceManager.
+    ///
+    /// # Returns
+    /// The result.
     luna.set("resource", module)?;
     Ok(())
 }

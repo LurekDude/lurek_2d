@@ -381,7 +381,7 @@ api = api.replace(
     1
 )
 
-# Add Zone countByType and getAllTypes before findByType in Zone block  
+# Add Zone countByType and getAllTypes before findByType in Zone block
 zone_api_extra = '''        methods.add_method("countByType", |_, this, card_type: String| {
             Ok(this.0.borrow().count_by_type(&card_type))
         });
@@ -398,7 +398,7 @@ api = api.replace(
     1
 )
 
-# Add getTypes to CardPool before its draw  
+# Add getTypes to CardPool before its draw
 cardpool_api_gettypes = '''        methods.add_method("getTypes", |lua, this, ()| {
             let types = this.0.borrow().get_types();
             let t = lua.create_table()?;

@@ -157,7 +157,7 @@ api = api.replace(
     1,
 )
 
-# Insert Card extras before `clone` binding  
+# Insert Card extras before `clone` binding
 api = api.replace(
     '        methods.add_method("clone", |_, this, ()| {',
     card_api_extra + '        methods.add_method("clone", |_, this, ()| {',

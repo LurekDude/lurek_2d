@@ -132,55 +132,135 @@ struct DocEntry(DocEntryData);
 
 impl LuaUserData for DocEntry {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
+        /// Returns the name.
+        ///
+        /// # Returns
+        /// The current name.
         methods.add_method("getName", |_, this, ()| Ok(this.0.name.clone()));
+        /// Returns the qualified name.
+        ///
+        /// # Returns
+        /// The current qualified name.
         methods.add_method("getQualifiedName", |_, this, ()| {
             Ok(this.0.qualified_name.clone())
         });
+        /// Returns the module.
+        ///
+        /// # Returns
+        /// The current module.
         methods.add_method("getModule", |_, this, ()| Ok(this.0.module.clone()));
+        /// Returns the kind.
+        ///
+        /// # Returns
+        /// The current kind.
         methods.add_method("getKind", |_, this, ()| Ok(this.0.kind.clone()));
+        /// Returns the description.
+        ///
+        /// # Returns
+        /// The current description.
         methods.add_method("getDescription", |_, this, ()| {
             Ok(this.0.description.clone())
         });
+        /// Returns the parameters.
+        ///
+        /// # Returns
+        /// The current parameters.
         methods.add_method("getParameters", |lua, this, ()| {
             let tbl = lua.create_table()?;
             for (i, p) in this.0.parameters.iter().enumerate() {
                 let pt = lua.create_table()?;
+                /// Name on this Object.
+                ///
+                /// # Returns
+                /// The result.
                 pt.set("name", p.name.clone())?;
                 pt.set("type", p.type_name.clone())?;
+                /// Description on this Object.
+                ///
+                /// # Returns
+                /// The result.
                 pt.set("description", p.description.clone())?;
+                /// Optional on this Object.
+                ///
+                /// # Returns
+                /// The result.
                 pt.set("optional", p.optional)?;
                 if let Some(ref d) = p.default {
+                    /// Default on this Object.
+                    ///
+                    /// # Returns
+                    /// The result.
                     pt.set("default", d.clone())?;
                 }
                 tbl.set(i + 1, pt)?;
             }
             Ok(tbl)
         });
+        /// Returns the returns.
+        ///
+        /// # Returns
+        /// The current returns.
         methods.add_method("getReturns", |lua, this, ()| {
             let tbl = lua.create_table()?;
             for (i, r) in this.0.returns.iter().enumerate() {
                 let rt = lua.create_table()?;
                 rt.set("type", r.type_name.clone())?;
+                /// Description on this Object.
+                ///
+                /// # Returns
+                /// The result.
                 rt.set("description", r.description.clone())?;
                 tbl.set(i + 1, rt)?;
             }
             Ok(tbl)
         });
+        /// Returns the example.
+        ///
+        /// # Returns
+        /// The current example.
         methods.add_method("getExample", |_, this, ()| Ok(this.0.example.clone()));
+        /// Returns the since.
+        ///
+        /// # Returns
+        /// The current since.
         methods.add_method("getSince", |_, this, ()| Ok(this.0.since.clone()));
+        /// Returns the deprecated.
+        ///
+        /// # Returns
+        /// The current deprecated.
         methods.add_method("getDeprecated", |_, this, ()| {
             Ok(this.0.deprecated.clone())
         });
+        /// Returns the score.
+        ///
+        /// # Returns
+        /// The current score.
         methods.add_method("getScore", |_, this, ()| Ok(this.0.score()));
+        /// Returns `true` if description.
+        ///
+        /// # Returns
+        /// `boolean`.
         methods.add_method("hasDescription", |_, this, ()| {
             Ok(!this.0.description.is_empty())
         });
+        /// Returns `true` if parameters.
+        ///
+        /// # Returns
+        /// `boolean`.
         methods.add_method("hasParameters", |_, this, ()| {
             Ok(!this.0.parameters.is_empty())
         });
+        /// Returns `true` if return type.
+        ///
+        /// # Returns
+        /// `boolean`.
         methods.add_method("hasReturnType", |_, this, ()| {
             Ok(!this.0.returns.is_empty())
         });
+        /// Returns `true` if example.
+        ///
+        /// # Returns
+        /// `boolean`.
         methods.add_method("hasExample", |_, this, ()| Ok(this.0.example.is_some()));
     }
 }
@@ -195,6 +275,10 @@ struct ApiCatalog(ApiCatalogData);
 
 impl LuaUserData for ApiCatalog {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
+        /// Returns the modules.
+        ///
+        /// # Returns
+        /// The current modules.
         methods.add_method("getModules", |lua, this, ()| {
             let tbl = lua.create_table()?;
             for (i, m) in this.0.modules().iter().enumerate() {
@@ -203,6 +287,13 @@ impl LuaUserData for ApiCatalog {
             Ok(tbl)
         });
 
+        /// Returns the entries.
+        ///
+        /// # Parameters
+        /// - `module` — `string` optional.
+        ///
+        /// # Returns
+        /// The current entries.
         methods.add_method("getEntries", |lua, this, module: Option<String>| {
             let tbl = lua.create_table()?;
             let entries: Vec<&DocEntryData> = match module.as_deref() {
@@ -215,10 +306,24 @@ impl LuaUserData for ApiCatalog {
             Ok(tbl)
         });
 
+        /// Returns the entry.
+        ///
+        /// # Parameters
+        /// - `qualified_name` — `string`.
+        ///
+        /// # Returns
+        /// The current entry.
         methods.add_method("getEntry", |_, this, qualified_name: String| {
             Ok(this.0.get_entry(&qualified_name).map(|e| DocEntry(e.clone())))
         });
 
+        /// Returns the types.
+        ///
+        /// # Parameters
+        /// - `module_name` — `string`.
+        ///
+        /// # Returns
+        /// The current types.
         methods.add_method("getTypes", |lua, this, module_name: String| {
             let tbl = lua.create_table()?;
             let mut idx = 1;
@@ -231,6 +336,13 @@ impl LuaUserData for ApiCatalog {
             Ok(tbl)
         });
 
+        /// Returns the type methods.
+        ///
+        /// # Parameters
+        /// - `qualified_name` — `string`.
+        ///
+        /// # Returns
+        /// The current type methods.
         methods.add_method("getTypeMethods", |lua, this, qualified_name: String| {
             let tbl = lua.create_table()?;
             let prefix = format!("{}:", qualified_name);
@@ -244,10 +356,18 @@ impl LuaUserData for ApiCatalog {
             Ok(tbl)
         });
 
+        /// Entry count on this Object.
+        ///
+        /// # Parameters
+        /// - `module` — `string` optional.
         methods.add_method("entryCount", |_, this, module: Option<String>| {
             Ok(this.0.entry_count(module.as_deref()))
         });
 
+        /// Merge on this Object.
+        ///
+        /// # Parameters
+        /// - `other` — `userdata`.
         methods.add_method("merge", |_, this, other: LuaAnyUserData| {
             let other = other.borrow::<ApiCatalog>()?;
             let mut merged = this.0.clone();
@@ -268,6 +388,10 @@ impl LuaUserData for ApiCatalog {
             Ok(ApiCatalog(merged))
         });
 
+        /// Returns a filtered subset.
+        ///
+        /// # Parameters
+        /// - `predicate` — `function`.
         methods.add_method("filter", |lua, this, predicate: LuaFunction| {
             let mut filtered = ApiCatalogData::new();
             for e in &this.0.entries {
@@ -280,6 +404,10 @@ impl LuaUserData for ApiCatalog {
             Ok(ApiCatalog(filtered))
         });
 
+        /// Search on this Object.
+        ///
+        /// # Parameters
+        /// - `query` — `string`.
         methods.add_method("search", |lua, this, query: String| {
             let query_lower = query.to_lowercase();
             let tbl = lua.create_table()?;
@@ -296,21 +424,53 @@ impl LuaUserData for ApiCatalog {
             Ok(tbl)
         });
 
+        /// To table on this Object.
+        ///
+        /// # Returns
+        /// The result.
         methods.add_method("toTable", |lua, this, ()| {
             let tbl = lua.create_table()?;
             for (i, e) in this.0.entries.iter().enumerate() {
                 let et = lua.create_table()?;
+                /// Name on this Object.
+                ///
+                /// # Returns
+                /// The result.
                 et.set("name", e.name.clone())?;
+                /// Qualified name on this Object.
+                ///
+                /// # Returns
+                /// The result.
                 et.set("qualifiedName", e.qualified_name.clone())?;
+                /// Module on this Object.
+                ///
+                /// # Returns
+                /// The result.
                 et.set("module", e.module.clone())?;
+                /// Kind on this Object.
+                ///
+                /// # Returns
+                /// The result.
                 et.set("kind", e.kind.clone())?;
+                /// Description on this Object.
+                ///
+                /// # Returns
+                /// The result.
                 et.set("description", e.description.clone())?;
+                /// Score on this Object.
+                ///
+                /// # Returns
+                /// The result.
                 et.set("score", e.score())?;
                 tbl.set(i + 1, et)?;
             }
             Ok(tbl)
         });
 
+        /// To j s o n on this Object.
+        ///
+        /// # Returns
+        /// The result.
         methods.add_method("toJSON", |_, this, ()| {
             let mut entries = Vec::new();
             for e in &this.0.entries {
@@ -366,7 +526,15 @@ struct ValidationReport {
 
 impl LuaUserData for ValidationReport {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
+        /// Returns `true` if valid.
+        ///
+        /// # Returns
+        /// `boolean`.
         methods.add_method("isValid", |_, this, ()| Ok(this.missing.is_empty()));
+        /// Returns the missing.
+        ///
+        /// # Returns
+        /// The current missing.
         methods.add_method("getMissing", |lua, this, ()| {
             let tbl = lua.create_table()?;
             for (i, m) in this.missing.iter().enumerate() {
@@ -374,6 +542,10 @@ impl LuaUserData for ValidationReport {
             }
             Ok(tbl)
         });
+        /// Returns the phantom.
+        ///
+        /// # Returns
+        /// The current phantom.
         methods.add_method("getPhantom", |lua, this, ()| {
             let tbl = lua.create_table()?;
             for (i, p) in this.phantom.iter().enumerate() {
@@ -381,6 +553,10 @@ impl LuaUserData for ValidationReport {
             }
             Ok(tbl)
         });
+        /// Returns the incomplete.
+        ///
+        /// # Returns
+        /// The current incomplete.
         methods.add_method("getIncomplete", |lua, this, ()| {
             let tbl = lua.create_table()?;
             for (i, inc) in this.incomplete.iter().enumerate() {
@@ -388,9 +564,25 @@ impl LuaUserData for ValidationReport {
             }
             Ok(tbl)
         });
+        /// Missing count on this Object.
+        ///
+        /// # Returns
+        /// The result.
         methods.add_method("missingCount", |_, this, ()| Ok(this.missing.len()));
+        /// Phantom count on this Object.
+        ///
+        /// # Returns
+        /// The result.
         methods.add_method("phantomCount", |_, this, ()| Ok(this.phantom.len()));
+        /// Incomplete count on this Object.
+        ///
+        /// # Returns
+        /// The result.
         methods.add_method("incompleteCount", |_, this, ()| Ok(this.incomplete.len()));
+        /// Returns the summary.
+        ///
+        /// # Returns
+        /// The current summary.
         methods.add_method("getSummary", |_, this, ()| {
             Ok(format!(
                 "Missing: {}, Phantom: {}, Incomplete: {}",
@@ -399,25 +591,45 @@ impl LuaUserData for ValidationReport {
                 this.incomplete.len()
             ))
         });
+        /// To table on this Object.
+        ///
+        /// # Returns
+        /// The result.
         methods.add_method("toTable", |lua, this, ()| {
             let tbl = lua.create_table()?;
             let missing = lua.create_table()?;
             for (i, m) in this.missing.iter().enumerate() {
                 missing.set(i + 1, m.clone())?;
             }
+            /// Missing on this Object.
+            ///
+            /// # Returns
+            /// The result.
             tbl.set("missing", missing)?;
             let phantom = lua.create_table()?;
             for (i, p) in this.phantom.iter().enumerate() {
                 phantom.set(i + 1, p.clone())?;
             }
+            /// Phantom on this Object.
+            ///
+            /// # Returns
+            /// The result.
             tbl.set("phantom", phantom)?;
             let incomplete = lua.create_table()?;
             for (i, inc) in this.incomplete.iter().enumerate() {
                 incomplete.set(i + 1, inc.clone())?;
             }
+            /// Incomplete on this Object.
+            ///
+            /// # Returns
+            /// The result.
             tbl.set("incomplete", incomplete)?;
             Ok(tbl)
         });
+        /// To j s o n on this Object.
+        ///
+        /// # Returns
+        /// The result.
         methods.add_method("toJSON", |_, this, ()| {
             let val = serde_json::json!({
                 "missing": this.missing,
@@ -444,10 +656,25 @@ struct QualityReport {
 
 impl LuaUserData for QualityReport {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
+        /// Returns the overall score.
+        ///
+        /// # Returns
+        /// The current overall score.
         methods.add_method("getOverallScore", |_, this, ()| Ok(this.overall_score));
+        /// Returns the grade.
+        ///
+        /// # Returns
+        /// The current grade.
         methods.add_method("getGrade", |_, this, ()| {
             Ok(DocEntryData::grade(this.overall_score).to_string())
         });
+        /// Returns the module scores.
+        ///
+        /// # Parameters
+        /// - `count` — `integer` optional.
+        ///
+        /// # Returns
+        /// The current module scores.
         methods.add_method("getModuleScores", |lua, this, ()| {
             let tbl = lua.create_table()?;
             for (k, v) in &this.module_scores {
@@ -455,6 +682,13 @@ impl LuaUserData for QualityReport {
             }
             Ok(tbl)
         });
+        /// Returns the worst.
+        ///
+        /// # Parameters
+        /// - `count` — `integer` optional.
+        ///
+        /// # Returns
+        /// The current worst.
         methods.add_method("getWorst", |lua, this, count: Option<usize>| {
             let n = count.unwrap_or(10);
             let mut sorted = this.entries.clone();
@@ -465,6 +699,13 @@ impl LuaUserData for QualityReport {
             }
             Ok(tbl)
         });
+        /// Returns the best.
+        ///
+        /// # Parameters
+        /// - `count` — `integer` optional.
+        ///
+        /// # Returns
+        /// The current best.
         methods.add_method("getBest", |lua, this, count: Option<usize>| {
             let n = count.unwrap_or(10);
             let mut sorted = this.entries.clone();
@@ -475,6 +716,13 @@ impl LuaUserData for QualityReport {
             }
             Ok(tbl)
         });
+        /// Returns the by grade.
+        ///
+        /// # Parameters
+        /// - `grade` — `string`.
+        ///
+        /// # Returns
+        /// The current by grade.
         methods.add_method("getByGrade", |lua, this, grade: String| {
             let tbl = lua.create_table()?;
             let mut idx = 1;
@@ -486,6 +734,10 @@ impl LuaUserData for QualityReport {
             }
             Ok(tbl)
         });
+        /// Returns the summary.
+        ///
+        /// # Returns
+        /// The current summary.
         methods.add_method("getSummary", |_, this, ()| {
             let mut lines = vec![format!(
                 "Overall: {} ({:.0}%)",
@@ -499,17 +751,37 @@ impl LuaUserData for QualityReport {
             }
             Ok(lines.join("\n"))
         });
+        /// To table on this Object.
+        ///
+        /// # Returns
+        /// The result.
         methods.add_method("toTable", |lua, this, ()| {
             let tbl = lua.create_table()?;
+            /// Overall score on this Object.
+            ///
+            /// # Returns
+            /// The result.
             tbl.set("overallScore", this.overall_score)?;
+            /// Grade on this Object.
+            ///
+            /// # Returns
+            /// The result.
             tbl.set("grade", DocEntryData::grade(this.overall_score))?;
             let mods = lua.create_table()?;
             for (k, v) in &this.module_scores {
                 mods.set(k.clone(), *v)?;
             }
+            /// Module scores on this Object.
+            ///
+            /// # Returns
+            /// The result.
             tbl.set("moduleScores", mods)?;
             Ok(tbl)
         });
+        /// To j s o n on this Object.
+        ///
+        /// # Returns
+        /// The result.
         methods.add_method("toJSON", |_, this, ()| {
             let val = serde_json::json!({
                 "overallScore": this.overall_score,
@@ -973,8 +1245,20 @@ pub fn register(lua: &Lua, luna_table: &LuaTable) -> LuaResult<()> {
                     }
                 }
             }
+            /// Stale on this Object.
+            ///
+            /// # Returns
+            /// The result.
             tbl.set("stale", stale)?;
+            /// Current on this Object.
+            ///
+            /// # Returns
+            /// The result.
             tbl.set("current", current)?;
+            /// Missing on this Object.
+            ///
+            /// # Returns
+            /// The result.
             tbl.set("missing", missing_tbl)?;
             Ok(tbl)
         })?,
@@ -1300,6 +1584,10 @@ pub fn register(lua: &Lua, luna_table: &LuaTable) -> LuaResult<()> {
         })?,
     )?;
 
+    /// Docs on this Object.
+    ///
+    /// # Returns
+    /// The result.
     luna_table.set("docs", docs)?;
     Ok(())
 }

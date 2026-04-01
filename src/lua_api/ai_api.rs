@@ -192,6 +192,10 @@ impl LuaUserData for LuaAIWorld {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
         add_type_methods::<Self>(methods);
 
+        /// Adds agent to the collection.
+        ///
+        /// # Parameters
+        /// - `name` — `string`.
         methods.add_method("addAgent", |_, this, name: String| {
             let mut w = this.inner.borrow_mut();
             w.add_agent(&name).map_err(LuaError::RuntimeError)?;
@@ -201,6 +205,13 @@ impl LuaUserData for LuaAIWorld {
             })
         });
 
+        /// Returns the agent.
+        ///
+        /// # Parameters
+        /// - `name` — `string`.
+        ///
+        /// # Returns
+        /// The current agent.
         methods.add_method("getAgent", |_, this, name: String| {
             let w = this.inner.borrow();
             if w.get_agent_index(&name).is_some() {
@@ -213,6 +224,10 @@ impl LuaUserData for LuaAIWorld {
             }
         });
 
+        /// Removes agent from the collection.
+        ///
+        /// # Parameters
+        /// - `agent` — `userdata`.
         methods.add_method("removeAgent", |_, this, agent: LuaAnyUserData| {
             let a = agent.borrow::<LuaAgent>()?;
             let mut w = this.inner.borrow_mut();
@@ -220,10 +235,21 @@ impl LuaUserData for LuaAIWorld {
             Ok(())
         });
 
+        /// Returns the agent count.
+        ///
+        /// # Returns
+        /// The current agent count.
         methods.add_method("getAgentCount", |_, this, ()| {
             Ok(this.inner.borrow().agent_count())
         });
 
+        /// Returns the global blackboard.
+        ///
+        /// # Parameters
+        /// - `dt` — `number`.
+        ///
+        /// # Returns
+        /// The current global blackboard.
         methods.add_method("getGlobalBlackboard", |_, this, ()| {
             let w = this.inner.borrow();
             Ok(LuaBlackboard {
@@ -231,6 +257,10 @@ impl LuaUserData for LuaAIWorld {
             })
         });
 
+        /// Advances the simulation by `dt` seconds.
+        ///
+        /// # Parameters
+        /// - `dt` — `number`.
         methods.add_method("update", |_, this, dt: f32| {
             let mut w = this.inner.borrow_mut();
             for agent in &mut w.agents {
@@ -246,8 +276,21 @@ impl LuaUserData for LuaAgent {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
         add_type_methods::<Self>(methods);
 
+        /// Returns the name.
+        ///
+        /// # Parameters
+        /// - `x` — `number`.
+        /// - `y` — `number`.
+        ///
+        /// # Returns
+        /// The current name.
         methods.add_method("getName", |_, this, ()| Ok(this.name.clone()));
 
+        /// Sets the position.
+        ///
+        /// # Parameters
+        /// - `x` — `number`.
+        /// - `y` — `number`.
         methods.add_method("setPosition", |_, this, (x, y): (f32, f32)| {
             let mut w = this.world.borrow_mut();
             if let Some(idx) = w.get_agent_index(&this.name) {
@@ -256,6 +299,10 @@ impl LuaUserData for LuaAgent {
             Ok(())
         });
 
+        /// Returns the position.
+        ///
+        /// # Returns
+        /// The current position.
         methods.add_method("getPosition", |_, this, ()| {
             let w = this.world.borrow();
             if let Some(idx) = w.get_agent_index(&this.name) {
@@ -265,6 +312,11 @@ impl LuaUserData for LuaAgent {
             }
         });
 
+        /// Sets the velocity.
+        ///
+        /// # Parameters
+        /// - `x` — `number`.
+        /// - `y` — `number`.
         methods.add_method("setVelocity", |_, this, (x, y): (f32, f32)| {
             let mut w = this.world.borrow_mut();
             if let Some(idx) = w.get_agent_index(&this.name) {
@@ -273,6 +325,10 @@ impl LuaUserData for LuaAgent {
             Ok(())
         });
 
+        /// Returns the velocity.
+        ///
+        /// # Returns
+        /// The current velocity.
         methods.add_method("getVelocity", |_, this, ()| {
             let w = this.world.borrow();
             if let Some(idx) = w.get_agent_index(&this.name) {
@@ -282,6 +338,10 @@ impl LuaUserData for LuaAgent {
             }
         });
 
+        /// Sets the max speed.
+        ///
+        /// # Parameters
+        /// - `v` — `number`.
         methods.add_method("setMaxSpeed", |_, this, v: f32| {
             let mut w = this.world.borrow_mut();
             if let Some(idx) = w.get_agent_index(&this.name) {
@@ -290,6 +350,10 @@ impl LuaUserData for LuaAgent {
             Ok(())
         });
 
+        /// Returns the max speed.
+        ///
+        /// # Returns
+        /// The current max speed.
         methods.add_method("getMaxSpeed", |_, this, ()| {
             let w = this.world.borrow();
             if let Some(idx) = w.get_agent_index(&this.name) {
@@ -299,6 +363,10 @@ impl LuaUserData for LuaAgent {
             }
         });
 
+        /// Sets the max force.
+        ///
+        /// # Parameters
+        /// - `v` — `number`.
         methods.add_method("setMaxForce", |_, this, v: f32| {
             let mut w = this.world.borrow_mut();
             if let Some(idx) = w.get_agent_index(&this.name) {
@@ -307,6 +375,10 @@ impl LuaUserData for LuaAgent {
             Ok(())
         });
 
+        /// Returns the max force.
+        ///
+        /// # Returns
+        /// The current max force.
         methods.add_method("getMaxForce", |_, this, ()| {
             let w = this.world.borrow();
             if let Some(idx) = w.get_agent_index(&this.name) {
@@ -316,6 +388,10 @@ impl LuaUserData for LuaAgent {
             }
         });
 
+        /// Sets the priority.
+        ///
+        /// # Parameters
+        /// - `p` — `integer`.
         methods.add_method("setPriority", |_, this, p: i32| {
             let mut w = this.world.borrow_mut();
             if let Some(idx) = w.get_agent_index(&this.name) {
@@ -324,6 +400,10 @@ impl LuaUserData for LuaAgent {
             Ok(())
         });
 
+        /// Returns the priority.
+        ///
+        /// # Returns
+        /// The current priority.
         methods.add_method("getPriority", |_, this, ()| {
             let w = this.world.borrow();
             if let Some(idx) = w.get_agent_index(&this.name) {
@@ -333,6 +413,10 @@ impl LuaUserData for LuaAgent {
             }
         });
 
+        /// Sets the decision model.
+        ///
+        /// # Parameters
+        /// - `model` — `string`.
         methods.add_method("setDecisionModel", |_, this, model: String| {
             let mut w = this.world.borrow_mut();
             if let Some(idx) = w.get_agent_index(&this.name) {
@@ -343,6 +427,10 @@ impl LuaUserData for LuaAgent {
             Ok(())
         });
 
+        /// Returns the decision model.
+        ///
+        /// # Returns
+        /// The current decision model.
         methods.add_method("getDecisionModel", |_, this, ()| {
             let w = this.world.borrow();
             if let Some(idx) = w.get_agent_index(&this.name) {
@@ -352,6 +440,10 @@ impl LuaUserData for LuaAgent {
             }
         });
 
+        /// Adds tag to the collection.
+        ///
+        /// # Parameters
+        /// - `tag` — `string`.
         methods.add_method("addTag", |_, this, tag: String| {
             let mut w = this.world.borrow_mut();
             if let Some(idx) = w.get_agent_index(&this.name) {
@@ -360,6 +452,10 @@ impl LuaUserData for LuaAgent {
             Ok(())
         });
 
+        /// Removes tag from the collection.
+        ///
+        /// # Parameters
+        /// - `tag` — `string`.
         methods.add_method("removeTag", |_, this, tag: String| {
             let mut w = this.world.borrow_mut();
             if let Some(idx) = w.get_agent_index(&this.name) {
@@ -368,6 +464,13 @@ impl LuaUserData for LuaAgent {
             Ok(())
         });
 
+        /// Returns `true` if tag.
+        ///
+        /// # Parameters
+        /// - `tag` — `string`.
+        ///
+        /// # Returns
+        /// `boolean`.
         methods.add_method("hasTag", |_, this, tag: String| {
             let w = this.world.borrow();
             if let Some(idx) = w.get_agent_index(&this.name) {
@@ -377,6 +480,10 @@ impl LuaUserData for LuaAgent {
             }
         });
 
+        /// Returns the blackboard.
+        ///
+        /// # Returns
+        /// The current blackboard.
         methods.add_method("getBlackboard", |_, this, ()| {
             let w = this.world.borrow();
             if let Some(idx) = w.get_agent_index(&this.name) {
@@ -396,6 +503,11 @@ impl LuaUserData for LuaBlackboard {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
         add_type_methods::<Self>(methods);
 
+        /// Sets the number.
+        ///
+        /// # Parameters
+        /// - `key` — `string`.
+        /// - `value` — `number`.
         methods.add_method("setNumber", |_, this, (key, value): (String, f64)| {
             this.inner.borrow_mut().set_number(&key, value);
             Ok(())
@@ -408,6 +520,11 @@ impl LuaUserData for LuaBlackboard {
             },
         );
 
+        /// Sets the bool.
+        ///
+        /// # Parameters
+        /// - `key` — `string`.
+        /// - `value` — `boolean`.
         methods.add_method("setBool", |_, this, (key, value): (String, bool)| {
             this.inner.borrow_mut().set_bool(&key, value);
             Ok(())
@@ -420,6 +537,11 @@ impl LuaUserData for LuaBlackboard {
             },
         );
 
+        /// Sets the string.
+        ///
+        /// # Parameters
+        /// - `key` — `string`.
+        /// - `value` — `string`.
         methods.add_method("setString", |_, this, (key, value): (String, String)| {
             this.inner.borrow_mut().set_string(&key, &value);
             Ok(())
@@ -433,20 +555,39 @@ impl LuaUserData for LuaBlackboard {
             },
         );
 
+        /// Returns `true` if the condition is met.
+        ///
+        /// # Parameters
+        /// - `key` — `string`.
+        ///
+        /// # Returns
+        /// `boolean`.
         methods.add_method("has", |_, this, key: String| {
             Ok(this.inner.borrow().has(&key))
         });
 
+        /// Removes the entry from the collection.
+        ///
+        /// # Parameters
+        /// - `key` — `string`.
         methods.add_method("remove", |_, this, key: String| {
             this.inner.borrow_mut().remove(&key);
             Ok(())
         });
 
+        /// Removes all entries.
+        ///
+        /// # Returns
+        /// The result.
         methods.add_method("clear", |_, this, ()| {
             this.inner.borrow_mut().clear();
             Ok(())
         });
 
+        /// Returns the keys.
+        ///
+        /// # Returns
+        /// The current keys.
         methods.add_method("getKeys", |lua, this, ()| {
             let keys = this.inner.borrow().keys();
             let tbl = lua.create_table()?;
@@ -456,6 +597,10 @@ impl LuaUserData for LuaBlackboard {
             Ok(tbl)
         });
 
+        /// Returns the size.
+        ///
+        /// # Returns
+        /// The current size.
         methods.add_method("getSize", |_, this, ()| Ok(this.inner.borrow().size()));
     }
 }
@@ -464,6 +609,11 @@ impl LuaUserData for LuaStateMachine {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
         add_type_methods::<Self>(methods);
 
+        /// Adds state to the collection.
+        ///
+        /// # Parameters
+        /// - `name` — `string`.
+        /// - `opts` — `table`.
         methods.add_method("addState", |lua, this, (name, opts): (String, LuaTable)| {
             let on_enter: Option<LuaFunction> = opts.get("onEnter").ok();
             let on_update: Option<LuaFunction> = opts.get("onUpdate").ok();
@@ -504,6 +654,10 @@ impl LuaUserData for LuaStateMachine {
             },
         );
 
+        /// Sets the initial state.
+        ///
+        /// # Parameters
+        /// - `name` — `string`.
         methods.add_method("setInitialState", |_, this, name: String| {
             let mut fsm = this.inner.borrow_mut();
             fsm.initial_state = Some(name.clone());
@@ -513,10 +667,21 @@ impl LuaUserData for LuaStateMachine {
             Ok(())
         });
 
+        /// Returns the current state.
+        ///
+        /// # Parameters
+        /// - `name` — `string`.
+        ///
+        /// # Returns
+        /// The current current state.
         methods.add_method("getCurrentState", |_, this, ()| {
             Ok(this.inner.borrow().current_state().map(|s| s.to_string()))
         });
 
+        /// Force state on this StateMachine.
+        ///
+        /// # Parameters
+        /// - `name` — `string`.
         methods.add_method("forceState", |_, this, name: String| {
             let mut fsm = this.inner.borrow_mut();
             fsm.current_state = Some(name);
@@ -524,6 +689,10 @@ impl LuaUserData for LuaStateMachine {
             Ok(())
         });
 
+        /// Returns the time in state.
+        ///
+        /// # Returns
+        /// The current time in state.
         methods.add_method("getTimeInState", |_, this, ()| {
             Ok(this.inner.borrow().time_in_state())
         });
@@ -534,6 +703,10 @@ impl LuaUserData for LuaBehaviorTree {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
         add_type_methods::<Self>(methods);
 
+        /// Sets the root.
+        ///
+        /// # Parameters
+        /// - `node_ud` — `userdata`.
         methods.add_method("setRoot", |_, this, node_ud: LuaAnyUserData| {
             let node = node_ud.borrow::<LuaBTNode>()?;
             let taken = std::mem::replace(
@@ -547,6 +720,10 @@ impl LuaUserData for LuaBehaviorTree {
             Ok(())
         });
 
+        /// Returns the last status.
+        ///
+        /// # Returns
+        /// The current last status.
         methods.add_method("getLastStatus", |_, this, ()| {
             Ok(this.inner.borrow().last_status.as_str().to_string())
         });
@@ -557,6 +734,10 @@ impl LuaUserData for LuaBTNode {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
         add_type_methods::<Self>(methods);
 
+        /// Adds child to the collection.
+        ///
+        /// # Parameters
+        /// - `child_ud` — `userdata`.
         methods.add_method("addChild", |_, this, child_ud: LuaAnyUserData| {
             let child = child_ud.borrow::<LuaBTNode>()?;
             let taken = std::mem::replace(
@@ -583,6 +764,10 @@ impl LuaUserData for LuaBTNode {
             Ok(())
         });
 
+        /// Returns the child count.
+        ///
+        /// # Returns
+        /// The current child count.
         methods.add_method("getChildCount", |_, this, ()| {
             let node = this.inner.borrow();
             let count = match &*node {
@@ -594,11 +779,19 @@ impl LuaUserData for LuaBTNode {
             Ok(count)
         });
 
+        /// Resets state to initial values.
+        ///
+        /// # Parameters
+        /// - `child_ud` — `userdata`.
         methods.add_method("reset", |_, this, ()| {
             this.inner.borrow_mut().reset();
             Ok(())
         });
 
+        /// Sets the child.
+        ///
+        /// # Parameters
+        /// - `child_ud` — `userdata`.
         methods.add_method("setChild", |_, this, child_ud: LuaAnyUserData| {
             let child = child_ud.borrow::<LuaBTNode>()?;
             let taken = std::mem::replace(
@@ -629,6 +822,10 @@ impl LuaUserData for LuaBTNode {
             Ok(())
         });
 
+        /// Sets the count.
+        ///
+        /// # Parameters
+        /// - `n` — `integer`.
         methods.add_method("setCount", |_, this, n: u32| {
             let mut node = this.inner.borrow_mut();
             if let BTNode::Repeater { count, .. } = &mut *node {
@@ -637,6 +834,10 @@ impl LuaUserData for LuaBTNode {
             Ok(())
         });
 
+        /// Returns the count.
+        ///
+        /// # Returns
+        /// The current count.
         methods.add_method("getCount", |_, this, ()| {
             let node = this.inner.borrow();
             if let BTNode::Repeater { count, .. } = &*node {
@@ -646,6 +847,10 @@ impl LuaUserData for LuaBTNode {
             }
         });
 
+        /// Sets the success policy.
+        ///
+        /// # Parameters
+        /// - `policy` — `string`.
         methods.add_method("setSuccessPolicy", |_, this, policy: String| {
             let mut node = this.inner.borrow_mut();
             if let BTNode::Parallel { success_policy, .. } = &mut *node {
@@ -654,6 +859,10 @@ impl LuaUserData for LuaBTNode {
             Ok(())
         });
 
+        /// Sets the failure policy.
+        ///
+        /// # Parameters
+        /// - `policy` — `string`.
         methods.add_method("setFailurePolicy", |_, this, policy: String| {
             let mut node = this.inner.borrow_mut();
             if let BTNode::Parallel { failure_policy, .. } = &mut *node {
@@ -662,6 +871,10 @@ impl LuaUserData for LuaBTNode {
             Ok(())
         });
 
+        /// Returns the node type.
+        ///
+        /// # Returns
+        /// The current node type.
         methods.add_method("getNodeType", |_, this, ()| {
             let node = this.inner.borrow();
             let name = match &*node {
@@ -827,19 +1040,38 @@ impl LuaUserData for LuaSteeringManager {
             },
         );
 
+        /// Returns the behavior count.
+        ///
+        /// # Parameters
+        /// - `mode` — `string`.
+        ///
+        /// # Returns
+        /// The current behavior count.
         methods.add_method("getBehaviorCount", |_, this, ()| {
             Ok(this.inner.borrow().behaviors.len())
         });
 
+        /// Sets the combine mode.
+        ///
+        /// # Parameters
+        /// - `mode` — `string`.
         methods.add_method("setCombineMode", |_, this, mode: String| {
             this.inner.borrow_mut().combine_mode = CombineMode::parse_str(&mode);
             Ok(())
         });
 
+        /// Returns the combine mode.
+        ///
+        /// # Returns
+        /// The current combine mode.
         methods.add_method("getCombineMode", |_, this, ()| {
             Ok(this.inner.borrow().combine_mode.as_str().to_string())
         });
 
+        /// Returns the last steering.
+        ///
+        /// # Returns
+        /// The current last steering.
         methods.add_method("getLastSteering", |_, this, ()| {
             Ok(this.inner.borrow().last_force)
         });
@@ -866,8 +1098,30 @@ impl LuaUserData for LuaPathGrid {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
         add_type_methods::<Self>(methods);
 
+        /// Returns the width.
+        ///
+        /// # Returns
+        /// The current width.
         methods.add_method("getWidth", |_, this, ()| Ok(this.inner.borrow().width));
+        /// Returns the height.
+        ///
+        /// # Parameters
+        /// - `x` — `integer`.
+        /// - `y` — `integer`.
+        /// - `walkable` — `boolean`.
+        ///
+        /// # Returns
+        /// The current height.
         methods.add_method("getHeight", |_, this, ()| Ok(this.inner.borrow().height));
+        /// Returns the cell size.
+        ///
+        /// # Parameters
+        /// - `x` — `integer`.
+        /// - `y` — `integer`.
+        /// - `walkable` — `boolean`.
+        ///
+        /// # Returns
+        /// The current cell size.
         methods.add_method("getCellSize", |_, this, ()| {
             Ok(this.inner.borrow().cell_size)
         });
@@ -882,12 +1136,26 @@ impl LuaUserData for LuaPathGrid {
             },
         );
 
+        /// Returns `true` if walkable.
+        ///
+        /// # Parameters
+        /// - `x` — `integer`.
+        /// - `y` — `integer`.
+        ///
+        /// # Returns
+        /// `boolean`.
         methods.add_method("isWalkable", |_, this, (x, y): (usize, usize)| {
             let lx = x.saturating_sub(1);
             let ly = y.saturating_sub(1);
             Ok(this.inner.borrow().is_walkable(lx, ly))
         });
 
+        /// Sets the cost.
+        ///
+        /// # Parameters
+        /// - `x` — `integer`.
+        /// - `y` — `integer`.
+        /// - `cost` — `number`.
         methods.add_method("setCost", |_, this, (x, y, cost): (usize, usize, f32)| {
             let lx = x.saturating_sub(1);
             let ly = y.saturating_sub(1);
@@ -895,6 +1163,14 @@ impl LuaUserData for LuaPathGrid {
             Ok(())
         });
 
+        /// Returns the cost.
+        ///
+        /// # Parameters
+        /// - `x` — `integer`.
+        /// - `y` — `integer`.
+        ///
+        /// # Returns
+        /// The current cost.
         methods.add_method("getCost", |_, this, (x, y): (usize, usize)| {
             let lx = x.saturating_sub(1);
             let ly = y.saturating_sub(1);
@@ -914,7 +1190,15 @@ impl LuaUserData for LuaPathGrid {
                         let tbl = lua.create_table()?;
                         for (i, (wx, wy)) in path.iter().enumerate() {
                             let pt = lua.create_table()?;
+                            /// X on this PathGrid.
+                            ///
+                            /// # Returns
+                            /// The result.
                             pt.set("x", *wx)?;
+                            /// Y on this PathGrid.
+                            ///
+                            /// # Returns
+                            /// The result.
                             pt.set("y", *wy)?;
                             tbl.set(i as i64 + 1, pt)?;
                         }
@@ -938,7 +1222,15 @@ impl LuaUserData for LuaPathGrid {
                         let tbl = lua.create_table()?;
                         for (i, (wx, wy)) in path.iter().enumerate() {
                             let pt = lua.create_table()?;
+                            /// X on this PathGrid.
+                            ///
+                            /// # Returns
+                            /// The result.
                             pt.set("x", *wx)?;
+                            /// Y on this PathGrid.
+                            ///
+                            /// # Returns
+                            /// The result.
                             pt.set("y", *wy)?;
                             tbl.set(i as i64 + 1, pt)?;
                         }
@@ -955,6 +1247,11 @@ impl LuaUserData for LuaFlowField {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
         add_type_methods::<Self>(methods);
 
+        /// Sets the goal.
+        ///
+        /// # Parameters
+        /// - `x` — `integer`.
+        /// - `y` — `integer`.
         methods.add_method("setGoal", |_, this, (x, y): (usize, usize)| {
             let lx = x.saturating_sub(1);
             let ly = y.saturating_sub(1);
@@ -962,25 +1259,57 @@ impl LuaUserData for LuaFlowField {
             Ok(())
         });
 
+        /// Returns the direction.
+        ///
+        /// # Parameters
+        /// - `x` — `integer`.
+        /// - `y` — `integer`.
+        ///
+        /// # Returns
+        /// The current direction.
         methods.add_method("getDirection", |_, this, (x, y): (usize, usize)| {
             let lx = x.saturating_sub(1);
             let ly = y.saturating_sub(1);
             Ok(this.inner.borrow().get_direction(lx, ly))
         });
 
+        /// Returns the distance.
+        ///
+        /// # Parameters
+        /// - `x` — `integer`.
+        /// - `y` — `integer`.
+        ///
+        /// # Returns
+        /// The current distance.
         methods.add_method("getDistance", |_, this, (x, y): (usize, usize)| {
             let lx = x.saturating_sub(1);
             let ly = y.saturating_sub(1);
             Ok(this.inner.borrow().get_distance(lx, ly))
         });
 
+        /// Returns the width.
+        ///
+        /// # Returns
+        /// The current width.
         methods.add_method("getWidth", |_, this, ()| Ok(this.inner.borrow().width));
+        /// Returns the height.
+        ///
+        /// # Returns
+        /// The current height.
         methods.add_method("getHeight", |_, this, ()| Ok(this.inner.borrow().height));
 
+        /// Returns `true` if goal.
+        ///
+        /// # Returns
+        /// `boolean`.
         methods.add_method("hasGoal", |_, this, ()| {
             Ok(this.inner.borrow().goal.is_some())
         });
 
+        /// Returns the goal.
+        ///
+        /// # Returns
+        /// The current goal.
         methods.add_method("getGoal", |_, this, ()| match this.inner.borrow().goal {
             Some((gx, gy)) => Ok((
                 LuaValue::Integer((gx + 1) as i64),
@@ -995,16 +1324,34 @@ impl LuaUserData for LuaQLearner {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
         add_type_methods::<Self>(methods);
 
+        /// Choose action on this QLearner.
+        ///
+        /// # Parameters
+        /// - `state` — `integer`.
         methods.add_method("chooseAction", |_, this, state: usize| {
             let s = state.saturating_sub(1);
             Ok(this.inner.borrow().choose_action(s) + 1)
         });
 
+        /// Best action on this QLearner.
+        ///
+        /// # Parameters
+        /// - `state` — `integer`.
         methods.add_method("bestAction", |_, this, state: usize| {
             let s = state.saturating_sub(1);
             Ok(this.inner.borrow().best_action(s) + 1)
         });
 
+        /// Returns the best action.
+        ///
+        /// # Parameters
+        /// - `state` — `integer`.
+        /// - `action` — `integer`.
+        /// - `reward` — `number`.
+        /// - `next_state` — `integer`.
+        ///
+        /// # Returns
+        /// The current best action.
         methods.add_method("getBestAction", |_, this, state: usize| {
             let s = state.saturating_sub(1);
             Ok(this.inner.borrow().best_action(s) + 1)
@@ -1021,6 +1368,14 @@ impl LuaUserData for LuaQLearner {
             },
         );
 
+        /// Returns the q value.
+        ///
+        /// # Parameters
+        /// - `state` — `integer`.
+        /// - `action` — `integer`.
+        ///
+        /// # Returns
+        /// The current q value.
         methods.add_method("getQValue", |_, this, (state, action): (usize, usize)| {
             let s = state.saturating_sub(1);
             let a = action.saturating_sub(1);
@@ -1037,63 +1392,131 @@ impl LuaUserData for LuaQLearner {
             },
         );
 
+        /// End episode on this QLearner.
+        ///
+        /// # Returns
+        /// The result.
         methods.add_method("endEpisode", |_, this, ()| {
             this.inner.borrow_mut().end_episode();
             Ok(())
         });
 
+        /// Returns the episode count.
+        ///
+        /// # Returns
+        /// The current episode count.
         methods.add_method("getEpisodeCount", |_, this, ()| {
             Ok(this.inner.borrow().episode_count)
         });
 
+        /// Returns the state count.
+        ///
+        /// # Returns
+        /// The current state count.
         methods.add_method("getStateCount", |_, this, ()| {
             Ok(this.inner.borrow().state_count)
         });
 
+        /// Returns the action count.
+        ///
+        /// # Parameters
+        /// - `v` — `number`.
+        ///
+        /// # Returns
+        /// The current action count.
         methods.add_method("getActionCount", |_, this, ()| {
             Ok(this.inner.borrow().action_count)
         });
 
+        /// Sets the learning rate.
+        ///
+        /// # Parameters
+        /// - `v` — `number`.
         methods.add_method("setLearningRate", |_, this, v: f64| {
             this.inner.borrow_mut().alpha = v;
             Ok(())
         });
 
+        /// Returns the learning rate.
+        ///
+        /// # Parameters
+        /// - `v` — `number`.
+        ///
+        /// # Returns
+        /// The current learning rate.
         methods.add_method("getLearningRate", |_, this, ()| {
             Ok(this.inner.borrow().alpha)
         });
 
+        /// Sets the discount factor.
+        ///
+        /// # Parameters
+        /// - `v` — `number`.
         methods.add_method("setDiscountFactor", |_, this, v: f64| {
             this.inner.borrow_mut().gamma = v;
             Ok(())
         });
 
+        /// Returns the discount factor.
+        ///
+        /// # Parameters
+        /// - `v` — `number`.
+        ///
+        /// # Returns
+        /// The current discount factor.
         methods.add_method("getDiscountFactor", |_, this, ()| {
             Ok(this.inner.borrow().gamma)
         });
 
+        /// Sets the exploration rate.
+        ///
+        /// # Parameters
+        /// - `v` — `number`.
         methods.add_method("setExplorationRate", |_, this, v: f64| {
             this.inner.borrow_mut().epsilon = v;
             Ok(())
         });
 
+        /// Returns the exploration rate.
+        ///
+        /// # Parameters
+        /// - `v` — `number`.
+        ///
+        /// # Returns
+        /// The current exploration rate.
         methods.add_method("getExplorationRate", |_, this, ()| {
             Ok(this.inner.borrow().epsilon)
         });
 
+        /// Sets the exploration decay.
+        ///
+        /// # Parameters
+        /// - `v` — `number`.
         methods.add_method("setExplorationDecay", |_, this, v: f64| {
             this.inner.borrow_mut().epsilon_decay = v;
             Ok(())
         });
 
+        /// Returns the exploration decay.
+        ///
+        /// # Returns
+        /// The current exploration decay.
         methods.add_method("getExplorationDecay", |_, this, ()| {
             Ok(this.inner.borrow().epsilon_decay)
         });
 
+        /// Serializes this object to a string representation.
+        ///
+        /// # Parameters
+        /// - `json` — `string`.
         methods.add_method("serialize", |_, this, ()| {
             Ok(this.inner.borrow().serialize())
         });
 
+        /// Populates this object from a serialized string.
+        ///
+        /// # Parameters
+        /// - `json` — `string`.
         methods.add_method("deserialize", |_, this, json: String| {
             this.inner
                 .borrow_mut()
@@ -1122,6 +1545,10 @@ impl LuaUserData for LuaUtilityAI {
             },
         );
 
+        /// Evaluates all conditions and returns a decision.
+        ///
+        /// # Returns
+        /// The result.
         methods.add_method("evaluate", |lua, this, ()| {
             let mut ai = this.inner.borrow_mut();
             if ai.actions.is_empty() {
@@ -1147,10 +1574,18 @@ impl LuaUserData for LuaUtilityAI {
             ))
         });
 
+        /// Returns the action count.
+        ///
+        /// # Returns
+        /// The current action count.
         methods.add_method("getActionCount", |_, this, ()| {
             Ok(this.inner.borrow().actions.len())
         });
 
+        /// Returns the last action.
+        ///
+        /// # Returns
+        /// The current last action.
         methods.add_method("getLastAction", |_, this, ()| {
             let ai = this.inner.borrow();
             Ok(ai.last_action.map(|i| ai.actions[i].name.clone()))
@@ -1240,10 +1675,18 @@ impl LuaUserData for LuaGOAPPlanner {
             },
         );
 
+        /// Returns the action count.
+        ///
+        /// # Returns
+        /// The current action count.
         methods.add_method("getActionCount", |_, this, ()| {
             Ok(this.inner.borrow().actions.len())
         });
 
+        /// Returns the goal count.
+        ///
+        /// # Returns
+        /// The current goal count.
         methods.add_method("getGoalCount", |_, this, ()| {
             Ok(this.inner.borrow().goals.len())
         });
@@ -1254,11 +1697,25 @@ impl LuaUserData for LuaInfluenceMap {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
         add_type_methods::<Self>(methods);
 
+        /// Adds layer to the collection.
+        ///
+        /// # Parameters
+        /// - `name` — `string`.
         methods.add_method("addLayer", |_, this, name: String| {
             this.inner.borrow_mut().add_layer(&name);
             Ok(())
         });
 
+        /// Returns `true` if layer.
+        ///
+        /// # Parameters
+        /// - `layer` — `string`.
+        /// - `x` — `integer`.
+        /// - `y` — `integer`.
+        /// - `value` — `number`.
+        ///
+        /// # Returns
+        /// `boolean`.
         methods.add_method("hasLayer", |_, this, name: String| {
             Ok(this.inner.borrow().has_layer(&name))
         });
@@ -1316,25 +1773,56 @@ impl LuaUserData for LuaInfluenceMap {
             },
         );
 
+        /// Decay on this InfluenceMap.
+        ///
+        /// # Parameters
+        /// - `layer` — `string`.
+        /// - `factor` — `number`.
         methods.add_method("decay", |_, this, (layer, factor): (String, f32)| {
             this.inner.borrow_mut().decay(&layer, factor);
             Ok(())
         });
 
+        /// Clear layer on this InfluenceMap.
+        ///
+        /// # Parameters
+        /// - `layer` — `string`.
         methods.add_method("clearLayer", |_, this, layer: String| {
             this.inner.borrow_mut().clear_layer(&layer);
             Ok(())
         });
 
+        /// Clear all on this InfluenceMap.
+        ///
+        /// # Parameters
+        /// - `layer` — `string`.
         methods.add_method("clearAll", |_, this, ()| {
             this.inner.borrow_mut().clear_all();
             Ok(())
         });
 
+        /// Returns the max position.
+        ///
+        /// # Parameters
+        /// - `layer` — `string`.
+        ///
+        /// # Returns
+        /// The current max position.
         methods.add_method("getMaxPosition", |_, this, layer: String| {
             Ok(this.inner.borrow().max_position(&layer))
         });
 
+        /// Returns the min position.
+        ///
+        /// # Parameters
+        /// - `layer` — `string`.
+        /// - `wx` — `number`.
+        /// - `wy` — `number`.
+        /// - `ww` — `number`.
+        /// - `wh` — `number`.
+        ///
+        /// # Returns
+        /// The current min position.
         methods.add_method("getMinPosition", |_, this, layer: String| {
             Ok(this.inner.borrow().min_position(&layer))
         });
@@ -1364,8 +1852,20 @@ impl LuaUserData for LuaInfluenceMap {
             },
         );
 
+        /// Returns the width.
+        ///
+        /// # Returns
+        /// The current width.
         methods.add_method("getWidth", |_, this, ()| Ok(this.inner.borrow().width));
+        /// Returns the height.
+        ///
+        /// # Returns
+        /// The current height.
         methods.add_method("getHeight", |_, this, ()| Ok(this.inner.borrow().height));
+        /// Returns the cell size.
+        ///
+        /// # Returns
+        /// The current cell size.
         methods.add_method("getCellSize", |_, this, ()| {
             Ok(this.inner.borrow().cell_size)
         });
@@ -1376,24 +1876,47 @@ impl LuaUserData for LuaSquad {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
         add_type_methods::<Self>(methods);
 
+        /// Returns the name.
+        ///
+        /// # Parameters
+        /// - `name` — `string`.
+        ///
+        /// # Returns
+        /// The current name.
         methods.add_method("getName", |_, this, ()| {
             Ok(this.inner.borrow().name.clone())
         });
 
+        /// Adds member to the collection.
+        ///
+        /// # Parameters
+        /// - `name` — `string`.
         methods.add_method("addMember", |_, this, name: String| {
             this.inner.borrow_mut().members.push(name);
             Ok(())
         });
 
+        /// Removes member from the collection.
+        ///
+        /// # Parameters
+        /// - `name` — `string`.
         methods.add_method("removeMember", |_, this, name: String| {
             this.inner.borrow_mut().members.retain(|m| m != &name);
             Ok(())
         });
 
+        /// Returns the member count.
+        ///
+        /// # Returns
+        /// The current member count.
         methods.add_method("getMemberCount", |_, this, ()| {
             Ok(this.inner.borrow().members.len())
         });
 
+        /// Returns the members.
+        ///
+        /// # Returns
+        /// The current members.
         methods.add_method("getMembers", |lua, this, ()| {
             let sq = this.inner.borrow();
             let tbl = lua.create_table()?;
@@ -1403,11 +1926,23 @@ impl LuaUserData for LuaSquad {
             Ok(tbl)
         });
 
+        /// Sets the leader.
+        ///
+        /// # Parameters
+        /// - `name` — `string`.
         methods.add_method("setLeader", |_, this, name: String| {
             this.inner.borrow_mut().leader = Some(name);
             Ok(())
         });
 
+        /// Returns the leader.
+        ///
+        /// # Parameters
+        /// - `ftype` — `string`.
+        /// - `spacing` — `number` optional.
+        ///
+        /// # Returns
+        /// The current leader.
         methods.add_method("getLeader", |_, this, ()| {
             Ok(this.inner.borrow().leader.clone())
         });
@@ -1424,10 +1959,23 @@ impl LuaUserData for LuaSquad {
             },
         );
 
+        /// Returns the formation.
+        ///
+        /// # Returns
+        /// The current formation.
         methods.add_method("getFormation", |_, this, ()| {
             Ok(this.inner.borrow().formation.as_str().to_string())
         });
 
+        /// Returns the formation spacing.
+        ///
+        /// # Parameters
+        /// - `member_idx` — `integer`.
+        /// - `leader_x` — `number`.
+        /// - `leader_y` — `number`.
+        ///
+        /// # Returns
+        /// The current formation spacing.
         methods.add_method("getFormationSpacing", |_, this, ()| {
             Ok(this.inner.borrow().formation_spacing)
         });
@@ -1443,6 +1991,10 @@ impl LuaUserData for LuaSquad {
             },
         );
 
+        /// Returns the blackboard.
+        ///
+        /// # Returns
+        /// The current blackboard.
         methods.add_method("getBlackboard", |_, this, ()| {
             let sq = this.inner.borrow();
             Ok(LuaBlackboard {
@@ -1507,23 +2059,47 @@ impl LuaUserData for LuaCommandQueue {
             },
         );
 
+        /// Cancel current on this CommandQueue.
+        ///
+        /// # Returns
+        /// The result.
         methods.add_method("cancelCurrent", |_, this, ()| {
             Ok(this.inner.borrow_mut().cancel_current())
         });
 
+        /// Removes all entries.
+        ///
+        /// # Returns
+        /// The result.
         methods.add_method("clear", |_, this, ()| {
             this.inner.borrow_mut().clear();
             Ok(())
         });
 
+        /// Returns the count.
+        ///
+        /// # Returns
+        /// The current count.
         methods.add_method("getCount", |_, this, ()| Ok(this.inner.borrow().count()));
 
+        /// Returns `true` if empty.
+        ///
+        /// # Returns
+        /// `boolean`.
         methods.add_method("isEmpty", |_, this, ()| Ok(this.inner.borrow().is_empty()));
 
+        /// Returns the current type.
+        ///
+        /// # Returns
+        /// The current current type.
         methods.add_method("getCurrentType", |_, this, ()| {
             Ok(this.inner.borrow().current_type().map(|s| s.to_string()))
         });
 
+        /// Returns the current target.
+        ///
+        /// # Returns
+        /// The current current target.
         methods.add_method("getCurrentTarget", |_, this, ()| {
             Ok(this.inner.borrow().current_target())
         });
@@ -1833,6 +2409,10 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
         })?,
     )?;
 
+    /// Ai on this CommandQueue.
+    ///
+    /// # Returns
+    /// The result.
     luna.set("ai", ai)?;
     Ok(())
 }

@@ -78,10 +78,22 @@ impl LuaUserData for LuaDataFrame {
 
         // -- Schema ----------------------------------------------------------
 
+        /// Nrows on this DataFrame.
+        ///
+        /// # Returns
+        /// The result.
         methods.add_method("nrows", |_, this, ()| Ok(this.inner.borrow().nrows()));
 
+        /// Ncols on this DataFrame.
+        ///
+        /// # Returns
+        /// The result.
         methods.add_method("ncols", |_, this, ()| Ok(this.inner.borrow().ncols()));
 
+        /// Columns on this DataFrame.
+        ///
+        /// # Returns
+        /// The result.
         methods.add_method("columns", |lua, this, ()| {
             let df = this.inner.borrow();
             let tbl = lua.create_table()?;
@@ -91,6 +103,14 @@ impl LuaUserData for LuaDataFrame {
             Ok(tbl)
         });
 
+        /// Returns the number of items.
+        ///
+        /// # Parameters
+        /// - `name` — `string`.
+        /// - `default` — `any` optional.
+        ///
+        /// # Returns
+        /// `integer`.
         methods.add_method("count", |_, this, ()| Ok(this.inner.borrow().count()));
 
         // -- Column operations -----------------------------------------------
@@ -106,6 +126,10 @@ impl LuaUserData for LuaDataFrame {
             },
         );
 
+        /// Removes column from the collection.
+        ///
+        /// # Parameters
+        /// - `col` — `any`.
         methods.add_method("removeColumn", |_, this, col: LuaValue| {
             let cr = lua_to_col_ref(col)?;
             this.inner
@@ -114,6 +138,11 @@ impl LuaUserData for LuaDataFrame {
                 .map_err(LuaError::RuntimeError)
         });
 
+        /// Rename on this DataFrame.
+        ///
+        /// # Parameters
+        /// - `col` — `any`.
+        /// - `new_name` — `string`.
         methods.add_method("rename", |_, this, (col, new_name): (LuaValue, String)| {
             let cr = lua_to_col_ref(col)?;
             this.inner
@@ -122,6 +151,13 @@ impl LuaUserData for LuaDataFrame {
                 .map_err(LuaError::RuntimeError)
         });
 
+        /// Returns the column.
+        ///
+        /// # Parameters
+        /// - `col` — `any`.
+        ///
+        /// # Returns
+        /// The current column.
         methods.add_method("getColumn", |lua, this, col: LuaValue| {
             let cr = lua_to_col_ref(col)?;
             let df = this.inner.borrow();
@@ -135,6 +171,10 @@ impl LuaUserData for LuaDataFrame {
 
         // -- Row operations (1-based Lua → 0-based Rust) ---------------------
 
+        /// Adds row to the collection.
+        ///
+        /// # Parameters
+        /// - `row_tbl` — `table` optional.
         methods.add_method("addRow", |_, this, row_tbl: Option<LuaTable>| {
             let mut df = this.inner.borrow_mut();
             let values: Vec<(String, CellValue)> = if let Some(tbl) = row_tbl {
@@ -151,6 +191,10 @@ impl LuaUserData for LuaDataFrame {
             Ok(row_0 + 1) // return 1-based
         });
 
+        /// Removes row from the collection.
+        ///
+        /// # Parameters
+        /// - `row` — `integer`.
         methods.add_method("removeRow", |_, this, row: usize| {
             if row == 0 {
                 return Err(LuaError::RuntimeError("row index must be >= 1".into()));
@@ -161,6 +205,13 @@ impl LuaUserData for LuaDataFrame {
                 .map_err(LuaError::RuntimeError)
         });
 
+        /// Returns the row.
+        ///
+        /// # Parameters
+        /// - `row` — `integer`.
+        ///
+        /// # Returns
+        /// The current row.
         methods.add_method("getRow", |lua, this, row: usize| {
             if row == 0 {
                 return Err(LuaError::RuntimeError("row index must be >= 1".into()));
@@ -176,6 +227,14 @@ impl LuaUserData for LuaDataFrame {
 
         // -- Cell access (1-based row) ---------------------------------------
 
+        /// Returns the value.
+        ///
+        /// # Parameters
+        /// - `row` — `integer`.
+        /// - `col` — `any`.
+        ///
+        /// # Returns
+        /// The current value.
         methods.add_method("getValue", |lua, this, (row, col): (usize, LuaValue)| {
             if row == 0 {
                 return Err(LuaError::RuntimeError("row index must be >= 1".into()));
@@ -225,16 +284,30 @@ impl LuaUserData for LuaDataFrame {
             },
         );
 
+        /// Head on this DataFrame.
+        ///
+        /// # Parameters
+        /// - `n` — `integer` optional.
         methods.add_method("head", |_, this, n: Option<usize>| {
             let df = this.inner.borrow();
             Ok(LuaDataFrame::new(df.head(n.unwrap_or(5))))
         });
 
+        /// Tail on this DataFrame.
+        ///
+        /// # Parameters
+        /// - `start` — `integer`.
+        /// - `end` — `integer`.
         methods.add_method("tail", |_, this, n: Option<usize>| {
             let df = this.inner.borrow();
             Ok(LuaDataFrame::new(df.tail(n.unwrap_or(5))))
         });
 
+        /// Slice on this DataFrame.
+        ///
+        /// # Parameters
+        /// - `start` — `integer`.
+        /// - `end` — `integer`.
         methods.add_method("slice", |_, this, (start, end): (usize, usize)| {
             // Lua 1-based inclusive → Rust 0-based inclusive
             if start == 0 || end == 0 {
@@ -247,6 +320,10 @@ impl LuaUserData for LuaDataFrame {
             Ok(LuaDataFrame::new(result))
         });
 
+        /// Returns filtered rows or items matching the query.
+        ///
+        /// # Parameters
+        /// - `cols` — `LuaMultiValue`.
         methods.add_method("select", |_, this, cols: LuaMultiValue| {
             let col_refs: Vec<ColRef> = cols
                 .into_iter()
@@ -259,6 +336,10 @@ impl LuaUserData for LuaDataFrame {
             Ok(LuaDataFrame::new(result))
         });
 
+        /// Unique on this DataFrame.
+        ///
+        /// # Parameters
+        /// - `col` — `any`.
         methods.add_method("unique", |lua, this, col: LuaValue| {
             let cr = lua_to_col_ref(col)?;
             let df = this.inner.borrow();
@@ -270,6 +351,10 @@ impl LuaUserData for LuaDataFrame {
             Ok(tbl)
         });
 
+        /// Group by on this DataFrame.
+        ///
+        /// # Parameters
+        /// - `col` — `any`.
         methods.add_method("groupBy", |lua, this, col: LuaValue| {
             let cr = lua_to_col_ref(col)?;
             let df = this.inner.borrow();
@@ -305,6 +390,10 @@ impl LuaUserData for LuaDataFrame {
             },
         );
 
+        /// Merge on this DataFrame.
+        ///
+        /// # Parameters
+        /// - `other` — `userdata`.
         methods.add_method("merge", |_, this, other: LuaAnyUserData| {
             let other_df = other.borrow::<LuaDataFrame>()?;
             let other_borrow = other_df.inner.borrow();
@@ -312,6 +401,13 @@ impl LuaUserData for LuaDataFrame {
             Ok(())
         });
 
+        /// Returns the number of by.
+        ///
+        /// # Parameters
+        /// - `col` — `any`.
+        ///
+        /// # Returns
+        /// `integer`.
         methods.add_method("countBy", |_, this, col: LuaValue| {
             let cr = lua_to_col_ref(col)?;
             let df = this.inner.borrow();
@@ -319,6 +415,11 @@ impl LuaUserData for LuaDataFrame {
             Ok(LuaDataFrame::new(result))
         });
 
+        /// Drop nil on this DataFrame.
+        ///
+        /// # Parameters
+        /// - `n` — `integer`.
+        /// - `seed` — `integer` optional.
         methods.add_method("dropNil", |_, this, col: LuaValue| {
             let cr = lua_to_col_ref(col)?;
             let df = this.inner.borrow();
@@ -326,11 +427,20 @@ impl LuaUserData for LuaDataFrame {
             Ok(LuaDataFrame::new(result))
         });
 
+        /// Sample on this DataFrame.
+        ///
+        /// # Parameters
+        /// - `n` — `integer`.
+        /// - `seed` — `integer` optional.
         methods.add_method("sample", |_, this, (n, seed): (usize, Option<u64>)| {
             let df = this.inner.borrow();
             Ok(LuaDataFrame::new(df.sample(n, seed)))
         });
 
+        /// Describe on this DataFrame.
+        ///
+        /// # Parameters
+        /// - `col` — `any`.
         methods.add_method("describe", |_, this, ()| {
             let df = this.inner.borrow();
             Ok(LuaDataFrame::new(df.describe()))
@@ -338,42 +448,70 @@ impl LuaUserData for LuaDataFrame {
 
         // -- Analytics (return scalar) ---------------------------------------
 
+        /// Sum on this DataFrame.
+        ///
+        /// # Parameters
+        /// - `col` — `any`.
         methods.add_method("sum", |_, this, col: LuaValue| {
             let cr = lua_to_col_ref(col)?;
             let df = this.inner.borrow();
             df.sum(cr).map_err(LuaError::RuntimeError)
         });
 
+        /// Mean on this DataFrame.
+        ///
+        /// # Parameters
+        /// - `col` — `any`.
         methods.add_method("mean", |_, this, col: LuaValue| {
             let cr = lua_to_col_ref(col)?;
             let df = this.inner.borrow();
             df.mean(cr).map_err(LuaError::RuntimeError)
         });
 
+        /// Min on this DataFrame.
+        ///
+        /// # Parameters
+        /// - `col` — `any`.
         methods.add_method("min", |_, this, col: LuaValue| {
             let cr = lua_to_col_ref(col)?;
             let df = this.inner.borrow();
             df.min_val(cr).map_err(LuaError::RuntimeError)
         });
 
+        /// Max on this DataFrame.
+        ///
+        /// # Parameters
+        /// - `col` — `any`.
         methods.add_method("max", |_, this, col: LuaValue| {
             let cr = lua_to_col_ref(col)?;
             let df = this.inner.borrow();
             df.max_val(cr).map_err(LuaError::RuntimeError)
         });
 
+        /// Median on this DataFrame.
+        ///
+        /// # Parameters
+        /// - `col` — `any`.
         methods.add_method("median", |_, this, col: LuaValue| {
             let cr = lua_to_col_ref(col)?;
             let df = this.inner.borrow();
             df.median(cr).map_err(LuaError::RuntimeError)
         });
 
+        /// Stddev on this DataFrame.
+        ///
+        /// # Parameters
+        /// - `col` — `any`.
         methods.add_method("stddev", |_, this, col: LuaValue| {
             let cr = lua_to_col_ref(col)?;
             let df = this.inner.borrow();
             df.stddev(cr).map_err(LuaError::RuntimeError)
         });
 
+        /// Variance on this DataFrame.
+        ///
+        /// # Parameters
+        /// - `col` — `any`.
         methods.add_method("variance", |_, this, col: LuaValue| {
             let cr = lua_to_col_ref(col)?;
             let df = this.inner.borrow();
@@ -382,6 +520,11 @@ impl LuaUserData for LuaDataFrame {
 
         // -- Nil handling ----------------------------------------------------
 
+        /// Fill nil on this DataFrame.
+        ///
+        /// # Parameters
+        /// - `col` — `any`.
+        /// - `val` — `any`.
         methods.add_method("fillNil", |_, this, (col, val): (LuaValue, LuaValue)| {
             let cr = lua_to_col_ref(col)?;
             let cv = lua_to_cell(val);
@@ -412,16 +555,28 @@ impl LuaUserData for LuaDataFrame {
 
         // -- Serialization ---------------------------------------------------
 
+        /// To c s v on this DataFrame.
+        ///
+        /// # Returns
+        /// The result.
         methods.add_method("toCSV", |_, this, ()| {
             let df = this.inner.borrow();
             Ok(df.to_csv())
         });
 
+        /// To j s o n on this DataFrame.
+        ///
+        /// # Returns
+        /// The result.
         methods.add_method("toJSON", |_, this, ()| {
             let df = this.inner.borrow();
             Ok(df.to_json())
         });
 
+        /// To binary on this DataFrame.
+        ///
+        /// # Returns
+        /// The result.
         methods.add_method("toBinary", |lua, this, ()| {
             let df = this.inner.borrow();
             let bytes = df.to_binary();
@@ -429,6 +584,10 @@ impl LuaUserData for LuaDataFrame {
         });
 
         #[allow(clippy::needless_range_loop)]
+        /// To table on this DataFrame.
+        ///
+        /// # Returns
+        /// The result.
         methods.add_method("toTable", |lua, this, ()| {
             let df = this.inner.borrow();
             let tbl = lua.create_table()?;
@@ -444,6 +603,10 @@ impl LuaUserData for LuaDataFrame {
             Ok(tbl)
         });
 
+        /// To string on this DataFrame.
+        ///
+        /// # Parameters
+        /// - `sql_str` — `string`.
         methods.add_method("toString", |_, this, ()| {
             let df = this.inner.borrow();
             Ok(df.to_string_table())
@@ -451,6 +614,10 @@ impl LuaUserData for LuaDataFrame {
 
         // -- SQL -------------------------------------------------------------
 
+        /// Runs a query and returns matching results.
+        ///
+        /// # Parameters
+        /// - `sql_str` — `string`.
         methods.add_method("query", |_, this, sql_str: String| {
             let df = this.inner.borrow();
             let result = sql::query_sql(&df, &sql_str).map_err(LuaError::RuntimeError)?;
@@ -459,6 +626,10 @@ impl LuaUserData for LuaDataFrame {
 
         // -- Clone -----------------------------------------------------------
 
+        /// Returns a deep copy of this object.
+        ///
+        /// # Returns
+        /// The result.
         methods.add_method("clone", |_, this, ()| {
             let df = this.inner.borrow();
             Ok(LuaDataFrame::new(df.clone_df()))
@@ -495,6 +666,13 @@ impl LuaUserData for LuaDatabase {
             },
         );
 
+        /// Returns the table.
+        ///
+        /// # Parameters
+        /// - `name` — `string`.
+        ///
+        /// # Returns
+        /// The current table.
         methods.add_method("getTable", |_, this, name: String| {
             let db = this.inner.borrow();
             match db.get_table(&name) {
@@ -503,6 +681,10 @@ impl LuaUserData for LuaDatabase {
             }
         });
 
+        /// Removes table from the collection.
+        ///
+        /// # Parameters
+        /// - `name` — `string`.
         methods.add_method("removeTable", |_, this, name: String| {
             this.inner
                 .borrow_mut()
@@ -510,10 +692,21 @@ impl LuaUserData for LuaDatabase {
                 .map_err(LuaError::RuntimeError)
         });
 
+        /// Returns `true` if table.
+        ///
+        /// # Parameters
+        /// - `name` — `string`.
+        ///
+        /// # Returns
+        /// `boolean`.
         methods.add_method("hasTable", |_, this, name: String| {
             Ok(this.inner.borrow().has_table(&name))
         });
 
+        /// List tables on this Database.
+        ///
+        /// # Returns
+        /// The result.
         methods.add_method("listTables", |lua, this, ()| {
             let db = this.inner.borrow();
             let names = db.list_tables();
@@ -524,15 +717,27 @@ impl LuaUserData for LuaDatabase {
             Ok(tbl)
         });
 
+        /// Table count on this Database.
+        ///
+        /// # Returns
+        /// The result.
         methods.add_method("tableCount", |_, this, ()| {
             Ok(this.inner.borrow().table_count())
         });
 
+        /// Removes all entries.
+        ///
+        /// # Parameters
+        /// - `other` — `userdata`.
         methods.add_method("clear", |_, this, ()| {
             this.inner.borrow_mut().clear();
             Ok(())
         });
 
+        /// Merge on this Database.
+        ///
+        /// # Parameters
+        /// - `other` — `userdata`.
         methods.add_method("merge", |_, this, other: LuaAnyUserData| {
             let other_db = other.borrow::<LuaDatabase>()?;
             // Build a new Database from the other's tables to pass owned
@@ -549,6 +754,10 @@ impl LuaUserData for LuaDatabase {
             Ok(())
         });
 
+        /// To j s o n on this Database.
+        ///
+        /// # Returns
+        /// The result.
         methods.add_method("toJSON", |_, this, ()| {
             let db = this.inner.borrow();
             let names = db.list_tables();
@@ -570,6 +779,10 @@ impl LuaUserData for LuaDatabase {
             Ok(out)
         });
 
+        /// Runs a query and returns matching results.
+        ///
+        /// # Parameters
+        /// - `sql_str` — `string`.
         methods.add_method("query", |_, this, sql_str: String| {
             let db = this.inner.borrow();
             let result = sql::query_sql_database(&db, &sql_str).map_err(LuaError::RuntimeError)?;
@@ -679,6 +892,10 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
         })?,
     )?;
 
+    /// Dataframe on this Database.
+    ///
+    /// # Returns
+    /// The result.
     luna.set("dataframe", df_table)?;
     Ok(())
 }

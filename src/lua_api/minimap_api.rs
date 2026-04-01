@@ -33,14 +33,26 @@ impl LuaUserData for LuaMinimap {
 
         // ── Grid queries ──
 
+        /// Returns the grid width.
+        ///
+        /// # Returns
+        /// The current grid width.
         methods.add_method("getGridWidth", |_, this, ()| {
             Ok(this.inner.borrow().grid_width())
         });
 
+        /// Returns the grid height.
+        ///
+        /// # Returns
+        /// The current grid height.
         methods.add_method("getGridHeight", |_, this, ()| {
             Ok(this.inner.borrow().grid_height())
         });
 
+        /// Returns the grid size.
+        ///
+        /// # Returns
+        /// The current grid size.
         methods.add_method("getGridSize", |_, this, ()| {
             let m = this.inner.borrow();
             Ok((m.grid_width(), m.grid_height()))
@@ -48,19 +60,40 @@ impl LuaUserData for LuaMinimap {
 
         // ── Display dimensions ──
 
+        /// Returns the display width.
+        ///
+        /// # Returns
+        /// The current display width.
         methods.add_method("getDisplayWidth", |_, this, ()| {
             Ok(this.inner.borrow().display_width())
         });
 
+        /// Returns the display height.
+        ///
+        /// # Returns
+        /// The current display height.
         methods.add_method("getDisplayHeight", |_, this, ()| {
             Ok(this.inner.borrow().display_height())
         });
 
+        /// Returns the display size.
+        ///
+        /// # Parameters
+        /// - `w` — `integer`.
+        /// - `h` — `integer`.
+        ///
+        /// # Returns
+        /// The current display size.
         methods.add_method("getDisplaySize", |_, this, ()| {
             let m = this.inner.borrow();
             Ok((m.display_width(), m.display_height()))
         });
 
+        /// Sets the display size.
+        ///
+        /// # Parameters
+        /// - `w` — `integer`.
+        /// - `h` — `integer`.
         methods.add_method_mut("setDisplaySize", |_, this, (w, h): (u32, u32)| {
             this.inner.borrow_mut().set_display_size(w, h);
             Ok(())
@@ -84,6 +117,14 @@ impl LuaUserData for LuaMinimap {
             },
         );
 
+        /// Returns the terrain.
+        ///
+        /// # Parameters
+        /// - `x` — `integer`.
+        /// - `y` — `integer`.
+        ///
+        /// # Returns
+        /// The current terrain.
         methods.add_method("getTerrain", |_, this, (x, y): (u32, u32)| {
             if x == 0 || y == 0 {
                 return Err(LuaError::RuntimeError(
@@ -103,6 +144,13 @@ impl LuaUserData for LuaMinimap {
             },
         );
 
+        /// Returns the terrain color.
+        ///
+        /// # Parameters
+        /// - `terrain_type` — `integer`.
+        ///
+        /// # Returns
+        /// The current terrain color.
         methods.add_method("getTerrainColor", |_, this, terrain_type: u32| {
             let c = this.inner.borrow().get_terrain_color(terrain_type);
             Ok((c[0], c[1], c[2], c[3]))
@@ -110,11 +158,24 @@ impl LuaUserData for LuaMinimap {
 
         // ── Fog of war ──
 
+        /// Sets the fog enabled.
+        ///
+        /// # Parameters
+        /// - `enabled` — `boolean`.
         methods.add_method_mut("setFogEnabled", |_, this, enabled: bool| {
             this.inner.borrow_mut().set_fog_enabled(enabled);
             Ok(())
         });
 
+        /// Returns `true` if fog enabled.
+        ///
+        /// # Parameters
+        /// - `x` — `integer`.
+        /// - `y` — `integer`.
+        /// - `level` — `integer`.
+        ///
+        /// # Returns
+        /// `boolean`.
         methods.add_method("isFogEnabled", |_, this, ()| {
             Ok(this.inner.borrow().fog_enabled())
         });
@@ -134,6 +195,14 @@ impl LuaUserData for LuaMinimap {
             },
         );
 
+        /// Returns the fog level.
+        ///
+        /// # Parameters
+        /// - `x` — `integer`.
+        /// - `y` — `integer`.
+        ///
+        /// # Returns
+        /// The current fog level.
         methods.add_method("getFogLevel", |_, this, (x, y): (u32, u32)| {
             if x == 0 || y == 0 {
                 return Err(LuaError::RuntimeError(
@@ -153,11 +222,22 @@ impl LuaUserData for LuaMinimap {
             },
         );
 
+        /// Returns the fog color.
+        ///
+        /// # Parameters
+        /// - `data` — `table`.
+        ///
+        /// # Returns
+        /// The current fog color.
         methods.add_method("getFogColor", |_, this, ()| {
             let c = this.inner.borrow().fog_color();
             Ok((c[0], c[1], c[2], c[3]))
         });
 
+        /// Sets the fog data.
+        ///
+        /// # Parameters
+        /// - `data` — `table`.
         methods.add_method_mut("setFogData", |_, this, data: LuaTable| {
             let len = data.len()? as usize;
             let mut bytes = Vec::with_capacity(len);
@@ -198,6 +278,13 @@ impl LuaUserData for LuaMinimap {
             },
         );
 
+        /// Returns `true` if object type visible.
+        ///
+        /// # Parameters
+        /// - `type_idx` — `integer`.
+        ///
+        /// # Returns
+        /// `boolean`.
         methods.add_method("isObjectTypeVisible", |_, this, type_idx: usize| {
             if type_idx == 0 {
                 return Err(LuaError::RuntimeError(
@@ -207,6 +294,10 @@ impl LuaUserData for LuaMinimap {
             Ok(this.inner.borrow().is_object_type_visible(type_idx - 1))
         });
 
+        /// Returns the object type count.
+        ///
+        /// # Returns
+        /// The current object type count.
         methods.add_method("getObjectTypeCount", |_, this, ()| {
             Ok(this.inner.borrow().object_type_count())
         });
@@ -228,15 +319,27 @@ impl LuaUserData for LuaMinimap {
             },
         );
 
+        /// Removes object from the collection.
+        ///
+        /// # Parameters
+        /// - `id` — `integer`.
         methods.add_method_mut("removeObject", |_, this, id: u32| {
             Ok(this.inner.borrow_mut().remove_object(id))
         });
 
+        /// Clear objects on this Minimap.
+        ///
+        /// # Returns
+        /// The result.
         methods.add_method_mut("clearObjects", |_, this, ()| {
             this.inner.borrow_mut().clear_objects();
             Ok(())
         });
 
+        /// Returns the object count.
+        ///
+        /// # Returns
+        /// The current object count.
         methods.add_method("getObjectCount", |_, this, ()| {
             Ok(this.inner.borrow().object_count())
         });
@@ -253,6 +356,13 @@ impl LuaUserData for LuaMinimap {
             },
         );
 
+        /// Returns the owner color.
+        ///
+        /// # Parameters
+        /// - `owner` — `integer`.
+        ///
+        /// # Returns
+        /// The current owner color.
         methods.add_method("getOwnerColor", |_, this, owner: u32| {
             let c = this.inner.borrow().get_owner_color(owner);
             Ok((c[0], c[1], c[2], c[3]))
@@ -260,6 +370,10 @@ impl LuaUserData for LuaMinimap {
 
         // ── Color mode ──
 
+        /// Sets the color mode.
+        ///
+        /// # Parameters
+        /// - `mode` — `string`.
         methods.add_method_mut("setColorMode", |_, this, mode: String| {
             let cm = match mode.as_str() {
                 "terrain" => ColorMode::Terrain,
@@ -275,6 +389,10 @@ impl LuaUserData for LuaMinimap {
             Ok(())
         });
 
+        /// Returns the color mode.
+        ///
+        /// # Returns
+        /// The current color mode.
         methods.add_method("getColorMode", |_, this, ()| {
             let mode = this.inner.borrow().color_mode();
             Ok(match mode {
@@ -285,20 +403,41 @@ impl LuaUserData for LuaMinimap {
 
         // ── Zoom and pan ──
 
+        /// Sets the zoom.
+        ///
+        /// # Parameters
+        /// - `zoom` — `number`.
         methods.add_method_mut("setZoom", |_, this, zoom: f32| {
             this.inner.borrow_mut().set_zoom(zoom);
             Ok(())
         });
 
+        /// Returns the zoom.
+        ///
+        /// # Parameters
+        /// - `x` — `number`.
+        /// - `y` — `number`.
+        ///
+        /// # Returns
+        /// The current zoom.
         methods.add_method("getZoom", |_, this, ()| {
             Ok(this.inner.borrow().zoom())
         });
 
+        /// Sets the center.
+        ///
+        /// # Parameters
+        /// - `x` — `number`.
+        /// - `y` — `number`.
         methods.add_method_mut("setCenter", |_, this, (x, y): (f32, f32)| {
             this.inner.borrow_mut().set_center(x, y);
             Ok(())
         });
 
+        /// Returns the center.
+        ///
+        /// # Returns
+        /// The current center.
         methods.add_method("getCenter", |_, this, ()| {
             let m = this.inner.borrow();
             Ok((m.center_x(), m.center_y()))
@@ -314,18 +453,42 @@ impl LuaUserData for LuaMinimap {
             },
         );
 
+        /// Clear viewport rect on this Minimap.
+        ///
+        /// # Returns
+        /// The result.
         methods.add_method_mut("clearViewportRect", |_, this, ()| {
             this.inner.borrow_mut().clear_viewport_rect();
             Ok(())
         });
 
+        /// Returns the viewport rect.
+        ///
+        /// # Returns
+        /// The current viewport rect.
         methods.add_method("getViewportRect", |lua, this, ()| {
             match this.inner.borrow().viewport_rect() {
                 Some((x, y, w, h)) => Ok(LuaValue::Table({
                     let t = lua.create_table()?;
+                    /// X on this Minimap.
+                    ///
+                    /// # Returns
+                    /// The result.
                     t.set("x", x)?;
+                    /// Y on this Minimap.
+                    ///
+                    /// # Returns
+                    /// The result.
                     t.set("y", y)?;
+                    /// W on this Minimap.
+                    ///
+                    /// # Returns
+                    /// The result.
                     t.set("w", w)?;
+                    /// H on this Minimap.
+                    ///
+                    /// # Parameters
+                    /// - `visible` — `boolean`.
                     t.set("h", h)?;
                     t
                 })),
@@ -333,11 +496,25 @@ impl LuaUserData for LuaMinimap {
             }
         });
 
+        /// Sets the viewport visible.
+        ///
+        /// # Parameters
+        /// - `visible` — `boolean`.
         methods.add_method_mut("setViewportVisible", |_, this, visible: bool| {
             this.inner.borrow_mut().set_viewport_visible(visible);
             Ok(())
         });
 
+        /// Returns `true` if viewport visible.
+        ///
+        /// # Parameters
+        /// - `r` — `number`.
+        /// - `g` — `number`.
+        /// - `b` — `number`.
+        /// - `a` — `number` optional.
+        ///
+        /// # Returns
+        /// `boolean`.
         methods.add_method("isViewportVisible", |_, this, ()| {
             Ok(this.inner.borrow().viewport_visible())
         });
@@ -352,6 +529,10 @@ impl LuaUserData for LuaMinimap {
             },
         );
 
+        /// Returns the viewport color.
+        ///
+        /// # Returns
+        /// The current viewport color.
         methods.add_method("getViewportColor", |_, this, ()| {
             let c = this.inner.borrow().viewport_color();
             Ok((c[0], c[1], c[2], c[3]))
@@ -359,6 +540,10 @@ impl LuaUserData for LuaMinimap {
 
         // ── Pings ──
 
+        /// Adds ping to the collection.
+        ///
+        /// # Returns
+        /// The result.
         methods.add_method_mut("addPing", |_, this, args: mlua::Variadic<f32>| {
             let args: Vec<f32> = args.into_iter().collect();
             if args.len() < 3 {
@@ -377,6 +562,10 @@ impl LuaUserData for LuaMinimap {
             Ok(())
         });
 
+        /// Returns the ping count.
+        ///
+        /// # Returns
+        /// The current ping count.
         methods.add_method("getPingCount", |_, this, ()| {
             Ok(this.inner.borrow().ping_count())
         });
@@ -419,14 +608,32 @@ impl LuaUserData for LuaMinimap {
             },
         );
 
+        /// Removes marker from the collection.
+        ///
+        /// # Parameters
+        /// - `id` — `integer`.
         methods.add_method_mut("removeMarker", |_, this, id: u32| {
             Ok(this.inner.borrow_mut().remove_marker(id))
         });
 
+        /// Returns `true` if marker.
+        ///
+        /// # Parameters
+        /// - `id` — `integer`.
+        ///
+        /// # Returns
+        /// `boolean`.
         methods.add_method("hasMarker", |_, this, id: u32| {
             Ok(this.inner.borrow().has_marker(id))
         });
 
+        /// Returns the marker description.
+        ///
+        /// # Parameters
+        /// - `id` — `integer`.
+        ///
+        /// # Returns
+        /// The current marker description.
         methods.add_method("getMarkerDescription", |_, this, id: u32| {
             Ok(this
                 .inner
@@ -435,17 +642,32 @@ impl LuaUserData for LuaMinimap {
                 .map(|s| s.to_string()))
         });
 
+        /// Returns the marker count.
+        ///
+        /// # Parameters
+        /// - `enabled` — `boolean`.
+        ///
+        /// # Returns
+        /// The current marker count.
         methods.add_method("getMarkerCount", |_, this, ()| {
             Ok(this.inner.borrow().marker_count())
         });
 
         // ── Rendering options ──
 
+        /// Sets the anti alias.
+        ///
+        /// # Parameters
+        /// - `enabled` — `boolean`.
         methods.add_method_mut("setAntiAlias", |_, this, enabled: bool| {
             this.inner.borrow_mut().set_anti_alias(enabled);
             Ok(())
         });
 
+        /// Returns `true` if anti alias.
+        ///
+        /// # Returns
+        /// `boolean`.
         methods.add_method("isAntiAlias", |_, this, ()| {
             Ok(this.inner.borrow().anti_alias())
         });
@@ -470,6 +692,10 @@ impl LuaUserData for LuaMinimap {
 
         // ── Update ──
 
+        /// Advances the simulation by `dt` seconds.
+        ///
+        /// # Parameters
+        /// - `dt` — `number`.
         methods.add_method_mut("update", |_, this, dt: f32| {
             this.inner.borrow_mut().update(dt);
             Ok(())
@@ -499,6 +725,10 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
         )?,
     )?;
 
+    /// Minimap on this Minimap.
+    ///
+    /// # Returns
+    /// The result.
     luna.set("minimap", module)?;
     Ok(())
 }

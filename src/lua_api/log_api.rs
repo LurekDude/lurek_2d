@@ -115,6 +115,10 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
         lua.create_function(|_, ()| Ok(log_messages::get_log_level().to_string()))?,
     )?;
 
+    /// Log on this Object.
+    ///
+    /// # Returns
+    /// The result.
     luna.set("log", log_table)?;
     Ok(())
 }

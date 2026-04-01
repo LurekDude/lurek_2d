@@ -33,14 +33,31 @@ impl LuaUserData for LuaNavGrid {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
         add_type_methods(methods);
 
+        /// Returns the width.
+        ///
+        /// # Returns
+        /// The current width.
         methods.add_method("getWidth", |_, this, ()| {
             Ok(this.inner.borrow().get_width())
         });
 
+        /// Returns the height.
+        ///
+        /// # Returns
+        /// The current height.
         methods.add_method("getHeight", |_, this, ()| {
             Ok(this.inner.borrow().get_height())
         });
 
+        /// Returns the dimensions.
+        ///
+        /// # Parameters
+        /// - `x` — `integer`.
+        /// - `y` — `integer`.
+        /// - `cost` — `integer`.
+        ///
+        /// # Returns
+        /// The current dimensions.
         methods.add_method("getDimensions", |_, this, ()| {
             let g = this.inner.borrow();
             let (w, h) = g.get_dimensions();
@@ -48,11 +65,25 @@ impl LuaUserData for LuaNavGrid {
         });
 
         // 1-based coords at Lua boundary
+        /// Sets the cost.
+        ///
+        /// # Parameters
+        /// - `x` — `integer`.
+        /// - `y` — `integer`.
+        /// - `cost` — `integer`.
         methods.add_method("setCost", |_, this, (x, y, cost): (u32, u32, u8)| {
             this.inner.borrow_mut().set_cost(x - 1, y - 1, cost);
             Ok(())
         });
 
+        /// Returns the cost.
+        ///
+        /// # Parameters
+        /// - `x` — `integer`.
+        /// - `y` — `integer`.
+        ///
+        /// # Returns
+        /// The current cost.
         methods.add_method("getCost", |_, this, (x, y): (u32, u32)| {
             Ok(this.inner.borrow().get_cost(x - 1, y - 1))
         });
@@ -65,6 +96,14 @@ impl LuaUserData for LuaNavGrid {
             },
         );
 
+        /// Returns `true` if blocked.
+        ///
+        /// # Parameters
+        /// - `x` — `integer`.
+        /// - `y` — `integer`.
+        ///
+        /// # Returns
+        /// `boolean`.
         methods.add_method("isBlocked", |_, this, (x, y): (u32, u32)| {
             Ok(this.inner.borrow().is_blocked(x - 1, y - 1))
         });
@@ -77,6 +116,10 @@ impl LuaUserData for LuaNavGrid {
             },
         );
 
+        /// Fill on this NavGrid.
+        ///
+        /// # Parameters
+        /// - `cost` — `integer`.
         methods.add_method("fill", |_, this, cost: u8| {
             this.inner.borrow_mut().fill(cost);
             Ok(())
@@ -91,6 +134,10 @@ impl LuaUserData for LuaNavGrid {
             },
         );
 
+        /// Load from string on this NavGrid.
+        ///
+        /// # Parameters
+        /// - `data` — `string`.
         methods.add_method("loadFromString", |_, this, data: LuaString| {
             this.inner
                 .borrow_mut()
@@ -98,20 +145,36 @@ impl LuaUserData for LuaNavGrid {
                 .map_err(LuaError::external)
         });
 
+        /// Save to string on this NavGrid.
+        ///
+        /// # Parameters
+        /// - `size` — `integer`.
         methods.add_method("saveToString", |lua, this, ()| {
             let bytes = this.inner.borrow().save_to_bytes();
             lua.create_string(&bytes)
         });
 
+        /// Sets the chunk size.
+        ///
+        /// # Parameters
+        /// - `size` — `integer`.
         methods.add_method("setChunkSize", |_, this, size: u32| {
             this.inner.borrow_mut().set_chunk_size(size);
             Ok(())
         });
 
+        /// Returns the chunk size.
+        ///
+        /// # Returns
+        /// The current chunk size.
         methods.add_method("getChunkSize", |_, this, ()| {
             Ok(this.inner.borrow().get_chunk_size())
         });
 
+        /// Rebuild abstract on this NavGrid.
+        ///
+        /// # Returns
+        /// The result.
         methods.add_method("rebuildAbstract", |_, this, ()| {
             let grid = this.inner.borrow();
             let chunk_size = grid.get_chunk_size();
@@ -121,16 +184,31 @@ impl LuaUserData for LuaNavGrid {
         });
 
         // 1-based dirty rect
+        /// Sets the dirty.
+        ///
+        /// # Parameters
+        /// - `x` — `integer`.
+        /// - `y` — `integer`.
+        /// - `w` — `integer`.
+        /// - `h` — `integer`.
         methods.add_method("setDirty", |_, this, (x, y, w, h): (u32, u32, u32, u32)| {
             this.inner.borrow_mut().set_dirty(x - 1, y - 1, w, h);
             Ok(())
         });
 
+        /// Clear dirty on this NavGrid.
+        ///
+        /// # Parameters
+        /// - `mode` — `string`.
         methods.add_method("clearDirty", |_, this, ()| {
             this.inner.borrow_mut().clear_dirty();
             Ok(())
         });
 
+        /// Sets the diagonal mode.
+        ///
+        /// # Parameters
+        /// - `mode` — `string`.
         methods.add_method("setDiagonalMode", |_, this, mode: String| {
             let dm = DiagonalMode::from_lua_str(&mode).ok_or_else(|| {
                 LuaError::external(format!(
@@ -142,6 +220,10 @@ impl LuaUserData for LuaNavGrid {
             Ok(())
         });
 
+        /// Returns the diagonal mode.
+        ///
+        /// # Returns
+        /// The current diagonal mode.
         methods.add_method("getDiagonalMode", |_, this, ()| {
             let dm = this.inner.borrow().get_diagonal_mode();
             let s = match dm {
@@ -174,7 +256,15 @@ fn waypoints_to_lua<'a>(lua: &'a Lua, path: &[Waypoint]) -> LuaResult<LuaTable<'
     let tbl = lua.create_table()?;
     for (i, wp) in path.iter().enumerate() {
         let entry = lua.create_table()?;
+        /// X on this UnitPathfinder.
+        ///
+        /// # Returns
+        /// The result.
         entry.set("x", wp.x + 1)?;
+        /// Y on this UnitPathfinder.
+        ///
+        /// # Returns
+        /// The result.
         entry.set("y", wp.y + 1)?;
         tbl.set(i + 1, entry)?;
     }
@@ -227,11 +317,25 @@ impl LuaUserData for LuaUnitPathfinder {
             },
         );
 
+        /// Returns the path length.
+        ///
+        /// # Parameters
+        /// - `path` — `table`.
+        ///
+        /// # Returns
+        /// The current path length.
         methods.add_method("getPathLength", |_, _this, path: LuaTable| {
             let waypoints = lua_to_waypoints(&path)?;
             Ok(UnitPathfinder::get_path_length(&waypoints))
         });
 
+        /// Returns the path cost.
+        ///
+        /// # Parameters
+        /// - `path` — `table`.
+        ///
+        /// # Returns
+        /// The current path cost.
         methods.add_method("getPathCost", |_, this, path: LuaTable| {
             let waypoints = lua_to_waypoints(&path)?;
             Ok(this.inner.borrow().get_path_cost(&waypoints))
@@ -315,24 +419,47 @@ impl LuaUserData for LuaUnitPathfinder {
             },
         );
 
+        /// Sets the cache enabled.
+        ///
+        /// # Parameters
+        /// - `enabled` — `boolean`.
         methods.add_method("setCacheEnabled", |_, this, enabled: bool| {
             this.inner.borrow_mut().set_cache_enabled(enabled);
             Ok(())
         });
 
+        /// Returns `true` if cache enabled.
+        ///
+        /// # Returns
+        /// `boolean`.
         methods.add_method("isCacheEnabled", |_, this, ()| {
             Ok(this.inner.borrow().is_cache_enabled())
         });
 
+        /// Clear cache on this UnitPathfinder.
+        ///
+        /// # Returns
+        /// The result.
         methods.add_method("clearCache", |_, this, ()| {
             this.inner.borrow_mut().clear_cache();
             Ok(())
         });
 
+        /// Returns the cache size.
+        ///
+        /// # Parameters
+        /// - `n` — `integer`.
+        ///
+        /// # Returns
+        /// The current cache size.
         methods.add_method("getCacheSize", |_, this, ()| {
             Ok(this.inner.borrow().get_cache_size())
         });
 
+        /// Sets the cache max size.
+        ///
+        /// # Parameters
+        /// - `n` — `integer`.
         methods.add_method("setCacheMaxSize", |_, this, n: usize| {
             this.inner.borrow_mut().set_cache_max_size(n);
             Ok(())
@@ -384,29 +511,69 @@ impl LuaUserData for LuaFlowField {
             },
         );
 
+        /// Returns the direction.
+        ///
+        /// # Parameters
+        /// - `x` — `integer`.
+        /// - `y` — `integer`.
+        ///
+        /// # Returns
+        /// The current direction.
         methods.add_method("getDirection", |_, this, (x, y): (u32, u32)| {
             let (dx, dy) = this.inner.borrow().get_direction(x - 1, y - 1);
             Ok((dx, dy))
         });
 
+        /// Returns the direction angle.
+        ///
+        /// # Parameters
+        /// - `x` — `integer`.
+        /// - `y` — `integer`.
+        ///
+        /// # Returns
+        /// The current direction angle.
         methods.add_method("getDirectionAngle", |_, this, (x, y): (u32, u32)| {
             Ok(this.inner.borrow().get_direction_angle(x - 1, y - 1))
         });
 
+        /// Returns the cost to target.
+        ///
+        /// # Parameters
+        /// - `x` — `integer`.
+        /// - `y` — `integer`.
+        ///
+        /// # Returns
+        /// The current cost to target.
         methods.add_method("getCostToTarget", |_, this, (x, y): (u32, u32)| {
             Ok(this.inner.borrow().get_cost_to_target(x - 1, y - 1))
         });
 
+        /// Returns `true` if calculated.
+        ///
+        /// # Returns
+        /// `boolean`.
         methods.add_method("isCalculated", |_, this, ()| {
             Ok(this.inner.borrow().is_calculated())
         });
 
+        /// Returns the targets.
+        ///
+        /// # Returns
+        /// The current targets.
         methods.add_method("getTargets", |lua, this, ()| {
             let targets = this.inner.borrow().get_targets();
             let tbl = lua.create_table()?;
             for (i, (x, y)) in targets.iter().enumerate() {
                 let entry = lua.create_table()?;
+                /// X on this FlowField.
+                ///
+                /// # Returns
+                /// The result.
                 entry.set("x", x + 1)?;
+                /// Y on this FlowField.
+                ///
+                /// # Returns
+                /// The result.
                 entry.set("y", y + 1)?;
                 tbl.set(i + 1, entry)?;
             }
@@ -528,6 +695,10 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
         lua.create_function(|_, ()| -> LuaResult<u32> { Ok(0) })?,
     )?;
 
+    /// Pathfinding on this FlowField.
+    ///
+    /// # Returns
+    /// The result.
     luna.set("pathfinding", pathfinding)?;
     Ok(())
 }

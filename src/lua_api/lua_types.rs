@@ -27,6 +27,10 @@ pub fn add_type_methods<'a, T: LunaType + 'static>(
     methods: &mut impl mlua::UserDataMethods<'a, T>,
 ) {
     methods.add_method("type", |_, _this, ()| Ok(T::TYPE_NAME.to_string()));
+    /// Type of on this Object.
+    ///
+    /// # Parameters
+    /// - `name` — `string`.
     methods.add_method("typeOf", |_, _this, name: String| {
         Ok(T::TYPE_NAME == name || T::TYPE_HIERARCHY.contains(&name.as_str()))
     });

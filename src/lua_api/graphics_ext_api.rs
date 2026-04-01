@@ -43,9 +43,25 @@ fn parse_color(r: f32, g: f32, b: f32, a: Option<f32>) -> Color {
 
 fn rect_to_table<'a>(lua: &'a Lua, r: &Rect) -> LuaResult<LuaTable<'a>> {
     let t = lua.create_table()?;
+    /// X on this Object.
+    ///
+    /// # Returns
+    /// The result.
     t.set("x", r.x)?;
+    /// Y on this Object.
+    ///
+    /// # Returns
+    /// The result.
     t.set("y", r.y)?;
+    /// Width on this Object.
+    ///
+    /// # Returns
+    /// The result.
     t.set("width", r.width)?;
+    /// Height on this Object.
+    ///
+    /// # Returns
+    /// The result.
     t.set("height", r.height)?;
     Ok(t)
 }
@@ -85,17 +101,43 @@ impl LuaUserData for LuaLight2D {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
         add_type_methods::<Self>(methods);
 
+        /// Sets the position.
+        ///
+        /// # Parameters
+        /// - `x` — `number`.
+        /// - `y` — `number`.
         methods.add_method("setPosition", |_, this, (x, y): (f32, f32)| {
             this.inner.borrow_mut().set_position(x, y);
             Ok(())
         });
+        /// Returns the position.
+        ///
+        /// # Parameters
+        /// - `r` — `number`.
+        ///
+        /// # Returns
+        /// The current position.
         methods.add_method("getPosition", |_, this, ()| {
             Ok(this.inner.borrow().get_position())
         });
+        /// Sets the radius.
+        ///
+        /// # Parameters
+        /// - `r` — `number`.
         methods.add_method("setRadius", |_, this, r: f32| {
             this.inner.borrow_mut().set_radius(r);
             Ok(())
         });
+        /// Returns the radius.
+        ///
+        /// # Parameters
+        /// - `r` — `number`.
+        /// - `g` — `number`.
+        /// - `b` — `number`.
+        /// - `a` — `number` optional.
+        ///
+        /// # Returns
+        /// The current radius.
         methods.add_method("getRadius", |_, this, ()| {
             Ok(this.inner.borrow().get_radius())
         });
@@ -106,21 +148,47 @@ impl LuaUserData for LuaLight2D {
                 Ok(())
             },
         );
+        /// Returns the color.
+        ///
+        /// # Parameters
+        /// - `i` — `number`.
+        ///
+        /// # Returns
+        /// The current color.
         methods.add_method("getColor", |_, this, ()| {
             let c = this.inner.borrow().get_color();
             Ok((c.r, c.g, c.b, c.a))
         });
+        /// Sets the intensity.
+        ///
+        /// # Parameters
+        /// - `i` — `number`.
         methods.add_method("setIntensity", |_, this, i: f32| {
             this.inner.borrow_mut().set_intensity(i);
             Ok(())
         });
+        /// Returns the intensity.
+        ///
+        /// # Parameters
+        /// - `b` — `boolean`.
+        ///
+        /// # Returns
+        /// The current intensity.
         methods.add_method("getIntensity", |_, this, ()| {
             Ok(this.inner.borrow().get_intensity())
         });
+        /// Sets the enabled.
+        ///
+        /// # Parameters
+        /// - `b` — `boolean`.
         methods.add_method("setEnabled", |_, this, b: bool| {
             this.inner.borrow_mut().set_enabled(b);
             Ok(())
         });
+        /// Returns `true` if enabled.
+        ///
+        /// # Returns
+        /// `boolean`.
         methods.add_method("isEnabled", |_, this, ()| {
             Ok(this.inner.borrow().is_enabled())
         });
@@ -146,9 +214,22 @@ impl LuaUserData for LuaTextureAtlas {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
         add_type_methods::<Self>(methods);
 
+        /// Pack on this TextureAtlas.
+        ///
+        /// # Parameters
+        /// - `name` — `string`.
+        /// - `w` — `integer`.
+        /// - `h` — `integer`.
         methods.add_method("pack", |_, this, (name, w, h): (String, u32, u32)| {
             Ok(this.inner.borrow_mut().pack(&name, w, h))
         });
+        /// Returns the region.
+        ///
+        /// # Parameters
+        /// - `name` — `string`.
+        ///
+        /// # Returns
+        /// The current region.
         methods.add_method("getRegion", |_lua, this, name: String| {
             let atlas = this.inner.borrow();
             match atlas.get_region(&name) {
@@ -161,27 +242,63 @@ impl LuaUserData for LuaTextureAtlas {
                 None => Ok(LuaMultiValue::from_vec(vec![LuaValue::Nil])),
             }
         });
+        /// Returns the region count.
+        ///
+        /// # Returns
+        /// The current region count.
         methods.add_method("getRegionCount", |_, this, ()| {
             Ok(this.inner.borrow().get_region_count())
         });
+        /// Returns the dimensions.
+        ///
+        /// # Returns
+        /// The current dimensions.
         methods.add_method("getDimensions", |_, this, ()| {
             Ok(this.inner.borrow().get_dimensions())
         });
+        /// Returns the regions.
+        ///
+        /// # Returns
+        /// The current regions.
         methods.add_method("getRegions", |lua, this, ()| {
             let atlas = this.inner.borrow();
             let regions = atlas.get_regions();
             let tbl = lua.create_table()?;
             for (i, r) in regions.iter().enumerate() {
                 let entry = lua.create_table()?;
+                /// Name on this TextureAtlas.
+                ///
+                /// # Returns
+                /// The result.
                 entry.set("name", r.name.clone())?;
+                /// X on this TextureAtlas.
+                ///
+                /// # Returns
+                /// The result.
                 entry.set("x", r.x)?;
+                /// Y on this TextureAtlas.
+                ///
+                /// # Returns
+                /// The result.
                 entry.set("y", r.y)?;
+                /// W on this TextureAtlas.
+                ///
+                /// # Returns
+                /// The result.
                 entry.set("w", r.w)?;
+                /// H on this TextureAtlas.
+                ///
+                /// # Returns
+                /// The result.
                 entry.set("h", r.h)?;
                 tbl.set(i + 1, entry)?;
             }
             Ok(tbl)
         });
+        /// Removes all entries.
+        ///
+        /// # Returns
+        /// The result.
         methods.add_method("clear", |_, this, ()| {
             this.inner.borrow_mut().clear();
             Ok(())
@@ -209,11 +326,20 @@ impl LuaUserData for LuaDrawLayer {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
         add_type_methods::<Self>(methods);
 
+        /// Queue on this DrawLayer.
+        ///
+        /// # Parameters
+        /// - `z` — `number`.
+        /// - `func` — `function`.
         methods.add_method("queue", |lua, this, (z, func): (f64, LuaFunction)| {
             let key = lua.create_registry_value(func)?;
             this.entries.borrow_mut().push((z, key));
             Ok(())
         });
+        /// Flushes pending data.
+        ///
+        /// # Returns
+        /// The result.
         methods.add_method("flush", |lua, this, ()| {
             let mut entries = this.entries.borrow_mut();
             entries.sort_by(|a, b| a.0.partial_cmp(&b.0).unwrap_or(std::cmp::Ordering::Equal));
@@ -224,6 +350,10 @@ impl LuaUserData for LuaDrawLayer {
             }
             Ok(())
         });
+        /// Removes all entries.
+        ///
+        /// # Returns
+        /// The result.
         methods.add_method("clear", |lua, this, ()| {
             let mut entries = this.entries.borrow_mut();
             for (_, key) in entries.drain(..) {
@@ -231,6 +361,10 @@ impl LuaUserData for LuaDrawLayer {
             }
             Ok(())
         });
+        /// Returns the count.
+        ///
+        /// # Returns
+        /// The current count.
         methods.add_method("getCount", |_, this, ()| Ok(this.entries.borrow().len()));
     }
 }
@@ -254,31 +388,73 @@ impl LuaUserData for LuaViewport {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
         add_type_methods::<Self>(methods);
 
+        /// Resize on this Viewport.
+        ///
+        /// # Parameters
+        /// - `w` — `number`.
+        /// - `h` — `number`.
         methods.add_method("resize", |_, this, (w, h): (f32, f32)| {
             this.inner.borrow_mut().resize(w, h);
             Ok(())
         });
+        /// Returns the scale.
+        ///
+        /// # Returns
+        /// The current scale.
         methods.add_method("getScale", |_, this, ()| {
             Ok(this.inner.borrow().get_scale())
         });
+        /// Returns the offset.
+        ///
+        /// # Returns
+        /// The current offset.
         methods.add_method("getOffset", |_, this, ()| {
             Ok(this.inner.borrow().get_offset())
         });
+        /// Returns the game dimensions.
+        ///
+        /// # Parameters
+        /// - `mode` — `string`.
+        ///
+        /// # Returns
+        /// The current game dimensions.
         methods.add_method("getGameDimensions", |_, this, ()| {
             Ok(this.inner.borrow().get_game_dimensions())
         });
+        /// Returns the scale mode.
+        ///
+        /// # Parameters
+        /// - `mode` — `string`.
+        ///
+        /// # Returns
+        /// The current scale mode.
         methods.add_method("getScaleMode", |_, this, ()| {
             Ok(scale_mode_to_str(this.inner.borrow().get_scale_mode()).to_string())
         });
+        /// Sets the scale mode.
+        ///
+        /// # Parameters
+        /// - `sx` — `number`.
+        /// - `sy` — `number`.
         methods.add_method("setScaleMode", |_, this, mode: String| {
             this.inner
                 .borrow_mut()
                 .set_scale_mode(parse_scale_mode(&mode));
             Ok(())
         });
+        /// To game on this Viewport.
+        ///
+        /// # Parameters
+        /// - `sx` — `number`.
+        /// - `sy` — `number`.
         methods.add_method("toGame", |_, this, (sx, sy): (f32, f32)| {
             Ok(this.inner.borrow().to_game(sx, sy))
         });
+        /// To screen on this Viewport.
+        ///
+        /// # Parameters
+        /// - `gx` — `number`.
+        /// - `gy` — `number`.
         methods.add_method("toScreen", |_, this, (gx, gy): (f32, f32)| {
             Ok(this.inner.borrow().to_screen(gx, gy))
         });
@@ -304,28 +480,71 @@ impl LuaUserData for LuaViewportScale {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
         add_type_methods::<Self>(methods);
 
+        /// Resize on this ViewportScale.
+        ///
+        /// # Parameters
+        /// - `w` — `number`.
+        /// - `h` — `number`.
         methods.add_method("resize", |_, this, (w, h): (f32, f32)| {
             this.inner.borrow_mut().resize(w, h);
             Ok(())
         });
+        /// Returns the game dimensions.
+        ///
+        /// # Returns
+        /// The current game dimensions.
         methods.add_method("getGameDimensions", |_, this, ()| {
             Ok(this.inner.borrow().get_game_dimensions())
         });
+        /// Returns the scaled dimensions.
+        ///
+        /// # Returns
+        /// The current scaled dimensions.
         methods.add_method("getScaledDimensions", |_, this, ()| {
             Ok(this.inner.borrow().get_scaled_dimensions())
         });
+        /// Returns the offset.
+        ///
+        /// # Returns
+        /// The current offset.
         methods.add_method("getOffset", |_, this, ()| {
             Ok(this.inner.borrow().get_offset())
         });
+        /// Returns the scale.
+        ///
+        /// # Parameters
+        /// - `sx` — `number`.
+        /// - `sy` — `number`.
+        ///
+        /// # Returns
+        /// The current scale.
         methods.add_method("getScale", |_, this, ()| {
             Ok(this.inner.borrow().get_scale())
         });
+        /// Returns the mode.
+        ///
+        /// # Parameters
+        /// - `sx` — `number`.
+        /// - `sy` — `number`.
+        ///
+        /// # Returns
+        /// The current mode.
         methods.add_method("getMode", |_, this, ()| {
             Ok(scale_mode_to_str(this.inner.borrow().get_mode()).to_string())
         });
+        /// To game coords on this ViewportScale.
+        ///
+        /// # Parameters
+        /// - `sx` — `number`.
+        /// - `sy` — `number`.
         methods.add_method("toGameCoords", |_, this, (sx, sy): (f32, f32)| {
             Ok(this.inner.borrow().to_game_coords(sx, sy))
         });
+        /// To screen coords on this ViewportScale.
+        ///
+        /// # Parameters
+        /// - `gx` — `number`.
+        /// - `gy` — `number`.
         methods.add_method("toScreenCoords", |_, this, (gx, gy): (f32, f32)| {
             Ok(this.inner.borrow().to_screen_coords(gx, gy))
         });
@@ -360,6 +579,13 @@ impl LuaUserData for LuaSpriteSheet {
         add_type_methods::<Self>(methods);
 
         // getFrame(index) — 1-based
+        /// Returns the frame.
+        ///
+        /// # Parameters
+        /// - `index` — `integer`.
+        ///
+        /// # Returns
+        /// The current frame.
         methods.add_method("getFrame", |lua, this, index: usize| {
             let sheet = this.inner.borrow();
             match sheet.get_frame(index.saturating_sub(1)) {
@@ -367,26 +593,67 @@ impl LuaUserData for LuaSpriteSheet {
                 None => Ok(LuaValue::Nil),
             }
         });
+        /// Returns the frame count.
+        ///
+        /// # Returns
+        /// The current frame count.
         methods.add_method("getFrameCount", |_, this, ()| {
             Ok(this.inner.borrow().get_frame_count())
         });
+        /// Returns the frame size.
+        ///
+        /// # Parameters
+        /// - `row` — `integer`.
+        ///
+        /// # Returns
+        /// The current frame size.
         methods.add_method("getFrameSize", |_, this, ()| {
             Ok(this.inner.borrow().get_frame_size())
         });
+        /// Returns the grid size.
+        ///
+        /// # Parameters
+        /// - `row` — `integer`.
+        ///
+        /// # Returns
+        /// The current grid size.
         methods.add_method("getGridSize", |_, this, ()| {
             Ok(this.inner.borrow().get_grid_size())
         });
         // getRow(row) — 1-based
+        /// Returns the row.
+        ///
+        /// # Parameters
+        /// - `row` — `integer`.
+        ///
+        /// # Returns
+        /// The current row.
         methods.add_method("getRow", |lua, this, row: u32| {
             let rects = this.inner.borrow().get_row(row.saturating_sub(1));
             rects_to_table(lua, &rects)
         });
         // getColumn(col) — 1-based
+        /// Returns the column.
+        ///
+        /// # Parameters
+        /// - `start` — `integer`.
+        /// - `count` — `integer`.
+        ///
+        /// # Returns
+        /// The current column.
         methods.add_method("getColumn", |lua, this, col: u32| {
             let rects = this.inner.borrow().get_column(col.saturating_sub(1));
             rects_to_table(lua, &rects)
         });
         // getRange(start, count) — 1-based start
+        /// Returns the range.
+        ///
+        /// # Parameters
+        /// - `start` — `integer`.
+        /// - `count` — `integer`.
+        ///
+        /// # Returns
+        /// The current range.
         methods.add_method("getRange", |lua, this, (start, count): (usize, usize)| {
             let rects = this
                 .inner
@@ -404,6 +671,13 @@ impl LuaUserData for LuaSpriteSheet {
                 Ok(())
             },
         );
+        /// Returns the group.
+        ///
+        /// # Parameters
+        /// - `name` — `string`.
+        ///
+        /// # Returns
+        /// The current group.
         methods.add_method("getGroup", |lua, this, name: String| {
             let sheet = this.inner.borrow();
             match sheet.get_group(&name) {
@@ -411,6 +685,10 @@ impl LuaUserData for LuaSpriteSheet {
                 None => Ok(LuaValue::Nil),
             }
         });
+        /// Returns the group names.
+        ///
+        /// # Returns
+        /// The current group names.
         methods.add_method("getGroupNames", |lua, this, ()| {
             let names = this.inner.borrow().get_group_names();
             let tbl = lua.create_table()?;
@@ -432,6 +710,13 @@ impl LuaUserData for LuaSpriteSheet {
             },
         );
         // getDirectionFrames(direction) — 1-based
+        /// Returns the direction frames.
+        ///
+        /// # Parameters
+        /// - `direction` — `integer`.
+        ///
+        /// # Returns
+        /// The current direction frames.
         methods.add_method("getDirectionFrames", |lua, this, direction: u32| {
             let sheet = this.inner.borrow();
             match sheet.get_direction_frames(direction.saturating_sub(1)) {
@@ -487,6 +772,14 @@ impl LuaUserData for LuaPolygonMap {
                 Ok(())
             },
         );
+        /// Removes region from the collection.
+        ///
+        /// # Parameters
+        /// - `name` — `string`.
+        /// - `r` — `number`.
+        /// - `g` — `number`.
+        /// - `b` — `number`.
+        /// - `a` — `number` optional.
         methods.add_method("removeRegion", |_, this, name: String| {
             this.inner.borrow_mut().remove_region(&name);
             Ok(())
@@ -500,6 +793,13 @@ impl LuaUserData for LuaPolygonMap {
                 Ok(())
             },
         );
+        /// Returns the region color.
+        ///
+        /// # Parameters
+        /// - `name` — `string`.
+        ///
+        /// # Returns
+        /// The current region color.
         methods.add_method("getRegionColor", |_, this, name: String| {
             match this.inner.borrow().get_region_color(&name) {
                 Some(c) => Ok((c.r, c.g, c.b, c.a)),
@@ -515,6 +815,14 @@ impl LuaUserData for LuaPolygonMap {
                 Ok(())
             },
         );
+        /// Returns the region at.
+        ///
+        /// # Parameters
+        /// - `x` — `number`.
+        /// - `y` — `number`.
+        ///
+        /// # Returns
+        /// The current region at.
         methods.add_method("getRegionAt", |_, this, (x, y): (f32, f32)| {
             Ok(this
                 .inner
@@ -522,6 +830,10 @@ impl LuaUserData for LuaPolygonMap {
                 .get_region_at(x, y)
                 .map(|s| s.to_string()))
         });
+        /// Returns the region names.
+        ///
+        /// # Returns
+        /// The current region names.
         methods.add_method("getRegionNames", |lua, this, ()| {
             let names = this.inner.borrow().get_region_names();
             let tbl = lua.create_table()?;
@@ -530,6 +842,13 @@ impl LuaUserData for LuaPolygonMap {
             }
             Ok(tbl)
         });
+        /// Returns the region vertices.
+        ///
+        /// # Parameters
+        /// - `name` — `string`.
+        ///
+        /// # Returns
+        /// The current region vertices.
         methods.add_method("getRegionVertices", |lua, this, name: String| {
             let pm = this.inner.borrow();
             match pm.get_region_vertices(&name) {
@@ -543,6 +862,13 @@ impl LuaUserData for LuaPolygonMap {
                 None => Ok(LuaValue::Nil),
             }
         });
+        /// Returns the region center.
+        ///
+        /// # Parameters
+        /// - `name` — `string`.
+        ///
+        /// # Returns
+        /// The current region center.
         methods.add_method("getRegionCenter", |_, this, name: String| {
             match this.inner.borrow().get_region_center(&name) {
                 Some((x, y)) => Ok(LuaMultiValue::from_vec(vec![
@@ -552,6 +878,10 @@ impl LuaUserData for LuaPolygonMap {
                 None => Ok(LuaMultiValue::from_vec(vec![LuaValue::Nil])),
             }
         });
+        /// Returns the bounding box.
+        ///
+        /// # Returns
+        /// The current bounding box.
         methods.add_method("getBoundingBox", |_, this, ()| {
             match this.inner.borrow().get_bounding_box() {
                 Some((x, y, w, h)) => Ok(LuaMultiValue::from_vec(vec![
@@ -572,6 +902,13 @@ impl LuaUserData for LuaPolygonMap {
                 Ok(())
             },
         );
+        /// Sets the outline width.
+        ///
+        /// # Parameters
+        /// - `r` — `number`.
+        /// - `g` — `number`.
+        /// - `b` — `number`.
+        /// - `a` — `number` optional.
         methods.add_method("setOutlineWidth", |_, this, w: f32| {
             this.inner.borrow_mut().set_outline_width(w);
             Ok(())
@@ -585,14 +922,26 @@ impl LuaUserData for LuaPolygonMap {
                 Ok(())
             },
         );
+        /// Highlight on this PolygonMap.
+        ///
+        /// # Parameters
+        /// - `name` — `string`.
         methods.add_method("highlight", |_, this, name: String| {
             this.inner.borrow_mut().highlight(name);
             Ok(())
         });
+        /// Clear highlight on this PolygonMap.
+        ///
+        /// # Returns
+        /// The result.
         methods.add_method("clearHighlight", |_, this, ()| {
             this.inner.borrow_mut().clear_highlight();
             Ok(())
         });
+        /// Removes all entries.
+        ///
+        /// # Returns
+        /// The result.
         methods.add_method("clear", |_, this, ()| {
             this.inner.borrow_mut().clear();
             Ok(())
@@ -626,6 +975,16 @@ impl LuaUserData for LuaGraphRenderer {
                 Ok(())
             },
         );
+        /// Returns the viewport.
+        ///
+        /// # Parameters
+        /// - `xmin` — `number`.
+        /// - `xmax` — `number`.
+        /// - `ymin` — `number`.
+        /// - `ymax` — `number`.
+        ///
+        /// # Returns
+        /// The current viewport.
         methods.add_method("getViewport", |_, this, ()| {
             Ok(this.inner.borrow().get_viewport())
         });
@@ -636,9 +995,19 @@ impl LuaUserData for LuaGraphRenderer {
                 Ok(())
             },
         );
+        /// Returns the range.
+        ///
+        /// # Returns
+        /// The current range.
         methods.add_method("getRange", |_, this, ()| {
             Ok(this.inner.borrow().get_range())
         });
+        /// Auto range on this GraphRenderer.
+        ///
+        /// # Parameters
+        /// - `name` — `string`.
+        /// - `pts` — `table`.
+        /// - `color` — `table` optional.
         methods.add_method("autoRange", |_, this, ()| {
             this.inner.borrow_mut().auto_range();
             Ok(())
@@ -695,22 +1064,45 @@ impl LuaUserData for LuaGraphRenderer {
                 Ok(())
             },
         );
+        /// Removes series from the collection.
+        ///
+        /// # Parameters
+        /// - `name` — `string`.
         methods.add_method("removeSeries", |_, this, name: String| {
             this.inner.borrow_mut().remove_series(&name);
             Ok(())
         });
+        /// Clear series on this GraphRenderer.
+        ///
+        /// # Parameters
+        /// - `b` — `boolean`.
         methods.add_method("clearSeries", |_, this, ()| {
             this.inner.borrow_mut().clear_series();
             Ok(())
         });
+        /// Sets the show grid.
+        ///
+        /// # Parameters
+        /// - `b` — `boolean`.
         methods.add_method("setShowGrid", |_, this, b: bool| {
             this.inner.borrow_mut().set_show_grid(b);
             Ok(())
         });
+        /// Sets the show axes.
+        ///
+        /// # Parameters
+        /// - `b` — `boolean`.
         methods.add_method("setShowAxes", |_, this, b: bool| {
             this.inner.borrow_mut().set_show_axes(b);
             Ok(())
         });
+        /// Sets the show labels.
+        ///
+        /// # Parameters
+        /// - `r` — `number`.
+        /// - `g` — `number`.
+        /// - `b` — `number`.
+        /// - `a` — `number` optional.
         methods.add_method("setShowLabels", |_, this, b: bool| {
             this.inner.borrow_mut().set_show_labels(b);
             Ok(())
@@ -742,6 +1134,11 @@ impl LuaUserData for LuaGraphRenderer {
                 Ok(())
             },
         );
+        /// Sets the title.
+        ///
+        /// # Parameters
+        /// - `x_label` — `string`.
+        /// - `y_label` — `string`.
         methods.add_method("setTitle", |_, this, text: String| {
             this.inner.borrow_mut().set_title(&text);
             Ok(())
@@ -753,10 +1150,19 @@ impl LuaUserData for LuaGraphRenderer {
                 Ok(())
             },
         );
+        /// Sets the cursor position.
+        ///
+        /// # Parameters
+        /// - `x` — `number`.
+        /// - `y` — `number`.
         methods.add_method("setCursorPosition", |_, this, (x, y): (f64, f64)| {
             this.inner.borrow_mut().set_cursor_position(x, y);
             Ok(())
         });
+        /// Returns the cursor value.
+        ///
+        /// # Returns
+        /// The current cursor value.
         methods.add_method("getCursorValue", |_, this, ()| {
             match this.inner.borrow().get_cursor_value() {
                 Some((x, y)) => Ok(LuaMultiValue::from_vec(vec![
@@ -817,6 +1223,12 @@ impl LuaUserData for LuaLargeMapRenderer {
             },
         );
         // setTile(x, y, tileId) — 1-based coords and tileId
+        /// Sets the tile.
+        ///
+        /// # Parameters
+        /// - `x` — `integer`.
+        /// - `y` — `integer`.
+        /// - `tile_id` — `integer`.
         methods.add_method("setTile", |_, this, (x, y, tile_id): (u32, u32, u32)| {
             this.inner
                 .borrow_mut()
@@ -824,6 +1236,14 @@ impl LuaUserData for LuaLargeMapRenderer {
             Ok(())
         });
         // getTile(x, y) — 1-based coords, returns 1-based tileId
+        /// Returns the tile.
+        ///
+        /// # Parameters
+        /// - `x` — `integer`.
+        /// - `y` — `integer`.
+        ///
+        /// # Returns
+        /// The current tile.
         methods.add_method("getTile", |_, this, (x, y): (u32, u32)| {
             match this
                 .inner
@@ -834,31 +1254,80 @@ impl LuaUserData for LuaLargeMapRenderer {
                 None => Ok(LuaValue::Integer(0)),
             }
         });
+        /// Returns the map size.
+        ///
+        /// # Parameters
+        /// - `s` — `integer`.
+        ///
+        /// # Returns
+        /// The current map size.
         methods.add_method("getMapSize", |_, this, ()| {
             Ok(this.inner.borrow().get_map_size())
         });
+        /// Sets the chunk size.
+        ///
+        /// # Parameters
+        /// - `x` — `number`.
+        /// - `y` — `number`.
+        /// - `zoom` — `number`.
         methods.add_method("setChunkSize", |_, this, s: u32| {
             this.inner.borrow_mut().set_chunk_size(s);
             Ok(())
         });
+        /// Returns the chunk size.
+        ///
+        /// # Parameters
+        /// - `x` — `number`.
+        /// - `y` — `number`.
+        /// - `zoom` — `number`.
+        ///
+        /// # Returns
+        /// The current chunk size.
         methods.add_method("getChunkSize", |_, this, ()| {
             Ok(this.inner.borrow().get_chunk_size())
         });
+        /// Sets the camera.
+        ///
+        /// # Parameters
+        /// - `x` — `number`.
+        /// - `y` — `number`.
+        /// - `zoom` — `number`.
         methods.add_method("setCamera", |_, this, (x, y, zoom): (f32, f32, f32)| {
             this.inner.borrow_mut().set_camera(x, y, zoom);
             Ok(())
         });
+        /// Sets the viewport.
+        ///
+        /// # Parameters
+        /// - `w` — `number`.
+        /// - `h` — `number`.
         methods.add_method("setViewport", |_, this, (w, h): (f32, f32)| {
             this.inner.borrow_mut().set_viewport(w, h);
             Ok(())
         });
+        /// Sets the l o d enabled.
+        ///
+        /// # Parameters
+        /// - `b` — `boolean`.
         methods.add_method("setLODEnabled", |_, this, b: bool| {
             this.inner.borrow_mut().set_lod_enabled(b);
             Ok(())
         });
+        /// Returns `true` if l o d enabled.
+        ///
+        /// # Parameters
+        /// - `levels` — `table`.
+        ///
+        /// # Returns
+        /// `boolean`.
         methods.add_method("isLODEnabled", |_, this, ()| {
             Ok(this.inner.borrow().is_lod_enabled())
         });
+        /// Sets the l o d thresholds.
+        ///
+        /// # Parameters
+        /// - `cx` — `integer`.
+        /// - `cy` — `integer`.
         methods.add_method("setLODThresholds", |_, this, levels: LuaTable| {
             let thresholds: Vec<f32> = levels
                 .sequence_values::<f32>()
@@ -866,24 +1335,55 @@ impl LuaUserData for LuaLargeMapRenderer {
             this.inner.borrow_mut().set_lod_thresholds(thresholds);
             Ok(())
         });
+        /// Invalidate chunk on this LargeMapRenderer.
+        ///
+        /// # Parameters
+        /// - `cx` — `integer`.
+        /// - `cy` — `integer`.
         methods.add_method("invalidateChunk", |_, this, (cx, cy): (i32, i32)| {
             this.inner.borrow_mut().invalidate_chunk(cx, cy);
             Ok(())
         });
+        /// Invalidate all on this LargeMapRenderer.
+        ///
+        /// # Returns
+        /// The result.
         methods.add_method("invalidateAll", |_, this, ()| {
             this.inner.borrow_mut().invalidate_all();
             Ok(())
         });
+        /// Returns the visible chunks.
+        ///
+        /// # Parameters
+        /// - `cols` — `integer`.
+        ///
+        /// # Returns
+        /// The current visible chunks.
         methods.add_method("getVisibleChunks", |_, this, ()| {
             Ok(this.inner.borrow().get_visible_chunks())
         });
+        /// Returns the total chunks.
+        ///
+        /// # Parameters
+        /// - `cols` — `integer`.
+        ///
+        /// # Returns
+        /// The current total chunks.
         methods.add_method("getTotalChunks", |_, this, ()| {
             Ok(this.inner.borrow().get_total_chunks())
         });
+        /// Sets the tileset columns.
+        ///
+        /// # Parameters
+        /// - `cols` — `integer`.
         methods.add_method("setTilesetColumns", |_, this, cols: u32| {
             this.inner.borrow_mut().set_tileset_columns(cols);
             Ok(())
         });
+        /// Returns the tileset columns.
+        ///
+        /// # Returns
+        /// The current tileset columns.
         methods.add_method("getTilesetColumns", |_, this, ()| {
             Ok(this.inner.borrow().get_tileset_columns())
         });
@@ -965,6 +1465,13 @@ impl LuaUserData for LuaColumnBatch {
             },
         );
         // getDepthAt(col) — 1-based
+        /// Returns the depth at.
+        ///
+        /// # Parameters
+        /// - `col` — `integer`.
+        ///
+        /// # Returns
+        /// The current depth at.
         methods.add_method("getDepthAt", |_, this, col: usize| {
             Ok(this
                 .inner
@@ -972,6 +1479,10 @@ impl LuaUserData for LuaColumnBatch {
                 .get_depth_at(col.saturating_sub(1))
                 .unwrap_or(0.0))
         });
+        /// Returns the depth buffer.
+        ///
+        /// # Returns
+        /// The current depth buffer.
         methods.add_method("getDepthBuffer", |lua, this, ()| {
             let buf = this.inner.borrow().get_depth_buffer();
             let tbl = lua.create_table()?;
@@ -980,12 +1491,24 @@ impl LuaUserData for LuaColumnBatch {
             }
             Ok(tbl)
         });
+        /// Returns the column count.
+        ///
+        /// # Returns
+        /// The current column count.
         methods.add_method("getColumnCount", |_, this, ()| {
             Ok(this.inner.borrow().get_column_count())
         });
+        /// Returns the screen width.
+        ///
+        /// # Returns
+        /// The current screen width.
         methods.add_method("getScreenWidth", |_, this, ()| {
             Ok(this.inner.borrow().get_screen_width())
         });
+        /// Returns the screen height.
+        ///
+        /// # Returns
+        /// The current screen height.
         methods.add_method("getScreenHeight", |_, this, ()| {
             Ok(this.inner.borrow().get_screen_height())
         });
@@ -1011,22 +1534,59 @@ impl LuaUserData for LuaCamera2D {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
         add_type_methods::<Self>(methods);
 
+        /// Sets the position.
+        ///
+        /// # Parameters
+        /// - `x` — `number`.
+        /// - `y` — `number`.
         methods.add_method("setPosition", |_, this, (x, y): (f32, f32)| {
             this.inner.borrow_mut().set_position(x, y);
             Ok(())
         });
+        /// Returns the position.
+        ///
+        /// # Parameters
+        /// - `z` — `number`.
+        ///
+        /// # Returns
+        /// The current position.
         methods.add_method("getPosition", |_, this, ()| {
             Ok(this.inner.borrow().get_position())
         });
+        /// Sets the zoom.
+        ///
+        /// # Parameters
+        /// - `z` — `number`.
         methods.add_method("setZoom", |_, this, z: f32| {
             this.inner.borrow_mut().set_zoom(z);
             Ok(())
         });
+        /// Returns the zoom.
+        ///
+        /// # Parameters
+        /// - `r` — `number`.
+        ///
+        /// # Returns
+        /// The current zoom.
         methods.add_method("getZoom", |_, this, ()| Ok(this.inner.borrow().get_zoom()));
+        /// Sets the rotation.
+        ///
+        /// # Parameters
+        /// - `r` — `number`.
         methods.add_method("setRotation", |_, this, r: f32| {
             this.inner.borrow_mut().set_rotation(r);
             Ok(())
         });
+        /// Returns the rotation.
+        ///
+        /// # Parameters
+        /// - `x` — `number`.
+        /// - `y` — `number`.
+        /// - `w` — `number`.
+        /// - `h` — `number`.
+        ///
+        /// # Returns
+        /// The current rotation.
         methods.add_method("getRotation", |_, this, ()| {
             Ok(this.inner.borrow().get_rotation())
         });
@@ -1037,6 +1597,16 @@ impl LuaUserData for LuaCamera2D {
                 Ok(())
             },
         );
+        /// Returns the viewport.
+        ///
+        /// # Parameters
+        /// - `x` — `number`.
+        /// - `y` — `number`.
+        /// - `w` — `number`.
+        /// - `h` — `number`.
+        ///
+        /// # Returns
+        /// The current viewport.
         methods.add_method("getViewport", |_, this, ()| {
             Ok(this.inner.borrow().get_viewport())
         });
@@ -1047,6 +1617,10 @@ impl LuaUserData for LuaCamera2D {
                 Ok(())
             },
         );
+        /// Returns the bounds.
+        ///
+        /// # Returns
+        /// The current bounds.
         methods.add_method("getBounds", |_, this, ()| {
             match this.inner.borrow().get_bounds() {
                 Some((x, y, w, h)) => Ok(LuaMultiValue::from_vec(vec![
@@ -1058,34 +1632,84 @@ impl LuaUserData for LuaCamera2D {
                 None => Ok(LuaMultiValue::from_vec(vec![LuaValue::Nil])),
             }
         });
+        /// Removes bounds from the collection.
+        ///
+        /// # Parameters
+        /// - `dx` — `number`.
+        /// - `dy` — `number`.
         methods.add_method("removeBounds", |_, this, ()| {
             this.inner.borrow_mut().remove_bounds();
             Ok(())
         });
+        /// Returns `true` if bounds.
+        ///
+        /// # Parameters
+        /// - `dx` — `number`.
+        /// - `dy` — `number`.
+        ///
+        /// # Returns
+        /// `boolean`.
         methods.add_method("hasBounds", |_, this, ()| {
             Ok(this.inner.borrow().has_bounds())
         });
+        /// Move on this Camera2D.
+        ///
+        /// # Parameters
+        /// - `dx` — `number`.
+        /// - `dy` — `number`.
         methods.add_method("move", |_, this, (dx, dy): (f32, f32)| {
             this.inner.borrow_mut().move_by(dx, dy);
             Ok(())
         });
+        /// Look at on this Camera2D.
+        ///
+        /// # Parameters
+        /// - `x` — `number`.
+        /// - `y` — `number`.
         methods.add_method("lookAt", |_, this, (x, y): (f32, f32)| {
             this.inner.borrow_mut().look_at(x, y);
             Ok(())
         });
+        /// To world coords on this Camera2D.
+        ///
+        /// # Parameters
+        /// - `sx` — `number`.
+        /// - `sy` — `number`.
         methods.add_method("toWorldCoords", |_, this, (sx, sy): (f32, f32)| {
             Ok(this.inner.borrow().to_world_coords(sx, sy))
         });
+        /// To screen coords on this Camera2D.
+        ///
+        /// # Parameters
+        /// - `wx` — `number`.
+        /// - `wy` — `number`.
         methods.add_method("toScreenCoords", |_, this, (wx, wy): (f32, f32)| {
             Ok(this.inner.borrow().to_screen_coords(wx, wy))
         });
+        /// Returns the visible area.
+        ///
+        /// # Parameters
+        /// - `w` — `number`.
+        /// - `h` — `number`.
+        ///
+        /// # Returns
+        /// The current visible area.
         methods.add_method("getVisibleArea", |_, this, ()| {
             Ok(this.inner.borrow().get_visible_area())
         });
+        /// Sets the dead zone.
+        ///
+        /// # Parameters
+        /// - `w` — `number`.
+        /// - `h` — `number`.
         methods.add_method("setDeadZone", |_, this, (w, h): (f32, f32)| {
             this.inner.borrow_mut().set_dead_zone(w, h);
             Ok(())
         });
+        /// Returns the dead zone.
+        ///
+        /// # Returns
+        /// The current dead zone.
         methods.add_method("getDeadZone", |_, this, ()| {
             match this.inner.borrow().get_dead_zone() {
                 Some((w, h)) => Ok(LuaMultiValue::from_vec(vec![
@@ -1095,10 +1719,19 @@ impl LuaUserData for LuaCamera2D {
                 None => Ok(LuaMultiValue::from_vec(vec![LuaValue::Nil])),
             }
         });
+        /// Sets the target.
+        ///
+        /// # Parameters
+        /// - `x` — `number`.
+        /// - `y` — `number`.
         methods.add_method("setTarget", |_, this, (x, y): (f32, f32)| {
             this.inner.borrow_mut().set_target(x, y);
             Ok(())
         });
+        /// Returns the target.
+        ///
+        /// # Returns
+        /// The current target.
         methods.add_method("getTarget", |_, this, ()| {
             match this.inner.borrow().get_target() {
                 Some((x, y)) => Ok(LuaMultiValue::from_vec(vec![
@@ -1108,24 +1741,57 @@ impl LuaUserData for LuaCamera2D {
                 None => Ok(LuaMultiValue::from_vec(vec![LuaValue::Nil])),
             }
         });
+        /// Sets the follow smooth.
+        ///
+        /// # Parameters
+        /// - `intensity` — `number`.
+        /// - `duration` — `number`.
         methods.add_method("setFollowSmooth", |_, this, s: f32| {
             this.inner.borrow_mut().set_follow_smooth(s);
             Ok(())
         });
+        /// Returns the follow smooth.
+        ///
+        /// # Parameters
+        /// - `intensity` — `number`.
+        /// - `duration` — `number`.
+        ///
+        /// # Returns
+        /// The current follow smooth.
         methods.add_method("getFollowSmooth", |_, this, ()| {
             Ok(this.inner.borrow().get_follow_smooth())
         });
+        /// Shake on this Camera2D.
+        ///
+        /// # Parameters
+        /// - `intensity` — `number`.
+        /// - `duration` — `number`.
         methods.add_method("shake", |_, this, (intensity, duration): (f32, f32)| {
             this.inner.borrow_mut().shake(intensity, duration);
             Ok(())
         });
+        /// Sets the look ahead.
+        ///
+        /// # Parameters
+        /// - `mul` — `number`.
         methods.add_method("setLookAhead", |_, this, mul: f32| {
             this.inner.borrow_mut().set_look_ahead(mul);
             Ok(())
         });
+        /// Returns the look ahead.
+        ///
+        /// # Parameters
+        /// - `dt` — `number`.
+        ///
+        /// # Returns
+        /// The current look ahead.
         methods.add_method("getLookAhead", |_, this, ()| {
             Ok(this.inner.borrow().get_look_ahead())
         });
+        /// Advances the simulation by `dt` seconds.
+        ///
+        /// # Parameters
+        /// - `dt` — `number`.
         methods.add_method("update", |_, this, dt: f32| {
             this.inner.borrow_mut().update(dt);
             Ok(())
@@ -1153,6 +1819,13 @@ impl LuaUserData for LuaAnimation {
         add_type_methods::<Self>(methods);
 
         // addFrame(x, y, w, h) → 1-based index
+        /// Adds frame to the collection.
+        ///
+        /// # Parameters
+        /// - `x` — `number`.
+        /// - `y` — `number`.
+        /// - `w` — `number`.
+        /// - `h` — `number`.
         methods.add_method("addFrame", |_, this, (x, y, w, h): (f32, f32, f32, f32)| {
             let idx = this.inner.borrow_mut().add_frame(Rect::new(x, y, w, h));
             // Rust returns 0-based index; convert to 1-based
@@ -1172,21 +1845,41 @@ impl LuaUserData for LuaAnimation {
                 Ok(())
             },
         );
+        /// Starts playback.
+        ///
+        /// # Parameters
+        /// - `name` — `string`.
         methods.add_method("play", |_, this, name: String| {
             Ok(this.inner.borrow_mut().play(&name))
         });
+        /// Stops playback.
+        ///
+        /// # Returns
+        /// The result.
         methods.add_method("stop", |_, this, ()| {
             this.inner.borrow_mut().stop();
             Ok(())
         });
+        /// Pauses playback.
+        ///
+        /// # Returns
+        /// The result.
         methods.add_method("pause", |_, this, ()| {
             this.inner.borrow_mut().pause();
             Ok(())
         });
+        /// Resumes paused playback.
+        ///
+        /// # Parameters
+        /// - `dt` — `number`.
         methods.add_method("resume", |_, this, ()| {
             this.inner.borrow_mut().resume();
             Ok(())
         });
+        /// Advances the simulation by `dt` seconds.
+        ///
+        /// # Parameters
+        /// - `dt` — `number`.
         methods.add_method("update", |_, this, dt: f32| {
             let mut anim = this.inner.borrow_mut();
             anim.update(dt);
@@ -1194,6 +1887,10 @@ impl LuaUserData for LuaAnimation {
             let _ = anim.drain_events();
             Ok(())
         });
+        /// Returns the current quad.
+        ///
+        /// # Returns
+        /// The current current quad.
         methods.add_method("getCurrentQuad", |_, this, ()| {
             match this.inner.borrow().current_quad() {
                 Some(r) => Ok(LuaMultiValue::from_vec(vec![
@@ -1206,9 +1903,17 @@ impl LuaUserData for LuaAnimation {
             }
         });
         // getCurrentFrame() → 1-based
+        /// Returns the current frame.
+        ///
+        /// # Returns
+        /// The current current frame.
         methods.add_method("getCurrentFrame", |_, this, ()| {
             Ok(this.inner.borrow().current_frame() + 1)
         });
+        /// Returns the current clip.
+        ///
+        /// # Returns
+        /// The current current clip.
         methods.add_method("getCurrentClip", |_, this, ()| {
             Ok(this
                 .inner
@@ -1216,26 +1921,66 @@ impl LuaUserData for LuaAnimation {
                 .get_current_clip()
                 .map(|s| s.to_string()))
         });
+        /// Returns `true` if playing.
+        ///
+        /// # Parameters
+        /// - `f` — `number`.
+        ///
+        /// # Returns
+        /// `boolean`.
         methods.add_method("isPlaying", |_, this, ()| {
             Ok(this.inner.borrow().is_playing())
         });
+        /// Returns `true` if looping.
+        ///
+        /// # Parameters
+        /// - `f` — `number`.
+        ///
+        /// # Returns
+        /// `boolean`.
         methods.add_method("isLooping", |_, this, ()| {
             Ok(this.inner.borrow().is_looping())
         });
+        /// Sets the speed.
+        ///
+        /// # Parameters
+        /// - `f` — `number`.
         methods.add_method("setSpeed", |_, this, f: f32| {
             this.inner.borrow_mut().set_speed(f);
             Ok(())
         });
+        /// Returns the speed.
+        ///
+        /// # Returns
+        /// The current speed.
         methods.add_method("getSpeed", |_, this, ()| {
             Ok(this.inner.borrow().get_speed())
         });
+        /// Returns the frame count.
+        ///
+        /// # Parameters
+        /// - `index` — `integer`.
+        ///
+        /// # Returns
+        /// The current frame count.
         methods.add_method("getFrameCount", |_, this, ()| {
             Ok(this.inner.borrow().get_frame_count())
         });
+        /// Returns the clip count.
+        ///
+        /// # Parameters
+        /// - `index` — `integer`.
+        ///
+        /// # Returns
+        /// The current clip count.
         methods.add_method("getClipCount", |_, this, ()| {
             Ok(this.inner.borrow().get_clip_count())
         });
         // setFrame(index) — 1-based
+        /// Sets the frame.
+        ///
+        /// # Parameters
+        /// - `index` — `integer`.
         methods.add_method("setFrame", |_, this, index: usize| {
             this.inner.borrow_mut().set_frame(index.saturating_sub(1));
             Ok(())
@@ -1318,36 +2063,84 @@ impl LuaUserData for LuaTrail {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
         add_type_methods::<Self>(methods);
 
+        /// Adds point to the collection.
+        ///
+        /// # Parameters
+        /// - `x` — `number`.
+        /// - `y` — `number`.
         methods.add_method("pushPoint", |_, this, (x, y): (f32, f32)| {
             this.inner.borrow_mut().push_point(x, y);
             Ok(())
         });
+        /// Advances the simulation by `dt` seconds.
+        ///
+        /// # Parameters
+        /// - `start` — `number`.
+        /// - `end` — `number` optional.
         methods.add_method("update", |_, this, dt: f32| {
             this.inner.borrow_mut().update(dt);
             Ok(())
         });
+        /// Sets the width.
+        ///
+        /// # Parameters
+        /// - `start` — `number`.
+        /// - `end` — `number` optional.
         methods.add_method("setWidth", |_, this, (start, end): (f32, Option<f32>)| {
             this.inner.borrow_mut().set_width(start, end);
             Ok(())
         });
+        /// Sets the lifetime.
+        ///
+        /// # Parameters
+        /// - `lt` — `number`.
         methods.add_method("setLifetime", |_, this, lt: f32| {
             this.inner.borrow_mut().set_lifetime(lt);
             Ok(())
         });
+        /// Returns the lifetime.
+        ///
+        /// # Parameters
+        /// - `d` — `number`.
+        ///
+        /// # Returns
+        /// The current lifetime.
         methods.add_method("getLifetime", |_, this, ()| {
             Ok(this.inner.borrow().get_lifetime())
         });
+        /// Sets the min distance.
+        ///
+        /// # Parameters
+        /// - `d` — `number`.
         methods.add_method("setMinDistance", |_, this, d: f32| {
             this.inner.borrow_mut().set_min_distance(d);
             Ok(())
         });
+        /// Removes all entries.
+        ///
+        /// # Returns
+        /// The result.
         methods.add_method("clear", |_, this, ()| {
             this.inner.borrow_mut().clear();
             Ok(())
         });
+        /// Returns the point count.
+        ///
+        /// # Returns
+        /// The current point count.
         methods.add_method("getPointCount", |_, this, ()| {
             Ok(this.inner.borrow().get_point_count())
         });
+        /// Returns the width.
+        ///
+        /// # Parameters
+        /// - `r` — `number`.
+        /// - `g` — `number`.
+        /// - `b` — `number`.
+        /// - `a` — `number` optional.
+        ///
+        /// # Returns
+        /// The current width.
         methods.add_method("getWidth", |_, this, ()| {
             Ok(this.inner.borrow().get_width())
         });
@@ -1387,12 +2180,24 @@ impl LuaUserData for LuaDecalSurface {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
         add_type_methods::<Self>(methods);
 
+        /// Returns the dimensions.
+        ///
+        /// # Returns
+        /// The current dimensions.
         methods.add_method("getDimensions", |_, this, ()| {
             Ok(this.inner.borrow().get_dimensions())
         });
+        /// Returns the width.
+        ///
+        /// # Returns
+        /// The current width.
         methods.add_method("getWidth", |_, this, ()| {
             Ok(this.inner.borrow().get_width())
         });
+        /// Returns the height.
+        ///
+        /// # Returns
+        /// The current height.
         methods.add_method("getHeight", |_, this, ()| {
             Ok(this.inner.borrow().get_height())
         });
@@ -1414,6 +2219,10 @@ impl LuaUserData for LuaPaletteLUT {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
         add_type_methods::<Self>(methods);
 
+        /// Returns the color count.
+        ///
+        /// # Returns
+        /// The current color count.
         methods.add_method("getColorCount", |_, this, ()| {
             Ok(this.inner.borrow().get_color_count())
         });
@@ -1439,6 +2248,13 @@ impl LuaUserData for LuaPaletteLUT {
                 Ok(())
             },
         );
+        /// Returns the from color.
+        ///
+        /// # Parameters
+        /// - `index` — `integer`.
+        ///
+        /// # Returns
+        /// The current from color.
         methods.add_method("getFromColor", |_, this, index: usize| {
             match this.inner.borrow().get_from_color(index) {
                 Some(c) => Ok(LuaMultiValue::from_vec(vec![
@@ -1450,6 +2266,13 @@ impl LuaUserData for LuaPaletteLUT {
                 None => Ok(LuaMultiValue::from_vec(vec![LuaValue::Nil])),
             }
         });
+        /// Returns the to color.
+        ///
+        /// # Parameters
+        /// - `index` — `integer`.
+        ///
+        /// # Returns
+        /// The current to color.
         methods.add_method("getToColor", |_, this, index: usize| {
             match this.inner.borrow().get_to_color(index) {
                 Some(c) => Ok(LuaMultiValue::from_vec(vec![
@@ -1461,6 +2284,10 @@ impl LuaUserData for LuaPaletteLUT {
                 None => Ok(LuaMultiValue::from_vec(vec![LuaValue::Nil])),
             }
         });
+        /// Removes all entries.
+        ///
+        /// # Returns
+        /// The result.
         methods.add_method("clear", |_, this, ()| {
             this.inner.borrow_mut().clear();
             Ok(())

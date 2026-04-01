@@ -32,6 +32,11 @@ impl LuaUserData for LuaPostFxEffect {
         add_type_methods::<Self>(methods);
 
         // setParameter(name, value)
+        /// Sets the parameter.
+        ///
+        /// # Parameters
+        /// - `name` — `string`.
+        /// - `value` — `number`.
         methods.add_method("setParameter", |_, this, (name, value): (String, f32)| {
             this.inner.borrow_mut().set_parameter(name, value);
             Ok(())
@@ -49,11 +54,22 @@ impl LuaUserData for LuaPostFxEffect {
         );
 
         // hasParameter(name) -> boolean
+        /// Returns `true` if parameter.
+        ///
+        /// # Parameters
+        /// - `name` — `string`.
+        ///
+        /// # Returns
+        /// `boolean`.
         methods.add_method("hasParameter", |_, this, name: String| {
             Ok(this.inner.borrow().has_parameter(&name))
         });
 
         // getParameterNames() -> table<string>
+        /// Returns the parameter names.
+        ///
+        /// # Returns
+        /// The current parameter names.
         methods.add_method("getParameterNames", |lua, this, ()| {
             let names = this.inner.borrow().get_parameter_names();
             let table = lua.create_table()?;
@@ -64,19 +80,38 @@ impl LuaUserData for LuaPostFxEffect {
         });
 
         // getType() -> string
+        /// Returns the effect type.
+        ///
+        /// # Returns
+        /// The current effect type.
         methods.add_method("getEffectType", |_, this, ()| {
             Ok(this.inner.borrow().get_type_name().to_string())
         });
 
         // isBuiltIn() -> boolean
+        /// Returns `true` if built in.
+        ///
+        /// # Returns
+        /// `boolean`.
         methods.add_method("isBuiltIn", |_, this, ()| {
             Ok(this.inner.borrow().is_built_in())
         });
 
         // isEnabled() -> boolean
+        /// Returns `true` if enabled.
+        ///
+        /// # Parameters
+        /// - `enabled` — `boolean`.
+        ///
+        /// # Returns
+        /// `boolean`.
         methods.add_method("isEnabled", |_, this, ()| Ok(this.inner.borrow().enabled));
 
         // setEnabled(enabled)
+        /// Sets the enabled.
+        ///
+        /// # Parameters
+        /// - `enabled` — `boolean`.
         methods.add_method("setEnabled", |_, this, enabled: bool| {
             this.inner.borrow_mut().enabled = enabled;
             Ok(())
@@ -85,18 +120,30 @@ impl LuaUserData for LuaPostFxEffect {
         // --- Convenience setters ---
 
         // setThreshold(value) — bloom bright-pass threshold
+        /// Sets the threshold.
+        ///
+        /// # Parameters
+        /// - `value` — `number`.
         methods.add_method("setThreshold", |_, this, value: f32| {
             this.inner.borrow_mut().set_parameter("threshold", value);
             Ok(())
         });
 
         // setIntensity(value) — bloom/godrays intensity
+        /// Sets the intensity.
+        ///
+        /// # Parameters
+        /// - `value` — `number`.
         methods.add_method("setIntensity", |_, this, value: f32| {
             this.inner.borrow_mut().set_parameter("intensity", value);
             Ok(())
         });
 
         // setScanlineStrength(value) — CRT scanline visibility
+        /// Sets the scanline strength.
+        ///
+        /// # Parameters
+        /// - `value` — `number`.
         methods.add_method("setScanlineStrength", |_, this, value: f32| {
             this.inner
                 .borrow_mut()
@@ -105,36 +152,60 @@ impl LuaUserData for LuaPostFxEffect {
         });
 
         // setRadius(value) — blur radius
+        /// Sets the radius.
+        ///
+        /// # Parameters
+        /// - `value` — `number`.
         methods.add_method("setRadius", |_, this, value: f32| {
             this.inner.borrow_mut().set_parameter("radius", value);
             Ok(())
         });
 
         // setStrength(value) — vignette/blur strength
+        /// Sets the strength.
+        ///
+        /// # Parameters
+        /// - `value` — `number`.
         methods.add_method("setStrength", |_, this, value: f32| {
             this.inner.borrow_mut().set_parameter("strength", value);
             Ok(())
         });
 
         // setOffset(value) — chromatic aberration offset
+        /// Sets the offset.
+        ///
+        /// # Parameters
+        /// - `value` — `number`.
         methods.add_method("setOffset", |_, this, value: f32| {
             this.inner.borrow_mut().set_parameter("offset", value);
             Ok(())
         });
 
         // setBrightness(value) — colour grading brightness
+        /// Sets the brightness.
+        ///
+        /// # Parameters
+        /// - `value` — `number`.
         methods.add_method("setBrightness", |_, this, value: f32| {
             this.inner.borrow_mut().set_parameter("brightness", value);
             Ok(())
         });
 
         // setContrast(value) — colour grading contrast
+        /// Sets the contrast.
+        ///
+        /// # Parameters
+        /// - `value` — `number`.
         methods.add_method("setContrast", |_, this, value: f32| {
             this.inner.borrow_mut().set_parameter("contrast", value);
             Ok(())
         });
 
         // setSaturation(value) — colour grading saturation
+        /// Sets the saturation.
+        ///
+        /// # Parameters
+        /// - `value` — `number`.
         methods.add_method("setSaturation", |_, this, value: f32| {
             this.inner.borrow_mut().set_parameter("saturation", value);
             Ok(())
@@ -164,6 +235,10 @@ impl LuaUserData for LuaPostFxStack {
         add_type_methods::<Self>(methods);
 
         // add(effect) — append an effect to the end of the chain
+        /// Adds an entry to the collection.
+        ///
+        /// # Parameters
+        /// - `effect` — `userdata`.
         methods.add_method("add", |_, this, effect: LuaAnyUserData| {
             let effect: LuaPostFxEffect = effect.borrow::<LuaPostFxEffect>()?.clone();
             let idx = {
@@ -177,6 +252,10 @@ impl LuaUserData for LuaPostFxStack {
         });
 
         // remove(effect) -> boolean
+        /// Removes the entry from the collection.
+        ///
+        /// # Parameters
+        /// - `effect` — `userdata`.
         methods.add_method("remove", |_, this, effect: LuaAnyUserData| {
             let effect: LuaPostFxEffect = effect.borrow::<LuaPostFxEffect>()?.clone();
             let effect_idx = this
@@ -225,6 +304,13 @@ impl LuaUserData for LuaPostFxStack {
         );
 
         // isEnabled(effect) -> boolean
+        /// Returns `true` if effect enabled.
+        ///
+        /// # Parameters
+        /// - `effect` — `userdata`.
+        ///
+        /// # Returns
+        /// `boolean`.
         methods.add_method("isEffectEnabled", |_, this, effect: LuaAnyUserData| {
             let effect: LuaPostFxEffect = effect.borrow::<LuaPostFxEffect>()?.clone();
             let effect_idx = this
@@ -238,11 +324,25 @@ impl LuaUserData for LuaPostFxStack {
         });
 
         // getEffectCount() -> int
+        /// Returns the effect count.
+        ///
+        /// # Parameters
+        /// - `index` — `integer`.
+        ///
+        /// # Returns
+        /// The current effect count.
         methods.add_method("getEffectCount", |_, this, ()| {
             Ok(this.inner.borrow().get_effect_count())
         });
 
         // getEffect(index) -> Effect | nil
+        /// Returns the effect.
+        ///
+        /// # Parameters
+        /// - `index` — `integer`.
+        ///
+        /// # Returns
+        /// The current effect.
         methods.add_method("getEffect", |_, this, index: usize| {
             let stack = this.inner.borrow();
             if let Some(effect_idx) = stack.get_effect(index) {
@@ -257,6 +357,10 @@ impl LuaUserData for LuaPostFxStack {
         });
 
         // getEnabledEffects() -> table of Effects
+        /// Returns the enabled effects.
+        ///
+        /// # Returns
+        /// The current enabled effects.
         methods.add_method("getEnabledEffects", |lua, this, ()| {
             let stack = this.inner.borrow();
             let effects = this.effects.borrow();
@@ -276,27 +380,48 @@ impl LuaUserData for LuaPostFxStack {
         });
 
         // resize(width, height) — recreate internal canvases at new resolution
+        /// Resize on this PostFxStack.
+        ///
+        /// # Parameters
+        /// - `w` — `integer`.
+        /// - `h` — `integer`.
         methods.add_method("resize", |_, this, (w, h): (u32, u32)| {
             this.inner.borrow_mut().resize(w, h);
             Ok(())
         });
 
         // getWidth() -> int
+        /// Returns the width.
+        ///
+        /// # Returns
+        /// The current width.
         methods.add_method("getWidth", |_, this, ()| {
             Ok(this.inner.borrow().get_width())
         });
 
         // getHeight() -> int
+        /// Returns the height.
+        ///
+        /// # Returns
+        /// The current height.
         methods.add_method("getHeight", |_, this, ()| {
             Ok(this.inner.borrow().get_height())
         });
 
         // getDimensions() -> int, int
+        /// Returns the dimensions.
+        ///
+        /// # Returns
+        /// The current dimensions.
         methods.add_method("getDimensions", |_, this, ()| {
             Ok(this.inner.borrow().get_dimensions())
         });
 
         // isCapturing() -> boolean
+        /// Returns `true` if capturing.
+        ///
+        /// # Returns
+        /// `boolean`.
         methods.add_method("isCapturing", |_, this, ()| {
             Ok(this.inner.borrow().capturing)
         });
@@ -379,6 +504,10 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
         })?,
     )?;
 
+    /// Postfx on this PostFxStack.
+    ///
+    /// # Returns
+    /// The result.
     luna.set("postfx", postfx)?;
 
     Ok(())

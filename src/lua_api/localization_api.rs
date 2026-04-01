@@ -307,6 +307,10 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
         )?;
     }
 
+    /// Localization on this Object.
+    ///
+    /// # Returns
+    /// The result.
     luna.set("localization", loc)?;
     Ok(())
 }

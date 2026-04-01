@@ -30,52 +30,137 @@ struct LuaVec2 {
 
 impl LuaUserData for LuaVec2 {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
+        /// Returns the x.
+        ///
+        /// # Parameters
+        /// - `x` — `number`.
+        ///
+        /// # Returns
+        /// The current x.
         methods.add_method("getX", |_, this, ()| Ok(this.inner.borrow().x));
+        /// Returns the y.
+        ///
+        /// # Parameters
+        /// - `x` — `number`.
+        ///
+        /// # Returns
+        /// The current y.
         methods.add_method("getY", |_, this, ()| Ok(this.inner.borrow().y));
+        /// Sets the x.
+        ///
+        /// # Parameters
+        /// - `x` — `number`.
         methods.add_method("setX", |_, this, x: f32| {
             this.inner.borrow_mut().x = x;
             Ok(())
         });
+        /// Sets the y.
+        ///
+        /// # Parameters
+        /// - `y` — `number`.
         methods.add_method("setY", |_, this, y: f32| {
             this.inner.borrow_mut().y = y;
             Ok(())
         });
+        /// Returns the current value.
+        ///
+        /// # Parameters
+        /// - `x` — `number`.
+        /// - `y` — `number`.
+        ///
+        /// # Returns
+        /// The current get.
         methods.add_method("get", |_, this, ()| {
             let v = *this.inner.borrow();
             Ok((v.x, v.y))
         });
+        /// Sets the value.
+        ///
+        /// # Parameters
+        /// - `x` — `number`.
+        /// - `y` — `number`.
         methods.add_method("set", |_, this, (x, y): (f32, f32)| {
             let mut v = this.inner.borrow_mut();
             v.x = x;
             v.y = y;
             Ok(())
         });
+        /// Returns the length.
+        ///
+        /// # Parameters
+        /// - `other` — `userdata`.
+        ///
+        /// # Returns
+        /// The current length.
         methods.add_method("getLength", |_, this, ()| Ok(this.inner.borrow().length()));
+        /// Returns the length squared.
+        ///
+        /// # Parameters
+        /// - `other` — `userdata`.
+        ///
+        /// # Returns
+        /// The current length squared.
         methods.add_method("getLengthSquared", |_, this, ()| {
             Ok(this.inner.borrow().length_squared())
         });
+        /// Returns the angle.
+        ///
+        /// # Parameters
+        /// - `other` — `userdata`.
+        ///
+        /// # Returns
+        /// The current angle.
         methods.add_method("getAngle", |_, this, ()| Ok(this.inner.borrow().angle()));
+        /// Dot on this Vec2.
+        ///
+        /// # Parameters
+        /// - `other` — `userdata`.
         methods.add_method("dot", |_, this, other: LuaAnyUserData| {
             let a = *this.inner.borrow();
             let b = *other.borrow::<LuaVec2>()?.inner.borrow();
             Ok(a.dot(b))
         });
+        /// Cross on this Vec2.
+        ///
+        /// # Parameters
+        /// - `other` — `userdata`.
         methods.add_method("cross", |_, this, other: LuaAnyUserData| {
             let a = *this.inner.borrow();
             let b = *other.borrow::<LuaVec2>()?.inner.borrow();
             Ok(a.x * b.y - a.y * b.x)
         });
+        /// Returns the distance.
+        ///
+        /// # Parameters
+        /// - `other` — `userdata`.
+        ///
+        /// # Returns
+        /// The current distance.
         methods.add_method("getDistance", |_, this, other: LuaAnyUserData| {
             let a = *this.inner.borrow();
             let b = *other.borrow::<LuaVec2>()?.inner.borrow();
             Ok(a.distance(b))
         });
+        /// Returns the normalized.
+        ///
+        /// # Parameters
+        /// - `angle` — `number`.
+        ///
+        /// # Returns
+        /// The current normalized.
         methods.add_method("getNormalized", |lua, this, ()| {
             let n = this.inner.borrow().normalize();
             lua.create_userdata(LuaVec2 {
                 inner: RefCell::new(n),
             })
         });
+        /// Returns the rotated.
+        ///
+        /// # Parameters
+        /// - `angle` — `number`.
+        ///
+        /// # Returns
+        /// The current rotated.
         methods.add_method("getRotated", |lua, this, angle: f32| {
             let v = *this.inner.borrow();
             let cos = angle.cos();
@@ -85,12 +170,25 @@ impl LuaUserData for LuaVec2 {
                 inner: RefCell::new(r),
             })
         });
+        /// Returns the perpendicular.
+        ///
+        /// # Parameters
+        /// - `other` — `userdata`.
+        /// - `t` — `number`.
+        ///
+        /// # Returns
+        /// The current perpendicular.
         methods.add_method("getPerpendicular", |lua, this, ()| {
             let v = *this.inner.borrow();
             lua.create_userdata(LuaVec2 {
                 inner: RefCell::new(Vec2::new(-v.y, v.x)),
             })
         });
+        /// Interpolates between start and target values.
+        ///
+        /// # Parameters
+        /// - `other` — `userdata`.
+        /// - `t` — `number`.
         methods.add_method("lerp", |lua, this, (other, t): (LuaAnyUserData, f32)| {
             let a = *this.inner.borrow();
             let b = *other.borrow::<LuaVec2>()?.inner.borrow();
@@ -98,6 +196,10 @@ impl LuaUserData for LuaVec2 {
                 inner: RefCell::new(a.lerp(b, t)),
             })
         });
+        /// Returns a deep copy of this object.
+        ///
+        /// # Parameters
+        /// - `other` — `userdata`.
         methods.add_method("clone", |lua, this, ()| {
             lua.create_userdata(LuaVec2 {
                 inner: RefCell::new(*this.inner.borrow()),
@@ -182,12 +284,27 @@ struct LuaNoiseGenerator {
 
 impl LuaUserData for LuaNoiseGenerator {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
+        /// Sets the seed.
+        ///
+        /// # Parameters
+        /// - `seed` — `integer`.
         methods.add_method("setSeed", |_, this, seed: u64| {
             this.inner.borrow_mut().set_seed(seed);
             Ok(())
         });
+        /// Returns the seed.
+        ///
+        /// # Parameters
+        /// - `args` — `LuaMultiValue`.
+        ///
+        /// # Returns
+        /// The current seed.
         methods.add_method("getSeed", |_, this, ()| Ok(this.inner.borrow().seed()));
 
+        /// Perlin noise on this NoiseGenerator.
+        ///
+        /// # Parameters
+        /// - `args` — `LuaMultiValue`.
         methods.add_method("perlinNoise", |_, this, args: LuaMultiValue| {
             let gen = this.inner.borrow();
             let n = args.len();
@@ -210,6 +327,10 @@ impl LuaUserData for LuaNoiseGenerator {
             }
         });
 
+        /// Simplex noise on this NoiseGenerator.
+        ///
+        /// # Parameters
+        /// - `args` — `LuaMultiValue`.
         methods.add_method("simplexNoise", |_, this, args: LuaMultiValue| {
             let gen = this.inner.borrow();
             let n = args.len();
@@ -390,24 +511,79 @@ struct LuaGrid {
 
 impl LuaUserData for LuaGrid {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
+        /// Returns the width.
+        ///
+        /// # Parameters
+        /// - `x` — `integer`.
+        /// - `y` — `integer`.
+        /// - `w` — `boolean`.
+        ///
+        /// # Returns
+        /// The current width.
         methods.add_method("getWidth", |_, this, ()| Ok(this.inner.borrow().width()));
+        /// Returns the height.
+        ///
+        /// # Parameters
+        /// - `x` — `integer`.
+        /// - `y` — `integer`.
+        /// - `w` — `boolean`.
+        ///
+        /// # Returns
+        /// The current height.
         methods.add_method("getHeight", |_, this, ()| Ok(this.inner.borrow().height()));
+        /// Returns the dimensions.
+        ///
+        /// # Parameters
+        /// - `x` — `integer`.
+        /// - `y` — `integer`.
+        /// - `w` — `boolean`.
+        ///
+        /// # Returns
+        /// The current dimensions.
         methods.add_method("getDimensions", |_, this, ()| {
             let g = this.inner.borrow();
             Ok((g.width(), g.height()))
         });
         // 1-based coords in Lua
+        /// Sets the walkable.
+        ///
+        /// # Parameters
+        /// - `x` — `integer`.
+        /// - `y` — `integer`.
+        /// - `w` — `boolean`.
         methods.add_method("setWalkable", |_, this, (x, y, w): (u32, u32, bool)| {
             this.inner.borrow_mut().set_walkable(x - 1, y - 1, w);
             Ok(())
         });
+        /// Returns `true` if walkable.
+        ///
+        /// # Parameters
+        /// - `x` — `integer`.
+        /// - `y` — `integer`.
+        ///
+        /// # Returns
+        /// `boolean`.
         methods.add_method("isWalkable", |_, this, (x, y): (u32, u32)| {
             Ok(this.inner.borrow().is_walkable(x - 1, y - 1))
         });
+        /// Sets the cost.
+        ///
+        /// # Parameters
+        /// - `x` — `integer`.
+        /// - `y` — `integer`.
+        /// - `cost` — `number`.
         methods.add_method("setCost", |_, this, (x, y, cost): (u32, u32, f32)| {
             this.inner.borrow_mut().set_cost(x - 1, y - 1, cost);
             Ok(())
         });
+        /// Returns the cost.
+        ///
+        /// # Parameters
+        /// - `x` — `integer`.
+        /// - `y` — `integer`.
+        ///
+        /// # Returns
+        /// The current cost.
         methods.add_method("getCost", |_, this, (x, y): (u32, u32)| {
             Ok(this.inner.borrow().get_cost(x - 1, y - 1))
         });
@@ -440,7 +616,15 @@ impl LuaUserData for LuaGrid {
                         let tbl = lua.create_table_with_capacity(p.len(), 0)?;
                         for (i, (px, py)) in p.iter().enumerate() {
                             let pt = lua.create_table_with_capacity(0, 2)?;
+                            /// X on this Grid.
+                            ///
+                            /// # Returns
+                            /// The result.
                             pt.set("x", px + 1)?;
+                            /// Y on this Grid.
+                            ///
+                            /// # Returns
+                            /// The result.
                             pt.set("y", py + 1)?;
                             tbl.raw_set(i + 1, pt)?;
                         }
@@ -451,6 +635,11 @@ impl LuaUserData for LuaGrid {
             },
         );
 
+        /// Build flow field on this Grid.
+        ///
+        /// # Parameters
+        /// - `gx` — `integer`.
+        /// - `gy` — `integer`.
         methods.add_method("buildFlowField", |lua, this, (gx, gy): (u32, u32)| {
             let g = this.inner.borrow();
             let field = g.build_flow_field(gx - 1, gy - 1);
@@ -460,9 +649,25 @@ impl LuaUserData for LuaGrid {
                 let x = (i as u32 % w) + 1;
                 let y = (i as u32 / w) + 1;
                 let entry = lua.create_table_with_capacity(0, 4)?;
+                /// X on this Grid.
+                ///
+                /// # Returns
+                /// The result.
                 entry.set("x", x)?;
+                /// Y on this Grid.
+                ///
+                /// # Returns
+                /// The result.
                 entry.set("y", y)?;
+                /// Dx on this Grid.
+                ///
+                /// # Returns
+                /// The result.
                 entry.set("dx", *dx)?;
+                /// Dy on this Grid.
+                ///
+                /// # Returns
+                /// The result.
                 entry.set("dy", *dy)?;
                 tbl.raw_set(i + 1, entry)?;
             }
@@ -491,6 +696,17 @@ fn to_string_id(val: &LuaValue) -> LuaResult<String> {
 
 impl LuaUserData for LuaSpatialHash {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
+        /// Returns the cell size.
+        ///
+        /// # Parameters
+        /// - `id` — `any`.
+        /// - `x` — `number`.
+        /// - `y` — `number`.
+        /// - `w` — `number`.
+        /// - `h` — `number`.
+        ///
+        /// # Returns
+        /// The current cell size.
         methods.add_method("getCellSize", |_, this, ()| {
             Ok(this.inner.borrow().cell_size())
         });
@@ -502,6 +718,14 @@ impl LuaUserData for LuaSpatialHash {
                 Ok(())
             },
         );
+        /// Removes the entry from the collection.
+        ///
+        /// # Parameters
+        /// - `id` — `any`.
+        /// - `x` — `number`.
+        /// - `y` — `number`.
+        /// - `w` — `number`.
+        /// - `h` — `number`.
         methods.add_method("remove", |_, this, id: LuaValue| {
             let key = to_string_id(&id)?;
             this.inner.borrow_mut().remove(&key);
@@ -515,6 +739,13 @@ impl LuaUserData for LuaSpatialHash {
                 Ok(())
             },
         );
+        /// Removes all entries.
+        ///
+        /// # Parameters
+        /// - `x` — `number`.
+        /// - `y` — `number`.
+        /// - `w` — `number`.
+        /// - `h` — `number`.
         methods.add_method("clear", |_, this, ()| {
             this.inner.borrow_mut().clear();
             Ok(())
@@ -530,6 +761,12 @@ impl LuaUserData for LuaSpatialHash {
                 Ok(tbl)
             },
         );
+        /// Query circle on this SpatialHash.
+        ///
+        /// # Parameters
+        /// - `cx` — `number`.
+        /// - `cy` — `number`.
+        /// - `r` — `number`.
         methods.add_method("queryCircle", |lua, this, (cx, cy, r): (f32, f32, f32)| {
             let ids = this.inner.borrow().query_circle(cx, cy, r);
             let tbl = lua.create_table_with_capacity(ids.len(), 0)?;
@@ -549,6 +786,10 @@ impl LuaUserData for LuaSpatialHash {
                 Ok(tbl)
             },
         );
+        /// Returns the item count.
+        ///
+        /// # Returns
+        /// The current item count.
         methods.add_method("getItemCount", |_, this, ()| {
             Ok(this.inner.borrow().item_count())
         });
@@ -568,20 +809,65 @@ struct LuaRaycaster2D {
 
 impl LuaUserData for LuaRaycaster2D {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
+        /// Returns the width.
+        ///
+        /// # Parameters
+        /// - `x` — `integer`.
+        /// - `y` — `integer`.
+        /// - `val` — `integer`.
+        ///
+        /// # Returns
+        /// The current width.
         methods.add_method("getWidth", |_, this, ()| Ok(this.inner.borrow().width()));
+        /// Returns the height.
+        ///
+        /// # Parameters
+        /// - `x` — `integer`.
+        /// - `y` — `integer`.
+        /// - `val` — `integer`.
+        ///
+        /// # Returns
+        /// The current height.
         methods.add_method("getHeight", |_, this, ()| Ok(this.inner.borrow().height()));
+        /// Returns the dimensions.
+        ///
+        /// # Parameters
+        /// - `x` — `integer`.
+        /// - `y` — `integer`.
+        /// - `val` — `integer`.
+        ///
+        /// # Returns
+        /// The current dimensions.
         methods.add_method("getDimensions", |_, this, ()| {
             let rc = this.inner.borrow();
             Ok((rc.width(), rc.height()))
         });
         // 1-based cell access
+        /// Sets the cell.
+        ///
+        /// # Parameters
+        /// - `x` — `integer`.
+        /// - `y` — `integer`.
+        /// - `val` — `integer`.
         methods.add_method("setCell", |_, this, (x, y, val): (u32, u32, u32)| {
             this.inner.borrow_mut().set_cell(x - 1, y - 1, val);
             Ok(())
         });
+        /// Returns the cell.
+        ///
+        /// # Parameters
+        /// - `x` — `integer`.
+        /// - `y` — `integer`.
+        ///
+        /// # Returns
+        /// The current cell.
         methods.add_method("getCell", |_, this, (x, y): (u32, u32)| {
             Ok(this.inner.borrow().get_cell(x - 1, y - 1))
         });
+        /// Sets the cells.
+        ///
+        /// # Parameters
+        /// - `data` — `table`.
         methods.add_method("setCells", |_, this, data: LuaTable| {
             let len = data.raw_len();
             let mut vec = Vec::with_capacity(len);
@@ -592,6 +878,14 @@ impl LuaUserData for LuaRaycaster2D {
             this.inner.borrow_mut().set_cells(vec);
             Ok(())
         });
+        /// Returns `true` if blocked.
+        ///
+        /// # Parameters
+        /// - `x` — `integer`.
+        /// - `y` — `integer`.
+        ///
+        /// # Returns
+        /// `boolean`.
         methods.add_method("isBlocked", |_, this, (x, y): (u32, u32)| {
             Ok(this.inner.borrow().is_blocked(x - 1, y - 1))
         });
@@ -632,12 +926,40 @@ impl LuaUserData for LuaRaycaster2D {
                 let tbl = lua.create_table_with_capacity(hits.len(), 0)?;
                 for (i, h) in hits.iter().enumerate() {
                     let entry = lua.create_table_with_capacity(0, 7)?;
+                    /// Distance on this Raycaster2D.
+                    ///
+                    /// # Returns
+                    /// The result.
                     entry.set("distance", h.distance)?;
+                    /// Cell value on this Raycaster2D.
+                    ///
+                    /// # Returns
+                    /// The result.
                     entry.set("cellValue", h.cell_value)?;
+                    /// Side on this Raycaster2D.
+                    ///
+                    /// # Returns
+                    /// The result.
                     entry.set("side", h.side)?;
+                    /// Tex u on this Raycaster2D.
+                    ///
+                    /// # Returns
+                    /// The result.
                     entry.set("texU", h.tex_u)?;
+                    /// Hit x on this Raycaster2D.
+                    ///
+                    /// # Returns
+                    /// The result.
                     entry.set("hitX", h.hit_x)?;
+                    /// Hit y on this Raycaster2D.
+                    ///
+                    /// # Returns
+                    /// The result.
                     entry.set("hitY", h.hit_y)?;
+                    /// Hit on this Raycaster2D.
+                    ///
+                    /// # Returns
+                    /// The result.
                     entry.set("hit", h.hit)?;
                     tbl.raw_set(i + 1, entry)?;
                 }
@@ -689,54 +1011,118 @@ struct LuaTileWalker {
 impl LuaUserData for LuaTileWalker {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
         // 1-based position
+        /// Returns the position.
+        ///
+        /// # Parameters
+        /// - `x` — `integer`.
+        /// - `y` — `integer`.
+        ///
+        /// # Returns
+        /// The current position.
         methods.add_method("getPosition", |_, this, ()| {
             let w = this.inner.borrow();
             Ok((w.x() + 1, w.y() + 1))
         });
+        /// Sets the position.
+        ///
+        /// # Parameters
+        /// - `x` — `integer`.
+        /// - `y` — `integer`.
         methods.add_method("setPosition", |_, this, (x, y): (i32, i32)| {
             this.inner.borrow_mut().set_position(x - 1, y - 1);
             Ok(())
         });
+        /// Returns the facing.
+        ///
+        /// # Parameters
+        /// - `facing` — `string`.
+        ///
+        /// # Returns
+        /// The current facing.
         methods.add_method("getFacing", |_, this, ()| {
             Ok(this.inner.borrow().facing().to_str().to_string())
         });
+        /// Sets the facing.
+        ///
+        /// # Parameters
+        /// - `facing` — `string`.
         methods.add_method("setFacing", |_, this, facing: String| {
             let f = Facing::parse(&facing)
                 .ok_or_else(|| LuaError::RuntimeError(format!("invalid facing: {facing}")))?;
             this.inner.borrow_mut().set_facing(f);
             Ok(())
         });
+        /// Returns the facing angle.
+        ///
+        /// # Returns
+        /// The current facing angle.
         methods.add_method("getFacingAngle", |_, this, ()| {
             Ok(this.inner.borrow().facing().angle())
         });
+        /// Returns the facing direction.
+        ///
+        /// # Returns
+        /// The current facing direction.
         methods.add_method("getFacingDirection", |_, this, ()| {
             let f = this.inner.borrow().facing();
             Ok((f.dx(), f.dy()))
         });
+        /// Move forward on this TileWalker.
+        ///
+        /// # Returns
+        /// The result.
         methods.add_method("moveForward", |_, this, ()| {
             Ok(this.inner.borrow_mut().move_forward())
         });
+        /// Move backward on this TileWalker.
+        ///
+        /// # Returns
+        /// The result.
         methods.add_method("moveBackward", |_, this, ()| {
             Ok(this.inner.borrow_mut().move_backward())
         });
+        /// Strafe left on this TileWalker.
+        ///
+        /// # Returns
+        /// The result.
         methods.add_method("strafeLeft", |_, this, ()| {
             Ok(this.inner.borrow_mut().strafe_left())
         });
+        /// Strafe right on this TileWalker.
+        ///
+        /// # Returns
+        /// The result.
         methods.add_method("strafeRight", |_, this, ()| {
             Ok(this.inner.borrow_mut().strafe_right())
         });
+        /// Turn left on this TileWalker.
+        ///
+        /// # Returns
+        /// The result.
         methods.add_method("turnLeft", |_, this, ()| {
             this.inner.borrow_mut().turn_left();
             Ok(())
         });
+        /// Turn right on this TileWalker.
+        ///
+        /// # Returns
+        /// The result.
         methods.add_method("turnRight", |_, this, ()| {
             this.inner.borrow_mut().turn_right();
             Ok(())
         });
+        /// Turn around on this TileWalker.
+        ///
+        /// # Parameters
+        /// - `rc_ud` — `userdata`.
         methods.add_method("turnAround", |_, this, ()| {
             this.inner.borrow_mut().turn_around();
             Ok(())
         });
+        /// Sets the raycaster.
+        ///
+        /// # Parameters
+        /// - `rc_ud` — `userdata`.
         methods.add_method("setRaycaster", |_, this, rc_ud: LuaAnyUserData| {
             let lua_rc = rc_ud.borrow::<LuaRaycaster2D>()?;
             this.inner
@@ -744,31 +1130,77 @@ impl LuaUserData for LuaTileWalker {
                 .set_raycaster(Rc::clone(&lua_rc.inner));
             Ok(())
         });
+        /// Returns `true` if move forward.
+        ///
+        /// # Returns
+        /// `boolean`.
         methods.add_method("canMoveForward", |_, this, ()| {
             Ok(this.inner.borrow().can_move_forward())
         });
+        /// Returns `true` if move backward.
+        ///
+        /// # Returns
+        /// `boolean`.
         methods.add_method("canMoveBackward", |_, this, ()| {
             Ok(this.inner.borrow().can_move_backward())
         });
+        /// Returns `true` if strafe left.
+        ///
+        /// # Returns
+        /// `boolean`.
         methods.add_method("canStrafeLeft", |_, this, ()| {
             Ok(this.inner.borrow().can_strafe_left())
         });
+        /// Returns `true` if strafe right.
+        ///
+        /// # Parameters
+        /// - `t` — `number`.
+        ///
+        /// # Returns
+        /// `boolean`.
         methods.add_method("canStrafeRight", |_, this, ()| {
             Ok(this.inner.borrow().can_strafe_right())
         });
+        /// Begin move on this TileWalker.
+        ///
+        /// # Parameters
+        /// - `t` — `number`.
         methods.add_method("beginMove", |_, this, ()| {
             this.inner.borrow_mut().begin_move();
             Ok(())
         });
+        /// Returns the interpolated position.
+        ///
+        /// # Parameters
+        /// - `t` — `number`.
+        ///
+        /// # Returns
+        /// The current interpolated position.
         methods.add_method("getInterpolatedPosition", |_, this, t: f32| {
             let (ix, iy) = this.inner.borrow().get_interpolated_position(t);
             // Return 1-based
             Ok((ix + 1.0, iy + 1.0))
         });
+        /// Returns the interpolated angle.
+        ///
+        /// # Parameters
+        /// - `tx` — `integer`.
+        /// - `ty` — `integer`.
+        ///
+        /// # Returns
+        /// The current interpolated angle.
         methods.add_method("getInterpolatedAngle", |_, this, t: f32| {
             Ok(this.inner.borrow().get_interpolated_angle(t))
         });
         // 1-based target coords
+        /// Returns the relative facing.
+        ///
+        /// # Parameters
+        /// - `tx` — `integer`.
+        /// - `ty` — `integer`.
+        ///
+        /// # Returns
+        /// The current relative facing.
         methods.add_method("getRelativeFacing", |_, this, (tx, ty): (i32, i32)| {
             Ok(this
                 .inner
@@ -790,13 +1222,29 @@ struct LuaTween {
 
 impl LuaUserData for LuaTween {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
+        /// Adds value to the collection.
+        ///
+        /// # Parameters
+        /// - `start` — `number`.
+        /// - `target` — `number`.
         methods.add_method("addValue", |_, this, (start, target): (f64, f64)| {
             let idx = this.inner.borrow_mut().add_value(start, target);
             Ok(idx + 1) // 1-based
         });
+        /// Advances the simulation by `dt` seconds.
+        ///
+        /// # Parameters
+        /// - `dt` — `number`.
         methods.add_method("update", |_, this, dt: f64| {
             Ok(this.inner.borrow_mut().update(dt))
         });
+        /// Returns the value.
+        ///
+        /// # Parameters
+        /// - `index` — `integer` optional.
+        ///
+        /// # Returns
+        /// The current value.
         methods.add_method("getValue", |lua, this, index: Option<i64>| {
             let tw = this.inner.borrow();
             match index {
@@ -811,21 +1259,48 @@ impl LuaUserData for LuaTween {
                 }
             }
         });
+        /// Returns the value count.
+        ///
+        /// # Parameters
+        /// - `time` — `number`.
+        ///
+        /// # Returns
+        /// The current value count.
         methods.add_method("getValueCount", |_, this, ()| {
             Ok(this.inner.borrow().value_count())
         });
+        /// Resets state to initial values.
+        ///
+        /// # Parameters
+        /// - `time` — `number`.
         methods.add_method("reset", |_, this, ()| {
             this.inner.borrow_mut().reset();
             Ok(())
         });
+        /// Sets the value.
+        ///
+        /// # Parameters
+        /// - `time` — `number`.
         methods.add_method("set", |_, this, time: f64| {
             this.inner.borrow_mut().set_time(time);
             Ok(())
         });
+        /// Returns the clock.
+        ///
+        /// # Returns
+        /// The current clock.
         methods.add_method("getClock", |_, this, ()| Ok(this.inner.borrow().clock()));
+        /// Returns the duration.
+        ///
+        /// # Returns
+        /// The current duration.
         methods.add_method("getDuration", |_, this, ()| {
             Ok(this.inner.borrow().duration())
         });
+        /// Returns `true` if complete.
+        ///
+        /// # Returns
+        /// `boolean`.
         methods.add_method("isComplete", |_, this, ()| {
             Ok(this.inner.borrow().is_complete())
         });
@@ -1376,7 +1851,15 @@ pub fn register(lua: &Lua, luna_table: &LuaTable) -> LuaResult<()> {
                 let tbl = lua.create_table_with_capacity(pts.len(), 0)?;
                 for (i, (px, py)) in pts.iter().enumerate() {
                     let pt = lua.create_table_with_capacity(0, 2)?;
+                    /// X on this Tween.
+                    ///
+                    /// # Returns
+                    /// The result.
                     pt.set("x", *px)?;
+                    /// Y on this Tween.
+                    ///
+                    /// # Returns
+                    /// The result.
                     pt.set("y", *py)?;
                     tbl.raw_set(i + 1, pt)?;
                 }

@@ -161,6 +161,10 @@ impl LuaUserData for LuaSequencer {
 
         // ── Script loading ──
 
+        /// Loads state from persistent storage.
+        ///
+        /// # Parameters
+        /// - `script` — `table`.
         methods.add_method("load", |lua, this, script: LuaTable| {
             // Clear old call-fn registry keys
             {
@@ -174,6 +178,10 @@ impl LuaUserData for LuaSequencer {
 
         // ── Playback control ──
 
+        /// Begins execution.
+        ///
+        /// # Returns
+        /// The result.
         methods.add_method("start", |lua, this, ()| {
             let prev = this.inner.borrow().state();
             let call_idx = this.inner.borrow_mut().start();
@@ -182,6 +190,10 @@ impl LuaUserData for LuaSequencer {
             Ok(())
         });
 
+        /// Advances the simulation by `dt` seconds.
+        ///
+        /// # Parameters
+        /// - `dt` — `number`.
         methods.add_method("update", |lua, this, dt: f32| {
             let prev = this.inner.borrow().state();
             let call_idx = this.inner.borrow_mut().update(dt);
@@ -190,6 +202,10 @@ impl LuaUserData for LuaSequencer {
             Ok(())
         });
 
+        /// Advances to the next item.
+        ///
+        /// # Returns
+        /// The result.
         methods.add_method("advance", |lua, this, ()| {
             let prev = this.inner.borrow().state();
             let call_idx = this.inner.borrow_mut().advance();
@@ -198,11 +214,19 @@ impl LuaUserData for LuaSequencer {
             Ok(())
         });
 
+        /// Skip on this Sequencer.
+        ///
+        /// # Parameters
+        /// - `index` — `integer`.
         methods.add_method("skip", |_, this, ()| {
             this.inner.borrow_mut().skip();
             Ok(())
         });
 
+        /// Choose on this Sequencer.
+        ///
+        /// # Parameters
+        /// - `index` — `integer`.
         methods.add_method("choose", |lua, this, index: usize| {
             let prev = this.inner.borrow().state();
             let call_idx = this.inner.borrow_mut().choose(index);
@@ -213,49 +237,89 @@ impl LuaUserData for LuaSequencer {
 
         // ── Speed ──
 
+        /// Sets the speed.
+        ///
+        /// # Parameters
+        /// - `cps` — `number`.
         methods.add_method("setSpeed", |_, this, cps: f32| {
             this.inner.borrow_mut().set_speed(cps);
             Ok(())
         });
 
+        /// Returns the speed.
+        ///
+        /// # Returns
+        /// The current speed.
         methods.add_method("getSpeed", |_, this, ()| {
             Ok(this.inner.borrow().get_speed())
         });
 
         // ── State queries ──
 
+        /// Returns the state.
+        ///
+        /// # Returns
+        /// The current state.
         methods.add_method("getState", |_, this, ()| {
             Ok(this.inner.borrow().state().as_str().to_string())
         });
 
+        /// Returns `true` if active.
+        ///
+        /// # Returns
+        /// `boolean`.
         methods.add_method("isActive", |_, this, ()| {
             Ok(this.inner.borrow().is_active())
         });
 
+        /// Returns `true` if waiting for choice.
+        ///
+        /// # Returns
+        /// `boolean`.
         methods.add_method("isWaitingForChoice", |_, this, ()| {
             Ok(this.inner.borrow().is_waiting_for_choice())
         });
 
         // ── Text queries ──
 
+        /// Current speaker on this Sequencer.
+        ///
+        /// # Returns
+        /// The result.
         methods.add_method("currentSpeaker", |_, this, ()| {
             Ok(this.inner.borrow().current_speaker().to_string())
         });
 
+        /// Current text on this Sequencer.
+        ///
+        /// # Returns
+        /// The result.
         methods.add_method("currentText", |_, this, ()| {
             Ok(this.inner.borrow().current_text().to_string())
         });
 
+        /// Revealed text on this Sequencer.
+        ///
+        /// # Returns
+        /// The result.
         methods.add_method("revealedText", |_, this, ()| {
             Ok(this.inner.borrow().revealed_text().to_string())
         });
 
         // ── Choice queries ──
 
+        /// Returns the choice text.
+        ///
+        /// # Returns
+        /// The current choice text.
         methods.add_method("getChoiceText", |_, this, ()| {
             Ok(this.inner.borrow().choice_text().to_string())
         });
 
+        /// Returns the choice labels.
+        ///
+        /// # Returns
+        /// The current choice labels.
         methods.add_method("getChoiceLabels", |lua, this, ()| {
             let seq = this.inner.borrow();
             let labels = seq.choice_labels();
@@ -268,6 +332,11 @@ impl LuaUserData for LuaSequencer {
 
         // ── Event callbacks ──
 
+        /// Registers an event listener callback.
+        ///
+        /// # Parameters
+        /// - `event` — `string`.
+        /// - `func` — `function`.
         methods.add_method("on", |lua, this, (event, func): (String, LuaFunction)| {
             let key = lua.create_registry_value(func)?;
             let mut cbs = this.callbacks.borrow_mut();
@@ -284,6 +353,10 @@ impl LuaUserData for LuaSequencer {
             Ok(())
         });
 
+        /// Removes a previously registered event listener.
+        ///
+        /// # Parameters
+        /// - `event` — `string`.
         methods.add_method("off", |_, this, event: String| {
             let mut cbs = this.callbacks.borrow_mut();
             match event.as_str() {
@@ -319,6 +392,10 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
         })?,
     )?;
 
+    /// Dialog on this Sequencer.
+    ///
+    /// # Returns
+    /// The result.
     luna.set("dialog", module)?;
     Ok(())
 }

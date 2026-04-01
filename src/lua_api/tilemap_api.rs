@@ -143,9 +143,25 @@ impl LunaType for LuaIsoMap {
 
 fn rect_to_table(lua: &Lua, r: Rect) -> LuaResult<LuaTable<'_>> {
     let t = lua.create_table()?;
+    /// X on this IsoMap.
+    ///
+    /// # Returns
+    /// The result.
     t.set("x", r.x)?;
+    /// Y on this IsoMap.
+    ///
+    /// # Returns
+    /// The result.
     t.set("y", r.y)?;
+    /// Width on this IsoMap.
+    ///
+    /// # Returns
+    /// The result.
     t.set("width", r.width)?;
+    /// Height on this IsoMap.
+    ///
+    /// # Returns
+    /// The result.
     t.set("height", r.height)?;
     Ok(t)
 }
@@ -277,7 +293,15 @@ impl LuaUserData for LuaTileSet {
                     let t = lua.create_table()?;
                     for (i, f) in frames.iter().enumerate() {
                         let ft = lua.create_table()?;
+                        /// Tileid on this TileSet.
+                        ///
+                        /// # Returns
+                        /// The result.
                         ft.set("tileid", f.tile_id + 1)?;
+                        /// Duration on this TileSet.
+                        ///
+                        /// # Returns
+                        /// The result.
                         ft.set("duration", f.duration_ms)?;
                         t.set(i + 1, ft)?;
                     }
@@ -1274,18 +1298,70 @@ fn parse_script_step(t: &LuaTable) -> LuaResult<ScriptStep> {
 fn step_to_table<'lua>(lua: &'lua Lua, step: &ScriptStep) -> LuaResult<LuaTable<'lua>> {
     let t = lua.create_table()?;
     t.set("type", step.step_type.as_str())?;
+    /// Group index on this MapGroup.
+    ///
+    /// # Returns
+    /// The result.
     t.set("groupIndex", step.group_index)?;
+    /// Block index on this MapGroup.
+    ///
+    /// # Returns
+    /// The result.
     t.set("blockIndex", step.block_index)?;
+    /// X on this MapGroup.
+    ///
+    /// # Returns
+    /// The result.
     t.set("x", step.x + 1)?; // 0-based → 1-based
+    /// Y on this MapGroup.
+    ///
+    /// # Returns
+    /// The result.
     t.set("y", step.y + 1)?;
+    /// Width on this MapGroup.
+    ///
+    /// # Returns
+    /// The result.
     t.set("width", step.width)?;
+    /// Height on this MapGroup.
+    ///
+    /// # Returns
+    /// The result.
     t.set("height", step.height)?;
+    /// Returns the number of items.
+    ///
+    /// # Returns
+    /// `integer`.
     t.set("count", step.count)?;
+    /// Rotation on this MapGroup.
+    ///
+    /// # Returns
+    /// The result.
     t.set("rotation", step.rotation)?;
+    /// Mirror on this MapGroup.
+    ///
+    /// # Returns
+    /// The result.
     t.set("mirror", step.mirror)?;
+    /// Random rotation on this MapGroup.
+    ///
+    /// # Returns
+    /// The result.
     t.set("randomRotation", step.random_rotation)?;
+    /// Random mirror on this MapGroup.
+    ///
+    /// # Returns
+    /// The result.
     t.set("randomMirror", step.random_mirror)?;
+    /// Direction on this MapGroup.
+    ///
+    /// # Returns
+    /// The result.
     t.set("direction", step.direction)?;
+    /// Match sides on this MapGroup.
+    ///
+    /// # Returns
+    /// The result.
     t.set("matchSides", step.match_sides)?;
     t.set(
         "conditionStep",
@@ -1295,15 +1371,55 @@ fn step_to_table<'lua>(lua: &'lua Lua, step: &ScriptStep) -> LuaResult<LuaTable<
             -1
         },
     )?;
+    /// Condition success on this MapGroup.
+    ///
+    /// # Returns
+    /// The result.
     t.set("conditionSuccess", step.condition_success)?;
+    /// Chance on this MapGroup.
+    ///
+    /// # Returns
+    /// The result.
     t.set("chance", step.chance)?;
+    /// Repeat count on this MapGroup.
+    ///
+    /// # Returns
+    /// The result.
     t.set("repeatCount", step.repeat_count)?;
+    /// Min count on this MapGroup.
+    ///
+    /// # Returns
+    /// The result.
     t.set("minCount", step.min_count)?;
+    /// Max count on this MapGroup.
+    ///
+    /// # Returns
+    /// The result.
     t.set("maxCount", step.max_count)?;
+    /// Returns the number of filter w.
+    ///
+    /// # Returns
+    /// `integer`.
     t.set("sizeFilterW", step.size_filter_w)?;
+    /// Returns the number of filter h.
+    ///
+    /// # Returns
+    /// `integer`.
     t.set("sizeFilterH", step.size_filter_h)?;
+    /// Tile id on this MapGroup.
+    ///
+    /// # Returns
+    /// The result.
     t.set("tileId", step.tile_id)?;
+    /// Path width on this MapGroup.
+    ///
+    /// # Returns
+    /// The result.
     t.set("pathWidth", step.path_width)?;
+    /// Tile layer on this MapGroup.
+    ///
+    /// # Returns
+    /// The result.
     t.set("tileLayer", step.tile_layer + 1)?; // 0-based → 1-based
     t.set(
         "zoneStartY",
@@ -1547,8 +1663,20 @@ impl LuaUserData for LuaMapGen {
             match inner.get_zone(index - 1) {
                 Some(zone) => {
                     let t = lua.create_table()?;
+                    /// Name on this MapGen.
+                    ///
+                    /// # Returns
+                    /// The result.
                     t.set("name", zone.name.as_str())?;
+                    /// Start row on this MapGen.
+                    ///
+                    /// # Returns
+                    /// The result.
                     t.set("startRow", zone.start_row + 1)?; // 0-based → 1-based
+                    /// Height on this MapGen.
+                    ///
+                    /// # Returns
+                    /// The result.
                     t.set("height", zone.height)?;
                     Ok(LuaValue::Table(t))
                 }
@@ -1843,7 +1971,15 @@ impl LuaUserData for LuaChunkMap {
             let t = lua.create_table()?;
             for (i, (cx, cy)) in chunks.iter().enumerate() {
                 let entry = lua.create_table()?;
+                /// Cx on this ChunkMap.
+                ///
+                /// # Returns
+                /// The result.
                 entry.set("cx", *cx)?;
+                /// Cy on this ChunkMap.
+                ///
+                /// # Returns
+                /// The result.
                 entry.set("cy", *cy)?;
                 t.set(i + 1, entry)?;
             }
@@ -1861,7 +1997,15 @@ impl LuaUserData for LuaChunkMap {
                 let t = lua.create_table()?;
                 for (i, (cx, cy)) in chunks.iter().enumerate() {
                     let entry = lua.create_table()?;
+                    /// Cx on this ChunkMap.
+                    ///
+                    /// # Returns
+                    /// The result.
                     entry.set("cx", *cx)?;
+                    /// Cy on this ChunkMap.
+                    ///
+                    /// # Returns
+                    /// The result.
                     entry.set("cy", *cy)?;
                     t.set(i + 1, entry)?;
                 }
@@ -1974,9 +2118,25 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
                 Err(e) => Err(LuaError::RuntimeError(e)),
                 Ok(tmx) => {
                     let t = lua.create_table()?;
+                    /// Width on this ChunkMap.
+                    ///
+                    /// # Returns
+                    /// The result.
                     t.set("width", tmx.width)?;
+                    /// Height on this ChunkMap.
+                    ///
+                    /// # Returns
+                    /// The result.
                     t.set("height", tmx.height)?;
+                    /// Tile width on this ChunkMap.
+                    ///
+                    /// # Returns
+                    /// The result.
                     t.set("tileWidth", tmx.tile_width)?;
+                    /// Tile height on this ChunkMap.
+                    ///
+                    /// # Returns
+                    /// The result.
                     t.set("tileHeight", tmx.tile_height)?;
                     t.set(
                         "orientation",
@@ -1992,20 +2152,64 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
                     let ts_table = lua.create_table()?;
                     for (i, ts) in tmx.tilesets.iter().enumerate() {
                         let entry = lua.create_table()?;
+                        /// First gid on this ChunkMap.
+                        ///
+                        /// # Returns
+                        /// The result.
                         entry.set("firstGid", ts.first_gid)?;
+                        /// Name on this ChunkMap.
+                        ///
+                        /// # Returns
+                        /// The result.
                         entry.set("name", ts.name.as_str())?;
+                        /// Tile width on this ChunkMap.
+                        ///
+                        /// # Returns
+                        /// The result.
                         entry.set("tileWidth", ts.tile_width)?;
+                        /// Tile height on this ChunkMap.
+                        ///
+                        /// # Returns
+                        /// The result.
                         entry.set("tileHeight", ts.tile_height)?;
+                        /// Spacing on this ChunkMap.
+                        ///
+                        /// # Returns
+                        /// The result.
                         entry.set("spacing", ts.spacing)?;
+                        /// Margin on this ChunkMap.
+                        ///
+                        /// # Returns
+                        /// The result.
                         entry.set("margin", ts.margin)?;
+                        /// Tile count on this ChunkMap.
+                        ///
+                        /// # Returns
+                        /// The result.
                         entry.set("tileCount", ts.tile_count)?;
+                        /// Columns on this ChunkMap.
+                        ///
+                        /// # Returns
+                        /// The result.
                         entry.set("columns", ts.columns)?;
+                        /// Image source on this ChunkMap.
+                        ///
+                        /// # Returns
+                        /// The result.
                         entry.set("imageSource", ts.image_source.as_deref().unwrap_or(""))?;
                         if let Some(ref source) = ts.source {
+                            /// Source on this ChunkMap.
+                            ///
+                            /// # Returns
+                            /// The result.
                             entry.set("source", source.as_str())?;
                         }
                         ts_table.set(i + 1, entry)?;
                     }
+                    /// Tilesets on this ChunkMap.
+                    ///
+                    /// # Returns
+                    /// The result.
                     t.set("tilesets", ts_table)?;
 
                     // layers
@@ -2015,41 +2219,121 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
                         match layer {
                             TmxLayer::Tile(tl) => {
                                 entry.set("type", "tile")?;
+                                /// Name on this ChunkMap.
+                                ///
+                                /// # Returns
+                                /// The result.
                                 entry.set("name", tl.name.as_str())?;
+                                /// Width on this ChunkMap.
+                                ///
+                                /// # Returns
+                                /// The result.
                                 entry.set("width", tl.width)?;
+                                /// Height on this ChunkMap.
+                                ///
+                                /// # Returns
+                                /// The result.
                                 entry.set("height", tl.height)?;
+                                /// Visible on this ChunkMap.
+                                ///
+                                /// # Returns
+                                /// The result.
                                 entry.set("visible", tl.visible)?;
+                                /// Opacity on this ChunkMap.
+                                ///
+                                /// # Returns
+                                /// The result.
                                 entry.set("opacity", tl.opacity)?;
+                                /// Offset x on this ChunkMap.
+                                ///
+                                /// # Returns
+                                /// The result.
                                 entry.set("offsetX", tl.offset_x)?;
+                                /// Offset y on this ChunkMap.
+                                ///
+                                /// # Returns
+                                /// The result.
                                 entry.set("offsetY", tl.offset_y)?;
                                 let tiles_t = lua.create_table()?;
                                 for (ti, &gid) in tl.tiles.iter().enumerate() {
                                     tiles_t.set(ti + 1, gid)?;
                                 }
+                                /// Tiles on this ChunkMap.
+                                ///
+                                /// # Returns
+                                /// The result.
                                 entry.set("tiles", tiles_t)?;
                             }
                             TmxLayer::Object(ol) => {
                                 entry.set("type", "object")?;
+                                /// Name on this ChunkMap.
+                                ///
+                                /// # Returns
+                                /// The result.
                                 entry.set("name", ol.name.as_str())?;
+                                /// Visible on this ChunkMap.
+                                ///
+                                /// # Returns
+                                /// The result.
                                 entry.set("visible", ol.visible)?;
                                 let objs_t = lua.create_table()?;
                                 for (oi, obj) in ol.objects.iter().enumerate() {
                                     let oe = lua.create_table()?;
+                                    /// Id on this ChunkMap.
+                                    ///
+                                    /// # Returns
+                                    /// The result.
                                     oe.set("id", obj.id)?;
+                                    /// Name on this ChunkMap.
+                                    ///
+                                    /// # Returns
+                                    /// The result.
                                     oe.set("name", obj.name.as_str())?;
+                                    /// Obj_type on this ChunkMap.
+                                    ///
+                                    /// # Returns
+                                    /// The result.
                                     oe.set("obj_type", obj.obj_type.as_str())?;
+                                    /// X on this ChunkMap.
+                                    ///
+                                    /// # Returns
+                                    /// The result.
                                     oe.set("x", obj.x)?;
+                                    /// Y on this ChunkMap.
+                                    ///
+                                    /// # Returns
+                                    /// The result.
                                     oe.set("y", obj.y)?;
+                                    /// Width on this ChunkMap.
+                                    ///
+                                    /// # Returns
+                                    /// The result.
                                     oe.set("width", obj.width)?;
+                                    /// Height on this ChunkMap.
+                                    ///
+                                    /// # Returns
+                                    /// The result.
                                     oe.set("height", obj.height)?;
+                                    /// Gid on this ChunkMap.
+                                    ///
+                                    /// # Returns
+                                    /// The result.
                                     oe.set("gid", obj.gid)?;
                                     objs_t.set(oi + 1, oe)?;
                                 }
+                                /// Objects on this ChunkMap.
+                                ///
+                                /// # Returns
+                                /// The result.
                                 entry.set("objects", objs_t)?;
                             }
                         }
                         layers_table.set(i + 1, entry)?;
                     }
+                    /// Layers on this ChunkMap.
+                    ///
+                    /// # Returns
+                    /// The result.
                     t.set("layers", layers_table)?;
 
                     Ok(t)
@@ -2255,7 +2539,15 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
             let t = lua.create_table()?;
             for (i, (nq, nr)) in neighbors.iter().enumerate() {
                 let pair = lua.create_table()?;
+                /// Q on this ChunkMap.
+                ///
+                /// # Returns
+                /// The result.
                 pair.set("q", *nq)?;
+                /// R on this ChunkMap.
+                ///
+                /// # Returns
+                /// The result.
                 pair.set("r", *nr)?;
                 t.set(i + 1, pair)?;
             }
@@ -2295,7 +2587,15 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
             let t = lua.create_table()?;
             for (i, (q, r)) in cells.iter().enumerate() {
                 let pair = lua.create_table()?;
+                /// Q on this ChunkMap.
+                ///
+                /// # Returns
+                /// The result.
                 pair.set("q", *q)?;
+                /// R on this ChunkMap.
+                ///
+                /// # Returns
+                /// The result.
                 pair.set("r", *r)?;
                 t.set(i + 1, pair)?;
             }
@@ -2319,7 +2619,15 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
             let t = lua.create_table()?;
             for (i, (cq, cr)) in cells.iter().enumerate() {
                 let pair = lua.create_table()?;
+                /// Q on this ChunkMap.
+                ///
+                /// # Returns
+                /// The result.
                 pair.set("q", *cq)?;
+                /// R on this ChunkMap.
+                ///
+                /// # Returns
+                /// The result.
                 pair.set("r", *cr)?;
                 t.set(i + 1, pair)?;
             }
@@ -2335,7 +2643,15 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
             let t = lua.create_table()?;
             for (i, (cq, cr)) in cells.iter().enumerate() {
                 let pair = lua.create_table()?;
+                /// Q on this ChunkMap.
+                ///
+                /// # Returns
+                /// The result.
                 pair.set("q", *cq)?;
+                /// R on this ChunkMap.
+                ///
+                /// # Returns
+                /// The result.
                 pair.set("r", *cr)?;
                 t.set(i + 1, pair)?;
             }
@@ -2359,7 +2675,15 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
             let t = lua.create_table()?;
             for (i, (cq, cr)) in cells.iter().enumerate() {
                 let pair = lua.create_table()?;
+                /// Q on this ChunkMap.
+                ///
+                /// # Returns
+                /// The result.
                 pair.set("q", *cq)?;
+                /// R on this ChunkMap.
+                ///
+                /// # Returns
+                /// The result.
                 pair.set("r", *cr)?;
                 t.set(i + 1, pair)?;
             }
@@ -2408,11 +2732,31 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
     )?;
 
     // Tile-part constants (1-based for Lua callers)
+    /// F l o o r on this ChunkMap.
+    ///
+    /// # Returns
+    /// The result.
     tilemap_table.set("FLOOR", 1u32)?;
+    /// N o r t h_ w a l l on this ChunkMap.
+    ///
+    /// # Returns
+    /// The result.
     tilemap_table.set("NORTH_WALL", 2u32)?;
+    /// W e s t_ w a l l on this ChunkMap.
+    ///
+    /// # Returns
+    /// The result.
     tilemap_table.set("WEST_WALL", 3u32)?;
+    /// O b j e c t on this ChunkMap.
+    ///
+    /// # Returns
+    /// The result.
     tilemap_table.set("OBJECT", 4u32)?;
 
+    /// Tilemap on this ChunkMap.
+    ///
+    /// # Returns
+    /// The result.
     luna.set("tilemap", tilemap_table)?;
     Ok(())
 }

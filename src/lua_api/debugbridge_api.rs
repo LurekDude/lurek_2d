@@ -644,9 +644,25 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
             let tbl = lua.create_table()?;
             for (i, entry) in entries.iter().enumerate() {
                 let e = lua.create_table()?;
+                /// Timestamp on this Object.
+                ///
+                /// # Returns
+                /// The result.
                 e.set("timestamp", entry.timestamp)?;
+                /// Message on this Object.
+                ///
+                /// # Returns
+                /// The result.
                 e.set("message", entry.message.clone())?;
+                /// Source on this Object.
+                ///
+                /// # Returns
+                /// The result.
                 e.set("source", entry.source.clone())?;
+                /// Line on this Object.
+                ///
+                /// # Returns
+                /// The result.
                 e.set("line", entry.line)?;
                 tbl.set(i + 1, e)?;
             }
@@ -766,6 +782,10 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
         })?,
     )?;
 
+    /// Debugbridge on this Object.
+    ///
+    /// # Returns
+    /// The result.
     luna.set("debugbridge", db)?;
     Ok(())
 }
