@@ -24,6 +24,7 @@ pub enum QuestStatus {
 
 impl QuestStatus {
     /// Parse a status string.
+    #[allow(clippy::should_implement_trait)]
     pub fn from_str(s: &str) -> Option<Self> {
         match s {
             "available" => Some(Self::Available),
@@ -66,6 +67,7 @@ pub enum ObjectiveStatus {
 
 impl ObjectiveStatus {
     /// Parse a status string.
+    #[allow(clippy::should_implement_trait)]
     pub fn from_str(s: &str) -> Option<Self> {
         match s {
             "pending" => Some(Self::Pending),

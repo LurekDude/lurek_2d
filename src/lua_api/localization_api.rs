@@ -42,7 +42,7 @@ impl LocalizationState {
 
 /// Navigate a nested Lua table using dot-separated keys.
 /// Returns the resolved value or Nil.
-fn resolve_key<'lua>(lua: &'lua Lua, table: &LuaTable<'lua>, key: &str) -> LuaResult<LuaValue<'lua>> {
+fn resolve_key<'lua>(_lua: &'lua Lua, table: &LuaTable<'lua>, key: &str) -> LuaResult<LuaValue<'lua>> {
     let parts: Vec<&str> = key.split('.').collect();
     let mut current: LuaValue = LuaValue::Table(table.clone());
 
@@ -62,11 +62,8 @@ fn interpolate(text: &str, vars: &LuaTable) -> LuaResult<String> {
     let mut result = text.to_string();
     // Simple brace interpolation: find all {name} patterns
     let mut start = 0;
-    loop {
-        let open = match result[start..].find('{') {
-            Some(pos) => start + pos,
-            None => break,
-        };
+    while let Some(open_pos) = result[start..].find('{') {
+        let open = start + open_pos;
         let close = match result[open..].find('}') {
             Some(pos) => open + pos,
             None => break,

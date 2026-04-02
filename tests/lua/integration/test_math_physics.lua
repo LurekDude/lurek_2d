@@ -7,18 +7,18 @@ describe("math + physics integration", function()
         local body_id = luna.physics.newBody(world_id, 50, 50, "dynamic")
 
         -- Get position and verify it's numeric
-        local x, y = luna.physics.getBodyPosition(body_id)
+        local x, y = body_id:getPosition()
         expect_near(50, x, 0.1, "initial x")
         expect_near(50, y, 0.1, "initial y")
 
         -- Use math functions to compute new position
-        local angle = luna.math.rad(45)
+        local angle = math.rad(45)
         local dx = luna.math.cos(angle) * 10
         local dy = luna.math.sin(angle) * 10
 
-        luna.physics.setBodyPosition(body_id, x + dx, y + dy)
+        body_id:setPosition(x + dx, y + dy)
 
-        local nx, ny = luna.physics.getBodyPosition(body_id)
+        local nx, ny = body_id:getPosition()
         expect_near(50 + dx, nx, 0.1, "moved x")
         expect_near(50 + dy, ny, 0.1, "moved y")
 
@@ -30,8 +30,8 @@ describe("math + physics integration", function()
         local b1 = luna.physics.newBody(world_id, 0, 0, "static")
         local b2 = luna.physics.newBody(world_id, 3, 4, "static")
 
-        local x1, y1 = luna.physics.getBodyPosition(b1)
-        local x2, y2 = luna.physics.getBodyPosition(b2)
+        local x1, y1 = b1:getPosition()
+        local x2, y2 = b2:getPosition()
 
         local dist = luna.math.sqrt((x2 - x1)^2 + (y2 - y1)^2)
         expect_near(5.0, dist, 0.001, "3-4-5 triangle distance")
@@ -47,7 +47,7 @@ describe("math + physics integration", function()
         luna.physics.step(world_id, 0.016)
 
         -- Body should have moved down due to gravity
-        local _, y = luna.physics.getBodyPosition(body_id)
+        local _, y = body_id:getPosition()
         expect_true(y > 0, "body moved down by gravity")
 
         luna.physics.destroyWorld(world_id)
@@ -82,7 +82,7 @@ describe("math trigonometry for physics angles", function()
 
     it("rotate a velocity vector", function()
         local speed = 10
-        local angle = luna.math.rad(90)
+        local angle = math.rad(90)
 
         local vx = speed * luna.math.cos(angle)
         local vy = speed * luna.math.sin(angle)

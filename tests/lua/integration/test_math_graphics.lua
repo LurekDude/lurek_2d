@@ -3,7 +3,7 @@
 
 describe("math for graphics transformations", function()
     it("rotation matrix components", function()
-        local angle = luna.math.rad(90)
+        local angle = math.rad(90)
         local cos_a = luna.math.cos(angle)
         local sin_a = luna.math.sin(angle)
 

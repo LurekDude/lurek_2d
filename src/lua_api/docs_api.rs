@@ -392,7 +392,7 @@ impl LuaUserData for ApiCatalog {
         ///
         /// # Parameters
         /// - `predicate` — `function`.
-        methods.add_method("filter", |lua, this, predicate: LuaFunction| {
+        methods.add_method("filter", |_lua, this, predicate: LuaFunction| {
             let mut filtered = ApiCatalogData::new();
             for e in &this.0.entries {
                 let entry = DocEntry(e.clone());
@@ -745,7 +745,7 @@ impl LuaUserData for QualityReport {
                 this.overall_score * 100.0
             )];
             let mut mods: Vec<(&String, &f64)> = this.module_scores.iter().collect();
-            mods.sort_by_key(|(k, _)| k.clone());
+            mods.sort_by_key(|(k, _)| *k);
             for (m, s) in mods {
                 lines.push(format!("  {}: {:.0}%", m, s * 100.0));
             }
@@ -844,6 +844,7 @@ impl DocsState {
 // ---------------------------------------------------------------------------
 
 /// Walk a Lua table recursively to discover bindings.
+#[allow(clippy::only_used_in_recursion)]
 fn scan_table(
     lua: &Lua,
     table: &LuaTable,
@@ -943,30 +944,28 @@ pub fn register(lua: &Lua, luna_table: &LuaTable) -> LuaResult<()> {
             // Convert TOML table to entries
             let mut entries = Vec::new();
             if let Ok(api_entries) = parsed.get::<_, LuaTable>("entries") {
-                for pair in api_entries.pairs::<i64, LuaTable>() {
-                    if let Ok((_, entry_tbl)) = pair {
-                        let name: String = entry_tbl.get("name").unwrap_or_default();
-                        let qname: String = entry_tbl.get("qualifiedName").unwrap_or_default();
-                        let module: String = entry_tbl.get("module").unwrap_or_default();
-                        let kind: String = entry_tbl.get("kind").unwrap_or("function".into());
-                        let desc: String = entry_tbl.get("description").unwrap_or_default();
-                        let example: Option<String> = entry_tbl.get("example").ok();
-                        let since: Option<String> = entry_tbl.get("since").ok();
-                        let deprecated: Option<String> = entry_tbl.get("deprecated").ok();
+                for (_, entry_tbl) in api_entries.pairs::<i64, LuaTable>().flatten() {
+                    let name: String = entry_tbl.get("name").unwrap_or_default();
+                    let qname: String = entry_tbl.get("qualifiedName").unwrap_or_default();
+                    let module: String = entry_tbl.get("module").unwrap_or_default();
+                    let kind: String = entry_tbl.get("kind").unwrap_or("function".into());
+                    let desc: String = entry_tbl.get("description").unwrap_or_default();
+                    let example: Option<String> = entry_tbl.get("example").ok();
+                    let since: Option<String> = entry_tbl.get("since").ok();
+                    let deprecated: Option<String> = entry_tbl.get("deprecated").ok();
 
-                        entries.push(DocEntryData {
-                            name,
-                            qualified_name: qname,
-                            module,
-                            kind,
-                            description: desc,
-                            parameters: vec![],
-                            returns: vec![],
-                            example,
-                            since,
-                            deprecated,
-                        });
-                    }
+                    entries.push(DocEntryData {
+                        name,
+                        qualified_name: qname,
+                        module,
+                        kind,
+                        description: desc,
+                        parameters: vec![],
+                        returns: vec![],
+                        example,
+                        since,
+                        deprecated,
+                    });
                 }
             }
             Ok(ApiCatalog(ApiCatalogData { entries }))
@@ -981,7 +980,7 @@ pub fn register(lua: &Lua, luna_table: &LuaTable) -> LuaResult<()> {
             if let Ok(read_dir) = std::fs::read_dir(&directory) {
                 for entry in read_dir.flatten() {
                     let path = entry.path();
-                    if path.extension().map_or(false, |e| e == "toml") {
+                    if path.extension().is_some_and(|e| e == "toml") {
                         if let Ok(content) = std::fs::read_to_string(&path) {
                             let globals = lua.globals();
                             let luna_tbl: LuaTable = globals.get("luna")?;
@@ -989,27 +988,25 @@ pub fn register(lua: &Lua, luna_table: &LuaTable) -> LuaResult<()> {
                             let parse_fn: LuaFunction = data_tbl.get("parseToml")?;
                             if let Ok(parsed) = parse_fn.call::<_, LuaTable>(content) {
                                 if let Ok(entries) = parsed.get::<_, LuaTable>("entries") {
-                                    for pair in entries.pairs::<i64, LuaTable>() {
-                                        if let Ok((_, et)) = pair {
-                                            all_entries.push(DocEntryData {
-                                                name: et.get("name").unwrap_or_default(),
-                                                qualified_name: et
-                                                    .get("qualifiedName")
-                                                    .unwrap_or_default(),
-                                                module: et.get("module").unwrap_or_default(),
-                                                kind: et
-                                                    .get("kind")
-                                                    .unwrap_or("function".into()),
-                                                description: et
-                                                    .get("description")
-                                                    .unwrap_or_default(),
-                                                parameters: vec![],
-                                                returns: vec![],
-                                                example: et.get("example").ok(),
-                                                since: et.get("since").ok(),
-                                                deprecated: et.get("deprecated").ok(),
-                                            });
-                                        }
+                                    for (_, et) in entries.pairs::<i64, LuaTable>().flatten() {
+                                        all_entries.push(DocEntryData {
+                                            name: et.get("name").unwrap_or_default(),
+                                            qualified_name: et
+                                                .get("qualifiedName")
+                                                .unwrap_or_default(),
+                                            module: et.get("module").unwrap_or_default(),
+                                            kind: et
+                                                .get("kind")
+                                                .unwrap_or("function".into()),
+                                            description: et
+                                                .get("description")
+                                                .unwrap_or_default(),
+                                            parameters: vec![],
+                                            returns: vec![],
+                                            example: et.get("example").ok(),
+                                            since: et.get("since").ok(),
+                                            deprecated: et.get("deprecated").ok(),
+                                        });
                                     }
                                 }
                             }
@@ -1069,16 +1066,14 @@ pub fn register(lua: &Lua, luna_table: &LuaTable) -> LuaResult<()> {
         lua.create_function(move |_, (qualified_name, params): (String, LuaTable)| {
             let mut st = s.borrow_mut();
             let mut param_list = Vec::new();
-            for pair in params.pairs::<i64, LuaTable>() {
-                if let Ok((_, pt)) = pair {
-                    param_list.push(ParamInfo {
-                        name: pt.get("name").unwrap_or_default(),
-                        type_name: pt.get("type").unwrap_or_default(),
-                        description: pt.get("description").unwrap_or_default(),
-                        optional: pt.get("optional").unwrap_or(false),
-                        default: pt.get("default").ok(),
-                    });
-                }
+            for (_, pt) in params.pairs::<i64, LuaTable>().flatten() {
+                param_list.push(ParamInfo {
+                    name: pt.get("name").unwrap_or_default(),
+                    type_name: pt.get("type").unwrap_or_default(),
+                    description: pt.get("description").unwrap_or_default(),
+                    optional: pt.get("optional").unwrap_or(false),
+                    default: pt.get("default").ok(),
+                });
             }
             if let Some(entry) = st
                 .catalog
@@ -1099,13 +1094,11 @@ pub fn register(lua: &Lua, luna_table: &LuaTable) -> LuaResult<()> {
         lua.create_function(move |_, (qualified_name, returns): (String, LuaTable)| {
             let mut st = s.borrow_mut();
             let mut return_list = Vec::new();
-            for pair in returns.pairs::<i64, LuaTable>() {
-                if let Ok((_, rt)) = pair {
-                    return_list.push(ReturnInfo {
-                        type_name: rt.get("type").unwrap_or_default(),
-                        description: rt.get("description").unwrap_or_default(),
-                    });
-                }
+            for (_, rt) in returns.pairs::<i64, LuaTable>().flatten() {
+                return_list.push(ReturnInfo {
+                    type_name: rt.get("type").unwrap_or_default(),
+                    description: rt.get("description").unwrap_or_default(),
+                });
             }
             if let Some(entry) = st
                 .catalog
@@ -1239,7 +1232,7 @@ pub fn register(lua: &Lua, luna_table: &LuaTable) -> LuaResult<()> {
                 let mut idx = 1;
                 for entry in read_dir.flatten() {
                     let path = entry.path();
-                    if path.extension().map_or(false, |e| e == "rs" || e == "lua") {
+                    if path.extension().is_some_and(|e| e == "rs" || e == "lua") {
                         current.set(idx, path.to_string_lossy().to_string())?;
                         idx += 1;
                     }

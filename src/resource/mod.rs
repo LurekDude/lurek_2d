@@ -29,6 +29,7 @@ impl OverflowPolicy {
     }
 
     /// Parses a string into an OverflowPolicy. Defaults to Clamp for unknown strings.
+    #[allow(clippy::should_implement_trait)]
     pub fn from_str(s: &str) -> Self {
         match s {
             "lose" => OverflowPolicy::Lose,
@@ -338,6 +339,7 @@ impl ModifierType {
     }
 
     /// Parses a string into a ModifierType.
+    #[allow(clippy::should_implement_trait)]
     pub fn from_str(s: &str) -> Self {
         match s {
             "add" => ModifierType::Add,

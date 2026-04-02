@@ -188,11 +188,11 @@ impl PathThreadPool {
         self.pending.lock().map(|p| *p).unwrap_or(0)
     }
 
-    /// Update the thread count. Takes effect on next pool creation only —
+    /// Update the thread count. Takes effect on next pool creation only;
+    /// existing workers continue until the pool is dropped.
     ///
     /// # Parameters
     /// - `count` — `usize`.
-    /// existing workers continue until the pool is dropped.
     pub fn set_thread_count(&mut self, count: usize) {
         self.thread_count = count.max(1);
     }

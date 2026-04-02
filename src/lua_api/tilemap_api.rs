@@ -1918,7 +1918,7 @@ impl LuaUserData for LuaIsoMap {
 // Registration
 // ---------------------------------------------------------------------------
 
-/// Registers the `luna.tilemap` table with all factory functions and coordinate helpers.
+// Registers the `luna.tilemap` table with all factory functions and coordinate helpers.
 
 // ---------------------------------------------------------------------------
 // LuaChunkMap UserData

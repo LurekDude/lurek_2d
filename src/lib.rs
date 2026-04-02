@@ -56,8 +56,6 @@
 pub mod ai;
 /// Audio playback system backed by rodio.
 pub mod audio;
-/// Card game system: cards, decks, zones, pools, stack managers.
-pub mod cardgame;
 /// Turn-based combat engine: battles, combatants, abilities, statuses.
 pub mod combat;
 /// Dense N-dimensional numerical arrays (luna.compute).

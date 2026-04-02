@@ -16,7 +16,7 @@ describe("physics stress: 1000 bodies", function()
 
         -- Verify all bodies are valid
         for i = 1, 10 do
-            local x, y = luna.physics.getBodyPosition(bodies[i])
+            local x, y = bodies[i]:getPosition()
             expect_true(type(x) == "number", "body position is number")
         end
 

@@ -106,11 +106,11 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
     /// Decoded Lua values followed by the next unread byte offset.
     data_table.set(
         "decode",
-        lua.create_function(|_, (format_str, encoded): (String, String)| {
+        lua.create_function(|lua, (format_str, encoded): (String, String)| {
             let format =
                 data::EncodeFormat::parse_str(&format_str).map_err(LuaError::RuntimeError)?;
             let result = data::decode(format, &encoded).map_err(LuaError::RuntimeError)?;
-            Ok(result)
+            lua.create_string(&result)
         })?,
     )?;
 

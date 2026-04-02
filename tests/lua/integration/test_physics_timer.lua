@@ -10,7 +10,7 @@ describe("physics + timer integration", function()
         local dt = 0.016
         luna.physics.step(world_id, dt)
 
-        local _, y = luna.physics.getBodyPosition(body_id)
+        local _, y = body_id:getPosition()
         expect_true(y > 0, "body fell after one step")
 
         luna.physics.destroyWorld(world_id)
@@ -25,7 +25,7 @@ describe("physics + timer integration", function()
             luna.physics.step(world_id, 0.016)
         end
 
-        local _, y = luna.physics.getBodyPosition(body_id)
+        local _, y = body_id:getPosition()
         expect_true(y > 0.1, "body fell significantly after 10 steps")
 
         luna.physics.destroyWorld(world_id)
@@ -62,8 +62,8 @@ describe("physics multi-body + math", function()
             luna.physics.step(world_id, 0.016)
         end
 
-        local _, y1 = luna.physics.getBodyPosition(b1)
-        local _, y2 = luna.physics.getBodyPosition(b2)
+        local _, y1 = b1:getPosition()
+        local _, y2 = b2:getPosition()
 
         -- Both should fall the same amount (no friction/air resistance)
         expect_near(y1, y2, 0.1, "same fall distance")
@@ -79,7 +79,7 @@ describe("physics multi-body + math", function()
             luna.physics.step(world_id, 0.016)
         end
 
-        local x, y = luna.physics.getBodyPosition(body_id)
+        local x, y = body_id:getPosition()
         expect_near(50, x, 0.001, "static x unchanged")
         expect_near(300, y, 0.001, "static y unchanged")
 

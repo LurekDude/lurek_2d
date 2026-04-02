@@ -9,8 +9,7 @@ use std::rc::Rc;
 use mlua::prelude::*;
 
 use crate::inventory::{
-    Container, ContainerMode, Inventory, Item, ItemSet, ItemStack, SetRequirement, Slot, SlotState,
-    SubsystemFlags,
+    Container, ContainerMode, Inventory, Item, ItemSet, ItemStack, Slot, SlotState,
 };
 use crate::lua_api::lua_types::{add_type_methods, LunaType};
 
@@ -391,7 +390,7 @@ impl LuaUserData for LuaSlot {
         methods.add_method("canAccept", |_, this, item_ud: LuaAnyUserData| {
             let item = item_ud.borrow::<LuaItem>()?;
             let item_ref = item.0.borrow();
-            Ok(this.0.borrow().can_accept(&*item_ref))
+            Ok(this.0.borrow().can_accept(&item_ref))
         });
 
         /// Returns the capacity.
@@ -1032,7 +1031,7 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
                 max_quantity,
             )))))
         })?,
-    )?;;
+    )?;
 
     module.set(
         "newSlot",

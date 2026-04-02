@@ -8,6 +8,7 @@ use std::collections::HashMap;
 
 /// A single subscription entry in a [`Signal`].
 #[derive(Debug, Clone)]
+#[allow(dead_code)]
 pub struct Subscription {
     /// Unique handle ID (monotonic, per-Signal instance).
     pub handle: u64,

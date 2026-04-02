@@ -143,6 +143,7 @@ pub enum SlotState {
 
 impl SlotState {
     /// Parse from a Lua string.
+    #[allow(clippy::should_implement_trait)]
     pub fn from_str(s: &str) -> Option<Self> {
         match s {
             "active" => Some(SlotState::Active),
@@ -244,6 +245,7 @@ pub enum ContainerMode {
 
 impl ContainerMode {
     /// Parse from a Lua string.
+    #[allow(clippy::should_implement_trait)]
     pub fn from_str(s: &str) -> Option<Self> {
         match s {
             "fixed" => Some(ContainerMode::Fixed),
