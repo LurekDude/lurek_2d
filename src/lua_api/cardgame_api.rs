@@ -1,6 +1,8 @@
 //! Lua bindings for `luna.cardgame.*`.
 //!
-//! Exposes Card, Deck, Zone, StackManager, DeckBuilder, and CardPool to Lua.
+//! Exposes Card, Deck, Zone, StackManager, DeckBuilder, CardPool, Player,
+//! ScoreBoard, ResourcePool, Pot, TurnManager, TrickState, TrickHistory,
+//! EventLog, GameRules, and hand-evaluation utilities to Lua.
 
 use mlua::prelude::*;
 use std::cell::RefCell;
@@ -9,6 +11,15 @@ use std::rc::Rc;
 use crate::cardgame::{
     Card, CardPool, CardTypeDef, Deck, DeckBuilder, StackEntry, StackManager, Zone,
     clear_card_types, define_card_type, get_card_type, get_card_type_names,
+    // New types
+    EventLog, GameEvent, GameRules,
+    Player,
+    Pot, ResourcePool,
+    ScoreBoard,
+    TrickHistory, TrickState,
+    TurnManager,
+    // hand-eval utilities
+    find_at_least_n_of_a_kind, find_flush_groups, find_n_of_a_kind, find_sequences,
 };
 use crate::lua_api::lua_types::{add_type_methods, LunaType};
 
@@ -861,6 +872,659 @@ impl LuaUserData for LuaCardPool {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
+// LuaPlayer
+// ─────────────────────────────────────────────────────────────────────────────
+
+/// Lua-facing `Player` userdata.
+#[derive(Clone)]
+pub struct LuaPlayer(pub Rc<RefCell<Player>>);
+
+impl LunaType for LuaPlayer {
+    const TYPE_NAME: &'static str = "Player";
+    const TYPE_HIERARCHY: &'static [&'static str] = &["Player"];
+}
+
+impl LuaUserData for LuaPlayer {
+    fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
+        add_type_methods(methods);
+
+        /// Returns this player's unique identifier.
+        methods.add_method("getId", |_, this, ()| Ok(this.0.borrow().id.clone()));
+        /// Returns this player's display name.
+        methods.add_method("getName", |_, this, ()| Ok(this.0.borrow().name.clone()));
+        /// Sets this player's display name.
+        methods.add_method("setName", |_, this, name: String| {
+            this.0.borrow_mut().name = name;
+            Ok(())
+        });
+        /// Returns this player's current score.
+        methods.add_method("getScore", |_, this, ()| Ok(this.0.borrow().score));
+        /// Sets this player's score directly.
+        methods.add_method("setScore", |_, this, v: f64| {
+            this.0.borrow_mut().set_score(v);
+            Ok(())
+        });
+        /// Adds `delta` to this player's score and returns the new total.
+        methods.add_method("addScore", |_, this, delta: f64| {
+            Ok(this.0.borrow_mut().add_score(delta))
+        });
+        /// Returns the value of a named resource (`0` if not set).
+        methods.add_method("getResource", |_, this, key: String| {
+            Ok(this.0.borrow().get_resource(&key))
+        });
+        /// Sets a named resource to an exact value.
+        methods.add_method("setResource", |_, this, (key, amount): (String, f64)| {
+            this.0.borrow_mut().set_resource(key, amount);
+            Ok(())
+        });
+        /// Adds `amount` to a named resource and returns the new value.
+        methods.add_method("addResource", |_, this, (key, amount): (String, f64)| {
+            Ok(this.0.borrow_mut().add_resource(key, amount))
+        });
+        /// Spends `amount` from a named resource.  Errors if insufficient.
+        methods.add_method("spendResource", |_, this, (key, amount): (String, f64)| {
+            this.0.borrow_mut().spend_resource(&key, amount)
+                .map_err(LuaError::RuntimeError)
+        });
+        /// Returns all resources as a `{name: amount}` table.
+        methods.add_method("getAllResources", |lua, this, ()| {
+            let t = lua.create_table()?;
+            for (k, v) in this.0.borrow().get_all_resources() {
+                t.set(k, v)?;
+            }
+            Ok(t)
+        });
+        /// Returns this player's status string.
+        methods.add_method("getStatus", |_, this, ()| Ok(this.0.borrow().status.clone()));
+        /// Sets this player's status string (user-defined).
+        methods.add_method("setStatus", |_, this, s: String| {
+            this.0.borrow_mut().status = s;
+            Ok(())
+        });
+        /// Returns a metadata string value.
+        methods.add_method("getMeta", |_, this, key: String| {
+            Ok(this.0.borrow().get_meta(&key).map(String::from))
+        });
+        /// Sets a metadata string value.
+        methods.add_method("setMeta", |_, this, (k, v): (String, String)| {
+            this.0.borrow_mut().set_meta(k, v);
+            Ok(())
+        });
+    }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// LuaScoreBoard
+// ─────────────────────────────────────────────────────────────────────────────
+
+/// Lua-facing `ScoreBoard` userdata.
+#[derive(Clone)]
+pub struct LuaScoreBoard(pub Rc<RefCell<ScoreBoard>>);
+
+impl LunaType for LuaScoreBoard {
+    const TYPE_NAME: &'static str = "ScoreBoard";
+    const TYPE_HIERARCHY: &'static [&'static str] = &["ScoreBoard"];
+}
+
+impl LuaUserData for LuaScoreBoard {
+    fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
+        add_type_methods(methods);
+
+        /// Sets a player's score directly.
+        methods.add_method("setScore", |_, this, (pid, score): (String, f64)| {
+            this.0.borrow_mut().set_score(pid, score);
+            Ok(())
+        });
+        /// Adds `delta` to a player's score and returns the new total.
+        methods.add_method("addScore", |_, this, (pid, delta): (String, f64)| {
+            Ok(this.0.borrow_mut().add_score(pid, delta))
+        });
+        /// Adds `delta` with a `label` to a player's score.
+        methods.add_method("addScoreLabeled", |_, this, (pid, delta, label): (String, f64, String)| {
+            Ok(this.0.borrow_mut().add_score_labeled(pid, delta, label))
+        });
+        /// Returns a player's current score (`0` if not on the board).
+        methods.add_method("getScore", |_, this, pid: String| {
+            Ok(this.0.borrow().get_score(&pid))
+        });
+        /// Resets a player's score to zero.
+        methods.add_method("resetScore", |_, this, pid: String| {
+            this.0.borrow_mut().reset_score(pid);
+            Ok(())
+        });
+        /// Returns `{player_id, score}` pairs sorted descending by score.
+        methods.add_method("ranking", |lua, this, ()| {
+            let t = lua.create_table()?;
+            for (i, (pid, score)) in this.0.borrow().ranking().into_iter().enumerate() {
+                let entry = lua.create_table()?;
+                entry.set("player_id", pid)?;
+                entry.set("score", score)?;
+                t.set(i + 1, entry)?;
+            }
+            Ok(t)
+        });
+        /// Returns the player ID with the highest score, or `nil`.
+        methods.add_method("leader", |_, this, ()| Ok(this.0.borrow().leader()));
+        /// Returns the player ID with the lowest score, or `nil`.
+        methods.add_method("trailer", |_, this, ()| Ok(this.0.borrow().trailer()));
+        /// Returns `true` if two or more players share the top score.
+        methods.add_method("isTied", |_, this, ()| Ok(this.0.borrow().is_tied()));
+        /// Returns number of players on the board.
+        methods.add_method("getPlayerCount", |_, this, ()| Ok(this.0.borrow().player_count()));
+        /// Returns all player IDs on the board.
+        methods.add_method("getPlayers", |lua, this, ()| {
+            let t = lua.create_sequence_from(this.0.borrow().players().into_iter())?;
+            Ok(t)
+        });
+        /// Returns scoring history for a player as a list of `{player_id, delta, new_score, label}` tables.
+        methods.add_method("historyFor", |lua, this, pid: String| {
+            let t = lua.create_table()?;
+            for (i, e) in this.0.borrow().history_for(&pid).into_iter().enumerate() {
+                let entry = lua.create_table()?;
+                entry.set("player_id", e.player_id.clone())?;
+                entry.set("delta", e.delta)?;
+                entry.set("new_score", e.new_score)?;
+                entry.set("label", e.label.clone())?;
+                t.set(i + 1, entry)?;
+            }
+            Ok(t)
+        });
+    }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// LuaResourcePool
+// ─────────────────────────────────────────────────────────────────────────────
+
+/// Lua-facing `ResourcePool` userdata.
+#[derive(Clone)]
+pub struct LuaResourcePool(pub Rc<RefCell<ResourcePool>>);
+
+impl LunaType for LuaResourcePool {
+    const TYPE_NAME: &'static str = "ResourcePool";
+    const TYPE_HIERARCHY: &'static [&'static str] = &["ResourcePool"];
+}
+
+impl LuaUserData for LuaResourcePool {
+    fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
+        add_type_methods(methods);
+
+        /// Returns the resource pool name.
+        methods.add_method("getName", |_, this, ()| Ok(this.0.borrow().name.clone()));
+        /// Sets a player's balance directly.
+        methods.add_method("set", |_, this, (pid, amount): (String, f64)| {
+            this.0.borrow_mut().set(pid, amount);
+            Ok(())
+        });
+        /// Returns a player's balance (`0` if not set).
+        methods.add_method("get", |_, this, pid: String| {
+            Ok(this.0.borrow().get(&pid))
+        });
+        /// Adds `amount` to a player's balance and returns the new total.
+        methods.add_method("add", |_, this, (pid, amount): (String, f64)| {
+            Ok(this.0.borrow_mut().add(pid, amount))
+        });
+        /// Spends `amount` from a player's balance.  Errors if insufficient.
+        methods.add_method("spend", |_, this, (pid, amount): (String, f64)| {
+            this.0.borrow_mut().spend(&pid, amount).map_err(LuaError::RuntimeError)
+        });
+        /// Transfers `amount` from `from` to `to`.  Errors if insufficient.
+        methods.add_method("transfer", |_, this, (from, to, amount): (String, String, f64)| {
+            this.0.borrow_mut().transfer(&from, &to, amount).map_err(LuaError::RuntimeError)
+        });
+        /// Returns the sum of all balances.
+        methods.add_method("total", |_, this, ()| Ok(this.0.borrow().total()));
+        /// Returns all `{player_id, amount}` pairs.
+        methods.add_method("allBalances", |lua, this, ()| {
+            let t = lua.create_table()?;
+            for (i, (pid, amt)) in this.0.borrow().all_balances().into_iter().enumerate() {
+                let entry = lua.create_table()?;
+                entry.set("player_id", pid)?;
+                entry.set("amount", amt)?;
+                t.set(i + 1, entry)?;
+            }
+            Ok(t)
+        });
+    }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// LuaPot
+// ─────────────────────────────────────────────────────────────────────────────
+
+/// Lua-facing `Pot` userdata.
+#[derive(Clone)]
+pub struct LuaPot(pub Rc<RefCell<Pot>>);
+
+impl LunaType for LuaPot {
+    const TYPE_NAME: &'static str = "Pot";
+    const TYPE_HIERARCHY: &'static [&'static str] = &["Pot"];
+}
+
+impl LuaUserData for LuaPot {
+    fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
+        add_type_methods(methods);
+
+        /// Returns the current pot amount.
+        methods.add_method("getAmount", |_, this, ()| Ok(this.0.borrow().amount));
+        /// Adds `amount` directly to the pot.
+        methods.add_method("contribute", |_, this, amount: f64| {
+            this.0.borrow_mut().contribute(amount);
+            Ok(())
+        });
+        /// Contributes from a `ResourcePool` player balance.  Errors if insufficient.
+        methods.add_method("anteFrom", |_, this, (pool_ud, pid, amount): (LuaAnyUserData, String, f64)| {
+            let pool_rc: Rc<RefCell<ResourcePool>> = { pool_ud.borrow::<LuaResourcePool>()?.0.clone() };
+            let mut rp = pool_rc.borrow_mut();
+            this.0.borrow_mut().ante_from(&mut rp, &pid, amount)
+                .map_err(LuaError::RuntimeError)
+        });
+        /// Awards the entire pot to `player_id` in `pool`, clears the pot, returns amount won.
+        methods.add_method("award", |_, this, (pool_ud, pid): (LuaAnyUserData, String)| {
+            let pool_rc: Rc<RefCell<ResourcePool>> = { pool_ud.borrow::<LuaResourcePool>()?.0.clone() };
+            let mut rp = pool_rc.borrow_mut();
+            Ok(this.0.borrow_mut().award(&mut rp, pid))
+        });
+        /// Splits the pot evenly among `winners` (Lua sequence of player IDs).  Returns share per winner.
+        methods.add_method("splitAward", |_, this, (pool_ud, winners_t): (LuaAnyUserData, LuaTable)| {
+            let pool_rc: Rc<RefCell<ResourcePool>> = { pool_ud.borrow::<LuaResourcePool>()?.0.clone() };
+            let mut winners: Vec<String> = Vec::new();
+            for v in winners_t.sequence_values::<String>() { winners.push(v?); }
+            let refs: Vec<&str> = winners.iter().map(String::as_str).collect();
+            let mut rp = pool_rc.borrow_mut();
+            Ok(this.0.borrow_mut().split_award(&mut rp, &refs))
+        });
+        /// Clears the pot without awarding anyone.
+        methods.add_method("clear", |_, this, ()| {
+            this.0.borrow_mut().clear();
+            Ok(())
+        });
+        /// Returns `true` if the pot holds nothing.
+        methods.add_method("isEmpty", |_, this, ()| Ok(this.0.borrow().is_empty()));
+    }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// LuaTurnManager
+// ─────────────────────────────────────────────────────────────────────────────
+
+/// Lua-facing `TurnManager` userdata.
+#[derive(Clone)]
+pub struct LuaTurnManager(pub Rc<RefCell<TurnManager>>);
+
+impl LunaType for LuaTurnManager {
+    const TYPE_NAME: &'static str = "TurnManager";
+    const TYPE_HIERARCHY: &'static [&'static str] = &["TurnManager"];
+}
+
+impl LuaUserData for LuaTurnManager {
+    fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
+        add_type_methods(methods);
+
+        /// Returns the current active player ID, or `nil`.
+        methods.add_method("currentPlayer", |_, this, ()| {
+            Ok(this.0.borrow().current_player().map(String::from))
+        });
+        /// Returns the next player in turn order without advancing.
+        methods.add_method("peekNext", |_, this, ()| {
+            Ok(this.0.borrow().peek_next().map(String::from))
+        });
+        /// Advances to the next player's turn and returns the new active player ID.
+        methods.add_method("advanceTurn", |_, this, ()| {
+            Ok(this.0.borrow_mut().advance_turn())
+        });
+        /// Advances to the next phase.  When phases exhaust, turn advances automatically.
+        methods.add_method("advancePhase", |_, this, ()| {
+            Ok(this.0.borrow_mut().advance_phase())
+        });
+        /// Returns the current phase name, or `nil`.
+        methods.add_method("currentPhase", |_, this, ()| {
+            Ok(this.0.borrow().current_phase().map(String::from))
+        });
+        /// Jumps to a named phase.
+        methods.add_method("setPhase", |_, this, phase: String| {
+            this.0.borrow_mut().set_phase(&phase);
+            Ok(())
+        });
+        /// Returns the current round number (1-based).
+        methods.add_method("getRound", |_, this, ()| Ok(this.0.borrow().current_round()));
+        /// Returns the total turns elapsed.
+        methods.add_method("getTurn", |_, this, ()| Ok(this.0.borrow().current_turn()));
+        /// Marks a player as skipped for this round.
+        methods.add_method("skipPlayer", |_, this, pid: String| {
+            this.0.borrow_mut().skip_player(&pid);
+            Ok(())
+        });
+        /// Removes the skip mark from a player.
+        methods.add_method("unskipPlayer", |_, this, pid: String| {
+            this.0.borrow_mut().unskip_player(&pid);
+            Ok(())
+        });
+        /// Returns `true` if `player_id` is currently skipped.
+        methods.add_method("isSkipped", |_, this, pid: String| {
+            Ok(this.0.borrow().is_skipped(&pid))
+        });
+        /// Returns the full player order as a list.
+        methods.add_method("getPlayerOrder", |lua, this, ()| {
+            let t = lua.create_sequence_from(this.0.borrow().player_order().iter().cloned())?;
+            Ok(t)
+        });
+        /// Replaces the player order.
+        methods.add_method("setOrder", |_, this, t: LuaTable| {
+            let mut order = Vec::new();
+            for v in t.sequence_values::<String>() { order.push(v?); }
+            this.0.borrow_mut().set_order(order);
+            Ok(())
+        });
+    }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// LuaTrickState
+// ─────────────────────────────────────────────────────────────────────────────
+
+/// Lua-facing `TrickState` userdata.
+#[derive(Clone)]
+pub struct LuaTrickState(pub Rc<RefCell<TrickState>>);
+
+impl LunaType for LuaTrickState {
+    const TYPE_NAME: &'static str = "TrickState";
+    const TYPE_HIERARCHY: &'static [&'static str] = &["TrickState"];
+}
+
+impl LuaUserData for LuaTrickState {
+    fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
+        add_type_methods(methods);
+
+        /// Sets the lead player for this trick.
+        methods.add_method("setLead", |_, this, pid: String| {
+            this.0.borrow_mut().set_lead(pid);
+            Ok(())
+        });
+        /// Returns the lead player ID.
+        methods.add_method("getLead", |_, this, ()| Ok(this.0.borrow().lead_player.clone()));
+        /// Sets the trump suit/category (user-defined string).
+        methods.add_method("setTrump", |_, this, trump: String| {
+            this.0.borrow_mut().set_trump(trump);
+            Ok(())
+        });
+        /// Clears the trump.
+        methods.add_method("clearTrump", |_, this, ()| {
+            this.0.borrow_mut().clear_trump();
+            Ok(())
+        });
+        /// Returns the trump, or `nil`.
+        methods.add_method("getTrump", |_, this, ()| Ok(this.0.borrow().trump.clone()));
+        /// Records that `player_id` played `card`.
+        methods.add_method("play", |_, this, (pid, card_ud): (String, LuaAnyUserData)| {
+            let card = card_ud.borrow::<LuaCard>()?.0.borrow().clone();
+            this.0.borrow_mut().play(pid, card);
+            Ok(())
+        });
+        /// Returns `true` if `expected` players have played.
+        methods.add_method("isComplete", |_, this, expected: usize| {
+            Ok(this.0.borrow().is_complete(expected))
+        });
+        /// Returns number of cards played.
+        methods.add_method("getSize", |_, this, ()| Ok(this.0.borrow().size()));
+        /// Returns `true` if no cards have been played.
+        methods.add_method("isEmpty", |_, this, ()| Ok(this.0.borrow().is_empty()));
+        /// Clears all played cards.
+        methods.add_method("clear", |_, this, ()| {
+            this.0.borrow_mut().clear();
+            Ok(())
+        });
+        /// Returns all played slots as `{player_id, card}` tables.
+        methods.add_method("getSlots", |lua, this, ()| {
+            let t = lua.create_table()?;
+            for (i, slot) in this.0.borrow().slots().iter().enumerate() {
+                let entry = lua.create_table()?;
+                entry.set("player_id", slot.player_id.clone())?;
+                entry.set("card_type", slot.card.card_type.clone())?;
+                entry.set("card", LuaCard(Rc::new(RefCell::new(slot.card.clone()))))?;
+                t.set(i + 1, entry)?;
+            }
+            Ok(t)
+        });
+        /// Returns the card played by `player_id`, or `nil`.
+        methods.add_method("slotFor", |lua, this, pid: String| {
+            let borrow = this.0.borrow();
+            if let Some(slot) = borrow.slot_for(&pid) {
+                let entry = lua.create_table()?;
+                entry.set("player_id", slot.player_id.clone())?;
+                entry.set("card", LuaCard(Rc::new(RefCell::new(slot.card.clone()))))?;
+                Ok(LuaValue::Table(entry))
+            } else {
+                Ok(LuaValue::Nil)
+            }
+        });
+    }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// LuaTrickHistory
+// ─────────────────────────────────────────────────────────────────────────────
+
+/// Lua-facing `TrickHistory` userdata.
+#[derive(Clone)]
+pub struct LuaTrickHistory(pub Rc<RefCell<TrickHistory>>);
+
+impl LunaType for LuaTrickHistory {
+    const TYPE_NAME: &'static str = "TrickHistory";
+    const TYPE_HIERARCHY: &'static [&'static str] = &["TrickHistory"];
+}
+
+impl LuaUserData for LuaTrickHistory {
+    fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
+        add_type_methods(methods);
+
+        /// Records that `player_id` won trick `n`.
+        methods.add_method("record", |_, this, (trick, pid): (usize, String)| {
+            this.0.borrow_mut().record(trick, pid);
+            Ok(())
+        });
+        /// Returns how many tricks `player_id` has won.
+        methods.add_method("countFor", |_, this, pid: String| {
+            Ok(this.0.borrow().count_for(&pid))
+        });
+        /// Returns the most recent winner, or `nil`.
+        methods.add_method("lastWinner", |_, this, ()| {
+            Ok(this.0.borrow().last_winner().map(String::from))
+        });
+        /// Returns total tricks recorded.
+        methods.add_method("total", |_, this, ()| Ok(this.0.borrow().total()));
+        /// Returns `{player_id, count}` pairs sorted descending.
+        methods.add_method("ranking", |lua, this, ()| {
+            let t = lua.create_table()?;
+            for (i, (pid, cnt)) in this.0.borrow().ranking().into_iter().enumerate() {
+                let entry = lua.create_table()?;
+                entry.set("player_id", pid)?;
+                entry.set("count", cnt)?;
+                t.set(i + 1, entry)?;
+            }
+            Ok(t)
+        });
+        /// Clears all recorded tricks.
+        methods.add_method("clear", |_, this, ()| {
+            this.0.borrow_mut().clear();
+            Ok(())
+        });
+    }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// LuaEventLog
+// ─────────────────────────────────────────────────────────────────────────────
+
+/// Lua-facing `EventLog` userdata.
+#[derive(Clone)]
+pub struct LuaEventLog(pub Rc<RefCell<EventLog>>);
+
+impl LunaType for LuaEventLog {
+    const TYPE_NAME: &'static str = "EventLog";
+    const TYPE_HIERARCHY: &'static [&'static str] = &["EventLog"];
+}
+
+impl LuaUserData for LuaEventLog {
+    fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
+        add_type_methods(methods);
+
+        /// Appends an event: `log(tag, {player, turn, round, key=value, ...})`.
+        methods.add_method("log", |_, this, (tag, opts): (String, Option<LuaTable>)| {
+            let mut ev = GameEvent::new(tag);
+            if let Some(t) = opts {
+                if let Ok(p) = t.get::<_, String>("player") { ev.player_id = p; }
+                if let Ok(tn) = t.get::<_, usize>("turn") { ev.turn = tn; }
+                if let Ok(r) = t.get::<_, usize>("round") { ev.round = r; }
+                for pair in t.pairs::<String, String>() {
+                    if let Ok((k, v)) = pair {
+                        if k != "player" && k != "turn" && k != "round" {
+                            ev.data.insert(k, v);
+                        }
+                    }
+                }
+            }
+            this.0.borrow_mut().log(ev);
+            Ok(())
+        });
+        /// Returns the number of recorded events.
+        methods.add_method("getSize", |_, this, ()| Ok(this.0.borrow().len()));
+        /// Returns `true` if empty.
+        methods.add_method("isEmpty", |_, this, ()| Ok(this.0.borrow().is_empty()));
+        /// Clears all events.
+        methods.add_method("clear", |_, this, ()| {
+            this.0.borrow_mut().clear();
+            Ok(())
+        });
+        /// Returns all events matching `tag` as a list of `{tag, turn, round, player, ...}` tables.
+        methods.add_method("filterByTag", |lua, this, tag: String| {
+            event_list_to_lua(lua, this.0.borrow().filter_by_tag(&tag))
+        });
+        /// Returns all events for `player_id`.
+        methods.add_method("filterByPlayer", |lua, this, pid: String| {
+            event_list_to_lua(lua, this.0.borrow().filter_by_player(&pid))
+        });
+        /// Returns all events from `round`.
+        methods.add_method("filterByRound", |lua, this, round: usize| {
+            event_list_to_lua(lua, this.0.borrow().filter_by_round(round))
+        });
+        /// Returns the most recent event, or `nil`.
+        methods.add_method("last", |lua, this, ()| {
+            let borrow = this.0.borrow();
+            if let Some(ev) = borrow.last() {
+                Ok(LuaValue::Table(game_event_to_lua(lua, ev)?))
+            } else {
+                Ok(LuaValue::Nil)
+            }
+        });
+        /// Returns all events as a list.
+        methods.add_method("getAll", |lua, this, ()| {
+            event_list_to_lua(lua, this.0.borrow().events().iter().collect())
+        });
+    }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// LuaGameRules
+// ─────────────────────────────────────────────────────────────────────────────
+
+/// Lua-facing `GameRules` userdata.
+#[derive(Clone)]
+pub struct LuaGameRules(pub Rc<RefCell<GameRules>>);
+
+impl LunaType for LuaGameRules {
+    const TYPE_NAME: &'static str = "GameRules";
+    const TYPE_HIERARCHY: &'static [&'static str] = &["GameRules"];
+}
+
+impl LuaUserData for LuaGameRules {
+    fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
+        add_type_methods(methods);
+
+        /// Returns the list of phase names.
+        methods.add_method("getPhases", |lua, this, ()| {
+            let t = lua.create_sequence_from(this.0.borrow().phases.iter().cloned())?;
+            Ok(t)
+        });
+        /// Sets the phase list.
+        methods.add_method("setPhases", |_, this, t: LuaTable| {
+            let mut phases = Vec::new();
+            for v in t.sequence_values::<String>() { phases.push(v?); }
+            this.0.borrow_mut().phases = phases;
+            Ok(())
+        });
+        /// Returns the starting hand size.
+        methods.add_method("getStartingHandSize", |_, this, ()| Ok(this.0.borrow().starting_hand_size));
+        /// Sets the starting hand size.
+        methods.add_method("setStartingHandSize", |_, this, v: usize| {
+            this.0.borrow_mut().starting_hand_size = v;
+            Ok(())
+        });
+        /// Returns the max hand size (`0` = unlimited).
+        methods.add_method("getMaxHandSize", |_, this, ()| Ok(this.0.borrow().max_hand_size));
+        /// Sets the max hand size.
+        methods.add_method("setMaxHandSize", |_, this, v: usize| {
+            this.0.borrow_mut().max_hand_size = v;
+            Ok(())
+        });
+        /// Returns the max rounds (`0` = unlimited).
+        methods.add_method("getMaxRounds", |_, this, ()| Ok(this.0.borrow().max_rounds));
+        /// Sets the max rounds.
+        methods.add_method("setMaxRounds", |_, this, v: usize| {
+            this.0.borrow_mut().max_rounds = v;
+            Ok(())
+        });
+        /// Returns whether mulligans are allowed.
+        methods.add_method("getAllowMulligan", |_, this, ()| Ok(this.0.borrow().allow_mulligan));
+        /// Sets whether mulligans are allowed.
+        methods.add_method("setAllowMulligan", |_, this, v: bool| {
+            this.0.borrow_mut().allow_mulligan = v;
+            Ok(())
+        });
+        /// Returns the mulligan count.
+        methods.add_method("getMulliganCount", |_, this, ()| Ok(this.0.borrow().mulligan_count));
+        /// Sets the mulligan count.
+        methods.add_method("setMulliganCount", |_, this, v: usize| {
+            this.0.borrow_mut().mulligan_count = v;
+            Ok(())
+        });
+        /// Gets a named string setting.
+        methods.add_method("getSetting", |_, this, key: String| {
+            Ok(this.0.borrow().get_setting(&key).map(String::from))
+        });
+        /// Sets a named string setting.
+        methods.add_method("setSetting", |_, this, (k, v): (String, String)| {
+            this.0.borrow_mut().set_setting(k, v);
+            Ok(())
+        });
+    }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Helpers
+// ─────────────────────────────────────────────────────────────────────────────
+
+fn game_event_to_lua<'lua>(lua: &'lua Lua, ev: &GameEvent) -> LuaResult<LuaTable<'lua>> {
+    let t = lua.create_table()?;
+    t.set("tag", ev.tag.clone())?;
+    t.set("turn", ev.turn)?;
+    t.set("round", ev.round)?;
+    t.set("player", ev.player_id.clone())?;
+    for (k, v) in &ev.data {
+        t.set(k.as_str(), v.as_str())?;
+    }
+    Ok(t)
+}
+
+fn event_list_to_lua<'lua>(lua: &'lua Lua, events: Vec<&GameEvent>) -> LuaResult<LuaTable<'lua>> {
+    let t = lua.create_table()?;
+    for (i, ev) in events.into_iter().enumerate() {
+        t.set(i + 1, game_event_to_lua(lua, ev)?)?;
+    }
+    Ok(t)
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
 // Register
 // ─────────────────────────────────────────────────────────────────────────────
 
@@ -991,10 +1655,172 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
         lua.create_function(|_, ()| { clear_card_types(); Ok(()) })?,
     )?;
 
-    /// Cardgame on this CardPool.
-    ///
-    /// # Returns
-    /// The result.
+    // ── New factories ──────────────────────────────────────────────────────
+
+    // Factory: Player
+    module.set(
+        "newPlayer",
+        lua.create_function(|_, (id, name): (String, Option<String>)| {
+            let p = if let Some(n) = name {
+                Player::with_name(id, n)
+            } else {
+                Player::new(id)
+            };
+            Ok(LuaPlayer(Rc::new(RefCell::new(p))))
+        })?,
+    )?;
+
+    // Factory: ScoreBoard
+    module.set(
+        "newScoreBoard",
+        lua.create_function(|_, ()| {
+            Ok(LuaScoreBoard(Rc::new(RefCell::new(ScoreBoard::new()))))
+        })?,
+    )?;
+
+    // Factory: ResourcePool
+    module.set(
+        "newResourcePool",
+        lua.create_function(|_, name: Option<String>| {
+            Ok(LuaResourcePool(Rc::new(RefCell::new(ResourcePool::new(name.unwrap_or_default())))))
+        })?,
+    )?;
+
+    // Factory: Pot
+    module.set(
+        "newPot",
+        lua.create_function(|_, ()| {
+            Ok(LuaPot(Rc::new(RefCell::new(Pot::new()))))
+        })?,
+    )?;
+
+    // Factory: TurnManager
+    module.set(
+        "newTurnManager",
+        lua.create_function(|_, (players_t, phases_t): (LuaTable, Option<LuaTable>)| {
+            let mut players: Vec<String> = Vec::new();
+            for v in players_t.sequence_values::<String>() { players.push(v?); }
+            let mut phases: Vec<String> = Vec::new();
+            if let Some(t) = phases_t {
+                for v in t.sequence_values::<String>() { phases.push(v?); }
+            }
+            Ok(LuaTurnManager(Rc::new(RefCell::new(TurnManager::new(players, phases)))))
+        })?,
+    )?;
+
+    // Factory: TrickState
+    module.set(
+        "newTrickState",
+        lua.create_function(|_, lead: Option<String>| {
+            let mut ts = TrickState::new();
+            if let Some(l) = lead { ts.set_lead(l); }
+            Ok(LuaTrickState(Rc::new(RefCell::new(ts))))
+        })?,
+    )?;
+
+    // Factory: TrickHistory
+    module.set(
+        "newTrickHistory",
+        lua.create_function(|_, ()| {
+            Ok(LuaTrickHistory(Rc::new(RefCell::new(TrickHistory::new()))))
+        })?,
+    )?;
+
+    // Factory: EventLog
+    module.set(
+        "newEventLog",
+        lua.create_function(|_, max_size: Option<usize>| {
+            let log = if let Some(cap) = max_size {
+                EventLog::with_capacity(cap)
+            } else {
+                EventLog::new()
+            };
+            Ok(LuaEventLog(Rc::new(RefCell::new(log))))
+        })?,
+    )?;
+
+    // Factory: GameRules
+    module.set(
+        "newGameRules",
+        lua.create_function(|_, ()| {
+            Ok(LuaGameRules(Rc::new(RefCell::new(GameRules::default()))))
+        })?,
+    )?;
+
+    // ── Hand evaluation free functions ─────────────────────────────────────
+
+    /// Find all groups of exactly `n` cards sharing the same value of `stat`.
+    module.set(
+        "handFindNOfAKind",
+        lua.create_function(|lua, (cards_t, stat, n): (LuaTable, String, usize)| {
+            let cards = lua_table_to_cards(cards_t)?;
+            let groups = find_n_of_a_kind(&cards, &stat, n);
+            card_groups_to_lua(lua, &cards, groups)
+        })?,
+    )?;
+
+    /// Find all groups of `n` or more cards sharing the same value of `stat`.
+    module.set(
+        "handFindAtLeastNOfAKind",
+        lua.create_function(|lua, (cards_t, stat, n): (LuaTable, String, usize)| {
+            let cards = lua_table_to_cards(cards_t)?;
+            let groups = find_at_least_n_of_a_kind(&cards, &stat, n);
+            card_groups_to_lua(lua, &cards, groups)
+        })?,
+    )?;
+
+    /// Find consecutive runs (length >= `min_run`) sorted by `stat` value.
+    module.set(
+        "handFindSequences",
+        lua.create_function(|lua, (cards_t, stat, min_run): (LuaTable, String, usize)| {
+            let cards = lua_table_to_cards(cards_t)?;
+            let groups = find_sequences(&cards, &stat, min_run);
+            card_groups_to_lua(lua, &cards, groups)
+        })?,
+    )?;
+
+    /// Find flush groups: runs of `min_size`+ cards with the same `tag_prefix` tag.
+    module.set(
+        "handFindFlushGroups",
+        lua.create_function(|lua, (cards_t, tag_prefix, min_size): (LuaTable, String, usize)| {
+            let cards = lua_table_to_cards(cards_t)?;
+            let groups = find_flush_groups(&cards, &tag_prefix, min_size);
+            card_groups_to_lua(lua, &cards, groups)
+        })?,
+    )?;
+
     luna.set("cardgame", module)?;
     Ok(())
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Hand-eval Lua helpers
+// ─────────────────────────────────────────────────────────────────────────────
+
+fn lua_table_to_cards(t: LuaTable<'_>) -> LuaResult<Vec<Card>> {
+    let mut cards = Vec::new();
+    for v in t.sequence_values::<LuaAnyUserData>() {
+        let ud = v?;
+        let card = ud.borrow::<LuaCard>()?.0.borrow().clone();
+        cards.push(card);
+    }
+    Ok(cards)
+}
+
+fn card_groups_to_lua<'lua>(lua: &'lua Lua, src: &[Card], groups: Vec<crate::cardgame::CardGroup>) -> LuaResult<LuaTable<'lua>> {
+    let result = lua.create_table()?;
+    for (i, group) in groups.into_iter().enumerate() {
+        let g = lua.create_table()?;
+        g.set("score", group.score)?;
+        g.set("label", group.label)?;
+        let cards_t = lua.create_table()?;
+        for (j, &idx) in group.indices.iter().enumerate() {
+            if let Some(card) = src.get(idx) {
+                cards_t.set(j + 1, LuaCard(Rc::new(RefCell::new(card.clone()))))?;
+            }
+        }
+        g.set("cards", cards_t)?;
+        result.set(i + 1, g)?;
+    }
+    Ok(result)
 }
