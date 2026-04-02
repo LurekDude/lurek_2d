@@ -215,14 +215,41 @@ engine ← entity   ← lua_api
 
 ### Testing
 
-- **Primary**: Lua integration tests — run via `cargo run -- tests/lua/` on a debug build. These exercise the full API surface end-to-end.
-- **Secondary**: Rust integration tests in `tests/<module>_tests.rs` for internal logic.
-- **Stress tests**: `tests/stress/` for performance-sensitive paths.
-- Run `cargo test` — all must pass before any commit
-- Float comparisons: `assert!((val - expected).abs() < 1e-5)`
-- Lua tests MUST NOT require a window, GPU, or audio device (headless-safe)
+Luna2D has a **two-layer test system** — Rust integration tests and Lua BDD tests — both executed via `cargo test`.
+
+**Rust integration tests** (`tests/<module>_tests.rs`)
+- Auto-discovered by Cargo; one file per module
+- Import from crate root: `use luna2d::module::Type;`
+- Naming: `<subject>_<scenario>_<expected>` — no `test_` prefix
+- Float: `assert!((val - expected).abs() < 1e-5)` — never `assert_eq!` on floats
+
+**Lua BDD tests** (`tests/lua/`)
+- Dispatched by `tests/lua/harness.rs` — every `.lua` file needs one `#[test]` entry there
+- Framework (`tests/lua/init.lua`) provides: `describe` / `it` / `expect_equal` / `expect_near` / `expect_type` / `expect_error` etc.
+- Every Lua test file ends with `test_summary()` — mandatory
+- Layers: `unit/` (one module), `integration/` (cross-module), `stress/` (performance), `validation/` (negative-path), `golden/` (deterministic output)
+- VM is headless: no GPU, no audio, no window — never call `luna.graphics.draw*` in tests
+
+**VM helpers (Rust side):**
+- `create_test_vm()` → full Lua VM with BDD framework loaded and `_test_results` global
+- `make_vm()` → `(Rc<RefCell<SharedState>>, Lua)` for stateful Rust-side tests
+
+**Adding a new Lua test:**
+1. Create `tests/lua/unit/test_<module>.lua` using `describe`/`it`/`expect_*`
+2. Add `#[test] fn lua_test_<module>() { run_lua_test("unit/test_<module>.lua"); }` to `tests/lua/harness.rs`
+3. Run: `cargo test lua_test_<module>`
+
+**Quality gates:**
+- `cargo test` — all suites must exit 0
+- `cargo clippy -- -D warnings` — must exit 0
+- `python tools/test_coverage.py` — coverage analytics
+- `python tools/collect_docs.py --report-missing` — lists undocumented public items (exit 1 if any)
+
+**Constraints:**
+- Lua tests MUST NOT require a window, GPU, or audio device
 - New `luna.*` API functions require at least one Lua test before merge
-- Test helpers: `create_test_vm()` → full VM with `_test_results` global; `make_vm()` → `(state, lua)` tuple for stateful tests
+- Stress tests live in `tests/stress/` (Rust) and `tests/lua/stress/` (Lua)
+- Golden tests: expected files in `tests/golden/expected/`; actual output in `tests/golden/actual/` (git-ignored)
 
 ### File Structure
 
