@@ -222,8 +222,6 @@ pub mod thread_api;
 pub use crate::thread::channel as thread_channel;
 /// Re-export thread worker from src/thread.
 pub use crate::thread::worker as thread_worker;
-/// Registers the `luna.cardgame.*` card game API.
-pub mod cardgame_api;
 /// Registers the `luna.combat.*` combat system API.
 pub mod combat_api;
 /// Registers the `luna.crafting.*` crafting system API.
@@ -498,7 +496,6 @@ pub fn create_lua_vm(state: Rc<RefCell<SharedState>>) -> LuaResult<Lua> {
     entity_api::register(&lua, &luna)?;
     modding_api::register(&lua, &luna, state.clone())?;
     savegame_api::register(&lua, &luna, state.clone())?;
-    cardgame_api::register(&lua, &luna)?;
     item_api::register(&lua, &luna)?;
     combat_api::register(&lua, &luna)?;
     resource_api::register(&lua, &luna)?;

@@ -101,6 +101,8 @@ pub mod pathfinding;
 pub mod physics;
 /// Province-based map system for grand strategy games: provinces, terrain, adjacency.
 pub mod province;
+/// Province map module — spatial province data from colour-coded PNG images.
+pub mod province_map;
 /// Quest tracking: stages, objectives, quest log.
 pub mod quest;
 /// Numeric resource management: current/max pools with delta tracking.
