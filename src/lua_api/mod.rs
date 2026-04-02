@@ -230,6 +230,8 @@ pub mod combat_api;
 pub mod crafting_api;
 /// Registers the `luna.inventory.*` inventory system API.
 pub mod inventory_api;
+/// Registers the `luna.item.*` generic item data structures API.
+pub mod item_api;
 /// UserData type utilities for Luna2D Lua objects.
 pub mod lua_types;
 /// Registers the `luna.province.*` province map API.
@@ -497,6 +499,7 @@ pub fn create_lua_vm(state: Rc<RefCell<SharedState>>) -> LuaResult<Lua> {
     modding_api::register(&lua, &luna, state.clone())?;
     savegame_api::register(&lua, &luna, state.clone())?;
     cardgame_api::register(&lua, &luna)?;
+    item_api::register(&lua, &luna)?;
     combat_api::register(&lua, &luna)?;
     resource_api::register(&lua, &luna)?;
     stats_api::register(&lua, &luna)?;

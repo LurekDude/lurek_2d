@@ -304,6 +304,10 @@ name = "inventory_tests"
 path = "tests/game/inventory_tests.rs"
 
 [[test]]
+name = "item_tests"
+path = "tests/game/item_tests.rs"
+
+[[test]]
 name = "minimap_tests"
 path = "tests/game/minimap_tests.rs"
 

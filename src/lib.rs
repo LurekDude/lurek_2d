@@ -45,6 +45,13 @@
 //! | [`timer`] | Frame delta-time clock and scheduler |
 //! | [`window`] | winit event-loop wrapper |
 
+// Lua API files use `///` doc comments inside function bodies to document Lua-exposed
+// bindings at their call site; these are intentional inline docs, not misplaced rustdoc.
+#![allow(unused_doc_comments)]
+// The same inline `///` blocks do not produce well-formed markdown list continuations;
+// suppress that secondary lint across the whole crate.
+#![allow(clippy::doc_lazy_continuation)]
+
 /// Game AI toolkit: FSM, Behavior Trees, Steering, Pathfinding, Q-Learning, and more.
 pub mod ai;
 /// Audio playback system backed by rodio.
@@ -81,6 +88,8 @@ pub mod image;
 pub mod input;
 /// Item container and equip-slot inventory system.
 pub mod inventory;
+/// Generic item data structures: Item, Stack, StackBuilder, StackManager, ItemPool, Slot, StackHistory.
+pub mod item;
 /// Lua VM creation and the luna.* API bindings.
 pub mod lua_api;
 /// Foundational math types: Vec2, Mat3, Rect.
