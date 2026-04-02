@@ -4,7 +4,12 @@ use mlua::prelude::*;
 use std::cell::RefCell;
 use std::rc::Rc;
 
-use crate::combat::{CombatAction, CombatBattle, Combatant, StatusEffect};
+use crate::combat::{
+    CombatAction, CombatBattle, Combatant, StatusEffect,
+    CollisionGroupSet, Chassis, MountSlot,
+    Turret, Weapon, ProjectileType,
+    Projectile, ProjectilePool, CombatWorld,
+};
 use crate::lua_api::lua_types::{add_type_methods, LunaType};
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -646,6 +651,510 @@ impl LuaUserData for LuaCombatBattle {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
+// ProjectileType helpers
+// ─────────────────────────────────────────────────────────────────────────────
+
+/// Parses a string into a `ProjectileType`, defaulting to `Ballistic`.
+fn projectile_type_from_str(s: &str) -> ProjectileType {
+    match s {
+        "homing" => ProjectileType::Homing,
+        "ray" => ProjectileType::Ray,
+        "area" => ProjectileType::Area,
+        "beam" => ProjectileType::Beam,
+        _ => ProjectileType::Ballistic,
+    }
+}
+
+/// Returns the string representation of a `ProjectileType`.
+fn projectile_type_to_str(t: ProjectileType) -> &'static str {
+    match t {
+        ProjectileType::Ballistic => "ballistic",
+        ProjectileType::Homing => "homing",
+        ProjectileType::Ray => "ray",
+        ProjectileType::Area => "area",
+        ProjectileType::Beam => "beam",
+    }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// LuaCollisionGroupSet
+// ─────────────────────────────────────────────────────────────────────────────
+
+/// Lua wrapper for `CollisionGroupSet`.
+#[derive(Clone)]
+pub struct LuaCollisionGroupSet(pub Rc<RefCell<CollisionGroupSet>>);
+
+impl LunaType for LuaCollisionGroupSet {
+    const TYPE_NAME: &'static str = "CollisionGroupSet";
+    const TYPE_HIERARCHY: &'static [&'static str] = &["CollisionGroupSet"];
+}
+
+impl LuaUserData for LuaCollisionGroupSet {
+    fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
+        add_type_methods(methods);
+
+        /// Defines a new named collision group and returns its category bit.
+        methods.add_method("defineGroup", |_, this, name: String| {
+            this.0.borrow_mut().define_group(&name).map_err(LuaError::external)
+        });
+        /// Returns the category bit for a named group, or nil.
+        methods.add_method("getGroupBit", |_, this, name: String| {
+            Ok(this.0.borrow().get_group_bit(&name))
+        });
+        /// Sets whether two named groups should collide.
+        methods.add_method("setCollides", |_, this, (a, b, collides): (String, String, bool)| {
+            this.0.borrow_mut().set_collides(&a, &b, collides).map_err(LuaError::external)
+        });
+        /// Returns whether two named groups collide.
+        methods.add_method("getCollides", |_, this, (a, b): (String, String)| {
+            Ok(this.0.borrow().get_collides(&a, &b))
+        });
+        /// Computes the collision mask bits for a named group.
+        methods.add_method("computeMask", |_, this, group: String| {
+            Ok(this.0.borrow().compute_mask(&group))
+        });
+        /// Returns the number of defined groups.
+        methods.add_method("getGroupCount", |_, this, ()| {
+            Ok(this.0.borrow().group_count())
+        });
+        /// Returns a sequence of all defined group names.
+        methods.add_method("getGroupNames", |lua, this, ()| {
+            let names = this.0.borrow().group_names();
+            lua.create_sequence_from(names)
+        });
+        /// Resets all groups and collision rules.
+        methods.add_method("reset", |_, this, ()| {
+            this.0.borrow_mut().reset();
+            Ok(())
+        });
+    }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// LuaChassis
+// ─────────────────────────────────────────────────────────────────────────────
+
+/// Lua wrapper for `Chassis`.
+#[derive(Clone)]
+pub struct LuaChassis(pub Rc<RefCell<Chassis>>);
+
+impl LunaType for LuaChassis {
+    const TYPE_NAME: &'static str = "Chassis";
+    const TYPE_HIERARCHY: &'static [&'static str] = &["Chassis"];
+}
+
+impl LuaUserData for LuaChassis {
+    fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
+        add_type_methods(methods);
+
+        /// Returns the physics body ID for this chassis.
+        methods.add_method("getBodyId", |_, this, ()| Ok(this.0.borrow().body_id));
+        /// Returns the team identifier.
+        methods.add_method("getTeam", |_, this, ()| Ok(this.0.borrow().team.clone()));
+        /// Sets the team identifier.
+        methods.add_method("setTeam", |_, this, v: String| { this.0.borrow_mut().team = v; Ok(()) });
+        /// Returns current HP.
+        methods.add_method("getHp", |_, this, ()| Ok(this.0.borrow().hp));
+        /// Sets current HP, clamped to [0, maxHp].
+        methods.add_method("setHp", |_, this, v: f32| {
+            let mut b = this.0.borrow_mut();
+            b.hp = v.clamp(0.0, b.max_hp);
+            Ok(())
+        });
+        /// Returns maximum HP.
+        methods.add_method("getMaxHp", |_, this, ()| Ok(this.0.borrow().max_hp));
+        /// Sets maximum HP.
+        methods.add_method("setMaxHp", |_, this, v: f32| { this.0.borrow_mut().max_hp = v; Ok(()) });
+        /// Returns `true` if the chassis is dead (HP ≤ 0).
+        methods.add_method("isDead", |_, this, ()| Ok(this.0.borrow().is_dead()));
+        /// Returns `true` if the chassis has been destroyed.
+        methods.add_method("isDestroyed", |_, this, ()| Ok(this.0.borrow().destroyed));
+        /// Applies damage and returns the actual amount dealt.
+        methods.add_method("takeDamage", |_, this, amount: f32| {
+            Ok(this.0.borrow_mut().take_damage(amount))
+        });
+        /// Heals the chassis and returns the actual amount healed.
+        methods.add_method("heal", |_, this, amount: f32| {
+            Ok(this.0.borrow_mut().heal(amount))
+        });
+        /// Returns the armor value for a named zone.
+        methods.add_method("getArmor", |_, this, zone: String| {
+            Ok(this.0.borrow().get_armor(&zone))
+        });
+        /// Sets the armor value for a named zone.
+        methods.add_method("setArmor", |_, this, (zone, value): (String, f32)| {
+            this.0.borrow_mut().set_armor(&zone, value);
+            Ok(())
+        });
+        /// Returns a sequence of mount slot tables.
+        methods.add_method("getSlots", |lua, this, ()| {
+            let borrow = this.0.borrow();
+            let t = lua.create_table()?;
+            for (i, slot) in borrow.slots.iter().enumerate() {
+                let st = lua.create_table()?;
+                st.set("id", slot.id.clone())?;
+                st.set("x", slot.x)?;
+                st.set("y", slot.y)?;
+                st.set("sizeClass", slot.size_class.clone())?;
+                st.set("arcMin", slot.arc_min)?;
+                st.set("arcMax", slot.arc_max)?;
+                t.set(i + 1, st)?;
+            }
+            Ok(t)
+        });
+        /// Adds a mount slot from a Lua table with fields id, x, y, sizeClass, arcMin, arcMax.
+        methods.add_method("addSlot", |_, this, tbl: LuaTable| {
+            let slot = MountSlot {
+                id: tbl.get::<_, String>("id")?,
+                x: tbl.get::<_, f32>("x").unwrap_or(0.0),
+                y: tbl.get::<_, f32>("y").unwrap_or(0.0),
+                size_class: tbl.get::<_, String>("sizeClass").unwrap_or_else(|_| "medium".to_string()),
+                arc_min: tbl.get::<_, f32>("arcMin").unwrap_or(-std::f32::consts::PI),
+                arc_max: tbl.get::<_, f32>("arcMax").unwrap_or(std::f32::consts::PI),
+            };
+            this.0.borrow_mut().add_slot(slot);
+            Ok(())
+        });
+        /// Returns the optional user data string, or nil.
+        methods.add_method("getUserData", |_, this, ()| {
+            Ok(this.0.borrow().user_data.clone())
+        });
+        /// Sets the user data string.
+        methods.add_method("setUserData", |_, this, data: String| {
+            this.0.borrow_mut().user_data = Some(data);
+            Ok(())
+        });
+        /// Destroys the chassis, setting HP to 0 and destroyed to true.
+        methods.add_method("destroy", |_, this, ()| {
+            let mut b = this.0.borrow_mut();
+            b.destroyed = true;
+            b.hp = 0.0;
+            Ok(())
+        });
+    }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// LuaTurret
+// ─────────────────────────────────────────────────────────────────────────────
+
+/// Lua wrapper for `Turret`.
+#[derive(Clone)]
+pub struct LuaTurret(pub Rc<RefCell<Turret>>);
+
+impl LunaType for LuaTurret {
+    const TYPE_NAME: &'static str = "Turret";
+    const TYPE_HIERARCHY: &'static [&'static str] = &["Turret"];
+}
+
+impl LuaUserData for LuaTurret {
+    fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
+        add_type_methods(methods);
+
+        /// Returns the physics body ID.
+        methods.add_method("getBodyId", |_, this, ()| Ok(this.0.borrow().body_id));
+        /// Returns the revolute joint ID.
+        methods.add_method("getJointId", |_, this, ()| Ok(this.0.borrow().joint_id));
+        /// Returns the turn speed in radians per second.
+        methods.add_method("getTurnSpeed", |_, this, ()| Ok(this.0.borrow().turn_speed));
+        /// Sets the turn speed in radians per second.
+        methods.add_method("setTurnSpeed", |_, this, v: f32| { this.0.borrow_mut().turn_speed = v; Ok(()) });
+        /// Returns the minimum arc angle in radians.
+        methods.add_method("getArcMin", |_, this, ()| Ok(this.0.borrow().arc_min));
+        /// Sets the minimum arc angle in radians.
+        methods.add_method("setArcMin", |_, this, v: f32| { this.0.borrow_mut().arc_min = v; Ok(()) });
+        /// Returns the maximum arc angle in radians.
+        methods.add_method("getArcMax", |_, this, ()| Ok(this.0.borrow().arc_max));
+        /// Sets the maximum arc angle in radians.
+        methods.add_method("setArcMax", |_, this, v: f32| { this.0.borrow_mut().arc_max = v; Ok(()) });
+        /// Sets the desired target angle for the turret to aim at.
+        methods.add_method("aimAtAngle", |_, this, angle: f32| {
+            this.0.borrow_mut().aim_at_angle(angle);
+            Ok(())
+        });
+        /// Returns `true` if the turret is aimed within tolerance of its target.
+        methods.add_method("isAimed", |_, this, tolerance: Option<f32>| {
+            Ok(this.0.borrow().is_aimed(tolerance.unwrap_or(0.05)))
+        });
+        /// Returns the size class string.
+        methods.add_method("getSizeClass", |_, this, ()| Ok(this.0.borrow().size_class.clone()));
+        /// Sets the size class string.
+        methods.add_method("setSizeClass", |_, this, v: String| { this.0.borrow_mut().size_class = v; Ok(()) });
+        /// Returns `true` if the turret has been destroyed.
+        methods.add_method("isDestroyed", |_, this, ()| Ok(this.0.borrow().destroyed));
+        /// Destroys the turret.
+        methods.add_method("destroy", |_, this, ()| { this.0.borrow_mut().destroyed = true; Ok(()) });
+    }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// LuaWeapon
+// ─────────────────────────────────────────────────────────────────────────────
+
+/// Lua wrapper for fire-rate-based `Weapon`.
+#[derive(Clone)]
+pub struct LuaWeapon(pub Rc<RefCell<Weapon>>);
+
+impl LunaType for LuaWeapon {
+    const TYPE_NAME: &'static str = "Weapon";
+    const TYPE_HIERARCHY: &'static [&'static str] = &["Weapon"];
+}
+
+impl LuaUserData for LuaWeapon {
+    fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
+        add_type_methods(methods);
+
+        /// Returns the weapon display name.
+        methods.add_method("getName", |_, this, ()| Ok(this.0.borrow().name.clone()));
+        /// Returns the fire rate in rounds per second.
+        methods.add_method("getFireRate", |_, this, ()| Ok(this.0.borrow().fire_rate));
+        /// Sets the fire rate in rounds per second.
+        methods.add_method("setFireRate", |_, this, v: f32| { this.0.borrow_mut().fire_rate = v; Ok(()) });
+        /// Returns `true` if the weapon is ready to fire.
+        methods.add_method("canFire", |_, this, ()| Ok(this.0.borrow().can_fire()));
+        /// Attempts to fire the weapon. Returns `true` if a shot was produced.
+        methods.add_method("fire", |_, this, dt: Option<f32>| {
+            Ok(this.0.borrow_mut().fire(dt.unwrap_or(0.016)))
+        });
+        /// Starts continuous firing mode.
+        methods.add_method("startFiring", |_, this, ()| { this.0.borrow_mut().start_firing(); Ok(()) });
+        /// Stops continuous firing mode.
+        methods.add_method("stopFiring", |_, this, ()| { this.0.borrow_mut().stop_firing(); Ok(()) });
+        /// Returns `true` if the weapon is in firing mode.
+        methods.add_method("isFiring", |_, this, ()| Ok(this.0.borrow().is_firing()));
+        /// Returns current ammo count (-1 = infinite).
+        methods.add_method("getAmmo", |_, this, ()| Ok(this.0.borrow().ammo));
+        /// Sets current ammo count.
+        methods.add_method("setAmmo", |_, this, v: i32| { this.0.borrow_mut().ammo = v; Ok(()) });
+        /// Returns the maximum ammo capacity.
+        methods.add_method("getMaxAmmo", |_, this, ()| Ok(this.0.borrow().max_ammo));
+        /// Sets the maximum ammo capacity.
+        methods.add_method("setMaxAmmo", |_, this, v: i32| { this.0.borrow_mut().max_ammo = v; Ok(()) });
+        /// Reloads ammo. If amount is nil, refills to max.
+        methods.add_method("reload", |_, this, amount: Option<i32>| {
+            this.0.borrow_mut().reload(amount);
+            Ok(())
+        });
+        /// Returns `true` if the weapon has exhausted its ammo.
+        methods.add_method("isOutOfAmmo", |_, this, ()| Ok(this.0.borrow().is_out_of_ammo()));
+        /// Returns the burst size.
+        methods.add_method("getBurstSize", |_, this, ()| Ok(this.0.borrow().burst_size));
+        /// Sets the burst size.
+        methods.add_method("setBurstSize", |_, this, v: u32| { this.0.borrow_mut().burst_size = v; Ok(()) });
+        /// Returns the burst delay in seconds.
+        methods.add_method("getBurstDelay", |_, this, ()| Ok(this.0.borrow().burst_delay));
+        /// Sets the burst delay in seconds.
+        methods.add_method("setBurstDelay", |_, this, v: f32| { this.0.borrow_mut().burst_delay = v; Ok(()) });
+        /// Returns the angular spread in radians.
+        methods.add_method("getSpread", |_, this, ()| Ok(this.0.borrow().spread));
+        /// Sets the angular spread in radians.
+        methods.add_method("setSpread", |_, this, v: f32| { this.0.borrow_mut().spread = v; Ok(()) });
+        /// Returns damage per hit.
+        methods.add_method("getDamage", |_, this, ()| Ok(this.0.borrow().damage_amount));
+        /// Sets damage per hit.
+        methods.add_method("setDamage", |_, this, v: f32| { this.0.borrow_mut().damage_amount = v; Ok(()) });
+        /// Returns the damage type string.
+        methods.add_method("getDamageType", |_, this, ()| Ok(this.0.borrow().damage_type.clone()));
+        /// Sets the damage type string.
+        methods.add_method("setDamageType", |_, this, v: String| { this.0.borrow_mut().damage_type = v; Ok(()) });
+        /// Returns the armor penetration value.
+        methods.add_method("getPenetration", |_, this, ()| Ok(this.0.borrow().penetration));
+        /// Sets the armor penetration value.
+        methods.add_method("setPenetration", |_, this, v: f32| { this.0.borrow_mut().penetration = v; Ok(()) });
+        /// Returns the maximum range in world units.
+        methods.add_method("getRange", |_, this, ()| Ok(this.0.borrow().range));
+        /// Sets the maximum range in world units.
+        methods.add_method("setRange", |_, this, v: f32| { this.0.borrow_mut().range = v; Ok(()) });
+        /// Returns the projectile travel speed.
+        methods.add_method("getProjectileSpeed", |_, this, ()| Ok(this.0.borrow().projectile_speed));
+        /// Sets the projectile travel speed.
+        methods.add_method("setProjectileSpeed", |_, this, v: f32| { this.0.borrow_mut().projectile_speed = v; Ok(()) });
+        /// Returns the projectile type as a string.
+        methods.add_method("getProjectileType", |_, this, ()| {
+            Ok(projectile_type_to_str(this.0.borrow().projectile_type).to_string())
+        });
+        /// Sets the projectile type from a string.
+        methods.add_method("setProjectileType", |_, this, v: String| {
+            this.0.borrow_mut().projectile_type = projectile_type_from_str(&v);
+            Ok(())
+        });
+        /// Returns the remaining cooldown in seconds.
+        methods.add_method("getCooldown", |_, this, ()| Ok(this.0.borrow().cooldown_remaining));
+        /// Updates the cooldown timer by dt seconds.
+        methods.add_method("updateCooldown", |_, this, dt: f32| {
+            this.0.borrow_mut().update_cooldown(dt);
+            Ok(())
+        });
+    }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// LuaProjectile
+// ─────────────────────────────────────────────────────────────────────────────
+
+/// Lua wrapper for `Projectile`.
+#[derive(Clone)]
+pub struct LuaProjectile(pub Rc<RefCell<Projectile>>);
+
+impl LunaType for LuaProjectile {
+    const TYPE_NAME: &'static str = "Projectile";
+    const TYPE_HIERARCHY: &'static [&'static str] = &["Projectile"];
+}
+
+impl LuaUserData for LuaProjectile {
+    fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
+        add_type_methods(methods);
+
+        /// Returns the physics body ID.
+        methods.add_method("getBodyId", |_, this, ()| Ok(this.0.borrow().body_id));
+        /// Returns `true` if this projectile is currently active.
+        methods.add_method("isActive", |_, this, ()| Ok(this.0.borrow().active));
+        /// Returns the time this projectile has been alive in seconds.
+        methods.add_method("getLifetime", |_, this, ()| Ok(this.0.borrow().lifetime));
+        /// Returns total distance traveled in world units.
+        methods.add_method("getDistanceTraveled", |_, this, ()| Ok(this.0.borrow().distance_traveled));
+        /// Returns the travel speed.
+        methods.add_method("getSpeed", |_, this, ()| Ok(this.0.borrow().speed));
+        /// Returns the damage value.
+        methods.add_method("getDamage", |_, this, ()| Ok(this.0.borrow().damage_amount));
+        /// Returns the damage type string.
+        methods.add_method("getDamageType", |_, this, ()| Ok(this.0.borrow().damage_type.clone()));
+        /// Returns the name of the weapon that fired this projectile.
+        methods.add_method("getSourceWeapon", |_, this, ()| Ok(this.0.borrow().source_weapon_name.clone()));
+        /// Sets the homing target position.
+        methods.add_method("setTarget", |_, this, (x, y): (f32, f32)| {
+            this.0.borrow_mut().target_pos = Some((x, y));
+            Ok(())
+        });
+        /// Sets the homing target body ID.
+        methods.add_method("setTargetBody", |_, this, body_id: usize| {
+            this.0.borrow_mut().target_body = Some(body_id);
+            Ok(())
+        });
+        /// Deactivates this projectile.
+        methods.add_method("release", |_, this, ()| {
+            this.0.borrow_mut().active = false;
+            Ok(())
+        });
+    }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// LuaProjectilePool
+// ─────────────────────────────────────────────────────────────────────────────
+
+/// Lua wrapper for `ProjectilePool`.
+#[derive(Clone)]
+pub struct LuaProjectilePool(pub Rc<RefCell<ProjectilePool>>);
+
+impl LunaType for LuaProjectilePool {
+    const TYPE_NAME: &'static str = "ProjectilePool";
+    const TYPE_HIERARCHY: &'static [&'static str] = &["ProjectilePool"];
+}
+
+impl LuaUserData for LuaProjectilePool {
+    fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
+        add_type_methods(methods);
+
+        /// Spawns a projectile from the pool. Returns the index or nil if exhausted.
+        #[allow(clippy::too_many_arguments)]
+        methods.add_method("spawn", |_, this, (x, y, angle, speed, damage, damage_type, range): (f32, f32, f32, f32, f32, String, f32)| {
+            Ok(this.0.borrow_mut().spawn(x, y, angle, speed, damage, &damage_type, range))
+        });
+        /// Releases a projectile back to the pool by index.
+        methods.add_method("release", |_, this, index: usize| {
+            this.0.borrow_mut().release(index);
+            Ok(())
+        });
+        /// Returns the number of active projectiles.
+        methods.add_method("getActiveCount", |_, this, ()| Ok(this.0.borrow().active_count()));
+        /// Returns the number of free slots.
+        methods.add_method("getFreeCount", |_, this, ()| Ok(this.0.borrow().free_count()));
+        /// Returns the total pool capacity.
+        methods.add_method("getPoolSize", |_, this, ()| Ok(this.0.borrow().pool_size));
+        /// Resets all projectiles to inactive.
+        methods.add_method("reset", |_, this, ()| { this.0.borrow_mut().reset(); Ok(()) });
+    }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// LuaCombatWorld
+// ─────────────────────────────────────────────────────────────────────────────
+
+/// Lua wrapper for `CombatWorld`.
+#[derive(Clone)]
+pub struct LuaCombatWorld(pub Rc<RefCell<CombatWorld>>);
+
+impl LunaType for LuaCombatWorld {
+    const TYPE_NAME: &'static str = "CombatWorld";
+    const TYPE_HIERARCHY: &'static [&'static str] = &["CombatWorld"];
+}
+
+impl LuaUserData for LuaCombatWorld {
+    fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
+        add_type_methods(methods);
+
+        /// Adds a chassis to the world and returns its index.
+        methods.add_method("addChassis", |_, this, ud: LuaAnyUserData| {
+            let chassis = ud.borrow::<LuaChassis>()?.0.borrow().clone();
+            Ok(this.0.borrow_mut().add_chassis(chassis))
+        });
+        /// Returns the chassis at the given index, or nil.
+        methods.add_method("getChassis", |_, this, index: usize| {
+            let borrow = this.0.borrow();
+            Ok(borrow.get_chassis(index).cloned().map(|c| LuaChassis(Rc::new(RefCell::new(c)))))
+        });
+        /// Adds a turret to the world and returns its index.
+        methods.add_method("addTurret", |_, this, ud: LuaAnyUserData| {
+            let turret = ud.borrow::<LuaTurret>()?.0.borrow().clone();
+            Ok(this.0.borrow_mut().add_turret(turret))
+        });
+        /// Returns the turret at the given index, or nil.
+        methods.add_method("getTurret", |_, this, index: usize| {
+            let borrow = this.0.borrow();
+            Ok(borrow.get_turret(index).cloned().map(|t| LuaTurret(Rc::new(RefCell::new(t)))))
+        });
+        /// Adds a weapon to the world and returns its index.
+        methods.add_method("addWeapon", |_, this, ud: LuaAnyUserData| {
+            let weapon = ud.borrow::<LuaWeapon>()?.0.borrow().clone();
+            Ok(this.0.borrow_mut().add_weapon(weapon))
+        });
+        /// Returns the weapon at the given index, or nil.
+        methods.add_method("getWeapon", |_, this, index: usize| {
+            let borrow = this.0.borrow();
+            Ok(borrow.get_weapon(index).cloned().map(|w| LuaWeapon(Rc::new(RefCell::new(w)))))
+        });
+        /// Adds a projectile pool to the world and returns its index.
+        methods.add_method("addPool", |_, this, ud: LuaAnyUserData| {
+            let pool = ud.borrow::<LuaProjectilePool>()?.0.borrow().clone();
+            Ok(this.0.borrow_mut().add_pool(pool))
+        });
+        /// Returns the projectile pool at the given index, or nil.
+        methods.add_method("getPool", |_, this, index: usize| {
+            let borrow = this.0.borrow();
+            Ok(borrow.get_pool(index).cloned().map(|p| LuaProjectilePool(Rc::new(RefCell::new(p)))))
+        });
+        /// Returns the total number of active projectiles across all pools.
+        methods.add_method("getActiveProjectileCount", |_, this, ()| {
+            Ok(this.0.borrow().active_projectile_count())
+        });
+        /// Returns the number of non-destroyed chassis.
+        methods.add_method("getActiveChassisCount", |_, this, ()| {
+            Ok(this.0.borrow().active_chassis_count())
+        });
+        /// Updates all weapon cooldowns by dt seconds.
+        methods.add_method("update", |_, this, dt: f32| {
+            this.0.borrow_mut().update(dt);
+            Ok(())
+        });
+        /// Clears all entities and collision groups.
+        methods.add_method("reset", |_, this, ()| { this.0.borrow_mut().reset(); Ok(()) });
+        /// Removes destroyed chassis (invalidates indices).
+        methods.add_method("cleanup", |_, this, ()| { this.0.borrow_mut().cleanup(); Ok(()) });
+    }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
 // Register
 // ─────────────────────────────────────────────────────────────────────────────
 
@@ -687,10 +1196,52 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
         Ok(LuaCombatBattle(Rc::new(RefCell::new(CombatBattle::new(name.unwrap_or_default())))))
     })?)?;
 
-    /// Combat on this CombatBattle.
+    /// Creates a new `CollisionGroupSet`.
+    module.set("newCollisionGroupSet", lua.create_function(|_, ()| {
+        Ok(LuaCollisionGroupSet(Rc::new(RefCell::new(CollisionGroupSet::new()))))
+    })?)?;
+
+    /// Creates a new `Chassis` with the given body ID and max HP.
     ///
-    /// # Returns
-    /// The result.
+    /// # Parameters
+    /// - `body_id` — `integer`: Physics body ID.
+    /// - `max_hp` — `number`: Maximum hit points.
+    module.set("newChassis", lua.create_function(|_, (body_id, max_hp): (usize, f32)| {
+        Ok(LuaChassis(Rc::new(RefCell::new(Chassis::new(body_id, max_hp)))))
+    })?)?;
+
+    /// Creates a new `Turret` with the given body and joint IDs.
+    ///
+    /// # Parameters
+    /// - `body_id` — `integer`: Physics body ID.
+    /// - `joint_id` — `integer`: Revolute joint ID.
+    module.set("newTurret", lua.create_function(|_, (body_id, joint_id): (usize, usize)| {
+        Ok(LuaTurret(Rc::new(RefCell::new(Turret::new(body_id, joint_id)))))
+    })?)?;
+
+    /// Creates a new fire-rate `Weapon` with the given name.
+    ///
+    /// # Parameters
+    /// - `name` — `string`: Weapon display name.
+    module.set("newWeapon", lua.create_function(|_, name: String| {
+        Ok(LuaWeapon(Rc::new(RefCell::new(Weapon::new(name)))))
+    })?)?;
+
+    /// Creates a new `ProjectilePool` with the given capacity.
+    ///
+    /// # Parameters
+    /// - `size` — `integer`: Pool capacity.
+    /// - `proj_type` — `string` optional: Projectile type (default `"ballistic"`).
+    module.set("newProjectilePool", lua.create_function(|_, (size, proj_type): (usize, Option<String>)| {
+        let pt = proj_type.map(|s| projectile_type_from_str(&s)).unwrap_or(ProjectileType::Ballistic);
+        Ok(LuaProjectilePool(Rc::new(RefCell::new(ProjectilePool::new(size, pt)))))
+    })?)?;
+
+    /// Creates a new empty `CombatWorld`.
+    module.set("newCombatWorld", lua.create_function(|_, ()| {
+        Ok(LuaCombatWorld(Rc::new(RefCell::new(CombatWorld::new()))))
+    })?)?;
+
     luna.set("combat", module)?;
     Ok(())
 }

@@ -29,8 +29,18 @@ pub mod types;
 pub mod action;
 pub mod combatant;
 pub mod battle;
+pub mod collision_groups;
+pub mod chassis;
+pub mod weapon;
+pub mod projectile;
+pub mod world;
 
 pub use types::{DamageType, StatusEffect, CombatResult};
 pub use action::CombatAction;
 pub use combatant::Combatant;
 pub use battle::CombatBattle;
+pub use collision_groups::CollisionGroupSet;
+pub use chassis::{Chassis, MountSlot, ArmorZone};
+pub use weapon::{Turret, Weapon, ProjectileType};
+pub use projectile::{Projectile, ProjectilePool, MAX_POOL_SIZE};
+pub use world::CombatWorld;
