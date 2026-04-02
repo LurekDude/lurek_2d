@@ -1,12 +1,7 @@
 //! Decoded audio sample manipulation and MIDI SoundFont state.
 //!
-//! Provides `SoundData` for reading and writing decoded PCM audio samples,
-//! and `MidiState` for managing MIDI SoundFont (SF2) loading.
+//! This module re-exports from [`crate::audio`] for LÖVE 2D module-name
+//! compatibility. All implementation lives in the `audio` module.
 
-/// Decoded PCM sample buffer with per-sample read/write access.
-pub mod sound_data;
-pub use sound_data::SoundData;
-
-/// MIDI SoundFont state management.
-pub mod midi;
-pub use midi::MidiState;
+pub use crate::audio::midi::MidiState;
+pub use crate::audio::sound_data::SoundData;

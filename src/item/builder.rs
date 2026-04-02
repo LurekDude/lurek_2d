@@ -4,9 +4,9 @@
 //! optional overrides) and either builds a ready-to-use `Stack` or validates
 //! an existing stack against construction constraints.
 
-use std::collections::HashMap;
-use crate::item::item::{Item, get_item_type};
+use crate::item::item::{get_item_type, Item};
 use crate::item::stack::Stack;
+use std::collections::HashMap;
 
 // ─────────────────────────────────────────────────────────────────────────────
 // BuildEntry
@@ -131,10 +131,16 @@ impl StackBuilder {
         let total: usize = self.entries.iter().map(|e| e.count).sum();
 
         if self.min_size > 0 && total < self.min_size {
-            errors.push(format!("too few items: {} < minimum {}", total, self.min_size));
+            errors.push(format!(
+                "too few items: {} < minimum {}",
+                total, self.min_size
+            ));
         }
         if self.max_size > 0 && total > self.max_size {
-            errors.push(format!("too many items: {} > maximum {}", total, self.max_size));
+            errors.push(format!(
+                "too many items: {} > maximum {}",
+                total, self.max_size
+            ));
         }
 
         // Count per type across all entries
@@ -147,12 +153,21 @@ impl StackBuilder {
             if self.banned_types.iter().any(|b| b == type_name) {
                 errors.push(format!("banned type included: {}", type_name));
             }
-            let limit = self.per_type_limits.get(*type_name)
+            let limit = self
+                .per_type_limits
+                .get(*type_name)
                 .copied()
-                .or(if self.max_copies > 0 { Some(self.max_copies) } else { None });
+                .or(if self.max_copies > 0 {
+                    Some(self.max_copies)
+                } else {
+                    None
+                });
             if let Some(max) = limit {
                 if count > max {
-                    errors.push(format!("type '{}': {} copies exceeds limit of {}", type_name, count, max));
+                    errors.push(format!(
+                        "type '{}': {} copies exceeds limit of {}",
+                        type_name, count, max
+                    ));
                 }
             }
         }
@@ -180,7 +195,8 @@ impl StackBuilder {
                 if let Some(&max) = self.max_per_category.get(cat.as_str()) {
                     if max > 0 && count > max {
                         errors.push(format!(
-                            "category '{}': {} items exceeds limit of {}", cat, count, max
+                            "category '{}': {} items exceeds limit of {}",
+                            cat, count, max
                         ));
                     }
                 }
@@ -198,10 +214,16 @@ impl StackBuilder {
         let total = stack.size();
 
         if self.min_size > 0 && total < self.min_size {
-            errors.push(format!("stack too small: {} < minimum {}", total, self.min_size));
+            errors.push(format!(
+                "stack too small: {} < minimum {}",
+                total, self.min_size
+            ));
         }
         if self.max_size > 0 && total > self.max_size {
-            errors.push(format!("stack too large: {} > maximum {}", total, self.max_size));
+            errors.push(format!(
+                "stack too large: {} > maximum {}",
+                total, self.max_size
+            ));
         }
 
         let items = stack.items();
@@ -218,13 +240,20 @@ impl StackBuilder {
             if self.banned_types.iter().any(|b| b == type_name) {
                 errors.push(format!("banned type in stack: {}", type_name));
             }
-            let limit = self.per_type_limits.get(*type_name)
+            let limit = self
+                .per_type_limits
+                .get(*type_name)
                 .copied()
-                .or(if self.max_copies > 0 { Some(self.max_copies) } else { None });
+                .or(if self.max_copies > 0 {
+                    Some(self.max_copies)
+                } else {
+                    None
+                });
             if let Some(max) = limit {
                 if count > max {
                     errors.push(format!(
-                        "type '{}': {} copies exceeds limit of {}", type_name, count, max
+                        "type '{}': {} copies exceeds limit of {}",
+                        type_name, count, max
                     ));
                 }
             }
@@ -243,7 +272,8 @@ impl StackBuilder {
             if let Some(&max) = self.max_per_category.get(*cat) {
                 if max > 0 && count > max {
                     errors.push(format!(
-                        "category '{}': {} items exceeds limit of {}", cat, count, max
+                        "category '{}': {} items exceeds limit of {}",
+                        cat, count, max
                     ));
                 }
             }

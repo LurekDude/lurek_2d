@@ -1,7 +1,5 @@
 /// Bezier curve evaluation using De Casteljau's algorithm.
 pub mod bezier;
-/// sRGB gamma ↔ linear color space conversion.
-pub mod srgb;
 /// Standard easing functions for smooth animation and interpolation.
 pub mod easing;
 /// 2D geometry utility functions: intersections, containment, polygon ops, rasterization.
@@ -24,6 +22,8 @@ pub mod raycasting;
 pub mod rect;
 /// Spatial hash for efficient broad-phase AABB collision queries.
 pub mod spatial_hash;
+/// sRGB gamma ↔ linear color space conversion.
+pub mod srgb;
 /// 2D affine transform with chainable methods wrapping Mat3.
 pub mod transform;
 /// Value interpolator with easing curves.
@@ -38,11 +38,10 @@ pub use mat3::Mat3;
 pub use noise::NoiseGenerator;
 pub use procgen::*;
 pub use random::RandomGenerator;
-pub use raycasting::{RayHit, Raycaster2D, SpriteProjection};
 pub use raycasting::{cast_ray_2d, distance_shade, field_of_view, project_column, Segment};
+pub use raycasting::{RayHit, Raycaster2D, SpriteProjection};
 pub use rect::Rect;
 pub use spatial_hash::SpatialHash;
-pub use crate::tilemap::tile_walker::{Facing, TileWalker};
 pub use transform::Transform;
 pub use tween::{Tween, TweenValue};
 pub use vec2::Vec2;

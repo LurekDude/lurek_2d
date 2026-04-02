@@ -302,7 +302,7 @@ impl IsoMap {
     /// # Returns
     /// `bool`.
     pub fn get_level_visible(&self, z: usize) -> bool {
-        self.levels.get(z).map_or(true, |l| l.visible)
+        self.levels.get(z).is_none_or(|l| l.visible)
     }
 
     // -----------------------------------------------------------------------

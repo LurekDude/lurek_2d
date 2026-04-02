@@ -7,17 +7,22 @@ Luna2D loads and executes Lua game scripts, providing a complete `luna.*` API
 for graphics, audio, input, physics, math, data, particles, tilemaps, scenes,
 entities, and more.
 
+For full architecture detail and tier rules, see [`docs/architecture.md`](../docs/architecture.md).
+
 ## Architecture Principles
 
-1. **Domain modules are independent** — each subfolder (audio, graphics, physics,
-   etc.) is a self-contained domain module with no cross-dependencies except
-   through `math/` (the foundational layer).
-2. **Engine sits at the top** — `engine/` may depend on all modules. It owns
+1. **The tier system is load-bearing** — every module belongs to exactly one tier
+   (1, 2, or 3) plus two foundation layers (`math`, `engine`). The tier of a
+   module determines which other modules it may import. Violating tier rules
+   creates circular dependencies that are hard to untangle later.
+2. **`math/` is the leaf** — it has no Luna2D dependencies and may be imported
+   by all modules at all tiers.
+3. **`engine/` is the orchestrator** — it may import all domain modules. It owns
    the game loop, window, and app lifecycle.
-3. **lua_api is the bridge** — `lua_api/` depends on every domain module to
-   expose their functionality through a consistent `luna.*` Lua namespace.
-4. **No upward dependencies** — domain modules never import from `lua_api/` or
-   `engine/`. The dependency graph is strictly one-directional.
+4. **`lua_api/` is the bridge** — it depends on every domain module to expose
+   their functionality through a consistent `luna.*` Lua namespace.
+5. **No upward dependencies** — domain modules never import from `lua_api/`.
+   Tier N modules never import Tier N+1 modules.
 
 ## Dependency Graph
 
@@ -34,51 +39,97 @@ entities, and more.
               │          │          │
          ┌────▼───┐ ┌───▼────┐ ┌──▼──────┐
          │ engine │ │lua_api │ │  bin/   │
-         └───┬────┘ └───┬────┘ │ lunec  │
+         └───┬────┘ └───┬────┘ │ lunec   │
              │          │      └─────────┘
-    ┌────────┼──────────┤
-    │        │          │
-    ▼        ▼          ▼
-┌────────┐ ┌────────┐ ┌────────┐ ┌────────┐ ┌────────┐
-│graphics│ │ audio  │ │ input  │ │physics │ │ timer  │
-└───┬────┘ └────────┘ └────────┘ └────────┘ └────────┘
-    │
-    ▼          Also independent:
-┌────────┐    ai, compute, data, dataframe, entity, event,
-│  math  │    filesystem, graph, image, modding, particle,
-└────────┘    savegame, scene, sound, tilemap, window
-(foundation)
+             │   imports any tier
+             ▼
+        ┌─────────┐  ┌────────────┐  ┌────────────┐
+        │ Tier 1  │←─│  Tier 2    │←─│  Tier 3    │
+        │Basic    │  │ Extensions │  │ Gameplay   │
+        │Core     │  │            │  │ Systems    │
+        └────┬────┘  └────────────┘  └────────────┘
+             │
+             ▼
+        ┌─────────┐
+        │  math   │  Foundation (leaf — no deps)
+        └─────────┘
 ```
+
+**Crossing rules — enforced by code review and Clippy:**
+- ✅ Any tier → `math` (always allowed)
+- ✅ Tier 1 → `engine` types
+- ✅ Tier 2 → Tier 1
+- ✅ Tier 3 → Tier 1 and Tier 2
+- ❌ Same-tier cross-imports (Tier N → Tier N)
+- ❌ Upward imports (Tier 1 → Tier 2, Tier 2 → Tier 3)
+- ❌ Any module → `lua_api`
 
 ## Module Inventory
 
-| Folder | Files | Role | Dependencies |
-|--------|-------|------|-------------|
-| `ai/` | 15 | Game AI: FSM, BT, steering, GOAP, Q-learning | None (pure CPU) |
-| `audio/` | 5 | Audio playback via rodio, buses, MIDI | None |
-| `bin/` | 1 | Console-less launcher (`lunec`) | lib.rs |
-| `compute/` | 4 | N-dimensional numerical arrays | None |
-| `data/` | 6 | Binary data, compression, hashing, TOML | None |
-| `dataframe/` | 5 | Column-major tabular data, SQL queries | None |
-| `engine/` | 8 | App lifecycle, config, error handling | audio, graphics, input, physics, timer, event |
-| `entity/` | 2 | Lightweight ECS with ID recycling | None |
-| `event/` | 1 | Event queue (FIFO polling) | None |
-| `filesystem/` | 4 | Sandboxed VFS, async loading | None |
-| `graph/` | 9 | Directed graph, flow simulation | None |
-| `graphics/` | 26 | GPU rendering pipeline (wgpu) | math, engine |
-| `image/` | 2 | CPU pixel-level image manipulation | None |
-| `input/` | 5 | Keyboard, mouse, gamepad, touch state | None |
-| `lua_api/` | 31 | Lua VM, SharedState, all `luna.*` bindings | ALL modules |
-| `math/` | 21+ | Vec2, Mat3, Rect, noise, easing, pathfinding | None (foundation) |
-| `modding/` | 1 | Mod management, dependency resolution | None |
-| `particle/` | 1 | Emitter-based 2D particle effects | engine, graphics |
-| `physics/` | 5 | Rigid-body physics via rapier2d | None |
-| `savegame/` | 1 | Slot-based save/load, schema versioning | None |
-| `scene/` | 4 | Scene stack, transitions, depth sorting | None |
-| `sound/` | 3 | PCM sample manipulation, MIDI state | None |
-| `tilemap/` | 9 | Tilemaps, isometric, autotile, TMX, mapgen | None |
-| `timer/` | 3 | Frame clock, scheduled callbacks | None |
-| `window/` | 2 | Window state (placeholder) | None |
+### Foundation Layers
+
+| Folder | Tier | Role | May Import |
+|--------|------|------|-----------|
+| `math/` | Foundation | Vec2, Mat3, Rect, noise, easing | Nothing (leaf) |
+| `engine/` | Foundation | App, Config, EngineError, game loop | All modules |
+| `lua_api/` | Bridge | Lua VM, SharedState, `luna.*` bindings | ALL modules |
+
+### Tier 1 — Basic Core
+
+*Self-contained domain modules. Only reference `math` and `engine`.*
+
+| Folder | Role |
+|--------|------|
+| `graphics/` | GPU rendering pipeline (wgpu), draw commands, textures, fonts, camera |
+| `audio/` | Audio playback via rodio, buses, volume |
+| `physics/` | Rigid-body simulation via rapier2d, collision, raycasting |
+| `input/` | Keyboard, mouse, gamepad, touch state |
+| `timer/` | Frame clock, `Clock::tick()`, scheduled callbacks |
+| `filesystem/` | Sandboxed VFS, asset loading, path validation |
+| `compute/` | N-dimensional numerical arrays (NdArray), pure CPU |
+| `data/` | Binary buffers, compression, hashing, TOML parsing |
+| `image/` | CPU pixel-level image manipulation (ImageData) |
+| `sound/` | PCM sample manipulation, MIDI state |
+| `event/` | FIFO event queue, polling API |
+| `entity/` | Lightweight ECS with ID recycling and bitmap tags |
+| `window/` | Window state abstraction |
+| `thread/` | Background Rust threads, `Channel` inter-thread communication |
+
+### Tier 2 — Engine Extensions
+
+*Generic engine capabilities. Reference Tier 1 only. No same-tier cross-imports.*
+
+| Folder | Role |
+|--------|------|
+| `particle/` | Emitter-based 2D particle effects; builds on `graphics` |
+| `tilemap/` | Tilemaps, isometric, autotile, TMX, procedural mapgen |
+| `scene/` | Scene stack, transitions, depth sorting |
+| `savegame/` | Slot-based save/load, schema versioning |
+| `modding/` | Mod discovery, dependency resolution, load ordering |
+| `graph/` | Directed graph, flow simulation, Dijkstra |
+| `pathfinding/` | Grid pathfinding (A★, HPA★, flow fields) |
+| `ai/` | Generic AI — FSM, behaviour trees, steering, GOAP, Q-learning |
+| `dataframe/` | Column-major tabular data, SQL-style queries |
+| `resource/` | Generic resource pool, reference counting, hot-reload |
+
+### Tier 3 — Gameplay Systems
+
+*Genre-specific systems. Reference Tier 1 and Tier 2 only. No same-tier cross-imports.*
+
+| Folder | Role |
+|--------|------|
+| `combat/` | Turn-based and real-time combat, damage resolution |
+| `crafting/` | Recipe system, ingredient matching, crafting queues |
+| `dialog/` | Dialogue trees, branching narrative, localisation hooks |
+| `inventory/` | Inventory slots, stacking, weight limits |
+| `item/` | Item definitions, loot tables, rarity |
+| `quest/` | Quest tracking, objectives, branching completion states |
+| `stats/` | Character attributes, derived stats, modifiers |
+| `province_map/` | Province/territory map, ownership, borders |
+
+### Tier 4 — Platform Integrations (Future)
+
+*External SDK wrappers (Steam, Epic, etc.). Not yet implemented. Reserved.*
 
 ## Entry Points
 

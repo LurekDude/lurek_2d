@@ -765,7 +765,7 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
                 }
                 Err(e) => Ok(LuaMultiValue::from_vec(vec![
                     LuaValue::Boolean(false),
-                    LuaValue::String(lua.create_string(&e.to_string())?),
+                    LuaValue::String(lua.create_string(e.to_string())?),
                 ])),
             }
         })?,

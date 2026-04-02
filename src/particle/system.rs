@@ -822,9 +822,9 @@ impl ParticleSystem {
                     // Animated frames mode: cycle quads at frame_rate; else use lifetime progress
                     let quad_idx = if self.config.animated_frames > 0 {
                         let age = p.max_life - p.life;
-                        let frame = (age * self.config.frame_rate) as usize
-                            % (self.config.animated_frames as usize).min(self.config.quads.len());
-                        frame
+                        
+                        (age * self.config.frame_rate) as usize
+                            % (self.config.animated_frames as usize).min(self.config.quads.len())
                     } else {
                         ((t * self.config.quads.len() as f32) as usize)
                             .min(self.config.quads.len() - 1)

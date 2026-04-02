@@ -226,16 +226,14 @@ pub use crate::thread::worker as thread_worker;
 pub mod combat_api;
 /// Registers the `luna.crafting.*` crafting system API.
 pub mod crafting_api;
+/// Registers the `luna.quest.*` quest log and objective tracking API.
+pub mod quest_api;
 /// Registers the `luna.inventory.*` inventory system API.
 pub mod inventory_api;
 /// Registers the `luna.item.*` generic item data structures API.
 pub mod item_api;
 /// UserData type utilities for Luna2D Lua objects.
 pub mod lua_types;
-/// Registers the `luna.province.*` province map API.
-pub mod province_api;
-/// Registers the `luna.quest.*` quest tracking API.
-pub mod quest_api;
 /// Registers the `luna.resource.*` resource management API.
 pub mod resource_api;
 /// Registers the `luna.stats.*` character stats API.
@@ -503,10 +501,8 @@ pub fn create_lua_vm(state: Rc<RefCell<SharedState>>) -> LuaResult<Lua> {
     inventory_api::register(&lua, &luna)?;
     quest_api::register(&lua, &luna)?;
     crafting_api::register(&lua, &luna)?;
-    province_api::register(&lua, &luna)?;
 
     /// Luna on this Object.
-    ///
     /// # Returns
     /// The result.
     lua.globals().set("luna", luna)?;

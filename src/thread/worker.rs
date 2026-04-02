@@ -8,7 +8,7 @@ use std::collections::HashMap;
 use std::sync::{Arc, Mutex};
 use std::thread;
 
-use crate::lua_api::thread_channel::{channel_value_to_lua, Channel, ChannelValue, LuaChannel};
+use crate::thread::channel::{channel_value_to_lua, Channel, ChannelValue, LuaChannel};
 
 /// Execution state of a background Lua thread.
 ///

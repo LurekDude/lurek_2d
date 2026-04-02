@@ -205,15 +205,13 @@ fn server_thread(
 
             // Broadcast events
             while let Some(event_str) = sh.broadcast_queue.pop_front() {
-                for client in &mut clients {
-                    if let Some((stream, _)) = client {
-                        let mut msg = event_str.clone();
-                        if !msg.ends_with('\n') {
-                            msg.push('\n');
-                        }
-                        let _ = stream.write_all(msg.as_bytes());
-                        let _ = stream.flush();
+                for (stream, _) in clients.iter_mut().flatten() {
+                    let mut msg = event_str.clone();
+                    if !msg.ends_with('\n') {
+                        msg.push('\n');
                     }
+                    let _ = stream.write_all(msg.as_bytes());
+                    let _ = stream.flush();
                 }
             }
 
@@ -524,7 +522,7 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
                             .and_then(|v| v.as_i64())
                             .unwrap_or(1);
                         let locals_result: LuaResult<LuaTable> = lua
-                            .load(&format!(
+                            .load(format!(
                                 concat!(
                                     "local locals = {{}}\n",
                                     "if not debug or not debug.getlocal then return locals end\n",
@@ -576,10 +574,8 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
                         match globals_result {
                             Ok(tbl) => {
                                 let mut globals = serde_json::Map::new();
-                                for pair in tbl.pairs::<String, LuaValue>() {
-                                    if let Ok((k, v)) = pair {
-                                        globals.insert(k, lua_value_to_json(&v));
-                                    }
+                                for (k, v) in tbl.pairs::<String, LuaValue>().flatten() {
+                                    globals.insert(k, lua_value_to_json(&v));
                                 }
                                 serde_json::json!({"globals": globals})
                             }

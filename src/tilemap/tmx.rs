@@ -478,7 +478,7 @@ fn parse_tile_layer(
         .attribute("height")
         .and_then(|s| s.parse().ok())
         .unwrap_or(map_h);
-    let visible = node.attribute("visible").map_or(true, |s| s != "0");
+    let visible = node.attribute("visible") != Some("0");
     let opacity: f32 = node
         .attribute("opacity")
         .and_then(|s| s.parse().ok())
@@ -589,7 +589,7 @@ fn parse_base64_tiles(
     };
 
     // Each tile is a little-endian u32
-    if bytes.len() % 4 != 0 {
+    if !bytes.len().is_multiple_of(4) {
         return Err(format!(
             "TMX tile data: byte count {} is not a multiple of 4",
             bytes.len()
@@ -612,7 +612,7 @@ fn parse_base64_tiles(
 
 fn parse_object_layer(node: &roxmltree::Node) -> Result<TmxObjectLayer, String> {
     let name = node.attribute("name").unwrap_or("").to_string();
-    let visible = node.attribute("visible").map_or(true, |s| s != "0");
+    let visible = node.attribute("visible") != Some("0");
     let mut objects = Vec::new();
     for child in node.children() {
         if child.has_tag_name("object") {

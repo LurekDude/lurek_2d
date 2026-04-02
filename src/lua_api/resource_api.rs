@@ -9,7 +9,7 @@ use std::rc::Rc;
 use mlua::prelude::*;
 
 use crate::lua_api::lua_types::{add_type_methods, LunaType};
-use crate::resource::{ConversionRule, Modifier, ModifierType, OverflowPolicy, ResourceManager};
+use crate::resource::{ConversionRule, OverflowPolicy, ResourceManager};
 
 // ---------------------------------------------------------------------------
 // LuaResourceManager

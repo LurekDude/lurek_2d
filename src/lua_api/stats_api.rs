@@ -37,16 +37,16 @@ impl LuaUserData for LuaSheet {
                 s.define(&name, base);
                 if let Some(opts) = opts {
                     if let Some(attr) = s.attributes.get_mut(&name) {
-                        if let Some(min) = opts.get::<_, f64>("min").ok() {
+                        if let Ok(min) = opts.get::<_, f64>("min") {
                             attr.min = min;
                         }
-                        if let Some(max) = opts.get::<_, f64>("max").ok() {
+                        if let Ok(max) = opts.get::<_, f64>("max") {
                             attr.max = Some(max);
                         }
-                        if let Some(regen) = opts.get::<_, f64>("regen").ok() {
+                        if let Ok(regen) = opts.get::<_, f64>("regen") {
                             attr.regen = regen;
                         }
-                        if let Some(growth) = opts.get::<_, f64>("growth").ok() {
+                        if let Ok(growth) = opts.get::<_, f64>("growth") {
                             attr.growth = growth;
                         }
                     }
@@ -834,24 +834,22 @@ impl LuaUserData for LuaSheet {
         methods.add_method("restore", |_, this, snap: LuaTable| {
             let mut s = this.inner.borrow_mut();
             if let Ok(attrs) = snap.get::<_, LuaTable>("attributes") {
-                for entry in attrs.sequence_values::<LuaTable>() {
-                    if let Ok(entry) = entry {
-                        let name: String = entry.get("name")?;
-                        let base: f64 = entry.get("base")?;
-                        s.define(&name, base);
-                        if let Some(attr) = s.attributes.get_mut(&name) {
-                            if let Ok(min) = entry.get::<_, f64>("min") {
-                                attr.min = min;
-                            }
-                            if let Ok(max) = entry.get::<_, f64>("max") {
-                                attr.max = Some(max);
-                            }
-                            if let Ok(regen) = entry.get::<_, f64>("regen") {
-                                attr.regen = regen;
-                            }
-                            if let Ok(growth) = entry.get::<_, f64>("growth") {
-                                attr.growth = growth;
-                            }
+                for entry in attrs.sequence_values::<LuaTable>().flatten() {
+                    let name: String = entry.get("name")?;
+                    let base: f64 = entry.get("base")?;
+                    s.define(&name, base);
+                    if let Some(attr) = s.attributes.get_mut(&name) {
+                        if let Ok(min) = entry.get::<_, f64>("min") {
+                            attr.min = min;
+                        }
+                        if let Ok(max) = entry.get::<_, f64>("max") {
+                            attr.max = Some(max);
+                        }
+                        if let Ok(regen) = entry.get::<_, f64>("regen") {
+                            attr.regen = regen;
+                        }
+                        if let Ok(growth) = entry.get::<_, f64>("growth") {
+                            attr.growth = growth;
                         }
                     }
                 }
@@ -864,10 +862,8 @@ impl LuaUserData for LuaSheet {
             }
             if let Ok(flags) = snap.get::<_, LuaTable>("flags") {
                 s.flags.clear();
-                for f in flags.sequence_values::<String>() {
-                    if let Ok(name) = f {
-                        s.set_flag(&name);
-                    }
+                for name in flags.sequence_values::<String>().flatten() {
+                    s.set_flag(&name);
                 }
             }
             if let Ok(ap) = snap.get::<_, LuaTable>("actionPoints") {
@@ -890,10 +886,8 @@ impl LuaUserData for LuaSheet {
             }
             if let Ok(res) = snap.get::<_, LuaTable>("resistances") {
                 s.resistances.clear();
-                for pair in res.pairs::<String, f64>() {
-                    if let Ok((k, v)) = pair {
-                        s.resistances.insert(k, v);
-                    }
+                for (k, v) in res.pairs::<String, f64>().flatten() {
+                    s.resistances.insert(k, v);
                 }
             }
             Ok(())
@@ -932,13 +926,11 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
             lua.create_function(move |_, (name, opts): (String, LuaTable)| {
                 let mut buffs_vec = Vec::new();
                 if let Ok(buffs_tbl) = opts.get::<_, LuaTable>("buffs") {
-                    for entry in buffs_tbl.sequence_values::<LuaTable>() {
-                        if let Ok(entry) = entry {
-                            let stat: String = entry.get("stat")?;
-                            let add: f64 = entry.get("add").unwrap_or(0.0);
-                            let mul: f64 = entry.get("mul").unwrap_or(1.0);
-                            buffs_vec.push((stat, add, mul));
-                        }
+                    for entry in buffs_tbl.sequence_values::<LuaTable>().flatten() {
+                        let stat: String = entry.get("stat")?;
+                        let add: f64 = entry.get("add").unwrap_or(0.0);
+                        let mul: f64 = entry.get("mul").unwrap_or(1.0);
+                        buffs_vec.push((stat, add, mul));
                     }
                 }
                 registry.borrow_mut().define_trait(&name, buffs_vec);
@@ -955,18 +947,14 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
             lua.create_function(move |_, (name, opts): (String, LuaTable)| {
                 let mut bases = std::collections::HashMap::new();
                 if let Ok(btbl) = opts.get::<_, LuaTable>("bases") {
-                    for pair in btbl.pairs::<String, f64>() {
-                        if let Ok((k, v)) = pair {
-                            bases.insert(k, v);
-                        }
+                    for (k, v) in btbl.pairs::<String, f64>().flatten() {
+                        bases.insert(k, v);
                     }
                 }
                 let mut trait_names = Vec::new();
                 if let Ok(ttbl) = opts.get::<_, LuaTable>("traits") {
-                    for t in ttbl.sequence_values::<String>() {
-                        if let Ok(tn) = t {
-                            trait_names.push(tn);
-                        }
+                    for tn in ttbl.sequence_values::<String>().flatten() {
+                        trait_names.push(tn);
                     }
                 }
                 registry.borrow_mut().define_race(&name, bases, trait_names);
@@ -983,18 +971,14 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
             lua.create_function(move |_, (name, opts): (String, LuaTable)| {
                 let mut bases = std::collections::HashMap::new();
                 if let Ok(btbl) = opts.get::<_, LuaTable>("bases") {
-                    for pair in btbl.pairs::<String, f64>() {
-                        if let Ok((k, v)) = pair {
-                            bases.insert(k, v);
-                        }
+                    for (k, v) in btbl.pairs::<String, f64>().flatten() {
+                        bases.insert(k, v);
                     }
                 }
                 let mut trait_names = Vec::new();
                 if let Ok(ttbl) = opts.get::<_, LuaTable>("traits") {
-                    for t in ttbl.sequence_values::<String>() {
-                        if let Ok(tn) = t {
-                            trait_names.push(tn);
-                        }
+                    for tn in ttbl.sequence_values::<String>().flatten() {
+                        trait_names.push(tn);
                     }
                 }
                 registry

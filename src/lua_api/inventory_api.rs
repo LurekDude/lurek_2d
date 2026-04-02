@@ -9,7 +9,7 @@ use std::rc::Rc;
 use mlua::prelude::*;
 
 use crate::inventory::{
-    Container, ContainerMode, Inventory, Item, ItemSet, ItemStack, Slot, SlotState,
+    Container, ContainerMode, Inventory, InventoryEntry, ItemSet, ItemStack, Slot, SlotState,
 };
 use crate::lua_api::lua_types::{add_type_methods, LunaType};
 
@@ -19,7 +19,7 @@ use crate::lua_api::lua_types::{add_type_methods, LunaType};
 
 /// Lua UserData wrapper for a single item definition.
 #[derive(Clone)]
-pub(crate) struct LuaItem(Rc<RefCell<Item>>);
+pub(crate) struct LuaItem(Rc<RefCell<InventoryEntry>>);
 
 impl LunaType for LuaItem {
     const TYPE_NAME: &'static str = "Item";
@@ -1011,7 +1011,7 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
         "newItem",
         lua.create_function(|_, item_type: Option<String>| {
             let t = item_type.unwrap_or_else(|| "item".into());
-            Ok(LuaItem(Rc::new(RefCell::new(Item::new(t)))))
+            Ok(LuaItem(Rc::new(RefCell::new(InventoryEntry::new(t)))))
         })?,
     )?;
 

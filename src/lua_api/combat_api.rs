@@ -413,12 +413,12 @@ impl LuaUserData for LuaCombatant {
         /// Returns a list of action names owned by this combatant.
         methods.add_method("getActionNames", |lua, this, ()| {
             let names = this.0.borrow().action_names();
-            lua.create_sequence_from(names.into_iter())
+            lua.create_sequence_from(names)
         });
         /// Returns a list of active status effect names on this combatant.
         methods.add_method("getStatusNames", |lua, this, ()| {
             let names = this.0.borrow().status_names();
-            lua.create_sequence_from(names.into_iter())
+            lua.create_sequence_from(names)
         });
     }
 }

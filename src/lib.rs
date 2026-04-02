@@ -99,8 +99,6 @@ pub mod particle;
 pub mod pathfinding;
 /// Physics simulation with rigid bodies (rect and circle shapes), collision events, sensors, and layer filtering.
 pub mod physics;
-/// Province-based map system for grand strategy games: provinces, terrain, adjacency.
-pub mod province;
 /// Province map module — spatial province data from colour-coded PNG images.
 pub mod province_map;
 /// Quest tracking: stages, objectives, quest log.

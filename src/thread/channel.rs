@@ -10,7 +10,6 @@ use std::sync::{Arc, Condvar, Mutex};
 
 use mlua::prelude::*;
 
-use crate::lua_api::lua_types::{add_type_methods, LunaType};
 
 /// Serializable values that can be sent between threads.
 ///
@@ -207,14 +206,12 @@ pub struct LuaChannel {
     pub(crate) inner: Arc<Channel>,
 }
 
-impl LunaType for LuaChannel {
-    const TYPE_NAME: &'static str = "Channel";
-    const TYPE_HIERARCHY: &'static [&'static str] = &["Object"];
-}
-
 impl LuaUserData for LuaChannel {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
-        add_type_methods::<Self>(methods);
+        methods.add_method("type", |_, _, ()| Ok("Channel".to_string()));
+        methods.add_method("typeOf", |_, _, name: String| {
+            Ok("Channel" == name || ["Object"].contains(&name.as_str()))
+        });
 
         methods.add_method("push", |_, this, value: LuaValue| {
             let cv = lua_to_channel_value(value)?;

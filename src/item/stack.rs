@@ -21,12 +21,20 @@ pub struct Stack {
 impl Stack {
     /// Create an empty, unlimited-capacity named stack.
     pub fn new(name: impl Into<String>) -> Self {
-        Self { name: name.into(), items: Vec::new(), capacity: None }
+        Self {
+            name: name.into(),
+            items: Vec::new(),
+            capacity: None,
+        }
     }
 
     /// Create an empty stack with a hard capacity limit.
     pub fn with_capacity(name: impl Into<String>, capacity: usize) -> Self {
-        Self { name: name.into(), items: Vec::new(), capacity: Some(capacity) }
+        Self {
+            name: name.into(),
+            items: Vec::new(),
+            capacity: Some(capacity),
+        }
     }
 
     /// Number of items in the stack.
@@ -58,14 +66,18 @@ impl Stack {
 
     /// Add an item to the top (end).  Returns `false` if at capacity.
     pub fn push_top(&mut self, item: Item) -> bool {
-        if self.is_full() { return false; }
+        if self.is_full() {
+            return false;
+        }
         self.items.push(item);
         true
     }
 
     /// Add an item to the bottom (front).  Returns `false` if at capacity.
     pub fn push_bottom(&mut self, item: Item) -> bool {
-        if self.is_full() { return false; }
+        if self.is_full() {
+            return false;
+        }
         self.items.insert(0, item);
         true
     }
@@ -77,7 +89,11 @@ impl Stack {
 
     /// Remove and return the bottom item, or `None` if empty.
     pub fn pop_bottom(&mut self) -> Option<Item> {
-        if self.items.is_empty() { None } else { Some(self.items.remove(0)) }
+        if self.items.is_empty() {
+            None
+        } else {
+            Some(self.items.remove(0))
+        }
     }
 
     /// Remove and return `n` items from the top.  Returns fewer if the stack runs out.
@@ -107,7 +123,9 @@ impl Stack {
     /// Insert an item at a 0-based position (clamped to stack length).
     /// Returns `false` if at capacity.
     pub fn insert_at(&mut self, index: usize, item: Item) -> bool {
-        if self.is_full() { return false; }
+        if self.is_full() {
+            return false;
+        }
         let idx = index.min(self.items.len());
         self.items.insert(idx, item);
         true
@@ -115,13 +133,19 @@ impl Stack {
 
     /// Remove and return the item at a 0-based position.
     pub fn remove_at(&mut self, index: usize) -> Option<Item> {
-        if index < self.items.len() { Some(self.items.remove(index)) } else { None }
+        if index < self.items.len() {
+            Some(self.items.remove(index))
+        } else {
+            None
+        }
     }
 
     /// Move the item at `from` to position `to` within this stack (0-based).
     /// Returns `false` if indices are out of range.
     pub fn move_within(&mut self, from: usize, to: usize) -> bool {
-        if from >= self.items.len() || to > self.items.len() { return false; }
+        if from >= self.items.len() || to > self.items.len() {
+            return false;
+        }
         let item = self.items.remove(from);
         let dest = if to > from { to - 1 } else { to };
         self.items.insert(dest, item);
@@ -137,7 +161,9 @@ impl Stack {
 
     /// Return the 0-based indices of items matching `item_type`.
     pub fn search_by_type(&self, item_type: &str) -> Vec<usize> {
-        self.items.iter().enumerate()
+        self.items
+            .iter()
+            .enumerate()
             .filter(|(_, i)| i.item_type == item_type)
             .map(|(idx, _)| idx)
             .collect()
@@ -145,7 +171,9 @@ impl Stack {
 
     /// Return the 0-based indices of items carrying the given tag.
     pub fn search_by_tag(&self, tag: &str) -> Vec<usize> {
-        self.items.iter().enumerate()
+        self.items
+            .iter()
+            .enumerate()
             .filter(|(_, i)| i.has_tag(tag))
             .map(|(idx, _)| idx)
             .collect()
@@ -153,7 +181,9 @@ impl Stack {
 
     /// Return the 0-based indices of items in the given category.
     pub fn search_by_category(&self, category: &str) -> Vec<usize> {
-        self.items.iter().enumerate()
+        self.items
+            .iter()
+            .enumerate()
             .filter(|(_, i)| i.category == category)
             .map(|(idx, _)| idx)
             .collect()
@@ -173,7 +203,10 @@ impl Stack {
 
     /// Count items of the given type.
     pub fn count_by_type(&self, item_type: &str) -> usize {
-        self.items.iter().filter(|i| i.item_type == item_type).count()
+        self.items
+            .iter()
+            .filter(|i| i.item_type == item_type)
+            .count()
     }
 
     /// Count items in the given category.
@@ -191,14 +224,18 @@ impl Stack {
     /// Sort items in-place by a named stat (ascending).
     pub fn sort_by_stat(&mut self, stat: &str) {
         self.items.sort_by(|a, b| {
-            a.get_stat(stat).partial_cmp(&b.get_stat(stat)).unwrap_or(std::cmp::Ordering::Equal)
+            a.get_stat(stat)
+                .partial_cmp(&b.get_stat(stat))
+                .unwrap_or(std::cmp::Ordering::Equal)
         });
     }
 
     /// Sort items in-place by a named stat (descending).
     pub fn sort_by_stat_desc(&mut self, stat: &str) {
         self.items.sort_by(|a, b| {
-            b.get_stat(stat).partial_cmp(&a.get_stat(stat)).unwrap_or(std::cmp::Ordering::Equal)
+            b.get_stat(stat)
+                .partial_cmp(&a.get_stat(stat))
+                .unwrap_or(std::cmp::Ordering::Equal)
         });
     }
 
@@ -237,6 +274,11 @@ impl Stack {
 
     /// Get item type names of the top `n` items (for reveal-top-N style mechanics).
     pub fn peek_top_n_types(&self, n: usize) -> Vec<String> {
-        self.items.iter().rev().take(n).map(|i| i.item_type.clone()).collect()
+        self.items
+            .iter()
+            .rev()
+            .take(n)
+            .map(|i| i.item_type.clone())
+            .collect()
     }
 }
