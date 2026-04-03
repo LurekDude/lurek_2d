@@ -17,10 +17,10 @@ pub use crate::engine::{ErrorInfo, FullscreenType, SharedState, WindowState};
 
 /// Registers the `luna.ai.*` game AI toolkit API.
 pub mod ai_api;
-/// Registers the `luna.simulator.*` automated input simulation API.
-pub mod automation_api;
 /// Registers the `luna.audio.*` sound playback API.
 pub mod audio_api;
+/// Registers the `luna.simulator.*` automated input simulation API.
+pub mod automation_api;
 /// Registers the `luna.compute.*` array computation API.
 pub mod compute_api;
 /// Registers the `luna.data.*` binary data, compression, hashing, and encoding API.
@@ -40,10 +40,10 @@ pub mod entity_api;
 pub mod event_api;
 /// Registers the `luna.filesystem.*` sandboxed I/O API.
 pub mod filesystem_api;
-/// Registers the `luna.graph.*` directed-graph and item-flow simulation API.
-pub mod graph_api;
 /// Registers the `luna.font.*` font rasterizer and glyph metrics API.
 pub mod font_api;
+/// Registers the `luna.graph.*` directed-graph and item-flow simulation API.
+pub mod graph_api;
 /// Registers the `luna.graphics.*` drawing API.
 pub mod graphics_api;
 /// Registers the `luna.gui.*` retained-mode widget UI API.
@@ -64,6 +64,8 @@ pub mod math_api;
 pub mod minimap_api;
 /// Registers the `luna.modding.*` mod management API.
 pub mod modding_api;
+/// Registers the `luna.overlay.*` screen-effect overlay API.
+pub mod overlay_api;
 /// Registers the `luna.particle.*` particle-effects API.
 pub mod particle_api;
 /// Registers the `luna.pathfinding.*` grid-based pathfinding API.
@@ -74,8 +76,6 @@ pub mod patterns_api;
 pub mod physics_api;
 /// Registers the `luna.postfx.*` post-processing effects API.
 pub mod postfx_api;
-/// Registers the `luna.overlay.*` screen-effect overlay API.
-pub mod overlay_api;
 /// Registers the `luna.savegame.*` save/load system API.
 pub mod savegame_api;
 /// Registers the `luna.scene.*` scene stack, registry, data store, and depth-sorter API.

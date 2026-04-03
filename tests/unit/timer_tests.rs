@@ -258,3 +258,139 @@ fn test_lua_scheduler_cancel_all() {
     .exec()
     .unwrap();
 }
+
+// ── Additional timer/scheduler coverage ─────────────────────────────────────
+
+#[test]
+fn scheduler_pause_and_resume() {
+    use luna2d::timer::Scheduler;
+    let mut sched = Scheduler::new();
+    let id = sched.after(1.0);
+    assert!(sched.pause(id));
+    assert!(sched.is_paused(id));
+    assert!(sched.resume(id));
+    assert!(!sched.is_paused(id));
+}
+
+#[test]
+fn scheduler_pause_nonexistent_returns_false() {
+    use luna2d::timer::Scheduler;
+    let mut sched = Scheduler::new();
+    assert!(!sched.pause(9999));
+}
+
+#[test]
+fn scheduler_get_remaining_after_zero_time() {
+    use luna2d::timer::Scheduler;
+    let mut sched = Scheduler::new();
+    let id = sched.after(5.0);
+    let remaining = sched.get_remaining(id).unwrap();
+    assert!((remaining - 5.0).abs() < 1e-9);
+}
+
+#[test]
+fn scheduler_get_remaining_decreases_after_update() {
+    use luna2d::timer::Scheduler;
+    let mut sched = Scheduler::new();
+    let id = sched.after(3.0);
+    sched.update(1.0);
+    let remaining = sched.get_remaining(id).unwrap();
+    assert!((remaining - 2.0).abs() < 1e-9);
+}
+
+#[test]
+fn scheduler_get_remaining_nonexistent_returns_none() {
+    use luna2d::timer::Scheduler;
+    let sched = Scheduler::new();
+    assert!(sched.get_remaining(42).is_none());
+}
+
+#[test]
+fn scheduler_time_scale_slows_update() {
+    use luna2d::timer::Scheduler;
+    let mut sched = Scheduler::new();
+    sched.set_time_scale(0.5);
+    assert!((sched.get_time_scale() - 0.5).abs() < 1e-9);
+    let id = sched.after(2.0);
+    sched.update(1.0); // effective dt = 0.5
+    let remaining = sched.get_remaining(id).unwrap();
+    // should have 1.5 remaining (2.0 - 0.5)
+    assert!((remaining - 1.5).abs() < 1e-9);
+}
+
+#[test]
+fn scheduler_every_count_limited() {
+    use luna2d::timer::Scheduler;
+    let mut sched = Scheduler::new();
+    sched.every(0.5, 2); // fires at most 2 times
+    let fired1 = sched.update(0.6);
+    assert_eq!(fired1.len(), 1);
+    let fired2 = sched.update(0.6);
+    assert_eq!(fired2.len(), 1);
+    // Now the event has fired twice and should be gone
+    let fired3 = sched.update(0.6);
+    assert_eq!(fired3.len(), 0);
+    assert!(sched.is_empty());
+}
+
+#[test]
+fn scheduler_every_unlimited_does_not_expire() {
+    use luna2d::timer::Scheduler;
+    let mut sched = Scheduler::new();
+    sched.every(0.1, -1); // -1 = infinite
+    assert_eq!(sched.count(), 1);
+    for _ in 0..10 {
+        sched.update(0.2); // fires every tick
+    }
+    assert_eq!(sched.count(), 1); // still alive
+}
+
+#[test]
+fn scheduler_after_named_and_cancel_by_name() {
+    use luna2d::timer::Scheduler;
+    let mut sched = Scheduler::new();
+    sched.after_named("my_timer", 5.0);
+    let cancelled = sched.cancel_named("my_timer");
+    assert!(cancelled.is_some());
+    assert!(sched.is_empty());
+}
+
+#[test]
+fn scheduler_cancel_named_nonexistent_returns_none() {
+    use luna2d::timer::Scheduler;
+    let mut sched = Scheduler::new();
+    assert!(sched.cancel_named("no_such_timer").is_none());
+}
+
+#[test]
+fn scheduler_set_interval_changes_fire_timing() {
+    use luna2d::timer::Scheduler;
+    let mut sched = Scheduler::new();
+    let id = sched.every(2.0, -1);
+    assert!(sched.set_interval(id, 0.5));
+    let interval = sched.get_interval(id).unwrap();
+    assert!((interval - 0.5).abs() < 1e-9);
+}
+
+#[test]
+fn scheduler_reset_event_restarts_countdown() {
+    use luna2d::timer::Scheduler;
+    let mut sched = Scheduler::new();
+    let id = sched.after(1.0);
+    sched.update(0.8); // almost elapsed
+    assert!(sched.reset_event(id));
+    let remaining = sched.get_remaining(id).unwrap();
+    // reset: should be back near 1.0
+    assert!(remaining > 0.5);
+}
+
+#[test]
+fn clock_total_time_is_sum_of_deltas() {
+    use luna2d::timer::Clock;
+    let mut clock = Clock::new();
+    // tick a few times; we can't control real time but total >= 0
+    clock.tick();
+    clock.tick();
+    assert!(clock.total() >= 0.0);
+    assert!(clock.frame_count() == 2);
+}

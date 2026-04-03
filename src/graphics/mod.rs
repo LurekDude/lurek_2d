@@ -6,8 +6,6 @@
 //! All public items are documented. See the parent module for architectural context
 //! and the `luna.*` Lua API for the scripting interface.
 //!
-/// Compound shape builder that accumulates vector primitives for batched drawing.
-pub mod shape;
 /// Sprite-sheet frame animation with configurable durations and looping.
 pub mod animation;
 /// 2D camera with position, zoom, and rotation producing a view matrix.
@@ -42,6 +40,8 @@ pub mod polygon_map;
 pub mod renderer;
 /// Custom WGSL shader support with uniform variables.
 pub mod shader;
+/// Compound shape builder that accumulates vector primitives for batched drawing.
+pub mod shape;
 /// Sprite struct combining a texture, transform, and tint color.
 pub mod sprite;
 /// Sprite batching for efficient rendering of many sprites sharing one texture.
@@ -77,7 +77,7 @@ pub use nine_slice::{NineSlice, Patch};
 pub use palette_lut::PaletteLUT;
 pub use polygon_map::PolygonMap;
 pub use renderer::{
-    BlendMode, CompareMode, DepthMode, DrawCommand, DrawableKind, DrawMode, StencilAction,
+    BlendMode, CompareMode, DepthMode, DrawCommand, DrawMode, DrawableKind, StencilAction,
     StencilMode, TextAlign, TextureData,
 };
 pub use shader::{Shader, UniformValue};

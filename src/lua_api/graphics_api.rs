@@ -968,38 +968,6 @@ pub(super) fn invalid_mesh_handle(function_name: &str) -> LuaError {
     ))
 }
 
-/// Returns a `LuaError` for an invalid or released shape handle.
-///
-/// # Parameters
-/// - `function_name` — `&str`.
-///
-/// # Returns
-/// `LuaError`.
-pub(super) fn invalid_shape_handle(function_name: &str) -> LuaError {
-    LuaError::RuntimeError(format!(
-        "{}: invalid or already-released shape handle",
-        function_name
-    ))
-}
-
-/// Resolves a shape key and validates the shape is still alive.
-///
-/// # Parameters
-/// - `state` — `&SharedState`.
-/// - `id` — `u64`.
-/// - `function_name` — `&str`.
-///
-/// # Returns
-/// `LuaResult<ShapeKey>`.
-pub(super) fn require_shape_key(state: &SharedState, id: u64, function_name: &str) -> LuaResult<ShapeKey> {
-    let key = ShapeKey::from(slotmap::KeyData::from_ffi(id));
-    if !state.shapes.contains_key(key) {
-        Err(invalid_shape_handle(function_name))
-    } else {
-        Ok(key)
-    }
-}
-
 /// Resolves a texture key, validating the handle is still alive.
 ///
 /// # Parameters
@@ -4473,6 +4441,32 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
                     state: state_cl.clone(),
                     key,
                 })
+            })?,
+        )?;
+    }
+
+    // luna.graphics.releaseShape(shape) -> bool
+    /// Releases a compound shape resource and frees its slot-map entry.
+    ///
+    /// # Parameters
+    /// - `shape` — Shape userdata returned by newShape.
+    {
+        let state_cl = state.clone();
+        graphics.set(
+            "releaseShape",
+            lua.create_function(move |_, shape_ud: mlua::AnyUserData| {
+                let shape = shape_ud.borrow::<LuaCompoundShape>()?;
+                let key = shape.key;
+                drop(shape);
+                let mut st = state_cl.borrow_mut();
+                if st.shapes.remove(key).is_some() {
+                    Ok(true)
+                } else {
+                    Err(mlua::Error::RuntimeError(
+                        "luna.graphics.releaseShape: invalid or already-released shape handle"
+                            .into(),
+                    ))
+                }
             })?,
         )?;
     }

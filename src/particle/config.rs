@@ -1,7 +1,7 @@
 //! Particle emitter configuration types and enums.
 
-use crate::engine::resource_keys::TextureKey;
 use super::shapes::ParticleShape;
+use crate::engine::resource_keys::TextureKey;
 
 /// Area distribution mode for particle emission.
 ///

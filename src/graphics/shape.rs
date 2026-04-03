@@ -5,7 +5,7 @@
 //! builds up a [`CompoundShape`] once, then replays it any number of times via
 //! [`crate::graphics::DrawCommand::DrawShape`] with a per-call affine transform.
 //!
-//! **Tier position**: Tier 1 (`graphics`).  
+//! **Tier position**: Tier 1 (`graphics`).
 //! Imports only from within the `graphics` crate-module (`super::renderer`).
 //! No imports from Tier 2–3 modules or from `lua_api`.
 
