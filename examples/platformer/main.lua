@@ -19,6 +19,11 @@ local player = {
     alive = true,
 }
 
+-- Optional: spatial audio source for footsteps (Phase 4 demo).
+-- Place a "footstep.wav" next to this main.lua to enable.
+local footstep_source = nil
+local footstep_cooldown = 0
+
 local gravity = 900
 local platforms = {}
 local coins = {}
@@ -86,6 +91,12 @@ function luna.load()
     luna.window.setTitle("Platformer Demo - Luna2D")
     luna.graphics.setBackgroundColor(0.05, 0.07, 0.15)
     generate_level()
+
+    -- Phase 4: load optional footstep sound for spatial audio demo
+    local ok, src = pcall(luna.audio.newSource, "footstep.wav", "static")
+    if ok then
+        footstep_source = src
+    end
 end
 
 function luna.update(dt)
@@ -173,6 +184,17 @@ function luna.update(dt)
         p.life = p.life - dt
         if p.life <= 0 then
             table.remove(particles, i)
+        end
+    end
+
+    -- Phase 4: update spatial audio listener position to match player
+    if footstep_source then
+        luna.audio.setPosition(footstep_source, player.x, player.y, 0)
+        footstep_cooldown = footstep_cooldown - dt
+        if player.on_ground and math.abs(player.vx) > 10 and footstep_cooldown <= 0 then
+            luna.audio.stop(footstep_source)
+            luna.audio.play(footstep_source)
+            footstep_cooldown = 0.35
         end
     end
 end

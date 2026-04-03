@@ -25,6 +25,11 @@ name: Renderer
 - Graphics-related Lua bindings in `src/lua_api/graphics_api.rs` and `src/lua_api/graphics_ext_api.rs`
 - `luna.graphics.draw` — polymorphic dispatch to Image/Canvas/SpriteBatch/Mesh (Phase 3)
 - `luna.graphics.drawEx` — polymorphic dispatch with full affine transform (Phase 3)
+- `luna.graphics.captureScreenshot` — frame capture with ImageData callback (Phase 5)
+- `luna.image.newCompressedData` — load DDS/DXT compressed textures to Lua userdata (Phase 13)
+- `CompressedImageData:getDimensions/getWidth/getHeight/getMipmapCount/getFormat` — compressed texture metadata (Phase 13)
+- `luna.image.newCompressedData` — load DDS/DXT compressed textures to Lua userdata (Phase 13)
+- `CompressedImageData:getDimensions/getWidth/getHeight/getMipmapCount/getFormat` — compressed texture metadata (Phase 13)
 
 **Must not become**:
 - Shadow Developer for non-graphics engine code

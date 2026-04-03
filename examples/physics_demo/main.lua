@@ -1,5 +1,6 @@
 ﻿-- Physics demo for Luna2D
 -- Demonstrates: circle bodies, rect bodies, sensors, collision events, layer filtering
+-- Phase 2: standalone shape objects (newCircleShape, getType, getRadius, getBoundingBox)
 
 local world_id
 local ground_id
@@ -17,6 +18,14 @@ local H = 600
 local collision_flash = 0  -- seconds left for collision flash display
 local collision_count = 0
 local sensor_triggered = false
+
+-- Phase 2: test standalone shape queries at startup (printed once to console)
+local _demo_shape = luna.physics.newCircleShape(25)
+print("[physics_demo] shape type:", _demo_shape:getType())
+print("[physics_demo] shape radius:", _demo_shape:getRadius())
+local _bx1, _by1, _bx2, _by2 = _demo_shape:getBoundingBox()
+print("[physics_demo] bounding box:", _bx1, _by1, _bx2, _by2)
+_demo_shape = nil
 
 function luna.load()
     luna.window.setTitle("Physics Demo — Luna2D (Circles + Sensors + Layers)")

@@ -37,6 +37,20 @@ impl LuaUserData for LuaCompressedImageData {
         methods.add_method("getFormat", |_, this, ()| {
             Ok(this.inner.get_format().to_string())
         });
+        /// Return the width of the base mip level in pixels.
+        ///
+        /// # Returns
+        /// `integer`.
+        methods.add_method("getWidth", |_, this, ()| {
+            Ok(this.inner.width)
+        });
+        /// Return the height of the base mip level in pixels.
+        ///
+        /// # Returns
+        /// `integer`.
+        methods.add_method("getHeight", |_, this, ()| {
+            Ok(this.inner.height)
+        });
     }
 }
 

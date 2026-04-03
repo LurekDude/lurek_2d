@@ -426,3 +426,25 @@ pub struct TextureData {
     pub width: u32,
     pub height: u32,
 }
+
+/// Type discriminator for resources that can be passed to luna.graphics.draw.
+///
+/// Used to dispatch the polymorphic draw(drawable, ...) Lua API to the
+/// correct DrawCommand variant based on resource type.
+///
+/// # Variants
+/// - Image(TextureKey) — A loaded texture (Image).
+/// - Canvas(CanvasKey) — An off-screen render target.
+/// - SpriteBatch(SpriteBatchKey) — A batched sprite collection.
+/// - Mesh(MeshKey) — A custom geometry mesh.
+#[derive(Debug, Clone)]
+pub enum DrawableKind {
+    /// A loaded texture (Image).
+    Image(TextureKey),
+    /// An off-screen render target (Canvas).
+    Canvas(CanvasKey),
+    /// A batched sprite collection.
+    SpriteBatch(SpriteBatchKey),
+    /// A custom geometry mesh.
+    Mesh(MeshKey),
+}

@@ -3898,6 +3898,36 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
     )?;
 
 
+    // luna.graphics.captureScreenshot(callback)
+    /// Captures the current frame as an `ImageData` and passes it to `callback`.
+    ///
+    /// In headless or test mode this creates a blank transparent `ImageData` sized to the
+    /// current window dimensions and calls `callback` synchronously (GPU pixel readback is
+    /// deferred to future full-GPU implementation). Setting `pending_screenshot` in
+    /// `SharedState` allows engine-side code to detect that a capture was requested.
+    ///
+    /// # Parameters
+    /// - `callback` — `function`. Called with one `ImageData` argument.
+    ///
+    /// # Returns
+    /// Nothing.
+    let s = state.clone();
+    graphics.set(
+        "captureScreenshot",
+        lua.create_function(move |lua_ctx, callback: LuaFunction| {
+            let (w, h) = {
+                let st = s.borrow();
+                (st.window_width, st.window_height)
+            };
+            s.borrow_mut().pending_screenshot = true;
+            let img = crate::image::ImageData::new(w.max(1), h.max(1));
+            let img_ud = lua_ctx.create_userdata(img)?;
+            let result = callback.call::<_, ()>(img_ud);
+            s.borrow_mut().pending_screenshot = false;
+            result
+        })?,
+    )?;
+
     register_ext(lua, &graphics, state.clone())?;
 
     luna.set("graphics", graphics)?;

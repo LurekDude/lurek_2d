@@ -13,10 +13,12 @@ name: Developer
 **Owns**:
 - `src/engine/` — App lifecycle, Config, EngineError
 - `src/lua_api/` — Lua binding registration and SharedState
-- `src/input/` — Keyboard, mouse, gamepad state
+- `src/input/` — Keyboard, mouse, gamepad state; `luna.mouse.newCursor` / `getSystemCursor` / `setCursor` / `getCursor` / `isCursorSupported` — cursor userdata (Phase 7); `luna.keyboard.isModifierActive` — modifier key state (Phase 8)
 - `src/timer/` — Clock, delta timing
-- `src/filesystem/` — GameFS, sandboxed I/O
-- `src/math/` — Vec2, Mat3, Rect
+- `src/filesystem/` — GameFS, sandboxed I/O; `luna.filesystem.mount` / `unmount` / `load` / `newFileData` — VFS layer mounting (Phase 1)
+- `src/math/` — Vec2, Mat3, Rect; `luna.math.simplexNoise` — seeded OpenSimplex noise (Phase 12)
+- `src/data/` — ByteData, DataView, pack/unpack; `luna.data.pack` / `unpack` / `getPackedSize` / `newDataView` — binary packing (Phase 9)
+- `src/event/` — EventQueue, Signal; `luna.event.pump` / `wait` / `restart` — event loop control (Phase 11)
 - `src/window/` — Event loop
 - `src/main.rs` and `src/lib.rs`
 - Bug fixes in any module

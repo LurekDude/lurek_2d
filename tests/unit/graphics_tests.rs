@@ -2135,3 +2135,90 @@ fn graphics_draw_ex_sy_defaults_to_sx() {
         "drawEx sy should default to sx when omitted"
     );
 }
+
+// ===========================================================================
+// Feature: captureScreenshot
+// ===========================================================================
+
+#[test]
+fn graphics_capture_screenshot_stores_callback() {
+    // Verify that captureScreenshot does not panic and calls the callback synchronously.
+    // Actual GPU pixel readback is not testable headlessly; the stub creates a blank ImageData.
+    let (_state, lua) = make_graphics_vm();
+    let result = lua
+        .load(
+            r#"
+        local fired = false
+        luna.graphics.captureScreenshot(function(img)
+            fired = true
+            assert(type(img) == "userdata", "expected ImageData userdata")
+        end)
+        assert(fired, "callback must fire synchronously in stub mode")
+        "#,
+        )
+        .exec();
+    assert!(
+        result.is_ok(),
+        "captureScreenshot should not error: {:?}",
+        result
+    );
+}
+
+
+// ===========================================================================
+// Phase 3: DrawCommand image and canvas variants
+// ===========================================================================
+
+#[test]
+fn graphics_draw_command_image_variant() {
+    // Verify DrawCommand::DrawImage is pushed when drawing an Image at default transform.
+    let (state, lua) = make_graphics_vm();
+    run_draw(&lua, r#"
+        local img = luna.graphics.newImage("assets/icon.png")
+        luna.graphics.draw(img, 10, 20)
+    "#);
+    let st = state.borrow();
+    let found = st.draw_commands.iter().any(|cmd| {
+        matches!(cmd, DrawCommand::DrawImage { x, y, .. } if (*x - 10.0).abs() < 1e-4 && (*y - 20.0).abs() < 1e-4)
+    });
+    assert!(found, "Expected DrawCommand::DrawImage to be queued");
+}
+
+#[test]
+fn graphics_draw_command_canvas_variant() {
+    // Verify DrawCommand::DrawCanvas is pushed when drawing a Canvas.
+    let (state, lua) = make_graphics_vm();
+    run_draw(&lua, r#"
+        local c = luna.graphics.newCanvas(64, 64)
+        luna.graphics.draw(c, 5, 15)
+    "#);
+    let st = state.borrow();
+    let found = st.draw_commands.iter().any(|cmd| {
+        matches!(cmd, DrawCommand::DrawCanvas { x, y, .. } if (*x - 5.0).abs() < 1e-4 && (*y - 15.0).abs() < 1e-4)
+    });
+    assert!(found, "Expected DrawCommand::DrawCanvas to be queued");
+}
+
+// ===========================================================================
+// Phase 5: GpuRenderer::request_screenshot
+// ===========================================================================
+
+#[test]
+fn graphics_screenshot_request_queued_without_panic() {
+    // Headless stub: captureScreenshot must not panic and must call the callback.
+    let (_state, lua) = make_graphics_vm();
+    let result = lua
+        .load(r#"
+        local fired = false
+        luna.graphics.captureScreenshot(function(img)
+            fired = true
+        end)
+        assert(fired, "captureScreenshot callback must be invoked")
+        "#)
+        .exec();
+    assert!(
+        result.is_ok(),
+        "graphics_screenshot_request_queued_without_panic failed: {:?}",
+        result
+    );
+}

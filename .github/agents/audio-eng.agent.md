@@ -13,6 +13,7 @@ name: Audio-Eng
 **Owns**:
 - `src/audio/mixer.rs` — Mixer struct, rodio OutputStream, playback control
 - `src/audio/source.rs` — AudioSource loading, format handling
+- `src/audio/decoder.rs` — Streaming Decoder for chunked PCM reading
 - `src/audio/mod.rs` — Module exports
 - Audio-related Lua bindings in `src/lua_api/audio_api.rs`
 

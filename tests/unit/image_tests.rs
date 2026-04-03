@@ -88,3 +88,27 @@ fn image_data_encode_png() {
     // PNG files start with the PNG signature
     assert_eq!(&png_bytes[..4], &[137, 80, 78, 71]);
 }
+
+// ===========================================================================
+// Phase 13: CompressedImageData named tests
+// ===========================================================================
+
+#[test]
+fn compressed_image_data_format_string() {
+    // Verify get_format() returns a non-empty string for a valid DDS file.
+    let bytes = std::fs::read("tests/fixtures/test_dxt1.dds").unwrap();
+    let cid = CompressedImageData::from_dds(&bytes).unwrap();
+    let fmt = cid.get_format();
+    assert!(!fmt.is_empty(), "format string must not be empty");
+    assert_eq!(fmt, "dxt1", "DXT1 fixture must report 'dxt1' format");
+}
+
+#[test]
+fn compressed_image_data_dimensions_nonzero_for_valid_file() {
+    // Verify width and height are positive for a valid DDS file.
+    let bytes = std::fs::read("tests/fixtures/test_dxt1.dds").unwrap();
+    let cid = CompressedImageData::from_dds(&bytes).unwrap();
+    let (w, h) = cid.get_dimensions();
+    assert!(w > 0, "width must be > 0 for a valid DDS file");
+    assert!(h > 0, "height must be > 0 for a valid DDS file");
+}

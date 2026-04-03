@@ -1,4 +1,5 @@
 ﻿-- Hello World example for Luna2D
+-- Phase 12: simplex noise available via luna.math.simplexNoise(x, y) or luna.math.simplexNoise(x, y, z)
 
 function luna.load()
     luna.window.setTitle("Hello World - Luna2D")
@@ -37,5 +38,16 @@ function luna.keypressed(key)
             luna.math.random(),
             luna.math.random()
         )
+    end
+
+    -- Press S to capture a screenshot (stub: receives a blank ImageData)
+    if key == "s" then
+        local ok, err = pcall(luna.graphics.captureScreenshot, function(img)
+            local w, h = img:getDimensions()
+            luna.log.info("Screenshot captured: " .. w .. "x" .. h .. " pixels")
+        end)
+        if not ok then
+            luna.log.warn("captureScreenshot failed: " .. tostring(err))
+        end
     end
 end

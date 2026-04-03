@@ -977,3 +977,76 @@ fn decoder_get_duration_positive() {
     .unwrap();
     assert!(d.get_duration() > 0.0);
 }
+
+#[test]
+fn decoder_channel_count_mono_is_1() {
+    let d = luna2d::audio::Decoder::from_file(
+        "tests/fixtures/sine_mono_44100.wav",
+        1024,
+    )
+    .unwrap();
+    assert_eq!(d.channels, 1);
+}
+
+#[test]
+fn decoder_sample_rate_returns_positive() {
+    let d = luna2d::audio::Decoder::from_file(
+        "tests/fixtures/sine_mono_44100.wav",
+        1024,
+    )
+    .unwrap();
+    assert!(d.sample_rate > 0);
+}
+
+#[test]
+fn decoder_bit_depth_returns_positive() {
+    let d = luna2d::audio::Decoder::from_file(
+        "tests/fixtures/sine_mono_44100.wav",
+        1024,
+    )
+    .unwrap();
+    assert!(d.bit_depth > 0);
+}
+
+#[test]
+fn decoder_tell_starts_at_zero() {
+    let d = luna2d::audio::Decoder::from_file(
+        "tests/fixtures/sine_mono_44100.wav",
+        1024,
+    )
+    .unwrap();
+    assert!((d.tell() - 0.0).abs() < 1e-6);
+}
+
+#[test]
+fn decoder_tell_advances_after_decode() {
+    let mut d = luna2d::audio::Decoder::from_file(
+        "tests/fixtures/sine_mono_44100.wav",
+        1024,
+    )
+    .unwrap();
+    let _ = d.decode();
+    assert!(d.tell() > 0.0);
+}
+
+#[test]
+fn decoder_is_seekable_always_true() {
+    let d = luna2d::audio::Decoder::from_file(
+        "tests/fixtures/sine_mono_44100.wav",
+        1024,
+    )
+    .unwrap();
+    assert!(d.is_seekable());
+}
+
+#[test]
+fn decoder_seek_then_tell_round_trips() {
+    let mut d = luna2d::audio::Decoder::from_file(
+        "tests/fixtures/sine_mono_44100.wav",
+        1024,
+    )
+    .unwrap();
+    let target = 0.01;
+    d.seek(target);
+    assert!((d.tell() - target).abs() < 0.001);
+}

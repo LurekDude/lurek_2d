@@ -75,7 +75,8 @@ pub use nine_slice::{NineSlice, Patch};
 pub use palette_lut::PaletteLUT;
 pub use polygon_map::PolygonMap;
 pub use renderer::{
-    BlendMode, CompareMode, DrawCommand, DrawMode, StencilAction, TextAlign, TextureData,
+    BlendMode, CompareMode, DrawCommand, DrawableKind, DrawMode, StencilAction, TextAlign,
+    TextureData,
 };
 pub use shader::{Shader, UniformValue};
 pub use sprite::Sprite;

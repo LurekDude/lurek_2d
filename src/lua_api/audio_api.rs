@@ -1022,6 +1022,18 @@ impl LuaUserData for LuaDecoder {
             Ok(())
         });
 
+        /// Return the current playback position in seconds.
+        ///
+        /// # Returns
+        /// `f64`.
+        methods.add_method("tell", |_, this, ()| Ok(this.inner.tell()));
+
+        /// Returns whether this decoder supports seeking.
+        ///
+        /// # Returns
+        /// `boolean` — always `true` for in-memory decoders.
+        methods.add_method("isSeekable", |_, this, ()| Ok(this.inner.is_seekable()));
+
         /// Release the decoder (no-op in the current model).
         methods.add_method("release", |_, _, ()| Ok(()));
     }

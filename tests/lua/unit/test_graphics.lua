@@ -256,4 +256,21 @@ describe("luna.graphics.draw polymorphic dispatch", function()
     end)
 end)
 
+describe("luna.graphics.captureScreenshot", function()
+  it("accepts a callback without error", function()
+    local ok, err = pcall(luna.graphics.captureScreenshot, function(img)
+      -- callback fires synchronously in stub mode; img is ImageData userdata
+    end)
+    expect_equal(ok, true)
+  end)
+
+  it("callback receives an ImageData userdata", function()
+    local received_type = nil
+    luna.graphics.captureScreenshot(function(img)
+      received_type = type(img)
+    end)
+    expect_equal(received_type, "userdata")
+  end)
+end)
+
 test_summary()

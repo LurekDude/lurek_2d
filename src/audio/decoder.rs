@@ -102,6 +102,27 @@ impl Decoder {
         self.cursor = sample_pos.min(self.pcm.len());
     }
 
+    /// Return the current playback position in seconds.
+    ///
+    /// # Returns
+    /// `f64`.
+    pub fn tell(&self) -> f64 {
+        if self.sample_rate == 0 || self.channels == 0 {
+            return 0.0;
+        }
+        self.cursor as f64 / (self.sample_rate as f64 * self.channels as f64)
+    }
+
+    /// Returns whether this decoder supports seeking.
+    ///
+    /// Always `true` because PCM data is fully buffered in memory.
+    ///
+    /// # Returns
+    /// `bool`.
+    pub fn is_seekable(&self) -> bool {
+        true
+    }
+
     /// Reset playback to the beginning.
     pub fn rewind(&mut self) {
         self.cursor = 0;

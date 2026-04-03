@@ -1,13 +1,21 @@
 ﻿-- Sprites example for Luna2D
 -- Move a rectangle with arrow keys
+-- Demonstrates luna.graphics.draw() polymorphic dispatch
 
 local x, y = 400, 300
 local speed = 200
 local size = 40
+local icon  -- Image handle loaded via newImage
 
 function luna.load()
     luna.window.setTitle("Movement Demo - Luna2D")
     luna.graphics.setBackgroundColor(0.08, 0.08, 0.18)
+    -- Load an Image; luna.graphics.draw() dispatches based on type
+    icon = luna.graphics.newImage("assets/icon.png"
+    luna.window.setTitle("Movement Demo - Luna2D")
+    luna.graphics.setBackgroundColor(0.08, 0.08, 0.18)
+    -- Load an Image; luna.graphics.draw() dispatches based on type
+    icon = luna.graphics.newImage("assets/icon.png")
 end
 
 function luna.update(dt)
@@ -42,9 +50,21 @@ function luna.draw()
     luna.graphics.setColor(0.3, 0.8, 1.0)
     luna.graphics.rectangle("fill", x, y, size, size)
 
+    -- Draw icon using polymorphic luna.graphics.draw(drawable, x, y)
+    luna.graphics.setColor(1, 1, 1)
+    if icon then
+        luna.graphics.draw(icon, x + size + 4, y)
+    end
+
     -- Outline
     luna.graphics.setColor(1, 1, 1)
     luna.graphics.rectangle("line", x, y, size, size)
+
+    -- Draw icon using polymorphic luna.graphics.draw(drawable, x, y)
+    luna.graphics.setColor(1, 1, 1)
+    if icon then
+        luna.graphics.draw(icon, x + size + 4, y)
+    end
 
     -- Instructions
     luna.graphics.setColor(0.6, 0.6, 0.6)

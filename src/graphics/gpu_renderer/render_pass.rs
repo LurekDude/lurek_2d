@@ -2174,6 +2174,22 @@ impl GpuRenderer {
             }
         }
     }
+    /// Capture the current frame and deliver pixels to a callback.
+    ///
+    /// This is a stub implementation — in a full wgpu-backed build the swapchain
+    /// surface texture would be copied into a wgpu::Buffer, mapped on the next
+    /// frame, and the BGRA→RGBA-converted bytes passed to callback.
+    ///
+    /// As a headless-compatible stub the callback is invoked immediately with an
+    /// empty pixel buffer and the current viewport dimensions.
+    ///
+    /// # Parameters
+    /// - callback — Box<dyn FnOnce(Vec<u8>, u32, u32) + Send>. Receives (pixels, width, height).
+    pub fn request_screenshot(&mut self, callback: Box<dyn FnOnce(Vec<u8>, u32, u32) + Send>) {
+        // Stub: full GPU readback requires async buffer mapping. Until then,
+        // deliver an empty frame so callers can depend on the public API surface.
+        callback(vec![], self.width, self.height);
+    }
 }
 
 // ─── Free helpers ─────────────────────────────────────────────────────────────

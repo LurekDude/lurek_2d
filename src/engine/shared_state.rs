@@ -287,6 +287,10 @@ pub struct SharedState {
     pub fs: GameFS,
     /// MIDI SoundFont state for MIDI instrument rendering.
     pub midi_state: MidiState,
+    /// Whether a screenshot capture was requested this frame.
+    ///
+    /// Set to `true` by `luna.graphics.captureScreenshot`. Cleared after the callback fires.
+    pub pending_screenshot: bool,
 }
 
 impl SharedState {
@@ -357,6 +361,7 @@ impl SharedState {
             async_loader: None,
             fs,
             midi_state: MidiState::new(),
+            pending_screenshot: false,
         }
     }
 }
