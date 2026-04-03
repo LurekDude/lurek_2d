@@ -40,28 +40,48 @@ The following are **active, binding decisions** from `docs/design-assumptions.md
 ### Build and Run
 
 ```powershell
-cargo build                           # Debug build
+cargo build                           # Debug build (only needed to ship or run the binary)
 cargo build --release                 # Release build
 cargo run                             # Splash screen (no game)
 cargo run -- examples/hello_world     # Run example
 cargo run -- path/to/my_game          # Run custom game
 ```
 
-### Running Tests
+### Development Loop — Scoped Commands (use during implementation)
+
+**Never run `cargo build` or `cargo test` (full) during development.**
+These rebuild the entire engine (~4 min cold), saturate all CPU cores, and block
+parallel agents or the user working on other modules.
 
 ```powershell
-cargo test                            # All tests — DO NOT run cargo build first
-cargo test physics_tests              # Single module
-cargo test -- --nocapture             # Show stdout from tests
-RUST_LOG=debug cargo test -- --nocapture  # Debug output
+# Type-check only — no compilation, no linking, ~2-5s incremental
+cargo check
+
+# Test only the module you are working on
+cargo test --test <module>_tests -- --nocapture
+cargo test lua_test_<module> -- --nocapture
+
+# Lint only the library (no test binaries compiled)
+cargo clippy --lib
 ```
 
-> **Policy**: Run `cargo test` directly. Never prefix with `cargo build` — `cargo test` builds what it needs automatically. Do not create a separate build step before running tests.
+> **Rule**: `cargo check` runs the full borrow-checker and type-checker without producing
+> any binary output. It is the correct tool to validate a change during implementation.
+> `cargo build` is only needed for packaging or running the game binary — never as a
+> pre-test step, because `cargo test` already compiles what it needs automatically.
 
-### Quality Gates
+### Final Gate — before every `git commit`
+
+Run these **once**, only after all implementation work on a task is complete:
 
 ```powershell
-cargo clippy                          # Lint — must pass with 0 warnings
+cargo test && cargo clippy -- -D warnings
+```
+
+### Quality Gates (CI / commit checklist)
+
+```powershell
+cargo clippy -- -D warnings           # Lint — must pass with 0 warnings
 cargo fmt --check                     # Format check
 cargo test                            # All tests must pass
 ```
@@ -380,13 +400,17 @@ Luna2D uses the `log` crate facade (`log::info!`, `log::warn!`, `log::error!`, `
 
 | What you want | Command |
 |---|---|
-| Run all tests | `cargo test` |
-| Run one module | `cargo test physics_tests` |
-| See stdout from tests | `cargo test -- --nocapture` |
-| Debug log during tests | `RUST_LOG=debug cargo test -- --nocapture` |
+| Type-check only (fastest) | `cargo check` |
+| Run one module's tests | `cargo test --test <module>_tests` |
+| Run one Lua test | `cargo test lua_test_<module>` |
+| See stdout from tests | `cargo test --test <module>_tests -- --nocapture` |
+| Debug log during tests | `$env:RUST_LOG = "debug"; cargo test --test <module>_tests -- --nocapture` |
+| Lint library only | `cargo clippy --lib` |
+| Run all tests (final gate only) | `cargo test` |
 | Format test output | `cargo test -- --format pretty` |
 
-Test output files: none by default. Failures print inline. For structured reports, pipe to `cargo test 2>&1 | Tee-Object test_results.txt`.
+**Key rule**: Use scoped commands (`--test <module>`) during development. Full `cargo test` only at commit time.
+Test output files: none by default. Failures print inline. For structured reports: `cargo test 2>&1 | Tee-Object test_results.txt`.
 
 ### Docstrings
 

@@ -40,9 +40,9 @@ name: Developer
 
 Every Developer output includes:
 - Changed file paths with brief description of each change
-- Compilation verified: `cargo build` succeeds
-- Lint verified: `cargo clippy` with 0 warnings
-- Tests verified: `cargo test` passes
+- Type-check verified: `cargo check` exits 0
+- Lint verified: `cargo clippy --lib` with 0 warnings (full `cargo clippy` at commit gate only)
+- Module tests verified: `cargo test --test <module>_tests` passes
 - No `unsafe` blocks unless documented with `// SAFETY:` comment
 
 ## SUCCESS METRICS
@@ -59,7 +59,7 @@ Every Developer output includes:
 1. **Read** — Understand the request. Read affected files and their context.
 2. **Plan** — Identify minimal set of changes. Check module boundaries and dependency direction.
 3. **Implement** — Write the code. Follow Rust conventions from system prompt.
-4. **Verify** — Run `cargo build`, `cargo clippy`, `cargo test`.
+4. **Verify** — Run `cargo check` (type-check), then `cargo test --test <module>_tests` (scoped). Never run `cargo build` or full `cargo test` during development — they saturate all CPU cores and block parallel work.
 5. **Quality gates** — After every feature implementation, run the post-implementation checklist below.
 6. **Report** — List changed files, what was verified, any caveats.
 
@@ -101,10 +101,22 @@ Run these checks after every feature implementation, in order:
 - New examples added → update `wiki/Examples.md` with name, description, run command
 
 ### Testing policy
-- Run `cargo test` directly — do NOT run `cargo build` first; `cargo test` builds what it needs
-- Never prefix test runs with a separate `cargo build` step
-- For a single module: `cargo test <module>_tests`
-- For the full suite: `cargo test`
+
+**During development (fast — always use these):**
+```powershell
+cargo check                                   # Type-check only — no codegen
+cargo test --test <module>_tests -- --nocapture   # Only the module being changed
+cargo test lua_test_<module> -- --nocapture   # Only the Lua tests for this module
+cargo clippy --lib                            # Lint library only
+```
+
+**Final gate only (before routing to Reviewer / Manager for commit):**
+```powershell
+cargo test && cargo clippy -- -D warnings
+```
+
+`cargo build` is ONLY needed for dist packaging — never as a pre-test or pre-check step.
+Do NOT run `cargo test` (full, unfiltered) during implementation — assume another agent or the user is working in parallel on a different module.
 
 ## DECISION GATES
 

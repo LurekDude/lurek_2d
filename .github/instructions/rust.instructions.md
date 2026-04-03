@@ -45,6 +45,26 @@ Forbidden patterns:
 - Float comparisons in tests: `assert!((val - expected).abs() < 1e-5)` — never `assert_eq!` on floats
 - Doc comments (`///`) required on all `pub` functions and types
 
+## Build and Check Commands
+
+**During development (fast — use these while implementing):**
+```powershell
+cargo check                                   # Type-check only — no codegen, no binary
+cargo check --lib                             # Type-check the library crate only
+cargo test --test <module>_tests -- --nocapture  # Test only the one module you changed
+cargo clippy --lib                            # Lint the library only (no test binaries)
+```
+
+**Never** run `cargo build` or `cargo test` (full, no filter) during development — it rebuilds
+the entire engine (4+ min cold) and blocks all CPU cores. Other agents or the user may be
+working in parallel on different modules. Use scoped commands.
+
+**Final gate only (before `git commit`):**
+```powershell
+cargo test && cargo clippy -- -D warnings
+```
+`cargo build` is only needed for dist packaging — never add it as a pre-test step.
+
 ## Avoid
 
 - `String::from` in hot paths — prefer `&str` for owned-once patterns

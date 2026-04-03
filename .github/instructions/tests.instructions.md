@@ -114,12 +114,44 @@ test_summary()  -- required at end of every Lua test file
 
 ## Quality Tools
 
+### Development Loop — use these during implementation (fast, scoped)
+
+Never run `cargo build` or `cargo test` (full) while developing a module.
+Never consume the full CPU during development — other agents or the user may be working in parallel.
+
+```powershell
+# Step 1 — type-check only (no codegen, fastest, ~2-5s incremental)
+cargo check
+
+# Step 2 — test only the module you are working on
+cargo test --test <module>_tests -- --nocapture
+cargo test lua_test_<module> -- --nocapture
+
+# Lint scoped to the library (no test binaries)
+cargo clippy --lib 2>&1 | Select-String "^error|^warning"
+```
+
+**Rule**: `cargo check` validates the whole codebase type-system in one pass without linking.
+No separate `cargo build` step is ever needed before `cargo test` — Cargo builds what it needs automatically.
+
+### Final Gate — only at commit time (full, slow)
+
+Run these **once**, after all development on a task is complete, before `git commit`:
+
 ```powershell
 cargo test                                    # Run all tests — must exit 0
+cargo clippy -- -D warnings                   # Lint — must be clean
+# cargo build is only needed for dist/install — never needed for tests or CI
+```
+
+### Single-module commands reference
+
+```powershell
+cargo check                                   # Fast type-check (no binary output)
 cargo test --test <module>_tests              # Run one Rust test file
 cargo test lua_test_<module>                  # Run one Lua test by dispatcher name
-cargo test -- --nocapture                     # Show println! / lua print() output
-cargo clippy -- -D warnings                   # Lint — must be clean
+cargo test lua_test_<module> -- --nocapture   # Show lua print() output
+cargo clippy --lib                            # Lint lib only (fast)
 python tools/test_coverage.py                 # Coverage analytics → docs/API/test_coverage.json
 python tools/integration_coverage.py          # Check Lua integration test coverage
 python tools/collect_docs.py --report-missing # List undocumented public items

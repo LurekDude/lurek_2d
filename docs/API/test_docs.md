@@ -7,901 +7,1025 @@
 
 | Layer | Covered | Total | Coverage |
 |-------|---------|-------|----------|
-| Rust public functions | 0 | 2597 | 0.0% `--------------------` |
-| Lua API functions | 28 | 2328 | 1.2% `--------------------` |
+| Rust public functions | 325 | 2849 | 11.4% `##------------------` |
+| Lua API functions | 29 | 3140 | 0.9% `--------------------` |
 
 ## Rust Tests by Module
 
-### `ai` — 0/87 (0.0%)
+### `ai` — 15/87 (17.2%)
 
-**Uncovered public functions** (87):
+**Uncovered public functions** (72):
 
-- `DecisionModel::parse_str` in `src/ai/agent.rs:37`
-- `DecisionModel::as_str` in `src/ai/agent.rs:52`
-- `Agent::new` in `src/ai/agent.rs:119`
-- `BTStatus::parse_str` in `src/ai/behavior_tree.rs:32`
-- `BTStatus::as_str` in `src/ai/behavior_tree.rs:44`
-- `ParallelPolicy::parse_str` in `src/ai/behavior_tree.rs:74`
-- `ParallelPolicy::as_str` in `src/ai/behavior_tree.rs:85`
-- `BTNode::reset` in `src/ai/behavior_tree.rs:161`
-- `BTNode::child_count` in `src/ai/behavior_tree.rs:200`
-- `BehaviorTree::new` in `src/ai/behavior_tree.rs:228`
-- `Blackboard::new` in `src/ai/blackboard.rs:42`
-- `Blackboard::set_number` in `src/ai/blackboard.rs:54`
-- `Blackboard::get_number` in `src/ai/blackboard.rs:67`
-- `Blackboard::set_bool` in `src/ai/blackboard.rs:82`
-- `Blackboard::get_bool` in `src/ai/blackboard.rs:95`
-- `Blackboard::set_string` in `src/ai/blackboard.rs:110`
-- `Blackboard::get_string` in `src/ai/blackboard.rs:123`
-- `Blackboard::has` in `src/ai/blackboard.rs:140`
-- `Blackboard::remove` in `src/ai/blackboard.rs:154`
-- `Blackboard::clear` in `src/ai/blackboard.rs:159`
-- *...and 67 more*
+- `DecisionModel::parse_str` in `src/ai/agent.rs:82`
+- `DecisionModel::as_str` in `src/ai/agent.rs:100`
+- `BTStatus::parse_str` in `src/ai/behavior_tree.rs:63`
+- `BTStatus::as_str` in `src/ai/behavior_tree.rs:76`
+- `ParallelPolicy::parse_str` in `src/ai/behavior_tree.rs:111`
+- `ParallelPolicy::as_str` in `src/ai/behavior_tree.rs:123`
+- `BTNode::reset` in `src/ai/behavior_tree.rs:225`
+- `BTNode::child_count` in `src/ai/behavior_tree.rs:268`
+- `Blackboard::set_number` in `src/ai/blackboard.rs:96`
+- `Blackboard::get_number` in `src/ai/blackboard.rs:109`
+- `Blackboard::set_bool` in `src/ai/blackboard.rs:124`
+- `Blackboard::get_bool` in `src/ai/blackboard.rs:137`
+- `Blackboard::set_string` in `src/ai/blackboard.rs:152`
+- `Blackboard::get_string` in `src/ai/blackboard.rs:165`
+- `Blackboard::has` in `src/ai/blackboard.rs:182`
+- `Blackboard::remove` in `src/ai/blackboard.rs:196`
+- `Blackboard::clear` in `src/ai/blackboard.rs:201`
+- `Blackboard::keys` in `src/ai/blackboard.rs:209`
+- `Blackboard::set_parent` in `src/ai/blackboard.rs:225`
+- `Blackboard::parent` in `src/ai/blackboard.rs:233`
+- *...and 52 more*
 
-### `audio` — 0/116 (0.0%)
+### `audio` — 9/153 (5.9%)
 
-**Uncovered public functions** (116):
+**Uncovered public functions** (144):
 
-- `Bus::new` in `src/audio/bus.rs:24`
-- `Bus::name` in `src/audio/bus.rs:37`
-- `Bus::volume` in `src/audio/bus.rs:45`
-- `Bus::set_volume` in `src/audio/bus.rs:53`
-- `Bus::pitch` in `src/audio/bus.rs:61`
-- `Bus::set_pitch` in `src/audio/bus.rs:69`
-- `Bus::pause` in `src/audio/bus.rs:74`
-- `Bus::resume` in `src/audio/bus.rs:79`
-- `Bus::is_paused` in `src/audio/bus.rs:87`
-- `MidiState::new` in `src/audio/midi.rs:23`
-- `MidiState::set_soundfont` in `src/audio/midi.rs:41`
-- `MidiState::has_soundfont` in `src/audio/midi.rs:62`
-- `MidiState::clear_soundfont` in `src/audio/midi.rs:67`
-- `MidiState::soundfont_path` in `src/audio/midi.rs:76`
-- `MidiState::soundfont_data` in `src/audio/midi.rs:84`
-- `MidiPlayer::new` in `src/audio/midi_player.rs:73`
-- `MidiPlayer::load` in `src/audio/midi_player.rs:101`
-- `MidiPlayer::load_data` in `src/audio/midi_player.rs:126`
-- `MidiPlayer::is_loaded` in `src/audio/midi_player.rs:217`
-- `MidiPlayer::file_path` in `src/audio/midi_player.rs:225`
-- *...and 96 more*
+- `Bus::name` in `src/audio/bus.rs:53`
+- `Bus::volume` in `src/audio/bus.rs:61`
+- `Bus::set_volume` in `src/audio/bus.rs:69`
+- `Bus::pitch` in `src/audio/bus.rs:77`
+- `Bus::set_pitch` in `src/audio/bus.rs:85`
+- `Bus::pause` in `src/audio/bus.rs:90`
+- `Bus::resume` in `src/audio/bus.rs:95`
+- `Bus::is_paused` in `src/audio/bus.rs:103`
+- `Decoder::from_file` in `src/audio/decoder.rs:46`
+- `Decoder::decode` in `src/audio/decoder.rs:74`
+- `Decoder::get_duration` in `src/audio/decoder.rs:88`
+- `Decoder::seek` in `src/audio/decoder.rs:99`
+- `Decoder::tell` in `src/audio/decoder.rs:109`
+- `Decoder::is_seekable` in `src/audio/decoder.rs:122`
+- `Decoder::rewind` in `src/audio/decoder.rs:127`
+- `MidiState::set_soundfont` in `src/audio/midi.rs:55`
+- `MidiState::has_soundfont` in `src/audio/midi.rs:76`
+- `MidiState::clear_soundfont` in `src/audio/midi.rs:81`
+- `MidiState::soundfont_path` in `src/audio/midi.rs:90`
+- `MidiState::soundfont_data` in `src/audio/midi.rs:98`
+- *...and 124 more*
 
-### `battle` — 0/43 (0.0%)
+### `automation` — 5/24 (20.8%)
 
-**Uncovered public functions** (43):
+**Uncovered public functions** (19):
 
-- `CombatAction::new` in `src/battle/action.rs:22`
-- `CombatAction::is_ready` in `src/battle/action.rs:38`
-- `CombatAction::use_action` in `src/battle/action.rs:43`
-- `CombatAction::tick_cooldown` in `src/battle/action.rs:48`
-- `CombatBattle::new` in `src/battle/battle.rs:22`
-- `CombatBattle::add_combatant` in `src/battle/battle.rs:35`
-- `CombatBattle::get_combatant` in `src/battle/battle.rs:40`
-- `CombatBattle::get_combatant_mut` in `src/battle/battle.rs:45`
-- `CombatBattle::count` in `src/battle/battle.rs:52`
-- `CombatBattle::alive_names` in `src/battle/battle.rs:57`
-- `CombatBattle::sort_initiative` in `src/battle/battle.rs:66`
-- `CombatBattle::current_combatant` in `src/battle/battle.rs:76`
-- `CombatBattle::next_turn` in `src/battle/battle.rs:89`
-- `CombatBattle::attack` in `src/battle/battle.rs:105`
-- `CombatBattle::is_over` in `src/battle/battle.rs:172`
-- `CombatBattle::winner` in `src/battle/battle.rs:177`
-- `CombatBattle::get_all_names` in `src/battle/battle.rs:182`
-- `CombatBattle::push_log` in `src/battle/battle.rs:190`
-- `CombatBattle::get_log` in `src/battle/battle.rs:195`
-- `CombatBattle::remove_combatant` in `src/battle/battle.rs:200`
-- *...and 23 more*
+- `Script::with_description` in `src/automation/script.rs:98`
+- `Script::step_count` in `src/automation/script.rs:115`
+- `Simulator::load` in `src/automation/simulator.rs:144`
+- `Simulator::unload` in `src/automation/simulator.rs:160`
+- `Simulator::has_script` in `src/automation/simulator.rs:178`
+- `Simulator::get_scripts` in `src/automation/simulator.rs:190`
+- `Simulator::start` in `src/automation/simulator.rs:206`
+- `Simulator::pause` in `src/automation/simulator.rs:234`
+- `Simulator::resume` in `src/automation/simulator.rs:244`
+- `Simulator::is_running` in `src/automation/simulator.rs:257`
+- `Simulator::is_paused` in `src/automation/simulator.rs:265`
+- `Simulator::is_complete` in `src/automation/simulator.rs:277`
+- `Simulator::current_step` in `src/automation/simulator.rs:288`
+- `Simulator::step_count` in `src/automation/simulator.rs:300`
+- `Simulator::current_script` in `src/automation/simulator.rs:315`
+- `Simulator::elapsed_time` in `src/automation/simulator.rs:326`
+- `Action::parse_action` in `src/automation/step.rs:92`
+- `Action::as_str` in `src/automation/step.rs:114`
+- `Step::effective_scancode` in `src/automation/step.rs:273`
 
-### `cardgame` — 0/146 (0.0%)
+### `battle` — 5/43 (11.6%)
 
-**Uncovered public functions** (146):
+**Uncovered public functions** (38):
 
-- `BuildEntry::new` in `src/cardgame/builder.rs:32`
-- `DeckBuilder::new` in `src/cardgame/builder.rs:83`
-- `DeckBuilder::add` in `src/cardgame/builder.rs:102`
-- `DeckBuilder::add_with` in `src/cardgame/builder.rs:107`
-- `DeckBuilder::require_type` in `src/cardgame/builder.rs:121`
-- `DeckBuilder::ban_type` in `src/cardgame/builder.rs:126`
-- `DeckBuilder::remove_banned_type` in `src/cardgame/builder.rs:131`
-- `DeckBuilder::set_max_copies_for_type` in `src/cardgame/builder.rs:138`
-- `DeckBuilder::add_required_tag` in `src/cardgame/builder.rs:143`
-- `DeckBuilder::add_required_category` in `src/cardgame/builder.rs:148`
-- `DeckBuilder::validate_entries` in `src/cardgame/builder.rs:157`
-- `DeckBuilder::validate_stack` in `src/cardgame/builder.rs:273`
-- `DeckBuilder::build` in `src/cardgame/builder.rs:375`
-- `DeckBuilder::build_named` in `src/cardgame/builder.rs:380`
-- `CardTypeDef::new` in `src/cardgame/card.rs:48`
-- `define_card_type` in `src/cardgame/card.rs:72`
-- `get_card_type` in `src/cardgame/card.rs:78`
-- `get_card_type_names` in `src/cardgame/card.rs:83`
-- `clear_card_types` in `src/cardgame/card.rs:88`
-- `Card::new` in `src/cardgame/card.rs:147`
-- *...and 126 more*
+- `CombatAction::is_ready` in `src/battle/action.rs:71`
+- `CombatAction::use_action` in `src/battle/action.rs:76`
+- `CombatAction::tick_cooldown` in `src/battle/action.rs:81`
+- `Combatant::is_alive` in `src/battle/combatant.rs:87`
+- `Combatant::take_damage` in `src/battle/combatant.rs:99`
+- `Combatant::heal` in `src/battle/combatant.rs:116`
+- `Combatant::add_status` in `src/battle/combatant.rs:126`
+- `Combatant::remove_status` in `src/battle/combatant.rs:145`
+- `Combatant::has_status` in `src/battle/combatant.rs:156`
+- `Combatant::tick_statuses` in `src/battle/combatant.rs:164`
+- `Combatant::add_action` in `src/battle/combatant.rs:179`
+- `Combatant::get_action` in `src/battle/combatant.rs:190`
+- `Combatant::get_action_mut` in `src/battle/combatant.rs:201`
+- `Combatant::get_stat` in `src/battle/combatant.rs:212`
+- `Combatant::set_stat` in `src/battle/combatant.rs:221`
+- `Combatant::action_names` in `src/battle/combatant.rs:229`
+- `Combatant::status_names` in `src/battle/combatant.rs:240`
+- `Combatant::hp_percent` in `src/battle/combatant.rs:251`
+- `Combatant::mp_percent` in `src/battle/combatant.rs:262`
+- `CombatBattle::add_combatant` in `src/battle/lifecycle.rs:66`
+- *...and 18 more*
 
-### `combat` — 0/61 (0.0%)
-
-**Uncovered public functions** (61):
-
-- `Chassis::new` in `src/combat/chassis.rs:61`
-- `Chassis::add_slot` in `src/combat/chassis.rs:76`
-- `Chassis::get_slot` in `src/combat/chassis.rs:81`
-- `Chassis::get_slots` in `src/combat/chassis.rs:86`
-- `Chassis::take_damage` in `src/combat/chassis.rs:94`
-- `Chassis::heal` in `src/combat/chassis.rs:110`
-- `Chassis::is_dead` in `src/combat/chassis.rs:121`
-- `Chassis::get_armor` in `src/combat/chassis.rs:126`
-- `Chassis::set_armor` in `src/combat/chassis.rs:131`
-- `CollisionGroupSet::new` in `src/combat/collision_groups.rs:20`
-- `CollisionGroupSet::define_group` in `src/combat/collision_groups.rs:31`
-- `CollisionGroupSet::get_group_bit` in `src/combat/collision_groups.rs:47`
-- `CollisionGroupSet::set_collides` in `src/combat/collision_groups.rs:55`
-- `CollisionGroupSet::get_collides` in `src/combat/collision_groups.rs:84`
-- `CollisionGroupSet::compute_mask` in `src/combat/collision_groups.rs:102`
-- `CollisionGroupSet::group_count` in `src/combat/collision_groups.rs:124`
-- `CollisionGroupSet::group_names` in `src/combat/collision_groups.rs:129`
-- `CollisionGroupSet::reset` in `src/combat/collision_groups.rs:134`
-- `Projectile::reset` in `src/combat/projectile.rs:47`
-- `Projectile::update` in `src/combat/projectile.rs:64`
-- *...and 41 more*
-
-### `compute` — 0/80 (0.0%)
-
-**Uncovered public functions** (80):
-
-- `DataType::parse` in `src/compute/array.rs:30`
-- `DataType::byte_size` in `src/compute/array.rs:45`
-- `DataType::name` in `src/compute/array.rs:57`
-- `NdArray::new` in `src/compute/array.rs:87`
-- `NdArray::zeros` in `src/compute/array.rs:99`
-- `NdArray::ones` in `src/compute/array.rs:120`
-- `NdArray::range` in `src/compute/array.rs:139`
-- `NdArray::from_slice` in `src/compute/array.rs:168`
-- `NdArray::get_f64` in `src/compute/array.rs:191`
-- `NdArray::set_f64` in `src/compute/array.rs:214`
-- `NdArray::get_i32` in `src/compute/array.rs:239`
-- `NdArray::set_i32` in `src/compute/array.rs:250`
-- `NdArray::flat_index` in `src/compute/array.rs:266`
-- `NdArray::shape` in `src/compute/array.rs:291`
-- `NdArray::dtype` in `src/compute/array.rs:299`
-- `NdArray::size` in `src/compute/array.rs:307`
-- `NdArray::ndim` in `src/compute/array.rs:315`
-- `NdArray::strides` in `src/compute/array.rs:323`
-- `NdArray::data` in `src/compute/array.rs:331`
-- `NdArray::data_mut` in `src/compute/array.rs:339`
-- *...and 60 more*
-
-### `crafting` — 0/129 (0.0%)
+### `cardgame` — 17/146 (11.6%)
 
 **Uncovered public functions** (129):
 
-- `Ingredient::new` in `src/crafting/ingredient.rs:31`
-- `Ingredient::new_tag` in `src/crafting/ingredient.rs:48`
-- `Ingredient::is_tag` in `src/crafting/ingredient.rs:61`
-- `RecipeOutput::new` in `src/crafting/ingredient.rs:94`
-- `RecipeOutput::with_chance` in `src/crafting/ingredient.rs:113`
-- `RecipeKnowledge::new` in `src/crafting/knowledge.rs:22`
-- `RecipeKnowledge::discover` in `src/crafting/knowledge.rs:29`
-- `RecipeKnowledge::forget` in `src/crafting/knowledge.rs:40`
-- `RecipeKnowledge::is_known` in `src/crafting/knowledge.rs:51`
-- `RecipeKnowledge::get_known` in `src/crafting/knowledge.rs:59`
-- `RecipeKnowledge::count` in `src/crafting/knowledge.rs:67`
-- `RecipeKnowledge::set_auto_discover` in `src/crafting/knowledge.rs:73`
-- `RecipeKnowledge::is_auto_discover` in `src/crafting/knowledge.rs:79`
-- `RecipeKnowledge::get_source` in `src/crafting/knowledge.rs:88`
-- `RecipeKnowledge::clear` in `src/crafting/knowledge.rs:93`
-- `RecipeKnowledge::prototype` in `src/crafting/knowledge.rs:107`
-- `RecipeKnowledge::is_prototyped` in `src/crafting/knowledge.rs:122`
-- `RecipeKnowledge::set_research_cost` in `src/crafting/knowledge.rs:133`
-- `RecipeKnowledge::get_research_cost` in `src/crafting/knowledge.rs:144`
-- `RecipeKnowledge::research` in `src/crafting/knowledge.rs:156`
+- `DeckBuilder::add` in `src/cardgame/builder.rs:143`
+- `DeckBuilder::add_with` in `src/cardgame/builder.rs:154`
+- `DeckBuilder::require_type` in `src/cardgame/builder.rs:171`
+- `DeckBuilder::ban_type` in `src/cardgame/builder.rs:179`
+- `DeckBuilder::remove_banned_type` in `src/cardgame/builder.rs:190`
+- `DeckBuilder::set_max_copies_for_type` in `src/cardgame/builder.rs:201`
+- `DeckBuilder::add_required_tag` in `src/cardgame/builder.rs:210`
+- `DeckBuilder::add_required_category` in `src/cardgame/builder.rs:220`
+- `DeckBuilder::validate_entries` in `src/cardgame/builder.rs:232`
+- `DeckBuilder::validate_stack` in `src/cardgame/builder.rs:354`
+- `DeckBuilder::build` in `src/cardgame/builder.rs:459`
+- `DeckBuilder::build_named` in `src/cardgame/builder.rs:470`
+- `define_card_type` in `src/cardgame/card.rs:92`
+- `get_card_type` in `src/cardgame/card.rs:104`
+- `get_card_type_names` in `src/cardgame/card.rs:112`
+- `clear_card_types` in `src/cardgame/card.rs:117`
+- `Card::get_stat` in `src/cardgame/card.rs:240`
+- `Card::set_stat` in `src/cardgame/card.rs:249`
+- `Card::add_stat` in `src/cardgame/card.rs:261`
+- `Card::remove_stat` in `src/cardgame/card.rs:272`
 - *...and 109 more*
 
-### `data` — 0/21 (0.0%)
+### `combat` — 9/61 (14.8%)
 
-**Uncovered public functions** (21):
+**Uncovered public functions** (52):
 
-- `ByteData::new` in `src/data/byte_data.rs:21`
-- `ByteData::from_bytes` in `src/data/byte_data.rs:34`
-- `ByteData::from_string` in `src/data/byte_data.rs:45`
-- `ByteData::len` in `src/data/byte_data.rs:55`
-- `ByteData::is_empty` in `src/data/byte_data.rs:63`
-- `ByteData::get_byte` in `src/data/byte_data.rs:74`
-- `ByteData::set_byte` in `src/data/byte_data.rs:86`
-- `ByteData::get_string` in `src/data/byte_data.rs:99`
-- `ByteData::as_bytes` in `src/data/byte_data.rs:107`
-- `ByteData::as_bytes_mut` in `src/data/byte_data.rs:115`
-- `ByteData::clone_data` in `src/data/byte_data.rs:123`
-- `CompressFormat::parse_str` in `src/data/compress.rs:32`
-- `compress` in `src/data/compress.rs:55`
-- `decompress` in `src/data/compress.rs:99`
-- `EncodeFormat::parse_str` in `src/data/encode.rs:26`
-- `encode` in `src/data/encode.rs:46`
-- `decode` in `src/data/encode.rs:61`
-- `HashAlgorithm::parse_str` in `src/data/hash.rs:33`
-- `hash` in `src/data/hash.rs:55`
-- `parse_toml` in `src/data/toml_convert.rs:13`
-- *...and 1 more*
+- `Chassis::add_slot` in `src/combat/chassis.rs:111`
+- `Chassis::get_slot` in `src/combat/chassis.rs:122`
+- `Chassis::get_slots` in `src/combat/chassis.rs:130`
+- `Chassis::take_damage` in `src/combat/chassis.rs:144`
+- `Chassis::heal` in `src/combat/chassis.rs:166`
+- `Chassis::is_dead` in `src/combat/chassis.rs:180`
+- `Chassis::get_armor` in `src/combat/chassis.rs:191`
+- `Chassis::set_armor` in `src/combat/chassis.rs:200`
+- `CollisionGroupSet::define_group` in `src/combat/collision_groups.rs:44`
+- `CollisionGroupSet::get_group_bit` in `src/combat/collision_groups.rs:66`
+- `CollisionGroupSet::set_collides` in `src/combat/collision_groups.rs:82`
+- `CollisionGroupSet::get_collides` in `src/combat/collision_groups.rs:118`
+- `CollisionGroupSet::compute_mask` in `src/combat/collision_groups.rs:142`
+- `CollisionGroupSet::group_count` in `src/combat/collision_groups.rs:167`
+- `CollisionGroupSet::group_names` in `src/combat/collision_groups.rs:175`
+- `CollisionGroupSet::reset` in `src/combat/collision_groups.rs:180`
+- `Projectile::reset` in `src/combat/projectile.rs:63`
+- `ProjectilePool::spawn` in `src/combat/projectile.rs:182`
+- `ProjectilePool::release` in `src/combat/projectile.rs:210`
+- `ProjectilePool::active_count` in `src/combat/projectile.rs:221`
+- *...and 32 more*
 
-### `dataframe` — 0/65 (0.0%)
+### `compute` — 8/80 (10.0%)
 
-**Uncovered public functions** (65):
+**Uncovered public functions** (72):
 
-- `CellValue::is_nil` in `src/dataframe/frame.rs:30`
-- `CellValue::as_number` in `src/dataframe/frame.rs:38`
-- `CellValue::as_text` in `src/dataframe/frame.rs:49`
-- `CellValue::as_bool` in `src/dataframe/frame.rs:60`
-- `CellValue::cmp_for_sort` in `src/dataframe/frame.rs:75`
-- `DataFrame::new` in `src/dataframe/frame.rs:193`
-- `DataFrame::nrows` in `src/dataframe/frame.rs:204`
-- `DataFrame::ncols` in `src/dataframe/frame.rs:216`
-- `DataFrame::columns` in `src/dataframe/frame.rs:224`
-- `DataFrame::count` in `src/dataframe/frame.rs:232`
-- `DataFrame::resolve_col` in `src/dataframe/frame.rs:246`
-- `DataFrame::add_column` in `src/dataframe/frame.rs:274`
-- `DataFrame::remove_column` in `src/dataframe/frame.rs:291`
-- `DataFrame::rename_column` in `src/dataframe/frame.rs:306`
-- `DataFrame::get_column` in `src/dataframe/frame.rs:322`
-- `DataFrame::add_row` in `src/dataframe/frame.rs:335`
-- `DataFrame::remove_row` in `src/dataframe/frame.rs:358`
-- `DataFrame::get_row` in `src/dataframe/frame.rs:376`
-- `DataFrame::get_value` in `src/dataframe/frame.rs:397`
-- `DataFrame::set_value` in `src/dataframe/frame.rs:415`
-- *...and 45 more*
+- `DataType::parse` in `src/compute/array.rs:38`
+- `DataType::byte_size` in `src/compute/array.rs:53`
+- `DataType::name` in `src/compute/array.rs:65`
+- `NdArray::zeros` in `src/compute/array.rs:113`
+- `NdArray::ones` in `src/compute/array.rs:134`
+- `NdArray::range` in `src/compute/array.rs:153`
+- `NdArray::from_slice` in `src/compute/array.rs:182`
+- `NdArray::get_f64` in `src/compute/array.rs:205`
+- `NdArray::set_f64` in `src/compute/array.rs:228`
+- `NdArray::get_i32` in `src/compute/array.rs:253`
+- `NdArray::set_i32` in `src/compute/array.rs:264`
+- `NdArray::flat_index` in `src/compute/array.rs:280`
+- `NdArray::dtype` in `src/compute/array.rs:313`
+- `NdArray::ndim` in `src/compute/array.rs:329`
+- `NdArray::strides` in `src/compute/array.rs:337`
+- `NdArray::data` in `src/compute/array.rs:345`
+- `NdArray::data_mut` in `src/compute/array.rs:353`
+- `NdArray::set_shape` in `src/compute/array.rs:361`
+- `NdArray::compute_strides` in `src/compute/array.rs:375`
+- `add` in `src/compute/ops.rs:102`
+- *...and 52 more*
 
-### `dialog` — 0/18 (0.0%)
+### `crafting` — 22/129 (17.1%)
 
-**Uncovered public functions** (18):
+**Uncovered public functions** (107):
 
-- `SequencerState::as_str` in `src/dialog/mod.rs:51`
-- `Sequencer::new` in `src/dialog/mod.rs:82`
-- `Sequencer::load` in `src/dialog/mod.rs:94`
-- `Sequencer::start` in `src/dialog/mod.rs:105`
-- `Sequencer::state` in `src/dialog/mod.rs:115`
-- `Sequencer::is_active` in `src/dialog/mod.rs:120`
-- `Sequencer::is_waiting_for_choice` in `src/dialog/mod.rs:125`
-- `Sequencer::current_speaker` in `src/dialog/mod.rs:130`
-- `Sequencer::current_text` in `src/dialog/mod.rs:139`
-- `Sequencer::revealed_text` in `src/dialog/mod.rs:148`
-- `Sequencer::choice_text` in `src/dialog/mod.rs:163`
-- `Sequencer::choice_labels` in `src/dialog/mod.rs:172`
-- `Sequencer::set_speed` in `src/dialog/mod.rs:181`
-- `Sequencer::get_speed` in `src/dialog/mod.rs:186`
-- `Sequencer::update` in `src/dialog/mod.rs:193`
-- `Sequencer::advance` in `src/dialog/mod.rs:227`
-- `Sequencer::skip` in `src/dialog/mod.rs:240`
-- `Sequencer::choose` in `src/dialog/mod.rs:250`
+- `Ingredient::new_tag` in `src/crafting/ingredient.rs:56`
+- `Ingredient::is_tag` in `src/crafting/ingredient.rs:69`
+- `RecipeOutput::with_chance` in `src/crafting/ingredient.rs:121`
+- `RecipeKnowledge::discover` in `src/crafting/knowledge.rs:43`
+- `RecipeKnowledge::forget` in `src/crafting/knowledge.rs:54`
+- `RecipeKnowledge::is_known` in `src/crafting/knowledge.rs:65`
+- `RecipeKnowledge::get_known` in `src/crafting/knowledge.rs:73`
+- `RecipeKnowledge::set_auto_discover` in `src/crafting/knowledge.rs:87`
+- `RecipeKnowledge::is_auto_discover` in `src/crafting/knowledge.rs:93`
+- `RecipeKnowledge::get_source` in `src/crafting/knowledge.rs:102`
+- `RecipeKnowledge::clear` in `src/crafting/knowledge.rs:107`
+- `RecipeKnowledge::prototype` in `src/crafting/knowledge.rs:121`
+- `RecipeKnowledge::is_prototyped` in `src/crafting/knowledge.rs:136`
+- `RecipeKnowledge::set_research_cost` in `src/crafting/knowledge.rs:147`
+- `RecipeKnowledge::get_research_cost` in `src/crafting/knowledge.rs:158`
+- `RecipeKnowledge::research` in `src/crafting/knowledge.rs:170`
+- `RecipeGroup::add_recipe` in `src/crafting/knowledge.rs:213`
+- `RecipeGroup::remove_recipe` in `src/crafting/knowledge.rs:225`
+- `RecipeGroup::get_recipes` in `src/crafting/knowledge.rs:235`
+- `RecipeGroup::contains` in `src/crafting/knowledge.rs:250`
+- *...and 87 more*
 
-### `engine` — 0/17 (0.0%)
+### `data` — 4/35 (11.4%)
 
-**Uncovered public functions** (17):
+**Uncovered public functions** (31):
 
-- `App::new` in `src/engine/app.rs:1542`
-- `App::run` in `src/engine/app.rs:1551`
-- `Config::load_from_conf_lua` in `src/engine/config.rs:170`
-- `DebugOverlay::new` in `src/engine/debug_overlay.rs:25`
-- `DebugOverlay::draw_commands` in `src/engine/debug_overlay.rs:40`
+- `ByteData::from_bytes` in `src/data/byte_data.rs:45`
+- `ByteData::from_string` in `src/data/byte_data.rs:56`
+- `ByteData::get_byte` in `src/data/byte_data.rs:85`
+- `ByteData::set_byte` in `src/data/byte_data.rs:97`
+- `ByteData::get_string` in `src/data/byte_data.rs:110`
+- `ByteData::as_bytes` in `src/data/byte_data.rs:118`
+- `ByteData::as_bytes_mut` in `src/data/byte_data.rs:126`
+- `ByteData::clone_data` in `src/data/byte_data.rs:134`
+- `CompressFormat::parse_str` in `src/data/compress.rs:40`
+- `compress` in `src/data/compress.rs:63`
+- `decompress` in `src/data/compress.rs:107`
+- `DataView::new_slice` in `src/data/dataview.rs:55`
+- `DataView::get_size` in `src/data/dataview.rs:71`
+- `DataView::get_u8` in `src/data/dataview.rs:82`
+- `DataView::get_i8` in `src/data/dataview.rs:94`
+- `DataView::get_u16` in `src/data/dataview.rs:106`
+- `DataView::get_i16` in `src/data/dataview.rs:119`
+- `DataView::get_u32` in `src/data/dataview.rs:132`
+- `DataView::get_i32` in `src/data/dataview.rs:150`
+- `DataView::get_f32` in `src/data/dataview.rs:168`
+- *...and 11 more*
+
+### `dataframe` — 3/65 (4.6%)
+
+**Uncovered public functions** (62):
+
+- `CellValue::is_nil` in `src/dataframe/frame.rs:38`
+- `CellValue::as_number` in `src/dataframe/frame.rs:46`
+- `CellValue::as_text` in `src/dataframe/frame.rs:57`
+- `CellValue::as_bool` in `src/dataframe/frame.rs:68`
+- `CellValue::cmp_for_sort` in `src/dataframe/frame.rs:83`
+- `DataFrame::nrows` in `src/dataframe/frame.rs:215`
+- `DataFrame::ncols` in `src/dataframe/frame.rs:227`
+- `DataFrame::columns` in `src/dataframe/frame.rs:235`
+- `DataFrame::resolve_col` in `src/dataframe/frame.rs:257`
+- `DataFrame::add_column` in `src/dataframe/frame.rs:285`
+- `DataFrame::remove_column` in `src/dataframe/frame.rs:302`
+- `DataFrame::rename_column` in `src/dataframe/frame.rs:317`
+- `DataFrame::get_column` in `src/dataframe/frame.rs:333`
+- `DataFrame::add_row` in `src/dataframe/frame.rs:346`
+- `DataFrame::remove_row` in `src/dataframe/frame.rs:369`
+- `DataFrame::get_row` in `src/dataframe/frame.rs:387`
+- `DataFrame::get_value` in `src/dataframe/frame.rs:408`
+- `DataFrame::set_value` in `src/dataframe/frame.rs:426`
+- `DataFrame::clone_df` in `src/dataframe/frame.rs:440`
+- `DataFrame::from_raw` in `src/dataframe/frame.rs:458`
+- *...and 42 more*
+
+### `dialog` — 2/18 (11.1%)
+
+**Uncovered public functions** (16):
+
+- `SequencerState::as_str` in `src/dialog/mod.rs:80`
+- `Sequencer::load` in `src/dialog/mod.rs:137`
+- `Sequencer::start` in `src/dialog/mod.rs:151`
+- `Sequencer::state` in `src/dialog/mod.rs:164`
+- `Sequencer::is_active` in `src/dialog/mod.rs:172`
+- `Sequencer::is_waiting_for_choice` in `src/dialog/mod.rs:180`
+- `Sequencer::current_speaker` in `src/dialog/mod.rs:188`
+- `Sequencer::current_text` in `src/dialog/mod.rs:200`
+- `Sequencer::revealed_text` in `src/dialog/mod.rs:212`
+- `Sequencer::choice_text` in `src/dialog/mod.rs:230`
+- `Sequencer::choice_labels` in `src/dialog/mod.rs:242`
+- `Sequencer::set_speed` in `src/dialog/mod.rs:254`
+- `Sequencer::get_speed` in `src/dialog/mod.rs:262`
+- `Sequencer::advance` in `src/dialog/mod.rs:312`
+- `Sequencer::skip` in `src/dialog/mod.rs:325`
+- `Sequencer::choose` in `src/dialog/mod.rs:341`
+
+### `economy` — 10/96 (10.4%)
+
+**Uncovered public functions** (86):
+
+- `ResourceManager::new_resource` in `src/economy/manager.rs:47`
+- `ResourceManager::get_resource` in `src/economy/manager.rs:60`
+- `ResourceManager::get_resource_mut` in `src/economy/manager.rs:71`
+- `ResourceManager::has_resource` in `src/economy/manager.rs:82`
+- `ResourceManager::resource_names` in `src/economy/manager.rs:90`
+- `ResourceManager::remove_resource` in `src/economy/manager.rs:98`
+- `ResourceManager::tick` in `src/economy/manager.rs:106`
+- `ResourceManager::add_conversion_rule` in `src/economy/manager.rs:127`
+- `ResourceManager::conversion_rules` in `src/economy/manager.rs:135`
+- `ResourceManager::convert` in `src/economy/manager.rs:149`
+- `ResourceManager::exchange` in `src/economy/manager.rs:211`
+- `ResourceManager::total_by_group` in `src/economy/manager.rs:257`
+- `ResourceManager::percent` in `src/economy/manager.rs:273`
+- `ResourceManager::is_full` in `src/economy/manager.rs:291`
+- `ResourceManager::can_afford_all` in `src/economy/manager.rs:319`
+- `ResourceManager::spend_all` in `src/economy/manager.rs:336`
+- `ResourceManager::reset` in `src/economy/manager.rs:355`
+- `ModifierType::as_str` in `src/economy/modifier.rs:36`
+- `ModifierType::from_str` in `src/economy/modifier.rs:52`
+- `Modifier::mod_type` in `src/economy/modifier.rs:106`
+- *...and 66 more*
+
+### `engine` — 5/18 (27.8%)
+
+**Uncovered public functions** (13):
+
+- `App::run` in `src/engine/app.rs:1835`
+- `Config::load_from_conf_lua` in `src/engine/config.rs:229`
 - `ErrorCategory::as_str` in `src/engine/error.rs:50`
 - `EngineError::code` in `src/engine/error.rs:123`
 - `EngineError::category` in `src/engine/error.rs:144`
 - `EngineError::recovery_hint` in `src/engine/error.rs:163`
-- `ErrorScreen::from_error` in `src/engine/error_screen.rs:51`
-- `ErrorScreen::from_lua_error` in `src/engine/error_screen.rs:77`
-- `ErrorScreen::from_engine_error` in `src/engine/error_screen.rs:110`
-- `ErrorScreen::draw_commands` in `src/engine/error_screen.rs:127`
-- `wrap_text` in `src/engine/error_screen.rs:263`
-- `format_traceback` in `src/engine/error_screen.rs:313`
+- `ErrorScreen::from_error` in `src/engine/error_screen.rs:56`
+- `ErrorScreen::from_lua_error` in `src/engine/error_screen.rs:82`
+- `ErrorScreen::from_engine_error` in `src/engine/error_screen.rs:115`
+- `wrap_text` in `src/engine/error_screen.rs:268`
+- `format_traceback` in `src/engine/error_screen.rs:318`
 - `set_log_level` in `src/engine/log_messages.rs:21`
 - `get_log_level` in `src/engine/log_messages.rs:42`
 
-### `entity` — 0/60 (0.0%)
+### `entity` — 4/60 (6.7%)
 
-**Uncovered public functions** (60):
+**Uncovered public functions** (56):
 
-- `RelationType::new` in `src/entity/relationships.rs:26`
-- `RelationType::has_level` in `src/entity/relationships.rs:39`
-- `RelationshipManager::new` in `src/entity/relationships.rs:91`
-- `RelationshipManager::define_type` in `src/entity/relationships.rs:100`
-- `RelationshipManager::remove_type` in `src/entity/relationships.rs:109`
-- `RelationshipManager::get_type` in `src/entity/relationships.rs:121`
-- `RelationshipManager::type_names` in `src/entity/relationships.rs:126`
-- `RelationshipManager::get_value` in `src/entity/relationships.rs:141`
-- `RelationshipManager::set_value` in `src/entity/relationships.rs:149`
-- `RelationshipManager::adjust_value` in `src/entity/relationships.rs:154`
-- `RelationshipManager::set_level` in `src/entity/relationships.rs:164`
-- `RelationshipManager::get_level` in `src/entity/relationships.rs:181`
-- `RelationshipManager::has_relation` in `src/entity/relationships.rs:195`
-- `RelationshipManager::remove_relation` in `src/entity/relationships.rs:200`
-- `RelationshipManager::all_relations_for` in `src/entity/relationships.rs:205`
-- `RelationshipManager::all_relations` in `src/entity/relationships.rs:213`
-- `RelationshipManager::relation_count` in `src/entity/relationships.rs:218`
-- `Universe::new` in `src/entity/universe.rs:31`
-- `Universe::get_system_store` in `src/entity/universe.rs:83`
-- `Universe::spawn` in `src/entity/universe.rs:97`
-- *...and 40 more*
+- `RelationType::has_level` in `src/entity/relationships.rs:66`
+- `RelationshipManager::define_type` in `src/entity/relationships.rs:146`
+- `RelationshipManager::remove_type` in `src/entity/relationships.rs:161`
+- `RelationshipManager::get_type` in `src/entity/relationships.rs:179`
+- `RelationshipManager::type_names` in `src/entity/relationships.rs:187`
+- `RelationshipManager::get_value` in `src/entity/relationships.rs:209`
+- `RelationshipManager::set_value` in `src/entity/relationships.rs:222`
+- `RelationshipManager::adjust_value` in `src/entity/relationships.rs:232`
+- `RelationshipManager::set_level` in `src/entity/relationships.rs:251`
+- `RelationshipManager::get_level` in `src/entity/relationships.rs:276`
+- `RelationshipManager::has_relation` in `src/entity/relationships.rs:297`
+- `RelationshipManager::remove_relation` in `src/entity/relationships.rs:309`
+- `RelationshipManager::all_relations_for` in `src/entity/relationships.rs:320`
+- `RelationshipManager::all_relations` in `src/entity/relationships.rs:331`
+- `RelationshipManager::relation_count` in `src/entity/relationships.rs:339`
+- `Universe::get_system_store` in `src/entity/universe.rs:103`
+- `Universe::spawn` in `src/entity/universe.rs:117`
+- `Universe::kill` in `src/entity/universe.rs:137`
+- `Universe::is_alive` in `src/entity/universe.rs:162`
+- `Universe::get_entity_count` in `src/entity/universe.rs:170`
+- *...and 36 more*
 
-### `event` — 0/15 (0.0%)
-
-**Uncovered public functions** (15):
-
-- `EventQueue::new` in `src/event/mod.rs:56`
-- `EventQueue::push` in `src/event/mod.rs:66`
-- `EventQueue::push_event` in `src/event/mod.rs:75`
-- `EventQueue::poll` in `src/event/mod.rs:86`
-- `EventQueue::clear` in `src/event/mod.rs:91`
-- `EventQueue::is_empty` in `src/event/mod.rs:99`
-- `EventQueue::len` in `src/event/mod.rs:107`
-- `Signal::new` in `src/event/signal.rs:37`
-- `Signal::subscribe` in `src/event/signal.rs:48`
-- `Signal::remove` in `src/event/signal.rs:62`
-- `Signal::clear` in `src/event/signal.rs:79`
-- `Signal::clear_all` in `src/event/signal.rs:94`
-- `Signal::get_handles` in `src/event/signal.rs:104`
-- `Signal::get_count` in `src/event/signal.rs:109`
-- `Signal::get_total_count` in `src/event/signal.rs:114`
-
-### `filesystem` — 0/40 (0.0%)
-
-**Uncovered public functions** (40):
-
-- `AsyncLoader::new` in `src/filesystem/async_loader.rs:68`
-- `AsyncLoader::request_load` in `src/filesystem/async_loader.rs:101`
-- `AsyncLoader::poll` in `src/filesystem/async_loader.rs:133`
-- `AsyncLoader::pending_results` in `src/filesystem/async_loader.rs:146`
-- `FileMode::parse_mode` in `src/filesystem/file_handle.rs:35`
-- `FileMode::as_str` in `src/filesystem/file_handle.rs:51`
-- `FileHandle::open` in `src/filesystem/file_handle.rs:90`
-- `FileHandle::read` in `src/filesystem/file_handle.rs:172`
-- `FileHandle::read_line` in `src/filesystem/file_handle.rs:200`
-- `FileHandle::write` in `src/filesystem/file_handle.rs:230`
-- `FileHandle::seek` in `src/filesystem/file_handle.rs:248`
-- `FileHandle::tell` in `src/filesystem/file_handle.rs:266`
-- `FileHandle::get_size` in `src/filesystem/file_handle.rs:284`
-- `FileHandle::get_mode` in `src/filesystem/file_handle.rs:292`
-- `FileHandle::get_path` in `src/filesystem/file_handle.rs:300`
-- `FileHandle::flush` in `src/filesystem/file_handle.rs:308`
-- `FileHandle::close` in `src/filesystem/file_handle.rs:321`
-- `FileHandle::is_eof` in `src/filesystem/file_handle.rs:336`
-- `GameFS::new` in `src/filesystem/vfs.rs:56`
-- `GameFS::base_dir` in `src/filesystem/vfs.rs:67`
-- *...and 20 more*
-
-### `graph` — 0/83 (0.0%)
-
-**Uncovered public functions** (83):
-
-- `Graph::get_components` in `src/graph/algorithms.rs:13`
-- `Graph::has_cycle` in `src/graph/algorithms.rs:58`
-- `Graph::topological_sort` in `src/graph/algorithms.rs:115`
-- `Graph::new` in `src/graph/core.rs:78`
-- `Graph::add_node` in `src/graph/core.rs:99`
-- `Graph::remove_node` in `src/graph/core.rs:114`
-- `Graph::has_node` in `src/graph/core.rs:144`
-- `Graph::get_node_ids` in `src/graph/core.rs:152`
-- `Graph::get_node_count` in `src/graph/core.rs:160`
-- `Graph::add_edge` in `src/graph/core.rs:175`
-- `Graph::remove_edge` in `src/graph/core.rs:196`
-- `Graph::has_edge` in `src/graph/core.rs:216`
-- `Graph::get_edge_ids` in `src/graph/core.rs:224`
-- `Graph::get_edge_count` in `src/graph/core.rs:232`
-- `Graph::get_edge_between` in `src/graph/core.rs:244`
-- `Graph::create_item` in `src/graph/core.rs:261`
-- `Graph::add_item_to_node` in `src/graph/core.rs:278`
-- `Graph::remove_item` in `src/graph/core.rs:325`
-- `Graph::has_item` in `src/graph/core.rs:348`
-- `Graph::get_item_ids` in `src/graph/core.rs:356`
-- *...and 63 more*
-
-### `graphics` — 0/347 (0.0%)
-
-**Uncovered public functions** (347):
-
-- `Animation::new` in `src/graphics/animation.rs:114`
-- `Animation::add_frame` in `src/graphics/animation.rs:136`
-- `Animation::add_frames_from_grid` in `src/graphics/animation.rs:159`
-- `Animation::add_clip` in `src/graphics/animation.rs:204`
-- `Animation::add_clip_from_grid` in `src/graphics/animation.rs:228`
-- `Animation::play` in `src/graphics/animation.rs:258`
-- `Animation::stop` in `src/graphics/animation.rs:271`
-- `Animation::pause` in `src/graphics/animation.rs:278`
-- `Animation::resume` in `src/graphics/animation.rs:283`
-- `Animation::update` in `src/graphics/animation.rs:298`
-- `Animation::current_quad` in `src/graphics/animation.rs:372`
-- `Animation::current_frame` in `src/graphics/animation.rs:383`
-- `Animation::get_current_clip` in `src/graphics/animation.rs:391`
-- `Animation::is_playing` in `src/graphics/animation.rs:399`
-- `Animation::is_looping` in `src/graphics/animation.rs:407`
-- `Animation::get_speed` in `src/graphics/animation.rs:418`
-- `Animation::set_speed` in `src/graphics/animation.rs:428`
-- `Animation::get_frame_count` in `src/graphics/animation.rs:436`
-- `Animation::get_clip_count` in `src/graphics/animation.rs:444`
-- `Animation::drain_events` in `src/graphics/animation.rs:452`
-- *...and 327 more*
-
-### `image` — 0/13 (0.0%)
+### `event` — 4/17 (23.5%)
 
 **Uncovered public functions** (13):
 
-- `ImageData::new` in `src/image/image_data.rs:25`
-- `ImageData::from_file` in `src/image/image_data.rs:40`
-- `ImageData::from_bytes` in `src/image/image_data.rs:61`
-- `ImageData::width` in `src/image/image_data.rs:83`
-- `ImageData::height` in `src/image/image_data.rs:91`
-- `ImageData::dimensions` in `src/image/image_data.rs:99`
-- `ImageData::get_pixel` in `src/image/image_data.rs:111`
-- `ImageData::set_pixel` in `src/image/image_data.rs:136`
-- `ImageData::paste` in `src/image/image_data.rs:154`
-- `ImageData::map_pixel` in `src/image/image_data.rs:177`
-- `ImageData::encode_png` in `src/image/image_data.rs:201`
-- `ImageData::as_bytes` in `src/image/image_data.rs:218`
-- `ImageData::get_string` in `src/image/image_data.rs:226`
+- `EventQueue::push` in `src/event/mod.rs:69`
+- `EventQueue::push_event` in `src/event/mod.rs:78`
+- `EventQueue::poll` in `src/event/mod.rs:89`
+- `EventQueue::clear` in `src/event/mod.rs:94`
+- `EventQueue::pump` in `src/event/mod.rs:121`
+- `EventQueue::wait` in `src/event/mod.rs:135`
+- `Signal::subscribe` in `src/event/signal.rs:66`
+- `Signal::remove` in `src/event/signal.rs:86`
+- `Signal::clear` in `src/event/signal.rs:109`
+- `Signal::clear_all` in `src/event/signal.rs:127`
+- `Signal::get_handles` in `src/event/signal.rs:143`
+- `Signal::get_count` in `src/event/signal.rs:154`
+- `Signal::get_total_count` in `src/event/signal.rs:162`
 
-### `input` — 0/62 (0.0%)
+### `filesystem` — 7/49 (14.3%)
 
-**Uncovered public functions** (62):
+**Uncovered public functions** (42):
 
-- `GamepadState::new` in `src/input/gamepad.rs:31`
-- `GamepadState::update_button` in `src/input/gamepad.rs:47`
-- `GamepadState::update_axis` in `src/input/gamepad.rs:56`
-- `GamepadState::is_button_pressed` in `src/input/gamepad.rs:67`
-- `GamepadState::get_axis_value` in `src/input/gamepad.rs:78`
-- `GamepadState::get_name` in `src/input/gamepad.rs:86`
-- `GamepadState::is_connected` in `src/input/gamepad.rs:94`
-- `GamepadState::get_button_count` in `src/input/gamepad.rs:102`
-- `GamepadState::get_axis_count` in `src/input/gamepad.rs:110`
-- `GamepadState::set_guid` in `src/input/gamepad.rs:118`
-- `GamepadState::get_guid` in `src/input/gamepad.rs:126`
-- `GamepadState::get_hat` in `src/input/gamepad.rs:137`
-- `gilrs_button_to_string` in `src/input/gamepad.rs:168`
-- `gilrs_axis_to_string` in `src/input/gamepad.rs:196`
-- `KeyboardState::new` in `src/input/keyboard.rs:35`
-- `KeyboardState::begin_frame` in `src/input/keyboard.rs:52`
-- `KeyboardState::press_scancode` in `src/input/keyboard.rs:64`
-- `KeyboardState::release_scancode` in `src/input/keyboard.rs:74`
-- `KeyboardState::is_scancode_down` in `src/input/keyboard.rs:87`
-- `KeyboardState::set_key_repeat` in `src/input/keyboard.rs:95`
-- *...and 42 more*
+- `AsyncLoader::request_load` in `src/filesystem/async_loader.rs:107`
+- `AsyncLoader::poll` in `src/filesystem/async_loader.rs:139`
+- `AsyncLoader::pending_results` in `src/filesystem/async_loader.rs:152`
+- `FileData::as_str` in `src/filesystem/file_data.rs:48`
+- `FileMode::parse_mode` in `src/filesystem/file_handle.rs:43`
+- `FileMode::as_str` in `src/filesystem/file_handle.rs:59`
+- `FileHandle::open` in `src/filesystem/file_handle.rs:106`
+- `FileHandle::read_line` in `src/filesystem/file_handle.rs:216`
+- `FileHandle::write` in `src/filesystem/file_handle.rs:246`
+- `FileHandle::seek` in `src/filesystem/file_handle.rs:264`
+- `FileHandle::tell` in `src/filesystem/file_handle.rs:282`
+- `FileHandle::get_size` in `src/filesystem/file_handle.rs:300`
+- `FileHandle::get_mode` in `src/filesystem/file_handle.rs:308`
+- `FileHandle::get_path` in `src/filesystem/file_handle.rs:316`
+- `FileHandle::flush` in `src/filesystem/file_handle.rs:324`
+- `FileHandle::close` in `src/filesystem/file_handle.rs:337`
+- `FileHandle::is_eof` in `src/filesystem/file_handle.rs:352`
+- `GameFS::base_dir` in `src/filesystem/vfs.rs:97`
+- `GameFS::read_string` in `src/filesystem/vfs.rs:111`
+- `GameFS::read_bytes` in `src/filesystem/vfs.rs:139`
+- *...and 22 more*
 
-### `inventory` — 0/63 (0.0%)
+### `graph` — 5/83 (6.0%)
 
-**Uncovered public functions** (63):
+**Uncovered public functions** (78):
 
-- `ContainerMode::from_str` in `src/inventory/container.rs:24`
-- `ContainerMode::as_str` in `src/inventory/container.rs:34`
-- `Container::new` in `src/inventory/container.rs:60`
-- `Container::slot_count` in `src/inventory/container.rs:74`
-- `Container::get_slot` in `src/inventory/container.rs:79`
-- `Container::get_slot_mut` in `src/inventory/container.rs:84`
-- `Container::add_slot` in `src/inventory/container.rs:89`
-- `Container::remove_slot` in `src/inventory/container.rs:101`
-- `Container::expand` in `src/inventory/container.rs:108`
-- `Container::current_weight` in `src/inventory/container.rs:123`
-- `Container::add_item` in `src/inventory/container.rs:133`
-- `Container::count_item` in `src/inventory/container.rs:168`
-- `Container::has_item` in `src/inventory/container.rs:177`
-- `Container::remove_item` in `src/inventory/container.rs:182`
-- `Container::to_item_list` in `src/inventory/container.rs:203`
-- `Inventory::new` in `src/inventory/inventory.rs:46`
-- `Inventory::add_container` in `src/inventory/inventory.rs:58`
-- `Inventory::get_container` in `src/inventory/inventory.rs:67`
-- `Inventory::get_container_mut` in `src/inventory/inventory.rs:72`
-- `Inventory::remove_container` in `src/inventory/inventory.rs:77`
-- *...and 43 more*
+- `Graph::get_components` in `src/graph/algorithms.rs:20`
+- `Graph::has_cycle` in `src/graph/algorithms.rs:65`
+- `Graph::topological_sort` in `src/graph/algorithms.rs:122`
+- `Graph::add_node` in `src/graph/core.rs:107`
+- `Graph::remove_node` in `src/graph/core.rs:122`
+- `Graph::has_node` in `src/graph/core.rs:152`
+- `Graph::get_node_ids` in `src/graph/core.rs:160`
+- `Graph::get_node_count` in `src/graph/core.rs:168`
+- `Graph::add_edge` in `src/graph/core.rs:183`
+- `Graph::remove_edge` in `src/graph/core.rs:204`
+- `Graph::has_edge` in `src/graph/core.rs:224`
+- `Graph::get_edge_ids` in `src/graph/core.rs:232`
+- `Graph::get_edge_count` in `src/graph/core.rs:240`
+- `Graph::get_edge_between` in `src/graph/core.rs:252`
+- `Graph::create_item` in `src/graph/core.rs:269`
+- `Graph::add_item_to_node` in `src/graph/core.rs:286`
+- `Graph::remove_item` in `src/graph/core.rs:333`
+- `Graph::has_item` in `src/graph/core.rs:356`
+- `Graph::get_item_ids` in `src/graph/core.rs:364`
+- `Graph::get_item_count` in `src/graph/core.rs:372`
+- *...and 58 more*
 
-### `item` — 0/124 (0.0%)
+### `graphics` — 32/273 (11.7%)
 
-**Uncovered public functions** (124):
+**Uncovered public functions** (241):
 
-- `BuildEntry::new` in `src/item/builder.rs:32`
-- `StackBuilder::new` in `src/item/builder.rs:79`
-- `StackBuilder::add` in `src/item/builder.rs:96`
-- `StackBuilder::add_with` in `src/item/builder.rs:101`
-- `StackBuilder::require_type` in `src/item/builder.rs:115`
-- `StackBuilder::ban_type` in `src/item/builder.rs:120`
-- `StackBuilder::validate_entries` in `src/item/builder.rs:129`
-- `StackBuilder::validate_stack` in `src/item/builder.rs:212`
-- `StackBuilder::build` in `src/item/builder.rs:292`
-- `StackBuilder::build_named` in `src/item/builder.rs:297`
-- `ItemGroup::items_from` in `src/item/group.rs:32`
-- `group_by_stat` in `src/item/group.rs:44`
-- `group_by_category` in `src/item/group.rs:55`
-- `group_by_tag_prefix` in `src/item/group.rs:69`
-- `find_n_of_stat` in `src/item/group.rs:92`
-- `find_at_least_n_of_stat` in `src/item/group.rs:105`
-- `find_sequences` in `src/item/group.rs:121`
-- `find_tag_groups` in `src/item/group.rs:161`
-- `sorted_indices_by_stat` in `src/item/group.rs:180`
-- `sorted_indices_by_category` in `src/item/group.rs:197`
-- *...and 104 more*
+- `Animation::add_frame` in `src/graphics/animation.rs:147`
+- `Animation::add_frames_from_grid` in `src/graphics/animation.rs:170`
+- `Animation::add_clip` in `src/graphics/animation.rs:215`
+- `Animation::add_clip_from_grid` in `src/graphics/animation.rs:239`
+- `Animation::play` in `src/graphics/animation.rs:269`
+- `Animation::pause` in `src/graphics/animation.rs:289`
+- `Animation::resume` in `src/graphics/animation.rs:294`
+- `Animation::current_quad` in `src/graphics/animation.rs:383`
+- `Animation::current_frame` in `src/graphics/animation.rs:394`
+- `Animation::get_current_clip` in `src/graphics/animation.rs:402`
+- `Animation::is_playing` in `src/graphics/animation.rs:410`
+- `Animation::is_looping` in `src/graphics/animation.rs:418`
+- `Animation::get_speed` in `src/graphics/animation.rs:429`
+- `Animation::set_speed` in `src/graphics/animation.rs:439`
+- `Animation::get_frame_count` in `src/graphics/animation.rs:447`
+- `Animation::get_clip_count` in `src/graphics/animation.rs:455`
+- `Animation::drain_events` in `src/graphics/animation.rs:463`
+- `Animation::set_frame` in `src/graphics/animation.rs:474`
+- `Camera::view_matrix` in `src/graphics/camera.rs:55`
+- `Camera::set_position` in `src/graphics/camera.rs:66`
+- *...and 221 more*
 
-### `lua_api` — 0/89 (0.0%)
+### `gui` — 38/121 (31.4%)
 
-**Uncovered public functions** (89):
+**Uncovered public functions** (83):
 
-- `register` in `src/lua_api/ai_api.rs:2128`
-- `register` in `src/lua_api/audio_api.rs:872`
-- `register` in `src/lua_api/battle_api.rs:302`
-- `register` in `src/lua_api/cardgame_api.rs:1514`
-- `register` in `src/lua_api/combat_api.rs:523`
-- `register` in `src/lua_api/compute_api.rs:549`
-- `register` in `src/lua_api/crafting_api.rs:1735`
-- `register` in `src/lua_api/data_api.rs:15`
-- `register` in `src/lua_api/dataframe_api.rs:806`
-- `register` in `src/lua_api/debug_api.rs:194`
-- `register` in `src/lua_api/debugbridge_api.rs:353`
-- `register` in `src/lua_api/dialog_api.rs:382`
-- `register` in `src/lua_api/docs_api.rs:897`
-- `register` in `src/lua_api/entity_api.rs:543`
-- `register` in `src/lua_api/event_api.rs:138`
-- `register` in `src/lua_api/filesystem_api.rs:134`
-- `register` in `src/lua_api/graph_api.rs:1962`
-- `register_ext` in `src/lua_api/graphics_api/ext.rs:20`
-- `texture_key_from_value` in `src/lua_api/graphics_api/helpers.rs:473`
-- `font_key_from_value` in `src/lua_api/graphics_api/helpers.rs:486`
-- *...and 69 more*
+- `LayoutDirection::parse_str` in `src/gui/containers.rs:82`
+- `LayoutDirection::as_str` in `src/gui/containers.rs:95`
+- `Layout::perform_layout` in `src/gui/containers.rs:172`
+- `ScrollPanel::max_scroll` in `src/gui/containers.rs:272`
+- `ScrollPanel::clamp_scroll` in `src/gui/containers.rs:279`
+- `NinePatch::get_slices` in `src/gui/containers.rs:355`
+- `WidgetKind::base` in `src/gui/context.rs:138`
+- `WidgetKind::base_mut` in `src/gui/context.rs:179`
+- `WidgetKind::children` in `src/gui/context.rs:220`
+- `WidgetKind::children_mut` in `src/gui/context.rs:235`
+- `GuiContext::widget_count` in `src/gui/context.rs:292`
+- `GuiContext::add_button` in `src/gui/context.rs:305`
+- `GuiContext::add_label` in `src/gui/context.rs:318`
+- `GuiContext::add_text_input` in `src/gui/context.rs:328`
+- `GuiContext::add_checkbox` in `src/gui/context.rs:341`
+- `GuiContext::add_slider` in `src/gui/context.rs:355`
+- `GuiContext::add_progress_bar` in `src/gui/context.rs:369`
+- `GuiContext::add_combo_box` in `src/gui/context.rs:380`
+- `GuiContext::add_list_box` in `src/gui/context.rs:390`
+- `GuiContext::add_panel` in `src/gui/context.rs:400`
+- *...and 63 more*
 
-### `math` — 0/175 (0.0%)
+### `image` — 1/18 (5.6%)
 
-**Uncovered public functions** (175):
+**Uncovered public functions** (17):
 
-- `BezierCurve::new` in `src/math/bezier.rs:27`
-- `BezierCurve::evaluate` in `src/math/bezier.rs:44`
-- `BezierCurve::render` in `src/math/bezier.rs:62`
-- `BezierCurve::render_segment` in `src/math/bezier.rs:81`
-- `BezierCurve::get_derivative` in `src/math/bezier.rs:95`
-- `BezierCurve::get_control_point` in `src/math/bezier.rs:126`
-- `BezierCurve::set_control_point` in `src/math/bezier.rs:138`
-- `BezierCurve::insert_control_point` in `src/math/bezier.rs:152`
-- `BezierCurve::remove_control_point` in `src/math/bezier.rs:168`
-- `BezierCurve::get_control_point_count` in `src/math/bezier.rs:180`
-- `BezierCurve::translate` in `src/math/bezier.rs:189`
-- `BezierCurve::rotate` in `src/math/bezier.rs:202`
-- `BezierCurve::scale` in `src/math/bezier.rs:219`
-- `linear` in `src/math/easing.rs:15`
+- `CompressedFormat::as_str` in `src/image/compressed.rs:39`
+- `CompressedImageData::from_dds` in `src/image/compressed.rs:87`
+- `CompressedImageData::get_dimensions` in `src/image/compressed.rs:122`
+- `CompressedImageData::get_mipmap_count` in `src/image/compressed.rs:130`
+- `CompressedImageData::get_format` in `src/image/compressed.rs:138`
+- `ImageData::from_file` in `src/image/image_data.rs:53`
+- `ImageData::from_bytes` in `src/image/image_data.rs:74`
+- `ImageData::width` in `src/image/image_data.rs:96`
+- `ImageData::height` in `src/image/image_data.rs:104`
+- `ImageData::dimensions` in `src/image/image_data.rs:112`
+- `ImageData::get_pixel` in `src/image/image_data.rs:124`
+- `ImageData::set_pixel` in `src/image/image_data.rs:149`
+- `ImageData::paste` in `src/image/image_data.rs:167`
+- `ImageData::map_pixel` in `src/image/image_data.rs:190`
+- `ImageData::encode_png` in `src/image/image_data.rs:214`
+- `ImageData::as_bytes` in `src/image/image_data.rs:231`
+- `ImageData::get_string` in `src/image/image_data.rs:239`
+
+### `input` — 5/70 (7.1%)
+
+**Uncovered public functions** (65):
+
+- `GamepadState::update_button` in `src/input/gamepad.rs:59`
+- `GamepadState::update_axis` in `src/input/gamepad.rs:68`
+- `GamepadState::is_button_pressed` in `src/input/gamepad.rs:79`
+- `GamepadState::get_axis_value` in `src/input/gamepad.rs:90`
+- `GamepadState::get_name` in `src/input/gamepad.rs:98`
+- `GamepadState::is_connected` in `src/input/gamepad.rs:106`
+- `GamepadState::get_button_count` in `src/input/gamepad.rs:114`
+- `GamepadState::get_axis_count` in `src/input/gamepad.rs:122`
+- `GamepadState::set_guid` in `src/input/gamepad.rs:130`
+- `GamepadState::get_guid` in `src/input/gamepad.rs:138`
+- `GamepadState::get_hat` in `src/input/gamepad.rs:149`
+- `gilrs_button_to_string` in `src/input/gamepad.rs:180`
+- `gilrs_axis_to_string` in `src/input/gamepad.rs:208`
+- `GamepadMappings::set_mapping` in `src/input/gamepad.rs:254`
+- `GamepadMappings::get_mapping_string` in `src/input/gamepad.rs:265`
+- `GamepadMappings::load_from_file` in `src/input/gamepad.rs:279`
+- `GamepadMappings::save_to_file` in `src/input/gamepad.rs:308`
+- `KeyboardState::begin_frame` in `src/input/keyboard.rs:86`
+- `KeyboardState::press_scancode` in `src/input/keyboard.rs:98`
+- `KeyboardState::release_scancode` in `src/input/keyboard.rs:108`
+- *...and 45 more*
+
+### `inventory` — 8/63 (12.7%)
+
+**Uncovered public functions** (55):
+
+- `ContainerMode::from_str` in `src/inventory/container.rs:44`
+- `ContainerMode::as_str` in `src/inventory/container.rs:57`
+- `Container::slot_count` in `src/inventory/container.rs:115`
+- `Container::get_slot` in `src/inventory/container.rs:126`
+- `Container::get_slot_mut` in `src/inventory/container.rs:137`
+- `Container::add_slot` in `src/inventory/container.rs:145`
+- `Container::remove_slot` in `src/inventory/container.rs:160`
+- `Container::expand` in `src/inventory/container.rs:173`
+- `Container::current_weight` in `src/inventory/container.rs:191`
+- `Container::add_item` in `src/inventory/container.rs:208`
+- `Container::count_item` in `src/inventory/container.rs:249`
+- `Container::has_item` in `src/inventory/container.rs:265`
+- `Container::remove_item` in `src/inventory/container.rs:277`
+- `Container::to_item_list` in `src/inventory/container.rs:301`
+- `Inventory::add_container` in `src/inventory/inventory.rs:87`
+- `Inventory::get_container` in `src/inventory/inventory.rs:102`
+- `Inventory::get_container_mut` in `src/inventory/inventory.rs:113`
+- `Inventory::remove_container` in `src/inventory/inventory.rs:124`
+- `Inventory::container_names` in `src/inventory/inventory.rs:137`
+- `Inventory::add_equip_slot` in `src/inventory/inventory.rs:146`
+- *...and 35 more*
+
+### `item` — 17/124 (13.7%)
+
+**Uncovered public functions** (107):
+
+- `StackBuilder::add` in `src/item/builder.rs:133`
+- `StackBuilder::add_with` in `src/item/builder.rs:144`
+- `StackBuilder::require_type` in `src/item/builder.rs:161`
+- `StackBuilder::ban_type` in `src/item/builder.rs:169`
+- `StackBuilder::validate_entries` in `src/item/builder.rs:181`
+- `StackBuilder::validate_stack` in `src/item/builder.rs:270`
+- `StackBuilder::build` in `src/item/builder.rs:353`
+- `StackBuilder::build_named` in `src/item/builder.rs:364`
+- `ItemGroup::items_from` in `src/item/group.rs:43`
+- `group_by_stat` in `src/item/group.rs:62`
+- `group_by_category` in `src/item/group.rs:79`
+- `group_by_tag_prefix` in `src/item/group.rs:100`
+- `find_n_of_stat` in `src/item/group.rs:131`
+- `find_at_least_n_of_stat` in `src/item/group.rs:152`
+- `find_sequences` in `src/item/group.rs:176`
+- `find_tag_groups` in `src/item/group.rs:224`
+- `sorted_indices_by_stat` in `src/item/group.rs:251`
+- `sorted_indices_by_category` in `src/item/group.rs:274`
+- `StackHistory::with_max_size` in `src/item/history.rs:116`
+- `StackHistory::record` in `src/item/history.rs:126`
+- *...and 87 more*
+
+### `lua_api` — 1/86 (1.2%)
+
+**Uncovered public functions** (85):
+
+- `register` in `src/lua_api/ai_api.rs:1994`
+- `register` in `src/lua_api/audio_api.rs:1057`
+- `register` in `src/lua_api/automation_api.rs:111`
+- `register` in `src/lua_api/battle_api.rs:540`
+- `register` in `src/lua_api/cardgame_api.rs:1849`
+- `register` in `src/lua_api/combat_api.rs:661`
+- `register` in `src/lua_api/compute_api.rs:594`
+- `register` in `src/lua_api/crafting_api.rs:1994`
+- `register` in `src/lua_api/data_api.rs:24`
+- `register` in `src/lua_api/dataframe_api.rs:878`
+- `register` in `src/lua_api/debug_api.rs:201`
+- `register` in `src/lua_api/debugbridge_api.rs:360`
+- `register` in `src/lua_api/dialog_api.rs:409`
+- `register` in `src/lua_api/docs_api.rs:960`
+- `register` in `src/lua_api/economy_api.rs:903`
+- `register` in `src/lua_api/entity_api.rs:605`
+- `register` in `src/lua_api/event_api.rs:156`
+- `register` in `src/lua_api/filesystem_api.rs:173`
+- `register` in `src/lua_api/font_api.rs:159`
+- `register` in `src/lua_api/graph_api.rs:2076`
+- *...and 65 more*
+
+### `math` — 15/177 (8.5%)
+
+**Uncovered public functions** (162):
+
+- `BezierCurve::evaluate` in `src/math/bezier.rs:55`
+- `BezierCurve::render_segment` in `src/math/bezier.rs:92`
+- `BezierCurve::get_derivative` in `src/math/bezier.rs:106`
+- `BezierCurve::get_control_point` in `src/math/bezier.rs:137`
+- `BezierCurve::set_control_point` in `src/math/bezier.rs:149`
+- `BezierCurve::insert_control_point` in `src/math/bezier.rs:163`
+- `BezierCurve::remove_control_point` in `src/math/bezier.rs:179`
+- `BezierCurve::get_control_point_count` in `src/math/bezier.rs:191`
+- `BezierCurve::translate` in `src/math/bezier.rs:200`
+- `BezierCurve::rotate` in `src/math/bezier.rs:213`
+- `BezierCurve::scale` in `src/math/bezier.rs:230`
 - `ease_in_quad` in `src/math/easing.rs:26`
 - `ease_out_quad` in `src/math/easing.rs:37`
 - `ease_in_out_quad` in `src/math/easing.rs:48`
 - `ease_in_cubic` in `src/math/easing.rs:63`
 - `ease_out_cubic` in `src/math/easing.rs:74`
 - `ease_in_out_cubic` in `src/math/easing.rs:86`
-- *...and 155 more*
+- `ease_in_quart` in `src/math/easing.rs:102`
+- `ease_out_quart` in `src/math/easing.rs:113`
+- `ease_in_out_quart` in `src/math/easing.rs:125`
+- *...and 142 more*
 
-### `modding` — 0/19 (0.0%)
+### `minimap` — 2/55 (3.6%)
 
-**Uncovered public functions** (19):
+**Uncovered public functions** (53):
 
-- `ModInfo::new` in `src/modding/mod_manager.rs:53`
-- `ModManager::new` in `src/modding/mod_manager.rs:87`
-- `ModManager::register_mod` in `src/modding/mod_manager.rs:103`
-- `ModManager::unregister_mod` in `src/modding/mod_manager.rs:121`
-- `ModManager::get_mod` in `src/modding/mod_manager.rs:138`
-- `ModManager::get_mod_mut` in `src/modding/mod_manager.rs:149`
-- `ModManager::has_mod` in `src/modding/mod_manager.rs:160`
-- `ModManager::mod_count` in `src/modding/mod_manager.rs:168`
-- `ModManager::all_mods` in `src/modding/mod_manager.rs:176`
-- `ModManager::load_order` in `src/modding/mod_manager.rs:190`
-- `ModManager::set_load_order` in `src/modding/mod_manager.rs:224`
-- `ModManager::clear_load_order` in `src/modding/mod_manager.rs:229`
-- `ModManager::get_custom_load_order` in `src/modding/mod_manager.rs:237`
-- `ModManager::scan_folder` in `src/modding/mod_manager.rs:268`
-- `ModManager::mark_for_reload` in `src/modding/mod_manager.rs:343`
-- `ModManager::get_reload_queue` in `src/modding/mod_manager.rs:357`
-- `ModManager::clear_reload_queue` in `src/modding/mod_manager.rs:362`
-- `ModManager::validate_dependencies` in `src/modding/mod_manager.rs:372`
-- `ModManager::has_circular_dependencies` in `src/modding/mod_manager.rs:389`
+- `FogLevel::from_u8` in `src/minimap/mod.rs:55`
+- `Minimap::grid_width` in `src/minimap/mod.rs:256`
+- `Minimap::grid_height` in `src/minimap/mod.rs:264`
+- `Minimap::grid_size` in `src/minimap/mod.rs:272`
+- `Minimap::display_width` in `src/minimap/mod.rs:282`
+- `Minimap::display_height` in `src/minimap/mod.rs:290`
+- `Minimap::set_display_size` in `src/minimap/mod.rs:299`
+- `Minimap::set_terrain` in `src/minimap/mod.rs:312`
+- `Minimap::get_terrain` in `src/minimap/mod.rs:327`
+- `Minimap::set_terrain_color` in `src/minimap/mod.rs:340`
+- `Minimap::get_terrain_color` in `src/minimap/mod.rs:351`
+- `Minimap::set_fog_enabled` in `src/minimap/mod.rs:364`
+- `Minimap::fog_enabled` in `src/minimap/mod.rs:372`
+- `Minimap::set_fog_level` in `src/minimap/mod.rs:382`
+- `Minimap::get_fog_level` in `src/minimap/mod.rs:397`
+- `Minimap::set_fog_color` in `src/minimap/mod.rs:409`
+- `Minimap::fog_color` in `src/minimap/mod.rs:417`
+- `Minimap::set_fog_data` in `src/minimap/mod.rs:425`
+- `Minimap::add_object_type` in `src/minimap/mod.rs:442`
+- `Minimap::set_object_type_visible` in `src/minimap/mod.rs:457`
+- *...and 33 more*
 
-### `particle` — 0/21 (0.0%)
+### `modding` — 2/19 (10.5%)
 
-**Uncovered public functions** (21):
+**Uncovered public functions** (17):
 
-- `ParticleSystem::new` in `src/particle/system.rs:478`
-- `ParticleSystem::update` in `src/particle/system.rs:501`
-- `ParticleSystem::emit` in `src/particle/system.rs:666`
-- `ParticleSystem::count` in `src/particle/system.rs:679`
-- `ParticleSystem::reset` in `src/particle/system.rs:684`
-- `ParticleSystem::start` in `src/particle/system.rs:691`
-- `ParticleSystem::stop` in `src/particle/system.rs:697`
-- `ParticleSystem::pause` in `src/particle/system.rs:702`
-- `ParticleSystem::resume` in `src/particle/system.rs:707`
-- `ParticleSystem::move_to` in `src/particle/system.rs:718`
-- `ParticleSystem::clone_config` in `src/particle/system.rs:729`
-- `ParticleSystem::is_active` in `src/particle/system.rs:737`
-- `ParticleSystem::is_paused` in `src/particle/system.rs:745`
-- `ParticleSystem::is_stopped` in `src/particle/system.rs:753`
-- `ParticleSystem::is_empty` in `src/particle/system.rs:761`
-- `ParticleSystem::is_full` in `src/particle/system.rs:769`
-- `ParticleSystem::draw_commands` in `src/particle/system.rs:786`
-- `lerp` in `src/particle/system.rs:885`
-- `interpolate_sizes` in `src/particle/system.rs:906`
-- `interpolate_colors` in `src/particle/system.rs:935`
-- *...and 1 more*
+- `ModManager::register_mod` in `src/modding/mod_manager.rs:117`
+- `ModManager::unregister_mod` in `src/modding/mod_manager.rs:135`
+- `ModManager::get_mod` in `src/modding/mod_manager.rs:152`
+- `ModManager::get_mod_mut` in `src/modding/mod_manager.rs:163`
+- `ModManager::has_mod` in `src/modding/mod_manager.rs:174`
+- `ModManager::mod_count` in `src/modding/mod_manager.rs:182`
+- `ModManager::all_mods` in `src/modding/mod_manager.rs:190`
+- `ModManager::load_order` in `src/modding/mod_manager.rs:204`
+- `ModManager::set_load_order` in `src/modding/mod_manager.rs:238`
+- `ModManager::clear_load_order` in `src/modding/mod_manager.rs:243`
+- `ModManager::get_custom_load_order` in `src/modding/mod_manager.rs:251`
+- `ModManager::scan_folder` in `src/modding/mod_manager.rs:282`
+- `ModManager::mark_for_reload` in `src/modding/mod_manager.rs:357`
+- `ModManager::get_reload_queue` in `src/modding/mod_manager.rs:371`
+- `ModManager::clear_reload_queue` in `src/modding/mod_manager.rs:376`
+- `ModManager::validate_dependencies` in `src/modding/mod_manager.rs:386`
+- `ModManager::has_circular_dependencies` in `src/modding/mod_manager.rs:403`
 
-### `pathfinding` — 0/78 (0.0%)
+### `overlay` — 2/19 (10.5%)
 
-**Uncovered public functions** (78):
+**Uncovered public functions** (17):
 
-- `FlowField::new` in `src/pathfinding/ai_flow_field.rs:42`
+- `AmbientState::compute_color_from_time` in `src/overlay/ambient.rs:45`
+- `ShakeState::next_random` in `src/overlay/effects.rs:92`
+- `Overlay::trigger_flash` in `src/overlay/state.rs:257`
+- `Overlay::trigger_shake` in `src/overlay/state.rs:276`
+- `Overlay::trigger_fade` in `src/overlay/state.rs:299`
+- `Overlay::trigger_lightning` in `src/overlay/state.rs:315`
+- `Overlay::get_shake_offset` in `src/overlay/state.rs:324`
+- `Overlay::is_active` in `src/overlay/state.rs:338`
+- `Overlay::clear` in `src/overlay/state.rs:360`
+- `Overlay::resize` in `src/overlay/state.rs:385`
+- `Overlay::get_width` in `src/overlay/state.rs:396`
+- `Overlay::get_height` in `src/overlay/state.rs:406`
+- `Overlay::get_dimensions` in `src/overlay/state.rs:416`
+- `Overlay::get_flash_alpha` in `src/overlay/state.rs:428`
+- `Overlay::get_lightning_alpha` in `src/overlay/state.rs:444`
+- `WeatherType::from_name` in `src/overlay/weather.rs:47`
+- `WeatherType::name` in `src/overlay/weather.rs:65`
+
+### `particle` — 9/25 (36.0%)
+
+**Test functions:**
+
+- `interpolate_colors_empty_returns_white`
+- `interpolate_sizes_empty_returns_one` — ── Math helpers ─────────────────────────────────────────────────────────────
+- `particle_config_all_shapes_set`
+- `particle_files_are_split` — ── Sub-module imports compile ────────────────────────────────────────────────
+- `particle_gravity_affects_velocity` — ── Physics ──────────────────────────────────────────────────────────────────
+- `particle_instance_color_matches_config` — ── Per-instance color and shape ─────────────────────────────────────────────
+- `particle_instance_shape_reflects_config`
+- `particle_shape_default_is_square` — ── Shape defaults and assignment ────────────────────────────────────────────
+- `particle_spark_shape_draw_commands`
+- `particle_system_draw_commands_empty_when_no_particles`
+- `particle_system_draw_commands_returns_one_entry` — ── draw_commands batching ────────────────────────────────────────────────────
+- `particle_system_emit_respects_max` — ── Max particle cap ─────────────────────────────────────────────────────────
+
+**Uncovered public functions** (16):
+
+- `emission_offset` in `src/particle/emission.rs:13`
+- `emission_shape_offset` in `src/particle/emission.rs:76`
+- `ParticleSystem::reset` in `src/particle/emitter.rs:261`
+- `ParticleSystem::start` in `src/particle/emitter.rs:268`
+- `ParticleSystem::pause` in `src/particle/emitter.rs:279`
+- `ParticleSystem::resume` in `src/particle/emitter.rs:284`
+- `ParticleSystem::move_to` in `src/particle/emitter.rs:295`
+- `ParticleSystem::clone_config` in `src/particle/emitter.rs:306`
+- `ParticleSystem::is_active` in `src/particle/emitter.rs:314`
+- `ParticleSystem::is_paused` in `src/particle/emitter.rs:322`
+- `ParticleSystem::is_stopped` in `src/particle/emitter.rs:330`
+- `ParticleSystem::is_full` in `src/particle/emitter.rs:346`
+- `lerp` in `src/particle/math.rs:12`
+- `interpolate_alphas` in `src/particle/math.rs:95`
+- `rand_range` in `src/particle/math.rs:118`
+- `rand_normal` in `src/particle/math.rs:129`
+
+### `pathfinding` — 7/78 (9.0%)
+
+**Uncovered public functions** (71):
+
 - `FlowField::set_goal` in `src/pathfinding/ai_flow_field.rs:59`
 - `FlowField::compute` in `src/pathfinding/ai_flow_field.rs:65`
 - `FlowField::get_direction` in `src/pathfinding/ai_flow_field.rs:171`
 - `FlowField::get_distance` in `src/pathfinding/ai_flow_field.rs:187`
-- `astar` in `src/pathfinding/astar.rs:73`
-- `line_of_sight` in `src/pathfinding/astar.rs:280`
-- `smooth_path` in `src/pathfinding/astar.rs:322`
-- `PathThreadPool::new` in `src/pathfinding/async_pool.rs:54`
-- `PathThreadPool::submit` in `src/pathfinding/async_pool.rs:137`
-- `PathThreadPool::poll` in `src/pathfinding/async_pool.rs:163`
-- `PathThreadPool::cancel` in `src/pathfinding/async_pool.rs:175`
-- `PathThreadPool::pending_count` in `src/pathfinding/async_pool.rs:187`
-- `PathThreadPool::set_thread_count` in `src/pathfinding/async_pool.rs:196`
-- `PathThreadPool::get_thread_count` in `src/pathfinding/async_pool.rs:204`
-- `FlowField::new` in `src/pathfinding/flow_field.rs:36`
-- `FlowField::calculate` in `src/pathfinding/flow_field.rs:60`
-- `FlowField::calculate_multi` in `src/pathfinding/flow_field.rs:69`
-- `FlowField::get_direction` in `src/pathfinding/flow_field.rs:181`
-- `FlowField::get_direction_angle` in `src/pathfinding/flow_field.rs:196`
-- *...and 58 more*
+- `astar` in `src/pathfinding/astar.rs:80`
+- `line_of_sight` in `src/pathfinding/astar.rs:287`
+- `smooth_path` in `src/pathfinding/astar.rs:329`
+- `PathThreadPool::submit` in `src/pathfinding/async_pool.rs:153`
+- `PathThreadPool::poll` in `src/pathfinding/async_pool.rs:179`
+- `PathThreadPool::cancel` in `src/pathfinding/async_pool.rs:191`
+- `PathThreadPool::pending_count` in `src/pathfinding/async_pool.rs:203`
+- `PathThreadPool::set_thread_count` in `src/pathfinding/async_pool.rs:212`
+- `PathThreadPool::get_thread_count` in `src/pathfinding/async_pool.rs:220`
+- `FlowField::calculate` in `src/pathfinding/flow_field.rs:78`
+- `FlowField::calculate_multi` in `src/pathfinding/flow_field.rs:87`
+- `FlowField::get_direction` in `src/pathfinding/flow_field.rs:199`
+- `FlowField::get_direction_angle` in `src/pathfinding/flow_field.rs:214`
+- `FlowField::get_cost_to_target` in `src/pathfinding/flow_field.rs:229`
+- `FlowField::is_calculated` in `src/pathfinding/flow_field.rs:240`
+- `FlowField::get_targets` in `src/pathfinding/flow_field.rs:248`
+- *...and 51 more*
 
-### `physics` — 0/86 (0.0%)
+### `physics` — 3/90 (3.3%)
 
-**Uncovered public functions** (86):
+**Uncovered public functions** (87):
 
-- `Body::new` in `src/physics/body.rs:101`
-- `Body::new_circle` in `src/physics/body.rs:135`
-- `Body::new_polygon` in `src/physics/body.rs:167`
-- `Body::new_edge` in `src/physics/body.rs:212`
-- `Body::new_chain` in `src/physics/body.rs:249`
-- `Body::bounding_box` in `src/physics/body.rs:293`
-- `Body::collides_with_layer` in `src/physics/body.rs:319`
-- `Shape::to_rapier_collider` in `src/physics/shape.rs:63`
-- `Shape::regular_polygon` in `src/physics/shape.rs:105`
-- `World::new` in `src/physics/world.rs:188`
-- `World::add_body` in `src/physics/world.rs:337`
-- `World::add_fixture` in `src/physics/world.rs:377`
-- `World::fixture_count` in `src/physics/world.rs:420`
-- `World::set_fixture_friction` in `src/physics/world.rs:435`
-- `World::set_fixture_restitution` in `src/physics/world.rs:457`
-- `World::set_fixture_sensor` in `src/physics/world.rs:484`
-- `World::get_body` in `src/physics/world.rs:507`
-- `World::get_body_mut` in `src/physics/world.rs:521`
-- `World::body_count` in `src/physics/world.rs:529`
-- `World::add_revolute_joint` in `src/physics/world.rs:547`
-- *...and 66 more*
+- `Body::new_circle` in `src/physics/body.rs:145`
+- `Body::new_polygon` in `src/physics/body.rs:177`
+- `Body::new_edge` in `src/physics/body.rs:222`
+- `Body::new_chain` in `src/physics/body.rs:259`
+- `Body::bounding_box` in `src/physics/body.rs:303`
+- `Body::collides_with_layer` in `src/physics/body.rs:329`
+- `Shape::to_rapier_collider` in `src/physics/shape.rs:71`
+- `Shape::regular_polygon` in `src/physics/shape.rs:113`
+- `StandaloneShape::get_type` in `src/physics/shape.rs:172`
+- `StandaloneShape::get_radius` in `src/physics/shape.rs:186`
+- `StandaloneShape::get_bounding_box` in `src/physics/shape.rs:200`
+- `World::add_body` in `src/physics/world.rs:366`
+- `World::add_fixture` in `src/physics/world.rs:406`
+- `World::fixture_count` in `src/physics/world.rs:449`
+- `World::set_fixture_friction` in `src/physics/world.rs:464`
+- `World::set_fixture_restitution` in `src/physics/world.rs:486`
+- `World::set_fixture_sensor` in `src/physics/world.rs:513`
+- `World::get_body` in `src/physics/world.rs:536`
+- `World::get_body_mut` in `src/physics/world.rs:550`
+- `World::body_count` in `src/physics/world.rs:558`
+- *...and 67 more*
 
-### `province_map` — 0/48 (0.0%)
+### `postfx` — 2/24 (8.3%)
 
-**Uncovered public functions** (48):
+**Uncovered public functions** (22):
 
-- `detect_adjacency` in `src/province_map/adjacency.rs:15`
-- `detect_adjacency_with_tags` in `src/province_map/adjacency.rs:26`
-- `extract_all_borders` in `src/province_map/borders.rs:48`
-- `extract_borders_with_tag` in `src/province_map/borders.rs:88`
-- `extract_borders_by_property` in `src/province_map/borders.rs:100`
-- `Province::new` in `src/province_map/core.rs:49`
-- `ProvinceMap::new` in `src/province_map/core.rs:99`
-- `ProvinceMap::width` in `src/province_map/core.rs:111`
-- `ProvinceMap::height` in `src/province_map/core.rs:116`
-- `ProvinceMap::get_province` in `src/province_map/core.rs:121`
-- `ProvinceMap::get_province_mut` in `src/province_map/core.rs:126`
-- `ProvinceMap::province_count` in `src/province_map/core.rs:131`
-- `ProvinceMap::province_ids` in `src/province_map/core.rs:136`
-- `ProvinceMap::get_province_at` in `src/province_map/core.rs:145`
-- `ProvinceMap::get_neighbors` in `src/province_map/core.rs:156`
-- `ProvinceMap::get_adjacency` in `src/province_map/core.rs:174`
-- `ProvinceMap::pixel_lookup` in `src/province_map/core.rs:180`
-- `ProvinceMap::adjacency_count` in `src/province_map/core.rs:185`
-- `ProvinceMap::get_adjacency_mut` in `src/province_map/core.rs:190`
-- `ProvinceMap::insert_province` in `src/province_map/core.rs:196`
-- *...and 28 more*
+- `PostFxEffect::new_custom` in `src/postfx/effect.rs:65`
+- `PostFxEffect::set_parameter` in `src/postfx/effect.rs:84`
+- `PostFxEffect::get_parameter` in `src/postfx/effect.rs:100`
+- `PostFxEffect::has_parameter` in `src/postfx/effect.rs:116`
+- `PostFxEffect::get_parameter_names` in `src/postfx/effect.rs:128`
+- `PostFxEffect::get_type_name` in `src/postfx/effect.rs:142`
+- `PostFxEffect::is_built_in` in `src/postfx/effect.rs:155`
+- `PostFxEffectType::from_name` in `src/postfx/effect_type.rs:72`
+- `PostFxEffectType::name` in `src/postfx/effect_type.rs:97`
+- `PostFxEffectType::default_params` in `src/postfx/effect_type.rs:130`
+- `PostFxStack::add` in `src/postfx/stack.rs:69`
+- `PostFxStack::remove` in `src/postfx/stack.rs:86`
+- `PostFxStack::insert` in `src/postfx/stack.rs:106`
+- `PostFxStack::set_enabled` in `src/postfx/stack.rs:117`
+- `PostFxStack::is_enabled` in `src/postfx/stack.rs:130`
+- `PostFxStack::get_effect_count` in `src/postfx/stack.rs:142`
+- `PostFxStack::get_effect` in `src/postfx/stack.rs:153`
+- `PostFxStack::enabled_effects` in `src/postfx/stack.rs:170`
+- `PostFxStack::resize` in `src/postfx/stack.rs:188`
+- `PostFxStack::get_width` in `src/postfx/stack.rs:199`
+- *...and 2 more*
 
-### `quest` — 0/49 (0.0%)
+### `province_map` — 4/48 (8.3%)
 
-**Uncovered public functions** (49):
+**Uncovered public functions** (44):
 
-- `QuestLog::new` in `src/quest/log.rs:26`
-- `QuestLog::add_quest` in `src/quest/log.rs:31`
-- `QuestLog::get_quest` in `src/quest/log.rs:40`
-- `QuestLog::get_quest_mut` in `src/quest/log.rs:45`
-- `QuestLog::remove_quest` in `src/quest/log.rs:50`
-- `QuestLog::quest_ids` in `src/quest/log.rs:60`
-- `QuestLog::quests_with_status` in `src/quest/log.rs:65`
-- `QuestLog::quest_count` in `src/quest/log.rs:79`
-- `QuestLog::start_quest` in `src/quest/log.rs:84`
-- `QuestLog::complete_quest` in `src/quest/log.rs:94`
-- `QuestLog::fail_quest` in `src/quest/log.rs:104`
-- `QuestLog::active_ids` in `src/quest/log.rs:115`
-- `QuestLog::completed_ids` in `src/quest/log.rs:123`
-- `QuestLog::failed_ids` in `src/quest/log.rs:131`
-- `QuestLog::advance_objective` in `src/quest/log.rs:138`
-- `Objective::new` in `src/quest/objective.rs:35`
-- `Objective::advance` in `src/quest/objective.rs:50`
-- `Objective::set_progress` in `src/quest/objective.rs:64`
-- `Objective::is_complete` in `src/quest/objective.rs:76`
-- `Objective::add_tag` in `src/quest/objective.rs:81`
-- *...and 29 more*
+- `detect_adjacency` in `src/province_map/adjacency.rs:25`
+- `detect_adjacency_with_tags` in `src/province_map/adjacency.rs:40`
+- `extract_all_borders` in `src/province_map/borders.rs:65`
+- `extract_borders_with_tag` in `src/province_map/borders.rs:112`
+- `extract_borders_by_property` in `src/province_map/borders.rs:131`
+- `ProvinceMap::width` in `src/province_map/core.rs:167`
+- `ProvinceMap::height` in `src/province_map/core.rs:175`
+- `ProvinceMap::get_province` in `src/province_map/core.rs:186`
+- `ProvinceMap::get_province_mut` in `src/province_map/core.rs:197`
+- `ProvinceMap::province_count` in `src/province_map/core.rs:205`
+- `ProvinceMap::province_ids` in `src/province_map/core.rs:213`
+- `ProvinceMap::get_province_at` in `src/province_map/core.rs:229`
+- `ProvinceMap::get_neighbors` in `src/province_map/core.rs:246`
+- `ProvinceMap::get_adjacency` in `src/province_map/core.rs:271`
+- `ProvinceMap::pixel_lookup` in `src/province_map/core.rs:280`
+- `ProvinceMap::adjacency_count` in `src/province_map/core.rs:288`
+- `ProvinceMap::get_adjacency_mut` in `src/province_map/core.rs:300`
+- `ProvinceMap::insert_province` in `src/province_map/core.rs:309`
+- `ProvinceMap::set_pixel` in `src/province_map/core.rs:322`
+- `ProvinceMap::insert_adjacency` in `src/province_map/core.rs:331`
+- *...and 24 more*
 
-### `resource` — 0/96 (0.0%)
+### `quest` — 4/49 (8.2%)
 
-**Uncovered public functions** (96):
+**Uncovered public functions** (45):
 
-- `ResourceManager::new` in `src/resource/manager.rs:17`
-- `ResourceManager::new_resource` in `src/resource/manager.rs:25`
-- `ResourceManager::get_resource` in `src/resource/manager.rs:32`
-- `ResourceManager::get_resource_mut` in `src/resource/manager.rs:37`
-- `ResourceManager::has_resource` in `src/resource/manager.rs:42`
-- `ResourceManager::resource_names` in `src/resource/manager.rs:47`
-- `ResourceManager::remove_resource` in `src/resource/manager.rs:52`
-- `ResourceManager::tick` in `src/resource/manager.rs:57`
-- `ResourceManager::turn` in `src/resource/manager.rs:70`
-- `ResourceManager::add_conversion_rule` in `src/resource/manager.rs:75`
-- `ResourceManager::conversion_rules` in `src/resource/manager.rs:80`
-- `ResourceManager::convert` in `src/resource/manager.rs:86`
-- `ResourceManager::exchange` in `src/resource/manager.rs:138`
-- `ResourceManager::total_by_group` in `src/resource/manager.rs:178`
-- `ResourceManager::percent` in `src/resource/manager.rs:188`
-- `ResourceManager::is_full` in `src/resource/manager.rs:200`
-- `ResourceManager::is_empty` in `src/resource/manager.rs:208`
-- `ResourceManager::can_afford_all` in `src/resource/manager.rs:216`
-- `ResourceManager::spend_all` in `src/resource/manager.rs:227`
-- `ResourceManager::reset` in `src/resource/manager.rs:245`
-- *...and 76 more*
+- `QuestLog::add_quest` in `src/quest/log.rs:49`
+- `QuestLog::get_quest` in `src/quest/log.rs:64`
+- `QuestLog::get_quest_mut` in `src/quest/log.rs:75`
+- `QuestLog::remove_quest` in `src/quest/log.rs:86`
+- `QuestLog::quest_ids` in `src/quest/log.rs:99`
+- `QuestLog::quests_with_status` in `src/quest/log.rs:110`
+- `QuestLog::quest_count` in `src/quest/log.rs:127`
+- `QuestLog::start_quest` in `src/quest/log.rs:138`
+- `QuestLog::complete_quest` in `src/quest/log.rs:154`
+- `QuestLog::fail_quest` in `src/quest/log.rs:170`
+- `QuestLog::active_ids` in `src/quest/log.rs:184`
+- `QuestLog::completed_ids` in `src/quest/log.rs:195`
+- `QuestLog::failed_ids` in `src/quest/log.rs:206`
+- `QuestLog::advance_objective` in `src/quest/log.rs:222`
+- `Objective::advance` in `src/quest/objective.rs:82`
+- `Objective::set_progress` in `src/quest/objective.rs:99`
+- `Objective::is_complete` in `src/quest/objective.rs:114`
+- `Objective::add_tag` in `src/quest/objective.rs:122`
+- `Objective::has_tag` in `src/quest/objective.rs:136`
+- `QuestStage::add_objective` in `src/quest/objective.rs:182`
+- *...and 25 more*
 
 ### `root` — 0/1 (0.0%)
 
 **Uncovered public functions** (1):
 
-- `luna_run` in `src/lib.rs:130`
+- `luna_run` in `src/lib.rs:156`
 
-### `savegame` — 0/17 (0.0%)
+### `savegame` — 2/17 (11.8%)
 
-**Uncovered public functions** (17):
+**Uncovered public functions** (15):
 
-- `SaveManager::new` in `src/savegame/save_data.rs:51`
-- `SaveManager::register` in `src/savegame/save_data.rs:59`
-- `SaveManager::unregister` in `src/savegame/save_data.rs:70`
-- `SaveManager::registered_names` in `src/savegame/save_data.rs:78`
-- `SaveManager::set_schema_version` in `src/savegame/save_data.rs:86`
-- `SaveManager::schema_version` in `src/savegame/save_data.rs:94`
-- `SaveManager::add_migration` in `src/savegame/save_data.rs:102`
-- `SaveManager::applicable_migrations` in `src/savegame/save_data.rs:116`
-- `SaveManager::mark_dirty` in `src/savegame/save_data.rs:125`
-- `SaveManager::is_dirty` in `src/savegame/save_data.rs:133`
-- `SaveManager::clear_dirty` in `src/savegame/save_data.rs:138`
-- `SaveManager::enable_auto_save` in `src/savegame/save_data.rs:147`
-- `SaveManager::disable_auto_save` in `src/savegame/save_data.rs:153`
-- `SaveManager::update` in `src/savegame/save_data.rs:165`
-- `SaveManager::reset` in `src/savegame/save_data.rs:177`
-- `serialize_table` in `src/savegame/save_data.rs:193`
-- `serialize_value` in `src/savegame/save_data.rs:225`
+- `SaveManager::register` in `src/savegame/save_data.rs:75`
+- `SaveManager::unregister` in `src/savegame/save_data.rs:86`
+- `SaveManager::registered_names` in `src/savegame/save_data.rs:94`
+- `SaveManager::set_schema_version` in `src/savegame/save_data.rs:102`
+- `SaveManager::schema_version` in `src/savegame/save_data.rs:110`
+- `SaveManager::add_migration` in `src/savegame/save_data.rs:118`
+- `SaveManager::applicable_migrations` in `src/savegame/save_data.rs:132`
+- `SaveManager::mark_dirty` in `src/savegame/save_data.rs:141`
+- `SaveManager::is_dirty` in `src/savegame/save_data.rs:149`
+- `SaveManager::clear_dirty` in `src/savegame/save_data.rs:154`
+- `SaveManager::enable_auto_save` in `src/savegame/save_data.rs:163`
+- `SaveManager::disable_auto_save` in `src/savegame/save_data.rs:169`
+- `SaveManager::reset` in `src/savegame/save_data.rs:193`
+- `serialize_table` in `src/savegame/save_data.rs:209`
+- `serialize_value` in `src/savegame/save_data.rs:241`
 
-### `scene` — 0/36 (0.0%)
+### `scene` — 5/36 (13.9%)
 
-**Uncovered public functions** (36):
+**Uncovered public functions** (31):
 
-- `DepthSorter::new` in `src/scene/depth_sorter.rs:32`
-- `DepthSorter::add` in `src/scene/depth_sorter.rs:43`
-- `DepthSorter::add_object` in `src/scene/depth_sorter.rs:56`
-- `DepthSorter::sort` in `src/scene/depth_sorter.rs:65`
-- `DepthSorter::sorted_entries` in `src/scene/depth_sorter.rs:77`
-- `DepthSorter::clear` in `src/scene/depth_sorter.rs:83`
-- `DepthSorter::get_count` in `src/scene/depth_sorter.rs:91`
-- `SceneStack::new` in `src/scene/stack.rs:32`
-- `SceneStack::next_scene_id` in `src/scene/stack.rs:46`
-- `SceneStack::push` in `src/scene/stack.rs:63`
-- `SceneStack::pop` in `src/scene/stack.rs:88`
-- `SceneStack::switch_to` in `src/scene/stack.rs:116`
-- `SceneStack::clear` in `src/scene/stack.rs:138`
-- `SceneStack::pop_to` in `src/scene/stack.rs:152`
-- `SceneStack::pop_until` in `src/scene/stack.rs:165`
-- `SceneStack::get_stack_size` in `src/scene/stack.rs:180`
-- `SceneStack::is_empty` in `src/scene/stack.rs:188`
-- `SceneStack::get_current` in `src/scene/stack.rs:196`
-- `SceneStack::get_all` in `src/scene/stack.rs:204`
-- `SceneStack::is_transitioning` in `src/scene/stack.rs:214`
-- *...and 16 more*
+- `DepthSorter::add` in `src/scene/depth_sorter.rs:54`
+- `DepthSorter::add_object` in `src/scene/depth_sorter.rs:67`
+- `DepthSorter::sort` in `src/scene/depth_sorter.rs:76`
+- `DepthSorter::sorted_entries` in `src/scene/depth_sorter.rs:88`
+- `DepthSorter::clear` in `src/scene/depth_sorter.rs:94`
+- `DepthSorter::get_count` in `src/scene/depth_sorter.rs:102`
+- `SceneStack::next_scene_id` in `src/scene/stack.rs:61`
+- `SceneStack::push` in `src/scene/stack.rs:78`
+- `SceneStack::pop` in `src/scene/stack.rs:103`
+- `SceneStack::switch_to` in `src/scene/stack.rs:131`
+- `SceneStack::clear` in `src/scene/stack.rs:153`
+- `SceneStack::pop_to` in `src/scene/stack.rs:167`
+- `SceneStack::pop_until` in `src/scene/stack.rs:180`
+- `SceneStack::get_stack_size` in `src/scene/stack.rs:195`
+- `SceneStack::get_current` in `src/scene/stack.rs:211`
+- `SceneStack::get_all` in `src/scene/stack.rs:219`
+- `SceneStack::is_transitioning` in `src/scene/stack.rs:229`
+- `SceneStack::get_transition_progress` in `src/scene/stack.rs:237`
+- `SceneStack::update_transition` in `src/scene/stack.rs:248`
+- `SceneStack::register_scene` in `src/scene/stack.rs:266`
+- *...and 11 more*
 
-### `stats` — 0/37 (0.0%)
+### `stats` — 9/37 (24.3%)
 
-**Uncovered public functions** (37):
+**Uncovered public functions** (28):
 
-- `Buff::new` in `src/stats/attribute.rs:34`
-- `Buff::is_expired` in `src/stats/attribute.rs:51`
-- `Attribute::new` in `src/stats/attribute.rs:73`
-- `Sheet::new` in `src/stats/sheet.rs:48`
-- `Sheet::define` in `src/stats/sheet.rs:72`
-- `Sheet::get` in `src/stats/sheet.rs:78`
-- `Sheet::get_base` in `src/stats/sheet.rs:96`
-- `Sheet::set_base` in `src/stats/sheet.rs:101`
-- `Sheet::add_buff` in `src/stats/sheet.rs:112`
-- `Sheet::remove_buff` in `src/stats/sheet.rs:121`
-- `Sheet::clear_buffs` in `src/stats/sheet.rs:126`
-- `Sheet::apply_trait_buffs` in `src/stats/sheet.rs:136`
-- `Sheet::remove_trait_buffs` in `src/stats/sheet.rs:146`
-- `Sheet::set_flag` in `src/stats/sheet.rs:158`
-- `Sheet::clear_flag` in `src/stats/sheet.rs:163`
-- `Sheet::has_flag` in `src/stats/sheet.rs:168`
-- `Sheet::get_flags` in `src/stats/sheet.rs:173`
-- `Sheet::add_xp` in `src/stats/sheet.rs:178`
-- `Sheet::record_use` in `src/stats/sheet.rs:195`
-- `Sheet::get_stat_names` in `src/stats/sheet.rs:210`
-- *...and 17 more*
+- `Buff::is_expired` in `src/stats/attribute.rs:86`
+- `Sheet::define` in `src/stats/sheet.rs:108`
+- `Sheet::get` in `src/stats/sheet.rs:120`
+- `Sheet::get_base` in `src/stats/sheet.rs:144`
+- `Sheet::set_base` in `src/stats/sheet.rs:156`
+- `Sheet::add_buff` in `src/stats/sheet.rs:177`
+- `Sheet::remove_buff` in `src/stats/sheet.rs:192`
+- `Sheet::clear_buffs` in `src/stats/sheet.rs:200`
+- `Sheet::apply_trait_buffs` in `src/stats/sheet.rs:217`
+- `Sheet::remove_trait_buffs` in `src/stats/sheet.rs:233`
+- `Sheet::set_flag` in `src/stats/sheet.rs:248`
+- `Sheet::clear_flag` in `src/stats/sheet.rs:256`
+- `Sheet::has_flag` in `src/stats/sheet.rs:267`
+- `Sheet::get_flags` in `src/stats/sheet.rs:275`
+- `Sheet::add_xp` in `src/stats/sheet.rs:286`
+- `Sheet::record_use` in `src/stats/sheet.rs:306`
+- `Sheet::get_stat_names` in `src/stats/sheet.rs:324`
+- `Sheet::get_buff_count` in `src/stats/sheet.rs:335`
+- `Sheet::recover_action_points` in `src/stats/sheet.rs:350`
+- `Sheet::apply_damage` in `src/stats/sheet.rs:416`
+- *...and 8 more*
 
-### `thread` — 0/17 (0.0%)
+### `thread` — 2/17 (11.8%)
 
-**Uncovered public functions** (17):
+**Uncovered public functions** (15):
 
-- `Channel::new` in `src/thread/channel.rs:57`
-- `Channel::named` in `src/thread/channel.rs:73`
-- `Channel::push` in `src/thread/channel.rs:89`
-- `Channel::pop` in `src/thread/channel.rs:105`
-- `Channel::peek` in `src/thread/channel.rs:116`
-- `Channel::demand` in `src/thread/channel.rs:131`
-- `Channel::get_count` in `src/thread/channel.rs:157`
-- `Channel::clear` in `src/thread/channel.rs:162`
-- `Channel::supply` in `src/thread/channel.rs:176`
-- `Channel::name` in `src/thread/channel.rs:191`
-- `lua_to_channel_value` in `src/thread/channel.rs:263`
-- `channel_value_to_lua` in `src/thread/channel.rs:284`
-- `LuaThread::new` in `src/thread/worker.rs:60`
-- `LuaThread::start` in `src/thread/worker.rs:81`
-- `LuaThread::wait` in `src/thread/worker.rs:118`
-- `LuaThread::is_running` in `src/thread/worker.rs:128`
-- `LuaThread::get_error` in `src/thread/worker.rs:139`
+- `Channel::named` in `src/thread/channel.rs:79`
+- `Channel::push` in `src/thread/channel.rs:95`
+- `Channel::pop` in `src/thread/channel.rs:111`
+- `Channel::peek` in `src/thread/channel.rs:122`
+- `Channel::demand` in `src/thread/channel.rs:137`
+- `Channel::get_count` in `src/thread/channel.rs:163`
+- `Channel::clear` in `src/thread/channel.rs:168`
+- `Channel::supply` in `src/thread/channel.rs:182`
+- `Channel::name` in `src/thread/channel.rs:197`
+- `lua_to_channel_value` in `src/thread/channel.rs:269`
+- `channel_value_to_lua` in `src/thread/channel.rs:290`
+- `LuaThread::start` in `src/thread/worker.rs:87`
+- `LuaThread::wait` in `src/thread/worker.rs:124`
+- `LuaThread::is_running` in `src/thread/worker.rs:134`
+- `LuaThread::get_error` in `src/thread/worker.rs:145`
 
-### `tilemap` — 0/209 (0.0%)
+### `tilemap` — 15/209 (7.2%)
 
-**Uncovered public functions** (209):
+**Uncovered public functions** (194):
 
-- `AutoTileSheet::new` in `src/tilemap/autotile_sheet.rs:179`
-- `AutoTileSheet::get_layout` in `src/tilemap/autotile_sheet.rs:209`
-- `AutoTileSheet::get_tile_count` in `src/tilemap/autotile_sheet.rs:217`
-- `AutoTileSheet::get_tile_width` in `src/tilemap/autotile_sheet.rs:225`
-- `AutoTileSheet::get_tile_height` in `src/tilemap/autotile_sheet.rs:233`
-- `AutoTileSheet::apply_to_tileset` in `src/tilemap/autotile_sheet.rs:248`
-- `AutoTileSheet::get_bitmask_for_tile` in `src/tilemap/autotile_sheet.rs:272`
-- `AutoTileSheet::get_tile_for_bitmask` in `src/tilemap/autotile_sheet.rs:283`
-- `AutoTileSheet::get_quad` in `src/tilemap/autotile_sheet.rs:297`
-- `AutoTileSheet::get_grid_quad` in `src/tilemap/autotile_sheet.rs:328`
-- `AutoTileSheet::get_composite48_grid_quad` in `src/tilemap/autotile_sheet.rs:352`
-- `AutoTileSheet::get_quarter_rects` in `src/tilemap/autotile_sheet.rs:386`
-- `AutoTileSheet::get_quarter_dst_rects` in `src/tilemap/autotile_sheet.rs:414`
-- `ChunkMap::new` in `src/tilemap/chunk.rs:39`
-- `ChunkMap::get_chunk_size` in `src/tilemap/chunk.rs:51`
-- `ChunkMap::get_tile` in `src/tilemap/chunk.rs:69`
-- `ChunkMap::set_tile` in `src/tilemap/chunk.rs:85`
-- `ChunkMap::clear_tile` in `src/tilemap/chunk.rs:100`
-- `ChunkMap::fill_rect` in `src/tilemap/chunk.rs:112`
-- `ChunkMap::load_chunk` in `src/tilemap/chunk.rs:131`
-- *...and 189 more*
+- `AutoTileSheet::get_layout` in `src/tilemap/autotile_sheet.rs:217`
+- `AutoTileSheet::get_tile_count` in `src/tilemap/autotile_sheet.rs:225`
+- `AutoTileSheet::get_tile_width` in `src/tilemap/autotile_sheet.rs:233`
+- `AutoTileSheet::get_tile_height` in `src/tilemap/autotile_sheet.rs:241`
+- `AutoTileSheet::apply_to_tileset` in `src/tilemap/autotile_sheet.rs:256`
+- `AutoTileSheet::get_bitmask_for_tile` in `src/tilemap/autotile_sheet.rs:280`
+- `AutoTileSheet::get_tile_for_bitmask` in `src/tilemap/autotile_sheet.rs:291`
+- `AutoTileSheet::get_quad` in `src/tilemap/autotile_sheet.rs:305`
+- `AutoTileSheet::get_grid_quad` in `src/tilemap/autotile_sheet.rs:336`
+- `AutoTileSheet::get_composite48_grid_quad` in `src/tilemap/autotile_sheet.rs:360`
+- `AutoTileSheet::get_quarter_rects` in `src/tilemap/autotile_sheet.rs:394`
+- `AutoTileSheet::get_quarter_dst_rects` in `src/tilemap/autotile_sheet.rs:422`
+- `ChunkMap::get_chunk_size` in `src/tilemap/chunk.rs:55`
+- `ChunkMap::get_tile` in `src/tilemap/chunk.rs:73`
+- `ChunkMap::set_tile` in `src/tilemap/chunk.rs:89`
+- `ChunkMap::clear_tile` in `src/tilemap/chunk.rs:104`
+- `ChunkMap::fill_rect` in `src/tilemap/chunk.rs:116`
+- `ChunkMap::load_chunk` in `src/tilemap/chunk.rs:135`
+- `ChunkMap::unload_chunk` in `src/tilemap/chunk.rs:149`
+- `ChunkMap::get_loaded_chunks` in `src/tilemap/chunk.rs:157`
+- *...and 174 more*
 
-### `timer` — 0/29 (0.0%)
+### `timer` — 6/29 (20.7%)
 
-**Uncovered public functions** (29):
+**Uncovered public functions** (23):
 
-- `Clock::new` in `src/timer/clock.rs:32`
-- `Clock::tick` in `src/timer/clock.rs:56`
-- `Clock::delta` in `src/timer/clock.rs:86`
-- `Clock::total` in `src/timer/clock.rs:93`
-- `Clock::fps` in `src/timer/clock.rs:102`
-- `Clock::frame_count` in `src/timer/clock.rs:109`
-- `Clock::average_delta` in `src/timer/clock.rs:120`
-- `Scheduler::new` in `src/timer/scheduler.rs:73`
-- `Scheduler::after` in `src/timer/scheduler.rs:92`
-- `Scheduler::after_named` in `src/timer/scheduler.rs:118`
-- `Scheduler::every` in `src/timer/scheduler.rs:146`
-- `Scheduler::every_named` in `src/timer/scheduler.rs:172`
-- `Scheduler::cancel` in `src/timer/scheduler.rs:200`
-- `Scheduler::cancel_named` in `src/timer/scheduler.rs:218`
-- `Scheduler::cancel_all` in `src/timer/scheduler.rs:238`
-- `Scheduler::pause` in `src/timer/scheduler.rs:255`
-- `Scheduler::resume` in `src/timer/scheduler.rs:273`
-- `Scheduler::is_paused` in `src/timer/scheduler.rs:289`
-- `Scheduler::get_remaining` in `src/timer/scheduler.rs:306`
-- `Scheduler::get_interval` in `src/timer/scheduler.rs:317`
-- *...and 9 more*
+- `Clock::tick` in `src/timer/clock.rs:79`
+- `Clock::delta` in `src/timer/clock.rs:109`
+- `Clock::total` in `src/timer/clock.rs:116`
+- `Clock::fps` in `src/timer/clock.rs:125`
+- `Clock::frame_count` in `src/timer/clock.rs:132`
+- `Clock::average_delta` in `src/timer/clock.rs:143`
+- `Scheduler::after_named` in `src/timer/scheduler.rs:123`
+- `Scheduler::every` in `src/timer/scheduler.rs:151`
+- `Scheduler::every_named` in `src/timer/scheduler.rs:177`
+- `Scheduler::cancel` in `src/timer/scheduler.rs:205`
+- `Scheduler::cancel_named` in `src/timer/scheduler.rs:223`
+- `Scheduler::cancel_all` in `src/timer/scheduler.rs:243`
+- `Scheduler::pause` in `src/timer/scheduler.rs:260`
+- `Scheduler::resume` in `src/timer/scheduler.rs:278`
+- `Scheduler::is_paused` in `src/timer/scheduler.rs:294`
+- `Scheduler::get_remaining` in `src/timer/scheduler.rs:311`
+- `Scheduler::get_interval` in `src/timer/scheduler.rs:322`
+- `Scheduler::get_repeat_count` in `src/timer/scheduler.rs:333`
+- `Scheduler::set_interval` in `src/timer/scheduler.rs:349`
+- `Scheduler::reset_event` in `src/timer/scheduler.rs:369`
+- *...and 3 more*
 
 ## Lua API Tests by Module
 
-### `ai` — 1/134 (0.7%)
+### `ai` — 1/119 (0.8%)
 
-**Uncovered Lua API functions** (133):
+**Uncovered Lua API functions** (118):
 
 - `luna.ai.AIWorld:addAgent()`
 - `luna.ai.AIWorld:getAgent()`
@@ -923,11 +1047,11 @@
 - `luna.ai.Agent:setDecisionModel()`
 - `luna.ai.Agent:getDecisionModel()`
 - `luna.ai.Agent:addTag()`
-- *...and 113 more*
+- *...and 98 more*
 
-### `audio` — 0/124 (0.0%)
+### `audio` — 0/159 (0.0%)
 
-**Uncovered Lua API functions** (124):
+**Uncovered Lua API functions** (159):
 
 - `luna.audio.Source:play()`
 - `luna.audio.Source:stop()`
@@ -949,7 +1073,28 @@
 - `luna.audio.Source:getDuration()`
 - `luna.audio.Source:tell()`
 - `luna.audio.Source:seek()`
-- *...and 104 more*
+- *...and 139 more*
+
+### `automation` — 0/16 (0.0%)
+
+**Uncovered Lua API functions** (16):
+
+- `luna.automation.luna.automation.load()`
+- `luna.automation.luna.automation.unload()`
+- `luna.automation.luna.automation.hasScript()`
+- `luna.automation.luna.automation.getScripts()`
+- `luna.automation.luna.automation.start()`
+- `luna.automation.luna.automation.stop()`
+- `luna.automation.luna.automation.pause()`
+- `luna.automation.luna.automation.resume()`
+- `luna.automation.luna.automation.update()`
+- `luna.automation.luna.automation.isRunning()`
+- `luna.automation.luna.automation.isPaused()`
+- `luna.automation.luna.automation.isComplete()`
+- `luna.automation.luna.automation.getCurrentStep()`
+- `luna.automation.luna.automation.getStepCount()`
+- `luna.automation.luna.automation.getCurrentScript()`
+- `luna.automation.luna.automation.getElapsedTime()`
 
 ### `battle` — 0/76 (0.0%)
 
@@ -1081,9 +1226,9 @@
 - `luna.crafting.Recipe:setCategory()`
 - *...and 156 more*
 
-### `data` — 0/8 (0.0%)
+### `data` — 0/21 (0.0%)
 
-**Uncovered Lua API functions** (8):
+**Uncovered Lua API functions** (21):
 
 - `luna.data.luna.data.newByteData()`
 - `luna.data.luna.data.compress()`
@@ -1093,6 +1238,19 @@
 - `luna.data.luna.data.decode()`
 - `luna.data.luna.data.parseToml()`
 - `luna.data.luna.data.encodeToml()`
+- `luna.data.luna.data.pack()`
+- `luna.data.luna.data.unpack()`
+- `luna.data.luna.data.getPackedSize()`
+- `luna.data.luna.data.newDataView()`
+- `luna.data.DataView:getUInt8()`
+- `luna.data.DataView:getInt8()`
+- `luna.data.DataView:getInt16()`
+- `luna.data.DataView:getUInt16()`
+- `luna.data.DataView:getInt32()`
+- `luna.data.DataView:getUInt32()`
+- `luna.data.DataView:getFloat()`
+- `luna.data.DataView:getDouble()`
+- *...and 1 more*
 
 ### `dataframe` — 3/53 (5.7%)
 
@@ -1215,6 +1373,32 @@
 - `luna.docs.ApiCatalog:getTypeMethods()`
 - *...and 46 more*
 
+### `economy` — 1/47 (2.1%)
+
+**Uncovered Lua API functions** (46):
+
+- `luna.economy.ResourceManager:newResource()`
+- `luna.economy.ResourceManager:hasResource()`
+- `luna.economy.ResourceManager:removeResource()`
+- `luna.economy.ResourceManager:getResourceNames()`
+- `luna.economy.ResourceManager:getValue()`
+- `luna.economy.ResourceManager:setValue()`
+- `luna.economy.ResourceManager:getCapacity()`
+- `luna.economy.ResourceManager:setCapacity()`
+- `luna.economy.ResourceManager:getMinimum()`
+- `luna.economy.ResourceManager:setMinimum()`
+- `luna.economy.ResourceManager:getFlowRate()`
+- `luna.economy.ResourceManager:setFlowRate()`
+- `luna.economy.ResourceManager:getDecayRate()`
+- `luna.economy.ResourceManager:setDecayRate()`
+- `luna.economy.ResourceManager:getDecayPercent()`
+- `luna.economy.ResourceManager:setDecayPercent()`
+- `luna.economy.ResourceManager:getInterestRate()`
+- `luna.economy.ResourceManager:setInterestRate()`
+- `luna.economy.ResourceManager:getUpkeep()`
+- `luna.economy.ResourceManager:setUpkeep()`
+- *...and 26 more*
+
 ### `entity` — 1/40 (2.5%)
 
 **Uncovered Lua API functions** (39):
@@ -1241,9 +1425,9 @@
 - `luna.entity.Universe:hasTag()`
 - *...and 19 more*
 
-### `event` — 0/11 (0.0%)
+### `event` — 0/14 (0.0%)
 
-**Uncovered Lua API functions** (11):
+**Uncovered Lua API functions** (14):
 
 - `luna.event.Signal:emit()`
 - `luna.event.Signal:remove()`
@@ -1256,11 +1440,17 @@
 - `luna.event.luna.event.poll()`
 - `luna.event.luna.event.clear()`
 - `luna.event.luna.event.newSignal()`
+- `luna.event.luna.event.pump()`
+- `luna.event.luna.event.wait()`
+- `luna.event.luna.event.restart()`
 
-### `filesystem` — 2/30 (6.7%)
+### `filesystem` — 2/37 (5.4%)
 
-**Uncovered Lua API functions** (28):
+**Uncovered Lua API functions** (35):
 
+- `luna.filesystem.FileData:getSize()`
+- `luna.filesystem.FileData:getString()`
+- `luna.filesystem.FileData:getFilename()`
 - `luna.filesystem.FileHandle:read()`
 - `luna.filesystem.FileHandle:readLine()`
 - `luna.filesystem.FileHandle:seek()`
@@ -1278,10 +1468,23 @@
 - `luna.filesystem.luna.filesystem.isFile()`
 - `luna.filesystem.luna.filesystem.isDirectory()`
 - `luna.filesystem.luna.filesystem.createDirectory()`
-- `luna.filesystem.luna.filesystem.remove()`
-- `luna.filesystem.luna.filesystem.getInfo()`
-- `luna.filesystem.luna.filesystem.getSource()`
-- *...and 8 more*
+- *...and 15 more*
+
+### `font` — 0/11 (0.0%)
+
+**Uncovered Lua API functions** (11):
+
+- `luna.font.GlyphData:getWidth()`
+- `luna.font.GlyphData:getHeight()`
+- `luna.font.GlyphData:getAdvance()`
+- `luna.font.GlyphData:getBearingX()`
+- `luna.font.GlyphData:getBearingY()`
+- `luna.font.GlyphData:getGlyph()`
+- `luna.font.GlyphData:getGlyphString()`
+- `luna.font.luna.font.newRasterizer()`
+- `luna.font.luna.font.newTrueTypeRasterizer()`
+- `luna.font.luna.font.newBMFontRasterizer()`
+- `luna.font.luna.font.newGlyphData()`
 
 ### `graph` — 0/101 (0.0%)
 
@@ -1309,42 +1512,77 @@
 - `luna.graph.Graph:topologicalSort()`
 - *...and 81 more*
 
-### `graphics_ext` — 0/157 (0.0%)
+### `graphics` — 1/134 (0.7%)
 
-**Uncovered Lua API functions** (157):
+**Uncovered Lua API functions** (133):
 
-- `luna.graphics_ext.Light2D:setPosition()`
-- `luna.graphics_ext.Light2D:getPosition()`
-- `luna.graphics_ext.Light2D:setRadius()`
-- `luna.graphics_ext.Light2D:getRadius()`
-- `luna.graphics_ext.Light2D:getColor()`
-- `luna.graphics_ext.Light2D:setIntensity()`
-- `luna.graphics_ext.Light2D:getIntensity()`
-- `luna.graphics_ext.Light2D:setEnabled()`
-- `luna.graphics_ext.Light2D:isEnabled()`
-- `luna.graphics_ext.TextureAtlas:pack()`
-- `luna.graphics_ext.TextureAtlas:getRegion()`
-- `luna.graphics_ext.TextureAtlas:getRegionCount()`
-- `luna.graphics_ext.TextureAtlas:getDimensions()`
-- `luna.graphics_ext.TextureAtlas:getRegions()`
-- `luna.graphics_ext.TextureAtlas:clear()`
-- `luna.graphics_ext.DrawLayer:queue()`
-- `luna.graphics_ext.DrawLayer:flush()`
-- `luna.graphics_ext.DrawLayer:clear()`
-- `luna.graphics_ext.DrawLayer:getCount()`
-- `luna.graphics_ext.Viewport:resize()`
-- *...and 137 more*
+- `luna.graphics.Image:getWidth()`
+- `luna.graphics.Image:getHeight()`
+- `luna.graphics.Image:getDimensions()`
+- `luna.graphics.Image:getFilter()`
+- `luna.graphics.Image:getWrap()`
+- `luna.graphics.NineSlice:getInsets()`
+- `luna.graphics.NineSlice:getTextureSize()`
+- `luna.graphics.NineSlice:draw()`
+- `luna.graphics.Font:getWidth()`
+- `luna.graphics.Font:getHeight()`
+- `luna.graphics.Font:getLineHeight()`
+- `luna.graphics.Font:setLineHeight()`
+- `luna.graphics.Font:getAscent()`
+- `luna.graphics.Font:getDescent()`
+- `luna.graphics.SpriteBatch:getCount()`
+- `luna.graphics.SpriteBatch:clear()`
+- `luna.graphics.SpriteBatch:getBufferSize()`
+- `luna.graphics.Canvas:getWidth()`
+- `luna.graphics.Canvas:getHeight()`
+- `luna.graphics.Canvas:getDimensions()`
+- *...and 113 more*
 
-### `image` — 0/1 (0.0%)
+### `gui` — 0/287 (0.0%)
 
-**Uncovered Lua API functions** (1):
+**Uncovered Lua API functions** (287):
 
+- `luna.gui.luna.gui.setPosition()`
+- `luna.gui.luna.gui.getPosition()`
+- `luna.gui.luna.gui.setSize()`
+- `luna.gui.luna.gui.getSize()`
+- `luna.gui.luna.gui.setVisible()`
+- `luna.gui.luna.gui.isVisible()`
+- `luna.gui.luna.gui.setEnabled()`
+- `luna.gui.luna.gui.isEnabled()`
+- `luna.gui.luna.gui.setId()`
+- `luna.gui.luna.gui.getId()`
+- `luna.gui.luna.gui.setTooltip()`
+- `luna.gui.luna.gui.getTooltip()`
+- `luna.gui.luna.gui.getState()`
+- `luna.gui.luna.gui.addChild()`
+- `luna.gui.luna.gui.removeChild()`
+- `luna.gui.luna.gui.getChildCount()`
+- `luna.gui.luna.gui.findById()`
+- `luna.gui.luna.gui.setOnClick()`
+- `luna.gui.luna.gui.setOnChange()`
+- `luna.gui.luna.gui.setOnDraw()`
+- *...and 267 more*
+
+### `image` — 0/8 (0.0%)
+
+**Uncovered Lua API functions** (8):
+
+- `luna.image.CompressedImageData:getDimensions()`
+- `luna.image.CompressedImageData:getMipmapCount()`
+- `luna.image.CompressedImageData:getFormat()`
+- `luna.image.CompressedImageData:getWidth()`
+- `luna.image.CompressedImageData:getHeight()`
 - `luna.image.luna.image.newImageData()`
+- `luna.image.luna.image.newCompressedData()`
+- `luna.image.luna.image.isCompressed()`
 
-### `input` — 0/42 (0.0%)
+### `input` — 0/52 (0.0%)
 
-**Uncovered Lua API functions** (42):
+**Uncovered Lua API functions** (52):
 
+- `luna.input.Cursor:release()`
+- `luna.input.Cursor:getType()`
 - `luna.input.luna.input.isDown()`
 - `luna.input.luna.input.isScancodeDown()`
 - `luna.input.luna.input.setKeyRepeat()`
@@ -1353,6 +1591,7 @@
 - `luna.input.luna.input.hasTextInput()`
 - `luna.input.luna.input.getScancodeFromKey()`
 - `luna.input.luna.input.getKeyFromScancode()`
+- `luna.input.luna.input.isModifierActive()`
 - `luna.input.luna.input.getPosition()`
 - `luna.input.luna.input.getX()`
 - `luna.input.luna.input.getY()`
@@ -1362,10 +1601,7 @@
 - `luna.input.luna.input.setGrabbed()`
 - `luna.input.luna.input.isGrabbed()`
 - `luna.input.luna.input.setRelativeMode()`
-- `luna.input.luna.input.getRelativeMode()`
-- `luna.input.luna.input.setPosition()`
-- `luna.input.luna.input.setCursor()`
-- *...and 22 more*
+- *...and 32 more*
 
 ### `inventory` — 0/84 (0.0%)
 
@@ -1393,32 +1629,6 @@
 - `luna.inventory.ItemStack:setQuantity()`
 - *...and 64 more*
 
-### `item` — 0/117 (0.0%)
-
-**Uncovered Lua API functions** (117):
-
-- `luna.item.Item:getItemType()`
-- `luna.item.Item:getName()`
-- `luna.item.Item:setName()`
-- `luna.item.Item:getCategory()`
-- `luna.item.Item:setCategory()`
-- `luna.item.Item:getOwner()`
-- `luna.item.Item:setOwner()`
-- `luna.item.Item:getSlot()`
-- `luna.item.Item:setSlot()`
-- `luna.item.Item:getStat()`
-- `luna.item.Item:setStat()`
-- `luna.item.Item:addStat()`
-- `luna.item.Item:getStats()`
-- `luna.item.Item:hasTag()`
-- `luna.item.Item:addTag()`
-- `luna.item.Item:removeTag()`
-- `luna.item.Item:getTags()`
-- `luna.item.Item:getCounter()`
-- `luna.item.Item:setCounter()`
-- `luna.item.Item:addCounter()`
-- *...and 97 more*
-
 ### `localization` — 1/10 (10.0%)
 
 **Uncovered Lua API functions** (9):
@@ -1443,9 +1653,9 @@
 - `luna.log.luna.log.setLevel()`
 - `luna.log.luna.log.getLevel()`
 
-### `math` — 1/48 (2.1%)
+### `math` — 3/151 (2.0%)
 
-**Uncovered Lua API functions** (47):
+**Uncovered Lua API functions** (148):
 
 - `luna.math.RandomGenerator:setSeed()`
 - `luna.math.RandomGenerator:getSeed()`
@@ -1467,33 +1677,7 @@
 - `luna.math.BezierCurve:getControlPoint()`
 - `luna.math.BezierCurve:removeControlPoint()`
 - `luna.math.BezierCurve:getControlPointCount()`
-- *...and 27 more*
-
-### `math_ext` — 2/102 (2.0%)
-
-**Uncovered Lua API functions** (100):
-
-- `luna.math_ext.Vec2:getX()`
-- `luna.math_ext.Vec2:getY()`
-- `luna.math_ext.Vec2:setX()`
-- `luna.math_ext.Vec2:setY()`
-- `luna.math_ext.Vec2:get()`
-- `luna.math_ext.Vec2:getLength()`
-- `luna.math_ext.Vec2:getLengthSquared()`
-- `luna.math_ext.Vec2:getAngle()`
-- `luna.math_ext.Vec2:dot()`
-- `luna.math_ext.Vec2:cross()`
-- `luna.math_ext.Vec2:getDistance()`
-- `luna.math_ext.Vec2:getNormalized()`
-- `luna.math_ext.Vec2:getRotated()`
-- `luna.math_ext.Vec2:getPerpendicular()`
-- `luna.math_ext.Vec2:lerp()`
-- `luna.math_ext.Vec2:clone()`
-- `luna.math_ext.NoiseGenerator:setSeed()`
-- `luna.math_ext.NoiseGenerator:getSeed()`
-- `luna.math_ext.NoiseGenerator:perlinNoise()`
-- `luna.math_ext.NoiseGenerator:simplexNoise()`
-- *...and 80 more*
+- *...and 128 more*
 
 ### `minimap` — 0/41 (0.0%)
 
@@ -1547,9 +1731,61 @@
 - `luna.modding.mlua:getModCount()`
 - *...and 13 more*
 
-### `pathfinding` — 0/34 (0.0%)
+### `overlay` — 0/57 (0.0%)
 
-**Uncovered Lua API functions** (34):
+**Uncovered Lua API functions** (57):
+
+- `luna.overlay.Overlay:update()`
+- `luna.overlay.Overlay:draw()`
+- `luna.overlay.Overlay:resize()`
+- `luna.overlay.Overlay:getWidth()`
+- `luna.overlay.Overlay:getHeight()`
+- `luna.overlay.Overlay:getDimensions()`
+- `luna.overlay.Overlay:clear()`
+- `luna.overlay.Overlay:isActive()`
+- `luna.overlay.Overlay:getAmbientColor()`
+- `luna.overlay.Overlay:setTimeOfDay()`
+- `luna.overlay.Overlay:getTimeOfDay()`
+- `luna.overlay.Overlay:setAmbientEnabled()`
+- `luna.overlay.Overlay:isAmbientEnabled()`
+- `luna.overlay.Overlay:setWeather()`
+- `luna.overlay.Overlay:getWeather()`
+- `luna.overlay.Overlay:setWeatherIntensity()`
+- `luna.overlay.Overlay:getWeatherIntensity()`
+- `luna.overlay.Overlay:setWindDirection()`
+- `luna.overlay.Overlay:getWindDirection()`
+- `luna.overlay.Overlay:setWindSpeed()`
+- *...and 37 more*
+
+### `particle` — 0/95 (0.0%)
+
+**Uncovered Lua API functions** (95):
+
+- `luna.particle.ParticleSystem:update()`
+- `luna.particle.ParticleSystem:start()`
+- `luna.particle.ParticleSystem:stop()`
+- `luna.particle.ParticleSystem:pause()`
+- `luna.particle.ParticleSystem:reset()`
+- `luna.particle.ParticleSystem:getCount()`
+- `luna.particle.ParticleSystem:isActive()`
+- `luna.particle.ParticleSystem:isPaused()`
+- `luna.particle.ParticleSystem:isStopped()`
+- `luna.particle.ParticleSystem:setPosition()`
+- `luna.particle.ParticleSystem:getPosition()`
+- `luna.particle.ParticleSystem:emit()`
+- `luna.particle.ParticleSystem:setEmissionRate()`
+- `luna.particle.ParticleSystem:clone()`
+- `luna.particle.ParticleSystem:setGravity()`
+- `luna.particle.ParticleSystem:getGravity()`
+- `luna.particle.ParticleSystem:setAlphas()`
+- `luna.particle.ParticleSystem:getAlphas()`
+- `luna.particle.ParticleSystem:getEmissionShape()`
+- `luna.particle.ParticleSystem:setRelativeMode()`
+- *...and 75 more*
+
+### `pathfinding` — 0/50 (0.0%)
+
+**Uncovered Lua API functions** (50):
 
 - `luna.pathfinding.NavGrid:getWidth()`
 - `luna.pathfinding.NavGrid:getHeight()`
@@ -1571,7 +1807,7 @@
 - `luna.pathfinding.UnitPathfinder:getPathCost()`
 - `luna.pathfinding.UnitPathfinder:setCacheEnabled()`
 - `luna.pathfinding.UnitPathfinder:isCacheEnabled()`
-- *...and 14 more*
+- *...and 30 more*
 
 ### `patterns` — 3/47 (6.4%)
 
@@ -1598,6 +1834,32 @@
 - `luna.patterns.CommandStack:getHistorySize()`
 - `luna.patterns.CommandStack:getCurrentName()`
 - *...and 24 more*
+
+### `physics` — 0/108 (0.0%)
+
+**Uncovered Lua API functions** (108):
+
+- `luna.physics.Shape:getType()`
+- `luna.physics.Shape:getRadius()`
+- `luna.physics.Shape:getBoundingBox()`
+- `luna.physics.Shape:setDensity()`
+- `luna.physics.Shape:setFriction()`
+- `luna.physics.Shape:setRestitution()`
+- `luna.physics.Shape:setSensor()`
+- `luna.physics.Shape:destroy()`
+- `luna.physics.World:step()`
+- `luna.physics.World:setCallbacks()`
+- `luna.physics.World:getGravity()`
+- `luna.physics.World:setGravity()`
+- `luna.physics.World:isSleepingAllowed()`
+- `luna.physics.World:getBodyCount()`
+- `luna.physics.World:getCollisions()`
+- `luna.physics.Body:getPosition()`
+- `luna.physics.Body:setPosition()`
+- `luna.physics.Body:getVelocity()`
+- `luna.physics.Body:setVelocity()`
+- `luna.physics.Body:getAngle()`
+- *...and 88 more*
 
 ### `postfx` — 0/31 (0.0%)
 
@@ -1651,32 +1913,6 @@
 - `luna.quest.QuestStage:setName()`
 - *...and 54 more*
 
-### `resource` — 1/47 (2.1%)
-
-**Uncovered Lua API functions** (46):
-
-- `luna.resource.ResourceManager:newResource()`
-- `luna.resource.ResourceManager:hasResource()`
-- `luna.resource.ResourceManager:removeResource()`
-- `luna.resource.ResourceManager:getResourceNames()`
-- `luna.resource.ResourceManager:getValue()`
-- `luna.resource.ResourceManager:setValue()`
-- `luna.resource.ResourceManager:getCapacity()`
-- `luna.resource.ResourceManager:setCapacity()`
-- `luna.resource.ResourceManager:getMinimum()`
-- `luna.resource.ResourceManager:setMinimum()`
-- `luna.resource.ResourceManager:getFlowRate()`
-- `luna.resource.ResourceManager:setFlowRate()`
-- `luna.resource.ResourceManager:getDecayRate()`
-- `luna.resource.ResourceManager:setDecayRate()`
-- `luna.resource.ResourceManager:getDecayPercent()`
-- `luna.resource.ResourceManager:setDecayPercent()`
-- `luna.resource.ResourceManager:getInterestRate()`
-- `luna.resource.ResourceManager:setInterestRate()`
-- `luna.resource.ResourceManager:getUpkeep()`
-- `luna.resource.ResourceManager:setUpkeep()`
-- *...and 26 more*
-
 ### `savegame` — 0/13 (0.0%)
 
 **Uncovered Lua API functions** (13):
@@ -1721,14 +1957,31 @@
 - `luna.scene.luna.scene.getRegistered()`
 - *...and 8 more*
 
-### `sound` — 0/4 (0.0%)
+### `sprite` — 0/157 (0.0%)
 
-**Uncovered Lua API functions** (4):
+**Uncovered Lua API functions** (157):
 
-- `luna.sound.luna.sound.newSoundData()`
-- `luna.sound.luna.sound.setMidiSoundFont()`
-- `luna.sound.luna.sound.hasMidiSoundFont()`
-- `luna.sound.luna.sound.clearMidiSoundFont()`
+- `luna.sprite.Light2D:setPosition()`
+- `luna.sprite.Light2D:getPosition()`
+- `luna.sprite.Light2D:setRadius()`
+- `luna.sprite.Light2D:getRadius()`
+- `luna.sprite.Light2D:getColor()`
+- `luna.sprite.Light2D:setIntensity()`
+- `luna.sprite.Light2D:getIntensity()`
+- `luna.sprite.Light2D:setEnabled()`
+- `luna.sprite.Light2D:isEnabled()`
+- `luna.sprite.TextureAtlas:pack()`
+- `luna.sprite.TextureAtlas:getRegion()`
+- `luna.sprite.TextureAtlas:getRegionCount()`
+- `luna.sprite.TextureAtlas:getDimensions()`
+- `luna.sprite.TextureAtlas:getRegions()`
+- `luna.sprite.TextureAtlas:clear()`
+- `luna.sprite.DrawLayer:queue()`
+- `luna.sprite.DrawLayer:flush()`
+- `luna.sprite.DrawLayer:clear()`
+- `luna.sprite.DrawLayer:getCount()`
+- `luna.sprite.Viewport:resize()`
+- *...and 137 more*
 
 ### `stats` — 0/66 (0.0%)
 
@@ -1794,6 +2047,32 @@
 - `luna.thread.luna.thread.newChannel()`
 - `luna.thread.luna.thread.getChannel()`
 
+### `tilemap` — 0/137 (0.0%)
+
+**Uncovered Lua API functions** (137):
+
+- `luna.tilemap.TileSet:getFirstGid()`
+- `luna.tilemap.TileSet:getTileCount()`
+- `luna.tilemap.TileSet:getColumns()`
+- `luna.tilemap.TileSet:getTileWidth()`
+- `luna.tilemap.TileSet:getTileHeight()`
+- `luna.tilemap.TileSet:getTileDimensions()`
+- `luna.tilemap.TileSet:getSpacing()`
+- `luna.tilemap.TileSet:getMargin()`
+- `luna.tilemap.TileSet:getQuad()`
+- `luna.tilemap.TileSet:getAnimation()`
+- `luna.tilemap.TileSet:setSolid()`
+- `luna.tilemap.TileSet:isSolid()`
+- `luna.tilemap.TileMap:addTileSet()`
+- `luna.tilemap.TileMap:getTileSet()`
+- `luna.tilemap.TileMap:getTileSetCount()`
+- `luna.tilemap.TileMap:getLayerCount()`
+- `luna.tilemap.TileMap:getLayerName()`
+- `luna.tilemap.TileMap:getLayerVisible()`
+- `luna.tilemap.TileMap:getLayerColor()`
+- `luna.tilemap.TileMap:getLayerOffset()`
+- *...and 117 more*
+
 ### `timer` — 0/25 (0.0%)
 
 **Uncovered Lua API functions** (25):
@@ -1820,9 +2099,9 @@
 - `luna.timer.luna.timer.getTime()`
 - *...and 5 more*
 
-### `window` — 0/34 (0.0%)
+### `window` — 0/45 (0.0%)
 
-**Uncovered Lua API functions** (34):
+**Uncovered Lua API functions** (45):
 
 - `luna.window.luna.window.setTitle()`
 - `luna.window.luna.window.getTitle()`
@@ -1844,7 +2123,7 @@
 - `luna.window.luna.window.restore()`
 - `luna.window.luna.window.getPosition()`
 - `luna.window.luna.window.setPosition()`
-- *...and 14 more*
+- *...and 25 more*
 
 ## How to Improve Coverage
 
