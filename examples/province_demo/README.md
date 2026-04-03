@@ -18,3 +18,9 @@ Demonstrates the Luna2D province map system, inspired by Europa Universalis-styl
 | Left click | Select province |
 | Right click | Find path from selected to clicked province |
 | `M` | Cycle map mode |
+
+## Run
+
+```sh
+cargo run -- examples/province_demo
+```

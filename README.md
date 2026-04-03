@@ -22,6 +22,8 @@ cargo build --release
 
 `cargo run` with no game directory shows the built-in splash screen. `cargo run -- <path-to-game>` runs a folder containing a `main.lua` entry point.
 
+While the splash screen is visible you can also **drag and drop a game folder** (one that contains `main.lua`) onto the window to load it immediately — no restart required. Dropping a file inside a game folder is also accepted.
+
 ## Design Principles
 
 - Luna2D is a 2D engine. It does not target a full 3D pipeline.

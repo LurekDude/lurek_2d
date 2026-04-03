@@ -105,6 +105,9 @@ struct LunaApp {
     /// `false` until the first `RedrawRequested` triggers `init_lua()`, ensuring
     /// the splash frame is visible before the Lua VM blocks the event loop.
     lua_initialized: bool,
+
+    /// Whether a file or folder is currently being dragged over the window.
+    drag_hover: bool,
 }
 
 impl LunaApp {
@@ -142,6 +145,7 @@ impl LunaApp {
             splash_fonts: None,
             error_fonts: None,
             lua_initialized: false,
+            drag_hover: false,
         }
     }
 
@@ -226,14 +230,14 @@ impl LunaApp {
 
         // Resolve graphics backend from conf.lua (t.graphics.backend).
         // Falls back to WGPU_BACKEND env var, then to the platform-native primary backend.
-        let backends = wgpu::util::backend_bits_from_env().unwrap_or_else(|| {
+        let backends = wgpu::util::backend_bits_from_env().unwrap_or(
             match self.config.graphics.backend.as_str() {
                 "dx12" => wgpu::Backends::DX12,
                 "vulkan" => wgpu::Backends::VULKAN,
                 "metal" => wgpu::Backends::METAL,
                 _ => wgpu::Backends::PRIMARY, // "auto" or any unrecognised value
             }
-        });
+        );
 
         // Resolve power preference from conf.lua (t.graphics.power_preference).
         let power_preference = match self.config.graphics.power_preference.as_str() {
@@ -684,6 +688,7 @@ impl LunaApp {
             *title_key,
             *small_key,
             splash_fonts,
+            self.drag_hover,
         );
         let bg = [0.12, 0.08, 0.20, 1.0];
         let no_batches: SlotMap<SpriteBatchKey, crate::graphics::SpriteBatch> = SlotMap::with_key();
@@ -1528,6 +1533,55 @@ impl ApplicationHandler for LunaApp {
                 }
             }
 
+            // Drag-and-drop: allow loading a game folder by dropping it onto the window.
+            WindowEvent::HoveredFile(_) => {
+                if !self.has_game {
+                    self.drag_hover = true;
+                    if let Some(win) = &self.window {
+                        win.request_redraw();
+                    }
+                }
+            }
+
+            WindowEvent::HoveredFileCancelled => {
+                self.drag_hover = false;
+                if !self.has_game {
+                    if let Some(win) = &self.window {
+                        win.request_redraw();
+                    }
+                }
+            }
+
+            WindowEvent::DroppedFile(path) => {
+                self.drag_hover = false;
+                if !self.has_game {
+                    let main_lua = path.join("main.lua");
+                    if path.is_dir() && main_lua.exists() {
+                        log::info!("Game folder dropped — loading: {}", path.display());
+                        self.game_dir = path;
+                        self.explicit_game_dir = true;
+                        self.restart_game();
+                    } else if path.is_dir() {
+                        log::warn!(
+                            "Dropped folder has no main.lua: {}",
+                            path.display()
+                        );
+                    } else if let Some(parent) = path.parent() {
+                        // User may have dropped a file inside the game folder.
+                        let parent_main = parent.join("main.lua");
+                        if parent_main.exists() {
+                            log::info!(
+                                "Game file dropped — loading parent folder: {}",
+                                parent.display()
+                            );
+                            self.game_dir = parent.to_path_buf();
+                            self.explicit_game_dir = true;
+                            self.restart_game();
+                        }
+                    }
+                }
+            }
+
             _ => {}
         }
     }
@@ -1771,6 +1825,7 @@ fn make_splash_commands(
     title_key: FontKey,
     small_key: FontKey,
     fonts: &mut SlotMap<FontKey, crate::graphics::Font>,
+    drag_hover: bool,
 ) -> Vec<DrawCommand> {
     let cx = width as f32 / 2.0;
     let cy = height as f32 / 2.0;
@@ -1780,6 +1835,11 @@ fn make_splash_commands(
     let title_text = "LUNA2D";
     let subtitle_text = "2D Game Engine";
     let version_text = format!("v{}", env!("CARGO_PKG_VERSION"));
+    let hint_text = if drag_hover {
+        "Release to load game"
+    } else {
+        "Drop a game folder here to load it"
+    };
 
     // Measure text widths for centering.
     let title_w = fonts
@@ -1794,8 +1854,12 @@ fn make_splash_commands(
         .get_mut(small_key)
         .map(|f| f.text_width(&version_text))
         .unwrap_or(0.0);
+    let hint_w = fonts
+        .get_mut(small_key)
+        .map(|f| f.text_width(hint_text))
+        .unwrap_or(0.0);
 
-    vec![
+    let mut cmds = vec![
         // Moon crescent
         DrawCommand::SetColor(0.95, 0.90, 0.55, 1.0),
         DrawCommand::Circle {
@@ -1838,7 +1902,32 @@ fn make_splash_commands(
             y: cy + 110.0,
             scale: 1.0,
         },
-    ]
+    ];
+
+    // Drop hint — shown at the bottom of the splash screen.
+    // Brightens when the user is hovering a file over the window.
+    if drag_hover {
+        cmds.push(DrawCommand::SetColor(0.4, 0.8, 0.4, 0.15));
+        cmds.push(DrawCommand::Rectangle {
+            mode: DrawMode::Fill,
+            x: cx - 220.0,
+            y: height as f32 - 70.0,
+            w: 440.0,
+            h: 40.0,
+        });
+        cmds.push(DrawCommand::SetColor(0.5, 0.9, 0.5, 1.0));
+    } else {
+        cmds.push(DrawCommand::SetColor(0.35, 0.30, 0.45, 1.0));
+    }
+    cmds.push(DrawCommand::PrintFont {
+        font_key: small_key,
+        text: hint_text.to_string(),
+        x: cx - hint_w / 2.0,
+        y: height as f32 - 55.0,
+        scale: 1.0,
+    });
+
+    cmds
 }
 
 #[cfg(test)]
