@@ -106,6 +106,10 @@ pub struct GraphicsConfig {
 /// - `borderless` — Remove window decorations (title bar, borders).
 /// - `icon` — Path to a window icon image, resolved relative to the game directory and applied during startup.
 /// - `display_index` — Monitor index for window placement (0 = primary).
+/// - `scale_mode` — Viewport scaling mode: `"none"`, `"letterbox"`, `"stretch"`, or `"pixel"`. Default: `"none"`.
+/// - `game_width` — Logical game resolution width in virtual pixels. `None` means match window width.
+/// - `game_height` — Logical game resolution height in virtual pixels. `None` means match window height.
+/// - `maximized` — Start the window maximized. Default: `false`.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct WindowConfig {
     pub width: u32,
@@ -119,6 +123,14 @@ pub struct WindowConfig {
     pub borderless: bool,
     pub icon: Option<String>,
     pub display_index: u32,
+    /// Viewport scaling mode: `"none"`, `"letterbox"`, `"stretch"`, or `"pixel"`.
+    pub scale_mode: String,
+    /// Logical game resolution width in virtual pixels. `None` means match window width.
+    pub game_width: Option<u32>,
+    /// Logical game resolution height in virtual pixels. `None` means match window height.
+    pub game_height: Option<u32>,
+    /// Whether to start the window maximized.
+    pub maximized: bool,
 }
 
 /// Flags to enable or disable optional engine subsystems.
@@ -168,6 +180,10 @@ impl Default for Config {
                 borderless: false,
                 icon: None,
                 display_index: 0,
+                scale_mode: "none".to_string(),
+                game_width: None,
+                game_height: None,
+                maximized: false,
             },
             graphics: GraphicsConfig {
                 backend: "auto".to_string(),
@@ -277,6 +293,16 @@ impl Config {
         window
             .set("displayindex", config.window.display_index)
             .unwrap();
+        window
+            .set("scalemode", config.window.scale_mode.as_str())
+            .unwrap();
+        window
+            .set("gamewidth", config.window.game_width.unwrap_or(0))
+            .unwrap();
+        window
+            .set("gameheight", config.window.game_height.unwrap_or(0))
+            .unwrap();
+        window.set("maximized", config.window.maximized).unwrap();
         t.set("window", window).unwrap();
 
         let graphics = lua.create_table().unwrap();
@@ -364,6 +390,21 @@ impl Config {
             if let Ok(v) = window.get::<_, u32>("displayindex") {
                 config.window.display_index = v;
             }
+            if let Ok(v) = window.get::<_, String>("scalemode") {
+                let v = v.to_lowercase();
+                if matches!(v.as_str(), "none" | "letterbox" | "stretch" | "pixel") {
+                    config.window.scale_mode = v;
+                }
+            }
+            if let Ok(v) = window.get::<_, u32>("gamewidth") {
+                config.window.game_width = if v > 0 { Some(v) } else { None };
+            }
+            if let Ok(v) = window.get::<_, u32>("gameheight") {
+                config.window.game_height = if v > 0 { Some(v) } else { None };
+            }
+            if let Ok(v) = window.get::<_, bool>("maximized") {
+                config.window.maximized = v;
+            }
         }
 
         if let Ok(graphics) = t.get::<_, LuaTable>("graphics") {
@@ -424,11 +465,7 @@ impl Config {
             }
             if let Ok(v) = log_tbl.get::<_, String>("level") {
                 let v = v.to_lowercase();
-                config.log_level = if v.is_empty() {
-                    None
-                } else {
-                    Some(v)
-                };
+                config.log_level = if v.is_empty() { None } else { Some(v) };
             }
         }
 

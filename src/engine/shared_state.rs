@@ -67,6 +67,14 @@ pub enum FullscreenType {
 /// - `pending_vsync` — `Option<i32>`.
 /// - `fullscreen` — `bool`.
 /// - `fullscreen_type` — `FullscreenType`.
+/// - `game_width` — `f32`.
+/// - `game_height` — `f32`.
+/// - `scale_mode_str` — `String`.
+/// - `viewport_scale_x` — `f32`.
+/// - `viewport_scale_y` — `f32`.
+/// - `viewport_offset_x` — `f32`.
+/// - `viewport_offset_y` — `f32`.
+/// - `pending_scale_mode` — `Option<String>`.
 ///
 /// Query fields are written by `app.rs` from window events and read by Lua.
 /// Pending fields are written by Lua closures and consumed by `app.rs`.
@@ -121,6 +129,24 @@ pub struct WindowState {
     pub fullscreen: bool,
     /// The type of fullscreen currently active.
     pub fullscreen_type: FullscreenType,
+
+    // --- Viewport scaling (set from config, recomputed on resize) ---
+    /// The game's logical width in virtual pixels (game coordinate space).
+    pub game_width: f32,
+    /// The game's logical height in virtual pixels (game coordinate space).
+    pub game_height: f32,
+    /// Active scale mode string: `"none"`, `"letterbox"`, `"stretch"`, or `"pixel"`.
+    pub scale_mode_str: String,
+    /// Computed horizontal scale factor from game space to window pixels.
+    pub viewport_scale_x: f32,
+    /// Computed vertical scale factor from game space to window pixels.
+    pub viewport_scale_y: f32,
+    /// Computed horizontal offset in window pixels for centering the scaled viewport.
+    pub viewport_offset_x: f32,
+    /// Computed vertical offset in window pixels for centering the scaled viewport.
+    pub viewport_offset_y: f32,
+    /// Pending scale mode change requested from Lua.
+    pub pending_scale_mode: Option<String>,
 }
 
 impl Default for WindowState {
@@ -149,6 +175,14 @@ impl Default for WindowState {
             pending_vsync: None,
             fullscreen: false,
             fullscreen_type: FullscreenType::Desktop,
+            game_width: 800.0,
+            game_height: 600.0,
+            scale_mode_str: "none".to_string(),
+            viewport_scale_x: 1.0,
+            viewport_scale_y: 1.0,
+            viewport_offset_x: 0.0,
+            viewport_offset_y: 0.0,
+            pending_scale_mode: None,
         }
     }
 }

@@ -584,6 +584,92 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
         lua.create_function(|_, ()| Ok(false))?,
     )?;
 
+    // --- Viewport scaling ---
+
+    /// Returns the current viewport scale and offset information as a table.
+    ///
+    /// The returned table contains: `scale_x`, `scale_y`, `offset_x`, `offset_y`,
+    /// `game_width`, and `game_height`.
+    ///
+    /// # Returns
+    /// Table with viewport scale and offset fields.
+    let s = state.clone();
+    /// @return table
+    window.set(
+        "getScaleInfo",
+        lua.create_function(move |lua, ()| {
+            let st = s.borrow();
+            let ws = &st.window_state;
+            let t = lua.create_table()?;
+            t.set("scale_x", ws.viewport_scale_x)?;
+            t.set("scale_y", ws.viewport_scale_y)?;
+            t.set("offset_x", ws.viewport_offset_x)?;
+            t.set("offset_y", ws.viewport_offset_y)?;
+            t.set("game_width", ws.game_width)?;
+            t.set("game_height", ws.game_height)?;
+            Ok(t)
+        })?,
+    )?;
+
+    /// Returns the current viewport scale mode string.
+    ///
+    /// Possible values: `"none"`, `"letterbox"`, `"stretch"`, `"pixel"`.
+    ///
+    /// # Returns
+    /// Scale mode string.
+    let s = state.clone();
+    /// @return string
+    window.set(
+        "getScaleMode",
+        lua.create_function(move |_, ()| {
+            Ok(s.borrow().window_state.scale_mode_str.clone())
+        })?,
+    )?;
+
+    /// Sets the viewport scale mode.
+    ///
+    /// Changes take effect on the next frame via the pending action queue.
+    /// Invalid values are silently ignored.
+    ///
+    /// # Parameters
+    /// - `mode` — Scale mode: `"none"`, `"letterbox"`, `"stretch"`, or `"pixel"`.
+    let s = state.clone();
+    /// @param mode : string
+    window.set(
+        "setScaleMode",
+        lua.create_function(move |_, mode: String| {
+            let mode = mode.to_lowercase();
+            if matches!(mode.as_str(), "none" | "letterbox" | "stretch" | "pixel") {
+                s.borrow_mut().window_state.pending_scale_mode = Some(mode);
+            } else {
+                log::warn!("luna.window.setScaleMode: unknown mode '{}', ignoring", mode);
+            }
+            Ok(())
+        })?,
+    )?;
+
+    /// Returns the game's logical width in virtual pixels.
+    ///
+    /// # Returns
+    /// Game width as a number.
+    let s = state.clone();
+    /// @return number
+    window.set(
+        "getGameWidth",
+        lua.create_function(move |_, ()| Ok(s.borrow().window_state.game_width))?,
+    )?;
+
+    /// Returns the game's logical height in virtual pixels.
+    ///
+    /// # Returns
+    /// Game height as a number.
+    let s = state.clone();
+    /// @return number
+    window.set(
+        "getGameHeight",
+        lua.create_function(move |_, ()| Ok(s.borrow().window_state.game_height))?,
+    )?;
+
     /// Window.
     luna.set("window", window)?;
     Ok(())

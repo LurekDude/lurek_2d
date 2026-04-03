@@ -22,11 +22,12 @@ use crate::engine::error_screen::ErrorScreen;
 use crate::engine::resource_keys::{
     CanvasKey, FontKey, MeshKey, ShaderKey, SpriteBatchKey, TextureKey,
 };
+use crate::engine::{FullscreenType, SharedState};
+use crate::engine::shared_state::WindowState;
 use crate::graphics::renderer::{DrawCommand, DrawMode, TextureData};
 use crate::graphics::GpuRenderer;
 use crate::input::keyboard::{winit_key_to_string, winit_scancode_to_string};
 use crate::input::{gilrs_axis_to_string, gilrs_button_to_string, SystemCursor};
-use crate::engine::{FullscreenType, SharedState};
 use crate::lua_api::create_lua_vm;
 use slotmap::SlotMap;
 
@@ -36,6 +37,51 @@ use gilrs::{
 };
 
 use super::config::Config;
+
+/// Recomputes viewport scale and offset based on game and window dimensions.
+///
+/// Updates `viewport_scale_x`, `viewport_scale_y`, `viewport_offset_x`, and `viewport_offset_y`
+/// on the provided `WindowState` given the current physical window size.
+///
+/// # Parameters
+/// - `ws` — Mutable reference to the window state to update.
+/// - `win_w` — Physical window width in pixels.
+/// - `win_h` — Physical window height in pixels.
+fn recompute_viewport(ws: &mut WindowState, win_w: u32, win_h: u32) {
+    let gw = ws.game_width.max(1.0);
+    let gh = ws.game_height.max(1.0);
+    match ws.scale_mode_str.as_str() {
+        "letterbox" => {
+            let s = (win_w as f32 / gw).min(win_h as f32 / gh);
+            ws.viewport_scale_x = s;
+            ws.viewport_scale_y = s;
+            ws.viewport_offset_x = (win_w as f32 - gw * s) * 0.5;
+            ws.viewport_offset_y = (win_h as f32 - gh * s) * 0.5;
+        }
+        "stretch" => {
+            ws.viewport_scale_x = win_w as f32 / gw;
+            ws.viewport_scale_y = win_h as f32 / gh;
+            ws.viewport_offset_x = 0.0;
+            ws.viewport_offset_y = 0.0;
+        }
+        "pixel" => {
+            let s = ((win_w as f32 / gw).min(win_h as f32 / gh))
+                .floor()
+                .max(1.0);
+            ws.viewport_scale_x = s;
+            ws.viewport_scale_y = s;
+            ws.viewport_offset_x = (win_w as f32 - gw * s) * 0.5;
+            ws.viewport_offset_y = (win_h as f32 - gh * s) * 0.5;
+        }
+        _ => {
+            // "none" — pass-through, no scaling
+            ws.viewport_scale_x = 1.0;
+            ws.viewport_scale_y = 1.0;
+            ws.viewport_offset_x = 0.0;
+            ws.viewport_offset_y = 0.0;
+        }
+    }
+}
 
 // ─── Run state machine ──────────────────────────────────────────────────────
 
@@ -108,6 +154,12 @@ struct LunaApp {
 
     /// Whether a file or folder is currently being dragged over the window.
     drag_hover: bool,
+
+    /// Maximum allowed surface dimension from GPU limits.
+    max_surface_dim: u32,
+
+    /// Reusable command buffer for viewport-wrapped draw commands; avoids per-frame allocation.
+    render_cmd_buf: Vec<DrawCommand>,
 }
 
 impl LunaApp {
@@ -146,6 +198,8 @@ impl LunaApp {
             error_fonts: None,
             lua_initialized: false,
             drag_hover: false,
+            max_surface_dim: 4096,
+            render_cmd_buf: Vec::new(),
         }
     }
 
@@ -195,6 +249,19 @@ impl LunaApp {
         }
     }
 
+    /// Clamps surface dimensions to the GPU's maximum texture size, ensuring wgpu never panics.
+    ///
+    /// # Parameters
+    /// - `w` — Requested width in physical pixels.
+    /// - `h` — Requested height in physical pixels.
+    ///
+    /// # Returns
+    /// `(u32, u32)` clamped width and height, each at least 1.
+    fn clamp_surface_dims(&self, w: u32, h: u32) -> (u32, u32) {
+        let m = self.max_surface_dim.max(1);
+        (w.max(1).min(m), h.max(1).min(m))
+    }
+
     fn surface_configuration(&self, width: u32, height: u32) -> wgpu::SurfaceConfiguration {
         wgpu::SurfaceConfiguration {
             usage: wgpu::TextureUsages::RENDER_ATTACHMENT,
@@ -236,7 +303,7 @@ impl LunaApp {
                 "vulkan" => wgpu::Backends::VULKAN,
                 "metal" => wgpu::Backends::METAL,
                 _ => wgpu::Backends::PRIMARY, // "auto" or any unrecognised value
-            }
+            },
         );
 
         // Resolve power preference from conf.lua (t.graphics.power_preference).
@@ -298,9 +365,20 @@ impl LunaApp {
         (self.surface_present_mode, self.window_vsync_mode) =
             Self::resolve_present_mode(&self.surface_present_modes, self.window_vsync_mode);
 
-        surface.configure(&device, &self.surface_configuration(width, height));
+        // Read GPU limits and store the max surface dimension to prevent surface configure panics.
+        self.max_surface_dim = device.limits().max_texture_dimension_2d;
+        log::info!("GPU max_texture_dimension_2d = {}", self.max_surface_dim);
 
-        let renderer = GpuRenderer::new(device, queue, surface_format, width, height);
+        let (cw, ch) = self.clamp_surface_dims(width, height);
+        if cw != width || ch != height {
+            log::warn!(
+                "Initial window size {}\u{d7}{} exceeds GPU max texture size {}. Clamping to {}\u{d7}{}.",
+                width, height, self.max_surface_dim, cw, ch
+            );
+        }
+        surface.configure(&device, &self.surface_configuration(cw, ch));
+
+        let renderer = GpuRenderer::new(device, queue, surface_format, cw, ch);
 
         self.surface = Some(surface);
         self.renderer = Some(renderer);
@@ -335,6 +413,25 @@ impl LunaApp {
         }
         shared_state.window_state.vsync_mode = self.window_vsync_mode;
         shared_state.window = self.window.as_ref().map(Arc::clone);
+
+        // Initialize viewport state from config.
+        {
+            let ws = &mut shared_state.window_state;
+            ws.game_width = self
+                .config
+                .window
+                .game_width
+                .unwrap_or(self.config.window.width) as f32;
+            ws.game_height = self
+                .config
+                .window
+                .game_height
+                .unwrap_or(self.config.window.height) as f32;
+            ws.scale_mode_str = self.config.window.scale_mode.clone();
+            let (ww, wh) = (shared_state.window_width, shared_state.window_height);
+            recompute_viewport(ws, ww, wh);
+        }
+
         let state = Rc::new(RefCell::new(shared_state));
 
         let lua = match create_lua_vm(state.clone()) {
@@ -433,6 +530,7 @@ impl LunaApp {
             mouse_relative_mode,
             mouse_cursor,
             pending_cursor_position,
+            pending_scale_mode,
         ) = {
             let mut st = state.borrow_mut();
             (
@@ -454,6 +552,7 @@ impl LunaApp {
                 st.mouse.get_relative_mode(),
                 st.mouse.get_cursor(),
                 st.mouse.take_pending_position(),
+                st.window_state.pending_scale_mode.take(),
             )
         };
 
@@ -570,6 +669,18 @@ impl LunaApp {
         if pending_close {
             state.borrow_mut().quit_requested = true;
         }
+
+        // Apply pending scale mode
+        if let Some(new_mode) = pending_scale_mode {
+            if matches!(new_mode.as_str(), "none" | "letterbox" | "stretch" | "pixel") {
+                if let Some(state) = &self.state {
+                    let mut st = state.borrow_mut();
+                    st.window_state.scale_mode_str = new_mode;
+                    let (ww, wh) = (st.window_width, st.window_height);
+                    recompute_viewport(&mut st.window_state, ww, wh);
+                }
+            }
+        }
     }
 
     fn game_update(&mut self) {
@@ -606,7 +717,8 @@ impl LunaApp {
             return;
         };
 
-        let (commands, textures, shaders, default_filter, bg, cam_matrix, frame_time) = {
+        let (commands, textures, shaders, default_filter, bg, cam_matrix, frame_time,
+             vp_scale_x, vp_scale_y, vp_offset_x, vp_offset_y, vp_mode, game_w, game_h) = {
             let st = state.borrow();
             (
                 st.draw_commands.clone(),
@@ -616,7 +728,52 @@ impl LunaApp {
                 st.background_color,
                 st.camera.view_matrix(),
                 st.total_time as f32,
+                st.window_state.viewport_scale_x,
+                st.window_state.viewport_scale_y,
+                st.window_state.viewport_offset_x,
+                st.window_state.viewport_offset_y,
+                st.window_state.scale_mode_str.clone(),
+                st.window_state.game_width,
+                st.window_state.game_height,
             )
+        };
+
+        // Wrap draw commands with viewport transform when scale mode is active.
+        // Uses the reusable render_cmd_buf to avoid a per-frame heap allocation.
+        let use_viewport = vp_mode != "none"
+            && (vp_scale_x != 1.0
+                || vp_scale_y != 1.0
+                || vp_offset_x != 0.0
+                || vp_offset_y != 0.0);
+        if use_viewport {
+            self.render_cmd_buf.clear();
+            if vp_mode == "letterbox" || vp_mode == "pixel" {
+                self.render_cmd_buf.push(DrawCommand::SetScissor(Some((
+                    vp_offset_x,
+                    vp_offset_y,
+                    game_w * vp_scale_x,
+                    game_h * vp_scale_y,
+                ))));
+            }
+            self.render_cmd_buf.push(DrawCommand::PushTransform);
+            self.render_cmd_buf.push(DrawCommand::Translate {
+                x: vp_offset_x,
+                y: vp_offset_y,
+            });
+            self.render_cmd_buf.push(DrawCommand::Scale {
+                sx: vp_scale_x,
+                sy: vp_scale_y,
+            });
+            self.render_cmd_buf.extend(commands.iter().cloned());
+            self.render_cmd_buf.push(DrawCommand::PopTransform);
+            if vp_mode == "letterbox" || vp_mode == "pixel" {
+                self.render_cmd_buf.push(DrawCommand::SetScissor(None));
+            }
+        }
+        let final_commands: &Vec<DrawCommand> = if use_viewport {
+            &self.render_cmd_buf
+        } else {
+            &commands
         };
 
         // Temporarily take fonts out of SharedState for mutable access during rendering.
@@ -627,7 +784,7 @@ impl LunaApp {
 
         if let Err(e) = renderer.render_frame(
             surface,
-            &commands,
+            final_commands,
             &textures,
             &mut fonts,
             &sprite_batches,
@@ -787,6 +944,7 @@ impl LunaApp {
         else {
             return;
         };
+        let (w, h) = self.clamp_surface_dims(w, h);
         let surface_config = self.surface_configuration(w, h);
         let (Some(renderer), Some(surface)) = (&mut self.renderer, &self.surface) else {
             return;
@@ -798,6 +956,7 @@ impl LunaApp {
         if width == 0 || height == 0 {
             return;
         }
+        let (width, height) = self.clamp_surface_dims(width, height);
         let surface_config = self.surface_configuration(width, height);
         let (Some(renderer), Some(surface)) = (&mut self.renderer, &self.surface) else {
             return;
@@ -808,6 +967,7 @@ impl LunaApp {
             let mut st = state.borrow_mut();
             st.window_width = width;
             st.window_height = height;
+            recompute_viewport(&mut st.window_state, width, height);
         }
         // Fire luna.resize(w, h) callback
         if self.has_game {
@@ -1103,6 +1263,10 @@ impl ApplicationHandler for LunaApp {
             );
         }
 
+        if self.config.window.maximized && !self.config.window.fullscreen {
+            window.set_maximized(true);
+        }
+
         if let Some(icon_path) = self.config.window.icon.as_deref() {
             if let Some(icon) = load_window_icon(&self.game_dir, icon_path) {
                 window.set_window_icon(Some(icon));
@@ -1324,12 +1488,30 @@ impl ApplicationHandler for LunaApp {
             }
 
             WindowEvent::CursorMoved { position, .. } => {
-                self.mouse_x = position.x as f32;
-                self.mouse_y = position.y as f32;
+                // Transform window-space coordinates to game-space via inverse viewport.
+                let (gx, gy) = if let Some(state) = &self.state {
+                    let st = state.borrow();
+                    let ws = &st.window_state;
+                    let gx = if ws.viewport_scale_x > 0.0 {
+                        (position.x as f32 - ws.viewport_offset_x) / ws.viewport_scale_x
+                    } else {
+                        position.x as f32
+                    };
+                    let gy = if ws.viewport_scale_y > 0.0 {
+                        (position.y as f32 - ws.viewport_offset_y) / ws.viewport_scale_y
+                    } else {
+                        position.y as f32
+                    };
+                    (gx, gy)
+                } else {
+                    (position.x as f32, position.y as f32)
+                };
+                self.mouse_x = gx;
+                self.mouse_y = gy;
                 if let Some(state) = &self.state {
                     let mut st = state.borrow_mut();
-                    st.mouse.x = self.mouse_x;
-                    st.mouse.y = self.mouse_y;
+                    st.mouse.x = gx;
+                    st.mouse.y = gy;
                 }
             }
 
@@ -1571,10 +1753,7 @@ impl ApplicationHandler for LunaApp {
                         self.explicit_game_dir = true;
                         self.restart_game();
                     } else if path.is_dir() {
-                        log::warn!(
-                            "Dropped folder has no main.lua: {}",
-                            path.display()
-                        );
+                        log::warn!("Dropped folder has no main.lua: {}", path.display());
                     } else if let Some(parent) = path.parent() {
                         // User may have dropped a file inside the game folder.
                         let parent_main = parent.join("main.lua");
@@ -1681,7 +1860,12 @@ impl App {
 /// file is opened in append mode instead of being truncated.
 /// `log_level` overrides the build-mode default level when `Some` — valid values:
 /// `"error"`, `"warn"`, `"info"`, `"debug"`, `"trace"`.
-fn init_logging(game_dir: &Path, log_file: Option<&str>, log_append: bool, log_level: Option<&str>) {
+fn init_logging(
+    game_dir: &Path,
+    log_file: Option<&str>,
+    log_append: bool,
+    log_level: Option<&str>,
+) {
     use std::io::Write as _;
 
     // Resolve log file path: custom path relative to game_dir, or cwd/luna2d.log default.
@@ -1981,5 +2165,225 @@ mod tests {
             .expect("shared state should be initialized");
         assert_eq!(state.borrow().filesystem_identity, "phase01-save");
         assert!(matches!(app.run_state, RunState::Running));
+    }
+
+    // ── recompute_viewport ────────────────────────────────────────────────────
+
+    /// Build a WindowState with the given mode and game size for viewport tests.
+    fn make_ws(mode: &str, game_w: f32, game_h: f32) -> WindowState {
+        let mut ws = WindowState::default();
+        ws.scale_mode_str = mode.to_string();
+        ws.game_width = game_w;
+        ws.game_height = game_h;
+        ws
+    }
+
+    #[test]
+    fn recompute_viewport_letterbox_wide_window_uses_height_limited_scale() {
+        // 800×600 game, 1600×600 window → scale limited by height (600/600 = 1.0)
+        let mut ws = make_ws("letterbox", 800.0, 600.0);
+        recompute_viewport(&mut ws, 1600, 600);
+        assert!(
+            (ws.viewport_scale_x - 1.0).abs() < 1e-4,
+            "scale_x should be 1.0, got {}",
+            ws.viewport_scale_x
+        );
+        assert!(
+            (ws.viewport_scale_y - 1.0).abs() < 1e-4,
+            "scale_y should be 1.0, got {}",
+            ws.viewport_scale_y
+        );
+        // offset_x = (1600 - 800*1) * 0.5 = 400
+        assert!(
+            (ws.viewport_offset_x - 400.0).abs() < 1e-4,
+            "offset_x should be 400.0, got {}",
+            ws.viewport_offset_x
+        );
+        assert!(
+            ws.viewport_offset_y.abs() < 1e-4,
+            "offset_y should be 0.0, got {}",
+            ws.viewport_offset_y
+        );
+    }
+
+    #[test]
+    fn recompute_viewport_letterbox_tall_window_adds_top_bottom_bars() {
+        // 800×600 game, 800×900 window → scale = min(1.0, 1.5) = 1.0
+        let mut ws = make_ws("letterbox", 800.0, 600.0);
+        recompute_viewport(&mut ws, 800, 900);
+        assert!(
+            (ws.viewport_scale_x - 1.0).abs() < 1e-4,
+            "scale_x should be 1.0, got {}",
+            ws.viewport_scale_x
+        );
+        assert!(
+            (ws.viewport_scale_y - 1.0).abs() < 1e-4,
+            "scale_y should be 1.0, got {}",
+            ws.viewport_scale_y
+        );
+        assert!(
+            ws.viewport_offset_x.abs() < 1e-4,
+            "offset_x should be 0.0, got {}",
+            ws.viewport_offset_x
+        );
+        // offset_y = (900 - 600*1) * 0.5 = 150
+        assert!(
+            (ws.viewport_offset_y - 150.0).abs() < 1e-4,
+            "offset_y should be 150.0, got {}",
+            ws.viewport_offset_y
+        );
+    }
+
+    #[test]
+    fn recompute_viewport_letterbox_doubled_window_gives_scale_two() {
+        // 800×600 game, 1600×1200 window → scale = min(2.0, 2.0) = 2.0, no offset
+        let mut ws = make_ws("letterbox", 800.0, 600.0);
+        recompute_viewport(&mut ws, 1600, 1200);
+        assert!(
+            (ws.viewport_scale_x - 2.0).abs() < 1e-4,
+            "scale_x should be 2.0, got {}",
+            ws.viewport_scale_x
+        );
+        assert!(
+            (ws.viewport_scale_y - 2.0).abs() < 1e-4,
+            "scale_y should be 2.0, got {}",
+            ws.viewport_scale_y
+        );
+        assert!(
+            ws.viewport_offset_x.abs() < 1e-4,
+            "offset_x should be 0.0"
+        );
+        assert!(
+            ws.viewport_offset_y.abs() < 1e-4,
+            "offset_y should be 0.0"
+        );
+    }
+
+    #[test]
+    fn recompute_viewport_stretch_produces_nonuniform_scale() {
+        // 800×600 game, 1600×1200 window → scale_x = 2.0, scale_y = 2.0, no offset
+        let mut ws = make_ws("stretch", 800.0, 600.0);
+        recompute_viewport(&mut ws, 1600, 1200);
+        assert!(
+            (ws.viewport_scale_x - 2.0).abs() < 1e-4,
+            "scale_x should be 2.0, got {}",
+            ws.viewport_scale_x
+        );
+        assert!(
+            (ws.viewport_scale_y - 2.0).abs() < 1e-4,
+            "scale_y should be 2.0, got {}",
+            ws.viewport_scale_y
+        );
+        assert!(ws.viewport_offset_x.abs() < 1e-4);
+        assert!(ws.viewport_offset_y.abs() < 1e-4);
+    }
+
+    #[test]
+    fn recompute_viewport_stretch_nonuniform_window() {
+        // 800×600 game, 1600×900 window → scale_x = 2.0, scale_y = 1.5 (non-uniform)
+        let mut ws = make_ws("stretch", 800.0, 600.0);
+        recompute_viewport(&mut ws, 1600, 900);
+        assert!(
+            (ws.viewport_scale_x - 2.0).abs() < 1e-4,
+            "scale_x should be 2.0, got {}",
+            ws.viewport_scale_x
+        );
+        assert!(
+            (ws.viewport_scale_y - 1.5).abs() < 1e-4,
+            "scale_y should be 1.5, got {}",
+            ws.viewport_scale_y
+        );
+        assert!(ws.viewport_offset_x.abs() < 1e-4);
+        assert!(ws.viewport_offset_y.abs() < 1e-4);
+    }
+
+    #[test]
+    fn recompute_viewport_pixel_uses_integer_scale() {
+        // 320×240 game, 1000×800 window → raw scale = min(3.125, 3.333) = 3.125 → floor = 3
+        let mut ws = make_ws("pixel", 320.0, 240.0);
+        recompute_viewport(&mut ws, 1000, 800);
+        assert!(
+            (ws.viewport_scale_x - 3.0).abs() < 1e-4,
+            "scale_x should be 3.0, got {}",
+            ws.viewport_scale_x
+        );
+        assert!(
+            (ws.viewport_scale_y - 3.0).abs() < 1e-4,
+            "scale_y should be 3.0, got {}",
+            ws.viewport_scale_y
+        );
+        // offset_x = (1000 - 320*3) * 0.5 = (1000 - 960) * 0.5 = 20
+        assert!(
+            (ws.viewport_offset_x - 20.0).abs() < 1e-4,
+            "offset_x should be 20.0, got {}",
+            ws.viewport_offset_x
+        );
+        // offset_y = (800 - 240*3) * 0.5 = (800 - 720) * 0.5 = 40
+        assert!(
+            (ws.viewport_offset_y - 40.0).abs() < 1e-4,
+            "offset_y should be 40.0, got {}",
+            ws.viewport_offset_y
+        );
+    }
+
+    #[test]
+    fn recompute_viewport_pixel_window_barely_larger_than_game_gives_scale_one() {
+        // 320×240 game, 321×241 window → raw = min(1.003, 1.004) = 1.003 → floor = 1
+        let mut ws = make_ws("pixel", 320.0, 240.0);
+        recompute_viewport(&mut ws, 321, 241);
+        assert!(
+            (ws.viewport_scale_x - 1.0).abs() < 1e-4,
+            "scale should floor to 1.0, got {}",
+            ws.viewport_scale_x
+        );
+        assert!(
+            (ws.viewport_scale_y - 1.0).abs() < 1e-4,
+            "scale should floor to 1.0, got {}",
+            ws.viewport_scale_y
+        );
+    }
+
+    #[test]
+    fn recompute_viewport_pixel_window_smaller_than_game_clamps_to_one() {
+        // 320×240 game, 100×100 window → raw = ~0.31 → floor = 0 → max(1) = 1
+        let mut ws = make_ws("pixel", 320.0, 240.0);
+        recompute_viewport(&mut ws, 100, 100);
+        assert!(
+            (ws.viewport_scale_x - 1.0).abs() < 1e-4,
+            "scale should clamp to 1.0 minimum, got {}",
+            ws.viewport_scale_x
+        );
+    }
+
+    #[test]
+    fn recompute_viewport_none_mode_passthrough() {
+        let mut ws = make_ws("none", 800.0, 600.0);
+        recompute_viewport(&mut ws, 1920, 1080);
+        assert!(
+            (ws.viewport_scale_x - 1.0).abs() < 1e-4,
+            "none mode: scale_x should be 1.0"
+        );
+        assert!(
+            (ws.viewport_scale_y - 1.0).abs() < 1e-4,
+            "none mode: scale_y should be 1.0"
+        );
+        assert!(
+            ws.viewport_offset_x.abs() < 1e-4,
+            "none mode: offset_x should be 0"
+        );
+        assert!(
+            ws.viewport_offset_y.abs() < 1e-4,
+            "none mode: offset_y should be 0"
+        );
+    }
+
+    #[test]
+    fn recompute_viewport_unknown_mode_acts_as_none() {
+        let mut ws = make_ws("bogus", 800.0, 600.0);
+        recompute_viewport(&mut ws, 1600, 900);
+        assert!((ws.viewport_scale_x - 1.0).abs() < 1e-4);
+        assert!((ws.viewport_scale_y - 1.0).abs() < 1e-4);
+        assert!(ws.viewport_offset_x.abs() < 1e-4);
+        assert!(ws.viewport_offset_y.abs() < 1e-4);
     }
 }

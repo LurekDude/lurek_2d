@@ -114,6 +114,11 @@ fn lua_test_ai() {
 }
 
 #[test]
+fn lua_test_automation() {
+    run_lua_test("unit/test_automation.lua");
+}
+
+#[test]
 fn lua_test_audio_bus() {
     run_lua_test("unit/test_audio_bus.lua");
 }
@@ -244,6 +249,13 @@ fn lua_stress_data_compression() {
     run_lua_test("stress/test_data_compression_stress.lua");
 }
 
+// === luna.gui tests ===
+
+#[test]
+fn lua_test_gui() {
+    run_lua_test("unit/test_gui.lua");
+}
+
 // === Validation Tests ===
 
 #[test]
@@ -336,6 +348,11 @@ fn lua_test_postfx() {
 }
 
 #[test]
+fn lua_test_overlay() {
+    run_lua_test("unit/test_overlay.lua");
+}
+
+#[test]
 fn lua_test_scene() {
     run_lua_test("unit/test_scene.lua");
 }
@@ -353,6 +370,11 @@ fn lua_test_image() {
 #[test]
 fn lua_test_font() {
     run_lua_test("unit/test_font.lua");
+}
+
+#[test]
+fn lua_test_window_scaling() {
+    run_lua_test("unit/test_window_scaling.lua");
 }
 
 // === Additional Stress Tests ===
