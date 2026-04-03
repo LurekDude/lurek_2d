@@ -2,6 +2,14 @@
 //!
 //! Wraps `fastrand::Rng` with engine-compatible API including
 //! seeding, state save/restore, and normal distribution sampling.
+//!
+//! This module is part of Luna2D's `math` subsystem and provides the implementation
+//! details for random-related operations and data management.
+//! Key types exported from this module: `RandomGenerator`.
+//! Primary functions: `new()`, `with_seed()`, `random()`, `random_int()`.
+//!
+//! All public items are documented. See the parent module for architectural context
+//! and the `luna.*` Lua API for the scripting interface.
 
 use fastrand::Rng;
 
@@ -9,6 +17,10 @@ use fastrand::Rng;
 ///
 /// Wraps `fastrand::Rng` with engine-compatible API for deterministic
 /// random number generation, normal distribution, and state management.
+///
+/// # Fields
+/// - `rng` — `Rng`.
+/// - `seed` — `u64`.
 pub struct RandomGenerator {
     /// The underlying fast RNG.
     rng: Rng,

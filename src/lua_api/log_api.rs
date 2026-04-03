@@ -12,11 +12,19 @@ use crate::engine::log_messages;
 ///
 /// # Errors
 /// Returns a `LuaError` if any function or table registration fails.
+///
+/// # Parameters
+/// - `lua` — `&Lua`.
+/// - `luna` — `&LuaTable`.
+///
+/// # Returns
+/// `LuaResult<()>`.
 pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
     let log_table = lua.create_table()?;
 
     #[allow(unused_doc_comments)]
     /// Emit a debug-severity log message from Lua.
+    /// @param message : string
     ///
     /// # Parameters
     /// - `message` — The message string to log.
@@ -30,6 +38,7 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
 
     #[allow(unused_doc_comments)]
     /// Emit an info-severity log message from Lua.
+    /// @param message : string
     ///
     /// # Parameters
     /// - `message` — The message string to log.
@@ -43,6 +52,7 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
 
     #[allow(unused_doc_comments)]
     /// Emit a warn-severity log message from Lua.
+    /// @param message : string
     ///
     /// # Parameters
     /// - `message` — The message string to log.
@@ -56,6 +66,7 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
 
     #[allow(unused_doc_comments)]
     /// Emit an error-severity log message from Lua.
+    /// @param message : string
     ///
     /// # Parameters
     /// - `message` — The message string to log.
@@ -69,6 +80,8 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
 
     #[allow(unused_doc_comments)]
     /// Emit a log message from Lua at the specified severity level.
+    /// @param level : string
+    /// @param message : string
     ///
     /// Accepts the same level strings as `luna.log.setLevel`:
     /// `"debug"`, `"info"`, `"warn"`, `"error"`, `"trace"`.
@@ -94,6 +107,7 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
 
     #[allow(unused_doc_comments)]
     /// Set the minimum severity level for runtime log messages.
+    /// @param level : string
     ///
     /// # Parameters
     /// - `level` — One of `"off"`, `"error"`, `"warn"`, `"info"`, `"debug"`, `"trace"`.

@@ -1,4 +1,11 @@
 //! 2D spatial operations and linear algebra for NdArray.
+//!
+//! This module is part of Luna2D's `compute` subsystem and provides the implementation
+//! details for spatial-related operations and data management.
+//! Primary functions: `convolve2d()`, `dilate()`, `erode()`, `flood_fill()`.
+//!
+//! All public items are documented. See the parent module for architectural context
+//! and the `luna.*` Lua API for the scripting interface.
 
 use std::collections::VecDeque;
 

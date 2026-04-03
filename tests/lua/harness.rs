@@ -168,6 +168,18 @@ fn lua_test_docs() {
     run_lua_test("unit/test_docs.lua");
 }
 
+#[test]
+fn lua_test_battle() {
+    run_lua_test("unit/test_battle.lua");
+}
+
+// === luna.crafting tests ===
+
+#[test]
+fn lua_test_crafting() {
+    run_lua_test("unit/test_crafting.lua");
+}
+
 // === luna.log tests ===
 
 #[test]

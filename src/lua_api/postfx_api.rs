@@ -9,7 +9,7 @@ use std::rc::Rc;
 
 use mlua::prelude::*;
 
-use crate::graphics::postfx::{PostFxEffect, PostFxEffectType, PostFxStack};
+use crate::postfx::{PostFxEffect, PostFxEffectType, PostFxStack};
 use crate::lua_api::lua_types::{add_type_methods, LunaType};
 
 // ---------------------------------------------------------------------------
@@ -17,6 +17,9 @@ use crate::lua_api::lua_types::{add_type_methods, LunaType};
 // ---------------------------------------------------------------------------
 
 /// Lua UserData wrapper for a single post-processing effect.
+///
+/// # Fields
+/// - `inner` — `Rc<RefCell<PostFxEffect>>`.
 #[derive(Clone)]
 pub(crate) struct LuaPostFxEffect {
     inner: Rc<RefCell<PostFxEffect>>,
@@ -33,6 +36,8 @@ impl LuaUserData for LuaPostFxEffect {
 
         // setParameter(name, value)
         /// Sets the parameter.
+        /// @param name : string
+        /// @param value : number
         ///
         /// # Parameters
         /// - `name` — `string`.
@@ -55,6 +60,8 @@ impl LuaUserData for LuaPostFxEffect {
 
         // hasParameter(name) -> boolean
         /// Returns `true` if parameter.
+        /// @param name : string
+        /// @return any
         ///
         /// # Parameters
         /// - `name` — `string`.
@@ -67,6 +74,7 @@ impl LuaUserData for LuaPostFxEffect {
 
         // getParameterNames() -> table<string>
         /// Returns the parameter names.
+        /// @return any
         ///
         /// # Returns
         /// The current parameter names.
@@ -81,6 +89,7 @@ impl LuaUserData for LuaPostFxEffect {
 
         // getType() -> string
         /// Returns the effect type.
+        /// @return any
         ///
         /// # Returns
         /// The current effect type.
@@ -90,6 +99,7 @@ impl LuaUserData for LuaPostFxEffect {
 
         // isBuiltIn() -> boolean
         /// Returns `true` if built in.
+        /// @return any
         ///
         /// # Returns
         /// `boolean`.
@@ -99,6 +109,7 @@ impl LuaUserData for LuaPostFxEffect {
 
         // isEnabled() -> boolean
         /// Returns `true` if enabled.
+        /// @return any
         ///
         /// # Parameters
         /// - `enabled` — `boolean`.
@@ -109,6 +120,7 @@ impl LuaUserData for LuaPostFxEffect {
 
         // setEnabled(enabled)
         /// Sets the enabled.
+        /// @param enabled : boolean
         ///
         /// # Parameters
         /// - `enabled` — `boolean`.
@@ -121,6 +133,7 @@ impl LuaUserData for LuaPostFxEffect {
 
         // setThreshold(value) — bloom bright-pass threshold
         /// Sets the threshold.
+        /// @param value : number
         ///
         /// # Parameters
         /// - `value` — `number`.
@@ -131,6 +144,7 @@ impl LuaUserData for LuaPostFxEffect {
 
         // setIntensity(value) — bloom/godrays intensity
         /// Sets the intensity.
+        /// @param value : number
         ///
         /// # Parameters
         /// - `value` — `number`.
@@ -141,6 +155,7 @@ impl LuaUserData for LuaPostFxEffect {
 
         // setScanlineStrength(value) — CRT scanline visibility
         /// Sets the scanline strength.
+        /// @param value : number
         ///
         /// # Parameters
         /// - `value` — `number`.
@@ -153,6 +168,7 @@ impl LuaUserData for LuaPostFxEffect {
 
         // setRadius(value) — blur radius
         /// Sets the radius.
+        /// @param value : number
         ///
         /// # Parameters
         /// - `value` — `number`.
@@ -163,6 +179,7 @@ impl LuaUserData for LuaPostFxEffect {
 
         // setStrength(value) — vignette/blur strength
         /// Sets the strength.
+        /// @param value : number
         ///
         /// # Parameters
         /// - `value` — `number`.
@@ -173,6 +190,7 @@ impl LuaUserData for LuaPostFxEffect {
 
         // setOffset(value) — chromatic aberration offset
         /// Sets the offset.
+        /// @param value : number
         ///
         /// # Parameters
         /// - `value` — `number`.
@@ -183,6 +201,7 @@ impl LuaUserData for LuaPostFxEffect {
 
         // setBrightness(value) — colour grading brightness
         /// Sets the brightness.
+        /// @param value : number
         ///
         /// # Parameters
         /// - `value` — `number`.
@@ -193,6 +212,7 @@ impl LuaUserData for LuaPostFxEffect {
 
         // setContrast(value) — colour grading contrast
         /// Sets the contrast.
+        /// @param value : number
         ///
         /// # Parameters
         /// - `value` — `number`.
@@ -203,6 +223,7 @@ impl LuaUserData for LuaPostFxEffect {
 
         // setSaturation(value) — colour grading saturation
         /// Sets the saturation.
+        /// @param value : number
         ///
         /// # Parameters
         /// - `value` — `number`.
@@ -236,6 +257,7 @@ impl LuaUserData for LuaPostFxStack {
 
         // add(effect) — append an effect to the end of the chain
         /// Adds an entry to the collection.
+        /// @param effect : PostFxEffect
         ///
         /// # Parameters
         /// - `effect` — `userdata`.
@@ -253,6 +275,8 @@ impl LuaUserData for LuaPostFxStack {
 
         // remove(effect) -> boolean
         /// Removes the entry from the collection.
+        /// @param effect : PostFxEffect
+        /// @return boolean
         ///
         /// # Parameters
         /// - `effect` — `userdata`.
@@ -305,6 +329,8 @@ impl LuaUserData for LuaPostFxStack {
 
         // isEnabled(effect) -> boolean
         /// Returns `true` if effect enabled.
+        /// @param effect : PostFxEffect
+        /// @return any
         ///
         /// # Parameters
         /// - `effect` — `userdata`.
@@ -325,6 +351,7 @@ impl LuaUserData for LuaPostFxStack {
 
         // getEffectCount() -> int
         /// Returns the effect count.
+        /// @return any
         ///
         /// # Parameters
         /// - `index` — `integer`.
@@ -337,6 +364,8 @@ impl LuaUserData for LuaPostFxStack {
 
         // getEffect(index) -> Effect | nil
         /// Returns the effect.
+        /// @param index : integer
+        /// @return any
         ///
         /// # Parameters
         /// - `index` — `integer`.
@@ -358,6 +387,7 @@ impl LuaUserData for LuaPostFxStack {
 
         // getEnabledEffects() -> table of Effects
         /// Returns the enabled effects.
+        /// @return any
         ///
         /// # Returns
         /// The current enabled effects.
@@ -381,6 +411,8 @@ impl LuaUserData for LuaPostFxStack {
 
         // resize(width, height) — recreate internal canvases at new resolution
         /// Resize on this PostFxStack.
+        /// @param w : integer
+        /// @param h : integer
         ///
         /// # Parameters
         /// - `w` — `integer`.
@@ -392,6 +424,7 @@ impl LuaUserData for LuaPostFxStack {
 
         // getWidth() -> int
         /// Returns the width.
+        /// @return any
         ///
         /// # Returns
         /// The current width.
@@ -401,6 +434,7 @@ impl LuaUserData for LuaPostFxStack {
 
         // getHeight() -> int
         /// Returns the height.
+        /// @return any
         ///
         /// # Returns
         /// The current height.
@@ -410,6 +444,7 @@ impl LuaUserData for LuaPostFxStack {
 
         // getDimensions() -> int, int
         /// Returns the dimensions.
+        /// @return any
         ///
         /// # Returns
         /// The current dimensions.
@@ -419,6 +454,7 @@ impl LuaUserData for LuaPostFxStack {
 
         // isCapturing() -> boolean
         /// Returns `true` if capturing.
+        /// @return any
         ///
         /// # Returns
         /// `boolean`.
@@ -432,7 +468,7 @@ impl LuaUserData for LuaPostFxStack {
 // Registration
 // ---------------------------------------------------------------------------
 
-/// Registers the `luna.postfx.*` API.
+/// Registers the `luna.postfx.*` API. Panics in debug mode if the same entity is registered twice.
 ///
 /// # Parameters
 /// - `lua` — `&Lua`.
@@ -444,6 +480,10 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
     let postfx = lua.create_table()?;
 
     // luna.postfx.newEffect(name) -> PostFxEffect
+    /// New effect.
+    ///
+    /// @param name : string
+    /// @return any
     postfx.set(
         "newEffect",
         lua.create_function(|_, name: String| {
@@ -460,6 +500,10 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
     )?;
 
     // luna.postfx.newPass(shaderId) -> PostFxEffect (custom shader pass)
+    /// New pass.
+    ///
+    /// @param shader_id : integer
+    /// @return any
     postfx.set(
         "newPass",
         lua.create_function(|_, shader_id: usize| {
@@ -470,6 +514,11 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
     )?;
 
     // luna.postfx.newStack(width?, height?) -> PostFxStack
+    /// New stack.
+    ///
+    /// @param w : integer?
+    /// @param h : integer?
+    /// @return any
     postfx.set(
         "newStack",
         lua.create_function(|_, (w, h): (Option<u32>, Option<u32>)| {
@@ -484,6 +533,9 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
     )?;
 
     // luna.postfx.getEffectTypes() -> table of valid effect type names
+    /// Returns the effect types.
+    ///
+    /// @return any
     postfx.set(
         "getEffectTypes",
         lua.create_function(|lua, ()| {

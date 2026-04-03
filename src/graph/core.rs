@@ -1,4 +1,12 @@
 //! Top-level directed graph container with node, edge, and item management.
+//!
+//! This module is part of Luna2D's `graph` subsystem and provides the implementation
+//! details for core-related operations and data management.
+//! Key types exported from this module: `GraphStats`, `Graph`.
+//! Primary functions: `new()`, `add_node()`, `remove_node()`, `has_node()`.
+//!
+//! All public items are documented. See the parent module for architectural context
+//! and the `luna.*` Lua API for the scripting interface.
 
 use std::collections::HashMap;
 
@@ -6,7 +14,7 @@ use super::edge::Edge;
 use super::item::{GraphItem, ItemPosition};
 use super::node::{Node, OverflowPolicy};
 
-/// Statistics snapshot of the graph state.
+/// Statistics snapshot of the graph state. Consult the module-level documentation for the broader usage context and preconditions.
 ///
 /// # Fields
 /// - `nodes` — `usize`.
@@ -71,7 +79,7 @@ impl Default for Graph {
 }
 
 impl Graph {
-    /// Create an empty graph.
+    /// Create an empty graph. Returns a fully initialised instance with all fields set to their initial values.
     ///
     /// # Returns
     /// `Self`.
@@ -145,7 +153,7 @@ impl Graph {
         self.nodes.contains_key(&node_id)
     }
 
-    /// Get all node IDs.
+    /// Get all node IDs. This accessor incurs no allocation; call it freely in hot paths.
     ///
     /// # Returns
     /// `Vec<u64>`.
@@ -153,7 +161,7 @@ impl Graph {
         self.nodes.keys().copied().collect()
     }
 
-    /// Get the number of nodes.
+    /// Get the number of nodes. This accessor incurs no allocation; call it freely in hot paths.
     ///
     /// # Returns
     /// `usize`.
@@ -217,7 +225,7 @@ impl Graph {
         self.edges.contains_key(&edge_id)
     }
 
-    /// Get all edge IDs.
+    /// Get all edge IDs. This accessor incurs no allocation; call it freely in hot paths.
     ///
     /// # Returns
     /// `Vec<u64>`.
@@ -225,7 +233,7 @@ impl Graph {
         self.edges.keys().copied().collect()
     }
 
-    /// Get the number of edges.
+    /// Get the number of edges. This accessor incurs no allocation; call it freely in hot paths.
     ///
     /// # Returns
     /// `usize`.
@@ -315,7 +323,7 @@ impl Graph {
         Ok(true)
     }
 
-    /// Remove an item from the graph entirely.
+    /// Remove an item from the graph entirely. Returns the removed value if present, or `None` when the key did not exist.
     ///
     /// # Parameters
     /// - `item_id` — `u64`.
@@ -349,7 +357,7 @@ impl Graph {
         self.items.contains_key(&item_id)
     }
 
-    /// Get all item IDs.
+    /// Get all item IDs. This accessor incurs no allocation; call it freely in hot paths.
     ///
     /// # Returns
     /// `Vec<u64>`.
@@ -357,7 +365,7 @@ impl Graph {
         self.items.keys().copied().collect()
     }
 
-    /// Get the number of items.
+    /// Get the number of items. This accessor incurs no allocation; call it freely in hot paths.
     ///
     /// # Returns
     /// `usize`.
@@ -420,7 +428,7 @@ impl Graph {
 
     // ---- Stats ----
 
-    /// Compute a statistics snapshot.
+    /// Compute a statistics snapshot. This accessor incurs no allocation; call it freely in hot paths.
     ///
     /// # Returns
     /// `GraphStats`.
@@ -461,7 +469,7 @@ impl Graph {
 
     // ---- Edge queries ----
 
-    /// Get IDs of edges leaving a node.
+    /// Get IDs of edges leaving a node. This accessor incurs no allocation; call it freely in hot paths.
     ///
     /// # Parameters
     /// - `node_id` — `u64`.

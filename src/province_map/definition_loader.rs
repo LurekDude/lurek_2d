@@ -9,6 +9,13 @@ use crate::math::{Rect, Vec2};
 use super::core::{AdjacencyEdge, ProvinceMap, Province};
 
 /// A single province definition with metadata and neighbour list.
+///
+/// # Fields
+/// - `id` — `u32`.
+/// - `color` — `[u8; 3]`.
+/// - `center` — `(f32`.
+/// - `neighbors` — `Vec<u32>`.
+/// - `name` — `Option<String>`.
 #[derive(Debug, Clone)]
 pub struct ProvinceDefinition {
     /// Unique province ID (must be non-zero).
@@ -31,6 +38,14 @@ pub struct ProvinceDefinition {
 ///
 /// Adjacency edges are created from the `neighbors` lists. Each pair is
 /// stored once with `border_length = 0` (no pixel data).
+///
+/// # Parameters
+/// - `defs` — `&[ProvinceDefinition]`.
+/// - `width` — `u32`.
+/// - `height` — `u32`.
+///
+/// # Returns
+/// `ProvinceMap`.
 pub fn load_from_definitions(
     defs: &[ProvinceDefinition],
     width: u32,

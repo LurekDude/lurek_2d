@@ -1,4 +1,12 @@
 //! TTF/OTF font loading, glyph rasterization, and atlas packing for GPU text rendering.
+//!
+//! This module is part of Luna2D's `graphics` subsystem and provides the implementation
+//! details for font-related operations and data management.
+//! Key types exported from this module: `Font`, `GlyphInfo`.
+//! Primary functions: `from_bytes()`, `ensure_glyph()`, `text_width()`, `line_height()`.
+//!
+//! All public items are documented. See the parent module for architectural context
+//! and the `luna.*` Lua API for the scripting interface.
 
 use crate::engine::error::{EngineError, EngineResult};
 use std::collections::HashMap;
@@ -14,6 +22,21 @@ const GLYPH_PADDING: u32 = 1;
 ///
 /// Wraps a `fontdue::Font` for parsing and rasterization, caches rasterized
 /// glyphs in a HashMap, and packs them into a row-based RGBA atlas bitmap.
+///
+/// # Fields
+/// - `inner` — `fontdue::Font`.
+/// - `size` — `f32`.
+/// - `glyphs` — `HashMap<char`.
+/// - `atlas_bitmap` — `Vec<u8>`.
+/// - `atlas_width` — `u32`.
+/// - `atlas_height` — `u32`.
+/// - `cursor_x` — `u32`.
+/// - `cursor_y` — `u32`.
+/// - `row_height` — `u32`.
+/// - `line_height` — `f32`.
+/// - `ascent` — `f32`.
+/// - `descent` — `f32`.
+/// - `dirty` — `bool`.
 pub struct Font {
     inner: fontdue::Font,
     size: f32,

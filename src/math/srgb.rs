@@ -2,6 +2,13 @@
 //!
 //! Implements the standard IEC 61966-2-1 (sRGB) transfer functions for
 //! converting between gamma-encoded sRGB and linear light values.
+//!
+//! This module is part of Luna2D's `math` subsystem and provides the implementation
+//! details for srgb-related operations and data management.
+//! Primary functions: `gamma_to_linear()`, `linear_to_gamma()`.
+//!
+//! All public items are documented. See the parent module for architectural context
+//! and the `luna.*` Lua API for the scripting interface.
 
 /// Convert a single sRGB gamma-space color component to linear space.
 ///

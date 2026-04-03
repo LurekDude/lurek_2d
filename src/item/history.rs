@@ -11,6 +11,19 @@ use std::collections::VecDeque;
 // ─────────────────────────────────────────────────────────────────────────────
 
 /// The category of change that was recorded.
+///
+/// # Variants
+/// - `An` — An variant.
+/// - `Pushed` — Pushed variant.
+/// - `Popped` — Popped variant.
+/// - `Moved` — Moved variant.
+/// - `A` — A variant.
+/// - `Shuffled` — Shuffled variant.
+/// - `Sorted` — Sorted variant.
+/// - `Cleared` — Cleared variant.
+/// - `Built` — Built variant.
+/// - `User` — User variant.
+/// - `Custom` — Custom variant.
 #[derive(Debug, Clone, PartialEq)]
 pub enum HistoryAction {
     /// An item was pushed onto a stack (records the item type and display name).
@@ -46,7 +59,13 @@ pub enum HistoryAction {
 // HistoryEntry
 // ─────────────────────────────────────────────────────────────────────────────
 
-/// A single entry in the history log.
+/// A single entry in the history log. Consult the module-level documentation for the broader usage context and preconditions.
+///
+/// # Fields
+/// - `seq` — `u64`.
+/// - `stack_name` — `String`.
+/// - `action` — `HistoryAction`.
+/// - `size_after` — `usize`.
 #[derive(Debug, Clone)]
 pub struct HistoryEntry {
     /// Monotonically increasing sequence number.
@@ -64,6 +83,11 @@ pub struct HistoryEntry {
 // ─────────────────────────────────────────────────────────────────────────────
 
 /// Append-only change log with an optional rolling size limit.
+///
+/// # Fields
+/// - `entries` — `VecDeque<HistoryEntry>`.
+/// - `max_size` — `Option<usize>`.
+/// - `next_seq` — `u64`.
 #[derive(Debug, Clone)]
 pub struct StackHistory {
     entries: VecDeque<HistoryEntry>,
@@ -74,17 +98,31 @@ pub struct StackHistory {
 }
 
 impl StackHistory {
-    /// Create an unlimited history.
+    /// Create an unlimited history. Returns a fully initialised instance with all fields set to their initial values.
+    ///
+    /// # Returns
+    /// `Self`.
     pub fn new() -> Self {
         Self { entries: VecDeque::new(), max_size: None, next_seq: 0 }
     }
 
     /// Create a history capped at `max_size` entries (oldest are evicted).
+    ///
+    /// # Parameters
+    /// - `ax_size` — `usize`.
+    ///
+    /// # Returns
+    /// `Self`.
     pub fn with_max_size(max_size: usize) -> Self {
         Self { entries: VecDeque::with_capacity(max_size.min(512)), max_size: Some(max_size), next_seq: 0 }
     }
 
-    /// Append an action.
+    /// Append an action. Consult the module-level documentation for the broader usage context and preconditions.
+    ///
+    /// # Parameters
+    /// - `stack_name` — `impl Into<String>`.
+    /// - `action` — `HistoryAction`.
+    /// - `size_after` — `usize`.
     pub fn record(&mut self, stack_name: impl Into<String>, action: HistoryAction, size_after: usize) {
         if let Some(max) = self.max_size {
             while self.entries.len() >= max {
@@ -101,36 +139,59 @@ impl StackHistory {
     }
 
     /// Append a user-defined label as a `Custom` action.
+    ///
+    /// # Parameters
+    /// - `stack_name` — `impl Into<String>`.
+    /// - `label` — `impl Into<String>`.
+    /// - `size_after` — `usize`.
     pub fn record_custom(&mut self, stack_name: impl Into<String>, label: impl Into<String>, size_after: usize) {
         self.record(stack_name, HistoryAction::Custom { label: label.into() }, size_after);
     }
 
-    /// Number of entries in the log.
+    /// Number of entries in the log. Runs in O(1) time.
+    ///
+    /// # Returns
+    /// `usize`.
     pub fn len(&self) -> usize {
         self.entries.len()
     }
 
     /// Returns `true` if no events have been recorded.
+    ///
+    /// # Returns
+    /// `bool`.
     pub fn is_empty(&self) -> bool {
         self.entries.is_empty()
     }
 
     /// Iterate over all entries (oldest first).
+    ///
+    /// # Returns
+    /// `impl Iterator<Item = &HistoryEntry>`.
     pub fn entries(&self) -> impl Iterator<Item = &HistoryEntry> {
         self.entries.iter()
     }
 
-    /// Return the most recent entry, if any.
+    /// Return the most recent entry, if any. Consult the module-level documentation for the broader usage context and preconditions.
+    ///
+    /// # Returns
+    /// `Option<&HistoryEntry>`.
     pub fn last(&self) -> Option<&HistoryEntry> {
         self.entries.back()
     }
 
-    /// Clear all recorded entries.
+    /// Clear all recorded entries. After this call the container is in the same state as immediately after construction.
     pub fn clear(&mut self) {
         self.entries.clear();
     }
 
     /// Return entries for a specific stack name.
+    ///
+    /// # Parameters
+    /// - `stack_name` — `&str`.
+    ///
+    /// # Returns
+    /// `Vec<&HistoryEntry>`.
     pub fn entries_for(&self, stack_name: &str) -> Vec<&HistoryEntry> {
         self.entries.iter().filter(|e| e.stack_name == stack_name).collect()
     }

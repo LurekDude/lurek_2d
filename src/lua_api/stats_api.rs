@@ -1,6 +1,14 @@
 //! Lua API bindings for the `luna.stats` RPG character sheet system.
 //!
 //! Exposes [`Sheet`] and a global [`StatsRegistry`] as `luna.stats.*` Lua values.
+//!
+//! This module is part of Luna2D's `lua_api` subsystem and provides the implementation
+//! details for stats api-related operations and data management.
+//! Key types exported from this module: `LuaSheet`.
+//! Primary functions: `register()`.
+//!
+//! All public items are documented. See the parent module for architectural context
+//! and the `luna.*` Lua API for the scripting interface.
 
 use crate::lua_api::lua_types::{add_type_methods, LunaType};
 use crate::stats::{ActionPoints, LevelThresholds, Morale, Perk, Sheet, Skill, StatsRegistry};
@@ -11,6 +19,10 @@ use std::rc::Rc;
 // ─── Lua wrapper for SheetSheet ──────────────────────────────────────────────
 
 /// Lua-visible wrapper for a character [`Sheet`].
+///
+/// # Fields
+/// - `inner` — `Rc<RefCell<Sheet>>`.
+/// - `registry` — `Rc<RefCell<StatsRegistry>>`.
 #[derive(Clone)]
 pub(crate) struct LuaSheet {
     inner: Rc<RefCell<Sheet>>,
@@ -56,16 +68,22 @@ impl LuaUserData for LuaSheet {
         );
 
         /// `sheet:get(name)` – get effective value (buffs applied, clamped).
+        /// @param name : string
+        /// @return any
         methods.add_method("get", |_, this, name: String| {
             Ok(this.inner.borrow().get(&name))
         });
 
         /// `sheet:getBase(name)` – get raw base value.
+        /// @param name : string
+        /// @return any
         methods.add_method("getBase", |_, this, name: String| {
             Ok(this.inner.borrow().get_base(&name))
         });
 
         /// `sheet:setBase(name, value)` – set the base value.
+        /// @param name : string
+        /// @param value : number
         methods.add_method("setBase", |_, this, (name, value): (String, f64)| {
             let ok = this.inner.borrow_mut().set_base(&name, value);
             if !ok {
@@ -78,6 +96,8 @@ impl LuaUserData for LuaSheet {
         });
 
         /// `sheet:setMin(name, min)` – set the attribute minimum.
+        /// @param name : string
+        /// @param min : number
         methods.add_method("setMin", |_, this, (name, min): (String, f64)| {
             let mut s = this.inner.borrow_mut();
             if let Some(attr) = s.attributes.get_mut(&name) {
@@ -92,6 +112,8 @@ impl LuaUserData for LuaSheet {
         });
 
         /// `sheet:setMax(name, max)` – set the attribute maximum.
+        /// @param name : string
+        /// @param max : number
         methods.add_method("setMax", |_, this, (name, max): (String, f64)| {
             let mut s = this.inner.borrow_mut();
             if let Some(attr) = s.attributes.get_mut(&name) {
@@ -106,6 +128,7 @@ impl LuaUserData for LuaSheet {
         });
 
         /// `sheet:getMin(name)` – get the attribute minimum.
+        /// @param name : string
         methods.add_method("getMin", |_, this, name: String| {
             let s = this.inner.borrow();
             s.attributes.get(&name).map(|a| a.min).ok_or_else(|| {
@@ -114,6 +137,8 @@ impl LuaUserData for LuaSheet {
         });
 
         /// `sheet:getMax(name)` – get the attribute maximum (nil if unset).
+        /// @param name : string
+        /// @return any
         methods.add_method("getMax", |_, this, name: String| {
             let s = this.inner.borrow();
             match s.attributes.get(&name) {
@@ -126,6 +151,8 @@ impl LuaUserData for LuaSheet {
         });
 
         /// `sheet:setRegen(name, regen)` – set regen rate per second.
+        /// @param name : string
+        /// @param regen : number
         methods.add_method("setRegen", |_, this, (name, regen): (String, f64)| {
             let mut s = this.inner.borrow_mut();
             if let Some(attr) = s.attributes.get_mut(&name) {
@@ -140,6 +167,7 @@ impl LuaUserData for LuaSheet {
         });
 
         /// `sheet:getRegen(name)` – get regen rate.
+        /// @param name : string
         methods.add_method("getRegen", |_, this, name: String| {
             let s = this.inner.borrow();
             s.attributes.get(&name).map(|a| a.regen).ok_or_else(|| {
@@ -150,23 +178,34 @@ impl LuaUserData for LuaSheet {
         // ─── Buff API ──────────────────────────────────────────────────────
 
         /// `sheet:addBuff(stat, add, mul, duration, source?)` – returns integer handle.
+        /// @param stat : string
+        /// @param add : number
+        /// @param mul : number
+        /// @param duration : number
+        /// @param source : string?
+        /// @return any
         methods.add_method("addBuff", |_, this, (stat, add, mul, duration, source): (String, f64, f64, f64, Option<String>)| {
             let handle = this.inner.borrow_mut().add_buff(&stat, add, mul, duration, source.as_deref().unwrap_or(""));
             Ok(handle)
         });
 
         /// `sheet:removeBuff(handle)` – remove a buff by handle; returns true if found.
+        /// @param handle : integer
+        /// @return any
         methods.add_method("removeBuff", |_, this, handle: u32| {
             Ok(this.inner.borrow_mut().remove_buff(handle))
         });
 
         /// `sheet:clearBuffs(stat?)` – remove all buffs, or just those for the given stat.
+        /// @param stat : string?
         methods.add_method("clearBuffs", |_, this, stat: Option<String>| {
             this.inner.borrow_mut().clear_buffs(stat.as_deref());
             Ok(())
         });
 
         /// `sheet:getBuffs(stat?)` – return an array of buff info tables.
+        /// @param stat : string?
+        /// @return table
         methods.add_method("getBuffs", |lua, this, stat: Option<String>| {
             let s = this.inner.borrow();
             let tbl = lua.create_table()?;
@@ -222,6 +261,7 @@ impl LuaUserData for LuaSheet {
         // ─── Trait API ─────────────────────────────────────────────────────
 
         /// `sheet:addTrait(name)` – apply a globally-defined trait.
+        /// @param name : string
         methods.add_method("addTrait", |_, this, name: String| {
             let reg = this.registry.borrow();
             let trait_def = reg
@@ -239,16 +279,21 @@ impl LuaUserData for LuaSheet {
         });
 
         /// `sheet:removeTrait(name)` – remove a trait's buffs; returns true if found.
+        /// @param name : string
+        /// @return any
         methods.add_method("removeTrait", |_, this, name: String| {
             Ok(this.inner.borrow_mut().remove_trait_buffs(&name))
         });
 
         /// `sheet:hasTrait(name)` – check if a trait is currently active.
+        /// @param name : string
+        /// @return any
         methods.add_method("hasTrait", |_, this, name: String| {
             Ok(this.inner.borrow().active_traits.contains_key(&name))
         });
 
         /// `sheet:getActiveTraits()` – list all active trait names.
+        /// @return table
         methods.add_method("getActiveTraits", |lua, this, ()| {
             let s = this.inner.borrow();
             let tbl = lua.create_table()?;
@@ -286,6 +331,8 @@ impl LuaUserData for LuaSheet {
         );
 
         /// `sheet:learnSkill(name)` – unlock / increment skill level.
+        /// @param name : string
+        /// @return any
         methods.add_method("learnSkill", |_, this, name: String| {
             let mut s = this.inner.borrow_mut();
             let skill = s.skills.get_mut(&name).ok_or_else(|| {
@@ -298,6 +345,8 @@ impl LuaUserData for LuaSheet {
         });
 
         /// `sheet:useSkill(name)` – reduce cooldown counter. Returns remaining cooldown.
+        /// @param name : string
+        /// @return any
         methods.add_method("useSkill", |_, this, name: String| {
             let mut s = this.inner.borrow_mut();
             let skill = s.skills.get_mut(&name).ok_or_else(|| {
@@ -314,6 +363,7 @@ impl LuaUserData for LuaSheet {
         });
 
         /// `sheet:getSkillLevel(name)` – get current skill level.
+        /// @param name : string
         methods.add_method("getSkillLevel", |_, this, name: String| {
             let s = this.inner.borrow();
             s.skills.get(&name).map(|sk| sk.level).ok_or_else(|| {
@@ -322,6 +372,7 @@ impl LuaUserData for LuaSheet {
         });
 
         /// `sheet:getCooldownRemaining(name)` – get remaining skill cooldown in seconds.
+        /// @param name : string
         methods.add_method("getCooldownRemaining", |_, this, name: String| {
             let s = this.inner.borrow();
             s.skills
@@ -355,6 +406,7 @@ impl LuaUserData for LuaSheet {
         );
 
         /// `sheet:acquirePerk(name)` – acquire the perk if level requirement is met.
+        /// @param name : string
         methods.add_method("acquirePerk", |_, this, name: String| {
             let mut s = this.inner.borrow_mut();
             let level = s.level;
@@ -378,6 +430,8 @@ impl LuaUserData for LuaSheet {
         });
 
         /// `sheet:hasPerk(name)` – check if perk is acquired.
+        /// @param name : string
+        /// @return any
         methods.add_method("hasPerk", |_, this, name: String| {
             Ok(this
                 .inner
@@ -391,23 +445,28 @@ impl LuaUserData for LuaSheet {
         // ─── Flags ─────────────────────────────────────────────────────────
 
         /// `sheet:setFlag(name)` – set a boolean flag.
+        /// @param name : string
         methods.add_method("setFlag", |_, this, name: String| {
             this.inner.borrow_mut().set_flag(&name);
             Ok(())
         });
 
         /// `sheet:clearFlag(name)` – clear a flag.
+        /// @param name : string
         methods.add_method("clearFlag", |_, this, name: String| {
             this.inner.borrow_mut().clear_flag(&name);
             Ok(())
         });
 
         /// `sheet:hasFlag(name)` – check if a flag is set.
+        /// @param name : string
+        /// @return any
         methods.add_method("hasFlag", |_, this, name: String| {
             Ok(this.inner.borrow().has_flag(&name))
         });
 
         /// `sheet:getFlags()` – list all set flag names.
+        /// @return table
         methods.add_method("getFlags", |lua, this, ()| {
             let tbl = lua.create_table()?;
             let flags = this.inner.borrow().get_flags();
@@ -420,29 +479,36 @@ impl LuaUserData for LuaSheet {
         // ─── XP / Level ────────────────────────────────────────────────────
 
         /// `sheet:addXP(amount)` – add XP, auto-levels up. Returns levels gained.
+        /// @param amount : number
+        /// @return any
         methods.add_method("addXP", |_, this, amount: f64| {
             Ok(this.inner.borrow_mut().add_xp(amount))
         });
 
         /// `sheet:getXP()` – current XP in the current level.
+        /// @return any
         methods.add_method("getXP", |_, this, ()| Ok(this.inner.borrow().xp));
 
         /// `sheet:setXP(amount)` – force-set XP (no level-up triggered).
+        /// @param amount : number
         methods.add_method("setXP", |_, this, amount: f64| {
             this.inner.borrow_mut().xp = amount;
             Ok(())
         });
 
         /// `sheet:getLevel()` – current character level.
+        /// @return any
         methods.add_method("getLevel", |_, this, ()| Ok(this.inner.borrow().level));
 
         /// `sheet:setLevel(n)` – force-set character level.
+        /// @param n : integer
         methods.add_method("setLevel", |_, this, n: u32| {
             this.inner.borrow_mut().level = n;
             Ok(())
         });
 
         /// `sheet:setLevelThresholds(t)` – t is an array of XP thresholds OR table with base/increment.
+        /// @param t : table
         methods.add_method("setLevelThresholds", |_, this, t: LuaTable| {
             // Detect linear vs table
             let maybe_base = t.get::<_, f64>("base");
@@ -465,12 +531,15 @@ impl LuaUserData for LuaSheet {
         // ─── Use tracking ──────────────────────────────────────────────────
 
         /// `sheet:recordUse(name)` – record a use for use-based growth.
+        /// @param name : string
         methods.add_method("recordUse", |_, this, name: String| {
             this.inner.borrow_mut().record_use(&name);
             Ok(())
         });
 
         /// `sheet:getUseCount(name)` – number of times a stat was used.
+        /// @param name : string
+        /// @return any
         methods.add_method("getUseCount", |_, this, name: String| {
             Ok(this
                 .inner
@@ -484,12 +553,14 @@ impl LuaUserData for LuaSheet {
         // ─── Action Points ─────────────────────────────────────────────────
 
         /// `sheet:setActionPoints(max)` – initialise / reset action points.
+        /// @param max : number
         methods.add_method("setActionPoints", |_, this, max: f64| {
             this.inner.borrow_mut().action_points = Some(ActionPoints::new(max));
             Ok(())
         });
 
         /// `sheet:getActionPoints()` – returns current, max.
+        /// @return any
         methods.add_method("getActionPoints", |_, this, ()| {
             let s = this.inner.borrow();
             if let Some(ap) = &s.action_points {
@@ -500,6 +571,8 @@ impl LuaUserData for LuaSheet {
         });
 
         /// `sheet:spendActionPoints(n)` – spend n action points; errors if insufficient.
+        /// @param n : number
+        /// @return any
         methods.add_method("spendActionPoints", |_, this, n: f64| {
             let mut s = this.inner.borrow_mut();
             let ap = s.action_points.as_mut().ok_or_else(|| {
@@ -529,12 +602,14 @@ impl LuaUserData for LuaSheet {
         // ─── Morale ────────────────────────────────────────────────────────
 
         /// `sheet:setMorale(max)` – initialise morale with the given max.
+        /// @param max : number
         methods.add_method("setMorale", |_, this, max: f64| {
             this.inner.borrow_mut().morale = Some(Morale::new(max));
             Ok(())
         });
 
         /// `sheet:getMorale()` – returns current, max.
+        /// @return any
         methods.add_method("getMorale", |_, this, ()| {
             let s = this.inner.borrow();
             if let Some(m) = &s.morale {
@@ -545,6 +620,8 @@ impl LuaUserData for LuaSheet {
         });
 
         /// `sheet:adjustMorale(delta)` – add delta to current morale (clamped 0..max).
+        /// @param delta : number
+        /// @return any
         methods.add_method("adjustMorale", |_, this, delta: f64| {
             let mut s = this.inner.borrow_mut();
             let m = s.morale.as_mut().ok_or_else(|| {
@@ -555,6 +632,7 @@ impl LuaUserData for LuaSheet {
         });
 
         /// `sheet:setPanicThreshold(val)` – set the morale level below which the unit panics.
+        /// @param val : number
         methods.add_method("setPanicThreshold", |_, this, val: f64| {
             let mut s = this.inner.borrow_mut();
             let m = s.morale.as_mut().ok_or_else(|| {
@@ -567,6 +645,7 @@ impl LuaUserData for LuaSheet {
         });
 
         /// `sheet:setBerserkThreshold(val)` – set the morale level below which the unit goes berserk.
+        /// @param val : number
         methods.add_method("setBerserkThreshold", |_, this, val: f64| {
             let mut s = this.inner.borrow_mut();
             let m = s.morale.as_mut().ok_or_else(|| {
@@ -579,6 +658,7 @@ impl LuaUserData for LuaSheet {
         });
 
         /// `sheet:checkMorale()` – returns "panic", "berserk", or nil.
+        /// @return any
         methods.add_method("checkMorale", |_, this, ()| {
             Ok(this.inner.borrow_mut().check_morale())
         });
@@ -586,6 +666,8 @@ impl LuaUserData for LuaSheet {
         // ─── Resistances / Damage ──────────────────────────────────────────
 
         /// `sheet:setResistance(damageType, value)` – set a resistance (0.0..1.0).
+        /// @param dtype : string
+        /// @param val : number
         methods.add_method("setResistance", |_, this, (dtype, val): (String, f64)| {
             this.inner
                 .borrow_mut()
@@ -595,6 +677,8 @@ impl LuaUserData for LuaSheet {
         });
 
         /// `sheet:getResistance(damageType)` – get resistance value.
+        /// @param dtype : string
+        /// @return any
         methods.add_method("getResistance", |_, this, dtype: String| {
             Ok(this
                 .inner
@@ -620,12 +704,15 @@ impl LuaUserData for LuaSheet {
         // ─── Encumbrance ───────────────────────────────────────────────────
 
         /// `sheet:setEncumbrance(current, max)` – set encumbrance values.
+        /// @param current : number
+        /// @param max : number
         methods.add_method("setEncumbrance", |_, this, (current, max): (f64, f64)| {
             this.inner.borrow_mut().encumbrance = Some((current, max));
             Ok(())
         });
 
         /// `sheet:getEncumbrance()` – returns current, max.
+        /// @return any
         methods.add_method("getEncumbrance", |_, this, ()| {
             let s = this.inner.borrow();
             if let Some((c, m)) = s.encumbrance {
@@ -636,6 +723,7 @@ impl LuaUserData for LuaSheet {
         });
 
         /// `sheet:isEncumbered()` – returns true if current > max.
+        /// @return any
         methods.add_method("isEncumbered", |_, this, ()| {
             let s = this.inner.borrow();
             Ok(s.encumbrance.map(|(c, m)| c > m).unwrap_or(false))
@@ -644,12 +732,14 @@ impl LuaUserData for LuaSheet {
         // ─── Initiative ────────────────────────────────────────────────────
 
         /// `sheet:setInitiative(val)` – set base initiative.
+        /// @param val : number
         methods.add_method("setInitiative", |_, this, val: f64| {
             this.inner.borrow_mut().initiative = val;
             Ok(())
         });
 
         /// `sheet:getInitiative()` – get base initiative.
+        /// @return any
         methods.add_method("getInitiative", |_, this, ()| {
             Ok(this.inner.borrow().initiative)
         });
@@ -657,6 +747,7 @@ impl LuaUserData for LuaSheet {
         // ─── Update / Loop ─────────────────────────────────────────────────
 
         /// `sheet:update(dt)` – tick buff durations, skill cooldowns, and regen.
+        /// @return any
         methods.add_method("getStatNames", |lua, this, ()| {
             let names = this.inner.borrow().get_stat_names();
             let t = lua.create_table()?;
@@ -666,6 +757,8 @@ impl LuaUserData for LuaSheet {
             Ok(t)
         });
         /// Returns the buff count.
+        /// @param stat : string?
+        /// @return any
         ///
         /// # Parameters
         /// - `stat` — `string` optional.
@@ -676,6 +769,8 @@ impl LuaUserData for LuaSheet {
             Ok(this.inner.borrow().get_buff_count(stat.as_deref()))
         });
         /// Recover action points on this Sheet.
+        /// @param amount : number
+        /// @return any
         ///
         /// # Parameters
         /// - `amount` — `number`.
@@ -683,6 +778,7 @@ impl LuaUserData for LuaSheet {
             Ok(this.inner.borrow_mut().recover_action_points(amount))
         });
         /// Advances the simulation by `dt` seconds.
+        /// @param dt : number
         ///
         /// # Parameters
         /// - `dt` — `number`.
@@ -831,6 +927,7 @@ impl LuaUserData for LuaSheet {
         });
 
         /// `sheet:restore(snapshot)` – restore from a snapshot table (attributes, xp, level, flags).
+        /// @param snap : table
         methods.add_method("restore", |_, this, snap: LuaTable| {
             let mut s = this.inner.borrow_mut();
             if let Ok(attrs) = snap.get::<_, LuaTable>("attributes") {
@@ -898,6 +995,13 @@ impl LuaUserData for LuaSheet {
 // ─── Registration ─────────────────────────────────────────────────────────────
 
 /// Register the `luna.stats` module into the Lua state.
+///
+/// # Parameters
+/// - `lua` — `&Lua`.
+/// - `luna` — `&LuaTable`.
+///
+/// # Returns
+/// `LuaResult<()>`.
 pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
     let registry = Rc::new(RefCell::new(StatsRegistry::new()));
 
@@ -906,6 +1010,9 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
     // luna.stats.newSheet()
     {
         let registry = Rc::clone(&registry);
+        /// New sheet.
+        ///
+        /// @return any
         module.set(
             "newSheet",
             lua.create_function(move |_, ()| {
@@ -921,6 +1028,10 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
     // opts = {buffs = [ {stat, add?, mul?}, ... ]}
     {
         let registry = Rc::clone(&registry);
+        /// Define trait.
+        ///
+        /// @param name : string
+        /// @param opts : table
         module.set(
             "defineTrait",
             lua.create_function(move |_, (name, opts): (String, LuaTable)| {
@@ -942,6 +1053,10 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
     // luna.stats.defineRace(name, opts)
     {
         let registry = Rc::clone(&registry);
+        /// Define race.
+        ///
+        /// @param name : string
+        /// @param opts : table
         module.set(
             "defineRace",
             lua.create_function(move |_, (name, opts): (String, LuaTable)| {
@@ -966,6 +1081,10 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
     // luna.stats.defineClass(name, opts)
     {
         let registry = Rc::clone(&registry);
+        /// Define class.
+        ///
+        /// @param name : string
+        /// @param opts : table
         module.set(
             "defineClass",
             lua.create_function(move |_, (name, opts): (String, LuaTable)| {
@@ -992,6 +1111,9 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
     // luna.stats.getTraitNames()
     {
         let registry = Rc::clone(&registry);
+        /// Returns the trait names.
+        ///
+        /// @return any
         module.set(
             "getTraitNames",
             lua.create_function(move |lua, ()| {
@@ -1007,6 +1129,9 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
     // luna.stats.getRaceNames()
     {
         let registry = Rc::clone(&registry);
+        /// Returns the race names.
+        ///
+        /// @return any
         module.set(
             "getRaceNames",
             lua.create_function(move |lua, ()| {
@@ -1022,6 +1147,9 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
     // luna.stats.getClassNames()
     {
         let registry = Rc::clone(&registry);
+        /// Returns the class names.
+        ///
+        /// @return any
         module.set(
             "getClassNames",
             lua.create_function(move |lua, ()| {
@@ -1037,6 +1165,11 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
     // luna.stats.applyArchetypes(sheet, race, class)
     {
         let registry = Rc::clone(&registry);
+        /// Apply archetypes.
+        ///
+        /// @param sheet_ud : Sheet
+        /// @param race : string?
+        /// @param class : string?
         module.set(
             "applyArchetypes",
             lua.create_function(move |_, (sheet_ud, race, class): (LuaAnyUserData, Option<String>, Option<String>)| {

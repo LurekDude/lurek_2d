@@ -1,3 +1,12 @@
+//! Filesystem Api implementation for the `lua_api` subsystem.
+//!
+//! This module is part of Luna2D's `lua_api` subsystem and provides the implementation
+//! details for filesystem api-related operations and data management.
+//! Primary functions: `register()`.
+//!
+//! All public items are documented. See the parent module for architectural context
+//! and the `luna.*` Lua API for the scripting interface.
+//!
 use super::SharedState;
 use crate::filesystem::file_handle::{FileHandle, FileMode};
 use crate::filesystem::{GameFS, LoadStatus};
@@ -13,6 +22,8 @@ struct LuaFileHandle {
 impl LuaUserData for LuaFileHandle {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
         /// Reads a text file and returns its contents as a string.
+        /// @param count : integer?
+        /// @return any
         methods.add_method("read", |_, this, count: Option<usize>| {
             let mut handle = this.inner.borrow_mut();
             let bytes = handle
@@ -22,6 +33,7 @@ impl LuaUserData for LuaFileHandle {
         });
 
         /// Reads the next line of text from the file and returns it as a string.
+        /// @return any
         ///
         /// # Returns
         /// The line string (without newline), or nil at end of file.
@@ -34,6 +46,8 @@ impl LuaUserData for LuaFileHandle {
         });
 
         /// Writes a string to a file, creating it if needed.
+        /// @param data : string
+        /// @return any
         methods.add_method("write", |_, this, data: String| {
             let mut handle = this.inner.borrow_mut();
             let written = handle
@@ -43,6 +57,8 @@ impl LuaUserData for LuaFileHandle {
         });
 
         /// Seeks the file position to the given byte offset from the start.
+        /// @param pos : integer
+        /// @return any
         ///
         /// # Parameters
         /// - `offset` — Byte position to seek to (0-based).
@@ -58,6 +74,7 @@ impl LuaUserData for LuaFileHandle {
         });
 
         /// Returns the current read/write byte offset from the start of the file.
+        /// @return any
         ///
         /// # Returns
         /// Current byte offset as an integer.
@@ -70,6 +87,7 @@ impl LuaUserData for LuaFileHandle {
         });
 
         /// Returns the size of the open file in bytes.
+        /// @return any
         ///
         /// # Returns
         /// File size as an integer number of bytes.
@@ -79,6 +97,7 @@ impl LuaUserData for LuaFileHandle {
         });
 
         /// Returns the access mode the file was opened with.
+        /// @return any
         ///
         /// # Returns
         /// One of 'r' (read), 'w' (write), or 'a' (append).
@@ -137,6 +156,8 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
     // luna.filesystem.read(path) -> string
     /// Reads a text file and returns its contents as a string.
     let s = state.clone();
+    /// @param path : string
+    /// @return any
     fs.set(
         "read",
         lua.create_function(move |_, path: String| {
@@ -155,6 +176,8 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
     // luna.filesystem.write(path, data) - writes to save/ directory only
     /// Writes a string to a file, creating it if needed.
     let s = state.clone();
+    /// @param path : string
+    /// @param data : string
     fs.set(
         "write",
         lua.create_function(move |_, (path, data): (String, String)| {
@@ -173,6 +196,8 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
     // luna.filesystem.exists(path) -> bool
     /// Returns whether the given file or directory exists.
     let s = state.clone();
+    /// @param path : string
+    /// @return any
     fs.set(
         "exists",
         lua.create_function(move |_, path: String| {
@@ -192,6 +217,8 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
     /// # Returns
     /// true on success, or nil plus an error string on failure.
     let s = state.clone();
+    /// @param path : string
+    /// @param data : string
     fs.set(
         "append",
         lua.create_function(move |_, (path, data): (String, String)| {
@@ -206,6 +233,9 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
     // luna.filesystem.openFile(path, mode) -> FileHandle userdata
     /// Opens a file and returns a readable/writable file handle.
     let s = state.clone();
+    /// @param path : string
+    /// @param mode_str : string
+    /// @return any
     fs.set(
         "openFile",
         lua.create_function(move |_, (path, mode_str): (String, String)| {
@@ -230,6 +260,8 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
     /// # Returns
     /// Table of file and directory name strings.
     let s = state.clone();
+    /// @param path : string
+    /// @return any
     fs.set(
         "getDirectoryItems",
         lua.create_function(move |_, path: String| {
@@ -245,6 +277,8 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
     // luna.filesystem.isFile(path) -> bool
     /// Returns whether the given path is a regular file.
     let s = state.clone();
+    /// @param path : string
+    /// @return any
     fs.set(
         "isFile",
         lua.create_function(move |_, path: String| {
@@ -257,6 +291,8 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
     // luna.filesystem.isDirectory(path) -> bool
     /// Returns whether the given path is a directory.
     let s = state.clone();
+    /// @param path : string
+    /// @return any
     fs.set(
         "isDirectory",
         lua.create_function(move |_, path: String| {
@@ -269,6 +305,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
     // luna.filesystem.createDirectory(path) - save area only
     /// Creates a directory and any missing parent directories.
     let s = state.clone();
+    /// @param path : string
     fs.set(
         "createDirectory",
         lua.create_function(move |_, path: String| {
@@ -289,6 +326,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
     /// # Returns
     /// true on success, or nil plus an error string on failure.
     let s = state.clone();
+    /// @param path : string
     fs.set(
         "remove",
         lua.create_function(move |_, path: String| {
@@ -303,6 +341,8 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
     // luna.filesystem.getInfo(path) -> table {type, size, modtime, readonly}
     /// Returns a table of metadata (size, modtime, kind) for a path.
     let s = state.clone();
+    /// @param path : string
+    /// @return any
     fs.set(
         "getInfo",
         lua.create_function(move |lua, path: String| {
@@ -340,6 +380,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
     /// # Returns
     /// Source path string, or nil if not set.
     let s = state.clone();
+    /// @return any
     fs.set(
         "getSource",
         lua.create_function(move |_, ()| {
@@ -352,6 +393,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
     // luna.filesystem.getSaveDirectory() -> string
     /// Returns the sandboxed save data directory path.
     let s = state.clone();
+    /// @return any
     fs.set(
         "getSaveDirectory",
         lua.create_function(move |_, ()| {
@@ -374,6 +416,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
 
     // luna.filesystem.getUserDirectory() -> string
     /// Returns the current user's home directory path.
+    /// @return any
     fs.set(
         "getUserDirectory",
         lua.create_function(move |_, ()| Ok(GameFS::get_user_directory()))?,
@@ -385,6 +428,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
     /// # Returns
     /// Identity string, or nil if not yet set.
     let s = state.clone();
+    /// @return any
     fs.set(
         "getIdentity",
         lua.create_function(move |_, ()| {
@@ -399,6 +443,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
     /// # Parameters
     /// - `name` — Application identity string (e.g. 'mygame').
     let s = state.clone();
+    /// @param name : string
     fs.set(
         "setIdentity",
         lua.create_function(move |_, name: String| {
@@ -411,6 +456,8 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
     // luna.filesystem.lines(path) -> iterator function
     /// Returns an iterator over lines in a text file.
     let s = state.clone();
+    /// @param path : string
+    /// @return any
     fs.set(
         "lines",
         lua.create_function(move |lua, path: String| {
@@ -437,6 +484,8 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
     /// Start loading a file in the background. Returns a numeric handle.
     // luna.filesystem.readAsync(path)
     let s = state.clone();
+    /// @param path : string
+    /// @return any
     fs.set(
         "readAsync",
         lua.create_function(move |_, path: String| {
@@ -459,6 +508,8 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
     /// Status is "pending", "done", or "error".
     // luna.filesystem.pollAsync(handle)
     let s = state.clone();
+    /// @param handle_id : integer
+    /// @return any
     fs.set(
         "pollAsync",
         lua.create_function(move |lua, handle_id: u64| {

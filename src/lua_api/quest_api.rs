@@ -2,6 +2,14 @@
 //!
 //! Exposes quest creation, stage management, objective tracking, and journal
 //! entries through the `luna.quest` table.
+//!
+//! This module is part of Luna2D's `lua_api` subsystem and provides the implementation
+//! details for quest api-related operations and data management.
+//! Key types exported from this module: `LuaObjective`, `LuaQuestStage`, `LuaQuest`, `LuaQuestLog`.
+//! Primary functions: `register()`.
+//!
+//! All public items are documented. See the parent module for architectural context
+//! and the `luna.*` Lua API for the scripting interface.
 
 use std::cell::RefCell;
 use std::rc::Rc;
@@ -29,6 +37,7 @@ impl LuaUserData for LuaObjective {
         add_type_methods(methods);
 
         /// Returns the id.
+        /// @return any
         ///
         /// # Parameters
         /// - `desc` — `string`.
@@ -37,6 +46,7 @@ impl LuaUserData for LuaObjective {
         /// The current id.
         methods.add_method("getId", |_, this, ()| Ok(this.0.borrow().id.clone()));
         /// Returns the description.
+        /// @return any
         ///
         /// # Parameters
         /// - `desc` — `string`.
@@ -45,6 +55,7 @@ impl LuaUserData for LuaObjective {
         /// The current description.
         methods.add_method("getDescription", |_, this, ()| Ok(this.0.borrow().description.clone()));
         /// Sets the description.
+        /// @param desc : string
         ///
         /// # Parameters
         /// - `desc` — `string`.
@@ -53,6 +64,7 @@ impl LuaUserData for LuaObjective {
             Ok(())
         });
         /// Returns the current.
+        /// @return any
         ///
         /// # Parameters
         /// - `amount` — `integer`.
@@ -61,6 +73,7 @@ impl LuaUserData for LuaObjective {
         /// The current current.
         methods.add_method("getCurrent", |_, this, ()| Ok(this.0.borrow().current));
         /// Returns the required.
+        /// @return any
         ///
         /// # Parameters
         /// - `amount` — `integer`.
@@ -69,11 +82,14 @@ impl LuaUserData for LuaObjective {
         /// The current required.
         methods.add_method("getRequired", |_, this, ()| Ok(this.0.borrow().required));
         /// Advances to the next item.
+        /// @param amount : integer
+        /// @return any
         ///
         /// # Parameters
         /// - `amount` — `integer`.
         methods.add_method("advance", |_, this, amount: u32| Ok(this.0.borrow_mut().advance(amount)));
         /// Sets the progress.
+        /// @param value : integer
         ///
         /// # Parameters
         /// - `value` — `integer`.
@@ -82,6 +98,7 @@ impl LuaUserData for LuaObjective {
             Ok(())
         });
         /// Returns the status.
+        /// @return any
         ///
         /// # Parameters
         /// - `s` — `string`.
@@ -92,6 +109,7 @@ impl LuaUserData for LuaObjective {
             Ok(this.0.borrow().status.as_str().to_string())
         });
         /// Sets the status.
+        /// @param s : string
         ///
         /// # Parameters
         /// - `s` — `string`.
@@ -102,6 +120,7 @@ impl LuaUserData for LuaObjective {
             Ok(())
         });
         /// Returns `true` if mandatory.
+        /// @return any
         ///
         /// # Parameters
         /// - `v` — `boolean`.
@@ -110,6 +129,7 @@ impl LuaUserData for LuaObjective {
         /// `boolean`.
         methods.add_method("isMandatory", |_, this, ()| Ok(this.0.borrow().mandatory));
         /// Sets the mandatory.
+        /// @param v : boolean
         ///
         /// # Parameters
         /// - `v` — `boolean`.
@@ -118,6 +138,7 @@ impl LuaUserData for LuaObjective {
             Ok(())
         });
         /// Returns `true` if visible.
+        /// @return any
         ///
         /// # Parameters
         /// - `v` — `boolean`.
@@ -126,6 +147,7 @@ impl LuaUserData for LuaObjective {
         /// `boolean`.
         methods.add_method("isVisible", |_, this, ()| Ok(this.0.borrow().visible));
         /// Sets the visible.
+        /// @param v : boolean
         ///
         /// # Parameters
         /// - `v` — `boolean`.
@@ -134,6 +156,7 @@ impl LuaUserData for LuaObjective {
             Ok(())
         });
         /// Returns `true` if complete.
+        /// @return any
         ///
         /// # Parameters
         /// - `tag` — `string`.
@@ -142,6 +165,7 @@ impl LuaUserData for LuaObjective {
         /// `boolean`.
         methods.add_method("isComplete", |_, this, ()| Ok(this.0.borrow().is_complete()));
         /// Adds tag to the collection.
+        /// @param tag : string
         ///
         /// # Parameters
         /// - `tag` — `string`.
@@ -150,6 +174,8 @@ impl LuaUserData for LuaObjective {
             Ok(())
         });
         /// Returns `true` if tag.
+        /// @param tag : string
+        /// @return any
         ///
         /// # Parameters
         /// - `tag` — `string`.
@@ -158,6 +184,7 @@ impl LuaUserData for LuaObjective {
         /// `boolean`.
         methods.add_method("hasTag", |_, this, tag: String| Ok(this.0.borrow().has_tag(&tag)));
         /// Returns the tags.
+        /// @return any
         ///
         /// # Returns
         /// The current tags.
@@ -175,7 +202,7 @@ impl LuaUserData for LuaObjective {
 // LuaQuestStage
 // ─────────────────────────────────────────────────────────────────────────────
 
-/// Lua UserData wrapper for a quest stage.
+/// Lua UserData wrapper for a quest stage. Consult the module-level documentation for the broader usage context and preconditions.
 #[derive(Clone)]
 pub(crate) struct LuaQuestStage(pub(crate) Rc<RefCell<QuestStage>>);
 
@@ -189,6 +216,7 @@ impl LuaUserData for LuaQuestStage {
         add_type_methods(methods);
 
         /// Returns the id.
+        /// @return any
         ///
         /// # Parameters
         /// - `name` — `string`.
@@ -197,6 +225,7 @@ impl LuaUserData for LuaQuestStage {
         /// The current id.
         methods.add_method("getId", |_, this, ()| Ok(this.0.borrow().id.clone()));
         /// Returns the name.
+        /// @return any
         ///
         /// # Parameters
         /// - `name` — `string`.
@@ -205,6 +234,7 @@ impl LuaUserData for LuaQuestStage {
         /// The current name.
         methods.add_method("getName", |_, this, ()| Ok(this.0.borrow().name.clone()));
         /// Sets the name.
+        /// @param name : string
         ///
         /// # Parameters
         /// - `name` — `string`.
@@ -213,6 +243,7 @@ impl LuaUserData for LuaQuestStage {
             Ok(())
         });
         /// Adds objective to the collection.
+        /// @param obj : Objective
         ///
         /// # Parameters
         /// - `obj` — `userdata`.
@@ -223,6 +254,8 @@ impl LuaUserData for LuaQuestStage {
             Ok(())
         });
         /// Returns the objective.
+        /// @param id : string
+        /// @return any
         ///
         /// # Parameters
         /// - `id` — `string`.
@@ -240,11 +273,13 @@ impl LuaUserData for LuaQuestStage {
             }
         });
         /// Returns `true` if complete.
+        /// @return any
         ///
         /// # Returns
         /// `boolean`.
         methods.add_method("isComplete", |_, this, ()| Ok(this.0.borrow().is_complete()));
         /// Returns the objective count.
+        /// @return integer
         ///
         /// # Returns
         /// The current objective count.
@@ -252,6 +287,7 @@ impl LuaUserData for LuaQuestStage {
             Ok(this.0.borrow().objectives.len() as u32)
         });
         /// Returns the objective ids.
+        /// @return any
         ///
         /// # Returns
         /// The current objective ids.
@@ -270,7 +306,7 @@ impl LuaUserData for LuaQuestStage {
 // LuaQuest
 // ─────────────────────────────────────────────────────────────────────────────
 
-/// Lua UserData wrapper for a quest.
+/// Lua UserData wrapper for a quest. Consult the module-level documentation for the broader usage context and preconditions.
 #[derive(Clone)]
 pub(crate) struct LuaQuest(pub(crate) Rc<RefCell<Quest>>);
 
@@ -284,6 +320,7 @@ impl LuaUserData for LuaQuest {
         add_type_methods(methods);
 
         /// Returns the id.
+        /// @return any
         ///
         /// # Parameters
         /// - `t` — `string`.
@@ -292,6 +329,7 @@ impl LuaUserData for LuaQuest {
         /// The current id.
         methods.add_method("getId", |_, this, ()| Ok(this.0.borrow().id.clone()));
         /// Returns the title.
+        /// @return any
         ///
         /// # Parameters
         /// - `t` — `string`.
@@ -300,6 +338,7 @@ impl LuaUserData for LuaQuest {
         /// The current title.
         methods.add_method("getTitle", |_, this, ()| Ok(this.0.borrow().title.clone()));
         /// Sets the title.
+        /// @param t : string
         ///
         /// # Parameters
         /// - `t` — `string`.
@@ -308,6 +347,7 @@ impl LuaUserData for LuaQuest {
             Ok(())
         });
         /// Returns the description.
+        /// @return any
         ///
         /// # Parameters
         /// - `d` — `string`.
@@ -316,6 +356,7 @@ impl LuaUserData for LuaQuest {
         /// The current description.
         methods.add_method("getDescription", |_, this, ()| Ok(this.0.borrow().description.clone()));
         /// Sets the description.
+        /// @param d : string
         ///
         /// # Parameters
         /// - `d` — `string`.
@@ -324,6 +365,7 @@ impl LuaUserData for LuaQuest {
             Ok(())
         });
         /// Returns the status.
+        /// @return any
         ///
         /// # Parameters
         /// - `s` — `string`.
@@ -334,6 +376,7 @@ impl LuaUserData for LuaQuest {
             Ok(this.0.borrow().status.as_str().to_string())
         });
         /// Sets the status.
+        /// @param s : string
         ///
         /// # Parameters
         /// - `s` — `string`.
@@ -359,6 +402,7 @@ impl LuaUserData for LuaQuest {
         /// - `stage` — `userdata`.
         methods.add_method("fail", |_, this, ()| { this.0.borrow_mut().fail(); Ok(()) });
         /// Adds stage to the collection.
+        /// @param stage : QuestStage
         ///
         /// # Parameters
         /// - `stage` — `userdata`.
@@ -369,6 +413,7 @@ impl LuaUserData for LuaQuest {
             Ok(())
         });
         /// Returns the current stage index.
+        /// @return any
         ///
         /// # Returns
         /// The current current stage index.
@@ -376,6 +421,7 @@ impl LuaUserData for LuaQuest {
             Ok(this.0.borrow().current_stage as u32 + 1)
         });
         /// Returns the current stage.
+        /// @return any
         ///
         /// # Returns
         /// The current current stage.
@@ -390,6 +436,8 @@ impl LuaUserData for LuaQuest {
             }
         });
         /// Returns the stage.
+        /// @param id : string
+        /// @return any
         ///
         /// # Parameters
         /// - `id` — `string`.
@@ -407,11 +455,14 @@ impl LuaUserData for LuaQuest {
             }
         });
         /// Next stage on this Quest.
+        /// @return any
         ///
         /// # Parameters
         /// - `id` — `string`.
         methods.add_method("nextStage", |_, this, ()| Ok(this.0.borrow_mut().next_stage()));
         /// Goto stage on this Quest.
+        /// @param id : string
+        /// @return any
         ///
         /// # Parameters
         /// - `id` — `string`.
@@ -419,6 +470,7 @@ impl LuaUserData for LuaQuest {
             Ok(this.0.borrow_mut().goto_stage(&id))
         });
         /// Returns the stage count.
+        /// @return integer
         ///
         /// # Returns
         /// The current stage count.
@@ -426,6 +478,7 @@ impl LuaUserData for LuaQuest {
             Ok(this.0.borrow().stages.len() as u32)
         });
         /// Returns the stage ids.
+        /// @return any
         ///
         /// # Parameters
         /// - `id` — `string`.
@@ -441,6 +494,9 @@ impl LuaUserData for LuaQuest {
             Ok(t)
         });
         /// Advance objective on this Quest.
+        /// @param id : string
+        /// @param amount : integer
+        /// @return any
         ///
         /// # Parameters
         /// - `id` — `string`.
@@ -449,6 +505,9 @@ impl LuaUserData for LuaQuest {
             Ok(this.0.borrow_mut().advance_objective(&id, amount))
         });
         /// Sets the objective status.
+        /// @param id : string
+        /// @param s : string
+        /// @return any
         ///
         /// # Parameters
         /// - `id` — `string`.
@@ -459,6 +518,7 @@ impl LuaUserData for LuaQuest {
             Ok(this.0.borrow_mut().set_objective_status(&id, status))
         });
         /// All objectives complete on this Quest.
+        /// @return any
         ///
         /// # Parameters
         /// - `text` — `string`.
@@ -467,6 +527,9 @@ impl LuaUserData for LuaQuest {
             Ok(this.0.borrow().all_objectives_complete())
         });
         /// Adds journal entry to the collection.
+        /// @param text : string
+        /// @param tag : string?
+        /// @return any
         ///
         /// # Parameters
         /// - `text` — `string`.
@@ -476,6 +539,7 @@ impl LuaUserData for LuaQuest {
             Ok(this.0.borrow_mut().add_journal_entry(text, tag))
         });
         /// Returns the journal.
+        /// @return any
         ///
         /// # Returns
         /// The current journal.
@@ -492,6 +556,8 @@ impl LuaUserData for LuaQuest {
             Ok(t)
         });
         /// Sets the meta.
+        /// @param key : string
+        /// @param value : string
         ///
         /// # Parameters
         /// - `key` — `string`.
@@ -501,6 +567,8 @@ impl LuaUserData for LuaQuest {
             Ok(())
         });
         /// Returns the meta.
+        /// @param key : string
+        /// @return any
         ///
         /// # Parameters
         /// - `key` — `string`.
@@ -511,6 +579,7 @@ impl LuaUserData for LuaQuest {
             Ok(this.0.borrow().get_meta(&key).map(String::from))
         });
         /// Returns the reward.
+        /// @return any
         ///
         /// # Parameters
         /// - `r` — `string`.
@@ -519,6 +588,7 @@ impl LuaUserData for LuaQuest {
         /// The current reward.
         methods.add_method("getReward", |_, this, ()| Ok(this.0.borrow().reward.clone()));
         /// Sets the reward.
+        /// @param r : string
         ///
         /// # Parameters
         /// - `r` — `string`.
@@ -527,6 +597,7 @@ impl LuaUserData for LuaQuest {
             Ok(())
         });
         /// Returns `true` if visible.
+        /// @return any
         ///
         /// # Parameters
         /// - `v` — `boolean`.
@@ -535,6 +606,7 @@ impl LuaUserData for LuaQuest {
         /// `boolean`.
         methods.add_method("isVisible", |_, this, ()| Ok(this.0.borrow().visible));
         /// Sets the visible.
+        /// @param v : boolean
         ///
         /// # Parameters
         /// - `v` — `boolean`.
@@ -543,6 +615,9 @@ impl LuaUserData for LuaQuest {
             Ok(())
         });
         /// Adds an objective directly (creates a default stage if none exists).
+        /// @param id : string
+        /// @param description : string
+        /// @param required : integer
         ///
         /// # Parameters
         /// - `id` — `string`.
@@ -558,6 +633,7 @@ impl LuaUserData for LuaQuest {
             Ok(())
         });
         /// Returns the completion percentage (0.0–100.0) based on mandatory objectives.
+        /// @return any
         ///
         /// # Returns
         /// `number`.
@@ -565,6 +641,7 @@ impl LuaUserData for LuaQuest {
             Ok(this.0.borrow().completion_percent())
         });
         /// Returns the IDs of all Active objectives across all stages.
+        /// @return any
         ///
         /// # Returns
         /// `table` of strings.
@@ -586,6 +663,8 @@ impl LuaUserData for LuaQuest {
             Ok(t)
         });
         /// Resets an objective back to Active. Returns `true` if found.
+        /// @param id : string
+        /// @return any
         ///
         /// # Parameters
         /// - `id` — `string`.
@@ -602,7 +681,7 @@ impl LuaUserData for LuaQuest {
 // LuaQuestLog
 // ─────────────────────────────────────────────────────────────────────────────
 
-/// Lua UserData wrapper for a quest log.
+/// Lua UserData wrapper for a quest log. Consult the module-level documentation for the broader usage context and preconditions.
 #[derive(Clone)]
 pub(crate) struct LuaQuestLog(pub(crate) Rc<RefCell<QuestLog>>);
 
@@ -616,6 +695,7 @@ impl LuaUserData for LuaQuestLog {
         add_type_methods(methods);
 
         /// Adds quest to the collection.
+        /// @param quest : Quest
         ///
         /// # Parameters
         /// - `quest` — `userdata`.
@@ -626,6 +706,8 @@ impl LuaUserData for LuaQuestLog {
             Ok(())
         });
         /// Returns the quest.
+        /// @param id : string
+        /// @return any
         ///
         /// # Parameters
         /// - `id` — `string`.
@@ -643,6 +725,8 @@ impl LuaUserData for LuaQuestLog {
             }
         });
         /// Removes quest from the collection.
+        /// @param id : string
+        /// @return any
         ///
         /// # Parameters
         /// - `id` — `string`.
@@ -650,6 +734,7 @@ impl LuaUserData for LuaQuestLog {
             Ok(this.0.borrow_mut().remove_quest(&id))
         });
         /// Returns the quest count.
+        /// @return any
         ///
         /// # Returns
         /// The current quest count.
@@ -657,6 +742,7 @@ impl LuaUserData for LuaQuestLog {
             Ok(this.0.borrow().quest_count() as u32)
         });
         /// Returns the quest ids.
+        /// @return any
         ///
         /// # Returns
         /// The current quest ids.
@@ -669,6 +755,8 @@ impl LuaUserData for LuaQuestLog {
             Ok(t)
         });
         /// Start quest on this QuestLog.
+        /// @param id : string
+        /// @return any
         ///
         /// # Parameters
         /// - `id` — `string`.
@@ -676,6 +764,8 @@ impl LuaUserData for LuaQuestLog {
             Ok(this.0.borrow_mut().start_quest(&id))
         });
         /// Complete quest on this QuestLog.
+        /// @param id : string
+        /// @return any
         ///
         /// # Parameters
         /// - `quest_id` — `string`.
@@ -685,6 +775,8 @@ impl LuaUserData for LuaQuestLog {
             Ok(this.0.borrow_mut().complete_quest(&id))
         });
         /// Fail quest on this QuestLog.
+        /// @param id : string
+        /// @return any
         ///
         /// # Parameters
         /// - `quest_id` — `string`.
@@ -694,6 +786,10 @@ impl LuaUserData for LuaQuestLog {
             Ok(this.0.borrow_mut().fail_quest(&id))
         });
         /// Advance objective on this QuestLog.
+        /// @param quest_id : string
+        /// @param obj_id : string
+        /// @param amount : integer
+        /// @return any
         ///
         /// # Parameters
         /// - `quest_id` — `string`.
@@ -703,6 +799,7 @@ impl LuaUserData for LuaQuestLog {
             Ok(this.0.borrow_mut().advance_objective(&quest_id, &obj_id, amount))
         });
         /// Returns the active quest ids.
+        /// @return any
         ///
         /// # Returns
         /// The current active quest ids.
@@ -713,6 +810,7 @@ impl LuaUserData for LuaQuestLog {
             Ok(t)
         });
         /// Returns the completed quest ids.
+        /// @return any
         ///
         /// # Returns
         /// The current completed quest ids.
@@ -723,6 +821,7 @@ impl LuaUserData for LuaQuestLog {
             Ok(t)
         });
         /// Returns the failed quest ids.
+        /// @return any
         ///
         /// # Parameters
         /// - `status` — `string`.
@@ -736,6 +835,8 @@ impl LuaUserData for LuaQuestLog {
             Ok(t)
         });
         /// Returns the quests with status.
+        /// @param status : string
+        /// @return any
         ///
         /// # Parameters
         /// - `status` — `string`.
@@ -761,9 +862,22 @@ impl LuaUserData for LuaQuestLog {
 // ─────────────────────────────────────────────────────────────────────────────
 
 /// Register `luna.quest.*` API with the Lua VM.
+///
+/// # Parameters
+/// - `lua` — `&Lua`.
+/// - `luna` — `&LuaTable`.
+///
+/// # Returns
+/// `LuaResult<()>`.
 pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
     let module = lua.create_table()?;
 
+    /// New objective.
+    ///
+    /// @param id : string
+    /// @param desc : string
+    /// @param required : integer
+    /// @return any
     module.set(
         "newObjective",
         lua.create_function(|_, (id, desc, required): (String, String, u32)| {
@@ -771,6 +885,11 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
         })?,
     )?;
 
+    /// New stage.
+    ///
+    /// @param id : string
+    /// @param name : string
+    /// @return any
     module.set(
         "newStage",
         lua.create_function(|_, (id, name): (String, String)| {
@@ -778,6 +897,11 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
         })?,
     )?;
 
+    /// New quest.
+    ///
+    /// @param id : string
+    /// @param title : string?
+    /// @return any
     module.set(
         "newQuest",
         lua.create_function(|_, (id, title): (String, Option<String>)| {
@@ -786,6 +910,9 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
         })?,
     )?;
 
+    /// New quest log.
+    ///
+    /// @return any
     module.set(
         "newQuestLog",
         lua.create_function(|_, ()| {

@@ -1,4 +1,12 @@
 //! Unit-aware pathfinder with result caching and convenience methods.
+//!
+//! This module is part of Luna2D's `pathfinding` subsystem and provides the implementation
+//! details for unit pathfinder-related operations and data management.
+//! Key types exported from this module: `Waypoint`, `UnitPathfinder`.
+//! Primary functions: `new()`, `find_path()`, `find_path_smooth()`, `get_path_length()`.
+//!
+//! All public items are documented. See the parent module for architectural context
+//! and the `luna.*` Lua API for the scripting interface.
 
 use std::cell::RefCell;
 use std::collections::{HashMap, VecDeque};
@@ -7,7 +15,7 @@ use std::rc::Rc;
 use crate::pathfinding::astar;
 use crate::pathfinding::nav_grid::NavGrid;
 
-/// A waypoint along a computed path.
+/// A waypoint along a computed path. Consult the module-level documentation for the broader usage context and preconditions.
 ///
 /// # Fields
 /// - `x` — `u32`.
@@ -31,6 +39,13 @@ struct CacheKey {
 }
 
 /// A pathfinder that operates on a shared `NavGrid` with optional result caching.
+///
+/// # Fields
+/// - `grid` — `Rc<RefCell<NavGrid>>`.
+/// - `cache` — `HashMap<CacheKey`.
+/// - `cache_order` — `Vec<CacheKey>`.
+/// - `cache_enabled` — `bool`.
+/// - `cache_max_size` — `usize`.
 pub struct UnitPathfinder {
     /// Shared reference to the navigation grid.
     grid: Rc<RefCell<NavGrid>>,
@@ -340,7 +355,7 @@ impl UnitPathfinder {
         astar::line_of_sight(&grid, x1, y1, x2, y2, unit_size)
     }
 
-    /// Enable or disable path caching.
+    /// Enable or disable path caching. Replaces the current cache enabled value; callers hold responsibility for maintaining consistency with related fields.
     ///
     /// # Parameters
     /// - `enabled` — `bool`.
@@ -352,7 +367,7 @@ impl UnitPathfinder {
         }
     }
 
-    /// Returns `true` if caching is enabled.
+    /// Returns `true` if caching is enabled. This accessor incurs no allocation; call it freely in hot paths.
     ///
     /// # Returns
     /// `bool`.
@@ -360,7 +375,7 @@ impl UnitPathfinder {
         self.cache_enabled
     }
 
-    /// Remove all cached path results.
+    /// Remove all cached path results. After this call the container is in the same state as immediately after construction.
     pub fn clear_cache(&mut self) {
         self.cache.clear();
         self.cache_order.clear();

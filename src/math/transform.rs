@@ -2,6 +2,14 @@
 //!
 //! Compatible with standard 2D transform API for translate, rotate, scale,
 //! shear, and point transformation.
+//!
+//! This module is part of Luna2D's `math` subsystem and provides the implementation
+//! details for transform-related operations and data management.
+//! Key types exported from this module: `Transform`.
+//! Primary functions: `new()`, `from_components()`, `translate()`, `rotate()`.
+//!
+//! All public items are documented. See the parent module for architectural context
+//! and the `luna.*` Lua API for the scripting interface.
 
 use crate::math::mat3::Mat3;
 use crate::math::vec2::Vec2;
@@ -10,6 +18,9 @@ use crate::math::vec2::Vec2;
 ///
 /// Wraps `Mat3` with chainable transformation methods matching
 /// the standard 2D transform API.
+///
+/// # Fields
+/// - `matrix` — `Mat3`.
 #[derive(Debug, Clone, Copy)]
 pub struct Transform {
     /// Internal 3×3 matrix.
@@ -61,7 +72,7 @@ impl Transform {
         t
     }
 
-    /// Apply translation to the transform.
+    /// Apply translation to the transform. Consult the module-level documentation for the broader usage context and preconditions.
     ///
     /// # Parameters
     /// - `dx` — horizontal offset
@@ -74,7 +85,7 @@ impl Transform {
         self
     }
 
-    /// Apply a rotation to the transform.
+    /// Apply a rotation to the transform. Consult the module-level documentation for the broader usage context and preconditions.
     ///
     /// # Parameters
     /// - `angle` — rotation angle in radians
@@ -179,7 +190,7 @@ impl Transform {
         (p.x, p.y)
     }
 
-    /// Compute the inverse of this transform.
+    /// Compute the inverse of this transform. Consult the module-level documentation for the broader usage context and preconditions.
     ///
     /// # Returns
     /// A `Transform` that undoes this transform; composing them gives identity.

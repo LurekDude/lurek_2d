@@ -2,6 +2,14 @@
 //!
 //! Like `Viewport`, but also tracks the scaled content dimensions for
 //! use with an automatic graphics transform stack.
+//!
+//! This module is part of Luna2D's `graphics` subsystem and provides the implementation
+//! details for viewport scale-related operations and data management.
+//! Key types exported from this module: `ViewportScale`.
+//! Primary functions: `new()`, `resize()`, `get_game_dimensions()`, `get_scaled_dimensions()`.
+//!
+//! All public items are documented. See the parent module for architectural context
+//! and the `luna.*` Lua API for the scripting interface.
 
 use crate::graphics::viewport::ScaleMode;
 
@@ -119,7 +127,7 @@ impl ViewportScale {
         (self.scaled_width, self.scaled_height)
     }
 
-    /// Current offset `(offset_x, offset_y)`.
+    /// Current offset `(offset_x, offset_y)`. This accessor incurs no allocation; call it freely in hot paths.
     ///
     /// # Returns
     /// `(f32, f32)`.
@@ -135,7 +143,7 @@ impl ViewportScale {
         (self.scale_x, self.scale_y)
     }
 
-    /// Reference to the active scale mode.
+    /// Reference to the active scale mode. This accessor incurs no allocation; call it freely in hot paths.
     ///
     /// # Returns
     /// `&ScaleMode`.

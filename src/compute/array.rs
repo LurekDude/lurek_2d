@@ -1,9 +1,17 @@
 //! Core NdArray type and DataType enum.
+//!
+//! This module is part of Luna2D's `compute` subsystem and provides the implementation
+//! details for array-related operations and data management.
+//! Key types exported from this module: `DataType`, `NdArray`.
+//! Primary functions: `parse()`, `byte_size()`, `name()`, `new()`.
+//!
+//! All public items are documented. See the parent module for architectural context
+//! and the `luna.*` Lua API for the scripting interface.
 
 /// Maximum number of elements allowed in a single NdArray.
 const MAX_ELEMENTS: usize = 268_435_456;
 
-/// Element data type for an NdArray.
+/// Element data type for an NdArray. Consult the module-level documentation for the broader usage context and preconditions.
 ///
 /// # Variants
 /// - `Float32` — Float32 variant.
@@ -50,7 +58,7 @@ impl DataType {
         }
     }
 
-    /// Human-readable name for this dtype.
+    /// Human-readable name for this dtype. Consult the module-level documentation for the broader usage context and preconditions.
     ///
     /// # Returns
     /// `&'static str`.
@@ -67,6 +75,12 @@ impl DataType {
 ///
 /// Data is stored as a contiguous `Vec<u8>` byte buffer. Shapes are limited
 /// to 1D, 2D, or 3D with a hard cap of 268,435,456 elements.
+///
+/// # Fields
+/// - `shape` — `Vec<usize>`.
+/// - `strides` — `Vec<usize>`.
+/// - `dtype` — `DataType`.
+/// - `data` — `Vec<u8>`.
 #[derive(Debug, Clone)]
 pub struct NdArray {
     shape: Vec<usize>,
@@ -88,7 +102,7 @@ impl NdArray {
         Self::zeros(shape, dtype)
     }
 
-    /// Create a zero-initialized NdArray.
+    /// Create a zero-initialized NdArray. Consult the module-level documentation for the broader usage context and preconditions.
     ///
     /// # Parameters
     /// - `shape` — `&[usize]`.

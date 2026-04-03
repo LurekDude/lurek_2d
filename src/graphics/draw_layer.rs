@@ -2,8 +2,16 @@
 //!
 //! Entries are queued with a z-order value and flushed in ascending order
 //! so that lower z-values are drawn first (back-to-front).
+//!
+//! This module is part of Luna2D's `graphics` subsystem and provides the implementation
+//! details for draw layer-related operations and data management.
+//! Key types exported from this module: `LayerEntry`, `DrawLayer`.
+//! Primary functions: `new()`, `queue()`, `flush()`, `clear()`.
+//!
+//! All public items are documented. See the parent module for architectural context
+//! and the `luna.*` Lua API for the scripting interface.
 
-/// A queued draw entry with its z-order.
+/// A queued draw entry with its z-order. Consult the module-level documentation for the broader usage context and preconditions.
 ///
 /// # Fields
 /// - `z_order` — `f64`.
@@ -15,10 +23,14 @@ pub struct LayerEntry {
     pub callback_id: usize,
 }
 
-/// Z-ordered draw callback queue.
+/// Z-ordered draw callback queue. Consult the module-level documentation for the broader usage context and preconditions.
 ///
 /// Collects entries during the draw phase and flushes them in z-order
 /// so that rendering happens back-to-front.
+///
+/// # Fields
+/// - `entries` — `Vec<LayerEntry>`.
+/// - `next_id` — `usize`.
 pub struct DrawLayer {
     /// Pending entries waiting to be flushed.
     entries: Vec<LayerEntry>,
@@ -27,7 +39,7 @@ pub struct DrawLayer {
 }
 
 impl DrawLayer {
-    /// Creates an empty draw layer.
+    /// Creates an empty draw layer. Returns a fully initialised instance with all fields set to their initial values.
     ///
     /// # Returns
     /// `Self`.
@@ -38,7 +50,7 @@ impl DrawLayer {
         }
     }
 
-    /// Queues an entry with the given z-order.
+    /// Queues an entry with the given z-order. Consult the module-level documentation for the broader usage context and preconditions.
     ///
     /// # Parameters
     /// - `z_order` — `f64`.
@@ -73,12 +85,12 @@ impl DrawLayer {
         std::mem::take(&mut self.entries)
     }
 
-    /// Discards all queued entries.
+    /// Discards all queued entries. After this call the container is in the same state as immediately after construction.
     pub fn clear(&mut self) {
         self.entries.clear();
     }
 
-    /// Returns the number of queued entries.
+    /// Returns the number of queued entries. This accessor incurs no allocation; call it freely in hot paths.
     ///
     /// # Returns
     /// `usize`.

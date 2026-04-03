@@ -1,11 +1,35 @@
 //! Behavior Tree with composite, decorator, and leaf nodes.
 //!
-//! All nodes return `BTStatus`. Composites memo the running-child index
-//! to support multi-frame "running" states.
+//! A behavior tree is a hierarchical decision-making structure where each node
+//! returns a [`BTStatus`] (Success, Failure, or Running) after being ticked.
+//! The tree is traversed from root each frame. Composite nodes (Selector, Sequence,
+//! Parallel) manage child execution order. Decorator nodes (Inverter, Repeater,
+//! Succeeder) modify child results. Leaf nodes (Action, Condition) call Lua
+//! callbacks to evaluate game state or perform actions.
+//!
+//! ## Running State and Multi-Frame Execution
+//!
+//! When a leaf node returns `Running`, composite nodes memo the running-child
+//! index so the next tick resumes from that child instead of restarting from
+//! the first child. This enables multi-frame behaviors like "walk to target"
+//! that take several frames to complete.
+//!
+//! ## Lua Integration
+//!
+//! Leaf callbacks are stored as `mlua::RegistryKey` references:
+//! - **Action**: `fn(agent_table, blackboard_table, dt) → "success" | "failure" | "running"`
+//! - **Condition**: `fn(agent_table, blackboard_table) → bool`
+//!
+//! The tree itself does not call these callbacks — that happens at the
+//! [`AIWorld`](crate::ai::world::AIWorld) level during `update(dt)`.
 
 use mlua::RegistryKey;
 
-/// Return status produced by every BT node after a tick.
+/// Execution status returned by every behavior tree node after a tick.
+///
+/// The three-valued return type is the foundation of BT logic:
+/// composites and decorators use it to decide whether to continue, abort,
+/// or resume child traversal on the next frame.
 ///
 /// # Variants
 /// - `Success` — Success variant.
@@ -13,16 +37,23 @@ use mlua::RegistryKey;
 /// - `Running` — Running variant.
 #[derive(Debug, Clone, PartialEq)]
 pub enum BTStatus {
-    /// Node completed successfully.
+    /// The node completed its work successfully.
     Success,
-    /// Node failed.
+    /// The node could not accomplish its task.
     Failure,
-    /// Node is still running (will resume next tick).
+    /// The node is still executing and should be resumed next frame.
+    /// Composite nodes store the index of the running child so they
+    /// can skip completed siblings on the next tick.
     Running,
 }
 
 impl BTStatus {
-    /// Parses a Lua status string.
+    /// Converts a Lua status string into a `BTStatus`.
+    ///
+    /// Accepts `"success"` and `"failure"` literally; any other string
+    /// (including `"running"`) maps to `Running`. This permissive default
+    /// ensures that a Lua callback returning an unrecognized string keeps
+    /// the behavior alive rather than silently succeeding or failing.
     ///
     /// # Parameters
     /// - `s` — `&str`.
@@ -37,7 +68,8 @@ impl BTStatus {
         }
     }
 
-    /// Returns the Lua string representation.
+    /// Returns the canonical Lua string for this status.
+    /// Round-trips with [`parse_str`](Self::parse_str).
     ///
     /// # Returns
     /// `&'static str`.
@@ -50,21 +82,26 @@ impl BTStatus {
     }
 }
 
-/// Parallel node success/failure policy.
+/// Policy for determining when a Parallel composite node succeeds or fails.
+///
+/// Parallel nodes tick all children every frame (unlike Selector/Sequence which
+/// stop on the first decisive result). The success and failure policies control
+/// how individual child results are aggregated into an overall result.
 ///
 /// # Variants
 /// - `RequireOne` — RequireOne variant.
 /// - `RequireAll` — RequireAll variant.
 #[derive(Debug, Clone, PartialEq)]
 pub enum ParallelPolicy {
-    /// Succeeds/fails when any one child meets the condition.
+    /// The parallel node succeeds/fails as soon as any single child meets the condition.
     RequireOne,
-    /// Succeeds/fails when all children meet the condition.
+    /// The parallel node succeeds/fails only when every child meets the condition.
     RequireAll,
 }
 
 impl ParallelPolicy {
-    /// Parses policy from Lua string.
+    /// Parses a Lua string (`"requireOne"` or `"requireAll"`) into a policy.
+    /// Defaults to `RequireOne` for unrecognized strings.
     ///
     /// # Parameters
     /// - `s` — `&str`.
@@ -78,7 +115,8 @@ impl ParallelPolicy {
         }
     }
 
-    /// Returns the Lua string representation.
+    /// Returns the Lua string identifier for this policy.
+    /// Round-trips with [`parse_str`](Self::parse_str).
     ///
     /// # Returns
     /// `&'static str`.
@@ -90,7 +128,28 @@ impl ParallelPolicy {
     }
 }
 
-/// Recursive behavior-tree node.
+/// A node in the behavior tree. Nodes are organized into three categories:
+///
+/// **Composites** (have multiple children):
+/// - `Selector` — tries children left-to-right; returns `Success` on the first
+///   child success, `Failure` if all children fail.
+/// - `Sequence` — runs children left-to-right; returns `Failure` on the first
+///   child failure, `Success` if all children succeed.
+/// - `Parallel` — ticks all children every frame; result depends on the
+///   `success_policy` and `failure_policy`.
+///
+/// **Decorators** (have exactly one child):
+/// - `Inverter` — flips Success ↔ Failure, passes Running through unchanged.
+/// - `Repeater` — repeats the child N times (0 = infinite loop).
+/// - `Succeeder` — always returns Success regardless of child result.
+///
+/// **Leaves** (no children, call Lua callbacks):
+/// - `Action` — calls `fn(agent, bb, dt) → "success"|"failure"|"running"`.
+/// - `Condition` — calls `fn(agent, bb) → bool` (true → Success, false → Failure).
+///
+/// Composite nodes store a `running_idx` that memos which child was Running last
+/// frame, allowing the tree to resume mid-sequence without restarting from the
+/// first child.
 ///
 /// # Variants
 /// - `Selector` — Selector variant.
@@ -157,7 +216,12 @@ pub enum BTNode {
 }
 
 impl BTNode {
-    /// Recursively resets running-child memos and repeater counters.
+    /// Recursively resets all running-child memos and repeater counters.
+    ///
+    /// Call this when the tree needs to start fresh — e.g., when an agent
+    /// changes decision model or when the tree is reassigned. After reset,
+    /// the next tick will traverse from the root with `running_idx = 0` for
+    /// all composites and `done = 0` for all repeaters.
     pub fn reset(&mut self) {
         match self {
             BTNode::Selector {
@@ -193,7 +257,11 @@ impl BTNode {
         }
     }
 
-    /// Returns the number of children for composite nodes, 1 for decorators, 0 for leaves.
+    /// Returns the number of direct children this node has.
+    ///
+    /// - Composites (Selector, Sequence, Parallel): number of child nodes.
+    /// - Decorators (Inverter, Repeater, Succeeder): always 1.
+    /// - Leaves (Action, Condition): always 0.
     ///
     /// # Returns
     /// `usize`.
@@ -208,20 +276,27 @@ impl BTNode {
     }
 }
 
-/// Root container holding the behavior tree and caching the last tick status.
+/// Root container for a behavior tree instance.
+///
+/// Wraps an optional root [`BTNode`] and caches the [`BTStatus`] from the last tick.
+/// The `last_status` is useful for external code (e.g., the Lua API) to query
+/// what the tree decided without re-ticking it.
+///
+/// An empty tree (root = None) is valid — it returns `Success` without doing anything.
 ///
 /// # Fields
 /// - `root` — `Option<BTNode>`.
 /// - `last_status` — `BTStatus`.
 pub struct BehaviorTree {
-    /// The root node of the tree.
+    /// The root node of the tree, or `None` for an empty tree.
     pub root: Option<BTNode>,
-    /// Status from the last tick.
+    /// The status returned by the most recent tick. Defaults to `Success`.
     pub last_status: BTStatus,
 }
 
 impl BehaviorTree {
-    /// Creates a new empty behavior tree.
+    /// Creates a new behavior tree with no root node.
+    /// `last_status` defaults to `Success`.
     ///
     /// # Returns
     /// `Self`.

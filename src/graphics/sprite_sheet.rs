@@ -23,7 +23,7 @@ pub struct FrameGroup {
     pub count: usize,
 }
 
-/// Directional layout for sprite sets.
+/// Directional layout for sprite sets. Consult the module-level documentation for the broader usage context and preconditions.
 ///
 /// # Variants
 /// - `Rows` — Rows variant.
@@ -140,7 +140,7 @@ impl SpriteSheet {
         self.frames.get(index).copied()
     }
 
-    /// Total number of frames in the sheet.
+    /// Total number of frames in the sheet. This accessor incurs no allocation; call it freely in hot paths.
     ///
     /// # Returns
     /// `usize`.
@@ -156,7 +156,7 @@ impl SpriteSheet {
         (self.frame_width, self.frame_height)
     }
 
-    /// Grid dimensions `(columns, rows)`.
+    /// Grid dimensions `(columns, rows)`. This accessor incurs no allocation; call it freely in hot paths.
     ///
     /// # Returns
     /// `(u32, u32)`.
@@ -215,7 +215,7 @@ impl SpriteSheet {
         self.frames[start..end].to_vec()
     }
 
-    /// Store a named frame group.
+    /// Store a named frame group. Consult the module-level documentation for the broader usage context and preconditions.
     ///
     /// # Parameters
     /// - `name` — `impl Into<String>`.
@@ -245,7 +245,7 @@ impl SpriteSheet {
         Some(self.get_range(group.start_frame, group.count))
     }
 
-    /// Return the names of all defined groups.
+    /// Return the names of all defined groups. This accessor incurs no allocation; call it freely in hot paths.
     ///
     /// # Returns
     /// `Vec<String>`.

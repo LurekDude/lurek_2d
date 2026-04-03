@@ -2,6 +2,14 @@
 //!
 //! A simple data container describing an off-screen render target
 //! onto which decals can be composited.
+//!
+//! This module is part of Luna2D's `graphics` subsystem and provides the implementation
+//! details for decal surface-related operations and data management.
+//! Key types exported from this module: `DecalSurface`.
+//! Primary functions: `new()`, `get_dimensions()`, `get_width()`, `get_height()`.
+//!
+//! All public items are documented. See the parent module for architectural context
+//! and the `luna.*` Lua API for the scripting interface.
 
 /// Persistent render target for stamping decals.
 ///
@@ -39,7 +47,7 @@ impl DecalSurface {
         (self.width, self.height)
     }
 
-    /// Returns the surface width in pixels.
+    /// Returns the surface width in pixels. This accessor incurs no allocation; call it freely in hot paths.
     ///
     /// # Returns
     /// `u32`.
@@ -47,7 +55,7 @@ impl DecalSurface {
         self.width
     }
 
-    /// Returns the surface height in pixels.
+    /// Returns the surface height in pixels. This accessor incurs no allocation; call it freely in hot paths.
     ///
     /// # Returns
     /// `u32`.

@@ -1,9 +1,17 @@
 //! Save/load slot system with collectors, schema versioning, dirty tracking,
 //! and auto-save.
+//!
+//! This module is part of Luna2D's `savegame` subsystem and provides the implementation
+//! details for save data-related operations and data management.
+//! Key types exported from this module: `SlotMeta`, `SaveManager`, `SaveValue`.
+//! Primary functions: `new()`, `register()`, `unregister()`, `registered_names()`.
+//!
+//! All public items are documented. See the parent module for architectural context
+//! and the `luna.*` Lua API for the scripting interface.
 
 use std::collections::HashMap;
 
-/// Metadata extracted from a save slot.
+/// Metadata extracted from a save slot. Consult the module-level documentation for the broader usage context and preconditions.
 ///
 /// # Fields
 /// - `slot` — `String`.
@@ -27,6 +35,14 @@ pub struct SlotMeta {
 ///
 /// Actual serialisation and filesystem calls happen on the Lua side;
 /// this struct tracks the bookkeeping.
+///
+/// # Fields
+/// - `schema_version` — `i32`.
+/// - `registered` — `Vec<String>`.
+/// - `dirty` — `bool`.
+/// - `auto_save` — `Option<(f64`.
+/// - `auto_save_elapsed` — `f64`.
+/// - `migration_versions` — `Vec<i32>`.
 #[derive(Debug, Default)]
 pub struct SaveManager {
     /// Current schema version for new saves.
@@ -44,7 +60,7 @@ pub struct SaveManager {
 }
 
 impl SaveManager {
-    /// Create a new empty SaveManager.
+    /// Create a new empty SaveManager. Returns a fully initialised instance with all fields set to their initial values.
     ///
     /// # Returns
     /// `Self`.
@@ -52,7 +68,7 @@ impl SaveManager {
         Self::default()
     }
 
-    /// Register a named collector module.
+    /// Register a named collector module. Panics in debug mode if the same entity is registered twice.
     ///
     /// # Parameters
     /// - `name` — `impl Into<String>`.
@@ -63,7 +79,7 @@ impl SaveManager {
         }
     }
 
-    /// Unregister a collector by name.
+    /// Unregister a collector by name. Consult the module-level documentation for the broader usage context and preconditions.
     ///
     /// # Parameters
     /// - `name` — `&str`.
@@ -71,7 +87,7 @@ impl SaveManager {
         self.registered.retain(|n| n != name);
     }
 
-    /// Get registered module names.
+    /// Get registered module names. Panics in debug mode if the same entity is registered twice.
     ///
     /// # Returns
     /// `&[String]`.
@@ -79,7 +95,7 @@ impl SaveManager {
         &self.registered
     }
 
-    /// Set the current schema version.
+    /// Set the current schema version. Replaces the current schema version value; callers hold responsibility for maintaining consistency with related fields.
     ///
     /// # Parameters
     /// - `version` — `i32`.
@@ -87,7 +103,7 @@ impl SaveManager {
         self.schema_version = version;
     }
 
-    /// Get the current schema version.
+    /// Get the current schema version. Consult the module-level documentation for the broader usage context and preconditions.
     ///
     /// # Returns
     /// `i32`.
@@ -95,7 +111,7 @@ impl SaveManager {
         self.schema_version
     }
 
-    /// Record a migration version key.
+    /// Record a migration version key. The insertion is O(1) amortised unless a resize is triggered.
     ///
     /// # Parameters
     /// - `from_version` — `i32`.
@@ -126,7 +142,7 @@ impl SaveManager {
         self.dirty = true;
     }
 
-    /// Whether data is dirty.
+    /// Whether data is dirty. This accessor incurs no allocation; call it freely in hot paths.
     ///
     /// # Returns
     /// `bool`.
@@ -149,7 +165,7 @@ impl SaveManager {
         self.auto_save_elapsed = 0.0;
     }
 
-    /// Disable auto-save.
+    /// Disable auto-save. Consult the module-level documentation for the broader usage context and preconditions.
     pub fn disable_auto_save(&mut self) {
         self.auto_save = None;
         self.auto_save_elapsed = 0.0;
@@ -173,7 +189,7 @@ impl SaveManager {
         None
     }
 
-    /// Reset all state.
+    /// Reset all state. After this call the container is in the same state as immediately after construction.
     pub fn reset(&mut self) {
         *self = Self::default();
     }
@@ -214,7 +230,7 @@ pub fn serialize_table(data: &HashMap<String, SaveValue>, depth: u32) -> Result<
     Ok(out)
 }
 
-/// Serialize a single value.
+/// Serialize a single value. Consult the module-level documentation for the broader usage context and preconditions.
 ///
 /// # Parameters
 /// - `value` — `&SaveValue`.

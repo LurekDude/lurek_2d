@@ -9,7 +9,7 @@ use std::rc::Rc;
 
 use mlua::prelude::*;
 
-use crate::graphics::minimap::{ColorMode, FogLevel, Minimap};
+use crate::minimap::{ColorMode, FogLevel, Minimap};
 use crate::lua_api::lua_types::{add_type_methods, LunaType};
 
 // ---------------------------------------------------------------------------
@@ -17,6 +17,9 @@ use crate::lua_api::lua_types::{add_type_methods, LunaType};
 // ---------------------------------------------------------------------------
 
 /// Lua UserData wrapper for a grid-based minimap.
+///
+/// # Fields
+/// - `inner` — `Rc<RefCell<Minimap>>`.
 #[derive(Clone)]
 pub(crate) struct LuaMinimap {
     inner: Rc<RefCell<Minimap>>,
@@ -34,6 +37,7 @@ impl LuaUserData for LuaMinimap {
         // ── Grid queries ──
 
         /// Returns the grid width.
+        /// @return any
         ///
         /// # Returns
         /// The current grid width.
@@ -42,6 +46,7 @@ impl LuaUserData for LuaMinimap {
         });
 
         /// Returns the grid height.
+        /// @return any
         ///
         /// # Returns
         /// The current grid height.
@@ -50,6 +55,7 @@ impl LuaUserData for LuaMinimap {
         });
 
         /// Returns the grid size.
+        /// @return any
         ///
         /// # Returns
         /// The current grid size.
@@ -61,6 +67,7 @@ impl LuaUserData for LuaMinimap {
         // ── Display dimensions ──
 
         /// Returns the display width.
+        /// @return any
         ///
         /// # Returns
         /// The current display width.
@@ -69,6 +76,7 @@ impl LuaUserData for LuaMinimap {
         });
 
         /// Returns the display height.
+        /// @return any
         ///
         /// # Returns
         /// The current display height.
@@ -77,6 +85,7 @@ impl LuaUserData for LuaMinimap {
         });
 
         /// Returns the display size.
+        /// @return any
         ///
         /// # Parameters
         /// - `w` — `integer`.
@@ -90,6 +99,8 @@ impl LuaUserData for LuaMinimap {
         });
 
         /// Sets the display size.
+        /// @param w : integer
+        /// @param h : integer
         ///
         /// # Parameters
         /// - `w` — `integer`.
@@ -118,6 +129,9 @@ impl LuaUserData for LuaMinimap {
         );
 
         /// Returns the terrain.
+        /// @param x : integer
+        /// @param y : integer
+        /// @return any
         ///
         /// # Parameters
         /// - `x` — `integer`.
@@ -145,6 +159,8 @@ impl LuaUserData for LuaMinimap {
         );
 
         /// Returns the terrain color.
+        /// @param terrain_type : integer
+        /// @return any
         ///
         /// # Parameters
         /// - `terrain_type` — `integer`.
@@ -159,6 +175,7 @@ impl LuaUserData for LuaMinimap {
         // ── Fog of war ──
 
         /// Sets the fog enabled.
+        /// @param enabled : boolean
         ///
         /// # Parameters
         /// - `enabled` — `boolean`.
@@ -168,6 +185,7 @@ impl LuaUserData for LuaMinimap {
         });
 
         /// Returns `true` if fog enabled.
+        /// @return any
         ///
         /// # Parameters
         /// - `x` — `integer`.
@@ -196,6 +214,9 @@ impl LuaUserData for LuaMinimap {
         );
 
         /// Returns the fog level.
+        /// @param x : integer
+        /// @param y : integer
+        /// @return any
         ///
         /// # Parameters
         /// - `x` — `integer`.
@@ -223,6 +244,7 @@ impl LuaUserData for LuaMinimap {
         );
 
         /// Returns the fog color.
+        /// @return any
         ///
         /// # Parameters
         /// - `data` — `table`.
@@ -235,6 +257,7 @@ impl LuaUserData for LuaMinimap {
         });
 
         /// Sets the fog data.
+        /// @param data : table
         ///
         /// # Parameters
         /// - `data` — `table`.
@@ -279,6 +302,8 @@ impl LuaUserData for LuaMinimap {
         );
 
         /// Returns `true` if object type visible.
+        /// @param type_idx : integer
+        /// @return any
         ///
         /// # Parameters
         /// - `type_idx` — `integer`.
@@ -295,6 +320,7 @@ impl LuaUserData for LuaMinimap {
         });
 
         /// Returns the object type count.
+        /// @return any
         ///
         /// # Returns
         /// The current object type count.
@@ -320,6 +346,8 @@ impl LuaUserData for LuaMinimap {
         );
 
         /// Removes object from the collection.
+        /// @param id : integer
+        /// @return any
         ///
         /// # Parameters
         /// - `id` — `integer`.
@@ -337,6 +365,7 @@ impl LuaUserData for LuaMinimap {
         });
 
         /// Returns the object count.
+        /// @return any
         ///
         /// # Returns
         /// The current object count.
@@ -357,6 +386,8 @@ impl LuaUserData for LuaMinimap {
         );
 
         /// Returns the owner color.
+        /// @param owner : integer
+        /// @return any
         ///
         /// # Parameters
         /// - `owner` — `integer`.
@@ -371,6 +402,7 @@ impl LuaUserData for LuaMinimap {
         // ── Color mode ──
 
         /// Sets the color mode.
+        /// @param mode : string
         ///
         /// # Parameters
         /// - `mode` — `string`.
@@ -390,6 +422,7 @@ impl LuaUserData for LuaMinimap {
         });
 
         /// Returns the color mode.
+        /// @return any
         ///
         /// # Returns
         /// The current color mode.
@@ -404,6 +437,7 @@ impl LuaUserData for LuaMinimap {
         // ── Zoom and pan ──
 
         /// Sets the zoom.
+        /// @param zoom : number
         ///
         /// # Parameters
         /// - `zoom` — `number`.
@@ -413,6 +447,7 @@ impl LuaUserData for LuaMinimap {
         });
 
         /// Returns the zoom.
+        /// @return any
         ///
         /// # Parameters
         /// - `x` — `number`.
@@ -425,6 +460,8 @@ impl LuaUserData for LuaMinimap {
         });
 
         /// Sets the center.
+        /// @param x : number
+        /// @param y : number
         ///
         /// # Parameters
         /// - `x` — `number`.
@@ -435,6 +472,7 @@ impl LuaUserData for LuaMinimap {
         });
 
         /// Returns the center.
+        /// @return any
         ///
         /// # Returns
         /// The current center.
@@ -463,6 +501,7 @@ impl LuaUserData for LuaMinimap {
         });
 
         /// Returns the viewport rect.
+        /// @return any
         ///
         /// # Returns
         /// The current viewport rect.
@@ -497,6 +536,7 @@ impl LuaUserData for LuaMinimap {
         });
 
         /// Sets the viewport visible.
+        /// @param visible : boolean
         ///
         /// # Parameters
         /// - `visible` — `boolean`.
@@ -506,6 +546,7 @@ impl LuaUserData for LuaMinimap {
         });
 
         /// Returns `true` if viewport visible.
+        /// @return any
         ///
         /// # Parameters
         /// - `r` — `number`.
@@ -530,6 +571,7 @@ impl LuaUserData for LuaMinimap {
         );
 
         /// Returns the viewport color.
+        /// @return any
         ///
         /// # Returns
         /// The current viewport color.
@@ -563,6 +605,7 @@ impl LuaUserData for LuaMinimap {
         });
 
         /// Returns the ping count.
+        /// @return any
         ///
         /// # Returns
         /// The current ping count.
@@ -609,6 +652,8 @@ impl LuaUserData for LuaMinimap {
         );
 
         /// Removes marker from the collection.
+        /// @param id : integer
+        /// @return any
         ///
         /// # Parameters
         /// - `id` — `integer`.
@@ -617,6 +662,8 @@ impl LuaUserData for LuaMinimap {
         });
 
         /// Returns `true` if marker.
+        /// @param id : integer
+        /// @return any
         ///
         /// # Parameters
         /// - `id` — `integer`.
@@ -628,6 +675,8 @@ impl LuaUserData for LuaMinimap {
         });
 
         /// Returns the marker description.
+        /// @param id : integer
+        /// @return any
         ///
         /// # Parameters
         /// - `id` — `integer`.
@@ -643,6 +692,7 @@ impl LuaUserData for LuaMinimap {
         });
 
         /// Returns the marker count.
+        /// @return any
         ///
         /// # Parameters
         /// - `enabled` — `boolean`.
@@ -656,6 +706,7 @@ impl LuaUserData for LuaMinimap {
         // ── Rendering options ──
 
         /// Sets the anti alias.
+        /// @param enabled : boolean
         ///
         /// # Parameters
         /// - `enabled` — `boolean`.
@@ -665,6 +716,7 @@ impl LuaUserData for LuaMinimap {
         });
 
         /// Returns `true` if anti alias.
+        /// @return any
         ///
         /// # Returns
         /// `boolean`.
@@ -693,6 +745,7 @@ impl LuaUserData for LuaMinimap {
         // ── Update ──
 
         /// Advances the simulation by `dt` seconds.
+        /// @param dt : number
         ///
         /// # Parameters
         /// - `dt` — `number`.
@@ -707,10 +760,24 @@ impl LuaUserData for LuaMinimap {
 // Registration
 // ---------------------------------------------------------------------------
 
-/// Register the `luna.minimap` module.
+/// Register the `luna.minimap` module. Panics in debug mode if the same entity is registered twice.
+///
+/// # Parameters
+/// - `lua` — `&Lua`.
+/// - `luna` — `&LuaTable`.
+///
+/// # Returns
+/// `LuaResult<()>`.
 pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
     let module = lua.create_table()?;
 
+    /// New minimap.
+    ///
+    /// @param grid_w : integer
+    /// @param grid_h : integer
+    /// @param display_w : integer?
+    /// @param display_h : integer?
+    /// @return any
     module.set(
         "newMinimap",
         lua.create_function(

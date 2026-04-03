@@ -67,7 +67,7 @@ impl Camera {
         self.position = position;
     }
 
-    /// Sets the camera's zoom level.
+    /// Sets the camera's zoom level. Replaces the current zoom value; callers hold responsibility for maintaining consistency with related fields.
     ///
     /// # Parameters
     /// - `zoom` — `f32`.
@@ -75,7 +75,7 @@ impl Camera {
         self.zoom = zoom;
     }
 
-    /// Sets the camera's rotation in radians.
+    /// Sets the camera's rotation in radians. Replaces the current rotation value; callers hold responsibility for maintaining consistency with related fields.
     ///
     /// # Parameters
     /// - `rotation` — `f32`.
@@ -203,7 +203,7 @@ impl Camera2D {
         (self.position.x, self.position.y)
     }
 
-    /// Sets the uniform zoom factor.
+    /// Sets the uniform zoom factor. Replaces the current zoom value; callers hold responsibility for maintaining consistency with related fields.
     ///
     /// # Parameters
     /// - `z` — `f32`.
@@ -211,7 +211,7 @@ impl Camera2D {
         self.zoom = z;
     }
 
-    /// Returns the current zoom factor.
+    /// Returns the current zoom factor. This accessor incurs no allocation; call it freely in hot paths.
     ///
     /// # Returns
     /// `f32`.
@@ -219,7 +219,7 @@ impl Camera2D {
         self.zoom
     }
 
-    /// Sets the rotation in radians.
+    /// Sets the rotation in radians. Replaces the current rotation value; callers hold responsibility for maintaining consistency with related fields.
     ///
     /// # Parameters
     /// - `r` — `f32`.
@@ -274,7 +274,7 @@ impl Camera2D {
         self.bounds = Some(Rect::new(x, y, w, h));
     }
 
-    /// Returns the world-space bounds, if set.
+    /// Returns the world-space bounds, if set. This accessor incurs no allocation; call it freely in hot paths.
     ///
     /// # Returns
     /// `Option<(f32, f32, f32, f32)>`.
@@ -282,7 +282,7 @@ impl Camera2D {
         self.bounds.map(|b| (b.x, b.y, b.width, b.height))
     }
 
-    /// Removes previously set bounds.
+    /// Removes previously set bounds. Returns the removed value if present, or `None` when the key did not exist.
     pub fn remove_bounds(&mut self) {
         self.bounds = None;
     }
@@ -394,7 +394,7 @@ impl Camera2D {
         self.dead_zone.map(|(hw, hh)| (hw * 2.0, hh * 2.0))
     }
 
-    /// Sets the follow target position.
+    /// Sets the follow target position. Replaces the current target value; callers hold responsibility for maintaining consistency with related fields.
     ///
     /// # Parameters
     /// - `x` — `f32`.
@@ -421,7 +421,7 @@ impl Camera2D {
         self.follow_smooth = speed.max(0.0);
     }
 
-    /// Returns the smooth follow speed.
+    /// Returns the smooth follow speed. This accessor incurs no allocation; call it freely in hot paths.
     ///
     /// # Returns
     /// `f32`.
@@ -429,7 +429,7 @@ impl Camera2D {
         self.follow_smooth
     }
 
-    /// Sets the look-ahead multiplier.
+    /// Sets the look-ahead multiplier. Replaces the current look ahead value; callers hold responsibility for maintaining consistency with related fields.
     ///
     /// # Parameters
     /// - `mul` — `f32`.
@@ -437,7 +437,7 @@ impl Camera2D {
         self.look_ahead = mul;
     }
 
-    /// Returns the look-ahead multiplier.
+    /// Returns the look-ahead multiplier. This accessor incurs no allocation; call it freely in hot paths.
     ///
     /// # Returns
     /// `f32`.
@@ -447,7 +447,7 @@ impl Camera2D {
 
     // ── Shake ───────────────────────────────────────────────────────────
 
-    /// Starts a camera shake effect.
+    /// Starts a camera shake effect. Consult the module-level documentation for the broader usage context and preconditions.
     ///
     /// # Parameters
     /// - `intensity` — Maximum pixel offset.

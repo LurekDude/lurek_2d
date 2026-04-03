@@ -120,7 +120,7 @@ cargo test --test <module>_tests              # Run one Rust test file
 cargo test lua_test_<module>                  # Run one Lua test by dispatcher name
 cargo test -- --nocapture                     # Show println! / lua print() output
 cargo clippy -- -D warnings                   # Lint — must be clean
-python tools/test_coverage.py                 # Coverage analytics → docs/test_coverage.json
+python tools/test_coverage.py                 # Coverage analytics → docs/API/test_coverage.json
 python tools/integration_coverage.py          # Check Lua integration test coverage
 python tools/collect_docs.py --report-missing # List undocumented public items
 ```

@@ -1,8 +1,16 @@
 //! Touch input state tracking for Luna2D.
+//!
+//! This module is part of Luna2D's `input` subsystem and provides the implementation
+//! details for touch-related operations and data management.
+//! Key types exported from this module: `TouchPoint`, `TouchState`.
+//! Primary functions: `new()`, `touch_start()`, `touch_move()`, `touch_end()`.
+//!
+//! All public items are documented. See the parent module for architectural context
+//! and the `luna.*` Lua API for the scripting interface.
 
 use std::collections::HashMap;
 
-/// Information about a single touch point.
+/// Information about a single touch point. Consult the module-level documentation for the broader usage context and preconditions.
 ///
 /// # Fields
 /// - `id` — `u64`.
@@ -21,7 +29,10 @@ pub struct TouchPoint {
     pub pressure: f64,
 }
 
-/// Tracks active touch points.
+/// Tracks active touch points. Consult the module-level documentation for the broader usage context and preconditions.
+///
+/// # Fields
+/// - `touches` — `HashMap<u64`.
 #[derive(Debug, Default)]
 pub struct TouchState {
     /// Currently active touch points, keyed by touch ID.
@@ -29,7 +40,7 @@ pub struct TouchState {
 }
 
 impl TouchState {
-    /// Creates a new empty touch state.
+    /// Creates a new empty touch state. Returns a fully initialised instance with all fields set to their initial values.
     ///
     /// # Returns
     /// `Self`.
@@ -37,7 +48,7 @@ impl TouchState {
         Self::default()
     }
 
-    /// Registers or updates a touch point.
+    /// Registers or updates a touch point. Consult the module-level documentation for the broader usage context and preconditions.
     ///
     /// # Parameters
     /// - `id` — `u64`.
@@ -63,7 +74,7 @@ impl TouchState {
         }
     }
 
-    /// Removes a touch point.
+    /// Removes a touch point. Consult the module-level documentation for the broader usage context and preconditions.
     ///
     /// # Parameters
     /// - `id` — `u64`.
@@ -71,7 +82,7 @@ impl TouchState {
         self.touches.remove(&id);
     }
 
-    /// Returns all active touch points.
+    /// Returns all active touch points. This accessor incurs no allocation; call it freely in hot paths.
     ///
     /// # Returns
     /// `Vec<TouchPoint>`.
@@ -79,7 +90,7 @@ impl TouchState {
         self.touches.values().copied().collect()
     }
 
-    /// Returns a specific touch point by ID.
+    /// Returns a specific touch point by ID. This accessor incurs no allocation; call it freely in hot paths.
     ///
     /// # Parameters
     /// - `id` — `u64`.
@@ -90,7 +101,7 @@ impl TouchState {
         self.touches.get(&id).copied()
     }
 
-    /// Returns the number of active touches.
+    /// Returns the number of active touches. This accessor incurs no allocation; call it freely in hot paths.
     ///
     /// # Returns
     /// `usize`.

@@ -1,11 +1,19 @@
 //! File handle with buffered read/write and sandboxed path resolution.
+//!
+//! This module is part of Luna2D's `filesystem` subsystem and provides the implementation
+//! details for file handle-related operations and data management.
+//! Key types exported from this module: `FileMode`, `FileHandle`.
+//! Primary functions: `parse_mode()`, `as_str()`, `open()`, `read()`.
+//!
+//! All public items are documented. See the parent module for architectural context
+//! and the `luna.*` Lua API for the scripting interface.
 
 use crate::engine::error::{EngineError, EngineResult};
 use crate::filesystem::GameFS;
 use std::io::{BufRead, BufReader, BufWriter, Read, Seek, SeekFrom, Write};
 use std::path::PathBuf;
 
-/// File access mode.
+/// File access mode. Consult the module-level documentation for the broader usage context and preconditions.
 ///
 /// # Variants
 /// - `Read` — open for reading; file must exist
@@ -59,6 +67,14 @@ impl FileMode {
 }
 
 /// A sandboxed file handle for reading or writing game files.
+///
+/// # Fields
+/// - `mode` — `FileMode`.
+/// - `path` — `PathBuf`.
+/// - `logical_path` — `String`.
+/// - `reader` — `Option<BufReader<std::fs::File>>`.
+/// - `writer` — `Option<BufWriter<std::fs::File>>`.
+/// - `size` — `u64`.
 pub struct FileHandle {
     /// Current mode (Read/Write/Append/Closed).
     mode: FileMode,
@@ -76,7 +92,7 @@ pub struct FileHandle {
 }
 
 impl FileHandle {
-    /// Open a file within the sandbox.
+    /// Open a file within the sandbox. Consult the module-level documentation for the broader usage context and preconditions.
     ///
     /// Read mode is allowed from `base_dir`; Write and Append are restricted to `save/`.
     ///
@@ -220,7 +236,7 @@ impl FileHandle {
         }
     }
 
-    /// Write raw bytes to the file.
+    /// Write raw bytes to the file. Returns an error if the underlying I/O operation fails.
     ///
     /// # Parameters
     /// - `data` — byte slice to write
@@ -285,7 +301,7 @@ impl FileHandle {
         self.size
     }
 
-    /// Get the current file access mode.
+    /// Get the current file access mode. This accessor incurs no allocation; call it freely in hot paths.
     ///
     /// # Returns
     /// The `FileMode` this handle was opened with, or `Closed` after `close()` is called.
@@ -301,7 +317,7 @@ impl FileHandle {
         &self.logical_path
     }
 
-    /// Flush buffered writes to disk.
+    /// Flush buffered writes to disk. Returns an error if the underlying I/O operation fails.
     ///
     /// # Returns
     /// `Ok(())` on success, or an `EngineError` if flushing fails.

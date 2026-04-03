@@ -20,22 +20,22 @@ This directory contains **permanent** CLI scripts for the Luna2D engine pipeline
 | Script | Purpose | Output |
 |---|---|---|
 | `gen_all_docs.py` | Run the full doc pipeline in one command | `docs/` + `wiki/` |
-| `gen_api_data.py` | Build master machine-readable API JSON | `docs/api_data.json` |
-| `gen_docs_lua.py` | Compact Lua API reference | `docs/lua-api.md` |
-| `gen_docs_rust.py` | Compact Rust API reference | `docs/rust-api.md` |
-| `gen_docs_tests.py` | Test catalog from Rust test files | `docs/test-docs.md` |
+| `gen_api_data.py` | Build master machine-readable API JSON | `docs/API/api_data.json` |
+| `gen_docs_lua.py` | Compact Lua API reference | `docs/API/lua-api.md` |
+| `gen_docs_rust.py` | Compact Rust API reference | `docs/API/rust-api.md` |
+| `gen_docs_tests.py` | Test catalog from Rust test files | `docs/API/test-docs.md` |
 | `gen_wiki_api.py` | Game-developer API cheatsheet | `wiki/API-Reference.md` |
-| `gen_lua_api.py` | Legacy Lua reference (VS Code extension) | `docs/lua_api_reference_generated.md` |
-| `collect_docs.py` | Rich Rust API collector with missing-doc report | `docs/api_generated.md` |
-| `doc_coverage.py` | Rust + Lua docstring coverage analytics | `docs/doc_coverage.json` |
-| `gen_test_docs.py` | Human-readable test documentation from metadata | `docs/test_docs.md` |
+| `gen_lua_api.py` | Legacy Lua reference (VS Code extension) | `docs/API/lua_api_reference_generated.md` |
+| `collect_docs.py` | Rich Rust API collector with missing-doc report | `docs/API/api_generated.md` |
+| `doc_coverage.py` | Rust + Lua docstring coverage analytics | `docs/API/doc_coverage.json` |
+| `gen_test_docs.py` | Human-readable test documentation from metadata | `docs/API/test_docs.md` |
 
 ### Coverage & Analytics
 
 | Script | Purpose | Output |
 |---|---|---|
-| `doc_coverage.py` | Count public items with/without `///` docs | `docs/doc_coverage.json` |
-| `test_coverage.py` | Cross-reference API functions vs test files | stdout + `docs/test_coverage.json` |
+| `doc_coverage.py` | Count public items with/without `///` docs | `docs/API/doc_coverage.json` |
+| `test_coverage.py` | Cross-reference API functions vs test files | stdout + `docs/API/test_coverage.json` |
 | `integration_coverage.py` | Integration test coverage check | stdout |
 | `module_audit.py` | Module structure and coverage audit | stdout |
 | `quality_report.py` | Quality metrics report | stdout |

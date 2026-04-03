@@ -1,5 +1,11 @@
 //! Grid-based pathfinding: A★, HPA★, flow fields, and unit-size-aware navigation.
 //! Also includes province-level A★ on adjacency graphs.
+//!
+//! This module is part of Luna2D's `pathfinding` subsystem and provides the implementation
+//! details for mod-related operations and data management.
+//!
+//! All public items are documented. See the parent module for architectural context
+//! and the `luna.*` Lua API for the scripting interface.
 
 /// astar.
 pub mod astar;

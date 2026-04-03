@@ -4,7 +4,15 @@
 //! branching choices, timed pauses, and inline callbacks. Drives text-based
 //! narrative sequences from flat script arrays.
 
-/// Dialog node types in a script.
+/// Dialog node types in a script. Consult the module-level documentation for the broader usage context and preconditions.
+///
+/// # Variants
+/// - `A` — A variant.
+/// - `Say` — Say variant.
+/// - `Choice` — Choice variant.
+/// - `Wait` — Wait variant.
+/// - `Lua` — Lua variant.
+/// - `Call` — Call variant.
 #[derive(Debug, Clone)]
 pub enum DialogNode {
     /// A spoken line with speaker name and text.
@@ -21,6 +29,10 @@ pub enum DialogNode {
 }
 
 /// A single choice option with a label and branch nodes.
+///
+/// # Fields
+/// - `label` — `String`.
+/// - `branch` — `Vec<DialogNode>`.
 #[derive(Debug, Clone)]
 pub struct ChoiceOption {
     /// Display label for this option.
@@ -29,7 +41,21 @@ pub struct ChoiceOption {
     pub branch: Vec<DialogNode>,
 }
 
-/// Sequencer playback state.
+/// Sequencer playback state. Consult the module-level documentation for the broader usage context and preconditions.
+///
+/// # Variants
+/// - `Not` — Not variant.
+/// - `Idle` — Idle variant.
+/// - `Typewriter` — Typewriter variant.
+/// - `Typing` — Typing variant.
+/// - `Full` — Full variant.
+/// - `Waiting` — Waiting variant.
+/// - `Presenting` — Presenting variant.
+/// - `Choice` — Choice variant.
+/// - `Executing` — Executing variant.
+/// - `Paused` — Paused variant.
+/// - `Script` — Script variant.
+/// - `Done` — Done variant.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum SequencerState {
     /// Not started or reset.
@@ -48,6 +74,9 @@ pub enum SequencerState {
 
 impl SequencerState {
     /// Returns the string representation of the state.
+    ///
+    /// # Returns
+    /// `&'static str`.
     pub fn as_str(&self) -> &'static str {
         match self {
             SequencerState::Idle => "idle",
@@ -64,6 +93,14 @@ impl SequencerState {
 ///
 /// Drives a flat array of [`DialogNode`] values through a state machine,
 /// revealing text character-by-character at a configurable speed.
+///
+/// # Fields
+/// - `nodes` — `Vec<DialogNode>`.
+/// - `state` — `SequencerState`.
+/// - `current_index` — `usize`.
+/// - `speed` — `f32`.
+/// - `revealed_chars` — `usize`.
+/// - `timer` — `f32`.
 #[derive(Debug)]
 pub struct Sequencer {
     nodes: Vec<DialogNode>,
@@ -79,6 +116,9 @@ pub struct Sequencer {
 
 impl Sequencer {
     /// Creates a new idle sequencer with default speed (30 cps).
+    ///
+    /// # Returns
+    /// `Self`.
     pub fn new() -> Self {
         Self {
             nodes: Vec::new(),
@@ -91,6 +131,9 @@ impl Sequencer {
     }
 
     /// Loads a script node array. Clears previous script, resets to Idle.
+    ///
+    /// # Parameters
+    /// - `nodes` — `Vec<DialogNode>`.
     pub fn load(&mut self, nodes: Vec<DialogNode>) {
         self.nodes = nodes;
         self.state = SequencerState::Idle;
@@ -102,6 +145,9 @@ impl Sequencer {
     /// Begins playback from the first node. If empty, goes to Done.
     ///
     /// Returns an optional callback index if the first node is a Call.
+    ///
+    /// # Returns
+    /// `Option<usize>`.
     pub fn start(&mut self) -> Option<usize> {
         if self.nodes.is_empty() {
             self.state = SequencerState::Done;
@@ -111,22 +157,34 @@ impl Sequencer {
         self.enter_current_node()
     }
 
-    /// Returns the current sequencer state.
+    /// Returns the current sequencer state. Consult the module-level documentation for the broader usage context and preconditions.
+    ///
+    /// # Returns
+    /// `SequencerState`.
     pub fn state(&self) -> SequencerState {
         self.state
     }
 
     /// Returns true if not Idle and not Done.
+    ///
+    /// # Returns
+    /// `bool`.
     pub fn is_active(&self) -> bool {
         self.state != SequencerState::Idle && self.state != SequencerState::Done
     }
 
-    /// Returns true only in Choice state.
+    /// Returns true only in Choice state. This accessor incurs no allocation; call it freely in hot paths.
+    ///
+    /// # Returns
+    /// `bool`.
     pub fn is_waiting_for_choice(&self) -> bool {
         self.state == SequencerState::Choice
     }
 
     /// Returns the speaker name of the current say node, or empty string.
+    ///
+    /// # Returns
+    /// `&str`.
     pub fn current_speaker(&self) -> &str {
         if let Some(DialogNode::Say { speaker, .. }) = self.nodes.get(self.current_index) {
             speaker.as_str()
@@ -136,6 +194,9 @@ impl Sequencer {
     }
 
     /// Returns the full text of the current say node, or empty string.
+    ///
+    /// # Returns
+    /// `&str`.
     pub fn current_text(&self) -> &str {
         if let Some(DialogNode::Say { text, .. }) = self.nodes.get(self.current_index) {
             text.as_str()
@@ -145,6 +206,9 @@ impl Sequencer {
     }
 
     /// Returns the typewriter-revealed substring of the current text.
+    ///
+    /// # Returns
+    /// `&str`.
     pub fn revealed_text(&self) -> &str {
         let full = self.current_text();
         if self.revealed_chars >= full.len() {
@@ -160,6 +224,9 @@ impl Sequencer {
     }
 
     /// Returns the choice prompt text, or empty string if not in Choice state.
+    ///
+    /// # Returns
+    /// `&str`.
     pub fn choice_text(&self) -> &str {
         if let Some(DialogNode::Choice { text, .. }) = self.nodes.get(self.current_index) {
             text.as_str()
@@ -169,6 +236,9 @@ impl Sequencer {
     }
 
     /// Returns the choice option labels, or empty vec if not in Choice state.
+    ///
+    /// # Returns
+    /// `Vec<&str>`.
     pub fn choice_labels(&self) -> Vec<&str> {
         if let Some(DialogNode::Choice { options, .. }) = self.nodes.get(self.current_index) {
             options.iter().map(|o| o.label.as_str()).collect()
@@ -178,11 +248,17 @@ impl Sequencer {
     }
 
     /// Sets the typewriter speed in characters per second. 0 = instant.
+    ///
+    /// # Parameters
+    /// - `cps` — `f32`.
     pub fn set_speed(&mut self, cps: f32) {
         self.speed = cps.max(0.0);
     }
 
     /// Returns the current typewriter speed in characters per second.
+    ///
+    /// # Returns
+    /// `f32`.
     pub fn get_speed(&self) -> f32 {
         self.speed
     }
@@ -190,6 +266,12 @@ impl Sequencer {
     /// Advances the typewriter/wait timers. Call every frame.
     ///
     /// Returns an optional callback index if a Call node was entered.
+    ///
+    /// # Parameters
+    /// - `dt` — `f32`.
+    ///
+    /// # Returns
+    /// `Option<usize>`.
     pub fn update(&mut self, dt: f32) -> Option<usize> {
         match self.state {
             SequencerState::Typing => {
@@ -224,6 +306,9 @@ impl Sequencer {
     /// TYPING → completes text → WAITING. WAITING → next node.
     ///
     /// Returns an optional callback index if a Call node was entered.
+    ///
+    /// # Returns
+    /// `Option<usize>`.
     pub fn advance(&mut self) -> Option<usize> {
         match self.state {
             SequencerState::Typing => {
@@ -247,6 +332,12 @@ impl Sequencer {
     /// Select a choice option (1-based index). Splices branch nodes inline.
     ///
     /// Returns an optional callback index if the first branch node is a Call.
+    ///
+    /// # Parameters
+    /// - `index` — `usize`.
+    ///
+    /// # Returns
+    /// `Option<usize>`.
     pub fn choose(&mut self, index: usize) -> Option<usize> {
         if self.state != SequencerState::Choice {
             return None;

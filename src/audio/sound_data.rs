@@ -1,11 +1,25 @@
-//! Decoded PCM audio sample buffer.
+//! Decoded PCM audio sample buffer with per-sample read/write access.
+//!
+//! `SoundData` stores fully decoded f32 PCM samples in interleaved channel
+//! order (for stereo: L, R, L, R, ...). It can be created as a silent buffer
+//! or decoded from an audio file via rodio. Lua code can read and write
+//! individual samples for procedural audio and DSP effects.
 
 use mlua::prelude::*;
 use rodio::Source;
 
 /// Decoded audio samples in f32 PCM format.
 ///
-/// Stores interleaved samples (for stereo: L, R, L, R, ...).
+/// Stores interleaved samples (for stereo: L, R, L, R, ...). Samples are
+/// always clamped to `[-1.0, 1.0]` on write. Can be constructed as a
+/// silent buffer or decoded from a file. Exposes per-sample access for
+/// procedural audio, oscillators, and effect processing from Lua.
+///
+/// # Fields
+/// - `samples` — `Vec<f32>`.
+/// - `sample_rate` — `u32`.
+/// - `channels` — `u16`.
+/// - `bit_depth` — `u16`.
 #[derive(Debug, Clone)]
 pub struct SoundData {
     samples: Vec<f32>,
@@ -33,7 +47,7 @@ impl SoundData {
         }
     }
 
-    /// Decode an audio file to SoundData.
+    /// Decode an audio file to SoundData. Returns a fully initialised instance with all fields set to their initial values.
     ///
     /// # Parameters
     /// - `path` — `&str`.
@@ -90,7 +104,7 @@ impl SoundData {
         }
     }
 
-    /// Get the number of samples per channel.
+    /// Get the number of samples per channel. Consult the module-level documentation for the broader usage context and preconditions.
     ///
     /// # Returns
     /// `usize`.
@@ -101,7 +115,7 @@ impl SoundData {
         self.samples.len() / self.channels as usize
     }
 
-    /// Get the sample rate in Hz.
+    /// Get the sample rate in Hz. Consult the module-level documentation for the broader usage context and preconditions.
     ///
     /// # Returns
     /// `u32`.
@@ -109,7 +123,7 @@ impl SoundData {
         self.sample_rate
     }
 
-    /// Get the number of audio channels.
+    /// Get the number of audio channels. Consult the module-level documentation for the broader usage context and preconditions.
     ///
     /// # Returns
     /// `u16`.
@@ -117,7 +131,7 @@ impl SoundData {
         self.channels
     }
 
-    /// Get the bit depth.
+    /// Get the bit depth. Consult the module-level documentation for the broader usage context and preconditions.
     ///
     /// # Returns
     /// `u16`.
@@ -125,7 +139,7 @@ impl SoundData {
         self.bit_depth
     }
 
-    /// Get the duration in seconds.
+    /// Get the duration in seconds. Consult the module-level documentation for the broader usage context and preconditions.
     ///
     /// # Returns
     /// `f64`.
@@ -136,7 +150,7 @@ impl SoundData {
         self.sample_count() as f64 / self.sample_rate as f64
     }
 
-    /// Get a reference to the raw samples.
+    /// Get a reference to the raw samples. Consult the module-level documentation for the broader usage context and preconditions.
     ///
     /// # Returns
     /// `&[f32]`.

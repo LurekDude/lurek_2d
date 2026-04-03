@@ -1,4 +1,11 @@
 //! Registers the `luna.image.*` pixel-level image manipulation API.
+//!
+//! This module is part of Luna2D's `lua_api` subsystem and provides the implementation
+//! details for image api-related operations and data management.
+//! Primary functions: `register()`.
+//!
+//! All public items are documented. See the parent module for architectural context
+//! and the `luna.*` Lua API for the scripting interface.
 
 use std::cell::RefCell;
 use std::rc::Rc;
@@ -23,6 +30,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
     // luna.image.newImageData(width, height) or luna.image.newImageData(filename)
     /// Creates a new blank RGBA8 ImageData buffer of the given size.
     let state_clone = state.clone();
+    /// @param args : MultiValue
     image_table.set(
         "newImageData",
         lua.create_function(move |lua, args: LuaMultiValue| {

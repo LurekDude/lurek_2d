@@ -1,8 +1,16 @@
 //! Data compression and decompression using deflate, gzip, zlib, and LZ4.
+//!
+//! This module is part of Luna2D's `data` subsystem and provides the implementation
+//! details for compress-related operations and data management.
+//! Key types exported from this module: `CompressFormat`.
+//! Primary functions: `parse_str()`, `compress()`, `decompress()`.
+//!
+//! All public items are documented. See the parent module for architectural context
+//! and the `luna.*` Lua API for the scripting interface.
 
 use std::io::{Read, Write};
 
-/// Supported compression formats.
+/// Supported compression formats. Consult the module-level documentation for the broader usage context and preconditions.
 ///
 /// # Variants
 /// - `Deflate` — Deflate variant.
@@ -22,7 +30,7 @@ pub enum CompressFormat {
 }
 
 impl CompressFormat {
-    /// Parse a format name string.
+    /// Parse a format name string. Returns an error if the source data is malformed or missing.
     ///
     /// # Parameters
     /// - `s` — `&str`.

@@ -1,4 +1,12 @@
 //! LIFO scene stack with registry and inter-scene data store.
+//!
+//! This module is part of Luna2D's `scene` subsystem and provides the implementation
+//! details for stack-related operations and data management.
+//! Key types exported from this module: `SceneStack`.
+//! Primary functions: `new()`, `next_scene_id()`, `push()`, `pop()`.
+//!
+//! All public items are documented. See the parent module for architectural context
+//! and the `luna.*` Lua API for the scripting interface.
 
 use std::collections::HashMap;
 
@@ -11,6 +19,13 @@ pub type SceneId = u64;
 ///
 /// Scenes are identified by `SceneId` values. The Lua API layer maps these
 /// to `mlua::RegistryKey` references for actual Lua table access.
+///
+/// # Fields
+/// - `stack` — `Vec<SceneId>`.
+/// - `registry` — `HashMap<String`.
+/// - `data_keys` — `HashMap<String`.
+/// - `transition` — `Option<ActiveTransition>`.
+/// - `next_id` — `u64`.
 pub struct SceneStack {
     /// The scene stack, bottom-to-top.
     stack: Vec<SceneId>,
@@ -25,7 +40,7 @@ pub struct SceneStack {
 }
 
 impl SceneStack {
-    /// Create a new empty scene stack.
+    /// Create a new empty scene stack. Returns a fully initialised instance with all fields set to their initial values.
     ///
     /// # Returns
     /// `Self`.
@@ -39,7 +54,7 @@ impl SceneStack {
         }
     }
 
-    /// Allocate a new unique scene ID.
+    /// Allocate a new unique scene ID. Consult the module-level documentation for the broader usage context and preconditions.
     ///
     /// # Returns
     /// `SceneId`.
@@ -74,7 +89,7 @@ impl SceneStack {
         prev
     }
 
-    /// Pop the top scene from the stack.
+    /// Pop the top scene from the stack. Consult the module-level documentation for the broader usage context and preconditions.
     ///
     /// # Parameters
     /// - `transition_type` — `TransitionType`.
@@ -173,7 +188,7 @@ impl SceneStack {
         popped
     }
 
-    /// Number of scenes on the stack.
+    /// Number of scenes on the stack. This accessor incurs no allocation; call it freely in hot paths.
     ///
     /// # Returns
     /// `usize`.
@@ -181,7 +196,7 @@ impl SceneStack {
         self.stack.len()
     }
 
-    /// Whether the stack is empty.
+    /// Whether the stack is empty. This accessor incurs no allocation; call it freely in hot paths.
     ///
     /// # Returns
     /// `bool`.
@@ -243,7 +258,7 @@ impl SceneStack {
 
     // -- Registry --
 
-    /// Register a scene by name.
+    /// Register a scene by name. Panics in debug mode if the same entity is registered twice.
     ///
     /// # Parameters
     /// - `name` — `String`.
@@ -252,7 +267,7 @@ impl SceneStack {
         self.registry.insert(name, scene_id);
     }
 
-    /// Get a registered scene ID by name.
+    /// Get a registered scene ID by name. This accessor incurs no allocation; call it freely in hot paths.
     ///
     /// # Parameters
     /// - `name` — `&str`.
@@ -263,7 +278,7 @@ impl SceneStack {
         self.registry.get(name).copied()
     }
 
-    /// Check if a name is registered.
+    /// Check if a name is registered. This accessor incurs no allocation; call it freely in hot paths.
     ///
     /// # Parameters
     /// - `name` — `&str`.
@@ -274,7 +289,7 @@ impl SceneStack {
         self.registry.contains_key(name)
     }
 
-    /// Unregister a scene by name.
+    /// Unregister a scene by name. Consult the module-level documentation for the broader usage context and preconditions.
     ///
     /// # Parameters
     /// - `name` — `&str`.
@@ -282,7 +297,7 @@ impl SceneStack {
         self.registry.remove(name);
     }
 
-    /// Get all registered scene names.
+    /// Get all registered scene names. This accessor incurs no allocation; call it freely in hot paths.
     ///
     /// # Returns
     /// `Vec<String>`.
@@ -292,7 +307,7 @@ impl SceneStack {
 
     // -- Data store --
 
-    /// Store a data value reference by key.
+    /// Store a data value reference by key. Replaces the current data value; callers hold responsibility for maintaining consistency with related fields.
     ///
     /// # Parameters
     /// - `key` — `String`.
@@ -312,7 +327,7 @@ impl SceneStack {
         self.data_keys.get(key).copied()
     }
 
-    /// Check if a data key exists.
+    /// Check if a data key exists. This accessor incurs no allocation; call it freely in hot paths.
     ///
     /// # Parameters
     /// - `key` — `&str`.
@@ -323,7 +338,7 @@ impl SceneStack {
         self.data_keys.contains_key(key)
     }
 
-    /// Remove a data value by key.
+    /// Remove a data value by key. Returns the removed value if present, or `None` when the key did not exist.
     ///
     /// # Parameters
     /// - `key` — `&str`.

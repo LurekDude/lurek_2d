@@ -1,11 +1,24 @@
 //! CPU-side RGBA8 pixel buffer for image manipulation.
+//!
+//! This module is part of Luna2D's `image` subsystem and provides the implementation
+//! details for image data-related operations and data management.
+//! Key types exported from this module: `ImageData`.
+//! Primary functions: `new()`, `from_file()`, `from_bytes()`, `width()`.
+//!
+//! All public items are documented. See the parent module for architectural context
+//! and the `luna.*` Lua API for the scripting interface.
 
 use mlua::prelude::*;
 
-/// CPU-side pixel buffer in RGBA8 format.
+/// CPU-side pixel buffer in RGBA8 format. Consult the module-level documentation for the broader usage context and preconditions.
 ///
 /// Stores pixel data in row-major order, 4 bytes per pixel (R, G, B, A).
 /// Can be created empty, from a file, or from raw bytes.
+///
+/// # Fields
+/// - `width` — `u32`.
+/// - `height` — `u32`.
+/// - `pixels` — `Vec<u8>`.
 #[derive(Debug, Clone)]
 pub struct ImageData {
     width: u32,
@@ -30,7 +43,7 @@ impl ImageData {
         }
     }
 
-    /// Load an image from a file path.
+    /// Load an image from a file path. Returns a fully initialised instance with all fields set to their initial values.
     ///
     /// # Parameters
     /// - `path` — `&str`.
@@ -49,7 +62,7 @@ impl ImageData {
         })
     }
 
-    /// Create from raw RGBA bytes.
+    /// Create from raw RGBA bytes. Returns a fully initialised instance with all fields set to their initial values.
     ///
     /// # Parameters
     /// - `width` — `u32`.
@@ -76,7 +89,7 @@ impl ImageData {
         })
     }
 
-    /// Get the width of the image.
+    /// Get the width of the image. Consult the module-level documentation for the broader usage context and preconditions.
     ///
     /// # Returns
     /// `u32`.
@@ -84,7 +97,7 @@ impl ImageData {
         self.width
     }
 
-    /// Get the height of the image.
+    /// Get the height of the image. Consult the module-level documentation for the broader usage context and preconditions.
     ///
     /// # Returns
     /// `u32`.
@@ -92,7 +105,7 @@ impl ImageData {
         self.height
     }
 
-    /// Get both dimensions.
+    /// Get both dimensions. Consult the module-level documentation for the broader usage context and preconditions.
     ///
     /// # Returns
     /// `(u32, u32)`.
@@ -194,7 +207,7 @@ impl ImageData {
         }
     }
 
-    /// Encode the image as PNG bytes.
+    /// Encode the image as PNG bytes. Consult the module-level documentation for the broader usage context and preconditions.
     ///
     /// # Returns
     /// `Result<Vec<u8>, String>`.

@@ -2,6 +2,14 @@
 //!
 //! Stores per-column wall data produced by a raycaster and provides
 //! helpers for updating columns from raw ray data and querying depth.
+//!
+//! This module is part of Luna2D's `graphics` subsystem and provides the implementation
+//! details for column batch-related operations and data management.
+//! Key types exported from this module: `ColumnData`, `ColumnBatch`.
+//! Primary functions: `new()`, `set_column()`, `get_column()`, `update_from_ray_data()`.
+//!
+//! All public items are documented. See the parent module for architectural context
+//! and the `luna.*` Lua API for the scripting interface.
 
 use crate::graphics::Color;
 
@@ -129,7 +137,7 @@ impl ColumnBatch {
         self.columns.get(col)
     }
 
-    /// Bulk-update columns from raw ray data.
+    /// Bulk-update columns from raw ray data. Consult the module-level documentation for the broader usage context and preconditions.
     ///
     /// # Parameters
     /// - `rays` — `&[f32]`.
@@ -175,7 +183,7 @@ impl ColumnBatch {
         }
     }
 
-    /// Depth value at a 0-based column index.
+    /// Depth value at a 0-based column index. This accessor incurs no allocation; call it freely in hot paths.
     ///
     /// # Parameters
     /// - `col` — `usize`.
@@ -194,7 +202,7 @@ impl ColumnBatch {
         self.columns.iter().map(|c| c.depth).collect()
     }
 
-    /// Set the floor color.
+    /// Set the floor color. Replaces the current floor color value; callers hold responsibility for maintaining consistency with related fields.
     ///
     /// # Parameters
     /// - `color` — `Color`.
@@ -202,7 +210,7 @@ impl ColumnBatch {
         self.floor_color = color;
     }
 
-    /// Set the ceiling color.
+    /// Set the ceiling color. Replaces the current ceiling color value; callers hold responsibility for maintaining consistency with related fields.
     ///
     /// # Parameters
     /// - `color` — `Color`.
@@ -210,7 +218,7 @@ impl ColumnBatch {
         self.ceiling_color = color;
     }
 
-    /// Number of columns.
+    /// Number of columns. This accessor incurs no allocation; call it freely in hot paths.
     ///
     /// # Returns
     /// `usize`.
@@ -218,7 +226,7 @@ impl ColumnBatch {
         self.columns.len()
     }
 
-    /// Screen width in pixels.
+    /// Screen width in pixels. This accessor incurs no allocation; call it freely in hot paths.
     ///
     /// # Returns
     /// `f32`.
@@ -226,7 +234,7 @@ impl ColumnBatch {
         self.screen_width
     }
 
-    /// Screen height in pixels.
+    /// Screen height in pixels. This accessor incurs no allocation; call it freely in hot paths.
     ///
     /// # Returns
     /// `f32`.

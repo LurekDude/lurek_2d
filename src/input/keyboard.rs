@@ -1,8 +1,29 @@
+//! Keyboard implementation for the `input` subsystem.
+//!
+//! This module is part of Luna2D's `input` subsystem and provides the implementation
+//! details for keyboard-related operations and data management.
+//! Key types exported from this module: `KeyboardState`.
+//! Primary functions: `new()`, `begin_frame()`, `press_scancode()`, `release_scancode()`.
+//!
+//! All public items are documented. See the parent module for architectural context
+//! and the `luna.*` Lua API for the scripting interface.
+//!
 use std::collections::HashSet;
 
 /// Tracks which keyboard keys are currently down, just pressed, or just released.
 ///
 /// Also tracks physical scancodes, key repeat, and text input state.
+///
+/// # Fields
+/// - `keys_down` — `HashSet<String>`.
+/// - `keys_pressed` — `Vec<String>`.
+/// - `keys_released` — `Vec<String>`.
+/// - `scancodes_down` — `HashSet<String>`.
+/// - `scancodes_pressed` — `Vec<String>`.
+/// - `scancodes_released` — `Vec<String>`.
+/// - `key_repeat_enabled` — `bool`.
+/// - `text_input_enabled` — `bool`.
+/// - `text_input_buffer` — `Vec<String>`.
 pub struct KeyboardState {
     keys_down: HashSet<String>,
     keys_pressed: Vec<String>,

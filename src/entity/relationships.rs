@@ -2,6 +2,14 @@
 //!
 //! Stores symmetric numeric relations and named-state levels between entity pairs.
 //! Entity IDs are `u32` to match [`Universe`](super::Universe).
+//!
+//! This module is part of Luna2D's `entity` subsystem and provides the implementation
+//! details for relationships-related operations and data management.
+//! Key types exported from this module: `RelationType`, `Relationship`, `RelationshipManager`.
+//! Primary functions: `new()`, `has_level()`, `new()`, `define_type()`.
+//!
+//! All public items are documented. See the parent module for architectural context
+//! and the `luna.*` Lua API for the scripting interface.
 
 use std::collections::HashMap;
 
@@ -11,6 +19,11 @@ use std::collections::HashMap;
 /// ```text
 /// define_type("diplomacy", &["war","neutral","alliance"], "neutral")
 /// ```
+///
+/// # Fields
+/// - `name` — `String`.
+/// - `levels` — `Vec<String>`.
+/// - `default_level` — `String`.
 #[derive(Debug, Clone)]
 pub struct RelationType {
     /// Name of this relation type (e.g. `"diplomacy"`, `"trade"`).
@@ -23,6 +36,14 @@ pub struct RelationType {
 
 impl RelationType {
     /// Create a new relation type. Panics in debug if `default_level` is not in `levels`.
+    ///
+    /// # Parameters
+    /// - `name` — `&str`.
+    /// - `levels` — `Vec<String>`.
+    /// - `default_level` — `&str`.
+    ///
+    /// # Returns
+    /// `Self`.
     pub fn new(name: &str, levels: Vec<String>, default_level: &str) -> Self {
         debug_assert!(
             levels.iter().any(|l| l == default_level),
@@ -36,6 +57,12 @@ impl RelationType {
     }
 
     /// Return `true` if `level` is a valid level for this type.
+    ///
+    /// # Parameters
+    /// - `level` — `&str`.
+    ///
+    /// # Returns
+    /// `bool`.
     pub fn has_level(&self, level: &str) -> bool {
         self.levels.iter().any(|l| l == level)
     }
@@ -45,6 +72,13 @@ impl RelationType {
 ///
 /// The relationship is keyed as `(min(a, b), max(a, b))` so that `A↔B` and `B↔A` share
 /// the same record. Code using [`RelationshipManager`] does not need to sort the IDs.
+///
+/// # Fields
+/// - `from_id` — `u32`.
+/// - `to_id` — `u32`.
+/// - `value` — `f64`.
+/// - `s` — ``type_name → level_string`.`.
+/// - `type_levels` — `HashMap<String`.
 #[derive(Debug, Clone)]
 pub struct Relationship {
     /// First entity ID (lower of the two).
@@ -70,6 +104,10 @@ impl Relationship {
 }
 
 /// Manages all relation types and the per-pair relationship records.
+///
+/// # Fields
+/// - `types` — `HashMap<String`.
+/// - `relations` — `HashMap<(u32`.
 #[derive(Debug, Default)]
 pub struct RelationshipManager {
     types: HashMap<String, RelationType>,
@@ -87,7 +125,10 @@ fn ordered(a: u32, b: u32) -> (u32, u32) {
 }
 
 impl RelationshipManager {
-    /// Create a new empty manager.
+    /// Create a new empty manager. Returns a fully initialised instance with all fields set to their initial values.
+    ///
+    /// # Returns
+    /// `Self`.
     pub fn new() -> Self {
         Self::default()
     }
@@ -97,6 +138,11 @@ impl RelationshipManager {
     /// Define a named relation type with a set of valid levels.
     ///
     /// Replaces any existing type with the same name.
+    ///
+    /// # Parameters
+    /// - `name` — `&str`.
+    /// - `levels` — `Vec<String>`.
+    /// - `default_level` — `&str`.
     pub fn define_type(&mut self, name: &str, levels: Vec<String>, default_level: &str) {
         self.types
             .insert(name.to_string(), RelationType::new(name, levels, default_level));
@@ -106,6 +152,12 @@ impl RelationshipManager {
     ///
     /// Existing relationships keep their data but the removed type's levels
     /// are cleaned from all records.
+    ///
+    /// # Parameters
+    /// - `name` — `&str`.
+    ///
+    /// # Returns
+    /// `bool`.
     pub fn remove_type(&mut self, name: &str) -> bool {
         if self.types.remove(name).is_some() {
             for rel in self.relations.values_mut() {
@@ -118,11 +170,20 @@ impl RelationshipManager {
     }
 
     /// Get a reference to a relation type definition.
+    ///
+    /// # Parameters
+    /// - `name` — `&str`.
+    ///
+    /// # Returns
+    /// `Option<&RelationType>`.
     pub fn get_type(&self, name: &str) -> Option<&RelationType> {
         self.types.get(name)
     }
 
     /// Get the names of all defined relation types.
+    ///
+    /// # Returns
+    /// `Vec<String>`.
     pub fn type_names(&self) -> Vec<String> {
         self.types.keys().cloned().collect()
     }
@@ -138,6 +199,13 @@ impl RelationshipManager {
     }
 
     /// Get the numeric relation value between two entities.
+    ///
+    /// # Parameters
+    /// - `a` — `u32`.
+    /// - `b` — `u32`.
+    ///
+    /// # Returns
+    /// `f64`.
     pub fn get_value(&self, a: u32, b: u32) -> f64 {
         self.relations
             .get(&ordered(a, b))
@@ -146,11 +214,21 @@ impl RelationshipManager {
     }
 
     /// Set the numeric relation value between two entities.
+    ///
+    /// # Parameters
+    /// - `a` — `u32`.
+    /// - `b` — `u32`.
+    /// - `value` — `f64`.
     pub fn set_value(&mut self, a: u32, b: u32, value: f64) {
         self.ensure(a, b).value = value;
     }
 
     /// Adjust the numeric relation value by `delta`.
+    ///
+    /// # Parameters
+    /// - `a` — `u32`.
+    /// - `b` — `u32`.
+    /// - `delta` — `f64`.
     pub fn adjust_value(&mut self, a: u32, b: u32, delta: f64) {
         let rel = self.ensure(a, b);
         rel.value += delta;
@@ -161,6 +239,15 @@ impl RelationshipManager {
     /// Set the named level for a relation type between two entities.
     ///
     /// Returns `false` if the type is unknown or the level is not valid for that type.
+    ///
+    /// # Parameters
+    /// - `a` — `u32`.
+    /// - `b` — `u32`.
+    /// - `ype_name` — `&str`.
+    /// - `level` — `&str`.
+    ///
+    /// # Returns
+    /// `bool`.
     pub fn set_level(&mut self, a: u32, b: u32, type_name: &str, level: &str) -> bool {
         match self.types.get(type_name) {
             None => false,
@@ -178,6 +265,14 @@ impl RelationshipManager {
     ///
     /// Falls back to the type's `default_level` if no explicit level has been set.
     /// Returns `None` if the type name is unknown.
+    ///
+    /// # Parameters
+    /// - `a` — `u32`.
+    /// - `b` — `u32`.
+    /// - `ype_name` — `&str`.
+    ///
+    /// # Returns
+    /// `Option<String>`.
     pub fn get_level(&self, a: u32, b: u32, type_name: &str) -> Option<String> {
         let def = self.types.get(type_name)?.default_level.clone();
         let level = self
@@ -192,16 +287,36 @@ impl RelationshipManager {
     // ── Query ────────────────────────────────────────────────────────────────
 
     /// Return `true` if a relationship record exists for this pair.
+    ///
+    /// # Parameters
+    /// - `a` — `u32`.
+    /// - `b` — `u32`.
+    ///
+    /// # Returns
+    /// `bool`.
     pub fn has_relation(&self, a: u32, b: u32) -> bool {
         self.relations.contains_key(&ordered(a, b))
     }
 
     /// Remove a relationship record. Returns `true` if it existed.
+    ///
+    /// # Parameters
+    /// - `a` — `u32`.
+    /// - `b` — `u32`.
+    ///
+    /// # Returns
+    /// `bool`.
     pub fn remove_relation(&mut self, a: u32, b: u32) -> bool {
         self.relations.remove(&ordered(a, b)).is_some()
     }
 
     /// Get all relationships involving a given entity.
+    ///
+    /// # Parameters
+    /// - `entity_id` — `u32`.
+    ///
+    /// # Returns
+    /// `Vec<&Relationship>`.
     pub fn all_relations_for(&self, entity_id: u32) -> Vec<&Relationship> {
         self.relations
             .values()
@@ -209,12 +324,18 @@ impl RelationshipManager {
             .collect()
     }
 
-    /// Get all relationships as an iterator.
+    /// Get all relationships as an iterator. Consult the module-level documentation for the broader usage context and preconditions.
+    ///
+    /// # Returns
+    /// `impl Iterator<Item = &Relationship>`.
     pub fn all_relations(&self) -> impl Iterator<Item = &Relationship> {
         self.relations.values()
     }
 
     /// Get the total number of relationship records.
+    ///
+    /// # Returns
+    /// `usize`.
     pub fn relation_count(&self) -> usize {
         self.relations.len()
     }

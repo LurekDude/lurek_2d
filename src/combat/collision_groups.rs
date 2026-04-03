@@ -4,6 +4,10 @@
 //! to 16-bit category bitmasks and tracks which groups should collide.
 
 /// Maps named collision groups to 16-bit category bitmasks.
+///
+/// # Fields
+/// - `groups` — `Vec<(String`.
+/// - `collisions` — `Vec<(usize`.
 #[derive(Clone)]
 pub struct CollisionGroupSet {
     /// (name, category bit) pairs — one entry per defined group.
@@ -16,7 +20,10 @@ pub struct CollisionGroupSet {
 const MAX_GROUPS: usize = 16;
 
 impl CollisionGroupSet {
-    /// Creates an empty collision group set.
+    /// Creates an empty collision group set. Returns a fully initialised instance with all fields set to their initial values.
+    ///
+    /// # Returns
+    /// `Self`.
     pub fn new() -> Self {
         Self {
             groups: Vec::new(),
@@ -28,6 +35,12 @@ impl CollisionGroupSet {
     ///
     /// Returns the assigned category bit, or an error if the name is already
     /// taken or the maximum of 16 groups has been reached.
+    ///
+    /// # Parameters
+    /// - `name` — `&str`.
+    ///
+    /// # Returns
+    /// `Result<u32, String>`.
     pub fn define_group(&mut self, name: &str) -> Result<u32, String> {
         if self.groups.len() >= MAX_GROUPS {
             return Err(format!(
@@ -44,6 +57,12 @@ impl CollisionGroupSet {
     }
 
     /// Returns the category bit for a named group, or `None` if not defined.
+    ///
+    /// # Parameters
+    /// - `name` — `&str`.
+    ///
+    /// # Returns
+    /// `Option<u32>`.
     pub fn get_group_bit(&self, name: &str) -> Option<u32> {
         self.groups
             .iter()
@@ -52,6 +71,14 @@ impl CollisionGroupSet {
     }
 
     /// Sets whether two named groups should collide with each other.
+    ///
+    /// # Parameters
+    /// - `group_a` — `&str`.
+    /// - `group_b` — `&str`.
+    /// - `collides` — `bool`.
+    ///
+    /// # Returns
+    /// `Result<(), String>`.
     pub fn set_collides(
         &mut self,
         group_a: &str,
@@ -81,6 +108,13 @@ impl CollisionGroupSet {
 
     /// Returns whether two named groups collide. Defaults to `true` if no
     /// explicit rule has been set.
+    ///
+    /// # Parameters
+    /// - `group_a` — `&str`.
+    /// - `group_b` — `&str`.
+    ///
+    /// # Returns
+    /// `bool`.
     pub fn get_collides(&self, group_a: &str, group_b: &str) -> bool {
         let (idx_a, idx_b) = match (self.group_index(group_a), self.group_index(group_b)) {
             (Ok(a), Ok(b)) => (a, b),
@@ -99,6 +133,12 @@ impl CollisionGroupSet {
 
     /// Computes the collision mask bits for a named group based on the stored
     /// collision rules. Any group without an explicit rule is assumed to collide.
+    ///
+    /// # Parameters
+    /// - `group` — `&str`.
+    ///
+    /// # Returns
+    /// `u32`.
     pub fn compute_mask(&self, group: &str) -> u32 {
         let idx = match self.group_index(group) {
             Ok(i) => i,
@@ -120,17 +160,23 @@ impl CollisionGroupSet {
         mask
     }
 
-    /// Returns the number of defined groups.
+    /// Returns the number of defined groups. Consult the module-level documentation for the broader usage context and preconditions.
+    ///
+    /// # Returns
+    /// `usize`.
     pub fn group_count(&self) -> usize {
         self.groups.len()
     }
 
     /// Returns the names of all defined groups.
+    ///
+    /// # Returns
+    /// `Vec<String>`.
     pub fn group_names(&self) -> Vec<String> {
         self.groups.iter().map(|(n, _)| n.clone()).collect()
     }
 
-    /// Resets all groups and collision rules.
+    /// Resets all groups and collision rules. After this call the container is in the same state as immediately after construction.
     pub fn reset(&mut self) {
         self.groups.clear();
         self.collisions.clear();

@@ -1,3 +1,12 @@
+//! Window Api implementation for the `lua_api` subsystem.
+//!
+//! This module is part of Luna2D's `lua_api` subsystem and provides the implementation
+//! details for window api-related operations and data management.
+//! Primary functions: `register()`.
+//!
+//! All public items are documented. See the parent module for architectural context
+//! and the `luna.*` Lua API for the scripting interface.
+//!
 use super::{FullscreenType, SharedState};
 use mlua::prelude::*;
 use std::cell::RefCell;
@@ -22,6 +31,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
     /// # Parameters
     /// - `title` — New title string to display.
     let s = state.clone();
+    /// @param title : string
     window.set(
         "setTitle",
         lua.create_function(move |_, title: String| {
@@ -36,6 +46,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
     /// # Returns
     /// Title string.
     let s = state.clone();
+    /// @return any
     window.set(
         "getTitle",
         lua.create_function(move |_, ()| Ok(s.borrow().window_title.clone()))?,
@@ -43,6 +54,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
 
     /// Returns the window width in pixels.
     let s = state.clone();
+    /// @return any
     window.set(
         "getWidth",
         lua.create_function(move |_, ()| Ok(s.borrow().window_width))?,
@@ -50,6 +62,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
 
     /// Returns the window height in pixels.
     let s = state.clone();
+    /// @return any
     window.set(
         "getHeight",
         lua.create_function(move |_, ()| Ok(s.borrow().window_height))?,
@@ -57,6 +70,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
 
     /// Returns the window dimensions (width, height).
     let s = state.clone();
+    /// @return any
     window.set(
         "getDimensions",
         lua.create_function(move |_, ()| {
@@ -69,6 +83,8 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
 
     /// Enables or disables fullscreen mode.
     let s = state.clone();
+    /// @param enabled : boolean
+    /// @param fstype : string?
     window.set(
         "setFullscreen",
         lua.create_function(move |_, (enabled, fstype): (bool, Option<String>)| {
@@ -85,6 +101,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
 
     /// Returns the current fullscreen type string, or nil if windowed.
     let s = state.clone();
+    /// @return any
     window.set(
         "getFullscreen",
         lua.create_function(move |_, ()| {
@@ -101,6 +118,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
     // --- isOpen ---
 
     /// Returns whether the window has been created and is not yet closed.
+    /// @return boolean
     ///
     /// # Returns
     /// true if the window is open, false if it has been closed.
@@ -110,6 +128,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
 
     /// Enables or disables vertical synchronization.
     let s = state.clone();
+    /// @param mode : integer
     window.set(
         "setVSync",
         lua.create_function(move |_, mode: i32| {
@@ -198,6 +217,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
 
     /// Returns the window position (x, y) on the desktop.
     let s = state.clone();
+    /// @return any
     window.set(
         "getPosition",
         lua.create_function(move |_, ()| {
@@ -208,6 +228,8 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
 
     /// Moves the window to the given desktop position.
     let s = state.clone();
+    /// @param x : integer
+    /// @param y : integer
     window.set(
         "setPosition",
         lua.create_function(move |_, (x, y): (i32, i32)| {
@@ -218,6 +240,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
 
     /// Returns the number of connected displays.
     let s = state.clone();
+    /// @return any
     window.set(
         "getDisplayCount",
         lua.create_function(move |_, ()| {
@@ -233,6 +256,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
 
     /// Returns the desktop resolution (width, height) for the given display.
     let s = state.clone();
+    /// @return any
     window.set(
         "getDesktopDimensions",
         lua.create_function(move |_, ()| {
@@ -251,6 +275,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
 
     /// Returns the DPI scaling factor for the window.
     let s = state.clone();
+    /// @return any
     window.set(
         "getDPIScale",
         lua.create_function(move |_, ()| Ok(s.borrow().window_state.dpi_scale))?,
@@ -258,6 +283,8 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
 
     /// Converts a device-independent coordinate to physical pixels.
     let s = state.clone();
+    /// @param value : number
+    /// @return any
     window.set(
         "toPixels",
         lua.create_function(move |_, value: f64| {
@@ -268,6 +295,8 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
 
     /// Converts physical pixels to device-independent coordinates.
     let s = state.clone();
+    /// @param value : number
+    /// @return any
     window.set(
         "fromPixels",
         lua.create_function(move |_, value: f64| {
@@ -284,6 +313,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
 
     /// Sets the window icon from a pixel buffer.
     let s = state.clone();
+    /// @param path : string
     window.set(
         "setIcon",
         lua.create_function(move |_, path: String| {
@@ -296,6 +326,9 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
 
     /// Resizes the window and optionally changes fullscreen mode.
     let s = state.clone();
+    /// @param w : integer
+    /// @param h : integer
+    /// @param flags : table?
     window.set(
         "setMode",
         lua.create_function(move |_, (w, h, flags): (u32, u32, Option<LuaTable>)| {
@@ -322,6 +355,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
 
     /// Returns the current window mode settings as a table.
     let s = state.clone();
+    /// @return any
     window.set(
         "getMode",
         lua.create_function(move |lua, ()| {
@@ -373,6 +407,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
     // Each table entry has `width`, `height`, and `refreshRate` (Hz) fields.
     /// Returns all available fullscreen video modes.
     let s = state.clone();
+    /// @return any
     window.set(
         "getFullscreenModes",
         lua.create_function(move |lua, ()| {
@@ -403,6 +438,8 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
     // The optional `display` index is reserved for future multi-monitor support.
     /// Returns the name of the given display.
     let s = state.clone();
+    /// @param display : integer?
+    /// @return any
     window.set(
         "getDisplayName",
         lua.create_function(move |_, _display: Option<i32>| {
@@ -421,6 +458,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
     // Returns the physical pixel dimensions of the window (logical size × DPI scale).
     /// Returns the window dimensions in physical pixels (for HiDPI).
     let s = state.clone();
+    /// @return any
     window.set(
         "getPixelDimensions",
         lua.create_function(move |_, ()| {
@@ -437,6 +475,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
     // buttons:  "ok" | "okcancel" | "yesno"   (default "ok")
     // Returns:  "ok" | "yes" | "no" | "cancel"
     /// Shows a platform native message box dialog.
+    /// @return string
     window.set(
         "showMessageBox",
         lua.create_function(

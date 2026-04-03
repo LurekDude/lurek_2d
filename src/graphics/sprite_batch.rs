@@ -1,4 +1,12 @@
 //! Sprite batching for efficient rendering of many sprites sharing one texture.
+//!
+//! This module is part of Luna2D's `graphics` subsystem and provides the implementation
+//! details for sprite batch-related operations and data management.
+//! Key types exported from this module: `SpriteBatch`, `BatchEntry`.
+//! Primary functions: `new()`, `add()`, `clear()`, `texture_key()`.
+//!
+//! All public items are documented. See the parent module for architectural context
+//! and the `luna.*` Lua API for the scripting interface.
 
 use crate::engine::resource_keys::TextureKey;
 
@@ -6,6 +14,12 @@ use crate::engine::resource_keys::TextureKey;
 ///
 /// Created via `luna.graphics.newSpriteBatch(image_id, max_sprites?)`.
 /// Use `add()` to queue sprites and the engine draws them all at once.
+///
+/// # Fields
+/// - `e` — `:textures`.`.
+/// - `texture_key` — `TextureKey`.
+/// - `entries` — `Vec<BatchEntry>`.
+/// - `max_entries` — `usize`.
 pub struct SpriteBatch {
     /// Key into `SharedState::textures`.
     texture_key: TextureKey,
@@ -90,7 +104,7 @@ impl SpriteBatch {
         Some(idx)
     }
 
-    /// Removes all entries from the batch.
+    /// Removes all entries from the batch. After this call the container is in the same state as immediately after construction.
     pub fn clear(&mut self) {
         self.entries.clear();
     }
@@ -103,7 +117,7 @@ impl SpriteBatch {
         self.texture_key
     }
 
-    /// Returns a slice of all batch entries.
+    /// Returns a slice of all batch entries. Consult the module-level documentation for the broader usage context and preconditions.
     ///
     /// # Returns
     /// `&[BatchEntry]`.

@@ -2,6 +2,14 @@
 //!
 //! Cave generation, Voronoi diagrams, flood fill, Poisson disk sampling,
 //! and periodic Perlin noise.
+//!
+//! This module is part of Luna2D's `math` subsystem and provides the implementation
+//! details for procgen-related operations and data management.
+//! Key types exported from this module: `CellularOpts`, `VoronoiOpts`.
+//! Primary functions: `cellular_automata()`, `voronoi_diagram()`, `flood_fill()`, `poisson_disk()`.
+//!
+//! All public items are documented. See the parent module for architectural context
+//! and the `luna.*` Lua API for the scripting interface.
 
 /// Options for cellular automata generation.
 ///
@@ -37,7 +45,7 @@ impl Default for CellularOpts {
     }
 }
 
-/// Options for Voronoi diagram generation.
+/// Options for Voronoi diagram generation. Consult the module-level documentation for the broader usage context and preconditions.
 ///
 /// # Fields
 /// - `warp_scale` — `f32`.
@@ -151,7 +159,7 @@ pub fn cellular_automata(width: u32, height: u32, opts: &CellularOpts) -> Vec<u8
     grid
 }
 
-/// Generates a Voronoi diagram.
+/// Generates a Voronoi diagram. Consult the module-level documentation for the broader usage context and preconditions.
 ///
 /// # Parameters
 /// - `width` — `u32`.
@@ -239,7 +247,7 @@ fn simple_hash_noise(x: f32, y: f32, seed: u64) -> f32 {
     (h & 0xFFFF) as f32 / 65535.0 * 2.0 - 1.0
 }
 
-/// BFS flood fill on a grid.
+/// BFS flood fill on a grid. Consult the module-level documentation for the broader usage context and preconditions.
 ///
 /// # Parameters
 /// - `data` — `&[u8]`.

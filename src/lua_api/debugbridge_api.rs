@@ -350,6 +350,13 @@ fn handle_client_message(line: &str, client_idx: usize, shared: &Arc<Mutex<Bridg
 // ---------------------------------------------------------------------------
 
 /// Registers the `luna.debugbridge` namespace.
+///
+/// # Parameters
+/// - `lua` — `&Lua`.
+/// - `luna` — `&LuaTable`.
+///
+/// # Returns
+/// `LuaResult<()>`.
 pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
     let db = lua.create_table()?;
 
@@ -366,6 +373,8 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
     let sh = shared.clone();
     let run = running.clone();
     let th = thread_handle.clone();
+    /// @param port : u16?
+    /// @return boolean
     db.set(
         "start",
         lua.create_function(move |_, port: Option<u16>| {
@@ -417,6 +426,7 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
 
     /// Returns whether the server is currently running.
     let run = running.clone();
+    /// @return any
     db.set(
         "isRunning",
         lua.create_function(move |_, ()| Ok(run.load(Ordering::Relaxed)))?,
@@ -424,6 +434,7 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
 
     /// Returns the server port (0 if not running).
     let sh = shared.clone();
+    /// @return any
     db.set(
         "getPort",
         lua.create_function(move |_, ()| {
@@ -433,6 +444,7 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
 
     /// Returns the number of connected TCP clients.
     let sh = shared.clone();
+    /// @return any
     db.set(
         "getClientCount",
         lua.create_function(move |_, ()| {
@@ -443,6 +455,7 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
     /// Poll for pending Lua-dependent requests from TCP clients.
     /// Must be called each frame from luna.update().
     let sh = shared.clone();
+    /// @return any
     db.set(
         "poll",
         lua.create_function(move |lua, ()| {
@@ -601,6 +614,9 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
 
     /// Captures a print message and broadcasts it to connected clients.
     let sh = shared.clone();
+    /// @param msg : string
+    /// @param source : string?
+    /// @param line : integer?
     db.set(
         "capturePrint",
         lua.create_function(move |_, (msg, source, line): (String, Option<String>, Option<u32>)| {
@@ -624,6 +640,8 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
 
     /// Returns the print history.
     let sh = shared.clone();
+    /// @param count : integer?
+    /// @return table
     db.set(
         "getPrintHistory",
         lua.create_function(move |lua, count: Option<usize>| {
@@ -681,6 +699,7 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
 
     /// Sets the maximum print history size.
     let sh = shared.clone();
+    /// @param max : integer
     db.set(
         "setMaxPrintHistory",
         lua.create_function(move |_, max: usize| {
@@ -699,6 +718,7 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
 
     /// Records a frame time sample.
     let sh = shared.clone();
+    /// @param dt : number
     db.set(
         "recordFrame",
         lua.create_function(move |_, dt: f64| {
@@ -715,6 +735,7 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
 
     /// Returns performance statistics.
     let sh = shared.clone();
+    /// @return table
     db.set(
         "getPerformance",
         lua.create_function(move |lua, ()| {
@@ -738,6 +759,7 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
 
     /// Flags a screenshot request for the next frame.
     let sh = shared.clone();
+    /// @param scale : integer?
     db.set(
         "requestScreenshot",
         lua.create_function(move |_, scale: Option<u32>| {
@@ -752,6 +774,7 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
 
     /// Returns whether a screenshot is currently requested.
     let sh = shared.clone();
+    /// @return any
     db.set(
         "isScreenshotRequested",
         lua.create_function(move |_, ()| {
@@ -766,6 +789,8 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
 
     /// Broadcasts a JSON event to all connected clients.
     let sh = shared.clone();
+    /// @param event : string
+    /// @param json_data : string
     db.set(
         "broadcast",
         lua.create_function(move |_, (event, json_data): (String, String)| {

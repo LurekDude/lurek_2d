@@ -2,13 +2,22 @@
 //!
 //! Exposes `NavGrid`, `UnitPathfinder`, and `FlowField` as Lua UserData
 //! with 1-based tile coordinates at the Lua boundary.
+//!
+//! This module is part of Luna2D's `lua_api` subsystem and provides the implementation
+//! details for pathfinding api-related operations and data management.
+//! Primary functions: `register()`.
+//!
+//! All public items are documented. See the parent module for architectural context
+//! and the `luna.*` Lua API for the scripting interface.
 
 use std::cell::RefCell;
 use std::rc::Rc;
 
 use mlua::prelude::*;
 
+use crate::pathfinding::ai_flow_field::FlowField as AiFlowField;
 use crate::pathfinding::hpa::{build_abstract, AbstractGraph};
+use crate::pathfinding::pathgrid::PathGrid;
 use crate::pathfinding::{DiagonalMode, FlowField, NavGrid, UnitPathfinder, Waypoint};
 
 use super::lua_types::{add_type_methods, LunaType};
@@ -34,6 +43,7 @@ impl LuaUserData for LuaNavGrid {
         add_type_methods(methods);
 
         /// Returns the width.
+        /// @return any
         ///
         /// # Returns
         /// The current width.
@@ -42,6 +52,7 @@ impl LuaUserData for LuaNavGrid {
         });
 
         /// Returns the height.
+        /// @return any
         ///
         /// # Returns
         /// The current height.
@@ -50,6 +61,7 @@ impl LuaUserData for LuaNavGrid {
         });
 
         /// Returns the dimensions.
+        /// @return any
         ///
         /// # Parameters
         /// - `x` — `integer`.
@@ -66,6 +78,9 @@ impl LuaUserData for LuaNavGrid {
 
         // 1-based coords at Lua boundary
         /// Sets the cost.
+        /// @param x : integer
+        /// @param y : integer
+        /// @param cost : u8
         ///
         /// # Parameters
         /// - `x` — `integer`.
@@ -77,6 +92,9 @@ impl LuaUserData for LuaNavGrid {
         });
 
         /// Returns the cost.
+        /// @param x : integer
+        /// @param y : integer
+        /// @return any
         ///
         /// # Parameters
         /// - `x` — `integer`.
@@ -97,6 +115,9 @@ impl LuaUserData for LuaNavGrid {
         );
 
         /// Returns `true` if blocked.
+        /// @param x : integer
+        /// @param y : integer
+        /// @return any
         ///
         /// # Parameters
         /// - `x` — `integer`.
@@ -117,6 +138,7 @@ impl LuaUserData for LuaNavGrid {
         );
 
         /// Fill on this NavGrid.
+        /// @param cost : u8
         ///
         /// # Parameters
         /// - `cost` — `integer`.
@@ -135,6 +157,7 @@ impl LuaUserData for LuaNavGrid {
         );
 
         /// Load from string on this NavGrid.
+        /// @param data : string
         ///
         /// # Parameters
         /// - `data` — `string`.
@@ -155,6 +178,7 @@ impl LuaUserData for LuaNavGrid {
         });
 
         /// Sets the chunk size.
+        /// @param size : integer
         ///
         /// # Parameters
         /// - `size` — `integer`.
@@ -164,6 +188,7 @@ impl LuaUserData for LuaNavGrid {
         });
 
         /// Returns the chunk size.
+        /// @return any
         ///
         /// # Returns
         /// The current chunk size.
@@ -185,6 +210,10 @@ impl LuaUserData for LuaNavGrid {
 
         // 1-based dirty rect
         /// Sets the dirty.
+        /// @param x : integer
+        /// @param y : integer
+        /// @param w : integer
+        /// @param h : integer
         ///
         /// # Parameters
         /// - `x` — `integer`.
@@ -206,6 +235,7 @@ impl LuaUserData for LuaNavGrid {
         });
 
         /// Sets the diagonal mode.
+        /// @param mode : string
         ///
         /// # Parameters
         /// - `mode` — `string`.
@@ -221,6 +251,7 @@ impl LuaUserData for LuaNavGrid {
         });
 
         /// Returns the diagonal mode.
+        /// @return string
         ///
         /// # Returns
         /// The current diagonal mode.
@@ -318,6 +349,8 @@ impl LuaUserData for LuaUnitPathfinder {
         );
 
         /// Returns the path length.
+        /// @param path : table
+        /// @return any
         ///
         /// # Parameters
         /// - `path` — `table`.
@@ -330,6 +363,8 @@ impl LuaUserData for LuaUnitPathfinder {
         });
 
         /// Returns the path cost.
+        /// @param path : table
+        /// @return any
         ///
         /// # Parameters
         /// - `path` — `table`.
@@ -420,6 +455,7 @@ impl LuaUserData for LuaUnitPathfinder {
         );
 
         /// Sets the cache enabled.
+        /// @param enabled : boolean
         ///
         /// # Parameters
         /// - `enabled` — `boolean`.
@@ -429,6 +465,7 @@ impl LuaUserData for LuaUnitPathfinder {
         });
 
         /// Returns `true` if cache enabled.
+        /// @return any
         ///
         /// # Returns
         /// `boolean`.
@@ -446,6 +483,7 @@ impl LuaUserData for LuaUnitPathfinder {
         });
 
         /// Returns the cache size.
+        /// @return any
         ///
         /// # Parameters
         /// - `n` — `integer`.
@@ -457,6 +495,7 @@ impl LuaUserData for LuaUnitPathfinder {
         });
 
         /// Sets the cache max size.
+        /// @param n : integer
         ///
         /// # Parameters
         /// - `n` — `integer`.
@@ -512,6 +551,9 @@ impl LuaUserData for LuaFlowField {
         );
 
         /// Returns the direction.
+        /// @param x : integer
+        /// @param y : integer
+        /// @return any
         ///
         /// # Parameters
         /// - `x` — `integer`.
@@ -525,6 +567,9 @@ impl LuaUserData for LuaFlowField {
         });
 
         /// Returns the direction angle.
+        /// @param x : integer
+        /// @param y : integer
+        /// @return any
         ///
         /// # Parameters
         /// - `x` — `integer`.
@@ -537,6 +582,9 @@ impl LuaUserData for LuaFlowField {
         });
 
         /// Returns the cost to target.
+        /// @param x : integer
+        /// @param y : integer
+        /// @return any
         ///
         /// # Parameters
         /// - `x` — `integer`.
@@ -549,6 +597,7 @@ impl LuaUserData for LuaFlowField {
         });
 
         /// Returns `true` if calculated.
+        /// @return any
         ///
         /// # Returns
         /// `boolean`.
@@ -557,6 +606,7 @@ impl LuaUserData for LuaFlowField {
         });
 
         /// Returns the targets.
+        /// @return table
         ///
         /// # Returns
         /// The current targets.
@@ -591,6 +641,148 @@ impl LuaUserData for LuaFlowField {
 }
 
 // ---------------------------------------------------------------------------
+// LuaPathGrid
+// ---------------------------------------------------------------------------
+
+/// Lua wrapper around a [`PathGrid`] (A* weighted grid, PathGrid-based).
+#[derive(Clone)]
+struct LuaPathGrid {
+    inner: Rc<RefCell<PathGrid>>,
+}
+
+impl LunaType for LuaPathGrid {
+    const TYPE_NAME: &'static str = "PathGrid";
+    const TYPE_HIERARCHY: &'static [&'static str] = &["Object"];
+}
+
+impl LuaUserData for LuaPathGrid {
+    fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
+        add_type_methods(methods);
+
+        methods.add_method("getWidth", |_, this, ()| {
+            Ok(this.inner.borrow().width as u32)
+        });
+        methods.add_method("getHeight", |_, this, ()| {
+            Ok(this.inner.borrow().height as u32)
+        });
+        methods.add_method("getCellSize", |_, this, ()| {
+            Ok(this.inner.borrow().cell_size)
+        });
+        // 1-based Lua coordinates
+        methods.add_method_mut("setWalkable", |_, this, (x, y, w): (usize, usize, bool)| {
+            this.inner.borrow_mut().set_walkable(x - 1, y - 1, w);
+            Ok(())
+        });
+        methods.add_method("isWalkable", |_, this, (x, y): (usize, usize)| {
+            Ok(this.inner.borrow().is_walkable(x - 1, y - 1))
+        });
+        methods.add_method_mut("setCost", |_, this, (x, y, cost): (usize, usize, f32)| {
+            this.inner.borrow_mut().set_cost(x - 1, y - 1, cost);
+            Ok(())
+        });
+        methods.add_method("getCost", |_, this, (x, y): (usize, usize)| {
+            Ok(this.inner.borrow().get_cost(x - 1, y - 1))
+        });
+        methods.add_method(
+            "findPath",
+            |lua, this, (sx, sy, gx, gy): (usize, usize, usize, usize)| -> LuaResult<LuaValue> {
+                match this
+                    .inner
+                    .borrow()
+                    .find_path(sx - 1, sy - 1, gx - 1, gy - 1)
+                {
+                    None => Ok(LuaValue::Nil),
+                    Some(pts) => {
+                        let tbl = lua.create_table()?;
+                        for (i, (px, py)) in pts.iter().enumerate() {
+                            let pt = lua.create_table()?;
+                            pt.set("x", *px)?;
+                            pt.set("y", *py)?;
+                            tbl.set(i + 1, pt)?;
+                        }
+                        Ok(LuaValue::Table(tbl))
+                    }
+                }
+            },
+        );
+        methods.add_method(
+            "findPathSmoothed",
+            |lua, this, (sx, sy, gx, gy): (usize, usize, usize, usize)| -> LuaResult<LuaValue> {
+                match this
+                    .inner
+                    .borrow()
+                    .find_path_smoothed(sx - 1, sy - 1, gx - 1, gy - 1)
+                {
+                    None => Ok(LuaValue::Nil),
+                    Some(pts) => {
+                        let tbl = lua.create_table()?;
+                        for (i, (px, py)) in pts.iter().enumerate() {
+                            let pt = lua.create_table()?;
+                            pt.set("x", *px)?;
+                            pt.set("y", *py)?;
+                            tbl.set(i + 1, pt)?;
+                        }
+                        Ok(LuaValue::Table(tbl))
+                    }
+                }
+            },
+        );
+    }
+}
+
+// ---------------------------------------------------------------------------
+// LuaAiFlowField
+// ---------------------------------------------------------------------------
+
+/// Lua wrapper around a PathGrid-based [`AiFlowField`].
+#[derive(Clone)]
+struct LuaAiFlowField {
+    inner: Rc<RefCell<AiFlowField>>,
+}
+
+impl LunaType for LuaAiFlowField {
+    const TYPE_NAME: &'static str = "FlowField";
+    const TYPE_HIERARCHY: &'static [&'static str] = &["Object"];
+}
+
+impl LuaUserData for LuaAiFlowField {
+    fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
+        add_type_methods(methods);
+
+        methods.add_method("getWidth", |_, this, ()| {
+            Ok(this.inner.borrow().width as u32)
+        });
+        methods.add_method("getHeight", |_, this, ()| {
+            Ok(this.inner.borrow().height as u32)
+        });
+        methods.add_method("hasGoal", |_, this, ()| {
+            Ok(this.inner.borrow().goal.is_some())
+        });
+        // 1-based Lua coordinates
+        methods.add_method_mut("setGoal", |_, this, (x, y): (usize, usize)| {
+            this.inner.borrow_mut().set_goal(x - 1, y - 1);
+            Ok(())
+        });
+        methods.add_method("getGoal", |_, this, ()| -> LuaResult<(LuaValue, LuaValue)> {
+            match this.inner.borrow().goal {
+                None => Ok((LuaValue::Nil, LuaValue::Nil)),
+                Some((gx, gy)) => Ok((
+                    LuaValue::Integer((gx + 1) as i64),
+                    LuaValue::Integer((gy + 1) as i64),
+                )),
+            }
+        });
+        methods.add_method("getDirection", |_, this, (x, y): (usize, usize)| {
+            let (dx, dy) = this.inner.borrow().get_direction(x - 1, y - 1);
+            Ok((dx, dy))
+        });
+        methods.add_method("getDistance", |_, this, (x, y): (usize, usize)| {
+            Ok(this.inner.borrow().get_distance(x - 1, y - 1))
+        });
+    }
+}
+
+// ---------------------------------------------------------------------------
 // Registration
 // ---------------------------------------------------------------------------
 
@@ -606,6 +798,11 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
     let pathfinding = lua.create_table()?;
 
     // luna.pathfinding.newNavGrid(width, height)
+    /// New nav grid.
+    ///
+    /// @param width : integer
+    /// @param height : integer
+    /// @return any
     pathfinding.set(
         "newNavGrid",
         lua.create_function(|_, (width, height): (u32, u32)| {
@@ -617,6 +814,12 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
     )?;
 
     // luna.pathfinding.newNavGridFromTileMap(tilemap, layer, blockedGids)
+    /// New nav grid from tile map.
+    ///
+    /// @param tilemap_ud : userdata
+    /// @param layer : integer
+    /// @param blocked : table
+    /// @return any
     pathfinding.set(
         "newNavGridFromTileMap",
         lua.create_function(
@@ -659,6 +862,10 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
     )?;
 
     // luna.pathfinding.newPathfinder(navGrid)
+    /// New pathfinder.
+    ///
+    /// @param grid_ud : NavGrid
+    /// @return any
     pathfinding.set(
         "newPathfinder",
         lua.create_function(|_, grid_ud: LuaAnyUserData| {
@@ -670,6 +877,10 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
     )?;
 
     // luna.pathfinding.newFlowField(navGrid)
+    /// New flow field.
+    ///
+    /// @param grid_ud : NavGrid
+    /// @return any
     pathfinding.set(
         "newFlowField",
         lua.create_function(|_, grid_ud: LuaAnyUserData| {
@@ -681,6 +892,9 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
     )?;
 
     // luna.pathfinding.setThreadCount(count) — no-op for now
+    /// Sets the thread count.
+    ///
+    /// @param count : integer
     pathfinding.set(
         "setThreadCount",
         lua.create_function(|_, _count: u32| {
@@ -690,6 +904,9 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
     )?;
 
     // luna.pathfinding.getThreadCount() — returns 0 until async is wired up
+    /// Returns the thread count.
+    ///
+    /// @return any
     pathfinding.set(
         "getThreadCount",
         lua.create_function(|_, ()| -> LuaResult<u32> { Ok(0) })?,
@@ -699,6 +916,43 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
     ///
     /// # Returns
     /// The result.
+
+    // luna.pathfinding.newPathGrid(w, h, cellSize)
+    /// New PathGrid (A* grid with per-cell cost and walkability).
+    ///
+    /// @param w : integer
+    /// @param h : integer
+    /// @param cell_size : number
+    /// @return any
+    pathfinding.set(
+        "newPathGrid",
+        lua.create_function(|_, (w, h, cell_size): (usize, usize, f32)| {
+            Ok(LuaPathGrid {
+                inner: Rc::new(RefCell::new(PathGrid::new(w, h, cell_size))),
+            })
+        })?,
+    )?;
+
+    // luna.pathfinding.newPathFlowField(pathGrid)
+    /// New PathGrid-based BFS flow field.
+    ///
+    /// @param grid : PathGrid
+    /// @return any
+    pathfinding.set(
+        "newPathFlowField",
+        lua.create_function(|_, grid_ud: LuaAnyUserData| {
+            let grid = grid_ud.borrow::<LuaPathGrid>()?;
+            let g = grid.inner.borrow();
+            let walkable: Vec<bool> = (0..g.height)
+                .flat_map(|y| (0..g.width).map(move |x| (x, y)))
+                .map(|(x, y)| g.is_walkable(x, y))
+                .collect();
+            Ok(LuaAiFlowField {
+                inner: Rc::new(RefCell::new(AiFlowField::new(g.width, g.height, walkable))),
+            })
+        })?,
+    )?;
+
     luna.set("pathfinding", pathfinding)?;
     Ok(())
 }

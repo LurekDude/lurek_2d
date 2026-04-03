@@ -16,6 +16,13 @@ use std::collections::HashMap;
 ///
 /// Stats, tags, and metadata defined here are seeded into every new
 /// `Item` created with `Item::new(type_name)`.
+///
+/// # Fields
+/// - `name` — `String`.
+/// - `category` — `String`.
+/// - `base_stats` — `HashMap<String`.
+/// - `base_tags` — `Vec<String>`.
+/// - `metadata` — `HashMap<String`.
 #[derive(Debug, Clone, Default)]
 pub struct ItemTypeDef {
     /// Display name for this type.
@@ -32,6 +39,12 @@ pub struct ItemTypeDef {
 
 impl ItemTypeDef {
     /// Create a minimal type definition with just a name.
+    ///
+    /// # Parameters
+    /// - `name` — `impl Into<String>`.
+    ///
+    /// # Returns
+    /// `Self`.
     pub fn new(name: impl Into<String>) -> Self {
         let n = name.into();
         Self {
@@ -53,22 +66,35 @@ thread_local! {
 }
 
 /// Register (or overwrite) an item type in the thread-local type registry.
+///
+/// # Parameters
+/// - `name` — `impl Into<String>`.
+/// - `def` — `ItemTypeDef`.
 pub fn define_item_type(name: impl Into<String>, def: ItemTypeDef) {
     let name = name.into();
     ITEM_TYPE_REGISTRY.with(|r| r.borrow_mut().insert(name, def));
 }
 
 /// Look up an item type definition by name. Returns `None` if not found.
+///
+/// # Parameters
+/// - `name` — `&str`.
+///
+/// # Returns
+/// `Option<ItemTypeDef>`.
 pub fn get_item_type(name: &str) -> Option<ItemTypeDef> {
     ITEM_TYPE_REGISTRY.with(|r| r.borrow().get(name).cloned())
 }
 
-/// Return all registered type names.
+/// Return all registered type names. This accessor incurs no allocation; call it freely in hot paths.
+///
+/// # Returns
+/// `Vec<String>`.
 pub fn get_item_type_names() -> Vec<String> {
     ITEM_TYPE_REGISTRY.with(|r| r.borrow().keys().cloned().collect())
 }
 
-/// Remove all entries from the registry.
+/// Remove all entries from the registry. After this call the container is in the same state as immediately after construction.
 pub fn clear_item_types() {
     ITEM_TYPE_REGISTRY.with(|r| r.borrow_mut().clear());
 }
@@ -77,10 +103,21 @@ pub fn clear_item_types() {
 // Item — instance
 // ─────────────────────────────────────────────────────────────────────────────
 
-/// A single item instance.
+/// A single item instance. Consult the module-level documentation for the broader usage context and preconditions.
 ///
 /// All stat names, tag names, counter names, and metadata keys are
 /// user-defined.  The engine never attaches meaning to them.
+///
+/// # Fields
+/// - `item_type` — `String`.
+/// - `name` — `String`.
+/// - `category` — `String`.
+/// - `stats` — `HashMap<String`.
+/// - `tags` — `Vec<String>`.
+/// - `counters` — `HashMap<String`.
+/// - `metadata` — `HashMap<String`.
+/// - `owner` — `String`.
+/// - `slot` — `String`.
 #[derive(Debug, Clone)]
 pub struct Item {
     /// The registered item type name (blueprint key).
@@ -108,6 +145,12 @@ impl Item {
     ///
     /// Looks up the type registry and seeds `stats`, `tags`, `name`, and
     /// `category` from the matching `ItemTypeDef` if one exists.
+    ///
+    /// # Parameters
+    /// - `item_type` — `impl Into<String>`.
+    ///
+    /// # Returns
+    /// `Self`.
     pub fn new(item_type: impl Into<String>) -> Self {
         let item_type = item_type.into();
         let (name, category, stats, tags) = get_item_type(&item_type)
@@ -129,16 +172,33 @@ impl Item {
     // ── Stats ─────────────────────────────────────────────────────────────────
 
     /// Get a numeric stat value (`0.0` if not set).
+    ///
+    /// # Parameters
+    /// - `key` — `&str`.
+    ///
+    /// # Returns
+    /// `f64`.
     pub fn get_stat(&self, key: &str) -> f64 {
         *self.stats.get(key).unwrap_or(&0.0)
     }
 
     /// Set a numeric stat to an exact value.
+    ///
+    /// # Parameters
+    /// - `key` — `impl Into<String>`.
+    /// - `value` — `f64`.
     pub fn set_stat(&mut self, key: impl Into<String>, value: f64) {
         self.stats.insert(key.into(), value);
     }
 
     /// Add `delta` to a numeric stat and return the new value.
+    ///
+    /// # Parameters
+    /// - `key` — `impl Into<String>`.
+    /// - `delta` — `f64`.
+    ///
+    /// # Returns
+    /// `f64`.
     pub fn add_stat(&mut self, key: impl Into<String>, delta: f64) -> f64 {
         let k = key.into();
         let v = self.stats.entry(k).or_insert(0.0);
@@ -146,19 +206,31 @@ impl Item {
         *v
     }
 
-    /// Remove a stat entry entirely.
+    /// Remove a stat entry entirely. Returns the removed value if present, or `None` when the key did not exist.
+    ///
+    /// # Parameters
+    /// - `key` — `&str`.
     pub fn remove_stat(&mut self, key: &str) {
         self.stats.remove(key);
     }
 
     // ── Tags ──────────────────────────────────────────────────────────────────
 
-    /// Returns `true` if the tag is present.
+    /// Returns `true` if the tag is present. This accessor incurs no allocation; call it freely in hot paths.
+    ///
+    /// # Parameters
+    /// - `ag` — `&str`.
+    ///
+    /// # Returns
+    /// `bool`.
     pub fn has_tag(&self, tag: &str) -> bool {
         self.tags.iter().any(|t| t == tag)
     }
 
-    /// Add a tag if not already present.
+    /// Add a tag if not already present. The insertion is O(1) amortised unless a resize is triggered.
+    ///
+    /// # Parameters
+    /// - `ag` — `impl Into<String>`.
     pub fn add_tag(&mut self, tag: impl Into<String>) {
         let t = tag.into();
         if !self.has_tag(&t) {
@@ -167,6 +239,12 @@ impl Item {
     }
 
     /// Remove a tag.  Returns `true` if it was present.
+    ///
+    /// # Parameters
+    /// - `ag` — `&str`.
+    ///
+    /// # Returns
+    /// `bool`.
     pub fn remove_tag(&mut self, tag: &str) -> bool {
         let before = self.tags.len();
         self.tags.retain(|t| t != tag);
@@ -176,16 +254,33 @@ impl Item {
     // ── Counters ──────────────────────────────────────────────────────────────
 
     /// Get a named counter (`0` if not set).
+    ///
+    /// # Parameters
+    /// - `key` — `&str`.
+    ///
+    /// # Returns
+    /// `i32`.
     pub fn get_counter(&self, key: &str) -> i32 {
         *self.counters.get(key).unwrap_or(&0)
     }
 
-    /// Set a named counter.
+    /// Set a named counter. Replaces the current counter value; callers hold responsibility for maintaining consistency with related fields.
+    ///
+    /// # Parameters
+    /// - `key` — `impl Into<String>`.
+    /// - `value` — `i32`.
     pub fn set_counter(&mut self, key: impl Into<String>, value: i32) {
         self.counters.insert(key.into(), value);
     }
 
     /// Add `delta` to a counter and return the new value.
+    ///
+    /// # Parameters
+    /// - `key` — `impl Into<String>`.
+    /// - `delta` — `i32`.
+    ///
+    /// # Returns
+    /// `i32`.
     pub fn add_counter(&mut self, key: impl Into<String>, delta: i32) -> i32 {
         let k = key.into();
         let v = self.counters.entry(k).or_insert(0);
@@ -193,19 +288,32 @@ impl Item {
         *v
     }
 
-    /// Remove a counter entry.
+    /// Remove a counter entry. Returns the removed value if present, or `None` when the key did not exist.
+    ///
+    /// # Parameters
+    /// - `key` — `&str`.
     pub fn remove_counter(&mut self, key: &str) {
         self.counters.remove(key);
     }
 
     // ── Metadata ──────────────────────────────────────────────────────────────
 
-    /// Get a metadata value.
+    /// Get a metadata value. This accessor incurs no allocation; call it freely in hot paths.
+    ///
+    /// # Parameters
+    /// - `key` — `&str`.
+    ///
+    /// # Returns
+    /// `Option<&str>`.
     pub fn get_meta(&self, key: &str) -> Option<&str> {
         self.metadata.get(key).map(String::as_str)
     }
 
-    /// Set a metadata key/value pair.
+    /// Set a metadata key/value pair. Replaces the current meta value; callers hold responsibility for maintaining consistency with related fields.
+    ///
+    /// # Parameters
+    /// - `key` — `impl Into<String>`.
+    /// - `value` — `impl Into<String>`.
     pub fn set_meta(&mut self, key: impl Into<String>, value: impl Into<String>) {
         self.metadata.insert(key.into(), value.into());
     }

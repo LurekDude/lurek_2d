@@ -1,4 +1,11 @@
 //! Polygon utilities: ear-clipping triangulation and convexity testing.
+//!
+//! This module is part of Luna2D's `math` subsystem and provides the implementation
+//! details for polygon-related operations and data management.
+//! Primary functions: `triangulate()`, `is_convex()`.
+//!
+//! All public items are documented. See the parent module for architectural context
+//! and the `luna.*` Lua API for the scripting interface.
 
 use crate::math::vec2::Vec2;
 
@@ -61,7 +68,7 @@ pub fn triangulate(polygon: &[Vec2]) -> Result<Vec<[Vec2; 3]>, String> {
     Ok(triangles)
 }
 
-/// Check if a polygon is convex.
+/// Check if a polygon is convex. This accessor incurs no allocation; call it freely in hot paths.
 ///
 /// Uses cross-product sign consistency at each vertex to determine convexity.
 ///

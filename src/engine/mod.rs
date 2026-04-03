@@ -37,9 +37,12 @@ pub mod error_screen;
 pub mod log_messages;
 /// Typed resource keys for generational ID-based resource pools.
 pub mod resource_keys;
+/// Central shared runtime state: SharedState, WindowState, FullscreenType, ErrorInfo.
+pub mod shared_state;
 
 pub use app::App;
 pub use config::Config;
 pub use debug_overlay::DebugOverlay;
 pub use error::{EngineError, EngineResult, ErrorCategory};
 pub use error_screen::ErrorScreen;
+pub use shared_state::{ErrorInfo, FullscreenType, SharedState, WindowState};

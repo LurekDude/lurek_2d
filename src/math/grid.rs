@@ -2,6 +2,14 @@
 //!
 //! Cells are addressed with 0-based `(x, y)` coordinates. The Lua layer
 //! converts to/from 1-based indices.
+//!
+//! This module is part of Luna2D's `math` subsystem and provides the implementation
+//! details for grid-related operations and data management.
+//! Key types exported from this module: `Grid`.
+//! Primary functions: `new()`, `width()`, `height()`, `set_walkable()`.
+//!
+//! All public items are documented. See the parent module for architectural context
+//! and the `luna.*` Lua API for the scripting interface.
 
 use std::cmp::Ordering;
 use std::collections::{BinaryHeap, VecDeque};
@@ -42,6 +50,12 @@ impl PartialOrd for Node {
 ///
 /// Supports A*, Dijkstra, and BFS pathfinding as well as flow field generation.
 /// All coordinates are 0-based.
+///
+/// # Fields
+/// - `width` — `u32`.
+/// - `height` — `u32`.
+/// - `walkable` — `Vec<bool>`.
+/// - `costs` — `Vec<f32>`.
 pub struct Grid {
     width: u32,
     height: u32,
@@ -69,7 +83,7 @@ impl Grid {
         }
     }
 
-    /// Returns the grid width in cells.
+    /// Returns the grid width in cells. Consult the module-level documentation for the broader usage context and preconditions.
     ///
     /// # Returns
     /// `u32`.
@@ -77,7 +91,7 @@ impl Grid {
         self.width
     }
 
-    /// Returns the grid height in cells.
+    /// Returns the grid height in cells. Consult the module-level documentation for the broader usage context and preconditions.
     ///
     /// # Returns
     /// `u32`.

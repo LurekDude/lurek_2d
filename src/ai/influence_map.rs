@@ -1,25 +1,57 @@
-//! Multi-layer spatial float grid for strategic area analysis.
+//! Multi-layer spatial float grid for strategic area analysis and influence mapping.
+//!
+//! An [`InfluenceMap`] divides the game world into a uniform grid of cells, each
+//! storing one float value per named layer. Layers allow different types of
+//! influence to coexist (e.g., `"danger"`, `"resources"`, `"visibility"`) without
+//! interfering with each other.
+//!
+//! ## Common Operations
+//!
+//! - **Stamping**: `stamp_influence()` adds circular influence with linear falloff
+//!   at a world-space position (e.g., stamp enemy threat around each enemy unit).
+//! - **Propagation**: `propagate()` applies 3×3 averaging diffusion to spread values
+//!   across the grid, controlled by a `momentum` parameter.
+//! - **Decay**: `decay()` multiplies all cells by a factor each frame, causing old
+//!   influence to fade over time.
+//! - **Querying**: `max_position()`, `min_position()`, and `query_rect()` let AI
+//!   agents reason about which areas are most/least dangerous, resourceful, etc.
+//! - **Blending**: `blend()` combines two layers with weighted addition into a
+//!   destination layer (e.g., `combined = 0.7 * danger + 0.3 * distance`).
+//!
+//! ## Coordinate System
+//!
+//! The grid uses integer cell coordinates internally, but all public APIs accept
+//! and return world-space floating-point coordinates. The `cell_size` parameter
+//! controls the mapping between world space and grid space.
 
 use std::collections::HashMap;
 
-/// Multi-layer spatial float grid for influence mapping.
+/// A multi-layer spatial float grid for influence mapping and strategic reasoning.
+///
+/// The grid has fixed dimensions (`width × height` cells) with a configurable
+/// `cell_size` in world units. Named float layers can be added dynamically.
+/// Each layer is a flat `Vec<f32>` of length `width * height`, indexed as
+/// `y * width + x`.
+///
+/// Designed for AI systems that need to reason about spatial properties:
+/// threat levels, resource density, visibility, territorial control, etc.
+/// Multiple layers can be queried and blended to produce composite scores
+/// for decision-making.
 ///
 /// # Fields
 /// - `width` — `usize`.
 /// - `height` — `usize`.
 /// - `cell_size` — `f32`.
 /// - `layers` — `HashMap<String, Vec<f32>>`.
-///
-/// Stores named float layers of shape width × height.
-/// Supports stamping, propagation (diffusion), decay, and spatial queries.
 pub struct InfluenceMap {
-    /// Grid width in cells.
+    /// Number of cells along the X axis.
     pub width: usize,
-    /// Grid height in cells.
+    /// Number of cells along the Y axis.
     pub height: usize,
-    /// World-space size of each cell.
+    /// World-space size of each cell in both dimensions (cells are square).
     pub cell_size: f32,
-    /// Named float layers, each of length width × height.
+    /// Named float layers. Each layer is a flat array of `width * height`
+    /// floats, indexed as `y * width + x`.
     pub(crate) layers: HashMap<String, Vec<f32>>,
 }
 
@@ -51,7 +83,7 @@ impl InfluenceMap {
             .insert(name.to_string(), vec![0.0; self.width * self.height]);
     }
 
-    /// Returns whether a layer exists.
+    /// Returns whether a layer exists. This accessor incurs no allocation; call it freely in hot paths.
     ///
     /// # Parameters
     /// - `name` — `&str`.
@@ -205,7 +237,7 @@ impl InfluenceMap {
         }
     }
 
-    /// Clears all layers to zero.
+    /// Clears all layers to zero. After this call the container is in the same state as immediately after construction.
     pub fn clear_all(&mut self) {
         for data in self.layers.values_mut() {
             for v in data.iter_mut() {

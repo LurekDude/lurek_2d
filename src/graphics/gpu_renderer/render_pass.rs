@@ -1,5 +1,12 @@
 //! Render-frame execution, draw-call dispatch, tessellation, and pipeline management
 //! for [`GpuRenderer`].
+//!
+//! This module is part of Luna2D's `gpu_renderer` subsystem and provides the implementation
+//! details for render pass-related operations and data management.
+//! Primary functions: `render_frame()`, `parse_filter_mode()`.
+//!
+//! All public items are documented. See the parent module for architectural context
+//! and the `luna.*` Lua API for the scripting interface.
 
 #[allow(unused_imports)]
 use super::{GpuRenderer, RenderStats};
@@ -2303,6 +2310,13 @@ fn shader_for_draw(draw: PreparedDraw) -> Option<ShaderKey> {
     }
 }
 
+/// Parse a Lua string into a wgpu `FilterMode`.
+///
+/// # Returns
+/// `wgpu::FilterMode`.
+///
+/// # Parameters
+/// - `value` — `&str`
 pub(super) fn parse_filter_mode(value: &str) -> wgpu::FilterMode {
     match value {
         "linear" => wgpu::FilterMode::Linear,

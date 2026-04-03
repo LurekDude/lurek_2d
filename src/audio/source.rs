@@ -2,6 +2,14 @@
 //!
 //! The primary audio logic lives in `mixer::Mixer`. This module re-exports
 //! the public enum types used by the Lua API and engine code.
+//!
+//! This module is part of Luna2D's `audio` subsystem and provides the implementation
+//! details for source-related operations and data management.
+//! Key types exported from this module: `AudioSource`.
+//! Primary functions: `new()`.
+//!
+//! All public items are documented. See the parent module for architectural context
+//! and the `luna.*` Lua API for the scripting interface.
 
 /// Handle for a loaded audio asset (legacy compatibility shim).
 ///

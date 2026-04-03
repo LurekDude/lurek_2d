@@ -210,7 +210,7 @@ impl LargeMapRenderer {
         }
     }
 
-    /// Marks all chunks as dirty.
+    /// Marks all chunks as dirty. Consult the module-level documentation for the broader usage context and preconditions.
     pub fn invalidate_all(&mut self) {
         for chunk in self.chunks.values_mut() {
             chunk.dirty = true;
@@ -238,7 +238,7 @@ impl LargeMapRenderer {
         count
     }
 
-    /// Returns the total number of chunks.
+    /// Returns the total number of chunks. This accessor incurs no allocation; call it freely in hot paths.
     ///
     /// # Returns
     /// `usize`.
@@ -256,7 +256,7 @@ impl LargeMapRenderer {
 
     // ── Camera / viewport ───────────────────────────────────────────────
 
-    /// Sets the camera position and zoom.
+    /// Sets the camera position and zoom. Replaces the current camera value; callers hold responsibility for maintaining consistency with related fields.
     ///
     /// # Parameters
     /// - `x` — `f32`.
@@ -288,7 +288,7 @@ impl LargeMapRenderer {
         self.lod_enabled = enabled;
     }
 
-    /// Returns whether LOD is enabled.
+    /// Returns whether LOD is enabled. This accessor incurs no allocation; call it freely in hot paths.
     ///
     /// # Returns
     /// `bool`.
@@ -314,7 +314,7 @@ impl LargeMapRenderer {
         self.tileset_columns = cols.max(1);
     }
 
-    /// Returns the number of tileset columns.
+    /// Returns the number of tileset columns. This accessor incurs no allocation; call it freely in hot paths.
     ///
     /// # Returns
     /// `u32`.

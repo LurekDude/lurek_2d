@@ -170,7 +170,7 @@ For each gate from Stage 3c:
 | `cargo build` succeeds | Run `cargo build` and capture result |
 | `cargo test` passes | Run `cargo test <module>_tests` and capture result |
 | Named Lua test present | Check file exists; no missing `luna.*` calls |
-| API docs updated | `docs/lua_api_reference_generated.md` contains each `luna.*` function from MDL |
+| API docs updated | `docs/API/lua_api_reference_generated.md` contains each `luna.*` function from MDL |
 | `cargo clippy -- -D warnings` passes | Run and capture result |
 | Phase file location | In `done/` = complete; still in `docs/roadmap/` = not closed |
 
@@ -403,7 +403,7 @@ cargo test
 cargo clippy -- -D warnings
 
 # Stage only affected files — NEVER git add .
-git add <all files modified in Phases 4–6> docs/roadmap/<phase-file> docs/lua_api_reference_generated.md
+git add <all files modified in Phases 4–6> docs/roadmap/<phase-file> docs/API/lua_api_reference_generated.md
 
 git commit -m "feat(<module>): phase NN complete — <one-line summary>"
 ```
@@ -445,6 +445,6 @@ Before calling the workflow complete, confirm every item:
 - Rust conventions: `.github/skills/rust-coding/SKILL.md`
 - Test patterns: `.github/skills/testing-rust/SKILL.md`
 - Lua API registry: `src/lua_api/<module>_api.rs` → `pub fn register()`
-- API reference: `docs/lua_api_reference_generated.md`
+- API reference: `docs/API/lua_api_reference_generated.md`
 - Completed phases: `docs/roadmap/done/`
 - Agents: `Developer` (impl) | `Tester` (tests) | `Doc-Writer` (docs) | `Reviewer` (sign-off) | `Renderer` / `Physicist` / `Audio-Eng` (domain)

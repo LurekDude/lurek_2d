@@ -38,7 +38,7 @@ description: "Create a new tilemap feature (layer type, autotile rule, collision
 
 5. **Update documentation**
    - Add `///` doc comments to all public items
-   - Update `docs/lua_api_reference_generated.md` via `python tools/gen_lua_api.py`
+   - Update `docs/API/lua_api_reference_generated.md` via `python tools/gen_lua_api.py`
 
 ## Acceptance Criteria
 

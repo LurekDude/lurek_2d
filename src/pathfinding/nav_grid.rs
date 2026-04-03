@@ -1,4 +1,12 @@
 //! Navigation grid with per-cell traversal costs and diagonal movement modes.
+//!
+//! This module is part of Luna2D's `pathfinding` subsystem and provides the implementation
+//! details for nav grid-related operations and data management.
+//! Key types exported from this module: `DiagonalMode`, `NavGrid`.
+//! Primary functions: `from_lua_str()`, `new()`, `from_costs()`, `get_width()`.
+//!
+//! All public items are documented. See the parent module for architectural context
+//! and the `luna.*` Lua API for the scripting interface.
 
 /// Controls how diagonal movement is handled during pathfinding.
 ///
@@ -42,6 +50,14 @@ impl DiagonalMode {
 ///
 /// Cells are addressed with 0-based `(x, y)` coordinates in row-major order.
 /// A cost of `0` marks a cell as blocked; values `1..=255` represent movement cost.
+///
+/// # Fields
+/// - `width` — `u32`.
+/// - `height` — `u32`.
+/// - `costs` — `Vec<u8>`.
+/// - `chunk_size` — `u32`.
+/// - `diagonal_mode` — `DiagonalMode`.
+/// - `dirty_rects` — `Vec<(u32`.
 #[derive(Debug, Clone)]
 pub struct NavGrid {
     /// Grid width in cells.
@@ -106,7 +122,7 @@ impl NavGrid {
         }
     }
 
-    /// Grid width in cells.
+    /// Grid width in cells. This accessor incurs no allocation; call it freely in hot paths.
     ///
     /// # Returns
     /// `u32`.
@@ -114,7 +130,7 @@ impl NavGrid {
         self.width
     }
 
-    /// Grid height in cells.
+    /// Grid height in cells. This accessor incurs no allocation; call it freely in hot paths.
     ///
     /// # Returns
     /// `u32`.
@@ -122,7 +138,7 @@ impl NavGrid {
         self.height
     }
 
-    /// Returns `(width, height)`.
+    /// Returns `(width, height)`. This accessor incurs no allocation; call it freely in hot paths.
     ///
     /// # Returns
     /// `(u32, u32)`.
@@ -203,7 +219,7 @@ impl NavGrid {
         true
     }
 
-    /// Set every cell to `cost`.
+    /// Set every cell to `cost`. Consult the module-level documentation for the broader usage context and preconditions.
     ///
     /// # Parameters
     /// - `cost` — `u8`.
@@ -263,7 +279,7 @@ impl NavGrid {
         self.chunk_size = size.max(2).min(self.width.min(self.height).max(2));
     }
 
-    /// Current HPA* chunk size.
+    /// Current HPA* chunk size. This accessor incurs no allocation; call it freely in hot paths.
     ///
     /// # Returns
     /// `u32`.
@@ -271,7 +287,7 @@ impl NavGrid {
         self.chunk_size
     }
 
-    /// Set the diagonal movement mode.
+    /// Set the diagonal movement mode. Replaces the current diagonal mode value; callers hold responsibility for maintaining consistency with related fields.
     ///
     /// # Parameters
     /// - `mode` — `DiagonalMode`.
@@ -279,7 +295,7 @@ impl NavGrid {
         self.diagonal_mode = mode;
     }
 
-    /// Current diagonal movement mode.
+    /// Current diagonal movement mode. This accessor incurs no allocation; call it freely in hot paths.
     ///
     /// # Returns
     /// `DiagonalMode`.
@@ -298,7 +314,7 @@ impl NavGrid {
         self.dirty_rects.push((x, y, w, h));
     }
 
-    /// Clear all pending dirty rectangles.
+    /// Clear all pending dirty rectangles. After this call the container is in the same state as immediately after construction.
     pub fn clear_dirty(&mut self) {
         self.dirty_rects.clear();
     }

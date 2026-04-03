@@ -1,4 +1,11 @@
 //! Draw command types, blend modes, and texture data for the Luna2D rendering pipeline.
+//!
+//! This module is part of Luna2D's `graphics` subsystem and provides the implementation
+//! details for renderer-related operations and data management.
+//! Key types exported from this module: `CompareMode`, `StencilAction`, `TextAlign`, `DrawMode`, `BlendMode`.
+//!
+//! All public items are documented. See the parent module for architectural context
+//! and the `luna.*` Lua API for the scripting interface.
 
 use crate::engine::resource_keys::{
     CanvasKey, FontKey, MeshKey, ShaderKey, SpriteBatchKey, TextureKey,
@@ -88,7 +95,7 @@ pub enum DrawMode {
     Line,
 }
 
-/// Blending mode for draw operations.
+/// Blending mode for draw operations. Consult the module-level documentation for the broader usage context and preconditions.
 ///
 /// # Variants
 /// - `Alpha` — Alpha variant.

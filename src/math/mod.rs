@@ -1,3 +1,11 @@
+//! Mod implementation for the `math` subsystem.
+//!
+//! This module is part of Luna2D's `math` subsystem and provides the implementation
+//! details for mod-related operations and data management.
+//!
+//! All public items are documented. See the parent module for architectural context
+//! and the `luna.*` Lua API for the scripting interface.
+//!
 /// Bezier curve evaluation using De Casteljau's algorithm.
 pub mod bezier;
 /// Standard easing functions for smooth animation and interpolation.

@@ -1,5 +1,11 @@
 //! Inventory system — slot-based item containers, equipment slots, item sets,
 //! subsystem toggles (weight, size, stacking, sets), and callback hooks.
+//!
+//! This module is part of Luna2D's `inventory` subsystem and provides the implementation
+//! details for mod-related operations and data management.
+//!
+//! All public items are documented. See the parent module for architectural context
+//! and the `luna.*` Lua API for the scripting interface.
 
 /// Item definition and item stacks.
 pub mod item;

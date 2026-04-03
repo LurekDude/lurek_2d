@@ -2,15 +2,15 @@
 """
 gen_test_docs.py — Generate human-readable test documentation for Luna2D.
 
-Reads docs/test_coverage.json (produced by test_coverage.py) and generates
-docs/test_docs.md: a Markdown document describing what each module tests,
+Reads docs/API/test_coverage.json (produced by test_coverage.py) and generates
+docs/API/test_docs.md: a Markdown document describing what each module tests,
 coverage statistics, and a prioritised list of uncovered items.
 
 Also scans tests/*.rs to extract individual test function doc comments
 (/// or // comments immediately before #[test] fn).
 
 Usage:
-    python tools/gen_test_docs.py                  # generate docs/test_docs.md
+    python tools/gen_test_docs.py                  # generate docs/API/test_docs.md
     python tools/gen_test_docs.py --output FILE    # custom output path
     python tools/gen_test_docs.py --input FILE     # custom input JSON path
     python tools/gen_test_docs.py --help
@@ -29,8 +29,8 @@ import sys
 from pathlib import Path
 
 WORKSPACE_ROOT = Path(__file__).resolve().parent.parent
-DEFAULT_INPUT = WORKSPACE_ROOT / "docs" / "test_coverage.json"
-DEFAULT_OUTPUT = WORKSPACE_ROOT / "docs" / "test_docs.md"
+DEFAULT_INPUT = WORKSPACE_ROOT / "docs" / "API" / "test_coverage.json"
+DEFAULT_OUTPUT = WORKSPACE_ROOT / "docs" / "API" / "test_docs.md"
 TESTS_DIR = WORKSPACE_ROOT / "tests"
 
 # Matches a Rust test function
@@ -229,7 +229,7 @@ def main() -> None:
     input_path = Path(args.input)
     if not input_path.is_file():
         print(f"ERROR: Input file not found: {input_path}", file=sys.stderr)
-        print("Run: python tools/test_coverage.py  (to generate docs/test_coverage.json first)",
+        print("Run: python tools/test_coverage.py  (to generate docs/API/test_coverage.json first)",
               file=sys.stderr)
         sys.exit(1)
 

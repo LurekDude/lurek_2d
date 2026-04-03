@@ -1,4 +1,12 @@
 //! Graph edge — a directed connection between nodes.
+//!
+//! This module is part of Luna2D's `graph` subsystem and provides the implementation
+//! details for edge-related operations and data management.
+//! Key types exported from this module: `Edge`.
+//! Primary functions: `new()`, `get_type()`, `set_type()`, `is_on_cooldown()`.
+//!
+//! All public items are documented. See the parent module for architectural context
+//! and the `luna.*` Lua API for the scripting interface.
 
 use std::collections::HashSet;
 
@@ -54,7 +62,7 @@ pub struct Edge {
 }
 
 impl Edge {
-    /// Create a new edge with defaults.
+    /// Create a new edge with defaults. Returns a fully initialised instance with all fields set to their initial values.
     ///
     /// # Parameters
     /// - `id` — `u64`.
@@ -84,7 +92,7 @@ impl Edge {
         }
     }
 
-    /// Get the edge type.
+    /// Get the edge type. This accessor incurs no allocation; call it freely in hot paths.
     ///
     /// # Returns
     /// `&str`.
@@ -92,7 +100,7 @@ impl Edge {
         &self.edge_type
     }
 
-    /// Set the edge type.
+    /// Set the edge type. Replaces the current type value; callers hold responsibility for maintaining consistency with related fields.
     ///
     /// # Parameters
     /// - `t` — `&str`.
@@ -100,7 +108,7 @@ impl Edge {
         self.edge_type = t.to_string();
     }
 
-    /// Whether the edge is in cooldown.
+    /// Whether the edge is in cooldown. This accessor incurs no allocation; call it freely in hot paths.
     ///
     /// # Returns
     /// `bool`.
@@ -119,7 +127,7 @@ impl Edge {
         self.allowed_types.is_empty() || self.allowed_types.contains(t)
     }
 
-    /// Add an allowed item type.
+    /// Add an allowed item type. The insertion is O(1) amortised unless a resize is triggered.
     ///
     /// # Parameters
     /// - `t` — `&str`.
@@ -127,7 +135,7 @@ impl Edge {
         self.allowed_types.insert(t.to_string());
     }
 
-    /// Remove an allowed item type.
+    /// Remove an allowed item type. Returns the removed value if present, or `None` when the key did not exist.
     ///
     /// # Parameters
     /// - `t` — `&str`.
@@ -143,7 +151,7 @@ impl Edge {
         self.allowed_types.clear();
     }
 
-    /// Whether transit capacity is full.
+    /// Whether transit capacity is full. This accessor incurs no allocation; call it freely in hot paths.
     ///
     /// # Returns
     /// `bool`.

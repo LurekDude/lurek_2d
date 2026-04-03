@@ -1,4 +1,11 @@
 //! Registers the `luna.dataframe.*` tabular data API.
+//!
+//! This module is part of Luna2D's `lua_api` subsystem and provides the implementation
+//! details for dataframe api-related operations and data management.
+//! Primary functions: `register()`.
+//!
+//! All public items are documented. See the parent module for architectural context
+//! and the `luna.*` Lua API for the scripting interface.
 
 use std::cell::RefCell;
 use std::rc::Rc;
@@ -79,18 +86,21 @@ impl LuaUserData for LuaDataFrame {
         // -- Schema ----------------------------------------------------------
 
         /// Nrows on this DataFrame.
+        /// @return any
         ///
         /// # Returns
         /// The result.
         methods.add_method("nrows", |_, this, ()| Ok(this.inner.borrow().nrows()));
 
         /// Ncols on this DataFrame.
+        /// @return any
         ///
         /// # Returns
         /// The result.
         methods.add_method("ncols", |_, this, ()| Ok(this.inner.borrow().ncols()));
 
         /// Columns on this DataFrame.
+        /// @return table
         ///
         /// # Returns
         /// The result.
@@ -104,6 +114,7 @@ impl LuaUserData for LuaDataFrame {
         });
 
         /// Returns the number of items.
+        /// @return integer
         ///
         /// # Parameters
         /// - `name` — `string`.
@@ -127,6 +138,7 @@ impl LuaUserData for LuaDataFrame {
         );
 
         /// Removes column from the collection.
+        /// @param col : any
         ///
         /// # Parameters
         /// - `col` — `any`.
@@ -139,6 +151,8 @@ impl LuaUserData for LuaDataFrame {
         });
 
         /// Rename on this DataFrame.
+        /// @param col : any
+        /// @param new_name : string
         ///
         /// # Parameters
         /// - `col` — `any`.
@@ -152,6 +166,8 @@ impl LuaUserData for LuaDataFrame {
         });
 
         /// Returns the column.
+        /// @param col : any
+        /// @return table
         ///
         /// # Parameters
         /// - `col` — `any`.
@@ -172,6 +188,8 @@ impl LuaUserData for LuaDataFrame {
         // -- Row operations (1-based Lua → 0-based Rust) ---------------------
 
         /// Adds row to the collection.
+        /// @param row_tbl : table?
+        /// @return any
         ///
         /// # Parameters
         /// - `row_tbl` — `table` optional.
@@ -192,6 +210,7 @@ impl LuaUserData for LuaDataFrame {
         });
 
         /// Removes row from the collection.
+        /// @param row : integer
         ///
         /// # Parameters
         /// - `row` — `integer`.
@@ -206,6 +225,8 @@ impl LuaUserData for LuaDataFrame {
         });
 
         /// Returns the row.
+        /// @param row : integer
+        /// @return table
         ///
         /// # Parameters
         /// - `row` — `integer`.
@@ -228,6 +249,8 @@ impl LuaUserData for LuaDataFrame {
         // -- Cell access (1-based row) ---------------------------------------
 
         /// Returns the value.
+        /// @param row : integer
+        /// @param col : any
         ///
         /// # Parameters
         /// - `row` — `integer`.
@@ -285,6 +308,8 @@ impl LuaUserData for LuaDataFrame {
         );
 
         /// Head on this DataFrame.
+        /// @param n : integer?
+        /// @return any
         ///
         /// # Parameters
         /// - `n` — `integer` optional.
@@ -294,6 +319,8 @@ impl LuaUserData for LuaDataFrame {
         });
 
         /// Tail on this DataFrame.
+        /// @param n : integer?
+        /// @return any
         ///
         /// # Parameters
         /// - `start` — `integer`.
@@ -304,6 +331,9 @@ impl LuaUserData for LuaDataFrame {
         });
 
         /// Slice on this DataFrame.
+        /// @param start : integer
+        /// @param end : integer
+        /// @return any
         ///
         /// # Parameters
         /// - `start` — `integer`.
@@ -321,6 +351,8 @@ impl LuaUserData for LuaDataFrame {
         });
 
         /// Returns filtered rows or items matching the query.
+        /// @param cols : MultiValue
+        /// @return any
         ///
         /// # Parameters
         /// - `cols` — `LuaMultiValue`.
@@ -337,6 +369,8 @@ impl LuaUserData for LuaDataFrame {
         });
 
         /// Unique on this DataFrame.
+        /// @param col : any
+        /// @return table
         ///
         /// # Parameters
         /// - `col` — `any`.
@@ -352,6 +386,8 @@ impl LuaUserData for LuaDataFrame {
         });
 
         /// Group by on this DataFrame.
+        /// @param col : any
+        /// @return table
         ///
         /// # Parameters
         /// - `col` — `any`.
@@ -391,6 +427,7 @@ impl LuaUserData for LuaDataFrame {
         );
 
         /// Merge on this DataFrame.
+        /// @param other : DataFrame
         ///
         /// # Parameters
         /// - `other` — `userdata`.
@@ -402,6 +439,8 @@ impl LuaUserData for LuaDataFrame {
         });
 
         /// Returns the number of by.
+        /// @param col : any
+        /// @return any
         ///
         /// # Parameters
         /// - `col` — `any`.
@@ -416,6 +455,8 @@ impl LuaUserData for LuaDataFrame {
         });
 
         /// Drop nil on this DataFrame.
+        /// @param col : any
+        /// @return any
         ///
         /// # Parameters
         /// - `n` — `integer`.
@@ -428,6 +469,9 @@ impl LuaUserData for LuaDataFrame {
         });
 
         /// Sample on this DataFrame.
+        /// @param n : integer
+        /// @param seed : integer?
+        /// @return any
         ///
         /// # Parameters
         /// - `n` — `integer`.
@@ -438,6 +482,7 @@ impl LuaUserData for LuaDataFrame {
         });
 
         /// Describe on this DataFrame.
+        /// @return any
         ///
         /// # Parameters
         /// - `col` — `any`.
@@ -449,6 +494,7 @@ impl LuaUserData for LuaDataFrame {
         // -- Analytics (return scalar) ---------------------------------------
 
         /// Sum on this DataFrame.
+        /// @param col : any
         ///
         /// # Parameters
         /// - `col` — `any`.
@@ -459,6 +505,7 @@ impl LuaUserData for LuaDataFrame {
         });
 
         /// Mean on this DataFrame.
+        /// @param col : any
         ///
         /// # Parameters
         /// - `col` — `any`.
@@ -469,6 +516,7 @@ impl LuaUserData for LuaDataFrame {
         });
 
         /// Min on this DataFrame.
+        /// @param col : any
         ///
         /// # Parameters
         /// - `col` — `any`.
@@ -479,6 +527,7 @@ impl LuaUserData for LuaDataFrame {
         });
 
         /// Max on this DataFrame.
+        /// @param col : any
         ///
         /// # Parameters
         /// - `col` — `any`.
@@ -489,6 +538,7 @@ impl LuaUserData for LuaDataFrame {
         });
 
         /// Median on this DataFrame.
+        /// @param col : any
         ///
         /// # Parameters
         /// - `col` — `any`.
@@ -499,6 +549,7 @@ impl LuaUserData for LuaDataFrame {
         });
 
         /// Stddev on this DataFrame.
+        /// @param col : any
         ///
         /// # Parameters
         /// - `col` — `any`.
@@ -509,6 +560,7 @@ impl LuaUserData for LuaDataFrame {
         });
 
         /// Variance on this DataFrame.
+        /// @param col : any
         ///
         /// # Parameters
         /// - `col` — `any`.
@@ -521,6 +573,8 @@ impl LuaUserData for LuaDataFrame {
         // -- Nil handling ----------------------------------------------------
 
         /// Fill nil on this DataFrame.
+        /// @param col : any
+        /// @param val : any
         ///
         /// # Parameters
         /// - `col` — `any`.
@@ -556,6 +610,7 @@ impl LuaUserData for LuaDataFrame {
         // -- Serialization ---------------------------------------------------
 
         /// To c s v on this DataFrame.
+        /// @return any
         ///
         /// # Returns
         /// The result.
@@ -565,6 +620,7 @@ impl LuaUserData for LuaDataFrame {
         });
 
         /// To j s o n on this DataFrame.
+        /// @return any
         ///
         /// # Returns
         /// The result.
@@ -585,6 +641,7 @@ impl LuaUserData for LuaDataFrame {
 
         #[allow(clippy::needless_range_loop)]
         /// To table on this DataFrame.
+        /// @return table
         ///
         /// # Returns
         /// The result.
@@ -604,6 +661,7 @@ impl LuaUserData for LuaDataFrame {
         });
 
         /// To string on this DataFrame.
+        /// @return any
         ///
         /// # Parameters
         /// - `sql_str` — `string`.
@@ -615,6 +673,8 @@ impl LuaUserData for LuaDataFrame {
         // -- SQL -------------------------------------------------------------
 
         /// Runs a query and returns matching results.
+        /// @param sql_str : string
+        /// @return any
         ///
         /// # Parameters
         /// - `sql_str` — `string`.
@@ -627,6 +687,7 @@ impl LuaUserData for LuaDataFrame {
         // -- Clone -----------------------------------------------------------
 
         /// Returns a deep copy of this object.
+        /// @return any
         ///
         /// # Returns
         /// The result.
@@ -667,6 +728,8 @@ impl LuaUserData for LuaDatabase {
         );
 
         /// Returns the table.
+        /// @param name : string
+        /// @return any
         ///
         /// # Parameters
         /// - `name` — `string`.
@@ -682,6 +745,7 @@ impl LuaUserData for LuaDatabase {
         });
 
         /// Removes table from the collection.
+        /// @param name : string
         ///
         /// # Parameters
         /// - `name` — `string`.
@@ -693,6 +757,8 @@ impl LuaUserData for LuaDatabase {
         });
 
         /// Returns `true` if table.
+        /// @param name : string
+        /// @return any
         ///
         /// # Parameters
         /// - `name` — `string`.
@@ -704,6 +770,7 @@ impl LuaUserData for LuaDatabase {
         });
 
         /// List tables on this Database.
+        /// @return table
         ///
         /// # Returns
         /// The result.
@@ -718,6 +785,7 @@ impl LuaUserData for LuaDatabase {
         });
 
         /// Table count on this Database.
+        /// @return any
         ///
         /// # Returns
         /// The result.
@@ -735,6 +803,7 @@ impl LuaUserData for LuaDatabase {
         });
 
         /// Merge on this Database.
+        /// @param other : Database
         ///
         /// # Parameters
         /// - `other` — `userdata`.
@@ -755,6 +824,7 @@ impl LuaUserData for LuaDatabase {
         });
 
         /// To j s o n on this Database.
+        /// @return any
         ///
         /// # Returns
         /// The result.
@@ -780,6 +850,8 @@ impl LuaUserData for LuaDatabase {
         });
 
         /// Runs a query and returns matching results.
+        /// @param sql_str : string
+        /// @return any
         ///
         /// # Parameters
         /// - `sql_str` — `string`.
@@ -807,12 +879,18 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
     let df_table = lua.create_table()?;
 
     // luna.dataframe.newDataFrame()
+    /// New data frame.
+    ///
+    /// @return any
     df_table.set(
         "newDataFrame",
         lua.create_function(|_, ()| Ok(LuaDataFrame::new(DataFrame::new())))?,
     )?;
 
     // luna.dataframe.newDatabase()
+    /// New database.
+    ///
+    /// @return any
     df_table.set(
         "newDatabase",
         lua.create_function(|_, ()| {
@@ -823,6 +901,10 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
     )?;
 
     // luna.dataframe.fromTable(t) — array of row-tables
+    /// From table.
+    ///
+    /// @param tbl : table
+    /// @return any
     df_table.set(
         "fromTable",
         lua.create_function(|_, tbl: LuaTable| {
@@ -850,6 +932,10 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
     )?;
 
     // luna.dataframe.fromCSV(str)
+    /// From csv.
+    ///
+    /// @param s : string
+    /// @return any
     df_table.set(
         "fromCSV",
         lua.create_function(|_, s: String| {
@@ -859,6 +945,10 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
     )?;
 
     // luna.dataframe.fromJSON(str)
+    /// From json.
+    ///
+    /// @param s : string
+    /// @return any
     df_table.set(
         "fromJSON",
         lua.create_function(|_, s: String| {
@@ -868,6 +958,10 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
     )?;
 
     // luna.dataframe.fromBinary(str)
+    /// From binary.
+    ///
+    /// @param s : string
+    /// @return any
     df_table.set(
         "fromBinary",
         lua.create_function(|_, s: LuaString| {
@@ -877,6 +971,12 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
     )?;
 
     // luna.dataframe.random(defs, n, seed?)
+    /// Random.
+    ///
+    /// @param defs_tbl : table
+    /// @param n : integer
+    /// @param seed : integer?
+    /// @return any
     df_table.set(
         "random",
         lua.create_function(|_, (defs_tbl, n, seed): (LuaTable, usize, Option<u64>)| {

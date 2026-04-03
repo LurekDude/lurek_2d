@@ -2,15 +2,15 @@
 """Convenience runner: regenerate the full Luna2D documentation pipeline in one command.
 
 Steps:
-    1. gen_api_data.py          -> docs/api_data.json         (master machine-readable JSON)
-    2. gen_docs_lua.py          -> docs/lua-api.md            (compact Lua API reference)
-    3. gen_docs_rust.py         -> docs/rust-api.md           (compact Rust API reference)
-    4. gen_docs_tests.py        -> docs/test-docs.md          (test catalog)
+    1. gen_api_data.py          -> docs/API/api_data.json         (master machine-readable JSON)
+    2. gen_docs_lua.py          -> docs/API/lua-api.md            (compact Lua API reference)
+    3. gen_docs_rust.py         -> docs/API/rust-api.md           (compact Rust API reference)
+    4. gen_docs_tests.py        -> docs/API/test-docs.md          (test catalog)
     5. gen_wiki_api.py          -> wiki/API-Reference.md      (game-developer cheatsheet)
-    6. doc_coverage.py          -> docs/doc_coverage.json     (docstring coverage analytics)
-    7. test_coverage.py         -> docs/test_coverage.json    (test coverage analytics)
-    8. gen_test_docs.py         -> docs/test_docs.md          (human-readable test docs)
-    9. gen_lua_api.py           -> docs/lua_api_reference_generated.md  (legacy — kept for VS Code ext)
+    6. doc_coverage.py          -> docs/API/doc_coverage.json     (docstring coverage analytics)
+    7. test_coverage.py         -> docs/API/test_coverage.json    (test coverage analytics)
+    8. gen_test_docs.py         -> docs/API/test_docs.md          (human-readable test docs)
+    9. gen_lua_api.py           -> docs/API/lua_api_reference_generated.md  (legacy — kept for VS Code ext)
 
 Usage:
     python tools/gen_all_docs.py          # run all steps
@@ -23,17 +23,17 @@ import time
 from pathlib import Path
 
 SCRIPTS = [
-    ("gen_api_data.py",    "Master JSON (docs/api_data.json)"),
-    ("gen_docs_lua.py",    "Lua API reference (docs/lua-api.md)"),
-    ("gen_docs_rust.py",   "Rust API reference (docs/rust-api.md)"),
-    ("gen_docs_tests.py",  "Test catalog (docs/test-docs.md)"),
+    ("gen_api_data.py",    "Master JSON (docs/API/api_data.json)"),
+    ("gen_docs_lua.py",    "Lua API reference (docs/API/lua-api.md)"),
+    ("gen_docs_rust.py",   "Rust API reference (docs/API/rust-api.md)"),
+    ("gen_docs_tests.py",  "Test catalog (docs/API/test-docs.md)"),
     ("gen_wiki_api.py",    "Wiki cheatsheet (wiki/API-Reference.md)"),
-    ("doc_coverage.py",    "Doc coverage analytics (docs/doc_coverage.json)"),
-    ("test_coverage.py",   "Test coverage analytics (docs/test_coverage.json)"),
-    ("gen_test_docs.py",   "Test documentation (docs/test_docs.md)"),
+    ("doc_coverage.py",    "Doc coverage analytics (docs/API/doc_coverage.json)"),
+    ("test_coverage.py",   "Test coverage analytics (docs/API/test_coverage.json)"),
+    ("gen_test_docs.py",   "Test documentation (docs/API/test_docs.md)"),
 ]
 
-LEGACY_SCRIPT = ("gen_lua_api.py", "Legacy Lua ref (docs/lua_api_reference_generated.md)")
+LEGACY_SCRIPT = ("gen_lua_api.py", "Legacy Lua ref (docs/API/lua_api_reference_generated.md)")
 
 TOOLS_DIR = Path(__file__).parent
 

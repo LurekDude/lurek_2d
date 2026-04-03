@@ -51,6 +51,11 @@ pub struct ScheduledEvent {
 /// The global `time_scale` multiplier compresses or stretches all timers.
 /// A scale of `0.5` makes everything run at half speed; `2.0` doubles speed.
 /// Individual events can be paused with [`Scheduler::pause`].
+///
+/// # Fields
+/// - `events` — `Vec<ScheduledEvent>`.
+/// - `next_id` — `u32`.
+/// - `time_scale` — `f64`.
 #[derive(Debug, Clone)]
 pub struct Scheduler {
     events: Vec<ScheduledEvent>,
@@ -158,7 +163,7 @@ impl Scheduler {
         id
     }
 
-    /// Schedule a named repeating callback.
+    /// Schedule a named repeating callback. Consult the module-level documentation for the broader usage context and preconditions.
     ///
     /// # Parameters
     /// - `name` — `impl Into<String>`.
@@ -188,7 +193,7 @@ impl Scheduler {
 
     // ── Cancellation ──────────────────────────────────────────────────────
 
-    /// Cancel a scheduled event by its ID.
+    /// Cancel a scheduled event by its ID. Consult the module-level documentation for the broader usage context and preconditions.
     ///
     /// # Parameters
     /// - `id` — `u32`.
@@ -206,7 +211,7 @@ impl Scheduler {
         }
     }
 
-    /// Cancel a scheduled event by its name.
+    /// Cancel a scheduled event by its name. Consult the module-level documentation for the broader usage context and preconditions.
     ///
     /// # Parameters
     /// - `name` — `&str`.
@@ -229,7 +234,7 @@ impl Scheduler {
         }
     }
 
-    /// Cancel all scheduled events.
+    /// Cancel all scheduled events. Consult the module-level documentation for the broader usage context and preconditions.
     ///
     /// # Returns
     /// `u32`.
@@ -261,7 +266,7 @@ impl Scheduler {
         }
     }
 
-    /// Resume a previously paused event by ID.
+    /// Resume a previously paused event by ID. Consult the module-level documentation for the broader usage context and preconditions.
     ///
     /// # Parameters
     /// - `id` — `u32`.
@@ -383,7 +388,7 @@ impl Scheduler {
         self.time_scale = scale.clamp(0.0, 100.0);
     }
 
-    /// Returns the current global time-scale.
+    /// Returns the current global time-scale. This accessor incurs no allocation; call it freely in hot paths.
     ///
     /// # Returns
     /// `f64`.
@@ -443,7 +448,7 @@ impl Scheduler {
         self.events.len()
     }
 
-    /// Get the IDs of all active events.
+    /// Get the IDs of all active events. Consult the module-level documentation for the broader usage context and preconditions.
     ///
     /// # Returns
     /// `Vec<u32>`.

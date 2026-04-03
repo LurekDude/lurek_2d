@@ -16,6 +16,10 @@ use crate::math::Rect;
 /// Tiles are stored in square chunks of `chunk_size × chunk_size` tiles.  Chunks are
 /// allocated on first write and can be individually unloaded to reclaim memory.
 /// Reads from unloaded chunks return [`ChunkMap::DEFAULT_GID`] (0).
+///
+/// # Fields
+/// - `chunk_size` — `u32`.
+/// - `chunks` — `HashMap<(i32`.
 #[derive(Debug, Clone)]
 pub struct ChunkMap {
     chunk_size: u32,
@@ -26,7 +30,7 @@ impl ChunkMap {
     /// Default GID returned for tiles in non-loaded chunks.
     pub const DEFAULT_GID: u32 = 0;
 
-    /// Creates a new empty chunk map.
+    /// Creates a new empty chunk map. Returns a fully initialised instance with all fields set to their initial values.
     ///
     /// # Parameters
     /// - `chunk_size` — `u32`.

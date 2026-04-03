@@ -7,7 +7,7 @@ producing a single machine-readable JSON used as the source for all other
 doc generators. Not intended for direct human reading.
 
 Usage:
-    python tools/gen_api_data.py                  # -> docs/api_data.json
+    python tools/gen_api_data.py                  # -> docs/API/api_data.json
     python tools/gen_api_data.py --output FILE    # custom output path
     python tools/gen_api_data.py --verbose        # print per-module stats
 
@@ -28,7 +28,7 @@ WORKSPACE_ROOT = Path(__file__).resolve().parent.parent
 TOOLS_DIR = WORKSPACE_ROOT / "tools"
 SRC_DIR = WORKSPACE_ROOT / "src"
 TESTS_DIR = WORKSPACE_ROOT / "tests"
-OUTPUT_FILE = WORKSPACE_ROOT / "docs" / "api_data.json"
+OUTPUT_FILE = WORKSPACE_ROOT / "docs" / "API" / "api_data.json"
 
 
 # ── Load gen_lua_api as a module (avoids duplicating parser logic) ─────────────
@@ -58,6 +58,9 @@ def extract_lua_api(gen_lua_api, verbose: bool = False) -> dict:
         module_doc = (
             gen_lua_api._collect_module_doc(api_file) if api_file.exists() else ""
         )
+        class_descs = (
+            gen_lua_api.collect_class_descriptions(api_file) if api_file.exists() else {}
+        )
 
         module_fns = []
         classes: dict = {}
@@ -73,6 +76,8 @@ def extract_lua_api(gen_lua_api, verbose: bool = False) -> dict:
                 "params_doc": f.params,
                 "returns_doc": f.returns,
                 "inferred_sig": f.inferred_sig,
+                "typed_params": f.typed_params,
+                "inferred_return": f.inferred_return,
                 "line": f.line,
                 "file": f.file,
             }
@@ -82,8 +87,16 @@ def extract_lua_api(gen_lua_api, verbose: bool = False) -> dict:
             elif f.kind == "method":
                 owner = f.owner_type or "Unknown"
                 if owner not in classes:
-                    classes[owner] = {"description": "", "methods": []}
+                    classes[owner] = {
+                        "description": class_descs.get(owner, ""),
+                        "methods": [],
+                    }
                 classes[owner]["methods"].append(entry)
+
+        # Fill in any class descriptions that weren't set during method iteration
+        for owner, cls_data in classes.items():
+            if not cls_data["description"] and owner in class_descs:
+                cls_data["description"] = class_descs[owner]
 
         modules[mod_name] = {
             "description": module_doc,
@@ -327,7 +340,7 @@ def main() -> int:
         epilog=__doc__,
     )
     parser.add_argument(
-        "--output", default=str(OUTPUT_FILE), help="Output JSON path (default: docs/api_data.json)"
+        "--output", default=str(OUTPUT_FILE), help="Output JSON path (default: docs/API/api_data.json)"
     )
     parser.add_argument("--verbose", "-v", action="store_true", help="Print per-module stats")
     args = parser.parse_args()

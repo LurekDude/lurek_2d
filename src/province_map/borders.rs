@@ -8,7 +8,12 @@ use std::collections::HashSet;
 
 use super::core::ProvinceMap;
 
-/// Visual style for a border line.
+/// Visual style for a border line. Consult the module-level documentation for the broader usage context and preconditions.
+///
+/// # Fields
+/// - `width` — `f32`.
+/// - `color` — `[f32; 4]`.
+/// - `dashed` — `bool`.
 #[derive(Debug, Clone)]
 pub struct BorderStyle {
     /// Line width in pixels.
@@ -30,6 +35,12 @@ impl Default for BorderStyle {
 }
 
 /// A border segment as a list of pixel coordinates forming a polyline.
+///
+/// # Fields
+/// - `province_a` — `u32`.
+/// - `province_b` — `u32`.
+/// - `points` — `Vec<(f32`.
+/// - `tags` — `HashSet<String>`.
 #[derive(Debug, Clone)]
 pub struct BorderSegment {
     /// ID of the first province (smaller).
@@ -45,6 +56,12 @@ pub struct BorderSegment {
 /// Convert all adjacency edge border segments into ordered polylines.
 ///
 /// Each adjacency edge with border pixel data produces one [`BorderSegment`].
+///
+/// # Parameters
+/// - `ap` — `&ProvinceMap`.
+///
+/// # Returns
+/// `Vec<BorderSegment>`.
 pub fn extract_all_borders(map: &ProvinceMap) -> Vec<BorderSegment> {
     let ids = map.province_ids();
     let mut segments = Vec::new();
@@ -85,6 +102,13 @@ pub fn extract_all_borders(map: &ProvinceMap) -> Vec<BorderSegment> {
 /// Extract only borders that have a specific tag.
 ///
 /// Use this to get e.g. all river borders, wall borders, etc.
+///
+/// # Parameters
+/// - `ap` — `&ProvinceMap`.
+/// - `ag` — `&str`.
+///
+/// # Returns
+/// `Vec<BorderSegment>`.
 pub fn extract_borders_with_tag(map: &ProvinceMap, tag: &str) -> Vec<BorderSegment> {
     extract_all_borders(map)
         .into_iter()
@@ -97,6 +121,13 @@ pub fn extract_borders_with_tag(map: &ProvinceMap, tag: &str) -> Vec<BorderSegme
 /// The caller supplies a function that maps province ID to an optional grouping
 /// value. Borders where the two provinces have different values (or one is
 /// `None`) are returned.
+///
+/// # Parameters
+/// - `ap` — `&ProvinceMap`.
+/// - `group_fn` — `F`.
+///
+/// # Returns
+/// `Vec<BorderSegment> where     F: Fn(u32) -> Option<String>,`.
 pub fn extract_borders_by_property<F>(map: &ProvinceMap, group_fn: F) -> Vec<BorderSegment>
 where
     F: Fn(u32) -> Option<String>,

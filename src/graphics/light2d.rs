@@ -1,4 +1,12 @@
 //! 2D point light data container for lighting systems.
+//!
+//! This module is part of Luna2D's `graphics` subsystem and provides the implementation
+//! details for light2d-related operations and data management.
+//! Key types exported from this module: `Light2D`.
+//! Primary functions: `new()`, `set_position()`, `get_position()`, `set_radius()`.
+//!
+//! All public items are documented. See the parent module for architectural context
+//! and the `luna.*` Lua API for the scripting interface.
 
 use crate::graphics::Color;
 
@@ -52,7 +60,7 @@ impl Light2D {
         }
     }
 
-    /// Sets the light's world-space position.
+    /// Sets the light's world-space position. Replaces the current position value; callers hold responsibility for maintaining consistency with related fields.
     ///
     /// # Parameters
     /// - `x` — `f32`.
@@ -70,7 +78,7 @@ impl Light2D {
         (self.x, self.y)
     }
 
-    /// Sets the light's influence radius.
+    /// Sets the light's influence radius. Replaces the current radius value; callers hold responsibility for maintaining consistency with related fields.
     ///
     /// # Parameters
     /// - `radius` — `f32`.
@@ -78,7 +86,7 @@ impl Light2D {
         self.radius = radius;
     }
 
-    /// Returns the light's influence radius.
+    /// Returns the light's influence radius. This accessor incurs no allocation; call it freely in hot paths.
     ///
     /// # Returns
     /// `f32`.
@@ -86,7 +94,7 @@ impl Light2D {
         self.radius
     }
 
-    /// Sets the light's tint color.
+    /// Sets the light's tint color. Replaces the current color value; callers hold responsibility for maintaining consistency with related fields.
     ///
     /// # Parameters
     /// - `color` — `Color`.
@@ -94,7 +102,7 @@ impl Light2D {
         self.color = color;
     }
 
-    /// Returns the light's tint color.
+    /// Returns the light's tint color. This accessor incurs no allocation; call it freely in hot paths.
     ///
     /// # Returns
     /// `Color`.
@@ -102,7 +110,7 @@ impl Light2D {
         self.color
     }
 
-    /// Sets the light's brightness multiplier.
+    /// Sets the light's brightness multiplier. Replaces the current intensity value; callers hold responsibility for maintaining consistency with related fields.
     ///
     /// # Parameters
     /// - `intensity` — `f32`.
@@ -118,7 +126,7 @@ impl Light2D {
         self.intensity
     }
 
-    /// Sets whether the light is active.
+    /// Sets whether the light is active. Replaces the current enabled value; callers hold responsibility for maintaining consistency with related fields.
     ///
     /// # Parameters
     /// - `enabled` — `bool`.
@@ -126,7 +134,7 @@ impl Light2D {
         self.enabled = enabled;
     }
 
-    /// Returns whether the light is active.
+    /// Returns whether the light is active. This accessor incurs no allocation; call it freely in hot paths.
     ///
     /// # Returns
     /// `bool`.

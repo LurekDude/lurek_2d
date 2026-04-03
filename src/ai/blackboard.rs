@@ -1,8 +1,35 @@
 //! Typed key-value store with optional parent chain for hierarchical lookup.
+//!
+//! Blackboards are the primary mechanism for sharing named data between AI
+//! subsystems in Luna2D. Each [`Agent`](crate::ai::agent::Agent) has a local
+//! blackboard; each [`Squad`](crate::ai::squad::Squad) has a squad-level
+//! blackboard; and the [`AIWorld`](crate::ai::world::AIWorld) has a global one.
+//!
+//! ## Hierarchical Lookup
+//!
+//! Blackboards can be chained: an agent's blackboard has the world's global
+//! blackboard as its parent. When reading a key, the lookup walks the parent
+//! chain until a match is found or the chain ends. Writes always target the
+//! local store — they never propagate to parents.
+//!
+//! ## Supported Value Types
+//!
+//! Three value types are supported via [`BlackboardValue`]:
+//! - `Number(f64)` — numeric values
+//! - `Bool(bool)` — boolean flags
+//! - `Text(String)` — string data
+//!
+//! Each type has dedicated get/set methods that enforce type safety at the
+//! Rust level. The Lua API layer provides a unified `bb:get(key)` interface.
 
 use std::collections::HashMap;
 
-/// Typed value stored in a Blackboard slot.
+/// A typed value stored in a blackboard slot.
+///
+/// Three types are supported, matching the primitive types commonly passed
+/// between Lua callbacks and the AI subsystem. Complex data structures should
+/// be decomposed into multiple blackboard entries rather than stored as a
+/// single serialized blob.
 ///
 /// # Variants
 /// - `Number` — Number variant.
@@ -10,27 +37,42 @@ use std::collections::HashMap;
 /// - `Text` — Text variant.
 #[derive(Debug, Clone)]
 pub enum BlackboardValue {
-    /// Numeric value (f64).
+    /// A 64-bit floating-point number. Used for health, distances, scores, etc.
     Number(f64),
-    /// Boolean value.
+    /// A boolean flag. Used for state flags like "is_alert", "has_weapon".
     Bool(bool),
-    /// String value.
+    /// A string value. Used for state names, target identifiers, etc.
     Text(String),
 }
 
-/// Key-value store with optional parent chain for hierarchical lookup.
+/// A hierarchical key-value store for sharing named data between AI subsystems.
+///
+/// Used by agents, squads, and the AI world to communicate without direct
+/// coupling. For example, an FSM state callback can write `"target_x"` to the
+/// agent's blackboard, and a steering behavior can read it to compute forces.
+///
+/// ## Lookup Rules
+///
+/// - `get_*` methods first check local entries, then walk the parent chain.
+/// - `set_*` methods always write to the local store only.
+/// - `has()` checks both local and parent stores.
+/// - `remove()` and `clear()` affect only the local store.
+///
+/// ## Cloning
+///
+/// Blackboards implement `Clone`. Cloning creates a deep copy including the
+/// parent chain. This is used when snapshotting state but should be avoided
+/// in per-frame code due to allocation cost.
 ///
 /// # Fields
 /// - `entries` — `HashMap<String, BlackboardValue>`.
 /// - `parent` — `Option<Box<Blackboard>>`.
-///
-/// Used by agents, squads, and worlds to share named data.
-/// `get*` walks the parent chain; `set*` writes locally only.
 #[derive(Clone)]
 pub struct Blackboard {
-    /// Local key-value entries.
+    /// Local key-value entries. Keys are case-sensitive strings.
     pub(crate) entries: HashMap<String, BlackboardValue>,
-    /// Optional parent for hierarchical lookup. Never propagates writes.
+    /// Optional parent blackboard for hierarchical read-through.
+    /// Writes never propagate to the parent.
     pub(crate) parent: Option<Box<Blackboard>>,
 }
 
@@ -160,7 +202,7 @@ impl Blackboard {
         self.entries.clear();
     }
 
-    /// Returns all local key names.
+    /// Returns all local key names. Consult the module-level documentation for the broader usage context and preconditions.
     ///
     /// # Returns
     /// `Vec<String>`.
@@ -168,7 +210,7 @@ impl Blackboard {
         self.entries.keys().cloned().collect()
     }
 
-    /// Returns the number of local entries.
+    /// Returns the number of local entries. Runs in O(1) time.
     ///
     /// # Returns
     /// `usize`.

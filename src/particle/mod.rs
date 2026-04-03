@@ -7,5 +7,6 @@
 //! Supports multi-stop size/color/alpha interpolation, emission shapes,
 //! radial/tangential acceleration, linear damping, relative mode, and texture-based rendering.
 
+/// System sub-module.
 pub mod system;
 pub use system::*;

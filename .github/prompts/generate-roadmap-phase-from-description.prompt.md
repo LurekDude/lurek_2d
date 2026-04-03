@@ -66,7 +66,7 @@ file_search **/<slug>*.rs
 For each relevant source file found, read its public API surface (structs, pub fn signatures, Lua method registrations).
 
 Also check:
-- `docs/lua_api_reference_generated.md` — what the current generated reference says
+- `docs/API/lua_api_reference_generated.md` — what the current generated reference says
 - Any related roadmap phase already in `docs/roadmap/` that touches the same domain
 
 Build two lists:

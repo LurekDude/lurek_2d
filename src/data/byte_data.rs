@@ -1,10 +1,21 @@
 //! Contiguous byte buffer accessible from Lua.
+//!
+//! This module is part of Luna2D's `data` subsystem and provides the implementation
+//! details for byte data-related operations and data management.
+//! Key types exported from this module: `ByteData`.
+//! Primary functions: `new()`, `from_bytes()`, `from_string()`, `len()`.
+//!
+//! All public items are documented. See the parent module for architectural context
+//! and the `luna.*` Lua API for the scripting interface.
 
 use mlua::prelude::*;
 
 /// Contiguous byte buffer for binary data manipulation.
 ///
 /// Wraps a `Vec<u8>` with indexed get/set operations and string conversion.
+///
+/// # Fields
+/// - `data` — `Vec<u8>`.
 #[derive(Debug, Clone)]
 pub struct ByteData {
     data: Vec<u8>,
@@ -24,7 +35,7 @@ impl ByteData {
         }
     }
 
-    /// Create from an existing byte vector.
+    /// Create from an existing byte vector. Returns a fully initialised instance with all fields set to their initial values.
     ///
     /// # Parameters
     /// - `bytes` — `Vec<u8>`.
@@ -35,7 +46,7 @@ impl ByteData {
         Self { data: bytes }
     }
 
-    /// Create from a string.
+    /// Create from a string. Returns a fully initialised instance with all fields set to their initial values.
     ///
     /// # Parameters
     /// - `s` — `&str`.
@@ -56,7 +67,7 @@ impl ByteData {
         self.data.len()
     }
 
-    /// Check if the buffer is empty.
+    /// Check if the buffer is empty. This accessor incurs no allocation; call it freely in hot paths.
     ///
     /// # Returns
     /// `bool`.
@@ -100,7 +111,7 @@ impl ByteData {
         String::from_utf8_lossy(&self.data).to_string()
     }
 
-    /// Get a reference to the raw bytes.
+    /// Get a reference to the raw bytes. Consult the module-level documentation for the broader usage context and preconditions.
     ///
     /// # Returns
     /// `&[u8]`.
@@ -116,7 +127,7 @@ impl ByteData {
         &mut self.data
     }
 
-    /// Clone the data into a new ByteData.
+    /// Clone the data into a new ByteData. Consult the module-level documentation for the broader usage context and preconditions.
     ///
     /// # Returns
     /// `Self`.

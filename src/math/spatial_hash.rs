@@ -5,7 +5,7 @@
 
 use std::collections::{HashMap, HashSet};
 
-/// Entry in the spatial hash.
+/// Entry in the spatial hash. Consult the module-level documentation for the broader usage context and preconditions.
 ///
 /// # Fields
 /// - `id` — `String`.
@@ -27,11 +27,16 @@ pub struct SpatialItem {
     pub h: f32,
 }
 
-/// Spatial hash for AABB queries.
+/// Spatial hash for AABB queries. Consult the module-level documentation for the broader usage context and preconditions.
 ///
 /// Divides the 2D plane into a uniform grid of square cells. Each item is
 /// inserted into every cell its bounding box overlaps, enabling fast
 /// broad-phase collision queries.
+///
+/// # Fields
+/// - `cell_size` — `f32`.
+/// - `items` — `HashMap<String`.
+/// - `buckets` — `HashMap<(i32`.
 pub struct SpatialHash {
     cell_size: f32,
     items: HashMap<String, SpatialItem>,
@@ -55,7 +60,7 @@ impl SpatialHash {
         }
     }
 
-    /// Returns the cell size.
+    /// Returns the cell size. Consult the module-level documentation for the broader usage context and preconditions.
     ///
     /// # Returns
     /// `f32`.
@@ -87,7 +92,7 @@ impl SpatialHash {
         )
     }
 
-    /// Inserts an item with the given AABB.
+    /// Inserts an item with the given AABB. Consult the module-level documentation for the broader usage context and preconditions.
     ///
     /// # Parameters
     /// - `id` — `String`.
@@ -111,7 +116,7 @@ impl SpatialHash {
             .insert(id.clone(), SpatialItem { id, x, y, w, h });
     }
 
-    /// Removes an item by its ID.
+    /// Removes an item by its ID. Consult the module-level documentation for the broader usage context and preconditions.
     ///
     /// # Parameters
     /// - `id` — `&str`.

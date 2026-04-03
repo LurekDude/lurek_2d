@@ -1,3 +1,13 @@
+//! Rect implementation for the `math` subsystem.
+//!
+//! This module is part of Luna2D's `math` subsystem and provides the implementation
+//! details for rect-related operations and data management.
+//! Key types exported from this module: `Rect`.
+//! Primary functions: `new()`, `center()`, `area()`, `contains()`.
+//!
+//! All public items are documented. See the parent module for architectural context
+//! and the `luna.*` Lua API for the scripting interface.
+//!
 use super::vec2::Vec2;
 
 /// An axis-aligned rectangle defined by its top-left corner and dimensions.
@@ -45,7 +55,7 @@ impl Rect {
         Vec2::new(self.x + self.width / 2.0, self.y + self.height / 2.0)
     }
 
-    /// Returns the area of the rectangle.
+    /// Returns the area of the rectangle. Consult the module-level documentation for the broader usage context and preconditions.
     ///
     /// # Returns
     /// `f32` — `width × height`.

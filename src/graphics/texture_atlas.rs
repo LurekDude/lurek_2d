@@ -156,7 +156,7 @@ impl TextureAtlas {
         self.regions.get(name)
     }
 
-    /// Returns the number of packed regions.
+    /// Returns the number of packed regions. This accessor incurs no allocation; call it freely in hot paths.
     ///
     /// # Returns
     /// `usize`.
@@ -180,7 +180,7 @@ impl TextureAtlas {
         self.regions.values().collect()
     }
 
-    /// Removes all packed regions and shelves.
+    /// Removes all packed regions and shelves. After this call the container is in the same state as immediately after construction.
     pub fn clear(&mut self) {
         self.regions.clear();
         self.shelves.clear();

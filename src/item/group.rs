@@ -17,6 +17,11 @@ use crate::item::item::Item;
 ///
 /// Indices refer to positions in the original `&[Item]` slice passed to the
 /// analysis function.
+///
+/// # Fields
+/// - `label` — `String`.
+/// - `indices` — `Vec<usize>`.
+/// - `score` — `u32`.
 #[derive(Debug, Clone)]
 pub struct ItemGroup {
     /// Human-readable label (user-defined or derived, e.g. `"triple|6"`).
@@ -29,6 +34,12 @@ pub struct ItemGroup {
 
 impl ItemGroup {
     /// Collect the actual items from the source slice.
+    ///
+    /// # Parameters
+    /// - `src` — `&'a [Item]`.
+    ///
+    /// # Returns
+    /// `Vec<&'a Item>`.
     pub fn items_from<'a>(&self, src: &'a [Item]) -> Vec<&'a Item> {
         self.indices.iter().filter_map(|&i| src.get(i)).collect()
     }
@@ -41,6 +52,13 @@ impl ItemGroup {
 /// Group item indices by the integer part of a named stat.
 ///
 /// Returns a map from `stat_value as i64` to a list of 0-based indices.
+///
+/// # Parameters
+/// - `items` — `&[Item]`.
+/// - `stat` — `&str`.
+///
+/// # Returns
+/// `HashMap<i64, Vec<usize>>`.
 pub fn group_by_stat(items: &[Item], stat: &str) -> HashMap<i64, Vec<usize>> {
     let mut map: HashMap<i64, Vec<usize>> = HashMap::new();
     for (i, item) in items.iter().enumerate() {
@@ -49,9 +67,15 @@ pub fn group_by_stat(items: &[Item], stat: &str) -> HashMap<i64, Vec<usize>> {
     map
 }
 
-/// Group item indices by category.
+/// Group item indices by category. Consult the module-level documentation for the broader usage context and preconditions.
 ///
 /// Returns a map from category string to a list of 0-based indices.
+///
+/// # Parameters
+/// - `items` — `&[Item]`.
+///
+/// # Returns
+/// `HashMap<String, Vec<usize>>`.
 pub fn group_by_category(items: &[Item]) -> HashMap<String, Vec<usize>> {
     let mut map: HashMap<String, Vec<usize>> = HashMap::new();
     for (i, item) in items.iter().enumerate() {
@@ -66,6 +90,13 @@ pub fn group_by_category(items: &[Item]) -> HashMap<String, Vec<usize>> {
 /// prefix separator are grouped under the tag itself.
 ///
 /// Example: items tagged `"suit:hearts"`, `"suit:spades"` both group under `"suit"`.
+///
+/// # Parameters
+/// - `items` — `&[Item]`.
+/// - `prefix` — `&str`.
+///
+/// # Returns
+/// `HashMap<String, Vec<usize>>`.
 pub fn group_by_tag_prefix(items: &[Item], prefix: &str) -> HashMap<String, Vec<usize>> {
     let search = format!("{}:", prefix);
     let mut map: HashMap<String, Vec<usize>> = HashMap::new();
@@ -89,6 +120,14 @@ pub fn group_by_tag_prefix(items: &[Item], prefix: &str) -> HashMap<String, Vec<
 /// and the group has exactly `n` members.
 ///
 /// Analogous to "n-of-a-kind" in card games.  Useful for any matching scenario.
+///
+/// # Parameters
+/// - `items` — `&[Item]`.
+/// - `stat` — `&str`.
+/// - `n` — `usize`.
+///
+/// # Returns
+/// `Vec<ItemGroup>`.
 pub fn find_n_of_stat(items: &[Item], stat: &str, n: usize) -> Vec<ItemGroup> {
     group_by_stat(items, stat)
         .into_iter()
@@ -102,6 +141,14 @@ pub fn find_n_of_stat(items: &[Item], stat: &str, n: usize) -> Vec<ItemGroup> {
 }
 
 /// Find all groups where at least `n` items share the same integer stat value.
+///
+/// # Parameters
+/// - `items` — `&[Item]`.
+/// - `stat` — `&str`.
+/// - `n` — `usize`.
+///
+/// # Returns
+/// `Vec<ItemGroup>`.
 pub fn find_at_least_n_of_stat(items: &[Item], stat: &str, n: usize) -> Vec<ItemGroup> {
     group_by_stat(items, stat)
         .into_iter()
@@ -118,6 +165,14 @@ pub fn find_at_least_n_of_stat(items: &[Item], stat: &str, n: usize) -> Vec<Item
 ///
 /// Sorts items by stat value and identifies consecutive runs.
 /// Returns one `ItemGroup` per run.
+///
+/// # Parameters
+/// - `items` — `&[Item]`.
+/// - `stat` — `&str`.
+/// - `in_run` — `usize`.
+///
+/// # Returns
+/// `Vec<ItemGroup>`.
 pub fn find_sequences(items: &[Item], stat: &str, min_run: usize) -> Vec<ItemGroup> {
     if items.is_empty() || min_run == 0 { return Vec::new(); }
 
@@ -158,6 +213,14 @@ pub fn find_sequences(items: &[Item], stat: &str, min_run: usize) -> Vec<ItemGro
 ///
 /// Analogous to "flush" detection: all items with the same `suit:hearts` tag
 /// form one group.
+///
+/// # Parameters
+/// - `items` — `&[Item]`.
+/// - `ag_prefix` — `&str`.
+/// - `in_size` — `usize`.
+///
+/// # Returns
+/// `Vec<ItemGroup>`.
 pub fn find_tag_groups(items: &[Item], tag_prefix: &str, min_size: usize) -> Vec<ItemGroup> {
     group_by_tag_prefix(items, tag_prefix)
         .into_iter()
@@ -177,6 +240,14 @@ pub fn find_tag_groups(items: &[Item], tag_prefix: &str, min_size: usize) -> Vec
 /// Return a sorted list of 0-based indices; does not modify the slice.
 ///
 /// `ascending = true` → lowest stat first.
+///
+/// # Parameters
+/// - `items` — `&[Item]`.
+/// - `stat` — `&str`.
+/// - `ascending` — `bool`.
+///
+/// # Returns
+/// `Vec<usize>`.
 pub fn sorted_indices_by_stat(items: &[Item], stat: &str, ascending: bool) -> Vec<usize> {
     let mut indices: Vec<usize> = (0..items.len()).collect();
     if ascending {
@@ -194,6 +265,12 @@ pub fn sorted_indices_by_stat(items: &[Item], stat: &str, ascending: bool) -> Ve
 }
 
 /// Return sorted indices grouped alphabetically by category.
+///
+/// # Parameters
+/// - `items` — `&[Item]`.
+///
+/// # Returns
+/// `Vec<usize>`.
 pub fn sorted_indices_by_category(items: &[Item]) -> Vec<usize> {
     let mut indices: Vec<usize> = (0..items.len()).collect();
     indices.sort_by(|&a, &b| items[a].category.cmp(&items[b].category));

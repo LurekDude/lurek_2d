@@ -43,7 +43,7 @@ use crate::audio::bus::Bus;
 use crate::engine::resource_keys::BusKey;
 use crate::engine::resource_keys::SoundKey;
 
-/// Type of audio source.
+/// Type of audio source. Consult the module-level documentation for the broader usage context and preconditions.
 ///
 /// # Variants
 /// - `Static` — Static variant.
@@ -56,7 +56,7 @@ pub enum SourceType {
     Stream,
 }
 
-/// Playback state of an audio source.
+/// Playback state of an audio source. Consult the module-level documentation for the broader usage context and preconditions.
 ///
 /// # Variants
 /// - `Stopped` — Stopped variant.
@@ -97,10 +97,21 @@ struct AudioEntry {
     fade_in_duration: Option<f32>,
 }
 
-/// Manages audio output via rodio: loads sources, controls playback, and adjusts volume.
+/// Manages audio output via rodio: loads sources, controls playback, volume,
+/// pitch, pan, looping, fade effects, bus routing, and master volume.
 ///
-/// Supports static (in-memory) and streaming source types, per-source volume/pitch/pan,
-/// master volume, looping, batch operations, and source cloning.
+/// The `Mixer` is the single point of entry for all audio operations in
+/// Luna2D. It owns a `SlotMap<SoundKey, AudioEntry>` for O(1) lookup and safe
+/// handle invalidation, a `SlotMap<BusKey, Bus>` for named routing groups, and
+/// a master volume applied on top of all per-source and per-bus values. Uses
+/// `rodio::Sink` per source for independent playback control.
+///
+/// # Fields
+/// - `_stream` — `Option<rodio::OutputStream>`.
+/// - `stream_handle` — `Option<rodio::OutputStreamHandle>`.
+/// - `sources` — `SlotMap<SoundKey, AudioEntry>`.
+/// - `master_volume` — `f32`.
+/// - `buses` — `SlotMap<BusKey, Bus>`.
 pub struct Mixer {
     _stream: Option<rodio::OutputStream>,
     stream_handle: Option<rodio::OutputStreamHandle>,
@@ -437,7 +448,7 @@ impl Mixer {
         PlayState::Stopped
     }
 
-    /// Returns whether the source is paused.
+    /// Returns whether the source is paused. This accessor incurs no allocation; call it freely in hot paths.
     ///
     /// # Parameters
     /// - `key` — `SoundKey`.
@@ -448,7 +459,7 @@ impl Mixer {
         self.get_play_state(key) == PlayState::Paused
     }
 
-    /// Returns whether the source is stopped.
+    /// Returns whether the source is stopped. This accessor incurs no allocation; call it freely in hot paths.
     ///
     /// # Parameters
     /// - `key` — `SoundKey`.
@@ -586,7 +597,7 @@ impl Mixer {
         self.sources.contains_key(key)
     }
 
-    /// Pauses all currently playing sources.
+    /// Pauses all currently playing sources. Consult the module-level documentation for the broader usage context and preconditions.
     pub fn pause_all(&mut self) {
         for entry in self.sources.values_mut() {
             if let Some(ref sink) = entry.sink {
@@ -615,7 +626,7 @@ impl Mixer {
         }
     }
 
-    /// Resumes all paused sources.
+    /// Resumes all paused sources. Consult the module-level documentation for the broader usage context and preconditions.
     pub fn resume_all(&mut self) {
         for entry in self.sources.values_mut() {
             if let Some(ref sink) = entry.sink {

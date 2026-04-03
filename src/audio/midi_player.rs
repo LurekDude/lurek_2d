@@ -1,5 +1,13 @@
 //! Software MIDI synthesizer: parses MIDI with `midly`, renders to PCM
 //! via sine-additive synthesis, and plays through a rodio `Sink`.
+//!
+//! This module is part of Luna2D's `audio` subsystem and provides the implementation
+//! details for midi player-related operations and data management.
+//! Key types exported from this module: `MidiData`, `MidiPlayer`.
+//! Primary functions: `new()`, `load()`, `load_data()`, `is_loaded()`.
+//!
+//! All public items are documented. See the parent module for architectural context
+//! and the `luna.*` Lua API for the scripting interface.
 
 use crate::audio::PlayState;
 use crate::engine::resource_keys::BusKey;
@@ -40,7 +48,26 @@ pub struct MidiData {
 ///
 /// Parses MIDI via `midly`, renders all tracks to a PCM buffer on `play()`,
 /// and feeds the result into a `rodio::Sink`. Supports per-channel volume,
-/// muting, track muting, tempo scaling, and looping.
+/// muting, track muting, tempo scaling, looping, and bus routing.
+/// All synthesis is done on the Rust side so no external soundfont is needed
+/// for basic MIDI playback (though `MidiState` enables SF2 loading).
+///
+/// # Fields
+/// - `midi_data` — `Option<MidiData>`.
+/// - `raw_midi` — `Option<Vec<u8>>`.
+/// - `file_path` — `Option<String>`.
+/// - `volume` — `f32`.
+/// - `looping` — `bool`.
+/// - `tempo_scale` — `f32`.
+/// - `current_bpm` — `f64`.
+/// - `channel_muted` — `[bool; 16]`.
+/// - `channel_volume` — `[f32; 16]`.
+/// - `channel_instrument` — `[u8; 16]`.
+/// - `track_muted` — `Vec<bool>`.
+/// - `position_secs` — `f64`.
+/// - `sink` — `Option<rodio::Sink>`.
+/// - `play_state` — `PlayState`.
+/// - `bus_key` — `Option<BusKey>`.
 pub struct MidiPlayer {
     midi_data: Option<MidiData>,
     raw_midi: Option<Vec<u8>>,
@@ -264,7 +291,7 @@ impl MidiPlayer {
         self.play_state = PlayState::Stopped;
     }
 
-    /// Pauses playback.
+    /// Pauses playback. Consult the module-level documentation for the broader usage context and preconditions.
     pub fn pause(&mut self) {
         if let Some(ref sink) = self.sink {
             sink.pause();
@@ -272,7 +299,7 @@ impl MidiPlayer {
         self.play_state = PlayState::Paused;
     }
 
-    /// Resumes paused playback.
+    /// Resumes paused playback. Consult the module-level documentation for the broader usage context and preconditions.
     pub fn resume(&mut self) {
         if let Some(ref sink) = self.sink {
             sink.play();
@@ -290,7 +317,7 @@ impl MidiPlayer {
         self.play_state == PlayState::Playing
     }
 
-    /// Returns whether the player is paused.
+    /// Returns whether the player is paused. This accessor incurs no allocation; call it freely in hot paths.
     ///
     /// # Returns
     /// `bool`.
@@ -298,7 +325,7 @@ impl MidiPlayer {
         self.play_state == PlayState::Paused
     }
 
-    /// Seeks to a position in seconds.
+    /// Seeks to a position in seconds. Consult the module-level documentation for the broader usage context and preconditions.
     ///
     /// # Parameters
     /// - `secs` — `f64`.
@@ -330,7 +357,7 @@ impl MidiPlayer {
         self.volume = vol.max(0.0);
     }
 
-    /// Returns the master volume.
+    /// Returns the master volume. Consult the module-level documentation for the broader usage context and preconditions.
     ///
     /// # Returns
     /// `f32`.
@@ -338,7 +365,7 @@ impl MidiPlayer {
         self.volume
     }
 
-    /// Sets whether playback should loop.
+    /// Sets whether playback should loop. Replaces the current looping value; callers hold responsibility for maintaining consistency with related fields.
     ///
     /// # Parameters
     /// - `looping` — `bool`.
@@ -362,7 +389,7 @@ impl MidiPlayer {
         self.tempo_scale = scale.max(0.01);
     }
 
-    /// Returns the current tempo scale factor.
+    /// Returns the current tempo scale factor. Consult the module-level documentation for the broader usage context and preconditions.
     ///
     /// # Returns
     /// `f32`.
@@ -370,7 +397,7 @@ impl MidiPlayer {
         self.tempo_scale
     }
 
-    /// Returns the current effective BPM.
+    /// Returns the current effective BPM. Consult the module-level documentation for the broader usage context and preconditions.
     ///
     /// # Returns
     /// `f64`.
@@ -478,7 +505,7 @@ impl MidiPlayer {
         self.midi_data.as_ref().map_or(0, |d| d.channel_count)
     }
 
-    /// Solos a channel (mutes all others).
+    /// Solos a channel (mutes all others). Consult the module-level documentation for the broader usage context and preconditions.
     ///
     /// # Parameters
     /// - `ch` — `usize`.
@@ -488,7 +515,7 @@ impl MidiPlayer {
         }
     }
 
-    /// Un-solos all channels (unmutes all).
+    /// Un-solos all channels (unmutes all). Consult the module-level documentation for the broader usage context and preconditions.
     pub fn unsolo_all(&mut self) {
         self.channel_muted = [false; 16];
     }
@@ -553,7 +580,7 @@ impl MidiPlayer {
         self.bus_key = key;
     }
 
-    /// Returns the audio bus key, if assigned.
+    /// Returns the audio bus key, if assigned. Consult the module-level documentation for the broader usage context and preconditions.
     ///
     /// # Returns
     /// `Option<BusKey>`.
@@ -561,7 +588,7 @@ impl MidiPlayer {
         self.bus_key
     }
 
-    /// Returns the current playback state.
+    /// Returns the current playback state. Consult the module-level documentation for the broader usage context and preconditions.
     ///
     /// # Returns
     /// `PlayState`.

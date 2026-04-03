@@ -1,331 +1,264 @@
-#!/usr/bin/env python3
+﻿#!/usr/bin/env python3
 """
-gen_docs_lua.py — Generate compact Lua API developer reference from docs/api_data.json.
+gen_docs_lua.py -- Generate Lua API reference from docs/API/api_data.json.
 
-Reads the master data file produced by gen_api_data.py and writes a compact
-Markdown reference for Luna2D Lua scripting. Covers all modules, classes, and
-their functions/methods with signatures, descriptions, and parameter tables.
+Each function/method is rendered in a Lua code block:
+    name( param : type, optional : type? ) -> ReturnType  -- description
 
 Usage:
-    python tools/gen_docs_lua.py                   # -> docs/lua-api.md
-    python tools/gen_docs_lua.py --output FILE     # custom output path
-    python tools/gen_docs_lua.py --input FILE      # custom input path
-    python tools/gen_docs_lua.py --check           # coverage report only (exit 1 if <80%)
-
-Exit codes:
-    0 — success
-    1 — coverage below threshold (--check) or fatal error
+    python tools/gen_docs_lua.py                   # -> docs/API/lua-api.md
+    python tools/gen_docs_lua.py --output FILE
+    python tools/gen_docs_lua.py --check           # coverage check only
 """
-
-import argparse
-import json
-import re
-import sys
+import argparse, json, re, sys
 from pathlib import Path
 
 WORKSPACE_ROOT = Path(__file__).resolve().parent.parent
-INPUT_FILE = WORKSPACE_ROOT / "docs" / "api_data.json"
-OUTPUT_FILE = WORKSPACE_ROOT / "docs" / "lua-api.md"
+INPUT_FILE  = WORKSPACE_ROOT / "docs" / "API" / "api_data.json"
+OUTPUT_FILE = WORKSPACE_ROOT / "docs" / "API" / "lua-api.md"
 
-# Canonical module display order (matches existing convention in gen_lua_api.py)
 _MODULE_ORDER = [
-    "graphics", "graphics_ext", "window", "input",
-    "timer", "math", "math_ext",
-    "audio", "physics", "filesystem", "particle",
-    "event", "system", "thread",
-    "ai", "compute", "dataframe",
-    "data", "image", "sound", "graph", "tilemap",
-    "dialog", "entity", "scene", "pathfinding", "postfx",
-    "minimap", "savegame", "modding", "localization",
-    "stats", "inventory", "crafting", "cardgame", "combat",
-    "log", "debug",
+    "graphics","graphics_ext","window","input","timer","math","math_ext",
+    "audio","physics","filesystem","particle","event","system","thread",
+    "ai","compute","dataframe","data","image","sound","graph","tilemap",
+    "dialog","entity","scene","pathfinding","postfx",
+    "minimap","savegame","modding","localization",
+    "stats","inventory","crafting","cardgame","combat",
+    "log","debug","battle","debugbridge","docs","item","patterns","quest","resource",
 ]
 
 
-# ── Return type extraction ─────────────────────────────────────────────────────
+def _parse_params(params_doc, inferred_sig):
+    """Return list of (name, type, is_optional) from params_doc + inferred_sig."""
+    sig_inner = re.sub(r"^\(|\)$", "", (inferred_sig or "").strip())
+    sig_parts = []
+    for token in re.split(r",\s*", sig_inner):
+        token = token.strip()
+        if not token:
+            continue
+        is_opt = token.startswith("[") or token.endswith("]")
+        sig_parts.append((token.strip("[] "), is_opt))
 
-def _extract_return_type(returns_doc: str) -> str:
-    """Extract the bare type name from a # Returns section."""
+    type_map = {}
+    for line in (params_doc or "").split("\n"):
+        # Only extract type when it is explicitly backtick-enclosed: `name` — `Type`: desc
+        m = re.match(r"\s*-\s*`?([a-zA-Z_]\w*)`?\s*[\u2014\u2013-]+\s*`([A-Za-z][A-Za-z0-9_?]*)`", line)
+        if m:
+            type_map[m.group(1)] = m.group(2).rstrip("?")
+
+    return [(n, type_map.get(n, ""), o) for n, o in sig_parts]
+
+
+def _parse_return_type(returns_doc):
+    """Extract return type from returns_doc.
+
+    Only returns a type when it is clearly a type name, not prose.
+    Priority: backtick-enclosed type at start (`Type` -- ...) or `Type: description`.
+    """
     if not returns_doc:
         return ""
-    first_line = returns_doc.strip().split("\n")[0].strip().lstrip("- ").strip()
-    # Match: "TypeName — description" or "TypeName: description" or just "TypeName"
-    m = re.match(r"^([A-Za-z][A-Za-z0-9_?*]*)(?:\s|$|[—–:-])", first_line)
+    first = returns_doc.strip().split("\n")[0].strip()
+
+    # Pattern 1: starts with backtick-type: `Type` or `Type` -- desc
+    m = re.match(r"`([A-Za-z][A-Za-z0-9_?]*)`", first)
     if m:
         t = m.group(1)
-        # Skip common non-type words
-        if t.lower() not in ("the", "a", "an", "this", "true", "false", "nil", "none"):
+        # Exclude prose words and Lua primitives that are usually values, not types
+        if t.lower() not in ("the","a","an","this","true","false","nil","none","it"):
             return t
+
+    # Pattern 2: CamelCase type name at start: TypeName -- desc or TypeName: ...
+    m = re.match(r"^([A-Z][A-Za-z0-9]+)(?:\s*[\u2014\u2013:-]|\s*$)", first)
+    if m:
+        t = m.group(1)
+        # Must look like a type (CamelCase or known primitives), not a sentence start
+        return t
+
     return ""
 
 
-def _fmt_sig(fn: dict) -> str:
-    """Build a Lua call signature string for a function entry."""
-    sig = fn.get("inferred_sig") or ""
-    # If we have a params_doc, try to rebuild nicer typed params
-    params_doc = fn.get("params_doc", "")
-    if params_doc:
-        # Parse "- name — type: desc" lines
-        typed_params = []
-        for line in params_doc.split("\n"):
-            line = line.strip().lstrip("- ").strip()
-            # Match: `name` — type or name — type
-            m = re.match(r"`?([a-zA-Z_]\w*)`?\s*[—–-]+\s*([A-Za-z][A-Za-z0-9_?]*)", line)
-            if m:
-                pname = m.group(1)
-                ptype = m.group(2)
-                # Optional param wrapped in []
-                if "[" in line[:line.find(m.group(1))] or ptype.endswith("?"):
-                    typed_params.append(f"[{pname}: {ptype.rstrip('?')}]")
-                else:
-                    typed_params.append(f"{pname}: {ptype}")
-        if typed_params:
-            return "( " + ", ".join(typed_params) + " )"
-    # Fall back to inferred_sig
-    if sig and sig != "()":
-        inner = sig.strip("()")
-        if inner:
-            return "( " + inner + " )"
-    return "()"
+def _build_call(fn, prefix):
+    """Return (call_str, desc) for one function/method entry."""
+    desc = (fn.get("description", "") or "").rstrip(".")
 
-
-# ── Rendering helpers ──────────────────────────────────────────────────────────
-
-def _render_fn_row(fn: dict, call_prefix: str) -> str:
-    """Render a single function/method as a compact table row."""
-    name = fn["name"]
-    sig = _fmt_sig(fn)
-    ret = _extract_return_type(fn.get("returns_doc", ""))
-    desc = fn.get("description", "") or "*(undocumented)*"
-    # Truncate desc to ~90 chars for table
-    if len(desc) > 90:
-        desc = desc[:87] + "..."
-    ret_col = f"`{ret}`" if ret else ""
-    call = f"`{call_prefix}.{name}{sig}`"
-    return f"| {call} | {ret_col} | {desc} |"
-
-
-def _render_method_row(fn: dict, class_name: str) -> str:
-    """Render a method as a compact table row."""
-    name = fn["name"]
-    sig = _fmt_sig(fn)
-    ret = _extract_return_type(fn.get("returns_doc", ""))
-    desc = fn.get("description", "") or "*(undocumented)*"
-    if len(desc) > 90:
-        desc = desc[:87] + "..."
-    ret_col = f"`{ret}`" if ret else ""
-    call = f"`{class_name}:{name}{sig}`"
-    return f"| {call} | {ret_col} | {desc} |"
-
-
-def _render_fn_detail(fn: dict, call_expr: str) -> list:
-    """Render a full detail block for a function (used in expandable sections)."""
-    lines = []
-    desc = fn.get("description", "")
-    full_doc = fn.get("full_doc", "")
-    params_doc = fn.get("params_doc", "")
-    returns_doc = fn.get("returns_doc", "")
-
-    lines.append(f"#### `{call_expr}`")
-    lines.append("")
-    if desc:
-        lines.append(desc)
-        # Additional paragraphs
-        if full_doc and "\n" in full_doc:
-            extra = full_doc[len(desc):].strip()
-            # Remove section headers (# Parameters, # Returns) — rendered below
-            extra = re.sub(r"\n#[^#].*", "", extra).strip()
-            if extra:
-                lines.append("")
-                lines.append(extra)
+    # Prefer explicitly typed params from @param docstring tags
+    typed = fn.get("typed_params")  # None = field absent (old data), [] = no params
+    if typed is not None:
+        parts = []
+        for item in typed:
+            name, lua_type = item[0], item[1]
+            part = f"{name} : {lua_type}" if lua_type else name
+            parts.append(part)
+        args = "( " + ", ".join(parts) + " )" if parts else "()"
     else:
-        lines.append("*(undocumented)*")
-    lines.append("")
+        # Legacy fallback: use inferred_sig param names + params_doc types
+        params = _parse_params(fn.get("params_doc", ""), fn.get("inferred_sig", "()"))
+        parts = []
+        for name, typ, is_opt in params:
+            part = f"{name} : {typ}" if typ else name
+            parts.append(part)
+        args = "( " + ", ".join(parts) + " )" if parts else "()"
 
-    if params_doc:
-        lines.append("**Parameters:**")
-        lines.append("")
-        for pl in params_doc.split("\n"):
-            if pl.strip():
-                lines.append(pl.strip())
-        lines.append("")
+    # Return type: prefer inferred_return, fall back to returns_doc
+    ret = fn.get("inferred_return") or _parse_return_type(fn.get("returns_doc", ""))
 
-    if returns_doc:
-        ret_type = _extract_return_type(returns_doc)
-        first_line = returns_doc.strip().split("\n")[0].strip()
-        if ret_type:
-            lines.append(f"**Returns:** `{ret_type}` — {first_line}")
+    call = f"{prefix}{args}"
+    if ret:
+        call += f" -> {ret}"
+    return call, desc
+
+
+def _code_block(entries):
+    """entries = [(call_str, desc)] -> ```lua ... ``` lines."""
+    if not entries:
+        return []
+    lines = []
+    for call, desc in entries:
+        if desc:
+            lines.append(f"{call}  -- {desc}")
         else:
-            lines.append(f"**Returns:** {first_line}")
-        lines.append("")
-
-    return lines
+            lines.append(call)
+    return ["```lua"] + lines + ["```"]
 
 
-def render_module(mod_name: str, mod_data: dict, detail: bool = False) -> list:
-    """Render one module section including any classes."""
+def _callbacks():
+    CB = [
+        ("function luna.load()",                                                   "Called once after the script is loaded."),
+        ("function luna.update( dt : number )",                                    "Called every frame; dt = elapsed seconds."),
+        ("function luna.draw()",                                                   "Called every frame for rendering."),
+        ("function luna.keypressed( key : string, scancode : string, isrepeat : boolean )", "Key press event."),
+        ("function luna.keyreleased( key : string, scancode : string )",           "Key release event."),
+        ("function luna.textinput( text : string )",                               "Unicode character typed."),
+        ("function luna.mousepressed( x : number, y : number, button : number )", "Mouse button press."),
+        ("function luna.mousereleased( x : number, y : number, button : number )","Mouse button release."),
+        ("function luna.wheelmoved( x : number, y : number )",                    "Mouse wheel scroll."),
+        ("function luna.gamepadpressed( id : number, button : string )",          "Gamepad button press."),
+        ("function luna.gamepadreleased( id : number, button : string )",         "Gamepad button release."),
+        ("function luna.gamepadaxis( id : number, axis : string, value : number )","Gamepad axis; value in -1..1."),
+        ("function luna.joystickadded( id : number )",                            "Gamepad connected."),
+        ("function luna.joystickremoved( id : number )",                          "Gamepad disconnected."),
+        ("function luna.touchpressed( id, x : number, y : number, dx : number, dy : number, pressure : number )", "Touch begin."),
+        ("function luna.touchmoved(  id, x : number, y : number, dx : number, dy : number, pressure : number )", "Touch move."),
+        ("function luna.touchreleased(id, x : number, y : number, dx : number, dy : number, pressure : number )", "Touch end."),
+        ("function luna.focus( focused : boolean )",                              "Window focus change."),
+        ("function luna.visible( visible : boolean )",                            "Window show/hide."),
+        ("function luna.resize( w : number, h : number )",                        "Window resized."),
+        ("function luna.quit()",                                                   "Return true to cancel quit."),
+        ("function luna.errorhandler( msg : string )",                            "Unhandled Lua error."),
+    ]
+    out = ["## Callbacks","",
+           "All callbacks are optional. Define any in `main.lua` and the engine calls them automatically.",
+           ""]
+    return out + _code_block(CB)
+
+
+def _render_module(mod_name, mod_data):
     out = []
-    anchor = mod_name.replace("_", "-")
+    anchor = mod_name.replace("_","-")
     out.append(f"## `luna.{mod_name}` {{#{anchor}}}")
     out.append("")
-
-    desc = mod_data.get("description", "")
+    desc = (mod_data.get("description","") or "").strip()
     if desc:
-        first_line = desc.split("\n")[0]
-        out.append(f"> {first_line}")
+        for i, para in enumerate(desc.split("\n\n")[:2]):
+            if i: out.append(">")
+            for line in para.strip().splitlines():
+                out.append(f"> {line}" if line.strip() else ">")
         out.append("")
 
-    fn_list = mod_data.get("functions", [])
-    classes = mod_data.get("classes", {})
+    fns = mod_data.get("functions",[])
+    cls = mod_data.get("classes",{})
 
-    if fn_list:
-        out.append("### Module functions")
-        out.append("")
-        out.append("| Function | Returns | Description |")
-        out.append("|----------|---------|-------------|")
-        for fn in sorted(fn_list, key=lambda f: f["name"]):
-            out.append(_render_fn_row(fn, f"luna.{mod_name}"))
+    if fns:
+        entries = [_build_call(fn, f"luna.{mod_name}.{fn['name']}") for fn in sorted(fns, key=lambda f:f["name"])]
+        out += _code_block(entries)
         out.append("")
 
-    for cls_name, cls_data in sorted(classes.items()):
-        out.append(f"### `{cls_name}` methods")
+    for cls_name, cls_data in sorted(cls.items()):
+        out.append(f"### `{cls_name}`")
         out.append("")
-        cls_desc = cls_data.get("description", "")
-        if cls_desc:
-            out.append(f"> {cls_desc.split(chr(10))[0]}")
-            out.append("")
-        methods = cls_data.get("methods", [])
+        cd = (cls_data.get("description", "") or "").strip()
+        if cd:
+            # Show first sentence of the class description
+            first_line = cd.split("\n")[0].strip()
+            # Clean up "Lua-facing `X` userdata" boilerplate to something readable
+            first_line = re.sub(r"Lua-facing `[^`]+` userdata[., ]*", "", first_line).strip()
+            if first_line:
+                out.append(first_line)
+                out.append("")
+            else:
+                # Keep original if stripping left nothing useful
+                out.append(cd.split("\n")[0].strip())
+                out.append("")
+        methods = cls_data.get("methods",[])
         if methods:
-            out.append("| Method | Returns | Description |")
-            out.append("|--------|---------|-------------|")
-            for fn in sorted(methods, key=lambda f: f["name"]):
-                out.append(_render_method_row(fn, cls_name))
+            entries = [_build_call(m, f"{cls_name}:{m['name']}") for m in sorted(methods, key=lambda f:f["name"])]
+            out += _code_block(entries)
             out.append("")
-
     return out
 
 
-def generate_lua_docs(data: dict) -> str:
-    """Generate the full compact Lua API Markdown document."""
-    lua_api = data["lua_api"]
-    modules = lua_api["modules"]
-    s = lua_api["summary"]
-    generated = data["meta"]["generated"][:10]
-    version = data["meta"]["version"]
+def generate(data):
+    mods = data["lua_api"]["modules"]
+    s    = data["lua_api"]["summary"]
+    gen  = data["meta"]["generated"][:10]
+    ver  = data["meta"]["version"]
+
+    seen, ordered = set(), []
+    for m in _MODULE_ORDER:
+        if m in mods: seen.add(m); ordered.append(m)
+    for m in sorted(mods):
+        if m not in seen: ordered.append(m)
 
     out = []
-    out.append("# Luna2D Lua API Reference")
-    out.append("")
-    out.append(
-        f"> Auto-generated by `tools/gen_docs_lua.py` from `docs/api_data.json`."
-    )
-    out.append(f"> Source: `tools/gen_api_data.py` | Version: `{version}` | Generated: {generated}")
-    out.append(
-        f"> **Coverage:** {s['documented']}/{s['total_functions']} functions documented ({s['coverage_pct']}%)"
-    )
-    out.append("")
+    out += ["# Luna2D Lua API Reference","",
+            f"*Auto-generated by `tools/gen_docs_lua.py`. Version: `{ver}` | Generated: {gen}*",
+            f"*Coverage: {s['documented']}/{s['total_functions']} functions documented ({s['coverage_pct']}%)*",
+            "","---","","## Contents",""]
 
-    # Table of Contents
-    out.append("## Contents")
-    out.append("")
-    out.append("| Module | Fn | Classes | Link |")
-    out.append("|--------|----|---------|------|")
+    for m in ordered:
+        anchor = m.replace("_","-")
+        n_fns = len(mods[m].get("functions",[]))
+        n_cls = len(mods[m].get("classes",{}))
+        parts = ([f"{n_fns} fn"] if n_fns else []) + ([f"{n_cls} class{'es' if n_cls!=1 else ''}"] if n_cls else [])
+        suffix = " \u2014 " + ", ".join(parts) if parts else ""
+        out.append(f"- [`luna.{m}`](#{anchor}){suffix}")
 
-    seen: set = set()
-    ordered: list = []
-    for mod in _MODULE_ORDER:
-        if mod in modules:
-            seen.add(mod)
-            ordered.append(mod)
-    for mod in sorted(modules.keys()):
-        if mod not in seen:
-            ordered.append(mod)
+    out += ["","---",""]
+    out += _callbacks()
+    out += ["","---",""]
 
-    for mod in ordered:
-        mod_data = modules[mod]
-        n_fns = len(mod_data.get("functions", []))
-        n_classes = len(mod_data.get("classes", {}))
-        anchor = mod.replace("_", "-")
-        out.append(f"| `luna.{mod}` | {n_fns} | {n_classes} | [#{anchor}](#{anchor}) |")
-    out.append("")
+    for m in ordered:
+        out += _render_module(m, mods[m])
+        out += ["---",""]
 
-    # Callbacks section
-    out.append("## Callbacks")
-    out.append("")
-    out.append(
-        "Define any of these functions in `main.lua`. All are optional — "
-        "the engine calls them automatically."
-    )
-    out.append("")
-    out.append("| Callback | Parameters | Description |")
-    out.append("|----------|------------|-------------|")
-    out.append("| `luna.load()` | — | Called once after script is loaded |")
-    out.append("| `luna.update(dt)` | `dt: number` | Called every frame; dt = elapsed seconds |")
-    out.append("| `luna.draw()` | — | Called every frame for rendering |")
-    out.append("| `luna.keypressed(key, scancode, isrepeat)` | `key: string` | Key press event |")
-    out.append("| `luna.keyreleased(key, scancode)` | `key: string` | Key release event |")
-    out.append("| `luna.textinput(text)` | `text: string` | Unicode character typed |")
-    out.append("| `luna.mousepressed(x, y, button)` | `button: 1/2/3` | Mouse button press |")
-    out.append("| `luna.mousereleased(x, y, button)` | `button: number` | Mouse button release |")
-    out.append("| `luna.wheelmoved(x, y)` | scroll delta | Mouse wheel |")
-    out.append("| `luna.gamepadpressed(id, button)` | `id: number` | Gamepad button press |")
-    out.append("| `luna.gamepadreleased(id, button)` | `id: number` | Gamepad button release |")
-    out.append("| `luna.gamepadaxis(id, axis, value)` | `value: -1..1` | Gamepad axis |")
-    out.append("| `luna.joystickadded(id)` | `id: number` | Gamepad connected |")
-    out.append("| `luna.joystickremoved(id)` | `id: number` | Gamepad disconnected |")
-    out.append("| `luna.touchpressed(id, x, y, dx, dy, pressure)` | — | Touch begin |")
-    out.append("| `luna.touchmoved(id, x, y, dx, dy, pressure)` | — | Touch move |")
-    out.append("| `luna.touchreleased(id, x, y, dx, dy, pressure)` | — | Touch end |")
-    out.append("| `luna.focus(focused)` | `focused: bool` | Window focus change |")
-    out.append("| `luna.visible(visible)` | `visible: bool` | Window show/hide |")
-    out.append("| `luna.resize(w, h)` | `w, h: number` | Window resized |")
-    out.append("| `luna.quit()` | — | Return `true` to cancel quit |")
-    out.append("| `luna.errorhandler(msg)` | `msg: string` | Unhandled Lua error |")
-    out.append("")
-
-    # Per-module sections
-    for mod in ordered:
-        section = render_module(mod, modules[mod])
-        out.extend(section)
-
-    out.append("")
-    out.append("---")
-    out.append(f"*Generated by `tools/gen_docs_lua.py`. Do not edit by hand.*")
-
+    out.append("*Generated by `tools/gen_docs_lua.py`. Do not edit by hand.*")
     return "\n".join(out)
 
 
-def main() -> int:
-    parser = argparse.ArgumentParser(description="Generate Luna2D compact Lua API docs.")
-    parser.add_argument("--input", default=str(INPUT_FILE), help="Input api_data.json path")
-    parser.add_argument("--output", default=str(OUTPUT_FILE), help="Output .md path")
-    parser.add_argument(
-        "--check", action="store_true", help="Coverage check only (exit 1 if <80%%)"
-    )
-    args = parser.parse_args()
+def main():
+    p = argparse.ArgumentParser()
+    p.add_argument("--input",  default=str(INPUT_FILE))
+    p.add_argument("--output", default=str(OUTPUT_FILE))
+    p.add_argument("--check",  action="store_true")
+    args = p.parse_args()
 
-    input_path = Path(args.input)
-    if not input_path.exists():
-        print(f"[ERROR] Input file not found: {input_path}", file=sys.stderr)
-        print("Run 'python tools/gen_api_data.py' first.", file=sys.stderr)
+    inp = Path(args.input)
+    if not inp.exists():
+        print(f"[ERROR] Not found: {inp}\nRun python tools/gen_api_data.py first.", file=sys.stderr)
         return 1
 
-    data = json.loads(input_path.read_text(encoding="utf-8"))
+    data = json.loads(inp.read_text(encoding="utf-8"))
 
     if args.check:
         s = data["lua_api"]["summary"]
-        pct = s["coverage_pct"]
-        print(f"Lua API coverage: {s['documented']}/{s['total_functions']} ({pct}%)")
-        return 0 if pct >= 80 else 1
+        print(f"Coverage: {s['documented']}/{s['total_functions']} ({s['coverage_pct']}%)")
+        return 0 if s["coverage_pct"] >= 80 else 1
 
-    output_path = Path(args.output)
-    output_path.parent.mkdir(parents=True, exist_ok=True)
-
-    content = generate_lua_docs(data)
-    output_path.write_text(content, encoding="utf-8")
-
-    lines = content.count("\n")
-    print(f"[OK] Generated {output_path} ({lines} lines)")
+    out = Path(args.output)
+    out.parent.mkdir(parents=True, exist_ok=True)
+    content = generate(data)
+    out.write_text(content, encoding="utf-8")
+    print(f"[OK] Generated {out} ({content.count(chr(10))} lines)")
     return 0
 
 

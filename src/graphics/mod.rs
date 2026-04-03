@@ -1,3 +1,11 @@
+//! Mod implementation for the `graphics` subsystem.
+//!
+//! This module is part of Luna2D's `graphics` subsystem and provides the implementation
+//! details for mod-related operations and data management.
+//!
+//! All public items are documented. See the parent module for architectural context
+//! and the `luna.*` Lua API for the scripting interface.
+//!
 /// Sprite-sheet frame animation with configurable durations and looping.
 pub mod animation;
 /// 2D camera with position, zoom, and rotation producing a view matrix.
@@ -22,16 +30,12 @@ pub mod large_map_renderer;
 pub mod light2d;
 /// Custom geometry mesh with per-vertex position, UV, and color data.
 pub mod mesh;
-/// Grid-based minimap with terrain, fog of war, objects, pings, and markers.
-pub mod minimap;
 /// Nine-slice (9-patch) image rendering for scalable UI elements.
 pub mod nine_slice;
 /// Color palette lookup table for shader-based palette swapping.
 pub mod palette_lut;
 /// Polygon map renderer with region management and hit detection.
 pub mod polygon_map;
-/// Stackable post-processing effects pipeline (bloom, blur, CRT, vignette, etc.).
-pub mod postfx;
 /// DrawCommand queue, draw enums, and texture data types.
 pub mod renderer;
 /// Custom WGSL shader support with uniform variables.
@@ -67,11 +71,9 @@ pub use gpu_renderer::GpuRenderer;
 pub use large_map_renderer::LargeMapRenderer;
 pub use light2d::Light2D;
 pub use mesh::{Mesh, MeshDrawMode, MeshVertex};
-pub use minimap::{ColorMode, FogLevel, Minimap};
 pub use nine_slice::{NineSlice, Patch};
 pub use palette_lut::PaletteLUT;
 pub use polygon_map::PolygonMap;
-pub use postfx::{PostFxEffect, PostFxEffectType, PostFxStack};
 pub use renderer::{
     BlendMode, CompareMode, DrawCommand, DrawMode, StencilAction, TextAlign, TextureData,
 };

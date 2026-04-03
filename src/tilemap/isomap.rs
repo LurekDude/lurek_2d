@@ -48,7 +48,7 @@ impl IsoTilePart {
         }
     }
 
-    /// Returns the 0-based index of this part.
+    /// Returns the 0-based index of this part. Consult the module-level documentation for the broader usage context and preconditions.
     ///
     /// # Returns
     /// `u32`.
@@ -233,7 +233,7 @@ pub struct IsoMap {
 }
 
 impl IsoMap {
-    /// Creates an [`IsoMap`] with no levels.
+    /// Creates an [`IsoMap`] with no levels. Returns a fully initialised instance with all fields set to their initial values.
     ///
     /// # Parameters
     /// - `width` — `u32`.

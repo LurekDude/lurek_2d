@@ -20,30 +20,44 @@
 //!
 //! | Module | Purpose |
 //! |---|---|
-//! | [`ai`] | FSM, behaviour trees, steering, pathfinding, Q-learning, influence maps |
+//! | [`ai`] | FSM, behaviour trees, GOAP, Q-learning, influence maps, steering, squads |
 //! | [`audio`] | Sound playback via rodio, bus routing, MIDI synthesis |
+//! | [`battle`] | Turn-based battle engine: combatants, actions, statuses, turn order |
+//! | [`cardgame`] | Card game backend: cards, decks (stacks), zones, card pools, history |
+//! | [`combat`] | Vehicle combat: chassis, turrets, weapons, projectiles |
 //! | [`compute`] | N-dimensional numerical arrays (luna.compute) |
+//! | [`crafting`] | Recipe-based crafting queues and upgrade trees |
 //! | [`data`] | Binary data, compression, hashing, base64/hex encoding |
 //! | [`dataframe`] | In-memory column-major tabular data |
-//! | [`engine`] | App lifecycle, Config, EngineError, debug overlay |
-//! | [`entity`] | Lightweight ECS with ID recycling, tags, blueprints, systems |
+//! | [`dialog`] | Dialogue sequencer for branching narrative with typewriter effect |
+//! | [`economy`] | Named resource economy: capacity, flow rates, decay, and reservations |
+//! | [`engine`] | App lifecycle, Config, EngineError, SharedState, debug overlay |
+//! | [`entity`] | Lightweight ECS with ID recycling, bitmap tags, blueprints, systems |
 //! | [`event`] | Event queue for polling and custom events |
 //! | [`filesystem`] | Sandboxed game filesystem (GameFS) |
-//! | [`graph`] | Directed graph with item-flow simulation and pathfinding |
+//! | [`graph`] | Directed graph with item-flow simulation and Dijkstra |
 //! | [`graphics`] | GPU rendering pipeline via wgpu, draw commands, fonts |
 //! | [`image`] | CPU-side RGBA8 pixel buffer for image manipulation |
 //! | [`input`] | Keyboard, mouse, gamepad, and touch input state |
+//! | [`inventory`] | Inventory slots, stacking, weight limits, equip slots |
+//! | [`item`] | Item definitions, attributes, and loot-table rarity |
 //! | [`lua_api`] | Lua VM creation and all `luna.*` API bindings |
-//! | [`math`] | Vec2, Mat3, Rect, polygon utilities, pathfinding, raycasting |
+//! | [`math`] | Vec2, Mat3, Rect, polygon utilities, easing, noise |
+//! | [`minimap`] | Minimap content extraction and FOV mask rendering |
 //! | [`modding`] | Mod metadata, dependency resolution, and hook dispatch |
 //! | [`particle`] | Emitter-based 2D particle effects |
+//! | [`pathfinding`] | Grid pathfinding: A★, HPA★, flow fields, NavGrid |
 //! | [`physics`] | Rigid bodies, AABB/circle collision, sensors, layer filtering |
+//! | [`postfx`] | Post-processing effects data model: bloom, blur, color grading |
+//! | [`province_map`] | Province/territory spatial data from colour-coded PNG images |
+//! | [`quest`] | Quest tracking, objectives, branching completion states |
 //! | [`savegame`] | Slot-based save/load with schema versioning and auto-save |
 //! | [`scene`] | Scene stack, depth-sorted rendering, visual transitions |
-//! | [`sound`] | Decoded PCM audio sample buffers |
+//! | [`stats`] | Character attributes, derived stats, and buff modifiers |
 //! | [`tilemap`] | TileSet, TileMap, autotile, coordinate utilities, map generation |
-//! | [`timer`] | Frame delta-time clock and scheduler |
-//! | [`window`] | winit event-loop wrapper |
+//! | [`timer`] | Frame delta-time clock, `Clock::tick()`, and scheduled callbacks |
+//! | [`thread`] | Background Rust worker threads and `Channel` inter-thread communication |
+//! | [`window`] | winit event-loop wrapper and window state |
 
 // Lua API files use `///` doc comments inside function bodies to document Lua-exposed
 // bindings at their call site; these are intentional inline docs, not misplaced rustdoc.
@@ -56,7 +70,11 @@
 pub mod ai;
 /// Audio playback system backed by rodio.
 pub mod audio;
-/// Turn-based combat engine: battles, combatants, abilities, statuses.
+/// Card game backend engine: Card, Deck (Stack), DeckBuilder, Zone (StackManager), CardPool, Slot, StackHistory.
+pub mod cardgame;
+/// Turn-based battle engine: battles, combatants, abilities, and statuses.
+pub mod battle;
+/// Vehicle combat engine: chassis, turrets, weapons, projectiles, and collision groups.
 pub mod combat;
 /// Dense N-dimensional numerical arrays (luna.compute).
 pub mod compute;
@@ -96,6 +114,11 @@ pub mod math;
 pub mod modding;
 /// Emitter-based 2D particle effects.
 pub mod particle;
+/// Minimap content extraction, FOV mask, and tile sampling.
+pub mod minimap;
+/// Post-processing effects data model: bloom, blur, color grading, screen-space shaders.
+pub mod postfx;
+/// Grid pathfinding: A★, HPA★, flow fields, and NavGrid unit-size navigation.
 pub mod pathfinding;
 /// Physics simulation with rigid bodies (rect and circle shapes), collision events, sensors, and layer filtering.
 pub mod physics;
@@ -103,18 +126,19 @@ pub mod physics;
 pub mod province_map;
 /// Quest tracking: stages, objectives, quest log.
 pub mod quest;
-/// Numeric resource management: current/max pools with delta tracking.
-pub mod resource;
+/// Named resource economy: capacity, flow rates, decay, interest, reservations, and overflow policies.
+pub mod economy;
 /// Slot-based save/load system with collectors, schema versioning, and auto-save.
 pub mod savegame;
 /// Scene stack for managing game scene lifecycle, transitions, and depth-sorted rendering.
 pub mod scene;
 /// Character attribute and buff system.
 pub mod stats;
-/// Frame timing and delta-time clock.
+/// Background Rust worker threads and `Channel` inter-thread communication.
 pub mod thread;
 /// Tilemap engine: TileSet, TileMap, autotile, coords, and procedural generation.
 pub mod tilemap;
+/// Frame delta-time clock, `Clock::tick()`, and scheduled callbacks.
 pub mod timer;
 /// Window event loop placeholder.
 pub mod window;

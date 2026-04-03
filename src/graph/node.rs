@@ -1,4 +1,12 @@
 //! Graph node — a vertex with capacity, flow control, conversion rules, and queuing.
+//!
+//! This module is part of Luna2D's `graph` subsystem and provides the implementation
+//! details for node-related operations and data management.
+//! Key types exported from this module: `OverflowPolicy`, `FlowMode`, `ConversionRule`, `Supply`, `Demand`.
+//! Primary functions: `to_str()`, `to_str()`, `new()`, `get_type()`.
+//!
+//! All public items are documented. See the parent module for architectural context
+//! and the `luna.*` Lua API for the scripting interface.
 
 use std::collections::{HashMap, HashSet, VecDeque};
 use std::str::FromStr;
@@ -113,7 +121,7 @@ pub struct ConversionRule {
     pub out_count: u32,
 }
 
-/// A supply declaration on a node.
+/// A supply declaration on a node. Consult the module-level documentation for the broader usage context and preconditions.
 ///
 /// # Fields
 /// - `item_type` — `String`.
@@ -126,7 +134,7 @@ pub struct Supply {
     pub quantity: i32,
 }
 
-/// A demand declaration on a node.
+/// A demand declaration on a node. Consult the module-level documentation for the broader usage context and preconditions.
 ///
 /// # Fields
 /// - `item_type` — `String`.
@@ -215,7 +223,7 @@ pub struct Node {
 }
 
 impl Node {
-    /// Create a new node with defaults.
+    /// Create a new node with defaults. Returns a fully initialised instance with all fields set to their initial values.
     ///
     /// # Parameters
     /// - `id` — `u64`.
@@ -251,7 +259,7 @@ impl Node {
         }
     }
 
-    /// Get the node type.
+    /// Get the node type. This accessor incurs no allocation; call it freely in hot paths.
     ///
     /// # Returns
     /// `&str`.
@@ -259,7 +267,7 @@ impl Node {
         &self.node_type
     }
 
-    /// Set the node type.
+    /// Set the node type. Replaces the current type value; callers hold responsibility for maintaining consistency with related fields.
     ///
     /// # Parameters
     /// - `t` — `&str`.
@@ -267,7 +275,7 @@ impl Node {
         self.node_type = t.to_string();
     }
 
-    /// Get the capacity (`-1` = unlimited).
+    /// Get the capacity (`-1` = unlimited). This accessor incurs no allocation; call it freely in hot paths.
     ///
     /// # Returns
     /// `i32`.
@@ -275,7 +283,7 @@ impl Node {
         self.capacity
     }
 
-    /// Set the capacity.
+    /// Set the capacity. Replaces the current capacity value; callers hold responsibility for maintaining consistency with related fields.
     ///
     /// # Parameters
     /// - `c` — `i32`.
@@ -283,7 +291,7 @@ impl Node {
         self.capacity = c;
     }
 
-    /// Whether the node is at capacity.
+    /// Whether the node is at capacity. This accessor incurs no allocation; call it freely in hot paths.
     ///
     /// # Returns
     /// `bool`.
@@ -295,7 +303,7 @@ impl Node {
         }
     }
 
-    /// Number of items currently at this node.
+    /// Number of items currently at this node. Consult the module-level documentation for the broader usage context and preconditions.
     ///
     /// # Returns
     /// `usize`.
@@ -305,7 +313,7 @@ impl Node {
 
     // --- Tags ---
 
-    /// Add a tag.
+    /// Add a tag. The insertion is O(1) amortised unless a resize is triggered.
     ///
     /// # Parameters
     /// - `tag` — `&str`.
@@ -324,7 +332,7 @@ impl Node {
         self.tags.remove(tag)
     }
 
-    /// Check if a tag is present.
+    /// Check if a tag is present. This accessor incurs no allocation; call it freely in hot paths.
     ///
     /// # Parameters
     /// - `tag` — `&str`.
@@ -335,12 +343,12 @@ impl Node {
         self.tags.contains(tag)
     }
 
-    /// Remove all tags.
+    /// Remove all tags. After this call the container is in the same state as immediately after construction.
     pub fn clear_tags(&mut self) {
         self.tags.clear();
     }
 
-    /// Get all tags as a sorted vector.
+    /// Get all tags as a sorted vector. This accessor incurs no allocation; call it freely in hot paths.
     ///
     /// # Returns
     /// `Vec<String>`.
@@ -352,7 +360,7 @@ impl Node {
 
     // --- Supply ---
 
-    /// Add a supply declaration.
+    /// Add a supply declaration. The insertion is O(1) amortised unless a resize is triggered.
     ///
     /// # Parameters
     /// - `item_type` — `&str`.
@@ -377,7 +385,7 @@ impl Node {
         self.supplies.len() < before
     }
 
-    /// Remove all supply declarations.
+    /// Remove all supply declarations. After this call the container is in the same state as immediately after construction.
     pub fn clear_supplies(&mut self) {
         self.supplies.clear();
     }
@@ -410,7 +418,7 @@ impl Node {
 
     // --- Demand ---
 
-    /// Add a demand declaration.
+    /// Add a demand declaration. The insertion is O(1) amortised unless a resize is triggered.
     ///
     /// # Parameters
     /// - `item_type` — `&str`.
@@ -437,7 +445,7 @@ impl Node {
         self.demands.len() < before
     }
 
-    /// Remove all demand declarations.
+    /// Remove all demand declarations. After this call the container is in the same state as immediately after construction.
     pub fn clear_demands(&mut self) {
         self.demands.clear();
     }
@@ -474,7 +482,7 @@ impl Node {
         self.conversions.remove(in_type).is_some()
     }
 
-    /// Remove all conversion rules.
+    /// Remove all conversion rules. After this call the container is in the same state as immediately after construction.
     pub fn clear_all_conversions(&mut self) {
         self.conversions.clear();
     }

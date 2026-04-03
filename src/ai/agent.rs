@@ -1,10 +1,46 @@
 //! Autonomous agent with kinematic state and attached decision subsystems.
+//!
+//! An [`Agent`] is the fundamental unit of AI behavior in Luna2D. Each agent
+//! carries its own position, velocity, kinematic constraints (max speed and force),
+//! and a [`DecisionModel`] that determines which AI subsystems are ticked during
+//! the world's `update(dt)` pass.
+//!
+//! Agents are always owned by an [`AIWorld`](crate::ai::world::AIWorld) and are
+//! created via `AIWorld::add_agent()`. They are never instantiated standalone in
+//! production — the world manages their lifecycle, priority ordering, and
+//! blackboard parent-chain wiring.
+//!
+//! ## Decision Models
+//!
+//! The [`DecisionModel`] enum selects which combination of subsystems the world
+//! ticks for this agent each frame:
+//!
+//! - `Fsm` — only the [`StateMachine`](crate::ai::fsm::StateMachine)
+//! - `Bt` — only the [`BehaviorTree`](crate::ai::behavior_tree::BehaviorTree)
+//! - `Steering` — only the [`SteeringManager`](crate::ai::steering::SteeringManager)
+//! - `FsmSteering` — FSM first, then steering
+//! - `BtSteering` — BT first, then steering
+//!
+//! ## Blackboard Hierarchy
+//!
+//! Each agent has a local [`Blackboard`]. When created via `AIWorld::add_agent()`,
+//! the local blackboard's parent is set to the world's global blackboard, forming
+//! a two-level lookup chain: local → global. Writes always go to the local store;
+//! reads walk the chain until a match is found.
 
 use std::collections::HashSet;
 
 use crate::ai::blackboard::Blackboard;
 
-/// Controls which subsystems are ticked during `AIWorld::update`.
+/// Controls which AI subsystems are ticked for an agent during `AIWorld::update`.
+///
+/// Each variant maps to a specific combination of decision-making subsystems.
+/// The world checks this field to decide whether to tick the agent's FSM,
+/// BehaviorTree, SteeringManager, or a combination thereof. The order matters:
+/// when both FSM/BT and steering are active, the decision layer runs first
+/// (potentially setting steering targets), then steering computes forces.
+///
+/// Lua scripts set this via `agent:setDecisionModel("fsm+steering")` etc.
 ///
 /// # Variants
 /// - `Fsm` — Fsm variant.
@@ -14,20 +50,29 @@ use crate::ai::blackboard::Blackboard;
 /// - `BtSteering` — BtSteering variant.
 #[derive(Debug, Clone, PartialEq)]
 pub enum DecisionModel {
-    /// Ticks StateMachine only.
+    /// Ticks only the attached StateMachine. Transitions are evaluated each frame
+    /// in descending priority order; the first passing guard triggers a state change.
     Fsm,
-    /// Ticks BehaviorTree only.
+    /// Ticks only the attached BehaviorTree. The tree is traversed from root each
+    /// frame, resuming from the last "running" node if applicable.
     Bt,
-    /// Ticks SteeringManager only.
+    /// Ticks only the attached SteeringManager. Behaviors are combined (weighted
+    /// or priority) and the resulting force is applied to velocity.
     Steering,
-    /// Ticks StateMachine first, then SteeringManager.
+    /// Ticks the StateMachine first (which may update steering targets via
+    /// blackboard), then applies the SteeringManager forces.
     FsmSteering,
-    /// Ticks BehaviorTree first, then SteeringManager.
+    /// Ticks the BehaviorTree first (which may update steering targets via
+    /// blackboard), then applies the SteeringManager forces.
     BtSteering,
 }
 
 impl DecisionModel {
-    /// Parses a Lua string to a DecisionModel variant.
+    /// Parses a Lua-side string identifier into the corresponding `DecisionModel`.
+    ///
+    /// Accepted strings: `"fsm"`, `"bt"`, `"steering"`, `"fsm+steering"`, `"bt+steering"`.
+    /// Returns `None` for unrecognized input, allowing the Lua binding to emit
+    /// a descriptive error rather than silently defaulting.
     ///
     /// # Parameters
     /// - `s` — `&str`.
@@ -45,7 +90,10 @@ impl DecisionModel {
         }
     }
 
-    /// Returns the Lua string representation.
+    /// Returns the canonical Lua string identifier for this decision model.
+    ///
+    /// Used when serializing agent state back to Lua or for debugging output.
+    /// Round-trips with [`parse_str`](Self::parse_str).
     ///
     /// # Returns
     /// `&'static str`.
@@ -60,7 +108,23 @@ impl DecisionModel {
     }
 }
 
-/// Autonomous agent with kinematic state and attached decision subsystems.
+/// An autonomous AI agent with kinematic state and pluggable decision subsystems.
+///
+/// Each agent lives inside an [`AIWorld`](crate::ai::world::AIWorld) and carries:
+///
+/// - **Kinematic state**: position, velocity, max_speed, max_force — used by
+///   steering behaviors to compute and clamp movement forces.
+/// - **Decision model**: selects which subsystems (FSM, BT, steering) are ticked.
+/// - **Subsystem indices**: optional indices into the world's FSM/BT/steering
+///   storage arrays, linking this agent to its attached decision-makers.
+/// - **Blackboard**: local key-value store with a parent chain to the world's
+///   global blackboard for hierarchical data lookup.
+/// - **Tags**: string-based labels for group queries and filtering (e.g.,
+///   `"enemy"`, `"flying"`, `"boss"`).
+///
+/// Agents are ticked in descending `priority` order by the world's update loop.
+/// Higher priority agents run first, allowing leaders to update blackboard state
+/// before followers read it.
 ///
 /// # Fields
 /// - `name` — `String`.
@@ -75,47 +139,57 @@ impl DecisionModel {
 /// - `fsm_index` — `Option<usize>`.
 /// - `bt_index` — `Option<usize>`.
 /// - `steering_index` — `Option<usize>`.
-///
-/// Created via `AIWorld::add_agent()`. Carries position, velocity, kinematic
-/// constraints, an optional FSM/BT/SteeringManager, and a local Blackboard.
 pub struct Agent {
-    /// Agent name (unique within its AIWorld).
+    /// Unique name within the owning AIWorld. Used for lookup and Lua API references.
     pub name: String,
-    /// Priority for update ordering (higher = ticked earlier).
+    /// Update priority — agents with higher values are ticked first.
+    /// Useful for ensuring leaders update before squad members.
     pub priority: i32,
-    /// World-space position.
+    /// World-space position as (x, y). Updated by steering forces each frame.
     pub position: (f32, f32),
-    /// Current velocity vector.
+    /// Current velocity vector (vx, vy). Clamped to `max_speed` magnitude.
     pub velocity: (f32, f32),
-    /// Maximum speed magnitude.
+    /// Maximum speed magnitude in world units per second. Steering behaviors
+    /// compute desired velocities relative to this cap.
     pub max_speed: f32,
-    /// Maximum steering force magnitude.
+    /// Maximum steering force magnitude. The combined force from all active
+    /// steering behaviors is truncated to this value before being applied.
     pub max_force: f32,
-    /// Which subsystems are ticked during update.
+    /// Determines which subsystems the world ticks for this agent.
     pub decision_model: DecisionModel,
-    /// Per-agent local blackboard.
+    /// Per-agent local blackboard. Parent-chained to the world's global
+    /// blackboard so reads cascade upward while writes stay local.
     pub blackboard: Blackboard,
-    /// Set of string tags for filtering and group queries.
+    /// String tags for group queries (e.g., "enemy", "patrol", "ranged").
+    /// Tags are case-sensitive and matched exactly.
     pub tags: HashSet<String>,
-    /// Index of FSM in the AIWorld's fsm storage (if attached).
+    /// Index into the AIWorld's FSM storage, if this agent has an attached
+    /// StateMachine. `None` means no FSM is attached.
     pub fsm_index: Option<usize>,
-    /// Index of BehaviorTree in the AIWorld's bt storage (if attached).
+    /// Index into the AIWorld's BehaviorTree storage, if this agent has an
+    /// attached BehaviorTree. `None` means no BT is attached.
     pub bt_index: Option<usize>,
-    /// Index of SteeringManager in the AIWorld's steering storage (if attached).
+    /// Index into the AIWorld's SteeringManager storage, if this agent has
+    /// an attached SteeringManager. `None` means no steering is attached.
     pub steering_index: Option<usize>,
 }
 
 impl Agent {
-    /// Creates a new agent with default kinematic state.
+    /// Creates a new agent with sensible default kinematic state.
+    ///
+    /// The agent starts at the origin `(0, 0)` with zero velocity.
+    /// Default kinematic constraints: `max_speed = 100`, `max_force = 200`.
+    /// Decision model defaults to `Fsm`. No FSM, BT, or steering is attached
+    /// until explicitly set via the Lua API or Rust code.
+    ///
+    /// The blackboard starts empty with no parent. `AIWorld::add_agent()` will
+    /// wire the parent to the world's global blackboard after creation.
     ///
     /// # Parameters
     /// - `name` — `&str`.
     ///
     /// # Returns
     /// `Self`.
-    ///
-    /// Position and velocity start at (0,0). MaxSpeed defaults to 100,
-    /// maxForce to 200, decision model to `Fsm`.
     pub fn new(name: &str) -> Self {
         Self {
             name: name.to_string(),

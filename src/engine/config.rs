@@ -31,7 +31,7 @@ use mlua::prelude::*;
 use serde::{Deserialize, Serialize};
 use std::path::Path;
 
-/// Top-level engine configuration.
+/// Top-level engine configuration. Consult the module-level documentation for the broader usage context and preconditions.
 ///
 /// Can be populated from `conf.lua` or constructed with defaults.
 ///

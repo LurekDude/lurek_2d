@@ -288,6 +288,10 @@ name = "combat_tests"
 path = "tests/game/combat_tests.rs"
 
 [[test]]
+name = "battle_tests"
+path = "tests/game/battle_tests.rs"
+
+[[test]]
 name = "crafting_tests"
 path = "tests/game/crafting_tests.rs"
 
@@ -296,12 +300,8 @@ name = "inventory_tests"
 path = "tests/game/inventory_tests.rs"
 
 [[test]]
-name = "item_tests"
-path = "tests/game/item_tests.rs"
-
-[[test]]
-name = "inventory_item_tests"
-path = "tests/game/inventory_item_tests.rs"
+name = "cardgame_tests"
+path = "tests/game/cardgame_tests.rs"
 
 [[test]]
 name = "minimap_tests"

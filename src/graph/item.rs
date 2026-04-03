@@ -1,6 +1,14 @@
 //! Graph item — a typed entity that flows through the network.
+//!
+//! This module is part of Luna2D's `graph` subsystem and provides the implementation
+//! details for item-related operations and data management.
+//! Key types exported from this module: `ItemPosition`, `GraphItem`.
+//! Primary functions: `new()`, `kill()`, `is_alive()`, `get_type()`.
+//!
+//! All public items are documented. See the parent module for architectural context
+//! and the `luna.*` Lua API for the scripting interface.
 
-/// Where a `GraphItem` currently resides.
+/// Where a `GraphItem` currently resides. Consult the module-level documentation for the broader usage context and preconditions.
 ///
 /// # Variants
 /// - `AtNode` — AtNode variant.
@@ -71,12 +79,12 @@ impl GraphItem {
         }
     }
 
-    /// Mark the item as dead.
+    /// Mark the item as dead. Consult the module-level documentation for the broader usage context and preconditions.
     pub fn kill(&mut self) {
         self.alive = false;
     }
 
-    /// Whether the item is still alive.
+    /// Whether the item is still alive. This accessor incurs no allocation; call it freely in hot paths.
     ///
     /// # Returns
     /// `bool`.
@@ -84,7 +92,7 @@ impl GraphItem {
         self.alive
     }
 
-    /// Get the item type.
+    /// Get the item type. This accessor incurs no allocation; call it freely in hot paths.
     ///
     /// # Returns
     /// `&str`.
@@ -92,7 +100,7 @@ impl GraphItem {
         &self.item_type
     }
 
-    /// Set the item type.
+    /// Set the item type. Replaces the current type value; callers hold responsibility for maintaining consistency with related fields.
     ///
     /// # Parameters
     /// - `item_type` — `&str`.
@@ -119,7 +127,7 @@ impl GraphItem {
         }
     }
 
-    /// Get remaining life in seconds.
+    /// Get remaining life in seconds. This accessor incurs no allocation; call it freely in hot paths.
     ///
     /// # Returns
     /// `f64`.
@@ -127,7 +135,7 @@ impl GraphItem {
         self.remaining_life
     }
 
-    /// Set remaining life in seconds.
+    /// Set remaining life in seconds. Replaces the current remaining life value; callers hold responsibility for maintaining consistency with related fields.
     ///
     /// # Parameters
     /// - `t` — `f64`.
@@ -135,7 +143,7 @@ impl GraphItem {
         self.remaining_life = t;
     }
 
-    /// Get the priority value.
+    /// Get the priority value. This accessor incurs no allocation; call it freely in hot paths.
     ///
     /// # Returns
     /// `i32`.
@@ -143,7 +151,7 @@ impl GraphItem {
         self.priority
     }
 
-    /// Set the priority value.
+    /// Set the priority value. Replaces the current priority value; callers hold responsibility for maintaining consistency with related fields.
     ///
     /// # Parameters
     /// - `p` — `i32`.
@@ -151,7 +159,7 @@ impl GraphItem {
         self.priority = p;
     }
 
-    /// Get the current position.
+    /// Get the current position. This accessor incurs no allocation; call it freely in hot paths.
     ///
     /// # Returns
     /// `&ItemPosition`.
@@ -159,7 +167,7 @@ impl GraphItem {
         &self.position
     }
 
-    /// Set the current position.
+    /// Set the current position. Replaces the current position value; callers hold responsibility for maintaining consistency with related fields.
     ///
     /// # Parameters
     /// - `pos` — `ItemPosition`.

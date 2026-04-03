@@ -56,6 +56,10 @@ impl LuaUserData for LuaEventBus {
 
         // on(event, callback, priority?) -> subscriptionId
         /// Registers an event listener callback.
+        /// @param event : string
+        /// @param callback : function
+        /// @param priority : integer?
+        /// @return any
         ///
         /// # Parameters
         /// - `event` — `string`.
@@ -75,6 +79,7 @@ impl LuaUserData for LuaEventBus {
 
         // off(subscriptionId)
         /// Removes a previously registered event listener.
+        /// @param id : integer
         ///
         /// # Parameters
         /// - `id` — `integer`.
@@ -92,6 +97,7 @@ impl LuaUserData for LuaEventBus {
 
         // emit(event, ...)
         /// Emits an event.
+        /// @param args : MultiValue
         ///
         /// # Parameters
         /// - `args` — `LuaMultiValue`.
@@ -130,6 +136,7 @@ impl LuaUserData for LuaEventBus {
 
         // clear(event)
         /// Removes all entries.
+        /// @param event : string
         ///
         /// # Parameters
         /// - `event` — `string`.
@@ -161,6 +168,8 @@ impl LuaUserData for LuaEventBus {
 
         // getListenerCount(event) -> int
         /// Returns the listener count.
+        /// @param event : string
+        /// @return any
         ///
         /// # Parameters
         /// - `event` — `string`.
@@ -179,6 +188,7 @@ impl LuaUserData for LuaEventBus {
 
         // getEvents() -> table<string>
         /// Returns the events.
+        /// @return any
         ///
         /// # Returns
         /// The current events.
@@ -235,6 +245,7 @@ impl LuaUserData for LuaObjectPool {
 
         // add(object)
         /// Adds an entry to the collection.
+        /// @param value : any
         ///
         /// # Parameters
         /// - `value` — `any`.
@@ -246,6 +257,7 @@ impl LuaUserData for LuaObjectPool {
 
         // acquire() -> any | nil
         /// Acquire on this ObjectPool.
+        /// @return any
         ///
         /// # Returns
         /// The result.
@@ -263,6 +275,7 @@ impl LuaUserData for LuaObjectPool {
 
         // release(object)
         /// Releases the underlying resource handle.
+        /// @param value : any
         ///
         /// # Parameters
         /// - `value` — `any`.
@@ -278,6 +291,7 @@ impl LuaUserData for LuaObjectPool {
 
         // getActiveCount() -> int
         /// Returns the active count.
+        /// @return any
         ///
         /// # Returns
         /// The current active count.
@@ -287,6 +301,7 @@ impl LuaUserData for LuaObjectPool {
 
         // getAvailableCount() -> int
         /// Returns the available count.
+        /// @return integer
         ///
         /// # Returns
         /// The current available count.
@@ -296,6 +311,7 @@ impl LuaUserData for LuaObjectPool {
 
         // getTotalCount() -> int
         /// Returns the total count.
+        /// @return integer
         ///
         /// # Returns
         /// The current total count.
@@ -363,6 +379,9 @@ impl LuaUserData for LuaCommandStack {
 
         // execute(name, execFn, undoFn?)
         /// Execute on this CommandStack.
+        /// @param name : string
+        /// @param exec_fn : function
+        /// @param undo_fn : function?
         ///
         /// # Parameters
         /// - `name` — `string`.
@@ -401,6 +420,7 @@ impl LuaUserData for LuaCommandStack {
 
         // undo() -> boolean
         /// Undo on this CommandStack.
+        /// @return boolean
         ///
         /// # Returns
         /// The result.
@@ -426,6 +446,7 @@ impl LuaUserData for LuaCommandStack {
 
         // redo() -> boolean
         /// Redo on this CommandStack.
+        /// @return boolean
         ///
         /// # Returns
         /// The result.
@@ -446,6 +467,7 @@ impl LuaUserData for LuaCommandStack {
 
         // canUndo() -> boolean
         /// Returns `true` if undo.
+        /// @return boolean
         ///
         /// # Returns
         /// `boolean`.
@@ -459,6 +481,7 @@ impl LuaUserData for LuaCommandStack {
 
         // canRedo() -> boolean
         /// Returns `true` if redo.
+        /// @return integer
         ///
         /// # Returns
         /// `boolean`.
@@ -469,6 +492,7 @@ impl LuaUserData for LuaCommandStack {
 
         // getHistorySize() -> int
         /// Returns the history size.
+        /// @return integer
         ///
         /// # Returns
         /// The current history size.
@@ -543,6 +567,8 @@ impl LuaUserData for LuaServiceLocator {
 
         // provide(name, value)
         /// Provide on this ServiceLocator.
+        /// @param name : string
+        /// @param value : any
         ///
         /// # Parameters
         /// - `name` — `string`.
@@ -558,6 +584,8 @@ impl LuaUserData for LuaServiceLocator {
 
         // locate(name) -> any | nil
         /// Locate on this ServiceLocator.
+        /// @param name : string
+        /// @return any
         ///
         /// # Parameters
         /// - `name` — `string`.
@@ -574,6 +602,8 @@ impl LuaUserData for LuaServiceLocator {
 
         // has(name) -> boolean
         /// Returns `true` if the condition is met.
+        /// @param name : string
+        /// @return any
         ///
         /// # Parameters
         /// - `name` — `string`.
@@ -586,6 +616,7 @@ impl LuaUserData for LuaServiceLocator {
 
         // remove(name)
         /// Removes the entry from the collection.
+        /// @param name : string
         ///
         /// # Parameters
         /// - `name` — `string`.
@@ -599,6 +630,7 @@ impl LuaUserData for LuaServiceLocator {
 
         // getServices() -> table<string>
         /// Returns the services.
+        /// @return any
         ///
         /// # Returns
         /// The current services.
@@ -661,6 +693,8 @@ impl LuaUserData for LuaFactory {
 
         // register(typeName, constructor)
         /// Adds an entry to the collection.
+        /// @param type_name : string
+        /// @param ctor : function
         ///
         /// # Parameters
         /// - `type_name` — `string`.
@@ -676,6 +710,7 @@ impl LuaUserData for LuaFactory {
 
         // create(typeName, ...) -> any
         /// Creates a new Factory instance.
+        /// @param args : MultiValue
         ///
         /// # Parameters
         /// - `args` — `LuaMultiValue`.
@@ -700,6 +735,8 @@ impl LuaUserData for LuaFactory {
 
         // has(typeName) -> boolean
         /// Returns `true` if the condition is met.
+        /// @param type_name : string
+        /// @return any
         ///
         /// # Parameters
         /// - `type_name` — `string`.
@@ -712,6 +749,7 @@ impl LuaUserData for LuaFactory {
 
         // getTypes() -> table<string>
         /// Returns the types.
+        /// @return any
         ///
         /// # Returns
         /// The current types.
@@ -726,6 +764,7 @@ impl LuaUserData for LuaFactory {
 
         // remove(typeName)
         /// Removes the entry from the collection.
+        /// @param type_name : string
         ///
         /// # Parameters
         /// - `type_name` — `string`.
@@ -796,6 +835,8 @@ impl LuaUserData for LuaSimpleState {
 
         // addState(name, callbacks?)
         /// Adds state to the collection.
+        /// @param name : string
+        /// @param callbacks : table?
         ///
         /// # Parameters
         /// - `name` — `string`.
@@ -835,6 +876,8 @@ impl LuaUserData for LuaSimpleState {
 
         // transitionTo(name) -> boolean
         /// Transition to on this SimpleState.
+        /// @param name : string
+        /// @return boolean
         ///
         /// # Parameters
         /// - `name` — `string`.
@@ -878,6 +921,7 @@ impl LuaUserData for LuaSimpleState {
 
         // update(dt)
         /// Advances the simulation by `dt` seconds.
+        /// @param dt : number
         ///
         /// # Parameters
         /// - `dt` — `number`.
@@ -898,6 +942,7 @@ impl LuaUserData for LuaSimpleState {
 
         // getCurrent() -> string | nil
         /// Returns the current.
+        /// @return any
         ///
         /// # Parameters
         /// - `name` — `string`.
@@ -910,6 +955,8 @@ impl LuaUserData for LuaSimpleState {
 
         // hasState(name) -> boolean
         /// Returns `true` if state.
+        /// @param name : string
+        /// @return any
         ///
         /// # Parameters
         /// - `name` — `string`.
@@ -922,6 +969,7 @@ impl LuaUserData for LuaSimpleState {
 
         // getStates() -> table<string>
         /// Returns the states.
+        /// @return any
         ///
         /// # Returns
         /// The current states.
@@ -957,10 +1005,20 @@ impl LuaUserData for LuaSimpleState {
 // ===========================================================================
 
 /// Registers `luna.patterns.*` factory functions.
+///
+/// # Parameters
+/// - `lua` — `&Lua`.
+/// - `luna` — `&LuaTable`.
+///
+/// # Returns
+/// `LuaResult<()>`.
 pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
     let patterns = lua.create_table()?;
 
     // luna.patterns.newEventBus() -> EventBus
+    /// New event bus.
+    ///
+    /// @return any
     patterns.set(
         "newEventBus",
         lua.create_function(|_lua, ()| {
@@ -971,6 +1029,9 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
     )?;
 
     // luna.patterns.newObjectPool() -> ObjectPool
+    /// New object pool.
+    ///
+    /// @return any
     patterns.set(
         "newObjectPool",
         lua.create_function(|_lua, ()| {
@@ -981,6 +1042,9 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
     )?;
 
     // luna.patterns.newCommandStack() -> CommandStack
+    /// New command stack.
+    ///
+    /// @return any
     patterns.set(
         "newCommandStack",
         lua.create_function(|_lua, ()| {
@@ -991,6 +1055,9 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
     )?;
 
     // luna.patterns.newServiceLocator() -> ServiceLocator
+    /// New service locator.
+    ///
+    /// @return any
     patterns.set(
         "newServiceLocator",
         lua.create_function(|_lua, ()| {
@@ -1001,6 +1068,9 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
     )?;
 
     // luna.patterns.newFactory() -> Factory
+    /// New factory.
+    ///
+    /// @return any
     patterns.set(
         "newFactory",
         lua.create_function(|_lua, ()| {
@@ -1011,6 +1081,9 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
     )?;
 
     // luna.patterns.newSimpleState() -> SimpleState
+    /// New simple state.
+    ///
+    /// @return any
     patterns.set(
         "newSimpleState",
         lua.create_function(|_lua, ()| {

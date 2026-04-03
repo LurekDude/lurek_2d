@@ -191,7 +191,7 @@ pub struct TmxObject {
     pub gid: u32,
 }
 
-/// Variant tag for TMX map layers.
+/// Variant tag for TMX map layers. Consult the module-level documentation for the broader usage context and preconditions.
 ///
 /// # Variants
 /// - `Tile` — Tile variant.
@@ -204,7 +204,7 @@ pub enum TmxLayer {
     Object(TmxObjectLayer),
 }
 
-/// A fully-parsed TMX map.
+/// A fully-parsed TMX map. Consult the module-level documentation for the broader usage context and preconditions.
 ///
 /// # Fields
 /// - `width` — `u32`.
@@ -253,7 +253,7 @@ impl TmxMap {
         })
     }
 
-    /// Returns only the object layers.
+    /// Returns only the object layers. Consult the module-level documentation for the broader usage context and preconditions.
     ///
     /// # Returns
     /// `impl Iterator<Item = &TmxObjectLayer>`.

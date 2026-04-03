@@ -1,4 +1,12 @@
 //! Dijkstra pathfinding and reachability queries on the graph.
+//!
+//! This module is part of Luna2D's `graph` subsystem and provides the implementation
+//! details for traversal-related operations and data management.
+//! Key types exported from this module: `PathResult`.
+//! Primary functions: `find_path()`, `find_path_for_item()`, `get_distance()`, `get_reachable()`.
+//!
+//! All public items are documented. See the parent module for architectural context
+//! and the `luna.*` Lua API for the scripting interface.
 
 use std::cmp::Ordering;
 use std::collections::{BinaryHeap, HashMap, HashSet};

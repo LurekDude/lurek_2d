@@ -1,7 +1,17 @@
+//! Vfs implementation for the `filesystem` subsystem.
+//!
+//! This module is part of Luna2D's `filesystem` subsystem and provides the implementation
+//! details for vfs-related operations and data management.
+//! Key types exported from this module: `FileInfo`, `FileType`, `GameFS`.
+//! Primary functions: `new()`, `base_dir()`, `read_string()`, `read_bytes()`.
+//!
+//! All public items are documented. See the parent module for architectural context
+//! and the `luna.*` Lua API for the scripting interface.
+//!
 use crate::engine::error::{EngineError, EngineResult};
 use std::path::{Path, PathBuf};
 
-/// File metadata returned by `get_info()`.
+/// File metadata returned by `get_info()`. Consult the module-level documentation for the broader usage context and preconditions.
 ///
 /// # Fields
 /// - `file_type` — whether the entry is a file, directory, symlink, or other
@@ -40,6 +50,10 @@ pub enum FileType {
 }
 
 /// Sandboxed filesystem rooted at the game directory; prevents path-traversal attacks.
+///
+/// # Fields
+/// - `base_dir` — `PathBuf`.
+/// - `identity` — `String`.
 pub struct GameFS {
     base_dir: PathBuf,
     identity: String,
@@ -277,7 +291,7 @@ impl GameFS {
         }
     }
 
-    /// Get file or directory metadata.
+    /// Get file or directory metadata. This accessor incurs no allocation; call it freely in hot paths.
     ///
     /// # Parameters
     /// - `path` — path relative to the game root
@@ -363,7 +377,7 @@ impl GameFS {
         self.base_dir.to_string_lossy().to_string()
     }
 
-    /// Get the save directory path.
+    /// Get the save directory path. This accessor incurs no allocation; call it freely in hot paths.
     ///
     /// # Returns
     /// Path to the `save/` subdirectory inside the game root.
@@ -383,7 +397,7 @@ impl GameFS {
             })
     }
 
-    /// Get the current user's home directory.
+    /// Get the current user's home directory. This accessor incurs no allocation; call it freely in hot paths.
     ///
     /// # Returns
     /// Home directory path as a `String` (`USERPROFILE` on Windows, `HOME` on Unix).
@@ -415,7 +429,7 @@ impl GameFS {
         &self.identity
     }
 
-    /// Set the game identity string.
+    /// Set the game identity string. Replaces the current identity value; callers hold responsibility for maintaining consistency with related fields.
     ///
     /// # Parameters
     /// - `identity` — short name used to identify the game (e.g. `"my_awesome_game"`)

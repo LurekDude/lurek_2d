@@ -8,7 +8,7 @@ and methods.add_method("name", ...) patterns. Associates each function
 with preceding /// docstrings.
 
 Usage:
-    python tools/gen_lua_api.py                     # -> docs/lua_api_reference_generated.md
+    python tools/gen_lua_api.py                     # -> docs/API/lua_api_reference_generated.md
     python tools/gen_lua_api.py --output FILE       # custom output path
     python tools/gen_lua_api.py --src DIR           # custom source directory
     python tools/gen_lua_api.py --check             # validate docstring coverage
@@ -31,7 +31,7 @@ from typing import Dict, List, Optional
 
 WORKSPACE_ROOT = Path(__file__).resolve().parent.parent
 SRC_LUA_API_DIR = WORKSPACE_ROOT / "src" / "lua_api"
-OUTPUT_FILE = WORKSPACE_ROOT / "docs" / "lua_api_reference_generated.md"
+OUTPUT_FILE = WORKSPACE_ROOT / "docs" / "API" / "lua_api_reference_generated.md"
 
 
 @dataclass
@@ -49,6 +49,8 @@ class LuaFunction:
     file: str
     kind: str  # "function" or "method"
     inferred_sig: str = field(default="")  # parameter signature inferred from Rust closure
+    typed_params: list = field(default_factory=list)  # [(name, lua_type, is_optional), ...]
+    inferred_return: str = field(default="")           # "bool", "Card", "table", "" etc.
 
 
 def _collect_docstring_above(lines: List[str], line_idx: int) -> str:
@@ -107,16 +109,6 @@ def _extract_params_returns(docstring: str) -> tuple:
 
 # ── Signature inference ──────────────────────────────────────────────────────
 
-# Match closure param list: |_, this, (a, b): (TypeA, TypeB)|
-# or |_, (a, b, c): (T1, T2, T3)|
-_CLOSURE_ARGS_RE = re.compile(
-    r"[|,]\s*[_a-z]+,\s*"  # skip leading arg (lua state)
-    r"(?:[_a-z]+,\s*)?"    # skip optional self/this
-    r"(?P<names>[^:)|]+):\s*(?P<types>[^|]+)"
-)
-# Simpler: extract just the arg block after the last comma before |
-_SIMPLE_ARGS_RE = re.compile(r"\|[^|]*,\s*(?P<args>[^|]+)\|")
-
 # Rust -> Lua type map
 _RUST_TO_LUA: Dict[str, str] = {
     "f32": "number", "f64": "number",
@@ -146,6 +138,86 @@ def _rust_type_to_lua(rust_type: str) -> str:
     return _RUST_TO_LUA.get(rust_type, rust_type)
 
 
+
+
+
+
+
+def _parse_tagged_params(docstring: str) -> list:
+    """Parse ``@param name : type`` lines from a /// docstring.
+
+    Returns a list of ``(name, lua_type, is_optional)`` tuples where
+    ``is_optional`` is ``True`` when the type ends with ``?`` (e.g. ``Card?``).
+
+    Expected format in Rust ///::
+
+        /// @param name : Type  Optional description.
+    """
+    result = []
+    for line in docstring.splitlines():
+        m = re.match(r"@param\s+(\w+)\s*:\s*(\S+)", line.strip())
+        if m:
+            name = m.group(1)
+            lua_type = m.group(2).rstrip(",.")
+            is_optional = lua_type.endswith("?")
+            result.append((name, lua_type, is_optional))
+    return result
+
+
+def _parse_tagged_return(docstring: str) -> str:
+    """Parse ``@return type`` from a /// docstring.
+
+    Returns the type string (e.g. ``"bool"``, ``"Card?"``, ``"string"``) or
+    ``""`` when no ``@return`` tag is present.
+
+    Expected format in Rust ///::
+
+        /// @return Type  Optional description.
+    """
+    for line in docstring.splitlines():
+        m = re.match(r"@return\s+(\S+)", line.strip())
+        if m:
+            return m.group(1).rstrip(",.")
+    return ""
+
+
+
+def collect_class_descriptions(api_file: Path) -> Dict[str, str]:
+    """Return {display_class_name: first_doc_line} for all pub struct LuaXxx types.
+
+    The display name strips the leading ``Lua`` prefix: ``LuaCard`` → ``Card``.
+    """
+    try:
+        lines = api_file.read_text(encoding="utf-8").splitlines()
+    except OSError:
+        return {}
+
+    result: Dict[str, str] = {}
+    for i, line in enumerate(lines):
+        m = re.match(r"\s*pub struct (Lua\w+)", line)
+        if not m:
+            continue
+        struct_name = m.group(1)
+        class_name = struct_name[3:] if struct_name.startswith("Lua") else struct_name
+        # Collect /// doc comment lines immediately above (skip #[...] attrs and blank lines)
+        j = i - 1
+        doc_parts: List[str] = []
+        while j >= 0:
+            stripped = lines[j].strip()
+            if stripped.startswith("///"):
+                text = stripped[3:].lstrip(" ")
+                doc_parts.insert(0, text)
+            elif stripped.startswith("#[") or stripped == "":
+                pass
+            else:
+                break
+            j -= 1
+        if doc_parts:
+            result[class_name] = doc_parts[0].strip()
+
+    return result
+
+
 def _infer_signature(lines: List[str], decl_line: int) -> str:
     """
     Attempt to infer a Lua-style parameter signature from the Rust closure
@@ -153,10 +225,26 @@ def _infer_signature(lines: List[str], decl_line: int) -> str:
 
     Returns a string like "(x, y, width, height)" or "" if not parseable.
     """
-    # Search a small window around the declaration for the closure args
-    search_text = " ".join(
-        line.strip() for line in lines[decl_line : decl_line + 6]
-    )
+    # Search only the current closure header. Scanning arbitrary following lines
+    # causes zero-arg methods like getName() to inherit params from the next
+    # declaration, which produces stale or invented signatures in the docs.
+    search_parts: List[str] = []
+    found_pipe = False
+    pipe_count = 0
+    for line in lines[decl_line : decl_line + 6]:
+        stripped = line.strip()
+        if not found_pipe:
+            if "|" not in stripped:
+                continue
+            found_pipe = True
+        search_parts.append(stripped)
+        pipe_count += stripped.count("|")
+        if pipe_count >= 2:
+            break
+
+    search_text = " ".join(search_parts)
+    if not search_text:
+        return ""
 
     # Pattern: |_, (a, b): (TypeA, TypeB)| or |_, this, (a, b): (TypeA, TypeB)|
     structured_m = re.search(
@@ -182,6 +270,9 @@ def _infer_signature(lines: List[str], decl_line: int) -> str:
     )
     if scalar_m:
         name = scalar_m.group(1).lstrip("_")
+        lua_t = _rust_type_to_lua(scalar_m.group(2))
+        if lua_t.endswith("?"):
+            return f"([{name}])"
         return f"({name})"
 
     # (name,): (Type,) — single param in tuple form
@@ -191,6 +282,9 @@ def _infer_signature(lines: List[str], decl_line: int) -> str:
     )
     if single_tuple_m:
         name = single_tuple_m.group(1).lstrip("_")
+        lua_t = _rust_type_to_lua(single_tuple_m.group(2))
+        if lua_t.endswith("?"):
+            return f"([{name}])"
         return f"({name})"
 
     # No params: |_, ()| or |_, this, ()|
@@ -283,6 +377,8 @@ def extract_lua_functions(api_file: Path) -> List[LuaFunction]:
                         returns=returns, line=i + 1,
                         file=rel_path, kind="function",
                         inferred_sig=inferred,
+                        typed_params=_parse_tagged_params(docstring),
+                        inferred_return=_parse_tagged_return(docstring),
                     ))
 
         # Single-line set pattern
@@ -301,6 +397,8 @@ def extract_lua_functions(api_file: Path) -> List[LuaFunction]:
                 returns=returns, line=i + 1,
                 file=rel_path, kind="function",
                 inferred_sig=inferred,
+                typed_params=_parse_tagged_params(docstring),
+                inferred_return=_parse_tagged_return(docstring),
             ))
 
         # Userdata methods
@@ -321,6 +419,8 @@ def extract_lua_functions(api_file: Path) -> List[LuaFunction]:
                 returns=returns, line=i + 1,
                 file=rel_path, kind="method",
                 inferred_sig=inferred,
+                typed_params=_parse_tagged_params(docstring),
+                inferred_return=_parse_tagged_return(docstring),
             ))
 
         i += 1

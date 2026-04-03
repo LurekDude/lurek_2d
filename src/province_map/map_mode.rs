@@ -9,6 +9,10 @@ use std::collections::HashMap;
 use super::core::{ProvinceMap, Province};
 
 /// A named map mode with its colour assignment function.
+///
+/// # Fields
+/// - `name` — `String`.
+/// - `color_fn` — `MapModeColorFn`.
 #[derive(Debug, Clone)]
 pub struct MapMode {
     /// Display name of this map mode (e.g. "Political", "Terrain").
@@ -17,7 +21,20 @@ pub struct MapMode {
     pub color_fn: MapModeColorFn,
 }
 
-/// How colours are assigned to provinces.
+/// How colours are assigned to provinces. Consult the module-level documentation for the broader usage context and preconditions.
+///
+/// # Variants
+/// - `Each` — Each variant.
+/// - `Fixed` — Fixed variant.
+/// - `SourceColor` — SourceColor variant.
+/// - `Gradient` — Gradient variant.
+/// - `The` — The variant.
+/// - `Per` — Per variant.
+/// - `Colour` — Colour variant.
+/// - `Lower` — Lower variant.
+/// - `Upper` — Upper variant.
+/// - `Category` — Category variant.
+/// - `Fallback` — Fallback variant.
 #[derive(Debug, Clone)]
 pub enum MapModeColorFn {
     /// Each province gets a specific fixed colour from the map.
@@ -56,6 +73,12 @@ pub enum MapModeColorFn {
 
 impl MapModeColorFn {
     /// Resolve the colour for a single province.
+    ///
+    /// # Parameters
+    /// - `province` — `&Province`.
+    ///
+    /// # Returns
+    /// `[f32`.
     pub fn resolve_color(&self, province: &Province) -> [f32; 4] {
         match self {
             Self::Fixed(map) => map
@@ -112,6 +135,13 @@ impl MapModeColorFn {
 ///
 /// Pixels that belong to province ID 0 (empty) are set to transparent black.
 /// The returned buffer has length `width * height * 4`.
+///
+/// # Parameters
+/// - `ap` — `&ProvinceMap`.
+/// - `ode` — `&MapMode`.
+///
+/// # Returns
+/// `Vec<u8>`.
 pub fn resolve_colors(map: &ProvinceMap, mode: &MapMode) -> Vec<u8> {
     let w = map.width() as usize;
     let h = map.height() as usize;

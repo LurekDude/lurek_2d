@@ -1,6 +1,23 @@
 //! Skills, perks, trait definitions, action points, morale, and level thresholds.
+//!
+//! This module is part of Luna2D's `stats` subsystem and provides the implementation
+//! details for skill-related operations and data management.
+//! Key types exported from this module: `Skill`, `Perk`, `TraitDef`, `ActionPoints`, `Morale`.
+//! Primary functions: `new()`, `new()`, `new()`, `new()`.
+//!
+//! All public items are documented. See the parent module for architectural context
+//! and the `luna.*` Lua API for the scripting interface.
 
 /// A named skill with cooldown, resource cost, and level tracking.
+///
+/// # Fields
+/// - `level` — `u32`.
+/// - `max_level` — `u32`.
+/// - `resource` — `String`.
+/// - `cost` — `f64`.
+/// - `cooldown` — `f64`.
+/// - `cooldown_remaining` — `f64`.
+/// - `passive_active` — `bool`.
 #[derive(Debug, Clone)]
 pub struct Skill {
     /// Current level (0 = not learned).
@@ -20,7 +37,16 @@ pub struct Skill {
 }
 
 impl Skill {
-    /// Create a new skill definition.
+    /// Create a new skill definition. Returns a fully initialised instance with all fields set to their initial values.
+    ///
+    /// # Parameters
+    /// - `ax_level` — `u32`.
+    /// - `resource` — `&str`.
+    /// - `cost` — `f64`.
+    /// - `cooldown` — `f64`.
+    ///
+    /// # Returns
+    /// `Self`.
     pub fn new(max_level: u32, resource: &str, cost: f64, cooldown: f64) -> Self {
         Self {
             level: 0,
@@ -35,6 +61,11 @@ impl Skill {
 }
 
 /// A named perk requiring a minimum level to acquire.
+///
+/// # Fields
+/// - `require_level` — `u32`.
+/// - `trait_name` — `Option<String>`.
+/// - `acquired` — `bool`.
 #[derive(Debug, Clone)]
 pub struct Perk {
     /// Minimum character level required to acquire.
@@ -46,7 +77,14 @@ pub struct Perk {
 }
 
 impl Perk {
-    /// Create a new perk definition.
+    /// Create a new perk definition. Returns a fully initialised instance with all fields set to their initial values.
+    ///
+    /// # Parameters
+    /// - `require_level` — `u32`.
+    /// - `rait_name` — `Option<String>`.
+    ///
+    /// # Returns
+    /// `Self`.
     pub fn new(require_level: u32, trait_name: Option<String>) -> Self {
         Self {
             require_level,
@@ -57,6 +95,10 @@ impl Perk {
 }
 
 /// A named trait definition (a bundle of buff descriptors).
+///
+/// # Fields
+/// - `s` — `(stat`.
+/// - `buffs` — `Vec<(String`.
 #[derive(Debug, Clone)]
 pub struct TraitDef {
     /// Buff descriptors: (stat, add, mul) tuples.
@@ -64,6 +106,10 @@ pub struct TraitDef {
 }
 
 /// Action point tracking for turn-based games.
+///
+/// # Fields
+/// - `current` — `f64`.
+/// - `max` — `f64`.
 #[derive(Debug, Clone)]
 pub struct ActionPoints {
     /// Current action points available.
@@ -74,12 +120,24 @@ pub struct ActionPoints {
 
 impl ActionPoints {
     /// Create action points with the given max.
+    ///
+    /// # Parameters
+    /// - `ax` — `f64`.
+    ///
+    /// # Returns
+    /// `Self`.
     pub fn new(max: f64) -> Self {
         Self { current: max, max }
     }
 }
 
 /// Morale state with panic/berserk thresholds.
+///
+/// # Fields
+/// - `current` — `f64`.
+/// - `max` — `f64`.
+/// - `panic_threshold` — `f64`.
+/// - `berserk_threshold` — `f64`.
 #[derive(Debug, Clone)]
 pub struct Morale {
     /// Current morale value.
@@ -94,6 +152,12 @@ pub struct Morale {
 
 impl Morale {
     /// Create morale with the given max (current starts at max).
+    ///
+    /// # Parameters
+    /// - `ax` — `f64`.
+    ///
+    /// # Returns
+    /// `Self`.
     pub fn new(max: f64) -> Self {
         Self {
             current: max,
@@ -105,6 +169,11 @@ impl Morale {
 }
 
 /// Level threshold setting: either a static table or a formula.
+///
+/// # Variants
+/// - `P` — P variant.
+/// - `Table` — Table variant.
+/// - `Linear` — Linear variant.
 #[derive(Debug, Clone)]
 pub enum LevelThresholds {
     /// XP required to reach each level (1-indexed: thresholds[0] = XP for level 2).
@@ -114,7 +183,10 @@ pub enum LevelThresholds {
 }
 
 impl LevelThresholds {
-    /// Default: 100 XP per level.
+    /// Default: 100 XP per level. Consult the module-level documentation for the broader usage context and preconditions.
+    ///
+    /// # Returns
+    /// `Self`.
     pub fn default_linear() -> Self {
         Self::Linear {
             base: 100.0,
@@ -123,6 +195,12 @@ impl LevelThresholds {
     }
 
     /// Get the XP threshold for the given level (level 1 = index 0 → returns threshold for level 2).
+    ///
+    /// # Parameters
+    /// - `level` — `u32`.
+    ///
+    /// # Returns
+    /// `f64`.
     pub fn threshold_for(&self, level: u32) -> f64 {
         match self {
             Self::Table(v) => {

@@ -2,6 +2,13 @@
 //!
 //! Supports a subset of SQL: SELECT, WHERE, GROUP BY, HAVING, ORDER BY,
 //! LIMIT/OFFSET, aggregate functions, and JOIN (for Database queries).
+//!
+//! This module is part of Luna2D's `dataframe` subsystem and provides the implementation
+//! details for sql-related operations and data management.
+//! Primary functions: `query_sql()`, `query_sql_database()`.
+//!
+//! All public items are documented. See the parent module for architectural context
+//! and the `luna.*` Lua API for the scripting interface.
 
 use crate::dataframe::frame::{CellValue, ColRef, DataFrame, Database};
 

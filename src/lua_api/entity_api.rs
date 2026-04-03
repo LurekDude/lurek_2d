@@ -2,6 +2,13 @@
 //!
 //! Exposes `Universe` as Lua UserData (`LuaUniverse`) with entity lifecycle,
 //! component operations, querying, systems, tags, layers, and blueprints.
+//!
+//! This module is part of Luna2D's `lua_api` subsystem and provides the implementation
+//! details for entity api-related operations and data management.
+//! Primary functions: `register()`.
+//!
+//! All public items are documented. See the parent module for architectural context
+//! and the `luna.*` Lua API for the scripting interface.
 
 use std::cell::RefCell;
 use std::rc::Rc;
@@ -34,12 +41,14 @@ impl LuaUserData for LuaUniverse {
         // === Entity Lifecycle ===
 
         /// Creates a new entity in this universe and returns its numeric ID.
+        /// @return any
         ///
         /// # Returns
         /// `integer` — entity ID.
         methods.add_method("spawn", |_, this, ()| Ok(this.inner.borrow_mut().spawn()));
 
         /// Destroys the entity with the given `id`, freeing its slot for reuse.
+        /// @param id : integer
         ///
         /// # Parameters
         /// - `id` — `integer`: Entity ID returned by `spawn`.
@@ -48,6 +57,8 @@ impl LuaUserData for LuaUniverse {
         });
 
         /// Returns `true` if the entity `id` is currently active in the universe.
+        /// @param id : integer
+        /// @return any
         ///
         /// # Parameters
         /// - `id` — `integer`: Entity ID to test.
@@ -68,6 +79,8 @@ impl LuaUserData for LuaUniverse {
         );
 
         /// Returns the current value.
+        /// @param id : integer
+        /// @param name : string
         ///
         /// # Parameters
         /// - `id` — `integer`.
@@ -80,6 +93,8 @@ impl LuaUserData for LuaUniverse {
         });
 
         /// Returns `true` if the condition is met.
+        /// @param id : integer
+        /// @param name : string
         ///
         /// # Parameters
         /// - `id` — `integer`.
@@ -92,6 +107,8 @@ impl LuaUserData for LuaUniverse {
         });
 
         /// Removes the entry from the collection.
+        /// @param id : integer
+        /// @param name : string
         ///
         /// # Parameters
         /// - `id` — `integer`.
@@ -101,6 +118,7 @@ impl LuaUserData for LuaUniverse {
         });
 
         /// Returns the components.
+        /// @param id : integer
         ///
         /// # Parameters
         /// - `id` — `integer`.
@@ -114,6 +132,7 @@ impl LuaUserData for LuaUniverse {
         // === Querying ===
 
         /// Runs a query and returns matching results.
+        /// @param args : MultiValue
         ///
         /// # Parameters
         /// - `args` — `LuaMultiValue`.
@@ -136,6 +155,7 @@ impl LuaUserData for LuaUniverse {
         );
 
         /// Returns the entities.
+        /// @return any
         ///
         /// # Returns
         /// The current entities.
@@ -144,6 +164,7 @@ impl LuaUserData for LuaUniverse {
         });
 
         /// Returns the entity count.
+        /// @return any
         ///
         /// # Parameters
         /// - `system` — `table`.
@@ -157,6 +178,7 @@ impl LuaUserData for LuaUniverse {
         // === System Management ===
 
         /// Adds system to the collection.
+        /// @param system : table
         ///
         /// # Parameters
         /// - `system` — `table`.
@@ -165,6 +187,7 @@ impl LuaUserData for LuaUniverse {
         });
 
         /// Removes system from the collection.
+        /// @param system : table
         ///
         /// # Parameters
         /// - `system` — `table`.
@@ -173,6 +196,7 @@ impl LuaUserData for LuaUniverse {
         });
 
         /// Advances the simulation by `dt` seconds.
+        /// @param dt : number
         ///
         /// # Parameters
         /// - `dt` — `number`.
@@ -213,6 +237,7 @@ impl LuaUserData for LuaUniverse {
         });
 
         /// Emits an event.
+        /// @param args : MultiValue
         ///
         /// # Parameters
         /// - `args` — `LuaMultiValue`.
@@ -277,6 +302,8 @@ impl LuaUserData for LuaUniverse {
         // === String Tags ===
 
         /// Attaches a string tag to the entity, enabling fast tag-based group queries.
+        /// @param id : integer
+        /// @param tag : string
         ///
         /// # Parameters
         /// - `id` — `integer`: Entity ID.
@@ -287,6 +314,8 @@ impl LuaUserData for LuaUniverse {
         });
 
         /// Removes a string tag from the entity.
+        /// @param id : integer
+        /// @param tag : string
         ///
         /// # Parameters
         /// - `id` — `integer`: Entity ID.
@@ -297,6 +326,9 @@ impl LuaUserData for LuaUniverse {
         });
 
         /// Returns `true` if the entity carries the given tag.
+        /// @param id : integer
+        /// @param tag : string
+        /// @return any
         ///
         /// # Parameters
         /// - `id` — `integer`: Entity ID.
@@ -309,6 +341,8 @@ impl LuaUserData for LuaUniverse {
         });
 
         /// Returns the tags.
+        /// @param id : integer
+        /// @return any
         ///
         /// # Parameters
         /// - `id` — `integer`.
@@ -320,6 +354,8 @@ impl LuaUserData for LuaUniverse {
         });
 
         /// Returns the entities by tag.
+        /// @param tag : string
+        /// @return any
         ///
         /// # Parameters
         /// - `id` — `integer`.
@@ -334,6 +370,8 @@ impl LuaUserData for LuaUniverse {
         // === Layer System ===
 
         /// Sets the layer.
+        /// @param id : integer
+        /// @param layer : integer
         ///
         /// # Parameters
         /// - `id` — `integer`.
@@ -344,6 +382,8 @@ impl LuaUserData for LuaUniverse {
         });
 
         /// Returns the layer.
+        /// @param id : integer
+        /// @return any
         ///
         /// # Parameters
         /// - `id` — `integer`.
@@ -355,6 +395,8 @@ impl LuaUserData for LuaUniverse {
         });
 
         /// Returns the entities by layer.
+        /// @param layer : integer
+        /// @return any
         ///
         /// # Parameters
         /// - `layer` — `integer`.
@@ -366,6 +408,7 @@ impl LuaUserData for LuaUniverse {
         });
 
         /// Returns the entities sorted.
+        /// @return any
         ///
         /// # Parameters
         /// - `name` — `string`.
@@ -379,6 +422,7 @@ impl LuaUserData for LuaUniverse {
         // === Bitmap Tags ===
 
         /// Define tag on this Universe.
+        /// @param name : string
         ///
         /// # Parameters
         /// - `id` — `integer`.
@@ -388,6 +432,8 @@ impl LuaUserData for LuaUniverse {
         });
 
         /// Bitmap tag on this Universe.
+        /// @param id : integer
+        /// @param name : string
         ///
         /// # Parameters
         /// - `id` — `integer`.
@@ -397,6 +443,8 @@ impl LuaUserData for LuaUniverse {
         });
 
         /// Bitmap untag on this Universe.
+        /// @param id : integer
+        /// @param name : string
         ///
         /// # Parameters
         /// - `id` — `integer`.
@@ -407,6 +455,9 @@ impl LuaUserData for LuaUniverse {
         });
 
         /// Returns `true` if bitmap tag.
+        /// @param id : integer
+        /// @param name : string
+        /// @return any
         ///
         /// # Parameters
         /// - `id` — `integer`.
@@ -419,6 +470,8 @@ impl LuaUserData for LuaUniverse {
         });
 
         /// Query bitmap tag on this Universe.
+        /// @param name : string
+        /// @return any
         ///
         /// # Parameters
         /// - `name` — `string`.
@@ -427,6 +480,8 @@ impl LuaUserData for LuaUniverse {
         });
 
         /// Query bitmap any on this Universe.
+        /// @param names : table
+        /// @return any
         ///
         /// # Parameters
         /// - `names` — `table`.
@@ -438,6 +493,8 @@ impl LuaUserData for LuaUniverse {
         });
 
         /// Query bitmap all on this Universe.
+        /// @param names : table
+        /// @return any
         ///
         /// # Parameters
         /// - `names` — `table`.
@@ -449,6 +506,8 @@ impl LuaUserData for LuaUniverse {
         });
 
         /// Returns the bitmap tag bit.
+        /// @param name : string
+        /// @return any
         ///
         /// # Parameters
         /// - `name` — `string`.
@@ -489,6 +548,7 @@ impl LuaUserData for LuaUniverse {
         );
 
         /// Returns `true` if blueprint.
+        /// @param name : string
         ///
         /// # Parameters
         /// - `name` — `string`.
@@ -500,6 +560,7 @@ impl LuaUserData for LuaUniverse {
         });
 
         /// Removes blueprint from the collection.
+        /// @param name : string
         ///
         /// # Parameters
         /// - `name` — `string`.
@@ -516,6 +577,7 @@ impl LuaUserData for LuaUniverse {
         });
 
         /// Returns the blueprint components.
+        /// @param name : string
         ///
         /// # Parameters
         /// - `name` — `string`.
@@ -543,6 +605,9 @@ impl LuaUserData for LuaUniverse {
 pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
     let entity = lua.create_table()?;
 
+    /// New universe.
+    ///
+    /// @return any
     entity.set(
         "newUniverse",
         lua.create_function(|_lua, ()| {

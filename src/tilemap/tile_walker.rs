@@ -1,4 +1,12 @@
 //! Tile-based first-person movement controller with cardinal directions.
+//!
+//! This module is part of Luna2D's `tilemap` subsystem and provides the implementation
+//! details for tile walker-related operations and data management.
+//! Key types exported from this module: `Facing`, `TileWalker`.
+//! Primary functions: `parse()`, `to_str()`, `angle()`, `dx()`.
+//!
+//! All public items are documented. See the parent module for architectural context
+//! and the `luna.*` Lua API for the scripting interface.
 
 use std::cell::RefCell;
 use std::f32::consts::PI;
@@ -6,7 +14,7 @@ use std::rc::Rc;
 
 use crate::math::raycasting::Raycaster2D;
 
-/// Cardinal facing direction.
+/// Cardinal facing direction. Consult the module-level documentation for the broader usage context and preconditions.
 ///
 /// # Variants
 /// - `North` — North variant.
@@ -131,6 +139,15 @@ impl Facing {
 ///
 /// Operates on integer grid coordinates with cardinal facing directions.
 /// Optionally references a `Raycaster2D` for collision checking.
+///
+/// # Fields
+/// - `x` — `i32`.
+/// - `y` — `i32`.
+/// - `facing` — `Facing`.
+/// - `prev_x` — `i32`.
+/// - `prev_y` — `i32`.
+/// - `prev_facing` — `Facing`.
+/// - `raycaster` — `Option<Rc<RefCell<Raycaster2D>>>`.
 pub struct TileWalker {
     x: i32,
     y: i32,
@@ -163,7 +180,7 @@ impl TileWalker {
         }
     }
 
-    /// Returns the current X coordinate.
+    /// Returns the current X coordinate. Consult the module-level documentation for the broader usage context and preconditions.
     ///
     /// # Returns
     /// `i32`.
@@ -171,7 +188,7 @@ impl TileWalker {
         self.x
     }
 
-    /// Returns the current Y coordinate.
+    /// Returns the current Y coordinate. Consult the module-level documentation for the broader usage context and preconditions.
     ///
     /// # Returns
     /// `i32`.
@@ -179,7 +196,7 @@ impl TileWalker {
         self.y
     }
 
-    /// Returns the current facing direction.
+    /// Returns the current facing direction. Consult the module-level documentation for the broader usage context and preconditions.
     ///
     /// # Returns
     /// `Facing`.
@@ -187,7 +204,7 @@ impl TileWalker {
         self.facing
     }
 
-    /// Sets the position.
+    /// Sets the position. Replaces the current position value; callers hold responsibility for maintaining consistency with related fields.
     ///
     /// # Parameters
     /// - `x` — `i32`.
@@ -197,7 +214,7 @@ impl TileWalker {
         self.y = y;
     }
 
-    /// Sets the facing direction.
+    /// Sets the facing direction. Replaces the current facing value; callers hold responsibility for maintaining consistency with related fields.
     ///
     /// # Parameters
     /// - `facing` — `Facing`.
@@ -328,17 +345,17 @@ impl TileWalker {
         }
     }
 
-    /// Turns left (counter-clockwise).
+    /// Turns left (counter-clockwise). Consult the module-level documentation for the broader usage context and preconditions.
     pub fn turn_left(&mut self) {
         self.facing = self.facing.turn_left();
     }
 
-    /// Turns right (clockwise).
+    /// Turns right (clockwise). Consult the module-level documentation for the broader usage context and preconditions.
     pub fn turn_right(&mut self) {
         self.facing = self.facing.turn_right();
     }
 
-    /// Turns around (180 degrees).
+    /// Turns around (180 degrees). Consult the module-level documentation for the broader usage context and preconditions.
     pub fn turn_around(&mut self) {
         self.facing = self.facing.opposite();
     }

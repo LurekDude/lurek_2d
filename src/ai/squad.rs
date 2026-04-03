@@ -1,31 +1,46 @@
-//! Multi-agent formation group with offset computation.
+//! Multi-agent formation groups with offset computation.
+//!
+//! A [`Squad`] groups named agents under an optional leader and computes
+//! world-space formation positions relative to the leader's current location.
+//! Five formation shapes are supported: `Line`, `Wedge`, `Circle`, `Column`,
+//! and `None` (no formation — all members collapse to the leader's position).
+//!
+//! Squads also carry a shared [`Blackboard`] for intra-group communication.
+//! The leader's blackboard and the squad blackboard are independent — link
+//! them via parent-chain if you need automatic fact propagation.
 
 use crate::ai::blackboard::Blackboard;
 
-/// Formation shapes for squad positioning.
+/// Formation shapes for squad positioning. Consult the module-level documentation for the broader usage context and preconditions.
+///
+/// Each variant determines how member offsets are computed relative to the
+/// leader's position and the configurable `formation_spacing`.
+///
+/// Serialized to/from Lua as lowercase strings (`"line"`, `"wedge"`, etc.).
 ///
 /// # Variants
-/// - `None` — None variant.
+/// - `None` — No formation.
 /// - `Line` — Line variant.
 /// - `Wedge` — Wedge variant.
 /// - `Circle` — Circle variant.
 /// - `Column` — Column variant.
 #[derive(Debug, Clone, PartialEq)]
 pub enum FormationType {
-    /// No formation — agents stay put.
+    /// No formation — all members occupy the leader's position.
     None,
-    /// Horizontal line from leader position.
+    /// Horizontal line centered on the leader. Members spread left/right.
     Line,
-    /// Alternating row V-shape.
+    /// V-shaped wedge with alternating left/right rows behind the leader.
     Wedge,
-    /// Equal angle distribution around leader.
+    /// Equal-angle circular distribution around the leader.
     Circle,
-    /// Vertical column behind leader.
+    /// Vertical column trailing directly behind the leader.
     Column,
 }
 
 impl FormationType {
-    /// Parses from Lua string.
+    /// Parses a Lua string into a `FormationType`. Unrecognised strings
+    /// default to `FormationType::None`.
     ///
     /// # Parameters
     /// - `s` — `&str`.
@@ -42,7 +57,7 @@ impl FormationType {
         }
     }
 
-    /// Returns the Lua string representation.
+    /// Returns the canonical lowercase Lua string for this formation type.
     ///
     /// # Returns
     /// `&'static str`.
@@ -57,7 +72,13 @@ impl FormationType {
     }
 }
 
-/// Multi-agent formation group.
+/// A named group of agents with formation positioning and shared state.
+///
+/// The squad tracks agent names (not owned `Agent` structs — those live in
+/// [`AIWorld`](crate::ai::world::AIWorld)). Call
+/// [`get_formation_position`](Self::get_formation_position) to compute
+/// the ideal world-space position for each member given the leader's
+/// current coordinates.
 ///
 /// # Fields
 /// - `name` — `String`.
@@ -66,25 +87,24 @@ impl FormationType {
 /// - `formation` — `FormationType`.
 /// - `formation_spacing` — `f32`.
 /// - `blackboard` — `Blackboard`.
-///
-/// Computes formation offset positions relative to the leader's position.
 pub struct Squad {
-    /// Squad name.
+    /// Human-readable squad identifier.
     pub name: String,
-    /// Agent names in the squad.
+    /// Agent names belonging to this squad (insertion order).
     pub members: Vec<String>,
-    /// Name of the leader agent.
+    /// Name of the designated leader, if any.
     pub leader: Option<String>,
-    /// Active formation type.
+    /// Current formation shape.
     pub formation: FormationType,
-    /// Spacing between formation positions.
+    /// World-unit distance between adjacent formation slots.
     pub formation_spacing: f32,
-    /// Squad-shared blackboard.
+    /// Shared key-value store accessible to all squad members.
     pub blackboard: Blackboard,
 }
 
 impl Squad {
-    /// Creates a new squad with the given name.
+    /// Creates a new squad with no members, no leader, no formation,
+    /// and a default spacing of 30 world units.
     ///
     /// # Parameters
     /// - `name` — `&str`.
@@ -102,7 +122,15 @@ impl Squad {
         }
     }
 
-    /// Computes the ideal world-space position for a member at the given index.
+    /// Computes the ideal world-space position for the member at `member_idx`
+    /// given the leader's current position.
+    ///
+    /// The returned coordinates depend on the active [`FormationType`]:
+    /// - **None**: returns `leader_pos` unchanged.
+    /// - **Line**: horizontal spread centered on the leader.
+    /// - **Wedge**: alternating left/right V behind the leader.
+    /// - **Circle**: equal-angle arc around the leader.
+    /// - **Column**: vertical stack behind the leader.
     ///
     /// # Parameters
     /// - `member_idx` — `usize`.
@@ -110,7 +138,6 @@ impl Squad {
     ///
     /// # Returns
     /// `(f32, f32)`.
-    /// `leader_pos` is the leader's current position.
     pub fn get_formation_position(&self, member_idx: usize, leader_pos: (f32, f32)) -> (f32, f32) {
         let spacing = self.formation_spacing;
         match self.formation {

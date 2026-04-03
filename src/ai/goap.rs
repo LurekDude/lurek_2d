@@ -1,4 +1,33 @@
-//! A★ planner over boolean world state for multi-step tactical planning.
+//! Goal-Oriented Action Planning (GOAP) using A★ search over boolean world state.
+//!
+//! GOAP is a planning system where the agent has a set of actions (each with
+//! boolean preconditions and effects) and a set of goals (target boolean world
+//! states). The planner uses A★ search to find the cheapest sequence of actions
+//! that transforms the current world state into one that satisfies the
+//! highest-priority goal.
+//!
+//! ## How Planning Works
+//!
+//! 1. The planner picks the highest-priority [`GOAPGoal`] (by `priority` field).
+//! 2. It initializes an A★ search with the current world state as the start node.
+//! 3. For each node, it tries every action whose preconditions are met, generating
+//!    successor nodes by applying the action's effects.
+//! 4. The heuristic counts unsatisfied goal conditions (admissible: never overestimates).
+//! 5. The first path that satisfies all goal conditions is returned as a list of
+//!    action names in execution order.
+//!
+//! ## Search Limits
+//!
+//! The planner enforces two depth/iteration limits:
+//! - `max_depth` — maximum number of actions in a plan (prevents infinite chains).
+//! - Hard limit of 10,000 A★ iterations (prevents runaway computation on large
+//!   action spaces).
+//!
+//! ## Lua Integration
+//!
+//! Actions can have optional Lua callbacks (`GOAPAction::callback`) that are
+//! executed when the game loop processes the planned action sequence. The planner
+//! itself is pure logic — it never calls Lua during planning.
 
 use std::cmp::Ordering;
 use std::collections::{BinaryHeap, HashMap};
@@ -7,6 +36,14 @@ use mlua::RegistryKey;
 
 /// A single GOAP action with boolean preconditions and effects.
 ///
+/// Actions are the building blocks of GOAP plans. Each action declares:
+/// - What must be true before it can execute (preconditions).
+/// - What becomes true after it executes (effects).
+/// - How expensive it is (cost), used by A★ to prefer cheaper plans.
+///
+/// The planner never modifies actions — they are reference data used during
+/// the search phase.
+///
 /// # Fields
 /// - `name` — `String`.
 /// - `cost` — `f64`.
@@ -14,30 +51,40 @@ use mlua::RegistryKey;
 /// - `preconditions` — `HashMap<String, bool>`.
 /// - `effects` — `HashMap<String, bool>`.
 pub struct GOAPAction {
-    /// Action name.
+    /// Human-readable action name, returned in plan results (e.g., `"chop_tree"`, `"craft_axe"`).
     pub name: String,
-    /// Cost of performing this action.
+    /// Numeric cost used by A★ to prefer cheaper action sequences.
+    /// Lower is better. Must be non-negative.
     pub cost: f64,
-    /// Optional Lua callback executed when this action is performed.
+    /// Optional Lua callback invoked when this action is executed during plan playback.
+    /// Not called during planning — planning is pure logic only.
     pub callback: Option<RegistryKey>,
-    /// Boolean preconditions that must be true to execute.
+    /// Boolean conditions that must all be true in the world state for this
+    /// action to be considered during planning.
     pub preconditions: HashMap<String, bool>,
-    /// Boolean effects applied after execution.
+    /// Boolean effects applied to the world state after this action executes.
+    /// Each key-value pair overwrites the corresponding world-state entry.
     pub effects: HashMap<String, bool>,
 }
 
-/// A planning goal expressed as a target boolean world state.
+/// A planning goal expressed as a desired boolean world state.
+///
+/// Goals represent what the agent wants to achieve. The planner selects the
+/// highest-priority goal and searches for an action sequence that transforms
+/// the current world state to satisfy all conditions in `state`.
 ///
 /// # Fields
 /// - `name` — `String`.
 /// - `priority` — `f64`.
 /// - `state` — `HashMap<String, bool>`.
 pub struct GOAPGoal {
-    /// Goal name.
+    /// Human-readable goal name (e.g., `"survive"`, `"build_shelter"`).
     pub name: String,
-    /// Priority (higher = preferred when planning).
+    /// Priority for goal selection. The planner picks the goal with the highest
+    /// priority value. When priorities are equal, the last-added goal wins.
     pub priority: f64,
-    /// Target boolean world state.
+    /// Target boolean world state. All entries must match for the goal to be
+    /// considered satisfied.
     pub state: HashMap<String, bool>,
 }
 
@@ -76,20 +123,29 @@ impl PlanNode {
     }
 }
 
-/// A★ planner over boolean world state for multi-step tactical planning.
+/// A★ planner that finds optimal action sequences to satisfy goals over boolean world state.
+///
+/// The planner holds a set of available [`GOAPAction`]s and a set of [`GOAPGoal`]s.
+/// When `plan()` is called, it selects the highest-priority goal and uses A★ search
+/// to find the cheapest sequence of actions whose cumulative effects satisfy all
+/// goal conditions from the given world state.
+///
+/// The planner is stateless between calls — it does not cache search results.
+/// Each `plan()` call performs a fresh search. For real-time games, call `plan()`
+/// only when conditions change, not every frame.
 ///
 /// # Fields
 /// - `actions` — `Vec<GOAPAction>`.
 /// - `goals` — `Vec<GOAPGoal>`.
 pub struct GOAPPlanner {
-    /// Available actions.
+    /// Available actions the planner can compose into sequences.
     pub actions: Vec<GOAPAction>,
-    /// Planning goals.
+    /// Goals the planner can target, selected by highest priority.
     pub goals: Vec<GOAPGoal>,
 }
 
 impl GOAPPlanner {
-    /// Creates a new empty GOAP planner.
+    /// Creates a new empty GOAP planner. Returns a fully initialised instance with all fields set to their initial values.
     ///
     /// # Returns
     /// `Self`.
@@ -123,7 +179,7 @@ impl GOAPPlanner {
         self.plan_for_goal(&goal.state, world_state, max_depth)
     }
 
-    /// Plans for a specific goal index.
+    /// Plans for a specific goal index. Consult the module-level documentation for the broader usage context and preconditions.
     ///
     /// # Parameters
     /// - `goal_idx` — `usize`.

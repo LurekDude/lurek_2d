@@ -1,4 +1,11 @@
 //! Coordinate conversion functions for isometric and hexagonal tile grids.
+//!
+//! This module is part of Luna2D's `tilemap` subsystem and provides the implementation
+//! details for coords-related operations and data management.
+//! Primary functions: `to_screen_iso()`, `from_screen_iso()`, `iso_rotate()`, `iso_direction_name()`.
+//!
+//! All public items are documented. See the parent module for architectural context
+//! and the `luna.*` Lua API for the scripting interface.
 
 use std::f32::consts::PI;
 

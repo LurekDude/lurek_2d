@@ -2,6 +2,13 @@
 //!
 //! Free functions for common geometric computations: intersections, containment,
 //! polygon operations, and rasterization.
+//!
+//! This module is part of Luna2D's `math` subsystem and provides the implementation
+//! details for geometry-related operations and data management.
+//! Primary functions: `angle_between()`, `circle_contains_point()`, `circle_intersects_circle()`, `circle_intersects_line()`.
+//!
+//! All public items are documented. See the parent module for architectural context
+//! and the `luna.*` Lua API for the scripting interface.
 
 /// Returns the angle in radians from (x1, y1) to (x2, y2).
 ///
@@ -34,7 +41,7 @@ pub fn circle_contains_point(cx: f32, cy: f32, r: f32, px: f32, py: f32) -> bool
     dx * dx + dy * dy <= r * r
 }
 
-/// Returns true if two circles overlap.
+/// Returns true if two circles overlap. Consult the module-level documentation for the broader usage context and preconditions.
 ///
 /// # Parameters
 /// - `x1` — `f32`.
@@ -194,7 +201,7 @@ pub fn polygon_area(vertices: &[f32]) -> f32 {
     area * 0.5
 }
 
-/// Computes the centroid of a polygon.
+/// Computes the centroid of a polygon. Consult the module-level documentation for the broader usage context and preconditions.
 ///
 /// # Parameters
 /// - `vertices` — `&[f32]`.

@@ -1,3 +1,13 @@
+//! Texture implementation for the `graphics` subsystem.
+//!
+//! This module is part of Luna2D's `graphics` subsystem and provides the implementation
+//! details for texture-related operations and data management.
+//! Key types exported from this module: `Texture`.
+//! Primary functions: `load()`, `from_rgba()`.
+//!
+//! All public items are documented. See the parent module for architectural context
+//! and the `luna.*` Lua API for the scripting interface.
+//!
 use crate::engine::error::{EngineError, EngineResult};
 use crate::engine::resource_keys::TextureKey;
 use crate::graphics::renderer::TextureData;

@@ -2,6 +2,14 @@
 //!
 //! Stores a series of timestamped points that age out over a configurable
 //! lifetime, producing a tapered ribbon from head to tail.
+//!
+//! This module is part of Luna2D's `graphics` subsystem and provides the implementation
+//! details for trail-related operations and data management.
+//! Key types exported from this module: `TrailPoint`, `Trail`.
+//! Primary functions: `new()`, `push_point()`, `update()`, `set_width()`.
+//!
+//! All public items are documented. See the parent module for architectural context
+//! and the `luna.*` Lua API for the scripting interface.
 
 use crate::graphics::Color;
 
@@ -21,7 +29,7 @@ pub struct TrailPoint {
     pub age: f32,
 }
 
-/// Fading textured ribbon renderer.
+/// Fading textured ribbon renderer. Consult the module-level documentation for the broader usage context and preconditions.
 ///
 /// # Fields
 /// - `points` — `Vec<TrailPoint>`.
@@ -141,7 +149,7 @@ impl Trail {
         self.min_distance = distance;
     }
 
-    /// Removes all trail points.
+    /// Removes all trail points. After this call the container is in the same state as immediately after construction.
     pub fn clear(&mut self) {
         self.points.clear();
     }

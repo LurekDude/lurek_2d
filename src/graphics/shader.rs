@@ -2,6 +2,14 @@
 //!
 //! Allows Lua scripts to create and apply custom fragment shaders
 //! with uniform variables.
+//!
+//! This module is part of Luna2D's `graphics` subsystem and provides the implementation
+//! details for shader-related operations and data management.
+//! Key types exported from this module: `ShaderFragmentInput`, `Shader`, `UniformValue`.
+//! Primary functions: `new()`, `send()`, `has_uniform()`, `ordered_uniforms()`.
+//!
+//! All public items are documented. See the parent module for architectural context
+//! and the `luna.*` Lua API for the scripting interface.
 
 use std::collections::HashMap;
 
@@ -98,7 +106,7 @@ impl Shader {
         })
     }
 
-    /// Sets a uniform value by name.
+    /// Sets a uniform value by name. Delivery is immediate and synchronous; all connected handlers run before this method returns.
     ///
     /// # Parameters
     /// - `name` — `String`.

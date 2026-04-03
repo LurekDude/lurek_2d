@@ -7,6 +7,10 @@ use std::cmp::Ordering;
 use std::collections::{BinaryHeap, HashMap, HashSet};
 
 /// A path through the province adjacency graph.
+///
+/// # Fields
+/// - `provinces` — `Vec<u32>`.
+/// - `total_cost` — `f64`.
 #[derive(Debug, Clone)]
 pub struct ProvincePath {
     /// Ordered list of province IDs from start to goal (inclusive).
@@ -20,6 +24,13 @@ pub struct ProvincePath {
 /// `tag_costs` adds extra cost when crossing an edge with matching tags.
 /// `province_costs` adds per-province overrides on top of `default_cost`.
 /// `blocked` contains impassable province IDs.
+///
+/// # Fields
+/// - `t` — `1.0).`.
+/// - `default_cost` — `f64`.
+/// - `province_costs` — `HashMap<u32`.
+/// - `tag_costs` — `HashMap<String`.
+/// - `blocked` — `HashSet<u32>`.
 #[derive(Debug, Clone, Default)]
 pub struct ProvinceCostFn {
     /// Default cost to enter any province (default: 1.0).
@@ -34,6 +45,9 @@ pub struct ProvinceCostFn {
 
 impl ProvinceCostFn {
     /// Create a cost function with default cost 1.0 and no overrides.
+    ///
+    /// # Returns
+    /// `Self`.
     pub fn new() -> Self {
         Self {
             default_cost: 1.0,
@@ -108,6 +122,13 @@ impl Ord for AStarNode {
 /// * `cost_fn` — cost function configuration
 ///
 /// Returns `None` if no path exists.
+///
+/// # Parameters
+/// - `neighbors` — `&HashMap<u32`.
+/// - `centroids` — `&HashMap<u32`.
+///
+/// # Returns
+/// `Option<ProvincePath>`.
 pub fn find_province_path(
     neighbors: &HashMap<u32, Vec<u32>>,
     centroids: &HashMap<u32, (f32, f32)>,
@@ -212,6 +233,13 @@ pub fn find_province_path(
 ///
 /// Returns a map of `province_id → cost_to_reach` for all reachable provinces
 /// (including `start` at cost 0).
+///
+/// # Parameters
+/// - `neighbors` — `&HashMap<u32`.
+/// - `edge_tags` — `&HashMap<(u32`.
+///
+/// # Returns
+/// `HashMap<u32, f64>`.
 pub fn province_reachable(
     neighbors: &HashMap<u32, Vec<u32>>,
     edge_tags: &HashMap<(u32, u32), HashSet<String>>,

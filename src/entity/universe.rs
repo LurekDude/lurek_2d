@@ -1,4 +1,12 @@
 //! Universe — a self-contained ECS world. Entities are u32 IDs starting at 1.
+//!
+//! This module is part of Luna2D's `entity` subsystem and provides the implementation
+//! details for universe-related operations and data management.
+//! Key types exported from this module: `Universe`.
+//! Primary functions: `new()`, `get_system_store()`, `spawn()`, `kill()`.
+//!
+//! All public items are documented. See the parent module for architectural context
+//! and the `luna.*` Lua API for the scripting interface.
 
 use mlua::{Function, Lua, RegistryKey, Result as LuaResult, Table, Value as LuaValue};
 use std::collections::{HashMap, HashSet};
@@ -6,10 +14,22 @@ use std::collections::{HashMap, HashSet};
 /// Maximum number of bitmap tag definitions per Universe.
 const MAX_BITMAP_TAGS: usize = 63;
 
-/// A self-contained ECS world.
+/// A self-contained ECS world. Consult the module-level documentation for the broader usage context and preconditions.
 ///
 /// Manages entities (u32 IDs with recycling), components (stored in Lua registry tables),
 /// string and bitmap tags, layers, blueprints, and systems.
+///
+/// # Fields
+/// - `next_id` — `u32`.
+/// - `free_list` — `Vec<u32>`.
+/// - `alive` — `HashSet<u32>`.
+/// - `string_tags` — `HashMap<u32`.
+/// - `bitmap_tag_names` — `Vec<String>`.
+/// - `bitmap_masks` — `HashMap<u32`.
+/// - `layers` — `HashMap<u32`.
+/// - `component_store` — `Option<RegistryKey>`.
+/// - `blueprint_store` — `Option<RegistryKey>`.
+/// - `system_store` — `Option<RegistryKey>`.
 pub struct Universe {
     next_id: u32,
     free_list: Vec<u32>,
@@ -24,7 +44,7 @@ pub struct Universe {
 }
 
 impl Universe {
-    /// Creates a new empty Universe.
+    /// Creates a new empty Universe. Returns a fully initialised instance with all fields set to their initial values.
     ///
     /// # Returns
     /// `Self`.
@@ -73,7 +93,7 @@ impl Universe {
         lua.registry_value::<Table>(key)
     }
 
-    /// get_system_store.
+    /// get_system_store. This accessor incurs no allocation; call it freely in hot paths.
     ///
     /// # Parameters
     /// - `lua` — `&'lua Lua`.
@@ -143,7 +163,7 @@ impl Universe {
         self.alive.contains(&id)
     }
 
-    /// Returns the number of alive entities.
+    /// Returns the number of alive entities. This accessor incurs no allocation; call it freely in hot paths.
     ///
     /// # Returns
     /// `usize`.
@@ -161,7 +181,7 @@ impl Universe {
 
     // === Component Operations ===
 
-    /// Sets a component value on an entity.
+    /// Sets a component value on an entity. Replaces the current component value; callers hold responsibility for maintaining consistency with related fields.
     ///
     /// # Parameters
     /// - `lua` — `&Lua`.
@@ -245,7 +265,7 @@ impl Universe {
         Ok(false)
     }
 
-    /// Removes a component from an entity.
+    /// Removes a component from an entity. Returns the removed value if present, or `None` when the key did not exist.
     ///
     /// # Parameters
     /// - `lua` — `&Lua`.
@@ -365,7 +385,7 @@ impl Universe {
         }
     }
 
-    /// Removes a string tag from an entity.
+    /// Removes a string tag from an entity. Returns the removed value if present, or `None` when the key did not exist.
     ///
     /// # Parameters
     /// - `id` — `u32`.
@@ -391,7 +411,7 @@ impl Universe {
             .unwrap_or(false)
     }
 
-    /// Returns all string tags for an entity.
+    /// Returns all string tags for an entity. This accessor incurs no allocation; call it freely in hot paths.
     ///
     /// # Parameters
     /// - `id` — `u32`.
@@ -466,7 +486,7 @@ impl Universe {
         Ok(())
     }
 
-    /// Removes a bitmap tag from an entity.
+    /// Removes a bitmap tag from an entity. Consult the module-level documentation for the broader usage context and preconditions.
     ///
     /// # Parameters
     /// - `id` — `u32`.
@@ -764,7 +784,7 @@ impl Universe {
         }
     }
 
-    /// Removes a blueprint definition.
+    /// Removes a blueprint definition. Returns the removed value if present, or `None` when the key did not exist.
     ///
     /// # Parameters
     /// - `lua` — `&Lua`.
@@ -780,7 +800,7 @@ impl Universe {
         Ok(())
     }
 
-    /// Lists all defined blueprint names.
+    /// Lists all defined blueprint names. Consult the module-level documentation for the broader usage context and preconditions.
     ///
     /// # Parameters
     /// - `lua` — `&Lua`.
@@ -930,7 +950,7 @@ impl Default for Universe {
     }
 }
 
-/// Deep-copies a Lua table recursively.
+/// Deep-copies a Lua table recursively. Consult the module-level documentation for the broader usage context and preconditions.
 ///
 /// # Parameters
 /// - `lua` — `&'lua Lua`.

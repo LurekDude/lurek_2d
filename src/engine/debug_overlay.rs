@@ -18,7 +18,7 @@ pub struct DebugOverlay {
 }
 
 impl DebugOverlay {
-    /// Creates a new disabled debug overlay.
+    /// Creates a new disabled debug overlay. Returns a fully initialised instance with all fields set to their initial values.
     ///
     /// # Returns
     /// `Self`.

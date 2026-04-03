@@ -2,6 +2,13 @@
 //!
 //! Scans the province map's pixel-lookup buffer in a single O(W*H) pass,
 //! checking right and bottom neighbours to discover shared borders.
+//!
+//! This module is part of Luna2D's `province_map` subsystem and provides the implementation
+//! details for adjacency-related operations and data management.
+//! Primary functions: `detect_adjacency()`, `detect_adjacency_with_tags()`.
+//!
+//! All public items are documented. See the parent module for architectural context
+//! and the `luna.*` Lua API for the scripting interface.
 
 use std::collections::{HashMap, HashSet};
 
@@ -12,6 +19,9 @@ use super::core::{AdjacencyEdge, ProvinceMap};
 /// For every pixel, the right `(x+1, y)` and bottom `(x, y+1)` neighbours are
 /// checked. When two different non-zero province IDs are found, an adjacency
 /// edge is recorded (or an existing one is updated with the new border pixel).
+///
+/// # Parameters
+/// - `ap` — `&mut ProvinceMap`.
 pub fn detect_adjacency(map: &mut ProvinceMap) {
     detect_adjacency_with_tags(map, &HashMap::new());
 }
@@ -23,6 +33,10 @@ pub fn detect_adjacency(map: &mut ProvinceMap) {
 /// as tag markers. If a tag pixel borders two distinct provinces, the
 /// adjacency edge between those provinces receives the corresponding tag
 /// string.
+///
+/// # Parameters
+/// - `ap` — `&mut ProvinceMap`.
+/// - `ag_pixel_colors` — `&HashMap<u32`.
 pub fn detect_adjacency_with_tags(
     map: &mut ProvinceMap,
     tag_pixel_colors: &HashMap<u32, String>,

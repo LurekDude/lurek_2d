@@ -1,3 +1,13 @@
+//! Vec2 implementation for the `math` subsystem.
+//!
+//! This module is part of Luna2D's `math` subsystem and provides the implementation
+//! details for vec2-related operations and data management.
+//! Key types exported from this module: `Vec2`.
+//! Primary functions: `new()`, `zero()`, `splat()`, `dot()`.
+//!
+//! All public items are documented. See the parent module for architectural context
+//! and the `luna.*` Lua API for the scripting interface.
+//!
 use std::ops::{Add, AddAssign, Div, Mul, MulAssign, Neg, Sub, SubAssign};
 
 /// A 2D floating-point vector used throughout the engine for positions, velocities, and directions.
@@ -15,13 +25,13 @@ pub struct Vec2 {
 }
 
 impl Vec2 {
-    /// The zero vector `(0.0, 0.0)`.
+    /// The zero vector `(0.0, 0.0)`. Consult the module-level documentation for the broader usage context and preconditions.
     pub const ZERO: Vec2 = Vec2 { x: 0.0, y: 0.0 };
-    /// The unit vector `(1.0, 1.0)`.
+    /// The unit vector `(1.0, 1.0)`. Consult the module-level documentation for the broader usage context and preconditions.
     pub const ONE: Vec2 = Vec2 { x: 1.0, y: 1.0 };
     /// Unit vector pointing up `(0.0, -1.0)` — screen space where Y increases downward.
     pub const UP: Vec2 = Vec2 { x: 0.0, y: -1.0 };
-    /// Unit vector pointing down `(0.0, 1.0)`.
+    /// Unit vector pointing down `(0.0, 1.0)`. Consult the module-level documentation for the broader usage context and preconditions.
     pub const DOWN: Vec2 = Vec2 { x: 0.0, y: 1.0 };
     /// Unit vector pointing left `(-1.0, 0.0)`.
     pub const LEFT: Vec2 = Vec2 { x: -1.0, y: 0.0 };
@@ -40,7 +50,7 @@ impl Vec2 {
         Vec2 { x, y }
     }
 
-    /// Returns the zero vector `(0.0, 0.0)`.
+    /// Returns the zero vector `(0.0, 0.0)`. Consult the module-level documentation for the broader usage context and preconditions.
     ///
     /// Equivalent to `Vec2::ZERO`; provided for ergonomics.
     ///

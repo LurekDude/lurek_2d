@@ -87,6 +87,17 @@ pub enum AnimEvent {
 /// 3. Call [`play`](Self::play) to start a clip, then
 ///    [`update`](Self::update) each tick.
 /// 4. Read the current source quad via [`current_quad`](Self::current_quad).
+///
+/// # Fields
+/// - `frames` — `Vec<AnimFrame>`.
+/// - `clips` — `HashMap<String`.
+/// - `current_clip` — `Option<String>`.
+/// - `current_frame_pos` — `usize`.
+/// - `timer` — `f32`.
+/// - `playing` — `bool`.
+/// - `speed` — `f32`.
+/// - `f` — `:update) call.`.
+/// - `pending_events` — `Vec<AnimEvent>`.
 pub struct Animation {
     /// All frames available to this animation.
     frames: Vec<AnimFrame>,
@@ -194,7 +205,7 @@ impl Animation {
 
     // ── Clip management ─────────────────────────────────────────────────
 
-    /// Registers a named clip.
+    /// Registers a named clip. The insertion is O(1) amortised unless a resize is triggered.
     ///
     /// # Parameters
     /// - `name` — Unique clip name.
@@ -245,7 +256,7 @@ impl Animation {
 
     // ── Playback control ────────────────────────────────────────────────
 
-    /// Starts playing a clip by name.
+    /// Starts playing a clip by name. Consult the module-level documentation for the broader usage context and preconditions.
     ///
     /// # Parameters
     /// - `name` — `&str`.
@@ -267,14 +278,14 @@ impl Animation {
         true
     }
 
-    /// Stops playback and resets to frame 0.
+    /// Stops playback and resets to frame 0. Consult the module-level documentation for the broader usage context and preconditions.
     pub fn stop(&mut self) {
         self.playing = false;
         self.current_frame_pos = 0;
         self.timer = 0.0;
     }
 
-    /// Pauses playback at the current frame.
+    /// Pauses playback at the current frame. Consult the module-level documentation for the broader usage context and preconditions.
     pub fn pause(&mut self) {
         self.playing = false;
     }
@@ -411,7 +422,7 @@ impl Animation {
             .is_some_and(|clip| clip.looping)
     }
 
-    /// Returns the playback speed multiplier.
+    /// Returns the playback speed multiplier. This accessor incurs no allocation; call it freely in hot paths.
     ///
     /// # Returns
     /// `f32`.
@@ -419,7 +430,7 @@ impl Animation {
         self.speed
     }
 
-    /// Sets the playback speed multiplier.
+    /// Sets the playback speed multiplier. Replaces the current speed value; callers hold responsibility for maintaining consistency with related fields.
     ///
     /// # Parameters
     /// - `speed` — `f32`.
@@ -437,7 +448,7 @@ impl Animation {
         self.frames.len()
     }
 
-    /// Returns the number of registered clips.
+    /// Returns the number of registered clips. This accessor incurs no allocation; call it freely in hot paths.
     ///
     /// # Returns
     /// `usize`.

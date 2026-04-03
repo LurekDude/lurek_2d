@@ -2,8 +2,16 @@
 //!
 //! Provides ray-vs-segment intersection, field of view computation,
 //! column projection, and distance-based shading.
+//!
+//! This module is part of Luna2D's `math` subsystem and provides the implementation
+//! details for raycasting-related operations and data management.
+//! Key types exported from this module: `Segment`, `RayHit`, `SpriteProjection`, `Raycaster2D`.
+//! Primary functions: `cast_ray_2d()`, `field_of_view()`, `project_column()`, `distance_shade()`.
+//!
+//! All public items are documented. See the parent module for architectural context
+//! and the `luna.*` Lua API for the scripting interface.
 
-/// A line segment for raycasting.
+/// A line segment for raycasting. Consult the module-level documentation for the broader usage context and preconditions.
 ///
 /// # Fields
 /// - `x1` — `f32`.
@@ -263,7 +271,7 @@ mod tests {
 
 // 2D grid-based raycaster using DDA (Digital Differential Analyzer) traversal.
 
-/// Result of a single ray cast.
+/// Result of a single ray cast. Consult the module-level documentation for the broader usage context and preconditions.
 ///
 /// # Fields
 /// - `distance` — `f32`.
@@ -294,7 +302,7 @@ pub struct RayHit {
     pub hit: bool,
 }
 
-/// Sprite projection result.
+/// Sprite projection result. Consult the module-level documentation for the broader usage context and preconditions.
 ///
 /// # Fields
 /// - `screen_x` — `f32`.
@@ -317,6 +325,11 @@ pub struct SpriteProjection {
 ///
 /// The grid stores wall types as `u32` values: 0 = empty, >0 = wall.
 /// Coordinates are 0-based with (0,0) at top-left.
+///
+/// # Fields
+/// - `width` — `u32`.
+/// - `height` — `u32`.
+/// - `cells` — `Vec<u32>`.
 pub struct Raycaster2D {
     width: u32,
     height: u32,
@@ -390,7 +403,7 @@ impl Raycaster2D {
         self.get_cell(x, y) > 0
     }
 
-    /// Returns the grid width.
+    /// Returns the grid width. Consult the module-level documentation for the broader usage context and preconditions.
     ///
     /// # Returns
     /// `u32`.
@@ -398,7 +411,7 @@ impl Raycaster2D {
         self.width
     }
 
-    /// Returns the grid height.
+    /// Returns the grid height. Consult the module-level documentation for the broader usage context and preconditions.
     ///
     /// # Returns
     /// `u32`.

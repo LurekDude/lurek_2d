@@ -1,4 +1,12 @@
 //! Inventory: the top-level item storage with subsystem management.
+//!
+//! This module is part of Luna2D's `inventory` subsystem and provides the implementation
+//! details for inventory-related operations and data management.
+//! Key types exported from this module: `SubsystemFlags`, `Inventory`.
+//! Primary functions: `new()`, `add_container()`, `get_container()`, `get_container_mut()`.
+//!
+//! All public items are documented. See the parent module for architectural context
+//! and the `luna.*` Lua API for the scripting interface.
 
 use std::collections::HashMap;
 
@@ -12,6 +20,12 @@ use super::slot::Slot;
 // ──────────────────────────────────────────────────────────────────────────────
 
 /// Active subsystem flags for an `Inventory`.
+///
+/// # Fields
+/// - `weight` — `bool`.
+/// - `size` — `bool`.
+/// - `stacking` — `bool`.
+/// - `sets` — `bool`.
 #[derive(Debug, Clone, Default)]
 pub struct SubsystemFlags {
     /// Enforce weight limits.
@@ -25,6 +39,14 @@ pub struct SubsystemFlags {
 }
 
 /// Top-level inventory managing containers, equip slots, item sets, and callbacks.
+///
+/// # Fields
+/// - `containers` — `HashMap<String`.
+/// - `container_order` — `Vec<String>`.
+/// - `equip_slots` — `HashMap<String`.
+/// - `equip_slot_order` — `Vec<String>`.
+/// - `item_sets` — `Vec<ItemSet>`.
+/// - `subsystems` — `SubsystemFlags`.
 #[derive(Debug, Clone)]
 pub struct Inventory {
     /// Named storage containers.
@@ -42,7 +64,10 @@ pub struct Inventory {
 }
 
 impl Inventory {
-    /// Create a new empty inventory.
+    /// Create a new empty inventory. Returns a fully initialised instance with all fields set to their initial values.
+    ///
+    /// # Returns
+    /// `Self`.
     pub fn new() -> Self {
         Self {
             containers: HashMap::new(),
@@ -54,7 +79,11 @@ impl Inventory {
         }
     }
 
-    /// Add or replace a named container.
+    /// Add or replace a named container. The insertion is O(1) amortised unless a resize is triggered.
+    ///
+    /// # Parameters
+    /// - `name` — `impl Into<String>`.
+    /// - `container` — `Container`.
     pub fn add_container(&mut self, name: impl Into<String>, container: Container) {
         let name = name.into();
         if !self.container_order.contains(&name) {
@@ -64,16 +93,34 @@ impl Inventory {
     }
 
     /// Get a reference to a container by name.
+    ///
+    /// # Parameters
+    /// - `name` — `&str`.
+    ///
+    /// # Returns
+    /// `Option<&Container>`.
     pub fn get_container(&self, name: &str) -> Option<&Container> {
         self.containers.get(name)
     }
 
     /// Get a mutable reference to a container by name.
+    ///
+    /// # Parameters
+    /// - `name` — `&str`.
+    ///
+    /// # Returns
+    /// `Option<&mut Container>`.
     pub fn get_container_mut(&mut self, name: &str) -> Option<&mut Container> {
         self.containers.get_mut(name)
     }
 
     /// Remove a container. Returns `true` if it existed.
+    ///
+    /// # Parameters
+    /// - `name` — `&str`.
+    ///
+    /// # Returns
+    /// `bool`.
     pub fn remove_container(&mut self, name: &str) -> bool {
         if self.containers.remove(name).is_some() {
             self.container_order.retain(|n| n != name);
@@ -83,12 +130,19 @@ impl Inventory {
         }
     }
 
-    /// All container names in insertion order.
+    /// All container names in insertion order. Consult the module-level documentation for the broader usage context and preconditions.
+    ///
+    /// # Returns
+    /// `&[String]`.
     pub fn container_names(&self) -> &[String] {
         &self.container_order
     }
 
-    /// Add or replace a named equipment slot.
+    /// Add or replace a named equipment slot. The insertion is O(1) amortised unless a resize is triggered.
+    ///
+    /// # Parameters
+    /// - `name` — `impl Into<String>`.
+    /// - `slot` — `Slot`.
     pub fn add_equip_slot(&mut self, name: impl Into<String>, slot: Slot) {
         let name = name.into();
         if !self.equip_slot_order.contains(&name) {
@@ -97,17 +151,35 @@ impl Inventory {
         self.equip_slots.insert(name, slot);
     }
 
-    /// Get a reference to an equip slot.
+    /// Get a reference to an equip slot. This accessor incurs no allocation; call it freely in hot paths.
+    ///
+    /// # Parameters
+    /// - `name` — `&str`.
+    ///
+    /// # Returns
+    /// `Option<&Slot>`.
     pub fn get_equip_slot(&self, name: &str) -> Option<&Slot> {
         self.equip_slots.get(name)
     }
 
-    /// Get a mutable equip slot.
+    /// Get a mutable equip slot. This accessor incurs no allocation; call it freely in hot paths.
+    ///
+    /// # Parameters
+    /// - `name` — `&str`.
+    ///
+    /// # Returns
+    /// `Option<&mut Slot>`.
     pub fn get_equip_slot_mut(&mut self, name: &str) -> Option<&mut Slot> {
         self.equip_slots.get_mut(name)
     }
 
     /// Remove an equip slot. Returns `true` if it existed.
+    ///
+    /// # Parameters
+    /// - `name` — `&str`.
+    ///
+    /// # Returns
+    /// `bool`.
     pub fn remove_equip_slot(&mut self, name: &str) -> bool {
         if self.equip_slots.remove(name).is_some() {
             self.equip_slot_order.retain(|n| n != name);
@@ -118,11 +190,21 @@ impl Inventory {
     }
 
     /// All equip slot names in insertion order.
+    ///
+    /// # Returns
+    /// `&[String]`.
     pub fn equip_slot_names(&self) -> &[String] {
         &self.equip_slot_order
     }
 
     /// Equip a stack into the named slot. Returns `false` if slot not found or item rejected.
+    ///
+    /// # Parameters
+    /// - `slot_name` — `&str`.
+    /// - `stack` — `ItemStack`.
+    ///
+    /// # Returns
+    /// `bool`.
     pub fn equip(&mut self, slot_name: &str, stack: ItemStack) -> bool {
         if let Some(slot) = self.equip_slots.get_mut(slot_name) {
             slot.set_stack(stack)
@@ -132,30 +214,63 @@ impl Inventory {
     }
 
     /// Unequip a slot and return the item (not the full stack). Returns `None` if slot is empty.
+    ///
+    /// # Parameters
+    /// - `slot_name` — `&str`.
+    ///
+    /// # Returns
+    /// `Option<InventoryEntry>`.
     pub fn unequip(&mut self, slot_name: &str) -> Option<InventoryEntry> {
         let slot = self.equip_slots.get_mut(slot_name)?;
         let stack = slot.stack.take()?;
         Some(stack.item)
     }
 
-    /// Enable a subsystem by name.
+    /// Enable a subsystem by name. Runs in O(1) time.
     /// Count total items of `item_type` across all containers.
+    ///
+    /// # Parameters
+    /// - `item_type` — `&str`.
+    ///
+    /// # Returns
+    /// `u32`.
     pub fn count_item(&self, item_type: &str) -> u32 {
-        self.containers.values().map(|c| c.count_item(item_type)).sum()
+        self.containers
+            .values()
+            .map(|c| c.count_item(item_type))
+            .sum()
     }
 
     /// Returns true if the inventory holds at least `qty` of `item_type` across all containers.
+    ///
+    /// # Parameters
+    /// - `item_type` — `&str`.
+    /// - `qty` — `u32`.
+    ///
+    /// # Returns
+    /// `bool`.
     pub fn has_item(&self, item_type: &str, qty: u32) -> bool {
         self.count_item(item_type) >= qty
     }
 
     /// Remove up to `qty` of `item_type` from whichever containers have it.
     /// Returns true if the full amount was consumed.
+    ///
+    /// # Parameters
+    /// - `item_type` — `&str`.
+    /// - `qty` — `u32`.
+    ///
+    /// # Returns
+    /// `bool`.
     pub fn remove_from_any(&mut self, item_type: &str, qty: u32) -> bool {
-        if !self.has_item(item_type, qty) { return false; }
+        if !self.has_item(item_type, qty) {
+            return false;
+        }
         let mut remaining = qty;
         for container in self.containers.values_mut() {
-            if remaining == 0 { break; }
+            if remaining == 0 {
+                break;
+            }
             let available = container.count_item(item_type);
             if available > 0 {
                 let take = available.min(remaining);
@@ -166,6 +281,10 @@ impl Inventory {
         remaining == 0
     }
 
+    /// Enable or disable the named inventory sub-system (weight, size, stacking, sets).
+    ///
+    /// # Parameters
+    /// - `name` — `&str`.
     pub fn enable_subsystem(&mut self, name: &str) {
         match name {
             "weight" => self.subsystems.weight = true,
@@ -176,7 +295,10 @@ impl Inventory {
         }
     }
 
-    /// Disable a subsystem by name.
+    /// Disable a subsystem by name. Consult the module-level documentation for the broader usage context and preconditions.
+    ///
+    /// # Parameters
+    /// - `name` — `&str`.
     pub fn disable_subsystem(&mut self, name: &str) {
         match name {
             "weight" => self.subsystems.weight = false,
@@ -187,7 +309,13 @@ impl Inventory {
         }
     }
 
-    /// Check whether a subsystem is enabled.
+    /// Check whether a subsystem is enabled. This accessor incurs no allocation; call it freely in hot paths.
+    ///
+    /// # Parameters
+    /// - `name` — `&str`.
+    ///
+    /// # Returns
+    /// `bool`.
     pub fn is_subsystem_enabled(&self, name: &str) -> bool {
         match name {
             "weight" => self.subsystems.weight,
@@ -198,17 +326,26 @@ impl Inventory {
         }
     }
 
-    /// Add an item set.
+    /// Add an item set. The insertion is O(1) amortised unless a resize is triggered.
+    ///
+    /// # Parameters
+    /// - `set` — `ItemSet`.
     pub fn add_item_set(&mut self, set: ItemSet) {
         self.item_sets.push(set);
     }
 
-    /// Get all registered item sets.
+    /// Get all registered item sets. This accessor incurs no allocation; call it freely in hot paths.
+    ///
+    /// # Returns
+    /// `&[ItemSet]`.
     pub fn get_item_sets(&self) -> &[ItemSet] {
         &self.item_sets
     }
 
     /// Get only currently active item sets (all requirements met).
+    ///
+    /// # Returns
+    /// `Vec<&ItemSet>`.
     pub fn get_active_sets(&self) -> Vec<&ItemSet> {
         self.item_sets
             .iter()
@@ -218,6 +355,15 @@ impl Inventory {
 
     /// Transfer a stack from one container/slot to another.
     /// All indices are 0-based internally.
+    ///
+    /// # Parameters
+    /// - `from_container` — `&str`.
+    /// - `from_slot` — `usize`.
+    /// - `o_container` — `&str`.
+    /// - `o_slot` — `usize`.
+    ///
+    /// # Returns
+    /// `bool`.
     pub fn transfer(
         &mut self,
         from_container: &str,
@@ -281,7 +427,107 @@ impl Inventory {
         }
     }
 
+    /// Split `quantity` items from a stack in `container` at `slot_idx` into the next
+    /// empty slot in the same container. Returns `true` if the split succeeded.
+    ///
+    /// # Parameters
+    /// - `container` — `&str`.
+    /// - `slot_idx` — `usize`.
+    /// - `quantity` — `u32`.
+    ///
+    /// # Returns
+    /// `bool`.
+    pub fn split_stack(&mut self, container: &str, slot_idx: usize, quantity: u32) -> bool {
+        let c = match self.containers.get_mut(container) {
+            Some(c) => c,
+            None => return false,
+        };
+        let split = match c.slots.get_mut(slot_idx) {
+            Some(s) => match &mut s.stack {
+                Some(stack) => stack.split(quantity),
+                None => None,
+            },
+            None => return false,
+        };
+        if let Some(new_stack) = split {
+            // Place into first empty slot
+            for slot in &mut c.slots {
+                if slot.is_empty() && slot.can_accept(&new_stack.item) {
+                    slot.stack = Some(new_stack);
+                    return true;
+                }
+            }
+            // No free slot — undo the split by adding back
+            if let Some(s) = c.slots.get_mut(slot_idx) {
+                if let Some(stack) = &mut s.stack {
+                    stack.quantity += quantity;
+                }
+            }
+            false
+        } else {
+            false
+        }
+    }
+
+    /// Merge the stack at `from_slot` into `to_slot` within the same container.
+    /// Returns `true` if any items were merged.
+    ///
+    /// # Parameters
+    /// - `container` — `&str`.
+    /// - `from_slot` — `usize`.
+    /// - `o_slot` — `usize`.
+    ///
+    /// # Returns
+    /// `bool`.
+    pub fn merge_stacks(&mut self, container: &str, from_slot: usize, to_slot: usize) -> bool {
+        let c = match self.containers.get_mut(container) {
+            Some(c) => c,
+            None => return false,
+        };
+        if from_slot == to_slot || from_slot >= c.slots.len() || to_slot >= c.slots.len() {
+            return false;
+        }
+        // Take source stack
+        let from_stack = match c.slots[from_slot].stack.take() {
+            Some(s) => s,
+            None => return false,
+        };
+        // Merge into destination
+        match &mut c.slots[to_slot].stack {
+            Some(dest) => {
+                if dest.item.item_type != from_stack.item.item_type {
+                    // Type mismatch — restore source
+                    c.slots[from_slot].stack = Some(from_stack);
+                    return false;
+                }
+                let leftover = dest.add(from_stack.quantity);
+                if leftover > 0 {
+                    c.slots[from_slot].stack = Some(ItemStack::new(
+                        from_stack.item,
+                        leftover,
+                        from_stack.max_quantity,
+                    ));
+                }
+                true
+            }
+            None => {
+                // Destination empty — just move
+                c.slots[to_slot].stack = Some(from_stack);
+                true
+            }
+        }
+    }
+
     /// Swap items between two container slots. Returns `false` if either slot not found.
+    ///
+    /// # Parameters
+    /// - `container_a` — `&str`.
+    /// - `slot_a` — `usize`.
+    /// - `container_b` — `&str`.
+    /// - `slot_b` — `usize`.
+    ///
+    /// # Returns
+    /// `bool`.
     pub fn swap(
         &mut self,
         container_a: &str,

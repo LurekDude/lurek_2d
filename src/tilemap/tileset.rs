@@ -1,4 +1,12 @@
 //! Tile set backed by a texture atlas with animation, solid flags, and autotile rules.
+//!
+//! This module is part of Luna2D's `tilemap` subsystem and provides the implementation
+//! details for tileset-related operations and data management.
+//! Key types exported from this module: `TileAnimFrame`, `TileSet`.
+//! Primary functions: `new()`, `get_first_gid()`, `get_tile_count()`, `get_columns()`.
+//!
+//! All public items are documented. See the parent module for architectural context
+//! and the `luna.*` Lua API for the scripting interface.
 
 use std::collections::HashMap;
 
@@ -21,6 +29,19 @@ pub struct TileAnimFrame {
 ///
 /// Tile IDs are 0-based within the set. The `first_gid` maps this set into the global
 /// GID space used by [`super::TileMap`].
+///
+/// # Fields
+/// - `first_gid` — `u32`.
+/// - `tile_count` — `u32`.
+/// - `columns` — `u32`.
+/// - `tile_width` — `u32`.
+/// - `tile_height` — `u32`.
+/// - `spacing` — `u32`.
+/// - `margin` — `u32`.
+/// - `solids` — `Vec<bool>`.
+/// - `animations` — `HashMap<u32`.
+/// - `auto_rules_4` — `HashMap<(String`.
+/// - `auto_rules_8` — `HashMap<(String`.
 #[derive(Debug, Clone)]
 pub struct TileSet {
     first_gid: u32,

@@ -1,3 +1,13 @@
+//! Gamepad implementation for the `input` subsystem.
+//!
+//! This module is part of Luna2D's `input` subsystem and provides the implementation
+//! details for gamepad-related operations and data management.
+//! Key types exported from this module: `GamepadState`.
+//! Primary functions: `new()`, `update_button()`, `update_axis()`, `is_button_pressed()`.
+//!
+//! All public items are documented. See the parent module for architectural context
+//! and the `luna.*` Lua API for the scripting interface.
+//!
 use std::collections::HashMap;
 
 /// Holds the current button and axis state for a single gamepad identified by its id.

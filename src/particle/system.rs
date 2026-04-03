@@ -53,7 +53,7 @@ pub enum InsertMode {
     Random,
 }
 
-/// Emitter lifecycle state.
+/// Emitter lifecycle state. Delivery is immediate and synchronous; all connected handlers run before this method returns.
 ///
 /// # Variants
 /// - `Active` — Active variant.
@@ -154,7 +154,7 @@ pub enum RelativeMode {
     Attached,
 }
 
-/// Configuration for a particle emitter.
+/// Configuration for a particle emitter. Consult the module-level documentation for the broader usage context and preconditions.
 ///
 /// # Fields
 /// - `max_particles` — `u32`.
@@ -430,7 +430,7 @@ pub struct Particle {
     pub origin_y: f32,
 }
 
-/// An emitter-based particle system.
+/// An emitter-based particle system. Consult the module-level documentation for the broader usage context and preconditions.
 ///
 /// # Fields
 /// - `config` — `ParticleConfig`.
@@ -672,7 +672,7 @@ impl ParticleSystem {
         }
     }
 
-    /// Returns the number of live particles.
+    /// Returns the number of live particles. Runs in O(1) time.
     ///
     /// # Returns
     /// `usize`.

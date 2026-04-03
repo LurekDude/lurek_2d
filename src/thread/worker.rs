@@ -34,6 +34,12 @@ pub enum ThreadState {
 /// Created via `luna.thread.newThread(code)`. Call `start()` to spawn the
 /// OS thread and `wait()` to block until completion. Errors are captured
 /// in `ThreadState::Error` and retrievable via `get_error()`.
+///
+/// # Fields
+/// - `code` — `String`.
+/// - `state` — `Arc<Mutex<ThreadState>>`.
+/// - `handle` — `Option<thread::JoinHandle<()>>`.
+/// - `channels` — `Arc<Mutex<HashMap<String`.
 pub struct LuaThread {
     /// The Lua source code to execute.
     code: String,

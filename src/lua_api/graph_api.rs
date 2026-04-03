@@ -303,6 +303,8 @@ impl LuaUserData for LuaGraph {
 
         // Remove a node from the graph.
         /// Removes node from the collection.
+        /// @param node_ud : Node
+        /// @return any
         ///
         /// # Parameters
         /// - `node_ud` — `userdata`.
@@ -313,6 +315,8 @@ impl LuaUserData for LuaGraph {
 
         // Check whether a node exists in the graph.
         /// Returns `true` if node.
+        /// @param node_ud : Node
+        /// @return any
         ///
         /// # Parameters
         /// - `node_ud` — `userdata`.
@@ -326,6 +330,7 @@ impl LuaUserData for LuaGraph {
 
         // Get all nodes as a table of LuaNode.
         /// Returns the nodes.
+        /// @return any
         ///
         /// # Returns
         /// The current nodes.
@@ -347,6 +352,7 @@ impl LuaUserData for LuaGraph {
 
         // Get the number of nodes.
         /// Returns the node count.
+        /// @return any
         ///
         /// # Parameters
         /// - `from_ud` — `userdata`.
@@ -363,6 +369,10 @@ impl LuaUserData for LuaGraph {
 
         // Add a directed edge between two nodes.
         /// Adds edge to the collection.
+        /// @param from_ud : Node
+        /// @param to_ud : Node
+        /// @param edge_type : string?
+        /// @return any
         ///
         /// # Parameters
         /// - `from_ud` — `userdata`.
@@ -379,6 +389,8 @@ impl LuaUserData for LuaGraph {
 
         // Remove an edge from the graph.
         /// Removes edge from the collection.
+        /// @param edge_ud : Edge
+        /// @return any
         ///
         /// # Parameters
         /// - `edge_ud` — `userdata`.
@@ -389,6 +401,8 @@ impl LuaUserData for LuaGraph {
 
         // Check whether an edge exists.
         /// Returns `true` if edge.
+        /// @param edge_ud : Edge
+        /// @return any
         ///
         /// # Parameters
         /// - `edge_ud` — `userdata`.
@@ -402,6 +416,7 @@ impl LuaUserData for LuaGraph {
 
         // Get all edges as a table of LuaEdge.
         /// Returns the edges.
+        /// @return any
         ///
         /// # Returns
         /// The current edges.
@@ -423,6 +438,7 @@ impl LuaUserData for LuaGraph {
 
         // Get the number of edges.
         /// Returns the edge count.
+        /// @return any
         ///
         /// # Parameters
         /// - `from_ud` — `userdata`.
@@ -482,6 +498,8 @@ impl LuaUserData for LuaGraph {
 
         // Remove an item from the graph entirely.
         /// Removes item from the collection.
+        /// @param item_ud : GraphItem
+        /// @return any
         ///
         /// # Parameters
         /// - `item_ud` — `userdata`.
@@ -492,6 +510,8 @@ impl LuaUserData for LuaGraph {
 
         // Check whether an item exists.
         /// Returns `true` if item.
+        /// @param item_ud : GraphItem
+        /// @return any
         ///
         /// # Parameters
         /// - `item_ud` — `userdata`.
@@ -505,6 +525,7 @@ impl LuaUserData for LuaGraph {
 
         // Get all items as a table of LuaGraphItem.
         /// Returns the items.
+        /// @return any
         ///
         /// # Returns
         /// The current items.
@@ -526,6 +547,7 @@ impl LuaUserData for LuaGraph {
 
         // Get the number of items.
         /// Returns the item count.
+        /// @return any
         ///
         /// # Parameters
         /// - `item_ud` — `userdata`.
@@ -554,6 +576,7 @@ impl LuaUserData for LuaGraph {
 
         // Advance simulation by dt seconds, dispatching event callbacks.
         /// Advances the simulation by `dt` seconds.
+        /// @param dt : number
         ///
         /// # Parameters
         /// - `dt` — `number`.
@@ -630,6 +653,10 @@ impl LuaUserData for LuaGraph {
 
         // Find a path for a specific item (filters by item type).
         /// Find path for item on this Graph.
+        /// @param item_ud : GraphItem
+        /// @param from_ud : Node
+        /// @param to_ud : Node
+        /// @return any
         ///
         /// # Parameters
         /// - `item_ud` — `userdata`.
@@ -706,6 +733,8 @@ impl LuaUserData for LuaGraph {
 
         // Get direct neighbors of a node.
         /// Returns the neighbors.
+        /// @param node_ud : Node
+        /// @return any
         ///
         /// # Parameters
         /// - `node_ud` — `userdata`.
@@ -733,6 +762,7 @@ impl LuaUserData for LuaGraph {
 
         // Get weakly connected components.
         /// Returns the components.
+        /// @return any
         ///
         /// # Returns
         /// The current components.
@@ -758,6 +788,7 @@ impl LuaUserData for LuaGraph {
 
         // Check whether the graph has a cycle.
         /// Returns `true` if cycle.
+        /// @return any
         ///
         /// # Returns
         /// `boolean`.
@@ -767,6 +798,7 @@ impl LuaUserData for LuaGraph {
 
         // Topological sort (returns nil if cycle exists).
         /// Topological sort on this Graph.
+        /// @return any
         ///
         /// # Returns
         /// The result.
@@ -807,6 +839,7 @@ impl LuaUserData for LuaGraph {
 
         // Get a statistics snapshot as a table.
         /// Returns the stats.
+        /// @return any
         ///
         /// # Returns
         /// The current stats.
@@ -922,6 +955,7 @@ impl LuaUserData for LuaNode {
         // ---- Properties ----
 
         /// Returns the type.
+        /// @return any
         ///
         /// # Parameters
         /// - `t` — `string`.
@@ -932,6 +966,7 @@ impl LuaUserData for LuaNode {
             with_node!(this, g, node, Ok(node.get_type().to_string()))
         });
         /// Sets the type.
+        /// @param t : string
         ///
         /// # Parameters
         /// - `t` — `string`.
@@ -943,6 +978,7 @@ impl LuaUserData for LuaNode {
         });
 
         /// Returns the capacity.
+        /// @return any
         ///
         /// # Parameters
         /// - `c` — `integer`.
@@ -953,6 +989,7 @@ impl LuaUserData for LuaNode {
             with_node!(this, g, node, Ok(node.get_capacity()))
         });
         /// Sets the capacity.
+        /// @param c : integer
         ///
         /// # Parameters
         /// - `c` — `integer`.
@@ -964,6 +1001,7 @@ impl LuaUserData for LuaNode {
         });
 
         /// Returns the item count.
+        /// @return any
         ///
         /// # Returns
         /// The current item count.
@@ -972,6 +1010,7 @@ impl LuaUserData for LuaNode {
         });
 
         /// Returns `true` if full.
+        /// @return boolean
         ///
         /// # Parameters
         /// - `a` — `boolean`.
@@ -983,6 +1022,7 @@ impl LuaUserData for LuaNode {
         });
 
         /// Returns `true` if active.
+        /// @return any
         ///
         /// # Parameters
         /// - `a` — `boolean`.
@@ -993,6 +1033,7 @@ impl LuaUserData for LuaNode {
             with_node!(this, g, node, Ok(node.active))
         });
         /// Sets the active.
+        /// @param a : boolean
         ///
         /// # Parameters
         /// - `a` — `boolean`.
@@ -1004,6 +1045,7 @@ impl LuaUserData for LuaNode {
         });
 
         /// Returns the overflow policy.
+        /// @return any
         ///
         /// # Parameters
         /// - `p` — `string`.
@@ -1014,6 +1056,7 @@ impl LuaUserData for LuaNode {
             with_node!(this, g, node, Ok(node.overflow_policy.to_str().to_string()))
         });
         /// Sets the overflow policy.
+        /// @param p : string
         ///
         /// # Parameters
         /// - `p` — `string`.
@@ -1026,6 +1069,7 @@ impl LuaUserData for LuaNode {
         });
 
         /// Returns the flow mode.
+        /// @return any
         ///
         /// # Parameters
         /// - `m` — `string`.
@@ -1036,6 +1080,7 @@ impl LuaUserData for LuaNode {
             with_node!(this, g, node, Ok(node.flow_mode.to_str().to_string()))
         });
         /// Sets the flow mode.
+        /// @param m : string
         ///
         /// # Parameters
         /// - `m` — `string`.
@@ -1048,6 +1093,7 @@ impl LuaUserData for LuaNode {
         });
 
         /// Returns the push rate.
+        /// @return any
         ///
         /// # Parameters
         /// - `r` — `number`.
@@ -1058,6 +1104,7 @@ impl LuaUserData for LuaNode {
             with_node!(this, g, node, Ok(node.push_rate))
         });
         /// Sets the push rate.
+        /// @param r : number
         ///
         /// # Parameters
         /// - `r` — `number`.
@@ -1069,6 +1116,7 @@ impl LuaUserData for LuaNode {
         });
 
         /// Returns the pull rate.
+        /// @return any
         ///
         /// # Parameters
         /// - `r` — `number`.
@@ -1079,6 +1127,7 @@ impl LuaUserData for LuaNode {
             with_node!(this, g, node, Ok(node.pull_rate))
         });
         /// Sets the pull rate.
+        /// @param r : number
         ///
         /// # Parameters
         /// - `r` — `number`.
@@ -1090,6 +1139,7 @@ impl LuaUserData for LuaNode {
         });
 
         /// Returns the push filter.
+        /// @return any
         ///
         /// # Parameters
         /// - `f` — `string` optional.
@@ -1100,6 +1150,7 @@ impl LuaUserData for LuaNode {
             with_node!(this, g, node, Ok(node.push_filter.clone()))
         });
         /// Sets the push filter.
+        /// @param f : string?
         ///
         /// # Parameters
         /// - `f` — `string` optional.
@@ -1111,6 +1162,7 @@ impl LuaUserData for LuaNode {
         });
 
         /// Returns the pull filter.
+        /// @return any
         ///
         /// # Parameters
         /// - `f` — `string` optional.
@@ -1121,6 +1173,7 @@ impl LuaUserData for LuaNode {
             with_node!(this, g, node, Ok(node.pull_filter.clone()))
         });
         /// Sets the pull filter.
+        /// @param f : string?
         ///
         /// # Parameters
         /// - `f` — `string` optional.
@@ -1132,6 +1185,7 @@ impl LuaUserData for LuaNode {
         });
 
         /// Returns the process time.
+        /// @return any
         ///
         /// # Parameters
         /// - `t` — `number`.
@@ -1142,6 +1196,7 @@ impl LuaUserData for LuaNode {
             with_node!(this, g, node, Ok(node.process_time))
         });
         /// Sets the process time.
+        /// @param t : number
         ///
         /// # Parameters
         /// - `t` — `number`.
@@ -1153,6 +1208,7 @@ impl LuaUserData for LuaNode {
         });
 
         /// Returns `true` if queue enabled.
+        /// @return any
         ///
         /// # Parameters
         /// - `e` — `boolean`.
@@ -1163,6 +1219,7 @@ impl LuaUserData for LuaNode {
             with_node!(this, g, node, Ok(node.queue_enabled))
         });
         /// Sets the queue enabled.
+        /// @param e : boolean
         ///
         /// # Parameters
         /// - `e` — `boolean`.
@@ -1174,6 +1231,7 @@ impl LuaUserData for LuaNode {
         });
 
         /// Returns the queue capacity.
+        /// @return any
         ///
         /// # Parameters
         /// - `c` — `integer`.
@@ -1184,6 +1242,7 @@ impl LuaUserData for LuaNode {
             with_node!(this, g, node, Ok(node.queue_capacity))
         });
         /// Sets the queue capacity.
+        /// @param c : integer
         ///
         /// # Parameters
         /// - `c` — `integer`.
@@ -1195,6 +1254,7 @@ impl LuaUserData for LuaNode {
         });
 
         /// Returns the queue size.
+        /// @return integer
         ///
         /// # Returns
         /// The current queue size.
@@ -1205,6 +1265,7 @@ impl LuaUserData for LuaNode {
         // ---- Items & Edges ----
 
         /// Returns the items.
+        /// @return any
         ///
         /// # Returns
         /// The current items.
@@ -1228,6 +1289,8 @@ impl LuaUserData for LuaNode {
         });
 
         /// Returns the edges.
+        /// @param dir : string?
+        /// @return any
         ///
         /// # Parameters
         /// - `dir` — `string` optional.
@@ -1296,6 +1359,8 @@ impl LuaUserData for LuaNode {
         );
 
         /// Clear conversion on this Node.
+        /// @param in_type : string
+        /// @return any
         ///
         /// # Parameters
         /// - `in_type` — `string`.
@@ -1317,6 +1382,7 @@ impl LuaUserData for LuaNode {
         // ---- Tags ----
 
         /// Adds tag to the collection.
+        /// @param tag : string
         ///
         /// # Parameters
         /// - `tag` — `string`.
@@ -1327,6 +1393,8 @@ impl LuaUserData for LuaNode {
             })
         });
         /// Removes tag from the collection.
+        /// @param tag : string
+        /// @return any
         ///
         /// # Parameters
         /// - `tag` — `string`.
@@ -1334,6 +1402,8 @@ impl LuaUserData for LuaNode {
             with_node_mut!(this, g, node, Ok(node.remove_tag(&tag)))
         });
         /// Returns `true` if tag.
+        /// @param tag : string
+        /// @return any
         ///
         /// # Parameters
         /// - `tag` — `string`.
@@ -1354,6 +1424,7 @@ impl LuaUserData for LuaNode {
             })
         });
         /// Returns the tags.
+        /// @return any
         ///
         /// # Returns
         /// The current tags.
@@ -1383,6 +1454,8 @@ impl LuaUserData for LuaNode {
             },
         );
         /// Removes supply from the collection.
+        /// @param item_type : string
+        /// @return any
         ///
         /// # Parameters
         /// - `item_type` — `string`.
@@ -1411,6 +1484,8 @@ impl LuaUserData for LuaNode {
             },
         );
         /// Removes demand from the collection.
+        /// @param item_type : string
+        /// @return any
         ///
         /// # Parameters
         /// - `item_type` — `string`.
@@ -1431,6 +1506,8 @@ impl LuaUserData for LuaNode {
         // ---- Queue ----
 
         /// Enqueue on this Node.
+        /// @param item_ud : GraphItem
+        /// @return any
         ///
         /// # Parameters
         /// - `item_ud` — `userdata`.
@@ -1440,6 +1517,7 @@ impl LuaUserData for LuaNode {
         });
 
         /// Dequeue on this Node.
+        /// @return any
         ///
         /// # Returns
         /// The result.
@@ -1495,6 +1573,7 @@ impl LuaUserData for LuaEdge {
         // ---- Properties ----
 
         /// Returns the type.
+        /// @return any
         ///
         /// # Parameters
         /// - `t` — `string`.
@@ -1505,6 +1584,7 @@ impl LuaUserData for LuaEdge {
             with_edge!(this, g, edge, Ok(edge.get_type().to_string()))
         });
         /// Sets the type.
+        /// @param t : string
         ///
         /// # Parameters
         /// - `t` — `string`.
@@ -1516,6 +1596,7 @@ impl LuaUserData for LuaEdge {
         });
 
         /// Returns the from.
+        /// @return any
         ///
         /// # Returns
         /// The current from.
@@ -1531,6 +1612,7 @@ impl LuaUserData for LuaEdge {
             )
         });
         /// Returns the to.
+        /// @return any
         ///
         /// # Returns
         /// The current to.
@@ -1547,6 +1629,7 @@ impl LuaUserData for LuaEdge {
         });
 
         /// Returns the capacity.
+        /// @return any
         ///
         /// # Parameters
         /// - `c` — `integer`.
@@ -1557,6 +1640,7 @@ impl LuaUserData for LuaEdge {
             with_edge!(this, g, edge, Ok(edge.capacity))
         });
         /// Sets the capacity.
+        /// @param c : integer
         ///
         /// # Parameters
         /// - `c` — `integer`.
@@ -1568,6 +1652,7 @@ impl LuaUserData for LuaEdge {
         });
 
         /// Returns the throughput.
+        /// @return any
         ///
         /// # Parameters
         /// - `t` — `number`.
@@ -1578,6 +1663,7 @@ impl LuaUserData for LuaEdge {
             with_edge!(this, g, edge, Ok(edge.throughput))
         });
         /// Sets the throughput.
+        /// @param t : number
         ///
         /// # Parameters
         /// - `t` — `number`.
@@ -1589,6 +1675,7 @@ impl LuaUserData for LuaEdge {
         });
 
         /// Returns the travel time.
+        /// @return any
         ///
         /// # Parameters
         /// - `t` — `number`.
@@ -1599,6 +1686,7 @@ impl LuaUserData for LuaEdge {
             with_edge!(this, g, edge, Ok(edge.travel_time))
         });
         /// Sets the travel time.
+        /// @param t : number
         ///
         /// # Parameters
         /// - `t` — `number`.
@@ -1610,6 +1698,7 @@ impl LuaUserData for LuaEdge {
         });
 
         /// Returns the weight.
+        /// @return any
         ///
         /// # Parameters
         /// - `w` — `number`.
@@ -1620,6 +1709,7 @@ impl LuaUserData for LuaEdge {
             with_edge!(this, g, edge, Ok(edge.weight))
         });
         /// Sets the weight.
+        /// @param w : number
         ///
         /// # Parameters
         /// - `w` — `number`.
@@ -1631,6 +1721,7 @@ impl LuaUserData for LuaEdge {
         });
 
         /// Returns the speed modifier.
+        /// @return any
         ///
         /// # Parameters
         /// - `m` — `number`.
@@ -1641,6 +1732,7 @@ impl LuaUserData for LuaEdge {
             with_edge!(this, g, edge, Ok(edge.speed_modifier))
         });
         /// Sets the speed modifier.
+        /// @param m : number
         ///
         /// # Parameters
         /// - `m` — `number`.
@@ -1652,6 +1744,7 @@ impl LuaUserData for LuaEdge {
         });
 
         /// Returns the cooldown.
+        /// @return any
         ///
         /// # Parameters
         /// - `c` — `number`.
@@ -1662,6 +1755,7 @@ impl LuaUserData for LuaEdge {
             with_edge!(this, g, edge, Ok(edge.cooldown))
         });
         /// Sets the cooldown.
+        /// @param c : number
         ///
         /// # Parameters
         /// - `c` — `number`.
@@ -1673,6 +1767,7 @@ impl LuaUserData for LuaEdge {
         });
 
         /// Returns `true` if on cooldown.
+        /// @return any
         ///
         /// # Parameters
         /// - `b` — `boolean`.
@@ -1684,6 +1779,7 @@ impl LuaUserData for LuaEdge {
         });
 
         /// Returns `true` if bidirectional.
+        /// @return any
         ///
         /// # Parameters
         /// - `b` — `boolean`.
@@ -1694,6 +1790,7 @@ impl LuaUserData for LuaEdge {
             with_edge!(this, g, edge, Ok(edge.bidirectional))
         });
         /// Sets the bidirectional.
+        /// @param b : boolean
         ///
         /// # Parameters
         /// - `b` — `boolean`.
@@ -1705,6 +1802,7 @@ impl LuaUserData for LuaEdge {
         });
 
         /// Returns `true` if active.
+        /// @return any
         ///
         /// # Parameters
         /// - `a` — `boolean`.
@@ -1715,6 +1813,7 @@ impl LuaUserData for LuaEdge {
             with_edge!(this, g, edge, Ok(edge.active))
         });
         /// Sets the active.
+        /// @param a : boolean
         ///
         /// # Parameters
         /// - `a` — `boolean`.
@@ -1726,6 +1825,7 @@ impl LuaUserData for LuaEdge {
         });
 
         /// Returns the items in transit.
+        /// @return any
         ///
         /// # Returns
         /// The current items in transit.
@@ -1751,6 +1851,7 @@ impl LuaUserData for LuaEdge {
         // ---- Type filtering ----
 
         /// Adds allowed type to the collection.
+        /// @param t : string
         ///
         /// # Parameters
         /// - `t` — `string`.
@@ -1761,6 +1862,8 @@ impl LuaUserData for LuaEdge {
             })
         });
         /// Removes allowed type from the collection.
+        /// @param t : string
+        /// @return any
         ///
         /// # Parameters
         /// - `t` — `string`.
@@ -1778,6 +1881,8 @@ impl LuaUserData for LuaEdge {
             })
         });
         /// Returns `true` if item type allowed.
+        /// @param t : string
+        /// @return any
         ///
         /// # Parameters
         /// - `t` — `string`.
@@ -1825,6 +1930,7 @@ impl LuaUserData for LuaGraphItem {
         // ---- Properties ----
 
         /// Returns the type.
+        /// @return any
         ///
         /// # Parameters
         /// - `t` — `string`.
@@ -1835,6 +1941,7 @@ impl LuaUserData for LuaGraphItem {
             with_item!(this, g, item, Ok(item.get_type().to_string()))
         });
         /// Sets the type.
+        /// @param t : string
         ///
         /// # Parameters
         /// - `t` — `string`.
@@ -1846,6 +1953,7 @@ impl LuaUserData for LuaGraphItem {
         });
 
         /// Returns the decay time.
+        /// @return any
         ///
         /// # Parameters
         /// - `t` — `number`.
@@ -1856,6 +1964,7 @@ impl LuaUserData for LuaGraphItem {
             with_item!(this, g, item, Ok(item.get_decay_time()))
         });
         /// Sets the decay time.
+        /// @param t : number
         ///
         /// # Parameters
         /// - `t` — `number`.
@@ -1867,6 +1976,7 @@ impl LuaUserData for LuaGraphItem {
         });
 
         /// Returns the remaining life.
+        /// @return any
         ///
         /// # Returns
         /// The current remaining life.
@@ -1875,6 +1985,7 @@ impl LuaUserData for LuaGraphItem {
         });
 
         /// Returns `true` if alive.
+        /// @return any
         ///
         /// # Returns
         /// `boolean`.
@@ -1894,6 +2005,7 @@ impl LuaUserData for LuaGraphItem {
         });
 
         /// Returns the priority.
+        /// @return any
         ///
         /// # Parameters
         /// - `p` — `integer`.
@@ -1904,6 +2016,7 @@ impl LuaUserData for LuaGraphItem {
             with_item!(this, g, item, Ok(item.get_priority()))
         });
         /// Sets the priority.
+        /// @param p : integer
         ///
         /// # Parameters
         /// - `p` — `integer`.
@@ -1916,6 +2029,7 @@ impl LuaUserData for LuaGraphItem {
 
         // Multi-value return: AtNode → (LuaNode), InTransit → (LuaEdge, progress), Unplaced → ()
         /// Returns the position.
+        /// @return any
         ///
         /// # Returns
         /// The current position.
@@ -1951,7 +2065,7 @@ impl LuaUserData for LuaGraphItem {
 // Registration
 // ---------------------------------------------------------------------------
 
-/// Register the `luna.graph` API table.
+/// Register the `luna.graph` API table. Panics in debug mode if the same entity is registered twice.
 ///
 /// # Parameters
 /// - `lua` — `&Lua`.
@@ -1964,6 +2078,7 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
 
     #[allow(unused_doc_comments)]
     /// Creates a new empty directed graph for item flow simulation.
+    /// @return any
     ///
     /// luna.graph.newGraph()
     graph_table.set(

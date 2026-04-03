@@ -2,6 +2,14 @@
 //!
 //! Maps source colors to target colors, allowing sprites to be
 //! re-colored at render time without modifying the original texture.
+//!
+//! This module is part of Luna2D's `graphics` subsystem and provides the implementation
+//! details for palette lut-related operations and data management.
+//! Key types exported from this module: `PaletteLUT`.
+//! Primary functions: `new()`, `get_color_count()`, `set_color()`, `get_from_color()`.
+//!
+//! All public items are documented. See the parent module for architectural context
+//! and the `luna.*` Lua API for the scripting interface.
 
 use crate::graphics::Color;
 
@@ -22,7 +30,7 @@ pub struct PaletteLUT {
 }
 
 impl PaletteLUT {
-    /// Creates an empty palette lookup table.
+    /// Creates an empty palette lookup table. Returns a fully initialised instance with all fields set to their initial values.
     ///
     /// # Returns
     /// `Self`.
@@ -33,7 +41,7 @@ impl PaletteLUT {
         }
     }
 
-    /// Returns the number of color mappings.
+    /// Returns the number of color mappings. This accessor incurs no allocation; call it freely in hot paths.
     ///
     /// # Returns
     /// `usize`.
@@ -81,7 +89,7 @@ impl PaletteLUT {
         self.to_colors.get(index).copied()
     }
 
-    /// Removes all color mappings.
+    /// Removes all color mappings. After this call the container is in the same state as immediately after construction.
     pub fn clear(&mut self) {
         self.from_colors.clear();
         self.to_colors.clear();

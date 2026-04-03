@@ -1,6 +1,14 @@
 //! Per-frame depth-sorted draw batcher.
+//!
+//! This module is part of Luna2D's `scene` subsystem and provides the implementation
+//! details for depth sorter-related operations and data management.
+//! Key types exported from this module: `DepthEntry`, `DepthSorter`.
+//! Primary functions: `new()`, `add()`, `add_object()`, `sort()`.
+//!
+//! All public items are documented. See the parent module for architectural context
+//! and the `luna.*` Lua API for the scripting interface.
 
-/// Entry in the depth-sorted draw queue.
+/// Entry in the depth-sorted draw queue. Consult the module-level documentation for the broader usage context and preconditions.
 ///
 /// # Fields
 /// - `depth` — `f32`.
@@ -15,17 +23,20 @@ pub struct DepthEntry {
     pub is_object: bool,
 }
 
-/// Per-frame depth-sorted draw batcher.
+/// Per-frame depth-sorted draw batcher. Consult the module-level documentation for the broader usage context and preconditions.
 ///
 /// Collects draw callbacks with depth values, sorts them, and flushes
 /// them in ascending depth order each frame.
+///
+/// # Fields
+/// - `entries` — `Vec<DepthEntry>`.
 pub struct DepthSorter {
     /// Pending draw entries.
     entries: Vec<DepthEntry>,
 }
 
 impl DepthSorter {
-    /// Create a new empty depth sorter.
+    /// Create a new empty depth sorter. Returns a fully initialised instance with all fields set to their initial values.
     ///
     /// # Returns
     /// `Self`.
@@ -35,7 +46,7 @@ impl DepthSorter {
         }
     }
 
-    /// Add a callback at the given depth.
+    /// Add a callback at the given depth. Consult the module-level documentation for the broader usage context and preconditions.
     ///
     /// # Parameters
     /// - `callback_index` — `usize`.
@@ -79,12 +90,12 @@ impl DepthSorter {
         &self.entries
     }
 
-    /// Clear all entries without calling them.
+    /// Clear all entries without calling them. After this call the container is in the same state as immediately after construction.
     pub fn clear(&mut self) {
         self.entries.clear();
     }
 
-    /// Number of queued entries.
+    /// Number of queued entries. This accessor incurs no allocation; call it freely in hot paths.
     ///
     /// # Returns
     /// `usize`.

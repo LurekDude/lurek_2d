@@ -2,6 +2,14 @@
 //!
 //! Provides Lua-level multithreading: create background threads that run
 //! independent Lua VMs and communicate via thread-safe channels.
+//!
+//! This module is part of Luna2D's `lua_api` subsystem and provides the implementation
+//! details for thread api-related operations and data management.
+//! Key types exported from this module: `LuaThreadHandle`.
+//! Primary functions: `register()`.
+//!
+//! All public items are documented. See the parent module for architectural context
+//! and the `luna.*` Lua API for the scripting interface.
 
 use std::collections::HashMap;
 use std::sync::{Arc, Mutex};
@@ -35,6 +43,7 @@ impl LuaUserData for LuaThreadHandle {
         add_type_methods::<Self>(methods);
 
         /// Launches the background thread, passing optional arguments to the Lua script via `...`.
+        /// @param args : MultiValue
         ///
         /// # Parameters
         /// - `...` — `any`: Optional arguments forwarded to the thread script as Lua values.
@@ -56,6 +65,7 @@ impl LuaUserData for LuaThreadHandle {
         });
 
         /// Returns `true` if the thread is currently executing.
+        /// @return any
         ///
         /// # Returns
         /// `boolean`.
@@ -65,6 +75,7 @@ impl LuaUserData for LuaThreadHandle {
         });
 
         /// Returns the error message if the thread terminated with a Lua error, or `nil` if it completed normally.
+        /// @return any
         ///
         /// # Returns
         /// `string` — error message, or `nil`.
@@ -98,6 +109,8 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
     /// The thread gets its own Lua VM and can communicate via channels.
     // luna.thread.newThread(code)
     let channels_for_new = named_channels.clone();
+    /// @param code : string
+    /// @return any
     thread_table.set(
         "newThread",
         lua.create_function(move |_, code: String| {
@@ -110,6 +123,7 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
     #[allow(unused_doc_comments)]
     /// Create an unnamed thread-safe channel for inter-thread communication.
     // luna.thread.newChannel()
+    /// @return any
     thread_table.set(
         "newChannel",
         lua.create_function(|_, ()| {
@@ -123,6 +137,8 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
     /// Get or create a named global channel (singleton, shared across threads).
     // luna.thread.getChannel(name)
     let channels_for_get = named_channels.clone();
+    /// @param name : string
+    /// @return any
     thread_table.set(
         "getChannel",
         lua.create_function(move |_, name: String| {

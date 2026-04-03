@@ -5,7 +5,7 @@
 
 use std::f32::consts::PI;
 
-/// Linear interpolation — no easing.
+/// Linear interpolation — no easing. Consult the module-level documentation for the broader usage context and preconditions.
 ///
 /// # Parameters
 /// - `t` — normalised progress value in `[0.0, 1.0]`
@@ -76,7 +76,7 @@ pub fn ease_out_cubic(t: f32) -> f32 {
     u * u * u + 1.0
 }
 
-/// Cubic ease-in-out — smooth S-curve.
+/// Cubic ease-in-out — smooth S-curve. Consult the module-level documentation for the broader usage context and preconditions.
 ///
 /// # Parameters
 /// - `t` — normalised progress value in `[0.0, 1.0]`
@@ -92,7 +92,7 @@ pub fn ease_in_out_cubic(t: f32) -> f32 {
     }
 }
 
-/// Quartic ease-in — very slow start.
+/// Quartic ease-in — very slow start. Consult the module-level documentation for the broader usage context and preconditions.
 ///
 /// # Parameters
 /// - `t` — normalised progress value in `[0.0, 1.0]`
@@ -103,7 +103,7 @@ pub fn ease_in_quart(t: f32) -> f32 {
     t * t * t * t
 }
 
-/// Quartic ease-out — very slow end.
+/// Quartic ease-out — very slow end. Consult the module-level documentation for the broader usage context and preconditions.
 ///
 /// # Parameters
 /// - `t` — normalised progress value in `[0.0, 1.0]`

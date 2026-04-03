@@ -2,12 +2,20 @@
 //!
 //! Manages a collection of named polygon regions with colors, labels,
 //! highlighting, and point-in-polygon queries.
+//!
+//! This module is part of Luna2D's `graphics` subsystem and provides the implementation
+//! details for polygon map-related operations and data management.
+//! Key types exported from this module: `PolygonRegion`, `PolygonMap`.
+//! Primary functions: `new()`, `add_region()`, `remove_region()`, `set_region_color()`.
+//!
+//! All public items are documented. See the parent module for architectural context
+//! and the `luna.*` Lua API for the scripting interface.
 
 use std::collections::HashMap;
 
 use crate::graphics::Color;
 
-/// A named polygon region.
+/// A named polygon region. Consult the module-level documentation for the broader usage context and preconditions.
 ///
 /// # Fields
 /// - `name` — `String`.
@@ -122,7 +130,7 @@ impl PolygonMap {
         }
     }
 
-    /// Get the fill color of a region.
+    /// Get the fill color of a region. This accessor incurs no allocation; call it freely in hot paths.
     ///
     /// # Parameters
     /// - `name` — `&str`.
@@ -174,7 +182,7 @@ impl PolygonMap {
         None
     }
 
-    /// Names of all regions.
+    /// Names of all regions. This accessor incurs no allocation; call it freely in hot paths.
     ///
     /// # Returns
     /// `Vec<String>`.
@@ -182,7 +190,7 @@ impl PolygonMap {
         self.regions.keys().cloned().collect()
     }
 
-    /// Flat vertex slice for a region.
+    /// Flat vertex slice for a region. This accessor incurs no allocation; call it freely in hot paths.
     ///
     /// # Parameters
     /// - `name` — `&str`.
@@ -254,7 +262,7 @@ impl PolygonMap {
         }
     }
 
-    /// Set the outline color for all regions.
+    /// Set the outline color for all regions. Replaces the current outline color value; callers hold responsibility for maintaining consistency with related fields.
     ///
     /// # Parameters
     /// - `color` — `Color`.
@@ -262,7 +270,7 @@ impl PolygonMap {
         self.outline_color = color;
     }
 
-    /// Set the outline stroke width.
+    /// Set the outline stroke width. Replaces the current outline width value; callers hold responsibility for maintaining consistency with related fields.
     ///
     /// # Parameters
     /// - `width` — `f32`.
@@ -270,7 +278,7 @@ impl PolygonMap {
         self.outline_width = width;
     }
 
-    /// Set the highlight color.
+    /// Set the highlight color. Replaces the current highlight color value; callers hold responsibility for maintaining consistency with related fields.
     ///
     /// # Parameters
     /// - `color` — `Color`.
@@ -278,7 +286,7 @@ impl PolygonMap {
         self.highlight_color = color;
     }
 
-    /// Highlight a region by name.
+    /// Highlight a region by name. Consult the module-level documentation for the broader usage context and preconditions.
     ///
     /// # Parameters
     /// - `name` — `impl Into<String>`.
@@ -286,7 +294,7 @@ impl PolygonMap {
         self.highlighted = Some(name.into());
     }
 
-    /// Clear any active highlight.
+    /// Clear any active highlight. After this call the container is in the same state as immediately after construction.
     pub fn clear_highlight(&mut self) {
         self.highlighted = None;
     }

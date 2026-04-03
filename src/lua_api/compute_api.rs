@@ -1,4 +1,11 @@
 //! Registers the `luna.compute.*` array computation API.
+//!
+//! This module is part of Luna2D's `lua_api` subsystem and provides the implementation
+//! details for compute api-related operations and data management.
+//! Primary functions: `register()`.
+//!
+//! All public items are documented. See the parent module for architectural context
+//! and the `luna.*` Lua API for the scripting interface.
 
 use mlua::prelude::*;
 
@@ -63,6 +70,7 @@ impl mlua::UserData for NdArray {
     fn add_methods<'lua, M: mlua::UserDataMethods<'lua, Self>>(methods: &mut M) {
         // -- Inspection --
         /// Returns the shape.
+        /// @return any
         ///
         /// # Returns
         /// The current shape.
@@ -75,18 +83,21 @@ impl mlua::UserData for NdArray {
         });
 
         /// Returns the dimensions.
+        /// @return any
         ///
         /// # Returns
         /// The current dimensions.
         methods.add_method("getDimensions", |_, this, ()| Ok(this.ndim()));
 
         /// Returns the size.
+        /// @return integer
         ///
         /// # Returns
         /// The current size.
         methods.add_method("getSize", |_, this, ()| Ok(this.size()));
 
         /// Returns the data type.
+        /// @return any
         ///
         /// # Parameters
         /// - `args` — `LuaMultiValue`.
@@ -98,6 +109,7 @@ impl mlua::UserData for NdArray {
         });
 
         /// Returns `true` if on g p u.
+        /// @return boolean
         ///
         /// # Parameters
         /// - `args` — `LuaMultiValue`.
@@ -108,6 +120,8 @@ impl mlua::UserData for NdArray {
 
         // -- Element access (1-based) --
         /// Returns the current value.
+        /// @param args : MultiValue
+        /// @return any
         ///
         /// # Parameters
         /// - `args` — `LuaMultiValue`.
@@ -141,6 +155,7 @@ impl mlua::UserData for NdArray {
         });
 
         /// Sets the value.
+        /// @param args : MultiValue
         ///
         /// # Parameters
         /// - `args` — `LuaMultiValue`.
@@ -187,6 +202,7 @@ impl mlua::UserData for NdArray {
         });
 
         /// To table on this Object.
+        /// @return any
         ///
         /// # Returns
         /// The result.
@@ -200,6 +216,7 @@ impl mlua::UserData for NdArray {
 
         // -- Shape manipulation --
         /// Reshape on this Object.
+        /// @param shape : any
         ///
         /// # Parameters
         /// - `shape` — `any`.
@@ -225,6 +242,7 @@ impl mlua::UserData for NdArray {
         });
 
         /// Fill on this Object.
+        /// @param val : number
         ///
         /// # Parameters
         /// - `val` — `number`.
@@ -240,6 +258,7 @@ impl mlua::UserData for NdArray {
         dispatch_arith!(methods, "div", ops::div, ops::div_scalar);
 
         /// Pow on this Object.
+        /// @param exp : number
         ///
         /// # Parameters
         /// - `exp` — `number`.
@@ -277,6 +296,8 @@ impl mlua::UserData for NdArray {
         });
 
         /// Clamps the value within the allowed range.
+        /// @param min : number
+        /// @param max : number
         ///
         /// # Parameters
         /// - `min` — `number`.
@@ -296,6 +317,7 @@ impl mlua::UserData for NdArray {
 
         // -- Masking --
         /// Threshold on this Object.
+        /// @param val : number
         ///
         /// # Parameters
         /// - `mask` — `userdata`.
@@ -318,30 +340,35 @@ impl mlua::UserData for NdArray {
 
         // -- Counting --
         /// Returns the number of non zero.
+        /// @return any
         ///
         /// # Returns
         /// `integer`.
         methods.add_method("countNonZero", |_, this, ()| Ok(ops::count_nonzero(this)));
 
         /// Argmin on this Object.
+        /// @return any
         ///
         /// # Returns
         /// The result.
         methods.add_method("argmin", |_, this, ()| Ok(ops::argmin(this) + 1));
 
         /// Argmax on this Object.
+        /// @return any
         ///
         /// # Parameters
         /// - `axis` — `integer` optional.
         methods.add_method("argmax", |_, this, ()| Ok(ops::argmax(this) + 1));
 
         /// Any on this Object.
+        /// @return any
         ///
         /// # Parameters
         /// - `axis` — `integer` optional.
         methods.add_method("any", |_, this, ()| Ok(ops::any(this)));
 
         /// All on this Object.
+        /// @return any
         ///
         /// # Parameters
         /// - `axis` — `integer` optional.
@@ -349,6 +376,8 @@ impl mlua::UserData for NdArray {
 
         // -- Reductions --
         /// Sum on this Object.
+        /// @param axis : integer?
+        /// @return any
         ///
         /// # Parameters
         /// - `axis` — `integer` optional.
@@ -361,6 +390,8 @@ impl mlua::UserData for NdArray {
         });
 
         /// Mean on this Object.
+        /// @param axis : integer?
+        /// @return any
         ///
         /// # Parameters
         /// - `axis` — `integer` optional.
@@ -373,6 +404,8 @@ impl mlua::UserData for NdArray {
         });
 
         /// Min on this Object.
+        /// @param axis : integer?
+        /// @return any
         ///
         /// # Parameters
         /// - `axis` — `integer` optional.
@@ -385,6 +418,8 @@ impl mlua::UserData for NdArray {
         });
 
         /// Max on this Object.
+        /// @param axis : integer?
+        /// @return any
         ///
         /// # Parameters
         /// - `axis` — `integer` optional.
@@ -398,6 +433,7 @@ impl mlua::UserData for NdArray {
 
         // -- Linear algebra --
         /// Matmul on this Object.
+        /// @param other : userdata
         ///
         /// # Parameters
         /// - `other` — `userdata`.
@@ -408,6 +444,7 @@ impl mlua::UserData for NdArray {
         });
 
         /// Dot on this Object.
+        /// @param other : userdata
         ///
         /// # Parameters
         /// - `other` — `userdata`.
@@ -418,6 +455,7 @@ impl mlua::UserData for NdArray {
 
         // -- Bitwise (int32 only) --
         /// Bitwise and on this Object.
+        /// @param other : userdata
         ///
         /// # Parameters
         /// - `other` — `userdata`.
@@ -428,6 +466,7 @@ impl mlua::UserData for NdArray {
         });
 
         /// Bitwise or on this Object.
+        /// @param other : userdata
         ///
         /// # Parameters
         /// - `other` — `userdata`.
@@ -438,6 +477,7 @@ impl mlua::UserData for NdArray {
         });
 
         /// Bitwise xor on this Object.
+        /// @param other : userdata
         ///
         /// # Parameters
         /// - `other` — `userdata`.
@@ -457,6 +497,7 @@ impl mlua::UserData for NdArray {
         });
 
         /// Bitwise l shift on this Object.
+        /// @param amount : integer
         ///
         /// # Parameters
         /// - `amount` — `integer`.
@@ -466,6 +507,7 @@ impl mlua::UserData for NdArray {
         });
 
         /// Bitwise r shift on this Object.
+        /// @param amount : integer
         ///
         /// # Parameters
         /// - `amount` — `integer`.
@@ -476,6 +518,7 @@ impl mlua::UserData for NdArray {
 
         // -- 2D Spatial (indices are 1-based in Lua) --
         /// Convolve2 d on this Object.
+        /// @param kernel : userdata
         ///
         /// # Parameters
         /// - `kernel` — `userdata`.
@@ -486,6 +529,7 @@ impl mlua::UserData for NdArray {
         });
 
         /// Dilate on this Object.
+        /// @param radius : integer
         ///
         /// # Parameters
         /// - `radius` — `integer`.
@@ -495,6 +539,7 @@ impl mlua::UserData for NdArray {
         });
 
         /// Erode on this Object.
+        /// @param radius : integer
         ///
         /// # Parameters
         /// - `row` — `integer`.
@@ -551,6 +596,10 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
 
     // luna.compute.newArray(shape, dtype?)
     // Create a new array initialized to zero with the given shape and optional dtype.
+    /// New array.
+    ///
+    /// @param shape : any
+    /// @param dtype : string?
     compute.set(
         "newArray",
         lua.create_function(|lua, (shape, dtype): (LuaValue, Option<String>)| {
@@ -563,6 +612,10 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
 
     // luna.compute.zeros(shape, dtype?)
     // Create a new array filled with zeros.
+    /// Zeros.
+    ///
+    /// @param shape : any
+    /// @param dtype : string?
     compute.set(
         "zeros",
         lua.create_function(|lua, (shape, dtype): (LuaValue, Option<String>)| {
@@ -575,6 +628,10 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
 
     // luna.compute.ones(shape, dtype?)
     // Create a new array filled with ones.
+    /// Ones.
+    ///
+    /// @param shape : any
+    /// @param dtype : string?
     compute.set(
         "ones",
         lua.create_function(|lua, (shape, dtype): (LuaValue, Option<String>)| {
@@ -587,6 +644,12 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
 
     // luna.compute.range(start, stop, step?, dtype?)
     // Create a 1D array with values from start to stop.
+    /// Range.
+    ///
+    /// @param start : number
+    /// @param stop : number
+    /// @param step : number?
+    /// @param dtype : string?
     compute.set(
         "range",
         lua.create_function(
@@ -601,6 +664,11 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
 
     // luna.compute.fromTable(tbl, shape?, dtype?)
     // Create an array from a Lua table of numbers.
+    /// From table.
+    ///
+    /// @param tbl : table
+    /// @param shape : any?
+    /// @param dtype : string?
     compute.set(
         "fromTable",
         lua.create_function(

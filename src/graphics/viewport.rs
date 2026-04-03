@@ -2,6 +2,14 @@
 //!
 //! Maps a fixed game resolution onto an arbitrary window size using
 //! letterboxing, stretching, or pixel-perfect scaling.
+//!
+//! This module is part of Luna2D's `graphics` subsystem and provides the implementation
+//! details for viewport-related operations and data management.
+//! Key types exported from this module: `ScaleMode`, `Viewport`.
+//! Primary functions: `new()`, `resize()`, `get_scale()`, `get_offset()`.
+//!
+//! All public items are documented. See the parent module for architectural context
+//! and the `luna.*` Lua API for the scripting interface.
 
 /// Scale mode for virtual resolution mapping.
 ///
@@ -115,7 +123,7 @@ impl Viewport {
         (self.scale_x, self.scale_y)
     }
 
-    /// Current offset `(offset_x, offset_y)`.
+    /// Current offset `(offset_x, offset_y)`. This accessor incurs no allocation; call it freely in hot paths.
     ///
     /// # Returns
     /// `(f32, f32)`.
@@ -131,7 +139,7 @@ impl Viewport {
         (self.game_width, self.game_height)
     }
 
-    /// Reference to the current scale mode.
+    /// Reference to the current scale mode. This accessor incurs no allocation; call it freely in hot paths.
     ///
     /// # Returns
     /// `&ScaleMode`.

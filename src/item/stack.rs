@@ -5,9 +5,14 @@
 
 use crate::item::item::Item;
 
-/// An ordered collection of items.
+/// An ordered collection of items. Consult the module-level documentation for the broader usage context and preconditions.
 ///
 /// `items[last]` = top, `items[0]` = bottom.
+///
+/// # Fields
+/// - `name` — `String`.
+/// - `items` — `Vec<Item>`.
+/// - `capacity` — `Option<usize>`.
 #[derive(Debug, Clone)]
 pub struct Stack {
     /// Display name for this collection.
@@ -20,6 +25,12 @@ pub struct Stack {
 
 impl Stack {
     /// Create an empty, unlimited-capacity named stack.
+    ///
+    /// # Parameters
+    /// - `name` — `impl Into<String>`.
+    ///
+    /// # Returns
+    /// `Self`.
     pub fn new(name: impl Into<String>) -> Self {
         Self {
             name: name.into(),
@@ -29,6 +40,13 @@ impl Stack {
     }
 
     /// Create an empty stack with a hard capacity limit.
+    ///
+    /// # Parameters
+    /// - `name` — `impl Into<String>`.
+    /// - `capacity` — `usize`.
+    ///
+    /// # Returns
+    /// `Self`.
     pub fn with_capacity(name: impl Into<String>, capacity: usize) -> Self {
         Self {
             name: name.into(),
@@ -37,27 +55,42 @@ impl Stack {
         }
     }
 
-    /// Number of items in the stack.
+    /// Number of items in the stack. Runs in O(1) time.
+    ///
+    /// # Returns
+    /// `usize`.
     pub fn size(&self) -> usize {
         self.items.len()
     }
 
-    /// Returns `true` if the stack is empty.
+    /// Returns `true` if the stack is empty. This accessor incurs no allocation; call it freely in hot paths.
+    ///
+    /// # Returns
+    /// `bool`.
     pub fn is_empty(&self) -> bool {
         self.items.is_empty()
     }
 
     /// Returns `true` if the stack is at capacity.
+    ///
+    /// # Returns
+    /// `bool`.
     pub fn is_full(&self) -> bool {
         self.capacity.is_some_and(|cap| self.items.len() >= cap)
     }
 
     /// The capacity limit, or `None` if unlimited.
+    ///
+    /// # Returns
+    /// `Option<usize>`.
     pub fn capacity(&self) -> Option<usize> {
         self.capacity
     }
 
-    /// Set or remove the capacity limit.
+    /// Set or remove the capacity limit. Replaces the current capacity value; callers hold responsibility for maintaining consistency with related fields.
+    ///
+    /// # Parameters
+    /// - `cap` — `Option<usize>`.
     pub fn set_capacity(&mut self, cap: Option<usize>) {
         self.capacity = cap;
     }
@@ -65,6 +98,12 @@ impl Stack {
     // ── Push / Pop ────────────────────────────────────────────────────────────
 
     /// Add an item to the top (end).  Returns `false` if at capacity.
+    ///
+    /// # Parameters
+    /// - `item` — `Item`.
+    ///
+    /// # Returns
+    /// `bool`.
     pub fn push_top(&mut self, item: Item) -> bool {
         if self.is_full() {
             return false;
@@ -74,6 +113,12 @@ impl Stack {
     }
 
     /// Add an item to the bottom (front).  Returns `false` if at capacity.
+    ///
+    /// # Parameters
+    /// - `item` — `Item`.
+    ///
+    /// # Returns
+    /// `bool`.
     pub fn push_bottom(&mut self, item: Item) -> bool {
         if self.is_full() {
             return false;
@@ -83,11 +128,17 @@ impl Stack {
     }
 
     /// Remove and return the top item, or `None` if empty.
+    ///
+    /// # Returns
+    /// `Option<Item>`.
     pub fn pop_top(&mut self) -> Option<Item> {
         self.items.pop()
     }
 
     /// Remove and return the bottom item, or `None` if empty.
+    ///
+    /// # Returns
+    /// `Option<Item>`.
     pub fn pop_bottom(&mut self) -> Option<Item> {
         if self.items.is_empty() {
             None
@@ -97,6 +148,12 @@ impl Stack {
     }
 
     /// Remove and return `n` items from the top.  Returns fewer if the stack runs out.
+    ///
+    /// # Parameters
+    /// - `n` — `usize`.
+    ///
+    /// # Returns
+    /// `Vec<Item>`.
     pub fn pop_many(&mut self, n: usize) -> Vec<Item> {
         (0..n).filter_map(|_| self.pop_top()).collect()
     }
@@ -104,16 +161,28 @@ impl Stack {
     // ── Peek ─────────────────────────────────────────────────────────────────
 
     /// Peek at the top item without removing it.
+    ///
+    /// # Returns
+    /// `Option<&Item>`.
     pub fn peek_top(&self) -> Option<&Item> {
         self.items.last()
     }
 
     /// Peek at the bottom item without removing it.
+    ///
+    /// # Returns
+    /// `Option<&Item>`.
     pub fn peek_bottom(&self) -> Option<&Item> {
         self.items.first()
     }
 
     /// Peek at the item at raw 0-based index (bottom = 0).
+    ///
+    /// # Parameters
+    /// - `index` — `usize`.
+    ///
+    /// # Returns
+    /// `Option<&Item>`.
     pub fn peek_at(&self, index: usize) -> Option<&Item> {
         self.items.get(index)
     }
@@ -122,6 +191,13 @@ impl Stack {
 
     /// Insert an item at a 0-based position (clamped to stack length).
     /// Returns `false` if at capacity.
+    ///
+    /// # Parameters
+    /// - `index` — `usize`.
+    /// - `item` — `Item`.
+    ///
+    /// # Returns
+    /// `bool`.
     pub fn insert_at(&mut self, index: usize, item: Item) -> bool {
         if self.is_full() {
             return false;
@@ -132,6 +208,12 @@ impl Stack {
     }
 
     /// Remove and return the item at a 0-based position.
+    ///
+    /// # Parameters
+    /// - `index` — `usize`.
+    ///
+    /// # Returns
+    /// `Option<Item>`.
     pub fn remove_at(&mut self, index: usize) -> Option<Item> {
         if index < self.items.len() {
             Some(self.items.remove(index))
@@ -142,6 +224,13 @@ impl Stack {
 
     /// Move the item at `from` to position `to` within this stack (0-based).
     /// Returns `false` if indices are out of range.
+    ///
+    /// # Parameters
+    /// - `from` — `usize`.
+    /// - `o` — `usize`.
+    ///
+    /// # Returns
+    /// `bool`.
     pub fn move_within(&mut self, from: usize, to: usize) -> bool {
         if from >= self.items.len() || to > self.items.len() {
             return false;
@@ -153,6 +242,9 @@ impl Stack {
     }
 
     /// Remove and return all items, leaving the stack empty.
+    ///
+    /// # Returns
+    /// `Vec<Item>`.
     pub fn clear(&mut self) -> Vec<Item> {
         std::mem::take(&mut self.items)
     }
@@ -160,6 +252,12 @@ impl Stack {
     // ── Search ────────────────────────────────────────────────────────────────
 
     /// Return the 0-based indices of items matching `item_type`.
+    ///
+    /// # Parameters
+    /// - `item_type` — `&str`.
+    ///
+    /// # Returns
+    /// `Vec<usize>`.
     pub fn search_by_type(&self, item_type: &str) -> Vec<usize> {
         self.items
             .iter()
@@ -170,6 +268,12 @@ impl Stack {
     }
 
     /// Return the 0-based indices of items carrying the given tag.
+    ///
+    /// # Parameters
+    /// - `ag` — `&str`.
+    ///
+    /// # Returns
+    /// `Vec<usize>`.
     pub fn search_by_tag(&self, tag: &str) -> Vec<usize> {
         self.items
             .iter()
@@ -180,6 +284,12 @@ impl Stack {
     }
 
     /// Return the 0-based indices of items in the given category.
+    ///
+    /// # Parameters
+    /// - `category` — `&str`.
+    ///
+    /// # Returns
+    /// `Vec<usize>`.
     pub fn search_by_category(&self, category: &str) -> Vec<usize> {
         self.items
             .iter()
@@ -190,18 +300,36 @@ impl Stack {
     }
 
     /// Return the index of the first item matching `item_type`, or `None`.
+    ///
+    /// # Parameters
+    /// - `item_type` — `&str`.
+    ///
+    /// # Returns
+    /// `Option<usize>`.
     pub fn find_by_type(&self, item_type: &str) -> Option<usize> {
         self.items.iter().position(|i| i.item_type == item_type)
     }
 
     /// Return the index of the first item carrying a tag, or `None`.
+    ///
+    /// # Parameters
+    /// - `ag` — `&str`.
+    ///
+    /// # Returns
+    /// `Option<usize>`.
     pub fn find_by_tag(&self, tag: &str) -> Option<usize> {
         self.items.iter().position(|i| i.has_tag(tag))
     }
 
     // ── Counts ────────────────────────────────────────────────────────────────
 
-    /// Count items of the given type.
+    /// Count items of the given type. Runs in O(1) time.
+    ///
+    /// # Parameters
+    /// - `item_type` — `&str`.
+    ///
+    /// # Returns
+    /// `usize`.
     pub fn count_by_type(&self, item_type: &str) -> usize {
         self.items
             .iter()
@@ -209,12 +337,24 @@ impl Stack {
             .count()
     }
 
-    /// Count items in the given category.
+    /// Count items in the given category. Runs in O(1) time.
+    ///
+    /// # Parameters
+    /// - `category` — `&str`.
+    ///
+    /// # Returns
+    /// `usize`.
     pub fn count_by_category(&self, category: &str) -> usize {
         self.items.iter().filter(|i| i.category == category).count()
     }
 
-    /// Count items carrying the given tag.
+    /// Count items carrying the given tag. Runs in O(1) time.
+    ///
+    /// # Parameters
+    /// - `ag` — `&str`.
+    ///
+    /// # Returns
+    /// `usize`.
     pub fn count_by_tag(&self, tag: &str) -> usize {
         self.items.iter().filter(|i| i.has_tag(tag)).count()
     }
@@ -222,6 +362,9 @@ impl Stack {
     // ── Sorting ───────────────────────────────────────────────────────────────
 
     /// Sort items in-place by a named stat (ascending).
+    ///
+    /// # Parameters
+    /// - `stat` — `&str`.
     pub fn sort_by_stat(&mut self, stat: &str) {
         self.items.sort_by(|a, b| {
             a.get_stat(stat)
@@ -231,6 +374,9 @@ impl Stack {
     }
 
     /// Sort items in-place by a named stat (descending).
+    ///
+    /// # Parameters
+    /// - `stat` — `&str`.
     pub fn sort_by_stat_desc(&mut self, stat: &str) {
         self.items.sort_by(|a, b| {
             b.get_stat(stat)
@@ -263,16 +409,28 @@ impl Stack {
     // ── Access ────────────────────────────────────────────────────────────────
 
     /// Read-only view of all items (bottom to top order).
+    ///
+    /// # Returns
+    /// `&[Item]`.
     pub fn items(&self) -> &[Item] {
         &self.items
     }
 
     /// Mutable access to all items (bottom to top order).
+    ///
+    /// # Returns
+    /// `&mut [Item]`.
     pub fn items_mut(&mut self) -> &mut [Item] {
         &mut self.items
     }
 
     /// Get item type names of the top `n` items (for reveal-top-N style mechanics).
+    ///
+    /// # Parameters
+    /// - `n` — `usize`.
+    ///
+    /// # Returns
+    /// `Vec<String>`.
     pub fn peek_top_n_types(&self, n: usize) -> Vec<String> {
         self.items
             .iter()

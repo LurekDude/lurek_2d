@@ -309,7 +309,7 @@ cargo fmt --check                   # format check
 
 ### Analytics tools
 ```powershell
-python tools/test_coverage.py                  # coverage metrics → docs/test_coverage.json
+python tools/test_coverage.py                  # coverage metrics → docs/API/test_coverage.json
 python tools/integration_coverage.py           # Lua integration coverage map
 python tools/collect_docs.py --report-missing  # undocumented public items (exit 1 if any)
 python tools/quality_report.py                 # combined quality snapshot

@@ -94,6 +94,13 @@ fn interpolate(text: &str, vars: &LuaTable) -> LuaResult<String> {
 // ---------------------------------------------------------------------------
 
 /// Registers `luna.localization.*` functions.
+///
+/// # Parameters
+/// - `lua` — `&Lua`.
+/// - `luna` — `&LuaTable`.
+///
+/// # Returns
+/// `LuaResult<()>`.
 pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
     let loc = lua.create_table()?;
     let state = Rc::new(RefCell::new(LocalizationState::new()));
@@ -101,6 +108,10 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
     // luna.localization.loadTable(langCode, translations)
     {
         let st = state.clone();
+        /// Load table.
+        ///
+        /// @param lang : string
+        /// @param table : table
         loc.set(
             "loadTable",
             lua.create_function(move |lua, (lang, table): (String, LuaTable)| {
@@ -117,6 +128,9 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
     // luna.localization.setLanguage(langCode)
     {
         let st = state.clone();
+        /// Sets the language.
+        ///
+        /// @param lang : string
         loc.set(
             "setLanguage",
             lua.create_function(move |lua, lang: String| {
@@ -140,6 +154,9 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
     // luna.localization.getLanguage() -> string | nil
     {
         let st = state.clone();
+        /// Returns the language.
+        ///
+        /// @return any
         loc.set(
             "getLanguage",
             lua.create_function(move |_lua, ()| {
@@ -151,6 +168,9 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
     // luna.localization.setBase(langCode)
     {
         let st = state.clone();
+        /// Sets the base.
+        ///
+        /// @param lang : string
         loc.set(
             "setBase",
             lua.create_function(move |_lua, lang: String| {
@@ -163,6 +183,9 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
     // luna.localization.getBase() -> string | nil
     {
         let st = state.clone();
+        /// Returns the base.
+        ///
+        /// @return any
         loc.set(
             "getBase",
             lua.create_function(move |_lua, ()| {
@@ -174,6 +197,10 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
     // luna.localization.hasLanguage(langCode) -> boolean
     {
         let st = state.clone();
+        /// Returns true if language.
+        ///
+        /// @param lang : string
+        /// @return any
         loc.set(
             "hasLanguage",
             lua.create_function(move |_lua, lang: String| {
@@ -185,6 +212,9 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
     // luna.localization.getAvailableLanguages() -> table<string>
     {
         let st = state.clone();
+        /// Returns the available languages.
+        ///
+        /// @return any
         loc.set(
             "getAvailableLanguages",
             lua.create_function(move |lua, ()| {
@@ -201,6 +231,11 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
     // luna.localization.t(key, vars?) -> string
     {
         let st = state.clone();
+        /// T.
+        ///
+        /// @param key : string
+        /// @param vars : table?
+        /// @return any
         loc.set(
             "t",
             lua.create_function(move |lua, (key, vars): (String, Option<LuaTable>)| {
@@ -267,6 +302,9 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
     // luna.localization.onChange(callback)
     {
         let st = state.clone();
+        /// On change.
+        ///
+        /// @param callback : function
         loc.set(
             "onChange",
             lua.create_function(move |lua, callback: LuaFunction| {
@@ -282,6 +320,9 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
     // by checking if the registry value equals the callback.
     {
         let st = state.clone();
+        /// Off change.
+        ///
+        /// @param callback : function
         loc.set(
             "offChange",
             lua.create_function(move |lua, callback: LuaFunction| {

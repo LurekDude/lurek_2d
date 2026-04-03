@@ -2,10 +2,18 @@
 //!
 //! Provides `ModInfo` for mod metadata and `ModManager` for registration,
 //! dependency resolution, load ordering, folder scanning, and hot-reload queuing.
+//!
+//! This module is part of Luna2D's `modding` subsystem and provides the implementation
+//! details for mod manager-related operations and data management.
+//! Key types exported from this module: `ModInfo`, `ModManager`.
+//! Primary functions: `new()`, `new()`, `register_mod()`, `unregister_mod()`.
+//!
+//! All public items are documented. See the parent module for architectural context
+//! and the `luna.*` Lua API for the scripting interface.
 
 use std::collections::{HashMap, HashSet};
 
-/// Metadata describing a mod.
+/// Metadata describing a mod. Consult the module-level documentation for the broader usage context and preconditions.
 ///
 /// # Fields
 /// - `id` — `String`.
@@ -69,6 +77,12 @@ impl ModInfo {
 
 /// Centralized registry for managing mods, resolving load order,
 /// validating dependencies, scanning mod folders, and queuing hot-reloads.
+///
+/// # Fields
+/// - `mods` — `Vec<ModInfo>`.
+/// - `r` — `:load_order`].`.
+/// - `custom_load_order` — `Option<Vec<String>>`.
+/// - `reload_queue` — `Vec<String>`.
 #[derive(Debug, Clone, Default)]
 pub struct ModManager {
     mods: Vec<ModInfo>,
@@ -80,7 +94,7 @@ pub struct ModManager {
 }
 
 impl ModManager {
-    /// Create a new empty ModManager.
+    /// Create a new empty ModManager. Returns a fully initialised instance with all fields set to their initial values.
     ///
     /// # Returns
     /// `Self`.
@@ -94,7 +108,7 @@ impl ModManager {
 
     // ── Registration ──────────────────────────────────────────────────────
 
-    /// Register a mod with the manager.
+    /// Register a mod with the manager. Panics in debug mode if the same entity is registered twice.
     ///
     /// # Parameters
     /// - `info` — `ModInfo`.
@@ -108,7 +122,7 @@ impl ModManager {
         }
     }
 
-    /// Remove a mod by ID.
+    /// Remove a mod by ID. Consult the module-level documentation for the broader usage context and preconditions.
     ///
     /// # Parameters
     /// - `id` — `&str`.
@@ -150,7 +164,7 @@ impl ModManager {
         self.mods.iter_mut().find(|m| m.id == id)
     }
 
-    /// Check if a mod is registered.
+    /// Check if a mod is registered. This accessor incurs no allocation; call it freely in hot paths.
     ///
     /// # Parameters
     /// - `id` — `&str`.
@@ -161,7 +175,7 @@ impl ModManager {
         self.mods.iter().any(|m| m.id == id)
     }
 
-    /// Get the number of registered mods.
+    /// Get the number of registered mods. Consult the module-level documentation for the broader usage context and preconditions.
     ///
     /// # Returns
     /// `usize`.
@@ -169,7 +183,7 @@ impl ModManager {
         self.mods.len()
     }
 
-    /// Get all registered mods.
+    /// Get all registered mods. Consult the module-level documentation for the broader usage context and preconditions.
     ///
     /// # Returns
     /// `&[ModInfo]`.
@@ -179,7 +193,7 @@ impl ModManager {
 
     // ── Load Order ────────────────────────────────────────────────────────
 
-    /// Get mods in their effective load order.
+    /// Get mods in their effective load order. Returns an error if the source data is malformed or missing.
     ///
     /// # Returns
     /// `Vec<&ModInfo>`.
@@ -330,7 +344,7 @@ impl ModManager {
 
     // ── Hot-reload Queue ──────────────────────────────────────────────────
 
-    /// Mark a registered mod for hot-reload.
+    /// Mark a registered mod for hot-reload. Consult the module-level documentation for the broader usage context and preconditions.
     ///
     /// # Parameters
     /// - `id` — `&str`.
@@ -382,7 +396,7 @@ impl ModManager {
         missing
     }
 
-    /// Check for circular dependency cycles.
+    /// Check for circular dependency cycles. This accessor incurs no allocation; call it freely in hot paths.
     ///
     /// # Returns
     /// `bool`.

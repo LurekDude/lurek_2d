@@ -1,6 +1,14 @@
 //! Visual transition types and active transition state for scene changes.
+//!
+//! This module is part of Luna2D's `scene` subsystem and provides the implementation
+//! details for transition-related operations and data management.
+//! Key types exported from this module: `TransitionType`, `ActiveTransition`.
+//! Primary functions: `from_lua_str()`, `new()`, `progress()`, `is_complete()`.
+//!
+//! All public items are documented. See the parent module for architectural context
+//! and the `luna.*` Lua API for the scripting interface.
 
-/// Visual transition types between scenes.
+/// Visual transition types between scenes. Consult the module-level documentation for the broader usage context and preconditions.
 ///
 /// # Variants
 /// - `None` — None variant.
@@ -61,7 +69,7 @@ pub struct ActiveTransition {
 }
 
 impl ActiveTransition {
-    /// Create a new active transition.
+    /// Create a new active transition. Returns a fully initialised instance with all fields set to their initial values.
     ///
     /// # Parameters
     /// - `transition_type` — `TransitionType`.
@@ -89,7 +97,7 @@ impl ActiveTransition {
         }
     }
 
-    /// Whether the transition has completed.
+    /// Whether the transition has completed. This accessor incurs no allocation; call it freely in hot paths.
     ///
     /// # Returns
     /// `bool`.

@@ -1,3 +1,13 @@
+//! Body implementation for the `physics` subsystem.
+//!
+//! This module is part of Luna2D's `physics` subsystem and provides the implementation
+//! details for body-related operations and data management.
+//! Key types exported from this module: `BodyType`, `BodyShape`, `Body`.
+//! Primary functions: `new()`, `new_circle()`, `new_polygon()`, `new_edge()`.
+//!
+//! All public items are documented. See the parent module for architectural context
+//! and the `luna.*` Lua API for the scripting interface.
+//!
 use crate::math::{Rect, Vec2};
 use crate::physics::shape::Shape;
 

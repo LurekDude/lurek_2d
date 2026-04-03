@@ -1,3 +1,12 @@
+//! Timer Api implementation for the `lua_api` subsystem.
+//!
+//! This module is part of Luna2D's `lua_api` subsystem and provides the implementation
+//! details for timer api-related operations and data management.
+//! Primary functions: `register()`.
+//!
+//! All public items are documented. See the parent module for architectural context
+//! and the `luna.*` Lua API for the scripting interface.
+//!
 use super::SharedState;
 use mlua::prelude::*;
 use std::cell::RefCell;
@@ -46,6 +55,9 @@ impl mlua::UserData for LuaScheduler {
 
         // Schedule `fn` to fire once after `delay` seconds. Returns event ID.
         /// Calls a Lua function after the given delay in seconds.
+        /// @param delay : number
+        /// @param func : function
+        /// @return any
         methods.add_method_mut("after", |lua, this, (delay, func): (f64, LuaFunction)| {
             let key = lua.create_registry_value(func)?;
             let id = this.scheduler.after(delay);
@@ -104,6 +116,8 @@ impl mlua::UserData for LuaScheduler {
 
         // Cancel event by numeric ID. Returns true if found.
         /// Cancels a scheduled timer callback.
+        /// @param id : integer
+        /// @return any
         methods.add_method_mut("cancel", |lua, this, id: u32| {
             let removed = this.scheduler.cancel(id);
             if removed {
@@ -115,6 +129,8 @@ impl mlua::UserData for LuaScheduler {
 
         // Cancel event by name. Returns true if found.
         /// Cancels a specific named timer that was scheduled on this scheduler.
+        /// @param name : string
+        /// @return boolean
         ///
         /// # Parameters
         /// - `name` — Name string used when the timer was created.
@@ -130,6 +146,7 @@ impl mlua::UserData for LuaScheduler {
 
         // Cancel all events. Returns count cancelled.
         /// Cancels and removes every pending timer entry from this scheduler.
+        /// @return any
         methods.add_method_mut("cancelAll", |lua, this, ()| {
             let n = this.scheduler.cancel_all();
             for (_, key) in this.callbacks.drain() {
@@ -143,14 +160,20 @@ impl mlua::UserData for LuaScheduler {
 
         // Pause event by ID. Returns true if found.
         /// Pauses the scheduler so no pending callbacks fire until resumed.
+        /// @param id : integer
+        /// @return any
         methods.add_method_mut("pause", |_, this, id: u32| Ok(this.scheduler.pause(id)));
 
         // Resume event by ID. Returns true if found.
         /// Resumes a paused scheduler, allowing its callbacks to fire again.
+        /// @param id : integer
+        /// @return any
         methods.add_method_mut("resume", |_, this, id: u32| Ok(this.scheduler.resume(id)));
 
         // Returns true if event ID is currently paused.
         /// Returns whether the scheduler is currently paused and not advancing timers.
+        /// @param id : integer
+        /// @return any
         ///
         /// # Returns
         /// true if paused, false if running.
@@ -162,6 +185,8 @@ impl mlua::UserData for LuaScheduler {
 
         // Returns seconds remaining until next fire for event ID, or nil.
         /// Returns the time remaining before the next invocation of the given timer.
+        /// @param id : integer
+        /// @return any
         ///
         /// # Parameters
         /// - `id` — Timer ID returned when the timer was created.
@@ -174,6 +199,8 @@ impl mlua::UserData for LuaScheduler {
 
         // Returns the base interval for event ID, or nil.
         /// Returns the repeat interval of the given timer entry in seconds.
+        /// @param id : integer
+        /// @return any
         ///
         /// # Parameters
         /// - `id` — Timer ID returned when the timer was created.
@@ -186,6 +213,8 @@ impl mlua::UserData for LuaScheduler {
 
         // Returns the repeat count remaining (-1=infinite) for event ID, or nil.
         /// Returns how many times the given timer has fired since it was created.
+        /// @param id : integer
+        /// @return any
         ///
         /// # Parameters
         /// - `id` — Timer ID.
@@ -198,6 +227,7 @@ impl mlua::UserData for LuaScheduler {
 
         // Returns active event count.
         /// Returns the number of active timer entries currently in the scheduler.
+        /// @return integer
         ///
         /// # Returns
         /// Active timer count as an integer.
@@ -205,6 +235,7 @@ impl mlua::UserData for LuaScheduler {
 
         // Returns true if no events are scheduled.
         /// Returns whether the scheduler has no active timer entries.
+        /// @return boolean
         ///
         /// # Returns
         /// true if the scheduler queue is empty.
@@ -214,6 +245,9 @@ impl mlua::UserData for LuaScheduler {
 
         // Change the interval of a repeating event ID. Returns true if found.
         /// Changes the repeat interval of an existing timer without recreating it.
+        /// @param id : integer
+        /// @param interval : number
+        /// @return any
         ///
         /// # Parameters
         /// - `id` — Timer ID.
@@ -224,6 +258,8 @@ impl mlua::UserData for LuaScheduler {
 
         // Reset remaining time of event ID back to its original interval. Returns true if found.
         /// Resets the elapsed time of the given timer so it fires again after its full interval.
+        /// @param id : integer
+        /// @return any
         ///
         /// # Parameters
         /// - `id` — Timer ID to reset.
@@ -235,6 +271,7 @@ impl mlua::UserData for LuaScheduler {
 
         // Set global time-scale for this scheduler (0 = frozen, 1 = normal, 2 = double speed).
         /// Sets a time-scale factor that speeds up or slows down all timers in the scheduler.
+        /// @param scale : number
         ///
         /// # Parameters
         /// - `scale` — Time multiplier (1.0 = real time, 2.0 = double speed).
@@ -245,6 +282,7 @@ impl mlua::UserData for LuaScheduler {
 
         // Get current time-scale.
         /// Returns the current time-scale factor applied to all timers in this scheduler.
+        /// @return any
         ///
         /// # Returns
         /// Time scale as a number (1.0 = real time, 0.5 = half speed).
@@ -258,6 +296,8 @@ impl mlua::UserData for LuaScheduler {
         // Fires registered Lua callbacks for each expired event.
         // Returns the number of callbacks that fired.
         /// Advances all pending timers by dt seconds.
+        /// @param dt : number
+        /// @return any
         methods.add_method_mut("update", |lua, this, dt: f64| {
             let fired_ids = this.scheduler.update(dt);
             let fired_count = fired_ids.len() as u32;
@@ -303,6 +343,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
 
     /// Returns the delta time (seconds) for the current frame.
     let s = state.clone();
+    /// @return any
     timer.set(
         "getDelta",
         lua.create_function(move |_, ()| Ok(s.borrow().delta_time))?,
@@ -310,6 +351,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
 
     /// Returns the measured frames-per-second for the current frame.
     let s = state.clone();
+    /// @return any
     timer.set(
         "getFPS",
         lua.create_function(move |_, ()| Ok(s.borrow().fps))?,
@@ -317,6 +359,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
 
     /// Returns the total elapsed time in seconds since engine start.
     let s = state.clone();
+    /// @return any
     timer.set(
         "getTime",
         lua.create_function(move |_, ()| Ok(s.borrow().total_time))?,
@@ -324,6 +367,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
 
     /// Returns the rolling-average frame delta time in seconds.
     let s = state.clone();
+    /// @return any
     timer.set(
         "getAverageDelta",
         lua.create_function(move |_, ()| Ok(s.borrow().clock.average_delta()))?,
@@ -331,6 +375,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
 
     /// Advances the timer by one step (called automatically each frame).
     let s = state.clone();
+    /// @return any
     timer.set(
         "step",
         lua.create_function(move |_, ()| {
@@ -354,6 +399,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
     )?;
 
     /// Suspends execution for the given number of seconds.
+    /// @param seconds : number
     timer.set(
         "sleep",
         lua.create_function(|_, seconds: f64| {

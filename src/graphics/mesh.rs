@@ -2,10 +2,18 @@
 //!
 //! Meshes allow Lua scripts to define arbitrary vertex data
 //! for rendering textured or colored geometry.
+//!
+//! This module is part of Luna2D's `graphics` subsystem and provides the implementation
+//! details for mesh-related operations and data management.
+//! Key types exported from this module: `MeshDrawMode`, `MeshVertex`, `Mesh`.
+//! Primary functions: `new()`, `from_vertices()`, `set_vertex()`, `get_vertex()`.
+//!
+//! All public items are documented. See the parent module for architectural context
+//! and the `luna.*` Lua API for the scripting interface.
 
 use crate::engine::resource_keys::TextureKey;
 
-/// Drawing mode for mesh geometry.
+/// Drawing mode for mesh geometry. Consult the module-level documentation for the broader usage context and preconditions.
 ///
 /// # Variants
 /// - `Triangles` — Triangles variant.
@@ -21,7 +29,7 @@ pub enum MeshDrawMode {
     Strip,
 }
 
-/// A single vertex in a mesh.
+/// A single vertex in a mesh. Consult the module-level documentation for the broader usage context and preconditions.
 ///
 /// # Fields
 /// - `x` — `f32`.
@@ -132,7 +140,7 @@ impl Mesh {
         }
     }
 
-    /// Gets a vertex at the given index.
+    /// Gets a vertex at the given index. This accessor incurs no allocation; call it freely in hot paths.
     ///
     /// # Parameters
     /// - `index` — `usize`.
@@ -151,7 +159,7 @@ impl Mesh {
         self.indices = Some(indices);
     }
 
-    /// Returns the number of vertices.
+    /// Returns the number of vertices. Consult the module-level documentation for the broader usage context and preconditions.
     ///
     /// # Returns
     /// `usize`.
@@ -159,7 +167,7 @@ impl Mesh {
         self.vertices.len()
     }
 
-    /// Sets the texture for this mesh.
+    /// Sets the texture for this mesh. Replaces the current texture value; callers hold responsibility for maintaining consistency with related fields.
     ///
     /// # Parameters
     /// - `texture` — `Option<TextureKey>`.
@@ -167,7 +175,7 @@ impl Mesh {
         self.texture = texture;
     }
 
-    /// Sets the draw mode.
+    /// Sets the draw mode. Replaces the current draw mode value; callers hold responsibility for maintaining consistency with related fields.
     ///
     /// # Parameters
     /// - `mode` — `MeshDrawMode`.

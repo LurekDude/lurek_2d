@@ -4,7 +4,17 @@
 //! revolute joint. A [`Weapon`] handles fire rate, ammo, bursts, and damage
 //! parameters.
 
-/// The type of projectile a weapon fires.
+/// The type of projectile a weapon fires. Consult the module-level documentation for the broader usage context and preconditions.
+///
+/// # Variants
+/// - `Standard` — Standard variant.
+/// - `Ballistic` — Ballistic variant.
+/// - `Homing` — Homing variant.
+/// - `Instant` — Instant variant.
+/// - `Ray` — Ray variant.
+/// - `Area` — Area variant.
+/// - `Sustained` — Sustained variant.
+/// - `Beam` — Beam variant.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ProjectileType {
     /// Standard ballistic projectile (travels in a straight line).
@@ -20,6 +30,18 @@ pub enum ProjectileType {
 }
 
 /// A rotatable weapon mount attached to a chassis slot.
+///
+/// # Fields
+/// - `body_id` — `usize`.
+/// - `joint_id` — `usize`.
+/// - `turn_speed` — `f32`.
+/// - `arc_min` — `f32`.
+/// - `arc_max` — `f32`.
+/// - `target_angle` — `Option<f32>`.
+/// - `weapon` — `Option<usize>`.
+/// - `chassis_id` — `Option<usize>`.
+/// - `size_class` — `String`.
+/// - `destroyed` — `bool`.
 #[derive(Clone)]
 pub struct Turret {
     /// Physics body ID for the turret.
@@ -46,6 +68,13 @@ pub struct Turret {
 
 impl Turret {
     /// Creates a new turret with the given physics body and joint IDs.
+    ///
+    /// # Parameters
+    /// - `body_id` — `usize`.
+    /// - `joint_id` — `usize`.
+    ///
+    /// # Returns
+    /// `Self`.
     pub fn new(body_id: usize, joint_id: usize) -> Self {
         Self {
             body_id,
@@ -65,6 +94,13 @@ impl Turret {
     ///
     /// Returns the desired angular velocity to reach the target, or `None`
     /// if no target is set.
+    ///
+    /// # Parameters
+    /// - `dt` — `f32`.
+    /// - `current_angle` — `f32`.
+    ///
+    /// # Returns
+    /// `Option<f32>`.
     pub fn update(&self, dt: f32, current_angle: f32) -> Option<f32> {
         let target = self.target_angle?;
         let clamped = self.clamp_to_arc(target);
@@ -88,6 +124,9 @@ impl Turret {
     }
 
     /// Sets the desired target angle for the turret.
+    ///
+    /// # Parameters
+    /// - `angle` — `f32`.
     pub fn aim_at_angle(&mut self, angle: f32) {
         self.target_angle = Some(angle);
     }
@@ -95,6 +134,12 @@ impl Turret {
     /// Returns `true` if the turret is within `tolerance` radians of its target.
     ///
     /// Returns `true` if no target is set (nothing to aim at).
+    ///
+    /// # Parameters
+    /// - `olerance` — `f32`.
+    ///
+    /// # Returns
+    /// `bool`.
     pub fn is_aimed(&self, tolerance: f32) -> bool {
         match self.target_angle {
             None => true,
@@ -109,12 +154,36 @@ impl Turret {
     }
 
     /// Clamps an angle to the turret's arc limits.
+    ///
+    /// # Parameters
+    /// - `angle` — `f32`.
+    ///
+    /// # Returns
+    /// `f32`.
     pub fn clamp_to_arc(&self, angle: f32) -> f32 {
         angle.clamp(self.arc_min, self.arc_max)
     }
 }
 
 /// A weapon that handles fire rate, ammo, burst, and damage.
+///
+/// # Fields
+/// - `name` — `String`.
+/// - `fire_rate` — `f32`.
+/// - `cooldown_remaining` — `f32`.
+/// - `ammo` — `i32`.
+/// - `max_ammo` — `i32`.
+/// - `burst_size` — `u32`.
+/// - `burst_delay` — `f32`.
+/// - `burst_remaining` — `u32`.
+/// - `spread` — `f32`.
+/// - `damage_amount` — `f32`.
+/// - `damage_type` — `String`.
+/// - `penetration` — `f32`.
+/// - `range` — `f32`.
+/// - `projectile_speed` — `f32`.
+/// - `projectile_type` — `ProjectileType`.
+/// - `firing` — `bool`.
 #[derive(Clone)]
 pub struct Weapon {
     /// Weapon display name.
@@ -153,6 +222,12 @@ pub struct Weapon {
 
 impl Weapon {
     /// Creates a new weapon with default values and the given name.
+    ///
+    /// # Parameters
+    /// - `name` — `impl Into<String>`.
+    ///
+    /// # Returns
+    /// `Self`.
     pub fn new(name: impl Into<String>) -> Self {
         Self {
             name: name.into(),
@@ -175,6 +250,9 @@ impl Weapon {
     }
 
     /// Returns `true` if the weapon is ready to fire (cooldown elapsed and ammo available).
+    ///
+    /// # Returns
+    /// `bool`.
     pub fn can_fire(&self) -> bool {
         self.cooldown_remaining <= 0.0 && !self.is_out_of_ammo()
     }
@@ -182,6 +260,12 @@ impl Weapon {
     /// Attempts to fire the weapon. Returns `true` if a shot was produced.
     ///
     /// Consumes ammo (if not infinite), applies cooldown, and manages burst state.
+    ///
+    /// # Parameters
+    /// - `_dt` — `f32`.
+    ///
+    /// # Returns
+    /// `bool`.
     pub fn fire(&mut self, _dt: f32) -> bool {
         if !self.can_fire() {
             return false;
@@ -212,23 +296,29 @@ impl Weapon {
         true
     }
 
-    /// Start continuous firing.
+    /// Start continuous firing. Consult the module-level documentation for the broader usage context and preconditions.
     pub fn start_firing(&mut self) {
         self.firing = true;
     }
 
-    /// Stop continuous firing.
+    /// Stop continuous firing. Consult the module-level documentation for the broader usage context and preconditions.
     pub fn stop_firing(&mut self) {
         self.firing = false;
         self.burst_remaining = 0;
     }
 
     /// Returns `true` if the weapon is currently in firing mode.
+    ///
+    /// # Returns
+    /// `bool`.
     pub fn is_firing(&self) -> bool {
         self.firing
     }
 
     /// Ticks the cooldown timer by `dt` seconds.
+    ///
+    /// # Parameters
+    /// - `dt` — `f32`.
     pub fn update_cooldown(&mut self, dt: f32) {
         if self.cooldown_remaining > 0.0 {
             self.cooldown_remaining -= dt;
@@ -240,6 +330,9 @@ impl Weapon {
 
     /// Reloads ammo. If `amount` is `None`, refills to max. If `Some(n)`, adds
     /// `n` rounds (clamped to `max_ammo` when positive).
+    ///
+    /// # Parameters
+    /// - `amount` — `Option<i32>`.
     pub fn reload(&mut self, amount: Option<i32>) {
         match amount {
             Some(n) => {
@@ -261,6 +354,9 @@ impl Weapon {
     }
 
     /// Returns `true` if the weapon has exhausted its ammo (not infinite).
+    ///
+    /// # Returns
+    /// `bool`.
     pub fn is_out_of_ammo(&self) -> bool {
         self.ammo == 0
     }

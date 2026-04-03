@@ -2,6 +2,13 @@
 //!
 //! Handles GPU object creation: textures, samplers, canvases, pipelines,
 //! font atlases, and depth/stencil targets.
+//!
+//! This module is part of Luna2D's `gpu_renderer` subsystem and provides the implementation
+//! details for gpu resources-related operations and data management.
+//! Primary functions: `new()`, `resize()`, `create_sampler()`, `create_texture_bind_group()`.
+//!
+//! All public items are documented. See the parent module for architectural context
+//! and the `luna.*` Lua API for the scripting interface.
 
 #[allow(unused_imports)]
 use super::{GpuRenderer, RenderStats};
@@ -186,6 +193,13 @@ impl GpuRenderer {
         self.screen_stencil_target = None;
     }
 
+    /// Create a wgpu texture sampler with the given filter settings.
+    ///
+    /// # Returns
+    /// `wgpu::Sampler`.
+///
+/// # Parameters
+/// - `default_filter` — `&(String, String, u32)`
     pub(super) fn create_sampler(&self, default_filter: &(String, String, u32)) -> wgpu::Sampler {
         let min_filter = parse_filter_mode(&default_filter.0);
         let mag_filter = parse_filter_mode(&default_filter.1);
@@ -207,6 +221,15 @@ impl GpuRenderer {
         })
     }
 
+    /// Allocate a wgpu bind group for the given texture.
+    ///
+    /// # Returns
+    /// `wgpu::BindGroup`.
+///
+/// # Parameters
+/// - `view` — `&wgpu::TextureView`
+/// - `sampler` — `&wgpu::Sampler`
+/// - `label` — `&'static str`
     pub(super) fn create_texture_bind_group(
         &self,
         view: &wgpu::TextureView,
@@ -292,6 +315,14 @@ impl GpuRenderer {
     }
 
     /// Ensures a font's glyph atlas is uploaded as a GPU texture, returning `true` if ready.
+    ///
+    /// # Returns
+    /// `bool`.
+///
+/// # Parameters
+/// - `font_key` — `FontKey`
+/// - `font` — `&mut crate::graphics::Font`
+/// - `default_filter` — `&(String, String, u32)`
     pub(super) fn ensure_font_atlas(
         &mut self,
         font_key: FontKey,
@@ -353,6 +384,15 @@ impl GpuRenderer {
         self.canvas_needs_clear.insert(key, true);
     }
 
+    /// Allocate the depth-stencil attachment for the main render pass.
+    ///
+    /// # Returns
+    /// `DepthStencilTarget`.
+///
+/// # Parameters
+/// - `width` — `u32`
+/// - `height` — `u32`
+/// - `label` — `&'static str`
     pub(super) fn create_depth_stencil_target(
         &self,
         width: u32,
@@ -379,6 +419,7 @@ impl GpuRenderer {
             height}
     }
 
+    /// Ensure the on-screen stencil target matches the current surface size.
     pub(super) fn ensure_screen_stencil_target(&mut self) {
         let needs_recreate = self
             .screen_stencil_target
@@ -394,6 +435,12 @@ impl GpuRenderer {
         }
     }
 
+    /// Ensure a per-canvas stencil buffer matches the canvas dimensions.
+///
+/// # Parameters
+/// - `key` — `CanvasKey`
+/// - `width` — `u32`
+/// - `height` — `u32`
     pub(super) fn ensure_canvas_stencil_target(&mut self, key: CanvasKey, width: u32, height: u32) {
         let needs_recreate = self
             .canvas_stencil_targets
@@ -408,6 +455,13 @@ impl GpuRenderer {
         }
     }
 
+    /// Drop GPU resources that have been released since the last frame.
+///
+/// # Parameters
+/// - `textures` — `&SlotMap<TextureKey, TextureData>`
+/// - `fonts` — `&SlotMap<FontKey, crate::graphics::Font>`
+/// - `canvases` — `&SlotMap<CanvasKey, crate::graphics::Canvas>`
+/// - `shaders` — `&SlotMap<ShaderKey, Shader>`
     pub(super) fn prune_released_resources(
         &mut self,
         textures: &SlotMap<TextureKey, TextureData>,

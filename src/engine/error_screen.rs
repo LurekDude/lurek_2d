@@ -28,6 +28,11 @@ const LINE_H: f32 = 14.0;
 ///
 /// Stores a pre-processed error title, message lines, and traceback so that
 /// `draw_commands()` can emit a frame without any game assets loaded.
+///
+/// # Fields
+/// - `title` — `String`.
+/// - `message_lines` — `Vec<String>`.
+/// - `traceback_lines` — `Vec<String>`.
 pub struct ErrorScreen {
     /// Bold heading (first line of the error).
     title: String,

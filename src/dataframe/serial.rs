@@ -1,4 +1,11 @@
 //! CSV, JSON, and LVDF binary serialization for DataFrame.
+//!
+//! This module is part of Luna2D's `dataframe` subsystem and provides the implementation
+//! details for serial-related operations and data management.
+//! Primary functions: `from_csv()`, `to_csv()`, `from_json()`, `to_json()`.
+//!
+//! All public items are documented. See the parent module for architectural context
+//! and the `luna.*` Lua API for the scripting interface.
 
 use crate::dataframe::frame::{CellValue, DataFrame};
 
@@ -6,7 +13,7 @@ use crate::dataframe::frame::{CellValue, DataFrame};
 // CSV (RFC 4180)
 // ---------------------------------------------------------------------------
 
-/// Parse a CSV string into a DataFrame.
+/// Parse a CSV string into a DataFrame. Returns a fully initialised instance with all fields set to their initial values.
 ///
 /// # Parameters
 /// - `s` — `&str`.
@@ -131,7 +138,7 @@ fn parse_csv_records(s: &str) -> Result<Vec<Vec<String>>, String> {
 
 /// Serialize a DataFrame to CSV format.
 impl DataFrame {
-    /// Serialize to CSV string (RFC 4180).
+    /// Serialize to CSV string (RFC 4180). Consult the module-level documentation for the broader usage context and preconditions.
     ///
     /// # Returns
     /// `String`.
@@ -583,7 +590,7 @@ fn json_write_value(out: &mut String, val: &CellValue) {
 //     payload: (Number=8 bytes f64 LE, Text=u32 LE len + bytes, Bool=1 byte, Nil=none)
 
 impl DataFrame {
-    /// Serialize to LVDF binary format.
+    /// Serialize to LVDF binary format. Consult the module-level documentation for the broader usage context and preconditions.
     ///
     /// # Returns
     /// `Vec<u8>`.

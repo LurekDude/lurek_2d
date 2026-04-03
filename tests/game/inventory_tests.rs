@@ -590,3 +590,219 @@ fn inventory_remove_from_any() {
         assert(inv:countItem("grain") == 3, "still 3")
     "#).exec().unwrap();
 }
+
+// ── New features ─────────────────────────────────────────────────────────────
+
+#[test]
+fn inventory_item_resource_ref() {
+    let lua = make_vm();
+    lua.load(r#"
+        local it = luna.inventory.newItem("sword")
+        assert(it:getResourceRef() == nil, "nil by default")
+        it:setResourceRef("sprites/sword.png")
+        assert(it:getResourceRef() == "sprites/sword.png", "stores string")
+        it:setResourceRef({ atlas = "items", frame = 7 })
+        local ref = it:getResourceRef()
+        assert(type(ref) == "table", "stores table")
+        assert(ref.atlas == "items", "table field")
+        assert(ref.frame == 7, "table field 2")
+    "#).exec().unwrap();
+}
+
+#[test]
+fn inventory_item_user_data() {
+    let lua = make_vm();
+    lua.load(r#"
+        local it = luna.inventory.newItem("potion")
+        assert(it:getUserData() == nil, "nil by default")
+        it:setUserData({ heal = 50, cooldown = 3.0 })
+        local ud = it:getUserData()
+        assert(ud.heal == 50, "heal")
+        assert(ud.cooldown == 3.0, "cooldown")
+    "#).exec().unwrap();
+}
+
+#[test]
+fn inventory_item_clone_preserves_type() {
+    let lua = make_vm();
+    lua.load(r#"
+        local it = luna.inventory.newItem("axe")
+        it:setWeight(5.0)
+        local copy = it:clone()
+        assert(copy:getType() == "axe", "type preserved")
+        assert(copy:getWeight() == 5.0, "weight preserved")
+        copy:setWeight(10.0)
+        assert(it:getWeight() == 5.0, "original unchanged")
+    "#).exec().unwrap();
+}
+
+#[test]
+fn inventory_slot_get_item() {
+    let lua = make_vm();
+    lua.load(r#"
+        local slot = luna.inventory.newSlot("any")
+        assert(slot:getItem() == nil, "nil when empty")
+        local it = luna.inventory.newItem("sword")
+        it:setWeight(3.0)
+        local stack = luna.inventory.newItemStack(it, 1, 1)
+        slot:setStack(stack)
+        local got = slot:getItem()
+        assert(got ~= nil, "got item")
+        assert(got:getType() == "sword", "correct type")
+    "#).exec().unwrap();
+}
+
+#[test]
+fn inventory_itemset_requirement_count() {
+    let lua = make_vm();
+    lua.load(r#"
+        local set = luna.inventory.newItemSet("warrior")
+        assert(set:getRequirementCount() == 0, "empty")
+        set:addRequirement("heavy_armor", "chest")
+        set:addRequirement("heavy_armor", "legs")
+        assert(set:getRequirementCount() == 2, "two reqs")
+    "#).exec().unwrap();
+}
+
+#[test]
+fn inventory_itemset_is_active() {
+    let lua = make_vm();
+    lua.load(r#"
+        local inv = luna.inventory.newInventory()
+        local slot = luna.inventory.newSlot("any", "active")
+        inv:addEquipSlot("head", slot)
+
+        local set = luna.inventory.newItemSet("plate")
+        set:addRequirement("heavy", "head")
+
+        -- not active yet
+        assert(not set:isActive(inv), "not active before equip")
+
+        -- equip an item with "heavy" tag
+        local it = luna.inventory.newItem("helm")
+        it:addTag("heavy")
+        local stack = luna.inventory.newItemStack(it, 1, 1)
+        inv:equip("head", stack)
+
+        assert(set:isActive(inv), "active after equip")
+    "#).exec().unwrap();
+}
+
+#[test]
+fn inventory_itemset_bonus_ref() {
+    let lua = make_vm();
+    lua.load(r#"
+        local set = luna.inventory.newItemSet("mage")
+        assert(set:getBonusRef() == nil, "nil by default")
+        set:setBonusRef({ spell_power = 10, mana_regen = 2 })
+        local b = set:getBonusRef()
+        assert(b.spell_power == 10, "bonus field")
+        assert(b.mana_regen == 2, "bonus field 2")
+    "#).exec().unwrap();
+}
+
+#[test]
+fn inventory_split_stack() {
+    let lua = make_vm();
+    lua.load(r#"
+        local inv = luna.inventory.newInventory()
+        local c = luna.inventory.newContainer("bag", "fixed", 5)
+        local arrow = luna.inventory.newItem("arrow")
+        arrow:setStackLimit(20)
+        c:addItem(arrow, 20)
+        inv:addContainer("bag", c)
+
+        local ok = inv:splitStack("bag", 1, 5)
+        assert(ok, "split succeeded")
+
+        -- verify via getContainer
+        local bag = inv:getContainer("bag")
+        local s1 = bag:getSlot(1)
+        local s2 = bag:getSlot(2)
+        assert(not s1:isEmpty(), "slot 1 still has items")
+        assert(not s2:isEmpty(), "slot 2 has split items")
+    "#).exec().unwrap();
+}
+
+#[test]
+fn inventory_merge_stacks() {
+    let lua = make_vm();
+    lua.load(r#"
+        local inv = luna.inventory.newInventory()
+        local c = luna.inventory.newContainer("bag", "fixed", 5)
+        -- stack_limit=10 so first addItem fills slot 0, second fills slot 1
+        local coin = luna.inventory.newItem("coin")
+        coin:setStackLimit(10)
+        c:addItem(coin, 10)
+        c:addItem(coin, 5)
+        inv:addContainer("bag", c)
+
+        -- merge slot 2 into slot 1
+        local ok = inv:mergeStacks("bag", 2, 1)
+        assert(ok, "merge succeeded")
+    "#).exec().unwrap();
+}
+
+#[test]
+fn inventory_get_item_sets() {
+    let lua = make_vm();
+    lua.load(r#"
+        local inv = luna.inventory.newInventory()
+        local s1 = luna.inventory.newItemSet("warrior")
+        local s2 = luna.inventory.newItemSet("mage")
+        inv:addItemSet(s1)
+        inv:addItemSet(s2)
+
+        local sets = inv:getItemSets()
+        assert(#sets == 2, "two sets returned")
+        assert(sets[1]:getName() == "warrior", "first is warrior")
+        assert(sets[2]:getName() == "mage", "second is mage")
+    "#).exec().unwrap();
+}
+
+#[test]
+fn inventory_callbacks() {
+    let lua = make_vm();
+    lua.load(r#"
+        local inv = luna.inventory.newInventory()
+        local log = {}
+
+        inv:setCallback("on_equip", function(slot, item)
+            table.insert(log, "equip:" .. slot .. ":" .. item)
+        end)
+
+        inv:fireCallback("on_equip", "head", "helm")
+        assert(#log == 1, "callback fired")
+        assert(log[1] == "equip:head:helm", "args passed")
+
+        -- overwrite callback
+        inv:setCallback("on_equip", function() table.insert(log, "new") end)
+        inv:fireCallback("on_equip")
+        assert(log[2] == "new", "replaced callback")
+
+        -- remove callback
+        inv:removeCallback("on_equip")
+        inv:fireCallback("on_equip")
+        assert(#log == 2, "no-op after removal")
+    "#).exec().unwrap();
+}
+
+#[test]
+fn inventory_callback_fire_missing_event() {
+    let lua = make_vm();
+    lua.load(r#"
+        local inv = luna.inventory.newInventory()
+        -- firing a non-existent callback should not error
+        inv:fireCallback("on_magic")
+    "#).exec().unwrap();
+}
+
+#[test]
+fn inventory_split_stack_validates_index() {
+    let lua = make_vm();
+    let result = lua.load(r#"
+        local inv = luna.inventory.newInventory()
+        inv:splitStack("bag", 0, 5)
+    "#).exec();
+    assert!(result.is_err(), "slot index 0 should fail");
+}

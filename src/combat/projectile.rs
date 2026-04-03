@@ -9,7 +9,23 @@ use crate::combat::weapon::ProjectileType;
 /// Maximum number of projectiles in a single pool.
 pub const MAX_POOL_SIZE: usize = 1024;
 
-/// A single in-flight projectile.
+/// A single in-flight projectile. Consult the module-level documentation for the broader usage context and preconditions.
+///
+/// # Fields
+/// - `body_id` — `usize`.
+/// - `active` — `bool`.
+/// - `lifetime` — `f32`.
+/// - `distance_traveled` — `f32`.
+/// - `max_range` — `f32`.
+/// - `speed` — `f32`.
+/// - `projectile_type` — `ProjectileType`.
+/// - `damage_amount` — `f32`.
+/// - `damage_type` — `String`.
+/// - `source_weapon_name` — `String`.
+/// - `target_pos` — `Option<(f32`.
+/// - `target_body` — `Option<usize>`.
+/// - `tracking_strength` — `f32`.
+/// - `turn_rate` — `f32`.
 #[derive(Clone)]
 pub struct Projectile {
     /// Physics body ID for this projectile.
@@ -61,6 +77,12 @@ impl Projectile {
     }
 
     /// Updates lifetime and distance based on current frame delta and position.
+    ///
+    /// # Parameters
+    /// - `dt` — `f32`.
+    /// - `_body_x` — `f32`.
+    /// - `_body_y` — `f32`.
+    /// - `_body_angle` — `f32`.
     pub fn update(&mut self, dt: f32, _body_x: f32, _body_y: f32, _body_angle: f32) {
         if !self.active {
             return;
@@ -92,6 +114,14 @@ impl Default for Projectile {
 }
 
 /// Pre-allocated pool of projectiles for efficient spawn/release cycling.
+///
+/// # Fields
+/// - `projectiles` — `Vec<Projectile>`.
+/// - `pool_size` — `usize`.
+/// - `body_ids` — `Vec<usize>`.
+/// - `free_indices` — `Vec<usize>`.
+/// - `projectile_type` — `ProjectileType`.
+/// - `collision_group` — `String`.
 #[derive(Clone)]
 pub struct ProjectilePool {
     /// All projectile slots in this pool.
@@ -111,6 +141,13 @@ pub struct ProjectilePool {
 impl ProjectilePool {
     /// Creates a new projectile pool with the given capacity (capped at
     /// [`MAX_POOL_SIZE`]).
+    ///
+    /// # Parameters
+    /// - `pool_size` — `usize`.
+    /// - `projectile_type` — `ProjectileType`.
+    ///
+    /// # Returns
+    /// `Self`.
     pub fn new(pool_size: usize, projectile_type: ProjectileType) -> Self {
         let size = pool_size.min(MAX_POOL_SIZE);
         let projectiles: Vec<Projectile> = (0..size).map(|_| Projectile::default()).collect();
@@ -126,9 +163,21 @@ impl ProjectilePool {
         }
     }
 
-    /// Spawns a projectile from the pool.
+    /// Spawns a projectile from the pool. Returns a typed key that can be used to look up or remove the resource.
     ///
     /// Returns the projectile index, or `None` if the pool is exhausted.
+    ///
+    /// # Parameters
+    /// - `x` — `f32`.
+    /// - `y` — `f32`.
+    /// - `_angle` — `f32`.
+    /// - `speed` — `f32`.
+    /// - `damage` — `f32`.
+    /// - `damage_type` — `&str`.
+    /// - `range` — `f32`.
+    ///
+    /// # Returns
+    /// `Option<usize>`.
     #[allow(clippy::too_many_arguments)]
     pub fn spawn(
         &mut self,
@@ -155,6 +204,9 @@ impl ProjectilePool {
     }
 
     /// Returns a projectile slot to the free pool.
+    ///
+    /// # Parameters
+    /// - `index` — `usize`.
     pub fn release(&mut self, index: usize) {
         if index < self.projectiles.len() && self.projectiles[index].active {
             self.projectiles[index].reset();
@@ -163,16 +215,25 @@ impl ProjectilePool {
     }
 
     /// Returns the number of currently active projectiles.
+    ///
+    /// # Returns
+    /// `usize`.
     pub fn active_count(&self) -> usize {
         self.pool_size - self.free_indices.len()
     }
 
-    /// Returns the number of free slots.
+    /// Returns the number of free slots. Consult the module-level documentation for the broader usage context and preconditions.
+    ///
+    /// # Returns
+    /// `usize`.
     pub fn free_count(&self) -> usize {
         self.free_indices.len()
     }
 
     /// Returns the indices of all active projectiles.
+    ///
+    /// # Returns
+    /// `Vec<usize>`.
     pub fn get_active(&self) -> Vec<usize> {
         self.projectiles
             .iter()
@@ -183,11 +244,23 @@ impl ProjectilePool {
     }
 
     /// Returns a reference to the projectile at the given index.
+    ///
+    /// # Parameters
+    /// - `index` — `usize`.
+    ///
+    /// # Returns
+    /// `Option<&Projectile>`.
     pub fn get(&self, index: usize) -> Option<&Projectile> {
         self.projectiles.get(index)
     }
 
     /// Returns a mutable reference to the projectile at the given index.
+    ///
+    /// # Parameters
+    /// - `index` — `usize`.
+    ///
+    /// # Returns
+    /// `Option<&mut Projectile>`.
     pub fn get_mut(&mut self, index: usize) -> Option<&mut Projectile> {
         self.projectiles.get_mut(index)
     }

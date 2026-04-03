@@ -1,9 +1,48 @@
 //! Reynolds-style steering behaviors with weighted/priority combination.
+//!
+//! This module implements Craig Reynolds' autonomous agent steering behaviors,
+//! adapted for 2D game AI. Each behavior produces a 2D force vector that is
+//! applied to the agent's velocity by the [`SteeringManager`] (managed at the
+//! [`AIWorld`](crate::ai::world::AIWorld) level).
+//!
+//! ## Available Behaviors
+//!
+//! - **Seek** — Produces a force toward a target position at maximum speed.
+//! - **Flee** — Produces a force away from a threat, with a configurable panic
+//!   distance beyond which the agent ignores the threat.
+//! - **Arrive** — Like seek, but decelerates within a slowing radius to stop
+//!   smoothly at the target instead of oscillating around it.
+//! - **Wander** — Projects a circle ahead of the agent and picks a random point
+//!   on its circumference, creating natural-looking meandering movement.
+//! - **Pursue** — Predicts a moving target's future position and steers toward
+//!   the intercept point rather than the current position.
+//! - **Evade** — Inverse of pursue: predicts a threat's future position and
+//!   steers away from the intercept point.
+//! - **Flock** — Combines separation, alignment, and cohesion forces for group
+//!   movement (Reynolds boids model).
+//!
+//! ## Combination Modes
+//!
+//! Multiple active behaviors are combined via [`CombineMode`]:
+//! - **Weighted**: all forces are summed (each multiplied by its weight),
+//!   then truncated to `max_force`.
+//! - **Priority**: behaviors are evaluated in order; the first non-zero force
+//!   is used and remaining behaviors are skipped.
 
-/// 2D force vector (fx, fy).
+/// 2D force vector (fx, fy). Consult the module-level documentation for the broader usage context and preconditions.
 pub type Force = (f32, f32);
 
-/// How multiple steering forces are combined.
+/// Determines how multiple active steering behaviors are combined into a
+/// single resultant force applied to the agent.
+///
+/// In **Weighted** mode, all enabled behaviors contribute simultaneously —
+/// their forces are summed (each scaled by its weight) and the total is
+/// clamped to `max_force`. This works well when behaviors cooperate
+/// (e.g., seek + obstacle avoidance).
+///
+/// In **Priority** mode, behaviors are evaluated in order. The first one
+/// that returns a non-zero force "wins" and the rest are skipped. This is
+/// useful when behaviors are mutually exclusive (e.g., flee overrides patrol).
 ///
 /// # Variants
 /// - `Weighted` — Weighted variant.
@@ -17,7 +56,7 @@ pub enum CombineMode {
 }
 
 impl CombineMode {
-    /// Parses from Lua string.
+    /// Parses from Lua string. Returns an error if the source data is malformed or missing.
     ///
     /// # Parameters
     /// - `s` — `&str`.
@@ -31,7 +70,7 @@ impl CombineMode {
         }
     }
 
-    /// Returns the Lua string representation.
+    /// Returns the Lua string representation. Consult the module-level documentation for the broader usage context and preconditions.
     ///
     /// # Returns
     /// `&'static str`.
@@ -43,7 +82,13 @@ impl CombineMode {
     }
 }
 
-/// Common data for all steering behaviors.
+/// Shared parameters common to all steering behavior instances.
+///
+/// Every [`SteeringBehaviorType`] variant carries a `SteeringBase` that controls
+/// the behavior's weight and enabled state. The weight is a multiplier applied
+/// to the raw force before combination (Weighted mode) or used as a tie-breaker
+/// (Priority mode). Disabled behaviors are skipped entirely during force
+/// calculation.
 ///
 /// # Fields
 /// - `weight` — `f32`.
@@ -65,7 +110,16 @@ impl Default for SteeringBase {
     }
 }
 
-/// Enumeration of all concrete steering behavior types.
+/// All concrete steering behavior types supported by the AI system.
+///
+/// Each variant carries its own parameters (target position, radii, neighbor
+/// lists, etc.) plus a shared [`SteeringBase`] for weight and enabled state.
+/// The `calculate()` method produces a 2D force vector for any behavior given
+/// the agent's current kinematic state.
+///
+/// Pursue, Evade, and Flock require access to other agents' positions, so their
+/// forces are computed at the [`AIWorld`](crate::ai::world::AIWorld) level
+/// rather than inside `calculate()` (which returns zero for those variants).
 ///
 /// # Variants
 /// - `Seek` — Seek variant.
@@ -195,7 +249,13 @@ impl SteeringBehaviorType {
         }
     }
 
-    /// Calculates the steering force for this behavior given an agent's state.
+    /// Computes the 2D steering force for this behavior given the agent's
+    /// current kinematic state. The force should be added to the agent's
+    /// velocity (after weighting and truncation by the SteeringManager).
+    ///
+    /// For Pursue, Evade, and Flock, this returns `(0.0, 0.0)` because
+    /// those behaviors need access to other agents' states, which is
+    /// handled at the AIWorld level.
     ///
     /// # Parameters
     /// - `agent_pos` — `(f32, f32)`.

@@ -1,32 +1,170 @@
-# src/audio/
+# `audio` — Agent Reference
 
-Audio subsystem providing sound loading, playback, and volume management through rodio.
+| Property | Value |
+|----------|-------|
+| **Tier** | Tier 1 — Basic Core |
+| **Lua API** | `luna.audio` |
+| **Source** | `src/audio/` |
+| **Tests** | `tests/audio_tests.rs` |
+| **Lua Tests** | `tests/lua/unit/test_audio.lua` |
 
-## What This Module Contains
+## Summary
 
-Mixer wraps rodio for multi-channel playback. AudioSource handles WAV/MP3/OGG/FLAC. Bus routing for master/music/sfx volume. MIDI file parsing via midly. SoundData for PCM sample access.
+The audio module wraps the `rodio` cross-platform audio library into a
+game-oriented mixing layer, handling every stage of game audio from file
+loading to final output.  It decodes sound files (WAV, OGG Vorbis, FLAC, MP3)
+into static in-memory sources or streaming sources, controls per-source
+playback state (volume, pitch, looping, fade in/out), routes sources through
+named audio buses for grouped volume control (for example a dedicated "sfx"
+bus and a "music" bus), and applies simple DSP effects (low-pass and
+high-pass filtering) as rodio source wrappers.
 
-## Files
+Each active sound is stored as an `AudioEntry` in a `SlotMap<SoundKey>`.  The
+`Mixer` owns the underlying `rodio::OutputStream` and manages the lifecycle
+of all `rodio::Sink` handles; a poll on every frame reaps finished sinks and
+keeps the active-source count bounded.  Spatial audio is approximated for 2D
+games: panning is derived from the horizontal offset between a sound's world
+position and the listener position, mapped to a stereo split via a linear
+panning law.
+
+A `MidiPlayer` provides synthesised music playback: MIDI events are parsed
+with `midly` and rendered to PCM at 44 100 Hz using additive sine synthesis,
+supporting per-channel mute, independent volume control on each track, and
+real-time tempo changes encoded in the MIDI file.
+
+## Architecture
+
+```
+Mixer (central audio manager)
+  │
+  ├── Sources ─── SlotMap<SoundKey, AudioEntry>
+  │     ├── Static ── entire file decoded into memory
+  │     └── Stream ── streaming from disk
+  │
+  ├── Playback control (per-source)
+  │     ├── play / pause / resume / stop
+  │     ├── set_volume / set_pitch / set_looping
+  │     ├── fade_in (linear over duration)
+  │     ├── seek (rebuilds sink for seek support)
+  │     └── clone_source (Arc sharing of decoded data)
+  │
+  ├── Bus routing ─── named buses with volume/pitch/paused
+  │     └── Bus { name, volume, pitch, paused }
+  │
+  ├── Effects
+  │     ├── lowpass(source, cutoff_hz)
+  │     └── highpass(source, cutoff_hz)
+  │
+  └── MidiPlayer ─── midly parsing + sine-additive PCM synthesis
+        ├── Per-track/channel mute and volume
+        ├── Tempo changes (microseconds per beat)
+        └── Real-time rendering at 44100 Hz
+```
+
+## Source Files
 
 | File | Purpose |
 |------|---------|
-| `bus.rs` | `Bus` implementation |
-| `midi.rs` | `Midi` implementation |
-| `midi_player.rs` | `MidiPlayer` implementation |
-| `mixer.rs` | `Mixer` implementation |
-| `mod.rs` | Module root — re-exports and module-level docs |
-| `sound_data.rs` | `SoundData` implementation |
-| `source.rs` | `Source` implementation |
+| `bus.rs` | Named audio bus for grouping sources under shared volume, pitch, and pause... |
+| `midi.rs` | MIDI SoundFont state management |
+| `midi_player.rs` | Software MIDI synthesizer: parses MIDI with `midly`, renders to PCM |
+| `mixer.rs` | Core audio mixer that owns every loaded sound and drives playback through rodio |
+| `sound_data.rs` | Decoded PCM audio sample buffer with per-sample read/write access |
+| `source.rs` | Audio source type and playback state enums for the audio subsystem |
 
-## Navigation
+## Submodules
 
-- **Owner agent**: `Audio-Eng`
-- **Tests**: `tests/audio_tests.rs`
-- **Lua API bindings**: `src/lua_api/audio_api.rs`
-- **Architecture docs**: `docs/architecture.md`
+### `audio::bus`
 
-## Dependencies
+Named audio bus for grouping sources under shared volume, pitch, and pause controls.
 
-- This module may depend on `math/` for foundational types (Vec2, Mat3, Rect)
-- This module must NOT depend on other domain modules directly
-- `engine/` and `lua_api/` may depend on this module
+- **`Bus`** (struct): A named audio bus that applies volume, pitch, and pause overrides to all sources assigned to it.  Buses are pure data...
+
+### `audio::midi`
+
+MIDI SoundFont state management.
+
+- **`MidiState`** (struct): MIDI SoundFont state. Consult the module-level documentation for the broader usage context and preconditions.  Tracks...
+
+### `audio::midi_player`
+
+Software MIDI synthesizer: parses MIDI with `midly`, renders to PCM via sine-additive synthesis, and plays through a rodio `Sink`.
+
+- **`MidiData`** (struct): Pre-parsed MIDI metadata extracted during `load()`.
+- **`MidiPlayer`** (struct): Software MIDI player with sine-additive synthesis.  Parses MIDI via `midly`, renders all tracks to a PCM buffer on...
+
+### `audio::mixer`
+
+Core audio mixer that owns every loaded sound and drives playback through rodio.
+
+- **`SourceType`** (enum): Type of audio source. Consult the module-level documentation for the broader usage context and preconditions.
+- **`PlayState`** (enum): Playback state of an audio source. Consult the module-level documentation for the broader usage context and...
+- **`Mixer`** (struct): Manages audio output via rodio: loads sources, controls playback, volume, pitch, pan, looping, fade effects, bus...
+
+### `audio::sound_data`
+
+Decoded PCM audio sample buffer with per-sample read/write access.
+
+- **`SoundData`** (struct): Decoded audio samples in f32 PCM format.  Stores interleaved samples (for stereo: L, R, L, R, ...). Samples are always...
+
+### `audio::source`
+
+Audio source type and playback state enums for the audio subsystem.
+
+- **`AudioSource`** (struct): Handle for a loaded audio asset (legacy compatibility shim).
+
+## Key Types
+
+### Structs
+
+#### `audio::source::AudioSource`
+
+Handle for a loaded audio asset (legacy compatibility shim).
+
+#### `audio::bus::Bus`
+
+A named audio bus that applies volume, pitch, and pause overrides to all sources assigned to it.  Buses are pure data...
+
+#### `audio::midi_player::MidiData`
+
+Pre-parsed MIDI metadata extracted during `load()`.
+
+#### `audio::midi_player::MidiPlayer`
+
+Software MIDI player with sine-additive synthesis.  Parses MIDI via `midly`, renders all tracks to a PCM buffer on...
+
+#### `audio::midi::MidiState`
+
+MIDI SoundFont state. Consult the module-level documentation for the broader usage context and preconditions.  Tracks...
+
+#### `audio::mixer::Mixer`
+
+Manages audio output via rodio: loads sources, controls playback, volume, pitch, pan, looping, fade effects, bus...
+
+#### `audio::sound_data::SoundData`
+
+Decoded audio samples in f32 PCM format.  Stores interleaved samples (for stereo: L, R, L, R, ...). Samples are always...
+
+### Enums
+
+#### `audio::mixer::PlayState`
+
+Playback state of an audio source. Consult the module-level documentation for the broader usage context and...
+
+#### `audio::mixer::SourceType`
+
+Type of audio source. Consult the module-level documentation for the broader usage context and preconditions.
+
+## Lua API
+
+Exposed under `luna.audio.*` by `src/lua_api/audio_api/`.
+
+## Item Summary
+
+| Kind | Count |
+|------|-------|
+| `enum` | 2 |
+| `mod` | 6 |
+| `struct` | 7 |
+| **Total** | **15** |
+

@@ -191,6 +191,13 @@ fn zone_to_table<'lua>(lua: &'lua Lua, zone: &ProfileZone) -> LuaResult<LuaTable
 // ---------------------------------------------------------------------------
 
 /// Registers the `luna.devtools` namespace.
+///
+/// # Parameters
+/// - `lua` — `&Lua`.
+/// - `luna` — `&LuaTable`.
+///
+/// # Returns
+/// `LuaResult<()>`.
 pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
     let dt = lua.create_table()?;
     let state = Rc::new(RefCell::new(DevtoolsState::new()));
@@ -199,6 +206,8 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
 
     /// Log at any level with optional source/line info.
     let s = state.clone();
+    /// @param level : string
+    /// @param message : string
     dt.set(
         "log",
         lua.create_function(move |_, (level, message): (String, String)| {
@@ -222,6 +231,7 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
 
     /// Sets the minimum log level to record.
     let s = state.clone();
+    /// @param level : string
     dt.set(
         "setLogLevel",
         lua.create_function(move |_, level: String| {
@@ -239,6 +249,7 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
 
     /// Toggles stderr console output.
     let s = state.clone();
+    /// @param enabled : boolean
     dt.set(
         "setLogConsole",
         lua.create_function(move |_, enabled: bool| {
@@ -256,6 +267,7 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
 
     /// Sets the log file path. Empty string disables file logging.
     let s = state.clone();
+    /// @param path : string
     dt.set(
         "setLogFile",
         lua.create_function(move |_, path: String| {
@@ -266,6 +278,7 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
 
     /// Returns the current log file path.
     let s = state.clone();
+    /// @return table
     dt.set(
         "getLogFile",
         lua.create_function(move |_, ()| Ok(s.borrow().log_file.clone()))?,
@@ -273,6 +286,8 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
 
     /// Returns the last `count` log entries (default all).
     let s = state.clone();
+    /// @param count : integer?
+    /// @return table
     dt.set(
         "getLogHistory",
         lua.create_function(move |lua, count: Option<usize>| {
@@ -332,6 +347,7 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
 
     /// Enables or disables the profiler.
     let s = state.clone();
+    /// @param enabled : boolean
     dt.set(
         "setProfilingEnabled",
         lua.create_function(move |_, enabled: bool| {
@@ -349,6 +365,7 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
 
     /// Starts a named timing zone.
     let s = state.clone();
+    /// @param name : string
     dt.set(
         "profilePush",
         lua.create_function(move |_, name: String| {
@@ -364,6 +381,7 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
 
     /// Ends the most recent timing zone.
     let s = state.clone();
+    /// @param name : string?
     dt.set(
         "profilePop",
         lua.create_function(move |_, _name: Option<String>| {
@@ -431,6 +449,7 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
 
     /// Returns the number of retained profile frames.
     let s = state.clone();
+    /// @return table
     dt.set(
         "getProfileFrameCount",
         lua.create_function(move |_, ()| Ok(s.borrow().profile_frames.len()))?,
@@ -438,6 +457,8 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
 
     /// Returns zone data for a specific frame (0 = most recent).
     let s = state.clone();
+    /// @param frame : integer?
+    /// @return table
     dt.set(
         "getProfileData",
         lua.create_function(move |lua, frame: Option<i64>| {
@@ -476,6 +497,7 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
 
     /// Records a frame time sample.
     let s = state.clone();
+    /// @param dt_val : number
     dt.set(
         "recordFrameTime",
         lua.create_function(move |_, dt_val: f64| {
@@ -593,6 +615,7 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
 
     /// Returns the raw frame time history.
     let s = state.clone();
+    /// @return table
     dt.set(
         "getFrameHistory",
         lua.create_function(move |lua, ()| {
@@ -607,6 +630,7 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
 
     /// Sets the maximum frame history buffer size (clamped 10–10000).
     let s = state.clone();
+    /// @param size : integer
     dt.set(
         "setFrameHistorySize",
         lua.create_function(move |_, size: usize| {
@@ -622,6 +646,7 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
 
     /// Returns the current frame history buffer size.
     let s = state.clone();
+    /// @return boolean
     dt.set(
         "getFrameHistorySize",
         lua.create_function(move |_, ()| Ok(s.borrow().frame_history_size))?,
@@ -631,6 +656,8 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
 
     /// Registers a file path for modification-time polling.
     let s = state.clone();
+    /// @param path : string
+    /// @return boolean
     dt.set(
         "watch",
         lua.create_function(move |_, path: String| {
@@ -649,6 +676,8 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
 
     /// Removes a file from the watch list.
     let s = state.clone();
+    /// @param path : string
+    /// @return boolean
     dt.set(
         "unwatch",
         lua.create_function(move |_, path: String| {
@@ -658,6 +687,7 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
 
     /// Returns all watched file paths.
     let s = state.clone();
+    /// @return table
     dt.set(
         "getWatchedPaths",
         lua.create_function(move |lua, ()| {
@@ -672,6 +702,7 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
 
     /// Scans watched files and returns paths whose modification time changed.
     let s = state.clone();
+    /// @return table
     dt.set(
         "scan",
         lua.create_function(move |lua, ()| {
@@ -698,6 +729,7 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
 
     /// Sets the advisory watch interval in seconds.
     let s = state.clone();
+    /// @param interval : number
     dt.set(
         "setWatchInterval",
         lua.create_function(move |_, interval: f64| {
@@ -726,6 +758,8 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
     // ===== Lua Debug Bridge =====
 
     /// Returns the Lua call stack as a table of stack frames.
+    /// @param max_depth : integer?
+    /// @return any
     /// Uses Lua's debug.getinfo to walk the stack.
     dt.set(
         "getCallStack",
@@ -754,6 +788,8 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
     )?;
 
     /// Evaluates a Lua string and returns success flag plus results.
+    /// @param code : string
+    /// @return any
     dt.set(
         "eval",
         lua.create_function(|lua, code: String| {
@@ -775,6 +811,7 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
 
     /// Opens a console window (no-op on non-Windows).
     let s = state.clone();
+    /// @return boolean
     dt.set(
         "openConsole",
         lua.create_function(move |_, ()| {

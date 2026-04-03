@@ -29,7 +29,7 @@ pub enum EventArg {
     Nil,
 }
 
-/// A single event in the event queue.
+/// A single event in the event queue. Consult the module-level documentation for the broader usage context and preconditions.
 ///
 /// # Fields
 /// - `name` — `String`.
@@ -43,13 +43,16 @@ pub struct Event {
 }
 
 /// FIFO event queue for system and custom events.
+///
+/// # Fields
+/// - `events` — `VecDeque<Event>`.
 #[derive(Debug)]
 pub struct EventQueue {
     events: VecDeque<Event>,
 }
 
 impl EventQueue {
-    /// Create a new empty event queue.
+    /// Create a new empty event queue. Returns a fully initialised instance with all fields set to their initial values.
     ///
     /// # Returns
     /// `Self`.
@@ -59,7 +62,7 @@ impl EventQueue {
         }
     }
 
-    /// Push an event onto the queue.
+    /// Push an event onto the queue. Consult the module-level documentation for the broader usage context and preconditions.
     ///
     /// # Parameters
     /// - `event` — `Event`.
@@ -67,7 +70,7 @@ impl EventQueue {
         self.events.push_back(event);
     }
 
-    /// Push an event by name and arguments.
+    /// Push an event by name and arguments. The insertion is O(1) amortised unless a resize is triggered.
     ///
     /// # Parameters
     /// - `name` — `&str`.
@@ -79,7 +82,7 @@ impl EventQueue {
         });
     }
 
-    /// Poll the next event from the queue.
+    /// Poll the next event from the queue. Consult the module-level documentation for the broader usage context and preconditions.
     ///
     /// # Returns
     /// `Option<Event>`.
@@ -87,12 +90,12 @@ impl EventQueue {
         self.events.pop_front()
     }
 
-    /// Clear all events from the queue.
+    /// Clear all events from the queue. After this call the container is in the same state as immediately after construction.
     pub fn clear(&mut self) {
         self.events.clear();
     }
 
-    /// Check if the queue is empty.
+    /// Check if the queue is empty. This accessor incurs no allocation; call it freely in hot paths.
     ///
     /// # Returns
     /// `bool`.

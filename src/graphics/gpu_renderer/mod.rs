@@ -83,7 +83,7 @@ const MAX_COLOR_IDXS: u64 = 1 << 19; // 524 288 indices
 const MAX_TEX_VERTS: u64 = 1 << 14; // 16 384 vertices
 const MAX_TEX_IDXS: u64 = 1 << 16; // 65 536 indices
 
-/// Per-frame rendering statistics.
+/// Per-frame rendering statistics. Consult the module-level documentation for the broader usage context and preconditions.
 ///
 /// # Fields
 /// - `draw_calls` — `u32`.
@@ -383,5 +383,7 @@ pub struct GpuRenderer {
 }
 
 
+/// Gpu Resources sub-module.
 pub(super) mod gpu_resources;
+/// Render Pass sub-module.
 pub(super) mod render_pass;

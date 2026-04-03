@@ -1,3 +1,12 @@
+//! Modding Api implementation for the `lua_api` subsystem.
+//!
+//! This module is part of Luna2D's `lua_api` subsystem and provides the implementation
+//! details for modding api-related operations and data management.
+//! Primary functions: `register()`.
+//!
+//! All public items are documented. See the parent module for architectural context
+//! and the `luna.*` Lua API for the scripting interface.
+//!
 use mlua::prelude::*;
 use std::cell::RefCell;
 use std::collections::HashMap;
@@ -17,26 +26,31 @@ impl mlua::UserData for LuaMod {
     fn add_methods<'lua, M: mlua::UserDataMethods<'lua, Self>>(methods: &mut M) {
         // -- metadata --
         /// Returns the id.
+        /// @return any
         ///
         /// # Returns
         /// The current id.
         methods.add_method("getId", |_, this, ()| Ok(this.info.id.clone()));
         /// Returns the name.
+        /// @return any
         ///
         /// # Returns
         /// The current name.
         methods.add_method("getName", |_, this, ()| Ok(this.info.name.clone()));
         /// Returns the version.
+        /// @return any
         ///
         /// # Returns
         /// The current version.
         methods.add_method("getVersion", |_, this, ()| Ok(this.info.version.clone()));
         /// Returns the author.
+        /// @return any
         ///
         /// # Returns
         /// The current author.
         methods.add_method("getAuthor", |_, this, ()| Ok(this.info.author.clone()));
         /// Returns the description.
+        /// @return any
         ///
         /// # Returns
         /// The current description.
@@ -44,6 +58,7 @@ impl mlua::UserData for LuaMod {
             Ok(this.info.description.clone())
         });
         /// Returns the dependencies.
+        /// @return any
         ///
         /// # Returns
         /// The current dependencies.
@@ -55,6 +70,7 @@ impl mlua::UserData for LuaMod {
             Ok(t)
         });
         /// Returns the priority.
+        /// @return any
         ///
         /// # Parameters
         /// - `enabled` — `boolean`.
@@ -65,6 +81,7 @@ impl mlua::UserData for LuaMod {
 
         // -- state --
         /// Returns `true` if enabled.
+        /// @return any
         ///
         /// # Parameters
         /// - `enabled` — `boolean`.
@@ -73,6 +90,7 @@ impl mlua::UserData for LuaMod {
         /// `boolean`.
         methods.add_method("isEnabled", |_, this, ()| Ok(this.info.enabled));
         /// Sets the enabled.
+        /// @param enabled : boolean
         ///
         /// # Parameters
         /// - `enabled` — `boolean`.
@@ -81,6 +99,7 @@ impl mlua::UserData for LuaMod {
             Ok(())
         });
         /// Returns `true` if loaded.
+        /// @return any
         ///
         /// # Parameters
         /// - `name` — `string`.
@@ -104,6 +123,8 @@ impl mlua::UserData for LuaMod {
         );
 
         /// Returns the hook.
+        /// @param name : string
+        /// @return any
         ///
         /// # Parameters
         /// - `name` — `string`.
@@ -120,6 +141,8 @@ impl mlua::UserData for LuaMod {
         });
 
         /// Returns `true` if hook.
+        /// @param name : string
+        /// @return any
         ///
         /// # Parameters
         /// - `name` — `string`.
@@ -131,6 +154,7 @@ impl mlua::UserData for LuaMod {
         });
 
         /// Returns the hook names.
+        /// @return any
         ///
         /// # Returns
         /// The current hook names.
@@ -144,6 +168,7 @@ impl mlua::UserData for LuaMod {
 
         // -- config --
         /// Sets the config.
+        /// @param value : any
         ///
         /// # Parameters
         /// - `value` — `any`.
@@ -157,6 +182,7 @@ impl mlua::UserData for LuaMod {
         });
 
         /// Returns the config.
+        /// @return any
         ///
         /// # Returns
         /// The current config.
@@ -204,6 +230,7 @@ impl LuaModManager {
 impl mlua::UserData for LuaModManager {
     fn add_methods<'lua, M: mlua::UserDataMethods<'lua, Self>>(methods: &mut M) {
         /// Adds mod to the collection.
+        /// @param ud : Mod
         ///
         /// # Parameters
         /// - `ud` — `userdata`.
@@ -226,6 +253,7 @@ impl mlua::UserData for LuaModManager {
         });
 
         /// Removes mod from the collection.
+        /// @param mod_id : string
         ///
         /// # Parameters
         /// - `mod_id` — `string`.
@@ -236,6 +264,8 @@ impl mlua::UserData for LuaModManager {
         });
 
         /// Returns `true` if mod.
+        /// @param mod_id : string
+        /// @return any
         ///
         /// # Parameters
         /// - `mod_id` — `string`.
@@ -247,12 +277,14 @@ impl mlua::UserData for LuaModManager {
         });
 
         /// Returns the mod count.
+        /// @return any
         ///
         /// # Returns
         /// The current mod count.
         methods.add_method("getModCount", |_, this, ()| Ok(this.manager.mod_count()));
 
         /// Returns the all mods.
+        /// @return any
         ///
         /// # Returns
         /// The current all mods.
@@ -308,6 +340,7 @@ impl mlua::UserData for LuaModManager {
         });
 
         /// Returns the load order.
+        /// @return any
         ///
         /// # Returns
         /// The current load order.
@@ -341,6 +374,7 @@ impl mlua::UserData for LuaModManager {
         });
 
         /// Validate dependencies on this ModManager.
+        /// @return any
         ///
         /// # Returns
         /// The result.
@@ -354,6 +388,7 @@ impl mlua::UserData for LuaModManager {
         });
 
         /// Returns `true` if circular dependencies.
+        /// @return any
         ///
         /// # Parameters
         /// - `order_table` — `table`.
@@ -368,6 +403,7 @@ impl mlua::UserData for LuaModManager {
 
         // Set explicit load order. Accepts a Lua array of mod ID strings.
         /// Sets the load order.
+        /// @param order_table : table
         ///
         /// # Parameters
         /// - `order_table` — `table`.
@@ -394,6 +430,8 @@ impl mlua::UserData for LuaModManager {
         // Returns a Lua array of mod info tables for discovered mods.
         // Mods are automatically registered in the manager.
         /// Scan folder on this ModManager.
+        /// @param path : string
+        /// @return any
         ///
         /// # Parameters
         /// - `path` — `string`.
@@ -455,6 +493,8 @@ impl mlua::UserData for LuaModManager {
 
         // Return the filesystem path of a registered mod, or nil if unknown.
         /// Returns the mod path.
+        /// @param mod_id : string
+        /// @return any
         ///
         /// # Parameters
         /// - `mod_id` — `string`.
@@ -469,6 +509,8 @@ impl mlua::UserData for LuaModManager {
 
         // Mark a registered mod for hot-reload. Returns true if the mod exists.
         /// Mark for reload on this ModManager.
+        /// @param mod_id : string
+        /// @return any
         ///
         /// # Parameters
         /// - `mod_id` — `string`.
@@ -478,6 +520,7 @@ impl mlua::UserData for LuaModManager {
 
         // Return the list of mod IDs currently pending hot-reload.
         /// Returns the reload queue.
+        /// @return any
         ///
         /// # Returns
         /// The current reload queue.
@@ -516,6 +559,10 @@ impl mlua::UserData for LuaModManager {
 pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) -> LuaResult<()> {
     let modding = lua.create_table()?;
 
+    /// New mod.
+    ///
+    /// @param info : table
+    /// @return any
     modding.set(
         "newMod",
         lua.create_function(|_lua, info: LuaTable| {
@@ -554,6 +601,8 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
         })?,
     )?;
 
+    /// New mod manager.
+    ///
     modding.set(
         "newModManager",
         lua.create_function(|_lua, ()| Ok(LuaModManager::new()))?,

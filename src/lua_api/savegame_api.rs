@@ -1,3 +1,12 @@
+//! Savegame Api implementation for the `lua_api` subsystem.
+//!
+//! This module is part of Luna2D's `lua_api` subsystem and provides the implementation
+//! details for savegame api-related operations and data management.
+//! Primary functions: `register()`.
+//!
+//! All public items are documented. See the parent module for architectural context
+//! and the `luna.*` Lua API for the scripting interface.
+//!
 use mlua::prelude::*;
 use std::cell::RefCell;
 use std::collections::HashMap;
@@ -51,6 +60,7 @@ impl mlua::UserData for LuaSaveManager {
         );
 
         /// Removes a previously registered save slot by name.
+        /// @param name : string
         ///
         /// # Parameters
         /// - `name` — `string`: Slot name to remove.
@@ -67,6 +77,7 @@ impl mlua::UserData for LuaSaveManager {
 
         // -- schema --
         /// Sets the schema version stored in the save file. Increment when save format changes.
+        /// @param version : integer
         ///
         /// # Parameters
         /// - `version` — `integer`: New schema version number.
@@ -76,6 +87,7 @@ impl mlua::UserData for LuaSaveManager {
         });
 
         /// Returns the schema version currently set on this save manager.
+        /// @return any
         ///
         /// # Returns
         /// `integer` — schema version.
@@ -98,6 +110,7 @@ impl mlua::UserData for LuaSaveManager {
 
         // -- collect (in-memory only) --
         /// Snapshots all registered tables into an in-memory serializable form, ready for disk write.
+        /// @return any
         ///
         /// # Returns
         /// `table` — the collected save data.
@@ -168,6 +181,7 @@ impl mlua::UserData for LuaSaveManager {
         });
 
         /// Returns `true` if the save data has been modified since the last write.
+        /// @return any
         ///
         /// # Returns
         /// `boolean`.
@@ -189,6 +203,8 @@ impl mlua::UserData for LuaSaveManager {
         });
 
         /// Ticks the autosave timer. Must be called from `luna.update(dt)` when autosave is enabled.
+        /// @param dt : number
+        /// @return any
         ///
         /// # Parameters
         /// - `dt` — `number`: Elapsed seconds since the last frame.
@@ -199,6 +215,7 @@ impl mlua::UserData for LuaSaveManager {
 
         // -- summary --
         /// Sets a human-readable summary string stored alongside the save data (e.g. for save-slot UI).
+        /// @param summary : string
         ///
         /// # Parameters
         /// - `summary` — `string`: Display text for this save slot.
@@ -208,6 +225,7 @@ impl mlua::UserData for LuaSaveManager {
         });
 
         /// Returns the summary string set by `setSummary`, or an empty string if none was set.
+        /// @return any
         ///
         /// # Returns
         /// `string` — save slot summary.
@@ -247,6 +265,8 @@ impl mlua::UserData for LuaSaveManager {
 pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) -> LuaResult<()> {
     let savegame = lua.create_table()?;
 
+    /// New save manager.
+    ///
     savegame.set(
         "newSaveManager",
         lua.create_function(|_lua, ()| Ok(LuaSaveManager::new()))?,

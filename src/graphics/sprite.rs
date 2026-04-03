@@ -1,3 +1,13 @@
+//! Sprite implementation for the `graphics` subsystem.
+//!
+//! This module is part of Luna2D's `graphics` subsystem and provides the implementation
+//! details for sprite-related operations and data management.
+//! Key types exported from this module: `Sprite`.
+//! Primary functions: `new()`, `set_position()`, `set_scale()`, `set_rotation()`.
+//!
+//! All public items are documented. See the parent module for architectural context
+//! and the `luna.*` Lua API for the scripting interface.
+//!
 use crate::graphics::Color;
 use crate::math::Vec2;
 
@@ -50,7 +60,7 @@ impl Sprite {
         self.position = Vec2::new(x, y);
     }
 
-    /// Sets the per-axis scale of the sprite.
+    /// Sets the per-axis scale of the sprite. Replaces the current scale value; callers hold responsibility for maintaining consistency with related fields.
     ///
     /// # Parameters
     /// - `sx` — Horizontal scale factor.

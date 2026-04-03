@@ -1,6 +1,44 @@
-//! Tabular epsilon-greedy Q-learner.
+//! Tabular epsilon-greedy Q-learner for discrete-state reinforcement learning.
+//!
+//! Implements the classic Q-learning algorithm where an agent learns optimal
+//! action-selection policies by iteratively updating a state-action value table
+//! (Q-table) using the Bellman equation:
+//!
+//! `Q(s,a) ← Q(s,a) + α[r + γ max_a' Q(s',a') - Q(s,a)]`
+//!
+//! ## Parameters
+//!
+//! - **α (alpha)**: Learning rate ∈ (0,1]. Controls how much new information
+//!   overrides old. Default: 0.1.
+//! - **γ (gamma)**: Discount factor ∈ [0,1]. Controls how much future rewards
+//!   are valued relative to immediate rewards. Default: 0.9.
+//! - **ε (epsilon)**: Exploration rate ∈ [0,1]. Probability of choosing a random
+//!   action instead of the best known action. Default: 0.1.
+//! - **epsilon_decay**: Multiplied into epsilon after each episode, gradually
+//!   shifting from exploration to exploitation. Default: 0.995.
+//!
+//! ## Storage
+//!
+//! The Q-table is a flat `Vec<f64>` of size `state_count × action_count`,
+//! indexed as `state * action_count + action`. This is more cache-friendly
+//! than a HashMap for small-to-medium state spaces.
+//!
+//! ## Serialization
+//!
+//! The Q-table can be serialized to JSON (`serialize()`) and deserialized
+//! (`deserialize()`) for saving/loading trained policies. The JSON format
+//! is a 2D array: `[[q(s0,a0), q(s0,a1), ...], [q(s1,a0), ...], ...]`.
 
-/// Tabular epsilon-greedy Q-learner for reinforcement learning.
+/// Tabular epsilon-greedy Q-learner for discrete-state reinforcement learning.
+///
+/// Maintains a flat Q-table mapping every (state, action) pair to a learned
+/// value. The agent selects actions using an epsilon-greedy policy:
+/// with probability ε it explores (random action), otherwise it exploits
+/// (highest Q-value action). After each transition the table is updated
+/// via the Bellman equation.
+///
+/// Designed for small-to-medium state spaces (up to ~10k states × ~20 actions).
+/// For larger spaces, consider function approximation approaches instead.
 ///
 /// # Fields
 /// - `state_count` — `usize`.
@@ -11,9 +49,6 @@
 /// - `epsilon` — `f64`.
 /// - `epsilon_decay` — `f64`.
 /// - `episode_count` — `u64`.
-///
-/// Q-table is a flat `Vec<f64>` indexed as `state * action_count + action`.
-/// Uses Bellman update: Q(s,a) ← Q(s,a) + α\[r + γ max_a' Q(s',a') - Q(s,a)\]
 pub struct QLearner {
     /// Number of discrete states.
     pub(crate) state_count: usize,
@@ -34,7 +69,10 @@ pub struct QLearner {
 }
 
 impl QLearner {
-    /// Creates a new Q-learner with the given state and action counts.
+    /// Creates a new Q-learner with zero-initialized Q-values.
+    ///
+    /// Default hyperparameters: α=0.1, γ=0.9, ε=0.1, decay=0.995.
+    /// Allocates a flat table of `state_count × action_count` f64 values.
     ///
     /// # Parameters
     /// - `state_count` — `usize`.
@@ -55,7 +93,11 @@ impl QLearner {
         }
     }
 
-    /// Epsilon-greedy action selection.
+    /// Selects an action using the epsilon-greedy policy.
+    ///
+    /// With probability ε, returns a uniformly random action (exploration).
+    /// Otherwise, returns the action with the highest Q-value for the
+    /// given state (exploitation). Returns 0 if `state` is out of range.
     ///
     /// # Parameters
     /// - `state` — `usize`.
@@ -73,7 +115,10 @@ impl QLearner {
         }
     }
 
-    /// Returns the action with the highest Q-value for the given state.
+    /// Returns the greedy-best action (highest Q-value) for the given state.
+    ///
+    /// Ties are broken by first-encountered order. Returns 0 if `state`
+    /// is out of range.
     ///
     /// # Parameters
     /// - `state` — `usize`.
@@ -97,7 +142,14 @@ impl QLearner {
         best_idx
     }
 
-    /// Bellman update: Q(s,a) ← Q(s,a) + α\[r + γ max Q(s',a') - Q(s,a)\]
+    /// Performs one Bellman Q-learning update. Consult the module-level documentation for the broader usage context and preconditions.
+    ///
+    /// Updates the Q-value for (`state`, `action`) using the observed
+    /// `reward` and the estimated value of `next_state`:
+    ///
+    /// `Q(s,a) ← Q(s,a) + α[r + γ max_a' Q(s',a') - Q(s,a)]`
+    ///
+    /// Silently no-ops if any index is out of range.
     ///
     /// # Parameters
     /// - `state` — `usize`.
@@ -123,7 +175,7 @@ impl QLearner {
         self.episode_count += 1;
     }
 
-    /// Gets the Q-value for a state-action pair.
+    /// Returns the Q-value for a (state, action) pair, or 0.0 if out of range.
     ///
     /// # Parameters
     /// - `state` — `usize`.
@@ -138,7 +190,7 @@ impl QLearner {
         self.qtable[state * self.action_count + action]
     }
 
-    /// Sets the Q-value for a state-action pair.
+    /// Overwrites the Q-value for a (state, action) pair. No-ops if out of range.
     ///
     /// # Parameters
     /// - `state` — `usize`.
@@ -163,7 +215,10 @@ impl QLearner {
         max_val
     }
 
-    /// Serializes the Q-table to a JSON string.
+    /// Serializes the Q-table to a JSON string (2D array of state rows).
+    ///
+    /// Format: `[[q(s0,a0), q(s0,a1), ...], [q(s1,a0), ...], ...]`
+    /// Use [`deserialize`](Self::deserialize) to restore from this format.
     ///
     /// # Returns
     /// `String`.
@@ -187,7 +242,10 @@ impl QLearner {
         out
     }
 
-    /// Deserializes a Q-table from a JSON string. Errors if dimensions mismatch.
+    /// Restores the Q-table from a JSON string produced by [`serialize`](Self::serialize).
+    ///
+    /// Returns `Err` if the outer dimensions don't match `state_count` or
+    /// any row length doesn't match `action_count`.
     ///
     /// # Parameters
     /// - `json` — `&str`.

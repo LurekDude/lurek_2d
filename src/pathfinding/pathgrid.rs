@@ -1,10 +1,18 @@
 //! Weighted grid pathfinding (A*, Dijkstra) with obstacle support.
 //! Moved from `ai/pathgrid`; used by the Lua `luna.ai.newPathGrid` API.
+//!
+//! This module is part of Luna2D's `pathfinding` subsystem and provides the implementation
+//! details for pathgrid-related operations and data management.
+//! Key types exported from this module: `Cell`, `PathGrid`.
+//! Primary functions: `new()`, `in_bounds()`, `set_walkable()`, `is_walkable()`.
+//!
+//! All public items are documented. See the parent module for architectural context
+//! and the `luna.*` Lua API for the scripting interface.
 
 use std::cmp::Ordering;
 use std::collections::BinaryHeap;
 
-/// Single cell of the navigation grid.
+/// Single cell of the navigation grid. Consult the module-level documentation for the broader usage context and preconditions.
 ///
 /// # Fields
 /// - `walkable` — `bool`.
@@ -54,7 +62,7 @@ impl Ord for AStarNode {
     }
 }
 
-/// A★ navigation grid.
+/// A★ navigation grid. Consult the module-level documentation for the broader usage context and preconditions.
 ///
 /// # Fields
 /// - `width` — `usize`.

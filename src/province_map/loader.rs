@@ -13,6 +13,14 @@ use super::core::{Province, ProvinceError, ProvinceMap};
 /// Convert an RGB colour triple to a province ID.
 ///
 /// The encoding is `(r << 16) | (g << 8) | b`, giving up to ~16 M unique IDs.
+///
+/// # Parameters
+/// - `r` — `u8`.
+/// - `g` — `u8`.
+/// - `b` — `u8`.
+///
+/// # Returns
+/// `u32`.
 pub fn color_to_id(r: u8, g: u8, b: u8) -> u32 {
     (u32::from(r) << 16) | (u32::from(g) << 8) | u32::from(b)
 }
@@ -59,6 +67,12 @@ impl ProvinceMap {
     ///
     /// Each unique RGB colour in the image becomes a province. Province ID `0`
     /// (black, `#000000`) is reserved for empty/background pixels and is skipped.
+    ///
+    /// # Parameters
+    /// - `path` — `&str`.
+    ///
+    /// # Returns
+    /// `Result<ProvinceMap, ProvinceError>`.
     pub fn from_file(path: &str) -> Result<ProvinceMap, ProvinceError> {
         let img = image::open(Path::new(path))
             .map_err(|e| ProvinceError::LoadError(format!("{path}: {e}")))?
@@ -75,6 +89,14 @@ impl ProvinceMap {
     ///
     /// `pixels` must contain exactly `width * height * 4` bytes in row-major
     /// RGBA order. Province ID `0` (black) is treated as empty and skipped.
+    ///
+    /// # Parameters
+    /// - `width` — `u32`.
+    /// - `height` — `u32`.
+    /// - `pixels` — `&[u8]`.
+    ///
+    /// # Returns
+    /// `Result<ProvinceMap, ProvinceError>`.
     pub fn from_image_data(
         width: u32,
         height: u32,

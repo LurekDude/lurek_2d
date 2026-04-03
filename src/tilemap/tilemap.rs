@@ -1,4 +1,12 @@
 //! Main tile map container with layers, tiles, viewport, collision, and autotile support.
+//!
+//! This module is part of Luna2D's `tilemap` subsystem and provides the implementation
+//! details for tilemap-related operations and data management.
+//! Key types exported from this module: `TileLayer`, `SweepResult`, `TileMap`.
+//! Primary functions: `new()`, `add_tileset()`, `get_tileset()`, `get_tileset_count()`.
+//!
+//! All public items are documented. See the parent module for architectural context
+//! and the `luna.*` Lua API for the scripting interface.
 
 use std::collections::HashMap;
 
@@ -93,6 +101,16 @@ pub struct SweepResult {
 /// A 2D tile map composed of layers, tilesets, and viewport-clipped rendering state.
 ///
 /// All tile coordinates are **0-based**. Lua helpers add 1-based conversion externally.
+///
+/// # Fields
+/// - `tile_width` — `u32`.
+/// - `tile_height` — `u32`.
+/// - `chunk_size` — `u32`.
+/// - `orientation` — `MapOrientation`.
+/// - `tilesets` — `Vec<TileSet>`.
+/// - `layers` — `Vec<TileLayer>`.
+/// - `viewport` — `Option<Rect>`.
+/// - `anim_timers` — `HashMap<u32`.
 #[derive(Debug, Clone)]
 pub struct TileMap {
     tile_width: u32,
@@ -136,7 +154,7 @@ impl TileMap {
     // TileSet management
     // ------------------------------------------------------------------
 
-    /// Adds a tileset to this map.
+    /// Adds a tileset to this map. The insertion is O(1) amortised unless a resize is triggered.
     ///
     /// # Parameters
     /// - `ts` — `TileSet`.
@@ -181,7 +199,7 @@ impl TileMap {
         self.layers.len() - 1
     }
 
-    /// Returns the number of layers.
+    /// Returns the number of layers. This accessor incurs no allocation; call it freely in hot paths.
     ///
     /// # Returns
     /// `usize`.
@@ -200,7 +218,7 @@ impl TileMap {
         self.layers.get(idx).map(|l| l.name.as_str())
     }
 
-    /// Sets layer visibility.
+    /// Sets layer visibility. Replaces the current layer visible value; callers hold responsibility for maintaining consistency with related fields.
     ///
     /// # Parameters
     /// - `idx` — `usize`.
@@ -247,7 +265,7 @@ impl TileMap {
         self.layers.get(idx).map_or([0.0; 4], |l| l.tint)
     }
 
-    /// Sets the pixel offset for a layer.
+    /// Sets the pixel offset for a layer. Replaces the current layer offset value; callers hold responsibility for maintaining consistency with related fields.
     ///
     /// # Parameters
     /// - `idx` — `usize`.
@@ -259,7 +277,7 @@ impl TileMap {
         }
     }
 
-    /// Returns the pixel offset of a layer.
+    /// Returns the pixel offset of a layer. This accessor incurs no allocation; call it freely in hot paths.
     ///
     /// # Parameters
     /// - `idx` — `usize`.
@@ -282,7 +300,7 @@ impl TileMap {
         }
     }
 
-    /// Returns the parallax factor of a layer.
+    /// Returns the parallax factor of a layer. This accessor incurs no allocation; call it freely in hot paths.
     ///
     /// # Parameters
     /// - `idx` — `usize`.
@@ -343,7 +361,7 @@ impl TileMap {
         0
     }
 
-    /// Sets a per-tile RGBA tint override.
+    /// Sets a per-tile RGBA tint override. Replaces the current tile tint value; callers hold responsibility for maintaining consistency with related fields.
     ///
     /// # Parameters
     /// - `layer` — `usize`.
@@ -487,7 +505,7 @@ impl TileMap {
     // Dimensions
     // ------------------------------------------------------------------
 
-    /// Returns the tile width in pixels.
+    /// Returns the tile width in pixels. This accessor incurs no allocation; call it freely in hot paths.
     ///
     /// # Returns
     /// `u32`.
@@ -495,7 +513,7 @@ impl TileMap {
         self.tile_width
     }
 
-    /// Returns the tile height in pixels.
+    /// Returns the tile height in pixels. This accessor incurs no allocation; call it freely in hot paths.
     ///
     /// # Returns
     /// `u32`.
@@ -527,7 +545,7 @@ impl TileMap {
         self.orientation
     }
 
-    /// Sets the map orientation.
+    /// Sets the map orientation. Replaces the current orientation value; callers hold responsibility for maintaining consistency with related fields.
     ///
     /// # Parameters
     /// - `orientation` — `MapOrientation`.

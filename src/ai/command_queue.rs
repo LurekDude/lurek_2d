@@ -1,10 +1,37 @@
-//! RTS-style ordered command queue for a single unit.
+//! RTS-style ordered command queue for scheduling unit actions.
+//!
+//! A [`CommandQueue`] manages a FIFO sequence of [`Command`] entries for a single
+//! unit or agent. Commands are dequeued from the front and ticked each frame via
+//! their Lua callback. Three insertion modes are supported:
+//!
+//! - **`enqueue`** — appends a command to the back (standard queue behavior).
+//! - **`push_front`** — inserts at the front, interrupting the current command
+//!   without clearing the rest of the queue.
+//! - **`replace`** — clears the entire queue and enqueues one new command.
+//!
+//! Commands carry metadata: a `kind` string (e.g., `"move"`, `"attack"`, `"patrol"`),
+//! target coordinates, a priority hint, and an `interruptible` flag that controls
+//! whether `cancel_current()` can remove it.
+//!
+//! ## Lua Callback Contract
+//!
+//! Each command's `callback` is a Lua function `fn(dt) → bool`:
+//! - Returns `true` if the command is still running (tick again next frame).
+//! - Returns `false` if the command is done (advance to next in queue).
+//!
+//! The AIWorld or Lua game loop is responsible for ticking the front command
+//! each frame and calling `advance()` when the callback returns `false`.
 
 use std::collections::VecDeque;
 
 use mlua::RegistryKey;
 
-/// A single RTS unit command with metadata.
+/// A single RTS unit command with metadata and a Lua tick callback.
+///
+/// Commands are stored in a [`CommandQueue`] and processed one at a time,
+/// front-to-back. Each frame the front command's callback is ticked with
+/// the frame's delta time. When the callback signals completion, the command
+/// is removed and the next one becomes active.
 ///
 /// # Fields
 /// - `kind` — `String`.
@@ -14,34 +41,48 @@ use mlua::RegistryKey;
 /// - `priority` — `i32`.
 /// - `interruptible` — `bool`.
 pub struct Command {
-    /// Command type identifier (e.g., "move", "attack", "patrol").
+    /// Command type identifier (e.g., `"move"`, `"attack"`, `"patrol"`, `"build"`).
+    /// Used by external code for filtering and UI display — not interpreted internally.
     pub kind: String,
-    /// Lua callback ticked each frame: `fn(dt) → bool` (true = still running, false = done).
+    /// Lua callback ticked each frame: `fn(dt) → bool`.
+    /// Returns `true` while the command is still running, `false` when done.
     pub callback: RegistryKey,
-    /// Target world-space X coordinate.
+    /// Target world-space X coordinate. Semantic meaning depends on `kind`
+    /// (e.g., move destination, attack target position).
     pub target_x: f32,
     /// Target world-space Y coordinate.
     pub target_y: f32,
-    /// Priority hint for external sorting (not used internally).
+    /// Priority hint for external sorting or display ordering.
+    /// Not used internally by `CommandQueue` — provided for game logic convenience.
     pub priority: i32,
-    /// Whether this command can be interrupted by `cancelCurrent()`.
+    /// Whether `cancel_current()` can remove this command. Non-interruptible
+    /// commands (e.g., death animations) cannot be cancelled by the player.
     pub interruptible: bool,
 }
 
-/// RTS-style ordered command queue.
+/// A FIFO queue of [`Command`] entries for sequential unit action scheduling.
+///
+/// Commands are consumed from the front. The game loop ticks the front command
+/// each frame and calls `advance()` to move to the next when it completes.
+/// Three insertion patterns are supported:
+///
+/// - `enqueue()` — adds to the back (normal queue append).
+/// - `push_front()` — inserts at front, pre-empting the current command.
+/// - `replace()` — clears everything and enqueues a single new command.
+///
+/// `cancel_current()` removes the front command only if its `interruptible`
+/// flag is set, providing a way for players to cancel commands while protecting
+/// non-interruptible actions (like scripted animations).
 ///
 /// # Fields
 /// - `commands` — `VecDeque<Command>`.
-///
-/// Commands are dequeued from the front. Three insertion modes:
-/// `enqueue` (append), `push_front` (interrupt), `replace` (clear + enqueue).
 pub struct CommandQueue {
-    /// The command queue.
+    /// The underlying double-ended queue of commands.
     pub(crate) commands: VecDeque<Command>,
 }
 
 impl CommandQueue {
-    /// Creates a new empty command queue.
+    /// Creates a new empty command queue. Returns a fully initialised instance with all fields set to their initial values.
     ///
     /// # Returns
     /// `Self`.
@@ -90,12 +131,12 @@ impl CommandQueue {
         false
     }
 
-    /// Clears all commands.
+    /// Clears all commands. After this call the container is in the same state as immediately after construction.
     pub fn clear(&mut self) {
         self.commands.clear();
     }
 
-    /// Returns the number of queued commands.
+    /// Returns the number of queued commands. Runs in O(1) time.
     ///
     /// # Returns
     /// `usize`.
@@ -103,7 +144,7 @@ impl CommandQueue {
         self.commands.len()
     }
 
-    /// Returns whether the queue is empty.
+    /// Returns whether the queue is empty. This accessor incurs no allocation; call it freely in hot paths.
     ///
     /// # Returns
     /// `bool`.

@@ -23,13 +23,21 @@
 //! semantics.  All such logic belongs in Lua scripts that use these structures.
 
 #[allow(clippy::module_inception)]
+/// Item sub-module.
 pub mod item;
+/// Stack sub-module.
 pub mod stack;
+/// Builder sub-module.
 pub mod builder;
+/// Manager sub-module.
 pub mod manager;
+/// Pool sub-module.
 pub mod pool;
+/// Slot sub-module.
 pub mod slot;
+/// Group sub-module.
 pub mod group;
+/// History sub-module.
 pub mod history;
 
 // Re-export everything flat for convenience

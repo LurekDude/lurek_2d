@@ -1,3 +1,12 @@
+//! Event Api implementation for the `lua_api` subsystem.
+//!
+//! This module is part of Luna2D's `lua_api` subsystem and provides the implementation
+//! details for event api-related operations and data management.
+//! Primary functions: `register()`.
+//!
+//! All public items are documented. See the parent module for architectural context
+//! and the `luna.*` Lua API for the scripting interface.
+//!
 use super::SharedState;
 use crate::event::{Event, EventArg, Signal};
 use mlua::prelude::*;
@@ -43,6 +52,7 @@ impl LuaUserData for LuaSignal {
         );
 
         /// Emits the named event, calling all registered callbacks in order.
+        /// @param args : MultiValue
         ///
         /// Extra arguments are forwarded to each callback.
         methods.add_method("emit", |lua, this, args: LuaMultiValue| {
@@ -74,6 +84,8 @@ impl LuaUserData for LuaSignal {
         });
 
         /// Removes a subscription by handle ID.
+        /// @param handle : integer
+        /// @return any
         ///
         /// Returns `true` if the handle existed.
         methods.add_method("remove", |lua, this, handle: u64| {
@@ -87,6 +99,8 @@ impl LuaUserData for LuaSignal {
         });
 
         /// Removes all callbacks for the named event.
+        /// @param name : string
+        /// @return any
         ///
         /// Returns the count of removed subscriptions.
         methods.add_method("clear", |lua, this, name: String| {
@@ -103,6 +117,7 @@ impl LuaUserData for LuaSignal {
         });
 
         /// Removes all callbacks across all events.
+        /// @return any
         ///
         /// Returns the total count of removed subscriptions.
         methods.add_method("clearAll", |lua, this, ()| {
@@ -115,11 +130,14 @@ impl LuaUserData for LuaSignal {
         });
 
         /// Returns the callback count for the named event.
+        /// @param name : string
+        /// @return any
         methods.add_method("getCount", |_, this, name: String| {
             Ok(this.inner.borrow().get_count(&name))
         });
 
         /// Returns the total callback count across all events.
+        /// @return any
         methods.add_method("getTotalCount", |_, this, ()| {
             Ok(this.inner.borrow().get_total_count())
         });
@@ -144,6 +162,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
     /// # Parameters
     /// - `exitcode` — Optional integer exit code (default 0).
     let s = state.clone();
+    /// @param code : integer?
     event.set(
         "quit",
         lua.create_function(move |_, code: Option<i32>| {
@@ -157,6 +176,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
     // luna.event.push(name, ...)
     /// Pushes a custom event onto the event queue.
     let s = state.clone();
+    /// @param args : MultiValue
     event.set(
         "push",
         lua.create_function(move |_, args: LuaMultiValue| {
@@ -199,6 +219,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
     // luna.event.poll() — returns an iterator function
     /// Polls and returns the next event from the queue, or nil if empty.
     let s = state.clone();
+    /// @return any
     event.set(
         "poll",
         lua.create_function(move |lua, ()| {
@@ -241,6 +262,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
     /// Event.
     // luna.event.newSignal() -> Signal
     /// Creates a new pub-sub Signal dispatcher.
+    /// @return any
     event.set(
         "newSignal",
         lua.create_function(|_, ()| {

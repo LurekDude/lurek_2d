@@ -18,6 +18,12 @@ use super::core::ProvinceMap;
 ///
 /// Returns the graph and a mapping from province ID to graph node ID, so
 /// callers can translate between the two ID spaces.
+///
+/// # Parameters
+/// - `ap` — `&ProvinceMap`.
+///
+/// # Returns
+/// `(Graph, HashMap<u32, u64>)`.
 pub fn adjacency_to_graph(map: &ProvinceMap) -> (Graph, HashMap<u32, u64>) {
     let mut graph = Graph::new();
     let mut id_map: HashMap<u32, u64> = HashMap::new();

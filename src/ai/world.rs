@@ -1,11 +1,35 @@
 //! Container that owns agents and ticks them in descending priority order each frame.
+//!
+//! The [`AIWorld`] is the top-level manager for the AI subsystem. It owns all
+//! [`Agent`](crate::ai::agent::Agent)s, maintains a name→index lookup table,
+//! and provides the global [`Blackboard`] that serves as the parent for every
+//! agent's local blackboard.
+//!
+//! ## Agent Lifecycle
+//!
+//! Agents are added via `add_agent(name)`, which creates an agent with default
+//! kinematic state and wires its local blackboard's parent to the global one.
+//! Agents can be removed by name; removal triggers a full index rebuild.
+//!
+//! ## Update Loop
+//!
+//! During `update(dt)` (called from the Lua `luna.update` callback), the world
+//! ticks all agents in descending `priority` order. For each agent, it checks
+//! the agent's [`DecisionModel`](crate::ai::agent::DecisionModel) and ticks the
+//! appropriate subsystems (FSM, BehaviorTree, SteeringManager).
 
 use std::collections::HashMap;
 
 use crate::ai::agent::Agent;
 use crate::ai::blackboard::Blackboard;
 
-/// Container that owns agents and ticks them each frame.
+/// Top-level AI container that owns agents and provides global shared state.
+///
+/// Agents are stored in a contiguous `Vec` for cache-friendly iteration.
+/// A `HashMap<String, usize>` provides O(1) name-based lookup. The global
+/// blackboard is automatically set as the parent of each agent's local
+/// blackboard on `add_agent()`, forming the two-level lookup hierarchy
+/// described in the [`blackboard`](crate::ai::blackboard) module.
 ///
 /// # Fields
 /// - `agents` — `Vec<Agent>`.
@@ -24,7 +48,7 @@ pub struct AIWorld {
 }
 
 impl AIWorld {
-    /// Creates a new empty AIWorld.
+    /// Creates a new empty AIWorld. Returns a fully initialised instance with all fields set to their initial values.
     ///
     /// # Returns
     /// `Self`.
@@ -89,7 +113,7 @@ impl AIWorld {
         self.name_index.get(name).copied()
     }
 
-    /// Returns the number of agents.
+    /// Returns the number of agents. Consult the module-level documentation for the broader usage context and preconditions.
     ///
     /// # Returns
     /// `usize`.

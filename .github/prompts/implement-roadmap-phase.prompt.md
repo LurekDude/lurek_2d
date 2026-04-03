@@ -84,7 +84,7 @@ Run or simulate:
 python tools/collect_docs.py --report-missing
 ```
 
-Read `docs/lua_api_reference_generated.md` (if present) and compare with phase's target API functions. Mark each target function as: `present` / `partial` / `missing`.
+Read `docs/API/lua_api_reference_generated.md` (if present) and compare with phase's target API functions. Mark each target function as: `present` / `partial` / `missing`.
 
 ### 3c — API Convention Check
 
@@ -376,8 +376,8 @@ The phase is not done until every item below is checked:
 - [ ] `cargo clippy -- -D warnings` produces zero warnings
 - [ ] `cargo fmt --check` produces zero diffs
 - [ ] `python tools/collect_docs.py --report-missing` exits 0 (zero missing public docs)
-- [ ] `python tools/collect_docs.py` completes and `docs/lua_api_reference_generated.md` is updated
-- [ ] Every new `luna.*` function appears in `docs/lua_api_reference_generated.md`
+- [ ] `python tools/collect_docs.py` completes and `docs/API/lua_api_reference_generated.md` is updated
+- [ ] Every new `luna.*` function appears in `docs/API/lua_api_reference_generated.md`
 - [ ] Every new `luna.*` function has a corresponding Lua test in `tests/lua/`
 - [ ] Every new Rust public function has a corresponding Rust test in `tests/<module>_tests.rs`
 - [ ] API parity check passed: new functions use same parameter order and semantics as a similar game engine equivalents

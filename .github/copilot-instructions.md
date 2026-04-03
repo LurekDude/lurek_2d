@@ -339,15 +339,15 @@ work/{session}/
 | `python tools/cag_validate.py` | Validate all `.github/` CAG files |
 | `python tools/cag_validate.py --type agent\|skill\|prompt\|instruction` | Validate one family |
 | `python tools/cag_validate.py --file <path>` | Validate a single file |
-| `python tools/collect_docs.py` | Generate `docs/api_generated.md` from `///` comments |
+| `python tools/collect_docs.py` | Generate `docs/API/api_generated.md` from `///` comments |
 | `python tools/collect_docs.py --report-missing` | List public items missing `///` docs (exit 1 if any) |
 | `python tools/collect_docs.py --suggest` | Print starter `///` lines for undocumented items |
-| `python tools/doc_coverage.py` | Docstring coverage analytics → `docs/doc_coverage.json` |
+| `python tools/doc_coverage.py` | Docstring coverage analytics → `docs/API/doc_coverage.json` |
 | `python tools/doc_coverage.py --report-missing` | List all Rust + Lua API items missing doc comments |
-| `python tools/test_coverage.py` | Test coverage analytics → `docs/test_coverage.json` |
+| `python tools/test_coverage.py` | Test coverage analytics → `docs/API/test_coverage.json` |
 | `python tools/test_coverage.py --suggest` | Print test stubs for uncovered items |
-| `python tools/gen_test_docs.py` | Generate `docs/test_docs.md` from coverage metadata |
-| `python tools/gen_lua_api.py` | Generate `docs/lua_api_reference_generated.md` |
+| `python tools/gen_test_docs.py` | Generate `docs/API/test_docs.md` from coverage metadata |
+| `python tools/gen_lua_api.py` | Generate `docs/API/lua_api_reference_generated.md` |
 | `python tools/gen_wiki_api.py` | Regenerate `wiki/API-Reference.md` cheatsheet |
 | `python tools/gen_splash.py` | Regenerate splash screen asset |
 | `python tools/gen_icon.py` | Regenerate window icon asset |

@@ -2,6 +2,12 @@
 //!
 //! Provides rigid-body simulation with circles, rectangles, sensors,
 //! raycasting, joints, and collision event recording.
+//!
+//! This module is part of Luna2D's `physics` subsystem and provides the implementation
+//! details for mod-related operations and data management.
+//!
+//! All public items are documented. See the parent module for architectural context
+//! and the `luna.*` Lua API for the scripting interface.
 
 /// Body types, shapes, and the `Body` struct used by the physics world.
 pub mod body;

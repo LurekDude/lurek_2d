@@ -1,3 +1,13 @@
+//! System Api implementation for the `lua_api` subsystem.
+//!
+//! This module is part of Luna2D's `lua_api` subsystem and provides the implementation
+//! details for system api-related operations and data management.
+//! Key types exported from this module: `PowerState`.
+//! Primary functions: `get_processor_count()`, `get_memory_size()`, `open_url()`, `get_preferred_locales()`.
+//!
+//! All public items are documented. See the parent module for architectural context
+//! and the `luna.*` Lua API for the scripting interface.
+//!
 use mlua::prelude::*;
 use std::cell::RefCell;
 use std::rc::Rc;
@@ -89,7 +99,7 @@ pub fn get_preferred_locales() -> Vec<String> {
     }
 }
 
-/// Power state of the device.
+/// Power state of the device. Consult the module-level documentation for the broader usage context and preconditions.
 ///
 /// # Variants
 /// - `Unknown` — cannot determine power state
@@ -151,6 +161,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
 
     // luna.system.getOS() -> string
     /// Returns the host operating system name ('Windows', 'Linux', 'macOS').
+    /// @return any
     system.set(
         "getOS",
         lua.create_function(|_, ()| {
@@ -172,6 +183,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
 
     // luna.system.getVersion() -> string
     /// Returns the Luna2D engine version string.
+    /// @return any
     system.set(
         "getVersion",
         lua.create_function(|_, ()| Ok(env!("CARGO_PKG_VERSION").to_string()))?,
@@ -179,6 +191,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
 
     // luna.system.getProcessorCount() -> integer
     /// Returns the number of logical CPU cores available.
+    /// @return any
     system.set(
         "getProcessorCount",
         lua.create_function(|_, ()| Ok(get_processor_count()))?,
@@ -186,6 +199,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
 
     // luna.system.getMemorySize() -> integer (MiB)
     /// Returns the total amount of installed system RAM in megabytes.
+    /// @return any
     ///
     /// # Returns
     /// RAM size in megabytes as an integer.
@@ -196,6 +210,8 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
 
     // luna.system.openURL(url) -> bool
     /// Opens a URL in the system's default browser.
+    /// @param url : string
+    /// @return any
     system.set(
         "openURL",
         lua.create_function(|_, url: String| Ok(open_url(&url)))?,
@@ -203,6 +219,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
 
     // luna.system.getPreferredLocales() -> table of strings
     /// Returns an ordered list of the user's preferred locale strings (e.g. 'en-US').
+    /// @return any
     ///
     /// # Returns
     /// Table of locale strings ordered from most to least preferred.
@@ -213,6 +230,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
 
     // luna.system.getPowerInfo() -> state, percent_or_nil, seconds_or_nil
     /// Returns battery state, percentage charged, and estimated time remaining.
+    /// @return any
     ///
     /// # Returns
     /// Table with fields state ('battery','charging','charged','unknown'), percent, and seconds.
@@ -226,6 +244,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
 
     // luna.system.getInfo() -> table { engine, version, lua_version, renderer, os, processors, memory }
     /// Returns a table of system information including OS name, CPU model, and installed RAM.
+    /// @return any
     ///
     /// # Returns
     /// Table with fields os, cpu, cores, and ram.
@@ -264,6 +283,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
 
     // luna.system.setClipboardText(text) — writes text to the system clipboard.
     /// Replaces the system clipboard contents with the given string.
+    /// @param text : string
     system.set(
         "setClipboardText",
         lua.create_function(|_, text: String| {
@@ -283,6 +303,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
 
     // luna.system.getClipboardText() -> string — reads text from the system clipboard.
     /// Returns the current contents of the system clipboard.
+    /// @return any
     system.set(
         "getClipboardText",
         lua.create_function(|_, ()| match arboard::Clipboard::new() {
@@ -306,6 +327,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
     // luna.system.setDebugOverlay(enabled)
     /// Shows or hides the FPS/draw-call debug overlay.
     let s = state.clone();
+    /// @param enabled : boolean
     system.set(
         "setDebugOverlay",
         lua.create_function(move |_, enabled: bool| {
@@ -332,6 +354,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
     /// # Parameters
     /// - `level` — One of 'debug', 'info', 'warn', or 'error'.
     // luna.system.setLogLevel(level)
+    /// @param level : string
     system.set(
         "setLogLevel",
         lua.create_function(|_, level: String| {
@@ -354,6 +377,8 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
     #[allow(unused_doc_comments)]
     /// Emit a log message from Lua at the specified level.
     // luna.system.log(level, message)
+    /// @param level : string
+    /// @param message : string
     system.set(
         "log",
         lua.create_function(|_, (level, message): (String, String)| {
@@ -375,6 +400,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
     {
         /// Returns the last unhandled error message, or nil.
         let s = state_for_error.clone();
+        /// @return any
         system.set(
             "getLastError",
             lua.create_function(move |lua, ()| {
@@ -401,6 +427,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
 
     // luna.system.getArch() -> string
     /// Returns the CPU architecture string for the current machine.
+    /// @return any
     ///
     /// # Returns
     /// One of 'x86_64', 'aarch64', 'arm', etc.
@@ -411,6 +438,8 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
 
     // luna.system.getEnv(name) -> string|nil
     /// Returns the value of the named OS environment variable, or nil if not set.
+    /// @param name : string
+    /// @return any
     ///
     /// # Parameters
     /// - `name` — Environment variable name (case-sensitive on Linux/macOS).
@@ -427,6 +456,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
 
     // luna.system.getArgs() -> table
     /// Returns the command-line arguments as a table.
+    /// @return table
     system.set(
         "getArgs",
         lua.create_function(|lua, ()| {
@@ -441,6 +471,8 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
 
     // luna.system.parseArgs([argTable]) -> { flags={}, options={}, positional={} }
     /// Parses a command-line argument string and returns a structured key/value table.
+    /// @param args : table?
+    /// @return any
     ///
     /// # Parameters
     /// - `args` — Argument string or table (e.g. '--flag=value --bool').
@@ -511,6 +543,9 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
 
     // luna.system.runBatch(tasks [, opts]) -> results table
     /// Runs a list of shell commands in parallel and returns immediately without blocking.
+    /// @param tasks : table
+    /// @param opts : table?
+    /// @return any
     ///
     /// # Parameters
     /// - `commands` — Table of command strings to execute concurrently.
@@ -566,6 +601,8 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
 
     // luna.system.getBatchResults(results) -> passed, failed, skipped
     /// Returns the output table from the most recently completed runBatch call.
+    /// @param results : table
+    /// @return any
     ///
     /// # Parameters
     /// - `handle` — Batch handle returned by runBatch.

@@ -15,13 +15,17 @@ For full architecture detail and tier rules, see [`docs/architecture.md`](../doc
    (1, 2, or 3) plus two foundation layers (`math`, `engine`). The tier of a
    module determines which other modules it may import. Violating tier rules
    creates circular dependencies that are hard to untangle later.
-2. **`math/` is the leaf** — it has no Luna2D dependencies and may be imported
+2. **Tiers are logical, not physical folders** — the repository keeps modules in
+   flat `src/<module>/` directories rather than `src/tier1/<module>/`,
+   `src/tier2/<module>/`, and `src/tier3/<module>/`. The dependency rules carry
+   the architecture; the filesystem does not encode the tiers directly.
+3. **`math/` is the leaf** — it has no Luna2D dependencies and may be imported
    by all modules at all tiers.
-3. **`engine/` is the orchestrator** — it may import all domain modules. It owns
+4. **`engine/` is the orchestrator** — it may import all domain modules. It owns
    the game loop, window, and app lifecycle.
-4. **`lua_api/` is the bridge** — it depends on every domain module to expose
+5. **`lua_api/` is the bridge** — it depends on every domain module to expose
    their functionality through a consistent `luna.*` Lua namespace.
-5. **No upward dependencies** — domain modules never import from `lua_api/`.
+6. **No upward dependencies** — domain modules never import from `lua_api/`.
    Tier N modules never import Tier N+1 modules.
 
 ## Dependency Graph
@@ -89,7 +93,6 @@ For full architecture detail and tier rules, see [`docs/architecture.md`](../doc
 | `compute/` | N-dimensional numerical arrays (NdArray), pure CPU |
 | `data/` | Binary buffers, compression, hashing, TOML parsing |
 | `image/` | CPU pixel-level image manipulation (ImageData) |
-| `sound/` | PCM sample manipulation, MIDI state |
 | `event/` | FIFO event queue, polling API |
 | `entity/` | Lightweight ECS with ID recycling and bitmap tags |
 | `window/` | Window state abstraction |
@@ -118,6 +121,8 @@ For full architecture detail and tier rules, see [`docs/architecture.md`](../doc
 
 | Folder | Role |
 |--------|------|
+| `battle/` | Turn-based battles, combatants, actions, statuses, turn order |
+| `cardgame/` | Cards, stacks, deck building, slots, history, and card-pool utilities |
 | `combat/` | Turn-based and real-time combat, damage resolution |
 | `crafting/` | Recipe system, ingredient matching, crafting queues |
 | `dialog/` | Dialogue trees, branching narrative, localisation hooks |
@@ -131,11 +136,21 @@ For full architecture detail and tier rules, see [`docs/architecture.md`](../doc
 
 *External SDK wrappers (Steam, Epic, etc.). Not yet implemented. Reserved.*
 
+## Active Vs Extra Directories
+
+The authoritative crate module map is the set of folders exported from `src/lib.rs`.
+That means not every top-level folder under `src/` is automatically part of the
+active architecture contract.
+
+Some top-level directories currently present, such as `automation/`, `doll/`,
+`gui/`, `minimap/`, `network/`, `overlay/`, `pipeline/`, and `terminal/`, are
+best treated as additional source-tree content rather than active crate modules
+until they are wired into `src/lib.rs`.
+
 ## Entry Points
 
 - **`main.rs`** — Binary CLI entry: parses args, loads `conf.lua`, creates `App`, runs game loop.
 - **`lib.rs`** — Library crate root: re-exports all modules as `pub mod`.
-- **`bin/lunec.rs`** — Windows console-less launcher (same behavior, no terminal window).
 
 ## Key Patterns
 

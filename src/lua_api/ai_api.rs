@@ -2,7 +2,7 @@
 //!
 //! Provides factory functions and UserData wrappers for AI subsystems:
 //! AIWorld, Agent, Blackboard, StateMachine, BehaviorTree, SteeringManager,
-//! PathGrid, FlowField, QLearner, UtilityAI, GOAPPlanner, InfluenceMap,
+//! QLearner, UtilityAI, GOAPPlanner, InfluenceMap,
 //! Squad, and CommandQueue.
 
 use std::cell::RefCell;
@@ -96,28 +96,6 @@ impl LunaType for LuaSteeringManager {
     const TYPE_HIERARCHY: &'static [&'static str] = &["Object"];
 }
 
-/// Lua wrapper for an A* navigation grid.
-#[derive(Clone)]
-struct LuaPathGrid {
-    inner: Rc<RefCell<PathGrid>>,
-}
-
-impl LunaType for LuaPathGrid {
-    const TYPE_NAME: &'static str = "PathGrid";
-    const TYPE_HIERARCHY: &'static [&'static str] = &["Object"];
-}
-
-/// Lua wrapper for a BFS flow field.
-#[derive(Clone)]
-struct LuaFlowField {
-    inner: Rc<RefCell<FlowField>>,
-}
-
-impl LunaType for LuaFlowField {
-    const TYPE_NAME: &'static str = "FlowField";
-    const TYPE_HIERARCHY: &'static [&'static str] = &["Object"];
-}
-
 /// Lua wrapper for a tabular Q-learner.
 #[derive(Clone)]
 struct LuaQLearner {
@@ -193,6 +171,8 @@ impl LuaUserData for LuaAIWorld {
         add_type_methods::<Self>(methods);
 
         /// Registers a new agent named `name` in this world and returns its handle.
+        /// @param name : string
+        /// @return any
         ///
         /// # Parameters
         /// - `name` — `string`: Unique identifier for the new agent.
@@ -209,6 +189,8 @@ impl LuaUserData for LuaAIWorld {
         });
 
         /// Looks up a registered agent by name.
+        /// @param name : string
+        /// @return any
         ///
         /// # Parameters
         /// - `name` — `string`: Name of the agent to retrieve.
@@ -228,6 +210,7 @@ impl LuaUserData for LuaAIWorld {
         });
 
         /// Removes and destroys the given agent from this world.
+        /// @param agent : Agent
         ///
         /// # Parameters
         /// - `agent` — `Agent`: Handle of the agent to remove, obtained from `addAgent`.
@@ -239,6 +222,7 @@ impl LuaUserData for LuaAIWorld {
         });
 
         /// Returns the number of agents currently registered in this world.
+        /// @return any
         ///
         /// # Returns
         /// `integer` — total agent count.
@@ -247,6 +231,7 @@ impl LuaUserData for LuaAIWorld {
         });
 
         /// Returns a snapshot of the shared world-level blackboard.
+        /// @return any
         ///
         /// # Returns
         /// A `Blackboard` containing data visible to all agents in this world.
@@ -258,6 +243,7 @@ impl LuaUserData for LuaAIWorld {
         });
 
         /// Advances all agents in the world by `dt` seconds, integrating velocity into position.
+        /// @param dt : number
         ///
         /// # Parameters
         /// - `dt` — `number`: Elapsed seconds since the last frame.
@@ -277,12 +263,15 @@ impl LuaUserData for LuaAgent {
         add_type_methods::<Self>(methods);
 
         /// Returns the unique name this agent was registered under.
+        /// @return any
         ///
         /// # Returns
         /// `string` — agent name.
         methods.add_method("getName", |_, this, ()| Ok(this.name.clone()));
 
         /// Teleports the agent to world-space coordinates (`x`, `y`).
+        /// @param x : number
+        /// @param y : number
         ///
         /// # Parameters
         /// - `x` — `number`: Horizontal world-space position.
@@ -296,6 +285,7 @@ impl LuaUserData for LuaAgent {
         });
 
         /// Returns the agent's current world-space position.
+        /// @return any
         ///
         /// # Returns
         /// Two numbers `x, y` representing world-space coordinates.
@@ -309,6 +299,8 @@ impl LuaUserData for LuaAgent {
         });
 
         /// Sets the agent's velocity vector in world units per second.
+        /// @param x : number
+        /// @param y : number
         ///
         /// # Parameters
         /// - `x` — `number`: Horizontal component.
@@ -322,6 +314,7 @@ impl LuaUserData for LuaAgent {
         });
 
         /// Returns the agent's current velocity vector.
+        /// @return any
         ///
         /// # Returns
         /// Two numbers `vx, vy` in world units/second.
@@ -335,6 +328,7 @@ impl LuaUserData for LuaAgent {
         });
 
         /// Sets the maximum movement speed cap in world units/second.
+        /// @param v : number
         ///
         /// # Parameters
         /// - `v` — `number`: New speed limit (world units/sec).
@@ -347,6 +341,7 @@ impl LuaUserData for LuaAgent {
         });
 
         /// Returns the maximum movement speed cap in world units/second.
+        /// @return any
         ///
         /// # Returns
         /// `number` — speed cap.
@@ -360,6 +355,7 @@ impl LuaUserData for LuaAgent {
         });
 
         /// Sets the maximum steering force that can be applied per frame.
+        /// @param v : number
         ///
         /// # Parameters
         /// - `v` — `number`: New force cap.
@@ -372,6 +368,7 @@ impl LuaUserData for LuaAgent {
         });
 
         /// Returns the maximum steering force cap.
+        /// @return any
         ///
         /// # Returns
         /// `number` — force cap.
@@ -385,6 +382,7 @@ impl LuaUserData for LuaAgent {
         });
 
         /// Sets the scheduling priority; higher-priority agents are processed first during `update`.
+        /// @param p : integer
         ///
         /// # Parameters
         /// - `p` — `integer`: Priority value, higher = earlier processing.
@@ -397,6 +395,7 @@ impl LuaUserData for LuaAgent {
         });
 
         /// Returns the agent's scheduling priority level.
+        /// @return any
         ///
         /// # Returns
         /// `integer` — priority.
@@ -410,6 +409,7 @@ impl LuaUserData for LuaAgent {
         });
 
         /// Switches the agent's active decision model at runtime. Valid values: `"fsm"`, `"bt"`, `"utility"`, `"goap"`.
+        /// @param model : string
         ///
         /// # Parameters
         /// - `model` — `string`: Decision model identifier.
@@ -424,6 +424,7 @@ impl LuaUserData for LuaAgent {
         });
 
         /// Returns the name of the agent's current decision model.
+        /// @return any
         ///
         /// # Returns
         /// `string` — e.g. `"fsm"`, `"bt"`, `"utility"`, `"goap"`.
@@ -437,6 +438,7 @@ impl LuaUserData for LuaAgent {
         });
 
         /// Adds a string tag to this agent's tag set (idempotent).
+        /// @param tag : string
         ///
         /// # Parameters
         /// - `tag` — `string`: Tag to add.
@@ -449,6 +451,7 @@ impl LuaUserData for LuaAgent {
         });
 
         /// Removes a string tag from this agent's tag set (no-op if absent).
+        /// @param tag : string
         ///
         /// # Parameters
         /// - `tag` — `string`: Tag to remove.
@@ -461,6 +464,8 @@ impl LuaUserData for LuaAgent {
         });
 
         /// Returns `true` if this agent's tag set contains `tag`.
+        /// @param tag : string
+        /// @return boolean
         ///
         /// # Parameters
         /// - `tag` — `string`: Tag to test.
@@ -477,6 +482,7 @@ impl LuaUserData for LuaAgent {
         });
 
         /// Returns this agent's private blackboard for reading or writing typed data.
+        /// @return any
         ///
         /// # Returns
         /// A `Blackboard` scoped to this agent.
@@ -500,6 +506,8 @@ impl LuaUserData for LuaBlackboard {
         add_type_methods::<Self>(methods);
 
         /// Stores a floating-point value under `key` on this blackboard.
+        /// @param key : string
+        /// @param value : number
         ///
         /// # Parameters
         /// - `key` — `string`: Key to write.
@@ -517,6 +525,8 @@ impl LuaUserData for LuaBlackboard {
         );
 
         /// Stores a boolean value under `key` on this blackboard.
+        /// @param key : string
+        /// @param value : boolean
         ///
         /// # Parameters
         /// - `key` — `string`: Key to write.
@@ -534,6 +544,8 @@ impl LuaUserData for LuaBlackboard {
         );
 
         /// Stores a string value under `key` on this blackboard.
+        /// @param key : string
+        /// @param value : string
         ///
         /// # Parameters
         /// - `key` — `string`: Key to write.
@@ -552,6 +564,8 @@ impl LuaUserData for LuaBlackboard {
         );
 
         /// Returns `true` if a value is stored under `key` in this blackboard.
+        /// @param key : string
+        /// @return any
         ///
         /// # Parameters
         /// - `key` — `string`: Key to check.
@@ -563,6 +577,7 @@ impl LuaUserData for LuaBlackboard {
         });
 
         /// Deletes the entry at `key` from this blackboard (no-op if absent).
+        /// @param key : string
         ///
         /// # Parameters
         /// - `key` — `string`: Key to delete.
@@ -578,6 +593,7 @@ impl LuaUserData for LuaBlackboard {
         });
 
         /// Returns the keys.
+        /// @return table
         ///
         /// # Returns
         /// The current keys.
@@ -591,6 +607,7 @@ impl LuaUserData for LuaBlackboard {
         });
 
         /// Returns the size.
+        /// @return integer
         ///
         /// # Returns
         /// The current size.
@@ -603,6 +620,8 @@ impl LuaUserData for LuaStateMachine {
         add_type_methods::<Self>(methods);
 
         /// Registers a new named state in this FSM.
+        /// @param name : string
+        /// @param opts : table
         ///
         /// # Parameters
         /// - `name` — `string`: Unique name for the state.
@@ -647,6 +666,7 @@ impl LuaUserData for LuaStateMachine {
         );
 
         /// Sets the initial state.
+        /// @param name : string
         ///
         /// # Parameters
         /// - `name` — `string`.
@@ -660,6 +680,7 @@ impl LuaUserData for LuaStateMachine {
         });
 
         /// Returns the current state.
+        /// @return any
         ///
         /// # Parameters
         /// - `name` — `string`.
@@ -671,6 +692,7 @@ impl LuaUserData for LuaStateMachine {
         });
 
         /// Force state on this StateMachine.
+        /// @param name : string
         ///
         /// # Parameters
         /// - `name` — `string`.
@@ -682,6 +704,7 @@ impl LuaUserData for LuaStateMachine {
         });
 
         /// Returns the time in state.
+        /// @return any
         ///
         /// # Returns
         /// The current time in state.
@@ -696,6 +719,7 @@ impl LuaUserData for LuaBehaviorTree {
         add_type_methods::<Self>(methods);
 
         /// Sets the top-level root node of this behavior tree.
+        /// @param node_ud : BTNode
         ///
         /// # Parameters
         /// - `node` — `BTNode`: Root `BTNode` returned by one of the node constructors.
@@ -713,6 +737,7 @@ impl LuaUserData for LuaBehaviorTree {
         });
 
         /// Returns the last status.
+        /// @return any
         ///
         /// # Returns
         /// The current last status.
@@ -727,6 +752,7 @@ impl LuaUserData for LuaBTNode {
         add_type_methods::<Self>(methods);
 
         /// Adds child to the collection.
+        /// @param child_ud : BTNode
         ///
         /// # Parameters
         /// - `child_ud` — `userdata`.
@@ -757,6 +783,7 @@ impl LuaUserData for LuaBTNode {
         });
 
         /// Returns the child count.
+        /// @return any
         ///
         /// # Returns
         /// The current child count.
@@ -781,6 +808,7 @@ impl LuaUserData for LuaBTNode {
         });
 
         /// Sets the child.
+        /// @param child_ud : BTNode
         ///
         /// # Parameters
         /// - `child_ud` — `userdata`.
@@ -815,6 +843,7 @@ impl LuaUserData for LuaBTNode {
         });
 
         /// Sets the count.
+        /// @param n : integer
         ///
         /// # Parameters
         /// - `n` — `integer`.
@@ -827,6 +856,7 @@ impl LuaUserData for LuaBTNode {
         });
 
         /// Returns the count.
+        /// @return any
         ///
         /// # Returns
         /// The current count.
@@ -840,6 +870,7 @@ impl LuaUserData for LuaBTNode {
         });
 
         /// Sets the success policy.
+        /// @param policy : string
         ///
         /// # Parameters
         /// - `policy` — `string`.
@@ -852,6 +883,7 @@ impl LuaUserData for LuaBTNode {
         });
 
         /// Sets the failure policy.
+        /// @param policy : string
         ///
         /// # Parameters
         /// - `policy` — `string`.
@@ -864,6 +896,7 @@ impl LuaUserData for LuaBTNode {
         });
 
         /// Returns the node type.
+        /// @return string
         ///
         /// # Returns
         /// The current node type.
@@ -1033,6 +1066,7 @@ impl LuaUserData for LuaSteeringManager {
         );
 
         /// Returns the behavior count.
+        /// @return integer
         ///
         /// # Parameters
         /// - `mode` — `string`.
@@ -1044,6 +1078,7 @@ impl LuaUserData for LuaSteeringManager {
         });
 
         /// Sets the combine mode.
+        /// @param mode : string
         ///
         /// # Parameters
         /// - `mode` — `string`.
@@ -1053,6 +1088,7 @@ impl LuaUserData for LuaSteeringManager {
         });
 
         /// Returns the combine mode.
+        /// @return any
         ///
         /// # Returns
         /// The current combine mode.
@@ -1061,6 +1097,7 @@ impl LuaUserData for LuaSteeringManager {
         });
 
         /// Returns the last steering.
+        /// @return any
         ///
         /// # Returns
         /// The current last steering.
@@ -1086,237 +1123,13 @@ impl LuaUserData for LuaSteeringManager {
     }
 }
 
-impl LuaUserData for LuaPathGrid {
-    fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
-        add_type_methods::<Self>(methods);
-
-        /// Returns the width.
-        ///
-        /// # Returns
-        /// The current width.
-        methods.add_method("getWidth", |_, this, ()| Ok(this.inner.borrow().width));
-        /// Returns the height.
-        ///
-        /// # Parameters
-        /// - `x` — `integer`.
-        /// - `y` — `integer`.
-        /// - `walkable` — `boolean`.
-        ///
-        /// # Returns
-        /// The current height.
-        methods.add_method("getHeight", |_, this, ()| Ok(this.inner.borrow().height));
-        /// Returns the cell size.
-        ///
-        /// # Parameters
-        /// - `x` — `integer`.
-        /// - `y` — `integer`.
-        /// - `walkable` — `boolean`.
-        ///
-        /// # Returns
-        /// The current cell size.
-        methods.add_method("getCellSize", |_, this, ()| {
-            Ok(this.inner.borrow().cell_size)
-        });
-
-        methods.add_method(
-            "setWalkable",
-            |_, this, (x, y, walkable): (usize, usize, bool)| {
-                let lx = x.saturating_sub(1);
-                let ly = y.saturating_sub(1);
-                this.inner.borrow_mut().set_walkable(lx, ly, walkable);
-                Ok(())
-            },
-        );
-
-        /// Returns `true` if walkable.
-        ///
-        /// # Parameters
-        /// - `x` — `integer`.
-        /// - `y` — `integer`.
-        ///
-        /// # Returns
-        /// `boolean`.
-        methods.add_method("isWalkable", |_, this, (x, y): (usize, usize)| {
-            let lx = x.saturating_sub(1);
-            let ly = y.saturating_sub(1);
-            Ok(this.inner.borrow().is_walkable(lx, ly))
-        });
-
-        /// Sets the cost.
-        ///
-        /// # Parameters
-        /// - `x` — `integer`.
-        /// - `y` — `integer`.
-        /// - `cost` — `number`.
-        methods.add_method("setCost", |_, this, (x, y, cost): (usize, usize, f32)| {
-            let lx = x.saturating_sub(1);
-            let ly = y.saturating_sub(1);
-            this.inner.borrow_mut().set_cost(lx, ly, cost);
-            Ok(())
-        });
-
-        /// Returns the cost.
-        ///
-        /// # Parameters
-        /// - `x` — `integer`.
-        /// - `y` — `integer`.
-        ///
-        /// # Returns
-        /// The current cost.
-        methods.add_method("getCost", |_, this, (x, y): (usize, usize)| {
-            let lx = x.saturating_sub(1);
-            let ly = y.saturating_sub(1);
-            Ok(this.inner.borrow().get_cost(lx, ly))
-        });
-
-        methods.add_method(
-            "findPath",
-            |lua, this, (sx, sy, gx, gy): (usize, usize, usize, usize)| {
-                let lsx = sx.saturating_sub(1);
-                let lsy = sy.saturating_sub(1);
-                let lgx = gx.saturating_sub(1);
-                let lgy = gy.saturating_sub(1);
-                let grid = this.inner.borrow();
-                match grid.find_path(lsx, lsy, lgx, lgy) {
-                    Some(path) => {
-                        let tbl = lua.create_table()?;
-                        for (i, (wx, wy)) in path.iter().enumerate() {
-                            let pt = lua.create_table()?;
-                            /// X on this PathGrid.
-                            ///
-                            /// # Returns
-                            /// The result.
-                            pt.set("x", *wx)?;
-                            /// Y on this PathGrid.
-                            ///
-                            /// # Returns
-                            /// The result.
-                            pt.set("y", *wy)?;
-                            tbl.set(i as i64 + 1, pt)?;
-                        }
-                        Ok(LuaValue::Table(tbl))
-                    }
-                    None => Ok(LuaValue::Nil),
-                }
-            },
-        );
-
-        methods.add_method(
-            "findPathSmoothed",
-            |lua, this, (sx, sy, gx, gy): (usize, usize, usize, usize)| {
-                let lsx = sx.saturating_sub(1);
-                let lsy = sy.saturating_sub(1);
-                let lgx = gx.saturating_sub(1);
-                let lgy = gy.saturating_sub(1);
-                let grid = this.inner.borrow();
-                match grid.find_path_smoothed(lsx, lsy, lgx, lgy) {
-                    Some(path) => {
-                        let tbl = lua.create_table()?;
-                        for (i, (wx, wy)) in path.iter().enumerate() {
-                            let pt = lua.create_table()?;
-                            /// X on this PathGrid.
-                            ///
-                            /// # Returns
-                            /// The result.
-                            pt.set("x", *wx)?;
-                            /// Y on this PathGrid.
-                            ///
-                            /// # Returns
-                            /// The result.
-                            pt.set("y", *wy)?;
-                            tbl.set(i as i64 + 1, pt)?;
-                        }
-                        Ok(LuaValue::Table(tbl))
-                    }
-                    None => Ok(LuaValue::Nil),
-                }
-            },
-        );
-    }
-}
-
-impl LuaUserData for LuaFlowField {
-    fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
-        add_type_methods::<Self>(methods);
-
-        /// Sets the goal.
-        ///
-        /// # Parameters
-        /// - `x` — `integer`.
-        /// - `y` — `integer`.
-        methods.add_method("setGoal", |_, this, (x, y): (usize, usize)| {
-            let lx = x.saturating_sub(1);
-            let ly = y.saturating_sub(1);
-            this.inner.borrow_mut().set_goal(lx, ly);
-            Ok(())
-        });
-
-        /// Returns the direction.
-        ///
-        /// # Parameters
-        /// - `x` — `integer`.
-        /// - `y` — `integer`.
-        ///
-        /// # Returns
-        /// The current direction.
-        methods.add_method("getDirection", |_, this, (x, y): (usize, usize)| {
-            let lx = x.saturating_sub(1);
-            let ly = y.saturating_sub(1);
-            Ok(this.inner.borrow().get_direction(lx, ly))
-        });
-
-        /// Returns the distance.
-        ///
-        /// # Parameters
-        /// - `x` — `integer`.
-        /// - `y` — `integer`.
-        ///
-        /// # Returns
-        /// The current distance.
-        methods.add_method("getDistance", |_, this, (x, y): (usize, usize)| {
-            let lx = x.saturating_sub(1);
-            let ly = y.saturating_sub(1);
-            Ok(this.inner.borrow().get_distance(lx, ly))
-        });
-
-        /// Returns the width.
-        ///
-        /// # Returns
-        /// The current width.
-        methods.add_method("getWidth", |_, this, ()| Ok(this.inner.borrow().width));
-        /// Returns the height.
-        ///
-        /// # Returns
-        /// The current height.
-        methods.add_method("getHeight", |_, this, ()| Ok(this.inner.borrow().height));
-
-        /// Returns `true` if goal.
-        ///
-        /// # Returns
-        /// `boolean`.
-        methods.add_method("hasGoal", |_, this, ()| {
-            Ok(this.inner.borrow().goal.is_some())
-        });
-
-        /// Returns the goal.
-        ///
-        /// # Returns
-        /// The current goal.
-        methods.add_method("getGoal", |_, this, ()| match this.inner.borrow().goal {
-            Some((gx, gy)) => Ok((
-                LuaValue::Integer((gx + 1) as i64),
-                LuaValue::Integer((gy + 1) as i64),
-            )),
-            None => Ok((LuaValue::Nil, LuaValue::Nil)),
-        });
-    }
-}
-
 impl LuaUserData for LuaQLearner {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
         add_type_methods::<Self>(methods);
 
         /// Choose action on this QLearner.
+        /// @param state : integer
+        /// @return any
         ///
         /// # Parameters
         /// - `state` — `integer`.
@@ -1326,6 +1139,8 @@ impl LuaUserData for LuaQLearner {
         });
 
         /// Returns the action with the highest Q-value for `state`.
+        /// @param state : integer
+        /// @return any
         ///
         /// # Parameters
         /// - `state` — `string`: State to query.
@@ -1338,6 +1153,8 @@ impl LuaUserData for LuaQLearner {
         });
 
         /// Returns the best action.
+        /// @param state : integer
+        /// @return any
         ///
         /// # Parameters
         /// - `state` — `integer`.
@@ -1364,6 +1181,9 @@ impl LuaUserData for LuaQLearner {
         );
 
         /// Returns the q value.
+        /// @param state : integer
+        /// @param action : integer
+        /// @return any
         ///
         /// # Parameters
         /// - `state` — `integer`.
@@ -1397,6 +1217,7 @@ impl LuaUserData for LuaQLearner {
         });
 
         /// Returns the episode count.
+        /// @return any
         ///
         /// # Returns
         /// The current episode count.
@@ -1405,6 +1226,7 @@ impl LuaUserData for LuaQLearner {
         });
 
         /// Returns the state count.
+        /// @return any
         ///
         /// # Returns
         /// The current state count.
@@ -1413,6 +1235,7 @@ impl LuaUserData for LuaQLearner {
         });
 
         /// Returns the action count.
+        /// @return any
         ///
         /// # Parameters
         /// - `v` — `number`.
@@ -1424,6 +1247,7 @@ impl LuaUserData for LuaQLearner {
         });
 
         /// Sets the learning rate.
+        /// @param v : number
         ///
         /// # Parameters
         /// - `v` — `number`.
@@ -1433,6 +1257,7 @@ impl LuaUserData for LuaQLearner {
         });
 
         /// Returns the learning rate.
+        /// @return any
         ///
         /// # Parameters
         /// - `v` — `number`.
@@ -1444,6 +1269,7 @@ impl LuaUserData for LuaQLearner {
         });
 
         /// Sets the discount factor.
+        /// @param v : number
         ///
         /// # Parameters
         /// - `v` — `number`.
@@ -1453,6 +1279,7 @@ impl LuaUserData for LuaQLearner {
         });
 
         /// Returns the discount factor.
+        /// @return any
         ///
         /// # Parameters
         /// - `v` — `number`.
@@ -1464,6 +1291,7 @@ impl LuaUserData for LuaQLearner {
         });
 
         /// Sets the exploration rate.
+        /// @param v : number
         ///
         /// # Parameters
         /// - `v` — `number`.
@@ -1473,6 +1301,7 @@ impl LuaUserData for LuaQLearner {
         });
 
         /// Returns the exploration rate.
+        /// @return any
         ///
         /// # Parameters
         /// - `v` — `number`.
@@ -1484,6 +1313,7 @@ impl LuaUserData for LuaQLearner {
         });
 
         /// Sets the exploration decay.
+        /// @param v : number
         ///
         /// # Parameters
         /// - `v` — `number`.
@@ -1493,6 +1323,7 @@ impl LuaUserData for LuaQLearner {
         });
 
         /// Returns the exploration decay.
+        /// @return any
         ///
         /// # Returns
         /// The current exploration decay.
@@ -1501,6 +1332,7 @@ impl LuaUserData for LuaQLearner {
         });
 
         /// Serializes this object to a string representation.
+        /// @return any
         ///
         /// # Parameters
         /// - `json` — `string`.
@@ -1509,6 +1341,7 @@ impl LuaUserData for LuaQLearner {
         });
 
         /// Populates this object from a serialized string.
+        /// @param json : string
         ///
         /// # Parameters
         /// - `json` — `string`.
@@ -1541,6 +1374,7 @@ impl LuaUserData for LuaUtilityAI {
         );
 
         /// Evaluates all conditions and returns a decision.
+        /// @return any
         ///
         /// # Returns
         /// The result.
@@ -1570,6 +1404,7 @@ impl LuaUserData for LuaUtilityAI {
         });
 
         /// Returns the action count.
+        /// @return integer
         ///
         /// # Returns
         /// The current action count.
@@ -1578,6 +1413,7 @@ impl LuaUserData for LuaUtilityAI {
         });
 
         /// Returns the last action.
+        /// @return any
         ///
         /// # Returns
         /// The current last action.
@@ -1671,6 +1507,7 @@ impl LuaUserData for LuaGOAPPlanner {
         );
 
         /// Returns the action count.
+        /// @return integer
         ///
         /// # Returns
         /// The current action count.
@@ -1679,6 +1516,7 @@ impl LuaUserData for LuaGOAPPlanner {
         });
 
         /// Returns the goal count.
+        /// @return integer
         ///
         /// # Returns
         /// The current goal count.
@@ -1693,6 +1531,7 @@ impl LuaUserData for LuaInfluenceMap {
         add_type_methods::<Self>(methods);
 
         /// Adds a named influence layer to this map.
+        /// @param name : string
         ///
         /// # Parameters
         /// - `name` — `string`: Layer identifier.
@@ -1702,6 +1541,8 @@ impl LuaUserData for LuaInfluenceMap {
         });
 
         /// Returns `true` if a layer with `name` exists in this map.
+        /// @param name : string
+        /// @return any
         ///
         /// # Parameters
         /// - `name` — `string`: Layer identifier to test.
@@ -1766,6 +1607,8 @@ impl LuaUserData for LuaInfluenceMap {
         );
 
         /// Decay on this InfluenceMap.
+        /// @param layer : string
+        /// @param factor : number
         ///
         /// # Parameters
         /// - `layer` — `string`.
@@ -1776,6 +1619,7 @@ impl LuaUserData for LuaInfluenceMap {
         });
 
         /// Clear layer on this InfluenceMap.
+        /// @param layer : string
         ///
         /// # Parameters
         /// - `layer` — `string`.
@@ -1794,6 +1638,8 @@ impl LuaUserData for LuaInfluenceMap {
         });
 
         /// Returns the max position.
+        /// @param layer : string
+        /// @return any
         ///
         /// # Parameters
         /// - `layer` — `string`.
@@ -1805,6 +1651,8 @@ impl LuaUserData for LuaInfluenceMap {
         });
 
         /// Returns the min position.
+        /// @param layer : string
+        /// @return any
         ///
         /// # Parameters
         /// - `layer` — `string`.
@@ -1845,16 +1693,19 @@ impl LuaUserData for LuaInfluenceMap {
         );
 
         /// Returns the width.
+        /// @return any
         ///
         /// # Returns
         /// The current width.
         methods.add_method("getWidth", |_, this, ()| Ok(this.inner.borrow().width));
         /// Returns the height.
+        /// @return any
         ///
         /// # Returns
         /// The current height.
         methods.add_method("getHeight", |_, this, ()| Ok(this.inner.borrow().height));
         /// Returns the cell size.
+        /// @return any
         ///
         /// # Returns
         /// The current cell size.
@@ -1869,6 +1720,7 @@ impl LuaUserData for LuaSquad {
         add_type_methods::<Self>(methods);
 
         /// Returns the name.
+        /// @return any
         ///
         /// # Parameters
         /// - `name` — `string`.
@@ -1880,6 +1732,7 @@ impl LuaUserData for LuaSquad {
         });
 
         /// Adds an agent identified by `name` to this squad.
+        /// @param name : string
         ///
         /// # Parameters
         /// - `name` — `string`: Name of the agent to enlist.
@@ -1889,6 +1742,7 @@ impl LuaUserData for LuaSquad {
         });
 
         /// Removes the agent identified by `name` from this squad.
+        /// @param name : string
         ///
         /// # Parameters
         /// - `name` — `string`: Name of the agent to remove.
@@ -1898,6 +1752,7 @@ impl LuaUserData for LuaSquad {
         });
 
         /// Returns the number of agents currently in this squad.
+        /// @return integer
         ///
         /// # Returns
         /// `integer` — member count.
@@ -1906,6 +1761,7 @@ impl LuaUserData for LuaSquad {
         });
 
         /// Returns the members.
+        /// @return table
         ///
         /// # Returns
         /// The current members.
@@ -1919,6 +1775,7 @@ impl LuaUserData for LuaSquad {
         });
 
         /// Sets the leader.
+        /// @param name : string
         ///
         /// # Parameters
         /// - `name` — `string`.
@@ -1928,6 +1785,7 @@ impl LuaUserData for LuaSquad {
         });
 
         /// Returns the leader.
+        /// @return any
         ///
         /// # Parameters
         /// - `ftype` — `string`.
@@ -1952,6 +1810,7 @@ impl LuaUserData for LuaSquad {
         );
 
         /// Returns the formation.
+        /// @return any
         ///
         /// # Returns
         /// The current formation.
@@ -1960,6 +1819,7 @@ impl LuaUserData for LuaSquad {
         });
 
         /// Returns the formation spacing.
+        /// @return any
         ///
         /// # Parameters
         /// - `member_idx` — `integer`.
@@ -1984,6 +1844,7 @@ impl LuaUserData for LuaSquad {
         );
 
         /// Returns the blackboard.
+        /// @return any
         ///
         /// # Returns
         /// The current blackboard.
@@ -2052,6 +1913,7 @@ impl LuaUserData for LuaCommandQueue {
         );
 
         /// Cancel current on this CommandQueue.
+        /// @return any
         ///
         /// # Returns
         /// The result.
@@ -2066,18 +1928,21 @@ impl LuaUserData for LuaCommandQueue {
         });
 
         /// Returns the count.
+        /// @return integer
         ///
         /// # Returns
         /// The current count.
         methods.add_method("getCount", |_, this, ()| Ok(this.inner.borrow().count()));
 
         /// Returns `true` if there are no commands queued.
+        /// @return boolean
         ///
         /// # Returns
         /// `boolean`.
         methods.add_method("isEmpty", |_, this, ()| Ok(this.inner.borrow().is_empty()));
 
         /// Returns the current type.
+        /// @return any
         ///
         /// # Returns
         /// The current current type.
@@ -2086,6 +1951,7 @@ impl LuaUserData for LuaCommandQueue {
         });
 
         /// Returns the current target.
+        /// @return any
         ///
         /// # Returns
         /// The current current target.
@@ -2130,6 +1996,9 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
 
     // luna.ai.newWorld()
     // Creates a new AI world container that owns agents and a global blackboard.
+    /// New world.
+    ///
+    /// @return any
     ai.set(
         "newWorld",
         lua.create_function(|_, ()| {
@@ -2141,6 +2010,9 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
 
     // luna.ai.newBlackboard()
     // Creates a new typed key-value blackboard for sharing AI state.
+    /// New blackboard.
+    ///
+    /// @return any
     ai.set(
         "newBlackboard",
         lua.create_function(|_, ()| {
@@ -2152,6 +2024,9 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
 
     // luna.ai.newStateMachine()
     // Creates a new finite state machine with guarded transitions.
+    /// New state machine.
+    ///
+    /// @return any
     ai.set(
         "newStateMachine",
         lua.create_function(|_, ()| {
@@ -2163,6 +2038,9 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
 
     // luna.ai.newBehaviorTree()
     // Creates a new behavior tree container.
+    /// New behavior tree.
+    ///
+    /// @return any
     ai.set(
         "newBehaviorTree",
         lua.create_function(|_, ()| {
@@ -2175,6 +2053,9 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
     // BT node factories
     // luna.ai.newSelector()
     // Creates a BT selector node (tries children until one succeeds).
+    /// New selector.
+    ///
+    /// @return any
     ai.set(
         "newSelector",
         lua.create_function(|_, ()| {
@@ -2189,6 +2070,9 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
 
     // luna.ai.newSequence()
     // Creates a BT sequence node (runs children until one fails).
+    /// New sequence.
+    ///
+    /// @return any
     ai.set(
         "newSequence",
         lua.create_function(|_, ()| {
@@ -2203,6 +2087,11 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
 
     // luna.ai.newParallel(successPolicy, failurePolicy)
     // Creates a BT parallel node (ticks all children simultaneously).
+    /// New parallel.
+    ///
+    /// @param sp : string?
+    /// @param fp : string?
+    /// @return any
     ai.set(
         "newParallel",
         lua.create_function(|_, (sp, fp): (Option<String>, Option<String>)| {
@@ -2222,6 +2111,9 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
 
     // luna.ai.newInverter()
     // Creates a BT inverter decorator (swaps success/failure).
+    /// New inverter.
+    ///
+    /// @return any
     ai.set(
         "newInverter",
         lua.create_function(|_, ()| {
@@ -2238,6 +2130,10 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
 
     // luna.ai.newRepeater(count)
     // Creates a BT repeater decorator (repeats child N times, 0=infinite).
+    /// New repeater.
+    ///
+    /// @param count : integer?
+    /// @return any
     ai.set(
         "newRepeater",
         lua.create_function(|_, count: Option<u32>| {
@@ -2256,6 +2152,9 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
 
     // luna.ai.newSucceeder()
     // Creates a BT succeeder decorator (always returns success).
+    /// New succeeder.
+    ///
+    /// @return any
     ai.set(
         "newSucceeder",
         lua.create_function(|_, ()| {
@@ -2272,6 +2171,10 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
 
     // luna.ai.newAction(callback)
     // Creates a BT action leaf node with a Lua callback.
+    /// New action.
+    ///
+    /// @param callback : function
+    /// @return any
     ai.set(
         "newAction",
         lua.create_function(|lua, callback: LuaFunction| {
@@ -2284,6 +2187,10 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
 
     // luna.ai.newCondition(callback)
     // Creates a BT condition leaf node with a Lua predicate.
+    /// New condition.
+    ///
+    /// @param callback : function
+    /// @return any
     ai.set(
         "newCondition",
         lua.create_function(|lua, callback: LuaFunction| {
@@ -2296,6 +2203,9 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
 
     // luna.ai.newSteeringManager()
     // Creates a new steering behavior manager for combining movement forces.
+    /// New steering manager.
+    ///
+    /// @return any
     ai.set(
         "newSteeringManager",
         lua.create_function(|_, ()| {
@@ -2305,35 +2215,13 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
         })?,
     )?;
 
-    // luna.ai.newPathGrid(width, height, cellSize)
-    // Creates a new A-star pathfinding grid.
-    ai.set(
-        "newPathGrid",
-        lua.create_function(|_, (w, h, cs): (usize, usize, f32)| {
-            Ok(LuaPathGrid {
-                inner: Rc::new(RefCell::new(PathGrid::new(w, h, cs))),
-            })
-        })?,
-    )?;
-
-    // luna.ai.newFlowField(pathGrid)
-    // Creates a BFS flow field from a PathGrid.
-    ai.set(
-        "newFlowField",
-        lua.create_function(|_, grid_ud: LuaAnyUserData| {
-            let grid = grid_ud.borrow::<LuaPathGrid>()?;
-            let g = grid.inner.borrow();
-            let walkable: Vec<bool> = (0..g.width * g.height)
-                .map(|i| g.is_walkable(i % g.width, i / g.width))
-                .collect();
-            Ok(LuaFlowField {
-                inner: Rc::new(RefCell::new(FlowField::new(g.width, g.height, walkable))),
-            })
-        })?,
-    )?;
-
     // luna.ai.newQLearner(stateCount, actionCount)
     // Creates a tabular Q-learning agent.
+    /// New q learner.
+    ///
+    /// @param sc : integer
+    /// @param ac : integer
+    /// @return any
     ai.set(
         "newQLearner",
         lua.create_function(|_, (sc, ac): (usize, usize)| {
@@ -2345,6 +2233,9 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
 
     // luna.ai.newUtilityAI()
     // Creates a new utility AI evaluator with response-curve-scored actions.
+    /// New utility ai.
+    ///
+    /// @return any
     ai.set(
         "newUtilityAI",
         lua.create_function(|_, ()| {
@@ -2356,6 +2247,9 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
 
     // luna.ai.newGOAPPlanner()
     // Creates a new goal-oriented action planning solver.
+    /// New goap planner.
+    ///
+    /// @return any
     ai.set(
         "newGOAPPlanner",
         lua.create_function(|_, ()| {
@@ -2367,6 +2261,12 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
 
     // luna.ai.newInfluenceMap(width, height, cellSize)
     // Creates a multi-layer influence map grid.
+    /// New influence map.
+    ///
+    /// @param w : integer
+    /// @param h : integer
+    /// @param cs : number
+    /// @return any
     ai.set(
         "newInfluenceMap",
         lua.create_function(|_, (w, h, cs): (usize, usize, f32)| {
@@ -2378,6 +2278,10 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
 
     // luna.ai.newSquad(name)
     // Creates a named squad for group formation positioning.
+    /// New squad.
+    ///
+    /// @param name : string
+    /// @return any
     ai.set(
         "newSquad",
         lua.create_function(|_, name: String| {
@@ -2389,6 +2293,9 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
 
     // luna.ai.newCommandQueue()
     // Creates an RTS-style command queue for sequencing agent orders.
+    /// New command queue.
+    ///
+    /// @return any
     ai.set(
         "newCommandQueue",
         lua.create_function(|_, ()| {

@@ -26,7 +26,8 @@ use crate::graphics::renderer::{DrawCommand, DrawMode, TextureData};
 use crate::graphics::GpuRenderer;
 use crate::input::keyboard::{winit_key_to_string, winit_scancode_to_string};
 use crate::input::{gilrs_axis_to_string, gilrs_button_to_string, SystemCursor};
-use crate::lua_api::{create_lua_vm, SharedState};
+use crate::engine::{FullscreenType, SharedState};
+use crate::lua_api::create_lua_vm;
 use slotmap::SlotMap;
 
 use gilrs::{
@@ -446,10 +447,10 @@ impl LunaApp {
             if fullscreen {
                 use winit::window::Fullscreen;
                 match pending_fullscreen_type {
-                    crate::lua_api::FullscreenType::Desktop => {
+                    FullscreenType::Desktop => {
                         window.set_fullscreen(Some(Fullscreen::Borderless(None)));
                     }
-                    crate::lua_api::FullscreenType::Exclusive => {
+                    FullscreenType::Exclusive => {
                         if let Some(monitor) = window.current_monitor() {
                             if let Some(mode) = monitor.video_modes().next() {
                                 window.set_fullscreen(Some(Fullscreen::Exclusive(mode)));
@@ -1524,6 +1525,10 @@ impl ApplicationHandler for LunaApp {
 // ─── App entry point (public API) ────────────────────────────────────────────
 
 /// Entry point for the Luna2D engine. Owns the game loop, GPU renderer, and Lua VM lifecycle.
+///
+/// # Fields
+/// - `config` — `Config`.
+/// - `conf_error` — `Option<String>`.
 pub struct App {
     config: Config,
     /// Error message from conf.lua loading, propagated to the error screen.

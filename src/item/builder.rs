@@ -13,6 +13,13 @@ use std::collections::HashMap;
 // ─────────────────────────────────────────────────────────────────────────────
 
 /// One "slot" in a stack template: an item type plus a count and optional overrides.
+///
+/// # Fields
+/// - `type_name` — `String`.
+/// - `count` — `usize`.
+/// - `stat_overrides` — `HashMap<String`.
+/// - `extra_tags` — `Vec<String>`.
+/// - `extra_metadata` — `HashMap<String`.
 #[derive(Debug, Clone, Default)]
 pub struct BuildEntry {
     /// The item type name to instantiate.
@@ -28,7 +35,14 @@ pub struct BuildEntry {
 }
 
 impl BuildEntry {
-    /// Create a minimal build entry.
+    /// Create a minimal build entry. Returns a fully initialised instance with all fields set to their initial values.
+    ///
+    /// # Parameters
+    /// - `ype_name` — `impl Into<String>`.
+    /// - `count` — `usize`.
+    ///
+    /// # Returns
+    /// `Self`.
     pub fn new(type_name: impl Into<String>, count: usize) -> Self {
         Self {
             type_name: type_name.into(),
@@ -48,6 +62,19 @@ impl BuildEntry {
 ///
 /// Constraints (min/max size, max copies per type, banned/required types) are
 /// all optional and default to "unconstrained".
+///
+/// # Fields
+/// - `name` — `String`.
+/// - `entries` — `Vec<BuildEntry>`.
+/// - `shuffle_on_build` — `bool`.
+/// - `min_size` — `usize`.
+/// - `max_size` — `usize`.
+/// - `max_copies` — `usize`.
+/// - `per_type_limits` — `HashMap<String`.
+/// - `required_types` — `Vec<String>`.
+/// - `banned_types` — `Vec<String>`.
+/// - `banned_categories` — `Vec<String>`.
+/// - `max_per_category` — `HashMap<String`.
 #[derive(Debug, Clone)]
 pub struct StackBuilder {
     /// Display name passed to the built stack.
@@ -76,6 +103,12 @@ pub struct StackBuilder {
 
 impl StackBuilder {
     /// Create a new stack builder with unconstrained defaults.
+    ///
+    /// # Parameters
+    /// - `name` — `impl Into<String>`.
+    ///
+    /// # Returns
+    /// `Self`.
     pub fn new(name: impl Into<String>) -> Self {
         Self {
             name: name.into(),
@@ -93,11 +126,21 @@ impl StackBuilder {
     }
 
     /// Add `count` copies of `type_name` to the template.
+    ///
+    /// # Parameters
+    /// - `ype_name` — `impl Into<String>`.
+    /// - `count` — `usize`.
     pub fn add(&mut self, type_name: impl Into<String>, count: usize) {
         self.entries.push(BuildEntry::new(type_name, count));
     }
 
     /// Add entries with per-item stat overrides and extra tags.
+    ///
+    /// # Parameters
+    /// - `ype_name` — `impl Into<String>`.
+    /// - `count` — `usize`.
+    /// - `stat_overrides` — `HashMap<String`.
+    /// - `extra_tags` — `Vec<String>`.
     pub fn add_with(
         &mut self,
         type_name: impl Into<String>,
@@ -112,11 +155,17 @@ impl StackBuilder {
     }
 
     /// Require a type to appear at least once.
+    ///
+    /// # Parameters
+    /// - `ype_name` — `impl Into<String>`.
     pub fn require_type(&mut self, type_name: impl Into<String>) {
         self.required_types.push(type_name.into());
     }
 
-    /// Ban a type from the stack.
+    /// Ban a type from the stack. Consult the module-level documentation for the broader usage context and preconditions.
+    ///
+    /// # Parameters
+    /// - `ype_name` — `impl Into<String>`.
     pub fn ban_type(&mut self, type_name: impl Into<String>) {
         self.banned_types.push(type_name.into());
     }
@@ -126,6 +175,9 @@ impl StackBuilder {
     /// Validate the current build entries against the configured constraints.
     ///
     /// Returns a list of human-readable error strings.  An empty vec means valid.
+    ///
+    /// # Returns
+    /// `Vec<String>`.
     pub fn validate_entries(&self) -> Vec<String> {
         let mut errors = Vec::new();
         let total: usize = self.entries.iter().map(|e| e.count).sum();
@@ -209,6 +261,12 @@ impl StackBuilder {
     /// Validate an existing `Stack` against the constraints (e.g. verify a player-built deck).
     ///
     /// Returns a list of human-readable error strings.  An empty vec means valid.
+    ///
+    /// # Parameters
+    /// - `stack` — `&Stack`.
+    ///
+    /// # Returns
+    /// `Vec<String>`.
     pub fn validate_stack(&self, stack: &Stack) -> Vec<String> {
         let mut errors = Vec::new();
         let total = stack.size();
@@ -289,11 +347,20 @@ impl StackBuilder {
     /// Items are created by calling `Item::new(type_name)` (seeding from the
     /// global registry) and then applying any per-entry overrides.
     /// The stack name defaults to `self.name`.
+    ///
+    /// # Returns
+    /// `Stack`.
     pub fn build(&self) -> Stack {
         self.build_named(&self.name)
     }
 
-    /// Build a `Stack` with a custom name.
+    /// Build a `Stack` with a custom name. Consult the module-level documentation for the broader usage context and preconditions.
+    ///
+    /// # Parameters
+    /// - `stack_name` — `&str`.
+    ///
+    /// # Returns
+    /// `Stack`.
     pub fn build_named(&self, stack_name: &str) -> Stack {
         let mut stack = Stack::new(stack_name);
         for entry in &self.entries {

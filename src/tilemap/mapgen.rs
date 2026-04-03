@@ -1,4 +1,12 @@
 //! Procedural map generation — MapBlock, MapGroup, MapScript, MapGen.
+//!
+//! This module is part of Luna2D's `tilemap` subsystem and provides the implementation
+//! details for mapgen-related operations and data management.
+//! Key types exported from this module: `Edge`, `MapBlock`, `MapGroup`, `StepType`, `ScriptStep`.
+//! Primary functions: `from_str()`, `as_str()`, `new()`, `set_tile()`.
+//!
+//! All public items are documented. See the parent module for architectural context
+//! and the `luna.*` Lua API for the scripting interface.
 
 use std::collections::HashMap;
 
@@ -60,6 +68,16 @@ impl Edge {
 /// A prefab grid of tiles that can be stamped into a generated map.
 ///
 /// Contains multi-layer tile data and per-segment edge connection IDs.
+///
+/// # Fields
+/// - `width` — `u32`.
+/// - `height` — `u32`.
+/// - `layers` — `u32`.
+/// - `segment_size` — `u32`.
+/// - `name` — `String`.
+/// - `weight` — `f32`.
+/// - `tile_data` — `Vec<Vec<u32>>`.
+/// - `sides` — `HashMap<(Edge`.
 #[derive(Clone)]
 pub struct MapBlock {
     width: u32,
@@ -159,7 +177,7 @@ impl MapBlock {
         self.sides.get(&(edge, segment)).copied().unwrap_or(0)
     }
 
-    /// Returns the block width in tiles.
+    /// Returns the block width in tiles. This accessor incurs no allocation; call it freely in hot paths.
     ///
     /// # Returns
     /// `u32`.
@@ -167,7 +185,7 @@ impl MapBlock {
         self.width
     }
 
-    /// Returns the block height in tiles.
+    /// Returns the block height in tiles. This accessor incurs no allocation; call it freely in hot paths.
     ///
     /// # Returns
     /// `u32`.
@@ -191,7 +209,7 @@ impl MapBlock {
         self.layers
     }
 
-    /// Returns the segment size in tiles.
+    /// Returns the segment size in tiles. This accessor incurs no allocation; call it freely in hot paths.
     ///
     /// # Returns
     /// `u32`.
@@ -239,7 +257,7 @@ impl MapBlock {
         self.name = name.to_string();
     }
 
-    /// Returns the name of this block.
+    /// Returns the name of this block. This accessor incurs no allocation; call it freely in hot paths.
     ///
     /// # Returns
     /// `&str`.
@@ -255,7 +273,7 @@ impl MapBlock {
         self.weight = weight;
     }
 
-    /// Returns the placement weight.
+    /// Returns the placement weight. This accessor incurs no allocation; call it freely in hot paths.
     ///
     /// # Returns
     /// `f32`.
@@ -265,6 +283,11 @@ impl MapBlock {
 }
 
 /// A biome-like container holding [`MapBlock`] prefabs and [`MapScript`] generators.
+///
+/// # Fields
+/// - `name` — `String`.
+/// - `blocks` — `Vec<MapBlock>`.
+/// - `scripts` — `Vec<MapScript>`.
 #[derive(Clone)]
 pub struct MapGroup {
     name: String,
@@ -273,7 +296,7 @@ pub struct MapGroup {
 }
 
 impl MapGroup {
-    /// Creates a new empty map group.
+    /// Creates a new empty map group. Returns a fully initialised instance with all fields set to their initial values.
     ///
     /// # Parameters
     /// - `name` — `&str`.
@@ -288,7 +311,7 @@ impl MapGroup {
         }
     }
 
-    /// Adds a block to this group.
+    /// Adds a block to this group. The insertion is O(1) amortised unless a resize is triggered.
     ///
     /// # Parameters
     /// - `block` — `MapBlock`.
@@ -336,7 +359,7 @@ impl MapGroup {
         }
     }
 
-    /// Adds a script to this group.
+    /// Adds a script to this group. The insertion is O(1) amortised unless a resize is triggered.
     ///
     /// # Parameters
     /// - `script` — `MapScript`.
@@ -363,7 +386,7 @@ impl MapGroup {
         self.scripts.len()
     }
 
-    /// Returns the name of this group.
+    /// Returns the name of this group. This accessor incurs no allocation; call it freely in hot paths.
     ///
     /// # Returns
     /// `&str`.
@@ -371,7 +394,7 @@ impl MapGroup {
         &self.name
     }
 
-    /// Sets the name of this group.
+    /// Sets the name of this group. Replaces the current name value; callers hold responsibility for maintaining consistency with related fields.
     ///
     /// # Parameters
     /// - `name` — `&str`.
@@ -575,6 +598,10 @@ impl Default for ScriptStep {
 }
 
 /// A named sequence of [`ScriptStep`]s that drives procedural generation.
+///
+/// # Fields
+/// - `name` — `String`.
+/// - `steps` — `Vec<ScriptStep>`.
 #[derive(Clone)]
 pub struct MapScript {
     name: String,
@@ -582,7 +609,7 @@ pub struct MapScript {
 }
 
 impl MapScript {
-    /// Creates a new empty map script.
+    /// Creates a new empty map script. Returns a fully initialised instance with all fields set to their initial values.
     ///
     /// # Parameters
     /// - `name` — `&str`.
@@ -596,7 +623,7 @@ impl MapScript {
         }
     }
 
-    /// Appends a step to this script.
+    /// Appends a step to this script. The insertion is O(1) amortised unless a resize is triggered.
     ///
     /// # Parameters
     /// - `step` — `ScriptStep`.
@@ -615,7 +642,7 @@ impl MapScript {
         self.steps.get(index)
     }
 
-    /// Returns the number of steps.
+    /// Returns the number of steps. This accessor incurs no allocation; call it freely in hot paths.
     ///
     /// # Returns
     /// `usize`.
@@ -633,12 +660,12 @@ impl MapScript {
         }
     }
 
-    /// Removes all steps.
+    /// Removes all steps. After this call the container is in the same state as immediately after construction.
     pub fn clear_steps(&mut self) {
         self.steps.clear();
     }
 
-    /// Sets the name of this script.
+    /// Sets the name of this script. Replaces the current name value; callers hold responsibility for maintaining consistency with related fields.
     ///
     /// # Parameters
     /// - `name` — `&str`.
@@ -646,7 +673,7 @@ impl MapScript {
         self.name = name.to_string();
     }
 
-    /// Returns the name of this script.
+    /// Returns the name of this script. This accessor incurs no allocation; call it freely in hot paths.
     ///
     /// # Returns
     /// `&str`.
@@ -760,10 +787,22 @@ impl Lcg {
     }
 }
 
-/// Top-level procedural map generator.
+/// Top-level procedural map generator. Consult the module-level documentation for the broader usage context and preconditions.
 ///
 /// Produces a [`TileMap`] by stamping [`MapBlock`] prefabs according to
 /// [`MapScript`] steps, using deterministic randomness.
+///
+/// # Fields
+/// - `grid_w` — `u32`.
+/// - `grid_h` — `u32`.
+/// - `segment_size` — `u32`.
+/// - `tile_pixel_w` — `u32`.
+/// - `tile_pixel_h` — `u32`.
+/// - `orientation` — `MapOrientation`.
+/// - `layer_mode` — `LayerMode`.
+/// - `zones` — `Vec<MapZone>`.
+/// - `last_placement_count` — `u32`.
+/// - `seed` — `u64`.
 #[derive(Clone)]
 pub struct MapGen {
     grid_w: u32,
@@ -955,7 +994,7 @@ impl MapGen {
         tilemap
     }
 
-    /// Returns the grid width in segments.
+    /// Returns the grid width in segments. This accessor incurs no allocation; call it freely in hot paths.
     ///
     /// # Returns
     /// `u32`.
@@ -963,7 +1002,7 @@ impl MapGen {
         self.grid_w
     }
 
-    /// Returns the grid height in segments.
+    /// Returns the grid height in segments. This accessor incurs no allocation; call it freely in hot paths.
     ///
     /// # Returns
     /// `u32`.
@@ -979,7 +1018,7 @@ impl MapGen {
         (self.grid_w, self.grid_h)
     }
 
-    /// Returns the segment size in tiles.
+    /// Returns the segment size in tiles. This accessor incurs no allocation; call it freely in hot paths.
     ///
     /// # Returns
     /// `u32`.
@@ -987,7 +1026,7 @@ impl MapGen {
         self.segment_size
     }
 
-    /// Sets the tile pixel dimensions.
+    /// Sets the tile pixel dimensions. Replaces the current tile size value; callers hold responsibility for maintaining consistency with related fields.
     ///
     /// # Parameters
     /// - `w` — `u32`.
@@ -997,7 +1036,7 @@ impl MapGen {
         self.tile_pixel_h = h;
     }
 
-    /// Returns the tile pixel width.
+    /// Returns the tile pixel width. This accessor incurs no allocation; call it freely in hot paths.
     ///
     /// # Returns
     /// `u32`.
@@ -1005,7 +1044,7 @@ impl MapGen {
         self.tile_pixel_w
     }
 
-    /// Returns the tile pixel height.
+    /// Returns the tile pixel height. This accessor incurs no allocation; call it freely in hot paths.
     ///
     /// # Returns
     /// `u32`.
@@ -1021,7 +1060,7 @@ impl MapGen {
         self.last_placement_count
     }
 
-    /// Sets the map orientation.
+    /// Sets the map orientation. Replaces the current orientation value; callers hold responsibility for maintaining consistency with related fields.
     ///
     /// # Parameters
     /// - `orientation` — `MapOrientation`.
@@ -1029,7 +1068,7 @@ impl MapGen {
         self.orientation = orientation;
     }
 
-    /// Returns the current map orientation.
+    /// Returns the current map orientation. This accessor incurs no allocation; call it freely in hot paths.
     ///
     /// # Returns
     /// `MapOrientation`.
@@ -1037,7 +1076,7 @@ impl MapGen {
         self.orientation
     }
 
-    /// Adds a named horizontal zone.
+    /// Adds a named horizontal zone. The insertion is O(1) amortised unless a resize is triggered.
     ///
     /// # Parameters
     /// - `name` — `&str`.
@@ -1051,7 +1090,7 @@ impl MapGen {
         });
     }
 
-    /// Returns the number of zones.
+    /// Returns the number of zones. This accessor incurs no allocation; call it freely in hot paths.
     ///
     /// # Returns
     /// `usize`.
@@ -1059,7 +1098,7 @@ impl MapGen {
         self.zones.len()
     }
 
-    /// Returns a zone by index.
+    /// Returns a zone by index. This accessor incurs no allocation; call it freely in hot paths.
     ///
     /// # Parameters
     /// - `index` — `usize`.
@@ -1070,12 +1109,12 @@ impl MapGen {
         self.zones.get(index)
     }
 
-    /// Removes all zones.
+    /// Removes all zones. After this call the container is in the same state as immediately after construction.
     pub fn clear_zones(&mut self) {
         self.zones.clear();
     }
 
-    /// Sets the layer mode.
+    /// Sets the layer mode. Replaces the current layer mode value; callers hold responsibility for maintaining consistency with related fields.
     ///
     /// # Parameters
     /// - `mode` — `LayerMode`.
@@ -1083,7 +1122,7 @@ impl MapGen {
         self.layer_mode = mode;
     }
 
-    /// Returns the current layer mode.
+    /// Returns the current layer mode. This accessor incurs no allocation; call it freely in hot paths.
     ///
     /// # Returns
     /// `LayerMode`.

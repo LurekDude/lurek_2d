@@ -1,4 +1,12 @@
 //! Simulation engine — update(dt) and step() for item flow, decay, transit, and conversions.
+//!
+//! This module is part of Luna2D's `graph` subsystem and provides the implementation
+//! details for simulation-related operations and data management.
+//! Key types exported from this module: `GraphEvent`.
+//! Primary functions: `update()`, `step()`.
+//!
+//! All public items are documented. See the parent module for architectural context
+//! and the `luna.*` Lua API for the scripting interface.
 
 use super::core::Graph;
 use super::item::ItemPosition;

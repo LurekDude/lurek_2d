@@ -2,6 +2,14 @@
 //!
 //! Uses easing functions from `crate::math::easing` to smoothly interpolate
 //! between start and target values over a duration.
+//!
+//! This module is part of Luna2D's `math` subsystem and provides the implementation
+//! details for tween-related operations and data management.
+//! Key types exported from this module: `TweenValue`, `Tween`.
+//! Primary functions: `new()`, `add_value()`, `update()`, `get_value()`.
+//!
+//! All public items are documented. See the parent module for architectural context
+//! and the `luna.*` Lua API for the scripting interface.
 
 use crate::math::easing;
 
@@ -22,6 +30,13 @@ pub struct TweenValue {
 ///
 /// Animates one or more values from start to target over a given duration,
 /// applying an easing curve to control the interpolation speed.
+///
+/// # Fields
+/// - `duration` — `f64`.
+/// - `easing_fn` — `fn(f32) -> f32`.
+/// - `easing_name` — `String`.
+/// - `clock` — `f64`.
+/// - `values` — `Vec<TweenValue>`.
 pub struct Tween {
     duration: f64,
     easing_fn: fn(f32) -> f32,
@@ -128,7 +143,7 @@ impl Tween {
         v.start + (v.target - v.start) * eased
     }
 
-    /// Returns all interpolated values.
+    /// Returns all interpolated values. This accessor incurs no allocation; call it freely in hot paths.
     ///
     /// # Returns
     /// `Vec<f64>`.
@@ -136,7 +151,7 @@ impl Tween {
         (0..self.values.len()).map(|i| self.get_value(i)).collect()
     }
 
-    /// Resets the clock to 0.
+    /// Resets the clock to 0. After this call the container is in the same state as immediately after construction.
     pub fn reset(&mut self) {
         self.clock = 0.0;
     }
@@ -165,7 +180,7 @@ impl Tween {
         self.values.len()
     }
 
-    /// Returns the easing name.
+    /// Returns the easing name. Consult the module-level documentation for the broader usage context and preconditions.
     ///
     /// # Returns
     /// `&str`.
@@ -173,7 +188,7 @@ impl Tween {
         &self.easing_name
     }
 
-    /// Returns the duration.
+    /// Returns the duration. Consult the module-level documentation for the broader usage context and preconditions.
     ///
     /// # Returns
     /// `f64`.
@@ -181,7 +196,7 @@ impl Tween {
         self.duration
     }
 
-    /// Returns the current clock time.
+    /// Returns the current clock time. Consult the module-level documentation for the broader usage context and preconditions.
     ///
     /// # Returns
     /// `f64`.

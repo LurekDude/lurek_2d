@@ -1,6 +1,6 @@
 //! Integration tests for the PostFX (post-processing effects) module.
 
-use luna2d::graphics::postfx::{PostFxEffect, PostFxEffectType, PostFxStack};
+use luna2d::postfx::{PostFxEffect, PostFxEffectType, PostFxStack};
 use std::cell::RefCell;
 use std::path::PathBuf;
 use std::rc::Rc;

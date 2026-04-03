@@ -160,7 +160,7 @@ impl GraphRenderer {
         self.viewport
     }
 
-    /// Sets the world (data) coordinate range.
+    /// Sets the world (data) coordinate range. Replaces the current range value; callers hold responsibility for maintaining consistency with related fields.
     ///
     /// # Parameters
     /// - `x_min` — `f64`.
@@ -239,7 +239,7 @@ impl GraphRenderer {
         self.series.insert(name.to_string(), s);
     }
 
-    /// Adds a scatter series.
+    /// Adds a scatter series. The insertion is O(1) amortised unless a resize is triggered.
     ///
     /// # Parameters
     /// - `name` — `&str`.
@@ -288,7 +288,7 @@ impl GraphRenderer {
         self.series.remove(name).is_some()
     }
 
-    /// Removes all series.
+    /// Removes all series. After this call the container is in the same state as immediately after construction.
     pub fn clear_series(&mut self) {
         self.series.clear();
     }
@@ -319,7 +319,7 @@ impl GraphRenderer {
         self.show_grid = b;
     }
 
-    /// Enables or disables the x/y axes.
+    /// Enables or disables the x/y axes. Replaces the current show axes value; callers hold responsibility for maintaining consistency with related fields.
     ///
     /// # Parameters
     /// - `b` — `bool`.
@@ -335,7 +335,7 @@ impl GraphRenderer {
         self.show_labels = b;
     }
 
-    /// Sets the grid line color.
+    /// Sets the grid line color. Replaces the current grid color value; callers hold responsibility for maintaining consistency with related fields.
     ///
     /// # Parameters
     /// - `c` — `Color`.
@@ -343,7 +343,7 @@ impl GraphRenderer {
         self.grid_color = c;
     }
 
-    /// Sets the axis line color.
+    /// Sets the axis line color. Replaces the current axis color value; callers hold responsibility for maintaining consistency with related fields.
     ///
     /// # Parameters
     /// - `c` — `Color`.
@@ -351,7 +351,7 @@ impl GraphRenderer {
         self.axis_color = c;
     }
 
-    /// Sets the chart background color.
+    /// Sets the chart background color. Replaces the current bg color value; callers hold responsibility for maintaining consistency with related fields.
     ///
     /// # Parameters
     /// - `c` — `Color`.
@@ -359,7 +359,7 @@ impl GraphRenderer {
         self.bg_color = c;
     }
 
-    /// Sets the chart title.
+    /// Sets the chart title. Replaces the current title value; callers hold responsibility for maintaining consistency with related fields.
     ///
     /// # Parameters
     /// - `text` — `&str`.
@@ -367,7 +367,7 @@ impl GraphRenderer {
         self.title = Some(text.to_string());
     }
 
-    /// Sets the x-axis and y-axis labels.
+    /// Sets the x-axis and y-axis labels. Replaces the current axis labels value; callers hold responsibility for maintaining consistency with related fields.
     ///
     /// # Parameters
     /// - `x_label` — `&str`.

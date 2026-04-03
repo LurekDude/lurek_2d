@@ -1,4 +1,12 @@
 //! Flow field pathfinding for steering many units toward one or more targets.
+//!
+//! This module is part of Luna2D's `pathfinding` subsystem and provides the implementation
+//! details for flow field-related operations and data management.
+//! Key types exported from this module: `FlowField`.
+//! Primary functions: `new()`, `calculate()`, `calculate_multi()`, `get_direction()`.
+//!
+//! All public items are documented. See the parent module for architectural context
+//! and the `luna.*` Lua API for the scripting interface.
 
 use std::cell::RefCell;
 use std::collections::VecDeque;
@@ -8,6 +16,16 @@ use crate::pathfinding::nav_grid::NavGrid;
 
 /// A pre-computed flow field that stores a direction vector and integrated cost
 /// for every cell, guiding any unit toward one or more target cells.
+///
+/// # Fields
+/// - `width` — `u32`.
+/// - `height` — `u32`.
+/// - `directions` — `Vec<(f32`.
+/// - `f32` — `:INFINITY` = unreachable).`.
+/// - `costs` — `Vec<f32>`.
+/// - `calculated` — `bool`.
+/// - `targets` — `Vec<(u32`.
+/// - `grid` — `Rc<RefCell<NavGrid>>`.
 pub struct FlowField {
     /// Grid width.
     width: u32,

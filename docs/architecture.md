@@ -18,6 +18,8 @@ See [`docs/design-assumptions.md`](design-assumptions.md) for binding constraint
 
 Luna2D organises its source modules into **four tiers** plus two always-available foundation layers. The tier of a module determines which other modules it may import.
 
+The tier system is a **logical dependency model**, not a filesystem grouping scheme. The current repository convention keeps domain modules as flat top-level folders such as `src/graphics/`, `src/particle/`, and `src/battle/`. Do not reorganise them into `src/tier1/`, `src/tier2/`, or `src/tier3/` unless the architecture contract itself changes.
+
 ### Foundation Layers (not tier-numbered)
 
 These two layers sit outside the tier numbering because every tier can reference them:
@@ -25,7 +27,7 @@ These two layers sit outside the tier numbering because every tier can reference
 | Layer | Path | Rule |
 |-------|------|------|
 | **`math`** | `src/math/` | No Luna2D dependencies. Pure algorithms. All modules may freely import it. |
-| **`engine`** | `src/engine/` | Application lifecycle (`App`, `Config`, `EngineError`, `SharedState`). Tier 1 modules may import engine types. Engine itself may import ALL modules. |
+| **`engine`** | `src/engine/` | Application lifecycle (`App`, `Config`, `EngineError`, `SharedState`, `WindowState`, `FullscreenType`). Tier 1 modules may import engine types. Engine itself may import ALL modules including `lua_api` (exclusively for the `create_lua_vm` bootstrap call). |
 
 ### Tier 1 — Basic Core
 
@@ -44,11 +46,12 @@ These two layers sit outside the tier numbering because every tier can reference
 | `compute` | `src/compute/` | N-dimensional numerical arrays (NdArray), pure CPU |
 | `data` | `src/data/` | Binary buffers, compression, hashing, TOML parsing |
 | `image` | `src/image/` | CPU pixel-level image manipulation (ImageData) |
-| `sound` | `src/sound/` | PCM sample manipulation, MIDI state |
 | `event` | `src/event/` | FIFO event queue, polling API |
 | `entity` | `src/entity/` | Lightweight ECS with ID recycling and bitmap tags |
 | `window` | `src/window/` | Window state abstraction |
 | `thread` | `src/thread/` | Background Rust threads, `Channel` inter-thread communication |
+| `postfx` | `src/postfx/` | Post-processing effects data model: bloom, blur, color grading, screen-space shaders. Pure CPU config; GPU application handled in `lua_api`. Extracted from `graphics`. |
+| `minimap` | `src/minimap/` | Minimap content extraction, FOV mask, and tile sampling. Pure CPU data model. Extracted from `graphics`. |
 
 **Import rule**: Tier 1 modules may only import `crate::math::*` and `crate::engine::*`.
 
@@ -67,9 +70,7 @@ These two layers sit outside the tier numbering because every tier can reference
 | `modding` | `src/modding/` | Mod discovery, dependency resolution, load ordering; builds on `filesystem` |
 | `graph` | `src/graph/` | Directed graph, flow simulation, Dijkstra |
 | `pathfinding` | `src/pathfinding/` | Grid pathfinding (A★, HPA★, flow fields); builds on `math` |
-| `ai` | `src/ai/` | Generic AI (FSM, behaviour trees, steering, GOAP, Q-learning) |
 | `dataframe` | `src/dataframe/` | Column-major tabular data, SQL-style queries |
-| `resource` | `src/resource/` | Generic resource pool, reference counting, hot-reload |
 
 **Import rule**: Tier 2 modules may import `math`, `engine`, and any **Tier 1** module. They must NOT import each other.
 
@@ -81,11 +82,15 @@ These two layers sit outside the tier numbering because every tier can reference
 
 | Module | Path | Responsibility |
 |--------|------|----------------|
-| `combat` | `src/combat/` | Turn-based and real-time combat, damage resolution |
+| `ai` | `src/ai/` | Game AI: FSM, behaviour trees, GOAP planning, Q-learning, influence maps, steering, and squads |
+| `battle` | `src/battle/` | Turn-based battles, combatants, actions, statuses, turn order |
+| `cardgame` | `src/cardgame/` | Cards, stacks, deck building, slots, history, and card-pool utilities |
+| `combat` | `src/combat/` | Vehicle combat minigame: chassis, turrets, weapons, projectiles |
 | `crafting` | `src/crafting/` | Recipe system, ingredient matching, crafting queues |
 | `dialog` | `src/dialog/` | Dialogue trees, branching narrative, localisation hooks |
+| `economy` | `src/economy/` | Named resource economy: capacity, flow rates, decay, interest, reservations, conversions, and overflow policies |
 | `inventory` | `src/inventory/` | Inventory slots, stacking, weight limits |
-| `item` | `src/item/` | Item definitions, loot tables, rarity |
+| `item` | `src/item/` | Item definitions, attributes, and loot-table rarity — shared by `inventory`, `crafting`, and loot systems |
 | `quest` | `src/quest/` | Quest tracking, objectives, branching completion states |
 | `stats` | `src/stats/` | Character attributes, derived stats, modifiers |
 | `province_map` | `src/province_map/` | Province/territory map, ownership, borders |
@@ -144,17 +149,46 @@ These two layers sit outside the tier numbering because every tier can reference
 `math` is the leaf of the dependency graph. It has no Luna2D dependencies and provides:
 - Vectors (`Vec2`, `Vec3`), matrices (`Mat3`), `Rect`
 - Noise, easing, interpolation
-- Pathfinding grids (used by Tier 1 `input` and Tier 2 `pathfinding`)
+- Color space utilities (sRGB ↔ linear conversion)
 
 All modules at all tiers may freely import `math`.
 
 ### `engine/` — App Lifecycle
 
-`engine` provides the application skeleton: `App`, `Config`, `EngineError`, `Clock`. It is the only module that may import from all other modules simultaneously (it orchestrates them in the game loop). Tier 1 modules may expose their types to `engine` for wiring during startup.
+`engine` provides the application skeleton: `App`, `Config`, `EngineError`, `Clock`, `SharedState`, `WindowState`, and `FullscreenType`. It is the only module that may import from all other modules simultaneously (it orchestrates them in the game loop). Tier 1 modules may expose their types to `engine` for wiring during startup.
+
+`SharedState` is the central shared runtime state — an `Rc<RefCell<SharedState>>` shared between the engine event loop and all Lua API closures. It is defined in `engine` (not `lua_api`) and re-exported from `lua_api` for sub-module convenience. `engine::app` imports `lua_api` exclusively for the `create_lua_vm` bootstrap call.
 
 ### `lua_api/` — Lua Binding Bridge
 
-`lua_api` sits above all tiers. It imports every module to expose its functionality through the `luna.*` namespace. It must never be imported by domain modules.
+`lua_api` sits above all tiers. It imports every module to expose its functionality through the `luna.*` namespace. It must never be imported by domain modules. `lua_api` re-exports `SharedState`, `WindowState`, `FullscreenType`, and `ErrorInfo` from `engine` for use by all sub-module register functions.
+
+---
+
+## Physical Layout Convention
+
+The architecture contract distinguishes between:
+
+- **Active crate modules**: directories declared in `src/lib.rs` and therefore part of the Rust crate surface.
+- **Additional top-level source directories**: folders that may contain design notes, incubating work, or dormant implementations but are not currently part of the crate contract unless they are wired into `src/lib.rs`.
+
+Today, the active module inventory is defined by the flat `src/<module>/` layout exported from `src/lib.rs`, not by nested tier folders.
+
+### Design-Stage Modules (not yet active)
+
+The following `src/` directories contain only design documents (`.md` files and `AGENT.md`). They have **no Rust source** and are **not declared in `src/lib.rs`**. They are placeholders for planned future modules and should not be treated as part of the active tier inventory until they are explicitly integrated into the crate module map.
+
+| Folder | Planned Tier | Intended Purpose |
+|--------|--------------|------------------|
+| `src/automation/` | T2 | Macro/script-driven game automation, triggers, and scheduled actions |
+| `src/doll/` | T3 | Paper-doll character equipment layering and sprite compositing |
+| `src/gui/` | T2 | Retained-mode widget UI system: buttons, panels, text fields |
+| `src/network/` | T2 | Peer-to-peer and client/server networking primitives |
+| `src/overlay/` | T2 | Composable per-frame screen-effect layer: weather particles, ambient lighting |
+| `src/pipeline/` | T2 | Data transformation pipelines: ETL chains, filter/map/reduce nodes |
+| `src/terminal/` | T2 | In-game developer terminal / REPL console |
+
+> When a design-stage module gains Rust source and is wired into `src/lib.rs`, move it to its proper tier table above and remove it from this list.
 
 ---
 

@@ -1,4 +1,12 @@
 //! Core province map data structures: [`Province`], [`AdjacencyEdge`], and [`ProvinceMap`].
+//!
+//! This module is part of Luna2D's `province_map` subsystem and provides the implementation
+//! details for core-related operations and data management.
+//! Key types exported from this module: `ProvinceError`, `Province`, `AdjacencyEdge`, `ProvinceMap`.
+//! Primary functions: `new()`, `new()`, `width()`, `height()`.
+//!
+//! All public items are documented. See the parent module for architectural context
+//! and the `luna.*` Lua API for the scripting interface.
 
 use std::collections::{HashMap, HashSet};
 
@@ -6,7 +14,15 @@ use thiserror::Error;
 
 use crate::math::{Rect, Vec2};
 
-/// Error type for province map operations.
+/// Error type for province map operations. Consult the module-level documentation for the broader usage context and preconditions.
+///
+/// # Variants
+/// - `D` — D variant.
+/// - `NotFound` — NotFound variant.
+/// - `Failed` — Failed variant.
+/// - `LoadError` — LoadError variant.
+/// - `Province` — Province variant.
+/// - `InvalidData` — InvalidData variant.
 #[derive(Debug, Error)]
 pub enum ProvinceError {
     /// The requested province ID does not exist in the map.
@@ -20,10 +36,19 @@ pub enum ProvinceError {
     InvalidData(String),
 }
 
-/// A single province in a province map.
+/// A single province in a province map. Consult the module-level documentation for the broader usage context and preconditions.
 ///
 /// Province IDs are derived from the RGB colour of pixels in the source PNG:
 /// `id = (r << 16) | (g << 8) | b`, giving up to 16 M unique provinces.
+///
+/// # Fields
+/// - `id` — `u32`.
+/// - `color` — `[u8; 3]`.
+/// - `area` — `u32`.
+/// - `centroid` — `Vec2`.
+/// - `bounding_box` — `Rect`.
+/// - `center` — `Vec2`.
+/// - `name` — `Option<String>`.
 pub struct Province {
     /// Unique province identifier derived from its RGB colour.
     pub id: u32,
@@ -46,6 +71,13 @@ impl Province {
     ///
     /// All computed fields default to zero / empty. After loading the pixel
     /// data, call position calculation to populate `center`.
+    ///
+    /// # Parameters
+    /// - `id` — `u32`.
+    /// - `color` — `[u8; 3]`.
+    ///
+    /// # Returns
+    /// `Self`.
     pub fn new(id: u32, color: [u8; 3]) -> Self {
         Self {
             id,
@@ -59,11 +91,18 @@ impl Province {
     }
 }
 
-/// An edge between two adjacent provinces.
+/// An edge between two adjacent provinces. Consult the module-level documentation for the broader usage context and preconditions.
 ///
 /// Stores border geometry and user-defined tags (e.g. "river", "wall",
 /// "mountain_pass"). The two province IDs are stored in ascending order
 /// (`province_a < province_b`) so that adjacency lookups are order-independent.
+///
+/// # Fields
+/// - `province_a` — `u32`.
+/// - `province_b` — `u32`.
+/// - `border_length` — `u32`.
+/// - `border_segments` — `Vec<(u16`.
+/// - `tags` — `HashSet<String>`.
 pub struct AdjacencyEdge {
     /// ID of the first province (always the smaller of the two).
     pub province_a: u32,
@@ -81,6 +120,13 @@ pub struct AdjacencyEdge {
 ///
 /// Provinces are indexed by their colour-derived ID. A flat pixel-lookup array maps
 /// every `(x, y)` position to its province ID for O(1) spatial queries.
+///
+/// # Fields
+/// - `width` — `u32`.
+/// - `height` — `u32`.
+/// - `provinces` — `HashMap<u32`.
+/// - `pixel_lookup` — `Vec<u32>`.
+/// - `adjacency` — `HashMap<(u32`.
 pub struct ProvinceMap {
     /// Map width in pixels.
     width: u32,
@@ -96,6 +142,13 @@ pub struct ProvinceMap {
 
 impl ProvinceMap {
     /// Create an empty province map with the given pixel dimensions.
+    ///
+    /// # Parameters
+    /// - `width` — `u32`.
+    /// - `height` — `u32`.
+    ///
+    /// # Returns
+    /// `Self`.
     pub fn new(width: u32, height: u32) -> Self {
         let pixel_count = (width as usize) * (height as usize);
         Self {
@@ -107,32 +160,56 @@ impl ProvinceMap {
         }
     }
 
-    /// Get the map width in pixels.
+    /// Get the map width in pixels. Consult the module-level documentation for the broader usage context and preconditions.
+    ///
+    /// # Returns
+    /// `u32`.
     pub fn width(&self) -> u32 {
         self.width
     }
 
-    /// Get the map height in pixels.
+    /// Get the map height in pixels. Consult the module-level documentation for the broader usage context and preconditions.
+    ///
+    /// # Returns
+    /// `u32`.
     pub fn height(&self) -> u32 {
         self.height
     }
 
-    /// Look up a province by its ID.
+    /// Look up a province by its ID. This accessor incurs no allocation; call it freely in hot paths.
+    ///
+    /// # Parameters
+    /// - `id` — `u32`.
+    ///
+    /// # Returns
+    /// `Option<&Province>`.
     pub fn get_province(&self, id: u32) -> Option<&Province> {
         self.provinces.get(&id)
     }
 
     /// Look up a province mutably by its ID.
+    ///
+    /// # Parameters
+    /// - `id` — `u32`.
+    ///
+    /// # Returns
+    /// `Option<&mut Province>`.
     pub fn get_province_mut(&mut self, id: u32) -> Option<&mut Province> {
         self.provinces.get_mut(&id)
     }
 
     /// Return the total number of provinces in this map.
+    ///
+    /// # Returns
+    /// `usize`.
     pub fn province_count(&self) -> usize {
         self.provinces.len()
     }
 
     /// Return a sorted list of all province IDs.
+    ///
+    /// # Returns
+    /// `Vec<u32>`.
     pub fn province_ids(&self) -> Vec<u32> {
         let mut ids: Vec<u32> = self.provinces.keys().copied().collect();
         ids.sort_unstable();
@@ -142,6 +219,13 @@ impl ProvinceMap {
     /// Get the province ID at the given pixel coordinate.
     ///
     /// Returns `None` if `(x, y)` is out of bounds.
+    ///
+    /// # Parameters
+    /// - `x` — `u32`.
+    /// - `y` — `u32`.
+    ///
+    /// # Returns
+    /// `Option<u32>`.
     pub fn get_province_at(&self, x: u32, y: u32) -> Option<u32> {
         if x >= self.width || y >= self.height {
             return None;
@@ -153,6 +237,12 @@ impl ProvinceMap {
     /// Get the IDs of all provinces adjacent to the given province.
     ///
     /// Returns an empty `Vec` if the province has no neighbours or does not exist.
+    ///
+    /// # Parameters
+    /// - `id` — `u32`.
+    ///
+    /// # Returns
+    /// `Vec<u32>`.
     pub fn get_neighbors(&self, id: u32) -> Vec<u32> {
         self.adjacency
             .iter()
@@ -171,28 +261,51 @@ impl ProvinceMap {
     /// Get the adjacency edge between two provinces.
     ///
     /// The order of `a` and `b` does not matter — they are normalised internally.
+    ///
+    /// # Parameters
+    /// - `a` — `u32`.
+    /// - `b` — `u32`.
+    ///
+    /// # Returns
+    /// `Option<&AdjacencyEdge>`.
     pub fn get_adjacency(&self, a: u32, b: u32) -> Option<&AdjacencyEdge> {
         let key = if a <= b { (a, b) } else { (b, a) };
         self.adjacency.get(&key)
     }
 
     /// Expose the raw pixel-lookup buffer (row-major, `width x height`).
+    ///
+    /// # Returns
+    /// `&[u32]`.
     pub fn pixel_lookup(&self) -> &[u32] {
         &self.pixel_lookup
     }
 
     /// Return the total number of adjacency edges in this map.
+    ///
+    /// # Returns
+    /// `usize`.
     pub fn adjacency_count(&self) -> usize {
         self.adjacency.len()
     }
 
     /// Get a mutable reference to the adjacency edge between two provinces.
+    ///
+    /// # Parameters
+    /// - `a` — `u32`.
+    /// - `b` — `u32`.
+    ///
+    /// # Returns
+    /// `Option<&mut AdjacencyEdge>`.
     pub fn get_adjacency_mut(&mut self, a: u32, b: u32) -> Option<&mut AdjacencyEdge> {
         let key = if a <= b { (a, b) } else { (b, a) };
         self.adjacency.get_mut(&key)
     }
 
     /// Insert a province into the map, keyed by its ID.
+///
+/// # Parameters
+/// - `province` — `Province`
     pub(crate) fn insert_province(&mut self, province: Province) {
         self.provinces.insert(province.id, province);
     }
@@ -201,12 +314,20 @@ impl ProvinceMap {
     ///
     /// # Panics
     /// Panics if `(x, y)` is out of bounds.
+///
+/// # Parameters
+/// - `x` — `u32`
+/// - `y` — `u32`
+/// - `id` — `u32`
     pub(crate) fn set_pixel(&mut self, x: u32, y: u32, id: u32) {
         let idx = (y as usize) * (self.width as usize) + (x as usize);
         self.pixel_lookup[idx] = id;
     }
 
-    /// Insert an adjacency edge into the map.
+    /// Insert an adjacency edge into the map. The insertion is O(1) amortised unless a resize is triggered.
+///
+/// # Parameters
+/// - `edge` — `AdjacencyEdge`
     pub(crate) fn insert_adjacency(&mut self, edge: AdjacencyEdge) {
         let key = (edge.province_a, edge.province_b);
         self.adjacency.insert(key, edge);
@@ -215,6 +336,13 @@ impl ProvinceMap {
     /// Euclidean distance between two province centroids.
     ///
     /// Returns `f64::INFINITY` if either province does not exist.
+    ///
+    /// # Parameters
+    /// - `a` — `u32`.
+    /// - `b` — `u32`.
+    ///
+    /// # Returns
+    /// `f64`.
     pub fn distance(&self, a: u32, b: u32) -> f64 {
         let pa = match self.get_province(a) {
             Some(p) => p,

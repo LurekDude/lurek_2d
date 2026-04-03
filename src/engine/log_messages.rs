@@ -35,7 +35,7 @@ pub fn set_log_level(level: &str) {
     LOG_LEVEL_OVERRIDE.store(filter as u8, Ordering::Relaxed);
 }
 
-/// Returns the current log level name.
+/// Returns the current log level name. This accessor incurs no allocation; call it freely in hot paths.
 ///
 /// # Returns
 /// `&'static str`.
@@ -54,41 +54,41 @@ pub fn get_log_level() -> &'static str {
 // Stable message IDs — lifecycle
 // ---------------------------------------------------------------------------
 
-/// Log message: engine starting.
+/// Log message: engine starting. Consult the module-level documentation for the broader usage context and preconditions.
 pub const L001_ENGINE_START: &str = "L001";
-/// Log message: engine shut down.
+/// Log message: engine shut down. Consult the module-level documentation for the broader usage context and preconditions.
 pub const L002_ENGINE_STOP: &str = "L002";
-/// Log message: game loaded from path.
+/// Log message: game loaded from path. Consult the module-level documentation for the broader usage context and preconditions.
 pub const L003_GAME_LOADED: &str = "L003";
-/// Log message: game restarted.
+/// Log message: game restarted. Consult the module-level documentation for the broader usage context and preconditions.
 pub const L004_GAME_RESTART: &str = "L004";
-/// Log message: conf.lua loaded.
+/// Log message: conf.lua loaded. Consult the module-level documentation for the broader usage context and preconditions.
 pub const L005_CONF_LOADED: &str = "L005";
 
 // ---------------------------------------------------------------------------
 // Stable message IDs — errors
 // ---------------------------------------------------------------------------
 
-/// Log message: render error occurred.
+/// Log message: render error occurred. Consult the module-level documentation for the broader usage context and preconditions.
 pub const L010_RENDER_ERROR: &str = "L010";
-/// Log message: Lua error caught.
+/// Log message: Lua error caught. Consult the module-level documentation for the broader usage context and preconditions.
 pub const L011_LUA_ERROR: &str = "L011";
-/// Log message: audio error.
+/// Log message: audio error. Consult the module-level documentation for the broader usage context and preconditions.
 pub const L012_AUDIO_ERROR: &str = "L012";
-/// Log message: filesystem error.
+/// Log message: filesystem error. Consult the module-level documentation for the broader usage context and preconditions.
 pub const L013_FS_ERROR: &str = "L013";
-/// Log message: physics error.
+/// Log message: physics error. Consult the module-level documentation for the broader usage context and preconditions.
 pub const L014_PHYSICS_ERROR: &str = "L014";
-/// Log message: resource not found.
+/// Log message: resource not found. Consult the module-level documentation for the broader usage context and preconditions.
 pub const L015_RESOURCE_NOT_FOUND: &str = "L015";
 
 // ---------------------------------------------------------------------------
 // Stable message IDs — warnings
 // ---------------------------------------------------------------------------
 
-/// Log message: no audio device available.
+/// Log message: no audio device available. Consult the module-level documentation for the broader usage context and preconditions.
 pub const L020_NO_AUDIO_DEVICE: &str = "L020";
-/// Log message: clipboard access failed.
+/// Log message: clipboard access failed. Consult the module-level documentation for the broader usage context and preconditions.
 pub const L021_CLIPBOARD_FAIL: &str = "L021";
 /// Log message: unknown log level requested.
 pub const L022_UNKNOWN_LOG_LEVEL: &str = "L022";
@@ -101,7 +101,7 @@ pub const L022_UNKNOWN_LOG_LEVEL: &str = "L022";
 pub const L030_ASYNC_LOAD_REQUEST: &str = "L030";
 /// Log message: async asset load completed.
 pub const L031_ASYNC_LOAD_COMPLETE: &str = "L031";
-/// Log message: draw batch statistics.
+/// Log message: draw batch statistics. Consult the module-level documentation for the broader usage context and preconditions.
 pub const L032_BATCH_STATS: &str = "L032";
 
 // ---------------------------------------------------------------------------

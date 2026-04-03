@@ -14,7 +14,7 @@ use std::thread;
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub struct LoadHandle(pub u64);
 
-/// Outcome of a completed load request.
+/// Outcome of a completed load request. Returns an error if the source data is malformed or missing.
 ///
 /// # Variants
 /// - `Ready` — Ready variant.
@@ -53,6 +53,12 @@ const QUEUE_CAPACITY: usize = 64;
 /// A single-threaded background file reader.
 ///
 /// Create one per engine session; drop it to join the worker thread.
+///
+/// # Fields
+/// - `next_id` — `AtomicU64`.
+/// - `tx` — `Option<mpsc::SyncSender<LoadRequest>>`.
+/// - `results` — `Arc<Mutex<HashMap<u64`.
+/// - `worker` — `Option<thread::JoinHandle<()>>`.
 pub struct AsyncLoader {
     next_id: AtomicU64,
     tx: Option<mpsc::SyncSender<LoadRequest>>,
@@ -61,7 +67,7 @@ pub struct AsyncLoader {
 }
 
 impl AsyncLoader {
-    /// Spawns the background worker thread.
+    /// Spawns the background worker thread. Returns a fully initialised instance with all fields set to their initial values.
     ///
     /// # Returns
     /// `Self`.
@@ -85,7 +91,7 @@ impl AsyncLoader {
         }
     }
 
-    /// Submit a file-read request.
+    /// Submit a file-read request. Consult the module-level documentation for the broader usage context and preconditions.
     ///
     /// # Parameters
     /// - `resolved_path` — `PathBuf`.

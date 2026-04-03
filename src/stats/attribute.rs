@@ -1,7 +1,21 @@
 //! Stat attributes, stack mode, and buff descriptors.
+//!
+//! This module is part of Luna2D's `stats` subsystem and provides the implementation
+//! details for attribute-related operations and data management.
+//! Key types exported from this module: `StackMode`, `Buff`, `Attribute`.
+//! Primary functions: `new()`, `is_expired()`, `new()`.
+//!
+//! All public items are documented. See the parent module for architectural context
+//! and the `luna.*` Lua API for the scripting interface.
 
 
 /// How a buff stacks with existing buffs of the same name.
+///
+/// # Variants
+/// - `Reapplying` — Reapplying variant.
+/// - `None` — None variant.
+/// - `Duration` — Duration variant.
+/// - `Intensity` — Intensity variant.
 #[derive(Debug, Clone, PartialEq)]
 pub enum StackMode {
     /// Reapplying the effect resets its duration.
@@ -13,6 +27,14 @@ pub enum StackMode {
 }
 
 /// A single stat modifier attached to an attribute.
+///
+/// # Fields
+/// - `stat` — `String`.
+/// - `add` — `f64`.
+/// - `mul` — `f64`.
+/// - `duration` — `f64`.
+/// - `source` — `String`.
+/// - `remaining` — `f64`.
 #[derive(Debug, Clone)]
 pub struct Buff {
     /// Which attribute this buff modifies.
@@ -30,7 +52,17 @@ pub struct Buff {
 }
 
 impl Buff {
-    /// Create a new permanent buff.
+    /// Create a new permanent buff. Returns a fully initialised instance with all fields set to their initial values.
+    ///
+    /// # Parameters
+    /// - `stat` — `&str`.
+    /// - `add` — `f64`.
+    /// - `l` — `f64`.
+    /// - `duration` — `f64`.
+    /// - `source` — `&str`.
+    ///
+    /// # Returns
+    /// `Self`.
     pub fn new(stat: &str, add: f64, mul: f64, duration: f64, source: &str) -> Self {
         let remaining = if duration < 0.0 {
             f64::NEG_INFINITY
@@ -47,13 +79,23 @@ impl Buff {
         }
     }
 
-    /// Whether this buff has expired.
+    /// Whether this buff has expired. This accessor incurs no allocation; call it freely in hot paths.
+    ///
+    /// # Returns
+    /// `bool`.
     pub fn is_expired(&self) -> bool {
         self.duration >= 0.0 && self.remaining <= 0.0
     }
 }
 
 /// A named stat attribute with base value, constraints, and regen.
+///
+/// # Fields
+/// - `base` — `f64`.
+/// - `min` — `f64`.
+/// - `max` — `Option<f64>`.
+/// - `regen` — `f64`.
+/// - `growth` — `f64`.
 #[derive(Debug, Clone)]
 pub struct Attribute {
     /// Base value before buffs.
@@ -70,6 +112,12 @@ pub struct Attribute {
 
 impl Attribute {
     /// Create a new attribute with the given base value.
+    ///
+    /// # Parameters
+    /// - `base` — `f64`.
+    ///
+    /// # Returns
+    /// `Self`.
     pub fn new(base: f64) -> Self {
         Self {
             base,

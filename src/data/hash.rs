@@ -1,9 +1,17 @@
 //! Cryptographic hash functions for data integrity verification.
+//!
+//! This module is part of Luna2D's `data` subsystem and provides the implementation
+//! details for hash-related operations and data management.
+//! Key types exported from this module: `HashAlgorithm`.
+//! Primary functions: `parse_str()`, `hash()`.
+//!
+//! All public items are documented. See the parent module for architectural context
+//! and the `luna.*` Lua API for the scripting interface.
 
 use md5::Digest;
 use sha1;
 
-/// Supported hash algorithms.
+/// Supported hash algorithms. Consult the module-level documentation for the broader usage context and preconditions.
 ///
 /// # Variants
 /// - `Md5` — Md5 variant.
@@ -23,7 +31,7 @@ pub enum HashAlgorithm {
 }
 
 impl HashAlgorithm {
-    /// Parse an algorithm name string.
+    /// Parse an algorithm name string. Returns an error if the source data is malformed or missing.
     ///
     /// # Parameters
     /// - `s` — `&str`.

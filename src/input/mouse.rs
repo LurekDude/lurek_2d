@@ -1,4 +1,14 @@
-/// Standard system cursor shapes.
+//! Mouse implementation for the `input` subsystem.
+//!
+//! This module is part of Luna2D's `input` subsystem and provides the implementation
+//! details for mouse-related operations and data management.
+//! Key types exported from this module: `SystemCursor`, `MouseState`.
+//! Primary functions: `from_name()`, `as_str()`, `new()`, `begin_frame()`.
+//!
+//! All public items are documented. See the parent module for architectural context
+//! and the `luna.*` Lua API for the scripting interface.
+//!
+/// Standard system cursor shapes. Consult the module-level documentation for the broader usage context and preconditions.
 ///
 /// # Variants
 /// - `Arrow` — Arrow variant.
@@ -167,7 +177,7 @@ impl MouseState {
         self.scroll_y = 0.0;
     }
 
-    /// Updates the cursor position.
+    /// Updates the cursor position. Consult the module-level documentation for the broader usage context and preconditions.
     ///
     /// # Parameters
     /// - `x` — `f32`.
@@ -223,7 +233,7 @@ impl MouseState {
         (self.x, self.y)
     }
 
-    /// Sets cursor visibility.
+    /// Sets cursor visibility. Replaces the current visible value; callers hold responsibility for maintaining consistency with related fields.
     ///
     /// # Parameters
     /// - `visible` — `bool`.
@@ -231,7 +241,7 @@ impl MouseState {
         self.visible = visible;
     }
 
-    /// Returns whether the cursor is visible.
+    /// Returns whether the cursor is visible. This accessor incurs no allocation; call it freely in hot paths.
     ///
     /// # Returns
     /// `bool`.
@@ -255,7 +265,7 @@ impl MouseState {
         self.grabbed
     }
 
-    /// Sets relative (FPS) mouse mode.
+    /// Sets relative (FPS) mouse mode. Replaces the current relative mode value; callers hold responsibility for maintaining consistency with related fields.
     ///
     /// # Parameters
     /// - `relative` — `bool`.
@@ -289,7 +299,7 @@ impl MouseState {
         (self.scroll_x, self.scroll_y)
     }
 
-    /// Sets the system cursor shape.
+    /// Sets the system cursor shape. Replaces the current cursor value; callers hold responsibility for maintaining consistency with related fields.
     ///
     /// # Parameters
     /// - `cursor` — `SystemCursor`.

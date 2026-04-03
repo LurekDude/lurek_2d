@@ -2,6 +2,13 @@
 //!
 //! Provides an algorithm to find a good interior position within a province
 //! for use as its center point (e.g. capital placement, label anchor).
+//!
+//! This module is part of Luna2D's `province_map` subsystem and provides the implementation
+//! details for positions-related operations and data management.
+//! Primary functions: `calculate_capital()`, `calculate_all_positions()`.
+//!
+//! All public items are documented. See the parent module for architectural context
+//! and the `luna.*` Lua API for the scripting interface.
 
 use crate::math::Vec2;
 
@@ -13,6 +20,13 @@ use super::core::ProvinceMap;
 /// within the province bounding box, keeps only those inside the province (via
 /// `pixel_lookup`), and picks the one farthest from any edge pixel.
 /// Falls back to the province centroid if no better candidate is found.
+///
+/// # Parameters
+/// - `ap` — `&ProvinceMap`.
+/// - `province_id` — `u32`.
+///
+/// # Returns
+/// `Vec2`.
 pub fn calculate_capital(map: &ProvinceMap, province_id: u32) -> Vec2 {
     let province = match map.get_province(province_id) {
         Some(p) => p,
@@ -82,6 +96,9 @@ pub fn calculate_capital(map: &ProvinceMap, province_id: u32) -> Vec2 {
 ///
 /// Finds the best interior point for each province using [`calculate_capital`]
 /// and writes it to `province.center`.
+///
+/// # Parameters
+/// - `ap` — `&mut ProvinceMap`.
 pub fn calculate_all_positions(map: &mut ProvinceMap) {
     let ids = map.province_ids();
     let primaries: Vec<(u32, Vec2)> = ids

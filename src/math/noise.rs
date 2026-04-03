@@ -2,6 +2,14 @@
 //!
 //! All functions return values in `[-1.0, 1.0]`. Seed is used to offset the
 //! gradient hash, producing different noise patterns per seed.
+//!
+//! This module is part of Luna2D's `math` subsystem and provides the implementation
+//! details for noise-related operations and data management.
+//! Key types exported from this module: `DistType`, `NoiseKind`, `FractalType`, `MapGenOptions`, `NoiseGenerator`.
+//! Primary functions: `perlin2d()`, `simplex2d()`, `fbm()`, `perlin3d()`.
+//!
+//! All public items are documented. See the parent module for architectural context
+//! and the `luna.*` Lua API for the scripting interface.
 
 /// Generates 2D Perlin noise at the given coordinates.
 ///
@@ -453,7 +461,7 @@ mod tests {
 // and Worley noise in 1D–4D, plus fractal combinators (FBM, ridged,
 // turbulence), domain warping, and full 2D map generation.
 
-/// Distance metric for Worley noise.
+/// Distance metric for Worley noise. Consult the module-level documentation for the broader usage context and preconditions.
 ///
 /// # Variants
 /// - `Euclidean` — Euclidean variant.
@@ -482,7 +490,7 @@ pub enum NoiseKind {
     Simplex,
 }
 
-/// Fractal type for multi-octave noise.
+/// Fractal type for multi-octave noise. Consult the module-level documentation for the broader usage context and preconditions.
 ///
 /// # Variants
 /// - `Fbm` — Fbm variant.
@@ -498,7 +506,7 @@ pub enum FractalType {
     Turbulence,
 }
 
-/// Options for 2D noise map generation.
+/// Options for 2D noise map generation. Consult the module-level documentation for the broader usage context and preconditions.
 ///
 /// # Fields
 /// - `scale_x` — `f64`.
@@ -548,11 +556,15 @@ impl Default for MapGenOptions {
     }
 }
 
-/// Seeded procedural noise generator.
+/// Seeded procedural noise generator. Consult the module-level documentation for the broader usage context and preconditions.
 ///
 /// Holds a 512-entry permutation table derived deterministically from the
 /// seed.  All noise methods are pure functions of the seed and coordinates —
 /// the same inputs always produce the same output.
+///
+/// # Fields
+/// - `seed` — `u64`.
+/// - `perm` — `[u8; 512]`.
 pub struct NoiseGenerator {
     seed: u64,
     perm: [u8; 512],
@@ -584,7 +596,7 @@ impl NoiseGenerator {
         self.build_perm();
     }
 
-    /// Returns the current seed.
+    /// Returns the current seed. Consult the module-level documentation for the broader usage context and preconditions.
     ///
     /// # Returns
     /// `u64`.

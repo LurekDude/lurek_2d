@@ -1,9 +1,32 @@
+//! Clock implementation for the `timer` subsystem.
+//!
+//! This module is part of Luna2D's `timer` subsystem and provides the implementation
+//! details for clock-related operations and data management.
+//! Key types exported from this module: `Clock`.
+//! Primary functions: `new()`, `tick()`, `delta()`, `total()`.
+//!
+//! All public items are documented. See the parent module for architectural context
+//! and the `luna.*` Lua API for the scripting interface.
+//!
 use std::time::Instant;
 
 /// Number of recent frames used to compute the rolling average delta.
 const AVERAGE_DELTA_WINDOW: usize = 60;
 
 /// Tracks per-frame delta time, accumulated total time, and a rolling FPS measurement.
+///
+/// # Fields
+/// - `start_time` — `Instant`.
+/// - `last_frame` — `Instant`.
+/// - `delta` — `f64`.
+/// - `total` — `f64`.
+/// - `frame_count` — `u64`.
+/// - `fps` — `f64`.
+/// - `fps_timer` — `f64`.
+/// - `fps_frame_count` — `u64`.
+/// - `delta_buffer` — `[f64; AVERAGE_DELTA_WINDOW]`.
+/// - `delta_buffer_index` — `usize`.
+/// - `delta_buffer_filled` — `bool`.
 pub struct Clock {
     start_time: Instant,
     last_frame: Instant,

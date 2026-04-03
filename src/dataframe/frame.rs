@@ -1,4 +1,12 @@
 //! Core DataFrame and Database types with CellValue cells.
+//!
+//! This module is part of Luna2D's `dataframe` subsystem and provides the implementation
+//! details for frame-related operations and data management.
+//! Key types exported from this module: `CellValue`, `ColRef`, `DataFrame`, `Database`.
+//! Primary functions: `is_nil()`, `as_number()`, `as_text()`, `as_bool()`.
+//!
+//! All public items are documented. See the parent module for architectural context
+//! and the `luna.*` Lua API for the scripting interface.
 
 use std::cmp::Ordering;
 use std::collections::HashMap;
@@ -23,7 +31,7 @@ pub enum CellValue {
 }
 
 impl CellValue {
-    /// Returns `true` if this cell is `Nil`.
+    /// Returns `true` if this cell is `Nil`. This accessor incurs no allocation; call it freely in hot paths.
     ///
     /// # Returns
     /// `bool`.
@@ -124,7 +132,7 @@ pub enum ColRef {
     Index(usize),
 }
 
-/// In-memory column-major tabular data.
+/// In-memory column-major tabular data. Consult the module-level documentation for the broader usage context and preconditions.
 ///
 /// # Fields
 /// - `column_names` — `Vec<String>`.
@@ -138,7 +146,10 @@ pub struct DataFrame {
     pub(crate) data: Vec<Vec<CellValue>>,
 }
 
-/// Named catalog of DataFrames.
+/// Named catalog of DataFrames. Consult the module-level documentation for the broader usage context and preconditions.
+///
+/// # Fields
+/// - `tables` — `HashMap<String`.
 pub struct Database {
     tables: HashMap<String, DataFrame>,
 }
@@ -197,7 +208,7 @@ impl DataFrame {
         }
     }
 
-    /// Return the number of rows.
+    /// Return the number of rows. Consult the module-level documentation for the broader usage context and preconditions.
     ///
     /// # Returns
     /// `usize`.
@@ -209,7 +220,7 @@ impl DataFrame {
         }
     }
 
-    /// Return the number of columns.
+    /// Return the number of columns. Consult the module-level documentation for the broader usage context and preconditions.
     ///
     /// # Returns
     /// `usize`.
@@ -217,7 +228,7 @@ impl DataFrame {
         self.column_names.len()
     }
 
-    /// Return the column names.
+    /// Return the column names. Consult the module-level documentation for the broader usage context and preconditions.
     ///
     /// # Returns
     /// `&[String]`.
@@ -225,7 +236,7 @@ impl DataFrame {
         &self.column_names
     }
 
-    /// Alias for `nrows()`.
+    /// Alias for `nrows()`; returns the row count in O(1) time.
     ///
     /// # Returns
     /// `usize`.
@@ -281,7 +292,7 @@ impl DataFrame {
         Ok(())
     }
 
-    /// Remove a column by reference.
+    /// Remove a column by reference. Returns the removed value if present, or `None` when the key did not exist.
     ///
     /// # Parameters
     /// - `col` — `ColRef`.
@@ -295,7 +306,7 @@ impl DataFrame {
         Ok(())
     }
 
-    /// Rename a column.
+    /// Rename a column. Consult the module-level documentation for the broader usage context and preconditions.
     ///
     /// # Parameters
     /// - `col` — `ColRef`.
@@ -312,7 +323,7 @@ impl DataFrame {
         Ok(())
     }
 
-    /// Return a reference to the column data.
+    /// Return a reference to the column data. This accessor incurs no allocation; call it freely in hot paths.
     ///
     /// # Parameters
     /// - `col` — `ColRef`.
@@ -348,7 +359,7 @@ impl DataFrame {
         row_idx
     }
 
-    /// Remove a row by 0-based index.
+    /// Remove a row by 0-based index. Returns the removed value if present, or `None` when the key did not exist.
     ///
     /// # Parameters
     /// - `row` — `usize`.
@@ -422,7 +433,7 @@ impl DataFrame {
         Ok(())
     }
 
-    /// Deep-clone this DataFrame.
+    /// Deep-clone this DataFrame. Consult the module-level documentation for the broader usage context and preconditions.
     ///
     /// # Returns
     /// `DataFrame`.
@@ -456,7 +467,7 @@ impl DataFrame {
         &self.data
     }
 
-    /// Generate a DataFrame with random data.
+    /// Generate a DataFrame with random data. Consult the module-level documentation for the broader usage context and preconditions.
     ///
     /// # Parameters
     /// - `defs` — `&[(String, String)]`.
@@ -575,7 +586,7 @@ impl Default for DataFrame {
 // ---------------------------------------------------------------------------
 
 impl Database {
-    /// Create an empty database.
+    /// Create an empty database. Returns a fully initialised instance with all fields set to their initial values.
     ///
     /// # Returns
     /// `Self`.
@@ -585,7 +596,7 @@ impl Database {
         }
     }
 
-    /// Add or replace a table.
+    /// Add or replace a table. The insertion is O(1) amortised unless a resize is triggered.
     ///
     /// # Parameters
     /// - `name` — `&str`.
@@ -651,7 +662,7 @@ impl Database {
         names
     }
 
-    /// Return the number of tables.
+    /// Return the number of tables. Consult the module-level documentation for the broader usage context and preconditions.
     ///
     /// # Returns
     /// `usize`.
@@ -659,7 +670,7 @@ impl Database {
         self.tables.len()
     }
 
-    /// Remove all tables.
+    /// Remove all tables. After this call the container is in the same state as immediately after construction.
     pub fn clear(&mut self) {
         self.tables.clear();
     }

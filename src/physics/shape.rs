@@ -1,6 +1,14 @@
 //! Extended shape types for physics bodies.
 //!
 //! Provides polygon, edge, and chain shapes beyond the basic rect/circle.
+//!
+//! This module is part of Luna2D's `physics` subsystem and provides the implementation
+//! details for shape-related operations and data management.
+//! Key types exported from this module: `Shape`.
+//! Primary functions: `to_rapier_collider()`, `regular_polygon()`.
+//!
+//! All public items are documented. See the parent module for architectural context
+//! and the `luna.*` Lua API for the scripting interface.
 
 use crate::math::Vec2;
 use rapier2d::prelude::*;

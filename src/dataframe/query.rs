@@ -1,4 +1,11 @@
 //! DataFrame query, filter, sort, join, analytics, and mutation.
+//!
+//! This module is part of Luna2D's `dataframe` subsystem and provides the implementation
+//! details for query-related operations and data management.
+//! Primary functions: `filter()`, `sort()`, `head()`, `tail()`.
+//!
+//! All public items are documented. See the parent module for architectural context
+//! and the `luna.*` Lua API for the scripting interface.
 
 use crate::dataframe::frame::{CellValue, ColRef, DataFrame};
 
@@ -110,7 +117,7 @@ impl DataFrame {
         Ok(self.extract_rows(&indices))
     }
 
-    /// Return the first `n` rows.
+    /// Return the first `n` rows. Consult the module-level documentation for the broader usage context and preconditions.
     ///
     /// # Parameters
     /// - `n` — `usize`.
@@ -123,7 +130,7 @@ impl DataFrame {
         self.extract_rows(&indices)
     }
 
-    /// Return the last `n` rows.
+    /// Return the last `n` rows. Consult the module-level documentation for the broader usage context and preconditions.
     ///
     /// # Parameters
     /// - `n` — `usize`.

@@ -1,4 +1,11 @@
 //! A★ search with octile/Manhattan heuristic and Theta★ path smoothing.
+//!
+//! This module is part of Luna2D's `pathfinding` subsystem and provides the implementation
+//! details for astar-related operations and data management.
+//! Primary functions: `astar()`, `line_of_sight()`, `smooth_path()`.
+//!
+//! All public items are documented. See the parent module for architectural context
+//! and the `luna.*` Lua API for the scripting interface.
 
 use std::cmp::Ordering;
 use std::collections::BinaryHeap;

@@ -2,12 +2,23 @@
 //!
 //! Supports arbitrary-degree curves with control point manipulation,
 //! rendering to polylines, derivative computation, and geometric transforms.
+//!
+//! This module is part of Luna2D's `math` subsystem and provides the implementation
+//! details for bezier-related operations and data management.
+//! Key types exported from this module: `BezierCurve`.
+//! Primary functions: `new()`, `evaluate()`, `render()`, `render_segment()`.
+//!
+//! All public items are documented. See the parent module for architectural context
+//! and the `luna.*` Lua API for the scripting interface.
 
 use crate::math::vec2::Vec2;
 
 /// A Bezier curve defined by control points.
 ///
 /// Uses De Casteljau's algorithm for evaluation. Minimum 2 control points required.
+///
+/// # Fields
+/// - `control_points` — `Vec<Vec2>`.
 pub struct BezierCurve {
     /// Control points defining the curve.
     control_points: Vec<Vec2>,
@@ -116,7 +127,7 @@ impl BezierCurve {
         }
     }
 
-    /// Get a control point by 0-based index.
+    /// Get a control point by 0-based index. This accessor incurs no allocation; call it freely in hot paths.
     ///
     /// # Parameters
     /// - `index` — 0-based control point index
@@ -127,7 +138,7 @@ impl BezierCurve {
         self.control_points.get(index).copied()
     }
 
-    /// Set a control point by 0-based index.
+    /// Set a control point by 0-based index. Replaces the current control point value; callers hold responsibility for maintaining consistency with related fields.
     ///
     /// # Parameters
     /// - `index` — 0-based control point index
@@ -173,7 +184,7 @@ impl BezierCurve {
         true
     }
 
-    /// Get the number of control points.
+    /// Get the number of control points. This accessor incurs no allocation; call it freely in hot paths.
     ///
     /// # Returns
     /// Number of control points; always ≥ 2.

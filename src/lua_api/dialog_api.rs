@@ -41,6 +41,10 @@ impl SequencerCallbacks {
 // ---------------------------------------------------------------------------
 
 /// Lua UserData wrapper for a dialog sequencer.
+///
+/// # Fields
+/// - `inner` — `Rc<RefCell<Sequencer>>`.
+/// - `callbacks` — `Rc<RefCell<SequencerCallbacks>>`.
 #[derive(Clone)]
 pub(crate) struct LuaSequencer {
     inner: Rc<RefCell<Sequencer>>,
@@ -162,6 +166,7 @@ impl LuaUserData for LuaSequencer {
         // ── Script loading ──
 
         /// Loads state from persistent storage.
+        /// @param script : table
         ///
         /// # Parameters
         /// - `script` — `table`.
@@ -191,6 +196,7 @@ impl LuaUserData for LuaSequencer {
         });
 
         /// Advances the simulation by `dt` seconds.
+        /// @param dt : number
         ///
         /// # Parameters
         /// - `dt` — `number`.
@@ -224,6 +230,7 @@ impl LuaUserData for LuaSequencer {
         });
 
         /// Choose on this Sequencer.
+        /// @param index : integer
         ///
         /// # Parameters
         /// - `index` — `integer`.
@@ -238,6 +245,7 @@ impl LuaUserData for LuaSequencer {
         // ── Speed ──
 
         /// Sets the speed.
+        /// @param cps : number
         ///
         /// # Parameters
         /// - `cps` — `number`.
@@ -247,6 +255,7 @@ impl LuaUserData for LuaSequencer {
         });
 
         /// Returns the speed.
+        /// @return any
         ///
         /// # Returns
         /// The current speed.
@@ -257,6 +266,7 @@ impl LuaUserData for LuaSequencer {
         // ── State queries ──
 
         /// Returns the state.
+        /// @return any
         ///
         /// # Returns
         /// The current state.
@@ -265,6 +275,7 @@ impl LuaUserData for LuaSequencer {
         });
 
         /// Returns `true` if active.
+        /// @return any
         ///
         /// # Returns
         /// `boolean`.
@@ -273,6 +284,7 @@ impl LuaUserData for LuaSequencer {
         });
 
         /// Returns `true` if waiting for choice.
+        /// @return any
         ///
         /// # Returns
         /// `boolean`.
@@ -283,6 +295,7 @@ impl LuaUserData for LuaSequencer {
         // ── Text queries ──
 
         /// Current speaker on this Sequencer.
+        /// @return any
         ///
         /// # Returns
         /// The result.
@@ -291,6 +304,7 @@ impl LuaUserData for LuaSequencer {
         });
 
         /// Current text on this Sequencer.
+        /// @return any
         ///
         /// # Returns
         /// The result.
@@ -299,6 +313,7 @@ impl LuaUserData for LuaSequencer {
         });
 
         /// Revealed text on this Sequencer.
+        /// @return any
         ///
         /// # Returns
         /// The result.
@@ -309,6 +324,7 @@ impl LuaUserData for LuaSequencer {
         // ── Choice queries ──
 
         /// Returns the choice text.
+        /// @return any
         ///
         /// # Returns
         /// The current choice text.
@@ -317,6 +333,7 @@ impl LuaUserData for LuaSequencer {
         });
 
         /// Returns the choice labels.
+        /// @return table
         ///
         /// # Returns
         /// The current choice labels.
@@ -333,6 +350,8 @@ impl LuaUserData for LuaSequencer {
         // ── Event callbacks ──
 
         /// Registers an event listener callback.
+        /// @param event : string
+        /// @param func : function
         ///
         /// # Parameters
         /// - `event` — `string`.
@@ -354,6 +373,7 @@ impl LuaUserData for LuaSequencer {
         });
 
         /// Removes a previously registered event listener.
+        /// @param event : string
         ///
         /// # Parameters
         /// - `event` — `string`.
@@ -379,9 +399,19 @@ impl LuaUserData for LuaSequencer {
 // ---------------------------------------------------------------------------
 
 /// Registers the `luna.dialog` module with the Lua VM.
+///
+/// # Parameters
+/// - `lua` — `&Lua`.
+/// - `luna` — `&LuaTable`.
+///
+/// # Returns
+/// `LuaResult<()>`.
 pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
     let module = lua.create_table()?;
 
+    /// New sequencer.
+    ///
+    /// @return any
     module.set(
         "newSequencer",
         lua.create_function(|_, ()| {

@@ -1,4 +1,11 @@
 //! Registers the `luna.data.*` binary data, compression, hashing, and encoding API.
+//!
+//! This module is part of Luna2D's `lua_api` subsystem and provides the implementation
+//! details for data api-related operations and data management.
+//! Primary functions: `register()`.
+//!
+//! All public items are documented. See the parent module for architectural context
+//! and the `luna.*` Lua API for the scripting interface.
 
 use mlua::prelude::*;
 
@@ -17,6 +24,7 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
 
     // luna.data.newByteData(size_or_string)
     /// Creates a new mutable byte buffer of the given size.
+    /// @param value : any
     data_table.set(
         "newByteData",
         lua.create_function(|lua, value: LuaValue| {
@@ -40,6 +48,10 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
 
     // luna.data.compress(format, data, level?)
     /// Compresses data using the given algorithm ('deflate', 'gzip', 'lz4').
+    /// @param format_str : string
+    /// @param raw_data : string
+    /// @param level : integer?
+    /// @return any
     data_table.set(
         "compress",
         lua.create_function(
@@ -56,6 +68,9 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
 
     // luna.data.decompress(format, data)
     /// Decompresses data using the given algorithm.
+    /// @param format_str : string
+    /// @param compressed_data : string
+    /// @return any
     data_table.set(
         "decompress",
         lua.create_function(|_, (format_str, compressed_data): (String, LuaString)| {
@@ -69,6 +84,9 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
 
     // luna.data.hash(algorithm, data)
     /// Returns the cryptographic hash (md5, sha1, sha256) of the input.
+    /// @param algo_str : string
+    /// @param raw_data : string
+    /// @return any
     data_table.set(
         "hash",
         lua.create_function(|_, (algo_str, raw_data): (String, LuaString)| {
@@ -79,6 +97,9 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
 
     // luna.data.encode(format, data)
     /// Encodes Lua values into a binary string using a pack-format string.
+    /// @param format_str : string
+    /// @param raw_data : string
+    /// @return any
     ///
     /// # Parameters
     /// - `format` — Pack-format string (same syntax as string.pack).
@@ -97,6 +118,8 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
 
     // luna.data.decode(format, text)
     /// Decodes binary data from a buffer according to a pack-format string.
+    /// @param format_str : string
+    /// @param encoded : string
     ///
     /// # Parameters
     /// - `format` — Pack-format string (same syntax as string.pack).
@@ -116,6 +139,7 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
 
     // luna.data.parseToml(str) -> table
     /// Parses a TOML string and returns a Lua table.
+    /// @param input : string
     data_table.set(
         "parseToml",
         lua.create_function(|lua, input: String| {
@@ -126,6 +150,7 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
 
     // luna.data.encodeToml(tbl) -> string
     /// Encodes a Lua table as a TOML string.
+    /// @param table : table
     data_table.set(
         "encodeToml",
         lua.create_function(|_, table: LuaTable| {
