@@ -51,6 +51,17 @@ Every Tester output includes:
 | **Rust integration** | `tests/<module>_tests.rs` | Cross-module behaviour via public Rust API | New public Rust types |
 | **Rust unit** | `src/**/*.rs` (`#[cfg(test)]`) | Individual functions, data structures | Complex internal logic |
 
+## NEW TEST FILES (Phases 1–18)
+
+| File | Coverage |
+|---|---|
+| `tests/lua/unit/test_data.lua` | `luna.data.pack` / `unpack` / `getPackedSize` / `newDataView` (Phase 9) |
+| `tests/lua/unit/test_event.lua` | `luna.event.pump` / `wait` / `restart` / `quit` (Phase 11) |
+| `tests/lua/unit/test_image.lua` | `luna.image.newCompressedData` / `CompressedImageData` (Phase 13) |
+| `tests/lua/unit/test_font.lua` | `luna.font.newRasterizer` / `GlyphData` (Phase 16) |
+| `tests/lua/validation/test_mount_traversal.lua` | Path traversal prevention for `luna.filesystem.mount` (Phase 1) |
+| `tests/unit/window_tests.rs` | `luna.window.getNativeDPIScale` / `getDisplayOrientation` / `getSafeArea` / `getSystemTheme` (Phase 17) |
+
 **Lua test helpers** — available in every headless VM:
 - `create_test_vm()` → full VM with `_test_results` global table for collecting pass/fail
 - `make_vm()` → `(state, lua)` tuple for stateful multi-call tests

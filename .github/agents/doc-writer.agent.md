@@ -18,6 +18,20 @@ name: Doc-Writer
 - `README.md` — Project-level documentation
 - Code comments for complex algorithms (in collaboration with Developer)
 
+**New module coverage (Phases 1–18)**:
+- `luna.filesystem.mount` / `unmount` / `newFileData` — VFS mounting and FileData (Phase 1)
+- `luna.data.pack` / `unpack` / `getPackedSize` / `newDataView` — binary data (Phase 9)
+- `luna.event.pump` / `wait` / `restart` / `quit` — event pump lifecycle (Phase 11)
+- `luna.math.simplexNoise` / `perlinNoise` / `newNoiseGenerator` — noise generation (Phase 12)
+- `luna.image.newCompressedData` / `CompressedImageData` — DXT compressed textures (Phase 13)
+- `luna.audio.newDecoder` / `Decoder` userdata — streaming audio decoding (Phase 14)
+- `luna.audio.newQueueableSource` / push-buffer streaming (Phase 15)
+- `luna.audio.getPlaybackDevices` / `setPlaybackDevice` — device selection (Phase 18)
+- `luna.graphics.draw` / `drawEx` polymorphic dispatch, `captureScreenshot`, stencil/depth modes (Phases 3, 5, 6)
+- `luna.font` module — `newRasterizer`, `newTrueTypeRasterizer`, `newBMFontRasterizer`, `GlyphData` (Phase 16)
+- `luna.window` additions — `getNativeDPIScale`, `getDisplayOrientation`, `getSafeArea`, `getSystemTheme` (Phase 17)
+- `luna.physics.newShape` — standalone Shape userdata (Phase 2)
+
 **Must not become**:
 - Shadow Developer modifying source code
 - Shadow Lua-Designer designing API surfaces

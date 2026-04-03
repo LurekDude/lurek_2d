@@ -16,9 +16,9 @@ name: Developer
 - `src/input/` — Keyboard, mouse, gamepad state; `luna.mouse.newCursor` / `getSystemCursor` / `setCursor` / `getCursor` / `isCursorSupported` — cursor userdata (Phase 7); `luna.keyboard.isModifierActive` — modifier key state (Phase 8); `luna.gamepad.setGamepadMapping` / `getGamepadMappingString` / `loadGamepadMappings` / `saveGamepadMappings` — SDL2 GameControllerDB mapping persistence (Phase 10)
 - `src/timer/` — Clock, delta timing
 - `src/filesystem/` — GameFS, sandboxed I/O; `luna.filesystem.mount` / `unmount` / `load` / `newFileData` — VFS layer mounting (Phase 1)
-- `src/math/` — Vec2, Mat3, Rect; `luna.math.simplexNoise` — seeded OpenSimplex noise (Phase 12)
+- `src/math/` — Vec2, Mat3, Rect; `luna.math.simplexNoise` / `perlinNoise` — standalone convenience noise; `luna.math.newNoiseGenerator` — `NoiseGenerator` userdata with `simplexNoise` / `perlinNoise` / `worleyNoise` / `fbm` / `ridged` methods (Phase 12)
 - `src/data/` — ByteData, DataView, pack/unpack; `luna.data.pack` / `unpack` / `getPackedSize` / `newDataView` — binary packing (Phase 9)
-- `src/event/` — EventQueue, Signal; `luna.event.pump` / `wait` / `restart` — event loop control (Phase 11)
+- `src/event/` — EventQueue, Signal; `luna.event.pump` / `wait` / `restart` / `quit` — event loop control (Phase 11)
 - `src/window/` — Event loop; `luna.window.focus` / `getNativeDPIScale` / `getDisplayOrientation` / `getSafeArea` / `getSystemTheme` / `isHighDPIAllowed` — missing surface additions (Phase 17)
 - `src/main.rs` and `src/lib.rs`
 - Bug fixes in any module
