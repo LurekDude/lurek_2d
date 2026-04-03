@@ -2,6 +2,7 @@
 
 | Property | Value |
 |----------|-------|
+| **Status** | Implemented — Full (CPU simulation, GPU rendering via DrawParticleSystem) |
 | **Tier** | Tier 2 — Engine Extensions |
 | **Lua API** | `luna.particle` |
 | **Source** | `src/particle/` |
@@ -63,83 +64,113 @@ ParticleSystem (main container)
 
 | File | Purpose |
 |------|---------|
-| `system.rs` | Particle system module providing emitter-based 2D particle effects |
-
-## Submodules
-
-### `particle::system`
-
-Particle system module providing emitter-based 2D particle effects.
-
-- **`AreaDistribution`** (enum): Area distribution mode for particle emission.
-- **`InsertMode`** (enum): Insert mode controlling where new particles are placed in the particle list.
-- **`EmitterState`** (enum): Emitter lifecycle state. Delivery is immediate and synchronous; all connected handlers run before this method returns.
-- **`EmissionShape`** (enum): Emission shape controlling where new particles spawn relative to the emitter.
-- **`RelativeMode`** (enum): Relative mode controlling whether particles move with the emitter.
-- **`ParticleConfig`** (struct): Configuration for a particle emitter. Consult the module-level documentation for the broader usage context and...
-- **`Particle`** (struct): A single particle managed by a `ParticleSystem`.
-- **`ParticleSystem`** (struct): An emitter-based particle system. Consult the module-level documentation for the broader usage context and...
-- **`lerp`** (fn): Linearly interpolate between `a` and `b` by factor `t`.
-- **`interpolate_sizes`** (fn): Interpolate a multi-stop size array at normalised time `t` (0 = birth, 1 = death).
-- **`interpolate_colors`** (fn): Interpolate a multi-stop color array at normalised time `t` (0 = birth, 1 = death).
-- **`interpolate_alphas`** (fn): Interpolate a multi-stop alpha array at normalised time `t` (0 = birth, 1 = death).
+| `src/particle/mod.rs`      | Module entry point, re-exports, tier and sub-file table |
+| `src/particle/config.rs`   | Enums + `ParticleConfig` (~50 fields) |
+| `src/particle/shapes.rs`   | `ParticleShape` enum (5 variants) |
+| `src/particle/particle.rs` | `Particle` live state struct |
+| `src/particle/emitter.rs`  | `ParticleSystem` simulation + `draw_commands()` |
+| `src/particle/math.rs`     | Math helpers (`lerp`, `interpolate_*`, `rand_*`) |
+| `src/particle/emission.rs` | Emission offset helpers for area distribution and shapes |
 
 ## Key Types
 
 ### Structs
 
-#### `particle::system::Particle`
+#### `particle::ParticleConfig`
 
-A single particle managed by a `ParticleSystem`.
+~50-field configuration struct that fully specifies emitter behaviour: spawn
+rate, lifetime range, speed range, emission spread, gravity, multi-stop
+size/color/alpha curves, spin, radial/tangential acceleration, linear damping,
+drag, turbulence, orbit speed, texture, animated frames, and shape.
 
-#### `particle::system::ParticleConfig`
+#### `particle::Particle`
 
-Configuration for a particle emitter. Consult the module-level documentation for the broader usage context and...
+Per-particle live state: position, velocity, lifetime, rotation, spin,
+per-particle radial/tangential acceleration, linear damping, size variation,
+and spawn origin for radial direction reference.
 
-#### `particle::system::ParticleSystem`
+#### `particle::ParticleSystem`
 
-An emitter-based particle system. Consult the module-level documentation for the broader usage context and...
+The main emitter struct.  Holds a `ParticleConfig`, a `Vec<Particle>` pool,
+emitter world position, accumulator for sub-frame emission, lifecycle state
+(`EmitterState`), and previous-frame position for move interpolation.
 
 ### Enums
 
-#### `particle::system::AreaDistribution`
+#### `particle::ParticleShape`
 
-Area distribution mode for particle emission.
+Geometric primitive used to render untextured particles.  Variants:
+`Square` | `Circle` | `Triangle` | `Spark` | `Diamond`.
+Mirrored on the GPU side as `ParticleRenderShape` in `src/graphics/renderer.rs`.
 
-#### `particle::system::EmissionShape`
+#### `particle::EmissionShape`
 
-Emission shape controlling where new particles spawn relative to the emitter.
+Controls where new particles spawn relative to the emitter.  8 variants:
+`Point` | `Circle` | `Rectangle` | `Ring` | `Line` | `Cone` | `Star` | `Spiral`.
 
-#### `particle::system::EmitterState`
+#### `particle::EmitterState`
 
-Emitter lifecycle state. Delivery is immediate and synchronous; all connected handlers run before this method returns.
+Lifecycle state: `Active` (emitting) | `Paused` (frozen) | `Stopped` (draining).
 
-#### `particle::system::InsertMode`
+#### `particle::AreaDistribution`
 
-Insert mode controlling where new particles are placed in the particle list.
+Secondary spawn-area spread: `None` | `Uniform` | `Normal` | `Ellipse` |
+`BorderEllipse` | `BorderRectangle`.
 
-#### `particle::system::RelativeMode`
+#### `particle::InsertMode`
 
-Relative mode controlling whether particles move with the emitter.
+Controls list insertion order for new particles: `Top` (end, default) | `Bottom` (front) | `Random`.
 
-## Public Functions
+#### `particle::RelativeMode`
 
-- **`interpolate_alphas()`** `system::` — Interpolate a multi-stop alpha array at normalised time `t` (0 = birth, 1 = death).
-- **`interpolate_colors()`** `system::` — Interpolate a multi-stop color array at normalised time `t` (0 = birth, 1 = death).
-- **`interpolate_sizes()`** `system::` — Interpolate a multi-stop size array at normalised time `t` (0 = birth, 1 = death).
-- **`lerp()`** `system::` — Linearly interpolate between `a` and `b` by factor `t`.
+`Detached` (world-space, default) | `Attached` (moves with emitter).
 
-## Lua API
+### GPU Bridge Types (in `src/graphics/renderer.rs`)
+
+| Type | Purpose |
+|------|---------|
+| `DrawCommand::DrawParticleSystem` | Batched GPU render command -- one per `ParticleSystem::draw_commands()` call |
+| `ParticleInstance` | Per-particle render data (pos, color, size, rotation, shape, texture) |
+| `ParticleRenderShape` | Tier 1 mirror of `ParticleShape` used by the GPU renderer |
+
+## Lua API Summary
 
 Exposed under `luna.particle.*` by `src/lua_api/particle_api/`.
+
+| Function | Description |
+|----------|-------------|
+| `luna.particle.new(cfg)` | Create a new `ParticleSystem` from a config table |
+| `ps:update(dt)` | Advance simulation by `dt` seconds |
+| `ps:draw()` | Queue a `DrawParticleSystem` command |
+| `ps:emit(n)` | Burst-emit `n` particles immediately |
+| `ps:start()` | Activate emitter (resets age) |
+| `ps:stop()` | Stop emitting; existing particles drain |
+| `ps:reset()` | Kill all live particles and reset accumulator |
+| `ps:count()` | Return number of live particles |
+| `ps:setShape(name)` | Set shape: "square", "circle", "triangle", "spark", "diamond" |
+| `ps:getShape()` | Return current shape name |
+
+Gravity is set via config fields `gravity_x` / `gravity_y` in `luna.particle.new(cfg)`.
+
+## Test Coverage
+
+| Suite | Description |
+|-------|-------------|
+| `tests/particle_tests.rs` | >=12 Rust integration tests covering spawn, update, emit, shapes, config defaults |
+| `tests/lua/unit/test_particle.lua` | Lua BDD tests (62 assertions including the full particle suite) |
+
+## Examples
+
+| Example | Description |
+|---------|-------------|
+| `examples/particles_demo/main.lua` | Full showcase: fire, explosion, smoke, sparks, magic, and snow emitters |
 
 ## Item Summary
 
 | Kind | Count |
 |------|-------|
-| `enum` | 5 |
-| `fn` | 4 |
-| `mod` | 1 |
-| `struct` | 3 |
-| **Total** | **13** |
-
+| `enum` | 6 (`AreaDistribution`, `InsertMode`, `EmitterState`, `EmissionShape`, `RelativeMode`, `ParticleShape`) |
+| `fn` | 4 (`lerp`, `interpolate_sizes`, `interpolate_colors`, `interpolate_alphas`) |
+| `mod` | 6 (`config`, `emission`, `emitter`, `math`, `particle`, `shapes`) |
+| `struct` | 3 (`ParticleConfig`, `Particle`, `ParticleSystem`) |
+| **Total** | **19** |

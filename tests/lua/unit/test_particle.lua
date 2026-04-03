@@ -419,4 +419,65 @@ describe("luna.particle.release", function()
     end)
 end)
 
+-- Phase 8: Particle shape tests
+
+describe("particle shapes", function()
+    it("setShape and getShape round-trip for all shapes", function()
+        local ps = luna.particle.newSystem({ maxParticles = 10 })
+        local shapes = {"square", "circle", "triangle", "spark", "diamond"}
+        for _, s in ipairs(shapes) do
+            ps:setShape(s)
+            expect_equal(ps:getShape(), s)
+        end
+        luna.particle.release(ps)
+    end)
+
+    it("invalid shape name raises error", function()
+        local ps = luna.particle.newSystem({ maxParticles = 10 })
+        expect_error(function()
+            ps:setShape("hexagon")
+        end)
+        luna.particle.release(ps)
+    end)
+
+    it("default shape is square", function()
+        local ps = luna.particle.newSystem({ maxParticles = 10 })
+        expect_equal(ps:getShape(), "square")
+        luna.particle.release(ps)
+    end)
+
+    it("setShape via object method matches getShape", function()
+        local ps = luna.particle.newSystem({ maxParticles = 10 })
+        ps:setShape("diamond")
+        expect_equal(ps:getShape(), "diamond")
+        luna.particle.release(ps)
+    end)
+end)
+
+describe("particle gravity", function()
+    it("gravity_y keeps particle alive after update", function()
+        local ps = luna.particle.newSystem({
+            maxParticles = 5,
+            emissionRate = 0,
+            gravityY = 200.0,
+            speedMin = 0,
+            speedMax = 0,
+            lifetimeMin = 10,
+            lifetimeMax = 10,
+        })
+        luna.particle.emit(ps, 1)
+        luna.particle.update(ps, 0.1)
+        -- Particle should still be alive (lifetime=10s, only 0.1s elapsed)
+        expect_equal(luna.particle.getCount(ps), 1)
+        luna.particle.release(ps)
+    end)
+
+    it("gravityY config key is accepted", function()
+        local ps = luna.particle.newSystem({ gravityY = 100 })
+        local gx, gy = luna.particle.getGravity(ps)
+        expect_true(math.abs(gy - 100) < 0.001, "gravityY config key sets gravity_y")
+        luna.particle.release(ps)
+    end)
+end)
+
 test_summary()

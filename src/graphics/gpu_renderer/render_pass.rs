@@ -18,10 +18,11 @@ use std::f32::consts::PI;
 
 
 use crate::engine::resource_keys::{
-    CanvasKey, FontKey, MeshKey, ShaderKey, SpriteBatchKey, TextureKey,
+    CanvasKey, FontKey, MeshKey, ShaderKey, ShapeKey, SpriteBatchKey, TextureKey,
 };
 use crate::graphics::mesh::Mesh;
-use crate::graphics::renderer::{BlendMode, DrawCommand, DrawMode, TextAlign, TextureData};
+use crate::graphics::renderer::{BlendMode, DrawCommand, DrawMode, ParticleRenderShape, TextAlign, TextureData};
+use crate::graphics::{CompoundShape, ShapeCommand};
 use crate::graphics::shader::{Shader, ShaderFragmentInput, UniformValue};
 use crate::math::{Mat3, Vec2};
 use slotmap::SlotMap;
@@ -37,6 +38,7 @@ impl GpuRenderer {
     /// - `sprite_batches` — `&SlotMap<SpriteBatchKey, crate::graphics::SpriteBatch>`.
     /// - `canvases` — `&SlotMap<CanvasKey, crate::graphics::Canvas>`.
     /// - `meshes` — `&SlotMap<MeshKey, Mesh>`.
+    /// - `shapes` — `&SlotMap<ShapeKey, CompoundShape>`.
     /// - `shaders` — `&SlotMap<ShaderKey, Shader>`.
     /// - `default_filter` — `&(String, String, u32)`.
     /// - `background_color` — `[f32`.
@@ -53,6 +55,7 @@ impl GpuRenderer {
         sprite_batches: &SlotMap<SpriteBatchKey, crate::graphics::SpriteBatch>,
         canvases: &SlotMap<CanvasKey, crate::graphics::Canvas>,
         meshes: &SlotMap<MeshKey, Mesh>,
+        shapes: &SlotMap<ShapeKey, CompoundShape>,
         shaders: &SlotMap<ShaderKey, Shader>,
         default_filter: &(String, String, u32),
         background_color: [f32; 4],
@@ -1141,6 +1144,137 @@ impl GpuRenderer {
                     }
                 }
                 DrawCommand::SyncMesh { .. } => {}
+                DrawCommand::DrawShape {
+                    shape_key,
+                    x,
+                    y,
+                    rotation,
+                    sx,
+                    sy,
+                    ox,
+                    oy,
+                } => {
+                    // Clone the command list to release the immutable borrow on `shapes`
+                    // before modifying local render state (color, line_width, transforms).
+                    let shape_cmds: Vec<ShapeCommand> = match shapes.get(*shape_key) {
+                        Some(s) => s.commands.clone(),
+                        None => continue, // shape freed between push and draw
+                    };
+                    let saved_color = current_color;
+                    let saved_line_width = line_width;
+
+                    // Build the compound transform:
+                    // parent * T(x,y) * R(rotation) * S(sx,sy) * T(-ox,-oy)
+                    // Mirrors DrawMesh / DrawImageEx vertex transform for visual consistency.
+                    let parent = *transform_stack.last().unwrap();
+                    let m = Mat3::from_translation(Vec2 { x: *x, y: *y })
+                        * Mat3::from_rotation(*rotation)
+                        * Mat3::from_scale(Vec2 { x: *sx, y: *sy })
+                        * Mat3::from_translation(Vec2 { x: -*ox, y: -*oy });
+                    transform_stack.push(parent * m);
+
+                    for sc in &shape_cmds {
+                        match sc {
+                            ShapeCommand::SetColor(r, g, b, a) => {
+                                current_color = [*r, *g, *b, *a];
+                            }
+                            ShapeCommand::SetLineWidth(w) => {
+                                line_width = *w;
+                            }
+                            ShapeCommand::Rectangle { mode, x, y, w, h } => {
+                                let mode = if wireframe { &DrawMode::Line } else { mode };
+                                let t = transform_stack.last().unwrap();
+                                let mut verts = Vec::new();
+                                let mut idxs = Vec::new();
+                                self.tess_rect(&mut verts, &mut idxs, t, current_color, mode, *x, *y, *w, *h, line_width);
+                                let (tw, th) = self.target_dimensions(current_target, canvases);
+                                append_color_draw(&mut draws, &mut all_color_verts, &mut all_color_idxs, current_target, current_blend_mode, normalize_scissor(current_scissor, tw, th), color_mask_bits, active_shader.filter(|key| shaders.contains_key(*key)), stencil_mode, stencil_reference, verts, idxs);
+                            }
+                            ShapeCommand::RoundedRectangle { mode, x, y, w, h, rx, ry } => {
+                                let mode = if wireframe { &DrawMode::Line } else { mode };
+                                let t = transform_stack.last().unwrap();
+                                let mut verts = Vec::new();
+                                let mut idxs = Vec::new();
+                                self.tess_rounded_rect(&mut verts, &mut idxs, t, current_color, mode, *x, *y, *w, *h, *rx, *ry, line_width);
+                                let (tw, th) = self.target_dimensions(current_target, canvases);
+                                append_color_draw(&mut draws, &mut all_color_verts, &mut all_color_idxs, current_target, current_blend_mode, normalize_scissor(current_scissor, tw, th), color_mask_bits, active_shader.filter(|key| shaders.contains_key(*key)), stencil_mode, stencil_reference, verts, idxs);
+                            }
+                            ShapeCommand::Circle { mode, x, y, r } => {
+                                let mode = if wireframe { &DrawMode::Line } else { mode };
+                                let t = transform_stack.last().unwrap();
+                                let mut verts = Vec::new();
+                                let mut idxs = Vec::new();
+                                self.tess_ellipse(&mut verts, &mut idxs, t, current_color, mode, *x, *y, *r, *r, 32, line_width);
+                                let (tw, th) = self.target_dimensions(current_target, canvases);
+                                append_color_draw(&mut draws, &mut all_color_verts, &mut all_color_idxs, current_target, current_blend_mode, normalize_scissor(current_scissor, tw, th), color_mask_bits, active_shader.filter(|key| shaders.contains_key(*key)), stencil_mode, stencil_reference, verts, idxs);
+                            }
+                            ShapeCommand::Ellipse { mode, x, y, rx, ry } => {
+                                let mode = if wireframe { &DrawMode::Line } else { mode };
+                                let t = transform_stack.last().unwrap();
+                                let mut verts = Vec::new();
+                                let mut idxs = Vec::new();
+                                self.tess_ellipse(&mut verts, &mut idxs, t, current_color, mode, *x, *y, *rx, *ry, 32, line_width);
+                                let (tw, th) = self.target_dimensions(current_target, canvases);
+                                append_color_draw(&mut draws, &mut all_color_verts, &mut all_color_idxs, current_target, current_blend_mode, normalize_scissor(current_scissor, tw, th), color_mask_bits, active_shader.filter(|key| shaders.contains_key(*key)), stencil_mode, stencil_reference, verts, idxs);
+                            }
+                            ShapeCommand::Triangle { mode, x1, y1, x2, y2, x3, y3 } => {
+                                let mode = if wireframe { &DrawMode::Line } else { mode };
+                                let t = transform_stack.last().unwrap();
+                                let mut verts = Vec::new();
+                                let mut idxs = Vec::new();
+                                self.tess_triangle(&mut verts, &mut idxs, t, current_color, mode, *x1, *y1, *x2, *y2, *x3, *y3, line_width);
+                                let (tw, th) = self.target_dimensions(current_target, canvases);
+                                append_color_draw(&mut draws, &mut all_color_verts, &mut all_color_idxs, current_target, current_blend_mode, normalize_scissor(current_scissor, tw, th), color_mask_bits, active_shader.filter(|key| shaders.contains_key(*key)), stencil_mode, stencil_reference, verts, idxs);
+                            }
+                            ShapeCommand::Polygon { mode, vertices } => {
+                                let mode = if wireframe { &DrawMode::Line } else { mode };
+                                let t = transform_stack.last().unwrap();
+                                let mut verts = Vec::new();
+                                let mut idxs = Vec::new();
+                                self.tess_polygon(&mut verts, &mut idxs, t, current_color, mode, vertices, line_width);
+                                let (tw, th) = self.target_dimensions(current_target, canvases);
+                                append_color_draw(&mut draws, &mut all_color_verts, &mut all_color_idxs, current_target, current_blend_mode, normalize_scissor(current_scissor, tw, th), color_mask_bits, active_shader.filter(|key| shaders.contains_key(*key)), stencil_mode, stencil_reference, verts, idxs);
+                            }
+                            ShapeCommand::Line { x1, y1, x2, y2 } => {
+                                let t = transform_stack.last().unwrap();
+                                let mut verts = Vec::new();
+                                let mut idxs = Vec::new();
+                                push_thick_line(&mut verts, &mut idxs, t, current_color, *x1, *y1, *x2, *y2, line_width);
+                                let (tw, th) = self.target_dimensions(current_target, canvases);
+                                append_color_draw(&mut draws, &mut all_color_verts, &mut all_color_idxs, current_target, current_blend_mode, normalize_scissor(current_scissor, tw, th), color_mask_bits, active_shader.filter(|key| shaders.contains_key(*key)), stencil_mode, stencil_reference, verts, idxs);
+                            }
+                            ShapeCommand::Polyline { points } => {
+                                if points.len() >= 4 {
+                                    let t = transform_stack.last().unwrap();
+                                    let mut verts = Vec::new();
+                                    let mut idxs = Vec::new();
+                                    let mut i = 0;
+                                    while i + 3 < points.len() {
+                                        push_thick_line(&mut verts, &mut idxs, t, current_color, points[i], points[i + 1], points[i + 2], points[i + 3], line_width);
+                                        i += 2;
+                                    }
+                                    let (tw, th) = self.target_dimensions(current_target, canvases);
+                                    append_color_draw(&mut draws, &mut all_color_verts, &mut all_color_idxs, current_target, current_blend_mode, normalize_scissor(current_scissor, tw, th), color_mask_bits, active_shader.filter(|key| shaders.contains_key(*key)), stencil_mode, stencil_reference, verts, idxs);
+                                }
+                            }
+                            ShapeCommand::Arc { mode, x, y, radius, angle1, angle2, segments } => {
+                                let mode = if wireframe { &DrawMode::Line } else { mode };
+                                let segs = if *segments == 0 { 32 } else { *segments };
+                                let t = transform_stack.last().unwrap();
+                                let mut verts = Vec::new();
+                                let mut idxs = Vec::new();
+                                self.tess_arc(&mut verts, &mut idxs, t, current_color, mode, *x, *y, *radius, *angle1, *angle2, segs, line_width);
+                                let (tw, th) = self.target_dimensions(current_target, canvases);
+                                append_color_draw(&mut draws, &mut all_color_verts, &mut all_color_idxs, current_target, current_blend_mode, normalize_scissor(current_scissor, tw, th), color_mask_bits, active_shader.filter(|key| shaders.contains_key(*key)), stencil_mode, stencil_reference, verts, idxs);
+                            }
+                        }
+                    }
+
+                    // Restore transform and state so shape drawing is self-contained.
+                    transform_stack.pop();
+                    current_color = saved_color;
+                    line_width = saved_line_width;
+                }
                 DrawCommand::DrawNineSlice {
                     texture_key,
                     tex_w,
@@ -1217,6 +1351,201 @@ impl GpuRenderer {
                 }
                 DrawCommand::SetShader(shader) => {
                     active_shader = shader.filter(|key| shaders.contains_key(*key));
+                }
+
+                DrawCommand::DrawParticleSystem { particles } => {
+                    let saved_color = current_color;
+                    for inst in particles {
+                        current_color = [inst.r, inst.g, inst.b, inst.a];
+                        let t = transform_stack.last().unwrap();
+                        let half = inst.size * 0.5;
+
+                        if let Some(tex_key) = inst.texture_key {
+                            let (tex_exists, tex_w, tex_h) = {
+                                if let Some(gt) = self.gpu_textures.get(tex_key) {
+                                    (true, gt.width as f32, gt.height as f32)
+                                } else {
+                                    (false, 0.0f32, 0.0f32)
+                                }
+                            };
+                            if tex_exists {
+                                let (u0, v0, u1, v1, qw, qh) =
+                                    if let Some([qx, qy, qw, qh]) = inst.quad {
+                                        let (tw, th) =
+                                            inst.quad_tex_dims.unwrap_or((tex_w, tex_h));
+                                        (
+                                            qx / tw,
+                                            qy / th,
+                                            (qx + qw) / tw,
+                                            (qy + qh) / th,
+                                            qw,
+                                            qh,
+                                        )
+                                    } else {
+                                        (0.0, 0.0, 1.0, 1.0, tex_w, tex_h)
+                                    };
+                                let mut verts = Vec::with_capacity(4);
+                                let mut idxs = Vec::with_capacity(6);
+                                push_tex_quad(
+                                    &mut verts,
+                                    &mut idxs,
+                                    t,
+                                    current_color,
+                                    inst.x,
+                                    inst.y,
+                                    inst.rotation,
+                                    inst.size,
+                                    inst.size,
+                                    0.0,
+                                    0.0,
+                                    qw,
+                                    qh,
+                                    u0,
+                                    v0,
+                                    u1,
+                                    v1,
+                                );
+                                let (target_width, target_height) =
+                                    self.target_dimensions(current_target, canvases);
+                                append_tex_draw(
+                                    &mut draws,
+                                    &mut all_tex_verts,
+                                    &mut all_tex_idxs,
+                                    current_target,
+                                    TexRef::Texture(tex_key),
+                                    current_blend_mode,
+                                    normalize_scissor(
+                                        current_scissor,
+                                        target_width,
+                                        target_height,
+                                    ),
+                                    color_mask_bits,
+                                    active_shader.filter(|key| shaders.contains_key(*key)),
+                                    stencil_mode,
+                                    stencil_reference,
+                                    verts,
+                                    idxs,
+                                );
+                            }
+                        } else {
+                            let mut verts = Vec::new();
+                            let mut idxs = Vec::new();
+                            match &inst.shape {
+                                ParticleRenderShape::Square => {
+                                    self.tess_rect(
+                                        &mut verts,
+                                        &mut idxs,
+                                        t,
+                                        current_color,
+                                        &DrawMode::Fill,
+                                        inst.x - half,
+                                        inst.y - half,
+                                        inst.size,
+                                        inst.size,
+                                        line_width,
+                                    );
+                                }
+                                ParticleRenderShape::Circle => {
+                                    self.tess_ellipse(
+                                        &mut verts,
+                                        &mut idxs,
+                                        t,
+                                        current_color,
+                                        &DrawMode::Fill,
+                                        inst.x,
+                                        inst.y,
+                                        half,
+                                        half,
+                                        16,
+                                        line_width,
+                                    );
+                                }
+                                ParticleRenderShape::Triangle => {
+                                    let r = inst.size;
+                                    let a0 = inst.rotation;
+                                    let a1 = inst.rotation + 2.0 * PI / 3.0;
+                                    let a2 = inst.rotation + 4.0 * PI / 3.0;
+                                    self.tess_triangle(
+                                        &mut verts,
+                                        &mut idxs,
+                                        t,
+                                        current_color,
+                                        &DrawMode::Fill,
+                                        inst.x + a0.cos() * r,
+                                        inst.y + a0.sin() * r,
+                                        inst.x + a1.cos() * r,
+                                        inst.y + a1.sin() * r,
+                                        inst.x + a2.cos() * r,
+                                        inst.y + a2.sin() * r,
+                                        line_width,
+                                    );
+                                }
+                                ParticleRenderShape::Spark => {
+                                    let len = inst.size * 3.0;
+                                    let dx = inst.rotation.cos() * len * 0.5;
+                                    let dy = inst.rotation.sin() * len * 0.5;
+                                    push_thick_line(
+                                        &mut verts,
+                                        &mut idxs,
+                                        t,
+                                        current_color,
+                                        inst.x - dx,
+                                        inst.y - dy,
+                                        inst.x + dx,
+                                        inst.y + dy,
+                                        line_width,
+                                    );
+                                }
+                                ParticleRenderShape::Diamond => {
+                                    let d = inst.size * std::f32::consts::SQRT_2 * 0.5;
+                                    let cos_r = inst.rotation.cos();
+                                    let sin_r = inst.rotation.sin();
+                                    let poly_verts = vec![
+                                        inst.x + cos_r * d,
+                                        inst.y + sin_r * d,
+                                        inst.x - sin_r * d,
+                                        inst.y + cos_r * d,
+                                        inst.x - cos_r * d,
+                                        inst.y - sin_r * d,
+                                        inst.x + sin_r * d,
+                                        inst.y - cos_r * d,
+                                    ];
+                                    self.tess_polygon(
+                                        &mut verts,
+                                        &mut idxs,
+                                        t,
+                                        current_color,
+                                        &DrawMode::Fill,
+                                        &poly_verts,
+                                        line_width,
+                                    );
+                                }
+                            }
+                            if !verts.is_empty() {
+                                let (target_width, target_height) =
+                                    self.target_dimensions(current_target, canvases);
+                                append_color_draw(
+                                    &mut draws,
+                                    &mut all_color_verts,
+                                    &mut all_color_idxs,
+                                    current_target,
+                                    current_blend_mode,
+                                    normalize_scissor(
+                                        current_scissor,
+                                        target_width,
+                                        target_height,
+                                    ),
+                                    color_mask_bits,
+                                    active_shader.filter(|key| shaders.contains_key(*key)),
+                                    stencil_mode,
+                                    stencil_reference,
+                                    verts,
+                                    idxs,
+                                );
+                            }
+                        }
+                    }
+                    current_color = saved_color;
                 }
             }
         }

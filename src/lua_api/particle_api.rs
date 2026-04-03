@@ -4,7 +4,7 @@
 use std::cell::RefCell;
 use std::rc::Rc;
 use crate::lua_api::SharedState;
-use crate::particle::{AreaDistribution, EmissionShape, ParticleConfig, ParticleSystem, RelativeMode, InsertMode};
+use crate::particle::{AreaDistribution, EmissionShape, ParticleConfig, ParticleShape, ParticleSystem, RelativeMode, InsertMode};
 use crate::engine::resource_keys::{ParticleKey, TextureKey};
 use crate::lua_api::lua_types::{add_type_methods, LunaType};
 use slotmap::{SlotMap, Key};
@@ -496,17 +496,56 @@ impl LuaUserData for LuaParticleSystem {
         /// The current relative mode.
         methods.add_method("getRelativeMode", |_, this, ()| {
             let st = this.state.borrow();
-            ensure_particle_exists(
-                &st.particle_systems,
-                this.key,
-                "ParticleSystem:getRelativeMode",
-            )?;
+            ensure_particle_exists(&st.particle_systems, this.key, "ParticleSystem:getRelativeMode")?;
             match st.particle_systems.get(this.key) {
                 Some(ps) => Ok(match ps.config.relative_mode {
                     RelativeMode::Attached => "attached".to_string(),
                     RelativeMode::Detached => "detached".to_string(),
                 }),
                 None => Ok("detached".to_string()),
+            }
+        });
+
+        /// Sets the particle render shape.
+        ///
+        /// # Parameters
+        /// - `shape_str` — `string` — one of `"square"`, `"circle"`, `"triangle"`, `"spark"`, `"diamond"`.
+        methods.add_method("setShape", |_, this, shape_str: String| {
+            let shape = match shape_str.to_lowercase().as_str() {
+                "square"   => ParticleShape::Square,
+                "circle"   => ParticleShape::Circle,
+                "triangle" => ParticleShape::Triangle,
+                "spark"    => ParticleShape::Spark,
+                "diamond"  => ParticleShape::Diamond,
+                other => return Err(LuaError::RuntimeError(format!(
+                    "setShape: unknown shape {:?}; expected square|circle|triangle|spark|diamond",
+                    other
+                ))),
+            };
+            let mut st = this.state.borrow_mut();
+            ensure_particle_exists(&st.particle_systems, this.key, "ParticleSystem:setShape")?;
+            if let Some(ps) = st.particle_systems.get_mut(this.key) {
+                ps.config.shape = shape;
+            }
+            Ok(())
+        });
+
+        /// Returns the particle render shape name.
+        ///
+        /// # Returns
+        /// `string`.
+        methods.add_method("getShape", |_, this, ()| {
+            let st = this.state.borrow();
+            ensure_particle_exists(&st.particle_systems, this.key, "ParticleSystem:getShape")?;
+            match st.particle_systems.get(this.key) {
+                Some(ps) => Ok(match ps.config.shape {
+                    ParticleShape::Square   => "square",
+                    ParticleShape::Circle   => "circle",
+                    ParticleShape::Triangle => "triangle",
+                    ParticleShape::Spark    => "spark",
+                    ParticleShape::Diamond  => "diamond",
+                }.to_string()),
+                None => Ok("square".to_string()),
             }
         });
     }

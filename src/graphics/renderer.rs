@@ -8,7 +8,7 @@
 //! and the `luna.*` Lua API for the scripting interface.
 
 use crate::engine::resource_keys::{
-    CanvasKey, FontKey, MeshKey, ShaderKey, SpriteBatchKey, TextureKey,
+    CanvasKey, FontKey, MeshKey, ShaderKey, ShapeKey, SpriteBatchKey, TextureKey,
 };
 use crate::graphics::mesh::Mesh;
 
@@ -213,6 +213,8 @@ pub enum BlendMode {
 /// - `Rotate` — Applies a rotation (in radians) to the current transform.
 /// - `Scale` — Applies a scale to the current transform.
 /// - `Arc` — Draws an arc (sector or outline) of a circle.
+/// - `DrawShape` — Draw all primitives in a compound shape with a unified affine transform.
+/// - `DrawParticleSystem` — Renders all particles in a single batched command, dispatching per-shape geometry helpers internally.
 #[derive(Debug, Clone)]
 pub enum DrawCommand {
     SetColor(f32, f32, f32, f32),
@@ -484,6 +486,39 @@ pub enum DrawCommand {
         /// Destination total height.
         h: f32,
     },
+    /// Draw all primitives in a compound shape with a unified affine transform.
+    ///
+    /// The renderer processes the shape's [`crate::graphics::ShapeCommand`] queue wrapped in a
+    /// `PushTransform`/`PopTransform` pair, applying the given transform before
+    /// dispatching each command.
+    DrawShape {
+        /// Key into `SharedState::shapes`.
+        shape_key: ShapeKey,
+        /// Destination X position in world pixels.
+        x: f32,
+        /// Destination Y position in world pixels.
+        y: f32,
+        /// Rotation in radians (counter-clockwise).
+        rotation: f32,
+        /// Horizontal scale factor.
+        sx: f32,
+        /// Vertical scale factor.
+        sy: f32,
+        /// Origin X offset (pivot point, in object space).
+        ox: f32,
+        /// Origin Y offset (pivot point, in object space).
+        oy: f32,
+    },
+    /// Draw all particles in a system in a single batched command.
+    ///
+    /// Each entry in `particles` represents one live particle with its pre-computed world position,
+    /// color, rotation, size, and shape. The renderer iterates the list and dispatches to the
+    /// appropriate geometry helper for each particle, avoiding N separate top-level `DrawCommand`
+    /// dispatches.
+    DrawParticleSystem {
+        /// Pre-computed per-particle render data for this frame.
+        particles: Vec<ParticleInstance>,
+    },
 }
 
 /// Raw RGBA pixel data for a loaded texture, stored in the renderer's texture atlas.
@@ -497,6 +532,81 @@ pub struct TextureData {
     pub pixels: Vec<u8>,
     pub width: u32,
     pub height: u32,
+}
+
+/// Geometric shape used when rendering a single untextured particle via `DrawParticleSystem`.
+///
+/// This mirrors `particle::ParticleShape` one-for-one. The particle module converts
+/// `ParticleShape` -> `ParticleRenderShape` when building the `DrawParticleSystem` command,
+/// keeping the Tier-1 `graphics` module free of an upward Tier-2 import.
+///
+/// # Variants
+/// - `Square` — Square variant.
+/// - `Circle` — Circle variant.
+/// - `Triangle` — Triangle variant.
+/// - `Spark` — Spark variant.
+/// - `Diamond` — Diamond variant.
+#[derive(Clone, Debug)]
+pub enum ParticleRenderShape {
+    /// Axis-aligned filled square. Size = side length.
+    Square,
+    /// Filled circle. Size = diameter.
+    Circle,
+    /// Filled equilateral triangle rotated by the particle's `rotation` field. Size = circumradius.
+    Triangle,
+    /// Thin line segment (1 px stroke) oriented along the particle's `rotation` field.
+    /// Rendered length = `size * 3.0`.
+    Spark,
+    /// Filled diamond (square rotated 45 degrees). Size = diagonal length.
+    Diamond,
+}
+
+/// Per-particle render data for a single frame.
+///
+/// Produced by `ParticleSystem::draw_commands()` and consumed by the GPU renderer's
+/// `DrawParticleSystem` arm. All positions are in world space.
+///
+/// # Fields
+/// - `x` — `f32`.
+/// - `y` — `f32`.
+/// - `r` — `f32`.
+/// - `g` — `f32`.
+/// - `b` — `f32`.
+/// - `a` — `f32`.
+/// - `rotation` — `f32`.
+/// - `size` — `f32`.
+/// - `shape` — `ParticleRenderShape`.
+/// - `texture_key` — `Option<TextureKey>`.
+/// - `quad` — `Option<[f32; 4]>`.
+/// - `quad_tex_dims` — `Option<(f32, f32)>`.
+#[derive(Clone, Debug)]
+pub struct ParticleInstance {
+    /// World X position.
+    pub x: f32,
+    /// World Y position.
+    pub y: f32,
+    /// Red channel (linear, 0-1).
+    pub r: f32,
+    /// Green channel (linear, 0-1).
+    pub g: f32,
+    /// Blue channel (linear, 0-1).
+    pub b: f32,
+    /// Alpha channel (0-1).
+    pub a: f32,
+    /// Rotation in radians.
+    pub rotation: f32,
+    /// Size in pixels (semantics depend on `shape`).
+    pub size: f32,
+    /// Geometric shape for untextured rendering.
+    pub shape: ParticleRenderShape,
+    /// Optional texture key; when `Some`, the shape field is ignored and the particle renders as a textured sprite.
+    pub texture_key: Option<TextureKey>,
+    /// Optional sprite-sheet quad region `[quad_x, quad_y, quad_w, quad_h]`.
+    /// Only used when `texture_key` is `Some`.
+    pub quad: Option<[f32; 4]>,
+    /// Full texture dimensions `(tex_w, tex_h)` for UV normalisation.
+    /// Only used when both `texture_key` and `quad` are `Some`.
+    pub quad_tex_dims: Option<(f32, f32)>,
 }
 
 /// Type discriminator for resources that can be passed to luna.graphics.draw.
