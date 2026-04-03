@@ -1,0 +1,222 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Luna2D — Module Architecture Diagram
+  Shows the layered dependency graph of engine modules.
+-->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 620" width="900" height="620"
+     font-family="'Segoe UI', Arial, sans-serif">
+  <defs>
+    <linearGradient id="bgGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#12082a"/>
+      <stop offset="100%" stop-color="#0a0518"/>
+    </linearGradient>
+    <linearGradient id="luaGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#7c3aed"/>
+      <stop offset="100%" stop-color="#4f1d96"/>
+    </linearGradient>
+    <linearGradient id="domainGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#1d4ed8"/>
+      <stop offset="100%" stop-color="#1e3a8a"/>
+    </linearGradient>
+    <linearGradient id="engineGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#065f46"/>
+      <stop offset="100%" stop-color="#064e3b"/>
+    </linearGradient>
+    <linearGradient id="mathGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#b45309"/>
+      <stop offset="100%" stop-color="#92400e"/>
+    </linearGradient>
+    <filter id="shadow">
+      <feDropShadow dx="0" dy="2" stdDeviation="4" flood-color="#000" flood-opacity="0.5"/>
+    </filter>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="3" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <marker id="arrowEnd" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+      <polygon points="0 0, 8 3, 0 6" fill="#a78bfa" opacity="0.7"/>
+    </marker>
+    <marker id="arrowMath" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+      <polygon points="0 0, 8 3, 0 6" fill="#fbbf24" opacity="0.6"/>
+    </marker>
+  </defs>
+
+  <!-- Background -->
+  <rect width="900" height="620" fill="url(#bgGrad)" rx="12"/>
+
+  <!-- Title -->
+  <text x="450" y="38" text-anchor="middle" font-size="20" font-weight="700"
+        fill="#e2d9f3" letter-spacing="2">Luna2D — Module Architecture</text>
+
+  <!-- ── Layer labels ─────────────────────────────────────────── -->
+  <text x="18" y="118" font-size="10" fill="#6d5e8a" letter-spacing="1">LUA API</text>
+  <text x="18" y="258" font-size="10" fill="#6d5e8a" letter-spacing="1">DOMAIN</text>
+  <text x="18" y="418" font-size="10" fill="#6d5e8a" letter-spacing="1">ENGINE</text>
+  <text x="18" y="538" font-size="10" fill="#6d5e8a" letter-spacing="1">MATH</text>
+
+  <!-- ── LAYER 1: lua_api ────────────────────────────────────── -->
+  <rect x="70" y="68" width="760" height="84" rx="10" fill="url(#luaGrad)" opacity="0.25" stroke="#7c3aed" stroke-width="1"/>
+  <text x="450" y="88" text-anchor="middle" font-size="11" fill="#c4b5fd" letter-spacing="1" font-weight="600">lua_api  (integration layer — may import any module)</text>
+
+  <!-- lua_api sub-boxes -->
+  <rect x="86"  y="96" width="84" height="44" rx="6" fill="url(#luaGrad)" filter="url(#shadow)"/>
+  <text x="128" y="122" text-anchor="middle" font-size="11" fill="#ede9fe">graphics_api</text>
+
+  <rect x="178" y="96" width="84" height="44" rx="6" fill="url(#luaGrad)" filter="url(#shadow)"/>
+  <text x="220" y="122" text-anchor="middle" font-size="11" fill="#ede9fe">physics_api</text>
+
+  <rect x="270" y="96" width="84" height="44" rx="6" fill="url(#luaGrad)" filter="url(#shadow)"/>
+  <text x="312" y="122" text-anchor="middle" font-size="11" fill="#ede9fe">audio_api</text>
+
+  <rect x="362" y="96" width="84" height="44" rx="6" fill="url(#luaGrad)" filter="url(#shadow)"/>
+  <text x="404" y="122" text-anchor="middle" font-size="11" fill="#ede9fe">input_api</text>
+
+  <rect x="454" y="96" width="84" height="44" rx="6" fill="url(#luaGrad)" filter="url(#shadow)"/>
+  <text x="496" y="122" text-anchor="middle" font-size="11" fill="#ede9fe">ai_api</text>
+
+  <rect x="546" y="96" width="84" height="44" rx="6" fill="url(#luaGrad)" filter="url(#shadow)"/>
+  <text x="588" y="122" text-anchor="middle" font-size="11" fill="#ede9fe">entity_api</text>
+
+  <rect x="638" y="96" width="84" height="44" rx="6" fill="url(#luaGrad)" filter="url(#shadow)"/>
+  <text x="680" y="122" text-anchor="middle" font-size="11" fill="#ede9fe">scene_api</text>
+
+  <rect x="730" y="96" width="84" height="44" rx="6" fill="url(#luaGrad)" filter="url(#shadow)"/>
+  <text x="772" y="122" text-anchor="middle" font-size="11" fill="#ede9fe">…more</text>
+
+  <!-- ── LAYER 2: domain modules ─────────────────────────────── -->
+  <rect x="70" y="172" width="760" height="160" rx="10" fill="url(#domainGrad)" opacity="0.18" stroke="#1d4ed8" stroke-width="1"/>
+  <text x="450" y="194" text-anchor="middle" font-size="11" fill="#93c5fd" letter-spacing="1" font-weight="600">Domain Modules  (peers — no cross-imports between them)</text>
+
+  <!-- Row 1 -->
+  <rect x="86"  y="202" width="102" height="44" rx="6" fill="url(#domainGrad)" filter="url(#shadow)"/>
+  <text x="137" y="222" text-anchor="middle" font-size="11" fill="#bfdbfe">graphics</text>
+  <text x="137" y="237" text-anchor="middle" font-size="9"  fill="#93c5fd">wgpu · DrawCmd</text>
+
+  <rect x="196" y="202" width="102" height="44" rx="6" fill="url(#domainGrad)" filter="url(#shadow)"/>
+  <text x="247" y="222" text-anchor="middle" font-size="11" fill="#bfdbfe">physics</text>
+  <text x="247" y="237" text-anchor="middle" font-size="9"  fill="#93c5fd">rapier2d · AABB</text>
+
+  <rect x="306" y="202" width="102" height="44" rx="6" fill="url(#domainGrad)" filter="url(#shadow)"/>
+  <text x="357" y="222" text-anchor="middle" font-size="11" fill="#bfdbfe">audio</text>
+  <text x="357" y="237" text-anchor="middle" font-size="9"  fill="#93c5fd">rodio · Mixer</text>
+
+  <rect x="416" y="202" width="102" height="44" rx="6" fill="url(#domainGrad)" filter="url(#shadow)"/>
+  <text x="467" y="222" text-anchor="middle" font-size="11" fill="#bfdbfe">input</text>
+  <text x="467" y="237" text-anchor="middle" font-size="9"  fill="#93c5fd">keyboard · mouse · pad</text>
+
+  <rect x="526" y="202" width="102" height="44" rx="6" fill="url(#domainGrad)" filter="url(#shadow)"/>
+  <text x="577" y="222" text-anchor="middle" font-size="11" fill="#bfdbfe">ai</text>
+  <text x="577" y="237" text-anchor="middle" font-size="9"  fill="#93c5fd">FSM · BT · GOAP</text>
+
+  <rect x="636" y="202" width="102" height="44" rx="6" fill="url(#domainGrad)" filter="url(#shadow)"/>
+  <text x="687" y="222" text-anchor="middle" font-size="11" fill="#bfdbfe">entity</text>
+  <text x="687" y="237" text-anchor="middle" font-size="9"  fill="#93c5fd">ECS · Universe</text>
+
+  <!-- Row 2 -->
+  <rect x="86"  y="256" width="102" height="44" rx="6" fill="url(#domainGrad)" filter="url(#shadow)"/>
+  <text x="137" y="276" text-anchor="middle" font-size="11" fill="#bfdbfe">scene</text>
+  <text x="137" y="291" text-anchor="middle" font-size="9"  fill="#93c5fd">SceneStack · Transition</text>
+
+  <rect x="196" y="256" width="102" height="44" rx="6" fill="url(#domainGrad)" filter="url(#shadow)"/>
+  <text x="247" y="276" text-anchor="middle" font-size="11" fill="#bfdbfe">filesystem</text>
+  <text x="247" y="291" text-anchor="middle" font-size="9"  fill="#93c5fd">GameFS · sandbox</text>
+
+  <rect x="306" y="256" width="102" height="44" rx="6" fill="url(#domainGrad)" filter="url(#shadow)"/>
+  <text x="357" y="276" text-anchor="middle" font-size="11" fill="#bfdbfe">timer</text>
+  <text x="357" y="291" text-anchor="middle" font-size="9"  fill="#93c5fd">Clock · Tween</text>
+
+  <rect x="416" y="256" width="102" height="44" rx="6" fill="url(#domainGrad)" filter="url(#shadow)"/>
+  <text x="467" y="276" text-anchor="middle" font-size="11" fill="#bfdbfe">savegame</text>
+  <text x="467" y="291" text-anchor="middle" font-size="9"  fill="#93c5fd">SaveManager · slots</text>
+
+  <rect x="526" y="256" width="102" height="44" rx="6" fill="url(#domainGrad)" filter="url(#shadow)"/>
+  <text x="577" y="276" text-anchor="middle" font-size="11" fill="#bfdbfe">threading</text>
+  <text x="577" y="291" text-anchor="middle" font-size="9"  fill="#93c5fd">Worker · Channel</text>
+
+  <rect x="636" y="256" width="102" height="44" rx="6" fill="url(#domainGrad)" filter="url(#shadow)"/>
+  <text x="687" y="276" text-anchor="middle" font-size="11" fill="#bfdbfe">window</text>
+  <text x="687" y="291" text-anchor="middle" font-size="9"  fill="#93c5fd">winit · config</text>
+
+  <!-- ── LAYER 3: engine ─────────────────────────────────────── -->
+  <rect x="70" y="352" width="760" height="100" rx="10" fill="url(#engineGrad)" opacity="0.25" stroke="#065f46" stroke-width="1"/>
+  <text x="450" y="372" text-anchor="middle" font-size="11" fill="#6ee7b7" letter-spacing="1" font-weight="600">engine  (top-level orchestrator — may import all modules)</text>
+
+  <rect x="86"  y="382" width="130" height="44" rx="6" fill="url(#engineGrad)" filter="url(#shadow)"/>
+  <text x="151" y="402" text-anchor="middle" font-size="11" fill="#a7f3d0">App</text>
+  <text x="151" y="417" text-anchor="middle" font-size="9"  fill="#6ee7b7">game loop · winit event loop</text>
+
+  <rect x="226" y="382" width="130" height="44" rx="6" fill="url(#engineGrad)" filter="url(#shadow)"/>
+  <text x="291" y="402" text-anchor="middle" font-size="11" fill="#a7f3d0">Config</text>
+  <text x="291" y="417" text-anchor="middle" font-size="9"  fill="#6ee7b7">conf.lua · window · perf</text>
+
+  <rect x="366" y="382" width="130" height="44" rx="6" fill="url(#engineGrad)" filter="url(#shadow)"/>
+  <text x="431" y="402" text-anchor="middle" font-size="11" fill="#a7f3d0">SharedState</text>
+  <text x="431" y="417" text-anchor="middle" font-size="9"  fill="#6ee7b7">Rc&lt;RefCell&lt;…&gt;&gt;</text>
+
+  <rect x="506" y="382" width="130" height="44" rx="6" fill="url(#engineGrad)" filter="url(#shadow)"/>
+  <text x="571" y="402" text-anchor="middle" font-size="11" fill="#a7f3d0">EngineError</text>
+  <text x="571" y="417" text-anchor="middle" font-size="9"  fill="#6ee7b7">thiserror · variants</text>
+
+  <rect x="646" y="382" width="168" height="44" rx="6" fill="url(#engineGrad)" filter="url(#shadow)"/>
+  <text x="730" y="402" text-anchor="middle" font-size="11" fill="#a7f3d0">GpuRenderer</text>
+  <text x="730" y="417" text-anchor="middle" font-size="9"  fill="#6ee7b7">wgpu surface · swapchain</text>
+
+  <!-- ── LAYER 4: math ───────────────────────────────────────── -->
+  <rect x="70" y="472" width="760" height="80" rx="10" fill="url(#mathGrad)" opacity="0.22" stroke="#b45309" stroke-width="1"/>
+  <text x="450" y="492" text-anchor="middle" font-size="11" fill="#fcd34d" letter-spacing="1" font-weight="600">math  (leaf — no internal deps; all modules may import)</text>
+
+  <rect x="86"  y="502" width="90" height="34" rx="6" fill="url(#mathGrad)" filter="url(#shadow)"/>
+  <text x="131" y="523" text-anchor="middle" font-size="11" fill="#fef3c7">Vec2 · Mat3</text>
+
+  <rect x="184" y="502" width="90" height="34" rx="6" fill="url(#mathGrad)" filter="url(#shadow)"/>
+  <text x="229" y="523" text-anchor="middle" font-size="11" fill="#fef3c7">Rect · Polygon</text>
+
+  <rect x="282" y="502" width="90" height="34" rx="6" fill="url(#mathGrad)" filter="url(#shadow)"/>
+  <text x="327" y="523" text-anchor="middle" font-size="11" fill="#fef3c7">Easing · Tween</text>
+
+  <rect x="380" y="502" width="90" height="34" rx="6" fill="url(#mathGrad)" filter="url(#shadow)"/>
+  <text x="425" y="523" text-anchor="middle" font-size="11" fill="#fef3c7">Noise · Bezier</text>
+
+  <rect x="478" y="502" width="90" height="34" rx="6" fill="url(#mathGrad)" filter="url(#shadow)"/>
+  <text x="523" y="523" text-anchor="middle" font-size="11" fill="#fef3c7">SpatialHash</text>
+
+  <rect x="576" y="502" width="90" height="34" rx="6" fill="url(#mathGrad)" filter="url(#shadow)"/>
+  <text x="621" y="523" text-anchor="middle" font-size="11" fill="#fef3c7">Raycast</text>
+
+  <rect x="674" y="502" width="140" height="34" rx="6" fill="url(#mathGrad)" filter="url(#shadow)"/>
+  <text x="744" y="523" text-anchor="middle" font-size="11" fill="#fef3c7">Color · Camera</text>
+
+  <!-- ── Dependency arrows ───────────────────────────────────── -->
+  <!-- lua_api → domain (representative) -->
+  <line x1="450" y1="152" x2="450" y2="170" stroke="#a78bfa" stroke-width="1.5"
+        stroke-dasharray="4,3" opacity="0.6" marker-end="url(#arrowEnd)"/>
+
+  <!-- domain → engine -->
+  <line x1="450" y1="332" x2="450" y2="350" stroke="#a78bfa" stroke-width="1.5"
+        stroke-dasharray="4,3" opacity="0.6" marker-end="url(#arrowEnd)"/>
+
+  <!-- engine → math -->
+  <line x1="450" y1="452" x2="450" y2="470" stroke="#fbbf24" stroke-width="1.5"
+        stroke-dasharray="4,3" opacity="0.6" marker-end="url(#arrowMath)"/>
+
+  <!-- domain → math (side arrow) -->
+  <line x1="820" y1="278" x2="840" y2="278" stroke="#fbbf24" stroke-width="1"
+        stroke-dasharray="3,3" opacity="0.4"/>
+  <line x1="840" y1="278" x2="840" y2="519" stroke="#fbbf24" stroke-width="1"
+        stroke-dasharray="3,3" opacity="0.4"/>
+  <line x1="840" y1="519" x2="820" y2="519" stroke="#fbbf24" stroke-width="1"
+        stroke-dasharray="3,3" opacity="0.4" marker-end="url(#arrowMath)"/>
+
+  <!-- ── Legend ─────────────────────────────────────────────── -->
+  <rect x="70" y="574" width="760" height="32" rx="6" fill="#1a0d3a" opacity="0.7"/>
+  <rect x="86"  y="582" width="14" height="8" rx="2" fill="#7c3aed" opacity="0.8"/>
+  <text x="106" y="590" font-size="9" fill="#c4b5fd">lua_api layer</text>
+  <rect x="180" y="582" width="14" height="8" rx="2" fill="#1d4ed8" opacity="0.8"/>
+  <text x="200" y="590" font-size="9" fill="#93c5fd">domain modules (peers)</text>
+  <rect x="310" y="582" width="14" height="8" rx="2" fill="#065f46" opacity="0.8"/>
+  <text x="330" y="590" font-size="9" fill="#6ee7b7">engine (orchestrator)</text>
+  <rect x="440" y="582" width="14" height="8" rx="2" fill="#b45309" opacity="0.8"/>
+  <text x="460" y="590" font-size="9" fill="#fcd34d">math (leaf, imported by all)</text>
+  <line x1="590" y1="586" x2="612" y2="586" stroke="#a78bfa" stroke-width="1.5" stroke-dasharray="4,3" opacity="0.7"/>
+  <text x="618" y="590" font-size="9" fill="#a78bfa">imports / depends on</text>
+</svg>
