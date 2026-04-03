@@ -6,7 +6,10 @@
 local effects = {}
 local stack = nil
 local current_effect = 1
-local effect_names = { "bloom", "blur", "crt", "godrays", "vignette", "colourgrade", "chromatic" }
+local effect_names = {
+    "bloom", "blur", "crt", "godrays", "vignette", "colourgrade", "chromatic",
+    "pixelate", "sepia", "grayscale", "invert", "scanlines", "edgedetect", "hueshift", "noise"
+}
 local active = {}  -- tracks which effects are active in the stack
 
 function luna.load()
@@ -99,16 +102,16 @@ function luna.draw()
             end
         end
 
-        y = y + 35
+        y = y + 30
     end
 
     -- Controls
     luna.graphics.setColor(0.7, 0.7, 0.7)
-    luna.graphics.print("Controls:", 10, 370, 1.5)
-    luna.graphics.print("Up/Down = select effect", 10, 395, 1)
-    luna.graphics.print("Space = toggle effect on/off", 10, 415, 1)
-    luna.graphics.print("Left/Right = adjust first parameter", 10, 435, 1)
-    luna.graphics.print("Stack effects: " .. stack:getEffectCount(), 10, 465, 1.2)
+    luna.graphics.print("Controls:", 500, 50, 1.5)
+    luna.graphics.print("Up/Down = select effect", 500, 75, 1)
+    luna.graphics.print("Space = toggle effect on/off", 500, 95, 1)
+    luna.graphics.print("Left/Right = adjust first parameter", 500, 115, 1)
+    luna.graphics.print("Stack effects: " .. stack:getEffectCount(), 500, 140, 1.2)
 end
 
 function luna.keypressed(key)

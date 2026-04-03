@@ -5,7 +5,7 @@
 //!
 //! This module is part of Luna2D's `engine` subsystem and provides the implementation
 //! details for resource keys-related operations and data management.
-//! Key types exported from this module: `TextureKey`, `FontKey`, `CanvasKey`, `SoundKey`, `ParticleKey`.
+//! Key types exported from this module: `TextureKey`, `FontKey`, `CanvasKey`, `SoundKey`, `ParticleKey`, `ShapeKey`.
 //!
 //! All public items are documented. See the parent module for architectural context
 //! and the `luna.*` Lua API for the scripting interface.
@@ -29,6 +29,8 @@ new_key_type! {
     pub struct ShaderKey;
     /// Key for mesh instances. Consult the module-level documentation for the broader usage context and preconditions.
     pub struct MeshKey;
+    /// Key for compound shape instances.
+    pub struct ShapeKey;
     /// Key for audio bus instances in the Mixer.
     pub struct BusKey;
     /// Key for MIDI player instances. Consult the module-level documentation for the broader usage context and preconditions.

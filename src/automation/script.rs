@@ -69,7 +69,11 @@ impl Script {
     /// # Returns
     /// `Script`.
     pub fn new(name: impl Into<String>, mut steps: Vec<Step>) -> Self {
-        steps.sort_by(|a, b| a.time.partial_cmp(&b.time).unwrap_or(std::cmp::Ordering::Equal));
+        steps.sort_by(|a, b| {
+            a.time
+                .partial_cmp(&b.time)
+                .unwrap_or(std::cmp::Ordering::Equal)
+        });
         steps.truncate(MAX_STEPS);
         Self {
             name: name.into(),

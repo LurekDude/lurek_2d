@@ -271,8 +271,6 @@ impl Step {
     /// # Returns
     /// `Option<&str>`.
     pub fn effective_scancode(&self) -> Option<&str> {
-        self.scancode
-            .as_deref()
-            .or(self.key.as_deref())
+        self.scancode.as_deref().or(self.key.as_deref())
     }
 }

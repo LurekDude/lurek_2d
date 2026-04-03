@@ -102,13 +102,17 @@ fn config_load_from_conf_lua_parses_graphics_backend_options() {
     for backend in ["auto", "dx12", "vulkan", "metal"] {
         write_conf(
             &temp_dir,
-            &format!(
-                r#"function luna.conf(t) t.graphics.backend = "{backend}" end"#
-            ),
+            &format!(r#"function luna.conf(t) t.graphics.backend = "{backend}" end"#),
         );
         let (config, error) = Config::load_from_conf_lua(temp_dir.path());
-        assert!(error.is_none(), "unexpected error for backend={backend}: {error:?}");
-        assert_eq!(config.graphics.backend, backend, "backend={backend} not stored");
+        assert!(
+            error.is_none(),
+            "unexpected error for backend={backend}: {error:?}"
+        );
+        assert_eq!(
+            config.graphics.backend, backend,
+            "backend={backend} not stored"
+        );
     }
 }
 
@@ -118,12 +122,13 @@ fn config_load_from_conf_lua_parses_graphics_power_preference_options() {
     for pref in ["high", "low", "none"] {
         write_conf(
             &temp_dir,
-            &format!(
-                r#"function luna.conf(t) t.graphics.power_preference = "{pref}" end"#
-            ),
+            &format!(r#"function luna.conf(t) t.graphics.power_preference = "{pref}" end"#),
         );
         let (config, error) = Config::load_from_conf_lua(temp_dir.path());
-        assert!(error.is_none(), "unexpected error for power_preference={pref}: {error:?}");
+        assert!(
+            error.is_none(),
+            "unexpected error for power_preference={pref}: {error:?}"
+        );
         assert_eq!(
             config.graphics.power_preference, pref,
             "power_preference={pref} not stored"

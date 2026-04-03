@@ -24,13 +24,15 @@ means Lua never touches the GPU directly — it constructs a list of intent
 and the renderer has full visibility over the draw list to minimise state
 switches before any GPU work begins.
 
-All resources (textures, fonts, canvases, shaders, meshes, sprite batches)
-are identified by typed SlotMap keys that are opaque to Lua.  When a script
-calls `luna.graphics.newImage("hero.png")`, Lua receives a lightweight handle
-table wrapping a `TextureKey`; the actual `wgpu::Texture` and
-`wgpu::TextureView` live inside `GpuRenderer` and are never passed to Lua.
-This keeps Lua values small and eliminates the need for Lua `__gc` finalizers
-on GPU resources.
+All resources (textures, fonts, canvases, shaders, meshes, sprite batches,
+and compound shapes) are identified by typed SlotMap keys that are opaque to
+Lua.  When a script calls `luna.graphics.newImage("hero.png")`, Lua receives a
+lightweight handle table wrapping a `TextureKey`; the actual `wgpu::Texture`
+and `wgpu::TextureView` live inside `GpuRenderer` and are never passed to Lua.
+`luna.graphics.newShape()` follows the same pattern — Lua holds a `LuaShape`
+userdata wrapping a `ShapeKey` while the `CompoundShape` command buffer lives
+in `SharedState::shapes`.  This keeps Lua values small and eliminates the need
+for Lua `__gc` finalizers on GPU resources.
 
 The transform stack (`push/pop/translate/rotate/scale`) is implemented as
 `DrawCommand` variants — the engine maintains a matrix stack as it processes
@@ -59,6 +61,7 @@ GpuRenderer (wgpu rendering backend)
   │     ├── Transform: PushTransform, PopTransform, Translate, Rotate, Scale
   │     ├── State: SetColor, SetBlendMode, SetShader, SetLineWidth
   │     ├── Stencil: SetStencilTest, Stencil
+  │     ├── CompoundShape: DrawShape (replays a CompoundShape with affine transform)
   │     └── Advanced: DrawMesh, DrawParticleSystem, DrawAnimation, DrawTrail
   │
   ├── Resources (SlotMap storage)
@@ -66,7 +69,8 @@ GpuRenderer (wgpu rendering backend)
   │     ├── Fonts ── fontdue rasterization + GPU atlas
   │     ├── Canvases ── off-screen render targets
   │     ├── Shaders ── custom WGSL fragment shaders
-  │     ├── Meshes ── vertex data + optional texture
+  │     ├── SpriteBatches ── instanced sprite rendering
+  │     └── Shapes ── CompoundShape command buffers (ShapeKey → CompoundShape)
   │     └── SpriteBatches ── instanced sprite rendering
   │
   ├── Camera ── Camera2D with smooth follow, shake, dead zone
@@ -100,6 +104,7 @@ GpuRenderer (wgpu rendering backend)
 | `palette_lut.rs` | Color palette lookup table for shader-based palette swapping |
 | `polygon_map.rs` | Polygon map renderer with region management and hit detection |
 | `renderer.rs` | Draw command types, blend modes, and texture data for the Luna2D rendering... |
+| `shape.rs` | `ShapeCommand` sub-enum and `CompoundShape` pooled builder resource |
 | `shader.rs` | Custom WGSL shader support for Luna2D |
 | `sprite.rs` | Sprite implementation for the `graphics` subsystem |
 | `sprite_batch.rs` | Sprite batching for efficient rendering of many sprites sharing one texture |
@@ -237,8 +242,15 @@ Draw command types, blend modes, and texture data for the Luna2D rendering pipel
 - **`CompareMode`** (enum): Stencil comparison mode for `luna.graphics.setStencilTest`.
 - **`StencilAction`** (enum): Stencil write action for `luna.graphics.stencil`.
 - **`TextAlign`** (enum): Text alignment mode for formatted text printing.
-- **`DrawMode`** (enum): Whether a shape is drawn filled or as an outline.
-- **`BlendMode`** (enum): Blending mode for draw operations. Consult the module-level documentation for the broader usage context and...
+- **`DrawMode`** (enum): Whether a shape is drawn filled or as an outline. Includes the `DrawShape` variant for replaying a `CompoundShape` with an affine transform.
+- **`TextureData`** (struct): Raw RGBA pixel data for a loaded texture, stored in the renderer's texture atlas.
+
+### `graphics::shape`
+
+`ShapeCommand` sub-enum and `CompoundShape` pooled builder resource.
+
+- **`ShapeCommand`** (enum): Sub-set of draw primitives stored inside a `CompoundShape` command buffer. Variants: `SetColor`, `SetLineWidth`, `Rectangle`, `RoundedRectangle`, `Circle`, `Ellipse`, `Triangle`, `Polygon`, `Line`, `Polyline`, `Arc`.
+- **`CompoundShape`** (struct): Accumulates `ShapeCommand` entries in local object space and replays them via `DrawCommand::DrawShape` with a per-call affine transformoader usage context and...
 - **`DrawCommand`** (enum): A single deferred draw operation queued during `luna.draw()` and executed by `GpuRenderer`.
 - **`TextureData`** (struct): Raw RGBA pixel data for a loaded texture, stored in the renderer's texture atlas.
 
@@ -341,6 +353,10 @@ Basic camera with position, zoom, and rotation.  Used by `SharedState` for the f
 #### `graphics::camera::Camera2D`
 
 Full-featured 2D camera with smooth follow, dead zone, bounds clamping,
+
+#### `graphics::shape::CompoundShape`
+
+Accumulates `ShapeCommand` entries in local object space and replays them as a unified draw call via `DrawCommand::DrawShape` with a per-call affine transform.
 
 #### `graphics::canvas::Canvas`
 
@@ -543,6 +559,10 @@ A data series that can be added to a [`GraphRenderer`].
 #### `graphics::mesh::MeshDrawMode`
 
 Drawing mode for mesh geometry. Consult the module-level documentation for the broader usage context and preconditions.
+
+#### `graphics::shape::ShapeCommand`
+
+Sub-set of draw primitives stored inside a `CompoundShape` command buffer. Variants: `SetColor`, `SetLineWidth`, `Rectangle`, `RoundedRectangle`, `Circle`, `Ellipse`, `Triangle`, `Polygon`, `Line`, `Polyline`, `Arc`.
 
 #### `graphics::postfx::PostFxEffectType`
 

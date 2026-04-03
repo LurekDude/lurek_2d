@@ -70,6 +70,8 @@
 pub mod ai;
 /// Audio playback system backed by rodio.
 pub mod audio;
+/// Automated input simulation via timed step scripts for testing and replay.
+pub mod automation;
 /// Turn-based battle engine: battles, combatants, abilities, and statuses.
 pub mod battle;
 /// Card game backend engine: Card, Deck (Stack), DeckBuilder, Zone (StackManager), CardPool, Slot, StackHistory.
@@ -100,6 +102,8 @@ pub mod filesystem;
 pub mod graph;
 /// 2D GPU rendering pipeline, draw commands, and graphics types.
 pub mod graphics;
+/// Retained-mode widget UI system: buttons, panels, text fields, layouts.
+pub mod gui;
 /// CPU-side pixel-level image manipulation.
 pub mod image;
 /// Keyboard, mouse, and gamepad input state.
@@ -116,6 +120,8 @@ pub mod math;
 pub mod minimap;
 /// Mod management framework: metadata, dependencies, load ordering, hooks.
 pub mod modding;
+/// Composable per-frame screen-effect overlay: weather, ambient lighting, flash, shake, fade, fog.
+pub mod overlay;
 /// Emitter-based 2D particle effects.
 pub mod particle;
 /// Grid pathfinding: A★, HPA★, flow fields, and NavGrid unit-size navigation.

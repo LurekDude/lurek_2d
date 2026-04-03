@@ -1,0 +1,1351 @@
+-- Luna2D GUI API Tests
+
+-- =========================================================================
+-- 1. luna.gui module exists
+-- =========================================================================
+describe("luna.gui module exists", function()
+    it("luna.gui is a table", function()
+        expect_type("table", luna.gui)
+    end)
+
+    it("has newButton factory", function()
+        expect_type("function", luna.gui.newButton)
+    end)
+
+    it("has newLabel factory", function()
+        expect_type("function", luna.gui.newLabel)
+    end)
+
+    it("has newTextInput factory", function()
+        expect_type("function", luna.gui.newTextInput)
+    end)
+
+    it("has newCheckbox factory", function()
+        expect_type("function", luna.gui.newCheckbox)
+    end)
+
+    it("has newSlider factory", function()
+        expect_type("function", luna.gui.newSlider)
+    end)
+
+    it("has newProgressBar factory", function()
+        expect_type("function", luna.gui.newProgressBar)
+    end)
+
+    it("has newComboBox factory", function()
+        expect_type("function", luna.gui.newComboBox)
+    end)
+
+    it("has newList factory", function()
+        expect_type("function", luna.gui.newList)
+    end)
+
+    it("has newPanel factory", function()
+        expect_type("function", luna.gui.newPanel)
+    end)
+
+    it("has newLayout factory", function()
+        expect_type("function", luna.gui.newLayout)
+    end)
+
+    it("has newScrollPanel factory", function()
+        expect_type("function", luna.gui.newScrollPanel)
+    end)
+
+    it("has newNinePatch factory", function()
+        expect_type("function", luna.gui.newNinePatch)
+    end)
+
+    it("has newTabBar factory", function()
+        expect_type("function", luna.gui.newTabBar)
+    end)
+
+    it("has newSeparator factory", function()
+        expect_type("function", luna.gui.newSeparator)
+    end)
+
+    it("has newSpacer factory", function()
+        expect_type("function", luna.gui.newSpacer)
+    end)
+
+    it("has newToast factory", function()
+        expect_type("function", luna.gui.newToast)
+    end)
+
+    it("has newTreeView factory", function()
+        expect_type("function", luna.gui.newTreeView)
+    end)
+
+    it("has newTheme factory", function()
+        expect_type("function", luna.gui.newTheme)
+    end)
+
+    it("has setTheme function", function()
+        expect_type("function", luna.gui.setTheme)
+    end)
+
+    it("has getTheme function", function()
+        expect_type("function", luna.gui.getTheme)
+    end)
+
+    it("has setFocus function", function()
+        expect_type("function", luna.gui.setFocus)
+    end)
+
+    it("has getFocus function", function()
+        expect_type("function", luna.gui.getFocus)
+    end)
+
+    it("has focusNext function", function()
+        expect_type("function", luna.gui.focusNext)
+    end)
+
+    it("has focusPrev function", function()
+        expect_type("function", luna.gui.focusPrev)
+    end)
+
+    it("has clearFocus function", function()
+        expect_type("function", luna.gui.clearFocus)
+    end)
+
+    it("has getRoot function", function()
+        expect_type("function", luna.gui.getRoot)
+    end)
+
+    it("has update function", function()
+        expect_type("function", luna.gui.update)
+    end)
+
+    it("has draw function", function()
+        expect_type("function", luna.gui.draw)
+    end)
+
+    it("has getWidgetCount function", function()
+        expect_type("function", luna.gui.getWidgetCount)
+    end)
+
+    it("has input routing functions", function()
+        expect_type("function", luna.gui.mousepressed)
+        expect_type("function", luna.gui.mousereleased)
+        expect_type("function", luna.gui.mousemoved)
+        expect_type("function", luna.gui.keypressed)
+        expect_type("function", luna.gui.textinput)
+        expect_type("function", luna.gui.wheelmoved)
+    end)
+
+    it("has toast functions", function()
+        expect_type("function", luna.gui.addToast)
+        expect_type("function", luna.gui.getToastCount)
+    end)
+end)
+
+-- =========================================================================
+-- 2. Button
+-- =========================================================================
+describe("luna.gui Button", function()
+    it("creates a button with text", function()
+        local btn = luna.gui.newButton("OK")
+        expect_type("table", btn)
+        expect_equal("OK", btn.getText())
+    end)
+
+    it("creates a button with default empty text", function()
+        local btn = luna.gui.newButton()
+        expect_equal("", btn.getText())
+    end)
+
+    it("can set and get text", function()
+        local btn = luna.gui.newButton("A")
+        btn.setText("B")
+        expect_equal("B", btn.getText())
+    end)
+end)
+
+-- =========================================================================
+-- 3. Label
+-- =========================================================================
+describe("luna.gui Label", function()
+    it("creates a label with text", function()
+        local lbl = luna.gui.newLabel("Hello")
+        expect_equal("Hello", lbl.getText())
+    end)
+
+    it("can update text", function()
+        local lbl = luna.gui.newLabel("old")
+        lbl.setText("new")
+        expect_equal("new", lbl.getText())
+    end)
+end)
+
+-- =========================================================================
+-- 4. TextInput
+-- =========================================================================
+describe("luna.gui TextInput", function()
+    it("creates with empty text", function()
+        local ti = luna.gui.newTextInput()
+        expect_equal("", ti.getText())
+    end)
+
+    it("can set and get text", function()
+        local ti = luna.gui.newTextInput()
+        ti.setText("hello")
+        expect_equal("hello", ti.getText())
+    end)
+
+    it("can set placeholder", function()
+        local ti = luna.gui.newTextInput()
+        ti.setPlaceholder("Enter name...")
+        expect_equal("Enter name...", ti.getPlaceholder())
+    end)
+
+    it("can set max length", function()
+        local ti = luna.gui.newTextInput()
+        ti.setMaxLength(10)
+        -- No getter exposed; just verify no error
+    end)
+end)
+
+-- =========================================================================
+-- 5. CheckBox
+-- =========================================================================
+describe("luna.gui CheckBox", function()
+    it("creates unchecked by default", function()
+        local cb = luna.gui.newCheckbox("Option")
+        expect_equal(false, cb.isChecked())
+    end)
+
+    it("can toggle checked state", function()
+        local cb = luna.gui.newCheckbox("Toggle")
+        cb.setChecked(true)
+        expect_equal(true, cb.isChecked())
+        cb.setChecked(false)
+        expect_equal(false, cb.isChecked())
+    end)
+
+    it("can set and get text", function()
+        local cb = luna.gui.newCheckbox("old")
+        cb.setText("new")
+        expect_equal("new", cb.getText())
+    end)
+end)
+
+-- =========================================================================
+-- 6. Slider
+-- =========================================================================
+describe("luna.gui Slider", function()
+    it("creates with min/max defaults", function()
+        local sl = luna.gui.newSlider()
+        expect_equal(0, sl.getMin())
+        expect_equal(100, sl.getMax())
+    end)
+
+    it("creates with custom min/max", function()
+        local sl = luna.gui.newSlider(10, 50)
+        expect_equal(10, sl.getMin())
+        expect_equal(50, sl.getMax())
+    end)
+
+    it("clamps value to range", function()
+        local sl = luna.gui.newSlider(0, 100)
+        sl.setValue(150)
+        expect_equal(100, sl.getValue())
+        sl.setValue(-10)
+        expect_equal(0, sl.getValue())
+    end)
+
+    it("can set step", function()
+        local sl = luna.gui.newSlider(0, 100)
+        sl.setStep(10)
+        sl.setValue(23)
+        expect_equal(20, sl.getValue())
+    end)
+end)
+
+-- =========================================================================
+-- 7. ProgressBar
+-- =========================================================================
+describe("luna.gui ProgressBar", function()
+    it("creates with defaults", function()
+        local pb = luna.gui.newProgressBar()
+        expect_equal(0, pb.getMin())
+        expect_equal(100, pb.getMax())
+    end)
+
+    it("creates with custom range", function()
+        local pb = luna.gui.newProgressBar(0, 100)
+        expect_equal(0, pb.getMin())
+        expect_equal(100, pb.getMax())
+    end)
+
+    it("can set and get value", function()
+        local pb = luna.gui.newProgressBar(0, 100)
+        pb.setValue(42)
+        expect_equal(42, pb.getValue())
+    end)
+end)
+
+-- =========================================================================
+-- 8. ComboBox
+-- =========================================================================
+describe("luna.gui ComboBox", function()
+    it("creates empty", function()
+        local cb = luna.gui.newComboBox()
+        expect_equal(0, cb.getItemCount())
+    end)
+
+    it("can add items", function()
+        local cb = luna.gui.newComboBox()
+        cb.addItem("Apple")
+        cb.addItem("Banana")
+        cb.addItem("Cherry")
+        expect_equal(3, cb.getItemCount())
+    end)
+
+    it("can get item by index (1-based)", function()
+        local cb = luna.gui.newComboBox()
+        cb.addItem("First")
+        cb.addItem("Second")
+        expect_equal("First", cb.getItem(1))
+        expect_equal("Second", cb.getItem(2))
+    end)
+
+    it("returns nil for out-of-bounds index", function()
+        local cb = luna.gui.newComboBox()
+        cb.addItem("Only")
+        expect_equal(nil, cb.getItem(5))
+    end)
+
+    it("can select and get selected index", function()
+        local cb = luna.gui.newComboBox()
+        cb.addItem("A")
+        cb.addItem("B")
+        cb.setSelectedIndex(2)
+        expect_equal(2, cb.getSelectedIndex())
+    end)
+
+    it("can remove item", function()
+        local cb = luna.gui.newComboBox()
+        cb.addItem("A")
+        cb.addItem("B")
+        local ok = cb.removeItem(1)
+        expect_equal(true, ok)
+        expect_equal(1, cb.getItemCount())
+    end)
+
+    it("can clear all items", function()
+        local cb = luna.gui.newComboBox()
+        cb.addItem("A")
+        cb.addItem("B")
+        cb.clearItems()
+        expect_equal(0, cb.getItemCount())
+    end)
+end)
+
+-- =========================================================================
+-- 9. ListBox
+-- =========================================================================
+describe("luna.gui ListBox", function()
+    it("creates empty", function()
+        local lb = luna.gui.newList()
+        expect_equal(0, lb.getItemCount())
+    end)
+
+    it("can add and get items", function()
+        local lb = luna.gui.newList()
+        lb.addItem("X")
+        lb.addItem("Y")
+        expect_equal(2, lb.getItemCount())
+        expect_equal("X", lb.getItem(1))
+        expect_equal("Y", lb.getItem(2))
+    end)
+end)
+
+-- =========================================================================
+-- 10. TabBar
+-- =========================================================================
+describe("luna.gui TabBar", function()
+    it("creates empty", function()
+        local tb = luna.gui.newTabBar()
+        expect_equal(0, tb.getTabCount())
+    end)
+
+    it("can add tabs", function()
+        local tb = luna.gui.newTabBar()
+        tb.addTab("General")
+        tb.addTab("Settings")
+        tb.addTab("About")
+        expect_equal(3, tb.getTabCount())
+    end)
+
+    it("can get tab label (1-based)", function()
+        local tb = luna.gui.newTabBar()
+        tb.addTab("First")
+        tb.addTab("Second")
+        expect_equal("First", tb.getTab(1))
+        expect_equal("Second", tb.getTab(2))
+    end)
+
+    it("can set active tab (1-based)", function()
+        local tb = luna.gui.newTabBar()
+        tb.addTab("A")
+        tb.addTab("B")
+        tb.setActiveTab(2)
+        expect_equal(2, tb.getActiveTab())
+    end)
+
+    it("can remove tab", function()
+        local tb = luna.gui.newTabBar()
+        tb.addTab("A")
+        tb.addTab("B")
+        local ok = tb.removeTab(1)
+        expect_equal(true, ok)
+        expect_equal(1, tb.getTabCount())
+    end)
+end)
+
+-- =========================================================================
+-- 11. Base widget methods (position, size, visibility, etc.)
+-- =========================================================================
+describe("luna.gui widget base methods", function()
+    it("can set and get position", function()
+        local btn = luna.gui.newButton("Pos")
+        btn.setPosition(100, 200)
+        local x, y = btn.getPosition()
+        expect_equal(100, x)
+        expect_equal(200, y)
+    end)
+
+    it("can set and get size", function()
+        local btn = luna.gui.newButton("Size")
+        btn.setSize(300, 150)
+        local w, h = btn.getSize()
+        expect_equal(300, w)
+        expect_equal(150, h)
+    end)
+
+    it("can set and get visibility", function()
+        local btn = luna.gui.newButton("Vis")
+        expect_equal(true, btn.isVisible())
+        btn.setVisible(false)
+        expect_equal(false, btn.isVisible())
+    end)
+
+    it("can set and get enabled state", function()
+        local btn = luna.gui.newButton("En")
+        expect_equal(true, btn.isEnabled())
+        btn.setEnabled(false)
+        expect_equal(false, btn.isEnabled())
+    end)
+
+    it("can set and get id", function()
+        local btn = luna.gui.newButton("Id")
+        btn.setId("my_button")
+        expect_equal("my_button", btn.getId())
+    end)
+
+    it("can set and get tooltip", function()
+        local btn = luna.gui.newButton("Tip")
+        btn.setTooltip("Click me!")
+        expect_equal("Click me!", btn.getTooltip())
+    end)
+
+    it("can set and get z-order", function()
+        local btn = luna.gui.newButton("Z")
+        btn.setZOrder(10)
+        expect_equal(10, btn.getZOrder())
+    end)
+
+    it("can set and get padding (4 values)", function()
+        local btn = luna.gui.newButton("Pad")
+        btn.setPadding(1, 2, 3, 4)
+        local t, r, b, l = btn.getPadding()
+        expect_equal(1, t)
+        expect_equal(2, r)
+        expect_equal(3, b)
+        expect_equal(4, l)
+    end)
+
+    it("can set padding (1 value = uniform)", function()
+        local btn = luna.gui.newButton("Pad1")
+        btn.setPadding(5)
+        local t, r, b, l = btn.getPadding()
+        expect_equal(5, t)
+        expect_equal(5, r)
+        expect_equal(5, b)
+        expect_equal(5, l)
+    end)
+
+    it("can set and get margin", function()
+        local btn = luna.gui.newButton("Mar")
+        btn.setMargin(10, 20, 10, 20)
+        local t, r, b, l = btn.getMargin()
+        expect_equal(10, t)
+        expect_equal(20, r)
+        expect_equal(10, b)
+        expect_equal(20, l)
+    end)
+
+    it("contains point hit test", function()
+        local btn = luna.gui.newButton("Hit")
+        btn.setPosition(10, 20)
+        btn.setSize(100, 50)
+        expect_equal(true, btn.containsPoint(50, 40))
+        expect_equal(false, btn.containsPoint(200, 200))
+    end)
+
+    it("can set and get min size", function()
+        local btn = luna.gui.newButton("Min")
+        btn.setMinSize(50, 25)
+        local w, h = btn.getMinSize()
+        expect_equal(50, w)
+        expect_equal(25, h)
+    end)
+
+    it("can set and get max size", function()
+        local btn = luna.gui.newButton("Max")
+        btn.setMaxSize(500, 300)
+        local w, h = btn.getMaxSize()
+        expect_equal(500, w)
+        expect_equal(300, h)
+    end)
+
+    it("can set flex grow and shrink", function()
+        local btn = luna.gui.newButton("Flex")
+        btn.setFlexGrow(2.0)
+        expect_equal(2.0, btn.getFlexGrow())
+        btn.setFlexShrink(0.5)
+        expect_equal(0.5, btn.getFlexShrink())
+    end)
+
+    it("getState returns a string", function()
+        local btn = luna.gui.newButton("State")
+        local s = btn.getState()
+        expect_type("string", s)
+        expect_equal("normal", s)
+    end)
+end)
+
+-- =========================================================================
+-- 12. Panel (container)
+-- =========================================================================
+describe("luna.gui Panel", function()
+    it("creates a panel", function()
+        local p = luna.gui.newPanel()
+        expect_type("table", p)
+    end)
+
+    it("can add and count children", function()
+        local p = luna.gui.newPanel()
+        local b1 = luna.gui.newButton("A")
+        local b2 = luna.gui.newButton("B")
+        p.addChild(b1)
+        p.addChild(b2)
+        expect_equal(2, p.getChildCount())
+    end)
+
+    it("can remove children", function()
+        local p = luna.gui.newPanel()
+        local b = luna.gui.newButton("X")
+        p.addChild(b)
+        expect_equal(1, p.getChildCount())
+        p.removeChild(b)
+        expect_equal(0, p.getChildCount())
+    end)
+end)
+
+-- =========================================================================
+-- 13. Layout
+-- =========================================================================
+describe("luna.gui Layout", function()
+    it("creates with default vertical direction", function()
+        local ly = luna.gui.newLayout()
+        expect_equal("vertical", ly.getDirection())
+    end)
+
+    it("creates with specified direction", function()
+        local ly = luna.gui.newLayout("horizontal")
+        expect_equal("horizontal", ly.getDirection())
+    end)
+
+    it("can change direction", function()
+        local ly = luna.gui.newLayout()
+        ly.setDirection("grid")
+        expect_equal("grid", ly.getDirection())
+    end)
+
+    it("can set spacing", function()
+        local ly = luna.gui.newLayout()
+        ly.setSpacing(10)
+        expect_equal(10, ly.getSpacing())
+    end)
+
+    it("can set alignment", function()
+        local ly = luna.gui.newLayout()
+        ly.setAlign("center")
+        expect_equal("center", ly.getAlign())
+    end)
+
+    it("can set justification", function()
+        local ly = luna.gui.newLayout()
+        ly.setJustify("space-between")
+        expect_equal("space-between", ly.getJustify())
+    end)
+end)
+
+-- =========================================================================
+-- 14. ScrollPanel
+-- =========================================================================
+describe("luna.gui ScrollPanel", function()
+    it("creates a scroll panel", function()
+        local sp = luna.gui.newScrollPanel()
+        expect_type("table", sp)
+    end)
+
+    it("can set and get content size", function()
+        local sp = luna.gui.newScrollPanel()
+        sp.setContentSize(800, 600)
+        local w, h = sp.getContentSize()
+        expect_equal(800, w)
+        expect_equal(600, h)
+    end)
+
+    it("can set and get scroll position", function()
+        local sp = luna.gui.newScrollPanel()
+        sp.setContentSize(500, 500)
+        sp.setScrollPosition(50, 100)
+        local sx, sy = sp.getScrollPosition()
+        expect_equal(50, sx)
+        expect_equal(100, sy)
+    end)
+
+    it("can set scroll speed", function()
+        local sp = luna.gui.newScrollPanel()
+        sp.setScrollSpeed(2.0)
+        -- No getter, just verify no error
+    end)
+end)
+
+-- =========================================================================
+-- 15. NinePatch
+-- =========================================================================
+describe("luna.gui NinePatch", function()
+    it("creates a nine-patch widget", function()
+        local np = luna.gui.newNinePatch()
+        expect_type("table", np)
+    end)
+end)
+
+-- =========================================================================
+-- 16. Separator
+-- =========================================================================
+describe("luna.gui Separator", function()
+    it("creates horizontal separator by default", function()
+        local sep = luna.gui.newSeparator()
+        expect_type("table", sep)
+    end)
+
+    it("creates vertical separator", function()
+        local sep = luna.gui.newSeparator(true)
+        expect_type("table", sep)
+    end)
+end)
+
+-- =========================================================================
+-- 17. Spacer
+-- =========================================================================
+describe("luna.gui Spacer", function()
+    it("creates a spacer with default size", function()
+        local sp = luna.gui.newSpacer()
+        expect_type("table", sp)
+    end)
+
+    it("creates a spacer with custom size", function()
+        local sp = luna.gui.newSpacer(50, 25)
+        local w, h = sp.getSize()
+        expect_equal(50, w)
+        expect_equal(25, h)
+    end)
+end)
+
+-- =========================================================================
+-- 18. Toast
+-- =========================================================================
+describe("luna.gui Toast", function()
+    it("creates a toast", function()
+        local t = luna.gui.newToast("Hello!", 3.0)
+        expect_type("table", t)
+    end)
+
+    it("can add toast to context", function()
+        local t = luna.gui.newToast("Msg", 2.0)
+        luna.gui.addToast(t)
+        local count = luna.gui.getToastCount()
+        -- count should be >= 1 (may accumulate from other tests)
+        expect_equal(true, count >= 1)
+    end)
+end)
+
+-- =========================================================================
+-- 19. TreeView
+-- =========================================================================
+describe("luna.gui TreeView", function()
+    it("creates empty tree", function()
+        local tv = luna.gui.newTreeView()
+        expect_equal(0, tv.getNodeCount())
+    end)
+
+    it("can add root nodes", function()
+        local tv = luna.gui.newTreeView()
+        local idx1 = tv.addNode("Root 1")
+        local idx2 = tv.addNode("Root 2")
+        expect_equal(2, tv.getNodeCount())
+        expect_type("number", idx1)
+        expect_type("number", idx2)
+    end)
+
+    it("can add child nodes", function()
+        local tv = luna.gui.newTreeView()
+        local root = tv.addNode("Parent")
+        local child = tv.addNode("Child", root)
+        expect_equal(2, tv.getNodeCount())
+        expect_type("number", child)
+    end)
+
+    it("can toggle node expansion", function()
+        local tv = luna.gui.newTreeView()
+        local root = tv.addNode("Root")
+        -- toggle returns boolean
+        local expanded = tv.toggleNode(root)
+        expect_type("boolean", expanded)
+    end)
+end)
+
+-- =========================================================================
+-- 20. Widget count & root
+-- =========================================================================
+describe("luna.gui widget count", function()
+    it("getWidgetCount returns a number", function()
+        local count = luna.gui.getWidgetCount()
+        expect_type("number", count)
+        expect_equal(true, count >= 0)
+    end)
+
+    it("getRoot returns a table", function()
+        local root = luna.gui.getRoot()
+        expect_type("table", root)
+    end)
+end)
+
+-- =========================================================================
+-- 21. Focus management
+-- =========================================================================
+describe("luna.gui focus", function()
+    it("clearFocus works without error", function()
+        luna.gui.clearFocus()
+    end)
+
+    it("getFocus returns nil when no focus", function()
+        luna.gui.clearFocus()
+        local f = luna.gui.getFocus()
+        expect_equal(nil, f)
+    end)
+
+    it("setFocus and getFocus work", function()
+        local btn = luna.gui.newButton("Focus Test")
+        luna.gui.setFocus(btn)
+        local f = luna.gui.getFocus()
+        expect_type("number", f)
+    end)
+
+    it("focusNext moves focus", function()
+        local b1 = luna.gui.newButton("N1")
+        local b2 = luna.gui.newButton("N2")
+        luna.gui.setFocus(b1)
+        luna.gui.focusNext()
+        -- focus should have moved
+        local f = luna.gui.getFocus()
+        expect_type("number", f)
+    end)
+end)
+
+-- =========================================================================
+-- 22. Input routing
+-- =========================================================================
+describe("luna.gui input routing", function()
+    it("mousepressed returns boolean", function()
+        local consumed = luna.gui.mousepressed(100, 100, 1)
+        expect_type("boolean", consumed)
+    end)
+
+    it("mousereleased returns boolean", function()
+        local consumed = luna.gui.mousereleased(100, 100, 1)
+        expect_type("boolean", consumed)
+    end)
+
+    it("mousemoved returns boolean", function()
+        local consumed = luna.gui.mousemoved(100, 100, 0, 0)
+        expect_type("boolean", consumed)
+    end)
+
+    it("keypressed returns boolean", function()
+        local consumed = luna.gui.keypressed("tab")
+        expect_type("boolean", consumed)
+    end)
+
+    it("textinput returns boolean", function()
+        local consumed = luna.gui.textinput("a")
+        expect_type("boolean", consumed)
+    end)
+
+    it("wheelmoved returns boolean", function()
+        local consumed = luna.gui.wheelmoved(0, -1)
+        expect_type("boolean", consumed)
+    end)
+end)
+
+-- =========================================================================
+-- 23. Update & draw (headless: no-op but should not error)
+-- =========================================================================
+describe("luna.gui update and draw", function()
+    it("update runs without error", function()
+        luna.gui.update(0.016)
+    end)
+
+    it("draw runs without error", function()
+        luna.gui.draw()
+    end)
+end)
+
+-- =========================================================================
+-- 24. Theme
+-- =========================================================================
+describe("luna.gui Theme", function()
+    it("creates a theme", function()
+        local theme = luna.gui.newTheme()
+        expect_type("table", theme)
+    end)
+
+    it("can set and get theme", function()
+        local theme = luna.gui.newTheme()
+        luna.gui.setTheme(theme)
+        local t = luna.gui.getTheme()
+        expect_type("boolean", t)
+    end)
+end)
+
+-- =========================================================================
+-- 25. findById
+-- =========================================================================
+describe("luna.gui findById", function()
+    it("finds a widget by id", function()
+        local btn = luna.gui.newButton("Find Me")
+        btn.setId("unique_btn")
+        local found = btn.findById("unique_btn")
+        -- findById searches from root; returned widget is a table or nil
+        -- Since btn is the one with the id, it should find itself
+        -- Note: depends on context-wide search
+    end)
+end)
+
+-- =========================================================================
+-- 26. Callbacks (onClick, onChange, onDraw)
+-- =========================================================================
+describe("luna.gui callbacks", function()
+    it("setOnClick accepts a function", function()
+        local btn = luna.gui.newButton("Clickable")
+        local clicked = false
+        btn.setOnClick(function()
+            clicked = true
+        end)
+        -- Callback is stored but not invoked here
+    end)
+
+    it("setOnChange accepts a function", function()
+        local sl = luna.gui.newSlider(0, 100)
+        sl.setOnChange(function(val) end)
+    end)
+
+    it("setOnDraw accepts a function", function()
+        local p = luna.gui.newPanel()
+        p.setOnDraw(function() end)
+    end)
+end)
+
+-- =========================================================================
+-- 22. RadioButton
+-- =========================================================================
+describe("luna.gui.newRadioButton", function()
+    it("creates a radio button", function()
+        local rb = luna.gui.newRadioButton("Option A", "group1")
+        expect_type("table", rb)
+    end)
+    it("has correct text", function()
+        local rb = luna.gui.newRadioButton("Opt", "g")
+        expect_equal("Opt", rb.getText())
+    end)
+    it("defaults to not selected", function()
+        local rb = luna.gui.newRadioButton("X", "g")
+        expect_equal(false, rb.isSelected())
+    end)
+    it("can set selected", function()
+        local rb = luna.gui.newRadioButton("X", "g")
+        rb.setSelected(true)
+        expect_equal(true, rb.isSelected())
+    end)
+    it("has group", function()
+        local rb = luna.gui.newRadioButton("X", "mygroup")
+        expect_equal("mygroup", rb.getGroup())
+    end)
+    it("has base widget methods", function()
+        local rb = luna.gui.newRadioButton("A", "g")
+        expect_type("function", rb.setPosition)
+        expect_type("function", rb.setSize)
+        expect_type("function", rb.setVisible)
+    end)
+end)
+
+-- =========================================================================
+-- 23. ScrollBar
+-- =========================================================================
+describe("luna.gui.newScrollBar", function()
+    it("creates a scroll bar", function()
+        local sb = luna.gui.newScrollBar(true)
+        expect_type("table", sb)
+    end)
+    it("defaults position to 0", function()
+        local sb = luna.gui.newScrollBar(true)
+        expect_near(0, sb.getScrollPosition(), 0.001)
+    end)
+    it("can set position", function()
+        local sb = luna.gui.newScrollBar(false)
+        sb.setScrollPosition(42)
+        expect_near(42, sb.getScrollPosition(), 0.001)
+    end)
+    it("default content size is 100", function()
+        local sb = luna.gui.newScrollBar(true)
+        expect_near(100, sb.getContentSize(), 0.001)
+    end)
+    it("default view size is 50", function()
+        local sb = luna.gui.newScrollBar(true)
+        expect_near(50, sb.getViewSize(), 0.001)
+    end)
+    it("can set content and view sizes", function()
+        local sb = luna.gui.newScrollBar(true)
+        sb.setContentSize(200)
+        sb.setViewSize(80)
+        expect_near(200, sb.getContentSize(), 0.001)
+        expect_near(80, sb.getViewSize(), 0.001)
+    end)
+    it("vertical flag persists", function()
+        local v = luna.gui.newScrollBar(true)
+        local h = luna.gui.newScrollBar(false)
+        expect_equal(true, v.isVertical())
+        expect_equal(false, h.isVertical())
+    end)
+end)
+
+-- =========================================================================
+-- 24. GUIWindow
+-- =========================================================================
+describe("luna.gui.newWindow", function()
+    it("creates a window", function()
+        local w = luna.gui.newWindow("Title")
+        expect_type("table", w)
+    end)
+    it("has correct title", function()
+        local w = luna.gui.newWindow("My Win")
+        expect_equal("My Win", w.getTitle())
+    end)
+    it("defaults closeable true", function()
+        local w = luna.gui.newWindow("W")
+        expect_equal(true, w.isCloseable())
+    end)
+    it("defaults draggable true", function()
+        local w = luna.gui.newWindow("W")
+        expect_equal(true, w.isDraggable())
+    end)
+    it("defaults resizable false", function()
+        local w = luna.gui.newWindow("W")
+        expect_equal(false, w.isResizable())
+    end)
+    it("can toggle closeable", function()
+        local w = luna.gui.newWindow("W")
+        w.setCloseable(false)
+        expect_equal(false, w.isCloseable())
+    end)
+    it("can add child", function()
+        local w = luna.gui.newWindow("W")
+        local btn = luna.gui.newButton("B")
+        w.addChild(btn._idx)
+        expect_equal(1, #w.getChildren())
+    end)
+end)
+
+-- =========================================================================
+-- 25. SplitPanel
+-- =========================================================================
+describe("luna.gui.newSplitPanel", function()
+    it("creates a split panel", function()
+        local sp = luna.gui.newSplitPanel("horizontal")
+        expect_type("table", sp)
+    end)
+    it("has correct orientation", function()
+        local sp = luna.gui.newSplitPanel("vertical")
+        expect_equal("vertical", sp.getOrientation())
+    end)
+    it("default split position is 0.5", function()
+        local sp = luna.gui.newSplitPanel("horizontal")
+        expect_near(0.5, sp.getSplitPosition(), 0.001)
+    end)
+    it("can set split position", function()
+        local sp = luna.gui.newSplitPanel("horizontal")
+        sp.setSplitPosition(0.3)
+        expect_near(0.3, sp.getSplitPosition(), 0.001)
+    end)
+    it("can set min panel size", function()
+        local sp = luna.gui.newSplitPanel("horizontal")
+        sp.setMinPanelSize(100)
+        expect_near(100, sp.getMinPanelSize(), 0.001)
+    end)
+end)
+
+-- =========================================================================
+-- 26. DockPanel
+-- =========================================================================
+describe("luna.gui.newDockPanel", function()
+    it("creates a dock panel", function()
+        local dp = luna.gui.newDockPanel()
+        expect_type("table", dp)
+    end)
+    it("starts with 0 docked", function()
+        local dp = luna.gui.newDockPanel()
+        expect_equal(0, dp.getDockedCount())
+    end)
+    it("can dock a child", function()
+        local dp = luna.gui.newDockPanel()
+        local btn = luna.gui.newButton("B")
+        dp.dock(btn._idx, "left")
+        expect_equal(1, dp.getDockedCount())
+    end)
+    it("can set split size", function()
+        local dp = luna.gui.newDockPanel()
+        dp.setSplitSize("left", 200)
+        expect_near(200, dp.getSplitSize("left"), 0.001)
+    end)
+end)
+
+-- =========================================================================
+-- 27. Toolbar
+-- =========================================================================
+describe("luna.gui.newToolbar", function()
+    it("creates a toolbar", function()
+        local tb = luna.gui.newToolbar("horizontal")
+        expect_type("table", tb)
+    end)
+    it("has orientation", function()
+        local tb = luna.gui.newToolbar("vertical")
+        expect_equal("vertical", tb.getOrientation())
+    end)
+    it("can add child", function()
+        local tb = luna.gui.newToolbar("horizontal")
+        local btn = luna.gui.newButton("B")
+        tb.addChild(btn._idx)
+        expect_equal(1, tb.getChildCount())
+    end)
+end)
+
+-- =========================================================================
+-- 28. MenuBar
+-- =========================================================================
+describe("luna.gui.newMenuBar", function()
+    it("creates a menu bar", function()
+        local mb = luna.gui.newMenuBar()
+        expect_type("table", mb)
+    end)
+    it("starts with 0 menus", function()
+        local mb = luna.gui.newMenuBar()
+        expect_equal(0, mb.getMenuCount())
+    end)
+    it("can add menu", function()
+        local mb = luna.gui.newMenuBar()
+        local mi = luna.gui.newMenuItem("File")
+        mb.addMenu(mi._idx)
+        expect_equal(1, mb.getMenuCount())
+    end)
+end)
+
+-- =========================================================================
+-- 29. MenuItem
+-- =========================================================================
+describe("luna.gui.newMenuItem", function()
+    it("creates a menu item", function()
+        local mi = luna.gui.newMenuItem("Edit")
+        expect_type("table", mi)
+    end)
+    it("has correct text", function()
+        local mi = luna.gui.newMenuItem("File")
+        expect_equal("File", mi.getText())
+    end)
+    it("defaults unchecked", function()
+        local mi = luna.gui.newMenuItem("X")
+        expect_equal(false, mi.isChecked())
+    end)
+    it("can set shortcut", function()
+        local mi = luna.gui.newMenuItem("Save")
+        mi.setShortcut("Ctrl+S")
+        expect_equal("Ctrl+S", mi.getShortcut())
+    end)
+    it("can add sub-item", function()
+        local mi = luna.gui.newMenuItem("File")
+        local sub = luna.gui.newMenuItem("Open")
+        mi.addSubItem(sub._idx)
+        expect_equal(1, #mi.getSubItems())
+    end)
+end)
+
+-- =========================================================================
+-- 30. Dialog
+-- =========================================================================
+describe("luna.gui.newDialog", function()
+    it("creates a dialog", function()
+        local d = luna.gui.newDialog("Confirm")
+        expect_type("table", d)
+    end)
+    it("has title", function()
+        local d = luna.gui.newDialog("Save?")
+        expect_equal("Save?", d.getTitle())
+    end)
+    it("defaults modal true", function()
+        local d = luna.gui.newDialog("D")
+        expect_equal(true, d.isModal())
+    end)
+    it("defaults not open", function()
+        local d = luna.gui.newDialog("D")
+        expect_equal(false, d.isOpen())
+    end)
+    it("can open and close", function()
+        local d = luna.gui.newDialog("D")
+        d.open()
+        expect_equal(true, d.isOpen())
+        d.close()
+        expect_equal(false, d.isOpen())
+    end)
+end)
+
+-- =========================================================================
+-- 31. StatusBar
+-- =========================================================================
+describe("luna.gui.newStatusBar", function()
+    it("creates a status bar", function()
+        local sb = luna.gui.newStatusBar()
+        expect_type("table", sb)
+    end)
+    it("starts with 0 sections", function()
+        local sb = luna.gui.newStatusBar()
+        expect_equal(0, sb.getSectionCount())
+    end)
+    it("can add section", function()
+        local sb = luna.gui.newStatusBar()
+        sb.addSection("Ready", 100)
+        expect_equal(1, sb.getSectionCount())
+    end)
+    it("can set section text", function()
+        local sb = luna.gui.newStatusBar()
+        sb.addSection("Info", 120)
+        sb.setSectionText(1, "Updated")
+        expect_equal("Updated", sb.getSectionText(1))
+    end)
+end)
+
+-- =========================================================================
+-- 32. Accordion
+-- =========================================================================
+describe("luna.gui.newAccordion", function()
+    it("creates an accordion", function()
+        local a = luna.gui.newAccordion()
+        expect_type("table", a)
+    end)
+    it("starts with 0 sections", function()
+        local a = luna.gui.newAccordion()
+        expect_equal(0, a.getSectionCount())
+    end)
+    it("defaults non-exclusive", function()
+        local a = luna.gui.newAccordion()
+        expect_equal(false, a.isExclusive())
+    end)
+    it("can set exclusive", function()
+        local a = luna.gui.newAccordion()
+        a.setExclusive(true)
+        expect_equal(true, a.isExclusive())
+    end)
+    it("can add section", function()
+        local a = luna.gui.newAccordion()
+        a.addSection("Section 1")
+        expect_equal(1, a.getSectionCount())
+    end)
+    it("can expand section", function()
+        local a = luna.gui.newAccordion()
+        a.addSection("S1")
+        a.toggleSection(1)
+        expect_equal(true, a.isSectionExpanded(1))
+    end)
+    it("can collapse section", function()
+        local a = luna.gui.newAccordion()
+        a.addSection("S1")
+        a.toggleSection(1)
+        a.toggleSection(1)
+        expect_equal(false, a.isSectionExpanded(1))
+    end)
+end)
+
+-- =========================================================================
+-- 33. TooltipPanel
+-- =========================================================================
+describe("luna.gui.newTooltipPanel", function()
+    it("creates a tooltip panel", function()
+        local tp = luna.gui.newTooltipPanel("Help text")
+        expect_type("table", tp)
+    end)
+    it("has correct text", function()
+        local tp = luna.gui.newTooltipPanel("Tip")
+        expect_equal("Tip", tp.getText())
+    end)
+    it("can set text", function()
+        local tp = luna.gui.newTooltipPanel("Old")
+        tp.setText("New")
+        expect_equal("New", tp.getText())
+    end)
+    it("default delay is 0.5", function()
+        local tp = luna.gui.newTooltipPanel("T")
+        expect_near(0.5, tp.getDelay(), 0.001)
+    end)
+    it("can set delay", function()
+        local tp = luna.gui.newTooltipPanel("T")
+        tp.setDelay(1.0)
+        expect_near(1.0, tp.getDelay(), 0.001)
+    end)
+end)
+
+-- =========================================================================
+-- 34. ColorPicker
+-- =========================================================================
+describe("luna.gui.newColorPicker", function()
+    it("creates a color picker", function()
+        local cp = luna.gui.newColorPicker()
+        expect_type("table", cp)
+    end)
+    it("default color is white", function()
+        local cp = luna.gui.newColorPicker()
+        local r, g, b, a = cp.getColor()
+        expect_near(1.0, r, 0.001)
+        expect_near(1.0, g, 0.001)
+        expect_near(1.0, b, 0.001)
+        expect_near(1.0, a, 0.001)
+    end)
+    it("can set color", function()
+        local cp = luna.gui.newColorPicker()
+        cp.setColor(0.5, 0.3, 0.1, 0.9)
+        local r, g, b, a = cp.getColor()
+        expect_near(0.5, r, 0.001)
+        expect_near(0.3, g, 0.001)
+        expect_near(0.1, b, 0.001)
+        expect_near(0.9, a, 0.001)
+    end)
+    it("default shows alpha", function()
+        local cp = luna.gui.newColorPicker()
+        expect_equal(true, cp.getShowAlpha())
+    end)
+    it("default color mode is rgb", function()
+        local cp = luna.gui.newColorPicker()
+        expect_equal("rgb", cp.getColorMode())
+    end)
+    it("can set color mode", function()
+        local cp = luna.gui.newColorPicker()
+        cp.setColorMode("hsv")
+        expect_equal("hsv", cp.getColorMode())
+    end)
+end)
+
+-- =========================================================================
+-- 35. GUITable
+-- =========================================================================
+describe("luna.gui.newTable", function()
+    it("creates a table", function()
+        local t = luna.gui.newTable()
+        expect_type("table", t)
+    end)
+    it("starts with 0 columns", function()
+        local t = luna.gui.newTable()
+        expect_equal(0, t.getColumnCount())
+    end)
+    it("starts with 0 rows", function()
+        local t = luna.gui.newTable()
+        expect_equal(0, t.getRowCount())
+    end)
+    it("can add column", function()
+        local t = luna.gui.newTable()
+        t.addColumn("Name", 100)
+        expect_equal(1, t.getColumnCount())
+    end)
+    it("can add row", function()
+        local t = luna.gui.newTable()
+        t.addColumn("Name", 100)
+        t.addRow({"Alice"})
+        expect_equal(1, t.getRowCount())
+    end)
+    it("no selected row by default", function()
+        local t = luna.gui.newTable()
+        expect_equal(nil, t.getSelectedRow())
+    end)
+    it("can select row after adding", function()
+        local t = luna.gui.newTable()
+        t.addColumn("Name", 100)
+        t.addRow({"Alice"})
+        t.setSelectedRow(1)
+        expect_equal(1, t.getSelectedRow())
+    end)
+    it("can set sortable", function()
+        local t = luna.gui.newTable()
+        t.setSortable(true)
+        expect_equal(true, t.isSortable())
+    end)
+end)
+
+-- =========================================================================
+-- 36. ImageWidget
+-- =========================================================================
+describe("luna.gui.newImageWidget", function()
+    it("creates an image widget", function()
+        local iw = luna.gui.newImageWidget()
+        expect_type("table", iw)
+    end)
+    it("default scale mode is fit", function()
+        local iw = luna.gui.newImageWidget()
+        expect_equal("fit", iw.getScaleMode())
+    end)
+    it("can set scale mode", function()
+        local iw = luna.gui.newImageWidget()
+        iw.setScaleMode("fill")
+        expect_equal("fill", iw.getScaleMode())
+    end)
+    it("default tint is white", function()
+        local iw = luna.gui.newImageWidget()
+        local r, g, b, a = iw.getTint()
+        expect_near(1.0, r, 0.001)
+        expect_near(1.0, g, 0.001)
+        expect_near(1.0, b, 0.001)
+        expect_near(1.0, a, 0.001)
+    end)
+    it("can set tint", function()
+        local iw = luna.gui.newImageWidget()
+        iw.setTint(0.5, 0.2, 0.8, 1.0)
+        local r, g, b, a = iw.getTint()
+        expect_near(0.5, r, 0.001)
+        expect_near(0.2, g, 0.001)
+        expect_near(0.8, b, 0.001)
+        expect_near(1.0, a, 0.001)
+    end)
+end)
+
+
+test_summary()

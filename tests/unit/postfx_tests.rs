@@ -341,7 +341,7 @@ fn test_lua_postfx_get_effect_types() {
         "#)
         .eval()
         .expect("Lua eval failed");
-    assert_eq!(count, 7);
+    assert_eq!(count, 15); // 7 original + 8 new: pixelate,sepia,grayscale,invert,scanlines,edgedetect,hueshift,noise
 }
 
 #[test]
@@ -369,4 +369,157 @@ fn test_lua_postfx_effect_type_method() {
         .eval()
         .expect("Lua eval failed");
     assert_eq!(t, "PostFxEffect");
+}
+
+// ── New effect type Rust tests ─────────────────────────────────────────────
+
+#[test]
+fn pixelate_default_params_has_block_size() {
+    let e = PostFxEffect::new(PostFxEffectType::Pixelate);
+    assert!((e.get_parameter("block_size", 0.0) - 4.0).abs() < 1e-5);
+}
+
+#[test]
+fn sepia_default_params_has_strength() {
+    let e = PostFxEffect::new(PostFxEffectType::Sepia);
+    assert!((e.get_parameter("strength", 0.0) - 1.0).abs() < 1e-5);
+}
+
+#[test]
+fn grayscale_default_params_has_strength() {
+    let e = PostFxEffect::new(PostFxEffectType::Grayscale);
+    assert!((e.get_parameter("strength", 0.0) - 1.0).abs() < 1e-5);
+}
+
+#[test]
+fn invert_default_params_has_strength() {
+    let e = PostFxEffect::new(PostFxEffectType::Invert);
+    assert!((e.get_parameter("strength", 0.0) - 1.0).abs() < 1e-5);
+}
+
+#[test]
+fn scanlines_default_params_has_strength_and_spacing() {
+    let e = PostFxEffect::new(PostFxEffectType::Scanlines);
+    assert!((e.get_parameter("strength", 0.0) - 0.5).abs() < 1e-5);
+    assert!((e.get_parameter("spacing", 0.0) - 4.0).abs() < 1e-5);
+}
+
+#[test]
+fn edge_detect_default_params_has_strength() {
+    let e = PostFxEffect::new(PostFxEffectType::EdgeDetect);
+    assert!((e.get_parameter("strength", 0.0) - 1.0).abs() < 1e-5);
+}
+
+#[test]
+fn hue_shift_default_params_has_angle() {
+    let e = PostFxEffect::new(PostFxEffectType::HueShift);
+    assert!((e.get_parameter("angle", 999.0) - 0.0).abs() < 1e-5);
+}
+
+#[test]
+fn noise_default_params_has_strength() {
+    let e = PostFxEffect::new(PostFxEffectType::Noise);
+    assert!((e.get_parameter("strength", 0.0) - 0.1).abs() < 1e-5);
+}
+
+#[test]
+fn all_new_effect_types_are_built_in() {
+    let new_types = [
+        PostFxEffectType::Pixelate,
+        PostFxEffectType::Sepia,
+        PostFxEffectType::Grayscale,
+        PostFxEffectType::Invert,
+        PostFxEffectType::Scanlines,
+        PostFxEffectType::EdgeDetect,
+        PostFxEffectType::HueShift,
+        PostFxEffectType::Noise,
+    ];
+    for t in &new_types {
+        assert!(PostFxEffect::new(t.clone()).is_built_in(), "{:?} should be built-in", t);
+    }
+}
+
+#[test]
+fn all_new_effect_types_round_trip_name() {
+    let new_names = [
+        "pixelate", "sepia", "grayscale", "invert", "scanlines", "edgedetect", "hueshift", "noise",
+    ];
+    for name in &new_names {
+        let t = PostFxEffectType::from_name(name);
+        assert!(t.is_some(), "from_name({}) returned None", name);
+        assert_eq!(t.unwrap().name(), *name, "name() round-trip failed for {}", name);
+    }
+}
+
+// ── New effect types via Lua API ───────────────────────────────────────────
+
+#[test]
+fn lua_pixelate_effect_has_block_size_param() {
+    let lua = make_vm();
+    let v: f32 = lua
+        .load(r#"
+            local e = luna.postfx.newEffect("pixelate")
+            return e:getParameter("block_size")
+        "#)
+        .eval()
+        .expect("Lua eval failed");
+    assert!((v - 4.0).abs() < 1e-5);
+}
+
+#[test]
+fn lua_sepia_effect_built_in() {
+    let lua = make_vm();
+    let ok: bool = lua
+        .load(r#"
+            local e = luna.postfx.newEffect("sepia")
+            return e:isBuiltIn()
+        "#)
+        .eval()
+        .expect("Lua eval failed");
+    assert!(ok);
+}
+
+#[test]
+fn lua_scanlines_effect_has_spacing_param() {
+    let lua = make_vm();
+    let v: f32 = lua
+        .load(r#"
+            local e = luna.postfx.newEffect("scanlines")
+            return e:getParameter("spacing")
+        "#)
+        .eval()
+        .expect("Lua eval failed");
+    assert!((v - 4.0).abs() < 1e-5);
+}
+
+#[test]
+fn lua_new_effects_stack_add_remove() {
+    let lua = make_vm();
+    let count: i32 = lua
+        .load(r#"
+            local stack = luna.postfx.newStack(800, 600)
+            local pixelate = luna.postfx.newEffect("pixelate")
+            local sepia     = luna.postfx.newEffect("sepia")
+            local grayscale = luna.postfx.newEffect("grayscale")
+            stack:add(pixelate)
+            stack:add(sepia)
+            stack:add(grayscale)
+            return stack:getEffectCount()
+        "#)
+        .eval()
+        .expect("Lua eval failed");
+    assert_eq!(count, 3);
+}
+
+#[test]
+fn lua_hueshift_effect_name_roundtrip() {
+    let lua = make_vm();
+    let name: String = lua
+        .load(r#"
+            local e = luna.postfx.newEffect("hueshift")
+            return e:getEffectType()
+        "#)
+        .eval()
+        .expect("Lua eval failed");
+    assert_eq!(name, "hueshift");
 }

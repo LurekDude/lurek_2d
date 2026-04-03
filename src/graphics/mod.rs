@@ -6,6 +6,8 @@
 //! All public items are documented. See the parent module for architectural context
 //! and the `luna.*` Lua API for the scripting interface.
 //!
+/// Compound shape builder that accumulates vector primitives for batched drawing.
+pub mod shape;
 /// Sprite-sheet frame animation with configurable durations and looping.
 pub mod animation;
 /// 2D camera with position, zoom, and rotation producing a view matrix.
@@ -79,6 +81,7 @@ pub use renderer::{
     StencilMode, TextAlign, TextureData,
 };
 pub use shader::{Shader, UniformValue};
+pub use shape::{CompoundShape, ShapeCommand};
 pub use sprite::Sprite;
 pub use sprite_batch::SpriteBatch;
 pub use sprite_sheet::SpriteSheet;

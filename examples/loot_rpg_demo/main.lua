@@ -1,16 +1,23 @@
+﻿-- Loot RPG Demo -- Luna2D item + inventory integration
+
+local item      = require("library.item")
+local inventory = require("library.inventory")
+local item      = require("library.item")
+local inventory = require("library.inventory")
+
 --[[
   loot_rpg_demo — Item System + Inventory Integration Example
   ─────────────────────────────────────────────────────────────
   Demonstrates how luna.item and luna.inventory work together in a
   dungeon-crawler style RPG:
 
-    • Item type catalog       (luna.item.defineType)
-    • Random loot pool        (luna.item.newItemPool)
-    • Gear loadout builder    (luna.item.newStackBuilder)
-    • Pickup journal          (luna.item.newHistory)
-    • Weight-limited backpack (luna.inventory.newContainer with weight limit)
-    • Equipment slots         (luna.inventory.newInventory)
-    • Shop with StackManager  (luna.item.newStackManager)
+    • Item type catalog       (item.defineType)
+    • Random loot pool        (item.newItemPool)
+    • Gear loadout builder    (item.newStackBuilder)
+    • Pickup journal          (item.newHistory)
+    • Weight-limited backpack (inventory.newContainer with weight limit)
+    • Equipment slots         (inventory.newInventory)
+    • Shop with StackManager  (item.newStackManager)
 
   Press SPACE to clear a new dungeon room (new loot drop).
   Press E to auto-equip best gear from your backpack.
@@ -22,17 +29,17 @@ local BAG_WEIGHT_LIMIT = 20.0
 local SHOP_STOCK       = 5
 
 -- ── 1. Item type catalog ──────────────────────────────────────────────────
-luna.item.clearTypes()
-luna.item.defineType("sword",    { category = "weapon",    base_stats = { dmg = 12, weight = 3.5 }, base_tags = {"equippable","weapon"} })
-luna.item.defineType("dagger",   { category = "weapon",    base_stats = { dmg =  7, weight = 1.0 }, base_tags = {"equippable","weapon"} })
-luna.item.defineType("shield",   { category = "armor",     base_stats = { def =  8, weight = 5.0 }, base_tags = {"equippable","armor"} })
-luna.item.defineType("helmet",   { category = "armor",     base_stats = { def =  4, weight = 2.0 }, base_tags = {"equippable","armor"} })
-luna.item.defineType("potion",   { category = "consumable",base_stats = { hp  = 50, weight = 0.5 }, base_tags = {"consumable"} })
-luna.item.defineType("arrow",    { category = "ammo",      base_stats = { dmg =  3, weight = 0.1 }, base_tags = {"ammo","stackable"} })
-luna.item.defineType("coin",     { category = "currency",  base_stats = { value=  1, weight = 0.01},base_tags = {"currency","stackable"} })
+item.clearTypes()
+item.defineType("sword",    { category = "weapon",    base_stats = { dmg = 12, weight = 3.5 }, base_tags = {"equippable","weapon"} })
+item.defineType("dagger",   { category = "weapon",    base_stats = { dmg =  7, weight = 1.0 }, base_tags = {"equippable","weapon"} })
+item.defineType("shield",   { category = "armor",     base_stats = { def =  8, weight = 5.0 }, base_tags = {"equippable","armor"} })
+item.defineType("helmet",   { category = "armor",     base_stats = { def =  4, weight = 2.0 }, base_tags = {"equippable","armor"} })
+item.defineType("potion",   { category = "consumable",base_stats = { hp  = 50, weight = 0.5 }, base_tags = {"consumable"} })
+item.defineType("arrow",    { category = "ammo",      base_stats = { dmg =  3, weight = 0.1 }, base_tags = {"ammo","stackable"} })
+item.defineType("coin",     { category = "currency",  base_stats = { value=  1, weight = 0.01},base_tags = {"currency","stackable"} })
 
 -- ── 2. Loot pool for dungeon rooms ────────────────────────────────────────
-local loot_pool = luna.item.newItemPool()
+local loot_pool = item.newItemPool()
 loot_pool:addType("coin",    20)
 loot_pool:addType("arrow",   15)
 loot_pool:addType("potion",   8)
@@ -42,30 +49,30 @@ loot_pool:addType("sword",    2)
 loot_pool:addType("shield",   1)
 
 -- ── 3. Starter loadout from StackBuilder ──────────────────────────────────
-local starter_builder = luna.item.newStackBuilder()
+local starter_builder = item.newStackBuilder()
 starter_builder:add("dagger", 1)
 starter_builder:add("potion", 2)
 starter_builder:add("coin",   10)
 local starter_gear = starter_builder:build("starter")
 
 -- ── 4. Pickup journal ─────────────────────────────────────────────────────
-local pickup_log = luna.item.newHistory(20)
+local pickup_log = item.newHistory(20)
 
 -- ── 5. Player inventory ───────────────────────────────────────────────────
-local player_inv  = luna.inventory.newInventory()
-local player_bag  = luna.inventory.newContainer("bag", "dynamic", 30)
+local player_inv  = inventory.newInventory()
+local player_bag  = inventory.newContainer("bag", "dynamic", 30)
 player_bag:setWeightLimit(BAG_WEIGHT_LIMIT)
 player_inv:addContainer("bag", player_bag)
 
 -- Equipment slots (each holds one item of the given type)
-local weapon_slot = luna.inventory.newSlot("weapon", "active")
-local armor_slot  = luna.inventory.newSlot("armor",  "active")
+local weapon_slot = inventory.newSlot("weapon", "active")
+local armor_slot  = inventory.newSlot("armor",  "active")
 
 -- ── 6. Shop (StackManager) ────────────────────────────────────────────────
-local shop = luna.item.newStackManager()
-local shop_potions = luna.item.newStack("shop_potions")
+local shop = item.newStackManager()
+local shop_potions = item.newStack("shop_potions")
 for i = 1, SHOP_STOCK do
-    shop_potions:push(luna.item.newItem("potion"))
+    shop_potions:push(item.newItem("potion"))
 end
 shop:addStack("potions", shop_potions)
 
@@ -74,13 +81,13 @@ local player = { hp = 100, max_hp = 100, equipped_dmg = 0, equipped_def = 0, coi
 
 -- ── Helpers ───────────────────────────────────────────────────────────────
 local function add_to_bag(item_obj)
-    local inv_item = luna.inventory.newItem(item_obj:getType())
+    local inv_item = inventory.newItem(item_obj:getType())
     local weight   = item_obj:getStat("weight")
     inv_item:setWeight(weight)
 
     local ok, err = pcall(function() player_bag:addItem(inv_item) end)
     if ok then
-        local bag_stack = luna.item.newStack("journal_temp")
+        local bag_stack = item.newStack("journal_temp")
         bag_stack:push(item_obj)
         pickup_log:recordCustom("bag", "picked_up_"..item_obj:getType(), bag_stack:size())
     end
@@ -122,7 +129,7 @@ local function auto_equip()
             local st = slot:getStack()
             if st then
                 local it_type = st:getItem():getType()
-                local ref_item = luna.item.newItem(it_type)
+                local ref_item = item.newItem(it_type)
                 if ref_item:hasTag("weapon") then
                     table.insert(weapons, ref_item)
                 elseif ref_item:hasTag("armor") then
@@ -134,14 +141,14 @@ local function auto_equip()
 
     -- Pick best weapon by dmg
     if #weapons > 0 then
-        local best = luna.item.findNOfStat(weapons, "dmg", 1)
+        local best = item.findNOfStat(weapons, "dmg", 1)
         if best and best[1] then
             player.equipped_dmg = weapons[best[1]+1]:getStat("dmg")
         end
     end
     -- Pick best armor by def
     if #armors > 0 then
-        local best = luna.item.findNOfStat(armors, "def", 1)
+        local best = item.findNOfStat(armors, "def", 1)
         if best and best[1] then
             player.equipped_def = armors[best[1]+1]:getStat("def")
         end
@@ -255,12 +262,12 @@ function luna.draw()
     luna.graphics.print("[SPACE] clear room  [E] auto-equip best gear  [B] buy potion (5c)  [H] use potion", 30, 366)
 
     -- ── Item type catalog panel ───────────────────────────────────────────
-    draw_panel(20, 420, 760, 160, "ITEM CATALOG  (luna.item.getTypeNames)")
-    local names = luna.item.getTypeNames()
+    draw_panel(20, 420, 760, 160, "ITEM CATALOG  (item.getTypeNames)")
+    local names = item.getTypeNames()
     local col_x = 30
     local cat_y = 446
     for i, name in ipairs(names) do
-        local def = luna.item.getType(name)
+        local def = item.getType(name)
         if def then
             local stats_str = ""
             for k, v in pairs(def.base_stats or {}) do
@@ -275,3 +282,4 @@ function luna.draw()
         end
     end
 end
+

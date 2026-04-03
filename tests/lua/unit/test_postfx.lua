@@ -77,10 +77,10 @@ describe("luna.postfx.newPass custom effects", function()
 end)
 
 describe("luna.postfx.getEffectTypes", function()
-    it("returns table of 7 types", function()
+    it("returns table of 15 types", function()
         local types = luna.postfx.getEffectTypes()
         expect_type("table", types)
-        expect_equal(#types, 7)
+        expect_equal(#types, 15)
     end)
 
     it("contains bloom", function()
@@ -297,6 +297,72 @@ describe("PostFxStack capturing state", function()
     it("not capturing by default", function()
         local stack = luna.postfx.newStack()
         expect_equal(stack:isCapturing(), false)
+    end)
+end)
+
+-- ── New effect types ─────────────────────────────────────────────────────────
+
+describe("New effect types — construction and defaults", function()
+    it("pixelate has block_size default 4.0", function()
+        local e = luna.postfx.newEffect("pixelate")
+        expect_equal(math.abs(e:getParameter("block_size") - 4.0) < 0.001, true)
+    end)
+
+    it("sepia has strength default 1.0", function()
+        local e = luna.postfx.newEffect("sepia")
+        expect_equal(math.abs(e:getParameter("strength") - 1.0) < 0.001, true)
+    end)
+
+    it("grayscale is built-in", function()
+        local e = luna.postfx.newEffect("grayscale")
+        expect_equal(e:isBuiltIn(), true)
+    end)
+
+    it("invert has strength default 1.0", function()
+        local e = luna.postfx.newEffect("invert")
+        expect_equal(math.abs(e:getParameter("strength") - 1.0) < 0.001, true)
+    end)
+
+    it("scanlines has spacing default 4.0", function()
+        local e = luna.postfx.newEffect("scanlines")
+        expect_equal(math.abs(e:getParameter("spacing") - 4.0) < 0.001, true)
+    end)
+
+    it("edgedetect has strength default 1.0", function()
+        local e = luna.postfx.newEffect("edgedetect")
+        expect_equal(math.abs(e:getParameter("strength") - 1.0) < 0.001, true)
+    end)
+
+    it("hueshift has angle default 0.0", function()
+        local e = luna.postfx.newEffect("hueshift")
+        expect_equal(math.abs(e:getParameter("angle") - 0.0) < 0.001, true)
+    end)
+
+    it("noise has strength default 0.1", function()
+        local e = luna.postfx.newEffect("noise")
+        expect_equal(math.abs(e:getParameter("strength") - 0.1) < 0.001, true)
+    end)
+
+    it("all new types round-trip through getEffectType", function()
+        local names = {"pixelate","sepia","grayscale","invert","scanlines","edgedetect","hueshift","noise"}
+        local all_ok = true
+        for _, name in ipairs(names) do
+            local e = luna.postfx.newEffect(name)
+            if e:getEffectType() ~= name then all_ok = false end
+        end
+        expect_equal(all_ok, true)
+    end)
+
+    it("getEffectTypes includes all new types", function()
+        local types = luna.postfx.getEffectTypes()
+        local set = {}
+        for _, t in ipairs(types) do set[t] = true end
+        local required = {"pixelate","sepia","grayscale","invert","scanlines","edgedetect","hueshift","noise"}
+        local all_found = true
+        for _, r in ipairs(required) do
+            if not set[r] then all_found = false end
+        end
+        expect_equal(all_found, true)
     end)
 end)
 

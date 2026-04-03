@@ -7,10 +7,11 @@ use crate::lua_api::SharedState;
 use crate::graphics::renderer::{BlendMode, CompareMode, DepthMode, DrawCommand, DrawMode, StencilAction, StencilMode, TextAlign};
 use crate::graphics::texture::Texture;
 use slotmap::Key;
-use crate::engine::resource_keys::{CanvasKey, FontKey, MeshKey, SpriteBatchKey, TextureKey, ShaderKey};
+use crate::engine::resource_keys::{CanvasKey, FontKey, MeshKey, SpriteBatchKey, TextureKey, ShaderKey, ShapeKey};
 use crate::lua_api::lua_types::{add_type_methods, LunaType};
 use crate::graphics::mesh::{Mesh, MeshDrawMode, MeshVertex};
 use crate::graphics::shader::{Shader, UniformValue};
+use crate::graphics::{CompoundShape, ShapeCommand};
 use mlua::prelude::*;
 
 // ── Helper types ──────────────────────────────────────────────────────────
@@ -477,6 +478,346 @@ impl LuaUserData for LuaCanvas {
     }
 }
 
+/// Lua handle for a compound shape resource stored in `SharedState::shapes`.
+///
+/// Produced by `luna.graphics.newShape()`. Call `luna.graphics.releaseShape(shape)`
+/// to free the slot-map entry and reclaim memory when the shape is no longer needed.
+///
+/// # Fields
+/// - `state` — `Rc<RefCell<SharedState>>`.
+/// - `key` — `ShapeKey`. Generational key into `SharedState::shapes`.
+#[derive(Clone)]
+pub struct LuaCompoundShape {
+    pub(crate) state: Rc<RefCell<SharedState>>,
+    pub(crate) key: ShapeKey,
+}
+
+impl LunaType for LuaCompoundShape {
+    const TYPE_NAME: &'static str = "Shape";
+    const TYPE_HIERARCHY: &'static [&'static str] = &["Object"];
+}
+
+impl LuaUserData for LuaCompoundShape {
+    fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
+        add_type_methods::<Self>(methods);
+
+        /// Sets the active draw color for subsequent commands in this shape.
+        ///
+        /// # Parameters
+        /// - `r` — Red component in [0, 1].
+        /// - `g` — Green component in [0, 1].
+        /// - `b` — Blue component in [0, 1].
+        /// - `a` — Optional alpha component (default 1.0).
+        methods.add_method("setColor", |_, this, (r, g, b, a): (f32, f32, f32, Option<f32>)| {
+            let a = a.unwrap_or(1.0);
+            this.state
+                .borrow_mut()
+                .shapes
+                .get_mut(this.key)
+                .ok_or_else(|| LuaError::RuntimeError("Shape handle is no longer valid".into()))?
+                .push_command(ShapeCommand::SetColor(r, g, b, a));
+            Ok(())
+        });
+
+        /// Sets the stroke width for outlined primitives that follow in this shape.
+        ///
+        /// # Parameters
+        /// - `w` — Line width in pixels (must be > 0).
+        methods.add_method("setLineWidth", |_, this, w: f32| {
+            this.state
+                .borrow_mut()
+                .shapes
+                .get_mut(this.key)
+                .ok_or_else(|| LuaError::RuntimeError("Shape handle is no longer valid".into()))?
+                .push_command(ShapeCommand::SetLineWidth(w));
+            Ok(())
+        });
+
+        /// Appends a rectangle (filled or outlined, optionally rounded) to this shape.
+        ///
+        /// # Parameters
+        /// - `mode` — `'fill'` or `'line'`.
+        /// - `x` — Left edge X in object space.
+        /// - `y` — Top edge Y in object space.
+        /// - `w` — Width in pixels.
+        /// - `h` — Height in pixels.
+        /// - `rx` — Optional horizontal corner radius.
+        /// - `ry` — Optional vertical corner radius (defaults to `rx`).
+        methods.add_method(
+            "rectangle",
+            |_, this, (mode, x, y, w, h, rx, ry): (String, f32, f32, f32, f32, Option<f32>, Option<f32>)| {
+                let dm = if mode == "fill" { DrawMode::Fill } else { DrawMode::Line };
+                let cmd = match rx {
+                    Some(rx_val) => ShapeCommand::RoundedRectangle {
+                        mode: dm,
+                        x,
+                        y,
+                        w,
+                        h,
+                        rx: rx_val,
+                        ry: ry.unwrap_or(rx_val),
+                    },
+                    None => ShapeCommand::Rectangle { mode: dm, x, y, w, h },
+                };
+                this.state
+                    .borrow_mut()
+                    .shapes
+                    .get_mut(this.key)
+                    .ok_or_else(|| LuaError::RuntimeError("Shape handle is no longer valid".into()))?
+                    .push_command(cmd);
+                Ok(())
+            },
+        );
+
+        /// Appends a rounded rectangle to this shape (corner radius is required).
+        ///
+        /// # Parameters
+        /// - `mode` — `'fill'` or `'line'`.
+        /// - `x` — Left edge X in object space.
+        /// - `y` — Top edge Y in object space.
+        /// - `w` — Width in pixels.
+        /// - `h` — Height in pixels.
+        /// - `rx` — Horizontal corner radius (required).
+        /// - `ry` — Optional vertical corner radius (defaults to `rx`).
+        methods.add_method(
+            "roundedRectangle",
+            |_, this, (mode, x, y, w, h, rx, ry): (String, f32, f32, f32, f32, f32, Option<f32>)| {
+                let dm = if mode == "fill" { DrawMode::Fill } else { DrawMode::Line };
+                let ry_val = ry.unwrap_or(rx);
+                this.state
+                    .borrow_mut()
+                    .shapes
+                    .get_mut(this.key)
+                    .ok_or_else(|| LuaError::RuntimeError("Shape handle is no longer valid".into()))?
+                    .push_command(ShapeCommand::RoundedRectangle { mode: dm, x, y, w, h, rx, ry: ry_val });
+                Ok(())
+            },
+        );
+
+        /// Appends a circle to this shape.
+        ///
+        /// # Parameters
+        /// - `mode` — `'fill'` or `'line'`.
+        /// - `x` — Centre X in object space.
+        /// - `y` — Centre Y in object space.
+        /// - `r` — Radius in pixels.
+        methods.add_method("circle", |_, this, (mode, x, y, r): (String, f32, f32, f32)| {
+            let dm = if mode == "fill" { DrawMode::Fill } else { DrawMode::Line };
+            this.state
+                .borrow_mut()
+                .shapes
+                .get_mut(this.key)
+                .ok_or_else(|| LuaError::RuntimeError("Shape handle is no longer valid".into()))?
+                .push_command(ShapeCommand::Circle { mode: dm, x, y, r });
+            Ok(())
+        });
+
+        /// Appends an ellipse to this shape.
+        ///
+        /// # Parameters
+        /// - `mode` — `'fill'` or `'line'`.
+        /// - `x` — Centre X in object space.
+        /// - `y` — Centre Y in object space.
+        /// - `rx` — Horizontal semi-axis in pixels.
+        /// - `ry` — Vertical semi-axis in pixels.
+        methods.add_method(
+            "ellipse",
+            |_, this, (mode, x, y, rx, ry): (String, f32, f32, f32, f32)| {
+                let dm = if mode == "fill" { DrawMode::Fill } else { DrawMode::Line };
+                this.state
+                    .borrow_mut()
+                    .shapes
+                    .get_mut(this.key)
+                    .ok_or_else(|| LuaError::RuntimeError("Shape handle is no longer valid".into()))?
+                    .push_command(ShapeCommand::Ellipse { mode: dm, x, y, rx, ry });
+                Ok(())
+            },
+        );
+
+        /// Appends a triangle to this shape.
+        ///
+        /// # Parameters
+        /// - `mode` — `'fill'` or `'line'`.
+        /// - `x1`, `y1` — First vertex.
+        /// - `x2`, `y2` — Second vertex.
+        /// - `x3`, `y3` — Third vertex.
+        methods.add_method(
+            "triangle",
+            |_, this, (mode, x1, y1, x2, y2, x3, y3): (String, f32, f32, f32, f32, f32, f32)| {
+                let dm = if mode == "fill" { DrawMode::Fill } else { DrawMode::Line };
+                this.state
+                    .borrow_mut()
+                    .shapes
+                    .get_mut(this.key)
+                    .ok_or_else(|| LuaError::RuntimeError("Shape handle is no longer valid".into()))?
+                    .push_command(ShapeCommand::Triangle { mode: dm, x1, y1, x2, y2, x3, y3 });
+                Ok(())
+            },
+        );
+
+        /// Appends a polygon to this shape from a flat vararg vertex list.
+        ///
+        /// # Parameters
+        /// - `mode` — `'fill'` or `'line'`.
+        /// - `x1, y1, x2, y2, ...` — Flat list of vertex coordinates (at least 6 numbers / 3 vertices).
+        methods.add_method("polygon", |lua_ctx, this, args: LuaMultiValue| {
+            let mut iter = args.into_iter();
+            let mode_val = iter.next().ok_or_else(|| {
+                LuaError::RuntimeError("Shape:polygon requires a mode argument".into())
+            })?;
+            let mode: String = lua_ctx.unpack(mode_val)?;
+            let dm = if mode == "fill" { DrawMode::Fill } else { DrawMode::Line };
+            let mut vertices = Vec::new();
+            for val in iter {
+                if let Ok(n) = lua_ctx.unpack::<f32>(val) {
+                    vertices.push(n);
+                }
+            }
+            if vertices.len() < 6 {
+                return Err(LuaError::RuntimeError(
+                    "Shape:polygon requires at least 3 vertices (6 numbers)".into(),
+                ));
+            }
+            this.state
+                .borrow_mut()
+                .shapes
+                .get_mut(this.key)
+                .ok_or_else(|| LuaError::RuntimeError("Shape handle is no longer valid".into()))?
+                .push_command(ShapeCommand::Polygon { mode: dm, vertices });
+            Ok(())
+        });
+
+        /// Appends a single line segment to this shape.
+        ///
+        /// # Parameters
+        /// - `x1` — Start X in object space.
+        /// - `y1` — Start Y in object space.
+        /// - `x2` — End X in object space.
+        /// - `y2` — End Y in object space.
+        methods.add_method("line", |_, this, (x1, y1, x2, y2): (f32, f32, f32, f32)| {
+            this.state
+                .borrow_mut()
+                .shapes
+                .get_mut(this.key)
+                .ok_or_else(|| LuaError::RuntimeError("Shape handle is no longer valid".into()))?
+                .push_command(ShapeCommand::Line { x1, y1, x2, y2 });
+            Ok(())
+        });
+
+        /// Appends a polyline to this shape from a flat vararg point list.
+        ///
+        /// # Parameters
+        /// - `x1, y1, x2, y2, ...` — Flat list of point coordinates (at least 4 numbers / 2 points).
+        methods.add_method("polyline", |lua_ctx, this, args: LuaMultiValue| {
+            let mut points = Vec::new();
+            for val in args.into_iter() {
+                if let Ok(n) = lua_ctx.unpack::<f32>(val) {
+                    points.push(n);
+                }
+            }
+            if points.len() < 4 {
+                return Err(LuaError::RuntimeError(
+                    "Shape:polyline requires at least 2 points (4 numbers)".into(),
+                ));
+            }
+            this.state
+                .borrow_mut()
+                .shapes
+                .get_mut(this.key)
+                .ok_or_else(|| LuaError::RuntimeError("Shape handle is no longer valid".into()))?
+                .push_command(ShapeCommand::Polyline { points });
+            Ok(())
+        });
+
+        /// Appends an arc to this shape.
+        ///
+        /// # Parameters
+        /// - `mode` — `'fill'` or `'line'`.
+        /// - `x` — Centre X in object space.
+        /// - `y` — Centre Y in object space.
+        /// - `radius` — Arc radius in pixels.
+        /// - `angle1` — Start angle in radians.
+        /// - `angle2` — End angle in radians.
+        /// - `segments` — Optional number of line segments (default 32).
+        methods.add_method(
+            "arc",
+            |_, this, (mode, x, y, radius, angle1, angle2, segments): (String, f32, f32, f32, f32, f32, Option<u32>)| {
+                let dm = if mode == "fill" { DrawMode::Fill } else { DrawMode::Line };
+                let segments = segments.unwrap_or(32);
+                this.state
+                    .borrow_mut()
+                    .shapes
+                    .get_mut(this.key)
+                    .ok_or_else(|| LuaError::RuntimeError("Shape handle is no longer valid".into()))?
+                    .push_command(ShapeCommand::Arc { mode: dm, x, y, radius, angle1, angle2, segments });
+                Ok(())
+            },
+        );
+
+        /// Draws all primitives in this shape at the given world position with an optional transform.
+        ///
+        /// # Parameters
+        /// - `x` — Destination X in world pixels.
+        /// - `y` — Destination Y in world pixels.
+        /// - `angle` — Optional rotation in radians (default 0).
+        /// - `sx` — Optional horizontal scale (default 1).
+        /// - `sy` — Optional vertical scale (default 1).
+        /// - `ox` — Optional origin X offset in object space (default 0).
+        /// - `oy` — Optional origin Y offset in object space (default 0).
+        #[allow(clippy::type_complexity)]
+        methods.add_method(
+            "draw",
+            |_, this, (x, y, rotation, sx, sy, ox, oy): (f32, f32, Option<f32>, Option<f32>, Option<f32>, Option<f32>, Option<f32>)| {
+                let rotation = rotation.unwrap_or(0.0);
+                let sx = sx.unwrap_or(1.0);
+                let sy = sy.unwrap_or(1.0);
+                let ox = ox.unwrap_or(0.0);
+                let oy = oy.unwrap_or(0.0);
+                this.state
+                    .borrow_mut()
+                    .draw_commands
+                    .push(DrawCommand::DrawShape {
+                        shape_key: this.key,
+                        x,
+                        y,
+                        rotation,
+                        sx,
+                        sy,
+                        ox,
+                        oy,
+                    });
+                Ok(())
+            },
+        );
+
+        /// Clears all commands from this shape and resets color and line-width state.
+        methods.add_method("clear", |_, this, ()| {
+            this.state
+                .borrow_mut()
+                .shapes
+                .get_mut(this.key)
+                .ok_or_else(|| LuaError::RuntimeError("Shape handle is no longer valid".into()))?
+                .clear();
+            Ok(())
+        });
+
+        /// Returns the number of draw commands currently queued in this shape.
+        ///
+        /// # Returns
+        /// `integer` — command count.
+        methods.add_method("getCommandCount", |_, this, ()| {
+            let count = this
+                .state
+                .borrow()
+                .shapes
+                .get(this.key)
+                .ok_or_else(|| LuaError::RuntimeError("Shape handle is no longer valid".into()))?
+                .command_count();
+            Ok(count)
+        });
+    }
+}
+
 /// Extract a `TextureKey` from either a `LuaImage` UserData or a numeric ID.
 ///
 /// # Parameters
@@ -625,6 +966,38 @@ pub(super) fn invalid_mesh_handle(function_name: &str) -> LuaError {
         "{}: invalid or already-released mesh handle",
         function_name
     ))
+}
+
+/// Returns a `LuaError` for an invalid or released shape handle.
+///
+/// # Parameters
+/// - `function_name` — `&str`.
+///
+/// # Returns
+/// `LuaError`.
+pub(super) fn invalid_shape_handle(function_name: &str) -> LuaError {
+    LuaError::RuntimeError(format!(
+        "{}: invalid or already-released shape handle",
+        function_name
+    ))
+}
+
+/// Resolves a shape key and validates the shape is still alive.
+///
+/// # Parameters
+/// - `state` — `&SharedState`.
+/// - `id` — `u64`.
+/// - `function_name` — `&str`.
+///
+/// # Returns
+/// `LuaResult<ShapeKey>`.
+pub(super) fn require_shape_key(state: &SharedState, id: u64, function_name: &str) -> LuaResult<ShapeKey> {
+    let key = ShapeKey::from(slotmap::KeyData::from_ffi(id));
+    if !state.shapes.contains_key(key) {
+        Err(invalid_shape_handle(function_name))
+    } else {
+        Ok(key)
+    }
 }
 
 /// Resolves a texture key, validating the handle is still alive.
@@ -4078,6 +4451,31 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
             result
         })?,
     )?;
+
+    // luna.graphics.newShape() -> Shape userdata
+    /// Creates a new empty compound shape and returns its userdata handle.
+    ///
+    /// The returned Shape accumulates draw primitives in object space.
+    /// Call `:draw(x, y)` each frame to render it at a given world position.
+    ///
+    /// # Returns
+    /// A `Shape` userdata.
+    {
+        let state_cl = state.clone();
+        graphics.set(
+            "newShape",
+            lua.create_function(move |_, ()| {
+                let key = state_cl
+                    .borrow_mut()
+                    .shapes
+                    .insert(CompoundShape::new());
+                Ok(LuaCompoundShape {
+                    state: state_cl.clone(),
+                    key,
+                })
+            })?,
+        )?;
+    }
 
     register_ext(lua, &graphics, state.clone())?;
 

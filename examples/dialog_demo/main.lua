@@ -1,5 +1,7 @@
--- Dialog Demo — Luna2D dialog sequencer example
+-- Dialog Demo – Luna2D dialog sequencer example
 -- Demonstrates typewriter text, choices, events, and call nodes.
+
+local dialog = require("library.dialog")
 
 local seq
 local log_lines = {}
@@ -10,7 +12,7 @@ local function log(msg)
 end
 
 function luna.load()
-    seq = luna.dialog.newSequencer()
+    seq = dialog.newSequencer()
     seq:setSpeed(25) -- 25 characters per second
 
     -- Register event callbacks

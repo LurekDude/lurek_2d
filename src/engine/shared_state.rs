@@ -17,13 +17,13 @@ use winit::window::Window;
 use crate::audio::midi::MidiState;
 use crate::audio::Mixer;
 use crate::engine::resource_keys::{
-    CanvasKey, FontKey, MeshKey, ParticleKey, ShaderKey, SpriteBatchKey, TextureKey,
+    CanvasKey, FontKey, MeshKey, ParticleKey, ShaderKey, ShapeKey, SpriteBatchKey, TextureKey,
 };
 use crate::event::EventQueue;
 use crate::filesystem::GameFS;
 use crate::graphics::gpu_renderer::RenderStats;
 use crate::graphics::renderer::{BlendMode, DepthMode, DrawCommand, StencilMode, TextureData};
-use crate::graphics::{Camera, Canvas, Mesh, Shader};
+use crate::graphics::{Camera, Canvas, CompoundShape, Mesh, Shader};
 use crate::input::{GamepadMappings, GamepadState, KeyboardState, MouseState, TouchState};
 use crate::particle::ParticleSystem;
 use crate::timer::Clock;
@@ -233,6 +233,7 @@ pub struct ErrorInfo {
 /// - `canvases` — Off-screen render targets (canvases) for compositing.
 /// - `gamepads` — Connected gamepad state instances.
 /// - `fs` — Persistent sandboxed `GameFS` instance with mount layer support.
+/// - `shapes` — Stores all compound shape instances.
 ///
 /// Shared mutable state accessible by both the engine loop and Lua closures.
 pub struct SharedState {
@@ -299,6 +300,8 @@ pub struct SharedState {
     pub active_shader: Option<ShaderKey>,
     /// Custom geometry meshes for rendering.
     pub meshes: SlotMap<MeshKey, Mesh>,
+    /// Compound shape instances for batched primitive drawing.
+    pub shapes: SlotMap<ShapeKey, CompoundShape>,
     /// Keyboard state with scancode tracking, key repeat, and text input.
     pub keyboard: KeyboardState,
     /// Active touch points for touchscreen input.
@@ -392,6 +395,7 @@ impl SharedState {
             shaders: SlotMap::with_key(),
             active_shader: None,
             meshes: SlotMap::with_key(),
+            shapes: SlotMap::with_key(),
             keyboard: KeyboardState::new(),
             touch: TouchState::new(),
             window_state: WindowState::default(),

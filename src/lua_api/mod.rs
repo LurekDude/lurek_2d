@@ -17,6 +17,8 @@ pub use crate::engine::{ErrorInfo, FullscreenType, SharedState, WindowState};
 
 /// Registers the `luna.ai.*` game AI toolkit API.
 pub mod ai_api;
+/// Registers the `luna.simulator.*` automated input simulation API.
+pub mod automation_api;
 /// Registers the `luna.audio.*` sound playback API.
 pub mod audio_api;
 /// Registers the `luna.compute.*` array computation API.
@@ -29,8 +31,7 @@ pub mod dataframe_api;
 pub mod debug_api;
 /// Registers the `luna.debugbridge.*` TCP debug server API.
 pub mod debugbridge_api;
-/// Registers the `luna.dialog.*` dialog sequencer API.
-pub mod dialog_api;
+// dialog_api removed — dialog system is now library/dialog/init.lua
 /// Registers the `luna.docs.*` documentation management API.
 pub mod docs_api;
 /// Registers the `luna.entity.*` ECS universe API.
@@ -45,6 +46,8 @@ pub mod graph_api;
 pub mod font_api;
 /// Registers the `luna.graphics.*` drawing API.
 pub mod graphics_api;
+/// Registers the `luna.gui.*` retained-mode widget UI API.
+pub mod gui_api;
 /// Registers the `luna.image.*` pixel-level image manipulation API.
 pub mod image_api;
 /// Registers the `luna.keyboard.*` and `luna.mouse.*` input API.
@@ -71,6 +74,8 @@ pub mod patterns_api;
 pub mod physics_api;
 /// Registers the `luna.postfx.*` post-processing effects API.
 pub mod postfx_api;
+/// Registers the `luna.overlay.*` screen-effect overlay API.
+pub mod overlay_api;
 /// Registers the `luna.savegame.*` save/load system API.
 pub mod savegame_api;
 /// Registers the `luna.scene.*` scene stack, registry, data store, and depth-sorter API.
@@ -99,8 +104,7 @@ pub mod combat_api;
 pub mod crafting_api;
 /// Registers the `luna.economy.*` named resource economy API.
 pub mod economy_api;
-/// Registers the `luna.inventory.*` inventory system API.
-pub mod inventory_api;
+// inventory_api removed — inventory system is now library/inventory/init.lua
 /// Item Api sub-module.
 // item_api removed – cardgame covers this domain
 /// UserData type utilities for Luna2D Lua objects.
@@ -146,9 +150,11 @@ pub fn create_lua_vm(state: Rc<RefCell<SharedState>>) -> LuaResult<Lua> {
     event_api::register(&lua, &luna, state.clone())?;
     system_api::register(&lua, &luna, state.clone())?;
     data_api::register(&lua, &luna)?;
+    automation_api::register(&lua, &luna, state.clone())?;
     log_api::register(&lua, &luna)?;
     localization_api::register(&lua, &luna)?;
     image_api::register(&lua, &luna, state.clone())?;
+    gui_api::register(&lua, &luna)?;
     compute_api::register(&lua, &luna)?;
     dataframe_api::register(&lua, &luna)?;
     debugbridge_api::register(&lua, &luna)?;
@@ -161,8 +167,9 @@ pub fn create_lua_vm(state: Rc<RefCell<SharedState>>) -> LuaResult<Lua> {
     pathfinding_api::register(&lua, &luna)?;
     patterns_api::register(&lua, &luna)?;
     minimap_api::register(&lua, &luna)?;
-    dialog_api::register(&lua, &luna)?;
+    // dialog_api moved to library/dialog/init.lua
     postfx_api::register(&lua, &luna)?;
+    overlay_api::register(&lua, &luna)?;
     entity_api::register(&lua, &luna)?;
     modding_api::register(&lua, &luna, state.clone())?;
     savegame_api::register(&lua, &luna, state.clone())?;
@@ -171,7 +178,7 @@ pub fn create_lua_vm(state: Rc<RefCell<SharedState>>) -> LuaResult<Lua> {
     combat_api::register(&lua, &luna, state.clone())?;
     economy_api::register(&lua, &luna)?;
     stats_api::register(&lua, &luna)?;
-    inventory_api::register(&lua, &luna)?;
+    // inventory_api moved to library/inventory/init.lua
     quest_api::register(&lua, &luna)?;
     crafting_api::register(&lua, &luna)?;
 
@@ -179,6 +186,25 @@ pub fn create_lua_vm(state: Rc<RefCell<SharedState>>) -> LuaResult<Lua> {
     /// # Returns
     /// The result.
     lua.globals().set("luna", luna)?;
+
+    // Add `library/` to the Lua package path so games can use
+    // `require("library.dialog")`, `require("library.item")`, etc.
+    // Two search patterns are appended:
+    //   1. cwd-relative  — works during development (cargo run -- examples/X)
+    //   2. exe-relative  — works in distribution (luna2d.exe next to library/)
+    {
+        let package: LuaTable = lua.globals().get("package")?;
+        let old_path: String = package.get("path")?;
+        let mut new_path = old_path;
+        new_path.push_str(";./?/init.lua;./?.lua");
+        if let Ok(exe) = std::env::current_exe() {
+            if let Some(dir) = exe.parent() {
+                let d = dir.to_string_lossy().replace('\\', "/");
+                new_path.push_str(&format!(";{}/?/init.lua;{}/?.lua", d, d));
+            }
+        }
+        package.set("path", new_path)?;
+    }
 
     Ok(lua)
 }

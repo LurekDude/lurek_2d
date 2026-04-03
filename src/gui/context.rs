@@ -1,0 +1,1027 @@
+//! Root widget tree, focus tracking, toast queue, and input routing.
+//!
+//! [`GuiContext`] is the central coordinator for the GUI system.  It owns a
+//! flat pool of type-erased widgets (stored as [`WidgetKind`] enum variants),
+//! tracks which widget has keyboard focus, manages a queue of active
+//! [`Toast`](super::Toast) notifications, and optionally holds a [`Theme`]
+//! for styled rendering.
+//!
+//! Widgets are identified by a `usize` index into the internal `widgets`
+//! vector.  The root panel is always at index `0`.  Container widgets
+//! (`Panel`, `Layout`, `ScrollPanel`) store their children's indices.
+//!
+//! Input events are forwarded from Lua callbacks and dispatched to the widget
+//! tree by hit-testing against widget bounds.
+
+use crate::gui::containers::{DockPanel, GUIWindow, Layout, NinePatch, Panel, ScrollPanel, SplitPanel};
+use crate::gui::controls::{
+    Button, CheckBox, ComboBox, Label, ListBox, ProgressBar, RadioButton, ScrollBar, Slider, TabBar, TextInput,
+};
+use crate::gui::extras::{
+    Accordion, ColorPicker, Dialog, GUITable, ImageWidget, MenuBar, MenuItem, Separator,
+    Spacer, StatusBar, Toast, Toolbar, TooltipPanel, TreeView,
+};
+use crate::gui::theme::Theme;
+use crate::gui::widget::{WidgetBase, WidgetState};
+
+/// Type-erased widget storage.
+///
+/// Each variant wraps a concrete widget type so that the [`GuiContext`] can
+/// store all widgets in a single `Vec<WidgetKind>`.
+///
+/// # Variants
+/// - `Button` — Wraps a [`Button`].
+/// - `Label` — Wraps a [`Label`].
+/// - `TextInput` — Wraps a [`TextInput`].
+/// - `CheckBox` — Wraps a [`CheckBox`].
+/// - `Slider` — Wraps a [`Slider`].
+/// - `ProgressBar` — Wraps a [`ProgressBar`].
+/// - `ComboBox` — Wraps a [`ComboBox`].
+/// - `ListBox` — Wraps a [`ListBox`].
+/// - `Panel` — Wraps a [`Panel`].
+/// - `Layout` — Wraps a [`Layout`].
+/// - `ScrollPanel` — Wraps a [`ScrollPanel`].
+/// - `NinePatch` — Wraps a [`NinePatch`].
+/// - `TabBar` — Wraps a [`TabBar`].
+/// - `Toast` — Wraps a [`Toast`].
+/// - `Separator` — Wraps a [`Separator`].
+/// - `Spacer` — Wraps a [`Spacer`].
+/// - `TreeView` — Wraps a [`TreeView`].
+/// - `RadioButton` — Wraps a [`RadioButton`].
+/// - `ScrollBar` — Wraps a [`ScrollBar`].
+/// - `GUIWindow` — Wraps a [`GUIWindow`].
+/// - `SplitPanel` — Wraps a [`SplitPanel`].
+/// - `DockPanel` — Wraps a [`DockPanel`].
+/// - `Toolbar` — Wraps a [`Toolbar`].
+/// - `MenuBar` — Wraps a [`MenuBar`].
+/// - `MenuItem` — Wraps a [`MenuItem`].
+/// - `Dialog` — Wraps a [`Dialog`].
+/// - `StatusBar` — Wraps a [`StatusBar`].
+/// - `Accordion` — Wraps a [`Accordion`].
+/// - `TooltipPanel` — Wraps a [`TooltipPanel`].
+/// - `ColorPicker` — Wraps a [`ColorPicker`].
+/// - `GUITable` — Wraps a [`GUITable`].
+/// - `ImageWidget` — Wraps an [`ImageWidget`].
+#[derive(Debug, Clone)]
+pub enum WidgetKind {
+    /// Wraps a [`Button`].
+    Button(Button),
+    /// Wraps a [`Label`].
+    Label(Label),
+    /// Wraps a [`TextInput`].
+    TextInput(TextInput),
+    /// Wraps a [`CheckBox`].
+    CheckBox(CheckBox),
+    /// Wraps a [`Slider`].
+    Slider(Slider),
+    /// Wraps a [`ProgressBar`].
+    ProgressBar(ProgressBar),
+    /// Wraps a [`ComboBox`].
+    ComboBox(ComboBox),
+    /// Wraps a [`ListBox`].
+    ListBox(ListBox),
+    /// Wraps a [`Panel`].
+    Panel(Panel),
+    /// Wraps a [`Layout`].
+    Layout(Layout),
+    /// Wraps a [`ScrollPanel`].
+    ScrollPanel(ScrollPanel),
+    /// Wraps a [`NinePatch`].
+    NinePatch(NinePatch),
+    /// Wraps a [`TabBar`].
+    TabBar(TabBar),
+    /// Wraps a [`Toast`].
+    Toast(Toast),
+    /// Wraps a [`Separator`].
+    Separator(Separator),
+    /// Wraps a [`Spacer`].
+    Spacer(Spacer),
+    /// Wraps a [`TreeView`].
+    TreeView(TreeView),
+    /// Wraps a [`RadioButton`].
+    RadioButton(RadioButton),
+    /// Wraps a [`ScrollBar`].
+    ScrollBar(ScrollBar),
+    /// Wraps a [`GUIWindow`].
+    GUIWindow(GUIWindow),
+    /// Wraps a [`SplitPanel`].
+    SplitPanel(SplitPanel),
+    /// Wraps a [`DockPanel`].
+    DockPanel(DockPanel),
+    /// Wraps a [`Toolbar`].
+    Toolbar(Toolbar),
+    /// Wraps a [`MenuBar`].
+    MenuBar(MenuBar),
+    /// Wraps a [`MenuItem`].
+    MenuItem(MenuItem),
+    /// Wraps a [`Dialog`].
+    Dialog(Dialog),
+    /// Wraps a [`StatusBar`].
+    StatusBar(StatusBar),
+    /// Wraps a [`Accordion`].
+    Accordion(Accordion),
+    /// Wraps a [`TooltipPanel`].
+    TooltipPanel(TooltipPanel),
+    /// Wraps a [`ColorPicker`].
+    ColorPicker(ColorPicker),
+    /// Wraps a [`GUITable`].
+    GUITable(GUITable),
+    /// Wraps an [`ImageWidget`].
+    ImageWidget(ImageWidget),
+}
+
+impl WidgetKind {
+    /// Return a reference to the shared [`WidgetBase`] inside this variant.
+    ///
+    /// # Returns
+    /// `&WidgetBase`.
+    pub fn base(&self) -> &WidgetBase {
+        match self {
+            Self::Button(w) => &w.base,
+            Self::Label(w) => &w.base,
+            Self::TextInput(w) => &w.base,
+            Self::CheckBox(w) => &w.base,
+            Self::Slider(w) => &w.base,
+            Self::ProgressBar(w) => &w.base,
+            Self::ComboBox(w) => &w.base,
+            Self::ListBox(w) => &w.base,
+            Self::Panel(w) => &w.base,
+            Self::Layout(w) => &w.base,
+            Self::ScrollPanel(w) => &w.base,
+            Self::NinePatch(w) => &w.base,
+            Self::TabBar(w) => &w.base,
+            Self::Toast(w) => &w.base,
+            Self::Separator(w) => &w.base,
+            Self::Spacer(w) => &w.base,
+            Self::TreeView(w) => &w.base,
+            Self::RadioButton(w) => &w.base,
+            Self::ScrollBar(w) => &w.base,
+            Self::GUIWindow(w) => &w.base,
+            Self::SplitPanel(w) => &w.base,
+            Self::DockPanel(w) => &w.base,
+            Self::Toolbar(w) => &w.base,
+            Self::MenuBar(w) => &w.base,
+            Self::MenuItem(w) => &w.base,
+            Self::Dialog(w) => &w.base,
+            Self::StatusBar(w) => &w.base,
+            Self::Accordion(w) => &w.base,
+            Self::TooltipPanel(w) => &w.base,
+            Self::ColorPicker(w) => &w.base,
+            Self::GUITable(w) => &w.base,
+            Self::ImageWidget(w) => &w.base,
+        }
+    }
+
+    /// Return a mutable reference to the shared [`WidgetBase`].
+    ///
+    /// # Returns
+    /// `&mut WidgetBase`.
+    pub fn base_mut(&mut self) -> &mut WidgetBase {
+        match self {
+            Self::Button(w) => &mut w.base,
+            Self::Label(w) => &mut w.base,
+            Self::TextInput(w) => &mut w.base,
+            Self::CheckBox(w) => &mut w.base,
+            Self::Slider(w) => &mut w.base,
+            Self::ProgressBar(w) => &mut w.base,
+            Self::ComboBox(w) => &mut w.base,
+            Self::ListBox(w) => &mut w.base,
+            Self::Panel(w) => &mut w.base,
+            Self::Layout(w) => &mut w.base,
+            Self::ScrollPanel(w) => &mut w.base,
+            Self::NinePatch(w) => &mut w.base,
+            Self::TabBar(w) => &mut w.base,
+            Self::Toast(w) => &mut w.base,
+            Self::Separator(w) => &mut w.base,
+            Self::Spacer(w) => &mut w.base,
+            Self::TreeView(w) => &mut w.base,
+            Self::RadioButton(w) => &mut w.base,
+            Self::ScrollBar(w) => &mut w.base,
+            Self::GUIWindow(w) => &mut w.base,
+            Self::SplitPanel(w) => &mut w.base,
+            Self::DockPanel(w) => &mut w.base,
+            Self::Toolbar(w) => &mut w.base,
+            Self::MenuBar(w) => &mut w.base,
+            Self::MenuItem(w) => &mut w.base,
+            Self::Dialog(w) => &mut w.base,
+            Self::StatusBar(w) => &mut w.base,
+            Self::Accordion(w) => &mut w.base,
+            Self::TooltipPanel(w) => &mut w.base,
+            Self::ColorPicker(w) => &mut w.base,
+            Self::GUITable(w) => &mut w.base,
+            Self::ImageWidget(w) => &mut w.base,
+        }
+    }
+
+    /// Return the child indices if this widget is a container type.
+    ///
+    /// # Returns
+    /// `Option<&Vec<usize>>`.
+    pub fn children(&self) -> Option<&Vec<usize>> {
+        match self {
+            Self::Panel(p) => Some(&p.children),
+            Self::Layout(l) => Some(&l.children),
+            Self::ScrollPanel(s) => Some(&s.children),
+            Self::GUIWindow(w) => Some(&w.children),
+            Self::Toolbar(w) => Some(&w.children),
+            _ => None,
+        }
+    }
+
+    /// Return mutable child indices if this widget is a container type.
+    ///
+    /// # Returns
+    /// `Option<&mut Vec<usize>>`.
+    pub fn children_mut(&mut self) -> Option<&mut Vec<usize>> {
+        match self {
+            Self::Panel(p) => Some(&mut p.children),
+            Self::Layout(l) => Some(&mut l.children),
+            Self::ScrollPanel(s) => Some(&mut s.children),
+            Self::GUIWindow(w) => Some(&mut w.children),
+            Self::Toolbar(w) => Some(&mut w.children),
+            _ => None,
+        }
+    }
+}
+
+/// Central GUI coordinator: widget pool, focus, toasts, and theme.
+///
+/// The context owns a flat `Vec<WidgetKind>` indexed by widget ID.  Index `0`
+/// is always the invisible root `Panel`.  New widgets are appended with
+/// `add_*` methods that return the widget's index.
+///
+/// Focus is tracked by `focused_widget: Option<usize>`.  The toast queue is
+/// a separate `Vec<Toast>` that is updated and drained by `update(dt)`.
+///
+/// # Fields
+/// - `widgets` — `Vec<WidgetKind>`. Flat pool of all widgets.
+/// - `focused_widget` — `Option<usize>`. Index of the focused widget.
+/// - `toasts` — `Vec<Toast>`. Active toast notifications.
+/// - `theme` — `Option<Theme>`. Active theme.
+#[derive(Debug, Clone)]
+pub struct GuiContext {
+    /// Flat pool of all widgets.
+    pub widgets: Vec<WidgetKind>,
+    /// Index of the focused widget.
+    pub focused_widget: Option<usize>,
+    /// Active toast notifications.
+    pub toasts: Vec<Toast>,
+    /// Active theme.
+    pub theme: Option<Theme>,
+}
+
+impl GuiContext {
+    /// Create a new GUI context with an invisible root panel at index 0.
+    ///
+    /// # Returns
+    /// `GuiContext`.
+    pub fn new() -> Self {
+        let root = Panel::new();
+        Self {
+            widgets: vec![WidgetKind::Panel(root)],
+            focused_widget: None,
+            toasts: Vec::new(),
+            theme: None,
+        }
+    }
+
+    /// Return the number of widgets in the pool (including the root).
+    ///
+    /// # Returns
+    /// `usize`.
+    pub fn widget_count(&self) -> usize {
+        self.widgets.len()
+    }
+
+    // ── Widget constructors ───────────────────────────────────────────
+
+    /// Add a button and return its pool index.
+    ///
+    /// # Parameters
+    /// - `text` — `impl Into<String>`.
+    ///
+    /// # Returns
+    /// `usize`.
+    pub fn add_button(&mut self, text: impl Into<String>) -> usize {
+        let idx = self.widgets.len();
+        self.widgets.push(WidgetKind::Button(Button::new(text)));
+        idx
+    }
+
+    /// Add a label and return its pool index.
+    ///
+    /// # Parameters
+    /// - `text` — `impl Into<String>`.
+    ///
+    /// # Returns
+    /// `usize`.
+    pub fn add_label(&mut self, text: impl Into<String>) -> usize {
+        let idx = self.widgets.len();
+        self.widgets.push(WidgetKind::Label(Label::new(text)));
+        idx
+    }
+
+    /// Add a text input and return its pool index.
+    ///
+    /// # Returns
+    /// `usize`.
+    pub fn add_text_input(&mut self) -> usize {
+        let idx = self.widgets.len();
+        self.widgets.push(WidgetKind::TextInput(TextInput::new()));
+        idx
+    }
+
+    /// Add a check box and return its pool index.
+    ///
+    /// # Parameters
+    /// - `text` — `impl Into<String>`.
+    ///
+    /// # Returns
+    /// `usize`.
+    pub fn add_checkbox(&mut self, text: impl Into<String>) -> usize {
+        let idx = self.widgets.len();
+        self.widgets.push(WidgetKind::CheckBox(CheckBox::new(text)));
+        idx
+    }
+
+    /// Add a slider and return its pool index.
+    ///
+    /// # Parameters
+    /// - `min` — `f64`.
+    /// - `max` — `f64`.
+    ///
+    /// # Returns
+    /// `usize`.
+    pub fn add_slider(&mut self, min: f64, max: f64) -> usize {
+        let idx = self.widgets.len();
+        self.widgets.push(WidgetKind::Slider(Slider::new(min, max)));
+        idx
+    }
+
+    /// Add a progress bar and return its pool index.
+    ///
+    /// # Parameters
+    /// - `min` — `f64`.
+    /// - `max` — `f64`.
+    ///
+    /// # Returns
+    /// `usize`.
+    pub fn add_progress_bar(&mut self, min: f64, max: f64) -> usize {
+        let idx = self.widgets.len();
+        self.widgets
+            .push(WidgetKind::ProgressBar(ProgressBar::new(min, max)));
+        idx
+    }
+
+    /// Add a combo box and return its pool index.
+    ///
+    /// # Returns
+    /// `usize`.
+    pub fn add_combo_box(&mut self) -> usize {
+        let idx = self.widgets.len();
+        self.widgets.push(WidgetKind::ComboBox(ComboBox::new()));
+        idx
+    }
+
+    /// Add a list box and return its pool index.
+    ///
+    /// # Returns
+    /// `usize`.
+    pub fn add_list_box(&mut self) -> usize {
+        let idx = self.widgets.len();
+        self.widgets.push(WidgetKind::ListBox(ListBox::new()));
+        idx
+    }
+
+    /// Add a panel and return its pool index.
+    ///
+    /// # Returns
+    /// `usize`.
+    pub fn add_panel(&mut self) -> usize {
+        let idx = self.widgets.len();
+        self.widgets.push(WidgetKind::Panel(Panel::new()));
+        idx
+    }
+
+    /// Add a layout and return its pool index.
+    ///
+    /// # Parameters
+    /// - `direction` — `LayoutDirection`.
+    ///
+    /// # Returns
+    /// `usize`.
+    pub fn add_layout(&mut self, direction: super::LayoutDirection) -> usize {
+        let idx = self.widgets.len();
+        self.widgets.push(WidgetKind::Layout(Layout::new(direction)));
+        idx
+    }
+
+    /// Add a scroll panel and return its pool index.
+    ///
+    /// # Returns
+    /// `usize`.
+    pub fn add_scroll_panel(&mut self) -> usize {
+        let idx = self.widgets.len();
+        self.widgets
+            .push(WidgetKind::ScrollPanel(ScrollPanel::new()));
+        idx
+    }
+
+    /// Add a nine-patch and return its pool index.
+    ///
+    /// # Returns
+    /// `usize`.
+    pub fn add_nine_patch(&mut self) -> usize {
+        let idx = self.widgets.len();
+        self.widgets.push(WidgetKind::NinePatch(NinePatch::new()));
+        idx
+    }
+
+    /// Add a tab bar and return its pool index.
+    ///
+    /// # Returns
+    /// `usize`.
+    pub fn add_tab_bar(&mut self) -> usize {
+        let idx = self.widgets.len();
+        self.widgets.push(WidgetKind::TabBar(TabBar::new()));
+        idx
+    }
+
+    /// Add a separator and return its pool index.
+    ///
+    /// # Parameters
+    /// - `vertical` — `bool`.
+    ///
+    /// # Returns
+    /// `usize`.
+    pub fn add_separator(&mut self, vertical: bool) -> usize {
+        let idx = self.widgets.len();
+        self.widgets
+            .push(WidgetKind::Separator(Separator::new(vertical)));
+        idx
+    }
+
+    /// Add a spacer and return its pool index.
+    ///
+    /// # Parameters
+    /// - `width` — `f32`.
+    /// - `height` — `f32`.
+    ///
+    /// # Returns
+    /// `usize`.
+    pub fn add_spacer(&mut self, width: f32, height: f32) -> usize {
+        let idx = self.widgets.len();
+        self.widgets
+            .push(WidgetKind::Spacer(Spacer::new(width, height)));
+        idx
+    }
+
+    /// Add a tree view and return its pool index.
+    ///
+    /// # Returns
+    /// `usize`.
+    pub fn add_tree_view(&mut self) -> usize {
+        let idx = self.widgets.len();
+        self.widgets.push(WidgetKind::TreeView(TreeView::new()));
+        idx
+    }
+
+
+    /// Add a radio button and return its pool index.
+    ///
+    /// # Parameters
+    /// - `text` — `impl Into<String>`.
+    /// - `group` — `impl Into<String>`.
+    ///
+    /// # Returns
+    /// `usize`.
+    pub fn add_radio_button(&mut self, text: impl Into<String>, group: impl Into<String>) -> usize {
+        let idx = self.widgets.len();
+        self.widgets.push(WidgetKind::RadioButton(RadioButton::new(text, group)));
+        idx
+    }
+
+    /// Add a scroll bar and return its pool index.
+    ///
+    /// # Parameters
+    /// - `vertical` — `bool`.
+    ///
+    /// # Returns
+    /// `usize`.
+    pub fn add_scroll_bar(&mut self, vertical: bool) -> usize {
+        let idx = self.widgets.len();
+        self.widgets.push(WidgetKind::ScrollBar(ScrollBar::new(vertical)));
+        idx
+    }
+
+    /// Add a GUI window and return its pool index.
+    ///
+    /// # Parameters
+    /// - `title` — `impl Into<String>`.
+    ///
+    /// # Returns
+    /// `usize`.
+    pub fn add_gui_window(&mut self, title: impl Into<String>) -> usize {
+        let idx = self.widgets.len();
+        self.widgets.push(WidgetKind::GUIWindow(GUIWindow::new(title)));
+        idx
+    }
+
+    /// Add a split panel and return its pool index.
+    ///
+    /// # Parameters
+    /// - `orientation` — `impl Into<String>`.
+    ///
+    /// # Returns
+    /// `usize`.
+    pub fn add_split_panel(&mut self, orientation: impl Into<String>) -> usize {
+        let idx = self.widgets.len();
+        self.widgets.push(WidgetKind::SplitPanel(SplitPanel::new(orientation)));
+        idx
+    }
+
+    /// Add a dock panel and return its pool index.
+    ///
+    /// # Returns
+    /// `usize`.
+    pub fn add_dock_panel(&mut self) -> usize {
+        let idx = self.widgets.len();
+        self.widgets.push(WidgetKind::DockPanel(DockPanel::new()));
+        idx
+    }
+
+    /// Add a toolbar and return its pool index.
+    ///
+    /// # Parameters
+    /// - `orientation` — `impl Into<String>`.
+    ///
+    /// # Returns
+    /// `usize`.
+    pub fn add_toolbar(&mut self, orientation: impl Into<String>) -> usize {
+        let idx = self.widgets.len();
+        self.widgets.push(WidgetKind::Toolbar(Toolbar::new(orientation)));
+        idx
+    }
+
+    /// Add a menu bar and return its pool index.
+    ///
+    /// # Returns
+    /// `usize`.
+    pub fn add_menu_bar(&mut self) -> usize {
+        let idx = self.widgets.len();
+        self.widgets.push(WidgetKind::MenuBar(MenuBar::new()));
+        idx
+    }
+
+    /// Add a menu item and return its pool index.
+    ///
+    /// # Parameters
+    /// - `text` — `impl Into<String>`.
+    ///
+    /// # Returns
+    /// `usize`.
+    pub fn add_menu_item(&mut self, text: impl Into<String>) -> usize {
+        let idx = self.widgets.len();
+        self.widgets.push(WidgetKind::MenuItem(MenuItem::new(text)));
+        idx
+    }
+
+    /// Add a dialog and return its pool index.
+    ///
+    /// # Parameters
+    /// - `title` — `impl Into<String>`.
+    ///
+    /// # Returns
+    /// `usize`.
+    pub fn add_dialog(&mut self, title: impl Into<String>) -> usize {
+        let idx = self.widgets.len();
+        self.widgets.push(WidgetKind::Dialog(Dialog::new(title)));
+        idx
+    }
+
+    /// Add a status bar and return its pool index.
+    ///
+    /// # Returns
+    /// `usize`.
+    pub fn add_status_bar(&mut self) -> usize {
+        let idx = self.widgets.len();
+        self.widgets.push(WidgetKind::StatusBar(StatusBar::new()));
+        idx
+    }
+
+    /// Add an accordion and return its pool index.
+    ///
+    /// # Returns
+    /// `usize`.
+    pub fn add_accordion(&mut self) -> usize {
+        let idx = self.widgets.len();
+        self.widgets.push(WidgetKind::Accordion(Accordion::new()));
+        idx
+    }
+
+    /// Add a tooltip panel and return its pool index.
+    ///
+    /// # Parameters
+    /// - `text` — `impl Into<String>`.
+    ///
+    /// # Returns
+    /// `usize`.
+    pub fn add_tooltip_panel(&mut self, text: impl Into<String>) -> usize {
+        let idx = self.widgets.len();
+        self.widgets.push(WidgetKind::TooltipPanel(TooltipPanel::new(text)));
+        idx
+    }
+
+    /// Add a color picker and return its pool index.
+    ///
+    /// # Returns
+    /// `usize`.
+    pub fn add_color_picker(&mut self) -> usize {
+        let idx = self.widgets.len();
+        self.widgets.push(WidgetKind::ColorPicker(ColorPicker::new()));
+        idx
+    }
+
+    /// Add a GUI table and return its pool index.
+    ///
+    /// # Returns
+    /// `usize`.
+    pub fn add_gui_table(&mut self) -> usize {
+        let idx = self.widgets.len();
+        self.widgets.push(WidgetKind::GUITable(GUITable::new()));
+        idx
+    }
+
+    /// Add an image widget and return its pool index.
+    ///
+    /// # Returns
+    /// `usize`.
+    pub fn add_image_widget(&mut self) -> usize {
+        let idx = self.widgets.len();
+        self.widgets.push(WidgetKind::ImageWidget(ImageWidget::new()));
+        idx
+    }
+
+    // ── Child management ──────────────────────────────────────────────
+
+    /// Add `child_idx` as a child of the container at `parent_idx`.
+    ///
+    /// Returns `false` if the parent is not a container or indices are invalid.
+    ///
+    /// # Parameters
+    /// - `parent_idx` — `usize`.
+    /// - `child_idx` — `usize`.
+    ///
+    /// # Returns
+    /// `bool`.
+    pub fn add_child(&mut self, parent_idx: usize, child_idx: usize) -> bool {
+        if parent_idx >= self.widgets.len() || child_idx >= self.widgets.len() {
+            return false;
+        }
+        if let Some(children) = self.widgets[parent_idx].children_mut() {
+            if !children.contains(&child_idx) {
+                children.push(child_idx);
+            }
+            true
+        } else {
+            false
+        }
+    }
+
+    /// Remove `child_idx` from the container at `parent_idx`.
+    ///
+    /// # Parameters
+    /// - `parent_idx` — `usize`.
+    /// - `child_idx` — `usize`.
+    ///
+    /// # Returns
+    /// `bool`.
+    pub fn remove_child(&mut self, parent_idx: usize, child_idx: usize) -> bool {
+        if parent_idx >= self.widgets.len() {
+            return false;
+        }
+        if let Some(children) = self.widgets[parent_idx].children_mut() {
+            if let Some(pos) = children.iter().position(|&c| c == child_idx) {
+                children.remove(pos);
+                return true;
+            }
+        }
+        false
+    }
+
+    /// Count the children of a container widget.
+    ///
+    /// # Parameters
+    /// - `widget_idx` — `usize`.
+    ///
+    /// # Returns
+    /// `usize`.
+    pub fn child_count(&self, widget_idx: usize) -> usize {
+        self.widgets
+            .get(widget_idx)
+            .and_then(|w| w.children())
+            .map_or(0, |c| c.len())
+    }
+
+    // ── Focus ─────────────────────────────────────────────────────────
+
+    /// Set keyboard focus to the given widget, clearing focus from the
+    /// previous widget.
+    ///
+    /// # Parameters
+    /// - `widget_idx` — `Option<usize>`. `None` to clear focus.
+    pub fn set_focus(&mut self, widget_idx: Option<usize>) {
+        // Clear previous
+        if let Some(prev) = self.focused_widget {
+            if let Some(w) = self.widgets.get_mut(prev) {
+                let base = w.base_mut();
+                if base.state == WidgetState::Focused {
+                    base.state = WidgetState::Normal;
+                }
+            }
+        }
+        // Set new
+        if let Some(idx) = widget_idx {
+            if let Some(w) = self.widgets.get_mut(idx) {
+                w.base_mut().state = WidgetState::Focused;
+            }
+        }
+        self.focused_widget = widget_idx;
+    }
+
+    /// Move focus to the next focusable widget (tab order by pool index).
+    pub fn focus_next(&mut self) {
+        let start = self.focused_widget.map_or(0, |i| i + 1);
+        for i in start..self.widgets.len() {
+            let base = self.widgets[i].base();
+            if base.visible && base.enabled {
+                self.set_focus(Some(i));
+                return;
+            }
+        }
+        // Wrap around
+        for i in 1..start.min(self.widgets.len()) {
+            let base = self.widgets[i].base();
+            if base.visible && base.enabled {
+                self.set_focus(Some(i));
+                return;
+            }
+        }
+    }
+
+    /// Move focus to the previous focusable widget.
+    pub fn focus_prev(&mut self) {
+        let start = self.focused_widget.unwrap_or(self.widgets.len());
+        if start > 1 {
+            for i in (1..start).rev() {
+                let base = self.widgets[i].base();
+                if base.visible && base.enabled {
+                    self.set_focus(Some(i));
+                    return;
+                }
+            }
+        }
+        // Wrap around
+        for i in (1..self.widgets.len()).rev() {
+            let base = self.widgets[i].base();
+            if base.visible && base.enabled {
+                self.set_focus(Some(i));
+                return;
+            }
+        }
+    }
+
+    // ── Toasts ────────────────────────────────────────────────────────
+
+    /// Queue a toast notification for display.
+    ///
+    /// # Parameters
+    /// - `toast` — `Toast`.
+    pub fn add_toast(&mut self, toast: Toast) {
+        self.toasts.push(toast);
+    }
+
+    /// Return the number of active (non-expired) toast notifications.
+    ///
+    /// # Returns
+    /// `usize`.
+    pub fn toast_count(&self) -> usize {
+        self.toasts.len()
+    }
+
+    // ── Update ────────────────────────────────────────────────────────
+
+    /// Advance toast timers and remove expired toasts.
+    ///
+    /// # Parameters
+    /// - `dt` — `f32`. Delta time in seconds.
+    pub fn update(&mut self, dt: f32) {
+        for toast in &mut self.toasts {
+            toast.update(dt);
+        }
+        self.toasts.retain(|t| !t.is_expired());
+    }
+
+    // ── Lookup ────────────────────────────────────────────────────────
+
+    /// Recursively search for a widget by its `id` string, starting from
+    /// `start_idx`.
+    ///
+    /// # Parameters
+    /// - `start_idx` — `usize`. Widget to start searching from.
+    /// - `id` — `&str`. Target `id`.
+    ///
+    /// # Returns
+    /// `Option<usize>` — widget pool index.
+    pub fn find_by_id(&self, start_idx: usize, id: &str) -> Option<usize> {
+        if start_idx >= self.widgets.len() {
+            return None;
+        }
+        if self.widgets[start_idx].base().id == id {
+            return Some(start_idx);
+        }
+        if let Some(children) = self.widgets[start_idx].children() {
+            for &child_idx in children {
+                if let Some(found) = self.find_by_id(child_idx, id) {
+                    return Some(found);
+                }
+            }
+        }
+        None
+    }
+
+    // ── Input routing ─────────────────────────────────────────────────
+
+    /// Forward a mouse press event to the widget tree.
+    ///
+    /// Hit-tests all visible, enabled widgets and sets focus + state
+    /// accordingly.
+    ///
+    /// # Parameters
+    /// - `x` — `f32`. Mouse X.
+    /// - `y` — `f32`. Mouse Y.
+    /// - `_button` — `u32`. Mouse button (1=left, 2=right, 3=middle).
+    ///
+    /// # Returns
+    /// `bool` — `true` if any widget consumed the event.
+    pub fn mouse_pressed(&mut self, x: f32, y: f32, _button: u32) -> bool {
+        let mut hit = None;
+        // Iterate in reverse z-order (last drawn = on top)
+        for i in (1..self.widgets.len()).rev() {
+            let base = self.widgets[i].base();
+            if base.visible && base.enabled && base.contains_point(x, y) {
+                hit = Some(i);
+                break;
+            }
+        }
+        if let Some(idx) = hit {
+            self.set_focus(Some(idx));
+            self.widgets[idx].base_mut().state = WidgetState::Pressed;
+
+            // Toggle checkbox
+            if let WidgetKind::CheckBox(cb) = &mut self.widgets[idx] {
+                cb.checked = !cb.checked;
+            }
+
+            true
+        } else {
+            self.set_focus(None);
+            false
+        }
+    }
+
+    /// Forward a mouse release event to the widget tree.
+    ///
+    /// # Parameters
+    /// - `x` — `f32`. Mouse X.
+    /// - `y` — `f32`. Mouse Y.
+    /// - `_button` — `u32`. Mouse button.
+    ///
+    /// # Returns
+    /// `bool` — `true` if any widget consumed the event.
+    pub fn mouse_released(&mut self, x: f32, y: f32, _button: u32) -> bool {
+        let mut consumed = false;
+        for i in 1..self.widgets.len() {
+            let base = self.widgets[i].base();
+            if base.state == WidgetState::Pressed {
+                let inside = base.contains_point(x, y);
+                let new_state = if inside {
+                    WidgetState::Hovered
+                } else {
+                    WidgetState::Normal
+                };
+                self.widgets[i].base_mut().state = new_state;
+                consumed = true;
+            }
+        }
+        consumed
+    }
+
+    /// Forward a mouse move event to update hover states.
+    ///
+    /// # Parameters
+    /// - `x` — `f32`. Mouse X.
+    /// - `y` — `f32`. Mouse Y.
+    ///
+    /// # Returns
+    /// `bool` — `true` if any widget's state changed.
+    pub fn mouse_moved(&mut self, x: f32, y: f32) -> bool {
+        let mut changed = false;
+        for i in 1..self.widgets.len() {
+            let base = self.widgets[i].base();
+            if !base.visible || !base.enabled {
+                continue;
+            }
+            let inside = base.contains_point(x, y);
+            let current = base.state;
+            if current == WidgetState::Pressed || current == WidgetState::Disabled {
+                continue;
+            }
+            let new_state = if inside {
+                if self.focused_widget == Some(i) {
+                    WidgetState::Focused
+                } else {
+                    WidgetState::Hovered
+                }
+            } else if self.focused_widget == Some(i) {
+                WidgetState::Focused
+            } else {
+                WidgetState::Normal
+            };
+            if current != new_state {
+                self.widgets[i].base_mut().state = new_state;
+                changed = true;
+            }
+        }
+        changed
+    }
+
+    /// Forward a key press event.  Handles tab focus navigation and
+    /// delegates to focused text inputs.
+    ///
+    /// # Parameters
+    /// - `key` — `&str`. Key name.
+    ///
+    /// # Returns
+    /// `bool` — `true` if consumed.
+    pub fn key_pressed(&mut self, key: &str) -> bool {
+        match key {
+            "tab" => {
+                self.focus_next();
+                true
+            }
+            "backspace" => {
+                if let Some(idx) = self.focused_widget {
+                    if let WidgetKind::TextInput(ti) = &mut self.widgets[idx] {
+                        ti.backspace();
+                        return true;
+                    }
+                }
+                false
+            }
+            _ => false,
+        }
+    }
+
+    /// Forward a text input event to the focused text input widget.
+    ///
+    /// # Parameters
+    /// - `text` — `&str`. Input text.
+    ///
+    /// # Returns
+    /// `bool` — `true` if consumed.
+    pub fn text_input(&mut self, text: &str) -> bool {
+        if let Some(idx) = self.focused_widget {
+            if let WidgetKind::TextInput(ti) = &mut self.widgets[idx] {
+                ti.insert_text(text);
+                return true;
+            }
+        }
+        false
+    }
+
+    /// Forward a mouse wheel event.
+    ///
+    /// # Parameters
+    /// - `_x` — `f32`. Horizontal scroll.
+    /// - `y` — `f32`. Vertical scroll.
+    ///
+    /// # Returns
+    /// `bool` — `true` if consumed.
+    pub fn wheel_moved(&mut self, _x: f32, y: f32) -> bool {
+        if let Some(idx) = self.focused_widget {
+            if let WidgetKind::ScrollPanel(sp) = &mut self.widgets[idx] {
+                sp.scroll_y -= y * sp.scroll_speed;
+                sp.clamp_scroll();
+                return true;
+            }
+        }
+        false
+    }
+}
+
+impl Default for GuiContext {
+    fn default() -> Self {
+        Self::new()
+    }
+}
