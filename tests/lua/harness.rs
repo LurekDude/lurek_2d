@@ -343,6 +343,11 @@ fn lua_test_postfx() {
 }
 
 #[test]
+fn lua_test_image_effect() {
+    run_lua_test("unit/test_image_effect.lua");
+}
+
+#[test]
 fn lua_test_overlay() {
     run_lua_test("unit/test_overlay.lua");
 }

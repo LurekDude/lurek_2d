@@ -9,6 +9,8 @@ use crate::graphics::texture::Texture;
 use slotmap::Key;
 use crate::engine::resource_keys::{CanvasKey, FontKey, MeshKey, SpriteBatchKey, TextureKey, ShaderKey, ShapeKey};
 use crate::lua_api::lua_types::{add_type_methods, LunaType};
+use crate::lua_api::postfx_api::LuaImageEffect;
+use crate::graphics::ImageEffectPass;
 use crate::graphics::mesh::{Mesh, MeshDrawMode, MeshVertex};
 use crate::graphics::shader::{Shader, UniformValue};
 use crate::graphics::{CompoundShape, ShapeCommand};
@@ -3133,13 +3135,37 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
                     _ => None,
                 }
             };
-            let x = args_iter.next().and_then(to_f32).unwrap_or(0.0);
-            let y = args_iter.next().and_then(to_f32).unwrap_or(0.0);
-            let r = args_iter.next().and_then(to_f32).unwrap_or(0.0);
-            let sx = args_iter.next().and_then(to_f32).unwrap_or(1.0);
-            let sy = args_iter.next().and_then(to_f32).unwrap_or(1.0);
-            let ox = args_iter.next().and_then(to_f32).unwrap_or(0.0);
-            let oy = args_iter.next().and_then(to_f32).unwrap_or(0.0);
+
+            // Options-table overload: draw(drawable, { x, y, r, sx, sy, ox, oy, effect })
+            let second_arg = args_iter.next().cloned().unwrap_or(LuaValue::Nil);
+            let (x, y, r, sx, sy, ox, oy, effect_passes) = if let LuaValue::Table(ref opts) = second_arg {
+                let x: f32 = opts.get::<_, Option<f32>>("x")?.unwrap_or(0.0);
+                let y: f32 = opts.get::<_, Option<f32>>("y")?.unwrap_or(0.0);
+                let r: f32 = opts.get::<_, Option<f32>>("r")?.unwrap_or(0.0);
+                let sx: f32 = opts.get::<_, Option<f32>>("sx")?.unwrap_or(1.0);
+                let sy: f32 = opts.get::<_, Option<f32>>("sy")?.unwrap_or(sx);
+                let ox: f32 = opts.get::<_, Option<f32>>("ox")?.unwrap_or(0.0);
+                let oy: f32 = opts.get::<_, Option<f32>>("oy")?.unwrap_or(0.0);
+                let passes: Option<Vec<ImageEffectPass>> =
+                    if let Ok(effect_ud) = opts.get::<_, LuaAnyUserData>("effect") {
+                        let effect = effect_ud.borrow::<LuaImageEffect>()?;
+                        let passes_vec = effect.inner.borrow().to_passes();
+                        Some(passes_vec)
+                    } else {
+                        None
+                    };
+                (x, y, r, sx, sy, ox, oy, passes)
+            } else {
+                // Positional form
+                let x = to_f32(&second_arg).unwrap_or(0.0);
+                let y = args_iter.next().and_then(to_f32).unwrap_or(0.0);
+                let r = args_iter.next().and_then(to_f32).unwrap_or(0.0);
+                let sx = args_iter.next().and_then(to_f32).unwrap_or(1.0);
+                let sy = args_iter.next().and_then(to_f32).unwrap_or(1.0);
+                let ox = args_iter.next().and_then(to_f32).unwrap_or(0.0);
+                let oy = args_iter.next().and_then(to_f32).unwrap_or(0.0);
+                (x, y, r, sx, sy, ox, oy, None)
+            };
 
             let has_transform = r != 0.0 || sx != 1.0 || sy != 1.0 || ox != 0.0 || oy != 0.0;
             let mut st = s.borrow_mut();
@@ -3153,7 +3179,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
                         if !st.textures.contains_key(key) {
                             return Err(invalid_texture_handle("luna.graphics.draw"));
                         }
-                        if has_transform {
+                        if has_transform || effect_passes.is_some() {
                             st.draw_commands.push(DrawCommand::DrawImageEx {
                                 texture_key: key,
                                 x,
@@ -3163,10 +3189,11 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
                                 sy,
                                 ox,
                                 oy,
+                                effect: effect_passes,
                             });
                         } else {
                             st.draw_commands
-                                .push(DrawCommand::DrawImage { texture_key: key, x, y });
+                                .push(DrawCommand::DrawImage { texture_key: key, x, y, effect: None });
                         }
                         return Ok(());
                     }
@@ -3208,7 +3235,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
                     // Backward compat: raw integer = texture ID
                     let key =
                         require_texture_key(&st, &drawable, "luna.graphics.draw")?;
-                    if has_transform {
+                    if has_transform || effect_passes.is_some() {
                         st.draw_commands.push(DrawCommand::DrawImageEx {
                             texture_key: key,
                             x,
@@ -3218,10 +3245,11 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
                             sy,
                             ox,
                             oy,
+                            effect: effect_passes,
                         });
                     } else {
                         st.draw_commands
-                            .push(DrawCommand::DrawImage { texture_key: key, x, y });
+                            .push(DrawCommand::DrawImage { texture_key: key, x, y, effect: None });
                     }
                     Ok(())
                 }
@@ -3945,7 +3973,9 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
                             sy,
                             ox,
                             oy,
-                        });
+                        
+                                                effect: None,
+                                            });
                         return Ok(());
                     }
                     // Try Canvas
@@ -3995,7 +4025,9 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
                         sy,
                         ox,
                         oy,
-                    });
+                    
+                                            effect: None,
+                                        });
                     Ok(())
                 }
                 LuaValue::Nil => Err(LuaError::RuntimeError(
@@ -4066,6 +4098,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
                     sy,
                     ox,
                     oy,
+                    effect: None,
                 });
                 Ok(())
             },

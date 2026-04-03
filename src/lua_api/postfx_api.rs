@@ -1,6 +1,6 @@
 //! Lua API bindings for the `luna.postfx.*` post-processing effects module.
 //!
-//! Registers the `luna.postfx` table and exposes three factory functions:
+//! Registers the `luna.postfx` table and exposes factory functions:
 //!
 //! - `luna.postfx.newEffect(name)` — creates a built-in `PostFxEffect`
 //!   by name (`"bloom"`, `"blur"`, `"crt"`, `"godrays"`, `"vignette"`,
@@ -9,11 +9,19 @@
 //!   backed by an external shader resource ID.
 //! - `luna.postfx.newStack(width?, height?)` — creates an empty
 //!   `PostFxStack` with the given canvas dimensions.
+//! - `luna.postfx.newImageEffect(...)` — creates a per-image
+//!   [`LuaImageEffect`] chain (empty, single-effect, chain-table, or
+//!   options-table overloads).
+//! - `luna.postfx.loadImageEffect(path)` — loads a [`LuaImageEffect`]
+//!   chain from a TOML preset file.
 //!
-//! `LuaPostFxEffect` and `LuaPostFxStack` are thin `mlua` UserData wrappers
-//! that hold `Rc<RefCell<...>>` smart pointers. `LuaPostFxStack` additionally
-//! owns the concrete effect vector so that effect objects added via Lua are
-//! kept alive as long as the stack is alive.
+//! `LuaPostFxEffect`, `LuaPostFxStack`, and `LuaImageEffect` are thin
+//! `mlua` UserData wrappers that hold `Rc<RefCell<...>>` smart pointers.
+//! `LuaPostFxStack` additionally owns the concrete effect vector so that
+//! effect objects added via Lua are kept alive as long as the stack is alive.
+//! `LuaImageEffect` stores [`crate::postfx::PostFxEffect`] values directly
+//! inside its [`crate::postfx::ImageEffect`] and is passed to
+//! `luna.graphics.draw` via the `effect` key of the options-table overload.
 //!
 //! The `register` function is called once during engine startup.
 
@@ -65,6 +73,12 @@ impl LuaUserData for LuaPostFxEffect {
         /// - `name` — `string` — Parameter key.
         /// - `value` — `number` — New float value.
         methods.add_method("setParameter", |_, this, (name, value): (String, f32)| {
+            if !value.is_finite() {
+                return Err(LuaError::RuntimeError(format!(
+                    "setParameter: value must be finite, got {}",
+                    value
+                )));
+            }
             this.inner.borrow_mut().set_parameter(name, value);
             Ok(())
         });
@@ -123,7 +137,7 @@ impl LuaUserData for LuaPostFxEffect {
         /// # Returns
         /// `string` — One of `"bloom"`, `"blur"`, `"crt"`, `"godrays"`,
         /// `"vignette"`, `"colourgrade"`, `"chromatic"`, or `"custom"`.
-        methods.add_method("getEffectType", |_, this, ()| {
+        methods.add_method("getType", |_, this, ()| {
             Ok(this.inner.borrow().get_type_name().to_string())
         });
 
@@ -175,6 +189,12 @@ impl LuaUserData for LuaPostFxEffect {
         /// # Parameters
         /// - `value` — `number` — Threshold luminance (0.0–1.0).
         methods.add_method("setThreshold", |_, this, value: f32| {
+            if !value.is_finite() {
+                return Err(LuaError::RuntimeError(format!(
+                    "parameter value must be finite, got {}",
+                    value
+                )));
+            }
             this.inner.borrow_mut().set_parameter("threshold", value);
             Ok(())
         });
@@ -189,6 +209,12 @@ impl LuaUserData for LuaPostFxEffect {
         /// # Parameters
         /// - `value` — `number` — Intensity multiplier (typically 0.0–2.0).
         methods.add_method("setIntensity", |_, this, value: f32| {
+            if !value.is_finite() {
+                return Err(LuaError::RuntimeError(format!(
+                    "parameter value must be finite, got {}",
+                    value
+                )));
+            }
             this.inner.borrow_mut().set_parameter("intensity", value);
             Ok(())
         });
@@ -218,6 +244,12 @@ impl LuaUserData for LuaPostFxEffect {
         /// # Parameters
         /// - `value` — `number` — Blur radius in pixels.
         methods.add_method("setRadius", |_, this, value: f32| {
+            if !value.is_finite() {
+                return Err(LuaError::RuntimeError(format!(
+                    "parameter value must be finite, got {}",
+                    value
+                )));
+            }
             this.inner.borrow_mut().set_parameter("radius", value);
             Ok(())
         });
@@ -231,6 +263,12 @@ impl LuaUserData for LuaPostFxEffect {
         /// # Parameters
         /// - `value` — `number` — Strength factor (0.0–1.0).
         methods.add_method("setStrength", |_, this, value: f32| {
+            if !value.is_finite() {
+                return Err(LuaError::RuntimeError(format!(
+                    "parameter value must be finite, got {}",
+                    value
+                )));
+            }
             this.inner.borrow_mut().set_parameter("strength", value);
             Ok(())
         });
@@ -245,6 +283,12 @@ impl LuaUserData for LuaPostFxEffect {
         /// # Parameters
         /// - `value` — `number` — Pixel offset for channel separation.
         methods.add_method("setOffset", |_, this, value: f32| {
+            if !value.is_finite() {
+                return Err(LuaError::RuntimeError(format!(
+                    "parameter value must be finite, got {}",
+                    value
+                )));
+            }
             this.inner.borrow_mut().set_parameter("offset", value);
             Ok(())
         });
@@ -259,6 +303,12 @@ impl LuaUserData for LuaPostFxEffect {
         /// # Parameters
         /// - `value` — `number` — Brightness multiplier (default 1.0).
         methods.add_method("setBrightness", |_, this, value: f32| {
+            if !value.is_finite() {
+                return Err(LuaError::RuntimeError(format!(
+                    "parameter value must be finite, got {}",
+                    value
+                )));
+            }
             this.inner.borrow_mut().set_parameter("brightness", value);
             Ok(())
         });
@@ -272,6 +322,12 @@ impl LuaUserData for LuaPostFxEffect {
         /// # Parameters
         /// - `value` — `number` — Contrast multiplier (default 1.0).
         methods.add_method("setContrast", |_, this, value: f32| {
+            if !value.is_finite() {
+                return Err(LuaError::RuntimeError(format!(
+                    "parameter value must be finite, got {}",
+                    value
+                )));
+            }
             this.inner.borrow_mut().set_parameter("contrast", value);
             Ok(())
         });
@@ -285,6 +341,12 @@ impl LuaUserData for LuaPostFxEffect {
         /// # Parameters
         /// - `value` — `number` — Saturation multiplier (0.0–2.0, default 1.0).
         methods.add_method("setSaturation", |_, this, value: f32| {
+            if !value.is_finite() {
+                return Err(LuaError::RuntimeError(format!(
+                    "parameter value must be finite, got {}",
+                    value
+                )));
+            }
             this.inner.borrow_mut().set_parameter("saturation", value);
             Ok(())
         });
@@ -565,15 +627,183 @@ impl LuaUserData for LuaPostFxStack {
 }
 
 // ---------------------------------------------------------------------------
+// LuaImageEffect
+// ---------------------------------------------------------------------------
+
+/// Lua UserData wrapper for a per-image shader effect chain.
+///
+/// Wraps an [`crate::postfx::ImageEffect`] in an `Rc<RefCell<...>>` so it
+/// can be safely passed between Lua variables and to `luna.graphics.draw`.
+/// The inner [`crate::postfx::ImageEffect`] stores [`crate::postfx::PostFxEffect`]
+/// objects directly (as owned values, not shared references).
+///
+/// # Fields
+/// - `inner` — `Rc<RefCell<ImageEffect>>` — Shared reference to the effect chain.
+#[derive(Clone)]
+pub(crate) struct LuaImageEffect {
+    pub(crate) inner: Rc<RefCell<crate::postfx::ImageEffect>>,
+}
+
+impl LunaType for LuaImageEffect {
+    const TYPE_NAME: &'static str = "ImageEffect";
+    const TYPE_HIERARCHY: &'static [&'static str] = &["Object"];
+}
+
+impl LuaUserData for LuaImageEffect {
+    fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
+        add_type_methods::<Self>(methods);
+
+        /// Appends a new effect pass by name to the end of this effect chain.
+        ///
+        /// Creates the effect internally and returns a shared handle so that
+        /// parameter mutations through the returned object are visible in the chain.
+        ///
+        /// # Parameters
+        /// - `name` — `string` — Effect type name (e.g. `"blur"`, `"sepia"`).
+        ///
+        /// # Returns
+        /// `PostFxEffect` — Shared handle to the newly added effect.
+        methods.add_method("addEffect", |_, this, name: String| {
+            let effect_type = PostFxEffectType::from_name(&name).ok_or_else(|| {
+                LuaError::RuntimeError(format!(
+                    "addEffect: unknown effect type '{}'. Valid types: bloom, blur, crt, godrays, vignette, colourgrade, chromatic, pixelate, sepia, grayscale, invert, scanlines, edgedetect, hueshift, noise",
+                    name
+                ))
+            })?;
+            let rc = Rc::new(RefCell::new(PostFxEffect::new(effect_type)));
+            this.inner.borrow_mut().add_effect_rc(Rc::clone(&rc));
+            Ok(LuaPostFxEffect { inner: rc })
+        });
+
+        /// Returns the effect at the given 1-based index or by name, or `nil`.
+        ///
+        /// When the first argument is an integer, retrieves by 1-based position.
+        /// When it is a string, retrieves the first effect whose type name matches.
+        ///
+        /// # Parameters
+        /// - `key` ? `integer | string` ? 1-based index or effect type name.
+        ///
+        /// # Returns
+        /// `PostFxEffect | nil`.
+        methods.add_method("getEffect", |_, this, key: LuaValue| {
+            let inner = this.inner.borrow();
+            let opt_rc = match &key {
+                LuaValue::Integer(i) => inner.get_effect_by_index((*i as usize).saturating_sub(1)),
+                LuaValue::Number(n) => inner.get_effect_by_index((*n as usize).saturating_sub(1)),
+                LuaValue::String(s) => {
+                    inner.get_effect_by_name(s.to_str().map_err(LuaError::external)?)
+                }
+                _ => None,
+            };
+            Ok(opt_rc.map(|r| LuaPostFxEffect { inner: r }))
+        });
+
+        /// Returns the number of effects in this chain.
+        ///
+        /// # Returns
+        /// `integer`.
+        methods.add_method("effectCount", |_, this, ()| {
+            Ok(this.inner.borrow().effect_count())
+        });
+
+        /// Removes an effect by 1-based index or by type name.
+        ///
+        /// # Parameters
+        /// - `key` ? `integer | string` ? 1-based index or effect type name.
+        ///
+        /// # Returns
+        /// `boolean` ? `true` if the effect was found and removed.
+        methods.add_method("removeEffect", |_, this, key: LuaValue| {
+            let mut inner = this.inner.borrow_mut();
+            let removed = match &key {
+                LuaValue::Integer(i) => inner.remove_by_index((*i as usize).saturating_sub(1)),
+                LuaValue::Number(n) => inner.remove_by_index((*n as usize).saturating_sub(1)),
+                LuaValue::String(s) => {
+                    inner.remove_by_name(s.to_str().map_err(LuaError::external)?)
+                }
+                _ => false,
+            };
+            Ok(removed)
+        });
+
+        /// Removes all effects from this chain.
+        methods.add_method("clearEffects", |_, this, ()| {
+            this.inner.borrow_mut().clear();
+            Ok(())
+        });
+
+        /// Returns a deep clone of this `ImageEffect`.
+        ///
+        /// The returned object shares no state with the original.
+        ///
+        /// # Returns
+        /// `ImageEffect`.
+        methods.add_method("clone", |_, this, ()| {
+            let inner = this.inner.borrow();
+            let mut cloned = crate::postfx::ImageEffect::new(&inner.name);
+            for effect in &inner.effects {
+                cloned.add_effect(effect.borrow().clone());
+            }
+            Ok(LuaImageEffect {
+                inner: Rc::new(RefCell::new(cloned)),
+            })
+        });
+
+        /// Serialises this effect chain to a TOML file at the given path.
+        ///
+        /// # Parameters
+        /// - `path` ? `string` ? Destination file path.
+        ///
+        /// # Returns
+        /// `()`.
+        methods.add_method("save", |_, this, path: String| {
+            let path_obj = std::path::Path::new(&path);
+            if path_obj
+                .components()
+                .any(|c| matches!(
+                    c,
+                    std::path::Component::ParentDir
+                        | std::path::Component::RootDir
+                        | std::path::Component::Prefix(_)
+                ))
+            {
+                return Err(LuaError::RuntimeError(
+                    "ImageEffect:save: path traversal not allowed".to_string(),
+                ));
+            }
+            let inner = this.inner.borrow();
+            let mut out = String::new();
+            out.push_str(&format!("name = {:?}\n", inner.name));
+            for effect_rc in &inner.effects {
+                let effect = effect_rc.borrow();
+                out.push_str("\n[[effects]]\n");
+                out.push_str(&format!("type = {:?}\n", effect.get_type_name()));
+                out.push_str(&format!("enabled = {}\n", effect.enabled));
+                let mut params: Vec<(&String, &f32)> = effect.params.iter().collect();
+                params.sort_by_key(|(k, _)| k.as_str());
+                for (k, v) in params {
+                    out.push_str(&format!("{} = {}\n", k, v));
+                }
+            }
+            std::fs::write(&path, out).map_err(|e| {
+                mlua::Error::RuntimeError(format!("ImageEffect:save: {}", e))
+            })
+        });
+    }
+}
+
+
+// ---------------------------------------------------------------------------
 // Registration
 // ---------------------------------------------------------------------------
 
 /// Registers the `luna.postfx.*` Lua API.
 ///
-/// Creates the `luna.postfx` sub-table and adds three factory functions:
-/// `newEffect`, `newPass`, and `newStack`. Also adds `getEffectTypes` for
-/// introspection. All `LuaPostFxEffect` and `LuaPostFxStack` methods are
-/// registered on their respective UserData types via `LuaUserData` impls.
+/// Creates the `luna.postfx` sub-table and adds factory functions:
+/// `newEffect`, `newPass`, `newStack`, `getEffectTypes`, `newImageEffect`,
+/// and `loadImageEffect`. All `LuaPostFxEffect`, `LuaPostFxStack`, and
+/// `LuaImageEffect` methods are registered on their respective UserData
+/// types via `LuaUserData` impls.
 ///
 /// # Parameters
 /// - `lua` — `&Lua` — The active Lua VM.
@@ -687,10 +917,171 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
         })?,
     )?;
 
+    // luna.postfx.newImageEffect(name?, params?) | (chain_table?) -> ImageEffect
+    /// Creates a per-image effect chain.
+    ///
+    /// Overloads:
+    /// - `newImageEffect()` — empty chain.
+    /// - `newImageEffect("blur")` — chain with a single named effect.
+    /// - `newImageEffect("blur", {radius=4})` — single effect with initial parameters.
+    /// - `newImageEffect({{type="blur",radius=2},{type="sepia"}})` — chain from an array of spec tables.
+    ///
+    /// @return ImageEffect
+    postfx.set(
+        "newImageEffect",
+        lua.create_function(|_, args: LuaMultiValue| {
+            let mut it = args.iter();
+            match it.next() {
+                None | Some(LuaValue::Nil) => {
+                    Ok(LuaImageEffect {
+                        inner: Rc::new(RefCell::new(crate::postfx::ImageEffect::new(""))),
+                    })
+                }
+                Some(LuaValue::String(s)) => {
+                    let name = s.to_str().map_err(LuaError::external)?.to_owned();
+                    let effect_type = PostFxEffectType::from_name(&name).ok_or_else(|| {
+                        LuaError::RuntimeError(format!(
+                            "newImageEffect: unknown effect type '{}'. Valid types: bloom, blur, crt, godrays, vignette, colourgrade, chromatic, pixelate, sepia, grayscale, invert, scanlines, edgedetect, hueshift, noise",
+                            name
+                        ))
+                    })?;
+                    let rc = Rc::new(RefCell::new(PostFxEffect::new(effect_type)));
+                    if let Some(LuaValue::Table(params)) = it.next() {
+                        for pair in params.clone().pairs::<String, LuaValue>() {
+                            let (k, v) = pair?;
+                            match v {
+                                LuaValue::Number(n) => rc.borrow_mut().set_parameter(k, n as f32),
+                                LuaValue::Integer(n) => rc.borrow_mut().set_parameter(k, n as f32),
+                                _ => {}
+                            }
+                        }
+                    }
+                    let mut chain = crate::postfx::ImageEffect::new(&name);
+                    chain.add_effect_rc(rc);
+                    Ok(LuaImageEffect {
+                        inner: Rc::new(RefCell::new(chain)),
+                    })
+                }
+                Some(LuaValue::Table(t)) => {
+                    let mut chain = crate::postfx::ImageEffect::new("");
+                    let mut idx: i64 = 1;
+                    loop {
+                        let entry: Option<LuaTable> = t.get(idx)?;
+                        match entry {
+                            None => break,
+                            Some(spec) => {
+                                let type_name: String = spec.get("type")?;
+                                let effect_type = PostFxEffectType::from_name(&type_name)
+                                    .ok_or_else(|| {
+                                        LuaError::RuntimeError(format!(
+                                            "newImageEffect: unknown effect type '{}'",
+                                            type_name
+                                        ))
+                                    })?;
+                                let rc = Rc::new(RefCell::new(PostFxEffect::new(effect_type)));
+                                for pair in spec.pairs::<String, LuaValue>() {
+                                    let (k, v) = pair?;
+                                    if k == "enabled" {
+                                        if let LuaValue::Boolean(b) = v {
+                                            rc.borrow_mut().enabled = b;
+                                        }
+                                    } else if k != "type" {
+                                        match v {
+                                            LuaValue::Number(n) => {
+                                                rc.borrow_mut().set_parameter(k, n as f32)
+                                            }
+                                            LuaValue::Integer(n) => {
+                                                rc.borrow_mut().set_parameter(k, n as f32)
+                                            }
+                                            _ => {}
+                                        }
+                                    }
+                                }
+                                chain.add_effect_rc(rc);
+                                idx += 1;
+                            }
+                        }
+                    }
+                    Ok(LuaImageEffect {
+                        inner: Rc::new(RefCell::new(chain)),
+                    })
+                }
+                _ => Err(LuaError::RuntimeError(
+                    "newImageEffect: expected nil, string, or table argument".to_string(),
+                )),
+            }
+        })?,
+    )?;
+
+    // luna.postfx.loadImageEffect(path) -> ImageEffect
+    /// Loads a per-image effect chain from a TOML preset file saved by `ImageEffect:save`.
+    ///
+    /// @param path : string
+    /// @return ImageEffect
+    postfx.set(
+        "loadImageEffect",
+        lua.create_function(|_, path: String| {
+            let path_obj = std::path::Path::new(&path);
+            if path_obj
+                .components()
+                .any(|c| matches!(
+                    c,
+                    std::path::Component::ParentDir
+                        | std::path::Component::RootDir
+                        | std::path::Component::Prefix(_)
+                ))
+            {
+                return Err(LuaError::RuntimeError(
+                    "loadImageEffect: path traversal not allowed".to_string(),
+                ));
+            }
+            let content = std::fs::read_to_string(&path).map_err(|e| {
+                LuaError::RuntimeError(format!("loadImageEffect: {}", e))
+            })?;
+            let doc: toml::Value = content.parse::<toml::Value>().map_err(|e| {
+                LuaError::RuntimeError(format!("loadImageEffect: TOML parse error: {}", e))
+            })?;
+            let name = doc.get("name").and_then(|v| v.as_str()).unwrap_or("").to_owned();
+            let mut chain = crate::postfx::ImageEffect::new(&name);
+            if let Some(effects) = doc.get("effects").and_then(|v| v.as_array()) {
+                for spec in effects {
+                    let type_name = spec.get("type").and_then(|v| v.as_str()).unwrap_or("");
+                    let effect_type = PostFxEffectType::from_name(type_name).ok_or_else(|| {
+                        LuaError::RuntimeError(format!(
+                            "loadImageEffect: unknown effect type '{}'",
+                            type_name
+                        ))
+                    })?;
+                    let mut effect = PostFxEffect::new(effect_type);
+                    if let Some(b) = spec.get("enabled").and_then(|v| v.as_bool()) {
+                        effect.enabled = b;
+                    }
+                    if let Some(table) = spec.as_table() {
+                        for (k, v) in table {
+                            if k == "type" || k == "enabled" {
+                                continue;
+                            }
+                            if let Some(f) = v.as_float() {
+                                effect.set_parameter(k.clone(), f as f32);
+                            } else if let Some(i) = v.as_integer() {
+                                effect.set_parameter(k.clone(), i as f32);
+                            }
+                        }
+                    }
+                    chain.add_effect(effect);
+                }
+            }
+            Ok(LuaImageEffect {
+                inner: Rc::new(RefCell::new(chain)),
+            })
+        })?,
+    )?;
+
     /// Registers `luna.postfx` and returns.
     ///
     /// # Returns
     /// `LuaResult<()>`.
+
     luna.set("postfx", postfx)?;
 
     Ok(())

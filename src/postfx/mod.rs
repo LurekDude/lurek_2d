@@ -19,7 +19,10 @@ pub mod effect_type;
 pub mod effect;
 /// Ordered chain of effects for full-screen post-processing.
 pub mod stack;
+/// Ordered per-image effect chain with lightweight pass conversion.
+pub mod image_effect;
 
 pub use effect_type::PostFxEffectType;
 pub use effect::PostFxEffect;
 pub use stack::PostFxStack;
+pub use image_effect::ImageEffect;

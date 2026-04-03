@@ -17,6 +17,7 @@ use super::effect_type::PostFxEffectType;
 /// - `params` — Named float parameters controlling the shader (e.g., `"threshold"`, `"intensity"`).
 /// - `enabled` — Whether this effect is active within its parent stack.
 /// - `shader_id` — Optional custom shader handle; only used for `Custom` effects.
+#[derive(Clone)]
 pub struct PostFxEffect {
     /// The type of this effect.
     pub effect_type: PostFxEffectType,

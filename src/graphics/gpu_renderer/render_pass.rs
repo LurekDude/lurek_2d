@@ -530,7 +530,15 @@ impl GpuRenderer {
                     );
                 }
 
-                DrawCommand::DrawImage { texture_key, x, y } => {
+                DrawCommand::DrawImage { texture_key, x, y, effect } => {
+                    if let Some(passes) = effect {
+                        if passes.iter().any(|p| p.enabled) {
+                            log::debug!(
+                                "luna.graphics.draw: image effect chain ({} passes); GPU-layer per-image effects require PostFx shader infrastructure",
+                                passes.len()
+                            );
+                        }
+                    }
                     if let Some(gt) = self.gpu_textures.get(*texture_key) {
                         let w = gt.width as f32;
                         let h = gt.height as f32;
@@ -584,7 +592,16 @@ impl GpuRenderer {
                     sy,
                     ox,
                     oy,
+                    effect,
                 } => {
+                    if let Some(passes) = effect {
+                        if passes.iter().any(|p| p.enabled) {
+                            log::debug!(
+                                "luna.graphics.drawEx: image effect chain ({} passes); GPU-layer per-image effects require PostFx shader infrastructure",
+                                passes.len()
+                            );
+                        }
+                    }
                     if let Some(gt) = self.gpu_textures.get(*texture_key) {
                         let w = gt.width as f32;
                         let h = gt.height as f32;
@@ -644,7 +661,16 @@ impl GpuRenderer {
                     sy,
                     ox,
                     oy,
+                    effect,
                 } => {
+                    if let Some(passes) = effect {
+                        if passes.iter().any(|p| p.enabled) {
+                            log::debug!(
+                                "luna.graphics.drawQuad: image effect chain ({} passes); GPU-layer per-image effects require PostFx shader infrastructure",
+                                passes.len()
+                            );
+                        }
+                    }
                     if let Some(_gt) = self.gpu_textures.get(*texture_key) {
                         let t = transform_stack.last().unwrap();
                         let mut verts = Vec::with_capacity(4);

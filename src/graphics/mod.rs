@@ -24,6 +24,8 @@ pub mod draw_layer;
 pub mod font;
 /// GPU-accelerated renderer backed by wgpu (primary runtime renderer).
 pub mod gpu_renderer;
+/// Lightweight per-image shader-effect pass data for the draw command pipeline.
+pub mod image_effect;
 /// Optimized renderer for large tile-based maps with chunking and LOD.
 pub mod large_map_renderer;
 /// 2D point light data container for lighting systems.
@@ -70,6 +72,7 @@ pub use decal_surface::DecalSurface;
 pub use draw_layer::DrawLayer;
 pub use font::Font;
 pub use gpu_renderer::GpuRenderer;
+pub use image_effect::ImageEffectPass;
 pub use large_map_renderer::LargeMapRenderer;
 pub use light2d::Light2D;
 pub use mesh::{Mesh, MeshDrawMode, MeshVertex};

@@ -10,6 +10,7 @@
 use crate::engine::resource_keys::{
     CanvasKey, FontKey, MeshKey, ShaderKey, ShapeKey, SpriteBatchKey, TextureKey,
 };
+use crate::graphics::image_effect::ImageEffectPass;
 use crate::graphics::mesh::Mesh;
 
 /// Stencil comparison mode for `luna.graphics.setStencilTest`.
@@ -274,6 +275,8 @@ pub enum DrawCommand {
         texture_key: TextureKey,
         x: f32,
         y: f32,
+        /// Optional per-image effect chain applied at draw time.
+        effect: Option<Vec<ImageEffectPass>>,
     },
     /// Draw a texture with full affine transform: rotation (radians), scale, origin offset.
     DrawImageEx {
@@ -285,6 +288,8 @@ pub enum DrawCommand {
         sy: f32,
         ox: f32,
         oy: f32,
+        /// Optional per-image effect chain applied at draw time.
+        effect: Option<Vec<ImageEffectPass>>,
     },
     /// Draw a sub-region of a texture (sprite-sheet) with full transform.
     DrawQuad {
@@ -305,6 +310,8 @@ pub enum DrawCommand {
         sy: f32,
         ox: f32,
         oy: f32,
+        /// Optional per-image effect chain applied at draw time.
+        effect: Option<Vec<ImageEffectPass>>,
     },
     Print {
         text: String,
