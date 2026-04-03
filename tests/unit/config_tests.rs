@@ -88,3 +88,84 @@ fn config_load_from_conf_lua_maps_empty_phase01_optionals_to_none() {
     assert_eq!(config.identity, None);
     assert_eq!(config.version, None);
 }
+
+#[test]
+fn config_graphics_defaults_are_auto_and_high() {
+    let (config, _) = Config::load_from_conf_lua(std::path::Path::new("nonexistent_dir_xyz"));
+    assert_eq!(config.graphics.backend, "auto");
+    assert_eq!(config.graphics.power_preference, "high");
+}
+
+#[test]
+fn config_load_from_conf_lua_parses_graphics_backend_options() {
+    let temp_dir = TempDir::new().expect("Failed to create temp dir");
+    for backend in ["auto", "dx12", "vulkan", "metal"] {
+        write_conf(
+            &temp_dir,
+            &format!(
+                r#"function luna.conf(t) t.graphics.backend = "{backend}" end"#
+            ),
+        );
+        let (config, error) = Config::load_from_conf_lua(temp_dir.path());
+        assert!(error.is_none(), "unexpected error for backend={backend}: {error:?}");
+        assert_eq!(config.graphics.backend, backend, "backend={backend} not stored");
+    }
+}
+
+#[test]
+fn config_load_from_conf_lua_parses_graphics_power_preference_options() {
+    let temp_dir = TempDir::new().expect("Failed to create temp dir");
+    for pref in ["high", "low", "none"] {
+        write_conf(
+            &temp_dir,
+            &format!(
+                r#"function luna.conf(t) t.graphics.power_preference = "{pref}" end"#
+            ),
+        );
+        let (config, error) = Config::load_from_conf_lua(temp_dir.path());
+        assert!(error.is_none(), "unexpected error for power_preference={pref}: {error:?}");
+        assert_eq!(
+            config.graphics.power_preference, pref,
+            "power_preference={pref} not stored"
+        );
+    }
+}
+
+#[test]
+fn config_graphics_rejects_unknown_backend_keeps_default() {
+    let temp_dir = TempDir::new().expect("Failed to create temp dir");
+    write_conf(
+        &temp_dir,
+        r#"function luna.conf(t) t.graphics.backend = "opengl" end"#,
+    );
+    let (config, _) = Config::load_from_conf_lua(temp_dir.path());
+    // Unknown backend must not overwrite the default — stays "auto".
+    assert_eq!(config.graphics.backend, "auto");
+}
+
+#[test]
+fn config_graphics_rejects_unknown_power_preference_keeps_default() {
+    let temp_dir = TempDir::new().expect("Failed to create temp dir");
+    write_conf(
+        &temp_dir,
+        r#"function luna.conf(t) t.graphics.power_preference = "turbo" end"#,
+    );
+    let (config, _) = Config::load_from_conf_lua(temp_dir.path());
+    // Unknown value must not overwrite the default — stays "high".
+    assert_eq!(config.graphics.power_preference, "high");
+}
+
+#[test]
+fn config_graphics_is_case_insensitive() {
+    let temp_dir = TempDir::new().expect("Failed to create temp dir");
+    write_conf(
+        &temp_dir,
+        r#"function luna.conf(t)
+            t.graphics.backend = "DX12"
+            t.graphics.power_preference = "LOW"
+        end"#,
+    );
+    let (config, _) = Config::load_from_conf_lua(temp_dir.path());
+    assert_eq!(config.graphics.backend, "dx12");
+    assert_eq!(config.graphics.power_preference, "low");
+}

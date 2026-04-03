@@ -130,11 +130,14 @@ path = "src/lib.rs"
 
 [profile.dev]
 # opt-level 1 keeps game code debuggable while feeling reasonably smooth.
-# incremental = true speeds up rebuilds; debug = true keeps full DWARF info
-# so the debugger can inspect every variable and step through code.
+# incremental = true speeds up rebuilds.
+# debug = "line-tables-only" preserves file/line info for backtraces and
+# basic debugger step-through, but drops full DWARF variable metadata —
+# saves ~15–20 MB vs debug = true. Use debug = true locally when you need
+# to inspect variables in a debugger (does not affect release builds).
 opt-level = 1
 incremental = true
-debug = true
+debug = "line-tables-only"
 
 # Optimize all dependencies even in debug mode (common fast-iteration pattern)
 # Gives near-release performance for deps while keeping game code debuggable
@@ -153,6 +156,13 @@ panic = "abort"
 overflow-checks = false
 debug = false
 
+# Size-optimised distribution profile: cargo build --profile dist
+# Trades some runtime speed for a smaller binary (~30–40% smaller than release).
+# Use for packaging / installer builds where download size matters.
+[profile.dist]
+inherits = "release"
+opt-level = "z"         # optimise for size instead of speed
+lto = "thin"            # thin LTO is faster to link and nearly as small
 
 [[test]]
 name = "compute_stress_tests"
@@ -171,6 +181,10 @@ name = "physics_stress_tests"
 path = "tests/stress/physics_stress_tests.rs"
 
 # === Unit tests ===
+[[test]]
+name = "automation_tests"
+path = "tests/unit/automation_tests.rs"
+
 [[test]]
 name = "audio_tests"
 path = "tests/unit/audio_tests.rs"
@@ -216,6 +230,10 @@ name = "graphics_tests"
 path = "tests/unit/graphics_tests.rs"
 
 [[test]]
+name = "gui_tests"
+path = "tests/unit/gui_tests.rs"
+
+[[test]]
 name = "image_tests"
 path = "tests/unit/image_tests.rs"
 
@@ -234,6 +252,10 @@ path = "tests/unit/modding_tests.rs"
 [[test]]
 name = "particle_tests"
 path = "tests/unit/particle_tests.rs"
+
+[[test]]
+name = "overlay_tests"
+path = "tests/unit/overlay_tests.rs"
 
 [[test]]
 name = "pathfinding_tests"

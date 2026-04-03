@@ -7,8 +7,9 @@
 //!
 //! # Structure
 //!
-//! [`Config`] is the top-level container and contains four nested structs:
+//! [`Config`] is the top-level container and contains five nested structs:
 //! - [`WindowConfig`] — window geometry, title, display placement, and decoration options.
+//! - [`GraphicsConfig`] — GPU backend selection and power preference, resolved at startup.
 //! - [`ModulesConfig`] — boolean feature-flags for optional engine subsystems (audio,
 //!   physics, graphics, etc.).  Disabling a module avoids the startup cost and prevents
 //!   the matching `luna.*` API calls from being registered.
@@ -21,10 +22,16 @@
 //! # Example `conf.lua`
 //!
 //! ```lua
-//! luna.window.setTitle("My Game")
-//! luna.window.setDimensions(1280, 720)
-//! luna.window.setFullscreen(false)
-//! luna.window.setVsync(true)
+//! function luna.conf(t)
+//!     t.window.title   = "My Game"
+//!     t.window.width   = 1280
+//!     t.window.height  = 720
+//!     t.window.vsync   = true
+//!     -- GPU backend: "auto" | "dx12" | "vulkan" | "metal"
+//!     t.graphics.backend          = "auto"
+//!     -- Power preference: "high" | "low" | "none"
+//!     t.graphics.power_preference = "high"
+//! end
 //! ```
 
 use mlua::prelude::*;
@@ -37,13 +44,17 @@ use std::path::Path;
 ///
 /// # Fields
 /// - `window` — Window dimensions, title, vsync, fullscreen, and resize settings.
+/// - `graphics` — GPU backend selection and power preference (resolved at engine startup).
 /// - `modules` — Flags enabling optional subsystems (audio, physics, graphics, etc.).
 /// - `performance` — Frame rate cap.
 /// - `identity` — Save directory name (used for persistent game data).
 /// - `version` — Target engine version string.
+/// - `log_file` — Path to the log file, relative to the game directory.
+/// - `log_append` — If `true`, appends to an existing log file instead of truncating it.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Config {
     pub window: WindowConfig,
+    pub graphics: GraphicsConfig,
     pub modules: ModulesConfig,
     pub performance: PerformanceConfig,
     pub identity: Option<String>,
@@ -52,6 +63,28 @@ pub struct Config {
     pub log_file: Option<String>,
     /// If `true`, appends to an existing log file instead of truncating it on startup.
     pub log_append: bool,
+}
+
+/// GPU backend and power-preference settings resolved once at engine startup.
+///
+/// These values are read from `t.graphics` in `conf.lua` and translate directly into
+/// [`wgpu::Backends`] and [`wgpu::PowerPreference`] passed to [`wgpu::Instance::new`] and
+/// [`wgpu::Instance::request_adapter`] respectively.
+///
+/// Changing these fields after the GPU has been initialised has no effect.
+///
+/// # Fields
+/// - `backend` — Which graphics API to use. `"auto"` lets wgpu choose the best available
+///   backend for the current platform (DX12 on Windows, Metal on macOS, Vulkan on Linux).
+///   Valid values: `"auto"`, `"dx12"`, `"vulkan"`, `"metal"`.
+/// - `power_preference` — Hint for which physical adapter to prefer when multiple GPUs are
+///   present. `"high"` requests the discrete GPU, `"low"` requests the integrated GPU,
+///   `"none"` expresses no preference and lets the driver decide.
+///   Valid values: `"high"`, `"low"`, `"none"`.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct GraphicsConfig {
+    pub backend: String,
+    pub power_preference: String,
 }
 
 /// Window dimensions, title, vsync, fullscreen, and resize settings.
@@ -130,6 +163,10 @@ impl Default for Config {
                 borderless: false,
                 icon: None,
                 display_index: 0,
+            },
+            graphics: GraphicsConfig {
+                backend: "auto".to_string(),
+                power_preference: "high".to_string(),
             },
             modules: ModulesConfig {
                 audio: true,
@@ -236,6 +273,18 @@ impl Config {
             .unwrap();
         t.set("window", window).unwrap();
 
+        let graphics = lua.create_table().unwrap();
+        graphics
+            .set("backend", config.graphics.backend.as_str())
+            .unwrap();
+        graphics
+            .set(
+                "power_preference",
+                config.graphics.power_preference.as_str(),
+            )
+            .unwrap();
+        t.set("graphics", graphics).unwrap();
+
         let modules = lua.create_table().unwrap();
         modules.set("audio", config.modules.audio).unwrap();
         modules.set("physics", config.modules.physics).unwrap();
@@ -305,6 +354,21 @@ impl Config {
             }
             if let Ok(v) = window.get::<_, u32>("displayindex") {
                 config.window.display_index = v;
+            }
+        }
+
+        if let Ok(graphics) = t.get::<_, LuaTable>("graphics") {
+            if let Ok(v) = graphics.get::<_, String>("backend") {
+                let v = v.to_lowercase();
+                if matches!(v.as_str(), "auto" | "dx12" | "vulkan" | "metal") {
+                    config.graphics.backend = v;
+                }
+            }
+            if let Ok(v) = graphics.get::<_, String>("power_preference") {
+                let v = v.to_lowercase();
+                if matches!(v.as_str(), "high" | "low" | "none") {
+                    config.graphics.power_preference = v;
+                }
             }
         }
 

@@ -224,8 +224,23 @@ impl LunaApp {
         let width = self.config.window.width;
         let height = self.config.window.height;
 
-        // Prefer the platform-native backend to avoid slow enumeration of all backends.
-        let backends = wgpu::util::backend_bits_from_env().unwrap_or(wgpu::Backends::PRIMARY);
+        // Resolve graphics backend from conf.lua (t.graphics.backend).
+        // Falls back to WGPU_BACKEND env var, then to the platform-native primary backend.
+        let backends = wgpu::util::backend_bits_from_env().unwrap_or_else(|| {
+            match self.config.graphics.backend.as_str() {
+                "dx12" => wgpu::Backends::DX12,
+                "vulkan" => wgpu::Backends::VULKAN,
+                "metal" => wgpu::Backends::METAL,
+                _ => wgpu::Backends::PRIMARY, // "auto" or any unrecognised value
+            }
+        });
+
+        // Resolve power preference from conf.lua (t.graphics.power_preference).
+        let power_preference = match self.config.graphics.power_preference.as_str() {
+            "low" => wgpu::PowerPreference::LowPower,
+            "none" => wgpu::PowerPreference::None,
+            _ => wgpu::PowerPreference::HighPerformance, // "high" or any unrecognised value
+        };
 
         let instance = wgpu::Instance::new(wgpu::InstanceDescriptor {
             backends,
@@ -238,7 +253,7 @@ impl LunaApp {
             .expect("Failed to create wgpu surface");
 
         let adapter = pollster::block_on(instance.request_adapter(&wgpu::RequestAdapterOptions {
-            power_preference: wgpu::PowerPreference::HighPerformance,
+            power_preference,
             compatible_surface: Some(&surface),
             force_fallback_adapter: false,
         }))
@@ -246,10 +261,12 @@ impl LunaApp {
 
         let adapter_info = adapter.get_info();
         log::info!(
-            "GPU adapter: {} ({:?}, {:?})",
+            "GPU adapter: {} ({:?}, {:?}) [backend={}, power={}]",
             adapter_info.name,
             adapter_info.backend,
-            adapter_info.device_type
+            adapter_info.device_type,
+            self.config.graphics.backend,
+            self.config.graphics.power_preference,
         );
 
         let (device, queue) = pollster::block_on(adapter.request_device(

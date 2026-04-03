@@ -49,6 +49,7 @@ App (entry point)
   │
   ├── Config ── loaded from conf.lua
   │     ├── WindowConfig { title, width, height, vsync, resizable, fullscreen }
+  │     ├── GraphicsConfig { backend, power_preference }
   │     ├── ModulesConfig { physics, audio, joystick }
   │     ├── PerformanceConfig { target_fps, fixed_timestep }
   │     └── load_from_conf_lua(path) → Config
