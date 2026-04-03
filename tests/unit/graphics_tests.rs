@@ -1970,3 +1970,168 @@ fn test_sprite_batch_buffer_size() {
     let batch = SpriteBatch::new(tex_key, 42);
     assert_eq!(batch.buffer_size(), 42);
 }
+
+// ===========================================================================
+// Phase 3: Polymorphic draw() dispatch
+// ===========================================================================
+
+#[test]
+fn graphics_draw_dispatch_image_userdata_pushes_draw_image() {
+    let (state, lua) = make_graphics_vm();
+    run_draw(
+        &lua,
+        r#"
+        local img = luna.graphics.newImage("assets/icon.png")
+        luna.graphics.draw(img, 10, 20)
+        "#,
+    );
+    let st = state.borrow();
+    let found = st
+        .draw_commands
+        .iter()
+        .any(|cmd| matches!(cmd, DrawCommand::DrawImage { x, y, .. } if (*x - 10.0).abs() < 1e-5 && (*y - 20.0).abs() < 1e-5));
+    assert!(found, "Expected DrawCommand::DrawImage after draw(img, 10, 20)");
+}
+
+#[test]
+fn graphics_draw_dispatch_image_with_rotation_pushes_draw_image_ex() {
+    let (state, lua) = make_graphics_vm();
+    run_draw(
+        &lua,
+        r#"
+        local img = luna.graphics.newImage("assets/icon.png")
+        luna.graphics.draw(img, 5, 10, 1.57)
+        "#,
+    );
+    let st = state.borrow();
+    let found = st.draw_commands.iter().any(|cmd| {
+        matches!(cmd, DrawCommand::DrawImageEx { rotation, .. } if (*rotation - 1.57).abs() < 0.01)
+    });
+    assert!(
+        found,
+        "Expected DrawCommand::DrawImageEx with rotation after draw(img, x, y, r)"
+    );
+}
+
+#[test]
+fn graphics_draw_dispatch_canvas_userdata_pushes_draw_canvas() {
+    let (state, lua) = make_graphics_vm();
+    run_draw(
+        &lua,
+        r#"
+        local canvas = luna.graphics.newCanvas(64, 64)
+        luna.graphics.draw(canvas, 30, 40)
+        "#,
+    );
+    let st = state.borrow();
+    let found = st.draw_commands.iter().any(|cmd| {
+        matches!(cmd, DrawCommand::DrawCanvas { x, y, .. } if (*x - 30.0).abs() < 1e-5 && (*y - 40.0).abs() < 1e-5)
+    });
+    assert!(
+        found,
+        "Expected DrawCommand::DrawCanvas after draw(canvas, 30, 40)"
+    );
+}
+
+#[test]
+fn graphics_draw_dispatch_sprite_batch_userdata_pushes_draw_batch() {
+    let (state, lua) = make_graphics_vm();
+    run_draw(
+        &lua,
+        r#"
+        local img = luna.graphics.newImage("assets/icon.png")
+        local batch = luna.graphics.newSpriteBatch(img, 10)
+        luna.graphics.draw(batch, 0, 0)
+        "#,
+    );
+    let st = state.borrow();
+    let found = st
+        .draw_commands
+        .iter()
+        .any(|cmd| matches!(cmd, DrawCommand::DrawBatch { .. }));
+    assert!(
+        found,
+        "Expected DrawCommand::DrawBatch after draw(batch, 0, 0)"
+    );
+}
+
+#[test]
+fn graphics_draw_dispatch_nil_returns_error() {
+    let (_state, lua) = make_graphics_vm();
+    let result = lua.load("luna.graphics.draw(nil, 0, 0)").exec();
+    assert_lua_error_contains(result, "nil");
+}
+
+#[test]
+fn graphics_draw_dispatch_string_returns_error() {
+    let (_state, lua) = make_graphics_vm();
+    let result = lua.load("luna.graphics.draw('not_drawable', 0, 0)").exec();
+    assert_lua_error_contains(result, "drawable");
+}
+
+#[test]
+fn graphics_draw_ex_dispatch_image_userdata_pushes_draw_image_ex() {
+    let (state, lua) = make_graphics_vm();
+    run_draw(
+        &lua,
+        r#"
+        local img = luna.graphics.newImage("assets/icon.png")
+        luna.graphics.drawEx(img, 15, 25, 0.5, 2.0, 2.0, 0, 0)
+        "#,
+    );
+    let st = state.borrow();
+    let found = st.draw_commands.iter().any(|cmd| {
+        matches!(cmd, DrawCommand::DrawImageEx { x, y, rotation, sx, .. }
+            if (*x - 15.0).abs() < 1e-5
+            && (*y - 25.0).abs() < 1e-5
+            && (*rotation - 0.5).abs() < 0.01
+            && (*sx - 2.0).abs() < 1e-5)
+    });
+    assert!(
+        found,
+        "Expected DrawCommand::DrawImageEx after drawEx(img, ...)"
+    );
+}
+
+#[test]
+fn graphics_draw_ex_dispatch_canvas_userdata_pushes_draw_canvas() {
+    let (state, lua) = make_graphics_vm();
+    run_draw(
+        &lua,
+        r#"
+        local canvas = luna.graphics.newCanvas(32, 32)
+        luna.graphics.drawEx(canvas, 5, 10, 0, 1, 1, 0, 0)
+        "#,
+    );
+    let st = state.borrow();
+    let found = st
+        .draw_commands
+        .iter()
+        .any(|cmd| matches!(cmd, DrawCommand::DrawCanvas { .. }));
+    assert!(
+        found,
+        "Expected DrawCommand::DrawCanvas after drawEx(canvas, ...)"
+    );
+}
+
+#[test]
+fn graphics_draw_ex_sy_defaults_to_sx() {
+    let (state, lua) = make_graphics_vm();
+    run_draw(
+        &lua,
+        r#"
+        local img = luna.graphics.newImage("assets/icon.png")
+        luna.graphics.drawEx(img, 0, 0, 0, 3.0)
+        "#,
+    );
+    let st = state.borrow();
+    // sy should equal sx (3.0) when not provided
+    let found = st.draw_commands.iter().any(|cmd| {
+        matches!(cmd, DrawCommand::DrawImageEx { sx, sy, .. }
+            if (*sx - 3.0).abs() < 1e-5 && (*sy - 3.0).abs() < 1e-5)
+    });
+    assert!(
+        found,
+        "drawEx sy should default to sx when omitted"
+    );
+}

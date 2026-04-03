@@ -79,6 +79,11 @@ fn lua_test_timer() {
 }
 
 #[test]
+fn lua_test_event() {
+    run_lua_test("unit/test_event.lua");
+}
+
+#[test]
 fn lua_test_input() {
     run_lua_test("unit/test_input.lua");
 }
@@ -116,6 +121,11 @@ fn lua_test_audio_bus() {
 #[test]
 fn lua_test_compute() {
     run_lua_test("unit/test_compute.lua");
+}
+
+#[test]
+fn lua_test_data() {
+    run_lua_test("unit/test_data.lua");
 }
 
 #[test]
@@ -251,6 +261,11 @@ fn lua_validation_savegame() {
     run_lua_test("validation/test_savegame_validation.lua");
 }
 
+#[test]
+fn lua_validation_filesystem_security() {
+    run_lua_test("validation/test_mount_traversal.lua");
+}
+
 // === Cross-Module Integration Tests ===
 
 #[test]
@@ -328,6 +343,11 @@ fn lua_test_scene() {
 #[test]
 fn lua_test_tween() {
     run_lua_test("unit/test_tween.lua");
+}
+
+#[test]
+fn lua_test_image() {
+    run_lua_test("unit/test_image.lua");
 }
 
 // === Additional Stress Tests ===

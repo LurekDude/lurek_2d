@@ -294,3 +294,170 @@ fn test_lua_parse_toml_error() {
         .exec();
     assert!(result.is_err());
 }
+
+// ── Phase 9 — pack / unpack / getPackedSize / DataView ─────────────────
+
+use luna2d::data::DataView;
+use luna2d::data::pack::{get_packed_size, pack, unpack, PackValue};
+
+#[test]
+fn data_pack_unpack_f32_round_trips() {
+    let bd = pack("<f", &[PackValue::Float(3.14f32)]).unwrap();
+    let (vals, _pos) = unpack("<f", bd.as_bytes(), 0).unwrap();
+    if let PackValue::Float(v) = vals[0] {
+        assert!((v - 3.14f32).abs() < 1e-4);
+    } else {
+        panic!("expected Float");
+    }
+}
+
+#[test]
+fn data_pack_unpack_u8_round_trips() {
+    let bd = pack("B", &[PackValue::UInt(255)]).unwrap();
+    let (vals, pos) = unpack("B", bd.as_bytes(), 0).unwrap();
+    assert_eq!(pos, 1);
+    if let PackValue::UInt(v) = vals[0] {
+        assert_eq!(v, 255);
+    } else {
+        panic!("expected UInt");
+    }
+}
+
+#[test]
+fn data_pack_string_round_trips() {
+    let bd = pack("s", &[PackValue::Str("hello".to_string())]).unwrap();
+    let (vals, _) = unpack("s", bd.as_bytes(), 0).unwrap();
+    if let PackValue::Str(s) = &vals[0] {
+        assert_eq!(s, "hello");
+    } else {
+        panic!("expected Str");
+    }
+}
+
+#[test]
+fn data_pack_null_terminated_string_round_trips() {
+    let bd = pack("z", &[PackValue::Str("world".to_string())]).unwrap();
+    // Expect "world" + 0 = 6 bytes
+    assert_eq!(bd.as_bytes().len(), 6);
+    let (vals, _) = unpack("z", bd.as_bytes(), 0).unwrap();
+    if let PackValue::Str(s) = &vals[0] {
+        assert_eq!(s, "world");
+    } else {
+        panic!("expected Str");
+    }
+}
+
+#[test]
+fn data_getpackedsize_matches_pack_output() {
+    let vals = &[PackValue::UInt(1u64), PackValue::Float(1.0f32)];
+    let sz = get_packed_size("Bf", vals).unwrap();
+    let bd = pack("Bf", vals).unwrap();
+    assert_eq!(sz, bd.as_bytes().len());
+}
+
+#[test]
+fn data_getpackedsize_fixed_types_no_values_needed() {
+    // B=1, H=2, I=4, f=4 => total 11
+    let sz = get_packed_size("BHIf", &[]).unwrap();
+    assert_eq!(sz, 11);
+}
+
+#[test]
+fn data_pack_endian_big() {
+    let bd = pack(">H", &[PackValue::UInt(0x0102)]).unwrap();
+    let bytes = bd.as_bytes();
+    assert_eq!(bytes[0], 0x01);
+    assert_eq!(bytes[1], 0x02);
+}
+
+#[test]
+fn data_pack_endian_little() {
+    let bd = pack("<H", &[PackValue::UInt(0x0102)]).unwrap();
+    let bytes = bd.as_bytes();
+    assert_eq!(bytes[0], 0x02);
+    assert_eq!(bytes[1], 0x01);
+}
+
+#[test]
+fn data_pack_padding_byte() {
+    let bd = pack("xB", &[PackValue::UInt(42)]).unwrap();
+    assert_eq!(bd.as_bytes().len(), 2);
+    assert_eq!(bd.as_bytes()[0], 0);
+    assert_eq!(bd.as_bytes()[1], 42);
+}
+
+#[test]
+fn data_pack_multi_type_round_trip() {
+    let vals = &[
+        PackValue::Int(-1i64),
+        PackValue::UInt(255u64),
+        PackValue::Double(1.5f64),
+    ];
+    let bd = pack("<bBd", vals).unwrap();
+    let (out, pos) = unpack("<bBd", bd.as_bytes(), 0).unwrap();
+    assert_eq!(pos, bd.as_bytes().len());
+    if let PackValue::Int(v) = out[0] {
+        assert_eq!(v, -1);
+    } else {
+        panic!("expected Int");
+    }
+    if let PackValue::UInt(v) = out[1] {
+        assert_eq!(v, 255);
+    } else {
+        panic!("expected UInt");
+    }
+    if let PackValue::Double(v) = out[2] {
+        assert!((v - 1.5).abs() < 1e-10);
+    } else {
+        panic!("expected Double");
+    }
+}
+
+#[test]
+fn data_dataview_reads_bytes() {
+    use std::sync::Arc;
+    let bytes = Arc::new(vec![0xABu8, 0xCD, 0xEF, 0x01]);
+    let dv = DataView::new(bytes);
+    assert_eq!(dv.get_u8(0).unwrap(), 0xAB);
+    assert_eq!(dv.get_u8(1).unwrap(), 0xCD);
+    assert_eq!(dv.get_u8(3).unwrap(), 0x01);
+    assert_eq!(dv.get_size(), 4);
+}
+
+#[test]
+fn data_dataview_slice() {
+    use std::sync::Arc;
+    let bytes = Arc::new(vec![0u8, 0, 0x01, 0x02, 0, 0]);
+    let dv = DataView::new_slice(bytes, 2, 2).unwrap();
+    assert_eq!(dv.get_size(), 2);
+    assert_eq!(dv.get_u8(0).unwrap(), 0x01);
+    assert_eq!(dv.get_u8(1).unwrap(), 0x02);
+    assert!(dv.get_u8(2).is_err()); // out of view bounds
+}
+
+#[test]
+fn data_dataview_u16_read() {
+    use std::sync::Arc;
+    // little-endian 0x0102 stored as [0x02, 0x01]
+    let bytes = Arc::new(vec![0x02u8, 0x01]);
+    let dv = DataView::new(bytes);
+    assert_eq!(dv.get_u16(0).unwrap(), 0x0102);
+}
+
+#[test]
+fn data_dataview_f32_from_pack() {
+    let bd = pack("<f", &[PackValue::Float(2.5f32)]).unwrap();
+    use std::sync::Arc;
+    let bytes = Arc::new(bd.as_bytes().to_vec());
+    let dv = DataView::new(bytes);
+    let v = dv.get_f32(0).unwrap();
+    assert!((v - 2.5f32).abs() < 1e-6);
+}
+
+#[test]
+fn data_dataview_out_of_bounds_error() {
+    use std::sync::Arc;
+    let bytes = Arc::new(vec![0u8; 2]);
+    let dv = DataView::new(bytes);
+    assert!(dv.get_u32(0).is_err()); // need 4 bytes, only 2
+}

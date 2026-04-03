@@ -39,6 +39,8 @@ mlua = { version = "0.9", default-features = false }
 
 # Image loading (minimal features for fast compile)
 image = { version = "0.24", default-features = false, features = ["png", "jpeg", "bmp"] }
+# DDS compressed texture format parsing
+ddsfile = "0.5"
 
 # Audio playback (WAV, MP3, OGG, FLAC)
 rodio = "0.17"

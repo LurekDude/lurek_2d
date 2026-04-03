@@ -108,5 +108,92 @@ end)
 -- See: newCircleBody, getBodyShape, setBodyShape, getCollisions,
 --      setBodyRestitution, setBodyLayer
 
+-- =========================================================================
+-- Phase 2: Standalone shape userdata
+-- =========================================================================
+describe("physics.Shape userdata", function()
+    it("newCircleShape is a function", function()
+        expect_type("function", luna.physics.newCircleShape)
+    end)
+
+    it("newCircleShape returns userdata with type 'circle'", function()
+        local s = luna.physics.newCircleShape(10)
+        expect_type("userdata", s)
+        expect_equal("circle", s:getType())
+    end)
+
+    it("getRadius returns correct value for circle", function()
+        local s = luna.physics.newCircleShape(7.5)
+        expect_near(7.5, s:getRadius(), 0.001)
+    end)
+
+    it("newRectangleShape returns userdata with type 'rectangle'", function()
+        local s = luna.physics.newRectangleShape(20, 10)
+        expect_type("userdata", s)
+        expect_equal("rectangle", s:getType())
+    end)
+
+    it("newEdgeShape returns userdata with type 'edge'", function()
+        local s = luna.physics.newEdgeShape(0, 0, 10, 0)
+        expect_type("userdata", s)
+        expect_equal("edge", s:getType())
+    end)
+
+    it("newPolygonShape returns userdata with type 'polygon'", function()
+        local s = luna.physics.newPolygonShape(0, 0, 10, 0, 5, 10)
+        expect_type("userdata", s)
+        expect_equal("polygon", s:getType())
+    end)
+
+    it("newChainShape returns userdata with type 'chain'", function()
+        local s = luna.physics.newChainShape(false, 0, 0, 5, 0, 10, 5)
+        expect_type("userdata", s)
+        expect_equal("chain", s:getType())
+    end)
+
+    it("getBoundingBox returns 4 numbers for circle", function()
+        local s = luna.physics.newCircleShape(5)
+        local x1, y1, x2, y2 = s:getBoundingBox()
+        expect_type("number", x1)
+        expect_type("number", x2)
+        expect_near(-5, x1, 0.001)
+        expect_near(5, x2, 0.001)
+    end)
+
+    it("setDensity does not error", function()
+        local s = luna.physics.newCircleShape(1)
+        expect_no_error(function() s:setDensity(2.0) end)
+    end)
+
+    it("setFriction does not error", function()
+        local s = luna.physics.newCircleShape(1)
+        expect_no_error(function() s:setFriction(0.8) end)
+    end)
+
+    it("setRestitution does not error", function()
+        local s = luna.physics.newCircleShape(1)
+        expect_no_error(function() s:setRestitution(0.5) end)
+    end)
+
+    it("setSensor does not error", function()
+        local s = luna.physics.newCircleShape(1)
+        expect_no_error(function() s:setSensor(true) end)
+    end)
+
+    it("destroy does not error", function()
+        local s = luna.physics.newCircleShape(1)
+        expect_no_error(function() s:destroy() end)
+    end)
+
+    it("attachShape attaches circle to body", function()
+        local world = luna.physics.newWorld(0, 9.81)
+        local body = luna.physics.newBody(world, 0, 0, "dynamic")
+        local shape = luna.physics.newCircleShape(15)
+        expect_no_error(function()
+            luna.physics.attachShape(body, shape)
+        end)
+    end)
+end)
+
 test_summary()
 

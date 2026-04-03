@@ -5,6 +5,7 @@ use luna2d::input::KeyboardState;
 use luna2d::input::MouseState;
 use luna2d::input::SystemCursor;
 use luna2d::input::TouchState;
+use luna2d::input::{CursorHandle, CursorKind};
 
 #[test]
 fn keyboard_key_down() {
@@ -723,4 +724,160 @@ fn phase_03_touch_runtime_dispatches_six_argument_callbacks() {
             .contains("call_lua_callback(lua, \"touchreleased\", (id, x, y, dx, dy, pressure));"),
         "touchreleased still lacks dx/dy arguments"
     );
+}
+
+// ── Phase 8 — Modifier key state ─────────────────────────────────
+
+#[test]
+fn keyboard_no_modifiers_on_init() {
+    let kb = KeyboardState::new();
+    assert!(!kb.is_modifier_active("shift"));
+    assert!(!kb.is_modifier_active("ctrl"));
+    assert!(!kb.is_modifier_active("alt"));
+    assert!(!kb.is_modifier_active("meta"));
+}
+
+#[test]
+fn keyboard_set_shift_modifier() {
+    let mut kb = KeyboardState::new();
+    kb.set_modifiers(true, false, false, false);
+    assert!(kb.is_modifier_active("shift"));
+    assert!(!kb.is_modifier_active("ctrl"));
+    assert!(!kb.is_modifier_active("alt"));
+    assert!(!kb.is_modifier_active("meta"));
+}
+
+#[test]
+fn keyboard_set_multiple_modifiers() {
+    let mut kb = KeyboardState::new();
+    kb.set_modifiers(true, true, false, false);
+    assert!(kb.is_modifier_active("shift"));
+    assert!(kb.is_modifier_active("ctrl"));
+    assert!(!kb.is_modifier_active("alt"));
+}
+
+#[test]
+fn keyboard_unknown_modifier_returns_false() {
+    let kb = KeyboardState::new();
+    assert!(!kb.is_modifier_active("capslock"));
+}
+
+#[test]
+fn keyboard_super_alias_for_meta() {
+    let mut kb = KeyboardState::new();
+    kb.set_modifiers(false, false, false, true);
+    assert!(kb.is_modifier_active("meta"));
+    assert!(kb.is_modifier_active("super"));
+}
+
+#[test]
+fn keyboard_clear_modifiers_by_reset() {
+    let mut kb = KeyboardState::new();
+    kb.set_modifiers(true, true, true, true);
+    kb.set_modifiers(false, false, false, false);
+    assert!(!kb.is_modifier_active("shift"));
+    assert!(!kb.is_modifier_active("ctrl"));
+    assert!(!kb.is_modifier_active("alt"));
+    assert!(!kb.is_modifier_active("meta"));
+}
+
+// ── Phase 7 — Mouse cursor userdata ──────────────────────────────
+
+#[test]
+fn mouse_get_system_cursor_arrow_is_system_kind() {
+    let c = CursorHandle {
+        kind: CursorKind::System(SystemCursor::Arrow),
+    };
+    assert!(matches!(c.kind, CursorKind::System(SystemCursor::Arrow)));
+}
+
+#[test]
+fn mouse_custom_cursor_stores_dimensions() {
+    let c = CursorHandle {
+        kind: CursorKind::Custom {
+            pixels: vec![0u8; 16],
+            width: 2,
+            height: 2,
+            hotx: 0,
+            hoty: 0,
+        },
+    };
+    assert!(matches!(c.kind, CursorKind::Custom { width: 2, .. }));
+}
+
+#[test]
+fn mouse_is_cursor_supported_returns_true() {
+    assert!(luna2d::input::is_cursor_supported());
+}
+
+#[test]
+fn mouse_lua_get_system_cursor_returns_userdata() {
+    let (_state, lua) = make_vm();
+    lua.load(
+        r#"
+        local c = luna.mouse.getSystemCursor("arrow")
+        assert(type(c) == "userdata")
+        local c2 = luna.mouse.getSystemCursor("hand")
+        assert(type(c2) == "userdata")
+        "#,
+    )
+    .exec()
+    .unwrap();
+}
+
+#[test]
+fn mouse_lua_is_cursor_supported() {
+    let (_state, lua) = make_vm();
+    lua.load(
+        r#"
+        local ok = luna.mouse.isCursorSupported()
+        assert(type(ok) == "boolean")
+        assert(ok == true)
+        "#,
+    )
+    .exec()
+    .unwrap();
+}
+
+#[test]
+fn mouse_lua_set_cursor_with_userdata() {
+    let (_state, lua) = make_vm();
+    lua.load(
+        r#"
+        local c = luna.mouse.getSystemCursor("hand")
+        luna.mouse.setCursor(c)
+        assert(luna.mouse.getCursor() == "hand")
+        "#,
+    )
+    .exec()
+    .unwrap();
+}
+
+#[test]
+fn mouse_lua_set_cursor_nil_resets_to_arrow() {
+    let (_state, lua) = make_vm();
+    lua.load(
+        r#"
+        luna.mouse.setCursor("hand")
+        luna.mouse.setCursor(nil)
+        assert(luna.mouse.getCursor() == "arrow")
+        "#,
+    )
+    .exec()
+    .unwrap();
+}
+
+#[test]
+fn keyboard_lua_is_modifier_active_returns_bool() {
+    let (_state, lua) = make_vm();
+    lua.load(
+        r#"
+        assert(type(luna.keyboard.isModifierActive("shift")) == "boolean")
+        assert(type(luna.keyboard.isModifierActive("ctrl")) == "boolean")
+        assert(luna.keyboard.isModifierActive("shift") == false)
+        assert(luna.keyboard.isModifierActive("capslock") == false)
+        "#,
+    )
+    .exec()
+    .unwrap();
 }

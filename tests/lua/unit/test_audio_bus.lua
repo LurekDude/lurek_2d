@@ -84,10 +84,13 @@ describe("luna.audio.setListener2D / getListener2D stubs", function()
         luna.audio.setListener2D(1.0, 2.0)
     end)
 
-    it("getListener2D returns 0, 0", function()
+    it("getListener2D returns the position set by setListener2D", function()
+        luna.audio.setListener2D(1.0, 2.0)
         local x, y = luna.audio.getListener2D()
-        expect_near(x, 0.0, 1e-5)
-        expect_near(y, 0.0, 1e-5)
+        expect_near(x, 1.0, 1e-5)
+        expect_near(y, 2.0, 1e-5)
+        -- reset for other tests
+        luna.audio.setListener2D(0.0, 0.0)
     end)
 end)
 

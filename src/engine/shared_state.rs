@@ -20,6 +20,7 @@ use crate::engine::resource_keys::{
     CanvasKey, FontKey, MeshKey, ParticleKey, ShaderKey, SpriteBatchKey, TextureKey,
 };
 use crate::event::EventQueue;
+use crate::filesystem::GameFS;
 use crate::graphics::gpu_renderer::RenderStats;
 use crate::graphics::renderer::{BlendMode, DrawCommand, TextureData};
 use crate::graphics::{Camera, Canvas, Mesh, Shader};
@@ -190,12 +191,14 @@ pub struct ErrorInfo {
 /// - `game_dir` — Absolute path to the game directory.
 /// - `quit_requested` — Set to `true` by `luna.event.quit()` to end the game loop.
 /// - `exit_code` — Exit code to return when `quit_requested` is `true`.
+/// - `restart_requested` — Set to `true` by `luna.event.restart()` to trigger engine restart.
 /// - `line_width` — Current stroke width for outline draw commands.
 /// - `blend_mode` — Current blend mode for draw operations.
 /// - `fonts` — Loaded TTF fonts for text rendering.
 /// - `active_font` — Index of the currently active font (`None` = use bitmap fallback).
 /// - `canvases` — Off-screen render targets (canvases) for compositing.
 /// - `gamepads` — Connected gamepad state instances.
+/// - `fs` — Persistent sandboxed `GameFS` instance with mount layer support.
 ///
 /// Shared mutable state accessible by both the engine loop and Lua closures.
 pub struct SharedState {
@@ -217,6 +220,8 @@ pub struct SharedState {
     pub game_dir: PathBuf,
     pub quit_requested: bool,
     pub exit_code: i32,
+    /// Whether a restart was requested via `luna.event.restart()`.
+    pub restart_requested: bool,
     pub line_width: f32,
     /// Current blend mode for draw operations.
     pub blend_mode: BlendMode,
@@ -278,6 +283,8 @@ pub struct SharedState {
     pub last_error: Option<ErrorInfo>,
     /// Background file loader for async asset loading.
     pub async_loader: Option<crate::filesystem::AsyncLoader>,
+    /// Persistent sandboxed filesystem with mount layer support.
+    pub fs: GameFS,
     /// MIDI SoundFont state for MIDI instrument rendering.
     pub midi_state: MidiState,
 }
@@ -297,6 +304,7 @@ impl SharedState {
     /// # Returns
     /// A newly-initialised `SharedState`.
     pub fn new(width: u32, height: u32, title: &str, game_dir: PathBuf) -> Self {
+        let fs = GameFS::new(game_dir.clone());
         SharedState {
             draw_commands: Vec::new(),
             current_color: [1.0, 1.0, 1.0, 1.0],
@@ -315,6 +323,7 @@ impl SharedState {
             game_dir,
             quit_requested: false,
             exit_code: 0,
+            restart_requested: false,
             line_width: 1.0,
             blend_mode: BlendMode::default(),
             fonts: SlotMap::with_key(),
@@ -346,6 +355,7 @@ impl SharedState {
             debug_overlay_enabled: false,
             last_error: None,
             async_loader: None,
+            fs,
             midi_state: MidiState::new(),
         }
     }

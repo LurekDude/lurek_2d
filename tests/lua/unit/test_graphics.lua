@@ -236,4 +236,24 @@ describe("luna.graphics nine-slice", function()
     end)
 end)
 
+-- ── Polymorphic draw() dispatch ─────────────────────────────────────────
+
+describe("luna.graphics.draw polymorphic dispatch", function()
+    it("draw() rejects nil with an error", function()
+        expect_error(function()
+            luna.graphics.draw(nil, 0, 0)
+        end, "nil")
+    end)
+
+    it("draw() rejects a non-drawable string with an error", function()
+        expect_error(function()
+            luna.graphics.draw("not_a_drawable", 0, 0)
+        end, "drawable")
+    end)
+
+    it("draw() is a function", function()
+        expect_type("function", luna.graphics.draw)
+    end)
+end)
+
 test_summary()

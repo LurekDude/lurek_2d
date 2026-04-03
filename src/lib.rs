@@ -70,10 +70,10 @@
 pub mod ai;
 /// Audio playback system backed by rodio.
 pub mod audio;
-/// Card game backend engine: Card, Deck (Stack), DeckBuilder, Zone (StackManager), CardPool, Slot, StackHistory.
-pub mod cardgame;
 /// Turn-based battle engine: battles, combatants, abilities, and statuses.
 pub mod battle;
+/// Card game backend engine: Card, Deck (Stack), DeckBuilder, Zone (StackManager), CardPool, Slot, StackHistory.
+pub mod cardgame;
 /// Vehicle combat engine: chassis, turrets, weapons, projectiles, and collision groups.
 pub mod combat;
 /// Dense N-dimensional numerical arrays (luna.compute).
@@ -86,6 +86,8 @@ pub mod data;
 pub mod dataframe;
 /// Dialog sequencer for visual-novel style text with typewriter effect, choices, waits, and callbacks.
 pub mod dialog;
+/// Named resource economy: capacity, flow rates, decay, interest, reservations, and overflow policies.
+pub mod economy;
 /// Core engine lifecycle, configuration, and error types.
 pub mod engine;
 /// Lightweight entity-component-system with ID recycling, bitmap tags, layers, blueprints, and systems.
@@ -110,24 +112,22 @@ pub mod item;
 pub mod lua_api;
 /// Foundational math types: Vec2, Mat3, Rect.
 pub mod math;
+/// Minimap content extraction, FOV mask, and tile sampling.
+pub mod minimap;
 /// Mod management framework: metadata, dependencies, load ordering, hooks.
 pub mod modding;
 /// Emitter-based 2D particle effects.
 pub mod particle;
-/// Minimap content extraction, FOV mask, and tile sampling.
-pub mod minimap;
-/// Post-processing effects data model: bloom, blur, color grading, screen-space shaders.
-pub mod postfx;
 /// Grid pathfinding: A★, HPA★, flow fields, and NavGrid unit-size navigation.
 pub mod pathfinding;
 /// Physics simulation with rigid bodies (rect and circle shapes), collision events, sensors, and layer filtering.
 pub mod physics;
+/// Post-processing effects data model: bloom, blur, color grading, screen-space shaders.
+pub mod postfx;
 /// Province map module — spatial province data from colour-coded PNG images.
 pub mod province_map;
 /// Quest tracking: stages, objectives, quest log.
 pub mod quest;
-/// Named resource economy: capacity, flow rates, decay, interest, reservations, and overflow policies.
-pub mod economy;
 /// Slot-based save/load system with collectors, schema versioning, and auto-save.
 pub mod savegame;
 /// Scene stack for managing game scene lifecycle, transitions, and depth-sorted rendering.

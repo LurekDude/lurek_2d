@@ -11,6 +11,35 @@
 //! All public items are documented. See the parent module for architectural context
 //! and the `luna.*` Lua API for the scripting interface.
 
+/// 3D spatial audio state for an audio source.
+///
+/// Used to compute panning relative to the listener position.
+/// Luna2D uses 2D x/y primarily; z is accepted but ignored for panning calculation.
+///
+/// # Fields
+/// - `position` — `[f32; 3]`. World-space position `[x, y, z]`.
+/// - `velocity` — `[f32; 3]`. World-space velocity vector (for Doppler).
+/// - `orientation` — `[f32; 6]`. Forward (xyz) + up (xyz) vectors.
+#[derive(Debug, Clone, Copy)]
+pub struct SpatialState {
+    /// World-space position `[x, y, z]`.
+    pub position: [f32; 3],
+    /// World-space velocity vector (for Doppler effect calculation).
+    pub velocity: [f32; 3],
+    /// Forward direction followed by up direction (6 floats total).
+    pub orientation: [f32; 6],
+}
+
+impl Default for SpatialState {
+    fn default() -> Self {
+        SpatialState {
+            position: [0.0, 0.0, 0.0],
+            velocity: [0.0, 0.0, 0.0],
+            orientation: [0.0, 0.0, -1.0, 0.0, 1.0, 0.0],
+        }
+    }
+}
+
 /// Handle for a loaded audio asset (legacy compatibility shim).
 ///
 /// # Fields

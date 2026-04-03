@@ -12,8 +12,33 @@ use std::rc::Rc;
 
 use mlua::prelude::*;
 
-use crate::image::ImageData;
+use crate::image::{CompressedImageData, ImageData};
 use crate::lua_api::SharedState;
+
+/// Lua userdata wrapper for [`CompressedImageData`].
+///
+/// Exposes `getDimensions()`, `getMipmapCount()`, and `getFormat()` to Lua.
+struct LuaCompressedImageData {
+    inner: CompressedImageData,
+}
+
+impl LuaUserData for LuaCompressedImageData {
+    fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
+        /// Return `(width, height)` of the base mip level.
+        methods.add_method("getDimensions", |_, this, ()| {
+            let (w, h) = this.inner.get_dimensions();
+            Ok((w, h))
+        });
+        /// Return the number of mipmap levels stored in this compressed image.
+        methods.add_method("getMipmapCount", |_, this, ()| {
+            Ok(this.inner.get_mipmap_count())
+        });
+        /// Return the compressed format name string (e.g. `"dxt1"`, `"bc7"`).
+        methods.add_method("getFormat", |_, this, ()| {
+            Ok(this.inner.get_format().to_string())
+        });
+    }
+}
 
 /// Registers the `luna.image` table on the provided `luna` namespace.
 ///
@@ -81,6 +106,50 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
             };
 
             lua.create_userdata(img_data)
+        })?,
+    )?;
+
+    // luna.image.newCompressedData(filename) -> CompressedImageData userdata
+    let state_clone = state.clone();
+    image_table.set(
+        "newCompressedData",
+        lua.create_function(move |lua, filename: String| {
+            let path = {
+                let s = state_clone.borrow();
+                s.game_dir.join(&filename)
+            };
+            let bytes = std::fs::read(&path).map_err(|e| {
+                LuaError::RuntimeError(format!(
+                    "newCompressedData: cannot read '{}': {}",
+                    filename, e
+                ))
+            })?;
+            let cid = CompressedImageData::from_dds(&bytes).map_err(|e| {
+                LuaError::RuntimeError(format!("newCompressedData: {}", e))
+            })?;
+            lua.create_userdata(LuaCompressedImageData { inner: cid })
+        })?,
+    )?;
+
+    // luna.image.isCompressed(path) -> bool
+    // Returns true if the file at `path` starts with the DDS magic bytes.
+    let state_clone = state.clone();
+    image_table.set(
+        "isCompressed",
+        lua.create_function(move |_, filename: String| {
+            let path = {
+                let s = state_clone.borrow();
+                s.game_dir.join(&filename)
+            };
+            let result = (|| -> Option<bool> {
+                let mut f = std::fs::File::open(&path).ok()?;
+                let mut magic = [0u8; 4];
+                use std::io::Read;
+                f.read_exact(&mut magic).ok()?;
+                Some(magic == [0x44, 0x44, 0x53, 0x20])
+            })()
+            .unwrap_or(false);
+            Ok(result)
         })?,
     )?;
 

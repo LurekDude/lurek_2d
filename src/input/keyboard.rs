@@ -10,6 +10,15 @@
 //!
 use std::collections::HashSet;
 
+/// Bitmask constant for the Shift modifier key.
+pub const MOD_SHIFT: u8 = 0b0001;
+/// Bitmask constant for the Control modifier key.
+pub const MOD_CTRL: u8 = 0b0010;
+/// Bitmask constant for the Alt/Option modifier key.
+pub const MOD_ALT: u8 = 0b0100;
+/// Bitmask constant for the Super/Meta modifier key.
+pub const MOD_META: u8 = 0b1000;
+
 /// Tracks which keyboard keys are currently down, just pressed, or just released.
 ///
 /// Also tracks physical scancodes, key repeat, and text input state.
@@ -24,6 +33,7 @@ use std::collections::HashSet;
 /// - `key_repeat_enabled` — `bool`.
 /// - `text_input_enabled` — `bool`.
 /// - `text_input_buffer` — `Vec<String>`.
+/// - `modifiers` — `u8`.
 pub struct KeyboardState {
     keys_down: HashSet<String>,
     keys_pressed: Vec<String>,
@@ -34,6 +44,8 @@ pub struct KeyboardState {
     scancodes_pressed: Vec<String>,
     /// Per-frame scancode release events.
     scancodes_released: Vec<String>,
+    /// Bitmask of currently active modifier keys.
+    modifiers: u8,
     /// Whether key repeat events are delivered to Lua callbacks.
     key_repeat_enabled: bool,
     /// Whether text input (IME) events are delivered to Lua callbacks.
@@ -64,6 +76,7 @@ impl KeyboardState {
             key_repeat_enabled: false,
             text_input_enabled: false,
             text_input_buffer: Vec::new(),
+            modifiers: 0,
         }
     }
 
@@ -213,6 +226,50 @@ impl KeyboardState {
         self.scancodes_pressed.clear();
         self.scancodes_released.clear();
         self.text_input_buffer.clear();
+    }
+
+    /// Returns `true` if the named modifier key is currently held.
+    ///
+    /// # Parameters
+    /// - `modifier` — `&str`. One of `"shift"`, `"ctrl"`, `"alt"`, `"meta"`, `"super"`.
+    ///
+    /// # Returns
+    /// `bool`.
+    pub fn is_modifier_active(&self, modifier: &str) -> bool {
+        let mask = match modifier {
+            "shift" => MOD_SHIFT,
+            "ctrl" => MOD_CTRL,
+            "alt" => MOD_ALT,
+            "meta" | "super" => MOD_META,
+            _ => return false,
+        };
+        self.modifiers & mask != 0
+    }
+
+    /// Sets the modifier bitmask when modifiers change.
+    ///
+    /// # Parameters
+    /// - `shift` — `bool`.
+    /// - `ctrl` — `bool`.
+    /// - `alt` — `bool`.
+    /// - `meta` — `bool`.
+    ///
+    /// # Returns
+    /// `()`.
+    pub fn set_modifiers(&mut self, shift: bool, ctrl: bool, alt: bool, meta: bool) {
+        self.modifiers = 0;
+        if shift {
+            self.modifiers |= MOD_SHIFT;
+        }
+        if ctrl {
+            self.modifiers |= MOD_CTRL;
+        }
+        if alt {
+            self.modifiers |= MOD_ALT;
+        }
+        if meta {
+            self.modifiers |= MOD_META;
+        }
     }
 }
 

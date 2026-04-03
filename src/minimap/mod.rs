@@ -349,7 +349,10 @@ impl Minimap {
     /// # Returns
     /// `[f32`.
     pub fn get_terrain_color(&self, terrain_type: u32) -> [f32; 4] {
-        self.terrain_colors.get(&terrain_type).copied().unwrap_or([0.5, 0.5, 0.5, 1.0])
+        self.terrain_colors
+            .get(&terrain_type)
+            .copied()
+            .unwrap_or([0.5, 0.5, 0.5, 1.0])
     }
 
     // ── Fog of war ──
@@ -489,7 +492,15 @@ impl Minimap {
     /// - `ype_index` — `usize`.
     /// - `owner` — `u32`.
     pub fn set_object(&mut self, id: u32, x: f32, y: f32, type_index: usize, owner: u32) {
-        self.objects.insert(id, MinimapObject { x, y, type_index, owner });
+        self.objects.insert(
+            id,
+            MinimapObject {
+                x,
+                y,
+                type_index,
+                owner,
+            },
+        );
     }
 
     /// Remove a tracked object by ID. Returns the removed value if present, or `None` when the key did not exist.
@@ -535,7 +546,10 @@ impl Minimap {
     /// # Returns
     /// `[f32`.
     pub fn get_owner_color(&self, owner: u32) -> [f32; 4] {
-        self.owner_colors.get(&owner).copied().unwrap_or([0.8, 0.8, 0.8, 1.0])
+        self.owner_colors
+            .get(&owner)
+            .copied()
+            .unwrap_or([0.8, 0.8, 0.8, 1.0])
     }
 
     // ── Color mode ──
@@ -700,7 +714,15 @@ impl Minimap {
     pub fn add_marker(&mut self, x: f32, y: f32, description: String, color: [f32; 4]) -> u32 {
         let id = self.next_marker_id;
         self.next_marker_id += 1;
-        self.markers.insert(id, MinimapMarker { x, y, description, color });
+        self.markers.insert(
+            id,
+            MinimapMarker {
+                x,
+                y,
+                description,
+                color,
+            },
+        );
         id
     }
 

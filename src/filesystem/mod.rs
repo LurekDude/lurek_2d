@@ -15,6 +15,10 @@ pub mod file_handle;
 /// Background asset-loading worker that reads files off the main thread.
 pub mod async_loader;
 
+/// Raw file data buffer loaded from the VFS.
+pub mod file_data;
+
 pub use async_loader::{AsyncLoader, LoadHandle, LoadResult, LoadStatus};
+pub use file_data::FileData;
 pub use file_handle::{FileHandle, FileMode};
-pub use vfs::{FileInfo, FileType, GameFS};
+pub use vfs::{FileInfo, FileType, GameFS, MountLayer};

@@ -7,9 +7,11 @@
 //! All public items are documented. See the parent module for architectural context
 //! and the `luna.*` Lua API for the scripting interface.
 
+use std::sync::Arc;
+
 use mlua::prelude::*;
 
-use crate::data::{self, ByteData};
+use crate::data::{self, ByteData, DataView};
 
 /// Registers the `luna.data` table on the provided `luna` namespace.
 ///
@@ -159,6 +161,77 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
         })?,
     )?;
 
+    // luna.data.pack(format, ...) -> string (raw bytes)
+    /// Packs values into a binary byte string according to a format string.
+    /// Compatible with LÖVE2D's data.pack API.
+    /// @param format : string
+    /// @return any
+    data_table.set(
+        "pack",
+        lua.create_function(|lua, (fmt, vals): (String, LuaMultiValue)| {
+            let pv = lua_values_to_pack(vals);
+            let bd = data::pack::pack(&fmt, &pv).map_err(LuaError::RuntimeError)?;
+            lua.create_string(bd.as_bytes())
+        })?,
+    )?;
+
+    // luna.data.unpack(format, data, pos?) -> values..., next_pos
+    /// Unpacks values from a binary byte string according to a format string.
+    /// Returns all decoded values followed by the next unread byte offset.
+    /// @param format : string
+    /// @param data : string
+    /// @param pos : integer?
+    /// @return any
+    data_table.set(
+        "unpack",
+        lua.create_function(
+            |lua, (fmt, raw, pos): (String, LuaString, Option<usize>)| {
+                let offset = pos.unwrap_or(0);
+                let (values, next_pos) =
+                    data::pack::unpack(&fmt, raw.as_bytes(), offset)
+                        .map_err(LuaError::RuntimeError)?;
+                let mut result = pack_values_to_lua(lua, values)?;
+                result.push(LuaValue::Integer(next_pos as i64));
+                Ok(LuaMultiValue::from_vec(result))
+            },
+        )?,
+    )?;
+
+    // luna.data.getPackedSize(format, ...) -> integer
+    /// Returns the total byte count that pack() would produce for the given format and values.
+    /// For fixed-width types no values are needed. String types (s/z) require the values.
+    /// @param format : string
+    /// @return any
+    data_table.set(
+        "getPackedSize",
+        lua.create_function(|_, (fmt, vals): (String, LuaMultiValue)| {
+            let pv = lua_values_to_pack(vals);
+            data::pack::get_packed_size(&fmt, &pv)
+                .map_err(LuaError::RuntimeError)
+                .map(|n| n as i64)
+        })?,
+    )?;
+
+    // luna.data.newDataView(data, offset?, size?) -> DataView
+    /// Creates a read-only windowed view into a byte string.
+    /// @param data : string
+    /// @param offset : integer?
+    /// @param size : integer?
+    /// @return any
+    data_table.set(
+        "newDataView",
+        lua.create_function(
+            |_, (raw, offset, size): (LuaString, Option<usize>, Option<usize>)| {
+                let bytes: Arc<Vec<u8>> = Arc::new(raw.as_bytes().to_vec());
+                let total = bytes.len();
+                let off = offset.unwrap_or(0);
+                let sz = size.unwrap_or_else(|| total.saturating_sub(off));
+                let dv = DataView::new_slice(bytes, off, sz).map_err(LuaError::RuntimeError)?;
+                Ok(LuaDataView { inner: dv })
+            },
+        )?,
+    )?;
+
     /// Data.
     luna.set("data", data_table)?;
     Ok(())
@@ -230,5 +303,76 @@ fn lua_value_to_toml(value: &LuaValue) -> LuaResult<toml::Value> {
         _ => Err(LuaError::RuntimeError(
             "encodeToml: unsupported value type".into(),
         )),
+    }
+}
+
+// ── pack/unpack helpers ─────────────────────────────────────────────────────
+
+/// Converts a `LuaMultiValue` into a `Vec<PackValue>` for passing to the pack API.
+fn lua_values_to_pack(vals: LuaMultiValue) -> Vec<data::PackValue> {
+    vals.into_iter()
+        .map(|v| match v {
+            LuaValue::Integer(n) => data::PackValue::Int(n),
+            LuaValue::Number(n) => data::PackValue::Double(n),
+            LuaValue::String(s) => {
+                data::PackValue::Str(s.to_str().unwrap_or("").to_string())
+            }
+            _ => data::PackValue::Int(0),
+        })
+        .collect()
+}
+
+/// Converts a `Vec<PackValue>` into a `Vec<LuaValue>` for returning from unpack.
+fn pack_values_to_lua<'lua>(
+    lua: &'lua Lua,
+    vals: Vec<data::PackValue>,
+) -> LuaResult<Vec<LuaValue<'lua>>> {
+    vals.into_iter()
+        .map(|v| match v {
+            data::PackValue::Int(n) => Ok(LuaValue::Integer(n)),
+            data::PackValue::UInt(n) => Ok(LuaValue::Integer(n as i64)),
+            data::PackValue::Float(f) => Ok(LuaValue::Number(f as f64)),
+            data::PackValue::Double(d) => Ok(LuaValue::Number(d)),
+            data::PackValue::Str(s) => lua.create_string(&s).map(LuaValue::String),
+            data::PackValue::Bytes(b) => lua.create_string(&b[..]).map(LuaValue::String),
+        })
+        .collect()
+}
+
+// ── DataView userdata ───────────────────────────────────────────────────────
+
+/// Lua userdata wrapper for `DataView`.
+struct LuaDataView {
+    /// The underlying read-only byte-buffer view.
+    inner: DataView,
+}
+
+impl LuaUserData for LuaDataView {
+    fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
+        methods.add_method("getUInt8", |_, this, offset: usize| {
+            this.inner.get_u8(offset).map(|v| v as i64).map_err(LuaError::RuntimeError)
+        });
+        methods.add_method("getInt8", |_, this, offset: usize| {
+            this.inner.get_i8(offset).map(|v| v as i64).map_err(LuaError::RuntimeError)
+        });
+        methods.add_method("getInt16", |_, this, offset: usize| {
+            this.inner.get_i16(offset).map(|v| v as i64).map_err(LuaError::RuntimeError)
+        });
+        methods.add_method("getUInt16", |_, this, offset: usize| {
+            this.inner.get_u16(offset).map(|v| v as i64).map_err(LuaError::RuntimeError)
+        });
+        methods.add_method("getInt32", |_, this, offset: usize| {
+            this.inner.get_i32(offset).map(|v| v as i64).map_err(LuaError::RuntimeError)
+        });
+        methods.add_method("getUInt32", |_, this, offset: usize| {
+            this.inner.get_u32(offset).map(|v| v as i64).map_err(LuaError::RuntimeError)
+        });
+        methods.add_method("getFloat", |_, this, offset: usize| {
+            this.inner.get_f32(offset).map(|v| v as f64).map_err(LuaError::RuntimeError)
+        });
+        methods.add_method("getDouble", |_, this, offset: usize| {
+            this.inner.get_f64(offset).map_err(LuaError::RuntimeError)
+        });
+        methods.add_method("getSize", |_, this, ()| Ok(this.inner.get_size() as i64));
     }
 }

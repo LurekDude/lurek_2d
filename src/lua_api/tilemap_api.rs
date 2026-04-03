@@ -20,6 +20,10 @@ use std::cell::RefCell;
 use std::rc::Rc;
 
 // ── Helper types ──────────────────────────────────────────────────────────
+/// Lua wrapper around a [`TileSet`].
+///
+/// # Fields
+/// - `inner` — `Rc<RefCell<TileSet>>`.
 #[derive(Clone)]
 pub(super) struct LuaTileSet {
     pub(super) inner: Rc<RefCell<TileSet>>,
@@ -35,30 +39,46 @@ pub(crate) struct LuaTileMap {
 }
 
 /// Lua wrapper around an [`AutoTileSheet`].
+///
+/// # Fields
+/// - `inner` — `Rc<RefCell<AutoTileSheet>>`.
 #[derive(Clone)]
 pub(super) struct LuaAutoTileSheet {
     pub(super) inner: Rc<RefCell<AutoTileSheet>>,
 }
 
 /// Lua wrapper around a [`MapBlock`].
+///
+/// # Fields
+/// - `inner` — `Rc<RefCell<MapBlock>>`.
 #[derive(Clone)]
 pub(super) struct LuaMapBlock {
     pub(super) inner: Rc<RefCell<MapBlock>>,
 }
 
 /// Lua wrapper around a [`MapGroup`].
+///
+/// # Fields
+/// - `inner` — `Rc<RefCell<MapGroup>>`.
 #[derive(Clone)]
 pub(super) struct LuaMapGroup {
     pub(super) inner: Rc<RefCell<MapGroup>>,
 }
 
 /// Lua wrapper around a [`MapScript`].
+///
+/// # Fields
+/// - `inner` — `Rc<RefCell<MapScript>>`.
 #[derive(Clone)]
 pub(super) struct LuaMapScript {
     pub(super) inner: Rc<RefCell<MapScript>>,
 }
 
 /// Lua wrapper around a [`MapGen`], storing the associated group for generation.
+///
+/// # Fields
+/// - `inner` — `Rc<RefCell<MapGen>>`.
+/// - `group` — `Rc<RefCell<MapGroup>>`.
 #[derive(Clone)]
 pub(super) struct LuaMapGen {
     pub(super) inner: Rc<RefCell<MapGen>>,
@@ -66,12 +86,18 @@ pub(super) struct LuaMapGen {
 }
 
 /// Lua wrapper around a [`ChunkMap`].
+///
+/// # Fields
+/// - `inner` — `Rc<RefCell<ChunkMap>>`.
 #[derive(Clone)]
 pub(super) struct LuaChunkMap {
     pub(super) inner: Rc<RefCell<ChunkMap>>,
 }
 
 /// Lua wrapper around an [`IsoMap`].
+///
+/// # Fields
+/// - `inner` — `Rc<RefCell<IsoMap>>`.
 #[derive(Clone)]
 pub(super) struct LuaIsoMap {
     pub(super) inner: Rc<RefCell<IsoMap>>,
@@ -130,6 +156,14 @@ impl LunaType for LuaIsoMap {
 // Helper: Rect Ôćĺ Lua table
 // ---------------------------------------------------------------------------
 
+/// Converts a [`Rect`] to a Lua table with `x`, `y`, `width`, and `height` fields.
+///
+/// # Parameters
+/// - `lua` — `&Lua`.
+/// - `r` — `Rect`.
+///
+/// # Returns
+/// `LuaResult<LuaTable<'_>>`.
 pub(super) fn rect_to_table(lua: &Lua, r: Rect) -> LuaResult<LuaTable<'_>> {
     let t = lua.create_table()?;
     /// X on this IsoMap.
@@ -159,6 +193,13 @@ pub(super) fn rect_to_table(lua: &Lua, r: Rect) -> LuaResult<LuaTable<'_>> {
 // Helper: parse Edge from string
 // ---------------------------------------------------------------------------
 
+/// Parses a cardinal direction string into an [`Edge`] enum variant.
+///
+/// # Parameters
+/// - `s` — `&str`.
+///
+/// # Returns
+/// `LuaResult<Edge>`.
 pub(super) fn parse_edge(s: &str) -> LuaResult<Edge> {
     Edge::from_str(s).ok_or_else(|| {
         LuaError::RuntimeError(format!(
@@ -1228,6 +1269,12 @@ impl LuaUserData for LuaMapGroup {
 // ---------------------------------------------------------------------------
 
 /// Parses a Lua table into a [`ScriptStep`].
+///
+/// # Parameters
+/// - `t` — `&LuaTable`.
+///
+/// # Returns
+/// `LuaResult<ScriptStep>`.
 pub(super) fn parse_script_step(t: &LuaTable) -> LuaResult<ScriptStep> {
     let type_str: String = t.get::<_, Option<String>>("type")?.unwrap_or_default();
     let step_type = StepType::from_str(&type_str).unwrap_or(StepType::FillRandom);
@@ -1290,6 +1337,13 @@ pub(super) fn parse_script_step(t: &LuaTable) -> LuaResult<ScriptStep> {
 }
 
 /// Converts a [`ScriptStep`] back to a Lua table.
+///
+/// # Parameters
+/// - `lua` — `&'lua Lua`.
+/// - `step` — `&ScriptStep`.
+///
+/// # Returns
+/// `LuaResult<LuaTable<'lua>>`.
 pub(super) fn step_to_table<'lua>(lua: &'lua Lua, step: &ScriptStep) -> LuaResult<LuaTable<'lua>> {
     let t = lua.create_table()?;
     t.set("type", step.step_type.as_str())?;
@@ -2314,6 +2368,14 @@ fn register_ext(lua: &Lua, tilemap_table: &LuaTable) -> LuaResult<()> {
     Ok(())
 }
 
+/// Registers all `luna.tilemap.*` tile map and procedural generation functions into the Lua VM.
+///
+/// # Parameters
+/// - `lua` — `&Lua`.
+/// - `luna` — `&LuaTable`.
+///
+/// # Returns
+/// `LuaResult<()>`.
 pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
     let tilemap_table = lua.create_table()?;
 

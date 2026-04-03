@@ -1,6 +1,6 @@
 //! Integration tests for the image data module.
 
-use luna2d::image::ImageData;
+use luna2d::image::{CompressedImageData, ImageData};
 
 #[test]
 fn image_data_new_blank() {
@@ -57,6 +57,27 @@ fn image_data_map_pixel() {
     img.map_pixel(|_x, _y, r, g, b, a| (255 - r, 255 - g, 255 - b, a));
     assert_eq!(img.get_pixel(0, 0), Some((155, 205, 230, 255)));
     assert_eq!(img.get_pixel(1, 0), Some((55, 155, 205, 128)));
+}
+
+#[test]
+fn image_compressed_dxt1_loads_from_dds() {
+    let bytes = std::fs::read("tests/fixtures/test_dxt1.dds").unwrap();
+    let cid = CompressedImageData::from_dds(&bytes).unwrap();
+    assert_eq!(cid.get_dimensions(), (1, 1));
+    assert_eq!(cid.get_format(), "dxt1");
+}
+
+#[test]
+fn image_compressed_mipmap_count_is_at_least_one() {
+    let bytes = std::fs::read("tests/fixtures/test_dxt1.dds").unwrap();
+    let cid = CompressedImageData::from_dds(&bytes).unwrap();
+    assert!(cid.get_mipmap_count() >= 1);
+}
+
+#[test]
+fn image_compressed_rejects_invalid_bytes() {
+    let result = CompressedImageData::from_dds(b"not a dds file at all");
+    assert!(result.is_err());
 }
 
 #[test]

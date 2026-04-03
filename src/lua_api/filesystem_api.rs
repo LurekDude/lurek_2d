@@ -14,6 +14,26 @@ use mlua::prelude::*;
 use std::cell::RefCell;
 use std::rc::Rc;
 
+/// Lua UserData wrapper around a [`crate::filesystem::FileData`] buffer.
+struct LuaFileData {
+    inner: crate::filesystem::FileData,
+}
+
+impl LuaUserData for LuaFileData {
+    fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
+        /// Returns the file size in bytes.
+        methods.add_method("getSize", |_, this, ()| Ok(this.inner.len() as i64));
+
+        /// Returns the file content as a Lua string.
+        methods.add_method("getString", |lua, this, ()| {
+            lua.create_string(&this.inner.bytes)
+        });
+
+        /// Returns the virtual path this data was loaded from.
+        methods.add_method("getFilename", |_, this, ()| Ok(this.inner.path.clone()));
+    }
+}
+
 /// Wrapper for FileHandle that can be shared as Lua userdata.
 struct LuaFileHandle {
     inner: RefCell<FileHandle>,
@@ -531,6 +551,60 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
             } else {
                 Ok(("error".to_string(), mlua::Value::Nil))
             }
+        })?,
+    )?;
+
+    // luna.filesystem.mount(source, mountpoint) -> bool
+    /// Mounts a directory at a virtual path. Returns true on success.
+    let s = state.clone();
+    fs.set(
+        "mount",
+        lua.create_function(move |_, (src, mp): (String, String)| {
+            s.borrow_mut()
+                .fs
+                .mount(&src, &mp)
+                .map(|_| true)
+                .map_err(LuaError::external)
+        })?,
+    )?;
+
+    // luna.filesystem.unmount(mountpoint) -> bool
+    /// Removes a virtual mount layer.
+    let s = state.clone();
+    fs.set(
+        "unmount",
+        lua.create_function(move |_, mp: String| Ok(s.borrow_mut().fs.unmount(&mp)))?,
+    )?;
+
+    // luna.filesystem.load(path) -> function
+    /// Loads and compiles a Lua file from the VFS, returning it as a callable function.
+    let s = state.clone();
+    fs.set(
+        "load",
+        lua.create_function(move |lua_ctx, path: String| {
+            let bytes = s
+                .borrow()
+                .fs
+                .load_chunk(&path)
+                .map_err(LuaError::external)?;
+            lua_ctx.load(&bytes[..]).into_function()
+        })?,
+    )?;
+
+    // luna.filesystem.newFileData(path) -> FileData userdata
+    /// Loads a file from the VFS into a FileData buffer.
+    let s = state.clone();
+    fs.set(
+        "newFileData",
+        lua.create_function(move |_, path: String| {
+            let bytes = s
+                .borrow()
+                .fs
+                .load_chunk(&path)
+                .map_err(LuaError::external)?;
+            Ok(LuaFileData {
+                inner: crate::filesystem::FileData::new(path, bytes),
+            })
         })?,
     )?;
 

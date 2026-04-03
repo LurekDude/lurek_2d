@@ -17,7 +17,6 @@ pub use crate::engine::{ErrorInfo, FullscreenType, SharedState, WindowState};
 
 /// Registers the `luna.ai.*` game AI toolkit API.
 pub mod ai_api;
-pub mod steering_api;
 /// Registers the `luna.audio.*` sound playback API.
 pub mod audio_api;
 /// Registers the `luna.compute.*` array computation API.
@@ -44,8 +43,6 @@ pub mod filesystem_api;
 pub mod graph_api;
 /// Registers the `luna.graphics.*` drawing API.
 pub mod graphics_api;
-/// Registers Phase 24 `luna.graphics.*` extension types (Light2D, Camera2D, etc.).
-pub mod sprite_api;
 /// Registers the `luna.image.*` pixel-level image manipulation API.
 pub mod image_api;
 /// Registers the `luna.keyboard.*` and `luna.mouse.*` input API.
@@ -76,6 +73,10 @@ pub mod postfx_api;
 pub mod savegame_api;
 /// Registers the `luna.scene.*` scene stack, registry, data store, and depth-sorter API.
 pub mod scene_api;
+/// Registers Phase 24 `luna.graphics.*` extension types (Light2D, Camera2D, etc.).
+pub mod sprite_api;
+/// Registers the `luna.steering.*` AI steering behaviours API.
+pub mod steering_api;
 /// Registers the `luna.sound.*` decoded audio sample manipulation API.
 // sound_api removed – functions merged into audio_api
 /// Registers the `luna.system.*` platform query API.
@@ -86,14 +87,16 @@ pub mod thread_api;
 pub use crate::thread::channel as thread_channel;
 /// Re-export thread worker from src/thread.
 pub use crate::thread::worker as thread_worker;
-/// Registers the `luna.cardgame.*` card game backend API.
-pub mod cardgame_api;
 /// Registers the `luna.battle.*` turn-based battle API.
 pub mod battle_api;
+/// Registers the `luna.cardgame.*` card game backend API.
+pub mod cardgame_api;
 /// Registers the `luna.combat.*` combat system API.
 pub mod combat_api;
 /// Registers the `luna.crafting.*` crafting system API.
 pub mod crafting_api;
+/// Registers the `luna.economy.*` named resource economy API.
+pub mod economy_api;
 /// Registers the `luna.inventory.*` inventory system API.
 pub mod inventory_api;
 /// Item Api sub-module.
@@ -102,8 +105,6 @@ pub mod inventory_api;
 pub mod lua_types;
 /// Registers the `luna.quest.*` quest log and objective tracking API.
 pub mod quest_api;
-/// Registers the `luna.economy.*` named resource economy API.
-pub mod economy_api;
 /// Registers the `luna.stats.*` character stats API.
 pub mod stats_api;
 /// Registers the `luna.tilemap.*` tile map, tileset, autotile, and procedural generation API.

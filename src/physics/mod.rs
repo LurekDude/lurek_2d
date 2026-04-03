@@ -20,7 +20,7 @@ pub mod world;
 
 pub use body::{Body, BodyShape, BodyType};
 pub use collision::CollisionInfo;
-pub use shape::Shape;
+pub use shape::{Shape, StandaloneShape};
 // Re-export BodyContact as CollisionEvent to preserve the existing public API.
 pub use world::BodyContact as CollisionEvent;
 pub use world::{ContactInfo, RaycastHit, World};

@@ -127,7 +127,6 @@ SharedState (Rc<RefCell<SharedState>>)
 | `log_api.rs` | Structured game-level logging API (`luna.log.*`) |
 | `lua_types.rs` | UserData type utilities for Luna2D Lua objects |
 | `math_api.rs` | Math Api implementation for the `lua_api` subsystem |
-| `math_ext_api.rs` | Extended math API bindings — Phase 25 types and utility functions |
 | `minimap_api.rs` | Lua API bindings for the `luna.minimap.*` minimap module |
 | `modding_api.rs` | Modding Api implementation for the `lua_api` subsystem |
 | `pathfinding_api.rs` | Registers the `luna.pathfinding.*` grid-based pathfinding API |
@@ -137,7 +136,6 @@ SharedState (Rc<RefCell<SharedState>>)
 | `economy_api.rs` | Registers the `luna.economy.*` named resource economy API |
 | `savegame_api.rs` | Savegame Api implementation for the `lua_api` subsystem |
 | `scene_api.rs` | Registers the `luna.scene.*` scene stack, registry, data store, and... |
-| `sound_api.rs` | Registers the `luna.sound.*` decoded audio sample manipulation API |
 | `stats_api.rs` | Lua API bindings for the `luna.stats` RPG character sheet system |
 | `system_api.rs` | System Api implementation for the `lua_api` subsystem |
 | `thread_api.rs` | Registers the `luna.thread` namespace |
@@ -350,19 +348,6 @@ Lua API bindings for the `luna.
 - **`LuaInventory`** (struct): Lua UserData wrapper for the top-level inventory.
 - **`register`** (fn): Register the `luna.inventory` module. Panics in debug mode if the same entity is registered twice.
 
-### `lua_api::item_api`
-
-Lua bindings for `luna.
-
-- **`LuaItem`** (struct): Lua-facing `Item` userdata. Consult the module-level documentation for the broader usage context and preconditions.
-- **`LuaStack`** (struct): Lua-facing `Stack` userdata. Consult the module-level documentation for the broader usage context and preconditions.
-- **`LuaStackBuilder`** (struct): Lua-facing `StackBuilder` userdata. Consult the module-level documentation for the broader usage context and...
-- **`LuaStackManager`** (struct): Lua-facing `StackManager` userdata. Consult the module-level documentation for the broader usage context and...
-- **`LuaItemPool`** (struct): Lua-facing `ItemPool` userdata. Consult the module-level documentation for the broader usage context and preconditions.
-- **`LuaSlot`** (struct): Lua-facing `Slot` userdata. Consult the module-level documentation for the broader usage context and preconditions.
-- **`LuaHistory`** (struct): Lua-facing `StackHistory` userdata. Consult the module-level documentation for the broader usage context and...
-- **`register`** (fn): Registers the `luna.item.*` API. Panics in debug mode if the same entity is registered twice.
-
 ### `lua_api::localization_api`
 
 Registers the `luna.
@@ -387,12 +372,6 @@ UserData type utilities for Luna2D Lua objects.
 Math Api implementation for the `lua_api` subsystem.
 
 - **`register`** (fn): Registers `luna.math.*` helpers (Vec2, distance, random, noise, transforms, etc.) into the Lua VM.
-
-### `lua_api::math_ext_api`
-
-Extended math API bindings — Phase 25 types and utility functions.
-
-- **`register`** (fn): Registers extended math API bindings on the `luna.math` table.
 
 ### `lua_api::minimap_api`
 
@@ -488,12 +467,12 @@ Lua API bindings for `luna.
 - **`LuaQuestLog`** (struct): Lua UserData wrapper for a quest log. Consult the module-level documentation for the broader usage context and...
 - **`register`** (fn): Register `luna.quest.*` API with the Lua VM.
 
-### `lua_api::resource_api`
+### `lua_api::economy_api`
 
-Lua API bindings for the `luna.
+Lua API bindings for the `luna.economy.*` named resource economy module.
 
 - **`LuaResourceManager`** (struct): Lua UserData wrapper for a resource economy manager.
-- **`register`** (fn): Registers the `luna.resource` module with the Lua VM.
+- **`register`** (fn): Registers the `luna.economy` module with the Lua VM.
 
 ### `lua_api::savegame_api`
 
@@ -506,12 +485,6 @@ Savegame Api implementation for the `lua_api` subsystem.
 Registers the `luna.
 
 - **`register`** (fn): Registers the `luna.scene` table with scene stack, registry, data store,
-
-### `lua_api::sound_api`
-
-Registers the `luna.
-
-- **`register`** (fn): Registers the `luna.sound` table on the provided `luna` namespace.
 
 ### `lua_api::stats_api`
 
@@ -674,10 +647,6 @@ Lua UserData wrapper for a loaded font resource.
 
 Lua-facing `StackHistory` userdata. Consult the module-level documentation for the broader usage context and...
 
-#### `lua_api::item_api::LuaHistory`
-
-Lua-facing `StackHistory` userdata. Consult the module-level documentation for the broader usage context and...
-
 #### `lua_api::graphics_api::helpers::LuaImage`
 
 Lua UserData wrapper for a loaded texture/image resource.
@@ -693,14 +662,6 @@ Lua wrapper around an [`IsoMap`]. Consult the module-level documentation for the
 #### `lua_api::inventory_api::LuaItem`
 
 Lua UserData wrapper for a single item definition.
-
-#### `lua_api::item_api::LuaItem`
-
-Lua-facing `Item` userdata. Consult the module-level documentation for the broader usage context and preconditions.
-
-#### `lua_api::item_api::LuaItemPool`
-
-Lua-facing `ItemPool` userdata. Consult the module-level documentation for the broader usage context and preconditions.
 
 #### `lua_api::inventory_api::LuaItemSet`
 
@@ -794,7 +755,7 @@ Lua-callable handle wrapping [`RecipeKnowledge`].
 
 Lua-callable handle wrapping [`RecipeRegistry`].
 
-#### `lua_api::resource_api::LuaResourceManager`
+#### `lua_api::economy_api::LuaResourceManager`
 
 Lua UserData wrapper for a resource economy manager.
 
@@ -806,17 +767,10 @@ Lua UserData wrapper for a dialog sequencer.
 
 Lua-visible wrapper for a character [`Sheet`].
 
-#### `lua_api::cardgame_api::LuaSlot`
-
-Lua-facing `Slot` userdata. Consult the module-level documentation for the broader usage context and preconditions.
 
 #### `lua_api::inventory_api::LuaSlot`
 
 Lua UserData wrapper for a single inventory slot.
-
-#### `lua_api::item_api::LuaSlot`
-
-Lua-facing `Slot` userdata. Consult the module-level documentation for the broader usage context and preconditions.
 
 #### `lua_api::audio_api::LuaSource`
 
@@ -829,18 +783,6 @@ Lua UserData wrapper for a sprite batch resource.
 #### `lua_api::cardgame_api::LuaStack`
 
 Lua-facing `Stack` userdata. Consult the module-level documentation for the broader usage context and preconditions.
-
-#### `lua_api::item_api::LuaStack`
-
-Lua-facing `Stack` userdata. Consult the module-level documentation for the broader usage context and preconditions.
-
-#### `lua_api::item_api::LuaStackBuilder`
-
-Lua-facing `StackBuilder` userdata. Consult the module-level documentation for the broader usage context and...
-
-#### `lua_api::item_api::LuaStackManager`
-
-Lua-facing `StackManager` userdata. Consult the module-level documentation for the broader usage context and...
 
 #### `lua_api::crafting_api::LuaStation`
 
@@ -963,11 +905,9 @@ Standard type identification for Luna2D UserData objects.  Every Luna2D Lua obje
 - **`register()`** `image_api::` — Registers the `luna.image` table on the provided `luna` namespace.
 - **`register()`** `input_api::` — Registers `luna.keyboard.*` and `luna.mouse.*` query functions into the Lua VM.
 - **`register()`** `inventory_api::` — Register the `luna.inventory` module. Panics in debug mode if the same entity is registered twice.
-- **`register()`** `item_api::` — Registers the `luna.item.*` API. Panics in debug mode if the same entity is registered twice.
 - **`register()`** `localization_api::` — Registers `luna.localization.*` functions.
 - **`register()`** `log_api::` — Registers the `luna.log.*` namespace into the shared `luna` table.
 - **`register()`** `math_api::` — Registers `luna.math.*` helpers (Vec2, distance, random, noise, transforms, etc.) into the Lua VM.
-- **`register()`** `math_ext_api::` — Registers extended math API bindings on the `luna.math` table.
 - **`register()`** `minimap_api::` — Register the `luna.minimap` module. Panics in debug mode if the same entity is registered twice.
 - **`register()`** `modding_api::` — Registers `luna.modding.*` functions into the Lua VM.
 - **`register()`** `particle_api::` — Register `luna..*` bindings in the Lua state.
@@ -976,10 +916,9 @@ Standard type identification for Luna2D UserData objects.  Every Luna2D Lua obje
 - **`register()`** `physics_api::` — Register `luna..*` bindings in the Lua state.
 - **`register()`** `postfx_api::` — Registers the `luna.postfx.*` API. Panics in debug mode if the same entity is registered twice.
 - **`register()`** `quest_api::` — Register `luna.quest.*` API with the Lua VM.
-- **`register()`** `resource_api::` — Registers the `luna.resource` module with the Lua VM.
+- **`register()`** `economy_api::` — Registers the `luna.economy` module with the Lua VM.
 - **`register()`** `savegame_api::` — Registers `luna.savegame.*` functions into the Lua VM.
 - **`register()`** `scene_api::` — Registers the `luna.scene` table with scene stack, registry, data store,
-- **`register()`** `sound_api::` — Registers the `luna.sound` table on the provided `luna` namespace.
 - **`register()`** `stats_api::` — Register the `luna.stats` module into the Lua state.
 - **`register()`** `system_api::` — Registers `luna.system.*` platform query functions into the Lua VM.
 - **`register()`** `thread_api::` — Registers all `luna.thread.*` functions into the Lua VM.

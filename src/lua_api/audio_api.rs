@@ -9,6 +9,7 @@
 //! and the `luna.*` Lua API for the scripting interface.
 //!
 use super::SharedState;
+use crate::audio::Decoder;
 use crate::audio::MidiPlayer;
 use crate::audio::SourceType;
 use crate::engine::resource_keys::BusKey;
@@ -946,6 +947,86 @@ fn require_sound_key(
     ensure_source_exists(&state.mixer, key, function_name)
 }
 
+/// Lua UserData wrapper for a streaming audio `Decoder`.
+///
+/// # Fields
+/// - `inner` — `Decoder`.
+pub struct LuaDecoder {
+    inner: Decoder,
+}
+
+impl LuaUserData for LuaDecoder {
+    fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
+        /// Decode the next chunk of audio samples.
+        ///
+        /// # Returns
+        /// SoundData userdata or nil at EOF.
+        methods.add_method_mut("decode", |lua, this, ()| {
+            match this.inner.decode() {
+                Some(pcm_i16) => {
+                    let samples: Vec<f32> =
+                        pcm_i16.iter().map(|&s| s as f32 / 32768.0).collect();
+                    let sd = crate::audio::SoundData::from_samples(
+                        samples,
+                        this.inner.sample_rate,
+                        this.inner.channels,
+                    );
+                    Ok(LuaValue::UserData(lua.create_userdata(sd)?))
+                }
+                None => Ok(LuaValue::Nil),
+            }
+        });
+
+        /// Return the number of audio channels.
+        ///
+        /// # Returns
+        /// `u32`.
+        methods.add_method("getChannelCount", |_, this, ()| {
+            Ok(this.inner.channels as u32)
+        });
+
+        /// Return the bit depth.
+        ///
+        /// # Returns
+        /// `u32`.
+        methods.add_method("getBitDepth", |_, this, ()| {
+            Ok(this.inner.bit_depth as u32)
+        });
+
+        /// Return the sample rate in Hz.
+        ///
+        /// # Returns
+        /// `u32`.
+        methods.add_method("getSampleRate", |_, this, ()| Ok(this.inner.sample_rate));
+
+        /// Return the total duration in seconds.
+        ///
+        /// # Returns
+        /// `f64`.
+        methods.add_method("getDuration", |_, this, ()| {
+            Ok(this.inner.get_duration())
+        });
+
+        /// Seek to a time offset in seconds.
+        ///
+        /// # Parameters
+        /// - `offset` — `f64`.
+        methods.add_method_mut("seek", |_, this, offset: f64| {
+            this.inner.seek(offset);
+            Ok(())
+        });
+
+        /// Rewind to the beginning.
+        methods.add_method_mut("rewind", |_, this, ()| {
+            this.inner.rewind();
+            Ok(())
+        });
+
+        /// Release the decoder (no-op in the current model).
+        methods.add_method("release", |_, _, ()| Ok(()));
+    }
+}
+
 /// Registers all `luna.audio.*` functions into the Lua VM.
 ///
 /// # Parameters
@@ -1434,27 +1515,192 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
     /// Returns the maximum number of simultaneous audio sources.
     audio.set("getMaxSources", lua.create_function(|_, ()| Ok(64))?)?;
 
-    // luna.audio.setListener2D(x, y) — stub
+    // luna.audio.setListener2D(x, y) — keeps backward compat alias
     /// Sets the 2D listener position for spatial audio.
     /// @param x : number
     /// @param y : number
+    let s = state.clone();
     audio.set(
         "setListener2D",
-        lua.create_function(|_, (_x, _y): (f32, f32)| {
-            log::debug!("stub: luna.audio.setListener2D called");
+        lua.create_function(move |_, (x, y): (f32, f32)| {
+            s.borrow_mut().mixer.set_listener_position(x, y, 0.0);
             Ok(())
         })?,
     )?;
 
-    // luna.audio.getListener2D() -> (0.0, 0.0) — stub
+    // luna.audio.getListener2D() -> x, y  (backward compat)
     /// Returns the current 2D listener position (x, y).
     /// @return any
+    let s = state.clone();
     audio.set(
         "getListener2D",
-        lua.create_function(|_, ()| {
-            log::debug!("stub: luna.audio.getListener2D called");
-            Ok((0.0_f32, 0.0_f32))
+        lua.create_function(move |_, ()| {
+            let pos = s.borrow().mixer.get_listener_position();
+            Ok((pos[0], pos[1]))
         })?,
+    )?;
+
+    // luna.audio.setListener(x, y, z?) — 3D listener position
+    /// Sets the 3D listener position for spatial audio.
+    /// @param x : number
+    /// @param y : number
+    /// @param z : number?
+    let s = state.clone();
+    audio.set(
+        "setListener",
+        lua.create_function(move |_, (x, y, z): (f32, f32, Option<f32>)| {
+            s.borrow_mut().mixer.set_listener_position(x, y, z.unwrap_or(0.0));
+            Ok(())
+        })?,
+    )?;
+
+    // luna.audio.getListener() -> x, y, z
+    /// Returns the 3D listener position.
+    /// @return any
+    let s = state.clone();
+    audio.set(
+        "getListener",
+        lua.create_function(move |_, ()| {
+            let pos = s.borrow().mixer.get_listener_position();
+            Ok((pos[0], pos[1], pos[2]))
+        })?,
+    )?;
+
+    // luna.audio.setPosition(source_id, x, y, z?)
+    /// Sets the 3D position of an audio source for spatial panning.
+    /// @param id_val : any
+    /// @param x : number
+    /// @param y : number
+    /// @param z : number?
+    let s = state.clone();
+    audio.set(
+        "setPosition",
+        lua.create_function(move |_, (id_val, x, y, z): (LuaValue, f32, f32, Option<f32>)| {
+            let key = sound_key_from_value(&id_val)?;
+            s.borrow_mut().mixer.set_source_position(key, x, y, z.unwrap_or(0.0));
+            Ok(())
+        })?,
+    )?;
+
+    // luna.audio.getPosition(source_id) -> x, y, z
+    /// Returns the 3D position of an audio source.
+    /// @param id_val : any
+    /// @return any
+    let s = state.clone();
+    audio.set(
+        "getPosition",
+        lua.create_function(move |_, id_val: LuaValue| {
+            let key = sound_key_from_value(&id_val)?;
+            let pos = s.borrow().mixer.get_source_position(key);
+            Ok((pos[0], pos[1], pos[2]))
+        })?,
+    )?;
+
+    // luna.audio.setVelocity(source_id, x, y, z?)
+    /// Sets the velocity of an audio source for Doppler calculation.
+    /// @param id_val : any
+    /// @param x : number
+    /// @param y : number
+    /// @param z : number?
+    let s = state.clone();
+    audio.set(
+        "setVelocity",
+        lua.create_function(move |_, (id_val, x, y, z): (LuaValue, f32, f32, Option<f32>)| {
+            let key = sound_key_from_value(&id_val)?;
+            s.borrow_mut().mixer.set_source_velocity(key, x, y, z.unwrap_or(0.0));
+            Ok(())
+        })?,
+    )?;
+
+    // luna.audio.getVelocity(source_id) -> x, y, z
+    /// Returns the velocity of an audio source.
+    /// @param id_val : any
+    /// @return any
+    let s = state.clone();
+    audio.set(
+        "getVelocity",
+        lua.create_function(move |_, id_val: LuaValue| {
+            let key = sound_key_from_value(&id_val)?;
+            let vel = s.borrow().mixer.get_source_velocity(key);
+            Ok((vel[0], vel[1], vel[2]))
+        })?,
+    )?;
+
+    // luna.audio.setOrientation(source_id, fx, fy, fz, ux, uy, uz)
+    /// Sets the orientation of an audio source.
+    /// @param id_val : any
+    /// @param fx : number
+    /// @param fy : number
+    /// @param fz : number
+    /// @param ux : number
+    /// @param uy : number
+    /// @param uz : number
+    let s = state.clone();
+    audio.set(
+        "setOrientation",
+        lua.create_function(
+            move |_, (id_val, fx, fy, fz, ux, uy, uz): (LuaValue, f32, f32, f32, f32, f32, f32)| {
+                let key = sound_key_from_value(&id_val)?;
+                s.borrow_mut().mixer.set_source_orientation(key, fx, fy, fz, ux, uy, uz);
+                Ok(())
+            },
+        )?,
+    )?;
+
+    // luna.audio.getOrientation(source_id) -> fx, fy, fz, ux, uy, uz
+    /// Returns the 6-component orientation of an audio source.
+    /// @param id_val : any
+    /// @return any
+    let s = state.clone();
+    audio.set(
+        "getOrientation",
+        lua.create_function(move |_, id_val: LuaValue| {
+            let key = sound_key_from_value(&id_val)?;
+            let o = s.borrow().mixer.get_source_orientation(key);
+            Ok((o[0], o[1], o[2], o[3], o[4], o[5]))
+        })?,
+    )?;
+
+    // luna.audio.setDopplerScale(scale)
+    /// Sets the global Doppler effect scale (1.0 = default).
+    /// @param scale : number
+    let s = state.clone();
+    audio.set(
+        "setDopplerScale",
+        lua.create_function(move |_, scale: f32| {
+            s.borrow_mut().mixer.set_doppler_scale(scale);
+            Ok(())
+        })?,
+    )?;
+
+    // luna.audio.getDopplerScale() -> scale
+    /// Returns the current global Doppler scale.
+    /// @return any
+    let s = state.clone();
+    audio.set(
+        "getDopplerScale",
+        lua.create_function(move |_, ()| Ok(s.borrow().mixer.get_doppler_scale()))?,
+    )?;
+
+    // luna.audio.setDistanceModel(model)
+    /// Sets the distance attenuation model.
+    /// @param model : string
+    let s = state.clone();
+    audio.set(
+        "setDistanceModel",
+        lua.create_function(move |_, model: String| {
+            s.borrow_mut().mixer.set_distance_model(&model);
+            Ok(())
+        })?,
+    )?;
+
+    // luna.audio.getDistanceModel() -> model
+    /// Returns the current distance attenuation model name.
+    /// @return any
+    let s = state.clone();
+    audio.set(
+        "getDistanceModel",
+        lua.create_function(move |_, ()| Ok(s.borrow().mixer.get_distance_model().to_string()))?,
     )?;
 
     // luna.audio.setMeter(scale) — stub
@@ -1768,6 +2014,34 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
             Ok(())
         })?,
     )?;
+    // luna.audio.newDecoder(source, buffersize?) -> Decoder userdata
+    /// Creates a streaming audio decoder for chunked PCM reading.
+    ///
+    /// # Parameters
+    /// - `source` — File path to the audio file.
+    /// - `buffersize` — Optional number of samples per chunk (default 2048).
+    ///
+    /// # Returns
+    /// Decoder userdata.
+    let state_clone = state.clone();
+    /// @param source : string
+    /// @param buffersize : number?
+    /// @return any
+    audio.set(
+        "newDecoder",
+        lua.create_function(move |_, (source, buffersize): (String, Option<usize>)| {
+            let st = state_clone.borrow();
+            let path = st.game_dir.join(&source);
+            let path_str = path.to_str().ok_or_else(|| {
+                LuaError::RuntimeError("Invalid path".to_string())
+            })?;
+            let buf = buffersize.unwrap_or(2048);
+            let decoder = Decoder::from_file(path_str, buf)
+                .map_err(|e| LuaError::RuntimeError(e.to_string()))?;
+            Ok(LuaDecoder { inner: decoder })
+        })?,
+    )?;
+
     /// Audio.
     luna.set("audio", audio)?;
     Ok(())

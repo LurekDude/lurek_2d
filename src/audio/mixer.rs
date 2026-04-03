@@ -95,6 +95,8 @@ struct AudioEntry {
     highpass_cutoff: Option<u32>,
     /// Fade-in duration in seconds applied on next play. `None` = no fade.
     fade_in_duration: Option<f32>,
+    /// Optional 3D spatial state; `None` = non-spatial (no panning by position).
+    spatial: Option<crate::audio::SpatialState>,
 }
 
 /// Manages audio output via rodio: loads sources, controls playback, volume,
@@ -112,12 +114,27 @@ struct AudioEntry {
 /// - `sources` — `SlotMap<SoundKey, AudioEntry>`.
 /// - `master_volume` — `f32`.
 /// - `buses` — `SlotMap<BusKey, Bus>`.
+/// - `listener_position` — `[f32; 3]`. Listener position for spatial audio.
+/// - `listener_orientation` — `[f32; 6]`. Listener orientation (forward + up vectors).
+/// - `listener_velocity` — `[f32; 3]`. Listener velocity for Doppler calculation.
+/// - `doppler_scale` — `f32`. Global Doppler effect scale factor.
+/// - `distance_model` — `String`. Distance attenuation model name.
 pub struct Mixer {
     _stream: Option<rodio::OutputStream>,
     stream_handle: Option<rodio::OutputStreamHandle>,
     sources: SlotMap<SoundKey, AudioEntry>,
     master_volume: f32,
     buses: SlotMap<BusKey, Bus>,
+    /// Listener position `[x, y, z]` for spatial audio.
+    listener_position: [f32; 3],
+    /// Listener orientation: forward (xyz) followed by up (xyz).
+    listener_orientation: [f32; 6],
+    /// Listener velocity `[x, y, z]` for Doppler calculation.
+    listener_velocity: [f32; 3],
+    /// Global Doppler effect scale factor (1.0 = default, 0.0 = disabled).
+    doppler_scale: f32,
+    /// Distance attenuation model name (e.g. `"inverse_clamped"`).
+    distance_model: String,
 }
 
 impl Default for Mixer {
@@ -148,6 +165,11 @@ impl Mixer {
             sources: SlotMap::with_key(),
             master_volume: 1.0,
             buses: SlotMap::with_key(),
+            listener_position: [0.0, 0.0, 0.0],
+            listener_orientation: [0.0, 0.0, -1.0, 0.0, 1.0, 0.0],
+            listener_velocity: [0.0, 0.0, 0.0],
+            doppler_scale: 1.0,
+            distance_model: "inverse_clamped".to_string(),
         }
     }
 
@@ -189,6 +211,7 @@ impl Mixer {
             lowpass_cutoff: None,
             highpass_cutoff: None,
             fade_in_duration: None,
+            spatial: None,
         })
     }
 
@@ -667,6 +690,7 @@ impl Mixer {
             lowpass_cutoff: entry.lowpass_cutoff,
             highpass_cutoff: entry.highpass_cutoff,
             fade_in_duration: entry.fade_in_duration,
+            spatial: entry.spatial,
         };
         Some(self.sources.insert(new_entry))
     }
@@ -1094,5 +1118,226 @@ impl Mixer {
     /// `Option<f32>`.
     pub fn get_fade_in(&self, key: SoundKey) -> Option<f32> {
         self.sources.get(key).and_then(|e| e.fade_in_duration)
+    }
+
+    // ── Spatial audio ────────────────────────────────────────────────────────
+
+    /// Sets the 3D spatial position of an audio source.
+    ///
+    /// Also recomputes the `pan` value using 2D projection so the change takes
+    /// effect immediately on the next `play` call.
+    ///
+    /// # Parameters
+    /// - `key` — `SoundKey`. The source to update.
+    /// - `x` — `f32`. X position.
+    /// - `y` — `f32`. Y position.
+    /// - `z` — `f32`. Z position (accepted but projection uses x/y for panning).
+    ///
+    /// # Returns
+    /// `()`.
+    pub fn set_source_position(&mut self, key: SoundKey, x: f32, y: f32, z: f32) {
+        if let Some(entry) = self.sources.get_mut(key) {
+            let state = entry.spatial.get_or_insert_with(crate::audio::SpatialState::default);
+            state.position = [x, y, z];
+            let dx = x - self.listener_position[0];
+            entry.pan = (dx / 200.0).clamp(-1.0, 1.0);
+        }
+    }
+
+    /// Returns the 3D spatial position of an audio source.
+    ///
+    /// # Parameters
+    /// - `key` — `SoundKey`. The source to query.
+    ///
+    /// # Returns
+    /// `[f32; 3]` — `[x, y, z]` position, or `[0.0, 0.0, 0.0]` if not set.
+    pub fn get_source_position(&self, key: SoundKey) -> [f32; 3] {
+        self.sources
+            .get(key)
+            .and_then(|e| e.spatial.as_ref())
+            .map(|s| s.position)
+            .unwrap_or([0.0, 0.0, 0.0])
+    }
+
+    /// Sets the spatial velocity of an audio source (used for Doppler calculation).
+    ///
+    /// # Parameters
+    /// - `key` — `SoundKey`. The source to update.
+    /// - `x` — `f32`. X velocity.
+    /// - `y` — `f32`. Y velocity.
+    /// - `z` — `f32`. Z velocity.
+    ///
+    /// # Returns
+    /// `()`.
+    pub fn set_source_velocity(&mut self, key: SoundKey, x: f32, y: f32, z: f32) {
+        if let Some(entry) = self.sources.get_mut(key) {
+            let state = entry.spatial.get_or_insert_with(crate::audio::SpatialState::default);
+            state.velocity = [x, y, z];
+        }
+    }
+
+    /// Returns the spatial velocity of an audio source.
+    ///
+    /// # Parameters
+    /// - `key` — `SoundKey`. The source to query.
+    ///
+    /// # Returns
+    /// `[f32; 3]` — velocity vector, or `[0.0, 0.0, 0.0]` if not set.
+    pub fn get_source_velocity(&self, key: SoundKey) -> [f32; 3] {
+        self.sources
+            .get(key)
+            .and_then(|e| e.spatial.as_ref())
+            .map(|s| s.velocity)
+            .unwrap_or([0.0, 0.0, 0.0])
+    }
+
+    /// Sets the spatial orientation of an audio source.
+    ///
+    /// # Parameters
+    /// - `key` — `SoundKey`.
+    /// - `fx` — `f32`. Forward x.
+    /// - `fy` — `f32`. Forward y.
+    /// - `fz` — `f32`. Forward z.
+    /// - `ux` — `f32`. Up x.
+    /// - `uy` — `f32`. Up y.
+    /// - `uz` — `f32`. Up z.
+    ///
+    /// # Returns
+    /// `()`.
+    #[allow(clippy::too_many_arguments)]
+    pub fn set_source_orientation(
+        &mut self,
+        key: SoundKey,
+        fx: f32,
+        fy: f32,
+        fz: f32,
+        ux: f32,
+        uy: f32,
+        uz: f32,
+    ) {
+        if let Some(entry) = self.sources.get_mut(key) {
+            let state = entry.spatial.get_or_insert_with(crate::audio::SpatialState::default);
+            state.orientation = [fx, fy, fz, ux, uy, uz];
+        }
+    }
+
+    /// Returns the spatial orientation of an audio source.
+    ///
+    /// # Parameters
+    /// - `key` — `SoundKey`.
+    ///
+    /// # Returns
+    /// `[f32; 6]` — forward xyz followed by up xyz; defaults to `[0,0,-1, 0,1,0]`.
+    pub fn get_source_orientation(&self, key: SoundKey) -> [f32; 6] {
+        self.sources
+            .get(key)
+            .and_then(|e| e.spatial.as_ref())
+            .map(|s| s.orientation)
+            .unwrap_or([0.0, 0.0, -1.0, 0.0, 1.0, 0.0])
+    }
+
+    /// Sets the 3D listener position for spatial audio.
+    ///
+    /// # Parameters
+    /// - `x` — `f32`. X position.
+    /// - `y` — `f32`. Y position.
+    /// - `z` — `f32`. Z position.
+    ///
+    /// # Returns
+    /// `()`.
+    pub fn set_listener_position(&mut self, x: f32, y: f32, z: f32) {
+        self.listener_position = [x, y, z];
+    }
+
+    /// Returns the 3D listener position.
+    ///
+    /// # Returns
+    /// `[f32; 3]`.
+    pub fn get_listener_position(&self) -> [f32; 3] {
+        self.listener_position
+    }
+
+    /// Sets the listener orientation (forward + up vectors).
+    ///
+    /// # Parameters
+    /// - `fx` — `f32`. Forward x.
+    /// - `fy` — `f32`. Forward y.
+    /// - `fz` — `f32`. Forward z.
+    /// - `ux` — `f32`. Up x.
+    /// - `uy` — `f32`. Up y.
+    /// - `uz` — `f32`. Up z.
+    ///
+    /// # Returns
+    /// `()`.
+    #[allow(clippy::too_many_arguments)]
+    pub fn set_listener_orientation(&mut self, fx: f32, fy: f32, fz: f32, ux: f32, uy: f32, uz: f32) {
+        self.listener_orientation = [fx, fy, fz, ux, uy, uz];
+    }
+
+    /// Returns the listener orientation (forward xyz + up xyz).
+    ///
+    /// # Returns
+    /// `[f32; 6]`.
+    pub fn get_listener_orientation(&self) -> [f32; 6] {
+        self.listener_orientation
+    }
+
+    /// Sets the listener velocity for Doppler calculation.
+    ///
+    /// # Parameters
+    /// - `x` — `f32`. X velocity.
+    /// - `y` — `f32`. Y velocity.
+    /// - `z` — `f32`. Z velocity.
+    ///
+    /// # Returns
+    /// `()`.
+    pub fn set_listener_velocity(&mut self, x: f32, y: f32, z: f32) {
+        self.listener_velocity = [x, y, z];
+    }
+
+    /// Returns the listener velocity.
+    ///
+    /// # Returns
+    /// `[f32; 3]`.
+    pub fn get_listener_velocity(&self) -> [f32; 3] {
+        self.listener_velocity
+    }
+
+    /// Sets the global Doppler effect scale.
+    ///
+    /// # Parameters
+    /// - `scale` — `f32`. Multiplier; `1.0` = default, `0.0` = disabled.
+    ///
+    /// # Returns
+    /// `()`.
+    pub fn set_doppler_scale(&mut self, scale: f32) {
+        self.doppler_scale = scale.max(0.0);
+    }
+
+    /// Returns the global Doppler effect scale.
+    ///
+    /// # Returns
+    /// `f32` — current scale.
+    pub fn get_doppler_scale(&self) -> f32 {
+        self.doppler_scale
+    }
+
+    /// Sets the distance attenuation model.
+    ///
+    /// # Parameters
+    /// - `model` — `&str`. One of `"none"`, `"inverse"`, `"inverse_clamped"`, `"linear"`, `"linear_clamped"`, `"exponent"`, `"exponent_clamped"`.
+    ///
+    /// # Returns
+    /// `()`.
+    pub fn set_distance_model(&mut self, model: &str) {
+        self.distance_model = model.to_string();
+    }
+
+    /// Returns the current distance attenuation model name.
+    ///
+    /// # Returns
+    /// `&str`.
+    pub fn get_distance_model(&self) -> &str {
+        &self.distance_model
     }
 }

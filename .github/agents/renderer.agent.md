@@ -23,6 +23,8 @@ name: Renderer
 - `src/graphics/shader.rs` — Software shader effects
 - `src/graphics/mod.rs` — DrawCommand enum, module exports
 - Graphics-related Lua bindings in `src/lua_api/graphics_api.rs` and `src/lua_api/graphics_ext_api.rs`
+- `luna.graphics.draw` — polymorphic dispatch to Image/Canvas/SpriteBatch/Mesh (Phase 3)
+- `luna.graphics.drawEx` — polymorphic dispatch with full affine transform (Phase 3)
 
 **Must not become**:
 - Shadow Developer for non-graphics engine code

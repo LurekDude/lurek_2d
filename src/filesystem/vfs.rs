@@ -49,14 +49,29 @@ pub enum FileType {
     Other,
 }
 
+/// A virtual filesystem mount layer overlaid on top of the game directory.
+///
+/// # Fields
+/// - `source` — `PathBuf`. The host-OS directory being mounted.
+/// - `mountpoint` — `String`. The virtual path prefix this layer serves.
+#[derive(Debug, Clone)]
+pub struct MountLayer {
+    /// The host-OS directory being mounted.
+    pub source: PathBuf,
+    /// The virtual path prefix this layer serves.
+    pub mountpoint: String,
+}
+
 /// Sandboxed filesystem rooted at the game directory; prevents path-traversal attacks.
 ///
 /// # Fields
 /// - `base_dir` — `PathBuf`.
 /// - `identity` — `String`.
+/// - `mounts` — `Vec<MountLayer>`.
 pub struct GameFS {
     base_dir: PathBuf,
     identity: String,
+    mounts: Vec<MountLayer>,
 }
 
 impl GameFS {
@@ -71,6 +86,7 @@ impl GameFS {
         GameFS {
             base_dir: base_dir.into(),
             identity: String::new(),
+            mounts: Vec::new(),
         }
     }
 
@@ -435,6 +451,161 @@ impl GameFS {
     /// - `identity` — short name used to identify the game (e.g. `"my_awesome_game"`)
     pub fn set_identity(&mut self, identity: &str) {
         self.identity = identity.to_string();
+    }
+
+    // ── Mount Layer Management ────────────────────────────────────────
+
+    /// Mounts a host directory (relative to the game dir) at a virtual mountpoint.
+    ///
+    /// The source path must not contain `..` components and must resolve to a
+    /// directory inside the game directory, preventing arbitrary filesystem access.
+    ///
+    /// # Parameters
+    /// - `source_path` — `&str`. Relative path (within game dir) to mount.
+    /// - `mountpoint` — `&str`. Virtual prefix to serve (e.g., `"/mods/hello"`).
+    ///
+    /// # Returns
+    /// `Result<(), EngineError>`.
+    pub fn mount(&mut self, source_path: &str, mountpoint: &str) -> EngineResult<()> {
+        // Security: reject path traversal in source
+        for component in std::path::Path::new(source_path).components() {
+            if let std::path::Component::ParentDir = component {
+                return Err(EngineError::FileSystemError(
+                    "Access denied: path traversal in mount source".into(),
+                ));
+            }
+        }
+        let full = self.base_dir.join(source_path);
+        if !full.is_dir() {
+            return Err(EngineError::FileSystemError(format!(
+                "Mount source '{}' is not a directory",
+                source_path
+            )));
+        }
+        let canonical = full.canonicalize().map_err(|e| {
+            EngineError::FileSystemError(format!(
+                "Cannot resolve mount source '{}': {}",
+                source_path, e
+            ))
+        })?;
+        let base_canonical = self.base_dir.canonicalize().map_err(|e| {
+            EngineError::FileSystemError(format!("Cannot resolve base dir: {}", e))
+        })?;
+        if !canonical.starts_with(&base_canonical) {
+            return Err(EngineError::FileSystemError(
+                "Access denied: mount source must be inside the game directory".into(),
+            ));
+        }
+        self.mounts.push(MountLayer {
+            source: canonical,
+            mountpoint: mountpoint.to_string(),
+        });
+        Ok(())
+    }
+
+    /// Mounts an absolute host-OS path at a virtual mountpoint.
+    ///
+    /// The caller is responsible for ensuring the path is safe to expose.
+    ///
+    /// # Parameters
+    /// - `source_path` — `&Path`. Absolute host-OS path to a directory.
+    /// - `mountpoint` — `&str`. Virtual path prefix.
+    ///
+    /// # Returns
+    /// `Result<(), EngineError>`.
+    pub fn mount_full(&mut self, source_path: &Path, mountpoint: &str) -> EngineResult<()> {
+        if !source_path.is_dir() {
+            return Err(EngineError::FileSystemError(format!(
+                "Mount source '{}' is not a directory",
+                source_path.display()
+            )));
+        }
+        let canonical = source_path.canonicalize().map_err(|e| {
+            EngineError::FileSystemError(format!("Cannot resolve mount path: {}", e))
+        })?;
+        self.mounts.push(MountLayer {
+            source: canonical,
+            mountpoint: mountpoint.to_string(),
+        });
+        Ok(())
+    }
+
+    /// Removes the first mount layer matching `mountpoint`.
+    ///
+    /// # Parameters
+    /// - `mountpoint` — `&str`. Virtual path prefix to remove.
+    ///
+    /// # Returns
+    /// `bool` — `true` if a layer was found and removed; `false` otherwise.
+    pub fn unmount(&mut self, mountpoint: &str) -> bool {
+        if let Some(idx) = self.mounts.iter().position(|m| m.mountpoint == mountpoint) {
+            self.mounts.remove(idx);
+            true
+        } else {
+            false
+        }
+    }
+
+    /// Reads file bytes from the VFS, searching mount layers newest-first before
+    /// falling back to the base game directory.
+    ///
+    /// Useful for `luna.filesystem.load()` — returns raw bytes for Lua compilation.
+    ///
+    /// # Parameters
+    /// - `path` — `&str`. Virtual path to the file.
+    ///
+    /// # Returns
+    /// `Result<Vec<u8>, EngineError>`.
+    pub fn load_chunk(&self, path: &str) -> EngineResult<Vec<u8>> {
+        for layer in self.mounts.iter().rev() {
+            if let Some(rel) = path.strip_prefix(&layer.mountpoint) {
+                let candidate = layer.source.join(rel.trim_start_matches('/'));
+                if candidate.is_file() {
+                    return std::fs::read(&candidate).map_err(|e| {
+                        EngineError::FileSystemError(format!(
+                            "Failed to read '{}': {}",
+                            path, e
+                        ))
+                    });
+                }
+            }
+        }
+        // Fall through to base directory
+        self.read_bytes(path)
+    }
+
+    /// Lists entries visible under a virtual path, merging all mount layers.
+    ///
+    /// # Parameters
+    /// - `path` — `&str`. Virtual path to the directory.
+    ///
+    /// # Returns
+    /// `Result<Vec<String>, EngineError>`.
+    pub fn get_directory_items_merged(&self, path: &str) -> EngineResult<Vec<String>> {
+        let mut items: std::collections::HashSet<String> = std::collections::HashSet::new();
+        if let Ok(base_items) = self.get_directory_items(path) {
+            items.extend(base_items);
+        }
+        for layer in &self.mounts {
+            if path.starts_with(&layer.mountpoint) || layer.mountpoint == path {
+                let rel = path
+                    .strip_prefix(&layer.mountpoint)
+                    .unwrap_or(path);
+                let dir = layer.source.join(rel.trim_start_matches('/'));
+                if dir.is_dir() {
+                    if let Ok(rd) = std::fs::read_dir(&dir) {
+                        for entry in rd.flatten() {
+                            if let Some(name) = entry.file_name().to_str() {
+                                items.insert(name.to_string());
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        let mut result: Vec<String> = items.into_iter().collect();
+        result.sort();
+        Ok(result)
     }
 
     // ── Internal Path Resolution ──────────────────────────────────────

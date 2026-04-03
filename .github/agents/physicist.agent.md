@@ -14,8 +14,11 @@ name: Physicist
 - `src/physics/body.rs` — Body struct, BodyType (Static/Dynamic/Kinematic), velocity, forces
 - `src/physics/collision.rs` — AABB intersection, CollisionInfo, collision response
 - `src/physics/world.rs` — World container, step function, body management
+- `src/physics/shape.rs` — `Shape` enum, `StandaloneShape` (Phase 2 standalone shape userdata)
 - `src/physics/mod.rs` — Module exports
 - Physics-related Lua bindings in `src/lua_api/physics_api.rs`
+- `luna.physics.newCircleShape` / `newRectangleShape` / `newPolygonShape` / `newEdgeShape` / `newChainShape` — standalone shape userdata (Phase 2)
+- `StandaloneShape` — shape geometry type with fixture parameters (density, friction, restitution, sensor)
 
 **Must not become**:
 - Shadow Renderer doing collision visualization

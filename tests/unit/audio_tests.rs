@@ -825,3 +825,155 @@ fn mixer_clone_copies_effect_fields() {
         .expect("clone fade_in should be Some");
     assert!((fade - 1.5).abs() < 1e-5);
 }
+
+#[test]
+fn audio_listener_position_defaults_to_origin() {
+    let mixer = Mixer::new();
+    let pos = mixer.get_listener_position();
+    assert!((pos[0]).abs() < 1e-5);
+    assert!((pos[1]).abs() < 1e-5);
+    assert!((pos[2]).abs() < 1e-5);
+}
+
+#[test]
+fn audio_set_listener_position_round_trips() {
+    let mut mixer = Mixer::new();
+    mixer.set_listener_position(10.0, 20.0, 5.0);
+    let pos = mixer.get_listener_position();
+    assert!((pos[0] - 10.0).abs() < 1e-5);
+    assert!((pos[1] - 20.0).abs() < 1e-5);
+    assert!((pos[2] - 5.0).abs() < 1e-5);
+}
+
+#[test]
+fn audio_doppler_scale_defaults_to_one() {
+    let mixer = Mixer::new();
+    assert!((mixer.get_doppler_scale() - 1.0).abs() < 1e-5);
+}
+
+#[test]
+fn audio_set_doppler_scale_round_trips() {
+    let mut mixer = Mixer::new();
+    mixer.set_doppler_scale(2.5);
+    assert!((mixer.get_doppler_scale() - 2.5).abs() < 1e-5);
+}
+
+#[test]
+fn audio_doppler_scale_clamped_to_zero() {
+    let mut mixer = Mixer::new();
+    mixer.set_doppler_scale(-1.0);
+    assert!((mixer.get_doppler_scale() - 0.0).abs() < 1e-5);
+}
+
+#[test]
+fn audio_distance_model_default_is_inverse_clamped() {
+    let mixer = Mixer::new();
+    assert_eq!(mixer.get_distance_model(), "inverse_clamped");
+}
+
+#[test]
+fn audio_set_distance_model_round_trips() {
+    let mut mixer = Mixer::new();
+    mixer.set_distance_model("linear");
+    assert_eq!(mixer.get_distance_model(), "linear");
+}
+
+#[test]
+fn audio_source_position_defaults_to_origin() {
+    let mut mixer = Mixer::new();
+    let key = mixer.load_source("test.wav", SourceType::Static);
+    let pos = mixer.get_source_position(key);
+    assert!((pos[0]).abs() < 1e-5);
+    assert!((pos[1]).abs() < 1e-5);
+    assert!((pos[2]).abs() < 1e-5);
+}
+
+#[test]
+fn audio_set_source_position_round_trips() {
+    let mut mixer = Mixer::new();
+    let key = mixer.load_source("test.wav", SourceType::Static);
+    mixer.set_source_position(key, 100.0, 50.0, 0.0);
+    let pos = mixer.get_source_position(key);
+    assert!((pos[0] - 100.0).abs() < 1e-5);
+    assert!((pos[1] - 50.0).abs() < 1e-5);
+}
+
+#[test]
+fn audio_set_source_velocity_round_trips() {
+    let mut mixer = Mixer::new();
+    let key = mixer.load_source("test.wav", SourceType::Static);
+    mixer.set_source_velocity(key, 3.0, 4.0, 0.0);
+    let vel = mixer.get_source_velocity(key);
+    assert!((vel[0] - 3.0).abs() < 1e-5);
+    assert!((vel[1] - 4.0).abs() < 1e-5);
+}
+
+#[test]
+fn audio_set_source_orientation_round_trips() {
+    let mut mixer = Mixer::new();
+    let key = mixer.load_source("test.wav", SourceType::Static);
+    mixer.set_source_orientation(key, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0);
+    let o = mixer.get_source_orientation(key);
+    assert!((o[0] - 1.0).abs() < 1e-5);
+    assert!((o[3]).abs() < 1e-5);
+    assert!((o[4] - 1.0).abs() < 1e-5);
+}
+
+#[test]
+fn decoder_loads_wav_fixture() {
+    let d = luna2d::audio::Decoder::from_file(
+        "tests/fixtures/sine_mono_44100.wav",
+        1024,
+    )
+    .unwrap();
+    assert_eq!(d.sample_rate, 44100);
+    assert_eq!(d.channels, 1);
+}
+
+#[test]
+fn decoder_decode_returns_chunk() {
+    let mut d = luna2d::audio::Decoder::from_file(
+        "tests/fixtures/sine_mono_44100.wav",
+        512,
+    )
+    .unwrap();
+    let chunk = d.decode();
+    assert!(chunk.is_some());
+    let c = chunk.unwrap();
+    assert!(c.len() <= 512);
+}
+
+#[test]
+fn decoder_decode_returns_none_at_eof() {
+    let mut d = luna2d::audio::Decoder::from_file(
+        "tests/fixtures/sine_mono_44100.wav",
+        100_000,
+    )
+    .unwrap();
+    let _ = d.decode(); // consume all
+    let eof = d.decode();
+    assert!(eof.is_none());
+}
+
+#[test]
+fn decoder_rewind_resets_position() {
+    let mut d = luna2d::audio::Decoder::from_file(
+        "tests/fixtures/sine_mono_44100.wav",
+        100_000,
+    )
+    .unwrap();
+    let _ = d.decode();
+    d.rewind();
+    let after_rewind = d.decode();
+    assert!(after_rewind.is_some());
+}
+
+#[test]
+fn decoder_get_duration_positive() {
+    let d = luna2d::audio::Decoder::from_file(
+        "tests/fixtures/sine_mono_44100.wav",
+        1024,
+    )
+    .unwrap();
+    assert!(d.get_duration() > 0.0);
+}

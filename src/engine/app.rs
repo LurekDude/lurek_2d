@@ -1159,6 +1159,18 @@ impl ApplicationHandler for LunaApp {
                 }
             }
 
+            WindowEvent::ModifiersChanged(mods) => {
+                let state_mods = mods.state();
+                if let Some(state) = &self.state {
+                    state.borrow_mut().keyboard.set_modifiers(
+                        state_mods.shift_key(),
+                        state_mods.control_key(),
+                        state_mods.alt_key(),
+                        state_mods.super_key(),
+                    );
+                }
+            }
+
             WindowEvent::KeyboardInput { event, .. } => {
                 // Resolve physical scancode string.
                 let scancode_str = if let PhysicalKey::Code(code) = event.physical_key {

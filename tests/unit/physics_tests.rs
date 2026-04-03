@@ -1,7 +1,7 @@
 //! Integration tests for the Luna2D physics engine.
 
 use luna2d::math::Vec2;
-use luna2d::physics::shape::Shape;
+use luna2d::physics::shape::{Shape, StandaloneShape};
 use luna2d::physics::{Body, BodyShape, BodyType, World};
 
 #[test]
@@ -1552,4 +1552,113 @@ fn test_sleeping_allowed_toggle() {
     // Re-enable sleeping
     world.set_sleeping_allowed(id, true);
     assert!(world.is_sleeping_allowed(id));
+}
+
+// ── StandaloneShape tests ──────────────────────────────────────────────────
+
+#[test]
+fn physics_standalone_circle_shape_type() {
+    let s = StandaloneShape::new(Shape::Circle { radius: 10.0 });
+    assert_eq!(s.get_type(), "circle");
+}
+
+#[test]
+fn physics_standalone_circle_shape_radius() {
+    let s = StandaloneShape::new(Shape::Circle { radius: 5.0 });
+    assert!((s.get_radius().unwrap() - 5.0).abs() < 1e-5);
+}
+
+#[test]
+fn physics_standalone_rectangle_shape_type() {
+    let s = StandaloneShape::new(Shape::Rect {
+        width: 20.0,
+        height: 10.0,
+    });
+    assert_eq!(s.get_type(), "rectangle");
+}
+
+#[test]
+fn physics_standalone_polygon_shape_type() {
+    let s = StandaloneShape::new(Shape::Polygon {
+        vertices: vec![
+            Vec2::new(0.0, 0.0),
+            Vec2::new(1.0, 0.0),
+            Vec2::new(0.0, 1.0),
+        ],
+    });
+    assert_eq!(s.get_type(), "polygon");
+}
+
+#[test]
+fn physics_standalone_edge_shape_type() {
+    let s = StandaloneShape::new(Shape::Edge {
+        v1: Vec2::new(0.0, 0.0),
+        v2: Vec2::new(10.0, 0.0),
+    });
+    assert_eq!(s.get_type(), "edge");
+}
+
+#[test]
+fn physics_standalone_chain_shape_type() {
+    let s = StandaloneShape::new(Shape::Chain {
+        vertices: vec![Vec2::new(0.0, 0.0), Vec2::new(5.0, 0.0)],
+        closed: false,
+    });
+    assert_eq!(s.get_type(), "chain");
+}
+
+#[test]
+fn physics_standalone_shape_default_density_is_one() {
+    let s = StandaloneShape::new(Shape::Circle { radius: 1.0 });
+    assert!((s.density - 1.0).abs() < 1e-5);
+}
+
+#[test]
+fn physics_standalone_shape_default_friction() {
+    let s = StandaloneShape::new(Shape::Circle { radius: 1.0 });
+    assert!((s.friction - 0.5).abs() < 1e-5);
+}
+
+#[test]
+fn physics_standalone_shape_default_restitution_is_zero() {
+    let s = StandaloneShape::new(Shape::Circle { radius: 1.0 });
+    assert!((s.restitution - 0.0).abs() < 1e-5);
+}
+
+#[test]
+fn physics_standalone_shape_not_sensor_by_default() {
+    let s = StandaloneShape::new(Shape::Circle { radius: 1.0 });
+    assert!(!s.sensor);
+}
+
+#[test]
+fn physics_circle_bounding_box_is_symmetric() {
+    let s = StandaloneShape::new(Shape::Circle { radius: 3.0 });
+    let (x1, y1, x2, y2) = s.get_bounding_box();
+    assert!((x1 - (-3.0)).abs() < 1e-5);
+    assert!((y1 - (-3.0)).abs() < 1e-5);
+    assert!((x2 - 3.0).abs() < 1e-5);
+    assert!((y2 - 3.0).abs() < 1e-5);
+}
+
+#[test]
+fn physics_rect_bounding_box_half_extents() {
+    let s = StandaloneShape::new(Shape::Rect {
+        width: 20.0,
+        height: 10.0,
+    });
+    let (x1, y1, x2, y2) = s.get_bounding_box();
+    assert!((x1 - (-10.0)).abs() < 1e-5);
+    assert!((y1 - (-5.0)).abs() < 1e-5);
+    assert!((x2 - 10.0).abs() < 1e-5);
+    assert!((y2 - 5.0).abs() < 1e-5);
+}
+
+#[test]
+fn physics_non_circle_get_radius_returns_none() {
+    let s = StandaloneShape::new(Shape::Rect {
+        width: 10.0,
+        height: 10.0,
+    });
+    assert!(s.get_radius().is_none());
 }

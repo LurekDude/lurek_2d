@@ -26,6 +26,8 @@
 
 /// Named audio bus for grouping sources under shared volume/pitch/pause controls.
 pub mod bus;
+/// Streaming audio decoder for chunked PCM reading.
+pub mod decoder;
 /// Software MIDI synthesizer with sine-additive PCM rendering.
 pub mod midi_player;
 /// Low-level audio mixer using rodio for playback and volume control.
@@ -34,11 +36,13 @@ pub mod mixer;
 pub mod source;
 
 pub use bus::Bus;
+pub use decoder::Decoder;
 pub use midi_player::MidiPlayer;
 pub use mixer::Mixer;
 pub use mixer::PlayState;
 pub use mixer::SourceType;
 pub use source::AudioSource;
+pub use source::SpatialState;
 /// Decoded PCM sample buffer with per-sample read/write access.
 pub mod sound_data;
 pub use sound_data::SoundData;

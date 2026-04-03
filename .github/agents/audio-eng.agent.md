@@ -81,3 +81,14 @@ Every Audio-Eng output includes:
 - **Blocking Main Thread**: Decoding audio synchronously on the game loop thread
 - **Volume Clipping**: Not clamping volume values to 0.0–1.0 range
 - **Leaked Sinks**: Creating rodio Sinks without tracking them for cleanup
+
+## PHASE 4 — Spatial Audio (implemented)
+
+- `luna.audio.setPosition(src, x, y, z?)` / `getPosition` — per-source 3D spatial positioning
+- `luna.audio.setVelocity(src, x, y, z?)` / `getVelocity` — source velocity for Doppler
+- `luna.audio.setOrientation(src, fx,fy,fz, ux,uy,uz)` / `getOrientation` — source orientation
+- `luna.audio.setDopplerScale(scale)` / `getDopplerScale` — global Doppler scale
+- `luna.audio.setDistanceModel(model)` / `getDistanceModel` — distance attenuation model
+- `luna.audio.setListener(x, y, z?)` / `getListener` — 3D listener position
+- `luna.audio.setListener2D` / `getListener2D` — 2D backward-compat aliases
+- `SpatialState` — per-source spatial state struct in `src/audio/source.rs`

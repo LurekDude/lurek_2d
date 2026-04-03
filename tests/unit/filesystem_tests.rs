@@ -334,3 +334,42 @@ fn file_handle_operations_after_close_rejected() {
     // Write after close should fail
     assert!(wh.write(b"more").is_err());
 }
+
+// ── Mount layer security ──────────────────────────────────────────
+
+#[test]
+fn filesystem_mount_traversal_is_rejected() {
+    let tmp = TempDir::new().expect("Failed to create temp dir");
+    let mut fs = GameFS::new(tmp.path());
+    let result = fs.mount("../../../etc", "/evil");
+    assert!(result.is_err(), "path traversal must be rejected");
+}
+
+#[test]
+fn filesystem_mount_and_unmount_works() {
+    let tmp = TempDir::new().expect("Failed to create temp dir");
+    let sub = tmp.path().join("sub");
+    std::fs::create_dir_all(&sub).unwrap();
+    std::fs::write(sub.join("hello.txt"), b"hello").unwrap();
+
+    let mut fs = GameFS::new(tmp.path());
+    fs.mount("sub", "/virtmod").unwrap();
+
+    let bytes = fs.load_chunk("/virtmod/hello.txt").unwrap();
+    assert_eq!(bytes, b"hello");
+
+    let removed = fs.unmount("/virtmod");
+    assert!(removed);
+    // After unmount the file is no longer reachable via that virtual path
+    assert!(fs.load_chunk("/virtmod/hello.txt").is_err());
+}
+
+#[test]
+fn filesystem_load_chunk_falls_back_to_base() {
+    let tmp = TempDir::new().expect("Failed to create temp dir");
+    std::fs::write(tmp.path().join("script.lua"), b"return 42").unwrap();
+
+    let fs = GameFS::new(tmp.path());
+    let bytes = fs.load_chunk("script.lua").unwrap();
+    assert_eq!(bytes, b"return 42");
+}

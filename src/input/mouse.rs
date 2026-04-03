@@ -326,3 +326,45 @@ impl MouseState {
         self.pending_position.take()
     }
 }
+
+/// The cursor type — either a named system icon or user-supplied pixel data.
+///
+/// # Variants
+/// - `System` — A named OS cursor from the `SystemCursor` variants.
+/// - `Custom` — A custom cursor created from RGBA pixel data.
+#[derive(Debug, Clone)]
+pub enum CursorKind {
+    /// A named OS cursor from the `SystemCursor` variants.
+    System(SystemCursor),
+    /// A custom cursor created from RGBA pixel data.
+    Custom {
+        /// RGBA pixel data row-major.
+        pixels: Vec<u8>,
+        /// Cursor image width in pixels.
+        width: u32,
+        /// Cursor image height in pixels.
+        height: u32,
+        /// Hot-spot X coordinate (pixels from left).
+        hotx: u32,
+        /// Hot-spot Y coordinate (pixels from top).
+        hoty: u32,
+    },
+}
+
+/// A held cursor — either a system cursor icon or custom pixel-data cursor.
+///
+/// # Fields
+/// - `kind` — `CursorKind`. The underlying cursor type.
+#[derive(Debug, Clone)]
+pub struct CursorHandle {
+    /// The cursor type: system icon or custom pixel data.
+    pub kind: CursorKind,
+}
+
+/// Returns whether cursor customisation is supported on this platform.
+///
+/// # Returns
+/// `bool` — always `true` on desktop.
+pub fn is_cursor_supported() -> bool {
+    true
+}

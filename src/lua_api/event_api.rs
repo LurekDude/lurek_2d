@@ -273,6 +273,68 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
         })?,
     )?;
 
+    // luna.event.pump()
+    /// Syncs OS-level events into the queue. In Luna2D this is a no-op (push model).
+    let s = state.clone();
+    event.set(
+        "pump",
+        lua.create_function(move |_, ()| {
+            s.borrow().event_queue.pump();
+            Ok(())
+        })?,
+    )?;
+
+    // luna.event.wait(timeout?) -> name, ...
+    /// Blocks until the next event arrives or the optional timeout elapses.
+    ///
+    /// # Parameters
+    /// - `timeout` — `number?`. Timeout in seconds (optional; omit to wait indefinitely).
+    ///
+    /// # Returns
+    /// Event name and arguments, or nothing on timeout.
+    let s = state.clone();
+    event.set(
+        "wait",
+        lua.create_function(move |lua, timeout: Option<f64>| {
+            let timeout_ms = timeout.map(|t| (t * 1000.0) as u64);
+            let evt = s.borrow_mut().event_queue.wait(timeout_ms);
+            match evt {
+                Some(event) => {
+                    let mut values = Vec::new();
+                    values.push(LuaValue::String(lua.create_string(&event.name)?));
+                    for arg in &event.args {
+                        let val = match arg {
+                            EventArg::Str(s) => LuaValue::String(lua.create_string(s)?),
+                            EventArg::Num(n) => LuaValue::Number(*n),
+                            EventArg::Bool(b) => LuaValue::Boolean(*b),
+                            EventArg::Nil => LuaValue::Nil,
+                        };
+                        values.push(val);
+                    }
+                    Ok(LuaMultiValue::from_vec(values))
+                }
+                None => Ok(LuaMultiValue::new()),
+            }
+        })?,
+    )?;
+
+    // luna.event.restart()
+    /// Requests that the engine restart at the beginning of the next frame.
+    ///
+    /// Sets `SharedState::restart_requested` to `true`. The engine loop checks this flag
+    /// after each frame and restarts if set.
+    ///
+    /// # Returns
+    /// `()`.
+    let s = state.clone();
+    event.set(
+        "restart",
+        lua.create_function(move |_, ()| {
+            s.borrow_mut().restart_requested = true;
+            Ok(())
+        })?,
+    )?;
+
     /// Event on this Signal.
     ///
     /// # Returns

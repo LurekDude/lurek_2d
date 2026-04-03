@@ -110,6 +110,54 @@ impl EventQueue {
     pub fn len(&self) -> usize {
         self.events.len()
     }
+
+    /// Drains pending OS-level events into the queue (no-op in Luna2D; documents as a sync point).
+    ///
+    /// Luna2D uses a push model — OS events are already in the queue when callbacks fire.
+    /// This function exists for API parity and does nothing.
+    ///
+    /// # Returns
+    /// `()`.
+    pub fn pump(&self) {
+        // Luna2D uses a push model; OS events are already in queue when this is called.
+    }
+
+    /// Blocks until an event is available or `timeout_ms` milliseconds elapse.
+    ///
+    /// If the queue already contains an event it is returned immediately without sleeping.
+    /// With a `Some(0)` timeout the queue is polled once and the function returns.
+    ///
+    /// # Parameters
+    /// - `timeout_ms` — `Option<u64>`. Max wait time in milliseconds; `None` = wait indefinitely (returns only when an event arrives).
+    ///
+    /// # Returns
+    /// `Option<Event>`.
+    pub fn wait(&mut self, timeout_ms: Option<u64>) -> Option<Event> {
+        // Non-blocking fast path: return immediately if an event is ready.
+        if let Some(evt) = self.poll() {
+            return Some(evt);
+        }
+        // Timed path: spin-wait with 1 ms granularity.
+        if let Some(ms) = timeout_ms {
+            let deadline =
+                std::time::Instant::now() + std::time::Duration::from_millis(ms);
+            while std::time::Instant::now() < deadline {
+                std::thread::sleep(std::time::Duration::from_millis(1));
+                if let Some(evt) = self.poll() {
+                    return Some(evt);
+                }
+            }
+            None
+        } else {
+            // Indefinite wait: keep sleeping until an event arrives.
+            loop {
+                std::thread::sleep(std::time::Duration::from_millis(1));
+                if let Some(evt) = self.poll() {
+                    return Some(evt);
+                }
+            }
+        }
+    }
 }
 
 impl Default for EventQueue {

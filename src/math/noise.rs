@@ -75,6 +75,36 @@ pub fn simplex2d(x: f32, y: f32, seed: u32) -> f32 {
     70.0 * (n0 + n1 + n2)
 }
 
+/// Returns 2D simplex noise for the given coordinates using seed 0.
+///
+/// Convenience wrapper around [`simplex2d`] with a fixed seed of `0`.
+/// Use [`NoiseGenerator::simplexNoise`] for seeded output.
+///
+/// # Parameters
+/// - `x` — X coordinate in noise space.
+/// - `y` — Y coordinate in noise space.
+///
+/// # Returns
+/// A value in approximately `[-1.0, 1.0]`.
+pub fn simplex_noise_2d(x: f32, y: f32) -> f32 {
+    simplex2d(x, y, 0)
+}
+
+/// Returns 3D simplex noise for the given coordinates using seed 0.
+///
+/// Delegates to [`NoiseGenerator::simplex_3d`] with seed `0`.
+///
+/// # Parameters
+/// - `x` — X coordinate in noise space.
+/// - `y` — Y coordinate in noise space.
+/// - `z` — Z coordinate in noise space.
+///
+/// # Returns
+/// A value in approximately `[-1.0, 1.0]`.
+pub fn simplex_noise_3d(x: f32, y: f32, z: f32) -> f32 {
+    NoiseGenerator::new(0).simplex_3d(x as f64, y as f64, z as f64) as f32
+}
+
 /// Generates fractal Brownian motion noise by layering multiple octaves of Perlin noise.
 ///
 /// # Parameters

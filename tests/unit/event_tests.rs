@@ -139,3 +139,60 @@ fn signal_default_trait() {
     let sig = Signal::default();
     assert_eq!(sig.get_total_count(), 0);
 }
+
+// ---------------------------------------------------------------------------
+// EventQueue::pump and EventQueue::wait tests
+// ---------------------------------------------------------------------------
+
+#[test]
+fn event_pump_does_not_panic() {
+    let queue = EventQueue::new();
+    queue.pump(); // no-op, must not panic
+}
+
+#[test]
+fn event_wait_returns_none_on_empty_with_zero_timeout() {
+    let mut queue = EventQueue::new();
+    let result = queue.wait(Some(0));
+    assert!(result.is_none());
+}
+
+#[test]
+fn event_wait_returns_event_if_available_immediately() {
+    let mut queue = EventQueue::new();
+    queue.push(Event {
+        name: "test".to_string(),
+        args: vec![],
+    });
+    let result = queue.wait(Some(0));
+    assert!(result.is_some());
+    assert_eq!(result.unwrap().name, "test");
+}
+
+#[test]
+fn event_wait_drains_in_order() {
+    let mut queue = EventQueue::new();
+    queue.push_event("first", vec![]);
+    queue.push_event("second", vec![]);
+    let a = queue.wait(Some(0)).unwrap();
+    let b = queue.wait(Some(0)).unwrap();
+    assert_eq!(a.name, "first");
+    assert_eq!(b.name, "second");
+}
+
+#[test]
+fn event_restart_requested_defaults_false() {
+    use luna2d::lua_api::SharedState;
+    use std::path::PathBuf;
+    let state = SharedState::new(800, 600, "Test", PathBuf::from("."));
+    assert!(!state.restart_requested);
+}
+
+#[test]
+fn event_restart_requested_can_be_set() {
+    use luna2d::lua_api::SharedState;
+    use std::path::PathBuf;
+    let mut state = SharedState::new(800, 600, "Test", PathBuf::from("."));
+    state.restart_requested = true;
+    assert!(state.restart_requested);
+}

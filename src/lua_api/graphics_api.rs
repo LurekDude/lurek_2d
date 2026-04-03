@@ -14,6 +14,11 @@ use crate::graphics::shader::{Shader, UniformValue};
 use mlua::prelude::*;
 
 // ── Helper types ──────────────────────────────────────────────────────────
+/// Lua UserData wrapper for a loaded texture resource.
+///
+/// # Fields
+/// - `state` — `Rc<RefCell<SharedState>>`.
+/// - `key` — `TextureKey`.
 #[derive(Clone)]
 pub struct LuaImage {
     pub(crate) state: Rc<RefCell<SharedState>>,
@@ -97,6 +102,16 @@ impl LuaUserData for LuaImage {
 /// Stores the source texture key, border insets, and texture dimensions
 /// so the engine can draw the image stretched to any size while preserving
 /// corner and edge proportions.
+///
+/// # Fields
+/// - `state` — `Rc<RefCell<SharedState>>`.
+/// - `texture_key` — `TextureKey`.
+/// - `top` — `f32`.
+/// - `right` — `f32`.
+/// - `bottom` — `f32`.
+/// - `left` — `f32`.
+/// - `tex_width` — `f32`.
+/// - `tex_height` — `f32`.
 #[derive(Clone)]
 pub struct LuaNineSlice {
     pub(crate) state: Rc<RefCell<SharedState>>,
@@ -463,6 +478,12 @@ impl LuaUserData for LuaCanvas {
 }
 
 /// Extract a `TextureKey` from either a `LuaImage` UserData or a numeric ID.
+///
+/// # Parameters
+/// - `val` — `&LuaValue`.
+///
+/// # Returns
+/// `LuaResult<TextureKey>`.
 pub(super) fn texture_key_from_value(val: &LuaValue) -> LuaResult<TextureKey> {
     match val {
         LuaValue::UserData(ud) => {
@@ -476,6 +497,12 @@ pub(super) fn texture_key_from_value(val: &LuaValue) -> LuaResult<TextureKey> {
 }
 
 /// Extract a `FontKey` from either a `LuaFont` UserData or a numeric ID.
+///
+/// # Parameters
+/// - `val` — `&LuaValue`.
+///
+/// # Returns
+/// `LuaResult<FontKey>`.
 pub(super) fn font_key_from_value(val: &LuaValue) -> LuaResult<FontKey> {
     match val {
         LuaValue::UserData(ud) => {
@@ -489,6 +516,12 @@ pub(super) fn font_key_from_value(val: &LuaValue) -> LuaResult<FontKey> {
 }
 
 /// Extract a `SpriteBatchKey` from either a `LuaSpriteBatch` UserData or a numeric ID.
+///
+/// # Parameters
+/// - `val` — `&LuaValue`.
+///
+/// # Returns
+/// `LuaResult<SpriteBatchKey>`.
 pub(super) fn batch_key_from_value(val: &LuaValue) -> LuaResult<SpriteBatchKey> {
     match val {
         LuaValue::UserData(ud) => {
@@ -504,6 +537,12 @@ pub(super) fn batch_key_from_value(val: &LuaValue) -> LuaResult<SpriteBatchKey> 
 }
 
 /// Extract a `CanvasKey` from either a `LuaCanvas` UserData or a numeric ID.
+///
+/// # Parameters
+/// - `val` — `&LuaValue`.
+///
+/// # Returns
+/// `LuaResult<CanvasKey>`.
 pub(super) fn canvas_key_from_value(val: &LuaValue) -> LuaResult<CanvasKey> {
     match val {
         LuaValue::UserData(ud) => {
@@ -518,6 +557,13 @@ pub(super) fn canvas_key_from_value(val: &LuaValue) -> LuaResult<CanvasKey> {
     }
 }
 
+/// Returns a `LuaError` for an invalid or released texture handle.
+///
+/// # Parameters
+/// - `function_name` — `&str`.
+///
+/// # Returns
+/// `LuaError`.
 pub(super) fn invalid_texture_handle(function_name: &str) -> LuaError {
     LuaError::RuntimeError(format!(
         "{}: invalid or already-released texture handle",
@@ -525,6 +571,13 @@ pub(super) fn invalid_texture_handle(function_name: &str) -> LuaError {
     ))
 }
 
+/// Returns a `LuaError` for an invalid or released font handle.
+///
+/// # Parameters
+/// - `function_name` — `&str`.
+///
+/// # Returns
+/// `LuaError`.
 pub(super) fn invalid_font_handle(function_name: &str) -> LuaError {
     LuaError::RuntimeError(format!(
         "{}: invalid or already-released font handle",
@@ -532,6 +585,13 @@ pub(super) fn invalid_font_handle(function_name: &str) -> LuaError {
     ))
 }
 
+/// Returns a `LuaError` for an invalid or released sprite batch handle.
+///
+/// # Parameters
+/// - `function_name` — `&str`.
+///
+/// # Returns
+/// `LuaError`.
 pub(super) fn invalid_batch_handle(function_name: &str) -> LuaError {
     LuaError::RuntimeError(format!(
         "{}: invalid or already-released sprite batch handle",
@@ -539,6 +599,13 @@ pub(super) fn invalid_batch_handle(function_name: &str) -> LuaError {
     ))
 }
 
+/// Returns a `LuaError` for an invalid or released canvas handle.
+///
+/// # Parameters
+/// - `function_name` — `&str`.
+///
+/// # Returns
+/// `LuaError`.
 pub(super) fn invalid_canvas_handle(function_name: &str) -> LuaError {
     LuaError::RuntimeError(format!(
         "{}: invalid or already-released canvas handle",
@@ -546,6 +613,13 @@ pub(super) fn invalid_canvas_handle(function_name: &str) -> LuaError {
     ))
 }
 
+/// Returns a `LuaError` for an invalid or released mesh handle.
+///
+/// # Parameters
+/// - `function_name` — `&str`.
+///
+/// # Returns
+/// `LuaError`.
 pub(super) fn invalid_mesh_handle(function_name: &str) -> LuaError {
     LuaError::RuntimeError(format!(
         "{}: invalid or already-released mesh handle",
@@ -553,6 +627,15 @@ pub(super) fn invalid_mesh_handle(function_name: &str) -> LuaError {
     ))
 }
 
+/// Resolves a texture key, validating the handle is still alive.
+///
+/// # Parameters
+/// - `state` — `&SharedState`.
+/// - `val` — `&LuaValue`.
+/// - `function_name` — `&str`.
+///
+/// # Returns
+/// `LuaResult<TextureKey>`.
 pub(super) fn require_texture_key(
     state: &SharedState,
     val: &LuaValue,
@@ -582,6 +665,15 @@ pub(super) fn require_texture_key(
     }
 }
 
+/// Resolves a font key and validates the font is still loaded.
+///
+/// # Parameters
+/// - `state` — `&SharedState`.
+/// - `val` — `&LuaValue`.
+/// - `function_name` — `&str`.
+///
+/// # Returns
+/// `LuaResult<FontKey>`.
 pub(super) fn require_font_key(
     state: &SharedState,
     val: &LuaValue,
@@ -595,6 +687,15 @@ pub(super) fn require_font_key(
     }
 }
 
+/// Resolves a sprite-batch key and validates the batch is still alive.
+///
+/// # Parameters
+/// - `state` — `&SharedState`.
+/// - `val` — `&LuaValue`.
+/// - `function_name` — `&str`.
+///
+/// # Returns
+/// `LuaResult<SpriteBatchKey>`.
 pub(super) fn require_batch_key(
     state: &SharedState,
     val: &LuaValue,
@@ -608,6 +709,15 @@ pub(super) fn require_batch_key(
     }
 }
 
+/// Resolves a canvas key and validates the canvas is still alive.
+///
+/// # Parameters
+/// - `state` — `&SharedState`.
+/// - `val` — `&LuaValue`.
+/// - `function_name` — `&str`.
+///
+/// # Returns
+/// `LuaResult<CanvasKey>`.
 pub(super) fn require_canvas_key(
     state: &SharedState,
     val: &LuaValue,
@@ -621,6 +731,15 @@ pub(super) fn require_canvas_key(
     }
 }
 
+/// Resolves a mesh key and validates the mesh is still alive.
+///
+/// # Parameters
+/// - `state` — `&SharedState`.
+/// - `id` — `u64`.
+/// - `function_name` — `&str`.
+///
+/// # Returns
+/// `LuaResult<MeshKey>`.
 pub(super) fn require_mesh_key(state: &SharedState, id: u64, function_name: &str) -> LuaResult<MeshKey> {
     let key = MeshKey::from(slotmap::KeyData::from_ffi(id));
     if !state.meshes.contains_key(key) {
@@ -2129,6 +2248,15 @@ fn register_ext(
 }
 
 
+/// Registers all `luna.graphics.*` drawing and resource management functions into the Lua VM.
+///
+/// # Parameters
+/// - `lua` — `&Lua`.
+/// - `luna` — `&LuaTable`.
+/// - `state` — `Rc<RefCell<SharedState>>`.
+///
+/// # Returns
+/// `LuaResult<()>`.
 pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> LuaResult<()> {
     let graphics = lua.create_table()?;
 
@@ -2483,16 +2611,135 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
     /// Queues draw commands for all live particles.
     ///
     /// Lua API: luna.graphics.draw(image_id, x, y)
-    // luna.graphics.draw(image_id, x, y)
+    // luna.graphics.draw(drawable, x?, y?, r?, sx?, sy?, ox?, oy?)
+    /// Draws any drawable object — Image, Canvas, or SpriteBatch — at the given position.
+    ///
+    /// Backward-compatible: still accepts raw integer image IDs.
+    ///
+    /// # Parameters
+    /// - `drawable` — `Drawable`. An Image, Canvas, SpriteBatch userdata, or integer image ID.
+    /// - `x` — `f32`. Destination X position (default 0).
+    /// - `y` — `f32`. Destination Y position (default 0).
+    /// - `r` — `f32`. Rotation in radians (default 0).
+    /// - `sx` — `f32`. X scale (default 1).
+    /// - `sy` — `f32`. Y scale (default 1).
+    /// - `ox` — `f32`. X origin offset (default 0).
+    /// - `oy` — `f32`. Y origin offset (default 0).
+    ///
+    /// # Returns
+    /// `()`.
     let s = state.clone();
     graphics.set(
         "draw",
-        lua.create_function(move |_, (id_val, x, y): (LuaValue, f32, f32)| {
+        lua.create_function(move |_, args: LuaMultiValue| {
+            let mut args_iter = args.iter();
+            let drawable = args_iter.next().cloned().unwrap_or(LuaValue::Nil);
+            let to_f32 = |v: &LuaValue| -> Option<f32> {
+                match v {
+                    LuaValue::Number(n) => Some(*n as f32),
+                    LuaValue::Integer(n) => Some(*n as f32),
+                    _ => None,
+                }
+            };
+            let x = args_iter.next().and_then(to_f32).unwrap_or(0.0);
+            let y = args_iter.next().and_then(to_f32).unwrap_or(0.0);
+            let r = args_iter.next().and_then(to_f32).unwrap_or(0.0);
+            let sx = args_iter.next().and_then(to_f32).unwrap_or(1.0);
+            let sy = args_iter.next().and_then(to_f32).unwrap_or(1.0);
+            let ox = args_iter.next().and_then(to_f32).unwrap_or(0.0);
+            let oy = args_iter.next().and_then(to_f32).unwrap_or(0.0);
+
+            let has_transform = r != 0.0 || sx != 1.0 || sy != 1.0 || ox != 0.0 || oy != 0.0;
             let mut st = s.borrow_mut();
-            let texture_key = require_texture_key(&st, &id_val, "luna.graphics.draw")?;
-            st.draw_commands
-                .push(DrawCommand::DrawImage { texture_key, x, y });
-            Ok(())
+
+            match &drawable {
+                LuaValue::UserData(ud) => {
+                    // Try Image
+                    if let Ok(img) = ud.borrow::<LuaImage>() {
+                        let key = img.key;
+                        drop(img);
+                        if !st.textures.contains_key(key) {
+                            return Err(invalid_texture_handle("luna.graphics.draw"));
+                        }
+                        if has_transform {
+                            st.draw_commands.push(DrawCommand::DrawImageEx {
+                                texture_key: key,
+                                x,
+                                y,
+                                rotation: r,
+                                sx,
+                                sy,
+                                ox,
+                                oy,
+                            });
+                        } else {
+                            st.draw_commands
+                                .push(DrawCommand::DrawImage { texture_key: key, x, y });
+                        }
+                        return Ok(());
+                    }
+                    // Try Canvas
+                    if let Ok(canvas) = ud.borrow::<LuaCanvas>() {
+                        let key = canvas.key;
+                        drop(canvas);
+                        if !st.canvases.contains_key(key) {
+                            return Err(invalid_canvas_handle("luna.graphics.draw"));
+                        }
+                        st.draw_commands.push(DrawCommand::DrawCanvas {
+                            canvas_key: key,
+                            x,
+                            y,
+                            rotation: r,
+                            sx,
+                            sy,
+                            ox,
+                            oy,
+                        });
+                        return Ok(());
+                    }
+                    // Try SpriteBatch
+                    if let Ok(batch) = ud.borrow::<LuaSpriteBatch>() {
+                        let key = batch.key;
+                        drop(batch);
+                        if !st.sprite_batches.contains_key(key) {
+                            return Err(invalid_batch_handle("luna.graphics.draw"));
+                        }
+                        st.draw_commands
+                            .push(DrawCommand::DrawBatch { batch_key: key });
+                        return Ok(());
+                    }
+                    Err(LuaError::RuntimeError(
+                        "luna.graphics.draw: drawable must be an Image, Canvas, or SpriteBatch".into(),
+                    ))
+                }
+                LuaValue::Integer(_) | LuaValue::Number(_) => {
+                    // Backward compat: raw integer = texture ID
+                    let key =
+                        require_texture_key(&st, &drawable, "luna.graphics.draw")?;
+                    if has_transform {
+                        st.draw_commands.push(DrawCommand::DrawImageEx {
+                            texture_key: key,
+                            x,
+                            y,
+                            rotation: r,
+                            sx,
+                            sy,
+                            ox,
+                            oy,
+                        });
+                    } else {
+                        st.draw_commands
+                            .push(DrawCommand::DrawImage { texture_key: key, x, y });
+                    }
+                    Ok(())
+                }
+                LuaValue::Nil => Err(LuaError::RuntimeError(
+                    "luna.graphics.draw: drawable cannot be nil".into(),
+                )),
+                _ => Err(LuaError::RuntimeError(
+                    "luna.graphics.draw: expected drawable object".into(),
+                )),
+            }
         })?,
     )?;
 
@@ -3145,56 +3392,128 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
         )?,
     )?;
 
-    #[allow(unused_doc_comments)]
-    /// Draws an image with a full affine transform.
+    // luna.graphics.drawEx(drawable, x, y, r?, sx?, sy?, ox?, oy?)
+    // - Polymorphic draw with full affine transform: Image/Canvas/SpriteBatch or integer ID.
+    // - `sy` defaults to `sx` when omitted (uniform scaling).
+    /// Draws any drawable object with a full affine transform.
     ///
-    /// Lua API: luna.graphics.drawEx(image_id, x, y, r?, sx?, sy?, ox?, oy?)
-    #[allow(unused_doc_comments)]
-    /// Draws an image with a full affine transform.
+    /// Accepts Image, Canvas, SpriteBatch userdata or raw integer image IDs.
+    /// When `sy` is omitted it defaults to `sx` for uniform scaling.
     ///
-    /// Lua API: luna.graphics.drawEx(image_id, x, y, r?, sx?, sy?, ox?, oy?)
-    #[allow(unused_doc_comments)]
-    /// Draws an image with a full affine transform.
+    /// # Parameters
+    /// - `drawable` — `Drawable`. An Image, Canvas, SpriteBatch userdata or integer image ID.
+    /// - `x` — `f32`. Destination X position.
+    /// - `y` — `f32`. Destination Y position.
+    /// - `r` — `f32`. Rotation in radians (default 0).
+    /// - `sx` — `f32`. X scale (default 1).
+    /// - `sy` — `f32`. Y scale (default sx).
+    /// - `ox` — `f32`. X origin offset (default 0).
+    /// - `oy` — `f32`. Y origin offset (default 0).
     ///
-    /// Lua API: luna.graphics.drawEx(image_id, x, y, r?, sx?, sy?, ox?, oy?)
-    // luna.graphics.drawEx(image_id, x, y, r?, sx?, sy?, ox?, oy?)
-    // - Full transform draw without a quad.
+    /// # Returns
+    /// `()`.
     let s = state.clone();
-    #[allow(clippy::type_complexity)]
     graphics.set(
         "drawEx",
-        lua.create_function(
-            move |_,
-                  (id_val, x, y, rotation, sx, sy, ox, oy): (
-                LuaValue,
-                f32,
-                f32,
-                Option<f32>,
-                Option<f32>,
-                Option<f32>,
-                Option<f32>,
-                Option<f32>,
-            )| {
-                let mut st = s.borrow_mut();
-                let texture_key = require_texture_key(&st, &id_val, "luna.graphics.drawEx")?;
-                let rotation = rotation.unwrap_or(0.0);
-                let sx = sx.unwrap_or(1.0);
-                let sy = sy.unwrap_or(sx);
-                let ox = ox.unwrap_or(0.0);
-                let oy = oy.unwrap_or(0.0);
-                st.draw_commands.push(DrawCommand::DrawImageEx {
-                    texture_key,
-                    x,
-                    y,
-                    rotation,
-                    sx,
-                    sy,
-                    ox,
-                    oy,
-                });
-                Ok(())
-            },
-        )?,
+        lua.create_function(move |_, args: LuaMultiValue| {
+            let mut args_iter = args.iter();
+            let drawable = args_iter.next().cloned().unwrap_or(LuaValue::Nil);
+            let to_f32 = |v: &LuaValue| -> Option<f32> {
+                match v {
+                    LuaValue::Number(n) => Some(*n as f32),
+                    LuaValue::Integer(n) => Some(*n as f32),
+                    _ => None,
+                }
+            };
+            let x = args_iter.next().and_then(to_f32).unwrap_or(0.0);
+            let y = args_iter.next().and_then(to_f32).unwrap_or(0.0);
+            let rotation = args_iter.next().and_then(to_f32).unwrap_or(0.0);
+            let sx = args_iter.next().and_then(to_f32).unwrap_or(1.0);
+            let sy = args_iter.next().and_then(to_f32).unwrap_or(sx);
+            let ox = args_iter.next().and_then(to_f32).unwrap_or(0.0);
+            let oy = args_iter.next().and_then(to_f32).unwrap_or(0.0);
+
+            let mut st = s.borrow_mut();
+
+            match &drawable {
+                LuaValue::UserData(ud) => {
+                    // Try Image
+                    if let Ok(img) = ud.borrow::<LuaImage>() {
+                        let key = img.key;
+                        drop(img);
+                        if !st.textures.contains_key(key) {
+                            return Err(invalid_texture_handle("luna.graphics.drawEx"));
+                        }
+                        st.draw_commands.push(DrawCommand::DrawImageEx {
+                            texture_key: key,
+                            x,
+                            y,
+                            rotation,
+                            sx,
+                            sy,
+                            ox,
+                            oy,
+                        });
+                        return Ok(());
+                    }
+                    // Try Canvas
+                    if let Ok(canvas) = ud.borrow::<LuaCanvas>() {
+                        let key = canvas.key;
+                        drop(canvas);
+                        if !st.canvases.contains_key(key) {
+                            return Err(invalid_canvas_handle("luna.graphics.drawEx"));
+                        }
+                        st.draw_commands.push(DrawCommand::DrawCanvas {
+                            canvas_key: key,
+                            x,
+                            y,
+                            rotation,
+                            sx,
+                            sy,
+                            ox,
+                            oy,
+                        });
+                        return Ok(());
+                    }
+                    // Try SpriteBatch
+                    if let Ok(batch) = ud.borrow::<LuaSpriteBatch>() {
+                        let key = batch.key;
+                        drop(batch);
+                        if !st.sprite_batches.contains_key(key) {
+                            return Err(invalid_batch_handle("luna.graphics.drawEx"));
+                        }
+                        st.draw_commands
+                            .push(DrawCommand::DrawBatch { batch_key: key });
+                        return Ok(());
+                    }
+                    Err(LuaError::RuntimeError(
+                        "luna.graphics.drawEx: drawable must be an Image, Canvas, or SpriteBatch"
+                            .into(),
+                    ))
+                }
+                LuaValue::Integer(_) | LuaValue::Number(_) => {
+                    let texture_key =
+                        require_texture_key(&st, &drawable, "luna.graphics.drawEx")?;
+                    st.draw_commands.push(DrawCommand::DrawImageEx {
+                        texture_key,
+                        x,
+                        y,
+                        rotation,
+                        sx,
+                        sy,
+                        ox,
+                        oy,
+                    });
+                    Ok(())
+                }
+                LuaValue::Nil => Err(LuaError::RuntimeError(
+                    "luna.graphics.drawEx: drawable cannot be nil".into(),
+                )),
+                _ => Err(LuaError::RuntimeError(
+                    "luna.graphics.drawEx: expected drawable object".into(),
+                )),
+            }
+        })?,
     )?;
 
     #[allow(unused_doc_comments)]

@@ -47,6 +47,24 @@ impl SoundData {
         }
     }
 
+    /// Create a `SoundData` from an existing f32 sample buffer.
+    ///
+    /// # Parameters
+    /// - `samples` — `Vec<f32>`.
+    /// - `sample_rate` — `u32`.
+    /// - `channels` — `u16`.
+    ///
+    /// # Returns
+    /// `Self`.
+    pub fn from_samples(samples: Vec<f32>, sample_rate: u32, channels: u16) -> Self {
+        Self {
+            samples,
+            sample_rate,
+            channels,
+            bit_depth: 16,
+        }
+    }
+
     /// Decode an audio file to SoundData. Returns a fully initialised instance with all fields set to their initial values.
     ///
     /// # Parameters

@@ -22,4 +22,5 @@ pub use keyboard::winit_scancode_to_string;
 pub use keyboard::KeyboardState;
 pub use mouse::MouseState;
 pub use mouse::SystemCursor;
+pub use mouse::{CursorHandle, CursorKind, is_cursor_supported};
 pub use touch::{TouchPoint, TouchState};

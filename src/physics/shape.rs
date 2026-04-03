@@ -111,6 +111,7 @@ impl Shape {
     /// # Returns
     /// A `Shape::Polygon` with the computed vertices.
     pub fn regular_polygon(radius: f32, sides: u32) -> Self {
+
         let sides = sides.clamp(3, 8);
         let mut vertices = Vec::with_capacity(sides as usize);
         for i in 0..sides {
@@ -118,5 +119,120 @@ impl Shape {
             vertices.push(Vec2::new(radius * angle.cos(), radius * angle.sin()));
         }
         Shape::Polygon { vertices }
+    }
+}
+
+/// A standalone shape value holding geometry and default fixture parameters.
+///
+/// Created via `luna.physics.newCircleShape` et al. and attached to bodies
+/// with `luna.physics.attachShape`. Can be reused across multiple bodies.
+///
+/// # Fields
+/// - `shape` — `Shape`. The underlying collision geometry.
+/// - `density` — `f32`. Mass density (default 1.0).
+/// - `friction` — `f32`. Surface friction coefficient (default 0.5).
+/// - `restitution` — `f32`. Bounciness: 0 = inelastic, 1 = fully elastic (default 0.0).
+/// - `sensor` — `bool`. If true, the shape detects overlaps without physical response.
+#[derive(Debug, Clone)]
+pub struct StandaloneShape {
+    /// The underlying collision geometry.
+    pub shape: Shape,
+    /// Mass density (default 1.0).
+    pub density: f32,
+    /// Surface friction coefficient (default 0.5).
+    pub friction: f32,
+    /// Bounciness: 0 = inelastic, 1 = fully elastic (default 0.0).
+    pub restitution: f32,
+    /// If true, the shape detects overlaps but produces no physical forces.
+    pub sensor: bool,
+}
+
+impl StandaloneShape {
+    /// Creates a new `StandaloneShape` with default fixture parameters.
+    ///
+    /// # Parameters
+    /// - `shape` — `Shape`. The collision geometry.
+    ///
+    /// # Returns
+    /// `StandaloneShape` with density=1.0, friction=0.5, restitution=0.0, sensor=false.
+    pub fn new(shape: Shape) -> Self {
+        StandaloneShape {
+            shape,
+            density: 1.0,
+            friction: 0.5,
+            restitution: 0.0,
+            sensor: false,
+        }
+    }
+
+    /// Returns the shape type name.
+    ///
+    /// # Returns
+    /// One of `"circle"`, `"rectangle"`, `"polygon"`, `"edge"`, `"chain"`.
+    pub fn get_type(&self) -> &str {
+        match &self.shape {
+            Shape::Circle { .. } => "circle",
+            Shape::Rect { .. } => "rectangle",
+            Shape::Polygon { .. } => "polygon",
+            Shape::Edge { .. } => "edge",
+            Shape::Chain { .. } => "chain",
+        }
+    }
+
+    /// Returns the radius for circle shapes.
+    ///
+    /// # Returns
+    /// `Some(f32)` for `Shape::Circle`; `None` for all other variants.
+    pub fn get_radius(&self) -> Option<f32> {
+        if let Shape::Circle { radius } = &self.shape {
+            Some(*radius)
+        } else {
+            None
+        }
+    }
+
+    /// Returns an axis-aligned bounding box for this shape as `(min_x, min_y, max_x, max_y)`.
+    ///
+    /// All coordinates are shape-local (centred at origin).
+    ///
+    /// # Returns
+    /// `(f32, f32, f32, f32)` — min_x, min_y, max_x, max_y.
+    pub fn get_bounding_box(&self) -> (f32, f32, f32, f32) {
+        match &self.shape {
+            Shape::Circle { radius } => (-radius, -radius, *radius, *radius),
+            Shape::Rect { width, height } => {
+                let hw = width / 2.0;
+                let hh = height / 2.0;
+                (-hw, -hh, hw, hh)
+            }
+            Shape::Polygon { vertices } => {
+                let (mut min_x, mut min_y) = (f32::MAX, f32::MAX);
+                let (mut max_x, mut max_y) = (f32::MIN, f32::MIN);
+                for v in vertices {
+                    min_x = min_x.min(v.x);
+                    min_y = min_y.min(v.y);
+                    max_x = max_x.max(v.x);
+                    max_y = max_y.max(v.y);
+                }
+                (min_x, min_y, max_x, max_y)
+            }
+            Shape::Edge { v1, v2 } => (
+                v1.x.min(v2.x),
+                v1.y.min(v2.y),
+                v1.x.max(v2.x),
+                v1.y.max(v2.y),
+            ),
+            Shape::Chain { vertices, .. } => {
+                let (mut min_x, mut min_y) = (f32::MAX, f32::MAX);
+                let (mut max_x, mut max_y) = (f32::MIN, f32::MIN);
+                for v in vertices {
+                    min_x = min_x.min(v.x);
+                    min_y = min_y.min(v.y);
+                    max_x = max_x.max(v.x);
+                    max_y = max_y.max(v.y);
+                }
+                (min_x, min_y, max_x, max_y)
+            }
+        }
     }
 }

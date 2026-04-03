@@ -9,10 +9,27 @@
 //!
 use super::SharedState;
 use crate::input::keyboard::{get_key_from_scancode, get_scancode_from_key};
-use crate::input::mouse::SystemCursor;
+use crate::input::mouse::{CursorKind, SystemCursor};
 use mlua::prelude::*;
 use std::cell::RefCell;
 use std::rc::Rc;
+
+/// Lua UserData wrapper around a mouse cursor handle.
+struct LuaCursor {
+    kind: CursorKind,
+}
+
+impl LuaUserData for LuaCursor {
+    fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
+        methods.add_method("release", |_, _, ()| Ok(()));
+        methods.add_method("getType", |_, this, ()| {
+            Ok(match &this.kind {
+                CursorKind::System(_) => "system".to_string(),
+                CursorKind::Custom { .. } => "custom".to_string(),
+            })
+        });
+    }
+}
 
 /// Registers `luna.keyboard.*` and `luna.mouse.*` query functions into the Lua VM.
 ///
@@ -108,6 +125,17 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
     keyboard.set(
         "getKeyFromScancode",
         lua.create_function(move |_, scancode: String| Ok(get_key_from_scancode(&scancode)))?,
+    )?;
+
+    /// Returns whether the named modifier key (shift/ctrl/alt/meta/super) is currently held.
+    let s = state.clone();
+    /// @param modifier : string
+    /// @return boolean
+    keyboard.set(
+        "isModifierActive",
+        lua.create_function(move |_, modifier: String| {
+            Ok(s.borrow().keyboard.is_modifier_active(&modifier))
+        })?,
     )?;
 
     /// Keyboard.
@@ -228,15 +256,67 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
     /// # Parameters
     /// - `cursor` — Cursor ID returned by newCursor or getSystemCursor, or nil to reset.
     let s = state.clone();
-    /// @param name : string
+    /// @param cursor : any
     mouse.set(
         "setCursor",
-        lua.create_function(move |_, name: String| {
-            s.borrow_mut()
-                .mouse
-                .set_cursor(SystemCursor::from_name(&name));
+        lua.create_function(move |_, cursor_val: LuaValue| {
+            let mut st = s.borrow_mut();
+            match cursor_val {
+                LuaValue::UserData(ud) => {
+                    if let Ok(cursor) = ud.borrow::<LuaCursor>() {
+                        match &cursor.kind {
+                            CursorKind::System(sc) => st.mouse.set_cursor(*sc),
+                            CursorKind::Custom { .. } => {
+                                st.mouse.set_cursor(SystemCursor::Arrow);
+                            }
+                        }
+                    }
+                }
+                LuaValue::String(name_str) => {
+                    st.mouse
+                        .set_cursor(SystemCursor::from_name(name_str.to_str().unwrap_or("arrow")));
+                }
+                LuaValue::Nil => {
+                    st.mouse.set_cursor(SystemCursor::Arrow);
+                }
+                _ => {}
+            }
             Ok(())
         })?,
+    )?;
+
+    /// Creates a custom mouse cursor from RGBA pixel data.
+    mouse.set(
+        "newCursor",
+        lua.create_function(
+            move |_, (pixels, width, height, hotx, hoty): (Vec<u8>, u32, u32, Option<u32>, Option<u32>)| {
+                Ok(LuaCursor {
+                    kind: CursorKind::Custom {
+                        pixels,
+                        width,
+                        height,
+                        hotx: hotx.unwrap_or(0),
+                        hoty: hoty.unwrap_or(0),
+                    },
+                })
+            },
+        )?,
+    )?;
+
+    /// Returns a system cursor object for the named cursor shape.
+    mouse.set(
+        "getSystemCursor",
+        lua.create_function(move |_, name: String| {
+            Ok(LuaCursor {
+                kind: CursorKind::System(SystemCursor::from_name(&name)),
+            })
+        })?,
+    )?;
+
+    /// Returns whether cursor customisation is supported on this platform.
+    mouse.set(
+        "isCursorSupported",
+        lua.create_function(move |_, ()| Ok(crate::input::mouse::is_cursor_supported()))?,
     )?;
 
     /// Returns the currently active cursor ID.

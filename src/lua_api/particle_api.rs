@@ -11,6 +11,14 @@ use slotmap::{SlotMap, Key};
 use mlua::prelude::*;
 
 // ── Helper types ──────────────────────────────────────────────────────────
+
+/// Returns a `LuaError` for an invalid or released particle system handle.
+///
+/// # Parameters
+/// - `function_name` — `&str`.
+///
+/// # Returns
+/// `LuaError`.
 pub(super) fn invalid_particle_handle(function_name: &str) -> LuaError {
     LuaError::RuntimeError(format!(
         "{}: invalid or already-released particle system handle",
@@ -18,6 +26,15 @@ pub(super) fn invalid_particle_handle(function_name: &str) -> LuaError {
     ))
 }
 
+/// Checks that a particle system key refers to an existing slot-map entry.
+///
+/// # Parameters
+/// - `particle_systems` — `&SlotMap<ParticleKey, ParticleSystem>`.
+/// - `key` — `ParticleKey`.
+/// - `function_name` — `&str`.
+///
+/// # Returns
+/// `LuaResult<()>`.
 pub(super) fn ensure_particle_exists(
     particle_systems: &SlotMap<ParticleKey, ParticleSystem>,
     key: ParticleKey,
@@ -30,6 +47,15 @@ pub(super) fn ensure_particle_exists(
     }
 }
 
+/// Extracts and validates a `ParticleKey` from a Lua value.
+///
+/// # Parameters
+/// - `particle_systems` — `&SlotMap<ParticleKey, ParticleSystem>`.
+/// - `val` — `&LuaValue`.
+/// - `function_name` — `&str`.
+///
+/// # Returns
+/// `LuaResult<ParticleKey>`.
 pub(super) fn require_particle_key(
     particle_systems: &SlotMap<ParticleKey, ParticleSystem>,
     val: &LuaValue,
@@ -40,6 +66,15 @@ pub(super) fn require_particle_key(
     Ok(key)
 }
 
+/// Returns a shared reference to an existing particle system, or an error.
+///
+/// # Parameters
+/// - `particle_systems` — `&'a SlotMap<ParticleKey, ParticleSystem>`.
+/// - `key` — `ParticleKey`.
+/// - `function_name` — `&str`.
+///
+/// # Returns
+/// `LuaResult<&'a ParticleSystem>`.
 pub(super) fn particle_system<'a>(
     particle_systems: &'a SlotMap<ParticleKey, ParticleSystem>,
     key: ParticleKey,
@@ -50,6 +85,15 @@ pub(super) fn particle_system<'a>(
         .ok_or_else(|| invalid_particle_handle(function_name))
 }
 
+/// Returns a mutable reference to an existing particle system, or an error.
+///
+/// # Parameters
+/// - `particle_systems` — `&'a mut SlotMap<ParticleKey, ParticleSystem>`.
+/// - `key` — `ParticleKey`.
+/// - `function_name` — `&str`.
+///
+/// # Returns
+/// `LuaResult<&'a mut ParticleSystem>`.
 pub(super) fn particle_system_mut<'a>(
     particle_systems: &'a mut SlotMap<ParticleKey, ParticleSystem>,
     key: ParticleKey,
@@ -64,6 +108,12 @@ pub(super) fn particle_system_mut<'a>(
 ///
 /// Callers validate liveness against their current `SharedState` borrow so stale-handle
 /// errors keep the right function context and never re-borrow the state from userdata.
+///
+/// # Parameters
+/// - `val` — `&LuaValue`.
+///
+/// # Returns
+/// `LuaResult<ParticleKey>`.
 pub(super) fn particle_key_from_value(val: &LuaValue) -> LuaResult<ParticleKey> {
     match val {
         LuaValue::UserData(ud) => {
@@ -79,6 +129,13 @@ pub(super) fn particle_key_from_value(val: &LuaValue) -> LuaResult<ParticleKey> 
 }
 
 /// Helper: parse a Lua color table `{r, g, b, a}` into `[f32; 4]`.
+///
+/// # Parameters
+/// - `c` — `&LuaTable`.
+/// - `default_a` — `f32`.
+///
+/// # Returns
+/// `LuaResult<[f32; 4]>`.
 pub(super) fn parse_color(c: &LuaTable, default_a: f32) -> LuaResult<[f32; 4]> {
     let r: f32 = c.get(1i32).unwrap_or(1.0);
     let g: f32 = c.get(2i32).unwrap_or(1.0);
@@ -456,6 +513,13 @@ impl LuaUserData for LuaParticleSystem {
 }
 
 /// Parse an emission shape from a Lua string name and optional parameters table.
+///
+/// # Parameters
+/// - `shape` — `&str`.
+/// - `args` — `Option<&LuaTable>`.
+///
+/// # Returns
+/// `EmissionShape`.
 pub(super) fn parse_emission_shape(shape: &str, args: Option<&LuaTable>) -> EmissionShape {
     match shape.to_lowercase().as_str() {
         "circle" => {
@@ -549,6 +613,13 @@ pub(super) fn parse_emission_shape(shape: &str, args: Option<&LuaTable>) -> Emis
 }
 
 /// Convert an `EmissionShape` to a Lua table with type and parameter fields.
+///
+/// # Parameters
+/// - `lua` — `&'lua Lua`.
+/// - `shape` — `&EmissionShape`.
+///
+/// # Returns
+/// `LuaResult<LuaTable<'lua>>`.
 pub(super) fn emission_shape_to_lua<'lua>(lua: &'lua Lua, shape: &EmissionShape) -> LuaResult<LuaTable<'lua>> {
     let t = lua.create_table()?;
     match shape {
@@ -675,6 +746,12 @@ pub(super) fn emission_shape_to_lua<'lua>(lua: &'lua Lua, shape: &EmissionShape)
 }
 
 /// Helper to extract an f64 from a `LuaValue`.
+///
+/// # Parameters
+/// - `v` — `&LuaValue`.
+///
+/// # Returns
+/// `Option<f64>`.
 pub(super) fn lua_value_to_f64(v: &LuaValue) -> Option<f64> {
     match v {
         LuaValue::Integer(i) => Some(*i as f64),
@@ -1596,6 +1673,15 @@ fn register_ext(
 }
 
 
+/// Registers all `luna.particle.*` particle system management functions into the Lua VM.
+///
+/// # Parameters
+/// - `lua` — `&Lua`.
+/// - `luna` — `&LuaTable`.
+/// - `state` — `Rc<RefCell<SharedState>>`.
+///
+/// # Returns
+/// `LuaResult<()>`.
 pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> LuaResult<()> {
     let particle = lua.create_table()?;
 

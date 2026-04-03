@@ -4,11 +4,102 @@
 use std::cell::RefCell;
 use std::rc::Rc;
 use crate::math::Vec2;
-use crate::physics::{Body, World, BodyType, Shape};
+use crate::physics::{Body, World, BodyType, Shape, StandaloneShape};
 use crate::lua_api::lua_types::{add_type_methods, LunaType};
 use mlua::prelude::*;
 
 // ── Helper types ──────────────────────────────────────────────────────────
+
+/// Lua UserData wrapper for a standalone physics shape.
+///
+/// Created by `luna.physics.newCircleShape` et al. Holds a reference-counted
+/// `StandaloneShape` so the shape can be attached to multiple bodies.
+///
+/// # Fields
+/// - `inner` — `Rc<RefCell<StandaloneShape>>`. The wrapped shape and fixture parameters.
+#[derive(Clone)]
+pub struct LuaShape {
+    pub(crate) inner: Rc<RefCell<StandaloneShape>>,
+}
+
+impl LuaUserData for LuaShape {
+    fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
+        /// Returns the shape type string: `"circle"`, `"rectangle"`, `"polygon"`, `"edge"`, or `"chain"`.
+        ///
+        /// # Returns
+        /// `string`.
+        methods.add_method("getType", |_, this, ()| {
+            Ok(this.inner.borrow().get_type().to_string())
+        });
+
+        /// Returns the radius of a circle shape.
+        ///
+        /// # Returns
+        /// `number` — radius; errors for non-circle shapes.
+        methods.add_method("getRadius", |_, this, ()| {
+            this.inner
+                .borrow()
+                .get_radius()
+                .ok_or_else(|| LuaError::RuntimeError("getRadius: only valid for circle shapes".into()))
+        });
+
+        /// Returns the axis-aligned bounding box of this shape in local coordinates.
+        ///
+        /// # Returns
+        /// Four numbers `x1, y1, x2, y2` (min corner, max corner).
+        methods.add_method("getBoundingBox", |_, this, ()| {
+            let (x1, y1, x2, y2) = this.inner.borrow().get_bounding_box();
+            Ok((x1, y1, x2, y2))
+        });
+
+        /// Sets the density for when this shape is attached to a body.
+        ///
+        /// # Parameters
+        /// - `density` — `number`. Mass per unit area.
+        methods.add_method_mut("setDensity", |_, this, density: f32| {
+            this.inner.borrow_mut().density = density;
+            Ok(())
+        });
+
+        /// Sets the friction coefficient for when this shape is attached to a body.
+        ///
+        /// # Parameters
+        /// - `friction` — `number`. Surface friction (0 = frictionless, 1 = high friction).
+        methods.add_method_mut("setFriction", |_, this, friction: f32| {
+            this.inner.borrow_mut().friction = friction;
+            Ok(())
+        });
+
+        /// Sets the restitution (bounciness) for when this shape is attached to a body.
+        ///
+        /// # Parameters
+        /// - `restitution` — `number`. 0 = inelastic, 1 = fully elastic.
+        methods.add_method_mut("setRestitution", |_, this, restitution: f32| {
+            this.inner.borrow_mut().restitution = restitution;
+            Ok(())
+        });
+
+        /// Sets whether this shape acts as a sensor (detects overlaps, no forces).
+        ///
+        /// # Parameters
+        /// - `sensor` — `boolean`.
+        methods.add_method_mut("setSensor", |_, this, sensor: bool| {
+            this.inner.borrow_mut().sensor = sensor;
+            Ok(())
+        });
+
+        /// Destroys the shape. No-op — Lua GC handles cleanup automatically.
+        methods.add_method("destroy", |_, _this, ()| Ok(()));
+    }
+}
+
+/// Parses a body type string into a [`BodyType`]. Defaults to `Dynamic` for unrecognised strings.
+///
+/// # Parameters
+/// - `s` — `&str`.
+///
+/// # Returns
+/// `BodyType`.
 pub(super) fn parse_body_type(s: &str) -> BodyType {
     match s {
         "static" => BodyType::Static,
@@ -514,6 +605,12 @@ impl LuaUserData for LuaBody {
 }
 
 /// Extract a world index from either a `LuaWorld` UserData or an integer.
+///
+/// # Parameters
+/// - `val` — `&LuaValue`.
+///
+/// # Returns
+/// `LuaResult<usize>`.
 pub(super) fn world_index_from_value(val: &LuaValue) -> LuaResult<usize> {
     match val {
         LuaValue::UserData(ud) => {
@@ -527,6 +624,12 @@ pub(super) fn world_index_from_value(val: &LuaValue) -> LuaResult<usize> {
 }
 
 /// Extract a body index from either a `LuaBody` UserData or an integer.
+///
+/// # Parameters
+/// - `val` — `&LuaValue`.
+///
+/// # Returns
+/// `LuaResult<usize>`.
 pub(super) fn body_index_from_value(val: &LuaValue) -> LuaResult<usize> {
     match val {
         LuaValue::UserData(ud) => {
@@ -1475,6 +1578,14 @@ fn register_ext(
 }
 
 
+/// Registers all `luna.physics.*` simulation and collision functions into the Lua VM.
+///
+/// # Parameters
+/// - `lua` — `&Lua`.
+/// - `luna` — `&LuaTable`.
+///
+/// # Returns
+/// `LuaResult<()>`.
 pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
     let physics = lua.create_table()?;
 
@@ -2559,6 +2670,178 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
 
 
     register_ext(lua, &physics, &worlds)?;
+
+    // ── Standalone shape factory functions ─────────────────────────────────
+
+    // luna.physics.newCircleShape(radius) -> shape
+    /// Creates a standalone circle shape.
+    ///
+    /// # Parameters
+    /// - `radius` — `number`. Circle radius in world units.
+    ///
+    /// # Returns
+    /// `Shape` userdata.
+    physics.set(
+        "newCircleShape",
+        lua.create_function(|_, radius: f32| {
+            Ok(LuaShape {
+                inner: Rc::new(RefCell::new(StandaloneShape::new(Shape::Circle { radius }))),
+            })
+        })?,
+    )?;
+
+    // luna.physics.newRectangleShape(hx, hy) -> shape
+    /// Creates a standalone rectangle shape from half-extents.
+    ///
+    /// # Parameters
+    /// - `hx` — `number`. Half-width.
+    /// - `hy` — `number`. Half-height.
+    ///
+    /// # Returns
+    /// `Shape` userdata.
+    physics.set(
+        "newRectangleShape",
+        lua.create_function(|_, (hx, hy): (f32, f32)| {
+            Ok(LuaShape {
+                inner: Rc::new(RefCell::new(StandaloneShape::new(Shape::Rect {
+                    width: hx * 2.0,
+                    height: hy * 2.0,
+                }))),
+            })
+        })?,
+    )?;
+
+    // luna.physics.newPolygonShape(x1, y1, x2, y2, ...) -> shape
+    /// Creates a standalone convex polygon shape from flat vertex coordinates.
+    ///
+    /// # Parameters
+    /// - `x1, y1, x2, y2, ...` — At least 3 vertex pairs (6 numbers).
+    ///
+    /// # Returns
+    /// `Shape` userdata.
+    physics.set(
+        "newPolygonShape",
+        lua.create_function(|_, args: LuaMultiValue| {
+            let nums: Vec<f32> = args
+                .iter()
+                .filter_map(|v| match v {
+                    LuaValue::Number(n) => Some(*n as f32),
+                    LuaValue::Integer(n) => Some(*n as f32),
+                    _ => None,
+                })
+                .collect();
+            if nums.len() < 6 || !nums.len().is_multiple_of(2) {
+                return Err(LuaError::RuntimeError(
+                    "newPolygonShape: need at least 3 vertex pairs (6 numbers)".into(),
+                ));
+            }
+            let vertices: Vec<Vec2> = nums
+                .chunks(2)
+                .map(|c| Vec2::new(c[0], c[1]))
+                .collect();
+            Ok(LuaShape {
+                inner: Rc::new(RefCell::new(StandaloneShape::new(Shape::Polygon {
+                    vertices,
+                }))),
+            })
+        })?,
+    )?;
+
+    // luna.physics.newEdgeShape(x1, y1, x2, y2) -> shape
+    /// Creates a standalone line-segment shape.
+    ///
+    /// # Parameters
+    /// - `x1` — `number`. Start X.
+    /// - `y1` — `number`. Start Y.
+    /// - `x2` — `number`. End X.
+    /// - `y2` — `number`. End Y.
+    ///
+    /// # Returns
+    /// `Shape` userdata.
+    physics.set(
+        "newEdgeShape",
+        lua.create_function(|_, (x1, y1, x2, y2): (f32, f32, f32, f32)| {
+            Ok(LuaShape {
+                inner: Rc::new(RefCell::new(StandaloneShape::new(Shape::Edge {
+                    v1: Vec2::new(x1, y1),
+                    v2: Vec2::new(x2, y2),
+                }))),
+            })
+        })?,
+    )?;
+
+    // luna.physics.newChainShape(closed, x1, y1, x2, y2, ...) -> shape
+    /// Creates a standalone chain shape from a closed/open flag followed by flat vertex coordinates.
+    ///
+    /// # Parameters
+    /// - `closed` — `boolean`. True to close the loop.
+    /// - `x1, y1, x2, y2, ...` — At least 2 vertex pairs (4 numbers).
+    ///
+    /// # Returns
+    /// `Shape` userdata.
+    physics.set(
+        "newChainShape",
+        lua.create_function(|_, (closed, rest): (bool, LuaMultiValue)| {
+            let nums: Vec<f32> = rest
+                .iter()
+                .filter_map(|v| match v {
+                    LuaValue::Number(n) => Some(*n as f32),
+                    LuaValue::Integer(n) => Some(*n as f32),
+                    _ => None,
+                })
+                .collect();
+            if nums.len() < 4 || !nums.len().is_multiple_of(2) {
+                return Err(LuaError::RuntimeError(
+                    "newChainShape: need at least 2 vertex pairs (4 numbers)".into(),
+                ));
+            }
+            let vertices: Vec<Vec2> = nums
+                .chunks(2)
+                .map(|c| Vec2::new(c[0], c[1]))
+                .collect();
+            Ok(LuaShape {
+                inner: Rc::new(RefCell::new(StandaloneShape::new(Shape::Chain {
+                    vertices,
+                    closed,
+                }))),
+            })
+        })?,
+    )?;
+
+    // luna.physics.attachShape(body, shape) -> fixture_id
+    /// Attaches a standalone shape to a body as a new collider fixture.
+    ///
+    /// Uses the density, friction, restitution, and sensor flag stored on the shape.
+    ///
+    /// # Parameters
+    /// - `body` — `Body` userdata returned by `newBody`.
+    /// - `shape` — `Shape` userdata returned by `newCircleShape` etc.
+    ///
+    /// # Returns
+    /// Fixture index of the newly attached collider.
+    physics.set(
+        "attachShape",
+        lua.create_function(
+            |_, (body_ud, shape_ud): (LuaAnyUserData, LuaAnyUserData)| {
+                let body = body_ud.borrow::<LuaBody>()?;
+                let shape = shape_ud.borrow::<LuaShape>()?;
+                let standalone = shape.inner.borrow();
+                let mut ws = body.worlds.borrow_mut();
+                if let Some(world) = ws.get_mut(body.world_index) {
+                    let idx = world.add_fixture(
+                        body.body_index,
+                        standalone.shape.clone(),
+                        standalone.density,
+                        standalone.friction,
+                        standalone.restitution,
+                        standalone.sensor,
+                    );
+                    return Ok(idx);
+                }
+                Ok(0usize)
+            },
+        )?,
+    )?;
 
     luna.set("physics", physics)?;
     Ok(())

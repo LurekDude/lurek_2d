@@ -1800,6 +1800,13 @@ fn read_segments(tbl: &LuaTable) -> LuaResult<Vec<Segment>> {
 
 /// Registers `luna.math.*` into the Lua VM, including Vec2, noise, tween, spatial hash,
 /// raycasting, tile-walking, and all standard math utilities.
+///
+/// # Parameters
+/// - `lua` — `&Lua`.
+/// - `luna` — `&LuaTable`.
+///
+/// # Returns
+/// `LuaResult<()>`.
 pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
     let math_api = lua.create_table()?;
 
@@ -2324,6 +2331,39 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
             lua.create_userdata(LuaVec2 {
                 inner: RefCell::new(Vec2::new(x.unwrap_or(0.0), y.unwrap_or(0.0))),
             })
+        })?,
+    )?;
+
+    /// Standalone simplex noise: returns a value in approximately `[-1, 1]` for 1–3 coordinates.
+    ///
+    /// Equivalent to calling `luna.math.newNoiseGenerator(0):simplexNoise(...)`.
+    ///
+    /// # Parameters
+    /// - `x` — X coordinate.
+    /// - `y` — Y coordinate (optional, defaults to 0).
+    /// - `z` — Z coordinate (optional; enables 3-D mode).
+    ///
+    /// # Returns
+    /// Noise value in approximately `[-1.0, 1.0]`.
+    math_api.set(
+        "simplexNoise",
+        lua.create_function(|_, args: LuaMultiValue| {
+            let vals: Vec<f32> = args
+                .iter()
+                .filter_map(|v| match v {
+                    LuaValue::Number(n) => Some(*n as f32),
+                    LuaValue::Integer(n) => Some(*n as f32),
+                    _ => None,
+                })
+                .collect();
+            match vals.len() {
+                1 => Ok(noise::simplex_noise_2d(vals[0], 0.0) as f64),
+                2 => Ok(noise::simplex_noise_2d(vals[0], vals[1]) as f64),
+                3 => Ok(noise::simplex_noise_3d(vals[0], vals[1], vals[2]) as f64),
+                _ => Err(LuaError::RuntimeError(
+                    "simplexNoise expects 1-3 arguments".into(),
+                )),
+            }
         })?,
     )?;
 
