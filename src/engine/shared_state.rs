@@ -22,7 +22,7 @@ use crate::engine::resource_keys::{
 use crate::event::EventQueue;
 use crate::filesystem::GameFS;
 use crate::graphics::gpu_renderer::RenderStats;
-use crate::graphics::renderer::{BlendMode, DrawCommand, TextureData};
+use crate::graphics::renderer::{BlendMode, DepthMode, DrawCommand, StencilMode, TextureData};
 use crate::graphics::{Camera, Canvas, Mesh, Shader};
 use crate::input::{GamepadState, KeyboardState, MouseState, TouchState};
 use crate::particle::ParticleSystem;
@@ -291,6 +291,12 @@ pub struct SharedState {
     ///
     /// Set to `true` by `luna.graphics.captureScreenshot`. Cleared after the callback fires.
     pub pending_screenshot: bool,
+    /// Active stencil mode — written by `luna.graphics.setStencilMode`, read at render time.
+    pub stencil_mode: StencilMode,
+    /// Active depth test mode and write-enable flag — written by `luna.graphics.setDepthMode`.
+    ///
+    /// The first field is the comparison function; the second controls depth writes.
+    pub depth_mode: (DepthMode, bool),
 }
 
 impl SharedState {
@@ -362,6 +368,8 @@ impl SharedState {
             fs,
             midi_state: MidiState::new(),
             pending_screenshot: false,
+            stencil_mode: StencilMode::default(),
+            depth_mode: (DepthMode::Always, false),
         }
     }
 }

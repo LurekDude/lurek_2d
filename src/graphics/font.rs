@@ -68,6 +68,7 @@ pub struct Font {
 ///
 /// Contains UV coordinates for sampling the atlas texture and metric
 /// data for text layout (advance width, baseline offset).
+#[derive(Debug, Clone, Copy)]
 pub struct GlyphInfo {
     /// U coordinate of the glyph's left edge in the atlas (normalized 0.0..1.0).
     pub uv_x: f32,

@@ -41,6 +41,8 @@ pub mod event_api;
 pub mod filesystem_api;
 /// Registers the `luna.graph.*` directed-graph and item-flow simulation API.
 pub mod graph_api;
+/// Registers the `luna.font.*` font rasterizer and glyph metrics API.
+pub mod font_api;
 /// Registers the `luna.graphics.*` drawing API.
 pub mod graphics_api;
 /// Registers the `luna.image.*` pixel-level image manipulation API.
@@ -131,6 +133,7 @@ pub fn create_lua_vm(state: Rc<RefCell<SharedState>>) -> LuaResult<Lua> {
     ai_api::register(&lua, &luna)?;
     steering_api::register(&lua, &luna)?;
     graphics_api::register(&lua, &luna, state.clone())?;
+    font_api::register(&lua, &luna, state.clone())?;
     sprite_api::register(&lua, &luna)?;
     input_api::register(&lua, &luna, state.clone())?;
     audio_api::register(&lua, &luna, state.clone())?;

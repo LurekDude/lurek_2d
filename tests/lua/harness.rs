@@ -350,6 +350,11 @@ fn lua_test_image() {
     run_lua_test("unit/test_image.lua");
 }
 
+#[test]
+fn lua_test_font() {
+    run_lua_test("unit/test_font.lua");
+}
+
 // === Additional Stress Tests ===
 
 #[test]

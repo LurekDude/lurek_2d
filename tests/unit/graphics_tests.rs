@@ -6,7 +6,8 @@ use std::rc::Rc;
 
 use luna2d::engine::resource_keys::TextureKey;
 use luna2d::graphics::renderer::{
-    CompareMode, DrawCommand, DrawMode, StencilAction, TextAlign, TextureData,
+    CompareMode, DepthMode, DrawCommand, DrawMode, StencilAction, StencilMode, TextAlign,
+    TextureData,
 };
 use luna2d::graphics::sprite_batch::BatchEntry;
 use luna2d::graphics::Animation;
@@ -2221,4 +2222,117 @@ fn graphics_screenshot_request_queued_without_panic() {
         "graphics_screenshot_request_queued_without_panic failed: {:?}",
         result
     );
+}
+
+// ===========================================================================
+// Phase 6: Stencil + Depth State
+// ===========================================================================
+
+#[test]
+fn graphics_stencil_default_is_keep() {
+    let state = Rc::new(RefCell::new(SharedState::new(
+        800,
+        600,
+        "Test",
+        PathBuf::from("."),
+    )));
+    let st = state.borrow();
+    assert_eq!(st.stencil_mode.action, StencilAction::Keep);
+    assert_eq!(st.stencil_mode.compare, CompareMode::Always);
+    assert_eq!(st.stencil_mode.value, 0);
+}
+
+#[test]
+fn graphics_depth_default_is_always() {
+    let state = Rc::new(RefCell::new(SharedState::new(
+        800,
+        600,
+        "Test",
+        PathBuf::from("."),
+    )));
+    let st = state.borrow();
+    assert_eq!(st.depth_mode.0, DepthMode::Always);
+    assert!(!st.depth_mode.1, "depth write should default to false");
+}
+
+#[test]
+fn graphics_stencil_mode_round_trip() {
+    let (state, lua) = make_graphics_vm();
+    lua.load(
+        r#"luna.graphics.setStencilMode("replace", "always", 1)"#,
+    )
+    .exec()
+    .expect("setStencilMode failed");
+    let st = state.borrow();
+    assert_eq!(st.stencil_mode.action, StencilAction::Replace);
+    assert_eq!(st.stencil_mode.compare, CompareMode::Always);
+    assert_eq!(st.stencil_mode.value, 1);
+}
+
+#[test]
+fn graphics_depth_mode_round_trip() {
+    let (state, lua) = make_graphics_vm();
+    lua.load(r#"luna.graphics.setDepthMode("less", true)"#)
+        .exec()
+        .expect("setDepthMode failed");
+    let st = state.borrow();
+    assert_eq!(st.depth_mode.0, DepthMode::Less);
+    assert!(st.depth_mode.1, "depth write should be true");
+}
+
+#[test]
+fn graphics_stencil_mode_defaults_in_get() {
+    let (_state, lua) = make_graphics_vm();
+    let result: (String, String, u8) = lua
+        .load(r#"return luna.graphics.getStencilMode()"#)
+        .eval()
+        .expect("getStencilMode failed");
+    assert_eq!(result.0, "keep");
+    assert_eq!(result.1, "always");
+    assert_eq!(result.2, 0);
+}
+
+#[test]
+fn graphics_depth_mode_defaults_in_get() {
+    let (_state, lua) = make_graphics_vm();
+    let result: (String, bool) = lua
+        .load(r#"return luna.graphics.getDepthMode()"#)
+        .eval()
+        .expect("getDepthMode failed");
+    assert_eq!(result.0, "always");
+    assert!(!result.1);
+}
+
+#[test]
+fn graphics_clear_stencil_resets_to_default() {
+    let (state, lua) = make_graphics_vm();
+    lua.load(
+        r#"
+        luna.graphics.setStencilMode("replace", "equal", 7)
+        luna.graphics.clearStencil()
+        "#,
+    )
+    .exec()
+    .expect("clearStencil failed");
+    let st = state.borrow();
+    assert_eq!(st.stencil_mode.action, StencilAction::Keep);
+    assert_eq!(st.stencil_mode.value, 0);
+}
+
+#[test]
+fn graphics_stencil_mode_unknown_action_errors() {
+    let (_state, lua) = make_graphics_vm();
+    let result = lua
+        .load(r#"luna.graphics.setStencilMode("explode")"#)
+        .exec();
+    assert!(result.is_err(), "expected error for unknown stencil action");
+}
+
+#[test]
+fn graphics_depth_mode_unknown_mode_errors() {
+    let (_state, lua) = make_graphics_vm();
+    let result = lua
+        .load(r#"luna.graphics.setDepthMode("turbo")"#)
+        .exec();
+    assert!(result.is_err(), "expected error for unknown depth mode");
 }

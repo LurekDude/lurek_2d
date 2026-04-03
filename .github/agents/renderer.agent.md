@@ -28,8 +28,10 @@ name: Renderer
 - `luna.graphics.captureScreenshot` — frame capture with ImageData callback (Phase 5)
 - `luna.image.newCompressedData` — load DDS/DXT compressed textures to Lua userdata (Phase 13)
 - `CompressedImageData:getDimensions/getWidth/getHeight/getMipmapCount/getFormat` — compressed texture metadata (Phase 13)
-- `luna.image.newCompressedData` — load DDS/DXT compressed textures to Lua userdata (Phase 13)
-- `CompressedImageData:getDimensions/getWidth/getHeight/getMipmapCount/getFormat` — compressed texture metadata (Phase 13)
+- `StencilMode` struct and `DepthMode` enum in `src/graphics/renderer.rs` (Phase 6)
+- `SharedState::stencil_mode` and `SharedState::depth_mode` fields (Phase 6)
+- `luna.graphics.setStencilMode`, `getStencilMode`, `clearStencil`, `setDepthMode`, `getDepthMode` (Phase 6)
+- `src/lua_api/font_api.rs` — `luna.font` module: `newRasterizer`, `newTrueTypeRasterizer`, `newBMFontRasterizer`, `newGlyphData`, `GlyphData` userdata (Phase 16)
 
 **Must not become**:
 - Shadow Developer for non-graphics engine code

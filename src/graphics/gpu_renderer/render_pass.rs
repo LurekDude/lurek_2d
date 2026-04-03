@@ -2710,6 +2710,9 @@ fn stencil_operation(action: crate::graphics::renderer::StencilAction) -> wgpu::
         crate::graphics::renderer::StencilAction::DecrementWrap => {
             wgpu::StencilOperation::DecrementWrap
         }
+        crate::graphics::renderer::StencilAction::Keep => wgpu::StencilOperation::Keep,
+        crate::graphics::renderer::StencilAction::Zero => wgpu::StencilOperation::Zero,
+        crate::graphics::renderer::StencilAction::Invert => wgpu::StencilOperation::Invert,
     }
 }
 

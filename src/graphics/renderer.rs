@@ -43,16 +43,23 @@ pub enum CompareMode {
     Never,
 }
 
-/// Stencil write action for `luna.graphics.stencil`.
+/// Stencil write action for `luna.graphics.stencil` and `luna.graphics.setStencilMode`.
 ///
 /// # Variants
+/// - `Keep` — Keep variant.
+/// - `Zero` — Zero variant.
 /// - `Replace` — Replace variant.
 /// - `Increment` — Increment variant.
 /// - `Decrement` — Decrement variant.
 /// - `IncrementWrap` — IncrementWrap variant.
 /// - `DecrementWrap` — DecrementWrap variant.
+/// - `Invert` — Invert variant.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum StencilAction {
+    /// Keep the current stencil value (no change).
+    Keep,
+    /// Set the stencil value to zero.
+    Zero,
     /// Replace the stencil value.
     Replace,
     /// Increment the stencil value (clamps at 255).
@@ -63,6 +70,71 @@ pub enum StencilAction {
     IncrementWrap,
     /// Decrement with wrap-around.
     DecrementWrap,
+    /// Bitwise invert the stencil value.
+    Invert,
+}
+
+/// Combined stencil rendering mode stored in `SharedState`.
+///
+/// Controls what happens to stencil buffer values when draws occur (`action`),
+/// the test that subsequent draws must pass (`compare`), and the reference
+/// value (`value`) used by the comparison.  The GPU applies this lazily when
+/// the pipeline is rebuilt.
+///
+/// # Fields
+/// - `action` — `StencilAction`.
+/// - `compare` — `CompareMode`.
+/// - `value` — `u8`.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct StencilMode {
+    /// Operation applied to the stencil buffer on pass/fail.
+    pub action: StencilAction,
+    /// Comparison function used to test incoming fragments against `value`.
+    pub compare: CompareMode,
+    /// Reference value compared against the stencil buffer.
+    pub value: u8,
+}
+
+impl Default for StencilMode {
+    fn default() -> Self {
+        Self {
+            action: StencilAction::Keep,
+            compare: CompareMode::Always,
+            value: 0,
+        }
+    }
+}
+
+/// Depth test comparison mode for `luna.graphics.setDepthMode`.
+///
+/// # Variants
+/// - `Always` — Always variant.
+/// - `Never` — Never variant.
+/// - `Less` — Less variant.
+/// - `LessEqual` — LessEqual variant.
+/// - `Equal` — Equal variant.
+/// - `NotEqual` — NotEqual variant.
+/// - `Greater` — Greater variant.
+/// - `GreaterEqual` — GreaterEqual variant.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
+pub enum DepthMode {
+    /// Always pass — depth test is effectively disabled (default).
+    #[default]
+    Always,
+    /// Never pass.
+    Never,
+    /// Pass if incoming depth < stored depth.
+    Less,
+    /// Pass if incoming depth <= stored depth.
+    LessEqual,
+    /// Pass if incoming depth == stored depth.
+    Equal,
+    /// Pass if incoming depth != stored depth.
+    NotEqual,
+    /// Pass if incoming depth > stored depth.
+    Greater,
+    /// Pass if incoming depth >= stored depth.
+    GreaterEqual,
 }
 
 /// Text alignment mode for formatted text printing.

@@ -4,7 +4,7 @@
 use std::cell::RefCell;
 use std::rc::Rc;
 use crate::lua_api::SharedState;
-use crate::graphics::renderer::{BlendMode, DrawCommand, DrawMode, CompareMode, StencilAction, TextAlign};
+use crate::graphics::renderer::{BlendMode, CompareMode, DepthMode, DrawCommand, DrawMode, StencilAction, StencilMode, TextAlign};
 use crate::graphics::texture::Texture;
 use slotmap::Key;
 use crate::engine::resource_keys::{CanvasKey, FontKey, MeshKey, SpriteBatchKey, TextureKey, ShaderKey};
@@ -503,7 +503,7 @@ pub(super) fn texture_key_from_value(val: &LuaValue) -> LuaResult<TextureKey> {
 ///
 /// # Returns
 /// `LuaResult<FontKey>`.
-pub(super) fn font_key_from_value(val: &LuaValue) -> LuaResult<FontKey> {
+pub(crate) fn font_key_from_value(val: &LuaValue) -> LuaResult<FontKey> {
     match val {
         LuaValue::UserData(ud) => {
             let font = ud.borrow::<LuaFont>()?;
@@ -674,7 +674,7 @@ pub(super) fn require_texture_key(
 ///
 /// # Returns
 /// `LuaResult<FontKey>`.
-pub(super) fn require_font_key(
+pub(crate) fn require_font_key(
     state: &SharedState,
     val: &LuaValue,
     function_name: &str,
@@ -1650,6 +1650,157 @@ fn register_ext(
                 st.draw_commands.push(DrawCommand::SetStencilTest(None));
             }
             Ok(())
+        })?,
+    )?;
+
+    // luna.graphics.setStencilMode(action, compare?, value?)
+    /// Sets the persistent stencil mode stored in SharedState.
+    ///
+    /// The GPU pipeline reads this on the next frame rebuild.  Both `compare`
+    /// and `value` are optional; they default to `"always"` and `0`.
+    let state_cl = state.clone();
+    graphics.set(
+        "setStencilMode",
+        lua.create_function(
+            move |_, (action_s, compare_s, value): (String, Option<String>, Option<u8>)| {
+                let action = match action_s.to_lowercase().as_str() {
+                    "keep" => StencilAction::Keep,
+                    "zero" => StencilAction::Zero,
+                    "replace" => StencilAction::Replace,
+                    "increment" => StencilAction::Increment,
+                    "decrement" => StencilAction::Decrement,
+                    "incrementwrap" => StencilAction::IncrementWrap,
+                    "decrementwrap" => StencilAction::DecrementWrap,
+                    "invert" => StencilAction::Invert,
+                    other => {
+                        return Err(LuaError::RuntimeError(format!(
+                            "luna.graphics.setStencilMode: unknown action '{}'",
+                            other
+                        )))
+                    }
+                };
+                let compare = match compare_s
+                    .as_deref()
+                    .unwrap_or("always")
+                    .to_lowercase()
+                    .as_str()
+                {
+                    "always" => CompareMode::Always,
+                    "never" => CompareMode::Never,
+                    "less" => CompareMode::Less,
+                    "lequal" | "lessequal" => CompareMode::LessEqual,
+                    "equal" => CompareMode::Equal,
+                    "notequal" => CompareMode::NotEqual,
+                    "gequal" | "greaterequal" => CompareMode::GreaterEqual,
+                    "greater" => CompareMode::Greater,
+                    other => {
+                        return Err(LuaError::RuntimeError(format!(
+                            "luna.graphics.setStencilMode: unknown compare mode '{}'",
+                            other
+                        )))
+                    }
+                };
+                let value = value.unwrap_or(0);
+                state_cl.borrow_mut().stencil_mode = StencilMode {
+                    action,
+                    compare,
+                    value,
+                };
+                Ok(())
+            },
+        )?,
+    )?;
+
+    // luna.graphics.getStencilMode() -> action, compare, value
+    /// Returns the current stencil mode as three values: action string, compare string, value.
+    let state_cl = state.clone();
+    graphics.set(
+        "getStencilMode",
+        lua.create_function(move |_, ()| {
+            let st = state_cl.borrow();
+            let action = match st.stencil_mode.action {
+                StencilAction::Keep => "keep",
+                StencilAction::Zero => "zero",
+                StencilAction::Replace => "replace",
+                StencilAction::Increment => "increment",
+                StencilAction::Decrement => "decrement",
+                StencilAction::IncrementWrap => "incrementwrap",
+                StencilAction::DecrementWrap => "decrementwrap",
+                StencilAction::Invert => "invert",
+            };
+            let compare = match st.stencil_mode.compare {
+                CompareMode::Always => "always",
+                CompareMode::Never => "never",
+                CompareMode::Less => "less",
+                CompareMode::LessEqual => "lequal",
+                CompareMode::Equal => "equal",
+                CompareMode::NotEqual => "notequal",
+                CompareMode::GreaterEqual => "gequal",
+                CompareMode::Greater => "greater",
+            };
+            Ok((action, compare, st.stencil_mode.value))
+        })?,
+    )?;
+
+    // luna.graphics.clearStencil()
+    /// Resets the stencil mode to the default (keep / always / 0).
+    let state_cl = state.clone();
+    graphics.set(
+        "clearStencil",
+        lua.create_function(move |_, ()| {
+            state_cl.borrow_mut().stencil_mode = StencilMode::default();
+            Ok(())
+        })?,
+    )?;
+
+    // luna.graphics.setDepthMode(mode, write?)
+    /// Sets the depth test comparison mode and optional write flag.
+    ///
+    /// `mode` is a lowercase string matching one of `DepthMode`'s variants.
+    /// `write` defaults to `false`.
+    let state_cl = state.clone();
+    graphics.set(
+        "setDepthMode",
+        lua.create_function(move |_, (mode_s, write): (String, Option<bool>)| {
+            let mode = match mode_s.to_lowercase().as_str() {
+                "always" => DepthMode::Always,
+                "never" => DepthMode::Never,
+                "less" => DepthMode::Less,
+                "lequal" | "lessequal" => DepthMode::LessEqual,
+                "equal" => DepthMode::Equal,
+                "notequal" => DepthMode::NotEqual,
+                "greater" => DepthMode::Greater,
+                "gequal" | "greaterequal" => DepthMode::GreaterEqual,
+                other => {
+                    return Err(LuaError::RuntimeError(format!(
+                        "luna.graphics.setDepthMode: unknown mode '{}'",
+                        other
+                    )))
+                }
+            };
+            state_cl.borrow_mut().depth_mode = (mode, write.unwrap_or(false));
+            Ok(())
+        })?,
+    )?;
+
+    // luna.graphics.getDepthMode() -> mode, write
+    /// Returns the current depth mode string and write-enable flag.
+    let state_cl = state.clone();
+    graphics.set(
+        "getDepthMode",
+        lua.create_function(move |_, ()| {
+            let st = state_cl.borrow();
+            let mode = match st.depth_mode.0 {
+                DepthMode::Always => "always",
+                DepthMode::Never => "never",
+                DepthMode::Less => "less",
+                DepthMode::LessEqual => "lequal",
+                DepthMode::Equal => "equal",
+                DepthMode::NotEqual => "notequal",
+                DepthMode::Greater => "greater",
+                DepthMode::GreaterEqual => "gequal",
+            };
+            Ok((mode, st.depth_mode.1))
         })?,
     )?;
 
