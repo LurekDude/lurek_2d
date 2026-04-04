@@ -1457,7 +1457,7 @@ fn register_ext(
         "resetCamera",
         lua.create_function(move |_, ()| {
             let mut st = s.borrow_mut();
-            st.camera = crate::graphics::Camera::default();
+            st.camera = crate::camera::Camera::default();
             Ok(())
         })?,
     )?;
@@ -3973,7 +3973,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
                             sy,
                             ox,
                             oy,
-                        
+
                                                 effect: None,
                                             });
                         return Ok(());
@@ -4025,7 +4025,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
                         sy,
                         ox,
                         oy,
-                    
+
                                             effect: None,
                                         });
                     Ok(())

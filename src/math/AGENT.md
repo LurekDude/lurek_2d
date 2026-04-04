@@ -2,7 +2,7 @@
 
 | Property | Value |
 |----------|-------|
-| **Tier** | Foundation (no deps) |
+| **Tier** | Baseline |
 | **Lua API** | `None` |
 | **Source** | `src/math/` |
 | **Tests** | `tests/math_tests.rs` |

@@ -1,167 +1,209 @@
 # Luna2D — Architecture
 
-> **Source of truth** for module structure, dependency rules, and the tier system.
-> Consult this before creating new modules, adding cross-module imports, or designing new subsystems.
+> **Source of truth** for module structure, dependency rules, and the active layer model.
+> Consult this before creating new modules, changing cross-module imports, or documenting subsystem boundaries.
 
 ---
 
 ## Design Philosophy
 
-Luna2D is a **single-executable, Lua-driven 2D game engine**. Rust owns the platform, the GPU, the physics simulation, and all threading. Lua scripts orchestrate gameplay through the `luna.*` API. The engine never exposes internal Rust types to game scripts — only clean, consistent Lua-facing APIs.
+Luna2D is a **single-executable, Lua-driven 2D game engine**. Rust owns the platform, GPU, physics simulation, threading, and other engine-managed resources. Lua scripts own game logic through the public `luna.*` API.
 
 See [`docs/zen-of-luna.md`](zen-of-luna.md) for first principles.
 See [`docs/design-assumptions.md`](design-assumptions.md) for binding constraints.
 
 ---
 
-## Module Tier System
+## Active Layer Model
 
-Luna2D organises its source modules into **four tiers** plus two always-available foundation layers. The tier of a module determines which other modules it may import.
+Luna2D uses an active **four-layer runtime model** plus one bridge layer:
 
-The tier system is a **logical dependency model**, not a filesystem grouping scheme. The current repository convention keeps domain modules as flat top-level folders such as `src/graphics/`, `src/particle/`, and `src/battle/`. Do not reorganise them into `src/tier1/`, `src/tier2/`, or `src/tier3/` unless the architecture contract itself changes.
+| Layer | Path | Role |
+|---|---|---|
+| **Baseline** | `src/math/`, `src/engine/` | Always-on runtime substrate |
+| **Bridge** | `src/lua_api/` | Registers the public `luna.*` API; not a numbered tier |
+| **Tier 1** | `src/` | Core engine subsystems built on Baseline |
+| **Tier 2** | `src/` | Reusable engine extensions built on Baseline + Tier 1 |
+| **Tier 3** | `library/` | Lunasome: pure-Lua gameplay libraries built on the public Lua API |
 
-### Foundation Layers (not tier-numbered)
+This is a **logical dependency model**, not a filesystem grouping scheme. Most Rust engine modules still live in flat `src/<module>/` directories. The layer contract is carried by import direction, not by nested folders.
 
-These two layers sit outside the tier numbering because every tier can reference them:
+### Boundary Rules
 
-| Layer | Path | Rule |
-|-------|------|------|
-| **`math`** | `src/math/` | No Luna2D dependencies. Pure algorithms. All modules may freely import it. |
-| **`engine`** | `src/engine/` | Application lifecycle (`App`, `Config`, `EngineError`, `SharedState`, `WindowState`, `FullscreenType`). Tier 1 modules may import engine types. Engine itself may import ALL modules including `lua_api` (exclusively for the `create_lua_vm` bootstrap call). |
+- **Baseline** is always available. `math` remains the leaf; `engine` owns app lifecycle and shared runtime state.
+- **Tier 1 Rust modules** may depend only on Baseline. No Tier 1 ↔ Tier 1 cross-imports.
+- **Tier 2 Rust modules** may depend on Baseline + Tier 1. No Tier 2 ↔ Tier 2 cross-imports.
+- **`lua_api`** is the bridge that imports engine layers and exposes `luna.*`. Domain Rust modules must never import it.
+- **Tier 3 Lunasome** lives in `library/` and consumes only public Lua-facing APIs. Lower engine layers do not depend on Tier 3.
+- **Examples** consume the public Lua surface but are not part of the numbered layer model.
 
-### Tier 1 — Basic Core
+### Dependency Graph
 
-**Definition**: Self-contained domain modules. May only reference `math` and `engine`. No cross-imports between Tier 1 modules.
+```
+game scripts and examples/
+            │
+            ▼
+library/  (Tier 3: Lunasome, pure Lua)
+            │ consumes public API
+            ▼
+      src/lua_api/  (bridge layer)
+            │ binds runtime to Lua
+            ▼
+      Tier 2 extensions
+            │
+            ▼
+   Tier 1 core subsystems
+            │
+            ▼
+Baseline: src/math/ + src/engine/
+```
 
-**Purpose**: Platform-level capabilities (rendering, audio, input, physics, storage). If you add a new first-class capability (e.g., 3D low-level rendering), it belongs here.
+### Lunasome Contract
 
-| Module | Path | Responsibility |
-|--------|------|----------------|
-| `graphics` | `src/graphics/` | GPU rendering pipeline (wgpu), draw commands, textures, fonts, camera |
-| `audio` | `src/audio/` | Audio playback via rodio, buses, volume, spatial audio |
-| `physics` | `src/physics/` | Rigid-body simulation via rapier2d, collision, raycasting |
-| `input` | `src/input/` | Keyboard, mouse, gamepad, touch state |
-| `timer` | `src/timer/` | Frame clock, `Clock::tick()`, scheduled callbacks |
-| `filesystem` | `src/filesystem/` | Sandboxed VFS, asset loading, path validation |
-| `compute` | `src/compute/` | N-dimensional numerical arrays (NdArray), pure CPU |
-| `data` | `src/data/` | Binary buffers, compression, hashing, TOML parsing |
-| `image` | `src/image/` | CPU pixel-level image manipulation (ImageData) |
-| `event` | `src/event/` | FIFO event queue, polling API |
-| `entity` | `src/entity/` | Lightweight ECS with ID recycling and bitmap tags |
-| `window` | `src/window/` | Window state abstraction |
-| `thread` | `src/thread/` | Background Rust threads, `Channel` inter-thread communication |
-| `postfx` | `src/postfx/` | Post-processing effects data model: bloom, blur, color grading, screen-space shaders. Pure CPU config; GPU application handled in `lua_api`. Extracted from `graphics`. |
-| `minimap` | `src/minimap/` | Minimap content extraction, FOV mask, and tile sampling. Pure CPU data model. Extracted from `graphics`. |
+Tier 3 is **Lunasome**, the pure-Lua standard-library layer in `library/`.
 
-**Import rule**: Tier 1 modules may only import `crate::math::*` and `crate::engine::*`.
-
-### Tier 2 — Engine Extensions
-
-**Definition**: Generic engine capabilities that build on Tier 1. Not gameplay-specific. May reference Tier 1 and foundation layers. **Must NOT import other Tier 2 modules.**
-
-**Purpose**: Reusable subsystems that most game genres will use (particles, tilemaps, AI, pathfinding, save games). Not tied to any particular genre.
-
-| Module | Path | Responsibility |
-|--------|------|----------------|
-| `particle` | `src/particle/` | Emitter-based 2D particle effects; builds on `graphics` |
-| `tilemap` | `src/tilemap/` | Tilemaps, isometric, autotile, TMX, procedural mapgen; builds on `graphics` |
-| `scene` | `src/scene/` | Scene stack, transitions, depth sorting |
-| `savegame` | `src/savegame/` | Slot-based save/load, schema versioning; builds on `filesystem` + `data` |
-| `modding` | `src/modding/` | Mod discovery, dependency resolution, load ordering; builds on `filesystem` |
-| `graph` | `src/graph/` | Directed graph, flow simulation, Dijkstra |
-| `pathfinding` | `src/pathfinding/` | Grid pathfinding (A★, HPA★, flow fields); builds on `math` |
-| `dataframe` | `src/dataframe/` | Column-major tabular data, SQL-style queries |
-
-**Import rule**: Tier 2 modules may import `math`, `engine`, and any **Tier 1** module. They must NOT import each other.
-
-### Tier 3 — Gameplay Systems
-
-**Definition**: Genre-specific systems designed around specific gameplay domains. Build on Tier 1 and Tier 2. **Must NOT import other Tier 3 modules.**
-
-**Purpose**: RPG combat, inventory, dialogue, crafting, quests, etc. These contain gameplay opinion — not all games will use all of these.
-
-| Module | Path | Responsibility |
-|--------|------|----------------|
-| `ai` | `src/ai/` | Game AI: FSM, behaviour trees, GOAP planning, Q-learning, influence maps, steering, and squads |
-| `battle` | `src/battle/` | Turn-based battles, combatants, actions, statuses, turn order |
-| `cardgame` | `src/cardgame/` | Cards, stacks, deck building, slots, history, and card-pool utilities |
-| `combat` | `src/combat/` | Vehicle combat minigame: chassis, turrets, weapons, projectiles |
-| `crafting` | `src/crafting/` | Recipe system, ingredient matching, crafting queues |
-| `dialog` | `src/dialog/` | Dialogue trees, branching narrative, localisation hooks |
-| `economy` | `src/economy/` | Named resource economy: capacity, flow rates, decay, interest, reservations, conversions, and overflow policies |
-| `inventory` | `src/inventory/` | Inventory slots, stacking, weight limits |
-| `item` | `src/item/` | Item definitions, attributes, and loot-table rarity — shared by `inventory`, `crafting`, and loot systems |
-| `quest` | `src/quest/` | Quest tracking, objectives, branching completion states |
-| `stats` | `src/stats/` | Character attributes, derived stats, modifiers |
-| `province_map` | `src/province_map/` | Province/territory map, ownership, borders |
-
-**Import rule**: Tier 3 modules may import `math`, `engine`, Tier 1, and Tier 2 modules. They must NOT import each other.
-
-### Tier 4 — Platform Integrations (Future)
-
-**Definition**: External platform SDK wrappers. Not gameplay logic; integration glue for distribution platforms and external services.
-
-**Purpose**: Steam achievements, Epic Games Store, itch.io store API, platform-specific OS integrations, cloud saves-as-a-service. These are **opt-in extensions**, not part of the core engine binary.
-
-**Import rule**: Tier 4 modules may import any lower tier. They must NOT be imported by any tier below them.
-
-**Status**: Not yet implemented. Reserved for future shipping builds.
+- It is shipped alongside the engine, not embedded in the Rust binary.
+- It is intended for **genre-specific or gameplay-domain-specific** libraries.
+- It consumes public `luna.*` APIs rather than Rust internals.
+- It should stay as self-contained as practical; avoid unnecessary cross-library dependency chains.
 
 ---
 
-## Dependency Graph (Summary)
+## Baseline
 
-```
-                    ┌─────────┐
-                    │ lua_api │  Integration layer — imports ALL modules
-                    └────┬────┘
-                         │ may import any module
-        ┌────────────────┼───────────────────┐
-        │                │                   │
-   ┌────▼────┐    ┌──────▼──────┐    ┌──────▼──────┐
-   │ Tier 3  │    │   Tier 2    │    │   Tier 1    │
-   │Gameplay │    │  Extensions │    │  Basic Core │
-   └─────────┘    └─────────────┘    └──────┬──────┘
-        │                │                  │ may import
-        └────────────────┴──────────────────┤
-                                       ┌────▼────┐
-                                       │ engine  │  Foundation
-                                       │  math   │  Foundation
-                                       └─────────┘
-```
-
-**Crossing rules**:
-- ✅ Any tier may import `math` and `engine`
-- ✅ Tier 2 may import Tier 1
-- ✅ Tier 3 may import Tier 1 and Tier 2
-- ❌ No same-tier cross-imports (Tier 1 ↔ Tier 1, Tier 2 ↔ Tier 2, Tier 3 ↔ Tier 3)
-- ❌ No upward imports (Tier 1 importing Tier 2, etc.)
-- ❌ Domain modules never import `lua_api`
-- `engine` may import all modules (it is the top-level orchestrator)
-- `lua_api` may import all modules (it is the Lua binding integration layer)
-
----
-
-## Always-Available Layers
-
-### `math/` — Foundation
+### `math/` — Foundational Algorithms
 
 `math` is the leaf of the dependency graph. It has no Luna2D dependencies and provides:
+
 - Vectors (`Vec2`, `Vec3`), matrices (`Mat3`), `Rect`
 - Noise, easing, interpolation
-- Color space utilities (sRGB ↔ linear conversion)
+- Color-space utilities and geometry helpers
+- `Color` (sRGB `[f32; 4]`) — moved here from `src/graphics/srgb.rs` during the graphics-module-split session as a pure math value type with no rendering dependency
 
-All modules at all tiers may freely import `math`.
+All other layers may import `math`.
 
-### `engine/` — App Lifecycle
+### `engine/` — Runtime Lifecycle
 
-`engine` provides the application skeleton: `App`, `Config`, `EngineError`, `Clock`, `SharedState`, `WindowState`, and `FullscreenType`. It is the only module that may import from all other modules simultaneously (it orchestrates them in the game loop). Tier 1 modules may expose their types to `engine` for wiring during startup.
+`engine` provides the application skeleton: `App`, `Config`, `EngineError`, `SharedState`, `WindowState`, and `FullscreenType`.
 
-`SharedState` is the central shared runtime state — an `Rc<RefCell<SharedState>>` shared between the engine event loop and all Lua API closures. It is defined in `engine` (not `lua_api`) and re-exported from `lua_api` for sub-module convenience. `engine::app` imports `lua_api` exclusively for the `create_lua_vm` bootstrap call.
+- It owns startup, bootstrapping, and the main event loop.
+- It is the top-level Rust orchestrator.
+- `SharedState` is defined here as the central runtime state shared with Lua closures.
 
-### `lua_api/` — Lua Binding Bridge
+---
 
-`lua_api` sits above all tiers. It imports every module to expose its functionality through the `luna.*` namespace. It must never be imported by domain modules. `lua_api` re-exports `SharedState`, `WindowState`, `FullscreenType`, and `ErrorInfo` from `engine` for use by all sub-module register functions.
+## Bridge Layer
+
+### `lua_api/` — Public Lua Surface
+
+`lua_api` sits above the engine layers. It imports runtime modules and exposes them through the `luna.*` namespace.
+
+- It is **not** a numbered tier.
+- It may import Baseline, Tier 1, Tier 2, and migration-state gameplay Rust modules when needed.
+- Domain Rust modules must never import `lua_api`.
+
+Every binding module follows the registration pattern:
+
+```rust
+pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> LuaResult<()>
+```
+
+---
+
+## Tier 1 — Core Engine Subsystems
+
+Tier 1 modules are engine-owned capabilities that sit directly on Baseline.
+
+| Module | Path | Responsibility |
+|---|---|---|
+| `animation` | `src/animation/` | Sprite animation: named clips, frame pools, speed control, frame-level events |
+| `audio` | `src/audio/` | Audio playback, mixers, buses, decoding |
+| `automation` | `src/automation/` | Automated input / replay helpers |
+| `camera` | `src/camera/` | Camera and viewport types: Camera, Camera2D, Viewport, ViewportScale |
+| `compute` | `src/compute/` | Dense numerical arrays and CPU-side compute helpers |
+| `data` | `src/data/` | Binary data, compression, hashing, encoding, TOML helpers |
+| `entity` | `src/entity/` | Lightweight ECS primitives and entity helpers |
+| `event` | `src/event/` | Event queue and polling primitives |
+| `filesystem` | `src/filesystem/` | Sandboxed game filesystem and path validation |
+| `graphics` | `src/graphics/` | GPU rendering pipeline, draw commands, textures, fonts, sprite batching |
+| `image` | `src/image/` | CPU-side image manipulation |
+| `input` | `src/input/` | Keyboard, mouse, gamepad, and touch state |
+| `physics` | `src/physics/` | Rigid bodies, shapes, collisions, and queries |
+| `thread` | `src/thread/` | Background Rust threads and `Channel` communication |
+| `timer` | `src/timer/` | Frame timing and scheduled callback primitives |
+| `window` | `src/window/` | Window lifecycle and state abstraction |
+
+**Import rule**: Tier 1 modules may import only `crate::math::*` and `crate::engine::*`.
+
+---
+
+## Tier 2 — Reusable Engine Extensions
+
+Tier 2 modules build on Baseline + Tier 1 and remain broadly useful across many game types.
+
+| Module | Path | Responsibility |
+|---|---|---|
+| `ai` | `src/ai/` | Generic AI helpers: FSMs, behaviour trees, GOAP, steering |
+| `dataframe` | `src/dataframe/` | Column-major tabular data structures |
+| `graph` | `src/graph/` | Directed graphs, flow simulation, graph algorithms |
+| `gui` | `src/gui/` | Retained-mode widget UI primitives |
+| `minimap` | `src/minimap/` | Minimap extraction, FOV masking, tile sampling |
+| `modding` | `src/modding/` | Mod discovery, dependency resolution, load ordering |
+| `overlay` | `src/overlay/` | Per-frame overlays such as weather and ambient layers |
+| `particle` | `src/particle/` | Emitter-based 2D particle systems |
+| `pathfinding` | `src/pathfinding/` | Navigation grids, A*, HPA*, flow fields |
+| `postfx` | `src/postfx/` | Post-processing effect data models |
+| `savegame` | `src/savegame/` | Save/load orchestration and schema versioning |
+| `scene` | `src/scene/` | Scene stack management and transitions |
+| `tilemap` | `src/tilemap/` | Tilemaps, tilesets, map generation, coordinate helpers |
+
+**Import rule**: Tier 2 modules may import Baseline and any Tier 1 module, but must not import other Tier 2 modules.
+
+---
+
+## Tier 3 — Lunasome in `library/`
+
+Tier 3 is the **Lunasome** layer: pure-Lua gameplay libraries that live under `library/`.
+
+Current shipped library families include:
+
+| Library | Path | Responsibility |
+|---|---|---|
+| `battle` | `library/battle/` | Turn-based battle helpers |
+| `cardgame` | `library/cardgame/` | Cards, decks, slots, and card pools |
+| `combat` | `library/combat/` | Combat-oriented gameplay helpers |
+| `crafting` | `library/crafting/` | Recipes, queues, and crafting logic |
+| `dialog` | `library/dialog/` | Dialogue sequencing |
+| `economy` | `library/economy/` | Gameplay resource economy helpers |
+| `inventory` | `library/inventory/` | Inventory gameplay logic |
+| `item` | `library/item/` | Item helpers and stack logic |
+| `province_map` | `library/province_map/` | Province-map gameplay helpers |
+| `quest` | `library/quest/` | Quest log and objective helpers |
+| `stats` | `library/stats/` | Gameplay stat and modifier helpers |
+
+Tier 3 is the target home for genre-specific and gameplay-specific libraries. When something can live as pure Lua on top of the public engine API, it belongs here instead of in new Rust gameplay modules.
+
+---
+
+## Legacy / Migration-State Rust Gameplay Modules
+
+Several gameplay-oriented Rust modules still exist under `src/`. They remain buildable and testable, but they are **not** the active Tier 3 architecture target.
+
+| Module | Path | Current Framing |
+|---|---|---|
+| `battle` | `src/battle/` | Migration-state Rust gameplay module |
+| `cardgame` | `src/cardgame/` | Migration-state Rust gameplay module |
+| `combat` | `src/combat/` | Migration-state Rust gameplay module |
+| `crafting` | `src/crafting/` | Migration-state Rust gameplay module |
+| `dialog` | `src/dialog/` | Migration-state Rust gameplay module |
+| `economy` | `src/economy/` | Migration-state Rust gameplay module |
+| `inventory` | `src/inventory/` | Migration-state Rust gameplay module |
+| `item` | `src/item/` | Migration-state Rust gameplay module |
+| `province_map` | `src/province_map/` | Migration-state Rust gameplay module |
+| `quest` | `src/quest/` | Migration-state Rust gameplay module |
+| `stats` | `src/stats/` | Migration-state Rust gameplay module |
+
+Documentation should describe these as **legacy** or **migration-state** gameplay Rust code, not as the current Tier 3 layer.
 
 ---
 
@@ -169,26 +211,45 @@ All modules at all tiers may freely import `math`.
 
 The architecture contract distinguishes between:
 
-- **Active crate modules**: directories declared in `src/lib.rs` and therefore part of the Rust crate surface.
-- **Additional top-level source directories**: folders that may contain design notes, incubating work, or dormant implementations but are not currently part of the crate contract unless they are wired into `src/lib.rs`.
+- **Active crate modules**: directories exported from `src/lib.rs`
+- **Additional source-tree directories**: folders that may contain notes, incubating work, or future modules but are not yet part of the crate contract
 
-Today, the active module inventory is defined by the flat `src/<module>/` layout exported from `src/lib.rs`, not by nested tier folders.
+Today, the active Rust module inventory is still defined by the flat `src/<module>/` layout exported from `src/lib.rs`.
 
-### Design-Stage Modules (not yet active)
+### Design-Stage Directories Not Exported From `src/lib.rs`
 
-The following `src/` directories contain only design documents (`.md` files and `AGENT.md`). They have **no Rust source** and are **not declared in `src/lib.rs`**. They are placeholders for planned future modules and should not be treated as part of the active tier inventory until they are explicitly integrated into the crate module map.
+| Folder | Intended Purpose |
+|---|---|
+| `src/doll/` | Paper-doll character compositing |
+| `src/network/` | Networking primitives |
+| `src/pipeline/` | Data transformation pipelines |
+| `src/terminal/` | In-game developer terminal / REPL |
 
-| Folder | Planned Tier | Intended Purpose |
-|--------|--------------|------------------|
-| `src/automation/` | T2 | Macro/script-driven game automation, triggers, and scheduled actions |
-| `src/doll/` | T3 | Paper-doll character equipment layering and sprite compositing |
-| `src/gui/` | T2 | Retained-mode widget UI system: buttons, panels, text fields |
-| `src/network/` | T2 | Peer-to-peer and client/server networking primitives |
-| `src/overlay/` | T2 | Composable per-frame screen-effect layer: weather particles, ambient lighting |
-| `src/pipeline/` | T2 | Data transformation pipelines: ETL chains, filter/map/reduce nodes |
-| `src/terminal/` | T2 | In-game developer terminal / REPL console |
+If a directory is not exported from `src/lib.rs`, it is not part of the active Rust crate surface yet.
 
-> When a design-stage module gains Rust source and is wired into `src/lib.rs`, move it to its proper tier table above and remove it from this list.
+---
+
+## Testing and Validation Surface
+
+Luna2D validation is split by responsibility:
+
+### Engine Rust tests
+
+- Registered test binaries live under `tests/unit/`, `tests/ext/`, `tests/game/`, and `tests/stress/`
+- Golden coverage is registered through `tests/golden/harness.rs`
+- A small number of legacy root-level Rust tests may still exist during migration; keep docs and `Cargo.toml` in sync
+
+### Lua API and Lunasome tests
+
+- `tests/lua/harness.rs` dispatches committed Lua test files
+- `tests/lua/unit/` covers both `luna.*` bindings and `library/` modules such as `test_library_dialog.lua`
+- `tests/lua/integration/`, `tests/lua/stress/`, and `tests/lua/validation/` cover broader Lua behavior
+
+### Example validation
+
+- `examples/` are smoke and acceptance artifacts
+- Validate them with targeted runs such as `cargo run -- examples/hello_world`
+- There is no dedicated `tests/examples/` Cargo harness today
 
 ---
 
@@ -196,31 +257,31 @@ The following `src/` directories contain only design documents (`.md` files and 
 
 1. Parse CLI args → game directory path
 2. `Config::load_from_conf_lua(game_dir)` — temporary Lua VM executes `conf.lua`
-3. `App::new(config)` — windowing (winit), GPU init (wgpu), audio (rodio), filesystem (GameFS)
-4. `create_lua_vm()` — LuaJIT VM, `luna` global table, `lua_api` modules registered
+3. `App::new(config)` — windowing (`winit`), GPU init (`wgpu`), audio (`rodio`), filesystem (`GameFS`)
+4. `create_lua_vm()` — LuaJIT VM, `luna` global table, and binding registration
 5. Load and execute `main.lua` → call `luna.load()`
-6. Enter `winit` event loop → `luna.update(dt)` / `luna.draw()` each frame
+6. Enter the `winit` event loop → `luna.update(dt)` / `luna.draw()` each frame
 
 ---
 
 ## Key Patterns
 
 - **`SharedState`**: `Rc<RefCell<SharedState>>` shared between Lua closures and the engine loop. Never use raw pointers or `unsafe` for state sharing.
-- **DrawCommand queue**: Lua `luna.draw()` pushes `DrawCommand` variants; the GPU renderer processes them after the callback returns. Never render inside a Lua closure.
-- **SlotMap resource pools**: Generational IDs (`TextureKey`, `FontKey`, etc.) prevent use-after-free.
-- **`register()` pattern**: Each `lua_api` sub-module has `pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> LuaResult<()>`.
+- **DrawCommand queue**: Lua `luna.draw()` pushes `DrawCommand` variants; the renderer processes them after the callback returns.
+- **SlotMap resource pools**: Generational IDs (`TextureKey`, `FontKey`, and related keys) prevent use-after-free.
+- **`register()` pattern**: Each `lua_api` sub-module exposes `pub fn register(lua, luna, state)`.
 
 ---
 
 ## Planned Build Variants (Future)
 
-The tier system enables opt-in build configurations:
+The layer model supports future build variants, though they are not yet implemented at the Cargo feature level.
 
-| Variant | Tiers Included | Target Use Case |
-|---------|----------------|-----------------|
-| **Light** | Foundation + Tier 1 | Minimal engine; custom game systems only |
-| **Standard** | Foundation + Tier 1 + Tier 2 | General-purpose games; no genre systems |
-| **Extended** | Foundation + Tier 1 + Tier 2 + Tier 3 | Full RPG/simulation game support |
-| **Platform** | All tiers + Tier 4 | Shipping builds with store integration |
+| Variant | Layers Included | Target Use Case |
+|---|---|---|
+| **Baseline** | Baseline + bridge | Minimal runtime substrate |
+| **Core** | Baseline + Tier 1 + bridge | Core engine without reusable extensions |
+| **Extended** | Baseline + Tier 1 + Tier 2 + bridge | General-purpose engine runtime |
+| **Lunasome** | Extended + shipped `library/` content | Full runtime plus standard Lua libraries |
 
-These variants are **not yet implemented** at the `Cargo.toml` feature level. They are documented as a design intent for future Cargo feature flag work.
+These variants are design intent only for now.

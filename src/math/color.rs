@@ -1,13 +1,13 @@
-//! Srgb implementation for the `graphics` subsystem.
+//! RGBA color value type for the Luna2D math layer.
 //!
-//! This module is part of Luna2D's `graphics` subsystem and provides the implementation
-//! details for srgb-related operations and data management.
+//! This module is part of Luna2D's `math` subsystem (Baseline layer).
+//! `Color` is a pure value type with no engine dependencies.
 //! Key types exported from this module: `Color`.
 //! Primary functions: `from_u8()`, `to_u8()`, `to_rgb_u32()`.
 //!
 //! All public items are documented. See the parent module for architectural context
 //! and the `luna.*` Lua API for the scripting interface.
-//!
+
 /// RGBA color stored as `f32` components in the range `[0.0, 1.0]`.
 ///
 /// Used everywhere the API accepts a color: `luna.graphics.setColor`, sprite tints,

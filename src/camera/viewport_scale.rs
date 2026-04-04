@@ -11,7 +11,7 @@
 //! All public items are documented. See the parent module for architectural context
 //! and the `luna.*` Lua API for the scripting interface.
 
-use crate::graphics::viewport::ScaleMode;
+use crate::camera::viewport::ScaleMode;
 
 /// Virtual resolution with automatic graphics stack management.
 ///

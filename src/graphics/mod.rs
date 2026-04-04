@@ -6,10 +6,6 @@
 //! All public items are documented. See the parent module for architectural context
 //! and the `luna.*` Lua API for the scripting interface.
 //!
-/// Sprite-sheet frame animation with configurable durations and looping.
-pub mod animation;
-/// 2D camera with position, zoom, and rotation producing a view matrix.
-pub mod camera;
 /// Off-screen render targets (canvases) for deferred compositing.
 pub mod canvas;
 /// Wolfenstein-style raycasting column batch renderer.
@@ -50,21 +46,12 @@ pub mod sprite;
 pub mod sprite_batch;
 /// Grid-based sprite sheet with directional support and named groups.
 pub mod sprite_sheet;
-/// RGBA Color struct with named constants and conversion helpers.
-pub mod srgb;
 /// Texture loading and TextureData storage for the renderer.
 pub mod texture;
 /// CPU-side bin-packing texture atlas using shelf algorithm.
 pub mod texture_atlas;
 /// Trail renderer for fading ribbon effects.
 pub mod trail;
-/// Virtual resolution viewport with manual transform application.
-pub mod viewport;
-/// Virtual resolution viewport with automatic scaling.
-pub mod viewport_scale;
-
-pub use animation::{Animation, AnimationFrame};
-pub use camera::{Camera, Camera2D};
 pub use canvas::Canvas;
 pub use column_batch::{ColumnBatch, ColumnData};
 pub use data_graph_renderer::{GraphRenderer, GraphSeries};
@@ -88,9 +75,6 @@ pub use shape::{CompoundShape, ShapeCommand};
 pub use sprite::Sprite;
 pub use sprite_batch::SpriteBatch;
 pub use sprite_sheet::SpriteSheet;
-pub use srgb::Color;
 pub use texture::Texture;
 pub use texture_atlas::TextureAtlas;
 pub use trail::Trail;
-pub use viewport::{ScaleMode, Viewport};
-pub use viewport_scale::ViewportScale;

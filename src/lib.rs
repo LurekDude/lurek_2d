@@ -68,8 +68,12 @@
 
 /// Game AI toolkit: FSM, Behavior Trees, Steering, Pathfinding, Q-Learning, and more.
 pub mod ai;
+/// Sprite animation system: named clips, frame pools, speed control, and frame-level events.
+pub mod animation;
 /// Audio playback system backed by rodio.
 pub mod audio;
+/// Camera and viewport types for 2D rendering.
+pub mod camera;
 /// Automated input simulation via timed step scripts for testing and replay.
 pub mod automation;
 // migration-state: pub mod battle; — now library/battle/init.lua
@@ -112,18 +116,22 @@ pub mod math;
 pub mod minimap;
 /// Mod management framework: metadata, dependencies, load ordering, hooks.
 pub mod modding;
+/// UDP networking via ENet — reliable packet transport for multiplayer games.
+pub mod network;
 /// Composable per-frame screen-effect overlay: weather, ambient lighting, flash, shake, fade, fog.
 pub mod overlay;
 /// Emitter-based 2D particle effects.
 pub mod particle;
 /// Grid pathfinding: A★, HPA★, flow fields, and NavGrid unit-size navigation.
 pub mod pathfinding;
-/// DAG-based pipeline orchestrator for composing multi-step workflows.
-pub mod pipeline;
 /// Physics simulation with rigid bodies (rect and circle shapes), collision events, sensors, and layer filtering.
 pub mod physics;
+/// DAG-based pipeline orchestrator for composing multi-step workflows.
+pub mod pipeline;
 /// Post-processing effects data model: bloom, blur, color grading, screen-space shaders.
 pub mod postfx;
+/// Procedural world generation: cellular automata, Voronoi, flood fill, Poisson disk, periodic noise.
+pub mod procgen;
 // migration-state: pub mod province_map; — now library/province_map/init.lua
 // migration-state: pub mod quest; — now library/quest/init.lua
 /// Slot-based save/load system with collectors, schema versioning, and auto-save.

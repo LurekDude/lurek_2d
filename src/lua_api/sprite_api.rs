@@ -10,8 +10,8 @@ use std::rc::Rc;
 
 use mlua::prelude::*;
 
-use crate::graphics::animation::Animation;
-use crate::graphics::camera::Camera2D;
+use crate::animation::Animation;
+use crate::camera::Camera2D;
 use crate::graphics::column_batch::ColumnBatch;
 use crate::graphics::decal_surface::DecalSurface;
 use crate::graphics::data_graph_renderer::GraphRenderer;
@@ -22,9 +22,9 @@ use crate::graphics::polygon_map::PolygonMap;
 use crate::graphics::sprite_sheet::{DirectionLayout, SpriteSheet};
 use crate::graphics::texture_atlas::TextureAtlas;
 use crate::graphics::trail::Trail;
-use crate::graphics::viewport::{ScaleMode, Viewport};
-use crate::graphics::viewport_scale::ViewportScale;
-use crate::graphics::Color;
+use crate::camera::{ScaleMode, Viewport};
+use crate::camera::ViewportScale;
+use crate::math::Color;
 use crate::lua_api::lua_types::{add_type_methods, LunaType};
 use crate::math::Rect;
 

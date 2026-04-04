@@ -10,11 +10,12 @@ use luna2d::graphics::renderer::{
     TextureData,
 };
 use luna2d::graphics::sprite_batch::BatchEntry;
-use luna2d::graphics::Animation;
+use luna2d::animation::Animation;
 use luna2d::graphics::Font;
 use luna2d::graphics::NineSlice;
 use luna2d::graphics::SpriteBatch;
-use luna2d::graphics::{BlendMode, Color};
+use luna2d::graphics::BlendMode;
+use luna2d::math::Color;
 use luna2d::lua_api::{create_lua_vm, SharedState};
 use slotmap::{Key, SlotMap};
 

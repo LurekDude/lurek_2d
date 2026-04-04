@@ -2,11 +2,12 @@
 
 | Property | Value |
 |----------|-------|
-| **Tier** | Tier 1 — Basic Core |
+| **Tier** | Tier 1 — Core Engine Subsystems |
 | **Lua API** | `luna.graphics` |
 | **Source** | `src/graphics/` |
 | **Tests** | `tests/graphics_tests.rs` |
 | **Lua Tests** | `tests/lua/unit/test_graphics.lua` |
+| **Extracted modules** | `animation` → `src/animation/`, `camera` → `src/camera/`, `Color` → `src/math/color.rs` |
 
 ## Summary
 
@@ -73,7 +74,7 @@ GpuRenderer (wgpu rendering backend)
   │     └── Shapes ── CompoundShape command buffers (ShapeKey → CompoundShape)
   │     └── SpriteBatches ── instanced sprite rendering
   │
-  ├── Camera ── Camera2D with smooth follow, shake, dead zone
+  ├── Camera ── see `src/camera/` (extracted module)
   │
   └── Specialized renderers
         ├── GraphRenderer ── line/scatter/bar data charts
@@ -89,8 +90,8 @@ GpuRenderer (wgpu rendering backend)
 
 | File | Purpose |
 |------|---------|
-| `animation.rs` | Sprite animation system with named clips, speed control, and frame-level events |
-| `camera.rs` | Camera types for 2D viewport control |
+| `animation.rs` | **Extracted** — see `src/animation/AGENT.md` |
+| `camera.rs` | **Extracted** — see `src/camera/AGENT.md` |
 | `canvas.rs` | Off-screen render targets (canvases) for deferred compositing |
 | `column_batch.rs` | Wolfenstein-style raycasting column batch renderer |
 | `data_graph_renderer.rs` | Mathematical function graph and chart renderer |
@@ -109,31 +110,22 @@ GpuRenderer (wgpu rendering backend)
 | `sprite.rs` | Sprite implementation for the `graphics` subsystem |
 | `sprite_batch.rs` | Sprite batching for efficient rendering of many sprites sharing one texture |
 | `sprite_sheet.rs` | Grid-based sprite sheet with directional support and named groups |
-| `srgb.rs` | Srgb implementation for the `graphics` subsystem |
+| `srgb.rs` | **Extracted** — `Color` moved to `src/math/color.rs`; `srgb.rs` re-exports it for compatibility |
 | `texture.rs` | Texture implementation for the `graphics` subsystem |
 | `texture_atlas.rs` | CPU-side bin-packing texture atlas using a shelf algorithm |
 | `trail.rs` | Trail renderer for fading ribbon effects |
-| `viewport.rs` | Virtual resolution viewport with manual transform application |
-| `viewport_scale.rs` | Virtual resolution viewport with automatic scaling and transform stack... |
+| `viewport.rs` | **Extracted** — see `src/camera/AGENT.md` |
+| `viewport_scale.rs` | **Extracted** — see `src/camera/AGENT.md` |
 
 ## Submodules
 
 ### `graphics::animation`
 
-Sprite animation system with named clips, speed control, and frame-level events.
-
-- **`AnimationFrame`** (type): Backward-compatible alias for [`AnimFrame`].  Existing code that imports `AnimationFrame` from `crate::graphics` will...
-- **`AnimFrame`** (struct): A single animation frame with a source rectangle and optional duration.
-- **`AnimClip`** (struct): A named animation clip that references frames by index into the parent
-- **`AnimEvent`** (enum): Events emitted by [`Animation::update`].
-- **`Animation`** (struct): Sprite animation with named clips, speed control, and playback events.
+**Extracted** — see `src/animation/AGENT.md`. Types `Animation`, `AnimFrame`, `AnimClip`, `AnimEvent` now live in `crate::animation`; `graphics` re-exports them for backward compatibility.
 
 ### `graphics::camera`
 
-Camera types for 2D viewport control.
-
-- **`Camera`** (struct): Basic camera with position, zoom, and rotation.  Used by `SharedState` for the flat `luna.graphics.setCamera()` API.
-- **`Camera2D`** (struct): Full-featured 2D camera with smooth follow, dead zone, bounds clamping,
+**Extracted** — see `src/camera/AGENT.md`. Types `Camera`, `Camera2D`, `Viewport`, `ViewportScale`, `ScaleMode` now live in `crate::camera`; `graphics` re-exports them for backward compatibility.
 
 ### `graphics::canvas`
 
@@ -285,9 +277,7 @@ Grid-based sprite sheet with directional support and named groups.
 
 ### `graphics::srgb`
 
-Srgb implementation for the `graphics` subsystem.
-
-- **`Color`** (struct): RGBA color stored as `f32` components in the range `[0.0, 1.0]`.  Used everywhere the API accepts a color:...
+**Extracted** — `Color` now lives in `crate::math::color`. `srgb.rs` re-exports `Color` from `crate::math` for backward compatibility.
 
 ### `graphics::texture`
 
@@ -311,32 +301,15 @@ Trail renderer for fading ribbon effects.
 
 ### `graphics::viewport`
 
-Virtual resolution viewport with manual transform application.
-
-- **`ScaleMode`** (enum): Scale mode for virtual resolution mapping.
-- **`Viewport`** (struct): Virtual resolution with manual transform application.
+**Extracted** — see `src/camera/AGENT.md`.
 
 ### `graphics::viewport_scale`
 
-Virtual resolution viewport with automatic scaling and transform stack integration.
-
-- **`ViewportScale`** (struct): Virtual resolution with automatic graphics stack management.
+**Extracted** — see `src/camera/AGENT.md`.
 
 ## Key Types
 
 ### Structs
-
-#### `graphics::animation::AnimClip`
-
-A named animation clip that references frames by index into the parent
-
-#### `graphics::animation::AnimFrame`
-
-A single animation frame with a source rectangle and optional duration.
-
-#### `graphics::animation::Animation`
-
-Sprite animation with named clips, speed control, and playback events.
 
 #### `graphics::texture_atlas::AtlasRegion`
 
@@ -346,14 +319,6 @@ A named rectangular region packed into the atlas.
 
 A single sprite in a batch, describing position, region, and transform.
 
-#### `graphics::camera::Camera`
-
-Basic camera with position, zoom, and rotation.  Used by `SharedState` for the flat `luna.graphics.setCamera()` API.
-
-#### `graphics::camera::Camera2D`
-
-Full-featured 2D camera with smooth follow, dead zone, bounds clamping,
-
 #### `graphics::shape::CompoundShape`
 
 Accumulates `ShapeCommand` entries in local object space and replays them as a unified draw call via `DrawCommand::DrawShape` with a per-call affine transform.
@@ -361,10 +326,6 @@ Accumulates `ShapeCommand` entries in local object space and replays them as a u
 #### `graphics::canvas::Canvas`
 
 An off-screen render target with a fixed pixel resolution.
-
-#### `graphics::srgb::Color`
-
-RGBA color stored as `f32` components in the range `[0.0, 1.0]`.  Used everywhere the API accepts a color:...
 
 #### `graphics::column_batch::ColumnBatch`
 

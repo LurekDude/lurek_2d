@@ -1,4 +1,6 @@
-//! Sprite animation system with named clips, speed control, and frame-level events.
+//! Sprite animation system: named clips, frame pools, speed control, and frame-level events.
+//!
+//! This is a Tier 1 engine module. It imports only from `crate::math`.
 //!
 //! An [`Animation`] stores a pool of [`AnimFrame`] entries (each defining a source
 //! rectangle and optional per-frame duration) and any number of named [`AnimClip`]s

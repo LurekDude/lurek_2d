@@ -308,6 +308,16 @@ path = "tests/unit/timer_tests.rs"
 name = "window_tests"
 path = "tests/unit/window_tests.rs"
 
+[[test]]
+name = "animation_tests"
+path = "tests/unit/animation_tests.rs"
+harness = true
+
+[[test]]
+name = "camera_tests"
+path = "tests/unit/camera_tests.rs"
+harness = true
+
 # === Extension tests ===
 [[test]]
 name = "graphics_ext_tests"
