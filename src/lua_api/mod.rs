@@ -70,6 +70,8 @@ pub mod overlay_api;
 pub mod particle_api;
 /// Registers the `luna.pathfinding.*` grid-based pathfinding API.
 pub mod pathfinding_api;
+/// Registers the `luna.pipeline.*` DAG pipeline orchestrator API.
+pub mod pipeline_api;
 /// Registers the `luna.patterns.*` software design patterns API.
 pub mod patterns_api;
 /// Registers the `luna.physics.*` rigid-body simulation API.
@@ -94,25 +96,17 @@ pub mod thread_api;
 pub use crate::thread::channel as thread_channel;
 /// Re-export thread worker from src/thread.
 pub use crate::thread::worker as thread_worker;
-/// Registers the `luna.battle.*` turn-based battle API.
-pub mod battle_api;
-/// Registers the `luna.cardgame.*` card game backend API.
-pub mod cardgame_api;
-/// Registers the `luna.combat.*` combat system API.
-pub mod combat_api;
-/// Registers the `luna.crafting.*` crafting system API.
-pub mod crafting_api;
-/// Registers the `luna.economy.*` named resource economy API.
-pub mod economy_api;
+// battle_api removed — battle system is now library/battle/init.lua
+// cardgame_api removed — cardgame system is now library/cardgame/init.lua
+// combat_api removed — combat system is now library/combat/init.lua
+// crafting_api removed — crafting system is now library/crafting/init.lua
+// economy_api removed — economy system is now library/economy/init.lua
 // inventory_api removed — inventory system is now library/inventory/init.lua
-/// Item Api sub-module.
-// item_api removed – cardgame covers this domain
+// item_api removed – cardgame covers this domain (doc comment removed)
 /// UserData type utilities for Luna2D Lua objects.
 pub mod lua_types;
-/// Registers the `luna.quest.*` quest log and objective tracking API.
-pub mod quest_api;
-/// Registers the `luna.stats.*` character stats API.
-pub mod stats_api;
+// quest_api removed — quest system is now library/quest/init.lua
+// stats_api removed — stats system is now library/stats/init.lua
 /// Registers the `luna.tilemap.*` tile map, tileset, autotile, and procedural generation API.
 pub mod tilemap_api;
 /// Registers the `luna.timer.*` frame-timing API.
@@ -165,6 +159,7 @@ pub fn create_lua_vm(state: Rc<RefCell<SharedState>>) -> LuaResult<Lua> {
     tilemap_api::register(&lua, &luna)?;
     scene_api::register(&lua, &luna)?;
     pathfinding_api::register(&lua, &luna)?;
+    pipeline_api::register(&lua, &luna)?;
     patterns_api::register(&lua, &luna)?;
     minimap_api::register(&lua, &luna)?;
     // dialog_api moved to library/dialog/init.lua
@@ -173,14 +168,14 @@ pub fn create_lua_vm(state: Rc<RefCell<SharedState>>) -> LuaResult<Lua> {
     entity_api::register(&lua, &luna)?;
     modding_api::register(&lua, &luna, state.clone())?;
     savegame_api::register(&lua, &luna, state.clone())?;
-    cardgame_api::register(&lua, &luna)?;
-    battle_api::register(&lua, &luna, state.clone())?;
-    combat_api::register(&lua, &luna, state.clone())?;
-    economy_api::register(&lua, &luna)?;
-    stats_api::register(&lua, &luna)?;
+    // cardgame_api moved to library/cardgame/init.lua
+    // battle_api moved to library/battle/init.lua
+    // combat_api moved to library/combat/init.lua
+    // economy_api moved to library/economy/init.lua
+    // stats_api moved to library/stats/init.lua
     // inventory_api moved to library/inventory/init.lua
-    quest_api::register(&lua, &luna)?;
-    crafting_api::register(&lua, &luna)?;
+    // quest_api moved to library/quest/init.lua
+    // crafting_api moved to library/crafting/init.lua
 
     /// Luna on this Object.
     /// # Returns

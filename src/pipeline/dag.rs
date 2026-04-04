@@ -1,0 +1,313 @@
+//! DAG container for pipeline steps: topological sort, cycle detection, parallel grouping.
+//!
+//! Key types: `Pipeline`, `ErrorMode`. Primary functions: `add_step`, `validate`,
+//! `get_execution_order`, `get_parallel_groups`.
+//! Part of the `pipeline` Tier 2 subsystem.
+
+use std::collections::{HashMap, HashSet, VecDeque};
+
+use crate::pipeline::step::PipelineStep;
+
+/// Determines how the pipeline responds when a step fails.
+///
+/// # Variants
+/// - `Abort` — Abort variant.
+/// - `Continue` — Continue variant.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum ErrorMode {
+    /// Stop pipeline execution on the first failed step.
+    Abort,
+    /// Skip the failed step and continue executing the remaining steps.
+    Continue,
+}
+
+/// A directed acyclic graph (DAG) container that holds pipeline steps and their dependencies.
+///
+/// `Pipeline` owns the step definitions and provides validation and scheduling helpers.
+/// Runtime countdown state lives in `PipelineScheduler`.
+///
+/// # Fields
+/// - `name` — `String`.
+/// - `error_mode` — `ErrorMode`.
+pub struct Pipeline {
+    /// Human-readable name for this pipeline.
+    pub name: String,
+    steps: HashMap<String, PipelineStep>,
+    /// Global error handling mode applied when a step has no step-level `ErrorPolicy`.
+    pub error_mode: ErrorMode,
+}
+
+impl Pipeline {
+    /// Creates a new empty pipeline with the given name.
+    ///
+    /// # Parameters
+    /// - `name` — `impl Into<String>`.
+    ///
+    /// # Returns
+    /// `Pipeline`.
+    pub fn new(name: impl Into<String>) -> Self {
+        Self {
+            name: name.into(),
+            steps: HashMap::new(),
+            error_mode: ErrorMode::Abort,
+        }
+    }
+
+    /// Adds a step to the pipeline.
+    ///
+    /// Returns `Err` if a step with the same name already exists.
+    ///
+    /// # Parameters
+    /// - `step` — `PipelineStep`.
+    ///
+    /// # Returns
+    /// `Result<(), String>`.
+    pub fn add_step(&mut self, step: PipelineStep) -> Result<(), String> {
+        if self.steps.contains_key(&step.name) {
+            return Err(format!("step '{}' already exists in pipeline '{}'", step.name, self.name));
+        }
+        self.steps.insert(step.name.clone(), step);
+        Ok(())
+    }
+
+    /// Removes a step by name and strips any dependency references to it from other steps.
+    ///
+    /// Returns `true` if the step was found and removed, `false` if it did not exist.
+    ///
+    /// # Parameters
+    /// - `name` — `&str`.
+    ///
+    /// # Returns
+    /// `bool`.
+    pub fn remove_step(&mut self, name: &str) -> bool {
+        if self.steps.remove(name).is_none() {
+            return false;
+        }
+        for step in self.steps.values_mut() {
+            step.deps.retain(|d| d != name);
+        }
+        true
+    }
+
+    /// Returns a shared reference to the step with the given name, if it exists.
+    ///
+    /// # Parameters
+    /// - `name` — `&str`.
+    ///
+    /// # Returns
+    /// `Option<&PipelineStep>`.
+    pub fn get_step(&self, name: &str) -> Option<&PipelineStep> {
+        self.steps.get(name)
+    }
+
+    /// Returns a mutable reference to the step with the given name, if it exists.
+    ///
+    /// # Parameters
+    /// - `name` — `&str`.
+    ///
+    /// # Returns
+    /// `Option<&mut PipelineStep>`.
+    pub fn get_step_mut(&mut self, name: &str) -> Option<&mut PipelineStep> {
+        self.steps.get_mut(name)
+    }
+
+    /// Returns an iterator over all steps in unspecified order.
+    ///
+    /// # Returns
+    /// `impl Iterator<Item = &PipelineStep>`.
+    pub fn get_steps(&self) -> impl Iterator<Item = &PipelineStep> {
+        self.steps.values()
+    }
+
+    /// Returns the total number of steps in the pipeline.
+    ///
+    /// # Returns
+    /// `usize`.
+    pub fn get_step_count(&self) -> usize {
+        self.steps.len()
+    }
+
+    /// Removes all steps from the pipeline.
+    pub fn clear(&mut self) {
+        self.steps.clear();
+    }
+
+    /// Validates the pipeline and returns `(is_valid, list_of_error_messages)`.
+    ///
+    /// Checks performed:
+    /// - All dependency names exist as steps in this pipeline.
+    /// - No dependency cycles (Kahn's algorithm).
+    ///
+    /// # Returns
+    /// `(bool, Vec<String>)`.
+    pub fn validate(&self) -> (bool, Vec<String>) {
+        let mut errors: Vec<String> = Vec::new();
+
+        // Check all dep names exist
+        for step in self.steps.values() {
+            for dep in &step.deps {
+                if !self.steps.contains_key(dep.as_str()) {
+                    errors.push(format!(
+                        "step '{}' depends on '{}' which does not exist",
+                        step.name, dep
+                    ));
+                }
+            }
+        }
+
+        // Check for cycles
+        if errors.is_empty() {
+            if let Err(cycle_msg) = self.get_execution_order() {
+                errors.push(cycle_msg);
+            }
+        }
+
+        let is_valid = errors.is_empty();
+        (is_valid, errors)
+    }
+
+    /// Returns a topological ordering of step names using Kahn's algorithm.
+    ///
+    /// Returns `Err` if a cycle is detected, naming the steps involved where possible.
+    ///
+    /// # Returns
+    /// `Result<Vec<String>, String>`.
+    pub fn get_execution_order(&self) -> Result<Vec<String>, String> {
+        // Build in-degree map and adjacency list (dep → dependents)
+        let mut in_degree: HashMap<&str, usize> = HashMap::new();
+        let mut dependents: HashMap<&str, Vec<&str>> = HashMap::new();
+
+        for name in self.steps.keys() {
+            in_degree.entry(name.as_str()).or_insert(0);
+            dependents.entry(name.as_str()).or_default();
+        }
+
+        for step in self.steps.values() {
+            for dep in &step.deps {
+                // Only count valid deps (validate() separately catches unknown deps)
+                if self.steps.contains_key(dep.as_str()) {
+                    *in_degree.entry(step.name.as_str()).or_insert(0) += 1;
+                    dependents.entry(dep.as_str()).or_default().push(step.name.as_str());
+                }
+            }
+        }
+
+        let mut queue: VecDeque<&str> = in_degree
+            .iter()
+            .filter(|(_, &deg)| deg == 0)
+            .map(|(&name, _)| name)
+            .collect();
+
+        let mut order: Vec<String> = Vec::with_capacity(self.steps.len());
+
+        while let Some(current) = queue.pop_front() {
+            order.push(current.to_owned());
+            if let Some(deps_of) = dependents.get(current) {
+                for &dependent in deps_of {
+                    // SAFETY: `dependent` was seeded from `self.steps.keys()` above, so it
+                    // is always present in `in_degree`.
+                    let deg = in_degree
+                        .get_mut(dependent)
+                        .unwrap_or_else(|| unreachable!("dependent key missing from in_degree"));
+                    *deg -= 1;
+                    if *deg == 0 {
+                        queue.push_back(dependent);
+                    }
+                }
+            }
+        }
+
+        if order.len() < self.steps.len() {
+            // Collect names of steps still in a non-zero degree (they form the cycle)
+            let remaining: Vec<&str> = in_degree
+                .iter()
+                .filter(|(_, &deg)| deg > 0)
+                .map(|(&name, _)| name)
+                .collect();
+            return Err(format!("cycle detected involving: {}", remaining.join(", ")));
+        }
+
+        Ok(order)
+    }
+
+    /// Groups steps into parallel execution levels.
+    ///
+    /// All steps at level 0 (no dependencies) can run concurrently. Steps at
+    /// level N depend only on steps at levels 0..N-1 and can run concurrently
+    /// with each other.
+    ///
+    /// Returns `Err` if there is a dependency cycle.
+    ///
+    /// # Returns
+    /// `Result<Vec<Vec<String>>, String>`.
+    pub fn get_parallel_groups(&self) -> Result<Vec<Vec<String>>, String> {
+        // Compute level for each step: max(level of deps) + 1, 0 for no deps
+        let topo = self.get_execution_order()?;
+        let mut levels: HashMap<&str, usize> = HashMap::new();
+
+        for name in &topo {
+            // SAFETY: `name` comes from `topo`, which is built from `self.steps.keys()`.
+            let step = self
+                .steps
+                .get(name.as_str())
+                .unwrap_or_else(|| unreachable!("step name from topo order not found in steps"));
+            let level = step
+                .deps
+                .iter()
+                .filter(|dep| self.steps.contains_key(dep.as_str()))
+                .map(|dep| levels.get(dep.as_str()).copied().unwrap_or(0) + 1)
+                .max()
+                .unwrap_or(0);
+            levels.insert(name.as_str(), level);
+        }
+
+        let max_level = levels.values().copied().max().unwrap_or(0);
+        let mut groups: Vec<Vec<String>> = vec![Vec::new(); max_level + 1];
+
+        for (name, &level) in &levels {
+            groups[level].push((*name).to_owned());
+        }
+
+        // Keep each group's order stable (sort by topo position)
+        let topo_index: HashMap<&str, usize> = topo
+            .iter()
+            .enumerate()
+            .map(|(i, n)| (n.as_str(), i))
+            .collect();
+
+        for group in &mut groups {
+            group.sort_by_key(|n| topo_index.get(n.as_str()).copied().unwrap_or(0));
+        }
+
+        // Remove empty groups (can occur if levels are sparse — they won't be, but guard anyway)
+        groups.retain(|g| !g.is_empty());
+
+        Ok(groups)
+    }
+
+    /// Resets the runtime state of every step in the pipeline.
+    pub fn reset(&mut self) {
+        for step in self.steps.values_mut() {
+            step.reset();
+        }
+    }
+
+    // ---------------------------------------------------------------------------
+    // Internal helpers
+    // ---------------------------------------------------------------------------
+
+    /// Returns the set of step names that directly or transitively depend on `root`.
+    ///
+    /// Used internally; not exposed as `pub` since callers can reconstruct this
+    /// via `get_execution_order` if needed.
+    #[allow(dead_code)]
+    fn dependents_of(&self, root: &str) -> HashSet<String> {
+        let mut result = HashSet::new();
+        for step in self.steps.values() {
+            if step.deps.iter().any(|d| d == root) {
+                result.insert(step.name.clone());
+            }
+        }
+        result
+    }
+}

@@ -266,6 +266,10 @@ name = "physics_tests"
 path = "tests/unit/physics_tests.rs"
 
 [[test]]
+name = "pipeline_tests"
+path = "tests/unit/pipeline_tests.rs"
+
+[[test]]
 name = "postfx_tests"
 path = "tests/unit/postfx_tests.rs"
 

@@ -149,6 +149,11 @@ fn lua_test_graph() {
 }
 
 #[test]
+fn lua_test_pipeline() {
+    run_lua_test("unit/test_pipeline.lua");
+}
+
+#[test]
 fn lua_test_pathfinding() {
     run_lua_test("unit/test_pathfinding.lua");
 }

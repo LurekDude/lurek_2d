@@ -2,10 +2,14 @@
 
 | Property | Value |
 |----------|-------|
-| **Tier** | Design-stage / Stub |
-| **Lua API** | `None` |
+| **Tier** | Tier 2 — Reusable Engine Extension |
+| **Lua API** | `luna.pipeline.*` |
 | **Source** | `src/pipeline/` |
-| **Tests** | `tests/pipeline_tests.rs` |
+| **Lua bindings** | `src/lua_api/pipeline_api.rs` |
+| **Rust tests** | `tests/unit/pipeline_tests.rs` (18 tests) |
+| **Lua tests** | `tests/lua/unit/test_pipeline.lua` (54 tests) |
+| **Design doc** | `docs/API/pipeline-design.md` |
+| **Status** | Implemented — Full |
 
 ## Summary
 
