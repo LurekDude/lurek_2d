@@ -59,7 +59,7 @@
 //! | `luna.gui.wheelmoved(x,y)` | Forward mouse wheel |
 //! | `luna.gui.update(dt)` | Advance toast timers |
 //! | `luna.gui.getWidgetCount()` | Total widget count |
-//! | Widget methods | See per-type method tables in gui.md |
+//! | Widget methods | See per-type method tables in `src/gui/AGENT.md` |
 //!
 //! ## Implementation Pattern
 //!

@@ -2,10 +2,10 @@
 
 | Property | Value |
 |----------|-------|
-| **Tier** | Design-stage / Stub |
+| **Tier** | Tier 2 — Reusable Engine Extensions |
 | **Lua API** | `luna.gui` |
 | **Source** | `src/gui/` |
-| **Tests** | `tests/gui_tests.rs` |
+| **Tests** | `tests/unit/gui_tests.rs` |
 | **Lua Tests** | `tests/lua/unit/test_gui.lua` |
 
 ## Summary
@@ -15,11 +15,10 @@ boxes, and inventory screens. The widget tree is rooted at an invisible
 `Panel` returned by `getRoot()`; all concrete types share a `Widget` base
 with position, size, visibility, zIndex, anchor constraints, and flexbox
 layout properties. Built-in widget types cover the full UI spectrum: `Button`
-(click with onClickRef), `Label` (text with font/alignment), `Image`
-(texture and quad renderer), `TextInput` (editable single-line field),
-`CheckBox`, `Slider`, `ProgressBar` (value-bound controls),
-`ListBox`, `ComboBox` (1-based indexed selection), `ScrollContainer`
-(overflow scrolling), `NineSlice` and `NinePatch` (scalable border panels),
+(click with onClickRef), `Label` (text with font/alignment), `TextInput`
+(editable single-line field), `CheckBox`, `Slider`, `ProgressBar`
+(value-bound controls), `List`, `ComboBox` (1-based indexed selection),
+`ScrollPanel` (overflow scrolling), `NinePatch` (scalable border panels),
 and `Panel` (arbitrary child container). A theme system maps per-widget-type
 per-state style records — normal, hover, pressed, focused, disabled — to
 colours, fonts, and textures. Input events must be forwarded manually from
@@ -41,12 +40,11 @@ Widget tree (retained, lazy-rendered)
   ├── Concrete widget types
   │     ├── Button  { onClickRef }
   │     ├── Label   { text, font, align }
-  │     ├── Image   { texture, quad }
   │     ├── TextInput { value, placeholder, onChangeRef }
   │     ├── CheckBox / Slider / ProgressBar { value, onChangeRef }
-  │     ├── ListBox / ComboBox { items, selectedIndex (1-based), onSelectRef }
-  │     ├── ScrollContainer { content, scrollX, scrollY }
-  │     ├── NineSlice / NinePatch panel border rendering
+  │     ├── List / ComboBox { items, selectedIndex (1-based), onSelectRef }
+  │     ├── ScrollPanel { content, scrollX, scrollY }
+  │     ├── NinePatch panel border rendering
   │     └── Panel   (container) { children: Vec<Widget>, layout }
   │
   ├── Theme system
@@ -60,35 +58,26 @@ Widget tree (retained, lazy-rendered)
   └── update(dt) / draw()
 ```
 
+## Source Files
+
+| File | Purpose |
+|------|---------|
+| `widget.rs` | Widget base type: shared fields, anchor constraints, flexbox layout |
+| `controls.rs` | Input controls: Button, Label, TextInput, Checkbox, RadioButton, Slider, ScrollBar, ComboBox, List, TabBar, ProgressBar |
+| `containers.rs` | Container/layout types: Panel, GUIWindow, ScrollPanel, Layout, Spacer, Separator, NinePatch, SplitPanel, DockPanel, Accordion |
+| `extras.rs` | Extended widget types: TreeView, Toolbar, MenuBar, MenuItem, Dialog, StatusBar, TooltipPanel, ColorPicker, GUITable, ImageWidget, Toast |
+| `context.rs` | GuiContext: the widget pool (`Vec<WidgetKind>`), input dispatch, draw queue |
+| `theme.rs` | Theme and WidgetStyle: per-type per-state style records |
+| `mod.rs` | Module root: re-exports all public types |
+
 ## Lua API
 
-Exposed under `luna.gui.*` by `src/lua_api/gui_api/`.
+Exposed under `luna.gui.*` by `src/lua_api/gui_api.rs`.
 
-## gui — GUI Widget System
-
-> **Lua namespace:** `luna.gui`
-> **C++ module:** `src/modules/gui/`
-> **Purpose:** Immediate-mode-style retained GUI with a widget tree, flexbox layout, theming, focus navigation, toast notifications, and nine-patch rendering.
-
-## Reimplementation Notes
-
-- All widget types inherit from `Widget` (base class with shared method table)
-- Widget types are registered with **two** luaL_Reg arrays: `widgetFunctions` (base) + type-specific functions
-- The module maintains a root widget tree — `getRoot()` returns the invisible root Panel
-- Input must be forwarded manually via `mousepressed`, `mousereleased`, `mousemoved`, `keypressed`, `textinput`, `wheelmoved`
-- `update(dt)` and `draw()` must be called each frame for animation and rendering
-- Layout uses CSS Flexbox-inspired model: direction, wrap, align, justify, flexGrow, flexShrink
-- Anchor system supports constraint-based positioning: edges and center relative to parent
-- `NAN` is used for "not anchored" semantics on anchor edges
-- Theme styles are keyed by `(widgetType, stateName)` → `WidgetStyle`
-- All list/combo indices are **1-based** in Lua (binding adjusts to 0-based C++)
-- Lua callback refs stored in `LUA_REGISTRYINDEX` — `onClickRef`, `onChangeRef`, `onDrawRef`
-
-## Dependencies
-
-- `engine::Object` base (reference counted)
-- `engine::graphics` for draw calls (via `luna.graphics` Lua API in draw callbacks)
-- No external library dependencies
+All Lua indices are **1-based**. Bindings use `index.checked_sub(1)` to convert
+to 0-based Rust and `i + 1` when returning indices to Lua. Widget references
+are Lua tables with methods injected at construction time; they are not
+userdata values.
 
 ---
 
@@ -119,7 +108,7 @@ Exposed under `luna.gui.*` by `src/lua_api/gui_api/`.
 | `newTreeView` | — | `TreeView` | Create a collapsible tree widget |
 | `newToolbar` | `orientation?: string="horizontal"` | `Toolbar` | Create a toolbar container |
 | `newMenuBar` | — | `MenuBar` | Create a horizontal menu bar |
-| `newMenuItem` | `text: string` | `MenuItem` | Create a menu item (for menus and context menus) |
+| `newMenuItem` | `text: string` | `MenuItem` | Create a menu item |
 | `newDialog` | `title?: string=""` | `Dialog` | Create a modal dialog |
 | `newStatusBar` | — | `StatusBar` | Create a status bar |
 | `newSplitPanel` | `orientation?: string="horizontal"` | `SplitPanel` | Create a resizable split panel |
@@ -127,7 +116,7 @@ Exposed under `luna.gui.*` by `src/lua_api/gui_api/`.
 | `newAccordion` | — | `Accordion` | Create a collapsible section container |
 | `newTooltipPanel` | `text?: string=""` | `TooltipPanel` | Create a rich tooltip panel |
 | `newColorPicker` | — | `ColorPicker` | Create a color picker widget |
-| `newGUITable` | — | `GUITable` | Create a data table widget |
+| `newTable` | — | `GUITable` | Create a data table widget |
 | `newImageWidget` | `image?: Texture` | `ImageWidget` | Create an image display widget |
 | `setTheme` | `theme: Theme` | — | Set the active theme |
 | `getTheme` | — | `Theme \| nil` | Get the active theme |
@@ -154,16 +143,9 @@ Exposed under `luna.gui.*` by `src/lua_api/gui_api/`.
 
 All widget types inherit these methods.
 
-### Enums
+### WidgetState values
 
-**WidgetState:**
-| Value | String |
-|---|---|
-| `STATE_NORMAL` | `"normal"` |
-| `STATE_HOVERED` | `"hovered"` |
-| `STATE_PRESSED` | `"pressed"` |
-| `STATE_FOCUSED` | `"focused"` |
-| `STATE_DISABLED` | `"disabled"` |
+`"normal"` `"hovered"` `"pressed"` `"focused"` `"disabled"`
 
 ### Methods
 
@@ -448,22 +430,22 @@ Inherits all Widget methods plus (1-based indices):
 
 | Method | Parameters | Returns | Description |
 |---|---|---|---|
-| `addNode` | `text: string, parentIndex?: number` | `number` | Add a node. If parentIndex given, adds as child. Returns 1-based index |
-| `removeNode` | `index: number` | — | Remove node and its children (1-based) |
+| `addNode` | `text: string, parentIndex?: number` | `number` | Add a node; optional parent index. Returns 1-based index |
+| `removeNode` | `index: number` | `boolean` | Remove node and its children (1-based); returns true on success |
 | `clearNodes` | — | — | Remove all nodes |
 | `getNodeCount` | — | `number` | Total node count |
-| `getNodeText` | `index: number` | `string` | Get node text (1-based) |
-| `setNodeText` | `index: number, text: string` | — | Set node text (1-based) |
-| `setNodeIcon` | `index: number, icon: Texture \| nil` | — | Set node icon |
-| `expandNode` | `index: number` | — | Expand a node to show children |
-| `collapseNode` | `index: number` | — | Collapse a node to hide children |
-| `isNodeExpanded` | `index: number` | `boolean` | Check if node is expanded |
+| `getNodeText` | `index: number` | `string \| nil` | Get node text (1-based) |
+| `setNodeText` | `index: number, text: string` | `boolean` | Set node text (1-based); returns true on success |
+| `setNodeIcon` | `index: number, icon: string \| nil` | `boolean` | Set node icon path (1-based); returns true on success |
+| `expandNode` | `index: number` | `boolean` | Expand a node to show children; returns true on success |
+| `collapseNode` | `index: number` | `boolean` | Collapse a node; returns true on success |
+| `isNodeExpanded` | `index: number` | `boolean \| nil` | Get expanded state (1-based); nil if out of range |
 | `expandAll` | — | — | Expand all nodes |
 | `collapseAll` | — | — | Collapse all nodes |
-| `setSelectedNode` | `index: number` | — | Set selected node (1-based) |
-| `getSelectedNode` | — | `number` | Get selected node (1-based) |
-| `getChildNodes` | `index: number` | `{number,...}` | Get child node indices (1-based) |
-| `getParentNode` | `index: number` | `number \| nil` | Get parent node index (1-based, nil if root) |
+| `setSelectedNode` | `index: number` | `boolean` | Set selected node (1-based); returns true on success |
+| `getSelectedNode` | — | `number \| nil` | Get selected node index (1-based), or nil if none |
+| `getChildNodes` | `index: number` | `{number,...}` | Get child node indices as 1-based array |
+| `getParentNode` | `index: number` | `number \| nil` | Get parent index (1-based), or nil if root |
 | `getNodeDepth` | `index: number` | `number` | Get nesting depth (0 = root level) |
 
 ## Toolbar
@@ -472,13 +454,13 @@ Inherits all Widget methods plus:
 
 | Method | Parameters | Returns | Description |
 |---|---|---|---|
-| `addButton` | `id: string, icon?: Texture, tooltip?: string` | `Button` | Add a toolbar button |
+| `addButton` | `id: string, tooltip?: string` | `number` | Add toolbar button; returns 1-based index |
 | `addSeparator` | — | — | Add a visual separator |
 | `addSpacer` | `width?: number` | — | Add flexible space |
-| `getButton` | `id: string` | `Button \| nil` | Get button by id |
-| `setButtonEnabled` | `id: string, enabled: boolean` | — | Enable/disable a toolbar button |
-| `setButtonToggled` | `id: string, toggled: boolean` | — | Set toggle state (for toggle buttons) |
-| `isButtonToggled` | `id: string` | `boolean` | Check toggle state |
+| `getButton` | `id: string` | `table \| nil` | Get button info table `{id, tooltip, enabled, toggled}` by id |
+| `setButtonEnabled` | `id: string, enabled: boolean` | `boolean` | Enable/disable a button; returns true on success |
+| `setButtonToggled` | `id: string, toggled: boolean` | `boolean` | Set toggle state; returns true on success |
+| `isButtonToggled` | `id: string` | `boolean \| nil` | Get toggle state; nil if id not found |
 
 ## MenuBar
 
@@ -486,7 +468,7 @@ Inherits all Widget methods plus:
 
 | Method | Parameters | Returns | Description |
 |---|---|---|---|
-| `addMenu` | `label: string` | `MenuItem` | Add a top-level menu. Returns the root MenuItem for adding sub-items |
+| `addMenu` | `menu_idx: number` | — | Register a top-level MenuItem widget by its context index |
 | `getMenuCount` | — | `number` | Number of top-level menus |
 | `getMenu` | `index: number` | `MenuItem` | Get top-level menu (1-based) |
 | `closeAll` | — | — | Close all open menus |
@@ -501,7 +483,8 @@ Inherits all Widget methods plus:
 | `getText` | — | `string` | Get item text |
 | `setShortcut` | `shortcut: string` | — | Set display shortcut text (e.g. `"Ctrl+S"`) |
 | `getShortcut` | — | `string` | Get shortcut text |
-| `addItem` | `text: string` | `MenuItem` | Add a sub-item. Returns the sub-MenuItem |
+| `addSubItem` | `child_idx: number` | — | Register a child MenuItem by its context index |
+| `getSubItems` | — | `{number,...}` | Get child MenuItem context indices |
 | `addSeparator` | — | — | Add a separator line |
 | `getItemCount` | — | `number` | Number of sub-items |
 | `getItem` | `index: number` | `MenuItem` | Get sub-item (1-based) |
@@ -517,11 +500,11 @@ Inherits all Widget methods plus:
 |---|---|---|---|
 | `setTitle` | `title: string` | — | Set dialog title |
 | `getTitle` | — | `string` | Get dialog title |
-| `setModal` | `modal: boolean` | — | Set modal (blocks input to background, default true) |
+| `setModal` | `modal: boolean` | — | Set modal (blocks background input; default true) |
 | `isModal` | — | `boolean` | Check modal state |
-| `setContent` | `widget: Widget` | — | Set the content widget |
-| `getContent` | — | `Widget \| nil` | Get content widget |
-| `addButton` | `text: string, callback: function` | `Button` | Add a footer button (OK, Cancel, etc.) |
+| `setContent` | `content_idx: number \| nil` | — | Set content widget by context index (nil clears) |
+| `getContent` | — | `number \| nil` | Get content widget context index, or nil if none |
+| `addButton` | `text: string, callback?: function` | `number` | Add a footer button; returns footer button count |
 | `show` | — | — | Show the dialog |
 | `close` | — | — | Close the dialog |
 | `isOpen` | — | `boolean` | Check if dialog is displayed |
@@ -533,11 +516,12 @@ Inherits all Widget methods plus:
 
 | Method | Parameters | Returns | Description |
 |---|---|---|---|
-| `setSection` | `index: number, text: string, width?: number` | — | Set a section's text and optional fixed width (1-based) |
-| `getSection` | `index: number` | `string` | Get section text (1-based) |
-| `setSectionCount` | `count: number` | — | Set number of sections |
+| `addSection` | `text: string, width?: number` | — | Append a section with text and optional fixed width |
+| `setSectionText` | `index: number, text: string` | — | Set section text (1-based) |
+| `getSectionText` | `index: number` | `string \| nil` | Get section text (1-based); nil if out of range |
 | `getSectionCount` | — | `number` | Get number of sections |
-| `setSectionWidget` | `index: number, widget: Widget` | — | Set a custom widget in a section |
+| `setSectionCount` | `count: number` | — | Resize sections array (shrinks or grows) |
+| `setSectionWidget` | `index: number, widget: number` | — | Set a custom widget (by context index) in a section |
 
 ## SplitPanel
 
@@ -573,7 +557,7 @@ Inherits all Widget methods plus (1-based indices):
 
 | Method | Parameters | Returns | Description |
 |---|---|---|---|
-| `addSection` | `title: string, content: Widget` | `number` | Add a collapsible section. Returns section index (1-based) |
+| `addSection` | `title: string, content_idx?: number` | — | Add a collapsible section with optional content widget index |
 | `removeSection` | `index: number` | — | Remove section (1-based) |
 | `getSectionCount` | — | `number` | Number of sections |
 | `setSectionTitle` | `index: number, title: string` | — | Set section title (1-based) |
@@ -622,7 +606,7 @@ Inherits all Widget methods plus (1-based indices):
 | `getColumnCount` | — | `number` | Number of columns |
 | `setColumnHeader` | `index: number, header: string` | — | Set column header text (1-based) |
 | `setColumnWidth` | `index: number, width: number` | — | Set column width (1-based) |
-| `addRow` | `values: {string,...}` | `number` | Add a row. Returns row index (1-based) |
+| `addRow` | `values: {string,...}` | `number` | Add a row; returns row index (1-based) |
 | `removeRow` | `index: number` | — | Remove row (1-based) |
 | `clearRows` | — | — | Remove all rows |
 | `getRowCount` | — | `number` | Number of rows |
@@ -686,14 +670,14 @@ Does NOT inherit Widget. Standalone type.
 | `ComboBox` | `newComboBox` | ✅ | 8 methods |
 | `Dialog` | `newDialog` | ✅ | 11 methods |
 | `DockPanel` | `newDockPanel` | ✅ | 5 methods |
-| `GUITable` | `newGUITable` | ✅ | 16 methods |
+| `GUITable` | `newTable` | ✅ | 15 methods |
 | `GUIWindow` | `newWindow` | ✅ | 5 methods |
 | `ImageWidget` | `newImageWidget` | ✅ | 6 methods |
 | `Label` | `newLabel` | ✅ | `setText`, `getText` |
 | `Layout` | `newLayout` | ✅ | 10 methods |
 | `List` | `newList` | ✅ | 8 methods |
 | `MenuBar` | `newMenuBar` | ✅ | 4 methods |
-| `MenuItem` | `newMenuItem` | ✅ | 11 methods |
+| `MenuItem` | `newMenuItem` | ✅ | 12 methods |
 | `NinePatch` | `newNinePatch` | ✅ | 5 methods |
 | `Panel` | `newPanel` | ✅ | 3 methods |
 | `ProgressBar` | `newProgressBar` | ✅ | 4 methods |
@@ -704,7 +688,7 @@ Does NOT inherit Widget. Standalone type.
 | `Slider` | `newSlider` | ✅ | 4 methods |
 | `Spacer` | `newSpacer` | ✅ | (none) |
 | `SplitPanel` | `newSplitPanel` | ✅ | 9 methods |
-| `StatusBar` | `newStatusBar` | ✅ | 5 methods |
+| `StatusBar` | `newStatusBar` | ✅ | 6 methods |
 | `TabBar` | `newTabBar` | ✅ | 5 methods |
 | `TextInput` | `newTextInput` | ✅ | 7 methods |
 | `Toast` | `newToast` | ✅ | 6 methods |
@@ -715,63 +699,17 @@ Does NOT inherit Widget. Standalone type.
 
 ---
 
-## Extension Integration
+## Module Boundaries
 
-The **GUI Widget Editor** panel (`luna2d.editor.guiWidget`) provides a visual WYSIWYG layout editor for composing GUI screens.
+**vs luna.graphics** — Graphics provides immediate-mode draw primitives (images, rectangles, text). GUI is a retained-mode widget tree that internally calls Graphics for rendering. Never mix raw `luna.graphics.draw` inside a widget region.
 
-### Editor Features
+**vs luna.scene** — Scene manages screen transitions. GUI widgets live *inside* a scene; push a GUI-heavy scene for menus, overlay widgets on gameplay scenes.
 
-- Widget toolbox palette with drag-to-canvas placement
-- Widget types: Panel, Button, Label, TextInput, Checkbox, Slider, Image, ScrollPanel, ProgressBar, Dropdown, TabBar, Toast, NinePatch
-- Visual canvas with checkerboard background and grid snapping
-- Widget selection, resize handles, bring-to-front/send-to-back ordering
-- Duplicate and delete operations
-- Properties panel: position (x, y), size (width, height), widget-specific properties
-- Hierarchy list with depth indicators
-- Export to **Lua** and **TOML** formats
+**vs luna.inventory** — Inventory manages item *data* (stacks, containers, equipment). GUI renders the *view* (grid of InventorySlot widgets). Connect them by reading Inventory state in GUI callbacks.
 
-### Export Format (Lua)
+**vs luna.event** — Event delivers raw input (key presses, mouse clicks). GUI translates those into widget-level callbacks (`onClick`, `onFocus`, `onChange`). Widgets consume input events; raw handlers should not duplicate widget logic.
 
-```lua
--- Generated by Luna2D Extension GUI Widget Editor
-return {
-    { type = "Panel", x = 10, y = 10, width = 400, height = 300,
-      props = { background = { 0.15, 0.15, 0.2, 0.95 } } },
-    { type = "Label", x = 20, y = 20, width = 200, height = 24,
-      props = { text = "Settings", fontSize = 18 } },
-    { type = "Slider", x = 20, y = 60, width = 360, height = 20,
-      props = { min = 0, max = 100, value = 75, label = "Volume" } },
-    { type = "Button", x = 150, y = 260, width = 100, height = 32,
-      props = { text = "Apply", style = "primary" } },
-}
-```
-
-### Export Format (TOML)
-
-```toml
-[[widgets]]
-type = "Panel"
-x = 10
-y = 10
-width = 400
-height = 300
-
-[widgets.props]
-background = [0.15, 0.15, 0.2, 0.95]
-
-[[widgets]]
-type = "Label"
-x = 20
-y = 20
-width = 200
-height = 24
-
-[widgets.props]
-text = "Settings"
-fontSize = 18
-```
-
----
+**vs luna.dialog** — Dialog manages narrative text flow (typewriter, choices, branching). GUI provides the visual container (a Panel with Labels). Dialog feeds content; GUI renders it.
 
 ## Game Design Role
 
@@ -781,181 +719,3 @@ fontSize = 18
 - **Forms**: Text inputs, sliders, checkboxes for user settings or in-game editors.
 - **Focus navigation**: Keyboard / gamepad tab-order for accessibility.
 - **Notifications**: Toast messages that auto-dismiss after a timeout.
-
----
-
-## Module Boundaries
-
-**vs luna.graphics** — Graphics provides immediate-mode draw primitives (images, rectangles, text). GUI is a retained-mode widget tree that internally calls Graphics for rendering. Never mix raw `luna.graphics.draw` inside a widget's region.
-
-**vs luna.scene** — Scene manages screen transitions. GUI widgets live *inside* a scene; push a GUI-heavy scene for menus, overlay widgets on gameplay scenes.
-
-**vs luna.inventory** — Inventory manages item *data* (stacks, containers, equipment). GUI renders the *view* (grid of InventorySlot widgets). Connect them by reading Inventory state in GUI callbacks.
-
-**vs luna.doll** — Doll renders character visuals (layered sprites). GUI renders UI elements. A character preview panel would draw a Doll *inside* a Panel widget using a custom draw callback.
-
-**vs luna.event** — Event delivers raw SDL input (key presses, mouse clicks). GUI translates those into widget-level callbacks (`onClick`, `onFocus`, `onChange`). Widgets consume input events; raw handlers should not duplicate widget logic.
-
-**vs luna.dialog** — Dialog manages narrative text flow (typewriter, choices, branching). GUI provides the visual container (a Panel with Labels). Dialog feeds content; GUI renders it.
-
----
-
-## Edge Cases & Pitfalls
-
-- **Focus & keyboard navigation**: Widgets must call `setFocused(true)` to receive keyboard events. Tab order follows the order widgets were added to a container unless overridden with `setTabIndex()`.
-- **Layout cycle prevention**: Nesting a widget inside a Layout that is itself a child of a resizing parent can cause infinite recalculation. Break cycles by setting explicit `width`/`height` on at least one ancestor.
-- **Theme hot-reload**: Calling `setTheme()` at runtime re-applies styles, but inline property overrides (`widget:setStyle("key", val)`) take priority over theme values — they are not reset on theme change.
-- **ScrollPanel z-clipping**: Tooltip or popup widgets drawn inside a ScrollPanel are clipped to the panel's scissor rect. Attach floating widgets to the root container instead.
-- **Button callback timing**: `onClick` fires on mouse-button *up*, not *down*. Holding and dragging away from a button cancels the click — matching OS conventions.
-- **TextInput IME**: On East Asian systems, `TextInput` receives composed strings via `textinput` events. Do not filter intermediate IME characters; wait for the commit event.
-
-## Reimplementation Notes
-
-- All widget types inherit from `Widget` (base class with shared method table)
-- Widget types are registered with **two** luaL_Reg arrays: `widgetFunctions` (base) + type-specific functions
-- The module maintains a root widget tree — `getRoot()` returns the invisible root Panel
-- Input must be forwarded manually via `mousepressed`, `mousereleased`, `mousemoved`, `keypressed`, `textinput`, `wheelmoved`
-- `update(dt)` and `draw()` must be called each frame for animation and rendering
-- Layout uses CSS Flexbox-inspired model: direction, wrap, align, justify, flexGrow, flexShrink
-- Anchor system supports constraint-based positioning: edges and center relative to parent
-- `NAN` is used for "not anchored" semantics on anchor edges
-- Theme styles are keyed by `(widgetType, stateName)` → `WidgetStyle`
-- All list/combo indices are **1-based** in Lua (binding adjusts to 0-based C++)
-- Lua callback refs stored in `LUA_REGISTRYINDEX` — `onClickRef`, `onChangeRef`, `onDrawRef`
-
-## Dependencies
-
-- `engine::Object` base (reference counted)
-- `engine::graphics` for draw calls (via `luna.graphics` Lua API in draw callbacks)
-- No external library dependencies
-
----
-
-## Module Functions
-
-| Function | Parameters | Returns | Description |
-|---|---|---|---|
-| `newButton` | `text?: string=""` | `Button` | Create a button widget |
-| `newLabel` | `text?: string=""` | `Label` | Create a text label |
-| `newTextInput` | — | `TextInput` | Create a text input field |
-| `newCheckbox` | `text?: string=""` | `Checkbox` | Create a checkbox with label |
-| `newRadioButton` | `text?: string="", group?: string="default"` | `RadioButton` | Create grouped radio button |
-| `newSlider` | `min?: number=0, max?: number=100` | `Slider` | Create a value slider |
-| `newScrollBar` | `vertical?: boolean=true` | `ScrollBar` | Create a scroll bar |
-| `newComboBox` | — | `ComboBox` | Create a dropdown combo box |
-| `newPanel` | — | `Panel` | Create a container panel |
-| `newWindow` | `title?: string=""` | `GUIWindow` | Create a draggable/closeable window |
-| `newProgressBar` | `min?: number=0, max?: number=100` | `ProgressBar` | Create a progress bar |
-| `newList` | — | `List` | Create a selectable list |
-| `newTabBar` | — | `TabBar` | Create a tab bar |
-| `newLayout` | `direction?: string="vertical"` | `Layout` | Create a flexbox layout container |
-| `newTheme` | — | `Theme` | Create a theme instance |
-| `newSeparator` | `vertical?: boolean=false` | `Separator` | Create a visual separator line |
-| `newSpacer` | `width?: number=0, height?: number=0` | `Spacer` | Create an empty spacing widget |
-| `newNinePatch` | — | `NinePatch` | Create a 9-patch slice calculator |
-| `newScrollPanel` | — | `ScrollPanel` | Create a scrollable panel |
-| `newToast` | `message?: string="", duration?: number=3.0` | `Toast` | Create a toast notification |
-| `newTreeView` | — | `TreeView` | Create a collapsible tree widget |
-| `newToolbar` | `orientation?: string="horizontal"` | `Toolbar` | Create a toolbar container |
-| `newMenuBar` | — | `MenuBar` | Create a horizontal menu bar |
-| `newMenuItem` | `text: string` | `MenuItem` | Create a menu item (for menus and context menus) |
-| `newDialog` | `title?: string=""` | `Dialog` | Create a modal dialog |
-| `newStatusBar` | — | `StatusBar` | Create a status bar |
-| `newSplitPanel` | `orientation?: string="horizontal"` | `SplitPanel` | Create a resizable split panel |
-| `newDockPanel` | — | `DockPanel` | Create a dock-based layout container |
-| `newAccordion` | — | `Accordion` | Create a collapsible section container |
-| `newTooltipPanel` | `text?: string=""` | `TooltipPanel` | Create a rich tooltip panel |
-| `newColorPicker` | — | `ColorPicker` | Create a color picker widget |
-| `newGUITable` | — | `GUITable` | Create a data table widget |
-| `newImageWidget` | `image?: Texture` | `ImageWidget` | Create an image display widget |
-| `setTheme` | `theme: Theme` | — | Set the active theme |
-| `getTheme` | — | `Theme \| nil` | Get the active theme |
-| `getRoot` | — | `Widget` | Get the root panel of the widget tree |
-| `setFocus` | `widget: Widget \| nil` | — | Set keyboard focus (nil to clear) |
-| `getFocus` | — | `Widget \| nil` | Get the currently focused widget |
-| `focusNext` | — | — | Move focus to next widget in tab order |
-| `focusPrev` | — | — | Move focus to previous widget in tab order |
-| `clearFocus` | — | — | Remove keyboard focus from all widgets |
-| `addToast` | `toast: Toast` | — | Queue a toast for display |
-| `getToastCount` | — | `number` | Number of active toast notifications |
-| `mousepressed` | `x: number, y: number, button?: int=1` | `boolean` | Forward mouse press; returns true if consumed |
-| `mousereleased` | `x: number, y: number, button?: int=1` | `boolean` | Forward mouse release; returns true if consumed |
-| `mousemoved` | `x: number, y: number, dx?: number=0, dy?: number=0` | `boolean` | Forward mouse move; returns true if consumed |
-| `keypressed` | `key: string` | `boolean` | Forward key press; returns true if consumed |
-| `textinput` | `text: string` | `boolean` | Forward text input; returns true if consumed |
-| `wheelmoved` | `x: number, y: number` | `boolean` | Forward wheel move; returns true if consumed |
-| `update` | `dt: number` | — | Update all widgets (animations, toasts) |
-| `draw` | — | — | Draw the entire widget tree |
-
----
-
-## Widget (base type)
-
-All widget types inherit these methods.
-
-### Enums
-
-**WidgetState:**
-| Value | String |
-|---|---|
-| `STATE_NORMAL` | `"normal"` |
-| `STATE_HOVERED` | `"hovered"` |
-| `STATE_PRESSED` | `"pressed"` |
-| `STATE_FOCUSED` | `"focused"` |
-| `STATE_DISABLED` | `"disabled"` |
-
-### Methods
-
-| Method | Parameters | Returns | Description |
-|---|---|---|---|
-| `setPosition` | `x: number, y: number` | — | Set position relative to parent |
-| `getPosition` | — | `x: number, y: number` | Get position relative to parent |
-| `setSize` | `w: number, h: number` | — | Set width and height |
-| `getSize` | — | `w: number, h: number` | Get width and height |
-| `setVisible` | `visible: boolean` | — | Show/hide widget |
-| `isVisible` | — | `boolean` | Check visibility |
-| `setEnabled` | `enabled: boolean` | — | Enable/disable input |
-| `isEnabled` | — | `boolean` | Check if enabled |
-| `setId` | `id: string` | — | Set identifier for `findById` |
-| `getId` | — | `string` | Get identifier |
-| `setTooltip` | `text: string` | — | Set tooltip text |
-| `getTooltip` | — | `string` | Get tooltip text |
-| `addChild` | `child: Widget` | — | Add a child to this widget |
-| `removeChild` | `child: Widget` | — | Remove a child widget |
-| `getChildCount` | — | `number` | Number of children |
-| `findById` | `id: string` | `Widget \| nil` | Recursive search by ID |
-| `containsPoint` | `x: number, y: number` | `boolean` | Hit test |
-| `setPadding` | `top: number, right?: number, bottom?: number, left?: number` | — | Set inner padding (CSS shorthand) |
-| `getPadding` | — | `top, right, bottom, left` | Get padding (4 values) |
-| `getState` | — | `string` | Current state name |
-| `setOnClick` | `callback: function` | — | Set click handler |
-| `setOnChange` | `callback: function` | — | Set change handler |
-| `setOnDraw` | `callback: function` | — | Set custom draw handler |
-| `setMargin` | `top: number, right?: number, bottom?: number, left?: number` | — | Set outer margin (CSS shorthand) |
-| `getMargin` | — | `top, right, bottom, left` | Get margin (4 values) |
-| `setZOrder` | `z: number` | — | Set draw layer (higher = on top) |
-| `getZOrder` | — | `number` | Get draw layer |
-| `setMinSize` | `w: number, h: number` | — | Set minimum size constraints |
-| `getMinSize` | — | `w: number, h: number` | Get minimum size constraints |
-| `setMaxSize` | `w: number, h: number` | — | Set maximum size constraints |
-| `getMaxSize` | — | `w: number, h: number` | Get maximum size constraints |
-| `setAnchor` | `left: number\|nil, top: number\|nil, right: number\|nil, bottom: number\|nil` | — | Set constraint edges (nil = unanchored) |
-| `setAnchorCenter` | `cx: number\|nil, cy: number\|nil` | — | Set center anchor (nil = unanchored) |
-| `clearAnchor` | — | — | Remove all anchor constraints |
-| `setFlexGrow` | `grow: number` | — | Set flex grow factor |
-| `getFlexGrow` | — | `number` | Get flex grow factor |
-| `setFlexShrink` | `shrink: number` | — | Set flex shrink factor |
-| `getFlexShrink` | — | `number` | Get flex shrink factor |
-
----
-
-## Enums
-
-**WidgetState:**
-| Value | String |
-|---|---|
-| `STATE_NORMAL` | `"normal"` |
-| `STATE_HOVERED` | `"hovered"` |
-| `STATE_PRESSED` | `"pressed"` |
-| `STATE_FOCUSED` | `"focused"` |
-| `STATE_DISABLED` | `"disabled"` |
