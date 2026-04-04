@@ -61,7 +61,7 @@
 | `newAccordion` | — | `Accordion` | Create a collapsible section container |
 | `newTooltipPanel` | `text?: string=""` | `TooltipPanel` | Create a rich tooltip panel |
 | `newColorPicker` | — | `ColorPicker` | Create a color picker widget |
-| `newGUITable` | — | `GUITable` | Create a data table widget |
+| `newTable` | — | `GUITable` | Create a data table widget |
 | `newImageWidget` | `image?: Texture` | `ImageWidget` | Create an image display widget |
 | `setTheme` | `theme: Theme` | — | Set the active theme |
 | `getTheme` | — | `Theme \| nil` | Get the active theme |
@@ -383,19 +383,19 @@ Inherits all Widget methods plus (1-based indices):
 | Method | Parameters | Returns | Description |
 |---|---|---|---|
 | `addNode` | `text: string, parentIndex?: number` | `number` | Add a node. If parentIndex given, adds as child. Returns 1-based index |
-| `removeNode` | `index: number` | — | Remove node and its children (1-based) |
+| `removeNode` | `index: number` | `boolean` | Remove node and its children (1-based). Returns false if index invalid |
 | `clearNodes` | — | — | Remove all nodes |
 | `getNodeCount` | — | `number` | Total node count |
-| `getNodeText` | `index: number` | `string` | Get node text (1-based) |
-| `setNodeText` | `index: number, text: string` | — | Set node text (1-based) |
-| `setNodeIcon` | `index: number, icon: Texture \| nil` | — | Set node icon |
-| `expandNode` | `index: number` | — | Expand a node to show children |
-| `collapseNode` | `index: number` | — | Collapse a node to hide children |
-| `isNodeExpanded` | `index: number` | `boolean` | Check if node is expanded |
+| `getNodeText` | `index: number` | `string \| nil` | Get node text (1-based) |
+| `setNodeText` | `index: number, text: string` | `boolean` | Set node text (1-based). Returns false if index invalid |
+| `setNodeIcon` | `index: number, icon: string` | `boolean` | Set node icon path. Returns false if index invalid |
+| `expandNode` | `index: number` | `boolean` | Expand a node. Returns false if index invalid |
+| `collapseNode` | `index: number` | `boolean` | Collapse a node. Returns false if index invalid |
+| `isNodeExpanded` | `index: number` | `boolean \| nil` | Check if node is expanded. Returns nil if index invalid |
 | `expandAll` | — | — | Expand all nodes |
 | `collapseAll` | — | — | Collapse all nodes |
-| `setSelectedNode` | `index: number` | — | Set selected node (1-based) |
-| `getSelectedNode` | — | `number` | Get selected node (1-based) |
+| `setSelectedNode` | `index: number` | `boolean` | Set selected node (1-based). Returns false if index invalid |
+| `getSelectedNode` | — | `number \| nil` | Get selected node (1-based), or nil if none |
 | `getChildNodes` | `index: number` | `{number,...}` | Get child node indices (1-based) |
 | `getParentNode` | `index: number` | `number \| nil` | Get parent node index (1-based, nil if root) |
 | `getNodeDepth` | `index: number` | `number` | Get nesting depth (0 = root level) |
@@ -406,13 +406,13 @@ Inherits all Widget methods plus:
 
 | Method | Parameters | Returns | Description |
 |---|---|---|---|
-| `addButton` | `id: string, icon?: Texture, tooltip?: string` | `Button` | Add a toolbar button |
+| `addButton` | `id: string, tooltip?: string` | `number` | Add a toolbar button. Returns 1-based index (idempotent — returns existing index if id already added) |
 | `addSeparator` | — | — | Add a visual separator |
 | `addSpacer` | `width?: number` | — | Add flexible space |
-| `getButton` | `id: string` | `Button \| nil` | Get button by id |
-| `setButtonEnabled` | `id: string, enabled: boolean` | — | Enable/disable a toolbar button |
-| `setButtonToggled` | `id: string, toggled: boolean` | — | Set toggle state (for toggle buttons) |
-| `isButtonToggled` | `id: string` | `boolean` | Check toggle state |
+| `getButton` | `id: string` | `table \| nil` | Get button by id. Returns `{id, tooltip, enabled, toggled}` table, or nil if not found |
+| `setButtonEnabled` | `id: string, enabled: boolean` | `boolean` | Enable/disable a toolbar button. Returns false if id not found |
+| `setButtonToggled` | `id: string, toggled: boolean` | `boolean` | Set toggle state. Returns false if id not found |
+| `isButtonToggled` | `id: string` | `boolean \| nil` | Check toggle state. Returns nil if id not found |
 
 ## MenuBar
 
@@ -420,7 +420,7 @@ Inherits all Widget methods plus:
 
 | Method | Parameters | Returns | Description |
 |---|---|---|---|
-| `addMenu` | `label: string` | `MenuItem` | Add a top-level menu. Returns the root MenuItem for adding sub-items |
+| `addMenu` | `menu_idx: number` | — | Add a top-level menu by widget index (`_idx` of a `MenuItem`) |
 | `getMenuCount` | — | `number` | Number of top-level menus |
 | `getMenu` | `index: number` | `MenuItem` | Get top-level menu (1-based) |
 | `closeAll` | — | — | Close all open menus |
@@ -435,7 +435,7 @@ Inherits all Widget methods plus:
 | `getText` | — | `string` | Get item text |
 | `setShortcut` | `shortcut: string` | — | Set display shortcut text (e.g. `"Ctrl+S"`) |
 | `getShortcut` | — | `string` | Get shortcut text |
-| `addItem` | `text: string` | `MenuItem` | Add a sub-item. Returns the sub-MenuItem |
+| `addSubItem` | `child_idx: number` | — | Add a sub-item by widget index (`_idx` of a `MenuItem`) |
 | `addSeparator` | — | — | Add a separator line |
 | `getItemCount` | — | `number` | Number of sub-items |
 | `getItem` | `index: number` | `MenuItem` | Get sub-item (1-based) |
@@ -453,9 +453,9 @@ Inherits all Widget methods plus:
 | `getTitle` | — | `string` | Get dialog title |
 | `setModal` | `modal: boolean` | — | Set modal (blocks input to background, default true) |
 | `isModal` | — | `boolean` | Check modal state |
-| `setContent` | `widget: Widget` | — | Set the content widget |
-| `getContent` | — | `Widget \| nil` | Get content widget |
-| `addButton` | `text: string, callback: function` | `Button` | Add a footer button (OK, Cancel, etc.) |
+| `setContent` | `content_idx: number \| nil` | — | Set the content widget by `_idx`. Pass `nil` to clear |
+| `getContent` | — | `number \| nil` | Get content widget `_idx`, or nil if not set |
+| `addButton` | `text: string, callback?: function` | `number` | Add a footer button (OK, Cancel, etc.). Returns total button count |
 | `show` | — | — | Show the dialog |
 | `close` | — | — | Close the dialog |
 | `isOpen` | — | `boolean` | Check if dialog is displayed |
@@ -467,11 +467,12 @@ Inherits all Widget methods plus:
 
 | Method | Parameters | Returns | Description |
 |---|---|---|---|
-| `setSection` | `index: number, text: string, width?: number` | — | Set a section's text and optional fixed width (1-based) |
-| `getSection` | `index: number` | `string` | Get section text (1-based) |
-| `setSectionCount` | `count: number` | — | Set number of sections |
+| `addSection` | `text: string, width?: number` | — | Append a section with optional fixed width |
+| `setSectionText` | `index: number, text: string` | — | Set section text (1-based) |
+| `getSectionText` | `index: number` | `string` | Get section text (1-based) |
 | `getSectionCount` | — | `number` | Get number of sections |
-| `setSectionWidget` | `index: number, widget: Widget` | — | Set a custom widget in a section |
+| `setSectionCount` | `count: number` | — | Resize sections array up or down |
+| `setSectionWidget` | `index: number, widget_idx: number` | — | Set a custom widget `_idx` in a section (stub) |
 
 ## SplitPanel
 
@@ -620,7 +621,7 @@ Does NOT inherit Widget. Standalone type.
 | `ComboBox` | `newComboBox` | ✅ | 8 methods |
 | `Dialog` | `newDialog` | ✅ | 11 methods |
 | `DockPanel` | `newDockPanel` | ✅ | 5 methods |
-| `GUITable` | `newGUITable` | ✅ | 16 methods |
+| `GUITable` | `newTable` | ✅ | 16 methods |
 | `GUIWindow` | `newWindow` | ✅ | 5 methods |
 | `ImageWidget` | `newImageWidget` | ✅ | 6 methods |
 | `Label` | `newLabel` | ✅ | `setText`, `getText` |

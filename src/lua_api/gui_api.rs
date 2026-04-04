@@ -2009,6 +2009,223 @@ fn add_tree_view_methods(
             })?,
         )?;
     }
+    {
+        let c = ctx.clone();
+        t.set(
+            "removeNode",
+            lua.create_function(move |_, index: usize| {
+                let mut g = c.borrow_mut();
+                if let Some(WidgetKind::TreeView(tv)) = g.widgets.get_mut(idx) {
+                    Ok(index.checked_sub(1).is_some_and(|i| tv.remove_node(i)))
+                } else {
+                    Ok(false)
+                }
+            })?,
+        )?;
+    }
+    {
+        let c = ctx.clone();
+        t.set(
+            "clearNodes",
+            lua.create_function(move |_, ()| {
+                let mut g = c.borrow_mut();
+                if let Some(WidgetKind::TreeView(tv)) = g.widgets.get_mut(idx) {
+                    tv.clear_nodes();
+                }
+                Ok(())
+            })?,
+        )?;
+    }
+    {
+        let c = ctx.clone();
+        t.set(
+            "getNodeText",
+            lua.create_function(move |_, index: usize| {
+                let g = c.borrow();
+                if let Some(WidgetKind::TreeView(tv)) = g.widgets.get(idx) {
+                    Ok(index.checked_sub(1)
+                        .and_then(|i| tv.get_node_text(i))
+                        .map(str::to_string))
+                } else {
+                    Ok(None)
+                }
+            })?,
+        )?;
+    }
+    {
+        let c = ctx.clone();
+        t.set(
+            "setNodeText",
+            lua.create_function(move |_, (index, text): (usize, String)| {
+                let mut g = c.borrow_mut();
+                if let Some(WidgetKind::TreeView(tv)) = g.widgets.get_mut(idx) {
+                    Ok(index.checked_sub(1).is_some_and(|i| tv.set_node_text(i, text)))
+                } else {
+                    Ok(false)
+                }
+            })?,
+        )?;
+    }
+    {
+        let c = ctx.clone();
+        t.set(
+            "setNodeIcon",
+            lua.create_function(move |_, (index, icon): (usize, String)| {
+                let mut g = c.borrow_mut();
+                if let Some(WidgetKind::TreeView(tv)) = g.widgets.get_mut(idx) {
+                    Ok(index.checked_sub(1).is_some_and(|i| tv.set_node_icon(i, icon)))
+                } else {
+                    Ok(false)
+                }
+            })?,
+        )?;
+    }
+    {
+        let c = ctx.clone();
+        t.set(
+            "expandNode",
+            lua.create_function(move |_, index: usize| {
+                let mut g = c.borrow_mut();
+                if let Some(WidgetKind::TreeView(tv)) = g.widgets.get_mut(idx) {
+                    Ok(index.checked_sub(1).is_some_and(|i| tv.expand_node(i)))
+                } else {
+                    Ok(false)
+                }
+            })?,
+        )?;
+    }
+    {
+        let c = ctx.clone();
+        t.set(
+            "collapseNode",
+            lua.create_function(move |_, index: usize| {
+                let mut g = c.borrow_mut();
+                if let Some(WidgetKind::TreeView(tv)) = g.widgets.get_mut(idx) {
+                    Ok(index.checked_sub(1).is_some_and(|i| tv.collapse_node(i)))
+                } else {
+                    Ok(false)
+                }
+            })?,
+        )?;
+    }
+    {
+        let c = ctx.clone();
+        t.set(
+            "isNodeExpanded",
+            lua.create_function(move |_, index: usize| {
+                let g = c.borrow();
+                if let Some(WidgetKind::TreeView(tv)) = g.widgets.get(idx) {
+                    Ok(index.checked_sub(1).and_then(|i| tv.is_node_expanded(i)))
+                } else {
+                    Ok(None)
+                }
+            })?,
+        )?;
+    }
+    {
+        let c = ctx.clone();
+        t.set(
+            "expandAll",
+            lua.create_function(move |_, ()| {
+                let mut g = c.borrow_mut();
+                if let Some(WidgetKind::TreeView(tv)) = g.widgets.get_mut(idx) {
+                    tv.expand_all();
+                }
+                Ok(())
+            })?,
+        )?;
+    }
+    {
+        let c = ctx.clone();
+        t.set(
+            "collapseAll",
+            lua.create_function(move |_, ()| {
+                let mut g = c.borrow_mut();
+                if let Some(WidgetKind::TreeView(tv)) = g.widgets.get_mut(idx) {
+                    tv.collapse_all();
+                }
+                Ok(())
+            })?,
+        )?;
+    }
+    {
+        let c = ctx.clone();
+        t.set(
+            "setSelectedNode",
+            lua.create_function(move |_, index: usize| {
+                let mut g = c.borrow_mut();
+                if let Some(WidgetKind::TreeView(tv)) = g.widgets.get_mut(idx) {
+                    Ok(index.checked_sub(1).is_some_and(|i| tv.set_selected_node(i)))
+                } else {
+                    Ok(false)
+                }
+            })?,
+        )?;
+    }
+    {
+        let c = ctx.clone();
+        t.set(
+            "getSelectedNode",
+            lua.create_function(move |_, ()| {
+                let g = c.borrow();
+                if let Some(WidgetKind::TreeView(tv)) = g.widgets.get(idx) {
+                    Ok(tv.get_selected_node().map(|i| i + 1))
+                } else {
+                    Ok(None)
+                }
+            })?,
+        )?;
+    }
+    {
+        let c = ctx.clone();
+        t.set(
+            "getChildNodes",
+            lua.create_function(move |_, index: usize| {
+                let g = c.borrow();
+                if let Some(WidgetKind::TreeView(tv)) = g.widgets.get(idx) {
+                    Ok(index
+                        .checked_sub(1)
+                        .and_then(|i| tv.get_child_nodes(i))
+                        .map(|v| v.iter().map(|&c| c + 1).collect::<Vec<_>>())
+                        .unwrap_or_default())
+                } else {
+                    Ok(Vec::new())
+                }
+            })?,
+        )?;
+    }
+    {
+        let c = ctx.clone();
+        t.set(
+            "getParentNode",
+            lua.create_function(move |_, index: usize| {
+                let g = c.borrow();
+                if let Some(WidgetKind::TreeView(tv)) = g.widgets.get(idx) {
+                    Ok(index
+                        .checked_sub(1)
+                        .and_then(|i| tv.get_parent_node(i))
+                        .flatten()
+                        .map(|p| p + 1))
+                } else {
+                    Ok(None)
+                }
+            })?,
+        )?;
+    }
+    {
+        let c = ctx.clone();
+        t.set(
+            "getNodeDepth",
+            lua.create_function(move |_, index: usize| {
+                let g = c.borrow();
+                if let Some(WidgetKind::TreeView(tv)) = g.widgets.get(idx) {
+                    Ok(index.checked_sub(1).and_then(|i| tv.get_node_depth(i)))
+                } else {
+                    Ok(None)
+                }
+            })?,
+        )?;
+    }
     Ok(())
 }
 
@@ -2675,6 +2892,93 @@ fn add_toolbar_methods(
             })?,
         )?;
     }
+    {
+        let c = ctx.clone();
+        t.set(
+            "addButton",
+            lua.create_function(
+                move |_, (id, tooltip): (String, Option<String>)| {
+                    let mut g = c.borrow_mut();
+                    if let Some(WidgetKind::Toolbar(tb)) = g.widgets.get_mut(idx) {
+                        let btn_idx = tb.add_button(id, tooltip.unwrap_or_default());
+                        Ok(btn_idx + 1)
+                    } else {
+                        Ok(0)
+                    }
+                },
+            )?,
+        )?;
+    }
+    t.set(
+        "addSeparator",
+        lua.create_function(|_, ()| Ok(()))?,
+    )?;
+    t.set(
+        "addSpacer",
+        lua.create_function(|_, _width: Option<f32>| Ok(()))?,
+    )?;
+    {
+        let c = ctx.clone();
+        t.set(
+            "getButton",
+            lua.create_function(move |lua, id: String| {
+                let g = c.borrow();
+                if let Some(WidgetKind::Toolbar(tb)) = g.widgets.get(idx) {
+                    if let Some(btn) = tb.buttons.iter().find(|b| b.id == id) {
+                        let tbl = lua.create_table()?;
+                        tbl.set("id", btn.id.clone())?;
+                        tbl.set("tooltip", btn.tooltip.clone())?;
+                        tbl.set("enabled", btn.enabled)?;
+                        tbl.set("toggled", btn.toggled)?;
+                        return Ok(Some(tbl));
+                    }
+                }
+                Ok(None)
+            })?,
+        )?;
+    }
+    {
+        let c = ctx.clone();
+        t.set(
+            "setButtonEnabled",
+            lua.create_function(move |_, (id, enabled): (String, bool)| {
+                let mut g = c.borrow_mut();
+                if let Some(WidgetKind::Toolbar(tb)) = g.widgets.get_mut(idx) {
+                    Ok(tb.set_button_enabled(&id, enabled))
+                } else {
+                    Ok(false)
+                }
+            })?,
+        )?;
+    }
+    {
+        let c = ctx.clone();
+        t.set(
+            "setButtonToggled",
+            lua.create_function(move |_, (id, toggled): (String, bool)| {
+                let mut g = c.borrow_mut();
+                if let Some(WidgetKind::Toolbar(tb)) = g.widgets.get_mut(idx) {
+                    Ok(tb.set_button_toggled(&id, toggled))
+                } else {
+                    Ok(false)
+                }
+            })?,
+        )?;
+    }
+    {
+        let c = ctx.clone();
+        t.set(
+            "isButtonToggled",
+            lua.create_function(move |_, id: String| {
+                let g = c.borrow();
+                if let Some(WidgetKind::Toolbar(tb)) = g.widgets.get(idx) {
+                    Ok(tb.is_button_toggled(&id))
+                } else {
+                    Ok(None)
+                }
+            })?,
+        )?;
+    }
     Ok(())
 }
 
@@ -2975,6 +3279,48 @@ fn add_dialog_methods(
         "setOnClose",
         lua.create_function(|_, _f: LuaFunction| Ok(()))?,
     )?;
+    {
+        let c = ctx.clone();
+        t.set(
+            "setContent",
+            lua.create_function(move |_, content_idx: Option<usize>| {
+                let mut g = c.borrow_mut();
+                if let Some(WidgetKind::Dialog(d)) = g.widgets.get_mut(idx) {
+                    d.content_idx = content_idx;
+                }
+                Ok(())
+            })?,
+        )?;
+    }
+    {
+        let c = ctx.clone();
+        t.set(
+            "getContent",
+            lua.create_function(move |_, ()| {
+                let g = c.borrow();
+                if let Some(WidgetKind::Dialog(d)) = g.widgets.get(idx) {
+                    Ok(d.content_idx)
+                } else {
+                    Ok(None)
+                }
+            })?,
+        )?;
+    }
+    {
+        let c = ctx.clone();
+        t.set(
+            "addButton",
+            lua.create_function(move |_, (text, _cb): (String, Option<LuaFunction>)| {
+                let mut g = c.borrow_mut();
+                if let Some(WidgetKind::Dialog(d)) = g.widgets.get_mut(idx) {
+                    d.footer_buttons.push(text);
+                    Ok(d.footer_buttons.len())
+                } else {
+                    Ok(0)
+                }
+            })?,
+        )?;
+    }
     Ok(())
 }
 
@@ -3045,6 +3391,23 @@ fn add_status_bar_methods(
             })?,
         )?;
     }
+    {
+        let c = ctx.clone();
+        t.set(
+            "setSectionCount",
+            lua.create_function(move |_, n: usize| {
+                let mut g = c.borrow_mut();
+                if let Some(WidgetKind::StatusBar(sb)) = g.widgets.get_mut(idx) {
+                    sb.sections.resize(n, (String::new(), 100.0));
+                }
+                Ok(())
+            })?,
+        )?;
+    }
+    t.set(
+        "setSectionWidget",
+        lua.create_function(|_, (_sidx, _widx): (usize, usize)| Ok(()))?,
+    )?;
     Ok(())
 }
 

@@ -173,6 +173,8 @@ impl Default for Spacer {
 pub struct TreeNode {
     /// Display label.
     pub text: String,
+    /// Optional icon name placeholder.
+    pub icon: Option<String>,
     /// Indices of child nodes in the tree's flat pool.
     pub children: Vec<usize>,
     /// Whether child nodes are visible.
@@ -193,6 +195,7 @@ impl TreeNode {
     pub fn new(text: impl Into<String>, parent: Option<usize>) -> Self {
         Self {
             text: text.into(),
+            icon: None,
             children: Vec::new(),
             expanded: false,
             parent,
@@ -211,6 +214,7 @@ impl TreeNode {
 /// - `base` — `WidgetBase`. Shared widget properties.
 /// - `nodes` — `Vec<TreeNode>`. Flat pool of all tree nodes.
 /// - `root_nodes` — `Vec<usize>`. Indices of root-level nodes.
+/// - `selected_node` — `Option<usize>`. Index of the currently selected node.
 #[derive(Debug, Clone)]
 pub struct TreeView {
     /// Shared widget properties.
@@ -219,6 +223,8 @@ pub struct TreeView {
     pub nodes: Vec<TreeNode>,
     /// Indices of root-level nodes.
     pub root_nodes: Vec<usize>,
+    /// Index of the currently selected node.
+    pub selected_node: Option<usize>,
 }
 
 impl TreeView {
@@ -231,6 +237,7 @@ impl TreeView {
             base: WidgetBase::new(WidgetType::TreeView),
             nodes: Vec::new(),
             root_nodes: Vec::new(),
+            selected_node: None,
         }
     }
 
@@ -285,6 +292,232 @@ impl TreeView {
     pub fn node_count(&self) -> usize {
         self.nodes.len()
     }
+
+    /// Remove the node at `index`, detaching it from its parent and remapping
+    /// all stored indices that follow.  Children of the removed node are
+    /// orphaned (their `parent` becomes `None`).
+    ///
+    /// # Parameters
+    /// - `index` — `usize`. 0-based node index.
+    ///
+    /// # Returns
+    /// `bool` — `true` if the node existed and was removed.
+    pub fn remove_node(&mut self, index: usize) -> bool {
+        if index >= self.nodes.len() {
+            return false;
+        }
+        let parent = self.nodes[index].parent;
+        if let Some(pi) = parent {
+            if pi < self.nodes.len() {
+                self.nodes[pi].children.retain(|&c| c != index);
+            }
+        } else {
+            self.root_nodes.retain(|&r| r != index);
+        }
+        self.nodes.remove(index);
+        let remap = |i: usize| -> usize { if i > index { i - 1 } else { i } };
+        for node in &mut self.nodes {
+            node.children.retain(|&c| c != index);
+            node.children.iter_mut().for_each(|c| *c = remap(*c));
+            node.parent = node.parent.and_then(|p| {
+                if p == index { None } else { Some(remap(p)) }
+            });
+        }
+        self.root_nodes.retain(|&r| r != index);
+        self.root_nodes.iter_mut().for_each(|r| *r = remap(*r));
+        self.selected_node = self.selected_node.and_then(|s| {
+            if s == index { None } else { Some(remap(s)) }
+        });
+        true
+    }
+
+    /// Remove all nodes and reset the tree.
+    pub fn clear_nodes(&mut self) {
+        self.nodes.clear();
+        self.root_nodes.clear();
+        self.selected_node = None;
+    }
+
+    /// Return the display text of the node at `index`, or `None` if out of range.
+    ///
+    /// # Parameters
+    /// - `index` — `usize`. 0-based node index.
+    ///
+    /// # Returns
+    /// `Option<&str>`.
+    pub fn get_node_text(&self, index: usize) -> Option<&str> {
+        self.nodes.get(index).map(|n| n.text.as_str())
+    }
+
+    /// Set the display text of the node at `index`.
+    ///
+    /// # Parameters
+    /// - `index` — `usize`. 0-based node index.
+    /// - `text` — `impl Into<String>`. New label.
+    ///
+    /// # Returns
+    /// `bool` — `true` if the node existed and was updated.
+    pub fn set_node_text(&mut self, index: usize, text: impl Into<String>) -> bool {
+        if let Some(node) = self.nodes.get_mut(index) {
+            node.text = text.into();
+            true
+        } else {
+            false
+        }
+    }
+
+    /// Set the icon name placeholder for the node at `index`.
+    ///
+    /// Passing an empty string clears the icon.
+    ///
+    /// # Parameters
+    /// - `index` — `usize`. 0-based node index.
+    /// - `icon` — `impl Into<String>`. Icon name, or empty string to clear.
+    ///
+    /// # Returns
+    /// `bool` — `true` if the node existed and was updated.
+    pub fn set_node_icon(&mut self, index: usize, icon: impl Into<String>) -> bool {
+        if let Some(node) = self.nodes.get_mut(index) {
+            let s = icon.into();
+            node.icon = if s.is_empty() { None } else { Some(s) };
+            true
+        } else {
+            false
+        }
+    }
+
+    /// Expand the node at `index` (make its children visible).
+    ///
+    /// # Parameters
+    /// - `index` — `usize`. 0-based node index.
+    ///
+    /// # Returns
+    /// `bool` — `true` if the node existed.
+    pub fn expand_node(&mut self, index: usize) -> bool {
+        if let Some(node) = self.nodes.get_mut(index) {
+            node.expanded = true;
+            true
+        } else {
+            false
+        }
+    }
+
+    /// Collapse the node at `index` (hide its children).
+    ///
+    /// # Parameters
+    /// - `index` — `usize`. 0-based node index.
+    ///
+    /// # Returns
+    /// `bool` — `true` if the node existed.
+    pub fn collapse_node(&mut self, index: usize) -> bool {
+        if let Some(node) = self.nodes.get_mut(index) {
+            node.expanded = false;
+            true
+        } else {
+            false
+        }
+    }
+
+    /// Return whether the node at `index` is expanded.
+    ///
+    /// # Parameters
+    /// - `index` — `usize`. 0-based node index.
+    ///
+    /// # Returns
+    /// `Option<bool>` — `None` if out of range.
+    pub fn is_node_expanded(&self, index: usize) -> Option<bool> {
+        self.nodes.get(index).map(|n| n.expanded)
+    }
+
+    /// Expand all nodes in the tree at once.
+    pub fn expand_all(&mut self) {
+        for node in &mut self.nodes {
+            node.expanded = true;
+        }
+    }
+
+    /// Collapse all nodes in the tree at once.
+    pub fn collapse_all(&mut self) {
+        for node in &mut self.nodes {
+            node.expanded = false;
+        }
+    }
+
+    /// Set the selected node.
+    ///
+    /// Passing an out-of-range index clears the selection and returns `false`.
+    ///
+    /// # Parameters
+    /// - `index` — `usize`. 0-based node index.
+    ///
+    /// # Returns
+    /// `bool` — `true` if the index is in range.
+    pub fn set_selected_node(&mut self, index: usize) -> bool {
+        if index < self.nodes.len() {
+            self.selected_node = Some(index);
+            true
+        } else {
+            self.selected_node = None;
+            false
+        }
+    }
+
+    /// Return the selected node index, or `None` if nothing is selected.
+    ///
+    /// # Returns
+    /// `Option<usize>` — 0-based index.
+    pub fn get_selected_node(&self) -> Option<usize> {
+        self.selected_node
+    }
+
+    /// Return a slice of child indices for the node at `index`.
+    ///
+    /// # Parameters
+    /// - `index` — `usize`. 0-based node index.
+    ///
+    /// # Returns
+    /// `Option<&[usize]>` — `None` if out of range.
+    pub fn get_child_nodes(&self, index: usize) -> Option<&[usize]> {
+        self.nodes.get(index).map(|n| n.children.as_slice())
+    }
+
+    /// Return the parent index of the node at `index`.
+    ///
+    /// Returns `Some(None)` for root-level nodes and `None` if the index is
+    /// out of range.
+    ///
+    /// # Parameters
+    /// - `index` — `usize`. 0-based node index.
+    ///
+    /// # Returns
+    /// `Option<Option<usize>>`.
+    pub fn get_parent_node(&self, index: usize) -> Option<Option<usize>> {
+        self.nodes.get(index).map(|n| n.parent)
+    }
+
+    /// Return the depth of the node at `index` (0 for root-level nodes).
+    ///
+    /// Traverses the parent chain; returns `None` if the index is out of range.
+    ///
+    /// # Parameters
+    /// - `index` — `usize`. 0-based node index.
+    ///
+    /// # Returns
+    /// `Option<usize>`.
+    pub fn get_node_depth(&self, index: usize) -> Option<usize> {
+        let mut depth = 0usize;
+        let mut current = index;
+        loop {
+            let node = self.nodes.get(current)?;
+            match node.parent {
+                None => return Some(depth),
+                Some(p) => {
+                    depth += 1;
+                    current = p;
+                }
+            }
+        }
+    }
 }
 
 impl Default for TreeView {
@@ -296,20 +529,67 @@ impl Default for TreeView {
 
 // ── Toolbar ───────────────────────────────────────────────────────────
 
+/// A named action button entry in a [`Toolbar`].
+///
+/// Toolbar buttons are identified by a string `id`, allowing scripts to
+/// reference them by name after creation.
+///
+/// # Fields
+/// - `id` — `String`. Unique identifier within the toolbar.
+/// - `tooltip` — `String`. Tooltip text shown on hover.
+/// - `enabled` — `bool`. Whether the button can be interacted with.
+/// - `toggled` — `bool`. Latched pressed/toggled state.
+#[derive(Debug, Clone)]
+pub struct ToolbarButton {
+    /// Unique identifier within the toolbar.
+    pub id: String,
+    /// Tooltip text shown on hover.
+    pub tooltip: String,
+    /// Whether the button can be interacted with.
+    pub enabled: bool,
+    /// Latched pressed/toggled state.
+    pub toggled: bool,
+}
+
+impl ToolbarButton {
+    /// Create a new toolbar button.
+    ///
+    /// # Parameters
+    /// - `id` — `impl Into<String>`. Button identifier.
+    /// - `tooltip` — `impl Into<String>`. Tooltip text.
+    ///
+    /// # Returns
+    /// `ToolbarButton`.
+    pub fn new(id: impl Into<String>, tooltip: impl Into<String>) -> Self {
+        Self {
+            id: id.into(),
+            tooltip: tooltip.into(),
+            enabled: true,
+            toggled: false,
+        }
+    }
+}
+
 /// A toolbar container for buttons and separators.
+///
+/// Named [`ToolbarButton`] entries are tracked in `buttons`; generic child
+/// widgets created through [`GuiContext`] APIs are tracked in `children`.
 ///
 /// # Fields
 /// - `base` — `WidgetBase`. Shared widget properties.
 /// - `orientation` — `String`. `"horizontal"` or `"vertical"`.
-/// - `children` — `Vec<usize>`. Child widget indices.
+/// - `children` — `Vec<usize>`. Generic child widget indices.
+/// - `buttons` — `Vec<ToolbarButton>`. Named toolbar button entries.
 #[derive(Debug, Clone)]
 pub struct Toolbar {
     /// Shared widget properties.
     pub base: WidgetBase,
     /// `"horizontal"` or `"vertical"`.
     pub orientation: String,
-    /// Child widget indices.
+    /// Generic child widget indices.
     pub children: Vec<usize>,
+    /// Named toolbar button entries.
+    pub buttons: Vec<ToolbarButton>,
 }
 
 impl Toolbar {
@@ -325,7 +605,97 @@ impl Toolbar {
             base: WidgetBase::new(WidgetType::Toolbar),
             orientation: orientation.into(),
             children: Vec::new(),
+            buttons: Vec::new(),
         }
+    }
+
+    /// Add a named button to the toolbar.
+    ///
+    /// If a button with the same `id` already exists, its existing index is
+    /// returned without creating a duplicate.
+    ///
+    /// # Parameters
+    /// - `id` — `impl Into<String>`. Button identifier.
+    /// - `tooltip` — `impl Into<String>`. Tooltip text.
+    ///
+    /// # Returns
+    /// `usize` — 0-based index of the button in `buttons`.
+    pub fn add_button(&mut self, id: impl Into<String>, tooltip: impl Into<String>) -> usize {
+        let id = id.into();
+        if let Some(pos) = self.buttons.iter().position(|b| b.id == id) {
+            return pos;
+        }
+        self.buttons.push(ToolbarButton::new(id, tooltip));
+        self.buttons.len() - 1
+    }
+
+    /// Add a visual separator to the toolbar.
+    ///
+    /// This is a placeholder; layout and rendering are handled externally.
+    pub fn add_separator(&mut self) {}
+
+    /// Add a flexible spacer to the toolbar.
+    ///
+    /// This is a placeholder; layout and rendering are handled externally.
+    ///
+    /// # Parameters
+    /// - `_width` — `f32`. Desired spacer width hint for the renderer.
+    pub fn add_spacer(&mut self, _width: f32) {}
+
+    /// Return the 0-based index of the button with the given `id`, or `None`.
+    ///
+    /// # Parameters
+    /// - `id` — `&str`. Button identifier.
+    ///
+    /// # Returns
+    /// `Option<usize>`.
+    pub fn get_button_index(&self, id: &str) -> Option<usize> {
+        self.buttons.iter().position(|b| b.id == id)
+    }
+
+    /// Enable or disable the button identified by `id`.
+    ///
+    /// # Parameters
+    /// - `id` — `&str`. Button identifier.
+    /// - `enabled` — `bool`. New enabled state.
+    ///
+    /// # Returns
+    /// `bool` — `true` if the button was found.
+    pub fn set_button_enabled(&mut self, id: &str, enabled: bool) -> bool {
+        if let Some(b) = self.buttons.iter_mut().find(|b| b.id == id) {
+            b.enabled = enabled;
+            true
+        } else {
+            false
+        }
+    }
+
+    /// Set the toggled (latched pressed) state of the button identified by `id`.
+    ///
+    /// # Parameters
+    /// - `id` — `&str`. Button identifier.
+    /// - `toggled` — `bool`. New toggled state.
+    ///
+    /// # Returns
+    /// `bool` — `true` if the button was found.
+    pub fn set_button_toggled(&mut self, id: &str, toggled: bool) -> bool {
+        if let Some(b) = self.buttons.iter_mut().find(|b| b.id == id) {
+            b.toggled = toggled;
+            true
+        } else {
+            false
+        }
+    }
+
+    /// Return whether the button identified by `id` is in the toggled state.
+    ///
+    /// # Parameters
+    /// - `id` — `&str`. Button identifier.
+    ///
+    /// # Returns
+    /// `Option<bool>` — `None` if the button does not exist.
+    pub fn is_button_toggled(&self, id: &str) -> Option<bool> {
+        self.buttons.iter().find(|b| b.id == id).map(|b| b.toggled)
     }
 }
 
@@ -410,11 +780,17 @@ impl MenuItem {
 
 /// A modal dialog window.
 ///
+/// Dialogs display a title bar, an optional content widget, and a row of
+/// footer buttons.  The `open` flag drives visibility; Lua scripts toggle it
+/// via the `open()` and `close()` methods.
+///
 /// # Fields
 /// - `base` — `WidgetBase`. Shared widget properties.
 /// - `title` — `String`. Dialog title.
 /// - `modal` — `bool`. Whether the dialog blocks background input.
 /// - `open` — `bool`. Whether the dialog is currently displayed.
+/// - `content_idx` — `Option<usize>`. Index of the body content widget, if any.
+/// - `footer_buttons` — `Vec<String>`. Labels for footer action buttons.
 #[derive(Debug, Clone)]
 pub struct Dialog {
     /// Shared widget properties.
@@ -425,6 +801,10 @@ pub struct Dialog {
     pub modal: bool,
     /// Whether the dialog is currently displayed.
     pub open: bool,
+    /// Index of the body content widget, if any.
+    pub content_idx: Option<usize>,
+    /// Labels for footer action buttons.
+    pub footer_buttons: Vec<String>,
 }
 
 impl Dialog {
@@ -441,6 +821,8 @@ impl Dialog {
             title: title.into(),
             modal: true,
             open: false,
+            content_idx: None,
+            footer_buttons: Vec::new(),
         }
     }
 }

@@ -6,7 +6,8 @@ use luna2d::gui::{
     GUITable, GUIWindow, GuiContext, ImageWidget, Label, Layout, LayoutDirection, ListBox,
     MenuBar, MenuItem, NinePatch, Panel, ProgressBar, RadioButton, ScrollBar, ScrollPanel,
     Separator, Slider, Spacer, SplitPanel, StatusBar, TabBar, TableColumn, TextInput, Theme,
-    Toast, Toolbar, TooltipPanel, TreeView, WidgetBase, WidgetState, WidgetStyle, WidgetType,
+    Toast, Toolbar, ToolbarButton, TooltipPanel, TreeView, WidgetBase, WidgetState,
+    WidgetStyle, WidgetType,
 };
 
 // ============================================================
@@ -493,6 +494,141 @@ fn tree_view_add_and_toggle() {
     assert!(!tv.nodes[root].expanded);
 }
 
+#[test]
+fn tree_view_clear_nodes() {
+    let mut tv = TreeView::new();
+    tv.add_node("A", None);
+    tv.add_node("B", None);
+    tv.clear_nodes();
+    assert_eq!(tv.node_count(), 0);
+    assert!(tv.root_nodes.is_empty());
+    assert!(tv.selected_node.is_none());
+}
+
+#[test]
+fn tree_view_node_text_ops() {
+    let mut tv = TreeView::new();
+    let i = tv.add_node("Hello", None);
+    assert_eq!(tv.get_node_text(i), Some("Hello"));
+    assert!(tv.set_node_text(i, "World"));
+    assert_eq!(tv.get_node_text(i), Some("World"));
+    assert!(!tv.set_node_text(99, "Nope"));
+    assert!(tv.get_node_text(99).is_none());
+}
+
+#[test]
+fn tree_view_node_icon() {
+    let mut tv = TreeView::new();
+    let i = tv.add_node("File", None);
+    assert!(tv.nodes[i].icon.is_none());
+    assert!(tv.set_node_icon(i, "file-icon"));
+    assert_eq!(tv.nodes[i].icon.as_deref(), Some("file-icon"));
+    // Empty string clears the icon
+    tv.set_node_icon(i, "");
+    assert!(tv.nodes[i].icon.is_none());
+}
+
+#[test]
+fn tree_view_expand_collapse_node() {
+    let mut tv = TreeView::new();
+    let i = tv.add_node("X", None);
+    assert!(!tv.nodes[i].expanded);
+    assert!(tv.expand_node(i));
+    assert!(tv.nodes[i].expanded);
+    assert_eq!(tv.is_node_expanded(i), Some(true));
+    assert!(tv.collapse_node(i));
+    assert_eq!(tv.is_node_expanded(i), Some(false));
+    assert!(!tv.expand_node(999));
+    assert!(tv.is_node_expanded(999).is_none());
+}
+
+#[test]
+fn tree_view_expand_collapse_all() {
+    let mut tv = TreeView::new();
+    tv.add_node("A", None);
+    tv.add_node("B", None);
+    tv.expand_all();
+    assert!(tv.nodes.iter().all(|n| n.expanded));
+    tv.collapse_all();
+    assert!(tv.nodes.iter().all(|n| !n.expanded));
+}
+
+#[test]
+fn tree_view_selected_node() {
+    let mut tv = TreeView::new();
+    let a = tv.add_node("A", None);
+    let b = tv.add_node("B", None);
+    assert!(tv.get_selected_node().is_none());
+    assert!(tv.set_selected_node(a));
+    assert_eq!(tv.get_selected_node(), Some(a));
+    assert!(tv.set_selected_node(b));
+    assert_eq!(tv.get_selected_node(), Some(b));
+    // Out of range clears selection
+    assert!(!tv.set_selected_node(999));
+    assert!(tv.get_selected_node().is_none());
+}
+
+#[test]
+fn tree_view_remove_node_basic() {
+    let mut tv = TreeView::new();
+    let root = tv.add_node("Root", None);
+    let child = tv.add_node("Child", Some(root));
+    assert_eq!(tv.node_count(), 2);
+    // Remove child
+    assert!(tv.remove_node(child));
+    assert_eq!(tv.node_count(), 1);
+    assert!(tv.nodes[root].children.is_empty());
+    // Index out of range returns false
+    assert!(!tv.remove_node(99));
+}
+
+#[test]
+fn tree_view_remove_root_node() {
+    let mut tv = TreeView::new();
+    tv.add_node("A", None);
+    tv.add_node("B", None);
+    assert_eq!(tv.root_nodes.len(), 2);
+    tv.remove_node(0);
+    assert_eq!(tv.node_count(), 1);
+    // B was re-indexed to 0
+    assert_eq!(tv.root_nodes, vec![0]);
+}
+
+#[test]
+fn tree_view_remove_remaps_selection() {
+    let mut tv = TreeView::new();
+    tv.add_node("A", None);
+    let b = tv.add_node("B", None);
+    tv.set_selected_node(b);
+    // Remove A (index 0); B becomes index 0
+    tv.remove_node(0);
+    assert_eq!(tv.get_selected_node(), Some(0));
+}
+
+#[test]
+fn tree_view_child_and_parent_nodes() {
+    let mut tv = TreeView::new();
+    let root = tv.add_node("Root", None);
+    let child = tv.add_node("Child", Some(root));
+    assert_eq!(tv.get_child_nodes(root), Some([child].as_slice()));
+    assert_eq!(tv.get_parent_node(child), Some(Some(root)));
+    assert_eq!(tv.get_parent_node(root), Some(None));
+    assert!(tv.get_child_nodes(99).is_none());
+    assert!(tv.get_parent_node(99).is_none());
+}
+
+#[test]
+fn tree_view_node_depth() {
+    let mut tv = TreeView::new();
+    let root = tv.add_node("Root", None);
+    let lvl1 = tv.add_node("Level1", Some(root));
+    let lvl2 = tv.add_node("Level2", Some(lvl1));
+    assert_eq!(tv.get_node_depth(root), Some(0));
+    assert_eq!(tv.get_node_depth(lvl1), Some(1));
+    assert_eq!(tv.get_node_depth(lvl2), Some(2));
+    assert!(tv.get_node_depth(99).is_none());
+}
+
 // ============================================================
 // Theme + WidgetStyle
 // ============================================================
@@ -758,6 +894,63 @@ fn toolbar_new_defaults() {
     let tb = Toolbar::new("horizontal");
     assert_eq!(tb.orientation, "horizontal");
     assert!(tb.children.is_empty());
+    assert!(tb.buttons.is_empty());
+}
+
+#[test]
+fn toolbar_button_struct() {
+    let btn = ToolbarButton::new("open", "Open file");
+    assert_eq!(btn.id, "open");
+    assert_eq!(btn.tooltip, "Open file");
+    assert!(btn.enabled);
+    assert!(!btn.toggled);
+}
+
+#[test]
+fn toolbar_add_button() {
+    let mut tb = Toolbar::new("horizontal");
+    let idx = tb.add_button("save", "Save");
+    assert_eq!(idx, 0);
+    assert_eq!(tb.buttons.len(), 1);
+    assert_eq!(tb.buttons[0].id, "save");
+}
+
+#[test]
+fn toolbar_add_button_no_duplicate() {
+    let mut tb = Toolbar::new("horizontal");
+    tb.add_button("cut", "Cut");
+    let idx2 = tb.add_button("cut", "Cut again");
+    // Same id returns existing index, no duplicate
+    assert_eq!(idx2, 0);
+    assert_eq!(tb.buttons.len(), 1);
+}
+
+#[test]
+fn toolbar_get_button_index() {
+    let mut tb = Toolbar::new("horizontal");
+    tb.add_button("copy", "Copy");
+    assert_eq!(tb.get_button_index("copy"), Some(0));
+    assert!(tb.get_button_index("missing").is_none());
+}
+
+#[test]
+fn toolbar_set_button_enabled() {
+    let mut tb = Toolbar::new("horizontal");
+    tb.add_button("paste", "Paste");
+    assert!(tb.buttons[0].enabled);
+    assert!(tb.set_button_enabled("paste", false));
+    assert!(!tb.buttons[0].enabled);
+    assert!(!tb.set_button_enabled("missing", false));
+}
+
+#[test]
+fn toolbar_button_toggled() {
+    let mut tb = Toolbar::new("horizontal");
+    tb.add_button("bold", "Bold");
+    assert_eq!(tb.is_button_toggled("bold"), Some(false));
+    assert!(tb.set_button_toggled("bold", true));
+    assert_eq!(tb.is_button_toggled("bold"), Some(true));
+    assert!(tb.is_button_toggled("missing").is_none());
 }
 
 #[test]
@@ -826,6 +1019,19 @@ fn dialog_new_defaults() {
     assert_eq!(d.title, "Confirm");
     assert!(d.modal);
     assert!(!d.open);
+    assert!(d.content_idx.is_none());
+    assert!(d.footer_buttons.is_empty());
+}
+
+#[test]
+fn dialog_content_and_footer() {
+    let mut d = Dialog::new("Save");
+    d.content_idx = Some(3);
+    d.footer_buttons.push("OK".to_string());
+    d.footer_buttons.push("Cancel".to_string());
+    assert_eq!(d.content_idx, Some(3));
+    assert_eq!(d.footer_buttons.len(), 2);
+    assert_eq!(d.footer_buttons[0], "OK");
 }
 
 #[test]

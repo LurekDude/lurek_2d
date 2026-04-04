@@ -53,7 +53,8 @@ pub use controls::{
 };
 pub use extras::{
     Accordion, AccordionSection, ColorPicker, Dialog, GUITable, ImageWidget, MenuBar, MenuItem,
-    Separator, Spacer, StatusBar, TableColumn, Toast, Toolbar, TooltipPanel, TreeNode, TreeView,
+    Separator, Spacer, StatusBar, TableColumn, Toast, Toolbar, ToolbarButton, TooltipPanel,
+    TreeNode, TreeView,
 };
 pub use theme::{Theme, WidgetStyle};
 pub use widget::{WidgetBase, WidgetState, WidgetType};
