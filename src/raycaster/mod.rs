@@ -26,8 +26,11 @@ pub mod segment;
 pub mod sprite_projection;
 /// Visibility polygon via endpoint raycasting.
 pub mod visibility;
+/// Wolfenstein-style raycasting column batch renderer.
+pub mod column_batch;
 
 // Re-exports
+pub use column_batch::{ColumnBatch, ColumnData};
 pub use dda::Raycaster2D;
 pub use depth_buffer::DepthBuffer;
 pub use doors::{Door, DoorDirection, DoorManager, DoorState};

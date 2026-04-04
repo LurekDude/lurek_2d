@@ -12,7 +12,7 @@ use mlua::prelude::*;
 
 use crate::animation::Animation;
 use crate::camera::Camera2D;
-use crate::graphics::column_batch::ColumnBatch;
+use crate::raycaster::column_batch::ColumnBatch;
 use crate::graphics::decal_surface::DecalSurface;
 use crate::graphics::data_graph_renderer::GraphRenderer;
 use crate::graphics::large_map_renderer::LargeMapRenderer;

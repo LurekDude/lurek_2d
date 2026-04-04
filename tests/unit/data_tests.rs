@@ -1,9 +1,9 @@
 //! Integration tests for the binary module.
 
-use luna2d::binary::byte_data::ByteData;
-use luna2d::binary::compress::{compress, decompress, CompressFormat};
-use luna2d::binary::encode::{decode, encode, EncodeFormat};
-use luna2d::binary::hash::{hash, HashAlgorithm};
+use luna2d::data::byte_data::ByteData;
+use luna2d::data::compress::{compress, decompress, CompressFormat};
+use luna2d::data::encode::{decode, encode, EncodeFormat};
+use luna2d::data::hash::{hash, HashAlgorithm};
 
 #[test]
 fn byte_data_new_zeroed() {
@@ -122,7 +122,7 @@ fn encode_decode_hex() {
 
 // ── DataView tests ───────────────────────────────────────────────────────────
 
-use luna2d::binary::DataView;
+use luna2d::data::DataView;
 
 #[test]
 fn data_dataview_reads_bytes() {
@@ -164,7 +164,7 @@ fn data_dataview_out_of_bounds_error() {
 
 // ── Luna2D Binary Pack Format tests ──────────────────────────────────────────
 
-use luna2d::binary::pack::{write, read, measure_size, BinValue};
+use luna2d::data::bin_pack::{write, read, measure_size, BinValue};
 
 #[test]
 fn binary_write_read_u32_f32_roundtrip() {

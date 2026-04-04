@@ -83,8 +83,6 @@ pub mod automation;
 /// Dense N-dimensional numerical arrays (luna.compute).
 pub mod compute;
 // migration-state: pub mod crafting; — now library/crafting/init.lua
-/// Binary buffers, compression, encoding, hashing, and Luna2D Binary Pack Format.
-pub mod binary;
 /// LÖVE2D-compatible binary data API: ByteData, compress, hash, encode, and LÖVE2D pack format.
 pub mod data;
 /// Format-agnostic serialization: JSON, TOML, CSV, and YAML via shared SerialValue.

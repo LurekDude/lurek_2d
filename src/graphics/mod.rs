@@ -8,8 +8,6 @@
 //!
 /// Off-screen render targets (canvases) for deferred compositing.
 pub mod canvas;
-/// Wolfenstein-style raycasting column batch renderer.
-pub mod column_batch;
 /// Mathematical function graph and chart renderer.
 pub mod data_graph_renderer;
 /// Persistent surface for stamping decal textures.
@@ -53,7 +51,6 @@ pub mod texture_atlas;
 /// Trail renderer for fading ribbon effects.
 pub mod trail;
 pub use canvas::Canvas;
-pub use column_batch::{ColumnBatch, ColumnData};
 pub use data_graph_renderer::{GraphRenderer, GraphSeries};
 pub use decal_surface::DecalSurface;
 pub use draw_layer::DrawLayer;

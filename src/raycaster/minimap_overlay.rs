@@ -76,8 +76,8 @@ pub fn extract_minimap(
     }
 
     // Draw player dot at center
-    let center_px = (view_radius * cell_size + cell_size / 2) as u32;
-    let center_py = (view_radius * cell_size + cell_size / 2) as u32;
+    let center_px = view_radius * cell_size + cell_size / 2;
+    let center_py = view_radius * cell_size + cell_size / 2;
     draw_player_arrow(
         &mut pixels,
         pixel_w,

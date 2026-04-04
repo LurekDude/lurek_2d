@@ -2,7 +2,7 @@
 
 use luna2d::animation::{AnimEvent, Animation};
 use luna2d::camera::Camera2D;
-use luna2d::graphics::column_batch::ColumnBatch;
+use luna2d::raycaster::column_batch::ColumnBatch;
 use luna2d::graphics::decal_surface::DecalSurface;
 use luna2d::graphics::draw_layer::DrawLayer;
 use luna2d::graphics::data_graph_renderer::GraphRenderer;

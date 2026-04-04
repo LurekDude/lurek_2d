@@ -4,7 +4,7 @@
 |----------|-------|
 | **Tier** | Tier 1 — Core Engine Subsystems |
 | **Lua API** | `luna.graphics.newAnimation()` (via `src/lua_api/sprite_api.rs`) |
-| **Source** | `src/animation/mod.rs` |
+| **Source** | `src/animation/` (split across `frame.rs`, `clip.rs`, `event.rs`, `animation.rs`) |
 | **Rust Tests** | `tests/unit/animation_tests.rs` — 14 tests |
 | **Lua Tests** | None (animation is tested indirectly via `test_graphics.lua`) |
 | **Status** | Implemented — Full |
@@ -54,7 +54,11 @@ There is no separate `luna.animation` module — all animation functions are acc
 
 | File | Purpose |
 |------|---------|
-| `mod.rs` | Entire animation module — `AnimFrame`, `AnimClip`, `AnimEvent`, `Animation` |
+| `mod.rs` | Sub-module declarations and `pub use` re-exports only |
+| `frame.rs` | `AnimFrame` struct and `AnimationFrame` backward-compat alias |
+| `clip.rs` | `AnimClip` struct |
+| `event.rs` | `AnimEvent` enum |
+| `animation.rs` | `Animation` controller: frame pool, clip management, update logic, unit tests |
 
 ## Key Types
 

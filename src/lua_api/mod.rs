@@ -21,10 +21,10 @@ pub mod ai_api;
 pub mod audio_api;
 /// Registers the `luna.simulator.*` automated input simulation API.
 pub mod automation_api;
-/// Registers the `luna.binary.*` binary buffers, compression, hashing, encoding, and packed binary I/O API.
-pub mod binary_api;
 /// Registers the `luna.compute.*` array computation API.
 pub mod compute_api;
+/// Registers the `luna.data.*` LÖVE2D-compatible binary data, pack, compress, hash, encode, and TOML API.
+pub mod data_api;
 /// Registers the `luna.dataframe.*` tabular data API.
 pub mod dataframe_api;
 /// Registers the `luna.debug.*` runtime diagnostics and developer tools API.
@@ -145,7 +145,7 @@ pub fn create_lua_vm(state: Rc<RefCell<SharedState>>) -> LuaResult<Lua> {
     particle_api::register(&lua, &luna, state.clone())?;
     event_api::register(&lua, &luna, state.clone())?;
     system_api::register(&lua, &luna, state.clone())?;
-    binary_api::register(&lua, &luna)?;
+    data_api::register(&lua, &luna)?;
     serial_api::register(&lua, &luna)?;
     automation_api::register(&lua, &luna, state.clone())?;
     log_api::register(&lua, &luna)?;

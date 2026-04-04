@@ -16,6 +16,8 @@ pub mod encode;
 pub mod hash;
 /// Binary pack/unpack utilities compatible with the LÖVE2D `data.pack` API.
 pub mod pack;
+/// Luna2D Binary Pack Format — space-separated type-token serialization.
+pub mod bin_pack;
 /// TOML parsing and encoding.
 pub mod toml_convert;
 
@@ -25,3 +27,4 @@ pub use dataview::DataView;
 pub use encode::{decode, encode, EncodeFormat};
 pub use hash::{hash, HashAlgorithm};
 pub use pack::{get_packed_size, pack, unpack, PackValue};
+pub use bin_pack::{measure_size as bin_measure_size, read as bin_read, write as bin_write, BinValue};
