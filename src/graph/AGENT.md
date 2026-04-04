@@ -2,7 +2,7 @@
 
 | Property | Value |
 |----------|-------|
-| **Tier** | Tier 2 — Engine Extensions |
+| **Tier** | Tier 2 — Reusable Engine Extensions |
 | **Lua API** | `luna.graph` |
 | **Source** | `src/graph/` |
 | **Tests** | `tests/graph_tests.rs` |

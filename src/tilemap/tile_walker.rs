@@ -12,7 +12,7 @@ use std::cell::RefCell;
 use std::f32::consts::PI;
 use std::rc::Rc;
 
-use crate::math::raycasting::Raycaster2D;
+use crate::raycaster::Raycaster2D;
 
 /// Cardinal facing direction. Consult the module-level documentation for the broader usage context and preconditions.
 ///

@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Luna2D — Splash Screen
+  Source design: 800 × 600 px
+  Render to PNG with:  python tools/gen_splash.py
+-->
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="600" viewBox="0 0 800 600">
+  <defs>
+    <!-- Night-sky radial gradient -->
+    <radialGradient id="bg" cx="50%" cy="42%" r="70%">
+      <stop offset="0%"   stop-color="#1E0A40"/>
+      <stop offset="60%"  stop-color="#0D0A28"/>
+      <stop offset="100%" stop-color="#050310"/>
+    </radialGradient>
+    <!-- Moon glow -->
+    <radialGradient id="moonGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%"   stop-color="#FFF5C0" stop-opacity="0.35"/>
+      <stop offset="100%" stop-color="#FFF5C0" stop-opacity="0"/>
+    </radialGradient>
+    <!-- Moon surface -->
+    <radialGradient id="moonFill" cx="40%" cy="38%" r="60%">
+      <stop offset="0%"   stop-color="#FFFBE8"/>
+      <stop offset="55%"  stop-color="#F5D96B"/>
+      <stop offset="100%" stop-color="#C89A1A"/>
+    </radialGradient>
+    <!-- Title glow filter -->
+    <filter id="glow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="6" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <!-- Soft shadow -->
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="130%">
+      <feDropShadow dx="0" dy="4" stdDeviation="8" flood-color="#000" flood-opacity="0.6"/>
+    </filter>
+  </defs>
+
+  <!-- ── Background ─────────────────────────────────────────────────────── -->
+  <rect width="800" height="600" fill="url(#bg)"/>
+
+  <!-- ── Stars (various sizes and opacities) ──────────────────────────── -->
+  <!-- Tiny stars -->
+  <circle cx="42"  cy="28"  r="1"   fill="#fff" opacity="0.7"/>
+  <circle cx="110" cy="55"  r="0.8" fill="#fff" opacity="0.5"/>
+  <circle cx="185" cy="20"  r="1.1" fill="#fff" opacity="0.8"/>
+  <circle cx="240" cy="72"  r="0.7" fill="#fff" opacity="0.55"/>
+  <circle cx="310" cy="18"  r="1"   fill="#fff" opacity="0.65"/>
+  <circle cx="370" cy="45"  r="0.9" fill="#fff" opacity="0.6"/>
+  <circle cx="450" cy="22"  r="1.2" fill="#fff" opacity="0.75"/>
+  <circle cx="530" cy="38"  r="0.8" fill="#fff" opacity="0.5"/>
+  <circle cx="600" cy="14"  r="1"   fill="#fff" opacity="0.7"/>
+  <circle cx="680" cy="58"  r="0.9" fill="#fff" opacity="0.6"/>
+  <circle cx="745" cy="30"  r="1.1" fill="#fff" opacity="0.8"/>
+  <circle cx="770" cy="85"  r="0.7" fill="#fff" opacity="0.5"/>
+  <circle cx="60"  cy="130" r="0.9" fill="#fff" opacity="0.55"/>
+  <circle cx="140" cy="160" r="1"   fill="#fff" opacity="0.65"/>
+  <circle cx="220" cy="120" r="0.8" fill="#fff" opacity="0.6"/>
+  <circle cx="30"  cy="200" r="0.9" fill="#fff" opacity="0.5"/>
+  <circle cx="88"  cy="240" r="1"   fill="#dde" opacity="0.45"/>
+  <circle cx="720" cy="130" r="1"   fill="#fff" opacity="0.7"/>
+  <circle cx="760" cy="175" r="0.8" fill="#fff" opacity="0.55"/>
+
+  <!-- Medium-bright stars (twinkle illusion via larger) -->
+  <circle cx="75"  cy="90"  r="1.6" fill="#fff" opacity="0.9"/>
+  <circle cx="195" cy="148" r="1.5" fill="#fff" opacity="0.85"/>
+  <circle cx="420" cy="70"  r="1.7" fill="#ffe" opacity="0.85"/>
+  <circle cx="650" cy="100" r="1.4" fill="#fff" opacity="0.8"/>
+  <circle cx="740" cy="220" r="1.5" fill="#fff" opacity="0.75"/>
+  <circle cx="25"  cy="310" r="1.4" fill="#dde" opacity="0.6"/>
+  <circle cx="775" cy="290" r="1.6" fill="#fff" opacity="0.7"/>
+
+  <!-- 4-point star shapes (hand-coded cross) -->
+  <g opacity="0.85" fill="#fff">
+    <polygon points="160,100 162,104 160,108 158,104" transform="rotate(0,160,104)"/>
+    <polygon points="560,55  562,59  560,63  558,59"/>
+    <polygon points="700,40  703,45  700,50  697,45"/>
+  </g>
+
+  <!-- ── Moon glow halo ─────────────────────────────────────────────────── -->
+  <ellipse cx="580" cy="155" rx="115" ry="115" fill="url(#moonGlow)"/>
+
+  <!-- ── Moon body ─────────────────────────────────────────────────────── -->
+  <circle cx="580" cy="155" r="88" fill="url(#moonFill)"/>
+  <!-- Crescent mask — dark circle offset to the lower-right -->
+  <circle cx="635" cy="128" r="80" fill="#0D0A28"/>
+  <!-- Subtle surface texture marks -->
+  <circle cx="545" cy="135" r="10" fill="none" stroke="#C89A1A" stroke-width="1.5" opacity="0.35"/>
+  <circle cx="520" cy="168" r="6.5" fill="none" stroke="#C89A1A" stroke-width="1.2" opacity="0.25"/>
+  <circle cx="558" cy="110" r="5"   fill="none" stroke="#C89A1A" stroke-width="1" opacity="0.2"/>
+
+  <!-- ── Decorative orbit arc ──────────────────────────────────────────── -->
+  <ellipse cx="540" cy="215" rx="185" ry="55"
+           fill="none" stroke="#8060C0" stroke-width="1.2" opacity="0.28"
+           stroke-dasharray="8 6"/>
+
+  <!-- ── Small star accent near title ────────────────────────────────────── -->
+  <g filter="url(#glow)" opacity="0.9">
+    <polygon points="260,260 264,272 276,272 267,280 270,292 260,285 250,292 253,280 244,272 256,272"
+             fill="#C89A1A" opacity="0.75"/>
+    <polygon points="540,268 543,278 553,278 546,284 549,294 540,288 531,294 534,284 527,278 537,278"
+             fill="#C89A1A" opacity="0.75"/>
+  </g>
+
+  <!-- ── Horizontal divider line ──────────────────────────────────────── -->
+  <line x1="180" y1="340" x2="620" y2="340"
+        stroke="#6040A0" stroke-width="1" opacity="0.55"/>
+
+  <!-- ── "LUNA2D" title ────────────────────────────────────────────────── -->
+  <!-- Glow layer -->
+  <text x="400" y="315"
+        text-anchor="middle"
+        font-family="'Segoe UI', 'Arial', sans-serif"
+        font-size="80" font-weight="900" letter-spacing="12"
+        fill="#F5D96B" opacity="0.25" filter="url(#glow)">LUNA2D</text>
+
+  <!-- Solid text -->
+  <text x="400" y="315"
+        text-anchor="middle"
+        font-family="'Segoe UI', 'Arial', sans-serif"
+        font-size="80" font-weight="900" letter-spacing="12"
+        fill="url(#moonFill)" filter="url(#shadow)">LUNA2D</text>
+
+  <!-- ── Subtitle ────────────────────────────────────────────────────── -->
+  <text x="400" y="370"
+        text-anchor="middle"
+        font-family="'Segoe UI', 'Arial', sans-serif"
+        font-size="22" font-weight="300" letter-spacing="6"
+        fill="#A890D0" opacity="0.90">2D GAME ENGINE</text>
+
+  <!-- ── "Powered by Rust + Lua" ──────────────────────────────────────── -->
+  <text x="400" y="420"
+        text-anchor="middle"
+        font-family="'Segoe UI', 'Arial', sans-serif"
+        font-size="13" font-weight="400" letter-spacing="2"
+        fill="#6855A0" opacity="0.80">Powered by Rust  ·  Lua 5.4  ·  tiny-skia</text>
+
+  <!-- ── Bottom corner decoration ─────────────────────────────────────── -->
+  <circle cx="15"  cy="585" r="80" fill="#3020a0" opacity="0.04"/>
+  <circle cx="785" cy="585" r="80" fill="#3020a0" opacity="0.04"/>
+</svg>

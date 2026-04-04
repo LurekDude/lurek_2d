@@ -38,12 +38,6 @@ pub enum ChannelValue {
 /// Internally uses a `Mutex<VecDeque>` protected queue with a `Condvar`
 /// for blocking `demand()` calls. Safe to wrap in `Arc` and share across
 /// OS threads.
-///
-/// # Fields
-/// - `name` — `Option<String>`.
-/// - `queue` — `Mutex<VecDeque<ChannelValue>>`.
-/// - `condvar` — `Condvar`.
-/// - `push_count` — `Mutex<u64>`.
 pub struct Channel {
     /// Optional name for globally-registered channels.
     name: Option<String>,
@@ -56,7 +50,7 @@ pub struct Channel {
 }
 
 impl Channel {
-    /// Create an unnamed channel. Returns a fully initialised instance with all fields set to their initial values.
+    /// Create an unnamed channel.
     ///
     /// # Returns
     /// `Arc<Self>`.
@@ -69,7 +63,7 @@ impl Channel {
         })
     }
 
-    /// Create a named channel. Consult the module-level documentation for the broader usage context and preconditions.
+    /// Create a named channel.
     ///
     /// # Parameters
     /// - `name` — `String`.
@@ -164,7 +158,7 @@ impl Channel {
         self.queue.lock().unwrap().len()
     }
 
-    /// Remove all values from the channel. After this call the container is in the same state as immediately after construction.
+    /// Remove all values from the channel.
     pub fn clear(&self) {
         self.queue.lock().unwrap().clear();
     }

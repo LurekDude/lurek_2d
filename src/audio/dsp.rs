@@ -1,6 +1,6 @@
+use rodio::Source;
 use std::sync::atomic::{AtomicU32, Ordering};
 use std::sync::{Arc, RwLock};
-use rodio::Source;
 
 #[derive(Debug)]
 
@@ -17,7 +17,6 @@ pub struct AtomicParam {
 }
 
 impl AtomicParam {
-
     /// Creates a new param.
     ///
     /// # Parameters
@@ -38,7 +37,6 @@ impl AtomicParam {
         }
     }
 
-
     /// Gets the value.
     ///
     /// # Returns
@@ -50,7 +48,6 @@ impl AtomicParam {
     pub fn get(&self) -> f32 {
         f32::from_bits(self.val.load(Ordering::Relaxed))
     }
-
 
     /// Sets the value.
     ///
@@ -84,7 +81,6 @@ pub struct EffectParams {
 }
 
 impl EffectParams {
-
     pub fn new(id: u32, typ: EffectType) -> Self {
         Self {
             id,
@@ -113,7 +109,11 @@ impl ActiveEffect {
     pub fn new(params: Arc<EffectParams>, sample_rate: u32, channels: u16) -> Self {
         let comb_len = match params.typ {
             EffectType::Reverb | EffectType::Chorus => {
-                let ms = if params.typ == EffectType::Chorus { 0.02 } else { 0.05 };
+                let ms = if params.typ == EffectType::Chorus {
+                    0.02
+                } else {
+                    0.05
+                };
                 ((sample_rate as f32 * ms) as usize * channels as usize).max(1)
             }
             _ => 1,
@@ -129,7 +129,6 @@ impl ActiveEffect {
             comb_pos: 0,
         }
     }
-
 
     /// Process sample.
     ///
@@ -152,7 +151,7 @@ impl ActiveEffect {
     pub fn process(&mut self, sample: f32, channel: u16, sample_rate: u32) -> f32 {
         let c = (channel as usize) % 2;
         let typ = self.params.typ;
-        
+
         match typ {
             EffectType::Lowpass | EffectType::Highpass | EffectType::Bandpass => {
                 let f0 = self.params.p1.get().clamp(20.0, 20000.0);
@@ -190,8 +189,9 @@ impl ActiveEffect {
                 };
 
                 let x0 = sample;
-                let out = (b0/a0)*x0 + (b1/a0)*self.bq_x1[c] + (b2/a0)*self.bq_x2[c] 
-                        - (a1/a0)*self.bq_y1[c] - (a2/a0)*self.bq_y2[c];
+                let out = (b0 / a0) * x0 + (b1 / a0) * self.bq_x1[c] + (b2 / a0) * self.bq_x2[c]
+                    - (a1 / a0) * self.bq_y1[c]
+                    - (a2 / a0) * self.bq_y2[c];
 
                 self.bq_x2[c] = self.bq_x1[c];
                 self.bq_x1[c] = x0;
@@ -203,7 +203,7 @@ impl ActiveEffect {
             EffectType::Reverb | EffectType::Chorus => {
                 let p1 = self.params.p1.get(); // room_size / decay
                 let p2 = self.params.p2.get(); // mix
-                
+
                 let delayed = self.comb_buf[self.comb_pos];
                 self.comb_buf[self.comb_pos] = sample + delayed * p1;
                 self.comb_pos = (self.comb_pos + 1) % self.comb_buf.len();
@@ -232,8 +232,7 @@ impl Default for SharedEffectGraph {
     }
 }
 
-impl SharedEffectGraph {
-}
+impl SharedEffectGraph {}
 
 pub struct DynamicEffectSource<I: Source<Item = f32>> {
     input: I,
@@ -248,7 +247,7 @@ impl<I: Source<Item = f32>> DynamicEffectSource<I> {
     pub fn new(input: I, shared_graph: Arc<RwLock<Vec<Arc<EffectParams>>>>) -> Self {
         let sample_rate = input.sample_rate();
         let channels = input.channels();
-        Self { 
+        Self {
             input,
             shared_graph,
             active_effects: Vec::new(),
@@ -265,12 +264,17 @@ impl<I: Source<Item = f32>> DynamicEffectSource<I> {
             if self.active_effects.len() != shared_len {
                 self.active_effects.clear();
                 for ef in guard.iter() {
-                    self.active_effects.push(ActiveEffect::new(Arc::clone(ef), self.sample_rate, self.channels));
+                    self.active_effects.push(ActiveEffect::new(
+                        Arc::clone(ef),
+                        self.sample_rate,
+                        self.channels,
+                    ));
                 }
             } else {
                 for (i, ef) in guard.iter().enumerate() {
                     if self.active_effects[i].params.id != ef.id {
-                        self.active_effects[i] = ActiveEffect::new(Arc::clone(ef), self.sample_rate, self.channels);
+                        self.active_effects[i] =
+                            ActiveEffect::new(Arc::clone(ef), self.sample_rate, self.channels);
                     }
                 }
             }
@@ -293,9 +297,9 @@ impl<I: Source<Item = f32>> Iterator for DynamicEffectSource<I> {
             for ef in &mut self.active_effects {
                 current_val = ef.process(current_val, self.current_channel, self.sample_rate);
             }
-            
+
             self.current_channel = (self.current_channel + 1) % self.channels;
-            
+
             // convert back to whatever sample type the pipeline uses
             Some(current_val)
         } else {

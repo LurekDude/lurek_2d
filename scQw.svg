@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#1a1040"/>
+      <stop offset="100%" stop-color="#0d0820"/>
+    </linearGradient>
+    <linearGradient id="moon" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#f5e6a8"/>
+      <stop offset="100%" stop-color="#d4a843"/>
+    </linearGradient>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="8" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Background circle -->
+  <circle cx="256" cy="256" r="250" fill="url(#bg)" stroke="#2a1860" stroke-width="4"/>
+
+  <!-- Stars -->
+  <circle cx="100" cy="120" r="2" fill="#ffffff" opacity="0.7"/>
+  <circle cx="380" cy="90" r="1.5" fill="#ffffff" opacity="0.5"/>
+  <circle cx="420" cy="180" r="2" fill="#ffffff" opacity="0.6"/>
+  <circle cx="150" cy="380" r="1.5" fill="#ffffff" opacity="0.4"/>
+  <circle cx="350" cy="350" r="2" fill="#ffffff" opacity="0.5"/>
+  <circle cx="80" cy="260" r="1" fill="#ffffff" opacity="0.6"/>
+  <circle cx="440" cy="300" r="1.5" fill="#ffffff" opacity="0.4"/>
+
+  <!-- Crescent moon -->
+  <circle cx="256" cy="200" r="100" fill="url(#moon)" filter="url(#glow)"/>
+  <circle cx="295" cy="170" r="85" fill="url(#bg)"/>
+
+  <!-- Glow around moon -->
+  <circle cx="256" cy="200" r="110" fill="none" stroke="#f5e6a8" stroke-width="1" opacity="0.2"/>
+
+  <!-- "2D" text -->
+  <text x="256" y="380" text-anchor="middle" font-family="Arial Black, Arial, sans-serif"
+        font-size="100" font-weight="900" fill="url(#moon)" letter-spacing="-2">
+    2D
+  </text>
+
+  <!-- "LUNA" text above -->
+  <text x="256" y="440" text-anchor="middle" font-family="Arial, sans-serif"
+        font-size="32" font-weight="300" fill="#8878b0" letter-spacing="12">
+    LUNA
+  </text>
+</svg>

@@ -20,7 +20,7 @@ use winit::window::{CursorGrabMode, CursorIcon, Window, WindowId};
 use crate::engine::debug_overlay::DebugOverlay;
 use crate::engine::error_screen::ErrorScreen;
 use crate::engine::resource_keys::{
-    CanvasKey, FontKey, MeshKey, ShaderKey, ShapeKey, SpriteBatchKey, TextureKey,
+    CanvasKey, FontKey, MeshKey, ShaderKey, SpriteBatchKey, TextureKey,
 };
 use crate::engine::{FullscreenType, SharedState};
 use crate::engine::shared_state::WindowState;
@@ -781,7 +781,6 @@ impl LunaApp {
         let sprite_batches = std::mem::take(&mut state.borrow_mut().sprite_batches);
         let canvases = state.borrow().canvases.clone();
         let meshes = state.borrow().meshes.clone();
-        let shapes = state.borrow().shapes.clone();
 
         if let Err(e) = renderer.render_frame(
             surface,
@@ -791,7 +790,6 @@ impl LunaApp {
             &sprite_batches,
             &canvases,
             &meshes,
-            &shapes,
             &shaders,
             &default_filter,
             bg,
@@ -854,7 +852,6 @@ impl LunaApp {
         let no_canvases: SlotMap<CanvasKey, crate::graphics::Canvas> = SlotMap::with_key();
         let no_textures: SlotMap<TextureKey, TextureData> = SlotMap::with_key();
         let no_meshes: SlotMap<MeshKey, crate::graphics::Mesh> = SlotMap::with_key();
-        let no_shapes: SlotMap<ShapeKey, crate::graphics::CompoundShape> = SlotMap::with_key();
         let no_shaders: SlotMap<ShaderKey, crate::graphics::Shader> = SlotMap::with_key();
         let default_filter = ("linear".to_string(), "linear".to_string(), 1);
         if let Err(e) = renderer.render_frame(
@@ -865,7 +862,6 @@ impl LunaApp {
             &no_batches,
             &no_canvases,
             &no_meshes,
-            &no_shapes,
             &no_shaders,
             &default_filter,
             bg,
@@ -908,7 +904,6 @@ impl LunaApp {
         let no_canvases: SlotMap<CanvasKey, crate::graphics::Canvas> = SlotMap::with_key();
         let no_textures: SlotMap<TextureKey, TextureData> = SlotMap::with_key();
         let no_meshes: SlotMap<MeshKey, crate::graphics::Mesh> = SlotMap::with_key();
-        let no_shapes: SlotMap<ShapeKey, crate::graphics::CompoundShape> = SlotMap::with_key();
         let no_shaders: SlotMap<ShaderKey, crate::graphics::Shader> = SlotMap::with_key();
         let default_filter = ("linear".to_string(), "linear".to_string(), 1);
         if let Err(e) = renderer.render_frame(
@@ -919,7 +914,6 @@ impl LunaApp {
             &no_batches,
             &no_canvases,
             &no_meshes,
-            &no_shapes,
             &no_shaders,
             &default_filter,
             bg,

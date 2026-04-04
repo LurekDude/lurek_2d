@@ -1,12 +1,4 @@
 //! Lua bindings for `luna.crafting.*`.
-//!
-//! This module is part of Luna2D's `lua_api` subsystem and provides the implementation
-//! details for crafting api-related operations and data management.
-//! Key types exported from this module: `LuaRecipe`, `LuaRecipeRegistry`, `LuaStation`, `LuaCraftSkill`, `LuaCraftQueue`.
-//! Primary functions: `register()`.
-//!
-//! All public items are documented. See the parent module for architectural context
-//! and the `luna.*` Lua API for the scripting interface.
 
 use mlua::prelude::*;
 use std::cell::RefCell;
@@ -20,7 +12,6 @@ use crate::lua_api::lua_types::{add_type_methods, LunaType};
 // ─────────────────────────────────────────────────────────────────────────────
 
 #[derive(Clone)]
-/// Lua-callable handle wrapping [`Recipe`].
 pub struct LuaRecipe(pub Rc<RefCell<Recipe>>);
 
 impl LunaType for LuaRecipe {
@@ -33,74 +24,61 @@ impl LuaUserData for LuaRecipe {
         add_type_methods(methods);
 
         /// Returns the unique string identifier of this recipe.
-        /// @return any
         ///
         /// # Returns
         /// `string` — recipe ID.
         methods.add_method("getId", |_, this, ()| Ok(this.0.borrow().id.clone()));
         /// Returns the human-readable display name of this recipe.
-        /// @return any
         ///
         /// # Returns
         /// `string`.
         methods.add_method("getName", |_, this, ()| Ok(this.0.borrow().name.clone()));
         /// Sets the display name of this recipe.
-        /// @param v : string
         ///
         /// # Parameters
         /// - `name` — `string`: New display name.
         methods.add_method("setName", |_, this, v: String| { this.0.borrow_mut().name = v; Ok(()) });
         /// Returns the recipe type tag (e.g. `'smelt'`, `'craft'`).
-        /// @return any
         ///
         /// # Returns
         /// `string` — recipe type.
         methods.add_method("getType", |_, this, ()| Ok(this.0.borrow().recipe_type.clone()));
         /// Returns the base crafting duration in seconds.
-        /// @return any
         ///
         /// # Returns
         /// `number` — duration in seconds.
         methods.add_method("getTime", |_, this, ()| Ok(this.0.borrow().time));
         /// Sets the base crafting duration in seconds.
-        /// @param v : number
         ///
         /// # Parameters
         /// - `time` — `number`: New duration in seconds.
         methods.add_method("setTime", |_, this, v: f64| { this.0.borrow_mut().time = v; Ok(()) });
         /// Returns the minimum station level required to craft this recipe.
-        /// @return any
         ///
         /// # Returns
         /// `integer` — required station level.
         methods.add_method("getStationLevel", |_, this, ()| Ok(this.0.borrow().station_level));
         /// Sets the minimum station level required to craft this recipe.
-        /// @param v : integer
         ///
         /// # Parameters
         /// - `level` — `integer`: Minimum station level.
         methods.add_method("setStationLevel", |_, this, v: u32| { this.0.borrow_mut().station_level = v; Ok(()) });
         /// Returns the station type string required to craft this recipe.
-        /// @return any
         ///
         /// # Returns
         /// `string` — station type.
         methods.add_method("getStationType", |_, this, ()| Ok(this.0.borrow().station_type.clone()));
         /// Sets which station type is required for this recipe.
-        /// @param v : string
         ///
         /// # Parameters
         /// - `type` — `string`: Station type identifier.
         methods.add_method("setStationType", |_, this, v: String| { this.0.borrow_mut().station_type = v; Ok(()) });
         /// Returns the skill name gated on this recipe, or an empty string if none.
-        /// @return any
         ///
         /// # Returns
         /// `string` — required skill name, or `''`.
         methods.add_method("getSkill", |_, this, ()| Ok(this.0.borrow().skill.clone()));
         /// Sets the skill required to unlock and use this recipe.
-        /// @param name : string
-        /// @param level : integer?
         ///
         /// # Parameters
         /// - `skill` — `string`: Skill name.
@@ -111,84 +89,70 @@ impl LuaUserData for LuaRecipe {
             Ok(())
         });
         /// Returns the XP awarded to the required skill when this recipe is completed.
-        /// @return any
         ///
         /// # Returns
         /// `number` — XP awarded.
         methods.add_method("getSkillXp", |_, this, ()| Ok(this.0.borrow().skill_xp));
         /// Sets the skill XP awarded on completion.
-        /// @param v : number
         ///
         /// # Parameters
         /// - `xp` — `number`: XP amount.
         methods.add_method("setSkillXp", |_, this, v: f64| { this.0.borrow_mut().skill_xp = v; Ok(()) });
         /// Returns the lore/description text for this recipe.
-        /// @return any
         ///
         /// # Returns
         /// `string`.
         methods.add_method("getDescription", |_, this, ()| Ok(this.0.borrow().description.clone()));
         /// Sets the description text shown in crafting UI.
-        /// @param v : string
         ///
         /// # Parameters
         /// - `desc` — `string`: Description string.
         methods.add_method("setDescription", |_, this, v: String| { this.0.borrow_mut().description = v; Ok(()) });
         /// Returns `true` if this recipe is currently craftable (not disabled).
-        /// @return any
         ///
         /// # Returns
         /// `boolean`.
         methods.add_method("isEnabled", |_, this, ()| Ok(this.0.borrow().enabled));
         /// Enables or disables this recipe. Disabled recipes cannot be enqueued.
-        /// @param v : boolean
         ///
         /// # Parameters
         /// - `enabled` — `boolean`: `true` to enable.
         methods.add_method("setEnabled", |_, this, v: bool| { this.0.borrow_mut().enabled = v; Ok(()) });
 
         /// Returns the UI category string for this recipe.
-        /// @return any
         ///
         /// # Returns
         /// `string` — category name, or `''` if unset.
         methods.add_method("getCategory", |_, this, ()| Ok(this.0.borrow().category.clone()));
         /// Sets the UI category for this recipe (e.g. `'weapons'`, `'potions'`).
-        /// @param v : string
         ///
         /// # Parameters
         /// - `category` — `string`: Category name.
         methods.add_method("setCategory", |_, this, v: String| { this.0.borrow_mut().category = v; Ok(()) });
 
         /// Returns the cooldown duration in seconds before this recipe can be used again.
-        /// @return any
         ///
         /// # Returns
         /// `number` — cooldown in seconds.
         methods.add_method("getCooldown", |_, this, ()| Ok(this.0.borrow().cooldown));
         /// Sets the cooldown duration in seconds.
-        /// @param v : number
         ///
         /// # Parameters
         /// - `cooldown` — `number`: Cooldown in seconds.
         methods.add_method("setCooldown", |_, this, v: f64| { this.0.borrow_mut().cooldown = v; Ok(()) });
 
         /// Returns `true` if this recipe can be crafted without a station.
-        /// @return any
         ///
         /// # Returns
         /// `boolean`.
         methods.add_method("isHandCraftable", |_, this, ()| Ok(this.0.borrow().hand_craftable));
         /// Sets whether this recipe can be crafted without a station.
-        /// @param v : boolean
         ///
         /// # Parameters
         /// - `craftable` — `boolean`: `true` to allow hand crafting.
         methods.add_method("setHandCraftable", |_, this, v: bool| { this.0.borrow_mut().hand_craftable = v; Ok(()) });
 
         /// Returns `true` if this recipe carries the given tag.
-        /// @param tag : string
-        /// @return any
         ///
         /// # Parameters
         /// - `tag` — `string`: Tag to test.
@@ -197,7 +161,6 @@ impl LuaUserData for LuaRecipe {
         /// `boolean`.
         methods.add_method("hasTag", |_, this, tag: String| Ok(this.0.borrow().has_tag(&tag)));
         /// Attaches a string tag to this recipe.
-        /// @param tag : string
         ///
         /// # Parameters
         /// - `tag` — `string`: Tag to add.
@@ -206,7 +169,6 @@ impl LuaUserData for LuaRecipe {
         });
 
         /// Returns a list of all tags attached to this recipe.
-        /// @return any
         ///
         /// # Returns
         /// `table` of `string` tags.
@@ -217,9 +179,6 @@ impl LuaUserData for LuaRecipe {
             Ok(t)
         });
         /// Adds an ingredient requirement to this recipe.
-        /// @param item_type : string
-        /// @param qty : integer
-        /// @param consumed : boolean?
         ///
         /// # Parameters
         /// - `id` — `string`: Item ID of the ingredient.
@@ -232,9 +191,6 @@ impl LuaUserData for LuaRecipe {
         });
 
         /// Adds an output item produced when this recipe is completed.
-        /// @param item_type : string
-        /// @param qty : integer
-        /// @param quality : string?
         ///
         /// # Parameters
         /// - `id` — `string`: Item ID of the output.
@@ -247,7 +203,6 @@ impl LuaUserData for LuaRecipe {
         });
 
         /// Returns a list of all ingredient requirements as `{id, count}` tables.
-        /// @return any
         ///
         /// # Returns
         /// `table` of `{id: string, count: integer}` tables.
@@ -277,7 +232,6 @@ impl LuaUserData for LuaRecipe {
         });
 
         /// Returns a list of all output items as `{id, count}` tables.
-        /// @return any
         ///
         /// # Returns
         /// `table` of `{id: string, count: integer}` tables.
@@ -316,9 +270,6 @@ impl LuaUserData for LuaRecipe {
         });
 
         /// Adds a byproduct output (produced alongside main outputs, not guaranteed).
-        /// @param item_type : string
-        /// @param qty : integer
-        /// @param chance : number?
         ///
         /// # Parameters
         /// - `item_type` — `string`: Item ID.
@@ -330,8 +281,6 @@ impl LuaUserData for LuaRecipe {
         });
 
         /// Adds a crafting condition requirement for this recipe (e.g. biome, weather).
-        /// @param cond_type : string
-        /// @param value : string
         ///
         /// # Parameters
         /// - `condition_type` — `string`: Condition type identifier.
@@ -341,7 +290,6 @@ impl LuaUserData for LuaRecipe {
         });
 
         /// Returns all crafting conditions as a list of `{condType, value}` tables.
-        /// @return any
         ///
         /// # Returns
         /// `table` of `{condType: string, value: string}`.
@@ -358,7 +306,6 @@ impl LuaUserData for LuaRecipe {
         });
 
         /// Returns whether output quality scales with the crafter's skill level.
-        /// @return any
         ///
         /// # Returns
         /// `boolean`.
@@ -366,7 +313,6 @@ impl LuaUserData for LuaRecipe {
             Ok(this.0.borrow().output_quality_scaling)
         });
         /// Sets whether output quality scales with the crafter's skill level.
-        /// @param v : boolean
         ///
         /// # Parameters
         /// - `scaling` — `boolean`.
@@ -375,7 +321,6 @@ impl LuaUserData for LuaRecipe {
         });
 
         /// Returns the ID of the modifier pool rolled on completion (empty = none).
-        /// @return any
         ///
         /// # Returns
         /// `string`.
@@ -383,7 +328,6 @@ impl LuaUserData for LuaRecipe {
             Ok(this.0.borrow().random_modifier_pool.clone())
         });
         /// Sets the modifier pool to roll on completion.
-        /// @param v : string
         ///
         /// # Parameters
         /// - `pool_id` — `string`: Modifier pool ID.
@@ -392,7 +336,6 @@ impl LuaUserData for LuaRecipe {
         });
 
         /// Returns the skill-up XP curve name: `'linear'`, `'quadratic'`, `'exponential'`.
-        /// @return any
         ///
         /// # Returns
         /// `string`.
@@ -400,7 +343,6 @@ impl LuaUserData for LuaRecipe {
             Ok(this.0.borrow().skill_up_curve.clone())
         });
         /// Sets the skill-up XP curve name.
-        /// @param v : string
         ///
         /// # Parameters
         /// - `curve` — `string`: Curve name.
@@ -415,7 +357,6 @@ impl LuaUserData for LuaRecipe {
 // ─────────────────────────────────────────────────────────────────────────────
 
 #[derive(Clone)]
-/// Lua-callable handle wrapping [`RecipeRegistry`].
 pub struct LuaRecipeRegistry(pub Rc<RefCell<RecipeRegistry>>);
 
 impl LunaType for LuaRecipeRegistry {
@@ -428,7 +369,6 @@ impl LuaUserData for LuaRecipeRegistry {
         add_type_methods(methods);
 
         /// Registers a recipe in this registry. Raises an error if a recipe with the same ID already exists.
-        /// @param recipe : Recipe
         ///
         /// # Parameters
         /// - `recipe` — `Recipe`: Recipe object to register.
@@ -438,8 +378,6 @@ impl LuaUserData for LuaRecipeRegistry {
             Ok(())
         });
         /// Returns the registered recipe with the given ID, or `nil` if none exists.
-        /// @param id : string
-        /// @return any
         ///
         /// # Parameters
         /// - `id` — `string`: Recipe ID to look up.
@@ -453,8 +391,6 @@ impl LuaUserData for LuaRecipeRegistry {
             Ok(r.map(|r| LuaRecipe(Rc::new(RefCell::new(r)))))
         });
         /// Removes the recipe with the given ID from this registry.
-        /// @param id : string
-        /// @return any
         ///
         /// # Parameters
         /// - `id` — `string`: Recipe ID to remove.
@@ -462,13 +398,11 @@ impl LuaUserData for LuaRecipeRegistry {
             Ok(this.0.borrow_mut().remove(&id))
         });
         /// Returns the total number of registered recipes.
-        /// @return integer
         ///
         /// # Returns
         /// `integer`.
         methods.add_method("count", |_, this, ()| Ok(this.0.borrow().count()));
         /// Returns a list of all registered recipe IDs.
-        /// @return any
         ///
         /// # Returns
         /// `table` of `string` IDs.
@@ -478,8 +412,6 @@ impl LuaUserData for LuaRecipeRegistry {
             Ok(t)
         });
         /// Returns all recipes that produce an item with the given ID.
-        /// @param item_type : string
-        /// @return any
         ///
         /// # Parameters
         /// - `item_id` — `string`: Output item ID to search for.
@@ -494,8 +426,6 @@ impl LuaUserData for LuaRecipeRegistry {
             Ok(t)
         });
         /// Returns all recipes that consume an item with the given ID as an ingredient.
-        /// @param item_type : string
-        /// @return any
         ///
         /// # Parameters
         /// - `item_id` — `string`: Ingredient item ID to search for.
@@ -510,8 +440,6 @@ impl LuaUserData for LuaRecipeRegistry {
             Ok(t)
         });
         /// Returns all recipes that carry the given tag.
-        /// @param tag : string
-        /// @return any
         ///
         /// # Parameters
         /// - `tag` — `string`: Tag string to match.
@@ -525,8 +453,6 @@ impl LuaUserData for LuaRecipeRegistry {
             Ok(t)
         });
         /// Returns all recipes that require the given station type.
-        /// @param station_type : string
-        /// @return any
         ///
         /// # Parameters
         /// - `station_type` — `string`: Station type identifier.
@@ -542,7 +468,6 @@ impl LuaUserData for LuaRecipeRegistry {
         });
 
         /// Alias for `add`. Registers a recipe (error if duplicate ID).
-        /// @param recipe : Recipe
         ///
         /// # Parameters
         /// - `recipe` — `Recipe`.
@@ -553,8 +478,6 @@ impl LuaUserData for LuaRecipeRegistry {
         });
 
         /// Alias for `remove`. Unregisters the recipe with the given ID.
-        /// @param id : string
-        /// @return any
         ///
         /// # Parameters
         /// - `id` — `string`.
@@ -566,7 +489,6 @@ impl LuaUserData for LuaRecipeRegistry {
         });
 
         /// Returns all recipes in registration order as a list of `Recipe` objects.
-        /// @return any
         ///
         /// # Returns
         /// `table` of `Recipe` objects.
@@ -584,8 +506,6 @@ impl LuaUserData for LuaRecipeRegistry {
         });
 
         /// Returns all recipe IDs in the given UI category.
-        /// @param category : string
-        /// @return any
         ///
         /// # Parameters
         /// - `category` — `string`: Category name.
@@ -605,7 +525,6 @@ impl LuaUserData for LuaRecipeRegistry {
 // ─────────────────────────────────────────────────────────────────────────────
 
 #[derive(Clone)]
-/// Lua-callable handle wrapping [`Station`].
 pub struct LuaStation(pub Rc<RefCell<Station>>);
 
 impl LunaType for LuaStation {
@@ -618,62 +537,51 @@ impl LuaUserData for LuaStation {
         add_type_methods(methods);
 
         /// Returns the station type identifier string.
-        /// @return any
         ///
         /// # Returns
         /// `string`.
         methods.add_method("getType", |_, this, ()| Ok(this.0.borrow().station_type.clone()));
         /// Returns the current upgrade level of this station.
-        /// @return any
         ///
         /// # Returns
         /// `integer` — level.
         methods.add_method("getLevel", |_, this, ()| Ok(this.0.borrow().level));
         /// Sets the station's upgrade level, affecting which recipes it can process.
-        /// @param v : integer
         ///
         /// # Parameters
         /// - `level` — `integer`: New station level.
         methods.add_method("setLevel", |_, this, v: u32| { this.0.borrow_mut().level = v; Ok(()) });
         /// Returns the display name of this station.
-        /// @return any
         ///
         /// # Returns
         /// `string`.
         methods.add_method("getName", |_, this, ()| Ok(this.0.borrow().name.clone()));
         /// Sets the display name of this station.
-        /// @param v : string
         ///
         /// # Parameters
         /// - `name` — `string`: New display name.
         methods.add_method("setName", |_, this, v: String| { this.0.borrow_mut().name = v; Ok(()) });
         /// Returns the crafting speed multiplier. `1.0` is normal speed.
-        /// @return any
         ///
         /// # Returns
         /// `number`.
         methods.add_method("getSpeedMultiplier", |_, this, ()| Ok(this.0.borrow().speed_multiplier));
         /// Sets the crafting speed multiplier. Values above `1.0` reduce effective recipe time.
-        /// @param v : number
         ///
         /// # Parameters
         /// - `mult` — `number`: Speed multiplier (e.g. `2.0` for double speed).
         methods.add_method("setSpeedMultiplier", |_, this, v: f64| { this.0.borrow_mut().speed_multiplier = v; Ok(()) });
         /// Returns `true` if this station is operational and can process recipes.
-        /// @return any
         ///
         /// # Returns
         /// `boolean`.
         methods.add_method("isActive", |_, this, ()| Ok(this.0.borrow().active));
         /// Enables or disables this station.
-        /// @param v : boolean
         ///
         /// # Parameters
         /// - `active` — `boolean`: `true` to enable.
         methods.add_method("setActive", |_, this, v: bool| { this.0.borrow_mut().active = v; Ok(()) });
         /// Returns `true` if this station can currently process the given recipe (level and type match).
-        /// @param recipe : Recipe
-        /// @return any
         ///
         /// # Parameters
         /// - `recipe` — `Recipe`: Recipe to check against this station's type and level.
@@ -686,8 +594,6 @@ impl LuaUserData for LuaStation {
             Ok(this.0.borrow().can_process(&recipe_inner))
         });
         /// Returns the effective crafting time for `recipe` after applying this station's speed multiplier.
-        /// @param recipe : Recipe
-        /// @return any
         ///
         /// # Parameters
         /// - `recipe` — `Recipe`: The recipe to evaluate.
@@ -701,53 +607,45 @@ impl LuaUserData for LuaStation {
         });
 
         /// Returns the maximum upgrade level this station can reach.
-        /// @return any
         ///
         /// # Returns
         /// `integer` — max level.
         methods.add_method("getMaxLevel", |_, this, ()| Ok(this.0.borrow().max_level));
         /// Sets the maximum upgrade level for this station.
-        /// @param v : integer
         ///
         /// # Parameters
         /// - `max` — `integer`: Maximum level.
         methods.add_method("setMaxLevel", |_, this, v: u32| { this.0.borrow_mut().max_level = v; Ok(()) });
 
         /// Increments station level by 1. Returns `false` if already at max level.
-        /// @return any
         ///
         /// # Returns
         /// `boolean` — `true` if upgraded successfully.
         methods.add_method("upgrade", |_, this, ()| Ok(this.0.borrow_mut().upgrade()));
 
         /// Returns the quality bonus applied to crafted items at this station.
-        /// @return any
         ///
         /// # Returns
         /// `number`.
         methods.add_method("getQualityBonus", |_, this, ()| Ok(this.0.borrow().quality_bonus));
         /// Sets the quality bonus applied to crafted items at this station.
-        /// @param v : number
         ///
         /// # Parameters
         /// - `bonus` — `number`: Quality bonus value.
         methods.add_method("setQualityBonus", |_, this, v: f64| { this.0.borrow_mut().quality_bonus = v; Ok(()) });
 
         /// Returns the output quantity multiplier applied by this station.
-        /// @return any
         ///
         /// # Returns
         /// `number`.
         methods.add_method("getOutputMultiplier", |_, this, ()| Ok(this.0.borrow().output_multiplier));
         /// Sets the output quantity multiplier for this station.
-        /// @param v : number
         ///
         /// # Parameters
         /// - `mult` — `number`: Output multiplier (e.g. `1.5` for 50% bonus).
         methods.add_method("setOutputMultiplier", |_, this, v: f64| { this.0.borrow_mut().output_multiplier = v; Ok(()) });
 
         /// Returns the station's world position as `(x, y)`.
-        /// @return any
         ///
         /// # Returns
         /// `number, number` — x and y coordinates.
@@ -756,8 +654,6 @@ impl LuaUserData for LuaStation {
             Ok((b.x, b.y))
         });
         /// Sets the station's world position.
-        /// @param x : number
-        /// @param y : number
         ///
         /// # Parameters
         /// - `x` — `number`: X coordinate.
@@ -768,22 +664,17 @@ impl LuaUserData for LuaStation {
         });
 
         /// Returns the proximity radius within which players can use this station.
-        /// @return any
         ///
         /// # Returns
         /// `number` — radius in world units. `0` means no proximity check.
         methods.add_method("getProximityRadius", |_, this, ()| Ok(this.0.borrow().proximity_radius));
         /// Sets the proximity radius for this station.
-        /// @param v : number
         ///
         /// # Parameters
         /// - `radius` — `number`: Radius in world units.
         methods.add_method("setProximityRadius", |_, this, v: f64| { this.0.borrow_mut().proximity_radius = v; Ok(()) });
 
         /// Returns `true` if the given world position is within this station's proximity radius.
-        /// @param x : number
-        /// @param y : number
-        /// @return any
         ///
         /// # Parameters
         /// - `x` — `number`: X coordinate to check.
@@ -796,33 +687,28 @@ impl LuaUserData for LuaStation {
         });
 
         /// Returns the current fuel level of this station.
-        /// @return any
         ///
         /// # Returns
         /// `number`.
         methods.add_method("getFuelLevel", |_, this, ()| Ok(this.0.borrow().fuel_level));
         /// Sets the fuel level directly.
-        /// @param v : number
         ///
         /// # Parameters
         /// - `level` — `number`: New fuel level.
         methods.add_method("setFuelLevel", |_, this, v: f64| { this.0.borrow_mut().fuel_level = v; Ok(()) });
 
         /// Returns the maximum fuel capacity of this station.
-        /// @return any
         ///
         /// # Returns
         /// `number`.
         methods.add_method("getFuelCapacity", |_, this, ()| Ok(this.0.borrow().fuel_capacity));
         /// Sets the maximum fuel capacity.
-        /// @param v : number
         ///
         /// # Parameters
         /// - `capacity` — `number`: New maximum fuel.
         methods.add_method("setFuelCapacity", |_, this, v: f64| { this.0.borrow_mut().fuel_capacity = v; Ok(()) });
 
         /// Adds fuel to this station, clamped to capacity.
-        /// @param amount : number
         ///
         /// # Parameters
         /// - `amount` — `number`: Fuel to add.
@@ -831,8 +717,6 @@ impl LuaUserData for LuaStation {
         });
 
         /// Consumes fuel from this station. Returns `false` if insufficient fuel.
-        /// @param amount : number
-        /// @return any
         ///
         /// # Parameters
         /// - `amount` — `number`: Fuel to consume.
@@ -844,8 +728,6 @@ impl LuaUserData for LuaStation {
         });
 
         /// Returns a stored metadata value by key.
-        /// @param key : string
-        /// @return any
         ///
         /// # Parameters
         /// - `key` — `string`: Metadata key.
@@ -856,8 +738,6 @@ impl LuaUserData for LuaStation {
             Ok(this.0.borrow().metadata.get(&key).cloned())
         });
         /// Stores a metadata key-value pair on this station.
-        /// @param key : string
-        /// @param val : string
         ///
         /// # Parameters
         /// - `key` — `string`: Metadata key.
@@ -873,7 +753,6 @@ impl LuaUserData for LuaStation {
 // ─────────────────────────────────────────────────────────────────────────────
 
 #[derive(Clone)]
-/// Lua-callable handle wrapping [`CraftSkill`].
 pub struct LuaCraftSkill(pub Rc<RefCell<CraftSkill>>);
 
 impl LunaType for LuaCraftSkill {
@@ -886,31 +765,26 @@ impl LuaUserData for LuaCraftSkill {
         add_type_methods(methods);
 
         /// Returns the skill's name identifier.
-        /// @return any
         ///
         /// # Returns
         /// `string`.
         methods.add_method("getName", |_, this, ()| Ok(this.0.borrow().name.clone()));
         /// Returns the total accumulated XP for this skill.
-        /// @return any
         ///
         /// # Returns
         /// `number` — total XP.
         methods.add_method("getXp", |_, this, ()| Ok(this.0.borrow().xp));
         /// Returns the current level derived from total XP.
-        /// @return any
         ///
         /// # Returns
         /// `integer` — current level.
         methods.add_method("getLevel", |_, this, ()| Ok(this.0.borrow().level));
         /// Returns the XP required to reach the next level.
-        /// @return any
         ///
         /// # Returns
         /// `number` — XP needed.
         methods.add_method("getXpToNext", |_, this, ()| Ok(this.0.borrow().get_xp_to_next()));
         /// Sets the skill directly to the given level, adjusting XP accordingly.
-        /// @param level : integer
         ///
         /// # Parameters
         /// - `level` — `integer`: Target level.
@@ -919,8 +793,6 @@ impl LuaUserData for LuaCraftSkill {
             Ok(())
         });
         /// Adds `xp` to this skill's total, potentially triggering level-ups.
-        /// @param amount : number
-        /// @return any
         ///
         /// # Parameters
         /// - `xp` — `number`: XP to add.
@@ -929,8 +801,6 @@ impl LuaUserData for LuaCraftSkill {
         /// `integer` — number of levels gained.
         methods.add_method("addXp", |_, this, amount: f64| Ok(this.0.borrow_mut().add_xp(amount)));
         /// Returns `true` if this skill's level meets the minimum required to use the given recipe.
-        /// @param recipe : Recipe
-        /// @return any
         ///
         /// # Parameters
         /// - `recipe` — `Recipe`: Recipe to check skill requirement against.
@@ -944,35 +814,30 @@ impl LuaUserData for LuaCraftSkill {
         });
 
         /// Returns the maximum level this skill can reach.
-        /// @return any
         ///
         /// # Returns
         /// `integer`.
         methods.add_method("getMaxLevel", |_, this, ()| Ok(this.0.borrow().max_level));
 
         /// Returns the speed bonus (0–1 fraction) from skill mastery.
-        /// @return any
         ///
         /// # Returns
         /// `number`.
         methods.add_method("getSpeedBonus", |_, this, ()| Ok(this.0.borrow().get_speed_bonus()));
 
         /// Returns the quality bonus (0–1 fraction) from skill mastery.
-        /// @return any
         ///
         /// # Returns
         /// `number`.
         methods.add_method("getQualityBonus", |_, this, ()| Ok(this.0.borrow().get_quality_bonus()));
 
         /// Returns the yield/quantity bonus (0–1 fraction) from skill mastery.
-        /// @return any
         ///
         /// # Returns
         /// `number`.
         methods.add_method("getYieldBonus", |_, this, ()| Ok(this.0.borrow().get_yield_bonus()));
 
         /// Registers a specialization branch for this skill.
-        /// @param name : string
         ///
         /// # Parameters
         /// - `name` — `string`: Specialization name.
@@ -981,8 +846,6 @@ impl LuaUserData for LuaCraftSkill {
         });
 
         /// Locks in a specialization branch. Fails if already specialized.
-        /// @param name : string
-        /// @return any
         ///
         /// # Parameters
         /// - `name` — `string`: Specialization to choose.
@@ -994,7 +857,6 @@ impl LuaUserData for LuaCraftSkill {
         });
 
         /// Returns the chosen specialization name, or `nil` if none chosen yet.
-        /// @return any
         ///
         /// # Returns
         /// `string` or `nil`.
@@ -1003,9 +865,6 @@ impl LuaUserData for LuaCraftSkill {
         });
 
         /// Defines a perk node in this skill's perk tree.
-        /// @param perk_id : string
-        /// @param req_level : integer
-        /// @param prereqs : table?
         ///
         /// # Parameters
         /// - `perk_id` — `string`: Unique perk identifier.
@@ -1021,8 +880,6 @@ impl LuaUserData for LuaCraftSkill {
         });
 
         /// Attempts to unlock a perk. Fails if prerequisites or level not met.
-        /// @param perk_id : string
-        /// @return any
         ///
         /// # Parameters
         /// - `perk_id` — `string`.
@@ -1034,8 +891,6 @@ impl LuaUserData for LuaCraftSkill {
         });
 
         /// Returns `true` if the given perk is unlocked.
-        /// @param perk_id : string
-        /// @return any
         ///
         /// # Parameters
         /// - `perk_id` — `string`.
@@ -1047,7 +902,6 @@ impl LuaUserData for LuaCraftSkill {
         });
 
         /// Returns perk IDs whose prerequisites and level requirements are met.
-        /// @return any
         ///
         /// # Returns
         /// `table` of `string` perk IDs.
@@ -1058,8 +912,6 @@ impl LuaUserData for LuaCraftSkill {
         });
 
         /// Returns the WoW-style difficulty color for a recipe from this skill's perspective.
-        /// @param recipe : Recipe
-        /// @return any
         ///
         /// # Parameters
         /// - `recipe` — `Recipe`.
@@ -1074,8 +926,6 @@ impl LuaUserData for LuaCraftSkill {
         });
 
         /// Returns the skill-up probability (0–1) for this skill when crafting a recipe.
-        /// @param recipe : Recipe
-        /// @return any
         ///
         /// # Parameters
         /// - `recipe` — `Recipe`.
@@ -1096,7 +946,6 @@ impl LuaUserData for LuaCraftSkill {
 // ─────────────────────────────────────────────────────────────────────────────
 
 #[derive(Clone)]
-/// Lua-callable handle wrapping [`CraftQueue`].
 pub struct LuaCraftQueue(pub Rc<RefCell<CraftQueue>>);
 
 impl LunaType for LuaCraftQueue {
@@ -1109,10 +958,6 @@ impl LuaUserData for LuaCraftQueue {
         add_type_methods(methods);
 
         /// Enqueue on this CraftQueue.
-        /// @param recipe_id : string
-        /// @param time : number
-        /// @param qty : integer?
-        /// @return any
         ///
         /// # Parameters
         /// - `recipe_id` — `string`.
@@ -1122,8 +967,6 @@ impl LuaUserData for LuaCraftQueue {
             Ok(this.0.borrow_mut().enqueue(recipe_id, time, qty.unwrap_or(1)))
         });
         /// Cancels the current operation.
-        /// @param id : integer
-        /// @return any
         ///
         /// # Parameters
         /// - `id` — `integer`.
@@ -1131,8 +974,6 @@ impl LuaUserData for LuaCraftQueue {
             Ok(this.0.borrow_mut().cancel(id))
         });
         /// Advances the simulation by `dt` seconds.
-        /// @param dt : number
-        /// @return any
         ///
         /// # Parameters
         /// - `dt` — `number`.
@@ -1142,7 +983,6 @@ impl LuaUserData for LuaCraftQueue {
             Ok(t)
         });
         /// Returns the IDs of jobs that completed since the last collection.
-        /// @return any
         ///
         /// # Returns
         /// `table` of `integer` job IDs.
@@ -1152,8 +992,6 @@ impl LuaUserData for LuaCraftQueue {
             Ok(t)
         });
         /// Returns the job.
-        /// @param id : integer
-        /// @return any
         ///
         /// # Parameters
         /// - `id` — `integer`.
@@ -1211,25 +1049,21 @@ impl LuaUserData for LuaCraftQueue {
             }
         });
         /// Returns the number of items.
-        /// @return integer
         ///
         /// # Returns
         /// `integer`.
         methods.add_method("count", |_, this, ()| Ok(this.0.borrow().count()));
         /// Returns `true` if full.
-        /// @return boolean
         ///
         /// # Returns
         /// `boolean`.
         methods.add_method("isFull", |_, this, ()| Ok(this.0.borrow().is_full()));
         /// Returns the max jobs.
-        /// @return any
         ///
         /// # Returns
         /// The current max jobs.
         methods.add_method("getMaxJobs", |_, this, ()| Ok(this.0.borrow().max_jobs()));
         /// Returns the ids.
-        /// @return any
         ///
         /// # Returns
         /// The current ids.
@@ -1247,7 +1081,6 @@ impl LuaUserData for LuaCraftQueue {
             Ok(())
         });
         /// Returns the all jobs.
-        /// @return any
         ///
         /// # Returns
         /// The current all jobs.
@@ -1289,8 +1122,6 @@ impl LuaUserData for LuaCraftQueue {
             Ok(t)
         });
         /// Sets the job paused.
-        /// @param id : integer
-        /// @param paused : boolean
         ///
         /// # Parameters
         /// - `id` — `integer`.
@@ -1307,7 +1138,6 @@ impl LuaUserData for LuaCraftQueue {
 // ─────────────────────────────────────────────────────────────────────────────
 
 #[derive(Clone)]
-/// Lua-callable handle wrapping [`UpgradeTree`].
 pub struct LuaUpgradeTree(pub Rc<RefCell<UpgradeTree>>);
 
 impl LunaType for LuaUpgradeTree {
@@ -1320,7 +1150,6 @@ impl LuaUserData for LuaUpgradeTree {
         add_type_methods(methods);
 
         /// Returns the name.
-        /// @return any
         ///
         /// # Parameters
         /// - `id` — `string`.
@@ -1331,7 +1160,6 @@ impl LuaUserData for LuaUpgradeTree {
         /// The current name.
         methods.add_method("getName", |_, this, ()| Ok(this.0.borrow().name.clone()));
         /// Returns the number of items.
-        /// @return integer
         ///
         /// # Parameters
         /// - `id` — `string`.
@@ -1342,9 +1170,6 @@ impl LuaUserData for LuaUpgradeTree {
         /// `integer`.
         methods.add_method("count", |_, this, ()| Ok(this.0.borrow().count()));
         /// Adds node to the collection.
-        /// @param id : string
-        /// @param name : string
-        /// @param prereqs : table?
         ///
         /// # Parameters
         /// - `id` — `string`.
@@ -1361,8 +1186,6 @@ impl LuaUserData for LuaUpgradeTree {
             Ok(())
         });
         /// Returns `true` if unlock.
-        /// @param id : string
-        /// @return any
         ///
         /// # Parameters
         /// - `id` — `string`.
@@ -1373,8 +1196,6 @@ impl LuaUserData for LuaUpgradeTree {
             Ok(this.0.borrow().can_unlock(&id))
         });
         /// Unlock on this UpgradeTree.
-        /// @param id : string
-        /// @return any
         ///
         /// # Parameters
         /// - `id` — `string`.
@@ -1382,8 +1203,6 @@ impl LuaUserData for LuaUpgradeTree {
             Ok(this.0.borrow_mut().unlock(&id))
         });
         /// Returns `true` if unlocked.
-        /// @param id : string
-        /// @return any
         ///
         /// # Parameters
         /// - `id` — `string`.
@@ -1395,8 +1214,6 @@ impl LuaUserData for LuaUpgradeTree {
             Ok(borrow.get_node(&id).map(|n| n.unlocked).unwrap_or(false))
         });
         /// Reset node on this UpgradeTree.
-        /// @param id : string
-        /// @return any
         ///
         /// # Parameters
         /// - `id` — `string`.
@@ -1404,7 +1221,6 @@ impl LuaUserData for LuaUpgradeTree {
             Ok(this.0.borrow_mut().reset_node(&id))
         });
         /// Returns the unlocked ids.
-        /// @return any
         ///
         /// # Returns
         /// The current unlocked ids.
@@ -1415,7 +1231,6 @@ impl LuaUserData for LuaUpgradeTree {
             Ok(t)
         });
         /// Returns the node ids.
-        /// @return any
         ///
         /// # Parameters
         /// - `id` — `string`.
@@ -1429,8 +1244,6 @@ impl LuaUserData for LuaUpgradeTree {
             Ok(t)
         });
         /// Sets the node cost.
-        /// @param id : string
-        /// @param cost_table : table
         ///
         /// # Parameters
         /// - `id` — `string`.
@@ -1446,8 +1259,6 @@ impl LuaUserData for LuaUpgradeTree {
             Ok(())
         });
         /// Returns the node cost.
-        /// @param id : string
-        /// @return any
         ///
         /// # Parameters
         /// - `id` — `string`.
@@ -1467,8 +1278,6 @@ impl LuaUserData for LuaUpgradeTree {
         });
 
         /// Adds a directed edge from `from_id` to `to_id` in the DAG.
-        /// @param from_id : string
-        /// @param to_id : string
         ///
         /// # Parameters
         /// - `from_id` — `string`.
@@ -1478,8 +1287,6 @@ impl LuaUserData for LuaUpgradeTree {
         });
 
         /// Returns direct children of the given node.
-        /// @param id : string
-        /// @return any
         ///
         /// # Parameters
         /// - `id` — `string`.
@@ -1493,7 +1300,6 @@ impl LuaUserData for LuaUpgradeTree {
         });
 
         /// Returns all root node IDs (nodes with no parents).
-        /// @return any
         ///
         /// # Returns
         /// `table` of `string` IDs.
@@ -1504,8 +1310,6 @@ impl LuaUserData for LuaUpgradeTree {
         });
 
         /// Returns the parent node ID of the given node, or `nil` if it is a root.
-        /// @param id : string
-        /// @return any
         ///
         /// # Parameters
         /// - `id` — `string`.
@@ -1517,9 +1321,6 @@ impl LuaUserData for LuaUpgradeTree {
         });
 
         /// Returns the shortest path of node IDs from `from` to `to`, or an empty table.
-        /// @param from : string
-        /// @param to : string
-        /// @return any
         ///
         /// # Parameters
         /// - `from` — `string`.
@@ -1534,7 +1335,6 @@ impl LuaUserData for LuaUpgradeTree {
         });
 
         /// Returns all node data as a list of `{id, name, unlocked, recipeId, outputItemType}` tables.
-        /// @return any
         ///
         /// # Returns
         /// `table` of node info tables.
@@ -1555,8 +1355,6 @@ impl LuaUserData for LuaUpgradeTree {
         });
 
         /// Returns data for a single node as a table, or `nil` if not found.
-        /// @param id : string
-        /// @return any
         ///
         /// # Parameters
         /// - `id` — `string`.
@@ -1586,7 +1384,6 @@ impl LuaUserData for LuaUpgradeTree {
 // ─────────────────────────────────────────────────────────────────────────────
 
 #[derive(Clone)]
-/// Lua-callable handle wrapping [`RecipeKnowledge`].
 pub struct LuaRecipeKnowledge(pub Rc<RefCell<RecipeKnowledge>>);
 
 impl LunaType for LuaRecipeKnowledge {
@@ -1599,8 +1396,6 @@ impl LuaUserData for LuaRecipeKnowledge {
         add_type_methods(methods);
 
         /// Marks a recipe as discovered with an optional source string.
-        /// @param id : string
-        /// @param source : string?
         ///
         /// # Parameters
         /// - `recipe_id` — `string`: Recipe ID to discover.
@@ -1610,8 +1405,6 @@ impl LuaUserData for LuaRecipeKnowledge {
             Ok(())
         });
         /// Removes knowledge of a recipe. Returns `true` if the recipe was known.
-        /// @param id : string
-        /// @return any
         ///
         /// # Parameters
         /// - `recipe_id` — `string`: Recipe ID to forget.
@@ -1622,8 +1415,6 @@ impl LuaUserData for LuaRecipeKnowledge {
             Ok(this.0.borrow_mut().forget(&id))
         });
         /// Returns `true` if the recipe is known (or auto-discover is on).
-        /// @param id : string
-        /// @return any
         ///
         /// # Parameters
         /// - `recipe_id` — `string`: Recipe ID to check.
@@ -1634,7 +1425,6 @@ impl LuaUserData for LuaRecipeKnowledge {
             Ok(this.0.borrow().is_known(&id))
         });
         /// Returns a list of all known recipe IDs.
-        /// @return any
         ///
         /// # Returns
         /// `table` of `string` IDs.
@@ -1647,14 +1437,11 @@ impl LuaUserData for LuaRecipeKnowledge {
             Ok(t)
         });
         /// Returns the number of known recipes.
-        /// @return integer
         ///
         /// # Returns
         /// `integer`.
         methods.add_method("count", |_, this, ()| Ok(this.0.borrow().count()));
         /// Returns the discovery source for a recipe, or `nil` if unknown.
-        /// @param id : string
-        /// @return any
         ///
         /// # Parameters
         /// - `recipe_id` — `string`.
@@ -1665,7 +1452,6 @@ impl LuaUserData for LuaRecipeKnowledge {
             Ok(this.0.borrow().get_source(&id).map(|s| s.to_string()))
         });
         /// Enables or disables auto-discovery mode (all recipes always known).
-        /// @param v : boolean
         ///
         /// # Parameters
         /// - `enabled` — `boolean`.
@@ -1673,7 +1459,6 @@ impl LuaUserData for LuaRecipeKnowledge {
             this.0.borrow_mut().set_auto_discover(v); Ok(())
         });
         /// Returns `true` if auto-discover mode is on.
-        /// @return any
         ///
         /// # Returns
         /// `boolean`.
@@ -1686,8 +1471,6 @@ impl LuaUserData for LuaRecipeKnowledge {
         });
 
         /// Permanently learns a recipe via the prototype mechanic (Don't Starve pattern).
-        /// @param id : string
-        /// @return any
         ///
         /// # Parameters
         /// - `recipe_id` — `string`.
@@ -1699,8 +1482,6 @@ impl LuaUserData for LuaRecipeKnowledge {
         });
 
         /// Returns `true` if the recipe has been prototyped.
-        /// @param id : string
-        /// @return any
         ///
         /// # Parameters
         /// - `recipe_id` — `string`.
@@ -1712,8 +1493,6 @@ impl LuaUserData for LuaRecipeKnowledge {
         });
 
         /// Sets the resource cost required to research a recipe (Rust blueprint pattern).
-        /// @param id : string
-        /// @param cost : number
         ///
         /// # Parameters
         /// - `recipe_id` — `string`.
@@ -1723,8 +1502,6 @@ impl LuaUserData for LuaRecipeKnowledge {
         });
 
         /// Returns the research cost for a recipe (0 if not set).
-        /// @param id : string
-        /// @return any
         ///
         /// # Parameters
         /// - `recipe_id` — `string`.
@@ -1736,9 +1513,6 @@ impl LuaUserData for LuaRecipeKnowledge {
         });
 
         /// Attempts to research a recipe by spending `scrap`. Returns `false` if not enough.
-        /// @param id : string
-        /// @param scrap : number
-        /// @return any
         ///
         /// # Parameters
         /// - `recipe_id` — `string`.
@@ -1757,7 +1531,6 @@ impl LuaUserData for LuaRecipeKnowledge {
 // ─────────────────────────────────────────────────────────────────────────────
 
 #[derive(Clone)]
-/// Lua-callable handle wrapping [`RecipeGroup`].
 pub struct LuaRecipeGroup(pub Rc<RefCell<RecipeGroup>>);
 
 impl LunaType for LuaRecipeGroup {
@@ -1770,43 +1543,36 @@ impl LuaUserData for LuaRecipeGroup {
         add_type_methods(methods);
 
         /// Returns the group name.
-        /// @return any
         ///
         /// # Returns
         /// `string`.
         methods.add_method("getName", |_, this, ()| Ok(this.0.borrow().name.clone()));
         /// Sets the group name.
-        /// @param v : string
         ///
         /// # Parameters
         /// - `name` — `string`.
         methods.add_method("setName", |_, this, v: String| { this.0.borrow_mut().name = v; Ok(()) });
         /// Returns the icon asset path for this group.
-        /// @return any
         ///
         /// # Returns
         /// `string`.
         methods.add_method("getIcon", |_, this, ()| Ok(this.0.borrow().icon.clone()));
         /// Sets the icon asset path.
-        /// @param v : string
         ///
         /// # Parameters
         /// - `icon` — `string`: Asset path.
         methods.add_method("setIcon", |_, this, v: String| { this.0.borrow_mut().icon = v; Ok(()) });
         /// Returns the display order index.
-        /// @return any
         ///
         /// # Returns
         /// `integer`.
         methods.add_method("getOrder", |_, this, ()| Ok(this.0.borrow().order));
         /// Sets the display order index.
-        /// @param v : integer
         ///
         /// # Parameters
         /// - `order` — `integer`.
         methods.add_method("setOrder", |_, this, v: i32| { this.0.borrow_mut().order = v; Ok(()) });
         /// Adds a recipe ID to this group (no-op if already present).
-        /// @param id : string
         ///
         /// # Parameters
         /// - `recipe_id` — `string`.
@@ -1814,8 +1580,6 @@ impl LuaUserData for LuaRecipeGroup {
             this.0.borrow_mut().add_recipe(id); Ok(())
         });
         /// Removes a recipe ID from this group. Returns `true` if it was present.
-        /// @param id : string
-        /// @return any
         ///
         /// # Parameters
         /// - `recipe_id` — `string`.
@@ -1826,7 +1590,6 @@ impl LuaUserData for LuaRecipeGroup {
             Ok(this.0.borrow_mut().remove_recipe(&id))
         });
         /// Returns all recipe IDs in this group.
-        /// @return any
         ///
         /// # Returns
         /// `table` of `string` IDs.
@@ -1838,14 +1601,11 @@ impl LuaUserData for LuaRecipeGroup {
             Ok(t)
         });
         /// Returns the number of recipes in this group.
-        /// @return integer
         ///
         /// # Returns
         /// `integer`.
         methods.add_method("count", |_, this, ()| Ok(this.0.borrow().count()));
         /// Returns `true` if this group contains the given recipe ID.
-        /// @param id : string
-        /// @return any
         ///
         /// # Parameters
         /// - `recipe_id` — `string`.
@@ -1863,7 +1623,6 @@ impl LuaUserData for LuaRecipeGroup {
 // ─────────────────────────────────────────────────────────────────────────────
 
 #[derive(Clone)]
-/// Lua-callable handle wrapping [`ModifierPool`].
 pub struct LuaModifierPool(pub Rc<RefCell<ModifierPool>>);
 
 impl LunaType for LuaModifierPool {
@@ -1876,16 +1635,12 @@ impl LuaUserData for LuaModifierPool {
         add_type_methods(methods);
 
         /// Returns the name of this modifier pool.
-        /// @return any
         ///
         /// # Returns
         /// `string`.
         methods.add_method("getName", |_, this, ()| Ok(this.0.borrow().name.clone()));
 
         /// Adds a modifier to the pool. Effects are a table of `{effectName: number}` pairs.
-        /// @param name : string
-        /// @param weight : number
-        /// @param effects : table?
         ///
         /// # Parameters
         /// - `name` — `string`: Modifier name.
@@ -1904,8 +1659,6 @@ impl LuaUserData for LuaModifierPool {
         });
 
         /// Removes a modifier by name. Returns `true` if it existed.
-        /// @param name : string
-        /// @return any
         ///
         /// # Parameters
         /// - `name` — `string`.
@@ -1917,7 +1670,6 @@ impl LuaUserData for LuaModifierPool {
         });
 
         /// Returns the total combined weight of all pool entries.
-        /// @return any
         ///
         /// # Returns
         /// `number`.
@@ -1926,14 +1678,12 @@ impl LuaUserData for LuaModifierPool {
         });
 
         /// Returns the number of entries in the pool.
-        /// @return integer
         ///
         /// # Returns
         /// `integer`.
         methods.add_method("count", |_, this, ()| Ok(this.0.borrow().count()));
 
         /// Returns all modifier entries as a list of `{name, weight, effects}` tables.
-        /// @return any
         ///
         /// # Returns
         /// `table` of modifier tables.
@@ -1953,8 +1703,6 @@ impl LuaUserData for LuaModifierPool {
         });
 
         /// Rolls a random modifier using `seed` as a deterministic source.
-        /// @param seed : integer
-        /// @return any
         ///
         /// # Parameters
         /// - `seed` — `integer`: Deterministic seed value.
@@ -1983,21 +1731,11 @@ impl LuaUserData for LuaModifierPool {
 // Register
 // ─────────────────────────────────────────────────────────────────────────────
 
-/// Register the `luna.crafting.*` table. Panics in debug mode if the same entity is registered twice.
-///
-/// # Parameters
-/// - `lua` — `&Lua`.
-/// - `luna` — `&LuaTable`.
-///
-/// # Returns
-/// `LuaResult<()>`.
+/// Register the `luna.crafting.*` table.
 pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
     let module = lua.create_table()?;
 
     /// Creates a new recipe instance.
-    /// @param id : string
-    /// @param recipe_type : string?
-    /// @return any
     ///
     /// # Parameters
     /// - `id` — `string`.
@@ -2008,15 +1746,11 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
     })?)?;
 
     /// Creates a new recipe registry instance.
-    /// @return any
     module.set("newRegistry", lua.create_function(|_, ()| {
         Ok(LuaRecipeRegistry(Rc::new(RefCell::new(RecipeRegistry::new()))))
     })?)?;
 
     /// Creates a new station instance.
-    /// @param station_type : string
-    /// @param level : integer?
-    /// @return any
     ///
     /// # Parameters
     /// - `station_type` — `string`.
@@ -2026,8 +1760,6 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
     })?)?;
 
     /// Creates a new craft skill instance.
-    /// @param name : string
-    /// @return any
     ///
     /// # Parameters
     /// - `name` — `string`.
@@ -2036,8 +1768,6 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
     })?)?;
 
     /// Creates a new craft queue instance.
-    /// @param max_jobs : integer?
-    /// @return any
     ///
     /// # Parameters
     /// - `max_jobs` — `integer` optional.
@@ -2046,8 +1776,6 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
     })?)?;
 
     /// Creates a new upgrade tree instance.
-    /// @param name : string?
-    /// @return any
     ///
     /// # Parameters
     /// - `name` — `string` optional.
@@ -2056,14 +1784,11 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
     })?)?;
 
     /// Creates a new recipe knowledge tracker.
-    /// @return any
     module.set("newRecipeKnowledge", lua.create_function(|_, ()| {
         Ok(LuaRecipeKnowledge(Rc::new(RefCell::new(RecipeKnowledge::new()))))
     })?)?;
 
     /// Creates a new recipe group for UI organization.
-    /// @param name : string
-    /// @return any
     ///
     /// # Parameters
     /// - `name` — `string`: Group name.
@@ -2072,8 +1797,6 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
     })?)?;
 
     /// Creates a new modifier pool.
-    /// @param name : string
-    /// @return any
     ///
     /// # Parameters
     /// - `name` — `string`: Pool identifier.

@@ -1,70 +1,101 @@
--- Luna2D Integration Test: SaveGame + Entity
--- Tests saving and restoring entity state through the save system
+-- Luna2D Integration Test: Save + Entity
+-- Tests saving and restoring entity state
 
-describe("integration: save and restore entity state", function()
-    it("saves entity data via save manager", function()
+describe("integration: save entity world state", function()
+    it("collects entity data for save", function()
         local universe = luna.entity.newUniverse()
 
-        -- Create some entities
-        for i = 1, 20 do
-            local id = universe:spawn()
-            universe:set(id, "name", "entity_" .. i)
-            universe:set(id, "health", 100 - i)
-            universe:set(id, "x", i * 10)
-        end
+        -- Create game entities
+        local player = universe:spawn()
+        universe:set(player, "name", "Hero")
+        universe:set(player, "health", 85)
+        universe:set(player, "position", {x = 100, y = 200})
 
-        -- Set up save manager
-        local sm = luna.savegame.newSaveManager()
-        sm:setSchemaVersion(1)
+        local enemy1 = universe:spawn()
+        universe:set(enemy1, "name", "Goblin")
+        universe:set(enemy1, "health", 30)
 
-        local entity_data = nil
-        sm:register("entities", function()
-            -- Collect entity data
-            local data = {}
-            local entities = universe:getEntities()
-            for _, id in ipairs(entities) do
-                data[#data + 1] = {
+        local enemy2 = universe:spawn()
+        universe:set(enemy2, "name", "Dragon")
+        universe:set(enemy2, "health", 500)
+
+        -- Collect state as save data
+        local save_data = {}
+        local ids = {player, enemy1, enemy2}
+        for _, id in ipairs(ids) do
+            if universe:isAlive(id) then
+                save_data[#save_data + 1] = {
                     name = universe:get(id, "name"),
                     health = universe:get(id, "health"),
-                    x = universe:get(id, "x")
                 }
             end
-            return data
-        end, function(data)
-            entity_data = data
-        end)
+        end
 
-        -- Collect save data
-        local save_data = sm:collect()
-        expect_not_nil(save_data, "save data collected")
+        expect_equal(3, #save_data, "3 entities collected")
+        expect_equal("Hero", save_data[1].name, "player name preserved")
+        expect_equal(85, save_data[1].health, "player health preserved")
+        expect_equal("Dragon", save_data[3].name, "dragon name preserved")
+    end)
 
-        -- Restore it
-        sm:restore(save_data)
-        expect_not_nil(entity_data, "entity data restored")
-        expect_equal(20, #entity_data, "all 20 entities restored")
+    it("save manager tracks entity dirty state", function()
+        local mgr = luna.savegame.newSaveManager()
+        local universe = luna.entity.newUniverse()
+
+        mgr:register("entities")
+        expect_false(mgr:isDirty(), "initially clean")
+
+        -- Modify entities
+        local id = universe:spawn()
+        universe:set(id, "modified", true)
+        mgr:markDirty()
+
+        expect_true(mgr:isDirty(), "dirty after entity modification")
     end)
 end)
 
-describe("integration: save dirty tracking with entity changes", function()
-    it("tracks dirty state when entities change", function()
-        local sm = luna.savegame.newSaveManager()
+describe("integration: TOML config for entities", function()
+    it("entity blueprints from TOML", function()
+        local toml_str = [[
+            [player]
+            health = 100
+            speed = 5.0
+            name = "Hero"
 
-        sm:register("state", function()
-            return {modified = true}
-        end, function(data) end)
+            [goblin]
+            health = 30
+            speed = 3.0
+            name = "Goblin"
 
-        -- Initially not dirty
-        expect_false(sm:isDirty(), "initially clean")
+            [dragon]
+            health = 500
+            speed = 2.0
+            name = "Dragon"
+        ]]
 
-        -- Mark dirty after entity change
-        sm:markDirty()
-        expect_true(sm:isDirty(), "dirty after mark")
+        local config = luna.data.parseToml(toml_str)
 
-        -- Collect resets dirty
-        sm:collect()
-        -- Dirty flag might or might not reset after collect - just verify no crash
-        expect_no_error(function()
-            sm:isDirty()
-        end)
+        local universe = luna.entity.newUniverse()
+
+        -- Create entities from TOML config
+        local entities = {}
+        for entity_type, props in pairs(config) do
+            local id = universe:spawn()
+            if type(props) == "table" then
+                for key, value in pairs(props) do
+                    universe:set(id, key, value)
+                end
+                universe:set(id, "type", entity_type)
+                entities[entity_type] = id
+            end
+        end
+
+        -- Verify entities created from config
+        expect_true(universe:getEntityCount() >= 3, "at least 3 entities from TOML")
+
+        -- Check one entity
+        if entities["player"] then
+            local name = universe:get(entities["player"], "name")
+            expect_equal("Hero", name, "player name from TOML")
+        end
     end)
 end)

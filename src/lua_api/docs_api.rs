@@ -133,13 +133,11 @@ struct DocEntry(DocEntryData);
 impl LuaUserData for DocEntry {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
         /// Returns the name.
-        /// @return any
         ///
         /// # Returns
         /// The current name.
         methods.add_method("getName", |_, this, ()| Ok(this.0.name.clone()));
         /// Returns the qualified name.
-        /// @return any
         ///
         /// # Returns
         /// The current qualified name.
@@ -147,19 +145,16 @@ impl LuaUserData for DocEntry {
             Ok(this.0.qualified_name.clone())
         });
         /// Returns the module.
-        /// @return any
         ///
         /// # Returns
         /// The current module.
         methods.add_method("getModule", |_, this, ()| Ok(this.0.module.clone()));
         /// Returns the kind.
-        /// @return any
         ///
         /// # Returns
         /// The current kind.
         methods.add_method("getKind", |_, this, ()| Ok(this.0.kind.clone()));
         /// Returns the description.
-        /// @return any
         ///
         /// # Returns
         /// The current description.
@@ -167,7 +162,6 @@ impl LuaUserData for DocEntry {
             Ok(this.0.description.clone())
         });
         /// Returns the parameters.
-        /// @return table
         ///
         /// # Returns
         /// The current parameters.
@@ -203,7 +197,6 @@ impl LuaUserData for DocEntry {
             Ok(tbl)
         });
         /// Returns the returns.
-        /// @return table
         ///
         /// # Returns
         /// The current returns.
@@ -222,19 +215,16 @@ impl LuaUserData for DocEntry {
             Ok(tbl)
         });
         /// Returns the example.
-        /// @return any
         ///
         /// # Returns
         /// The current example.
         methods.add_method("getExample", |_, this, ()| Ok(this.0.example.clone()));
         /// Returns the since.
-        /// @return any
         ///
         /// # Returns
         /// The current since.
         methods.add_method("getSince", |_, this, ()| Ok(this.0.since.clone()));
         /// Returns the deprecated.
-        /// @return any
         ///
         /// # Returns
         /// The current deprecated.
@@ -242,13 +232,11 @@ impl LuaUserData for DocEntry {
             Ok(this.0.deprecated.clone())
         });
         /// Returns the score.
-        /// @return any
         ///
         /// # Returns
         /// The current score.
         methods.add_method("getScore", |_, this, ()| Ok(this.0.score()));
         /// Returns `true` if description.
-        /// @return boolean
         ///
         /// # Returns
         /// `boolean`.
@@ -256,7 +244,6 @@ impl LuaUserData for DocEntry {
             Ok(!this.0.description.is_empty())
         });
         /// Returns `true` if parameters.
-        /// @return boolean
         ///
         /// # Returns
         /// `boolean`.
@@ -264,7 +251,6 @@ impl LuaUserData for DocEntry {
             Ok(!this.0.parameters.is_empty())
         });
         /// Returns `true` if return type.
-        /// @return boolean
         ///
         /// # Returns
         /// `boolean`.
@@ -272,7 +258,6 @@ impl LuaUserData for DocEntry {
             Ok(!this.0.returns.is_empty())
         });
         /// Returns `true` if example.
-        /// @return boolean
         ///
         /// # Returns
         /// `boolean`.
@@ -291,7 +276,6 @@ struct ApiCatalog(ApiCatalogData);
 impl LuaUserData for ApiCatalog {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
         /// Returns the modules.
-        /// @return table
         ///
         /// # Returns
         /// The current modules.
@@ -304,8 +288,6 @@ impl LuaUserData for ApiCatalog {
         });
 
         /// Returns the entries.
-        /// @param module : string?
-        /// @return table
         ///
         /// # Parameters
         /// - `module` — `string` optional.
@@ -325,8 +307,6 @@ impl LuaUserData for ApiCatalog {
         });
 
         /// Returns the entry.
-        /// @param qualified_name : string
-        /// @return any
         ///
         /// # Parameters
         /// - `qualified_name` — `string`.
@@ -338,8 +318,6 @@ impl LuaUserData for ApiCatalog {
         });
 
         /// Returns the types.
-        /// @param module_name : string
-        /// @return table
         ///
         /// # Parameters
         /// - `module_name` — `string`.
@@ -359,8 +337,6 @@ impl LuaUserData for ApiCatalog {
         });
 
         /// Returns the type methods.
-        /// @param qualified_name : string
-        /// @return table
         ///
         /// # Parameters
         /// - `qualified_name` — `string`.
@@ -381,8 +357,6 @@ impl LuaUserData for ApiCatalog {
         });
 
         /// Entry count on this Object.
-        /// @param module : string?
-        /// @return any
         ///
         /// # Parameters
         /// - `module` — `string` optional.
@@ -391,8 +365,6 @@ impl LuaUserData for ApiCatalog {
         });
 
         /// Merge on this Object.
-        /// @param other : userdata
-        /// @return any
         ///
         /// # Parameters
         /// - `other` — `userdata`.
@@ -417,8 +389,6 @@ impl LuaUserData for ApiCatalog {
         });
 
         /// Returns a filtered subset.
-        /// @param predicate : function
-        /// @return any
         ///
         /// # Parameters
         /// - `predicate` — `function`.
@@ -435,8 +405,6 @@ impl LuaUserData for ApiCatalog {
         });
 
         /// Search on this Object.
-        /// @param query : string
-        /// @return table
         ///
         /// # Parameters
         /// - `query` — `string`.
@@ -457,7 +425,6 @@ impl LuaUserData for ApiCatalog {
         });
 
         /// To table on this Object.
-        /// @return table
         ///
         /// # Returns
         /// The result.
@@ -501,7 +468,6 @@ impl LuaUserData for ApiCatalog {
         });
 
         /// To j s o n on this Object.
-        /// @return any
         ///
         /// # Returns
         /// The result.
@@ -561,13 +527,11 @@ struct ValidationReport {
 impl LuaUserData for ValidationReport {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
         /// Returns `true` if valid.
-        /// @return boolean
         ///
         /// # Returns
         /// `boolean`.
         methods.add_method("isValid", |_, this, ()| Ok(this.missing.is_empty()));
         /// Returns the missing.
-        /// @return table
         ///
         /// # Returns
         /// The current missing.
@@ -579,7 +543,6 @@ impl LuaUserData for ValidationReport {
             Ok(tbl)
         });
         /// Returns the phantom.
-        /// @return table
         ///
         /// # Returns
         /// The current phantom.
@@ -591,7 +554,6 @@ impl LuaUserData for ValidationReport {
             Ok(tbl)
         });
         /// Returns the incomplete.
-        /// @return table
         ///
         /// # Returns
         /// The current incomplete.
@@ -603,25 +565,21 @@ impl LuaUserData for ValidationReport {
             Ok(tbl)
         });
         /// Missing count on this Object.
-        /// @return integer
         ///
         /// # Returns
         /// The result.
         methods.add_method("missingCount", |_, this, ()| Ok(this.missing.len()));
         /// Phantom count on this Object.
-        /// @return integer
         ///
         /// # Returns
         /// The result.
         methods.add_method("phantomCount", |_, this, ()| Ok(this.phantom.len()));
         /// Incomplete count on this Object.
-        /// @return integer
         ///
         /// # Returns
         /// The result.
         methods.add_method("incompleteCount", |_, this, ()| Ok(this.incomplete.len()));
         /// Returns the summary.
-        /// @return any
         ///
         /// # Returns
         /// The current summary.
@@ -634,7 +592,6 @@ impl LuaUserData for ValidationReport {
             ))
         });
         /// To table on this Object.
-        /// @return table
         ///
         /// # Returns
         /// The result.
@@ -670,7 +627,6 @@ impl LuaUserData for ValidationReport {
             Ok(tbl)
         });
         /// To j s o n on this Object.
-        /// @return any
         ///
         /// # Returns
         /// The result.
@@ -701,13 +657,11 @@ struct QualityReport {
 impl LuaUserData for QualityReport {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
         /// Returns the overall score.
-        /// @return any
         ///
         /// # Returns
         /// The current overall score.
         methods.add_method("getOverallScore", |_, this, ()| Ok(this.overall_score));
         /// Returns the grade.
-        /// @return any
         ///
         /// # Returns
         /// The current grade.
@@ -715,7 +669,6 @@ impl LuaUserData for QualityReport {
             Ok(DocEntryData::grade(this.overall_score).to_string())
         });
         /// Returns the module scores.
-        /// @return table
         ///
         /// # Parameters
         /// - `count` — `integer` optional.
@@ -730,8 +683,6 @@ impl LuaUserData for QualityReport {
             Ok(tbl)
         });
         /// Returns the worst.
-        /// @param count : integer?
-        /// @return table
         ///
         /// # Parameters
         /// - `count` — `integer` optional.
@@ -749,8 +700,6 @@ impl LuaUserData for QualityReport {
             Ok(tbl)
         });
         /// Returns the best.
-        /// @param count : integer?
-        /// @return table
         ///
         /// # Parameters
         /// - `count` — `integer` optional.
@@ -768,8 +717,6 @@ impl LuaUserData for QualityReport {
             Ok(tbl)
         });
         /// Returns the by grade.
-        /// @param grade : string
-        /// @return table
         ///
         /// # Parameters
         /// - `grade` — `string`.
@@ -788,7 +735,6 @@ impl LuaUserData for QualityReport {
             Ok(tbl)
         });
         /// Returns the summary.
-        /// @return any
         ///
         /// # Returns
         /// The current summary.
@@ -806,7 +752,6 @@ impl LuaUserData for QualityReport {
             Ok(lines.join("\n"))
         });
         /// To table on this Object.
-        /// @return table
         ///
         /// # Returns
         /// The result.
@@ -834,7 +779,6 @@ impl LuaUserData for QualityReport {
             Ok(tbl)
         });
         /// To j s o n on this Object.
-        /// @return any
         ///
         /// # Returns
         /// The result.
@@ -949,14 +893,7 @@ fn scan_table(
 // Registration
 // ---------------------------------------------------------------------------
 
-/// Registers the `luna.docs` namespace. Panics in debug mode if the same entity is registered twice.
-///
-/// # Parameters
-/// - `lua` — `&Lua`.
-/// - `luna_table` — `&LuaTable`.
-///
-/// # Returns
-/// `LuaResult<()>`.
+/// Registers the `luna.docs` namespace.
 pub fn register(lua: &Lua, luna_table: &LuaTable) -> LuaResult<()> {
     let docs = lua.create_table()?;
     let state = Rc::new(RefCell::new(DocsState::new()));
@@ -964,8 +901,6 @@ pub fn register(lua: &Lua, luna_table: &LuaTable) -> LuaResult<()> {
     // ===== Catalog Management =====
 
     /// Scan the luna.* namespace to build an API catalog from live bindings.
-    /// @param opts : table?
-    /// @return any
     docs.set(
         "scan",
         lua.create_function(|lua, _opts: Option<LuaTable>| {
@@ -978,8 +913,6 @@ pub fn register(lua: &Lua, luna_table: &LuaTable) -> LuaResult<()> {
     )?;
 
     /// Scan a single module's bindings.
-    /// @param module_name : string
-    /// @return any
     docs.set(
         "scanModule",
         lua.create_function(|lua, module_name: String| {
@@ -994,8 +927,6 @@ pub fn register(lua: &Lua, luna_table: &LuaTable) -> LuaResult<()> {
     )?;
 
     /// Load a TOML doc file into an ApiCatalog.
-    /// @param path : string
-    /// @return any
     docs.set(
         "loadToml",
         lua.create_function(|lua, path: String| {
@@ -1042,8 +973,6 @@ pub fn register(lua: &Lua, luna_table: &LuaTable) -> LuaResult<()> {
     )?;
 
     /// Load all .toml files in a directory and merge.
-    /// @param directory : string
-    /// @return any
     docs.set(
         "loadAll",
         lua.create_function(|lua, directory: String| {
@@ -1093,8 +1022,6 @@ pub fn register(lua: &Lua, luna_table: &LuaTable) -> LuaResult<()> {
 
     /// Inject a description for an API entry.
     let s = state.clone();
-    /// @param qualified_name : string
-    /// @param description : string
     docs.set(
         "describe",
         lua.create_function(move |_, (qualified_name, description): (String, String)| {
@@ -1134,8 +1061,6 @@ pub fn register(lua: &Lua, luna_table: &LuaTable) -> LuaResult<()> {
 
     /// Set parameter info for an entry.
     let s = state.clone();
-    /// @param qualified_name : string
-    /// @param params : table
     docs.set(
         "setParamInfo",
         lua.create_function(move |_, (qualified_name, params): (String, LuaTable)| {
@@ -1164,8 +1089,6 @@ pub fn register(lua: &Lua, luna_table: &LuaTable) -> LuaResult<()> {
 
     /// Set return type info for an entry.
     let s = state.clone();
-    /// @param qualified_name : string
-    /// @param returns : table
     docs.set(
         "setReturnInfo",
         lua.create_function(move |_, (qualified_name, returns): (String, LuaTable)| {
@@ -1209,8 +1132,6 @@ pub fn register(lua: &Lua, luna_table: &LuaTable) -> LuaResult<()> {
     // ===== Validation =====
 
     /// Validate catalog completeness against live bindings.
-    /// @param catalog_ud : userdata?
-    /// @return any
     docs.set(
         "validate",
         lua.create_function(|lua, catalog_ud: Option<LuaAnyUserData>| {
@@ -1255,9 +1176,6 @@ pub fn register(lua: &Lua, luna_table: &LuaTable) -> LuaResult<()> {
     )?;
 
     /// Validate a single module.
-    /// @param module_name : string
-    /// @param catalog_ud : userdata?
-    /// @return any
     docs.set(
         "validateModule",
         lua.create_function(|lua, (module_name, catalog_ud): (String, Option<LuaAnyUserData>)| {
@@ -1302,9 +1220,6 @@ pub fn register(lua: &Lua, luna_table: &LuaTable) -> LuaResult<()> {
     )?;
 
     /// Compare catalog timestamps against source files.
-    /// @param catalog_ud : userdata
-    /// @param source_dir : string
-    /// @return table
     docs.set(
         "checkStaleness",
         lua.create_function(|lua, (_catalog_ud, source_dir): (LuaAnyUserData, String)| {
@@ -1346,8 +1261,6 @@ pub fn register(lua: &Lua, luna_table: &LuaTable) -> LuaResult<()> {
 
     /// Calculate quality metrics for a catalog.
     let s = state.clone();
-    /// @param catalog_ud : userdata?
-    /// @return any
     docs.set(
         "quality",
         lua.create_function(move |_, catalog_ud: Option<LuaAnyUserData>| {
@@ -1363,9 +1276,6 @@ pub fn register(lua: &Lua, luna_table: &LuaTable) -> LuaResult<()> {
 
     /// Quality for a single module.
     let s = state.clone();
-    /// @param module_name : string
-    /// @param catalog_ud : userdata?
-    /// @return any
     docs.set(
         "qualityModule",
         lua.create_function(move |_, (module_name, catalog_ud): (String, Option<LuaAnyUserData>)| {
@@ -1384,8 +1294,6 @@ pub fn register(lua: &Lua, luna_table: &LuaTable) -> LuaResult<()> {
     )?;
 
     /// Coverage: (documented, total).
-    /// @param catalog_ud : userdata?
-    /// @return any
     docs.set(
         "coverage",
         lua.create_function(|lua, catalog_ud: Option<LuaAnyUserData>| {
@@ -1405,9 +1313,6 @@ pub fn register(lua: &Lua, luna_table: &LuaTable) -> LuaResult<()> {
     )?;
 
     /// Module-level coverage.
-    /// @param module_name : string
-    /// @param catalog_ud : userdata?
-    /// @return any
     docs.set(
         "coverageModule",
         lua.create_function(|lua, (module_name, catalog_ud): (String, Option<LuaAnyUserData>)| {
@@ -1431,8 +1336,6 @@ pub fn register(lua: &Lua, luna_table: &LuaTable) -> LuaResult<()> {
     // ===== Export =====
 
     /// Export completions JSON for VS Code IntelliSense.
-    /// @param catalog_ud : userdata
-    /// @param path : string
     docs.set(
         "exportCompletions",
         lua.create_function(|_, (catalog_ud, path): (LuaAnyUserData, String)| {
@@ -1463,8 +1366,6 @@ pub fn register(lua: &Lua, luna_table: &LuaTable) -> LuaResult<()> {
     )?;
 
     /// Export hover JSON.
-    /// @param catalog_ud : userdata
-    /// @param path : string
     docs.set(
         "exportHover",
         lua.create_function(|_, (catalog_ud, path): (LuaAnyUserData, String)| {
@@ -1494,8 +1395,6 @@ pub fn register(lua: &Lua, luna_table: &LuaTable) -> LuaResult<()> {
     )?;
 
     /// Export signatures JSON.
-    /// @param catalog_ud : userdata
-    /// @param path : string
     docs.set(
         "exportSignatures",
         lua.create_function(|_, (catalog_ud, path): (LuaAnyUserData, String)| {
@@ -1534,8 +1433,6 @@ pub fn register(lua: &Lua, luna_table: &LuaTable) -> LuaResult<()> {
     )?;
 
     /// Export all three files to a directory.
-    /// @param catalog_ud : userdata
-    /// @param output_dir : string
     docs.set(
         "exportAll",
         lua.create_function(|_, (catalog_ud, output_dir): (LuaAnyUserData, String)| {
@@ -1605,8 +1502,6 @@ pub fn register(lua: &Lua, luna_table: &LuaTable) -> LuaResult<()> {
     )?;
 
     /// Export markdown API reference.
-    /// @param catalog_ud : userdata
-    /// @param path : string
     docs.set(
         "exportMarkdown",
         lua.create_function(|_, (catalog_ud, path): (LuaAnyUserData, String)| {
@@ -1652,8 +1547,6 @@ pub fn register(lua: &Lua, luna_table: &LuaTable) -> LuaResult<()> {
     )?;
 
     /// Export one-line-per-function cheatsheet.
-    /// @param catalog_ud : userdata
-    /// @param path : string
     docs.set(
         "exportCheatsheet",
         lua.create_function(|_, (catalog_ud, path): (LuaAnyUserData, String)| {

@@ -8,11 +8,6 @@ use std::collections::HashMap;
 use crate::math::Rect;
 
 /// Named frame group within the sprite sheet.
-///
-/// # Fields
-/// - `name` — `String`.
-/// - `start_frame` — `usize`.
-/// - `count` — `usize`.
 #[derive(Debug, Clone)]
 pub struct FrameGroup {
     /// Human-readable name for this group.
@@ -23,11 +18,7 @@ pub struct FrameGroup {
     pub count: usize,
 }
 
-/// Directional layout for sprite sets. Consult the module-level documentation for the broader usage context and preconditions.
-///
-/// # Variants
-/// - `Rows` — Rows variant.
-/// - `Columns` — Columns variant.
+/// Directional layout for sprite sets.
 #[derive(Debug, Clone, PartialEq)]
 pub enum DirectionLayout {
     /// Each direction occupies a row.
@@ -37,14 +28,6 @@ pub enum DirectionLayout {
 }
 
 /// Grid-based sprite sheet with directional support and named groups.
-///
-/// # Fields
-/// - `frame_width` — `u32`.
-/// - `frame_height` — `u32`.
-/// - `columns` — `u32`.
-/// - `rows` — `u32`.
-/// - `texture_width` — `u32`.
-/// - `texture_height` — `u32`.
 ///
 /// Divides a texture into equal-sized cells and pre-computes UV quads
 /// for every frame. Supports named groups and 4/8-directional layouts.
@@ -74,33 +57,11 @@ pub struct SpriteSheet {
 impl SpriteSheet {
     /// Create a new sprite sheet by dividing a texture into a uniform grid.
     ///
-    /// # Parameters
-    /// - `texture_width` — `u32`.
-    /// - `texture_height` — `u32`.
-    /// - `frame_width` — `u32`.
-    /// - `frame_height` — `u32`.
-    ///
-    /// # Returns
-    /// `Self`.
-    ///
     /// Computes columns/rows from texture and frame dimensions and
     /// pre-generates all frame quads.
-    pub fn new(
-        texture_width: u32,
-        texture_height: u32,
-        frame_width: u32,
-        frame_height: u32,
-    ) -> Self {
-        let columns = if frame_width > 0 {
-            texture_width / frame_width
-        } else {
-            0
-        };
-        let rows = if frame_height > 0 {
-            texture_height / frame_height
-        } else {
-            0
-        };
+    pub fn new(texture_width: u32, texture_height: u32, frame_width: u32, frame_height: u32) -> Self {
+        let columns = if frame_width > 0 { texture_width / frame_width } else { 0 };
+        let rows = if frame_height > 0 { texture_height / frame_height } else { 0 };
         let total = (columns * rows) as usize;
 
         let mut frames = Vec::with_capacity(total);
@@ -130,47 +91,26 @@ impl SpriteSheet {
     }
 
     /// Return the quad for a 0-based frame index.
-    ///
-    /// # Parameters
-    /// - `index` — `usize`.
-    ///
-    /// # Returns
-    /// `Option<Rect>`.
     pub fn get_frame(&self, index: usize) -> Option<Rect> {
         self.frames.get(index).copied()
     }
 
-    /// Total number of frames in the sheet. This accessor incurs no allocation; call it freely in hot paths.
-    ///
-    /// # Returns
-    /// `usize`.
+    /// Total number of frames in the sheet.
     pub fn get_frame_count(&self) -> usize {
         self.frames.len()
     }
 
     /// Dimensions of a single frame `(width, height)`.
-    ///
-    /// # Returns
-    /// `(u32, u32)`.
     pub fn get_frame_size(&self) -> (u32, u32) {
         (self.frame_width, self.frame_height)
     }
 
-    /// Grid dimensions `(columns, rows)`. This accessor incurs no allocation; call it freely in hot paths.
-    ///
-    /// # Returns
-    /// `(u32, u32)`.
+    /// Grid dimensions `(columns, rows)`.
     pub fn get_grid_size(&self) -> (u32, u32) {
         (self.columns, self.rows)
     }
 
     /// Return all frame quads in a 0-based row.
-    ///
-    /// # Parameters
-    /// - `row` — `u32`.
-    ///
-    /// # Returns
-    /// `Vec<Rect>`.
     pub fn get_row(&self, row: u32) -> Vec<Rect> {
         if row >= self.rows {
             return Vec::new();
@@ -181,12 +121,6 @@ impl SpriteSheet {
     }
 
     /// Return all frame quads in a 0-based column.
-    ///
-    /// # Parameters
-    /// - `col` — `u32`.
-    ///
-    /// # Returns
-    /// `Vec<Rect>`.
     pub fn get_column(&self, col: u32) -> Vec<Rect> {
         if col >= self.columns {
             return Vec::new();
@@ -200,13 +134,6 @@ impl SpriteSheet {
     }
 
     /// Return a contiguous range of frame quads starting at `start` (0-based).
-    ///
-    /// # Parameters
-    /// - `start` — `usize`.
-    /// - `count` — `usize`.
-    ///
-    /// # Returns
-    /// `Vec<Rect>`.
     pub fn get_range(&self, start: usize, count: usize) -> Vec<Rect> {
         let end = (start + count).min(self.frames.len());
         if start >= self.frames.len() {
@@ -215,12 +142,7 @@ impl SpriteSheet {
         self.frames[start..end].to_vec()
     }
 
-    /// Store a named frame group. Consult the module-level documentation for the broader usage context and preconditions.
-    ///
-    /// # Parameters
-    /// - `name` — `impl Into<String>`.
-    /// - `start_frame` — `usize`.
-    /// - `count` — `usize`.
+    /// Store a named frame group.
     pub fn name_group(&mut self, name: impl Into<String>, start_frame: usize, count: usize) {
         let name = name.into();
         self.groups.insert(
@@ -234,42 +156,23 @@ impl SpriteSheet {
     }
 
     /// Return the frame quads for a named group.
-    ///
-    /// # Parameters
-    /// - `name` — `&str`.
-    ///
-    /// # Returns
-    /// `Option<Vec<Rect>>`.
     pub fn get_group(&self, name: &str) -> Option<Vec<Rect>> {
         let group = self.groups.get(name)?;
         Some(self.get_range(group.start_frame, group.count))
     }
 
-    /// Return the names of all defined groups. This accessor incurs no allocation; call it freely in hot paths.
-    ///
-    /// # Returns
-    /// `Vec<String>`.
+    /// Return the names of all defined groups.
     pub fn get_group_names(&self) -> Vec<String> {
         self.groups.keys().cloned().collect()
     }
 
     /// Set the directional mode (4 or 8 directions) and layout.
-    ///
-    /// # Parameters
-    /// - `count` — `u32`.
-    /// - `layout` — `DirectionLayout`.
     pub fn set_directions(&mut self, count: u32, layout: DirectionLayout) {
         self.direction_count = Some(count);
         self.direction_layout = layout;
     }
 
     /// Return the frame quads for a 0-based direction index.
-    ///
-    /// # Parameters
-    /// - `direction` — `u32`.
-    ///
-    /// # Returns
-    /// `Option<Vec<Rect>>`.
     ///
     /// With `Rows` layout, direction `n` maps to row `n`.
     /// With `Columns` layout, direction `n` maps to column `n`.

@@ -11,12 +11,6 @@ use std::collections::HashMap;
 
 /// A chunk of tiles pre-batched for fast culling and rendering.
 ///
-/// # Fields
-/// - `cx` — `i32`.
-/// - `cy` — `i32`.
-/// - `dirty` — `bool`.
-/// - `tile_ids` — `Vec<u32>`.
-///
 /// Each chunk covers a `chunk_size × chunk_size` region of tiles.
 #[derive(Debug)]
 pub struct MapChunk {
@@ -33,21 +27,6 @@ pub struct MapChunk {
 // ── LargeMapRenderer ────────────────────────────────────────────────────
 
 /// Optimized large tile-map renderer with chunked culling.
-///
-/// # Fields
-/// - `tile_width` — `u32`.
-/// - `tile_height` — `u32`.
-/// - `map_width` — `u32`.
-/// - `map_height` — `u32`.
-/// - `tileset_columns` — `u32`.
-/// - `chunk_size` — `u32`.
-/// - `camera_x` — `f32`.
-/// - `camera_y` — `f32`.
-/// - `camera_zoom` — `f32`.
-/// - `viewport_w` — `f32`.
-/// - `viewport_h` — `f32`.
-/// - `lod_enabled` — `bool`.
-/// - `lod_thresholds` — `Vec<f32>`.
 ///
 /// Tiles are stored in a flat `Vec<u32>` (row-major). The renderer splits
 /// them into square chunks and exposes helpers to determine which chunks
@@ -87,13 +66,6 @@ pub struct LargeMapRenderer {
 
 impl LargeMapRenderer {
     /// Creates a new `LargeMapRenderer` with the given tile dimensions.
-    ///
-    /// # Parameters
-    /// - `tile_w` — `u32`.
-    /// - `tile_h` — `u32`.
-    ///
-    /// # Returns
-    /// `Self`.
     ///
     /// The map starts empty (0×0). Call [`set_map_data`](Self::set_map_data) to
     /// populate it.
@@ -137,11 +109,6 @@ impl LargeMapRenderer {
 
     /// Sets a single tile at `(x, y)` (0-based) and marks the enclosing chunk dirty.
     ///
-    /// # Parameters
-    /// - `x` — `u32`.
-    /// - `y` — `u32`.
-    /// - `tile_id` — `u32`.
-    ///
     /// Does nothing if `(x, y)` is out of bounds.
     pub fn set_tile(&mut self, x: u32, y: u32, tile_id: u32) {
         if x >= self.map_width || y >= self.map_height {
@@ -157,13 +124,6 @@ impl LargeMapRenderer {
     }
 
     /// Returns the tile ID at `(x, y)` (0-based), or `None` if out of bounds.
-    ///
-    /// # Parameters
-    /// - `x` — `u32`.
-    /// - `y` — `u32`.
-    ///
-    /// # Returns
-    /// `Option<u32>`.
     pub fn get_tile(&self, x: u32, y: u32) -> Option<u32> {
         if x >= self.map_width || y >= self.map_height {
             return None;
@@ -173,9 +133,6 @@ impl LargeMapRenderer {
     }
 
     /// Returns the map size as `(width, height)` in tiles.
-    ///
-    /// # Returns
-    /// `(u32, u32)`.
     pub fn get_map_size(&self) -> (u32, u32) {
         (self.map_width, self.map_height)
     }
@@ -183,34 +140,24 @@ impl LargeMapRenderer {
     // ── Chunk management ────────────────────────────────────────────────
 
     /// Changes the chunk size (tiles per side) and rebuilds all chunks.
-    ///
-    /// # Parameters
-    /// - `size` — `u32`.
     pub fn set_chunk_size(&mut self, size: u32) {
         self.chunk_size = size.max(1);
         self.rebuild_chunks();
     }
 
     /// Returns the current chunk size (tiles per side).
-    ///
-    /// # Returns
-    /// `u32`.
     pub fn get_chunk_size(&self) -> u32 {
         self.chunk_size
     }
 
     /// Marks a specific chunk as dirty (needs rebuild).
-    ///
-    /// # Parameters
-    /// - `cx` — `i32`.
-    /// - `cy` — `i32`.
     pub fn invalidate_chunk(&mut self, cx: i32, cy: i32) {
         if let Some(chunk) = self.chunks.get_mut(&(cx, cy)) {
             chunk.dirty = true;
         }
     }
 
-    /// Marks all chunks as dirty. Consult the module-level documentation for the broader usage context and preconditions.
+    /// Marks all chunks as dirty.
     pub fn invalidate_all(&mut self) {
         for chunk in self.chunks.values_mut() {
             chunk.dirty = true;
@@ -218,9 +165,6 @@ impl LargeMapRenderer {
     }
 
     /// Returns the number of chunks currently visible given the camera
-    ///
-    /// # Returns
-    /// `usize`.
     /// position, zoom, and viewport.
     pub fn get_visible_chunks(&self) -> usize {
         if self.chunk_size == 0 {
@@ -238,30 +182,19 @@ impl LargeMapRenderer {
         count
     }
 
-    /// Returns the total number of chunks. This accessor incurs no allocation; call it freely in hot paths.
-    ///
-    /// # Returns
-    /// `usize`.
+    /// Returns the total number of chunks.
     pub fn get_total_chunks(&self) -> usize {
         self.chunks.len()
     }
 
     /// Returns a reference to the chunk map for rendering.
-    ///
-    /// # Returns
-    /// `&HashMap<(i32, i32), MapChunk>`.
     pub fn chunks(&self) -> &HashMap<(i32, i32), MapChunk> {
         &self.chunks
     }
 
     // ── Camera / viewport ───────────────────────────────────────────────
 
-    /// Sets the camera position and zoom. Replaces the current camera value; callers hold responsibility for maintaining consistency with related fields.
-    ///
-    /// # Parameters
-    /// - `x` — `f32`.
-    /// - `y` — `f32`.
-    /// - `zoom` — `f32`.
+    /// Sets the camera position and zoom.
     pub fn set_camera(&mut self, x: f32, y: f32, zoom: f32) {
         self.camera_x = x;
         self.camera_y = y;
@@ -269,10 +202,6 @@ impl LargeMapRenderer {
     }
 
     /// Sets the viewport size in screen pixels.
-    ///
-    /// # Parameters
-    /// - `w` — `f32`.
-    /// - `h` — `f32`.
     pub fn set_viewport(&mut self, w: f32, h: f32) {
         self.viewport_w = w;
         self.viewport_h = h;
@@ -281,25 +210,16 @@ impl LargeMapRenderer {
     // ── LOD ─────────────────────────────────────────────────────────────
 
     /// Enables or disables level-of-detail rendering.
-    ///
-    /// # Parameters
-    /// - `enabled` — `bool`.
     pub fn set_lod_enabled(&mut self, enabled: bool) {
         self.lod_enabled = enabled;
     }
 
-    /// Returns whether LOD is enabled. This accessor incurs no allocation; call it freely in hot paths.
-    ///
-    /// # Returns
-    /// `bool`.
+    /// Returns whether LOD is enabled.
     pub fn is_lod_enabled(&self) -> bool {
         self.lod_enabled
     }
 
     /// Sets the zoom thresholds at which LOD levels change.
-    ///
-    /// # Parameters
-    /// - `levels` — `Vec<f32>`.
     pub fn set_lod_thresholds(&mut self, levels: Vec<f32>) {
         self.lod_thresholds = levels;
     }
@@ -307,17 +227,11 @@ impl LargeMapRenderer {
     // ── Tileset ─────────────────────────────────────────────────────────
 
     /// Sets the number of columns in the tileset image.
-    ///
-    /// # Parameters
-    /// - `cols` — `u32`.
     pub fn set_tileset_columns(&mut self, cols: u32) {
         self.tileset_columns = cols.max(1);
     }
 
-    /// Returns the number of tileset columns. This accessor incurs no allocation; call it freely in hot paths.
-    ///
-    /// # Returns
-    /// `u32`.
+    /// Returns the number of tileset columns.
     pub fn get_tileset_columns(&self) -> u32 {
         self.tileset_columns
     }

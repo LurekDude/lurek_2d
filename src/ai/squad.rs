@@ -11,7 +11,7 @@
 
 use crate::ai::blackboard::Blackboard;
 
-/// Formation shapes for squad positioning. Consult the module-level documentation for the broader usage context and preconditions.
+/// Formation shapes for squad positioning.
 ///
 /// Each variant determines how member offsets are computed relative to the
 /// leader's position and the configurable `formation_spacing`.

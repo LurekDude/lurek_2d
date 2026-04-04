@@ -315,19 +315,25 @@ impl TreeView {
             self.root_nodes.retain(|&r| r != index);
         }
         self.nodes.remove(index);
-        let remap = |i: usize| -> usize { if i > index { i - 1 } else { i } };
+        let remap = |i: usize| -> usize {
+            if i > index {
+                i - 1
+            } else {
+                i
+            }
+        };
         for node in &mut self.nodes {
             node.children.retain(|&c| c != index);
             node.children.iter_mut().for_each(|c| *c = remap(*c));
-            node.parent = node.parent.and_then(|p| {
-                if p == index { None } else { Some(remap(p)) }
-            });
+            node.parent = node
+                .parent
+                .and_then(|p| if p == index { None } else { Some(remap(p)) });
         }
         self.root_nodes.retain(|&r| r != index);
         self.root_nodes.iter_mut().for_each(|r| *r = remap(*r));
-        self.selected_node = self.selected_node.and_then(|s| {
-            if s == index { None } else { Some(remap(s)) }
-        });
+        self.selected_node =
+            self.selected_node
+                .and_then(|s| if s == index { None } else { Some(remap(s)) });
         true
     }
 
@@ -525,7 +531,6 @@ impl Default for TreeView {
         Self::new()
     }
 }
-
 
 // ── Toolbar ───────────────────────────────────────────────────────────
 

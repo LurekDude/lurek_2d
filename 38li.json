@@ -1,0 +1,75 @@
+{
+    "version": "0.2.0",
+    // ─────────────────────────────────────────────────────────────────────────
+    // Debugger: lldb (CodeLLDB — works on Windows/Linux/macOS via the
+    // vadimcn.vscode-lldb extension).
+    //
+    // These two launch configs build the binary and launch it without a game
+    // directory (splash screen mode).  To run a specific example game, use
+    // the Tasks menu (Terminal → Run Task → "Run Debug: Pick Example" or
+    // "Run Release: Pick Example").
+    //
+    // Prerequisite extensions (see .vscode/extensions.json):
+    //   rust-lang.rust-analyzer  — Rust language server + cargo integration
+    //   vadimcn.vscode-lldb      — provides the lldb debug adapter
+    // ─────────────────────────────────────────────────────────────────────────
+    "configurations": [
+        // ─── 🐛 DEBUG ─────────────────────────────────────────────────────────
+        // Full DWARF symbols, opt-level 1, debug logging, [DEBUG] in window title.
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "🐛 Build Debug (no game)",
+            "cargo": {
+                "args": ["build", "--bin=luna2d"],
+                "filter": { "name": "luna2d", "kind": "bin" }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}",
+            "stopAtEntry": false,
+            "environment": [],
+            "console": "integratedTerminal"
+        },
+        // ─── 🚀 RELEASE ───────────────────────────────────────────────────────
+        // opt-level 3 + LTO, stripped symbols, error-only logging, smallest exe.
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "🚀 Build Release (no game)",
+            "cargo": {
+                "args": ["build", "--bin=luna2d", "--release"],
+                "filter": { "name": "luna2d", "kind": "bin" }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}",
+            "stopAtEntry": false,
+            "environment": [],
+            "console": "integratedTerminal"
+        },
+        // ─── ⚡ RUN DEBUG (from source) ───────────────────────────────────────
+        // Uses CodeLLDB cargo integration — compiles incrementally then runs.
+        // No separate build step needed.
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "⚡ Run Debug Splash (cargo run)",
+            "cargo": {
+                "args": ["run", "--bin", "luna2d"]
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        },
+        // ─── ⚡ RUN RELEASE (from source) ────────────────────────────────────
+        // Uses CodeLLDB cargo integration — release build, compiles then runs.
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "⚡ Run Release Splash (cargo run)",
+            "cargo": {
+                "args": ["run", "--bin", "luna2d", "--release"]
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        }
+    ]
+}

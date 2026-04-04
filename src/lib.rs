@@ -82,8 +82,10 @@ pub mod automation;
 /// Dense N-dimensional numerical arrays (luna.compute).
 pub mod compute;
 // migration-state: pub mod crafting; — now library/crafting/init.lua
-/// Binary data manipulation, compression, hashing, and encoding.
-pub mod data;
+/// Binary buffers, compression, encoding, hashing, and Luna2D Binary Pack Format.
+pub mod binary;
+/// Format-agnostic serialization: JSON, TOML, CSV, and YAML via shared SerialValue.
+pub mod serial;
 /// In-memory column-major tabular data (luna.dataframe).
 pub mod dataframe;
 // migration-state: pub mod dialog; — now library/dialog/init.lua

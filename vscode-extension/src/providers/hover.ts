@@ -1,0 +1,521 @@
+import * as vscode from "vscode";
+import { ApiDataService, ApiFunction } from "../services/apiData.js";
+import { LuaDocumentAnalyzer, LuaDocumentInfo } from "../services/luaParser.js";
+
+const LUA_SELECTOR: vscode.DocumentSelector = { scheme: "file", language: "lua" };
+const analyzer = new LuaDocumentAnalyzer();
+
+// ── Document analysis cache ──────────────────────────────────
+
+interface CachedAnalysis {
+  version: number;
+  info: LuaDocumentInfo;
+}
+
+const analysisCache = new Map<string, CachedAnalysis>();
+
+function getCachedAnalysis(document: vscode.TextDocument): LuaDocumentInfo {
+  const key = document.uri.toString();
+  const cached = analysisCache.get(key);
+  if (cached && cached.version === document.version) return cached.info;
+  const info = analyzer.analyze(document.getText());
+  analysisCache.set(key, { version: document.version, info });
+  return info;
+}
+
+// ── Lua keyword documentation ────────────────────────────────
+
+const LUA_KEYWORD_DOCS: Record<string, string> = {
+  function: "Declares a function. Functions are first-class values in Lua.\n```lua\nfunction name(args) body end\nlocal f = function(args) body end\n```",
+  local: "Declares a local variable or function. Local scope is limited to the enclosing block.\n```lua\nlocal x = 10\nlocal function helper() end\n```",
+  if: "Conditional statement. Evaluates condition and executes the `then` block if truthy.\n```lua\nif condition then\n  -- body\nelseif other then\n  -- body\nelse\n  -- body\nend\n```",
+  then: "Follows `if`/`elseif` to begin the conditional block.",
+  else: "Alternative branch in an `if` statement, executed when all preceding conditions are false.",
+  elseif: "Additional conditional branch in an `if` statement.\n```lua\nif x > 0 then\n  -- positive\nelseif x < 0 then\n  -- negative\nend\n```",
+  end: "Closes a block started by `function`, `if`, `for`, `while`, or `do`.",
+  for: "Loop construct. Numeric `for` or generic `for` (iterator).\n```lua\nfor i = 1, 10 do end       -- numeric\nfor k, v in pairs(t) do end -- generic\n```",
+  while: "Loop that repeats while condition is truthy.\n```lua\nwhile condition do\n  -- body\nend\n```",
+  repeat: "Loop that repeats until condition becomes truthy (always executes at least once).\n```lua\nrepeat\n  -- body\nuntil condition\n```",
+  until: "Ends a `repeat` loop when the condition becomes truthy.",
+  do: "Creates a block scope.\n```lua\ndo\n  local temp = compute()\nend -- temp is out of scope\n```",
+  return: "Returns values from a function. Must be the last statement in a block.\n```lua\nreturn value1, value2\n```",
+  break: "Exits the innermost `for`, `while`, or `repeat` loop.",
+  goto: "Jumps to a label (Lua 5.2+/LuaJIT).\n```lua\ngoto done\n::done::\n```",
+  in: "Used in generic `for` loops: `for k, v in pairs(t) do end`",
+  and: "Logical AND operator. Returns first argument if falsy, otherwise second.\n```lua\nlocal x = a and b  -- b if a is truthy\n```",
+  or: "Logical OR operator. Returns first argument if truthy, otherwise second.\n```lua\nlocal x = a or default  -- default if a is falsy\n```",
+  not: "Logical NOT operator. Returns `true` if argument is falsy, `false` otherwise.",
+  nil: "The absence of a value. Variables are `nil` before assignment. `nil` is falsy.",
+  true: "Boolean true value.",
+  false: "Boolean false value. Along with `nil`, the only falsy values in Lua.",
+};
+
+// ── Easing function charts ───────────────────────────────────
+
+// ── Math constant hover docs ─────────────────────────────────
+
+const MATH_CONSTANT_DOCS: Record<string, string> = {
+  "math.pi":    "**`math.pi`** = `3.141592653589793` (π)\n\nRatio of a circle's circumference to its diameter.\n\n*Tip: `luna.math.pi` is also available as a constant.*",
+  "math.huge":  "**`math.huge`** = `+∞` (positive infinity overflow sentinel)\n\nUsed as a sentinel for unbounded ranges, e.g. `math.min(math.huge, x)` always returns `x`.",
+  "math.maxinteger": "**`math.maxinteger`** = `2^63 - 1` (max 64-bit signed integer, Lua 5.3+/LuaJIT)",
+  "math.mininteger": "**`math.mininteger`** = `-2^63` (min 64-bit signed integer, Lua 5.3+/LuaJIT)",
+};
+
+type EasingFn = (t: number) => number;
+
+const EASING_FUNCTIONS: Record<string, { fn: EasingFn; desc: string }> = {
+  linear: { fn: (t) => t, desc: "Constant speed, no acceleration" },
+  inQuad: { fn: (t) => t * t, desc: "Slow start, accelerating (quadratic)" },
+  outQuad: { fn: (t) => t * (2 - t), desc: "Fast start, decelerating (quadratic)" },
+  inOutQuad: { fn: (t) => (t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t), desc: "Accelerate then decelerate (quadratic)" },
+  inCubic: { fn: (t) => t * t * t, desc: "Slow start, accelerating (cubic)" },
+  outCubic: { fn: (t) => { const u = t - 1; return u * u * u + 1; }, desc: "Fast start, decelerating (cubic)" },
+  inOutCubic: { fn: (t) => (t < 0.5 ? 4 * t * t * t : (t - 1) * (2 * t - 2) * (2 * t - 2) + 1), desc: "Accelerate then decelerate (cubic)" },
+  inQuart: { fn: (t) => t * t * t * t, desc: "Slow start, accelerating (quartic)" },
+  outQuart: { fn: (t) => { const u = t - 1; return 1 - u * u * u * u; }, desc: "Fast start, decelerating (quartic)" },
+  inQuint: { fn: (t) => t * t * t * t * t, desc: "Slow start, accelerating (quintic)" },
+  outQuint: { fn: (t) => { const u = t - 1; return 1 + u * u * u * u * u; }, desc: "Fast start, decelerating (quintic)" },
+  inSine: { fn: (t) => 1 - Math.cos((t * Math.PI) / 2), desc: "Sine wave acceleration" },
+  outSine: { fn: (t) => Math.sin((t * Math.PI) / 2), desc: "Sine wave deceleration" },
+  inOutSine: { fn: (t) => 0.5 * (1 - Math.cos(Math.PI * t)), desc: "Sine wave accel/decel" },
+  inExpo: { fn: (t) => (t === 0 ? 0 : Math.pow(2, 10 * (t - 1))), desc: "Exponential acceleration" },
+  outExpo: { fn: (t) => (t === 1 ? 1 : 1 - Math.pow(2, -10 * t)), desc: "Exponential deceleration" },
+  inBack: { fn: (t) => { const s = 1.70158; return t * t * ((s + 1) * t - s); }, desc: "Overshoot start then accelerate" },
+  outBack: { fn: (t) => { const s = 1.70158; const u = t - 1; return u * u * ((s + 1) * u + s) + 1; }, desc: "Decelerate with overshoot at end" },
+  outBounce: {
+    fn: (t) => {
+      if (t < 1 / 2.75) return 7.5625 * t * t;
+      if (t < 2 / 2.75) { const u = t - 1.5 / 2.75; return 7.5625 * u * u + 0.75; }
+      if (t < 2.5 / 2.75) { const u = t - 2.25 / 2.75; return 7.5625 * u * u + 0.9375; }
+      const u = t - 2.625 / 2.75; return 7.5625 * u * u + 0.984375;
+    },
+    desc: "Bounce at end",
+  },
+  inBounce: {
+    fn: (t) => {
+      const r = 1 - t;
+      if (r < 1 / 2.75) return 1 - 7.5625 * r * r;
+      if (r < 2 / 2.75) { const u = r - 1.5 / 2.75; return 1 - (7.5625 * u * u + 0.75); }
+      if (r < 2.5 / 2.75) { const u = r - 2.25 / 2.75; return 1 - (7.5625 * u * u + 0.9375); }
+      const u = r - 2.625 / 2.75; return 1 - (7.5625 * u * u + 0.984375);
+    },
+    desc: "Bounce at start",
+  },
+  outElastic: {
+    fn: (t) => {
+      if (t === 0 || t === 1) return t;
+      return Math.pow(2, -10 * t) * Math.sin((t - 0.075) * (2 * Math.PI) / 0.3) + 1;
+    },
+    desc: "Elastic spring at end",
+  },
+  inElastic: {
+    fn: (t) => {
+      if (t === 0 || t === 1) return t;
+      return -(Math.pow(2, 10 * (t - 1)) * Math.sin((t - 1.075) * (2 * Math.PI) / 0.3));
+    },
+    desc: "Elastic spring at start",
+  },
+};
+
+function renderEasingChart(name: string, fn: EasingFn): string {
+  const W = 20;
+  const H = 8;
+  const samples: number[] = [];
+  for (let i = 0; i <= W; i++) {
+    samples.push(Math.max(0, Math.min(1, fn(i / W))));
+  }
+  const grid: string[][] = [];
+  for (let row = 0; row < H; row++) {
+    grid.push(new Array(W + 1).fill(" "));
+  }
+  for (let col = 0; col <= W; col++) {
+    const row = Math.max(0, Math.min(H - 1, Math.round((1 - samples[col]) * (H - 1))));
+    grid[row][col] = "●";
+  }
+  const lines: string[] = [];
+  for (let row = 0; row < H; row++) {
+    const label = row === 0 ? "1│" : row === H - 1 ? "0│" : " │";
+    lines.push(label + grid[row].join(""));
+  }
+  lines.push("  └" + "─".repeat(W + 1) + "► t");
+  return lines.join("\n");
+}
+
+// ── Rich hover content builder ───────────────────────────────
+
+function buildRichHover(fn: ApiFunction): vscode.MarkdownString {
+  const md = new vscode.MarkdownString();
+  md.appendCodeblock(fn.signature, "lua");
+
+  if (fn.description) md.appendMarkdown("\n" + fn.description + "\n");
+
+  if (fn.parameters.length > 0) {
+    md.appendMarkdown("\n**Parameters:**\n\n");
+    md.appendMarkdown("| Name | Type | Description |\n");
+    md.appendMarkdown("|------|------|-------------|\n");
+    for (const p of fn.parameters) {
+      const opt = p.optional ? " *(opt)*" : "";
+      const def = p.default ? ` (default: \`${p.default}\`)` : "";
+      const desc = (p.description || "") + def;
+      md.appendMarkdown(`| \`${p.name}\` | *${p.type}*${opt} | ${desc} |\n`);
+    }
+  }
+
+  if (fn.returns) md.appendMarkdown(`\n**Returns:** ${fn.returns}\n`);
+  if (fn.since) md.appendMarkdown(`\n*Since ${fn.since}*\n`);
+  if (fn.deprecated) md.appendMarkdown(`\n⚠️ **Deprecated:** ${fn.deprecated}\n`);
+
+  const source = fn.module ? `luna.${fn.module}` : "";
+  if (source) md.appendMarkdown(`\n*${source}*`);
+
+  md.isTrusted = true;
+  return md;
+}
+
+// ── Provider registration ────────────────────────────────────
+
+export function register(
+  context: vscode.ExtensionContext,
+  apiData: ApiDataService,
+): void {
+  // ── Main API hover provider ──
+
+  const apiHover = vscode.languages.registerHoverProvider(LUA_SELECTOR, {
+    provideHover(
+      document: vscode.TextDocument,
+      position: vscode.Position,
+    ): vscode.Hover | undefined {
+      // ── A: Luna2D API functions (luna.module.func) ──
+      const funcRange = document.getWordRangeAtPosition(position, /luna\.\w+\.\w+/);
+      if (funcRange) {
+        const word = document.getText(funcRange);
+        const fn = apiData.getFunction(word);
+        if (fn) return new vscode.Hover(buildRichHover(fn), funcRange);
+      }
+
+      // ── D: Luna callbacks (luna.callback) ──
+      const cbRange = document.getWordRangeAtPosition(position, /luna\.\w+/);
+      if (cbRange) {
+        const word = document.getText(cbRange);
+        // Don't match luna.graphics etc. (already handled above or is a module)
+        if (!word.includes(".", 5)) {
+          for (const cb of apiData.getCallbacks()) {
+            if (cb.fullPath === word) {
+              const md = new vscode.MarkdownString();
+              md.appendCodeblock(cb.signature, "lua");
+              md.appendMarkdown("\n" + cb.description + "\n");
+              if (cb.parameters.length > 0) {
+                md.appendMarkdown("\n**Parameters:**\n");
+                for (const p of cb.parameters) {
+                  md.appendMarkdown(`- \`${p.name}\`: *${p.type}* — ${p.description}\n`);
+                }
+              }
+              md.appendMarkdown("\n*Engine callback — called automatically by Luna2D*");
+              md.isTrusted = true;
+              return new vscode.Hover(md, cbRange);
+            }
+          }
+        }
+
+        // Module hover
+        const modName = word.replace("luna.", "");
+        const mod = apiData.getModule(modName);
+        if (mod) {
+          const md = new vscode.MarkdownString();
+          md.appendMarkdown(`**luna.${mod.name}**\n\n`);
+          if (mod.description) md.appendMarkdown(mod.description + "\n\n");
+          md.appendMarkdown(`*${mod.functions.length} functions, ${mod.methods.length} methods*`);
+          md.isTrusted = true;
+          return new vscode.Hover(md, cbRange);
+        }
+      }
+
+      // ── B: Lua standard library functions ──
+      const stdlibRange = document.getWordRangeAtPosition(position, /\b(?:string|table|math|os|io|coroutine|debug|package|utf8|bit|jit|ffi)\.\w+/);
+      if (stdlibRange) {
+        const word = document.getText(stdlibRange);
+        const stdlib = apiData.getLuaStdlib("luajit");
+        const match = stdlib.find(fn => fn.fullPath === word);
+        if (match) return new vscode.Hover(buildRichHover(match), stdlibRange);
+      }
+
+      // ── C: Local symbols from document analysis ──
+      const wordRange = document.getWordRangeAtPosition(position, /\w+/);
+      if (wordRange) {
+        const word = document.getText(wordRange);
+
+        // Skip if part of a luna.* or stdlib expression
+        const lineText = document.lineAt(position).text;
+        const charBefore = wordRange.start.character > 0 ? lineText[wordRange.start.character - 1] : "";
+        if (charBefore === ".") return undefined;
+
+        try {
+          const info = getCachedAnalysis(document);
+          for (const sym of info.symbols) {
+            if (sym.name === word && sym.line <= position.line) {
+              if (sym.kind === "parameter") continue;
+              const md = new vscode.MarkdownString();
+              if (sym.kind === "function") {
+                const params = (sym.parameters ?? []).join(", ");
+                const prefix = sym.isLocal ? "local " : "";
+                md.appendCodeblock(`${prefix}function ${sym.name}(${params})`, "lua");
+              } else if (sym.kind === "method") {
+                const params = (sym.parameters ?? []).join(", ");
+                md.appendCodeblock(`function ${sym.type ?? "obj"}:${sym.name}(${params})`, "lua");
+              } else if (sym.kind === "table") {
+                md.appendCodeblock(`local ${sym.name} = {}`, "lua");
+              } else {
+                md.appendCodeblock(`local ${sym.name}`, "lua");
+              }
+              if (sym.description) md.appendMarkdown("\n" + sym.description + "\n");
+              md.appendMarkdown(`\n*Defined at line ${sym.line + 1}*`);
+              if (sym.scope) md.appendMarkdown(` · scope: \`${sym.scope}\``);
+              md.isTrusted = true;
+              return new vscode.Hover(md, wordRange);
+            }
+          }
+        } catch { /* skip */ }
+
+        // ── F: Lua keyword hover ──
+        const keywordDoc = LUA_KEYWORD_DOCS[word];
+        if (keywordDoc) {
+          const md = new vscode.MarkdownString();
+          md.appendMarkdown(`**\`${word}\`** — Lua keyword\n\n`);
+          md.appendMarkdown(keywordDoc);
+          md.isTrusted = true;
+          return new vscode.Hover(md, wordRange);
+        }
+      }
+
+      return undefined;
+    },
+  });
+
+  // ── E: Easing string hover provider ──
+
+  const easingHover = vscode.languages.registerHoverProvider(LUA_SELECTOR, {
+    provideHover(
+      document: vscode.TextDocument,
+      position: vscode.Position,
+    ): vscode.Hover | undefined {
+      const line = document.lineAt(position).text;
+      const charIdx = position.character;
+
+      // Find string boundaries
+      let stringStart = -1;
+      let quoteChar = "";
+      for (let i = charIdx; i >= 0; i--) {
+        if (line[i] === '"' || line[i] === "'") {
+          stringStart = i + 1;
+          quoteChar = line[i];
+          break;
+        }
+      }
+      if (stringStart < 0 || !quoteChar) return undefined;
+
+      let stringEnd = -1;
+      for (let i = charIdx; i < line.length; i++) {
+        if (line[i] === quoteChar) {
+          stringEnd = i;
+          break;
+        }
+      }
+      if (stringEnd < 0) return undefined;
+
+      const stringContent = line.substring(stringStart, stringEnd);
+      const easing = EASING_FUNCTIONS[stringContent];
+      if (!easing) return undefined;
+
+      const chart = renderEasingChart(stringContent, easing.fn);
+      const md = new vscode.MarkdownString();
+      md.appendMarkdown(`**Easing: \`${stringContent}\`**\n\n`);
+      md.appendCodeblock(chart, "");
+      md.appendMarkdown(`\n${easing.desc}\n`);
+      md.isTrusted = true;
+
+      const range = new vscode.Range(position.line, stringStart, position.line, stringEnd);
+      return new vscode.Hover(md, range);
+    },
+  });
+
+  // ── F: Math constant hover (math.pi, math.huge, etc.) ────────
+
+  const mathConstHover = vscode.languages.registerHoverProvider(LUA_SELECTOR, {
+    provideHover(
+      document: vscode.TextDocument,
+      position: vscode.Position,
+    ): vscode.Hover | undefined {
+      const range = document.getWordRangeAtPosition(position, /math\.\w+/);
+      if (!range) return undefined;
+      const word = document.getText(range);
+      const doc = MATH_CONSTANT_DOCS[word];
+      if (!doc) return undefined;
+      const md = new vscode.MarkdownString(doc);
+      md.isTrusted = true;
+      return new vscode.Hover(md, range);
+    },
+  });
+
+  // ── I4: Callback parameter hover ─────────────────────────────
+
+  // Map: callback name → parameter name → {type, description}
+  const CALLBACK_PARAM_DOCS: Record<string, Record<string, { type: string; desc: string }>> = {
+    update: {
+      dt: { type: "number", desc: "Delta time in seconds since the last frame. Use this to make movement frame-rate-independent.\n\n```lua\nfunction luna.update(dt)\n  x = x + speed * dt\nend\n```" },
+    },
+    keypressed: {
+      key: { type: "string", desc: 'Name of the key that was pressed (e.g. `"space"`, `"a"`, `"left"`, `"escape"`).' },
+      scancode: { type: "string", desc: "Physical hardware scancode — use for layout-independent input." },
+      isrepeat: { type: "boolean", desc: "`true` if generated by key repeat (held down), `false` for first press." },
+    },
+    keyreleased: {
+      key: { type: "string", desc: 'Name of the key that was released (e.g. `"space"`, `"a"`, `"left"`).' },
+      scancode: { type: "string", desc: "Physical hardware scancode of the key." },
+    },
+    mousepressed: {
+      x: { type: "number", desc: "Mouse X position in screen coordinates when button was pressed." },
+      y: { type: "number", desc: "Mouse Y position in screen coordinates when button was pressed." },
+      button: { type: "number", desc: "Mouse button index: `1` = left, `2` = right, `3` = middle." },
+      istouch: { type: "boolean", desc: "`true` if this event was generated by a touch input device." },
+      presses: { type: "number", desc: "Number of consecutive presses (`2` = double-click)." },
+    },
+    mousereleased: {
+      x: { type: "number", desc: "Mouse X position when button was released." },
+      y: { type: "number", desc: "Mouse Y position when button was released." },
+      button: { type: "number", desc: "Mouse button index: `1` = left, `2` = right, `3` = middle." },
+      istouch: { type: "boolean", desc: "`true` if generated by a touch input device." },
+    },
+    wheelmoved: {
+      x: { type: "number", desc: "Horizontal scroll amount. Positive = right." },
+      y: { type: "number", desc: "Vertical scroll amount. Positive = up (scroll wheel towards user)." },
+    },
+    resize: {
+      w: { type: "number", desc: "New window width in pixels." },
+      h: { type: "number", desc: "New window height in pixels." },
+    },
+    focus: {
+      f: { type: "boolean", desc: "`true` if the window gained focus, `false` if it lost focus." },
+    },
+    visible: {
+      v: { type: "boolean", desc: "`true` if the window became visible, `false` if minimized/hidden." },
+    },
+    textinput: {
+      t: { type: "string", desc: "The UTF-8 encoded character(s) that were typed. Use this for text field input rather than `luna.keypressed`." },
+    },
+    gamepadpressed: {
+      joystick: { type: "Joystick", desc: "The joystick/gamepad object that reported the event." },
+      button: { type: "string", desc: 'Gamepad virtual button name: `"a"`, `"b"`, `"x"`, `"y"`, `"back"`, `"start"`, `"leftshoulder"`, `"rightshoulder"`, `"dpup"`, `"dpdown"`, `"dpleft"`, `"dpright"`.' },
+    },
+    gamepadreleased: {
+      joystick: { type: "Joystick", desc: "The joystick/gamepad object that reported the event." },
+      button: { type: "string", desc: 'Gamepad virtual button name (`"a"`, `"b"`, `"x"`, `"y"`, etc.).' },
+    },
+    gamepadaxis: {
+      joystick: { type: "Joystick", desc: "The joystick/gamepad object that reported the event." },
+      axis: { type: "string", desc: 'Axis name: `"leftx"`, `"lefty"`, `"rightx"`, `"righty"`, `"triggerleft"`, `"triggerright"`.' },
+      value: { type: "number", desc: "Axis value in the range `[-1.0, 1.0]` (triggers: `[0, 1]`)." },
+    },
+    joystickadded: { joystick: { type: "Joystick", desc: "The joystick/gamepad that was connected." } },
+    joystickremoved: { joystick: { type: "Joystick", desc: "The joystick/gamepad that was disconnected." } },
+    touchpressed: {
+      id: { type: "lightuserdata", desc: "Unique identifier for this touch point." },
+      x: { type: "number", desc: "X position of the touch in screen coordinates." },
+      y: { type: "number", desc: "Y position of the touch in screen coordinates." },
+      dx: { type: "number", desc: "X movement delta since last touch event." },
+      dy: { type: "number", desc: "Y movement delta since last touch event." },
+      pressure: { type: "number", desc: "Touch pressure in `[0, 1]`. Not all devices support pressure." },
+    },
+    touchmoved: {
+      id: { type: "lightuserdata", desc: "Unique identifier for this touch point." },
+      x: { type: "number", desc: "X position of the touch." },
+      y: { type: "number", desc: "Y position of the touch." },
+      dx: { type: "number", desc: "X movement delta." },
+      dy: { type: "number", desc: "Y movement delta." },
+      pressure: { type: "number", desc: "Touch pressure in `[0, 1]`." },
+    },
+    touchreleased: {
+      id: { type: "lightuserdata", desc: "Unique identifier for the touch point that ended." },
+      x: { type: "number", desc: "X position where touch was released." },
+      y: { type: "number", desc: "Y position where touch was released." },
+      dx: { type: "number", desc: "X movement delta at release." },
+      dy: { type: "number", desc: "Y movement delta at release." },
+      pressure: { type: "number", desc: "Pressure at release." },
+    },
+  };
+
+  const callbackParamHover = vscode.languages.registerHoverProvider(LUA_SELECTOR, {
+    provideHover(
+      document: vscode.TextDocument,
+      position: vscode.Position,
+    ): vscode.Hover | undefined {
+      const wordRange = document.getWordRangeAtPosition(position, /\w+/);
+      if (!wordRange) return undefined;
+      const word = document.getText(wordRange);
+      if (!(word in Object.values(CALLBACK_PARAM_DOCS).reduce((acc, p) => ({ ...acc, ...p }), {}))) {
+        return undefined;
+      }
+
+      // Walk backwards from current line to find the enclosing luna callback
+      const lines = document.getText().split("\n");
+      let callbackName: string | undefined;
+      let depth = 0;
+
+      for (let lineIdx = position.line; lineIdx >= 0; lineIdx--) {
+        const line = lines[lineIdx];
+        const endCount = (line.match(/\bend\b/g) ?? []).length;
+        const startCount = (line.match(/\b(?:function|do|then|repeat)\b/g) ?? []).length;
+        depth += endCount - startCount;
+        if (depth >= 0) {
+          const cbMatch = line.match(/luna\.(\w+)\s*=\s*function/);
+          if (cbMatch) { callbackName = cbMatch[1]; break; }
+        }
+      }
+
+      if (!callbackName) return undefined;
+      const paramDocs = CALLBACK_PARAM_DOCS[callbackName];
+      if (!paramDocs?.[word]) return undefined;
+
+      const { type, desc } = paramDocs[word];
+      const md = new vscode.MarkdownString();
+      md.appendCodeblock(`(parameter) ${word}: ${type}`, "typescript");
+      md.appendMarkdown(`\n${desc}\n\n*Parameter of \`luna.${callbackName}\`*`);
+      md.isTrusted = true;
+      return new vscode.Hover(md, wordRange);
+    },
+  });
+
+  // ── G: Physics gravity hover ─────────────────────────────────
+
+  const physicsGravityHover = vscode.languages.registerHoverProvider(LUA_SELECTOR, {
+    provideHover(
+      document: vscode.TextDocument,
+      position: vscode.Position,
+    ): vscode.Hover | undefined {
+      const line = document.lineAt(position).text;
+      // Only trigger near luna.physics.newWorld calls
+      if (!/luna\.physics\.newWorld/.test(line)) return undefined;
+
+      const wordRange = document.getWordRangeAtPosition(position, /[-\d]+\.?\d*/);
+      if (!wordRange) return undefined;
+      const numText = document.getText(wordRange);
+      const num = parseFloat(numText);
+      if (isNaN(num)) return undefined;
+
+      // Check if this number is the 2nd arg (gravity Y) of newWorld
+      const before = line.substring(0, wordRange.start.character);
+      const commaCount = (before.match(/,/g) ?? []).length;
+      if (commaCount !== 1) return undefined;
+
+      const earthPx = Math.round(980);
+      const md = new vscode.MarkdownString(
+        `**Gravity Y = ${num} px/s²**\n\n` +
+        `Earth gravity (at 1px = 1cm) ≈ **${earthPx} px/s²**\n\n` +
+        `Current value is **${(num / earthPx * 100).toFixed(0)}%** of Earth gravity.`
+      );
+      md.isTrusted = true;
+      return new vscode.Hover(md, wordRange);
+    },
+  });
+
+  context.subscriptions.push(apiHover, easingHover, mathConstHover, callbackParamHover, physicsGravityHover);
+}

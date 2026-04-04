@@ -2,7 +2,7 @@
 
 | Property | Value |
 |----------|-------|
-| **Tier** | Tier 1 — Basic Core |
+| **Tier** | Tier 1 — Core Engine Subsystems |
 | **Lua API** | `luna.physics` |
 | **Source** | `src/physics/` |
 | **Tests** | `tests/physics_tests.rs` |

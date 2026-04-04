@@ -41,9 +41,9 @@ use rodio::Source;
 use slotmap::SlotMap;
 
 use crate::audio::bus::Bus;
+use crate::audio::dsp::{DynamicEffectSource, EffectParams};
 use crate::engine::error::EngineError;
 use crate::engine::resource_keys::BusKey;
-use crate::audio::dsp::{DynamicEffectSource, EffectParams};
 use crate::engine::resource_keys::QueueableKey;
 use crate::engine::resource_keys::SoundKey;
 
@@ -385,7 +385,11 @@ impl Mixer {
                 lowpass_cutoff,
                 highpass_cutoff,
                 fade_in_duration,
-                self.sources.get(key).and_then(|e| e.bus_key).and_then(|bk| self.buses.get(bk)).map(|b| std::sync::Arc::clone(&b.effects)),
+                self.sources
+                    .get(key)
+                    .and_then(|e| e.bus_key)
+                    .and_then(|bk| self.buses.get(bk))
+                    .map(|b| std::sync::Arc::clone(&b.effects)),
             )
         });
 
@@ -820,7 +824,10 @@ impl Mixer {
     /// # Returns
     /// `Option<&Bus>`.
     pub fn get_bus_by_name(&self, name: &str) -> Option<BusKey> {
-        self.buses.iter().find(|(_, b)| b.name() == name).map(|(k, _)| k)
+        self.buses
+            .iter()
+            .find(|(_, b)| b.name() == name)
+            .map(|(k, _)| k)
     }
 
     /// Gets a bus by key.
@@ -1003,7 +1010,7 @@ impl Mixer {
                     } else {
                         f32_src
                     };
-                let f32_src: Box<dyn rodio::Source<Item = f32> + Send> = 
+                let f32_src: Box<dyn rodio::Source<Item = f32> + Send> =
                     if let Some(effects) = bus_effects {
                         Box::new(DynamicEffectSource::new(f32_src, effects))
                     } else {
@@ -1123,7 +1130,9 @@ impl Mixer {
                     lowpass_cutoff,
                     highpass_cutoff,
                     fade_in_dur,
-                    bus_key.and_then(|bk| self.buses.get(bk)).map(|b| std::sync::Arc::clone(&b.effects)),
+                    bus_key
+                        .and_then(|bk| self.buses.get(bk))
+                        .map(|b| std::sync::Arc::clone(&b.effects)),
                 );
                 if let Some((sink, duration)) = maybe {
                     if let Some(entry) = self.sources.get_mut(key) {
@@ -1263,7 +1272,9 @@ impl Mixer {
     /// `()`.
     pub fn set_source_position(&mut self, key: SoundKey, x: f32, y: f32, z: f32) {
         if let Some(entry) = self.sources.get_mut(key) {
-            let state = entry.spatial.get_or_insert_with(crate::audio::SpatialState::default);
+            let state = entry
+                .spatial
+                .get_or_insert_with(crate::audio::SpatialState::default);
             state.position = [x, y, z];
             let dx = x - self.listener_position[0];
             entry.pan = (dx / 200.0).clamp(-1.0, 1.0);
@@ -1297,7 +1308,9 @@ impl Mixer {
     /// `()`.
     pub fn set_source_velocity(&mut self, key: SoundKey, x: f32, y: f32, z: f32) {
         if let Some(entry) = self.sources.get_mut(key) {
-            let state = entry.spatial.get_or_insert_with(crate::audio::SpatialState::default);
+            let state = entry
+                .spatial
+                .get_or_insert_with(crate::audio::SpatialState::default);
             state.velocity = [x, y, z];
         }
     }
@@ -1342,7 +1355,9 @@ impl Mixer {
         uz: f32,
     ) {
         if let Some(entry) = self.sources.get_mut(key) {
-            let state = entry.spatial.get_or_insert_with(crate::audio::SpatialState::default);
+            let state = entry
+                .spatial
+                .get_or_insert_with(crate::audio::SpatialState::default);
             state.orientation = [fx, fy, fz, ux, uy, uz];
         }
     }
@@ -1396,7 +1411,15 @@ impl Mixer {
     /// # Returns
     /// `()`.
     #[allow(clippy::too_many_arguments)]
-    pub fn set_listener_orientation(&mut self, fx: f32, fy: f32, fz: f32, ux: f32, uy: f32, uz: f32) {
+    pub fn set_listener_orientation(
+        &mut self,
+        fx: f32,
+        fy: f32,
+        fz: f32,
+        ux: f32,
+        uy: f32,
+        uz: f32,
+    ) {
         self.listener_orientation = [fx, fy, fz, ux, uy, uz];
     }
 

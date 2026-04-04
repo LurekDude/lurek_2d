@@ -116,9 +116,9 @@ impl LuaUserData for LuaOverlay {
         ///
         /// Equivalent to calling `Overlay::clear()` — drops all live weather
         /// particles, deactivates flash/shake/fade/lightning, and disables
-        /// ambient, clouds, fog, heat haze, vignette, and film grain.
-        /// All parameters (intensity, colour, duration) are reset to
-        /// their initial values. Useful when transitioning between scenes.
+        /// ambient and clouds. All parameters (intensity, colour, duration)
+        /// are reset to their initial values. Useful when transitioning
+        /// between scenes.
         methods.add_method("clear", |_, this, ()| {
             this.inner.borrow_mut().clear();
             Ok(())
@@ -127,8 +127,7 @@ impl LuaUserData for LuaOverlay {
         /// Returns `true` if any overlay subsystem is currently active.
         ///
         /// Checks weather enabled, ambient enabled, flash/shake/fade/lightning
-        /// active, clouds enabled, fog enabled, heat haze enabled, vignette
-        /// enabled, and film grain enabled. Returns `false` when the overlay
+        /// active, and clouds enabled. Returns `false` when the overlay
         /// has been cleared or was never activated.
         /// @return boolean
         methods.add_method("isActive", |_, this, ()| {
@@ -496,179 +495,6 @@ impl LuaUserData for LuaOverlay {
         });
 
         // ===================================================================
-        // Atmospheric Fog
-        // ===================================================================
-
-        /// Enables or disables atmospheric fog.
-        /// @param enabled : boolean
-        /// Enables or disables the atmospheric fog overlay.
-        ///
-        /// When enabled, a translucent colour rectangle is blended over the
-        /// full scene every frame. Configure thickness via `setFogDensity`
-        /// and colour via `setFogColor`.
-        /// @param enabled : boolean
-        methods.add_method("setFogEnabled", |_, this, enabled: bool| {
-            this.inner.borrow_mut().fog.enabled = enabled;
-            Ok(())
-        });
-
-        /// Returns `true` if the atmospheric fog overlay is enabled.
-        /// @return boolean
-        methods.add_method("isFogEnabled", |_, this, ()| {
-            Ok(this.inner.borrow().fog.enabled)
-        });
-
-        /// Sets the fog density (0.0 = invisible, 1.0 = fully opaque).
-        ///
-        /// Maps directly to the alpha of the fog colour overlay.
-        /// @param density : number
-        methods.add_method("setFogDensity", |_, this, density: f32| {
-            this.inner.borrow_mut().fog.density = density;
-            Ok(())
-        });
-
-        /// Returns the current fog density (0.0–1.0).
-        /// @return number
-        methods.add_method("getFogDensity", |_, this, ()| {
-            Ok(this.inner.borrow().fog.density)
-        });
-
-        /// Sets the fog tint colour. Alpha defaults to 1.0.
-        ///
-        /// The rendered fog blends this colour at the opacity set by
-        /// `setFogDensity`. A grey-blue tint simulates cool morning mist;
-        /// warm orange-gold simulates dust storm haze.
-        /// @param r : number
-        /// @param g : number
-        /// @param b : number
-        /// @param a : number (optional)
-        methods.add_method(
-            "setFogColor",
-            |_, this, (r, g, b, a): (f32, f32, f32, Option<f32>)| {
-                this.inner.borrow_mut().fog.color = [r, g, b, a.unwrap_or(1.0)];
-                Ok(())
-            },
-        );
-
-        /// Returns the current fog colour as `(r, g, b, a)`.
-        /// @return number, number, number, number
-        methods.add_method("getFogColor", |_, this, ()| {
-            let c = this.inner.borrow().fog.color;
-            Ok((c[0], c[1], c[2], c[3]))
-        });
-
-        // ===================================================================
-        // Heat Haze
-        // ===================================================================
-
-        /// Enables or disables UV-distortion heat shimmer.
-        ///
-        /// When enabled, the renderer applies a time-animated sine wave
-        /// displacement to the scene's UV coordinates, simulating the
-        /// wavering distortion seen above hot surfaces.
-        /// @param enabled : boolean
-        methods.add_method("setHeatHazeEnabled", |_, this, enabled: bool| {
-            this.inner.borrow_mut().heat_haze.enabled = enabled;
-            Ok(())
-        });
-
-        /// Returns `true` if heat haze distortion is enabled.
-        /// @return boolean
-        methods.add_method("isHeatHazeEnabled", |_, this, ()| {
-            Ok(this.inner.borrow().heat_haze.enabled)
-        });
-
-        /// Sets the heat haze distortion intensity.
-        ///
-        /// Controls the peak UV displacement in pixels. 0.2–2.0 gives
-        /// subtle mirage shimmer; higher values are suitable for extreme
-        /// heat or magical warp effects.
-        /// @param intensity : number
-        methods.add_method("setHeatHazeIntensity", |_, this, intensity: f32| {
-            this.inner.borrow_mut().heat_haze.intensity = intensity;
-            Ok(())
-        });
-
-        /// Returns the heat haze distortion intensity.
-        /// @return number
-        methods.add_method("getHeatHazeIntensity", |_, this, ()| {
-            Ok(this.inner.borrow().heat_haze.intensity)
-        });
-
-        // ===================================================================
-        // Vignette
-        // ===================================================================
-
-        /// Enables or disables screen-edge darkening (vignette).
-        ///
-        /// The vignette grades from transparent at the screen centre to
-        /// near-black at the corners. Useful for suggesting restricted
-        /// vision, dramatic tension, or a cinematic look.
-        /// @param enabled : boolean
-        methods.add_method("setVignetteEnabled", |_, this, enabled: bool| {
-            this.inner.borrow_mut().vignette.enabled = enabled;
-            Ok(())
-        });
-
-        /// Returns `true` if the vignette overlay is enabled.
-        /// @return boolean
-        methods.add_method("isVignetteEnabled", |_, this, ()| {
-            Ok(this.inner.borrow().vignette.enabled)
-        });
-
-        /// Sets the vignette darkening strength (0.0–1.0).
-        ///
-        /// 0.0 is invisible; 0.5 is a gentle filmic border; 1.0 crushes
-        /// corners to near-black.
-        /// @param strength : number
-        methods.add_method("setVignetteStrength", |_, this, strength: f32| {
-            this.inner.borrow_mut().vignette.strength = strength;
-            Ok(())
-        });
-
-        /// Returns the current vignette darkening strength (0.0–1.0).
-        /// @return number
-        methods.add_method("getVignetteStrength", |_, this, ()| {
-            Ok(this.inner.borrow().vignette.strength)
-        });
-
-        // ===================================================================
-        // Film Grain
-        // ===================================================================
-
-        /// Enables or disables per-frame random film grain noise.
-        ///
-        /// The noise pattern is regenerated every frame so it does not
-        /// repeat or create a visible flicker texture.
-        /// @param enabled : boolean
-        methods.add_method("setFilmGrainEnabled", |_, this, enabled: bool| {
-            this.inner.borrow_mut().film_grain.enabled = enabled;
-            Ok(())
-        });
-
-        /// Returns `true` if film grain noise is enabled.
-        /// @return boolean
-        methods.add_method("isFilmGrainEnabled", |_, this, ()| {
-            Ok(this.inner.borrow().film_grain.enabled)
-        });
-
-        /// Sets the film grain noise amplitude (0.0–1.0).
-        ///
-        /// 0.1–0.3 gives a subtle cinematic look. Values above 0.5
-        /// produce heavy grain that can obscure fine detail.
-        /// @param intensity : number
-        methods.add_method("setFilmGrainIntensity", |_, this, intensity: f32| {
-            this.inner.borrow_mut().film_grain.intensity = intensity;
-            Ok(())
-        });
-
-        /// Returns the current film grain noise amplitude (0.0–1.0).
-        /// @return number
-        methods.add_method("getFilmGrainIntensity", |_, this, ()| {
-            Ok(this.inner.borrow().film_grain.intensity)
-        });
-
-        // ===================================================================
         // Lightning
         // ===================================================================
 
@@ -716,7 +542,7 @@ impl LuaUserData for LuaOverlay {
 /// Creates the `luna.overlay` sub-table and adds the `newOverlay` factory
 /// function, which returns a fully initialised `LuaOverlay` UserData.
 /// All subsystem methods (weather, ambient, flash, shake, fade, clouds,
-/// fog, heat haze, vignette, film grain, lightning) are registered on
+/// lightning) are registered on
 /// the `LuaOverlay` UserData type via its `LuaUserData` impl.
 ///
 /// # Parameters

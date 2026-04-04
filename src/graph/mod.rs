@@ -15,7 +15,7 @@ pub mod item;
 /// Graph node with conversion rules, overflow policy, and flow mode.
 pub mod node;
 /// Dijkstra shortest-path on the graph.
-pub mod traversal;
+pub mod pathfinding;
 /// Tick-based simulation: decay, transit, push/pull flow.
 pub mod simulation;
 /// Supply and demand processing for resource flow graphs.

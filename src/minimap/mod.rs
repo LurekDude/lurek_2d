@@ -8,13 +8,13 @@
 //! Sub-files: types.rs for supporting enums/structs;
 //! minimap.rs for the Minimap data model.
 
-/// Supporting type definitions: enums and plain data structs.
-pub mod types;
 /// Core Minimap data model.
 #[allow(clippy::module_inception)]
 pub mod minimap;
+/// Supporting type definitions: enums and plain data structs.
+pub mod types;
 
+pub use minimap::Minimap;
 pub use types::{
     ColorMode, FogLevel, MinimapMarker, MinimapObject, MinimapObjectType, MinimapPing,
 };
-pub use minimap::Minimap;

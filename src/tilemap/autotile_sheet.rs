@@ -46,14 +46,6 @@ pub enum AutoTileLayout {
 ///
 /// Stores the bitmask↔tile-index mapping tables for a given [`AutoTileLayout`] and
 /// can apply the resulting rules to a [`TileSet`].
-///
-/// # Fields
-/// - `tile_width` — `u32`.
-/// - `tile_height` — `u32`.
-/// - `layout` — `AutoTileLayout`.
-/// - `tile_count` — `u32`.
-/// - `bitmask_map` — `Vec<u16>`.
-/// - `reverse_map` — `HashMap<u16`.
 #[derive(Clone)]
 pub struct AutoTileSheet {
     tile_width: u32,
@@ -210,7 +202,7 @@ impl AutoTileSheet {
         }
     }
 
-    /// Returns the layout variant. This accessor incurs no allocation; call it freely in hot paths.
+    /// Returns the layout variant.
     ///
     /// # Returns
     /// `AutoTileLayout`.
@@ -226,7 +218,7 @@ impl AutoTileSheet {
         self.tile_count
     }
 
-    /// Returns the tile width in pixels. This accessor incurs no allocation; call it freely in hot paths.
+    /// Returns the tile width in pixels.
     ///
     /// # Returns
     /// `u32`.
@@ -234,7 +226,7 @@ impl AutoTileSheet {
         self.tile_width
     }
 
-    /// Returns the tile height in pixels. This accessor incurs no allocation; call it freely in hot paths.
+    /// Returns the tile height in pixels.
     ///
     /// # Returns
     /// `u32`.

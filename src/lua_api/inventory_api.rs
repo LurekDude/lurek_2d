@@ -19,11 +19,6 @@ use crate::lua_api::lua_types::{add_type_methods, LunaType};
 // ────────────────────────────────────────────────────────────────────────────
 
 /// Lua UserData wrapper for a single item definition.
-///
-/// # Fields
-/// - `inner` — `Rc<RefCell<InventoryEntry>>`.
-/// - `resource_ref` — `Rc<RefCell<Option<LuaRegistryKey>>>`.
-/// - `user_data_ref` — `Rc<RefCell<Option<LuaRegistryKey>>>`.
 #[derive(Clone)]
 pub(crate) struct LuaItem {
     inner: Rc<RefCell<InventoryEntry>>,
@@ -51,7 +46,6 @@ impl LuaUserData for LuaItem {
         add_type_methods::<Self>(methods);
 
         /// Returns the type.
-        /// @return any
         ///
         /// # Parameters
         /// - `t` — `string`.
@@ -63,7 +57,6 @@ impl LuaUserData for LuaItem {
         });
 
         /// Sets the type.
-        /// @param t : string
         ///
         /// # Parameters
         /// - `t` — `string`.
@@ -73,7 +66,6 @@ impl LuaUserData for LuaItem {
         });
 
         /// Returns the weight.
-        /// @return any
         ///
         /// # Parameters
         /// - `w` — `number`.
@@ -83,7 +75,6 @@ impl LuaUserData for LuaItem {
         methods.add_method("getWeight", |_, this, ()| Ok(this.inner.borrow().weight));
 
         /// Sets the weight.
-        /// @param w : number
         ///
         /// # Parameters
         /// - `w` — `number`.
@@ -93,7 +84,6 @@ impl LuaUserData for LuaItem {
         });
 
         /// Returns the size.
-        /// @return any
         ///
         /// # Parameters
         /// - `w` — `integer`.
@@ -107,8 +97,6 @@ impl LuaUserData for LuaItem {
         });
 
         /// Sets the size.
-        /// @param w : integer
-        /// @param h : integer
         ///
         /// # Parameters
         /// - `w` — `integer`.
@@ -121,7 +109,6 @@ impl LuaUserData for LuaItem {
         });
 
         /// Returns the stack limit.
-        /// @return any
         ///
         /// # Parameters
         /// - `n` — `integer`.
@@ -133,7 +120,6 @@ impl LuaUserData for LuaItem {
         });
 
         /// Sets the stack limit.
-        /// @param n : integer
         ///
         /// # Parameters
         /// - `n` — `integer`.
@@ -143,7 +129,6 @@ impl LuaUserData for LuaItem {
         });
 
         /// Adds tag to the collection.
-        /// @param tag : string
         ///
         /// # Parameters
         /// - `tag` — `string`.
@@ -153,8 +138,6 @@ impl LuaUserData for LuaItem {
         });
 
         /// Removes tag from the collection.
-        /// @param tag : string
-        /// @return any
         ///
         /// # Parameters
         /// - `tag` — `string`.
@@ -163,8 +146,6 @@ impl LuaUserData for LuaItem {
         });
 
         /// Returns `true` if tag.
-        /// @param tag : string
-        /// @return any
         ///
         /// # Parameters
         /// - `tag` — `string`.
@@ -176,7 +157,6 @@ impl LuaUserData for LuaItem {
         });
 
         /// Returns the tags.
-        /// @return table
         ///
         /// # Returns
         /// The current tags.
@@ -190,7 +170,6 @@ impl LuaUserData for LuaItem {
         });
 
         /// Returns a deep copy of this object.
-        /// @return any
         ///
         /// # Returns
         /// The result.
@@ -199,7 +178,6 @@ impl LuaUserData for LuaItem {
         });
 
         /// Store any Lua value as a resource reference (e.g. a texture or sprite).
-        /// @param value : any
         ///
         /// # Parameters
         /// - `value` — any Lua value to store.
@@ -210,7 +188,6 @@ impl LuaUserData for LuaItem {
         });
 
         /// Get the stored resource reference, or nil if none set.
-        /// @return any
         ///
         /// # Returns
         /// The stored Lua value, or `nil`.
@@ -222,7 +199,6 @@ impl LuaUserData for LuaItem {
         });
 
         /// Store any Lua value as user data on this item.
-        /// @param value : any
         ///
         /// # Parameters
         /// - `value` — any Lua value to store.
@@ -233,7 +209,6 @@ impl LuaUserData for LuaItem {
         });
 
         /// Get the stored user data, or nil if none set.
-        /// @return any
         ///
         /// # Returns
         /// The stored Lua value, or `nil`.
@@ -264,7 +239,6 @@ impl LuaUserData for LuaItemStack {
         add_type_methods::<Self>(methods);
 
         /// Returns the item.
-        /// @return any
         ///
         /// # Returns
         /// The current item.
@@ -274,7 +248,6 @@ impl LuaUserData for LuaItemStack {
         });
 
         /// Returns the quantity.
-        /// @return any
         ///
         /// # Parameters
         /// - `n` — `integer`.
@@ -284,7 +257,6 @@ impl LuaUserData for LuaItemStack {
         methods.add_method("getQuantity", |_, this, ()| Ok(this.0.borrow().quantity));
 
         /// Sets the quantity.
-        /// @param n : integer
         ///
         /// # Parameters
         /// - `n` — `integer`.
@@ -295,7 +267,6 @@ impl LuaUserData for LuaItemStack {
         });
 
         /// Returns the max quantity.
-        /// @return any
         ///
         /// # Returns
         /// The current max quantity.
@@ -304,7 +275,6 @@ impl LuaUserData for LuaItemStack {
         });
 
         /// Returns `true` if full.
-        /// @return boolean
         ///
         /// # Parameters
         /// - `n` — `integer`.
@@ -314,16 +284,12 @@ impl LuaUserData for LuaItemStack {
         methods.add_method("isFull", |_, this, ()| Ok(this.0.borrow().is_full()));
 
         /// Adds an entry to the collection.
-        /// @param n : integer
-        /// @return any
         ///
         /// # Parameters
         /// - `n` — `integer`.
         methods.add_method("add", |_, this, n: u32| Ok(this.0.borrow_mut().add(n)));
 
         /// Removes the entry from the collection.
-        /// @param n : integer
-        /// @return any
         ///
         /// # Parameters
         /// - `n` — `integer`.
@@ -332,8 +298,6 @@ impl LuaUserData for LuaItemStack {
         });
 
         /// Split on this ItemStack.
-        /// @param n : integer
-        /// @return any
         ///
         /// # Parameters
         /// - `n` — `integer`.
@@ -346,8 +310,6 @@ impl LuaUserData for LuaItemStack {
         });
 
         /// Merge on this ItemStack.
-        /// @param other : ItemStack
-        /// @return any
         ///
         /// # Parameters
         /// - `other` — `userdata`.
@@ -358,7 +320,6 @@ impl LuaUserData for LuaItemStack {
         });
 
         /// Returns a deep copy of this object.
-        /// @return any
         ///
         /// # Returns
         /// The result.
@@ -386,7 +347,6 @@ impl LuaUserData for LuaSlot {
         add_type_methods::<Self>(methods);
 
         /// Returns the type.
-        /// @return any
         ///
         /// # Parameters
         /// - `t` — `string`.
@@ -398,7 +358,6 @@ impl LuaUserData for LuaSlot {
         });
 
         /// Sets the type.
-        /// @param t : string
         ///
         /// # Parameters
         /// - `t` — `string`.
@@ -408,7 +367,6 @@ impl LuaUserData for LuaSlot {
         });
 
         /// Returns the state.
-        /// @return any
         ///
         /// # Parameters
         /// - `s` — `string`.
@@ -420,7 +378,6 @@ impl LuaUserData for LuaSlot {
         });
 
         /// Sets the state.
-        /// @param s : string
         ///
         /// # Parameters
         /// - `s` — `string`.
@@ -436,14 +393,12 @@ impl LuaUserData for LuaSlot {
         });
 
         /// Returns `true` if empty.
-        /// @return boolean
         ///
         /// # Returns
         /// `boolean`.
         methods.add_method("isEmpty", |_, this, ()| Ok(this.0.borrow().is_empty()));
 
         /// Returns the stack.
-        /// @return any
         ///
         /// # Returns
         /// The current stack.
@@ -456,8 +411,6 @@ impl LuaUserData for LuaSlot {
         });
 
         /// Sets the stack.
-        /// @param stack_ud : ItemStack
-        /// @return any
         ///
         /// # Parameters
         /// - `stack_ud` — `userdata`.
@@ -477,8 +430,6 @@ impl LuaUserData for LuaSlot {
         });
 
         /// Returns `true` if accept.
-        /// @param item_ud : Item
-        /// @return any
         ///
         /// # Parameters
         /// - `item_ud` — `userdata`.
@@ -492,7 +443,6 @@ impl LuaUserData for LuaSlot {
         });
 
         /// Returns the capacity.
-        /// @return any
         ///
         /// # Parameters
         /// - `w` — `integer`.
@@ -506,8 +456,6 @@ impl LuaUserData for LuaSlot {
         });
 
         /// Sets the capacity.
-        /// @param w : integer
-        /// @param h : integer
         ///
         /// # Parameters
         /// - `w` — `integer`.
@@ -520,7 +468,6 @@ impl LuaUserData for LuaSlot {
         });
 
         /// Shortcut: get the item from the held stack, or nil if empty.
-        /// @return any
         ///
         /// # Returns
         /// `Item` or `nil`.
@@ -552,14 +499,12 @@ impl LuaUserData for LuaContainer {
         add_type_methods::<Self>(methods);
 
         /// Returns the name.
-        /// @return any
         ///
         /// # Returns
         /// The current name.
         methods.add_method("getName", |_, this, ()| Ok(this.0.borrow().name.clone()));
 
         /// Returns the mode.
-        /// @return any
         ///
         /// # Returns
         /// The current mode.
@@ -568,7 +513,6 @@ impl LuaUserData for LuaContainer {
         });
 
         /// Returns the slot count.
-        /// @return any
         ///
         /// # Returns
         /// The current slot count.
@@ -577,7 +521,6 @@ impl LuaUserData for LuaContainer {
         });
 
         /// Returns the max slots.
-        /// @return any
         ///
         /// # Parameters
         /// - `n` — `integer`.
@@ -587,7 +530,6 @@ impl LuaUserData for LuaContainer {
         methods.add_method("getMaxSlots", |_, this, ()| Ok(this.0.borrow().max_slots));
 
         /// Sets the max slots.
-        /// @param n : integer
         ///
         /// # Parameters
         /// - `n` — `integer`.
@@ -597,7 +539,6 @@ impl LuaUserData for LuaContainer {
         });
 
         /// Returns the weight limit.
-        /// @return any
         ///
         /// # Parameters
         /// - `w` — `number`.
@@ -609,7 +550,6 @@ impl LuaUserData for LuaContainer {
         });
 
         /// Sets the weight limit.
-        /// @param w : number
         ///
         /// # Parameters
         /// - `w` — `number`.
@@ -619,7 +559,6 @@ impl LuaUserData for LuaContainer {
         });
 
         /// Returns the current weight.
-        /// @return any
         ///
         /// # Parameters
         /// - `index` — `integer`.
@@ -631,8 +570,6 @@ impl LuaUserData for LuaContainer {
         });
 
         /// Get a slot by 1-based index (Lua convention).
-        /// @param index : integer
-        /// @return any
         methods.add_method("getSlot", |_, this, index: usize| {
             if index < 1 {
                 return Err(LuaError::RuntimeError(
@@ -647,8 +584,6 @@ impl LuaUserData for LuaContainer {
         });
 
         /// Adds slot to the collection.
-        /// @param opts : table?
-        /// @return any
         ///
         /// # Parameters
         /// - `opts` — `table` optional.
@@ -668,7 +603,6 @@ impl LuaUserData for LuaContainer {
         });
 
         /// Removes slot from the collection.
-        /// @param index : integer
         ///
         /// # Parameters
         /// - `index` — `integer`.
@@ -683,8 +617,6 @@ impl LuaUserData for LuaContainer {
         });
 
         /// Expand on this Container.
-        /// @param n : integer
-        /// @return any
         ///
         /// # Parameters
         /// - `item_ud` — `userdata`.
@@ -723,8 +655,6 @@ impl LuaUserData for LuaContainer {
             },
         );
         /// Returns the number of item.
-        /// @param item_type : string
-        /// @return any
         ///
         /// # Parameters
         /// - `item_type` — `string`.
@@ -736,9 +666,6 @@ impl LuaUserData for LuaContainer {
             Ok(this.0.borrow().count_item(&item_type))
         });
         /// Removes item from the collection.
-        /// @param item_type : string
-        /// @param qty : integer
-        /// @return any
         ///
         /// # Parameters
         /// - `item_type` — `string`.
@@ -747,7 +674,6 @@ impl LuaUserData for LuaContainer {
             Ok(this.0.borrow_mut().remove_item(&item_type, qty))
         });
         /// To list on this Container.
-        /// @return any
         ///
         /// # Returns
         /// The result.
@@ -771,7 +697,6 @@ impl LuaUserData for LuaContainer {
             Ok(t)
         });
         /// Returns the slots.
-        /// @return table
         ///
         /// # Returns
         /// The current slots.
@@ -791,10 +716,6 @@ impl LuaUserData for LuaContainer {
 // ────────────────────────────────────────────────────────────────────────────
 
 /// Lua UserData wrapper for a named item set with requirements.
-///
-/// # Fields
-/// - `inner` — `Rc<RefCell<ItemSet>>`.
-/// - `bonus_ref` — `Rc<RefCell<Option<LuaRegistryKey>>>`.
 #[derive(Clone)]
 pub(crate) struct LuaItemSet {
     inner: Rc<RefCell<ItemSet>>,
@@ -820,7 +741,6 @@ impl LuaUserData for LuaItemSet {
         add_type_methods::<Self>(methods);
 
         /// Returns the name.
-        /// @return any
         ///
         /// # Parameters
         /// - `tag` — `string`.
@@ -842,7 +762,6 @@ impl LuaUserData for LuaItemSet {
         );
 
         /// Returns the requirements.
-        /// @return table
         ///
         /// # Returns
         /// The current requirements.
@@ -867,7 +786,6 @@ impl LuaUserData for LuaItemSet {
         });
 
         /// Returns the number of requirements in this set.
-        /// @return integer
         ///
         /// # Returns
         /// `integer`.
@@ -876,8 +794,6 @@ impl LuaUserData for LuaItemSet {
         });
 
         /// Check if all requirements of this set are met by the inventory.
-        /// @param inv_ud : Inventory
-        /// @return any
         ///
         /// # Parameters
         /// - `inventory` — `Inventory` userdata.
@@ -892,7 +808,6 @@ impl LuaUserData for LuaItemSet {
         });
 
         /// Store bonus data (any Lua value) on this item set.
-        /// @param value : any
         ///
         /// # Parameters
         /// - `value` — any Lua value (e.g. a stats table).
@@ -903,7 +818,6 @@ impl LuaUserData for LuaItemSet {
         });
 
         /// Get the stored bonus data, or nil if none set.
-        /// @return any
         ///
         /// # Returns
         /// The stored Lua value, or `nil`.
@@ -921,10 +835,6 @@ impl LuaUserData for LuaItemSet {
 // ────────────────────────────────────────────────────────────────────────────
 
 /// Lua UserData wrapper for the top-level inventory.
-///
-/// # Fields
-/// - `inner` — `Rc<RefCell<Inventory>>`.
-/// - `callbacks` — `Rc<RefCell<HashMap<String`.
 #[derive(Clone)]
 pub(crate) struct LuaInventory {
     inner: Rc<RefCell<Inventory>>,
@@ -963,8 +873,6 @@ impl LuaUserData for LuaInventory {
         );
 
         /// Returns the container.
-        /// @param name : string
-        /// @return any
         ///
         /// # Parameters
         /// - `name` — `string`.
@@ -980,8 +888,6 @@ impl LuaUserData for LuaInventory {
         });
 
         /// Removes container from the collection.
-        /// @param name : string
-        /// @return any
         ///
         /// # Parameters
         /// - `name` — `string`.
@@ -990,7 +896,6 @@ impl LuaUserData for LuaInventory {
         });
 
         /// Returns the container names.
-        /// @return table
         ///
         /// # Returns
         /// The current container names.
@@ -1017,8 +922,6 @@ impl LuaUserData for LuaInventory {
         );
 
         /// Returns the equip slot.
-        /// @param name : string
-        /// @return any
         ///
         /// # Parameters
         /// - `name` — `string`.
@@ -1034,8 +937,6 @@ impl LuaUserData for LuaInventory {
         });
 
         /// Removes equip slot from the collection.
-        /// @param name : string
-        /// @return any
         ///
         /// # Parameters
         /// - `name` — `string`.
@@ -1044,7 +945,6 @@ impl LuaUserData for LuaInventory {
         });
 
         /// Returns the equip slot names.
-        /// @return table
         ///
         /// # Returns
         /// The current equip slot names.
@@ -1067,8 +967,6 @@ impl LuaUserData for LuaInventory {
         );
 
         /// Unequip on this Inventory.
-        /// @param slot_name : string
-        /// @return any
         ///
         /// # Parameters
         /// - `slot_name` — `string`.
@@ -1081,8 +979,6 @@ impl LuaUserData for LuaInventory {
         });
 
         /// Returns the equipped.
-        /// @param slot_name : string
-        /// @return any
         ///
         /// # Parameters
         /// - `slot_name` — `string`.
@@ -1103,7 +999,6 @@ impl LuaUserData for LuaInventory {
         // ── Item sets ─────────────────────────────────────────────────────
 
         /// Adds item set to the collection.
-        /// @param set_ud : ItemSet
         ///
         /// # Parameters
         /// - `set_ud` — `userdata`.
@@ -1116,7 +1011,6 @@ impl LuaUserData for LuaInventory {
         });
 
         /// Returns the active sets.
-        /// @return table
         ///
         /// # Returns
         /// The current active sets.
@@ -1131,7 +1025,6 @@ impl LuaUserData for LuaInventory {
         });
 
         /// Returns the item set names.
-        /// @return table
         ///
         /// # Returns
         /// The current item set names.
@@ -1160,8 +1053,6 @@ impl LuaUserData for LuaInventory {
             },
         );
         /// Returns the number of item.
-        /// @param item_type : string
-        /// @return any
         ///
         /// # Parameters
         /// - `item_type` — `string`.
@@ -1184,7 +1075,6 @@ impl LuaUserData for LuaInventory {
             },
         );
         /// Enable subsystem on this Inventory.
-        /// @param name : string
         ///
         /// # Parameters
         /// - `name` — `string`.
@@ -1194,7 +1084,6 @@ impl LuaUserData for LuaInventory {
         });
 
         /// Disable subsystem on this Inventory.
-        /// @param name : string
         ///
         /// # Parameters
         /// - `name` — `string`.
@@ -1204,8 +1093,6 @@ impl LuaUserData for LuaInventory {
         });
 
         /// Returns `true` if subsystem enabled.
-        /// @param name : string
-        /// @return any
         ///
         /// # Parameters
         /// - `name` — `string`.
@@ -1294,7 +1181,6 @@ impl LuaUserData for LuaInventory {
         );
 
         /// Returns all registered item sets as ItemSet objects.
-        /// @return any
         ///
         /// # Returns
         /// `table` of `ItemSet` userdata objects.
@@ -1324,7 +1210,6 @@ impl LuaUserData for LuaInventory {
         );
 
         /// Remove the callback for an inventory event.
-        /// @param event : string
         ///
         /// # Parameters
         /// - `event` — `string`: event name.
@@ -1361,23 +1246,12 @@ impl LuaUserData for LuaInventory {
 // register
 // ────────────────────────────────────────────────────────────────────────────
 
-/// Register the `luna.inventory` module. Panics in debug mode if the same entity is registered twice.
-///
-/// # Parameters
-/// - `lua` — `&Lua`.
-/// - `luna` — `&LuaTable`.
-///
-/// # Returns
-/// `LuaResult<()>`.
+/// Register the `luna.inventory` module.
 pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
     let module = lua.create_table()?;
 
     // ── Factory functions ─────────────────────────────────────────────────
 
-    /// New item.
-    ///
-    /// @param item_type : string?
-    /// @return any
     module.set(
         "newItem",
         lua.create_function(|_, item_type: Option<String>| {
@@ -1386,12 +1260,6 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
         })?,
     )?;
 
-    /// New item stack.
-    ///
-    /// @param item_ud : Item
-    /// @param qty : integer?
-    /// @param max_qty : integer?
-    /// @return any
     module.set(
         "newItemStack",
         lua.create_function(
@@ -1412,11 +1280,6 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
         )?,
     )?;
 
-    /// New slot.
-    ///
-    /// @param slot_type : string?
-    /// @param state : string?
-    /// @return any
     module.set(
         "newSlot",
         lua.create_function(|_, (slot_type, state): (Option<String>, Option<String>)| {
@@ -1429,12 +1292,6 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
         })?,
     )?;
 
-    /// New container.
-    ///
-    /// @param name : string
-    /// @param mode_str : string?
-    /// @param slot_count : integer?
-    /// @return any
     module.set(
         "newContainer",
         lua.create_function(
@@ -1451,16 +1308,11 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
         )?,
     )?;
 
-    /// New inventory.
-    ///
     module.set(
         "newInventory",
         lua.create_function(|_, ()| Ok(LuaInventory::wrap(Inventory::new())))?,
     )?;
 
-    /// New item set.
-    ///
-    /// @param name : string
     module.set(
         "newItemSet",
         lua.create_function(|_, name: String| Ok(LuaItemSet::wrap(ItemSet::new(name))))?,

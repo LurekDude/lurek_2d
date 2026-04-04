@@ -1,0 +1,140 @@
+{
+  // ─── Editor ───────────────────────────────────────────────
+  "editor.tabSize": 4,
+  "editor.insertSpaces": false,
+  "editor.detectIndentation": false,
+  "editor.rulers": [100],
+  "editor.formatOnSave": false,
+
+  // ─── Files ────────────────────────────────────────────────
+  "files.trimTrailingWhitespace": true,
+  "files.insertFinalNewline": true,
+  "files.exclude": {
+    "**/__pycache__": true,
+    "**/.DS_Store": true,
+    "target/": true,
+    "build/": false
+  },
+  "explorer.excludeGitIgnore": false,
+  "search.exclude": {
+    "target/**": true,
+    "references/**": true
+  },
+
+  // ─── Rust (rust-analyzer) ─────────────────────────────────
+  "[rust]": {
+    "editor.formatOnSave": true,
+    "editor.defaultFormatter": "rust-lang.rust-analyzer"
+  },
+  "rust-analyzer.check.command": "clippy",
+  "rust-analyzer.check.extraArgs": ["--all-features"],
+  "rust-analyzer.inlayHints.bindingModeHints.enable": true,
+  "rust-analyzer.inlayHints.closureReturnTypeHints.enable": "always",
+  "rust-analyzer.inlayHints.lifetimeElisionHints.enable": "always",
+
+  // ─── Lua (sumneko.lua) ────────────────────────────────────
+  "Lua.runtime.version": "Lua 5.4",
+  "Lua.workspace.library": [
+    "c:\\Users\\tombl\\.vscode\\extensions\\love2d.ilove-toolkit-0.8.2\\data\\luacats\\library"
+  ],
+  "Lua.diagnostics.globals": ["luna"],
+  "Lua.diagnostics.disable": ["duplicate-set-field"],
+  "Lua.workspace.ignoreDir": [
+    "target",
+    "references"
+  ],
+
+  // ─── Markdown ─────────────────────────────────────────────
+  "markdownlint.config": {
+    "MD013": false,
+    "MD033": false
+  },
+
+  // ─── GitHub Copilot — Inline Completions ──────────────────
+  "github.copilot.enable": {
+    "*": true,
+    "markdown": true,
+    "yaml": true,
+    "lua": true,
+    "rust": true
+  },
+
+  // ─── GitHub Copilot — Next Edit Suggestions ───────────────
+  "github.copilot.nextEditSuggestions.enabled": true,
+  "github.copilot.nextEditSuggestions.extendedRange": true,
+  "github.copilot.nextEditSuggestions.fixes": true,
+  "github.copilot.nextEditSuggestions.eagerness": "auto",
+  "github.copilot.renameSuggestions.triggerAutomatically": true,
+
+  // ─── GitHub Copilot — Agent Core ──────────────────────────
+  "github.copilot.chat.agent.autoFix": true,
+  "github.copilot.chat.agent.currentEditorContext.enabled": true,
+  "github.copilot.chat.agent.largeToolResultsToDisk.enabled": true,
+  "github.copilot.chat.backgroundAgent.enabled": true,
+  "github.copilot.chat.backgroundCompaction": true,
+  "github.copilot.chat.claudeAgent.enabled": true,
+  "github.copilot.chat.switchAgent.enabled": true,
+  "github.copilot.chat.summarizeAgentConversationHistory.enabled": true,
+
+  // ─── GitHub Copilot — Memory ──────────────────────────────
+  "github.copilot.chat.copilotMemory.enabled": true,
+  "github.copilot.chat.tools.memory.enabled": true,
+
+  // ─── GitHub Copilot — Thinking / Reasoning ────────────────
+  "github.copilot.chat.anthropic.thinking.effort": "high",
+  "github.copilot.chat.anthropic.thinking.budgetTokens": 16000,
+  "github.copilot.chat.responsesApiReasoningEffort": "high",
+  "github.copilot.chat.responsesApiReasoningSummary": "detailed",
+  "github.copilot.chat.responsesApiContextManagement.enabled": true,
+
+  // ─── GitHub Copilot — Tools: Search / Subagents ───────────
+  "github.copilot.chat.codesearch.enabled": true,
+  "github.copilot.chat.codesearch.agent.enabled": true,
+  "github.copilot.chat.searchSubagent.enabled": true,
+  "github.copilot.chat.searchSubagent.useAgenticProxy": true,
+  "github.copilot.chat.searchSubagent.toolCallLimit": 8,
+  "github.copilot.chat.anthropic.toolSearchTool.enabled": true,
+  "github.copilot.chat.anthropic.toolSearchTool.mode": "server",
+
+  // ─── GitHub Copilot — Tools: Image / Media ────────────────
+  "github.copilot.chat.imageUpload.enabled": true,
+  "github.copilot.chat.tools.viewImage.enabled": true,
+
+  // ─── GitHub Copilot — Tools: Web Search ───────────────────
+  "github.copilot.chat.anthropic.tools.websearch.enabled": true,
+  "github.copilot.chat.anthropic.tools.websearch.maxUses": 10,
+
+  // ─── GitHub Copilot — MCP: Built-in GitHub Server ─────────
+  "github.copilot.chat.githubMcpServer.enabled": true,
+  "github.copilot.chat.githubMcpServer.toolsets": ["all"],
+  "github.copilot.chat.githubMcpServer.readonly": false,
+
+  // ─── GitHub Copilot — MCP: CLI Agent ──────────────────────
+  "github.copilot.chat.cli.mcp.enabled": true,
+  "github.copilot.chat.cli.customAgents.enabled": true,
+  "github.copilot.chat.cli.planMode.enabled": true,
+
+  // ─── GitHub Copilot — Workspace Context ───────────────────
+  "github.copilot.chat.workspace.enableFullWorkspace": true,
+  "github.copilot.chat.workspace.enableCodeSearch": true,
+  "github.copilot.chat.workspace.enableEmbeddingsSearch": true,
+  "github.copilot.chat.promptFileContextProvider.enabled": true,
+  "github.copilot.chat.codeGeneration.useInstructionFiles": true,
+
+  // ─── GitHub Copilot — Instructions ────────────────────────
+  "github.copilot.chat.useProjectTemplates": true,
+
+  // ─── VS Code Chat (core) ───────────────────────────────────
+  "workbench.browser.enableChatTools": true,
+  "chat.checkpoints.showFileChanges": true,
+  "chat.editing.explainChanges.enabled": true,
+  "chat.viewProgressBadge.enabled": true,
+  "chat.agentSessionProjection.enabled": true,
+  "chat.experimental.useSkillAdherencePrompt": true,
+
+  // ─── Terminal ─────────────────────────────────────────────
+  "terminal.integrated.env.windows": {},
+  "terminal.integrated.env.linux": {},
+  "terminal.integrated.env.osx": {},
+  "chat.subagents.allowInvocationsFromSubagents": true
+}

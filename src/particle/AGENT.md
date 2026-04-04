@@ -3,7 +3,7 @@
 | Property | Value |
 |----------|-------|
 | **Status** | Implemented — Full (CPU simulation, GPU rendering via DrawParticleSystem) |
-| **Tier** | Tier 2 — Engine Extensions |
+| **Tier** | Tier 2 — Reusable Engine Extensions |
 | **Lua API** | `luna.particle` |
 | **Source** | `src/particle/` |
 | **Tests** | `tests/particle_tests.rs` |

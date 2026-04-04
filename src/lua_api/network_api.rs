@@ -149,10 +149,7 @@ impl LuaUserData for LuaNetworkHost {
                                     peer_data: this.peer_data.clone(),
                                 },
                             )?;
-                            tbl.set(
-                                "data",
-                                lua.create_string(&data)?,
-                            )?;
+                            tbl.set("data", lua.create_string(&data)?)?;
                             tbl.set("channel", channel_id)?;
                         }
                     }
@@ -270,7 +267,11 @@ impl LuaUserData for LuaNetworkHost {
         /// # Returns
         /// `table<NetworkPeer>`.
         methods.add_method("getPeers", |lua, this, ()| {
-            let ids = this.inner.borrow_mut().connected_peer_ids().map_err(net_err)?;
+            let ids = this
+                .inner
+                .borrow_mut()
+                .connected_peer_ids()
+                .map_err(net_err)?;
             let tbl = lua.create_table()?;
             for (i, pid) in ids.into_iter().enumerate() {
                 tbl.set(
@@ -493,9 +494,8 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
                 .parse()
                 .map_err(|e| LuaError::RuntimeError(format!("invalid port: {e}")))?;
 
-            let host =
-                NetworkHost::new(bind_addr, peers, channels, in_bandwidth, out_bandwidth)
-                    .map_err(LuaError::external)?;
+            let host = NetworkHost::new(bind_addr, peers, channels, in_bandwidth, out_bandwidth)
+                .map_err(LuaError::external)?;
 
             Ok(LuaNetworkHost {
                 inner: Rc::new(RefCell::new(host)),

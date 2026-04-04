@@ -1,11 +1,4 @@
 //! Element-wise, reduction, comparison, masking, shape, and bitwise operations on NdArray.
-//!
-//! This module is part of Luna2D's `compute` subsystem and provides the implementation
-//! details for ops-related operations and data management.
-//! Primary functions: `add()`, `add_scalar()`, `sub()`, `sub_scalar()`.
-//!
-//! All public items are documented. See the parent module for architectural context
-//! and the `luna.*` Lua API for the scripting interface.
 
 use crate::compute::array::{DataType, NdArray};
 
@@ -92,109 +85,46 @@ fn require_int32(a: &NdArray) -> Result<(), String> {
 // ---------------------------------------------------------------------------
 
 /// Element-wise addition of two arrays (same shape and dtype).
-///
-/// # Parameters
-/// - `a` — `&NdArray`.
-/// - `b` — `&NdArray`.
-///
-/// # Returns
-/// `Result<NdArray, String>`.
 pub fn add(a: &NdArray, b: &NdArray) -> Result<NdArray, String> {
     elementwise_binary(a, b, |x, y| x + y)
 }
 
-/// Add a scalar to every element. The insertion is O(1) amortised unless a resize is triggered.
-///
-/// # Parameters
-/// - `a` — `&NdArray`.
-/// - `s` — `f64`.
-///
-/// # Returns
-/// `Result<NdArray, String>`.
+/// Add a scalar to every element.
 pub fn add_scalar(a: &NdArray, s: f64) -> Result<NdArray, String> {
     elementwise_scalar(a, s, |x, y| x + y)
 }
 
 /// Element-wise subtraction of two arrays (same shape and dtype).
-///
-/// # Parameters
-/// - `a` — `&NdArray`.
-/// - `b` — `&NdArray`.
-///
-/// # Returns
-/// `Result<NdArray, String>`.
 pub fn sub(a: &NdArray, b: &NdArray) -> Result<NdArray, String> {
     elementwise_binary(a, b, |x, y| x - y)
 }
 
-/// Subtract a scalar from every element. Consult the module-level documentation for the broader usage context and preconditions.
-///
-/// # Parameters
-/// - `a` — `&NdArray`.
-/// - `s` — `f64`.
-///
-/// # Returns
-/// `Result<NdArray, String>`.
+/// Subtract a scalar from every element.
 pub fn sub_scalar(a: &NdArray, s: f64) -> Result<NdArray, String> {
     elementwise_scalar(a, s, |x, y| x - y)
 }
 
 /// Element-wise multiplication of two arrays (same shape and dtype).
-///
-/// # Parameters
-/// - `a` — `&NdArray`.
-/// - `b` — `&NdArray`.
-///
-/// # Returns
-/// `Result<NdArray, String>`.
 pub fn mul(a: &NdArray, b: &NdArray) -> Result<NdArray, String> {
     elementwise_binary(a, b, |x, y| x * y)
 }
 
-/// Multiply every element by a scalar. Consult the module-level documentation for the broader usage context and preconditions.
-///
-/// # Parameters
-/// - `a` — `&NdArray`.
-/// - `s` — `f64`.
-///
-/// # Returns
-/// `Result<NdArray, String>`.
+/// Multiply every element by a scalar.
 pub fn mul_scalar(a: &NdArray, s: f64) -> Result<NdArray, String> {
     elementwise_scalar(a, s, |x, y| x * y)
 }
 
 /// Element-wise division of two arrays (same shape and dtype).
-///
-/// # Parameters
-/// - `a` — `&NdArray`.
-/// - `b` — `&NdArray`.
-///
-/// # Returns
-/// `Result<NdArray, String>`.
 pub fn div(a: &NdArray, b: &NdArray) -> Result<NdArray, String> {
     elementwise_binary(a, b, |x, y| x / y)
 }
 
-/// Divide every element by a scalar. Consult the module-level documentation for the broader usage context and preconditions.
-///
-/// # Parameters
-/// - `a` — `&NdArray`.
-/// - `s` — `f64`.
-///
-/// # Returns
-/// `Result<NdArray, String>`.
+/// Divide every element by a scalar.
 pub fn div_scalar(a: &NdArray, s: f64) -> Result<NdArray, String> {
     elementwise_scalar(a, s, |x, y| x / y)
 }
 
 /// Raise every element to a scalar exponent.
-///
-/// # Parameters
-/// - `a` — `&NdArray`.
-/// - `exp` — `f64`.
-///
-/// # Returns
-/// `Result<NdArray, String>`.
 pub fn pow_scalar(a: &NdArray, exp: f64) -> Result<NdArray, String> {
     let mut out = NdArray::zeros(a.shape(), a.dtype())?;
     for i in 0..a.size() {
@@ -203,48 +133,22 @@ pub fn pow_scalar(a: &NdArray, exp: f64) -> Result<NdArray, String> {
     Ok(out)
 }
 
-/// Element-wise square root. Consult the module-level documentation for the broader usage context and preconditions.
-///
-/// # Parameters
-/// - `a` — `&NdArray`.
-///
-/// # Returns
-/// `Result<NdArray, String>`.
+/// Element-wise square root.
 pub fn sqrt(a: &NdArray) -> Result<NdArray, String> {
     elementwise_unary(a, f64::sqrt)
 }
 
-/// Element-wise absolute value. Consult the module-level documentation for the broader usage context and preconditions.
-///
-/// # Parameters
-/// - `a` — `&NdArray`.
-///
-/// # Returns
-/// `Result<NdArray, String>`.
+/// Element-wise absolute value.
 pub fn abs(a: &NdArray) -> Result<NdArray, String> {
     elementwise_unary(a, f64::abs)
 }
 
-/// Element-wise negation. Consult the module-level documentation for the broader usage context and preconditions.
-///
-/// # Parameters
-/// - `a` — `&NdArray`.
-///
-/// # Returns
-/// `Result<NdArray, String>`.
+/// Element-wise negation.
 pub fn neg(a: &NdArray) -> Result<NdArray, String> {
     elementwise_unary(a, |x| -x)
 }
 
 /// Clamp every element to `[min_val, max_val]`.
-///
-/// # Parameters
-/// - `a` — `&NdArray`.
-/// - `min_val` — `f64`.
-/// - `max_val` — `f64`.
-///
-/// # Returns
-/// `Result<NdArray, String>`.
 pub fn clamp(a: &NdArray, min_val: f64, max_val: f64) -> Result<NdArray, String> {
     let mut out = NdArray::zeros(a.shape(), a.dtype())?;
     for i in 0..a.size() {
@@ -258,13 +162,6 @@ pub fn clamp(a: &NdArray, min_val: f64, max_val: f64) -> Result<NdArray, String>
 // ---------------------------------------------------------------------------
 
 /// Element-wise equality comparison of two arrays. Returns Float32 with 0/1.
-///
-/// # Parameters
-/// - `a` — `&NdArray`.
-/// - `b` — `&NdArray`.
-///
-/// # Returns
-/// `Result<NdArray, String>`.
 pub fn eq(a: &NdArray, b: &NdArray) -> Result<NdArray, String> {
     check_same_shape_dtype(a, b)?;
     let mut out = NdArray::zeros(a.shape(), DataType::Float32)?;
@@ -280,13 +177,6 @@ pub fn eq(a: &NdArray, b: &NdArray) -> Result<NdArray, String> {
 }
 
 /// Element-wise equality comparison against a scalar. Returns Float32.
-///
-/// # Parameters
-/// - `a` — `&NdArray`.
-/// - `s` — `f64`.
-///
-/// # Returns
-/// `Result<NdArray, String>`.
 pub fn eq_scalar(a: &NdArray, s: f64) -> Result<NdArray, String> {
     let mut out = NdArray::zeros(a.shape(), DataType::Float32)?;
     for i in 0..a.size() {
@@ -301,13 +191,6 @@ pub fn eq_scalar(a: &NdArray, s: f64) -> Result<NdArray, String> {
 }
 
 /// Element-wise not-equal comparison of two arrays. Returns Float32.
-///
-/// # Parameters
-/// - `a` — `&NdArray`.
-/// - `b` — `&NdArray`.
-///
-/// # Returns
-/// `Result<NdArray, String>`.
 pub fn neq(a: &NdArray, b: &NdArray) -> Result<NdArray, String> {
     check_same_shape_dtype(a, b)?;
     let mut out = NdArray::zeros(a.shape(), DataType::Float32)?;
@@ -323,13 +206,6 @@ pub fn neq(a: &NdArray, b: &NdArray) -> Result<NdArray, String> {
 }
 
 /// Element-wise not-equal comparison against a scalar. Returns Float32.
-///
-/// # Parameters
-/// - `a` — `&NdArray`.
-/// - `s` — `f64`.
-///
-/// # Returns
-/// `Result<NdArray, String>`.
 pub fn neq_scalar(a: &NdArray, s: f64) -> Result<NdArray, String> {
     let mut out = NdArray::zeros(a.shape(), DataType::Float32)?;
     for i in 0..a.size() {
@@ -344,13 +220,6 @@ pub fn neq_scalar(a: &NdArray, s: f64) -> Result<NdArray, String> {
 }
 
 /// Element-wise greater-than comparison of two arrays. Returns Float32.
-///
-/// # Parameters
-/// - `a` — `&NdArray`.
-/// - `b` — `&NdArray`.
-///
-/// # Returns
-/// `Result<NdArray, String>`.
 pub fn gt(a: &NdArray, b: &NdArray) -> Result<NdArray, String> {
     check_same_shape_dtype(a, b)?;
     let mut out = NdArray::zeros(a.shape(), DataType::Float32)?;
@@ -368,13 +237,6 @@ pub fn gt(a: &NdArray, b: &NdArray) -> Result<NdArray, String> {
 }
 
 /// Element-wise greater-than comparison against a scalar. Returns Float32.
-///
-/// # Parameters
-/// - `a` — `&NdArray`.
-/// - `s` — `f64`.
-///
-/// # Returns
-/// `Result<NdArray, String>`.
 pub fn gt_scalar(a: &NdArray, s: f64) -> Result<NdArray, String> {
     let mut out = NdArray::zeros(a.shape(), DataType::Float32)?;
     for i in 0..a.size() {
@@ -384,13 +246,6 @@ pub fn gt_scalar(a: &NdArray, s: f64) -> Result<NdArray, String> {
 }
 
 /// Element-wise less-than comparison of two arrays. Returns Float32.
-///
-/// # Parameters
-/// - `a` — `&NdArray`.
-/// - `b` — `&NdArray`.
-///
-/// # Returns
-/// `Result<NdArray, String>`.
 pub fn lt(a: &NdArray, b: &NdArray) -> Result<NdArray, String> {
     check_same_shape_dtype(a, b)?;
     let mut out = NdArray::zeros(a.shape(), DataType::Float32)?;
@@ -408,13 +263,6 @@ pub fn lt(a: &NdArray, b: &NdArray) -> Result<NdArray, String> {
 }
 
 /// Element-wise less-than comparison against a scalar. Returns Float32.
-///
-/// # Parameters
-/// - `a` — `&NdArray`.
-/// - `s` — `f64`.
-///
-/// # Returns
-/// `Result<NdArray, String>`.
 pub fn lt_scalar(a: &NdArray, s: f64) -> Result<NdArray, String> {
     let mut out = NdArray::zeros(a.shape(), DataType::Float32)?;
     for i in 0..a.size() {
@@ -424,13 +272,6 @@ pub fn lt_scalar(a: &NdArray, s: f64) -> Result<NdArray, String> {
 }
 
 /// Element-wise greater-than-or-equal comparison of two arrays. Returns Float32.
-///
-/// # Parameters
-/// - `a` — `&NdArray`.
-/// - `b` — `&NdArray`.
-///
-/// # Returns
-/// `Result<NdArray, String>`.
 pub fn gte(a: &NdArray, b: &NdArray) -> Result<NdArray, String> {
     check_same_shape_dtype(a, b)?;
     let mut out = NdArray::zeros(a.shape(), DataType::Float32)?;
@@ -448,13 +289,6 @@ pub fn gte(a: &NdArray, b: &NdArray) -> Result<NdArray, String> {
 }
 
 /// Element-wise greater-than-or-equal comparison against a scalar. Returns Float32.
-///
-/// # Parameters
-/// - `a` — `&NdArray`.
-/// - `s` — `f64`.
-///
-/// # Returns
-/// `Result<NdArray, String>`.
 pub fn gte_scalar(a: &NdArray, s: f64) -> Result<NdArray, String> {
     let mut out = NdArray::zeros(a.shape(), DataType::Float32)?;
     for i in 0..a.size() {
@@ -464,13 +298,6 @@ pub fn gte_scalar(a: &NdArray, s: f64) -> Result<NdArray, String> {
 }
 
 /// Element-wise less-than-or-equal comparison of two arrays. Returns Float32.
-///
-/// # Parameters
-/// - `a` — `&NdArray`.
-/// - `b` — `&NdArray`.
-///
-/// # Returns
-/// `Result<NdArray, String>`.
 pub fn lte(a: &NdArray, b: &NdArray) -> Result<NdArray, String> {
     check_same_shape_dtype(a, b)?;
     let mut out = NdArray::zeros(a.shape(), DataType::Float32)?;
@@ -488,13 +315,6 @@ pub fn lte(a: &NdArray, b: &NdArray) -> Result<NdArray, String> {
 }
 
 /// Element-wise less-than-or-equal comparison against a scalar. Returns Float32.
-///
-/// # Parameters
-/// - `a` — `&NdArray`.
-/// - `s` — `f64`.
-///
-/// # Returns
-/// `Result<NdArray, String>`.
 pub fn lte_scalar(a: &NdArray, s: f64) -> Result<NdArray, String> {
     let mut out = NdArray::zeros(a.shape(), DataType::Float32)?;
     for i in 0..a.size() {
@@ -508,26 +328,11 @@ pub fn lte_scalar(a: &NdArray, s: f64) -> Result<NdArray, String> {
 // ---------------------------------------------------------------------------
 
 /// Threshold mask: returns Float32 array with 1.0 where `a >= val`, 0.0 otherwise.
-///
-/// # Parameters
-/// - `a` — `&NdArray`.
-/// - `val` — `f64`.
-///
-/// # Returns
-/// `Result<NdArray, String>`.
 pub fn threshold(a: &NdArray, val: f64) -> Result<NdArray, String> {
     gte_scalar(a, val)
 }
 
 /// Conditional selection: where `cond != 0`, choose from `a`; otherwise from `b`.
-///
-/// # Parameters
-/// - `cond` — `&NdArray`.
-/// - `a` — `&NdArray`.
-/// - `b` — `&NdArray`.
-///
-/// # Returns
-/// `Result<NdArray, String>`.
 ///
 /// All three arrays must have the same shape. `a` and `b` must have the same dtype.
 /// `cond` is read as Float32.
@@ -559,13 +364,7 @@ pub fn where_mask(cond: &NdArray, a: &NdArray, b: &NdArray) -> Result<NdArray, S
 // Counting
 // ---------------------------------------------------------------------------
 
-/// Count the number of non-zero elements. Runs in O(1) time.
-///
-/// # Parameters
-/// - `a` — `&NdArray`.
-///
-/// # Returns
-/// `usize`.
+/// Count the number of non-zero elements.
 pub fn count_nonzero(a: &NdArray) -> usize {
     let mut count = 0usize;
     for i in 0..a.size() {
@@ -577,12 +376,6 @@ pub fn count_nonzero(a: &NdArray) -> usize {
 }
 
 /// Return the flat index of the minimum element (0-based).
-///
-/// # Parameters
-/// - `a` — `&NdArray`.
-///
-/// # Returns
-/// `usize`.
 pub fn argmin(a: &NdArray) -> usize {
     let mut best_idx = 0;
     let mut best_val = a.get_f64(0);
@@ -597,12 +390,6 @@ pub fn argmin(a: &NdArray) -> usize {
 }
 
 /// Return the flat index of the maximum element (0-based).
-///
-/// # Parameters
-/// - `a` — `&NdArray`.
-///
-/// # Returns
-/// `usize`.
 pub fn argmax(a: &NdArray) -> usize {
     let mut best_idx = 0;
     let mut best_val = a.get_f64(0);
@@ -617,12 +404,6 @@ pub fn argmax(a: &NdArray) -> usize {
 }
 
 /// Returns `true` if any element is non-zero.
-///
-/// # Parameters
-/// - `a` — `&NdArray`.
-///
-/// # Returns
-/// `bool`.
 pub fn any(a: &NdArray) -> bool {
     for i in 0..a.size() {
         if a.get_f64(i) != 0.0 {
@@ -633,12 +414,6 @@ pub fn any(a: &NdArray) -> bool {
 }
 
 /// Returns `true` if all elements are non-zero.
-///
-/// # Parameters
-/// - `a` — `&NdArray`.
-///
-/// # Returns
-/// `bool`.
 pub fn all(a: &NdArray) -> bool {
     for i in 0..a.size() {
         if a.get_f64(i) == 0.0 {
@@ -652,13 +427,7 @@ pub fn all(a: &NdArray) -> bool {
 // Reductions — global
 // ---------------------------------------------------------------------------
 
-/// Sum of all elements. Consult the module-level documentation for the broader usage context and preconditions.
-///
-/// # Parameters
-/// - `a` — `&NdArray`.
-///
-/// # Returns
-/// `f64`.
+/// Sum of all elements.
 pub fn sum(a: &NdArray) -> f64 {
     let mut s = 0.0;
     for i in 0..a.size() {
@@ -667,24 +436,12 @@ pub fn sum(a: &NdArray) -> f64 {
     s
 }
 
-/// Mean of all elements. Consult the module-level documentation for the broader usage context and preconditions.
-///
-/// # Parameters
-/// - `a` — `&NdArray`.
-///
-/// # Returns
-/// `f64`.
+/// Mean of all elements.
 pub fn mean(a: &NdArray) -> f64 {
     sum(a) / a.size() as f64
 }
 
-/// Minimum value across all elements. Consult the module-level documentation for the broader usage context and preconditions.
-///
-/// # Parameters
-/// - `a` — `&NdArray`.
-///
-/// # Returns
-/// `f64`.
+/// Minimum value across all elements.
 pub fn min_val(a: &NdArray) -> f64 {
     let mut m = a.get_f64(0);
     for i in 1..a.size() {
@@ -696,13 +453,7 @@ pub fn min_val(a: &NdArray) -> f64 {
     m
 }
 
-/// Maximum value across all elements. Consult the module-level documentation for the broader usage context and preconditions.
-///
-/// # Parameters
-/// - `a` — `&NdArray`.
-///
-/// # Returns
-/// `f64`.
+/// Maximum value across all elements.
 pub fn max_val(a: &NdArray) -> f64 {
     let mut m = a.get_f64(0);
     for i in 1..a.size() {
@@ -754,13 +505,6 @@ fn for_each_index(shape: &[usize], mut f: impl FnMut(usize, &[usize])) {
 }
 
 /// Sum along a given axis, producing an array with that axis removed.
-///
-/// # Parameters
-/// - `a` — `&NdArray`.
-/// - `axis` — `usize`.
-///
-/// # Returns
-/// `Result<NdArray, String>`.
 pub fn sum_axis(a: &NdArray, axis: usize) -> Result<NdArray, String> {
     check_axis(a, axis)?;
     let out_shape = reduced_shape(a.shape(), axis);
@@ -785,14 +529,7 @@ pub fn sum_axis(a: &NdArray, axis: usize) -> Result<NdArray, String> {
     Ok(out)
 }
 
-/// Mean along a given axis. Consult the module-level documentation for the broader usage context and preconditions.
-///
-/// # Parameters
-/// - `a` — `&NdArray`.
-/// - `axis` — `usize`.
-///
-/// # Returns
-/// `Result<NdArray, String>`.
+/// Mean along a given axis.
 pub fn mean_axis(a: &NdArray, axis: usize) -> Result<NdArray, String> {
     check_axis(a, axis)?;
     let mut out = sum_axis(a, axis)?;
@@ -803,14 +540,7 @@ pub fn mean_axis(a: &NdArray, axis: usize) -> Result<NdArray, String> {
     Ok(out)
 }
 
-/// Minimum along a given axis. Consult the module-level documentation for the broader usage context and preconditions.
-///
-/// # Parameters
-/// - `a` — `&NdArray`.
-/// - `axis` — `usize`.
-///
-/// # Returns
-/// `Result<NdArray, String>`.
+/// Minimum along a given axis.
 pub fn min_axis(a: &NdArray, axis: usize) -> Result<NdArray, String> {
     check_axis(a, axis)?;
     let out_shape = reduced_shape(a.shape(), axis);
@@ -839,14 +569,7 @@ pub fn min_axis(a: &NdArray, axis: usize) -> Result<NdArray, String> {
     Ok(out)
 }
 
-/// Maximum along a given axis. Consult the module-level documentation for the broader usage context and preconditions.
-///
-/// # Parameters
-/// - `a` — `&NdArray`.
-/// - `axis` — `usize`.
-///
-/// # Returns
-/// `Result<NdArray, String>`.
+/// Maximum along a given axis.
 pub fn max_axis(a: &NdArray, axis: usize) -> Result<NdArray, String> {
     check_axis(a, axis)?;
     let out_shape = reduced_shape(a.shape(), axis);
@@ -881,13 +604,6 @@ pub fn max_axis(a: &NdArray, axis: usize) -> Result<NdArray, String> {
 
 /// Reshape an array to a new shape with the same total element count.
 ///
-/// # Parameters
-/// - `a` — `&NdArray`.
-/// - `new_shape` — `&[usize]`.
-///
-/// # Returns
-/// `Result<NdArray, String>`.
-///
 /// Returns a new array with data copied from the original.
 pub fn reshape(a: &NdArray, new_shape: &[usize]) -> Result<NdArray, String> {
     let new_total: usize = new_shape.iter().product();
@@ -909,12 +625,6 @@ pub fn reshape(a: &NdArray, new_shape: &[usize]) -> Result<NdArray, String> {
 }
 
 /// Transpose a 2D array (swap rows and columns).
-///
-/// # Parameters
-/// - `a` — `&NdArray`.
-///
-/// # Returns
-/// `Result<NdArray, String>`.
 pub fn transpose_2d(a: &NdArray) -> Result<NdArray, String> {
     if a.ndim() != 2 {
         return Err(format!(
@@ -936,23 +646,13 @@ pub fn transpose_2d(a: &NdArray) -> Result<NdArray, String> {
 }
 
 /// Fill all elements of an array with a value (in-place).
-///
-/// # Parameters
-/// - `a` — `&mut NdArray`.
-/// - `val` — `f64`.
 pub fn fill(a: &mut NdArray, val: f64) {
     for i in 0..a.size() {
         a.set_f64(i, val);
     }
 }
 
-/// Clone an array (convenience wrapper). Consult the module-level documentation for the broader usage context and preconditions.
-///
-/// # Parameters
-/// - `a` — `&NdArray`.
-///
-/// # Returns
-/// `NdArray`.
+/// Clone an array (convenience wrapper).
 pub fn clone_array(a: &NdArray) -> NdArray {
     a.clone()
 }
@@ -961,14 +661,7 @@ pub fn clone_array(a: &NdArray) -> NdArray {
 // Bitwise — Int32 only
 // ---------------------------------------------------------------------------
 
-/// Bitwise AND of two Int32 arrays. Consult the module-level documentation for the broader usage context and preconditions.
-///
-/// # Parameters
-/// - `a` — `&NdArray`.
-/// - `b` — `&NdArray`.
-///
-/// # Returns
-/// `Result<NdArray, String>`.
+/// Bitwise AND of two Int32 arrays.
 pub fn bitwise_and(a: &NdArray, b: &NdArray) -> Result<NdArray, String> {
     require_int32(a)?;
     require_int32(b)?;
@@ -980,14 +673,7 @@ pub fn bitwise_and(a: &NdArray, b: &NdArray) -> Result<NdArray, String> {
     Ok(out)
 }
 
-/// Bitwise OR of two Int32 arrays. Consult the module-level documentation for the broader usage context and preconditions.
-///
-/// # Parameters
-/// - `a` — `&NdArray`.
-/// - `b` — `&NdArray`.
-///
-/// # Returns
-/// `Result<NdArray, String>`.
+/// Bitwise OR of two Int32 arrays.
 pub fn bitwise_or(a: &NdArray, b: &NdArray) -> Result<NdArray, String> {
     require_int32(a)?;
     require_int32(b)?;
@@ -999,14 +685,7 @@ pub fn bitwise_or(a: &NdArray, b: &NdArray) -> Result<NdArray, String> {
     Ok(out)
 }
 
-/// Bitwise XOR of two Int32 arrays. Consult the module-level documentation for the broader usage context and preconditions.
-///
-/// # Parameters
-/// - `a` — `&NdArray`.
-/// - `b` — `&NdArray`.
-///
-/// # Returns
-/// `Result<NdArray, String>`.
+/// Bitwise XOR of two Int32 arrays.
 pub fn bitwise_xor(a: &NdArray, b: &NdArray) -> Result<NdArray, String> {
     require_int32(a)?;
     require_int32(b)?;
@@ -1018,13 +697,7 @@ pub fn bitwise_xor(a: &NdArray, b: &NdArray) -> Result<NdArray, String> {
     Ok(out)
 }
 
-/// Bitwise NOT of an Int32 array. Consult the module-level documentation for the broader usage context and preconditions.
-///
-/// # Parameters
-/// - `a` — `&NdArray`.
-///
-/// # Returns
-/// `Result<NdArray, String>`.
+/// Bitwise NOT of an Int32 array.
 pub fn bitwise_not(a: &NdArray) -> Result<NdArray, String> {
     require_int32(a)?;
     let mut out = NdArray::zeros(a.shape(), DataType::Int32)?;
@@ -1035,13 +708,6 @@ pub fn bitwise_not(a: &NdArray) -> Result<NdArray, String> {
 }
 
 /// Bitwise left shift of an Int32 array by `amount` bits.
-///
-/// # Parameters
-/// - `a` — `&NdArray`.
-/// - `amount` — `u32`.
-///
-/// # Returns
-/// `Result<NdArray, String>`.
 pub fn bitwise_lshift(a: &NdArray, amount: u32) -> Result<NdArray, String> {
     require_int32(a)?;
     let mut out = NdArray::zeros(a.shape(), DataType::Int32)?;
@@ -1052,13 +718,6 @@ pub fn bitwise_lshift(a: &NdArray, amount: u32) -> Result<NdArray, String> {
 }
 
 /// Bitwise right shift (arithmetic) of an Int32 array by `amount` bits.
-///
-/// # Parameters
-/// - `a` — `&NdArray`.
-/// - `amount` — `u32`.
-///
-/// # Returns
-/// `Result<NdArray, String>`.
 pub fn bitwise_rshift(a: &NdArray, amount: u32) -> Result<NdArray, String> {
     require_int32(a)?;
     let mut out = NdArray::zeros(a.shape(), DataType::Int32)?;

@@ -1,19 +1,6 @@
 //! Graph item — a typed entity that flows through the network.
-//!
-//! This module is part of Luna2D's `graph` subsystem and provides the implementation
-//! details for item-related operations and data management.
-//! Key types exported from this module: `ItemPosition`, `GraphItem`.
-//! Primary functions: `new()`, `kill()`, `is_alive()`, `get_type()`.
-//!
-//! All public items are documented. See the parent module for architectural context
-//! and the `luna.*` Lua API for the scripting interface.
 
-/// Where a `GraphItem` currently resides. Consult the module-level documentation for the broader usage context and preconditions.
-///
-/// # Variants
-/// - `AtNode` — AtNode variant.
-/// - `InTransit` — InTransit variant.
-/// - `Unplaced` — Unplaced variant.
+/// Where a `GraphItem` currently resides.
 #[derive(Debug, Clone, PartialEq)]
 pub enum ItemPosition {
     /// Sitting at a node.
@@ -30,15 +17,6 @@ pub enum ItemPosition {
 }
 
 /// A typed entity that flows through the graph network.
-///
-/// # Fields
-/// - `id` — `u64`.
-/// - `item_type` — `String`.
-/// - `decay_time` — `f64`.
-/// - `remaining_life` — `f64`.
-/// - `alive` — `bool`.
-/// - `priority` — `i32`.
-/// - `position` — `ItemPosition`.
 #[derive(Debug, Clone)]
 pub struct GraphItem {
     /// Unique identifier.
@@ -59,14 +37,6 @@ pub struct GraphItem {
 
 impl GraphItem {
     /// Create a new item with the given type and decay time.
-    ///
-    /// # Parameters
-    /// - `id` — `u64`.
-    /// - `item_type` — `&str`.
-    /// - `decay_time` — `f64`.
-    ///
-    /// # Returns
-    /// `Self`.
     pub fn new(id: u64, item_type: &str, decay_time: f64) -> Self {
         Self {
             id,
@@ -79,47 +49,32 @@ impl GraphItem {
         }
     }
 
-    /// Mark the item as dead. Consult the module-level documentation for the broader usage context and preconditions.
+    /// Mark the item as dead.
     pub fn kill(&mut self) {
         self.alive = false;
     }
 
-    /// Whether the item is still alive. This accessor incurs no allocation; call it freely in hot paths.
-    ///
-    /// # Returns
-    /// `bool`.
+    /// Whether the item is still alive.
     pub fn is_alive(&self) -> bool {
         self.alive
     }
 
-    /// Get the item type. This accessor incurs no allocation; call it freely in hot paths.
-    ///
-    /// # Returns
-    /// `&str`.
+    /// Get the item type.
     pub fn get_type(&self) -> &str {
         &self.item_type
     }
 
-    /// Set the item type. Replaces the current type value; callers hold responsibility for maintaining consistency with related fields.
-    ///
-    /// # Parameters
-    /// - `item_type` — `&str`.
+    /// Set the item type.
     pub fn set_type(&mut self, item_type: &str) {
         self.item_type = item_type.to_string();
     }
 
     /// Get the decay time (`-1.0` = no decay).
-    ///
-    /// # Returns
-    /// `f64`.
     pub fn get_decay_time(&self) -> f64 {
         self.decay_time
     }
 
     /// Set the decay time. Also resets remaining life if positive.
-    ///
-    /// # Parameters
-    /// - `t` — `f64`.
     pub fn set_decay_time(&mut self, t: f64) {
         self.decay_time = t;
         if t > 0.0 {
@@ -127,50 +82,32 @@ impl GraphItem {
         }
     }
 
-    /// Get remaining life in seconds. This accessor incurs no allocation; call it freely in hot paths.
-    ///
-    /// # Returns
-    /// `f64`.
+    /// Get remaining life in seconds.
     pub fn get_remaining_life(&self) -> f64 {
         self.remaining_life
     }
 
-    /// Set remaining life in seconds. Replaces the current remaining life value; callers hold responsibility for maintaining consistency with related fields.
-    ///
-    /// # Parameters
-    /// - `t` — `f64`.
+    /// Set remaining life in seconds.
     pub fn set_remaining_life(&mut self, t: f64) {
         self.remaining_life = t;
     }
 
-    /// Get the priority value. This accessor incurs no allocation; call it freely in hot paths.
-    ///
-    /// # Returns
-    /// `i32`.
+    /// Get the priority value.
     pub fn get_priority(&self) -> i32 {
         self.priority
     }
 
-    /// Set the priority value. Replaces the current priority value; callers hold responsibility for maintaining consistency with related fields.
-    ///
-    /// # Parameters
-    /// - `p` — `i32`.
+    /// Set the priority value.
     pub fn set_priority(&mut self, p: i32) {
         self.priority = p;
     }
 
-    /// Get the current position. This accessor incurs no allocation; call it freely in hot paths.
-    ///
-    /// # Returns
-    /// `&ItemPosition`.
+    /// Get the current position.
     pub fn get_position(&self) -> &ItemPosition {
         &self.position
     }
 
-    /// Set the current position. Replaces the current position value; callers hold responsibility for maintaining consistency with related fields.
-    ///
-    /// # Parameters
-    /// - `pos` — `ItemPosition`.
+    /// Set the current position.
     pub fn set_position(&mut self, pos: ItemPosition) {
         self.position = pos;
     }

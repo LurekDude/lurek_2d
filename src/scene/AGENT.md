@@ -2,7 +2,7 @@
 
 | Property | Value |
 |----------|-------|
-| **Tier** | Tier 2 — Engine Extensions |
+| **Tier** | Tier 2 — Reusable Engine Extensions |
 | **Lua API** | `luna.scene` |
 | **Source** | `src/scene/` |
 | **Tests** | `tests/scene_tests.rs` |

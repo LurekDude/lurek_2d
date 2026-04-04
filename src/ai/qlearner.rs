@@ -142,7 +142,7 @@ impl QLearner {
         best_idx
     }
 
-    /// Performs one Bellman Q-learning update. Consult the module-level documentation for the broader usage context and preconditions.
+    /// Performs one Bellman Q-learning update.
     ///
     /// Updates the Q-value for (`state`, `action`) using the observed
     /// `reward` and the estimated value of `next_state`:

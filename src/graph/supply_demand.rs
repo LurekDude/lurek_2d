@@ -1,21 +1,11 @@
 //! Supply/demand processing — match demands to supplies and route items.
-//!
-//! This module is part of Luna2D's `graph` subsystem and provides the implementation
-//! details for supply demand-related operations and data management.
-//! Primary functions: `process_demand()`.
-//!
-//! All public items are documented. See the parent module for architectural context
-//! and the `luna.*` Lua API for the scripting interface.
 
 use super::core::Graph;
 use super::item::ItemPosition;
 use super::simulation::GraphEvent;
 
 impl Graph {
-    /// Process all demand/supply declarations. Consult the module-level documentation for the broader usage context and preconditions.
-    ///
-    /// # Returns
-    /// `Vec<GraphEvent>`.
+    /// Process all demand/supply declarations.
     ///
     /// Iterates demand nodes in priority order (highest first), finds matching
     /// supply nodes via pathfinding, creates items at the supply and routes them.
@@ -43,9 +33,9 @@ impl Graph {
                 .values()
                 .filter(|n| {
                     n.id != demand_node_id
-                        && n.supplies
-                            .iter()
-                            .any(|s| s.item_type == item_type && s.quantity != 0)
+                        && n.supplies.iter().any(|s| {
+                            s.item_type == item_type && s.quantity != 0
+                        })
                 })
                 .map(|n| n.id)
                 .collect();
@@ -156,7 +146,10 @@ mod tests {
         g.add_edge(supply, demand, None).unwrap();
 
         g.nodes.get_mut(&supply).unwrap().add_supply("ore", 5);
-        g.nodes.get_mut(&demand).unwrap().add_demand("ore", 3, 10);
+        g.nodes
+            .get_mut(&demand)
+            .unwrap()
+            .add_demand("ore", 3, 10);
 
         let events = g.process_demand();
         assert!(events.iter().any(
@@ -173,7 +166,10 @@ mod tests {
         // No edge connecting them
 
         g.nodes.get_mut(&supply).unwrap().add_supply("ore", 5);
-        g.nodes.get_mut(&demand).unwrap().add_demand("ore", 3, 10);
+        g.nodes
+            .get_mut(&demand)
+            .unwrap()
+            .add_demand("ore", 3, 10);
 
         let events = g.process_demand();
         assert!(!events
@@ -189,13 +185,16 @@ mod tests {
         g.add_edge(supply, demand, None).unwrap();
 
         g.nodes.get_mut(&supply).unwrap().add_supply("ore", 2);
-        g.nodes.get_mut(&demand).unwrap().add_demand("ore", 5, 10);
+        g.nodes
+            .get_mut(&demand)
+            .unwrap()
+            .add_demand("ore", 5, 10);
 
         let events = g.process_demand();
-        assert!(events.iter().any(
-            |e| matches!(e, GraphEvent::SupplyDepleted { node_id, item_type }
-                if *node_id == supply && item_type == "ore")
-        ));
+        assert!(events
+            .iter()
+            .any(|e| matches!(e, GraphEvent::SupplyDepleted { node_id, item_type }
+                if *node_id == supply && item_type == "ore")));
     }
 
     #[test]
@@ -205,8 +204,14 @@ mod tests {
         let demand = g.add_node("consumer", -1);
         g.add_edge(supply, demand, None).unwrap();
 
-        g.nodes.get_mut(&supply).unwrap().add_supply("magic", -1);
-        g.nodes.get_mut(&demand).unwrap().add_demand("magic", 10, 5);
+        g.nodes
+            .get_mut(&supply)
+            .unwrap()
+            .add_supply("magic", -1);
+        g.nodes
+            .get_mut(&demand)
+            .unwrap()
+            .add_demand("magic", 10, 5);
 
         let events = g.process_demand();
         assert!(events

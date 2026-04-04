@@ -25,6 +25,41 @@ describe("data + filesystem integration", function()
             expect_not_equal(hash1, hash3, "different input = different hash")
         end
     end)
+
+    it("can parse and encode TOML", function()
+        if luna.data and luna.data.parseToml and luna.data.encodeToml then
+            local decoded = luna.data.parseToml('title = "Luna2D"\nenabled = true\ncount = 3')
+            expect_equal("Luna2D", decoded.title, "parseToml decodes strings")
+            expect_true(decoded.enabled == true, "parseToml decodes booleans")
+            expect_equal(3, decoded.count, "parseToml decodes integers")
+
+            local encoded = luna.data.encodeToml({ title = "Luna2D", enabled = true, count = 3 })
+            expect_true(type(encoded) == "string", "encodeToml returns string")
+            expect_true(string.find(encoded, 'title = "Luna2D"', 1, true) ~= nil, "encoded TOML contains title")
+            expect_true(string.find(encoded, "enabled = true", 1, true) ~= nil, "encoded TOML contains boolean")
+            expect_true(string.find(encoded, "count = 3", 1, true) ~= nil, "encoded TOML contains integer")
+        end
+    end)
+
+    it("reports TOML errors with full function names", function()
+        if luna.data and luna.data.parseToml and luna.data.encodeToml then
+            local ok_parse, parse_err = pcall(function()
+                luna.data.parseToml("invalid = [")
+            end)
+            local parse_err_text = tostring(parse_err)
+            expect_false(ok_parse, "invalid TOML should fail")
+            expect_true(type(parse_err) == "string", "parseToml error is string")
+            expect_true(string.find(parse_err_text, "luna.data.parseToml", 1, true) ~= nil, "parseToml error includes function name")
+
+            local ok_encode, encode_err = pcall(function()
+                luna.data.encodeToml({ [1] = "first", name = "mixed" })
+            end)
+            local encode_err_text = tostring(encode_err)
+            expect_false(ok_encode, "mixed table should fail")
+            expect_true(type(encode_err) == "string", "encodeToml error is string")
+            expect_true(string.find(encode_err_text, "luna.data.encodeToml", 1, true) ~= nil, "encodeToml error includes function name")
+        end
+    end)
 end)
 
 describe("system info integration", function()

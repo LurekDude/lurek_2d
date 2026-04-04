@@ -1,4 +1,4 @@
---- Luna2D dialog sequencer — typewriter text, branching choices, events.
+﻿--- Luna2D dialog sequencer ÔÇö typewriter text, branching choices, events.
 --
 -- A pure-Lua replacement for the former `luna.dialog` Rust binding.
 -- No engine dependencies; works in headless test VMs.
@@ -17,11 +17,11 @@
 
 local M = {}
 
--- ─── Internal constants ───────────────────────────────────────────────────────
+-- ÔöÇÔöÇÔöÇ Internal constants ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
 
 local DEFAULT_CPS = 20  -- characters per second
 
--- ─── Node executor helpers ────────────────────────────────────────────────────
+-- ÔöÇÔöÇÔöÇ Node executor helpers ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
 
 --- Flatten nested branch nodes into a linear sequence with jump markers.
 -- Choices embed a jump-table so execution can branch then reconverge.
@@ -35,19 +35,19 @@ local function flatten(nodes, out, next_after)
     return out
 end
 
--- ─── Sequencer object ─────────────────────────────────────────────────────────
+-- ÔöÇÔöÇÔöÇ Sequencer object ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
 
 --- Create a new dialog sequencer.
 -- The sequencer runs a list of dialog nodes one at a time, revealing
 -- typewriter-style text, pausing for choices, and firing named callbacks.
 --
 -- States:
---   "idle"    — no script loaded or sequence ended, not started
---   "typing"  — revealing the current line character by character
---   "waiting" — current line fully revealed, waiting for advance()
---   "choice"  — waiting for the player to call choose(index)
---   "paused"  — a "wait" node is counting down
---   "done"    — sequence finished
+--   "idle"    ÔÇö no script loaded or sequence ended, not started
+--   "typing"  ÔÇö revealing the current line character by character
+--   "waiting" ÔÇö current line fully revealed, waiting for advance()
+--   "choice"  ÔÇö waiting for the player to call choose(index)
+--   "paused"  ÔÇö a "wait" node is counting down
+--   "done"    ÔÇö sequence finished
 --
 -- @treturn table Sequencer object.
 function M.newSequencer()
@@ -62,10 +62,10 @@ function M.newSequencer()
     local _choice_txt = ""
     local _choice_opts= {}   -- {label, branch} list
     local _wait_timer = 0.0
-    local _handlers   = {}   -- event_name → list of callbacks
+    local _handlers   = {}   -- event_name Ôćĺ list of callbacks
     local _pending_nodes = nil  -- nodes injected mid-sequence by a branch
 
-    -- ── private helpers ────────────────────────────────────────────────────
+    -- ÔöÇÔöÇ private helpers ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
 
     local function fire(event, ...)
         local list = _handlers[event]
@@ -101,11 +101,18 @@ function M.newSequencer()
         if _pc > #_nodes then
             set_state("done")
             fire("finished")
+            fire("done")
             return
         end
 
         local node = _nodes[_pc]
         _pc = _pc + 1
+
+        -- cond predicate: skip node when condition returns false
+        if type(node.cond) == "function" and not node.cond() then
+            step()
+            return
+        end
 
         if node.type == "say" then
             _speaker  = node.speaker or ""
@@ -131,13 +138,29 @@ function M.newSequencer()
             -- call nodes don't pause; run next immediately
             step()
 
+        elseif node.type == "event" then
+            -- fire named hook then continue immediately
+            fire("event", node.name, node.data)
+            step()
+
+        elseif node.type == "jump" then
+            -- find the node whose .label matches node.target and jump to it
+            local target = node.target or node.label
+            for i, n in ipairs(_nodes) do
+                if n.label == target then
+                    _pc = i
+                    break
+                end
+            end
+            step()
+
         else
             -- unknown node type: skip silently
             step()
         end
     end
 
-    -- ── public API ─────────────────────────────────────────────────────────
+    -- ÔöÇÔöÇ public API ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
 
     --- Load a new script, replacing any existing one.
     -- Call start() afterwards to begin playback.
@@ -160,6 +183,7 @@ function M.newSequencer()
         if #_nodes == 0 then
             set_state("done")
             fire("finished")
+            fire("done")
             return
         end
         _pc = 1
@@ -171,10 +195,17 @@ function M.newSequencer()
     -- @param dt number Delta time in seconds.
     function seq:update(dt)
         if _state == "typing" then
+            local old_revealed = _revealed
             _revealed = _revealed + _cps * dt
             if _revealed >= #_text then
                 _revealed = #_text
                 set_state("waiting")
+            end
+            -- fire "typewrite(char, full_text)" once per newly revealed character
+            local old_count = math.floor(old_revealed)
+            local new_count = math.floor(_revealed)
+            for i = old_count + 1, new_count do
+                fire("typewrite", string.sub(_text, i, i), _text)
             end
 
         elseif _state == "paused" then
@@ -305,5 +336,134 @@ function M.newSequencer()
 
     return seq
 end
+
+
+-- ÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉ
+-- NODE CONSTRUCTOR HELPERS
+-- ÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉ
+
+--- Create a `say` dialog node (spoken line with typewriter reveal).
+-- @param actor string Speaker name.
+-- @param text string Line to reveal.
+-- @param opts table Optional extra fields merged into the node (e.g. cond, label).
+-- @treturn table Node table: { type="say", speaker, text, ... }.
+function M.say(actor, text, opts)
+    local node = {}
+    if opts then for k, v in pairs(opts) do node[k] = v end end
+    node.type    = "say"
+    node.speaker = actor or ""
+    node.text    = text  or ""
+    return node
+end
+
+--- Create a `choice` dialog node (branching prompt).
+-- @param prompt string Prompt text shown above options.
+-- @param options table Array of { label, branch } tables.
+-- @param opts table Optional extra fields merged into the node.
+-- @treturn table Node table: { type="choice", text, options, ... }.
+function M.choice(prompt, options, opts)
+    local node = {}
+    if opts then for k, v in pairs(opts) do node[k] = v end end
+    node.type    = "choice"
+    node.text    = prompt  or ""
+    node.options = options or {}
+    return node
+end
+
+--- Create a `wait` dialog node (timed pause).
+-- @param seconds number Duration of the pause in seconds.
+-- @param opts table Optional extra fields merged into the node.
+-- @treturn table Node table: { type="wait", time, ... }.
+function M.wait(seconds, opts)
+    local node = {}
+    if opts then for k, v in pairs(opts) do node[k] = v end end
+    node.type = "wait"
+    node.time = seconds or 1.0
+    return node
+end
+
+--- Create an `event` dialog node (named hook signal).
+-- When executed, fires `seq:on("event", fn)` with (name, data) then advances.
+-- @param name string Event name.
+-- @param data any Optional payload passed to the callback.
+-- @param opts table Optional extra fields merged into the node.
+-- @treturn table Node table: { type="event", name, data, ... }.
+function M.event(name, data, opts)
+    local node = {}
+    if opts then for k, v in pairs(opts) do node[k] = v end end
+    node.type = "event"
+    node.name = name
+    node.data = data
+    return node
+end
+
+--- Create a `call` dialog node (inline Lua callback).
+-- When executed, calls `fn()` immediately and advances without pausing.
+-- @param fn function Callback to invoke.
+-- @param opts table Optional extra fields merged into the node.
+-- @treturn table Node table: { type="call", fn, ... }.
+function M.call(fn, opts)
+    local node = {}
+    if opts then for k, v in pairs(opts) do node[k] = v end end
+    node.type = "call"
+    node.fn   = fn
+    return node
+end
+
+--- Create a `jump` dialog node (label-based control transfer).
+-- Execution resumes at the first node in the current script whose `.label`
+-- field equals `target`. Unknown targets are silently skipped.
+-- @param target string Target label name.
+-- @param opts table Optional extra fields merged into the node.
+-- @treturn table Node table: { type="jump", target, ... }.
+function M.jump(target, opts)
+    local node = {}
+    if opts then for k, v in pairs(opts) do node[k] = v end end
+    node.type   = "jump"
+    node.target = target
+    return node
+end
+
+-- ÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉ
+-- PARITY ADDITIONS ÔÇö Phase 2A  (dialog)
+-- ÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉ
+
+--- Dialog-graph node-type enum.
+-- @field SAY
+-- @field CHOICE
+-- @field WAIT
+-- @field EVENT
+-- @field CALL
+-- @field JUMP
+M.NodeType = {
+    SAY    = "say",
+    CHOICE = "choice",
+    WAIT   = "wait",
+    EVENT  = "event",
+    CALL   = "call",
+    JUMP   = "jump",
+}
+
+--- Sequencer runtime-state enum.
+-- Matches the strings returned by seq:getState().
+-- @field IDLE
+-- @field TYPING
+-- @field WAITING
+-- @field CHOICE
+-- @field PAUSED
+-- @field DONE
+-- @field RUNNING Legacy alias for TYPING.
+-- @field WAITING_CHOICE Legacy alias for CHOICE.
+M.SequencerState = {
+    IDLE           = "idle",
+    TYPING         = "typing",
+    WAITING        = "waiting",
+    CHOICE         = "choice",
+    PAUSED         = "paused",
+    DONE           = "done",
+    -- Legacy aliases (pre-2A names kept for backward compatibility)
+    RUNNING        = "typing",
+    WAITING_CHOICE = "choice",
+}
 
 return M

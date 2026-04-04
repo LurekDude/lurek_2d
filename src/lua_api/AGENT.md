@@ -5,14 +5,14 @@
 | **Tier** | Bridge Layer |
 | **Lua API** | `N/A — this IS the binding layer` |
 | **Source** | `src/lua_api/` |
-| **Tests** | `tests/lua_api_tests.rs` |
+| **Tests** | `tests/lua/` (Lua BDD harness via `tests/lua/harness.rs`) |
 
 ## Summary
 
 The lua_api module is the complete Lua interface layer — it re-exports
 `SharedState` (defined in `engine::shared_state`, the single `Rc<RefCell<>>` struct that every API closure
 captures), implements the Lua VM factory function `create_lua_vm()`, and
-contains 30+ API source files each implementing a family of `luna.*` functions.
+contains 40+ API source files each implementing a family of `luna.*` functions.
 When the engine starts a new game, `create_lua_vm()` builds the mlua VM,
 creates the `luna` global table, and calls every module's `register()` function
 to populate it — one file per subsystem, each file covering a coherent surface
@@ -34,6 +34,10 @@ standard library (`math`, `table`, `string`, `coroutine`, `utf8`) remains
 available.  A safe `require`-equivalent is provided through
 `luna.filesystem.loadLua()` so game scripts can load modules from within the
 sandboxed game directory.
+
+> **Gameplay libraries** (battle, cardgame, combat, crafting, dialog, economy,
+> inventory, quest, stats) are pure-Lua modules in `library/` — they have no
+> Rust API files in this folder.
 
 ## Architecture
 
@@ -97,9 +101,7 @@ SharedState (Rc<RefCell<SharedState>>)
         ├── Pathfinding ── luna.pathfinding.* (A*, flow fields)
         ├── Event ── luna.event.* (custom events)
         ├── System ── luna.system.* (OS info, clipboard)
-        ├── Thread ── luna.thread.* (multi-threading)
-        ├── Graphics Ext ── additional graphics functions
-        └── Math Ext ── additional math functions
+        └── Thread ── luna.thread.* (multi-threading)
 ```
 
 ## Source Files
@@ -107,40 +109,45 @@ SharedState (Rc<RefCell<SharedState>>)
 | File | Purpose |
 |------|---------|
 | `ai_api.rs` | Registers the `luna.ai.*` game AI toolkit API |
-| `audio_api.rs` | Audio Api implementation for the `lua_api` subsystem |
-| `battle_api.rs` | Lua bindings for the `luna.battle.*` turn-based battle API |
-| `cardgame_api.rs` | Lua bindings for `luna.cardgame.*` |
-| `combat_api.rs` | Lua bindings for the `luna.combat.*` vehicle combat API |
+| `audio_api.rs` | Registers the `luna.audio.*` sound playback API |
+| `automation_api.rs` | Registers the `luna.simulator.*` automated input simulation API |
 | `compute_api.rs` | Registers the `luna.compute.*` array computation API |
-| `crafting_api.rs` | Lua bindings for `luna.crafting.*` |
 | `data_api.rs` | Registers the `luna.data.*` binary data, compression, hashing, and encoding API |
 | `dataframe_api.rs` | Registers the `luna.dataframe.*` tabular data API |
 | `debug_api.rs` | Registers the `luna.devtools.*` runtime diagnostics and developer tools API |
 | `debugbridge_api.rs` | Registers the `luna.debugbridge.*` TCP debug server API |
-| `dialog_api.rs` | Lua API bindings for the `luna.dialog.*` dialog sequencer module |
 | `docs_api.rs` | Registers the `luna.docs.*` documentation management API |
 | `entity_api.rs` | Registers the `luna.entity.*` ECS universe API |
-| `event_api.rs` | Event Api implementation for the `lua_api` subsystem |
-| `filesystem_api.rs` | Filesystem Api implementation for the `lua_api` subsystem |
+| `event_api.rs` | Registers `luna.event.*` engine lifecycle API |
+| `filesystem_api.rs` | Registers the `luna.filesystem.*` sandboxed I/O API |
+| `font_api.rs` | Registers the `luna.font.*` font rasterizer and glyph metrics API |
 | `graph_api.rs` | Registers the `luna.graph.*` directed-graph and item-flow simulation API |
+| `graphics_api.rs` | Registers the `luna.graphics.*` drawing API |
+| `gui_api.rs` | Registers the `luna.gui.*` retained-mode widget UI API |
+| `image_api.rs` | Registers the `luna.image.*` pixel-level image manipulation API |
+| `input_api.rs` | Registers the `luna.keyboard.*` and `luna.mouse.*` input API |
 | `localization_api.rs` | Registers the `luna.localization.*` internationalization API |
-| `log_api.rs` | Structured game-level logging API (`luna.log.*`) |
+| `log_api.rs` | Registers the `luna.log.*` structured game-level logging API |
 | `lua_types.rs` | UserData type utilities for Luna2D Lua objects |
-| `math_api.rs` | Math Api implementation for the `lua_api` subsystem |
-| `minimap_api.rs` | Lua API bindings for the `luna.minimap.*` minimap module |
-| `modding_api.rs` | Modding Api implementation for the `lua_api` subsystem |
+| `math_api.rs` | Registers the `luna.math.*` vector and math helper API |
+| `minimap_api.rs` | Registers the `luna.minimap.*` minimap API |
+| `modding_api.rs` | Registers the `luna.modding.*` mod management API |
+| `overlay_api.rs` | Registers the `luna.overlay.*` screen-effect overlay API |
+| `particle_api.rs` | Registers the `luna.particle.*` particle-effects API |
 | `pathfinding_api.rs` | Registers the `luna.pathfinding.*` grid-based pathfinding API |
 | `patterns_api.rs` | Registers the `luna.patterns.*` software design patterns API |
-| `postfx_api.rs` | Lua API bindings for the `luna.postfx.*` post-processing effects module |
-| `quest_api.rs` | Lua API bindings for `luna.quest.*` |
-| `economy_api.rs` | Registers the `luna.economy.*` named resource economy API |
-| `savegame_api.rs` | Savegame Api implementation for the `lua_api` subsystem |
-| `scene_api.rs` | Registers the `luna.scene.*` scene stack, registry, data store, and... |
-| `stats_api.rs` | Lua API bindings for the `luna.stats` RPG character sheet system |
-| `system_api.rs` | System Api implementation for the `lua_api` subsystem |
-| `thread_api.rs` | Registers the `luna.thread` namespace |
-| `timer_api.rs` | Timer Api implementation for the `lua_api` subsystem |
-| `window_api.rs` | Window Api implementation for the `lua_api` subsystem |
+| `physics_api.rs` | Registers the `luna.physics.*` rigid-body simulation API |
+| `pipeline_api.rs` | Registers the `luna.pipeline.*` DAG pipeline orchestrator API |
+| `postfx_api.rs` | Registers the `luna.postfx.*` post-processing effects API |
+| `savegame_api.rs` | Registers the `luna.savegame.*` save/load system API |
+| `scene_api.rs` | Registers the `luna.scene.*` scene stack, registry, data store, and depth-sorter API |
+| `sprite_api.rs` | Registers extended graphics types: sprite system, Camera2D, Animation, Trail, atlas utilities |
+| `steering_api.rs` | Registers the `luna.steering.*` AI steering behaviours API |
+| `system_api.rs` | Registers the `luna.system.*` platform query API |
+| `thread_api.rs` | Registers the `luna.thread.*` multithreading API |
+| `tilemap_api.rs` | Registers the `luna.tilemap.*` tile map, tileset, autotile, and procedural generation API |
+| `timer_api.rs` | Registers the `luna.timer.*` frame-timing API |
+| `window_api.rs` | Registers the `luna.window.*` window management API |
 
 ## Submodules
 
@@ -159,63 +166,11 @@ Audio Api implementation for the `lua_api` subsystem.
 - **`LuaMidiPlayer`** (struct): Lua UserData wrapper for the MIDI player.
 - **`register`** (fn): Registers all `luna.audio.*` functions into the Lua VM.
 
-### `lua_api::battle_api`
-
-Lua bindings for the `luna.
-
-- **`LuaStatusEffect`** (struct): Lua wrapper for [`StatusEffect`]. Consult the module-level documentation for the broader usage context and...
-- **`LuaCombatAction`** (struct): Lua wrapper for [`CombatAction`]. Consult the module-level documentation for the broader usage context and...
-- **`LuaCombatant`** (struct): Lua wrapper for [`Combatant`]. Consult the module-level documentation for the broader usage context and preconditions.
-- **`LuaCombatBattle`** (struct): Lua wrapper for [`CombatBattle`]. Consult the module-level documentation for the broader usage context and...
-- **`register`** (fn): Registers the `luna.battle.*` table. Panics in debug mode if the same entity is registered twice.
-
-### `lua_api::cardgame_api`
-
-Lua bindings for `luna.
-
-- **`LuaCard`** (struct): Lua-facing `Card` userdata with per-instance script and asset storage.
-- **`LuaStack`** (struct): Lua-facing `Stack` userdata. Consult the module-level documentation for the broader usage context and preconditions.
-- **`LuaDeckBuilder`** (struct): Lua-facing `StackBuilder` userdata with optional Lua custom validation rules.
-- **`LuaZoneManager`** (struct): Lua-facing `StackManager` userdata. Consult the module-level documentation for the broader usage context and...
-- **`LuaCardPool`** (struct): Lua-facing `CardPool` userdata. Consult the module-level documentation for the broader usage context and preconditions.
-- **`LuaSlot`** (struct): Lua-facing `Slot` userdata. Consult the module-level documentation for the broader usage context and preconditions.
-- **`LuaHistory`** (struct): Lua-facing `StackHistory` userdata. Consult the module-level documentation for the broader usage context and...
-- **`LuaEffectStack`** (struct): Lua-facing LIFO effect stack.  Each entry is a Lua table describing an effect.
-- **`register`** (fn): Registers the `luna.cardgame.*` API. Panics in debug mode if the same entity is registered twice.
-
-### `lua_api::combat_api`
-
-Lua bindings for the `luna.
-
-- **`LuaCollisionGroupSet`** (struct): Lua wrapper for `CollisionGroupSet`. Consult the module-level documentation for the broader usage context and...
-- **`LuaChassis`** (struct): Lua wrapper for `Chassis`. Consult the module-level documentation for the broader usage context and preconditions.
-- **`LuaTurret`** (struct): Lua wrapper for `Turret`. Consult the module-level documentation for the broader usage context and preconditions.
-- **`LuaWeapon`** (struct): Lua wrapper for fire-rate-based `Weapon`.
-- **`LuaProjectile`** (struct): Lua wrapper for `Projectile`. Consult the module-level documentation for the broader usage context and preconditions.
-- **`LuaProjectilePool`** (struct): Lua wrapper for `ProjectilePool`. Consult the module-level documentation for the broader usage context and...
-- **`LuaCombatWorld`** (struct): Lua wrapper for `CombatWorld`. Consult the module-level documentation for the broader usage context and preconditions.
-- **`register`** (fn): Register the `luna.combat.*` vehicle combat table.
-
 ### `lua_api::compute_api`
 
 Registers the `luna.
 
 - **`register`** (fn): Registers the `luna.compute` table with array factory functions.
-
-### `lua_api::crafting_api`
-
-Lua bindings for `luna.
-
-- **`LuaRecipe`** (struct): Lua-callable handle wrapping [`Recipe`].
-- **`LuaRecipeRegistry`** (struct): Lua-callable handle wrapping [`RecipeRegistry`].
-- **`LuaStation`** (struct): Lua-callable handle wrapping [`Station`].
-- **`LuaCraftSkill`** (struct): Lua-callable handle wrapping [`CraftSkill`].
-- **`LuaCraftQueue`** (struct): Lua-callable handle wrapping [`CraftQueue`].
-- **`LuaUpgradeTree`** (struct): Lua-callable handle wrapping [`UpgradeTree`].
-- **`LuaRecipeKnowledge`** (struct): Lua-callable handle wrapping [`RecipeKnowledge`].
-- **`LuaRecipeGroup`** (struct): Lua-callable handle wrapping [`RecipeGroup`].
-- **`LuaModifierPool`** (struct): Lua-callable handle wrapping [`ModifierPool`].
-- **`register`** (fn): Register the `luna.crafting.*` table. Panics in debug mode if the same entity is registered twice.
 
 ### `lua_api::data_api`
 
@@ -240,13 +195,6 @@ Registers the `luna.
 Registers the `luna.
 
 - **`register`** (fn): Registers the `luna.debugbridge` namespace.
-
-### `lua_api::dialog_api`
-
-Lua API bindings for the `luna.
-
-- **`LuaSequencer`** (struct): Lua UserData wrapper for a dialog sequencer.
-- **`register`** (fn): Registers the `luna.dialog` module with the Lua VM.
 
 ### `lua_api::docs_api`
 
@@ -315,15 +263,6 @@ Helper types and utilities for the graphics API.
 - **`require_canvas_key`** (fn): Resolve and validate a canvas key, returning `LuaError` if missing.
 - **`require_mesh_key`** (fn): Resolve and validate a mesh key, returning `LuaError` if missing.
 
-### `lua_api::graphics_ext_api`
-
-Lua API bindings for Phase 24 graphics extension types.
-
-- **`LuaTrail`** (struct): Lua UserData wrapper for Trail (internal — no factory).
-- **`LuaDecalSurface`** (struct): Lua UserData wrapper for DecalSurface (internal — no factory).
-- **`LuaPaletteLUT`** (struct): Lua UserData wrapper for PaletteLUT (internal — no factory).
-- **`register`** (fn): Registers Phase 24 graphics extension factory functions on `luna.graphics`.
-
 ### `lua_api::image_api`
 
 Registers the `luna.
@@ -335,18 +274,6 @@ Registers the `luna.
 Input Api implementation for the `lua_api` subsystem.
 
 - **`register`** (fn): Registers `luna.keyboard.*` and `luna.mouse.*` query functions into the Lua VM.
-
-### `lua_api::inventory_api`
-
-Lua API bindings for the `luna.
-
-- **`LuaItem`** (struct): Lua UserData wrapper for a single item definition.
-- **`LuaItemStack`** (struct): Lua UserData wrapper for a counted stack of items.
-- **`LuaSlot`** (struct): Lua UserData wrapper for a single inventory slot.
-- **`LuaContainer`** (struct): Lua UserData wrapper for a named collection of slots.
-- **`LuaItemSet`** (struct): Lua UserData wrapper for a named item set with requirements.
-- **`LuaInventory`** (struct): Lua UserData wrapper for the top-level inventory.
-- **`register`** (fn): Register the `luna.inventory` module. Panics in debug mode if the same entity is registered twice.
 
 ### `lua_api::localization_api`
 
@@ -457,23 +384,6 @@ Lua API bindings for the `luna.
 - **`LuaPostFxEffect`** (struct): Lua UserData wrapper for a single post-processing effect.
 - **`register`** (fn): Registers the `luna.postfx.*` API. Panics in debug mode if the same entity is registered twice.
 
-### `lua_api::quest_api`
-
-Lua API bindings for `luna.
-
-- **`LuaObjective`** (struct): Lua UserData wrapper for a quest objective.
-- **`LuaQuestStage`** (struct): Lua UserData wrapper for a quest stage. Consult the module-level documentation for the broader usage context and...
-- **`LuaQuest`** (struct): Lua UserData wrapper for a quest. Consult the module-level documentation for the broader usage context and...
-- **`LuaQuestLog`** (struct): Lua UserData wrapper for a quest log. Consult the module-level documentation for the broader usage context and...
-- **`register`** (fn): Register `luna.quest.*` API with the Lua VM.
-
-### `lua_api::economy_api`
-
-Lua API bindings for the `luna.economy.*` named resource economy module.
-
-- **`LuaResourceManager`** (struct): Lua UserData wrapper for a resource economy manager.
-- **`register`** (fn): Registers the `luna.economy` module with the Lua VM.
-
 ### `lua_api::savegame_api`
 
 Savegame Api implementation for the `lua_api` subsystem.
@@ -485,13 +395,6 @@ Savegame Api implementation for the `lua_api` subsystem.
 Registers the `luna.
 
 - **`register`** (fn): Registers the `luna.scene` table with scene stack, registry, data store,
-
-### `lua_api::stats_api`
-
-Lua API bindings for the `luna.
-
-- **`LuaSheet`** (struct): Lua-visible wrapper for a character [`Sheet`].
-- **`register`** (fn): Register the `luna.stats` module into the Lua state.
 
 ### `lua_api::system_api`
 
@@ -579,97 +482,21 @@ Lua UserData wrapper for an audio bus. Consult the module-level documentation fo
 
 Lua UserData wrapper for an off-screen canvas resource.
 
-#### `lua_api::cardgame_api::LuaCard`
-
-Lua-facing `Card` userdata with per-instance script and asset storage.
-
-#### `lua_api::cardgame_api::LuaCardPool`
-
-Lua-facing `CardPool` userdata. Consult the module-level documentation for the broader usage context and preconditions.
-
-#### `lua_api::combat_api::LuaChassis`
-
-Lua wrapper for `Chassis`. Consult the module-level documentation for the broader usage context and preconditions.
-
 #### `lua_api::tilemap_api::helpers::LuaChunkMap`
 
 Lua wrapper around a [`ChunkMap`]. Consult the module-level documentation for the broader usage context and...
-
-#### `lua_api::combat_api::LuaCollisionGroupSet`
-
-Lua wrapper for `CollisionGroupSet`. Consult the module-level documentation for the broader usage context and...
-
-#### `lua_api::battle_api::LuaCombatAction`
-
-Lua wrapper for [`CombatAction`]. Consult the module-level documentation for the broader usage context and...
-
-#### `lua_api::battle_api::LuaCombatBattle`
-
-Lua wrapper for [`CombatBattle`]. Consult the module-level documentation for the broader usage context and...
-
-#### `lua_api::combat_api::LuaCombatWorld`
-
-Lua wrapper for `CombatWorld`. Consult the module-level documentation for the broader usage context and preconditions.
-
-#### `lua_api::battle_api::LuaCombatant`
-
-Lua wrapper for [`Combatant`]. Consult the module-level documentation for the broader usage context and preconditions.
-
-#### `lua_api::inventory_api::LuaContainer`
-
-Lua UserData wrapper for a named collection of slots.
-
-#### `lua_api::crafting_api::LuaCraftQueue`
-
-Lua-callable handle wrapping [`CraftQueue`].
-
-#### `lua_api::crafting_api::LuaCraftSkill`
-
-Lua-callable handle wrapping [`CraftSkill`].
-
-#### `lua_api::graphics_ext_api::LuaDecalSurface`
-
-Lua UserData wrapper for DecalSurface (internal — no factory).
-
-#### `lua_api::cardgame_api::LuaDeckBuilder`
-
-Lua-facing `StackBuilder` userdata with optional Lua custom validation rules.
-
-#### `lua_api::cardgame_api::LuaEffectStack`
-
-Lua-facing LIFO effect stack.  Each entry is a Lua table describing an effect.
 
 #### `lua_api::graphics_api::helpers::LuaFont`
 
 Lua UserData wrapper for a loaded font resource.
 
-#### `lua_api::cardgame_api::LuaHistory`
-
-Lua-facing `StackHistory` userdata. Consult the module-level documentation for the broader usage context and...
-
 #### `lua_api::graphics_api::helpers::LuaImage`
 
 Lua UserData wrapper for a loaded texture/image resource.
 
-#### `lua_api::inventory_api::LuaInventory`
-
-Lua UserData wrapper for the top-level inventory.
-
 #### `lua_api::tilemap_api::helpers::LuaIsoMap`
 
 Lua wrapper around an [`IsoMap`]. Consult the module-level documentation for the broader usage context and...
-
-#### `lua_api::inventory_api::LuaItem`
-
-Lua UserData wrapper for a single item definition.
-
-#### `lua_api::inventory_api::LuaItemSet`
-
-Lua UserData wrapper for a named item set with requirements.
-
-#### `lua_api::inventory_api::LuaItemStack`
-
-Lua UserData wrapper for a counted stack of items.
 
 #### `lua_api::tilemap_api::helpers::LuaMapBlock`
 
@@ -695,21 +522,9 @@ Lua UserData wrapper for the MIDI player.
 
 Lua UserData wrapper for a grid-based minimap.
 
-#### `lua_api::crafting_api::LuaModifierPool`
-
-Lua-callable handle wrapping [`ModifierPool`].
-
 #### `lua_api::graphics_api::helpers::LuaNineSlice`
 
 Lua UserData wrapper for a nine-slice (9-patch) image definition.  Stores the source texture key, border insets, and...
-
-#### `lua_api::quest_api::LuaObjective`
-
-Lua UserData wrapper for a quest objective.
-
-#### `lua_api::graphics_ext_api::LuaPaletteLUT`
-
-Lua UserData wrapper for PaletteLUT (internal — no factory).
 
 #### `lua_api::particle_api::helpers::LuaParticleSystem`
 
@@ -719,59 +534,6 @@ Lua UserData wrapper for a particle system resource.
 
 Lua UserData wrapper for a single post-processing effect.
 
-#### `lua_api::combat_api::LuaProjectile`
-
-Lua wrapper for `Projectile`. Consult the module-level documentation for the broader usage context and preconditions.
-
-#### `lua_api::combat_api::LuaProjectilePool`
-
-Lua wrapper for `ProjectilePool`. Consult the module-level documentation for the broader usage context and...
-
-#### `lua_api::quest_api::LuaQuest`
-
-Lua UserData wrapper for a quest. Consult the module-level documentation for the broader usage context and...
-
-#### `lua_api::quest_api::LuaQuestLog`
-
-Lua UserData wrapper for a quest log. Consult the module-level documentation for the broader usage context and...
-
-#### `lua_api::quest_api::LuaQuestStage`
-
-Lua UserData wrapper for a quest stage. Consult the module-level documentation for the broader usage context and...
-
-#### `lua_api::crafting_api::LuaRecipe`
-
-Lua-callable handle wrapping [`Recipe`].
-
-#### `lua_api::crafting_api::LuaRecipeGroup`
-
-Lua-callable handle wrapping [`RecipeGroup`].
-
-#### `lua_api::crafting_api::LuaRecipeKnowledge`
-
-Lua-callable handle wrapping [`RecipeKnowledge`].
-
-#### `lua_api::crafting_api::LuaRecipeRegistry`
-
-Lua-callable handle wrapping [`RecipeRegistry`].
-
-#### `lua_api::economy_api::LuaResourceManager`
-
-Lua UserData wrapper for a resource economy manager.
-
-#### `lua_api::dialog_api::LuaSequencer`
-
-Lua UserData wrapper for a dialog sequencer.
-
-#### `lua_api::stats_api::LuaSheet`
-
-Lua-visible wrapper for a character [`Sheet`].
-
-
-#### `lua_api::inventory_api::LuaSlot`
-
-Lua UserData wrapper for a single inventory slot.
-
 #### `lua_api::audio_api::LuaSource`
 
 Lua UserData wrapper for an audio source resource.
@@ -779,18 +541,6 @@ Lua UserData wrapper for an audio source resource.
 #### `lua_api::graphics_api::helpers::LuaSpriteBatch`
 
 Lua UserData wrapper for a sprite batch resource.
-
-#### `lua_api::cardgame_api::LuaStack`
-
-Lua-facing `Stack` userdata. Consult the module-level documentation for the broader usage context and preconditions.
-
-#### `lua_api::crafting_api::LuaStation`
-
-Lua-callable handle wrapping [`Station`].
-
-#### `lua_api::battle_api::LuaStatusEffect`
-
-Lua wrapper for [`StatusEffect`]. Consult the module-level documentation for the broader usage context and...
 
 #### `lua_api::thread_api::LuaThreadHandle`
 
@@ -804,29 +554,9 @@ Lua wrapper around a [`TileMap`]. Consult the module-level documentation for the
 
 Lua wrapper around a [`TileSet`]. Consult the module-level documentation for the broader usage context and...
 
-#### `lua_api::graphics_ext_api::LuaTrail`
-
-Lua UserData wrapper for Trail (internal — no factory).
-
-#### `lua_api::combat_api::LuaTurret`
-
-Lua wrapper for `Turret`. Consult the module-level documentation for the broader usage context and preconditions.
-
-#### `lua_api::crafting_api::LuaUpgradeTree`
-
-Lua-callable handle wrapping [`UpgradeTree`].
-
-#### `lua_api::combat_api::LuaWeapon`
-
-Lua wrapper for fire-rate-based `Weapon`.
-
 #### `lua_api::physics_api::helpers::LuaWorld`
 
 Lua UserData wrapper for a physics world.
-
-#### `lua_api::cardgame_api::LuaZoneManager`
-
-Lua-facing `StackManager` userdata. Consult the module-level documentation for the broader usage context and...
 
 #### `lua_api::SharedState`
 
@@ -885,26 +615,19 @@ Standard type identification for Luna2D UserData objects.  Every Luna2D Lua obje
 - **`rect_to_table()`** `tilemap_api::helpers::` — Convert a `Rect` into a Lua table `{x, y, w, h}`.
 - **`register()`** `ai_api::` — Registers the `luna.ai.*` game AI toolkit API.
 - **`register()`** `audio_api::` — Registers all `luna.audio.*` functions into the Lua VM.
-- **`register()`** `battle_api::` — Registers the `luna.battle.*` table. Panics in debug mode if the same entity is registered twice.
-- **`register()`** `cardgame_api::` — Registers the `luna.cardgame.*` API. Panics in debug mode if the same entity is registered twice.
-- **`register()`** `combat_api::` — Register the `luna.combat.*` vehicle combat table.
 - **`register()`** `compute_api::` — Registers the `luna.compute` table with array factory functions.
-- **`register()`** `crafting_api::` — Register the `luna.crafting.*` table. Panics in debug mode if the same entity is registered twice.
 - **`register()`** `data_api::` — Registers the `luna.data` table on the provided `luna` namespace.
 - **`register()`** `dataframe_api::` — Register the `luna.dataframe` namespace.
 - **`register()`** `debug_api::` — Registers the `luna.devtools` namespace.
 - **`register()`** `debugbridge_api::` — Registers the `luna.debugbridge` namespace.
-- **`register()`** `dialog_api::` — Registers the `luna.dialog` module with the Lua VM.
 - **`register()`** `docs_api::` — Registers the `luna.docs` namespace. Panics in debug mode if the same entity is registered twice.
 - **`register()`** `entity_api::` — Registers the `luna.entity` table with the `newUniverse` factory function.
 - **`register()`** `event_api::` — Registers `luna.event.quit()` and related engine lifecycle functions into the Lua VM.
 - **`register()`** `filesystem_api::` — Registers `luna.filesystem.*` functions into the Lua VM.
 - **`register()`** `graph_api::` — Register the `luna.graph` API table. Panics in debug mode if the same entity is registered twice.
 - **`register()`** `graphics_api::` — Register `luna..*` bindings in the Lua state.
-- **`register()`** `graphics_ext_api::` — Registers Phase 24 graphics extension factory functions on `luna.graphics`.
 - **`register()`** `image_api::` — Registers the `luna.image` table on the provided `luna` namespace.
 - **`register()`** `input_api::` — Registers `luna.keyboard.*` and `luna.mouse.*` query functions into the Lua VM.
-- **`register()`** `inventory_api::` — Register the `luna.inventory` module. Panics in debug mode if the same entity is registered twice.
 - **`register()`** `localization_api::` — Registers `luna.localization.*` functions.
 - **`register()`** `log_api::` — Registers the `luna.log.*` namespace into the shared `luna` table.
 - **`register()`** `math_api::` — Registers `luna.math.*` helpers (Vec2, distance, random, noise, transforms, etc.) into the Lua VM.
@@ -915,11 +638,8 @@ Standard type identification for Luna2D UserData objects.  Every Luna2D Lua obje
 - **`register()`** `patterns_api::` — Registers `luna.patterns.*` factory functions.
 - **`register()`** `physics_api::` — Register `luna..*` bindings in the Lua state.
 - **`register()`** `postfx_api::` — Registers the `luna.postfx.*` API. Panics in debug mode if the same entity is registered twice.
-- **`register()`** `quest_api::` — Register `luna.quest.*` API with the Lua VM.
-- **`register()`** `economy_api::` — Registers the `luna.economy` module with the Lua VM.
 - **`register()`** `savegame_api::` — Registers `luna.savegame.*` functions into the Lua VM.
 - **`register()`** `scene_api::` — Registers the `luna.scene` table with scene stack, registry, data store,
-- **`register()`** `stats_api::` — Register the `luna.stats` module into the Lua state.
 - **`register()`** `system_api::` — Registers `luna.system.*` platform query functions into the Lua VM.
 - **`register()`** `thread_api::` — Registers all `luna.thread.*` functions into the Lua VM.
 - **`register()`** `tilemap_api::` — Register `luna..*` bindings in the Lua state.
@@ -948,5 +668,5 @@ Standard type identification for Luna2D UserData objects.  Every Luna2D Lua obje
 | `mod` | 50 |
 | `struct` | 77 |
 | `trait` | 1 |
-| **Total** | **217** |
+| **Total** | *(see generated docs)* |
 

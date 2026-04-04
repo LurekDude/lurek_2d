@@ -1,0 +1,556 @@
+1. Top-Down Bullet Hell (Vertical/Horizontal Shooter)
+Core Systems: High-performance Object Pooling, Pattern Emitters, Circular/Polygon Collision.
+
+Mechanics: Bullet patterns (Spiral, Wave, Aimed), "Graze" detection, Power-up drops, Boss phase triggers.
+
+Deep Library: A Pattern Designer where developers can script complex bullet behaviors using parametric equations.
+
+Integration Test: ProjectilePool + ScoreMultiplier (Test if destroying 100 bullets in 1s correctly updates the UI).
+
+2. Tactical Turn-Based Battle (Grid-based)
+Core Systems: A* Pathfinding (Grid), Turn-Queue Manager, Stat-based Combat Resolver.
+
+Mechanics: Move range, Attack range, Fog of war, Unit classes (Archer, Knight), Terrain modifiers.
+
+Deep Library: A Battle Director that handles AI decision-making (Minimax or Utility AI) for enemy units.
+
+Integration Test: GridSystem + AnimationState (Ensure unit finishes "Walk" animation before "Attack" begins).
+
+3. Hex-Based Strategy (Civilization Style)
+Core Systems: Hexagonal Coordinate System (Axial/Cube), Procedural Map Gen, Resource Yields.
+
+Mechanics: City founding, Hex-based movement costs, Border expansion, Tech tree progression.
+
+Deep Library: A World Graph module for handling continental layouts and trade-route calculations.
+
+Integration Test: HexGrid + ResourceModel (Verify a city on a "Gold" hex adds +5 to global economy per turn).
+
+4. Province-Based Grand Strategy (EU4 Style)
+Core Systems: Vector-based Map Partitioning, Political Relationship Matrices, Event Scripting.
+
+Mechanics: Diplomacy (War, Alliance), Stability/Unrest, Tax collection, Real-time pausable clock.
+
+Deep Library: A Diplomacy Engine managing AI relationships and "Casus Belli" logic.
+
+Integration Test: ProvinceMap + EventTrigger (Test if capturing a specific ID triggers a "Victory" pop-up).
+
+5. Collectible Card Game (CCG)
+Core Systems: State Machine (Turn phases), Deck/Hand/Graveyard Managers, Visual Effect Stack.
+
+Mechanics: Card draw, Mana/Energy costs, Passive/Active card abilities, "On Death" triggers.
+
+Deep Library: An Effect Interpreter that parses card JSON logic (e.g., "effect": "damage_all_enemies", "value": 2).
+
+Integration Test: DeckController + UIStack (Verify card visual stays in sync with its internal data state).
+
+6. Real-Time Strategy (RTS)
+Core Systems: Multi-unit Selection, Flow-field Pathfinding, Fog of War, Command Queues.
+
+Mechanics: Base building, Resource harvesting (Gold/Wood), Unit production, Control groups.
+
+Deep Library: A RTS Command Bus for handling hundreds of unit orders simultaneously without lag.
+
+Integration Test: UnitSelection + FogOfWar (Ensure hidden units cannot be selected/clicked).
+
+7. Tower Defense
+Core Systems: Wave Spawner, Path Following, Targeting Logic (Closest, Strongest).
+
+Mechanics: Tower upgrades, Enemy types (Flying, Tank), Currency system, Build-grid restrictions.
+
+Deep Library: A Tower Factory that handles modular components (Slow, Burn, AOE) for any tower.
+
+Integration Test: Projectile + SlowDebuff (Verify enemy movement speed decreases by exactly 50%).
+
+8. Metroidvania (Exploration Action)
+Core Systems: Ability Gating (Double jump, Dash), Persistent Room States, Mini-map logic.
+
+Mechanics: Backtracking, Hidden walls, Save points, Progressive power-ups.
+
+Deep Library: A World Partitioning system for loading/unloading massive seamless maps.
+
+Integration Test: Inventory + EnvironmentCollision (Test if acquiring "Dash" allows crossing a 10m gap).
+
+9. Roguelike (Classic/Grid)
+Core Systems: Turn-based Sync, Procedural Dungeon Gen (BSP/Cellular), Permadeath.
+
+Mechanics: Grid movement, Item identification, Line-of-sight, Inventory management.
+
+Deep Library: A Dungeon Architect module for generating balanced, navigable floor layouts.
+
+Integration Test: ProceduralGen + Pathfinder (Ensure every floor generated has a valid path to the exit).
+
+10. Roguelite Action (Hades Style)
+Core Systems: Room-based Combat, Meta-progression (Hub world), RNG Perk System.
+
+Mechanics: Dash-canceling, Synergy builds, Wave-based rewards, Boss arenas.
+
+Deep Library: A Synergy Solver that calculates how different perks interact (e.g., Fire + Poison = Explosion).
+
+Integration Test: CombatSystem + RNGGenerator (Check if "Common" perks appear 70% of the time).
+
+11. Farming/Life Sim
+Core Systems: Dynamic Time/Season Calendar, Tile-based Gardening, NPC Schedule AI.
+
+Mechanics: Crop growth cycles, Fishing mini-game, Relationship points, Crafting.
+
+Deep Library: A World Persistence module that saves the state of thousands of individual tiles.
+
+Integration Test: CalendarSystem + PlantGrowth (Verify a "Corn" plant matures after exactly 10 in-game days).
+
+12. Rhythm Game
+Core Systems: Audio Beat Mapping, Precise Input Windowing, Millisecond-accurate Sync.
+
+Mechanics: Note scrolling, Hit accuracy (Perfect, Great, Miss), Combo multiplier.
+
+Deep Library: An Audio Analyzer to generate beatmaps or sync visual elements to frequencies.
+
+Integration Test: AudioInput + ScoringSystem (Test if a 50ms offset still counts as a "Good" hit).
+
+13. Stealth Action
+Core Systems: AI Vision Cones, Noise Propagation, Hiding Spot Logic.
+
+Mechanics: Crouching, Distractions (rocks), Assassination, Alert levels (Patrol vs. Search).
+
+Deep Library: A Perception Engine that handles complex line-of-sight and sound-level calculations.
+
+Integration Test: NoiseEmitter + AIBehavior (Ensure the AI moves to the noise origin point).
+
+14. Physics-Based Puzzle
+Core Systems: Rigidbody Physics, Constraint Solvers (Springs, Hinges), Destructible Environments.
+
+Mechanics: Gravity manipulation, Chain reactions, Win conditions (e.g., "Clear all green blocks").
+
+Deep Library: A Physics Sandbox for rapid prototyping of Rube Goldberg-style interactions.
+
+Integration Test: Collision + PointSystem (Verify that 10N of force on a block gives 100 points).
+
+15. 2D Fighting Game
+Core Systems: Frame Data Management, Hitbox/Hurtbox Interpolation, Input Buffer.
+
+Mechanics: Combos, Special move inputs (QCF), Blocking, Super meters.
+
+Deep Library: A Frame Animator where users define active/recovery frames for every move.
+
+Integration Test: InputBuffer + SpecialMove (Confirm "Down-Forward-Punch" triggers the "Fireball" state).
+
+16. Point-and-Click Adventure
+Core Systems: Dialogue Trees, Item Interaction Matrix, Scene Hotspots.
+
+Mechanics: Item combining, "Look at/Pick up" actions, Puzzle logic gates.
+
+Deep Library: A Narrative Flow system (like Twine) integrated into the engine’s scene manager.
+
+Integration Test: InventoryItem + Hotspot (Test if using "Key" on "Door" changes the scene).
+
+17. Endless Runner
+Core Systems: Procedural Obstacle Spawning, Increasing Velocity, Parallax Backgrounds.
+
+Mechanics: Jump/Slide, Score-over-distance, Speed ramps, Revive mechanics.
+
+Deep Library: A Chunk Generator that pieces together hand-designed level segments seamlessly.
+
+Integration Test: SpeedController + DistanceTracker (Ensure speed increases every 500 meters).
+
+18. Survival/Crafting (Terraria Style)
+Core Systems: Destructible Tilemap, Crafting Recipes, Hunger/Health Systems.
+
+Mechanics: Mining, House building (valid room detection), Day/Night enemy scaling.
+
+Deep Library: An Inventory/Crafting Hub that handles massive item databases and UI sync.
+
+Integration Test: CraftingLogic + ItemDatabase (Verify 3 "Wood" + 2 "Iron" = 1 "Pickaxe").
+
+19. Party/Mini-game Collection
+Core Systems: Local Multiplayer Manager, Game-Mode Switcher, Shared Camera.
+
+Mechanics: Quick-time events, Competitive scoring, 4-player input handling.
+
+Deep Library: A Game State Orchestrator to transition between wildly different game scenes.
+
+Integration Test: PlayerInput + Scoreboard (Confirm 4 separate controllers map to 4 separate UI icons).
+
+20. Management/Tycoon
+Core Systems: Economic Simulation, Customer Flow AI, Facility Building.
+
+Mechanics: Profit/Loss tracking, Staff hiring, Pricing strategies, Reputation.
+
+Deep Library: An Economy Sim module for balancing supply, demand, and variable tax/costs.
+
+Integration Test: FinanceModel + Building (Verify that adding a "Shop" increases daily revenue).
+
+
+
+Gemini said
+To expand Luna into a truly comprehensive engine, we need to address these 20 additional genres with high technical specificity. These "Skills" go beyond simple gameplay; they define the specialized mathematical and architectural subsystems required for modern 2D development.
+
+1. Bullet Heaven / Horde Survivor
+Core Systems: Massive Sprite Batching (1000+ entities), Spatial Partitioning (Grid/Quadtree), Auto-Targeting Bus.
+
+Mechanics: Passive weapon synergies, XP gem attraction (magnetism), wave-based difficulty scaling, permanent meta-upgrades.
+
+Deep Library: Horde Manager – A high-performance system that handles entity movement and collision using a "Simple Physics" mode to bypass heavy Rigidbody overhead.
+
+Integration Test: MobSpawner + ExperienceVacuum (Ensure 500+ gems can move toward the player simultaneously without frame drops).
+
+2. Factory Automation / Logistics
+Core Systems: Directional Conveyor Graphs, Item Serialization, Grid-based Production Loops.
+
+Mechanics: Input/Output ratios, belt-weaving, power-grid connectivity, automated resource extraction.
+
+Deep Library: Logistics Flow – A graph-based simulation where items on belts are treated as data nodes rather than individual physics objects to save memory.
+
+Integration Test: ConveyorBelt + Assembler (Verify a 10-step production chain correctly outputs the final item after T seconds).
+
+3. Creature Collector / Monster Tamer
+Core Systems: Dynamic Stat Growth (IVs/EVs), Element-type Weakness Matrix, Multi-instance Creature Database.
+
+Mechanics: Catching probability (logarithmic curves), move-set evolution, party-wide XP sharing.
+
+Deep Library: Tamer Engine – A robust database system for managing thousands of unique creature instances and their persistent world-states.
+
+Integration Test: CaptureLogic + RNG (Verify that a creature with 10% HP has exactly the calculated capture success rate).
+
+4. Advanced Pinball Physics
+Core Systems: High-precision Flipper Collision, Variable Gravity Vectors, Continuous Collision Detection (CCD).
+
+Mechanics: Bumper force-reflection, lane triggers, multi-ball state management, tilt detection.
+
+Deep Library: Kinetic Sandbox – A specialized physics wrapper that handles ultra-fast moving small circles against static complex polygon geometry without "tunneling."
+
+Integration Test: FlipperInput + BallVelocity (Ensure the ball reflects at the correct angle based on where it hits the rotating flipper).
+
+5. 2D "Souls-like" (Precision Combat)
+Core Systems: Stamina-Gate Logic, Animation-Driven Hurtboxes, Frame-Perfect Parrying.
+
+Mechanics: I-frame rolling, "Commitment" (un-cancelable attacks), death-currency drops/recovery, bonfire-style checkpoints.
+
+Deep Library: Combat Frame Data – A tool for developers to tag specific frames of an animation as "Active," "Vulnerable," or "Interruptible."
+
+Integration Test: ParryWindow + EnemyAttack (Verify that input within a 3-frame window triggers the "Riposte" state).
+
+6. Atmospheric / Colony Simulation
+Core Systems: Gas/Fluid Diffusion (Cellular Automata), Thermal Transfer, AI Task Priority Queues.
+
+Mechanics: Oxygen levels, pressure-based flow, heat dissipation through materials, colonist "needs" (hunger, stress).
+
+Deep Library: AtmoSim – A 2D grid-based simulation that calculates how gases (CO2, Oxygen) mix and move between rooms.
+
+Integration Test: GasTile + VentObject (Ensure 100 units of Oxygen move from a high-pressure room to a vacuum room correctly).
+
+7. Platform Fighter (Brawl Style)
+Core Systems: Knockback Vector Calculation, Ledge-Grabbing Detection, Rollback Netcode Integration.
+
+Mechanics: Percentage-based damage, directional influence (DI), stocks/lives, platform-dropping.
+
+Deep Library: Brawl Physics – A custom movement controller that handles high-speed air friction and variable gravity based on character weight.
+
+Integration Test: AttackImpact + KnockbackCurve (Verify that 150% damage results in the player leaving the screen boundaries).
+
+8. Asymmetric Social Deduction
+Core Systems: Proximity-based State Sync, Hidden Role Assignment, Vision-masking (FoW).
+
+Mechanics: Sabotage events, "Meeting" phase state-machine, task-completion progress bars.
+
+Deep Library: Social Net – A networking layer optimized for low-bandwidth role updates and "Who can see what" visibility checks.
+
+Integration Test: RoleVisibility + PlayerProximity (Confirm a "Traitor" can see their teammates' icons while "Innocents" cannot).
+
+9. Narrative Branching / Visual Novel+
+Core Systems: Dialogue Tree Parser, Global Variable Persistance (Flags), Text Rendering (Rich Text/Typewriter).
+
+Mechanics: Choice-based consequences, character "Affection" scores, skip/auto-read functions.
+
+Deep Library: LunaScribe – A custom scripting language (similar to Ren'Py) that integrates directly with Luna's scene transitions.
+
+Integration Test: ChoiceSelect + FlagManager (Verify that picking Option A unlocks the "Secret Ending" variable).
+
+10. Structural Engineering (Bridge Builder)
+Core Systems: Stress/Strain Analysis, Rigid-body Joint Constraints, Material Durability.
+
+Mechanics: Wood/Steel/Cable material types, budget constraints, weight distribution, structural failure (breaking).
+
+Deep Library: Bridge Architect – A real-time physics solver that highlights over-stressed joints in a color gradient (Green to Red).
+
+Integration Test: WeightForce + JointConstraint (Ensure a bridge collapses when the load exceeds N Newtons).
+
+11. Logic / Programming Game
+Core Systems: Virtual Machine (VM) Interpreter, Instruction Parsing, Step-by-step Execution.
+
+Mechanics: Command registers, loops, conditional logic, "Bot" automation.
+
+Deep Library: LunaVM – A lightweight executor that allows players to "code" in-game entities using a block-based or assembly-style interface.
+
+Integration Test: UserScript + RobotMovement (Test if a move_forward(3) command moves the entity exactly 3 tiles).
+
+12. Trajectory Sports (Golf / Artillery)
+Core Systems: Parabolic Math, Wind Vectors, Surface Friction/Bounciness.
+
+Mechanics: Power-meter calculation, terrain slopes, spin/curve physics, "Hole" collision.
+
+Deep Library: Trajectory Predictor – A visual projection library that renders the expected path of a projectile based on current gravity and wind.
+
+Integration Test: ShotPower + WindVector (Verify the ball lands within X distance of the target under 5m/s wind).
+
+13. Top-Down Drift Racing
+Core Systems: Lateral Tire Friction, Centripetal Force Calculation, Dynamic Skid-marks.
+
+Mechanics: Oversteer/Understeer, gear shifting, slipstream (drafting), nitrous boosts.
+
+Deep Library: Drift Controller – A physics module that separates "Forward Velocity" from "Sideways Slip" to allow for satisfying power-slides.
+
+Integration Test: TireGrip + SteerAngle (Ensure the car loses grip and begins a "Drift" state at high speeds).
+
+14. Modern Brick Breaker (Arkanoid Evolution)
+Core Systems: Multi-collision Reflection, Paddle-segment Physics, Particle Bursts.
+
+Mechanics: Power-ups (multi-ball, laser, wider paddle), brick durability, screen-shake triggers.
+
+Deep Library: Brick Manager – A high-density grid system that handles thousands of breakable objects and their associated drop-rates.
+
+Integration Test: BallCollision + PaddleSegment (Confirm ball reflects at a steeper angle when hitting the edge of the paddle).
+
+15. Strategic Deck-builder (Slay the Spire Style)
+Core Systems: Turn-based State Manager, Relic/Card Synergy Engine, Intent-System AI.
+
+Mechanics: Draw/Discard piles, status effects (Vulnerable, Poison), procedurally generated paths.
+
+Deep Library: Deck Architect – A data-driven engine that processes card logic strings (e.g., deal(6); apply_weak(2)).
+
+Integration Test: StatusEffect + DamageCalc (Verify "Vulnerable" correctly increases damage by 50%).
+
+16. 2D Sniper / Ballistics Puzzle
+Core Systems: Long-distance Raycasting, Bullet Drop (Gravity), Scope Magnification.
+
+Mechanics: Breath holding (steadying), wind compensation, heart-rate impact on aim, slow-motion "kill cams."
+
+Deep Library: Ballistic Ray – A specialized projectile system that simulates gravity and wind over long distances without needing a physics body.
+
+Integration Test: GravityDrop + Distance (Confirm the bullet hits Y pixels lower at 100m distance).
+
+17. Voxel / Destructible Mining
+Core Systems: Quadtree-based Terrain Deformation, Resource Vein Generation, Fog of War.
+
+Mechanics: Digging/Drilling, light-source management, depth-based difficulty, inventory capacity.
+
+Deep Library: Terraform 2D – A system for modifying tilemap textures in real-time to allow smooth "digging" and "explosive" terrain removal.
+
+Integration Test: DrillAction + TerrainData (Ensure a 32×32 area of "Dirt" is removed and converted to a "Hole" state).
+
+18. Vertical Procedural Climber
+Core Systems: Infinite Chunk Spawning, Dynamic Camera Following, Falling-death Boundary.
+
+Mechanics: One-way platforms, spring-jumps, crumbling platforms, enemy hazards.
+
+Deep Library: Vertical Generator – An algorithm that ensures every procedurally generated jump is mathematically reachable by the player's max jump height.
+
+Integration Test: ProcGen + JumpHeight (Ensure no gap is generated larger than the player's 1.5s jump arc).
+
+19. Incremental / Idle Scaling
+Core Systems: Big-Number Arithmetic (Scientific Notation), Offline Progress Calculation, Hook-based Reward Systems.
+
+Mechanics: Prestige (reset for bonuses), automated clicking, upgrade multipliers, achievement-based buffs.
+
+Deep Library: Scaling Engine – A math library designed to handle numbers up to 10
+308
+  and beyond without precision loss.
+
+Integration Test: MultiplierStack + CurrencyGen (Verify that 10 levels of "+10% speed" result in exactly 2.59× total production).
+
+20. 2D Physics Sandbox
+Core Systems: Runtime Object Spawning, Joint Manipulation (Weld, Rope, Motor), Zero-G Toggling.
+
+Mechanics: Drag-and-drop building, thrusters, explosive triggers, "Weight" properties.
+
+Deep Library: Sandbox Toolkit – A UI-to-Physics bridge that allows players to click and drag any physics-enabled object in real-time.
+
+Integration Test: WeldJoint + ThrusterForce (Verify two objects welded together move as a single rigid body when force is applied).
+
+
+
+Gemini said
+Expanding the Luna ecosystem requires moving beyond common action genres into specialized simulations, technical puzzles, and complex management systems. These 20 additional "Skills" represent deep architectural challenges that will allow developers to build everything from high-stakes medical sims to complex logistics networks.
+
+1. Tile-Matching / Match-3 Puzzle
+Core Systems: Recursive Board Solver (Flood-fill), Swap-Logic State Machine, Combo-Chain Evaluator.
+
+Mechanics: Gravity-based refills, special tile transformations (Bombs, Color-wipes), obstacle tiles (Ice, Stone).
+
+Deep Library: Puzzle Core – A highly optimized board manager that allows for non-rectangular grids and custom "match" shapes (L-shapes, T-shapes, squares).
+
+Integration Test: MatchEvaluator + GravitySystem (Verify that a 5-tile match triggers a "Super-item" and correctly shifts the 15 tiles above it).
+
+2. Railroad / Transport Logistics
+Core Systems: Spline-based Track Layout, Multi-train Path Signaling (Blocks), Resource Supply-Chain Graph.
+
+Mechanics: Variable train speeds based on weight/incline, station loading/unloading timers, switching junctions.
+
+Deep Library: LunaRail – A system that handles complex rail-switching logic and prevents "deadlocks" in multi-train networks.
+
+Integration Test: TrackSwitch + TrainAI (Ensure Train B stops at a signal if Train A is currently occupying the "Block" ahead).
+
+3. Culinary / Cooking Simulation
+Core Systems: Multitask Timer Management, Ingredient State-Change (Raw → Cooked → Burnt), Recipe Verification.
+
+Mechanics: Chopping/Stirring mini-games, temperature zones, heat-transfer logic, order-priority queue.
+
+Deep Library: Kitchen Flow – A component-based system where "Heat" or "Cold" sources interact with ingredient objects to change their metadata (flavor/texture).
+
+Integration Test: HeatSource + Ingredient (Confirm a "Patty" changes state from Raw to Medium after exactly 15 seconds at 180°C).
+
+4. Atmospheric / Psychological Horror
+Core Systems: Dynamic Dynamic Lighting (Shadow-casting), Sanity/Stress Meter, Dynamic Soundscape Manager.
+
+Mechanics: Flashlight battery management, peripheral vision "ghosting," environmental triggers (flickering lights, moving objects).
+
+Deep Library: Fear Engine – A scriptable event system that triggers scares based on the player’s "Stress Level" and recent actions.
+
+Integration Test: SanityMeter + PostProcessing (Verify the screen begins to blur/distort once Sanity drops below 20%).
+
+5. System Infiltration / Gadget Puzzle
+Core Systems: Logic Gate Simulation (AND, OR, NOT), Circuit Overload Logic, Signal Propagation.
+
+Mechanics: Rewiring security panels, remote-hacking cameras, managing a "Battery" for gadgets, directional sound distraction.
+
+Deep Library: Circuit Architect – A visual wiring tool that lets players (and devs) connect world objects into complex logical networks.
+
+Integration Test: LogicGate + SecurityDoor (Confirm the door opens only when both "Terminal A" and "Terminal B" are hacked).
+
+6. Merchant / Item Shop Management
+Core Systems: NPC Demand Simulation, Dynamic Market Pricing, Inventory Shelf-stocking Logic.
+
+Mechanics: Haggling mini-game, store layout optimization (attractiveness score), staff hiring, shoplifting detection.
+
+Deep Library: Marketplace Sim – An economic engine that fluctuates prices based on "World Events" (e.g., a war increases the price of iron).
+
+Integration Test: PriceCalculator + NPCBudget (Test if an NPC refuses to buy an item priced 50% above its market value).
+
+7. Medical / Anatomy Simulation
+Core Systems: Layered Sprite Interaction (Skin → Muscle → Organ), Fluid Bleeding Physics, Heart Rate/Vital Monitoring.
+
+Mechanics: Surgical tool switching, precision cutting/suturing, managing patient stability, antiseptic cleaning.
+
+Deep Library: BioSystem – A "Human Health" state machine where damage to one organ affects related stats (e.g., lung damage reduces oxygen over time).
+
+Integration Test: SurgicalTool + OrganLayer (Verify that using a "Scalpel" on the "Dermis" layer reveals the "Subcutaneous" layer below).
+
+8. Marine / Fishing Simulation
+Core Systems: Underwater Buoyancy, Fish Schooling AI (Boids), Line Tension Physics.
+
+Mechanics: Lure depth management, "Fighting" the fish (rhythm/tension balance), bait types, dynamic weather impacts.
+
+Deep Library: Aquatic AI – A specialized behavior tree for marine life that includes hunger, fear of predators, and depth-specific spawning.
+
+Integration Test: LineTension + InputSystem (Ensure the fishing line snaps if tension exceeds X for more than 2 seconds).
+
+9. Terminal / Command-Line Hacking
+Core Systems: Virtual File System, Command Parser (Regex), Network Node Mapping.
+
+Mechanics: Brute-force guessing, SSH-style navigation, footprint management (deleting logs), "Trace" timers.
+
+Deep Library: LunaShell – A fully functional in-game terminal that supports custom user scripts and "Remote Server" simulation.
+
+Integration Test: CommandParser + FileAccess (Verify that typing rm -rf /logs successfully clears the "Alert Level" variable).
+
+10. God Game / Ecosystem Simulator
+Core Systems: Influence/Belief Resource, Terrain Deformation (Raising/Lowering), Natural Disaster Spawner.
+
+Mechanics: Answering "Prayers," guiding autonomous AI tribes, managing biome spread (Forest vs. Desert).
+
+Deep Library: Ecosystem Director – A system that manages the balance between predator/prey populations and resource availability across the map.
+
+Integration Test: InfluencePower + AIBelief (Test if performing a "Miracle" increases a tribe’s loyalty by exactly 15 points).
+
+11. Wildlife Photography / Discovery
+Core Systems: "Photo Frame" Capture Logic, Animal "Candid" Scoring, View-Frustum Visibility Check.
+
+Mechanics: Sneaking (Noise levels), using bait/calls, zoom/focus controls, night-vision/thermal modes.
+
+Deep Library: SnapJudge – An algorithm that scores photos based on subject centering, distance, and "rarity" of the animal's current animation state.
+
+Integration Test: CameraShot + AnimalState (Confirm a photo of a "Sleeping Lion" scores higher than a "Running Lion").
+
+12. Alchemical / Potion Mixing
+Core Systems: Liquid Mixing (RGB/Color-blending), Ratio-based Result Calculation, Toxicity/Potency Balancing.
+
+Mechanics: Mortar and pestle grinding, boiling/cooling, ingredient "Traits" (Fire, Ice, Healing).
+
+Deep Library: Alchemy Lab – A chemistry-style engine where adding 2 units of "Blue" and 1 unit of "Red" consistently creates a specific "Purple" potion.
+
+Integration Test: IngredientMix + BoilTime (Verify that over-boiling a "Healing" potion turns it into a "Poison" state).
+
+13. Courtroom Drama / Debate Sim
+Core Systems: Evidence-to-Statement Mapping, "Pressure" Meter, Branching Testimony Paths.
+
+Mechanics: Presenting evidence, finding contradictions, "Objection" timing, jury persuasion.
+
+Deep Library: Debate Tree – A specialized narrative engine that handles non-linear arguments and tracks which "Clues" the player has found.
+
+Integration Test: EvidenceSelect + StatementID (Test if presenting "Bloody Knife" during "Statement 4" triggers a "Contradiction Found" event).
+
+14. Zoo / Theme Park Tycoon
+Core Systems: Pathfinding for Crowds, Guest "Happiness" Heatmaps, Animal Habitat Requirements.
+
+Mechanics: Enclosure building, pricing food/tickets, maintenance/cleaning cycles, escaped animal emergencies.
+
+Deep Library: Park Flow – A simulation that handles thousands of "Guest" AIs, each with individual hunger, thirst, and fatigue levels.
+
+Integration Test: HabitatFence + AnimalAI (Confirm that a "Lion" cannot move past a "Grade 3 Fence" object).
+
+15. 2D Sports Manager (Data-Driven)
+Core Systems: Stat-based Match Simulation (No visuals required), Roster Management, Training Progression.
+
+Mechanics: Drafting players, setting tactics (e.g., 4-4-2), budget balancing, trade negotiations.
+
+Deep Library: MatchSim 2D – A backend engine that simulates a 90-minute game in seconds using probability based on player attributes.
+
+Integration Test: TeamStats + SimRunner (Verify a team with 90 "Attack" scores significantly more than a team with 20 "Defense" over 100 simulations).
+
+16. Musical Composition / DAW Sim
+Core Systems: MIDI-style Note Sequencer, BPM-Synced Audio Loops, Waveform Visualization.
+
+Mechanics: Placing notes on a piano roll, adjusting pitch/volume per note, layering tracks, export-to-file.
+
+Deep Library: LunaAudioSequencer – A tool for players to "create" music in-game that can then be used as the world's background track.
+
+Integration Test: PianoRoll + AudioEngine (Confirm that a note placed at T=1.0 plays exactly on the second beat).
+
+17. Skyscraper / Hotel Management
+Core Systems: Vertical Pathfinding (Elevators/Stairs), Utility Routing (Power/Water), Room-type Buffs.
+
+Mechanics: Zoning (Residential vs. Commercial), noise pollution levels, luxury ratings, tenant rent collection.
+
+Deep Library: Tower Logic – A system that optimizes resource flow (like electricity) from the basement to the 100th floor without lag.
+
+Integration Test: ElevatorWaitTime + TenantHappiness (Verify that a wait time over 30s causes a happiness drop in "Penthouse" tenants).
+
+18. Tower Defense Maze (Mazing Focus)
+Core Systems: Dynamic Path Recalculation (NavMesh update on building), Creep Flow-fields.
+
+Mechanics: Blocking paths to create longest loops, flying creeps (ignore walls), boss-shielding creeps.
+
+Deep Library: Maze Solver – A system that prevents players from "fully blocking" the goal, automatically finding the new shortest path when a tower is placed.
+
+Integration Test: TowerPlacement + Pathfinder (Ensure pathing updates instantly when a tower is placed, and prevents "Seal Off" actions).
+
+19. Physics-Based Vehicle Construction
+Core Systems: Part-to-Part Welding, Center of Mass Calculation, Aerodynamic Drag/Lift.
+
+Mechanics: Attaching wheels/engines/wings, fuel weight impact, structural integrity (parts breaking off under G-force).
+
+Deep Library: Assembler Pro – A specialized "Build Mode" that calculates the physical properties of a vehicle before it is "Spawned" into the world.
+
+Integration Test: EnginePower + VehicleMass (Confirm the vehicle reaches X velocity only when the "Weight" is below Y kg).
+
+20. Tactical Tabletop / Wargame
+Core Systems: Measurement-based Movement (Inches/cm), Dice-roll Conflict Resolution, Line-of-Sight (Template-based).
+
+Mechanics: "Unit Coherency," morale checks, terrain cover bonuses, specialized "Command Points."
+
+Deep Library: Wargame Arbiter – A module that enforces strict tabletop rules, handling complex measurements and "Area of Effect" templates.
+
+Integration Test: BlastTemplate + UnitGroup (Verify that a 3-inch "Explosion" circle applies damage to every model whose base overlaps the circle).
+
+Implementation Strategy
+To turn these into Libraries:
+
+Extract the Math: Move the core logic (e.g., the Match-3 Solver or Marketplace Economy) in

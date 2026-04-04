@@ -74,7 +74,7 @@ pub struct BodyContact {
     pub body_b: usize,
 }
 
-/// Result of a `World::raycast` query. Consult the module-level documentation for the broader usage context and preconditions.
+/// Result of a `World::raycast` query.
 ///
 /// # Fields
 /// - `body_id` — Integer body ID that was hit.
@@ -122,35 +122,6 @@ pub struct ContactInfo {
 /// Bodies are stored as a `Vec<Body>` for backward-API compatibility.
 /// Each `step()` syncs mutations into rapier, runs the pipeline, then
 /// reads back positions/velocities for Dynamic bodies.
-///
-/// # Fields
-/// - `bodies` — `Vec<Body>`.
-/// - `body_handles` — `Vec<RigidBodyHandle>`.
-/// - `collider_handles` — `Vec<ColliderHandle>`.
-/// - `extra_collider_handles` — `Vec<Vec<ColliderHandle>>`.
-/// - `collider_to_body` — `HashMap<ColliderHandle`.
-/// - `cached_shapes` — `Vec<BodyShape>`.
-/// - `cached_restitutions` — `Vec<f32>`.
-/// - `cached_layers` — `Vec<(u32`.
-/// - `cached_frictions` — `Vec<f32>`.
-/// - `pipeline` — `PhysicsPipeline`.
-/// - `gravity` — `Vector`.
-/// - `params` — `IntegrationParameters`.
-/// - `islands` — `IslandManager`.
-/// - `broad_phase` — `BroadPhaseBvh`.
-/// - `narrow_phase` — `NarrowPhase`.
-/// - `rbodies` — `RigidBodySet`.
-/// - `rcolliders` — `ColliderSet`.
-/// - `impulse_joints` — `ImpulseJointSet`.
-/// - `multibody_joints` — `MultibodyJointSet`.
-/// - `ccd_solver` — `CCDSolver`.
-/// - `joint_handles` — `Vec<ImpulseJointHandle>`.
-/// - `collision_events` — `Vec<BodyContact>`.
-/// - `begin_contact_events` — `Vec<(usize`.
-/// - `end_contact_events` — `Vec<(usize`.
-/// - `joint_types` — `Vec<&'static str>`.
-/// - `mouse_joint_anchors` — `HashMap<usize`.
-/// - `pixels_per_meter` — `f32`.
 pub struct World {
     // ── Backward-compat body buffer ──────────────────────────────────────────
     bodies: Vec<Body>,
@@ -504,7 +475,7 @@ impl World {
         }
     }
 
-    /// Sets whether a fixture is a sensor. Replaces the current fixture sensor value; callers hold responsibility for maintaining consistency with related fields.
+    /// Sets whether a fixture is a sensor.
     ///
     /// # Parameters
     /// - `body_id` — Index of the body.
@@ -551,7 +522,7 @@ impl World {
         self.bodies.get_mut(id)
     }
 
-    /// Returns the total number of bodies. Consult the module-level documentation for the broader usage context and preconditions.
+    /// Returns the total number of bodies.
     ///
     /// # Returns
     /// The body count.
@@ -838,7 +809,7 @@ impl World {
 
     // ── Extended body properties ──────────────────────────────────────────────
 
-    /// Teleports a body to a new position. Replaces the current body position value; callers hold responsibility for maintaining consistency with related fields.
+    /// Teleports a body to a new position.
     ///
     /// # Parameters
     /// - `id` — Body index.
@@ -899,7 +870,7 @@ impl World {
         }
     }
 
-    /// Returns the angular velocity of a body. This accessor incurs no allocation; call it freely in hot paths.
+    /// Returns the angular velocity of a body.
     ///
     /// # Parameters
     /// - `id` — Body index.
@@ -937,7 +908,7 @@ impl World {
         }
     }
 
-    /// Returns the mass of a body. This accessor incurs no allocation; call it freely in hot paths.
+    /// Returns the mass of a body.
     ///
     /// # Parameters
     /// - `id` — Body index.
@@ -948,7 +919,7 @@ impl World {
         self.bodies.get(id).map_or(0.0, |b| b.mass)
     }
 
-    /// Sets the mass of a body. Replaces the current body mass value; callers hold responsibility for maintaining consistency with related fields.
+    /// Sets the mass of a body.
     ///
     /// # Parameters
     /// - `id` — Body index.
@@ -965,7 +936,7 @@ impl World {
         }
     }
 
-    /// Sets the per-body gravity multiplier. Replaces the current gravity scale value; callers hold responsibility for maintaining consistency with related fields.
+    /// Sets the per-body gravity multiplier.
     ///
     /// # Parameters
     /// - `id` — Body index.
@@ -978,7 +949,7 @@ impl World {
         }
     }
 
-    /// Locks or unlocks rotation for a body. Replaces the current fixed rotation value; callers hold responsibility for maintaining consistency with related fields.
+    /// Locks or unlocks rotation for a body.
     ///
     /// # Parameters
     /// - `id` — Body index.
@@ -1164,7 +1135,7 @@ impl World {
         (0..self.joint_handles.len()).collect()
     }
 
-    /// Returns the body type as a string. This accessor incurs no allocation; call it freely in hot paths.
+    /// Returns the body type as a string.
     ///
     /// # Parameters
     /// - `id` — Body index.
@@ -1212,7 +1183,7 @@ impl World {
         (self.gravity.x, self.gravity.y)
     }
 
-    /// Sets the gravity vector. Replaces the current gravity value; callers hold responsibility for maintaining consistency with related fields.
+    /// Sets the gravity vector.
     ///
     /// # Parameters
     /// - `gx` — Horizontal gravity component.
@@ -1325,7 +1296,7 @@ impl World {
 
     // ── Extended joint API ────────────────────────────────────────────────────
 
-    /// Returns the total number of joints. Consult the module-level documentation for the broader usage context and preconditions.
+    /// Returns the total number of joints.
     ///
     /// # Returns
     /// The joint count.
@@ -1511,7 +1482,7 @@ impl World {
         Some((id_a, id_b))
     }
 
-    /// Removes a joint from the world. After this call the associated key is invalid and must not be reused.
+    /// Removes a joint from the world.
     ///
     /// # Parameters
     /// - `joint_id` — Joint index to remove.
@@ -1986,7 +1957,7 @@ impl World {
         (0.0, 0.0)
     }
 
-    /// Returns the type name of a joint. This accessor incurs no allocation; call it freely in hot paths.
+    /// Returns the type name of a joint.
     ///
     /// # Parameters
     /// - `joint_id` — Joint index.

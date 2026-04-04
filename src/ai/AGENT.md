@@ -2,7 +2,7 @@
 
 | Property | Value |
 |----------|-------|
-| **Tier** | Tier 2 — Engine Extensions |
+| **Tier** | Tier 2 — Reusable Engine Extensions |
 | **Lua API** | `luna.ai` |
 | **Source** | `src/ai/` |
 | **Tests** | `tests/ai_tests.rs` |
@@ -25,6 +25,10 @@ reinforcement learning when you want enemies to adapt to player behaviour over
 time.  Spatial AI structures — A* pathfinding grids, BFS flow fields, and
 named influence maps — are shared across all agents in the world, avoiding
 redundant computation when dozens of actors navigate the same level.
+
+Grid pathfinding (`SimpleGrid`, `SimpleCell`) and flow-field (`FlowField`)
+types are re-exported from `crate::pathfinding` so that `luna.ai.*` has a
+unified AI namespace without separate wrapper files.
 
 The `Blackboard` is the shared-memory substrate: a hierarchical key-value
 store where agents and behaviour trees read and write facts.  Parent-chain
@@ -74,11 +78,9 @@ AIWorld (central registry)
 | `behavior_tree.rs` | Behavior Tree with composite, decorator, and leaf nodes |
 | `blackboard.rs` | Typed key-value store with optional parent chain for hierarchical lookup |
 | `command_queue.rs` | RTS-style ordered command queue for scheduling unit actions |
-| `flowfield.rs` | Dijkstra-based flow field for efficient crowd pathfinding |
 | `fsm.rs` | Finite State Machine with priority-ordered guarded transitions |
 | `goap.rs` | Goal-Oriented Action Planning (GOAP) using A★ search over boolean world state |
 | `influence_map.rs` | Multi-layer spatial float grid for strategic area analysis and influence mapping |
-| `pathgrid.rs` | Weighted grid pathfinding (A★, Dijkstra) with obstacle support |
 | `qlearner.rs` | Tabular epsilon-greedy Q-learner for discrete-state reinforcement learning |
 | `squad.rs` | Multi-agent formation groups with offset computation |
 | `steering.rs` | Reynolds-style steering behaviors with weighted/priority combination |
@@ -117,10 +119,6 @@ RTS-style ordered command queue for scheduling unit actions.
 - **`Command`** (struct): A single RTS unit command with metadata and a Lua tick callback.  Commands are stored in a [`CommandQueue`] and...
 - **`CommandQueue`** (struct): A FIFO queue of [`Command`] entries for sequential unit action scheduling.  Commands are consumed from the front. The...
 
-### `ai::flowfield`
-
-Dijkstra-based flow field for efficient crowd pathfinding.
-
 ### `ai::fsm`
 
 Finite State Machine with priority-ordered guarded transitions.
@@ -142,10 +140,6 @@ Goal-Oriented Action Planning (GOAP) using A★ search over boolean world state.
 Multi-layer spatial float grid for strategic area analysis and influence mapping.
 
 - **`InfluenceMap`** (struct): A multi-layer spatial float grid for influence mapping and strategic reasoning.  The grid has fixed dimensions (`width...
-
-### `ai::pathgrid`
-
-Weighted grid pathfinding (A★, Dijkstra) with obstacle support.
 
 ### `ai::qlearner`
 

@@ -2,14 +2,6 @@
 //!
 //! Pathfinding requests are submitted with an ID and processed on worker
 //! threads. Results are collected via non-blocking [`PathThreadPool::poll`].
-//!
-//! This module is part of Luna2D's `pathfinding` subsystem and provides the implementation
-//! details for async pool-related operations and data management.
-//! Key types exported from this module: `PathThreadPool`.
-//! Primary functions: `new()`, `submit()`, `poll()`, `cancel()`.
-//!
-//! All public items are documented. See the parent module for architectural context
-//! and the `luna.*` Lua API for the scripting interface.
 
 use std::sync::mpsc::{self, Receiver, Sender};
 use std::sync::{Arc, Mutex};
@@ -36,14 +28,6 @@ struct PathRequest {
 pub type PathResult = (u64, Option<Vec<(u32, u32)>>);
 
 /// A pool of worker threads that process pathfinding requests asynchronously.
-///
-/// # Fields
-/// - `tx` — `Sender<PathRequest>`.
-/// - `rx` — `Receiver<PathResult>`.
-/// - `cancelled` — `Arc<Mutex<Vec<u64>>>`.
-/// - `thread_count` — `usize`.
-/// - `_handles` — `Vec<thread::JoinHandle<()>>`.
-/// - `pending` — `Arc<Mutex<u32>>`.
 pub struct PathThreadPool {
     /// Sender for dispatching work items.
     tx: Sender<PathRequest>,
@@ -139,7 +123,7 @@ impl PathThreadPool {
         }
     }
 
-    /// Submit a pathfinding request. Consult the module-level documentation for the broader usage context and preconditions.
+    /// Submit a pathfinding request.
     ///
     /// # Parameters
     /// - `id` — `u64`.
@@ -213,7 +197,7 @@ impl PathThreadPool {
         self.thread_count = count.max(1);
     }
 
-    /// Current configured thread count. This accessor incurs no allocation; call it freely in hot paths.
+    /// Current configured thread count.
     ///
     /// # Returns
     /// `usize`.

@@ -7,7 +7,7 @@
 
 use std::collections::HashMap;
 
-use crate::graphics::Color;
+use crate::math::Color;
 
 // ── Series types ────────────────────────────────────────────────────────
 

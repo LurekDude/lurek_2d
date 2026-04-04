@@ -2,7 +2,7 @@
 
 | Property | Value |
 |----------|-------|
-| **Tier** | Foundation (orchestrator) |
+| **Tier** | Baseline |
 | **Lua API** | `None` |
 | **Source** | `src/engine/` |
 | **Tests** | `tests/engine_tests.rs` |

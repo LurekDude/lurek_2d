@@ -98,10 +98,7 @@ impl PipelineScheduler {
     /// - `name` — `&str`.
     /// - `pipeline` — `&Pipeline`.
     pub fn mark_step_waiting(&mut self, name: &str, pipeline: &Pipeline) {
-        let delay = pipeline
-            .get_step(name)
-            .map(|s| s.delay)
-            .unwrap_or(0.0);
+        let delay = pipeline.get_step(name).map(|s| s.delay).unwrap_or(0.0);
 
         self.delay_timers.insert(name.to_owned(), delay);
     }

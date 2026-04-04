@@ -17,7 +17,7 @@ use mlua::prelude::*;
 
 use crate::pathfinding::ai_flow_field::FlowField as AiFlowField;
 use crate::pathfinding::hpa::{build_abstract, AbstractGraph};
-use crate::pathfinding::pathgrid::PathGrid;
+use crate::pathfinding::pathgrid::SimpleGrid;
 use crate::pathfinding::{DiagonalMode, FlowField, NavGrid, UnitPathfinder, Waypoint};
 
 use super::lua_types::{add_type_methods, LunaType};
@@ -644,10 +644,10 @@ impl LuaUserData for LuaFlowField {
 // LuaPathGrid
 // ---------------------------------------------------------------------------
 
-/// Lua wrapper around a [`PathGrid`] (A* weighted grid, PathGrid-based).
+/// Lua wrapper around a [`SimpleGrid`] (A* weighted grid, SimpleGrid-based).
 #[derive(Clone)]
 struct LuaPathGrid {
-    inner: Rc<RefCell<PathGrid>>,
+    inner: Rc<RefCell<SimpleGrid>>,
 }
 
 impl LunaType for LuaPathGrid {
@@ -734,7 +734,7 @@ impl LuaUserData for LuaPathGrid {
 // LuaAiFlowField
 // ---------------------------------------------------------------------------
 
-/// Lua wrapper around a PathGrid-based [`AiFlowField`].
+/// Lua wrapper around a SimpleGrid-based [`AiFlowField`].
 #[derive(Clone)]
 struct LuaAiFlowField {
     inner: Rc<RefCell<AiFlowField>>,
@@ -918,7 +918,7 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
     /// The result.
 
     // luna.pathfinding.newPathGrid(w, h, cellSize)
-    /// New PathGrid (A* grid with per-cell cost and walkability).
+    /// New SimpleGrid (A* grid with per-cell cost and walkability).
     ///
     /// @param w : integer
     /// @param h : integer
@@ -928,13 +928,13 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
         "newPathGrid",
         lua.create_function(|_, (w, h, cell_size): (usize, usize, f32)| {
             Ok(LuaPathGrid {
-                inner: Rc::new(RefCell::new(PathGrid::new(w, h, cell_size))),
+                inner: Rc::new(RefCell::new(SimpleGrid::new(w, h, cell_size))),
             })
         })?,
     )?;
 
     // luna.pathfinding.newPathFlowField(pathGrid)
-    /// New PathGrid-based BFS flow field.
+    /// New SimpleGrid-based BFS flow field.
     ///
     /// @param grid : PathGrid
     /// @return any

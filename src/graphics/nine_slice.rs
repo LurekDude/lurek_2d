@@ -29,16 +29,6 @@ pub type Patch = (f32, f32, f32, f32, f32, f32, f32, f32);
 ///
 /// Corners maintain their original pixel dimensions. Edges stretch
 /// along one axis. The center stretches in both axes.
-///
-/// # Fields
-/// - `e` — `:textures` for the source image.`.
-/// - `texture_key` — `TextureKey`.
-/// - `top` — `f32`.
-/// - `right` — `f32`.
-/// - `bottom` — `f32`.
-/// - `left` — `f32`.
-/// - `tex_width` — `f32`.
-/// - `tex_height` — `f32`.
 #[derive(Debug, Clone)]
 pub struct NineSlice {
     /// Key into `SharedState::textures` for the source image.
@@ -58,7 +48,7 @@ pub struct NineSlice {
 }
 
 impl NineSlice {
-    /// Creates a new nine-slice definition. Returns a fully initialised instance with all fields set to their initial values.
+    /// Creates a new nine-slice definition.
     ///
     /// # Parameters
     /// - `texture_key` — Key for the source texture in SharedState.

@@ -64,7 +64,10 @@ impl Pipeline {
     /// `Result<(), String>`.
     pub fn add_step(&mut self, step: PipelineStep) -> Result<(), String> {
         if self.steps.contains_key(&step.name) {
-            return Err(format!("step '{}' already exists in pipeline '{}'", step.name, self.name));
+            return Err(format!(
+                "step '{}' already exists in pipeline '{}'",
+                step.name, self.name
+            ));
         }
         self.steps.insert(step.name.clone(), step);
         Ok(())
@@ -187,7 +190,10 @@ impl Pipeline {
                 // Only count valid deps (validate() separately catches unknown deps)
                 if self.steps.contains_key(dep.as_str()) {
                     *in_degree.entry(step.name.as_str()).or_insert(0) += 1;
-                    dependents.entry(dep.as_str()).or_default().push(step.name.as_str());
+                    dependents
+                        .entry(dep.as_str())
+                        .or_default()
+                        .push(step.name.as_str());
                 }
             }
         }
@@ -224,7 +230,10 @@ impl Pipeline {
                 .filter(|(_, &deg)| deg > 0)
                 .map(|(&name, _)| name)
                 .collect();
-            return Err(format!("cycle detected involving: {}", remaining.join(", ")));
+            return Err(format!(
+                "cycle detected involving: {}",
+                remaining.join(", ")
+            ));
         }
 
         Ok(order)

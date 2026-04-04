@@ -2,7 +2,7 @@
 
 | Property | Value |
 |----------|-------|
-| **Tier** | Tier 2 — Engine Extension (Implemented) |
+| **Tier** | Tier 1 — Core Engine Subsystems |
 | **Lua namespace** | `luna.simulator` |
 | **Source** | `src/automation/` |
 | **Lua API** | `src/lua_api/automation_api.rs` |

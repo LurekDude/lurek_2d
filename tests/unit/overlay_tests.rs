@@ -1,9 +1,8 @@
 //! Integration tests for the Overlay (screen-effect overlay) module.
 
 use luna2d::overlay::{
-    AmbientState, CloudState, FadeState, FilmGrainState, FlashState, FogState,
-    HeatHazeState, LightningState, Overlay, ShakeState, VignetteState, WeatherState,
-    WeatherType,
+    AmbientState, CloudState, FadeState, FlashState, LightningState, Overlay, ShakeState,
+    WeatherState, WeatherType,
 };
 use std::cell::RefCell;
 use std::path::PathBuf;
@@ -121,34 +120,6 @@ fn cloud_state_default() {
     assert!((c.speed - 20.0).abs() < 1e-5);
     assert!((c.scale - 1.0).abs() < 1e-5);
     assert!((c.opacity - 0.3).abs() < 1e-5);
-}
-
-#[test]
-fn fog_state_default() {
-    let f = FogState::default();
-    assert!(!f.enabled);
-    assert!((f.density - 0.3).abs() < 1e-5);
-}
-
-#[test]
-fn heat_haze_state_default() {
-    let h = HeatHazeState::default();
-    assert!(!h.enabled);
-    assert!((h.intensity - 0.5).abs() < 1e-5);
-}
-
-#[test]
-fn vignette_state_default() {
-    let v = VignetteState::default();
-    assert!(!v.enabled);
-    assert!((v.strength - 0.5).abs() < 1e-5);
-}
-
-#[test]
-fn film_grain_state_default() {
-    let fg = FilmGrainState::default();
-    assert!(!fg.enabled);
-    assert!((fg.intensity - 0.3).abs() < 1e-5);
 }
 
 #[test]
@@ -491,11 +462,7 @@ fn overlay_clear_resets_all() {
     let mut ov = Overlay::new(800, 600);
     ov.weather.enabled = true;
     ov.ambient.enabled = true;
-    ov.fog.enabled = true;
-    ov.vignette.enabled = true;
-    ov.film_grain.enabled = true;
     ov.clouds.enabled = true;
-    ov.heat_haze.enabled = true;
     ov.trigger_flash(1.0, 0.0, 0.0, 1.0, 0.5);
     ov.trigger_shake(10.0, 0.5);
     ov.trigger_fade(0.0, 0.0, 0.0, 1.0, 1.0);
@@ -506,7 +473,6 @@ fn overlay_clear_resets_all() {
     assert!(!ov.is_active());
     assert!(!ov.weather.enabled);
     assert!(!ov.ambient.enabled);
-    assert!(!ov.fog.enabled);
     assert!(!ov.flash.active);
     assert!(!ov.shake.active);
     assert!(!ov.fade.active);
@@ -529,34 +495,6 @@ fn overlay_is_active_weather() {
 fn overlay_is_active_ambient() {
     let mut ov = Overlay::new(800, 600);
     ov.ambient.enabled = true;
-    assert!(ov.is_active());
-}
-
-#[test]
-fn overlay_is_active_fog() {
-    let mut ov = Overlay::new(800, 600);
-    ov.fog.enabled = true;
-    assert!(ov.is_active());
-}
-
-#[test]
-fn overlay_is_active_vignette() {
-    let mut ov = Overlay::new(800, 600);
-    ov.vignette.enabled = true;
-    assert!(ov.is_active());
-}
-
-#[test]
-fn overlay_is_active_film_grain() {
-    let mut ov = Overlay::new(800, 600);
-    ov.film_grain.enabled = true;
-    assert!(ov.is_active());
-}
-
-#[test]
-fn overlay_is_active_heat_haze() {
-    let mut ov = Overlay::new(800, 600);
-    ov.heat_haze.enabled = true;
     assert!(ov.is_active());
 }
 
@@ -694,13 +632,14 @@ fn lua_overlay_weather() {
 #[test]
 fn lua_overlay_weather_invalid() {
     let lua = make_vm();
-    let result = lua.load(
-        r#"
+    let result = lua
+        .load(
+            r#"
         local ov = luna.overlay.newOverlay()
         ov:setWeather("tornado")
     "#,
-    )
-    .exec();
+        )
+        .exec();
     assert!(result.is_err(), "Invalid weather type should error");
 }
 
@@ -793,75 +732,6 @@ fn lua_overlay_clouds() {
 }
 
 #[test]
-fn lua_overlay_fog() {
-    let lua = make_vm();
-    lua.load(
-        r#"
-        local ov = luna.overlay.newOverlay()
-        ov:setFogEnabled(true)
-        assert(ov:isFogEnabled() == true)
-        ov:setFogDensity(0.7)
-        assert(math.abs(ov:getFogDensity() - 0.7) < 0.001)
-        ov:setFogColor(0.5, 0.5, 0.6, 0.9)
-        local r, g, b, a = ov:getFogColor()
-        assert(math.abs(r - 0.5) < 0.001)
-        assert(math.abs(b - 0.6) < 0.001)
-        assert(math.abs(a - 0.9) < 0.001)
-    "#,
-    )
-    .exec()
-    .expect("Fog API should work");
-}
-
-#[test]
-fn lua_overlay_heat_haze() {
-    let lua = make_vm();
-    lua.load(
-        r#"
-        local ov = luna.overlay.newOverlay()
-        ov:setHeatHazeEnabled(true)
-        assert(ov:isHeatHazeEnabled() == true)
-        ov:setHeatHazeIntensity(0.8)
-        assert(math.abs(ov:getHeatHazeIntensity() - 0.8) < 0.001)
-    "#,
-    )
-    .exec()
-    .expect("Heat haze API should work");
-}
-
-#[test]
-fn lua_overlay_vignette() {
-    let lua = make_vm();
-    lua.load(
-        r#"
-        local ov = luna.overlay.newOverlay()
-        ov:setVignetteEnabled(true)
-        assert(ov:isVignetteEnabled() == true)
-        ov:setVignetteStrength(0.7)
-        assert(math.abs(ov:getVignetteStrength() - 0.7) < 0.001)
-    "#,
-    )
-    .exec()
-    .expect("Vignette API should work");
-}
-
-#[test]
-fn lua_overlay_film_grain() {
-    let lua = make_vm();
-    lua.load(
-        r#"
-        local ov = luna.overlay.newOverlay()
-        ov:setFilmGrainEnabled(true)
-        assert(ov:isFilmGrainEnabled() == true)
-        ov:setFilmGrainIntensity(0.6)
-        assert(math.abs(ov:getFilmGrainIntensity() - 0.6) < 0.001)
-    "#,
-    )
-    .exec()
-    .expect("Film grain API should work");
-}
-
-#[test]
 fn lua_overlay_lightning() {
     let lua = make_vm();
     lua.load(
@@ -886,8 +756,7 @@ fn lua_overlay_clear() {
         r#"
         local ov = luna.overlay.newOverlay()
         ov:setWeatherEnabled(true)
-        ov:setFogEnabled(true)
-        ov:setVignetteEnabled(true)
+        ov:setAmbientEnabled(true)
         assert(ov:isActive() == true)
         ov:clear()
         assert(ov:isActive() == false)
@@ -957,21 +826,6 @@ fn lua_overlay_draw_noop() {
     )
     .exec()
     .expect("draw() should be a no-op without error");
-}
-
-#[test]
-fn lua_overlay_fog_color_default_alpha() {
-    let lua = make_vm();
-    lua.load(
-        r#"
-        local ov = luna.overlay.newOverlay()
-        ov:setFogColor(0.3, 0.4, 0.5)
-        local r, g, b, a = ov:getFogColor()
-        assert(math.abs(a - 1.0) < 0.001, "Default fog alpha should be 1.0")
-    "#,
-    )
-    .exec()
-    .expect("Fog color alpha should default to 1.0");
 }
 
 #[test]

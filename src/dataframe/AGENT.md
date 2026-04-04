@@ -2,7 +2,7 @@
 
 | Property | Value |
 |----------|-------|
-| **Tier** | Tier 2 — Engine Extensions |
+| **Tier** | Tier 2 — Reusable Engine Extensions |
 | **Lua API** | `luna.dataframe` |
 | **Source** | `src/dataframe/` |
 | **Tests** | `tests/dataframe_tests.rs` |

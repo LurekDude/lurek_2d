@@ -21,9 +21,9 @@ pub mod nav_grid;
 pub mod province_path;
 /// unit_pathfinder.
 pub mod unit_pathfinder;
-/// PathGrid-based pathfinding, moved from `ai/pathgrid`.
+/// SimpleGrid-based pathfinding, moved from `ai/pathgrid`.
 pub mod pathgrid;
-/// AI flow field (PathGrid-based), moved from `ai/flowfield`.
+/// AI flow field (SimpleGrid-based), moved from `ai/flowfield`.
 pub mod ai_flow_field;
 
 pub use astar::{astar, line_of_sight, smooth_path};
@@ -33,3 +33,7 @@ pub use hpa::{build_abstract, hpa_star, is_reachable as hpa_is_reachable, Abstra
 pub use nav_grid::{DiagonalMode, NavGrid};
 pub use province_path::{find_province_path, province_reachable, ProvinceCostFn, ProvincePath};
 pub use unit_pathfinder::{UnitPathfinder, Waypoint};
+
+/// 2D pathfinding grid with A*, Dijkstra, BFS, and flow field generation.
+pub mod grid;
+pub use grid::Grid;

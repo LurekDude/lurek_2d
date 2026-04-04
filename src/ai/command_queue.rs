@@ -82,7 +82,7 @@ pub struct CommandQueue {
 }
 
 impl CommandQueue {
-    /// Creates a new empty command queue. Returns a fully initialised instance with all fields set to their initial values.
+    /// Creates a new empty command queue.
     ///
     /// # Returns
     /// `Self`.
@@ -131,12 +131,12 @@ impl CommandQueue {
         false
     }
 
-    /// Clears all commands. After this call the container is in the same state as immediately after construction.
+    /// Clears all commands.
     pub fn clear(&mut self) {
         self.commands.clear();
     }
 
-    /// Returns the number of queued commands. Runs in O(1) time.
+    /// Returns the number of queued commands.
     ///
     /// # Returns
     /// `usize`.
@@ -144,7 +144,7 @@ impl CommandQueue {
         self.commands.len()
     }
 
-    /// Returns whether the queue is empty. This accessor incurs no allocation; call it freely in hot paths.
+    /// Returns whether the queue is empty.
     ///
     /// # Returns
     /// `bool`.

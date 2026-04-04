@@ -11,13 +11,13 @@ use crate::math::random::RandomGenerator;
 use crate::math::transform::Transform;
 use crate::math::vec2::Vec2;
 use crate::math::geometry;
-use crate::math::grid::Grid;
+use crate::pathfinding::grid::Grid;
 use crate::math::noise::{
     DistType, FractalType, MapGenOptions, NoiseGenerator, NoiseKind,
 };
-use crate::math::procgen;
-use crate::math::raycasting::Raycaster2D;
-use crate::math::raycasting::{self, Segment};
+use crate::procgen;
+use crate::raycaster::Raycaster2D;
+use crate::raycaster::{cast_ray_2d, distance_shade, extract_minimap, field_of_view, project_column, Segment};
 use crate::math::spatial_hash::SpatialHash;
 use crate::tilemap::tile_walker::{Facing, TileWalker};
 use crate::math::tween::Tween;
@@ -1408,6 +1408,32 @@ impl LuaUserData for LuaRaycaster2D {
                 Ok((sp.screen_x, sp.scale, sp.distance, sp.visible))
             },
         );
+
+        methods.add_method(
+            "extractMinimap",
+            |lua,
+             this,
+             (px, py, pa, view_radius, cell_size, wr, wg, wb, wa, fr, fg, fb, fa, pr, pg, pb, pa2): (
+                f32, f32, f32, u32, u32,
+                u8, u8, u8, u8,
+                u8, u8, u8, u8,
+                u8, u8, u8, u8,
+            )| {
+                let rc = this.inner.borrow();
+                let (pixels, w, h) = extract_minimap(
+                    &rc, px, py, pa,
+                    view_radius, cell_size,
+                    [wr, wg, wb, wa],
+                    [fr, fg, fb, fa],
+                    [pr, pg, pb, pa2],
+                );
+                let tbl = lua.create_table_with_capacity(pixels.len(), 0)?;
+                for (i, byte) in pixels.into_iter().enumerate() {
+                    tbl.raw_set(i + 1, byte)?;
+                }
+                Ok((tbl, w, h))
+            },
+        );
     }
 }
 
@@ -2657,7 +2683,7 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
         lua.create_function(
             |_, (ox, oy, dx, dy, max_dist, segs_tbl): (f32, f32, f32, f32, f32, LuaTable)| {
                 let segs = read_segments(&segs_tbl)?;
-                match raycasting::cast_ray_2d(ox, oy, dx, dy, max_dist, &segs) {
+                match cast_ray_2d(ox, oy, dx, dy, max_dist, &segs) {
                     Some((hx, hy, idx)) => Ok((Some(hx), Some(hy), Some(idx as i64 + 1))),
                     None => Ok((None, None, None)),
                 }
@@ -2672,7 +2698,7 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
         lua.create_function(
             |lua, (ox, oy, segs_tbl, radius): (f32, f32, LuaTable, f32)| {
                 let segs = read_segments(&segs_tbl)?;
-                let poly = raycasting::field_of_view(ox, oy, &segs, radius);
+                let poly = field_of_view(ox, oy, &segs, radius);
                 let tbl = lua.create_table_with_capacity(poly.len(), 0)?;
                 for (i, v) in poly.iter().enumerate() {
                     tbl.raw_set(i + 1, *v)?;
@@ -2687,7 +2713,7 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
     math_api.set(
         "projectColumn",
         lua.create_function(|_, (distance, fov, screen_h): (f32, f32, f32)| {
-            let (wh, ds, de) = raycasting::project_column(distance, fov, screen_h);
+            let (wh, ds, de) = project_column(distance, fov, screen_h);
             Ok((wh, ds, de))
         })?,
     )?;
@@ -2697,7 +2723,7 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
     math_api.set(
         "distanceShade",
         lua.create_function(|_, (distance, max_dist): (f32, f32)| {
-            Ok(raycasting::distance_shade(distance, max_dist))
+            Ok(distance_shade(distance, max_dist))
         })?,
     )?;
 

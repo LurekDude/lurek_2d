@@ -2,7 +2,7 @@
 
 | Property | Value |
 |----------|-------|
-| **Tier** | Tier 1 — Basic Core |
+| **Tier** | Tier 1 — Core Engine Subsystems |
 | **Lua API** | `luna.timer` |
 | **Source** | `src/timer/` |
 | **Tests** | `tests/timer_tests.rs` |

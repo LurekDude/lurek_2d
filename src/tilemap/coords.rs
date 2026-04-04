@@ -1,11 +1,4 @@
 //! Coordinate conversion functions for isometric and hexagonal tile grids.
-//!
-//! This module is part of Luna2D's `tilemap` subsystem and provides the implementation
-//! details for coords-related operations and data management.
-//! Primary functions: `to_screen_iso()`, `from_screen_iso()`, `iso_rotate()`, `iso_direction_name()`.
-//!
-//! All public items are documented. See the parent module for architectural context
-//! and the `luna.*` Lua API for the scripting interface.
 
 use std::f32::consts::PI;
 
@@ -17,31 +10,16 @@ use crate::math::Vec2;
 
 /// Converts tile coordinates to screen position using diamond isometric projection.
 ///
-/// # Parameters
-/// - `tx` — `f32`.
-/// - `ty` — `f32`.
-/// - `tile_w` — `f32`.
-/// - `tile_h` — `f32`.
-///
-/// # Returns
-/// `Vec2`.
-///
 /// - `screen.x = (tx - ty) * tile_w / 2`
 /// - `screen.y = (tx + ty) * tile_h / 2`
 pub fn to_screen_iso(tx: f32, ty: f32, tile_w: f32, tile_h: f32) -> Vec2 {
-    Vec2::new((tx - ty) * tile_w / 2.0, (tx + ty) * tile_h / 2.0)
+    Vec2::new(
+        (tx - ty) * tile_w / 2.0,
+        (tx + ty) * tile_h / 2.0,
+    )
 }
 
 /// Converts screen position back to tile coordinates for diamond isometric projection.
-///
-/// # Parameters
-/// - `sx` — `f32`.
-/// - `sy` — `f32`.
-/// - `tile_w` — `f32`.
-/// - `tile_h` — `f32`.
-///
-/// # Returns
-/// `Vec2`.
 pub fn from_screen_iso(sx: f32, sy: f32, tile_w: f32, tile_h: f32) -> Vec2 {
     let tx = (sx / tile_w * 2.0 + sy / tile_h * 2.0) / 2.0;
     let ty = (sy / tile_h * 2.0 - sx / tile_w * 2.0) / 2.0;
@@ -50,25 +28,12 @@ pub fn from_screen_iso(sx: f32, sy: f32, tile_w: f32, tile_h: f32) -> Vec2 {
 
 /// Rotates an isometric direction (1–4) clockwise by `steps`.
 ///
-/// # Parameters
-/// - `direction` — `i32`.
-/// - `steps` — `i32`.
-///
-/// # Returns
-/// `i32`.
-///
 /// Directions: 1=south, 2=west, 3=north, 4=east.
 pub fn iso_rotate(direction: i32, steps: i32) -> i32 {
     (direction - 1 + steps).rem_euclid(4) + 1
 }
 
 /// Returns the name of an isometric direction (1–4).
-///
-/// # Parameters
-/// - `direction` — `i32`.
-///
-/// # Returns
-/// `&'static str`.
 ///
 /// Returns `"unknown"` for out-of-range values.
 pub fn iso_direction_name(direction: i32) -> &'static str {
@@ -82,12 +47,6 @@ pub fn iso_direction_name(direction: i32) -> &'static str {
 }
 
 /// Snaps an angle (in radians) to the nearest isometric direction (1–4).
-///
-/// # Parameters
-/// - `angle` — `f32`.
-///
-/// # Returns
-/// `i32`.
 ///
 /// - south (down, π/2) → 1
 /// - west (left, π) → 2
@@ -114,14 +73,6 @@ pub fn iso_direction_from_angle(angle: f32) -> i32 {
 
 /// Converts axial hex coordinates to screen position (pointy-top layout).
 ///
-/// # Parameters
-/// - `q` — `i32`.
-/// - `r` — `i32`.
-/// - `size` — `f32`.
-///
-/// # Returns
-/// `Vec2`.
-///
 /// - `x = size * √3 * (q + r/2)`
 /// - `y = size * 3/2 * r`
 pub fn to_screen_hex(q: i32, r: i32, size: f32) -> Vec2 {
@@ -132,14 +83,6 @@ pub fn to_screen_hex(q: i32, r: i32, size: f32) -> Vec2 {
 
 /// Converts screen position back to axial hex coordinates (pointy-top layout).
 ///
-/// # Parameters
-/// - `sx` — `f32`.
-/// - `sy` — `f32`.
-/// - `size` — `f32`.
-///
-/// # Returns
-/// `(i32, i32)`.
-///
 /// Uses fractional axial reverse, then rounds with [`hex_round`].
 pub fn from_screen_hex(sx: f32, sy: f32, size: f32) -> (i32, i32) {
     let q = (sx * 3.0_f32.sqrt() / 3.0 - sy / 3.0) / size;
@@ -148,13 +91,6 @@ pub fn from_screen_hex(sx: f32, sy: f32, size: f32) -> (i32, i32) {
 }
 
 /// Returns the six axial neighbor offsets for pointy-top hexagonal grids.
-///
-/// # Parameters
-/// - `q` — `i32`.
-/// - `r` — `i32`.
-///
-/// # Returns
-/// `[(i32, i32); 6]`.
 pub fn hex_neighbors(q: i32, r: i32) -> [(i32, i32); 6] {
     [
         (q + 1, r),
@@ -167,15 +103,6 @@ pub fn hex_neighbors(q: i32, r: i32) -> [(i32, i32); 6] {
 }
 
 /// Returns the hex distance between two axial coordinates using cube distance.
-///
-/// # Parameters
-/// - `q1` — `i32`.
-/// - `r1` — `i32`.
-/// - `q2` — `i32`.
-/// - `r2` — `i32`.
-///
-/// # Returns
-/// `i32`.
 pub fn hex_distance(q1: i32, r1: i32, q2: i32, r2: i32) -> i32 {
     let s1 = -q1 - r1;
     let s2 = -q2 - r2;
@@ -186,13 +113,6 @@ pub fn hex_distance(q1: i32, r1: i32, q2: i32, r2: i32) -> i32 {
 }
 
 /// Rounds fractional axial coordinates to the nearest hex cell using cube rounding.
-///
-/// # Parameters
-/// - `q` — `f32`.
-/// - `r` — `f32`.
-///
-/// # Returns
-/// `(i32, i32)`.
 pub fn hex_round(q: f32, r: f32) -> (i32, i32) {
     let s = -q - r;
     let mut rq = q.round();
@@ -214,15 +134,6 @@ pub fn hex_round(q: f32, r: f32) -> (i32, i32) {
 }
 
 /// Returns all hex cells along a line between two axial coordinates.
-///
-/// # Parameters
-/// - `q1` — `i32`.
-/// - `r1` — `i32`.
-/// - `q2` — `i32`.
-/// - `r2` — `i32`.
-///
-/// # Returns
-/// `Vec<(i32, i32)>`.
 ///
 /// Uses linear interpolation in cube space with [`hex_round`] at each step.
 pub fn hex_line(q1: i32, r1: i32, q2: i32, r2: i32) -> Vec<(i32, i32)> {
@@ -246,14 +157,6 @@ pub fn hex_line(q1: i32, r1: i32, q2: i32, r2: i32) -> Vec<(i32, i32)> {
 
 /// Returns all cells at exactly `radius` distance from `(q, r)`.
 ///
-/// # Parameters
-/// - `q` — `i32`.
-/// - `r` — `i32`.
-/// - `radius` — `i32`.
-///
-/// # Returns
-/// `Vec<(i32, i32)>`.
-///
 /// For radius 0, returns just the center cell.
 pub fn hex_ring(q: i32, r: i32, radius: i32) -> Vec<(i32, i32)> {
     if radius == 0 {
@@ -275,14 +178,6 @@ pub fn hex_ring(q: i32, r: i32, radius: i32) -> Vec<(i32, i32)> {
 }
 
 /// Returns all hex cells from center outward to `radius`, ring by ring.
-///
-/// # Parameters
-/// - `q` — `i32`.
-/// - `r` — `i32`.
-/// - `radius` — `i32`.
-///
-/// # Returns
-/// `Vec<(i32, i32)>`.
 pub fn hex_spiral(q: i32, r: i32, radius: i32) -> Vec<(i32, i32)> {
     let mut results = vec![(q, r)];
     for k in 1..=radius {
@@ -292,14 +187,6 @@ pub fn hex_spiral(q: i32, r: i32, radius: i32) -> Vec<(i32, i32)> {
 }
 
 /// Returns all hex cells within `radius` distance (filled hex circle).
-///
-/// # Parameters
-/// - `q` — `i32`.
-/// - `r` — `i32`.
-/// - `radius` — `i32`.
-///
-/// # Returns
-/// `Vec<(i32, i32)>`.
 pub fn hex_area(q: i32, r: i32, radius: i32) -> Vec<(i32, i32)> {
     let mut results = Vec::new();
     for dq in -radius..=radius {
@@ -313,16 +200,6 @@ pub fn hex_area(q: i32, r: i32, radius: i32) -> Vec<(i32, i32)> {
 }
 
 /// Rotates hex coordinates `(q, r)` around `(center_q, center_r)` by `steps × 60°` clockwise.
-///
-/// # Parameters
-/// - `q` — `i32`.
-/// - `r` — `i32`.
-/// - `center_q` — `i32`.
-/// - `center_r` — `i32`.
-/// - `steps` — `i32`.
-///
-/// # Returns
-/// `(i32, i32)`.
 ///
 /// Uses cube coordinate rotation.
 pub fn hex_rotate(q: i32, r: i32, center_q: i32, center_r: i32, steps: i32) -> (i32, i32) {
@@ -347,16 +224,6 @@ pub fn hex_rotate(q: i32, r: i32, center_q: i32, center_r: i32, steps: i32) -> (
 
 /// Reflects hex coordinates across an axis through the center.
 ///
-/// # Parameters
-/// - `q` — `i32`.
-/// - `r` — `i32`.
-/// - `center_q` — `i32`.
-/// - `center_r` — `i32`.
-/// - `axis` — `&str`.
-///
-/// # Returns
-/// `(i32, i32)`.
-///
 /// Axis must be `"q"`, `"r"`, or `"s"`. Uses cube coordinate reflection.
 pub fn hex_reflect(q: i32, r: i32, center_q: i32, center_r: i32, axis: &str) -> (i32, i32) {
     let cq = q - center_q;
@@ -364,10 +231,10 @@ pub fn hex_reflect(q: i32, r: i32, center_q: i32, center_r: i32, axis: &str) -> 
     let cs = -cq - cr;
 
     let (nq, nr) = match axis {
-        "q" => (cq, cs), // swap r and s, keep q
-        "r" => (cs, cr), // swap q and s, keep r
-        "s" => (cr, cq), // swap q and r, keep s
-        _ => (cq, cr),   // identity for unknown axis
+        "q" => (cq, cs),  // swap r and s, keep q
+        "r" => (cs, cr),  // swap q and s, keep r
+        "s" => (cr, cq),  // swap q and r, keep s
+        _ => (cq, cr),    // identity for unknown axis
     };
 
     (nq + center_q, nr + center_r)

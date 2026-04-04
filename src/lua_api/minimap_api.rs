@@ -9,8 +9,8 @@ use std::rc::Rc;
 
 use mlua::prelude::*;
 
-use crate::minimap::{ColorMode, FogLevel, Minimap};
 use crate::lua_api::lua_types::{add_type_methods, LunaType};
+use crate::minimap::{ColorMode, FogLevel, Minimap};
 
 // ---------------------------------------------------------------------------
 // LuaMinimap
@@ -198,20 +198,17 @@ impl LuaUserData for LuaMinimap {
             Ok(this.inner.borrow().fog_enabled())
         });
 
-        methods.add_method_mut(
-            "setFogLevel",
-            |_, this, (x, y, level): (u32, u32, u8)| {
-                if x == 0 || y == 0 {
-                    return Err(LuaError::RuntimeError(
-                        "luna.minimap: setFogLevel coordinates are 1-based".into(),
-                    ));
-                }
-                this.inner
-                    .borrow_mut()
-                    .set_fog_level(x - 1, y - 1, FogLevel::from_u8(level));
-                Ok(())
-            },
-        );
+        methods.add_method_mut("setFogLevel", |_, this, (x, y, level): (u32, u32, u8)| {
+            if x == 0 || y == 0 {
+                return Err(LuaError::RuntimeError(
+                    "luna.minimap: setFogLevel coordinates are 1-based".into(),
+                ));
+            }
+            this.inner
+                .borrow_mut()
+                .set_fog_level(x - 1, y - 1, FogLevel::from_u8(level));
+            Ok(())
+        });
 
         /// Returns the fog level.
         /// @param x : integer
@@ -455,9 +452,7 @@ impl LuaUserData for LuaMinimap {
         ///
         /// # Returns
         /// The current zoom.
-        methods.add_method("getZoom", |_, this, ()| {
-            Ok(this.inner.borrow().zoom())
-        });
+        methods.add_method("getZoom", |_, this, ()| Ok(this.inner.borrow().zoom()));
 
         /// Sets the center.
         /// @param x : number
@@ -615,41 +610,33 @@ impl LuaUserData for LuaMinimap {
 
         // ── Markers ──
 
-        methods.add_method_mut(
-            "addMarker",
-            |lua, this, args: mlua::MultiValue| {
-                let mut iter = args.into_iter();
-                let x: f32 = lua
-                    .unpack(iter.next().unwrap_or(mlua::Value::Nil))?;
-                let y: f32 = lua
-                    .unpack(iter.next().unwrap_or(mlua::Value::Nil))?;
-                let desc: String = iter
-                    .next()
-                    .and_then(|v| lua.unpack::<String>(v).ok())
-                    .unwrap_or_default();
-                let r: f32 = iter
-                    .next()
-                    .and_then(|v| lua.unpack::<f32>(v).ok())
-                    .unwrap_or(1.0);
-                let g: f32 = iter
-                    .next()
-                    .and_then(|v| lua.unpack::<f32>(v).ok())
-                    .unwrap_or(0.0);
-                let b: f32 = iter
-                    .next()
-                    .and_then(|v| lua.unpack::<f32>(v).ok())
-                    .unwrap_or(0.0);
-                let a: f32 = iter
-                    .next()
-                    .and_then(|v| lua.unpack::<f32>(v).ok())
-                    .unwrap_or(1.0);
-                let id = this
-                    .inner
-                    .borrow_mut()
-                    .add_marker(x, y, desc, [r, g, b, a]);
-                Ok(id)
-            },
-        );
+        methods.add_method_mut("addMarker", |lua, this, args: mlua::MultiValue| {
+            let mut iter = args.into_iter();
+            let x: f32 = lua.unpack(iter.next().unwrap_or(mlua::Value::Nil))?;
+            let y: f32 = lua.unpack(iter.next().unwrap_or(mlua::Value::Nil))?;
+            let desc: String = iter
+                .next()
+                .and_then(|v| lua.unpack::<String>(v).ok())
+                .unwrap_or_default();
+            let r: f32 = iter
+                .next()
+                .and_then(|v| lua.unpack::<f32>(v).ok())
+                .unwrap_or(1.0);
+            let g: f32 = iter
+                .next()
+                .and_then(|v| lua.unpack::<f32>(v).ok())
+                .unwrap_or(0.0);
+            let b: f32 = iter
+                .next()
+                .and_then(|v| lua.unpack::<f32>(v).ok())
+                .unwrap_or(0.0);
+            let a: f32 = iter
+                .next()
+                .and_then(|v| lua.unpack::<f32>(v).ok())
+                .unwrap_or(1.0);
+            let id = this.inner.borrow_mut().add_marker(x, y, desc, [r, g, b, a]);
+            Ok(id)
+        });
 
         /// Removes marker from the collection.
         /// @param id : integer

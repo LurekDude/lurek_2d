@@ -8,7 +8,7 @@
 //! All public items are documented. See the parent module for architectural context
 //! and the `luna.*` Lua API for the scripting interface.
 //!
-use crate::graphics::Color;
+use crate::math::Color;
 use crate::math::Vec2;
 
 /// A textured game object with position, scale, rotation, and tint color.

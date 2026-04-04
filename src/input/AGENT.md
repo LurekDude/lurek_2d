@@ -2,7 +2,7 @@
 
 | Property | Value |
 |----------|-------|
-| **Tier** | Tier 1 — Basic Core |
+| **Tier** | Tier 1 — Core Engine Subsystems |
 | **Lua API** | `luna.input` |
 | **Source** | `src/input/` |
 | **Tests** | `tests/input_tests.rs` |

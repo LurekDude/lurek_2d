@@ -1,7 +1,7 @@
 //! Dijkstra-based flow field for crowd pathfinding.
 //! Moved from `ai/flowfield`; used by the Lua `luna.ai.newFlowField` API.
 //!
-//! Note: this type operates on [`PathGrid`].  The higher-level
+//! Note: this type operates on [`SimpleGrid`].  The higher-level
 //! [`crate::pathfinding::FlowField`] operates on [`NavGrid`] instead.
 
 use std::collections::VecDeque;
@@ -13,7 +13,7 @@ use std::collections::VecDeque;
 /// - `height` — `usize`.
 /// - `goal` — `Option<(usize, usize)>`.
 ///
-/// Built from a PathGrid. Each cell stores a direction vector and BFS distance.
+/// Built from a SimpleGrid. Each cell stores a direction vector and BFS distance.
 pub struct FlowField {
     /// Grid width.
     pub width: usize,
@@ -25,12 +25,12 @@ pub struct FlowField {
     distances: Vec<f32>,
     /// Current goal cell (0-based), if set.
     pub goal: Option<(usize, usize)>,
-    /// Walkability data copied from the PathGrid.
+    /// Walkability data copied from the SimpleGrid.
     walkable: Vec<bool>,
 }
 
 impl FlowField {
-    /// Creates a new FlowField from a PathGrid's dimensions and walkability.
+    /// Creates a new FlowField from a SimpleGrid's dimensions and walkability.
     ///
     /// # Parameters
     /// - `width` — `usize`.

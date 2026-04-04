@@ -1,22 +1,8 @@
 //! Data compression and decompression using deflate, gzip, zlib, and LZ4.
-//!
-//! This module is part of Luna2D's `data` subsystem and provides the implementation
-//! details for compress-related operations and data management.
-//! Key types exported from this module: `CompressFormat`.
-//! Primary functions: `parse_str()`, `compress()`, `decompress()`.
-//!
-//! All public items are documented. See the parent module for architectural context
-//! and the `luna.*` Lua API for the scripting interface.
 
 use std::io::{Read, Write};
 
-/// Supported compression formats. Consult the module-level documentation for the broader usage context and preconditions.
-///
-/// # Variants
-/// - `Deflate` — Deflate variant.
-/// - `Gzip` — Gzip variant.
-/// - `Lz4` — Lz4 variant.
-/// - `Zlib` — Zlib variant.
+/// Supported compression formats.
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub enum CompressFormat {
     /// Raw deflate.
@@ -30,13 +16,7 @@ pub enum CompressFormat {
 }
 
 impl CompressFormat {
-    /// Parse a format name string. Returns an error if the source data is malformed or missing.
-    ///
-    /// # Parameters
-    /// - `s` — `&str`.
-    ///
-    /// # Returns
-    /// `Result<Self, String>`.
+    /// Parse a format name string.
     pub fn parse_str(s: &str) -> Result<Self, String> {
         match s.to_lowercase().as_str() {
             "deflate" => Ok(CompressFormat::Deflate),
@@ -52,14 +32,6 @@ impl CompressFormat {
 }
 
 /// Compress data using the specified format and compression level (0-9).
-///
-/// # Parameters
-/// - `data` — `&[u8]`.
-/// - `format` — `CompressFormat`.
-/// - `level` — `u32`.
-///
-/// # Returns
-/// `Result<Vec<u8>, String>`.
 pub fn compress(data: &[u8], format: CompressFormat, level: u32) -> Result<Vec<u8>, String> {
     let level = level.min(9);
     let compression = flate2::Compression::new(level);
@@ -97,13 +69,6 @@ pub fn compress(data: &[u8], format: CompressFormat, level: u32) -> Result<Vec<u
 }
 
 /// Decompress data using the specified format.
-///
-/// # Parameters
-/// - `data` — `&[u8]`.
-/// - `format` — `CompressFormat`.
-///
-/// # Returns
-/// `Result<Vec<u8>, String>`.
 pub fn decompress(data: &[u8], format: CompressFormat) -> Result<Vec<u8>, String> {
     match format {
         CompressFormat::Deflate => {
