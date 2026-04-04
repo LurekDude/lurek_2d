@@ -135,13 +135,38 @@ pub struct WindowConfig {
 
 /// Flags to enable or disable optional engine subsystems.
 ///
+/// All flags default to `true` (all systems on) except `debug`, which defaults to
+/// `true` only in debug builds.  Set a flag to `false` in `conf.lua` to skip
+/// registering the matching `luna.*` namespace entirely.
+///
 /// # Fields
-/// - `audio` — Enable the rodio audio subsystem.
-/// - `physics` — Enable the physics world subsystem.
-/// - `graphics` — Enable the graphics subsystem.
-/// - `input` — Enable the input subsystem.
-/// - `timer` — Enable the timer subsystem.
-/// - `filesystem` — Enable the filesystem subsystem.
+/// - `audio` — rodio audio subsystem (`luna.audio`).
+/// - `physics` — rapier2d physics world (`luna.physics`).
+/// - `graphics` — GPU render pipeline (`luna.graphics`, `luna.font`, `luna.sprite`).
+/// - `input` — keyboard / mouse / gamepad input (`luna.input`).
+/// - `timer` — frame timer and scheduled callbacks (`luna.timer`).
+/// - `filesystem` — sandboxed game filesystem (`luna.filesystem`).
+/// - `window` — window state queries (`luna.window`).
+/// - `particle` — 2D particle emitters (`luna.particle`).
+/// - `image` — CPU-side image manipulation (`luna.image`).
+/// - `gui` — retained-mode GUI widgets (`luna.gui`).
+/// - `overlay` — fullscreen overlay and post-processing effects (`luna.overlay`, `luna.postfx`).
+/// - `tilemap` — tile maps, tile sets, and map generation (`luna.tilemap`).
+/// - `scene` — scene stack and transition management (`luna.scene`).
+/// - `savegame` — save/load orchestration and schema versioning (`luna.savegame`).
+/// - `entity` — lightweight ECS primitives (`luna.entity`).
+/// - `ai` — FSMs, behaviour trees, and steering (`luna.ai`, `luna.steering`).
+/// - `pathfinding` — A★ and flow-field navigation grids (`luna.pathfinding`).
+/// - `thread` — background Rust threads and `Channel` objects (`luna.thread`).
+/// - `graph` — directed graphs and flow simulation (`luna.graph`).
+/// - `data` — binary data helpers, encoding/compression, and serial (`luna.data`, `luna.serial`).
+/// - `compute` — dense numerical arrays and `DataFrame` (`luna.compute`, `luna.dataframe`).
+/// - `minimap` — minimap extraction and FOV masking (`luna.minimap`).
+/// - `modding` — mod discovery and load ordering (`luna.modding`).
+/// - `pipeline` — data transformation pipelines and pattern helpers (`luna.pipeline`, `luna.patterns`).
+/// - `system` — system information queries (`luna.system`).
+/// - `localization` — string localisation tables (`luna.localization`).
+/// - `debug` — debug bridge, doc server, and automation helpers (`luna.debug`, `luna.debugbridge`, `luna.docs`, `luna.automation`).
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ModulesConfig {
     pub audio: bool,
@@ -150,6 +175,70 @@ pub struct ModulesConfig {
     pub input: bool,
     pub timer: bool,
     pub filesystem: bool,
+    pub window: bool,
+    pub particle: bool,
+    pub image: bool,
+    pub gui: bool,
+    pub overlay: bool,
+    pub tilemap: bool,
+    pub scene: bool,
+    pub savegame: bool,
+    pub entity: bool,
+    pub ai: bool,
+    pub pathfinding: bool,
+    pub thread: bool,
+    pub graph: bool,
+    pub data: bool,
+    pub compute: bool,
+    pub minimap: bool,
+    pub modding: bool,
+    pub pipeline: bool,
+    pub system: bool,
+    pub localization: bool,
+    pub debug: bool,
+    /// Enable luna.animation sprite animation API.
+    pub animation: bool,
+    /// Enable luna.camera Camera2D API.
+    pub camera: bool,
+    /// Enable luna.network UDP networking API.
+    pub network: bool,
+    /// Enable luna.procgen procedural generation API.
+    pub procgen: bool,
+    /// Enable luna.raycaster DDA raycaster API.
+    pub raycaster: bool,
+    /// Enable luna.spine skeletal animation API.
+    pub spine: bool,
+}
+
+impl ModulesConfig {
+    /// Enforces dependency constraints so that a partially-disabled config is never
+    /// internally inconsistent.  Call this after reading `conf.lua`.
+    ///
+    /// Current rules:
+    /// - `minimap` requires `graphics` (the minimap samples the render output).
+    /// - `particle` requires `graphics` (particles are draw calls).
+    /// - `gui` requires `graphics` (widgets render to the GPU surface).
+    /// - `overlay` requires `graphics` (overlay and postfx are render passes).
+    pub fn validate_and_fix(&mut self) {
+        if !self.graphics {
+            if self.minimap {
+                log::warn!("modules.minimap disabled: requires modules.graphics");
+                self.minimap = false;
+            }
+            if self.particle {
+                log::warn!("modules.particle disabled: requires modules.graphics");
+                self.particle = false;
+            }
+            if self.gui {
+                log::warn!("modules.gui disabled: requires modules.graphics");
+                self.gui = false;
+            }
+            if self.overlay {
+                log::warn!("modules.overlay disabled: requires modules.graphics");
+                self.overlay = false;
+            }
+        }
+    }
 }
 
 /// Frame rate cap and other performance tuning options.
@@ -196,6 +285,33 @@ impl Default for Config {
                 input: true,
                 timer: true,
                 filesystem: true,
+                window: true,
+                particle: true,
+                image: true,
+                gui: true,
+                overlay: true,
+                tilemap: true,
+                scene: true,
+                savegame: true,
+                entity: true,
+                ai: true,
+                pathfinding: true,
+                thread: true,
+                graph: true,
+                data: true,
+                compute: true,
+                minimap: true,
+                modding: true,
+                pipeline: true,
+                system: true,
+                localization: true,
+                debug: cfg!(debug_assertions),
+                animation: true,
+                camera: true,
+                network: true,
+                procgen: true,
+                raycaster: true,
+                spine: true,
             },
             performance: PerformanceConfig { target_fps: 60 },
             identity: None,
@@ -326,6 +442,37 @@ impl Config {
         modules
             .set("filesystem", config.modules.filesystem)
             .unwrap();
+        modules.set("window", config.modules.window).unwrap();
+        modules.set("particle", config.modules.particle).unwrap();
+        modules.set("image", config.modules.image).unwrap();
+        modules.set("gui", config.modules.gui).unwrap();
+        modules.set("overlay", config.modules.overlay).unwrap();
+        modules.set("tilemap", config.modules.tilemap).unwrap();
+        modules.set("scene", config.modules.scene).unwrap();
+        modules.set("savegame", config.modules.savegame).unwrap();
+        modules.set("entity", config.modules.entity).unwrap();
+        modules.set("ai", config.modules.ai).unwrap();
+        modules
+            .set("pathfinding", config.modules.pathfinding)
+            .unwrap();
+        modules.set("thread", config.modules.thread).unwrap();
+        modules.set("graph", config.modules.graph).unwrap();
+        modules.set("data", config.modules.data).unwrap();
+        modules.set("compute", config.modules.compute).unwrap();
+        modules.set("minimap", config.modules.minimap).unwrap();
+        modules.set("modding", config.modules.modding).unwrap();
+        modules.set("pipeline", config.modules.pipeline).unwrap();
+        modules.set("system", config.modules.system).unwrap();
+        modules
+            .set("localization", config.modules.localization)
+            .unwrap();
+        modules.set("debug", config.modules.debug).unwrap();
+        modules.set("animation", config.modules.animation).unwrap();
+        modules.set("camera", config.modules.camera).unwrap();
+        modules.set("network", config.modules.network).unwrap();
+        modules.set("procgen", config.modules.procgen).unwrap();
+        modules.set("raycaster", config.modules.raycaster).unwrap();
+        modules.set("spine", config.modules.spine).unwrap();
         t.set("modules", modules).unwrap();
 
         let perf = lua.create_table().unwrap();
@@ -440,6 +587,87 @@ impl Config {
             }
             if let Ok(v) = modules.get::<_, bool>("filesystem") {
                 config.modules.filesystem = v;
+            }
+            if let Ok(v) = modules.get::<_, bool>("window") {
+                config.modules.window = v;
+            }
+            if let Ok(v) = modules.get::<_, bool>("particle") {
+                config.modules.particle = v;
+            }
+            if let Ok(v) = modules.get::<_, bool>("image") {
+                config.modules.image = v;
+            }
+            if let Ok(v) = modules.get::<_, bool>("gui") {
+                config.modules.gui = v;
+            }
+            if let Ok(v) = modules.get::<_, bool>("overlay") {
+                config.modules.overlay = v;
+            }
+            if let Ok(v) = modules.get::<_, bool>("tilemap") {
+                config.modules.tilemap = v;
+            }
+            if let Ok(v) = modules.get::<_, bool>("scene") {
+                config.modules.scene = v;
+            }
+            if let Ok(v) = modules.get::<_, bool>("savegame") {
+                config.modules.savegame = v;
+            }
+            if let Ok(v) = modules.get::<_, bool>("entity") {
+                config.modules.entity = v;
+            }
+            if let Ok(v) = modules.get::<_, bool>("ai") {
+                config.modules.ai = v;
+            }
+            if let Ok(v) = modules.get::<_, bool>("pathfinding") {
+                config.modules.pathfinding = v;
+            }
+            if let Ok(v) = modules.get::<_, bool>("thread") {
+                config.modules.thread = v;
+            }
+            if let Ok(v) = modules.get::<_, bool>("graph") {
+                config.modules.graph = v;
+            }
+            if let Ok(v) = modules.get::<_, bool>("data") {
+                config.modules.data = v;
+            }
+            if let Ok(v) = modules.get::<_, bool>("compute") {
+                config.modules.compute = v;
+            }
+            if let Ok(v) = modules.get::<_, bool>("minimap") {
+                config.modules.minimap = v;
+            }
+            if let Ok(v) = modules.get::<_, bool>("modding") {
+                config.modules.modding = v;
+            }
+            if let Ok(v) = modules.get::<_, bool>("pipeline") {
+                config.modules.pipeline = v;
+            }
+            if let Ok(v) = modules.get::<_, bool>("system") {
+                config.modules.system = v;
+            }
+            if let Ok(v) = modules.get::<_, bool>("localization") {
+                config.modules.localization = v;
+            }
+            if let Ok(v) = modules.get::<_, bool>("debug") {
+                config.modules.debug = v;
+            }
+            if let Ok(v) = modules.get::<_, bool>("animation") {
+                config.modules.animation = v;
+            }
+            if let Ok(v) = modules.get::<_, bool>("camera") {
+                config.modules.camera = v;
+            }
+            if let Ok(v) = modules.get::<_, bool>("network") {
+                config.modules.network = v;
+            }
+            if let Ok(v) = modules.get::<_, bool>("procgen") {
+                config.modules.procgen = v;
+            }
+            if let Ok(v) = modules.get::<_, bool>("raycaster") {
+                config.modules.raycaster = v;
+            }
+            if let Ok(v) = modules.get::<_, bool>("spine") {
+                config.modules.spine = v;
             }
         }
 

@@ -191,18 +191,27 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
     // Scene stack operations
     // =======================================================================
 
-    // luna.scene.push(scene [, transition [, duration]])
+    // luna.scene.push(scene [, transition [, duration [, params]]])
     {
         let st = state.clone();
-        /// Adds an item.
+        /// Pushes a scene onto the stack.
+        ///
+        /// Calls `pause()` on the previous top scene and `enter(params)` on the new one.
         ///
         /// @param scene : table
         /// @param transition : string?
         /// @param duration : number?
+        /// @param params : any?  Forwarded as first argument to the scene's `enter()` callback.
         scene_table.set(
             "push",
             lua.create_function(
-                move |lua, (scene, transition, duration): (LuaTable, Option<String>, Option<f32>)| {
+                move |lua,
+                      (scene, transition, duration, params): (
+                    LuaTable,
+                    Option<String>,
+                    Option<f32>,
+                    Option<LuaValue>,
+                )| {
                     let trans = transition
                         .as_deref()
                         .map(TransitionType::from_lua_str)
@@ -223,9 +232,10 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
 
                     s.scene_refs.insert(scene_id, key);
 
-                    // Call enter() on the new scene
+                    // Call enter(params) on the new scene; params is nil when not provided
+                    let params_arg = params.unwrap_or(LuaValue::Nil);
                     if let Some(new_key) = s.scene_refs.get(&scene_id) {
-                        let _ = call_scene_method(lua, new_key, "enter", ());
+                        let _ = call_scene_method(lua, new_key, "enter", params_arg);
                     }
 
                     Ok(())
@@ -273,18 +283,27 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
         )?;
     }
 
-    // luna.scene.switchTo(scene [, transition [, duration]])
+    // luna.scene.switchTo(scene [, transition [, duration [, params]]])
     {
         let st = state.clone();
-        /// Switch to.
+        /// Replaces the top scene with a new one.
+        ///
+        /// Calls `leave()` on the old scene and `enter(params)` on the new one.
         ///
         /// @param scene : table
         /// @param transition : string?
         /// @param duration : number?
+        /// @param params : any?  Forwarded as first argument to the scene's `enter()` callback.
         scene_table.set(
             "switchTo",
             lua.create_function(
-                move |lua, (scene, transition, duration): (LuaTable, Option<String>, Option<f32>)| {
+                move |lua,
+                      (scene, transition, duration, params): (
+                    LuaTable,
+                    Option<String>,
+                    Option<f32>,
+                    Option<LuaValue>,
+                )| {
                     let trans = transition
                         .as_deref()
                         .map(TransitionType::from_lua_str)
@@ -305,9 +324,10 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
 
                     s.scene_refs.insert(scene_id, key);
 
-                    // Call enter() on new scene
+                    // Call enter(params) on the new scene; params is nil when not provided
+                    let params_arg = params.unwrap_or(LuaValue::Nil);
                     if let Some(new_key) = s.scene_refs.get(&scene_id) {
-                        let _ = call_scene_method(lua, new_key, "enter", ());
+                        let _ = call_scene_method(lua, new_key, "enter", params_arg);
                     }
 
                     Ok(())

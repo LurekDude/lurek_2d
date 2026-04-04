@@ -177,6 +177,40 @@ describe("Lifecycle callbacks", function()
         expect_equal("s1:leave", log[1])
         expect_equal("s2:enter", log[2])
     end)
+
+    it("push forwards params to enter callback", function()
+        luna.scene.clear()
+        local received = nil
+        local s = { enter = function(self, p) received = p end }
+
+        luna.scene.push(s, nil, nil, { level = 3, mode = "hard" })
+        expect_type("table", received)
+        expect_equal(3, received.level)
+        expect_equal("hard", received.mode)
+    end)
+
+    it("push with no params calls enter with nil", function()
+        luna.scene.clear()
+        local called = false
+        local received = "sentinel"
+        local s = { enter = function(self, p) called = true; received = p end }
+
+        luna.scene.push(s)
+        expect_true(called)
+        expect_equal(nil, received)
+    end)
+
+    it("switchTo forwards params to enter callback", function()
+        luna.scene.clear()
+        local received = nil
+        local s1 = {}
+        local s2 = { enter = function(self, p) received = p end }
+
+        luna.scene.push(s1)
+        luna.scene.switchTo(s2, nil, nil, { map = "village" })
+        expect_type("table", received)
+        expect_equal("village", received.map)
+    end)
 end)
 
 test_summary()
