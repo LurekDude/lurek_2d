@@ -446,4 +446,133 @@ describe("full workflow", function()
     end)
 end)
 
+-- ── setTerrainData ──
+
+describe("terrain data bulk set", function()
+    it("sets all cells from a flat table", function()
+        local m = luna.minimap.newMinimap(3, 2)
+        m:setTerrainData({1, 2, 3, 4, 5, 6})
+        expect_equal(1, m:getTerrain(1, 1))
+        expect_equal(2, m:getTerrain(2, 1))
+        expect_equal(3, m:getTerrain(3, 1))
+        expect_equal(4, m:getTerrain(1, 2))
+        expect_equal(5, m:getTerrain(2, 2))
+        expect_equal(6, m:getTerrain(3, 2))
+    end)
+
+    it("ignores excess values beyond grid size", function()
+        local m = luna.minimap.newMinimap(2, 2)
+        m:setTerrainData({7, 8, 9, 10, 11, 12, 13})
+        expect_equal(7, m:getTerrain(1, 1))
+        expect_equal(10, m:getTerrain(2, 2))
+        -- grid is 2x2 so only first 4 values should apply
+    end)
+end)
+
+-- ── Tile descriptions ──
+
+describe("tile descriptions", function()
+    it("returns nil for unset types", function()
+        local m = luna.minimap.newMinimap(5, 5)
+        assert(m:getTileDescription(0) == nil)
+        assert(m:getTileDescription(99) == nil)
+    end)
+
+    it("sets and retrieves a description", function()
+        local m = luna.minimap.newMinimap(5, 5)
+        m:setTileDescription(1, "Grass")
+        expect_equal("Grass", m:getTileDescription(1))
+    end)
+
+    it("overwrites existing description", function()
+        local m = luna.minimap.newMinimap(5, 5)
+        m:setTileDescription(0, "Water")
+        m:setTileDescription(0, "Deep water")
+        expect_equal("Deep water", m:getTileDescription(0))
+    end)
+
+    it("handles multiple types independently", function()
+        local m = luna.minimap.newMinimap(5, 5)
+        m:setTileDescription(0, "Water")
+        m:setTileDescription(1, "Forest")
+        m:setTileDescription(2, "Mountain")
+        expect_equal("Water",    m:getTileDescription(0))
+        expect_equal("Forest",   m:getTileDescription(1))
+        expect_equal("Mountain", m:getTileDescription(2))
+        assert(m:getTileDescription(3) == nil)
+    end)
+end)
+
+-- ── getHoverInfo ──
+
+describe("getHoverInfo", function()
+    it("returns nil outside minimap bounds", function()
+        local m = luna.minimap.newMinimap(4, 4, 100, 100)
+        assert(m:getHoverInfo(-1, 50, 0, 0) == nil)
+        assert(m:getHoverInfo(50, -1, 0, 0) == nil)
+        assert(m:getHoverInfo(101, 50, 0, 0) == nil)
+        assert(m:getHoverInfo(50, 101, 0, 0) == nil)
+    end)
+
+    it("returns tile description for hovered cell", function()
+        local m = luna.minimap.newMinimap(4, 4, 100, 100)
+        m:setTerrainData({1,1,1,1, 1,1,1,1, 1,1,1,1, 1,1,1,1})
+        m:setTileDescription(1, "Plains")
+        local info = m:getHoverInfo(1, 1, 0, 0)
+        expect_equal("Plains", info)
+    end)
+
+    it("returns nil when terrain has no description", function()
+        local m = luna.minimap.newMinimap(4, 4, 100, 100)
+        m:setTerrain(1, 1, 99)
+        assert(m:getHoverInfo(1, 1, 0, 0) == nil)
+    end)
+end)
+
+-- ── setClickable / isClickable ──
+
+describe("clickable", function()
+    it("defaults to true", function()
+        local m = luna.minimap.newMinimap(10, 10)
+        assert(m:isClickable())
+    end)
+
+    it("can be disabled", function()
+        local m = luna.minimap.newMinimap(10, 10)
+        m:setClickable(false)
+        assert(not m:isClickable())
+    end)
+
+    it("can be re-enabled", function()
+        local m = luna.minimap.newMinimap(10, 10)
+        m:setClickable(false)
+        m:setClickable(true)
+        assert(m:isClickable())
+    end)
+end)
+
+-- ── getCenterX / getCenterY ──
+
+describe("center individual getters", function()
+    it("getCenterX returns the X component", function()
+        local m = luna.minimap.newMinimap(10, 10)
+        m:setCenter(3.5, 7.25)
+        expect_near(3.5, m:getCenterX())
+    end)
+
+    it("getCenterY returns the Y component", function()
+        local m = luna.minimap.newMinimap(10, 10)
+        m:setCenter(3.5, 7.25)
+        expect_near(7.25, m:getCenterY())
+    end)
+
+    it("getCenterX and getCenterY match getCenter", function()
+        local m = luna.minimap.newMinimap(10, 10)
+        m:setCenter(1.0, 9.0)
+        local cx, cy = m:getCenter()
+        expect_near(cx, m:getCenterX())
+        expect_near(cy, m:getCenterY())
+    end)
+end)
+
 test_summary()

@@ -724,6 +724,131 @@ impl LuaUserData for LuaMinimap {
             Ok(this.inner.borrow().anti_alias())
         });
 
+        // ── Bulk terrain data ──
+
+        /// Sets the terrain data from a flat 1-based Lua table of integers (row-major).
+        /// @param data : table
+        ///
+        /// # Parameters
+        /// - `data` — `table`.
+        methods.add_method_mut("setTerrainData", |_, this, data: LuaTable| {
+            let len = data.len()? as usize;
+            let mut values = Vec::with_capacity(len);
+            for i in 1..=len {
+                let v: u32 = data.get(i)?;
+                values.push(v);
+            }
+            this.inner.borrow_mut().set_terrain_data(&values);
+            Ok(())
+        });
+
+        // ── Tile descriptions ──
+
+        /// Set a hover tooltip string for a terrain type ID.
+        /// @param type_id : integer
+        /// @param desc : string
+        ///
+        /// # Parameters
+        /// - `type_id` — `integer`.
+        /// - `desc` — `string`.
+        methods.add_method_mut(
+            "setTileDescription",
+            |_, this, (type_id, desc): (u32, String)| {
+                this.inner.borrow_mut().set_tile_description(type_id, desc);
+                Ok(())
+            },
+        );
+
+        /// Get the hover tooltip string for a terrain type ID, or nil if not set.
+        /// @param type_id : integer
+        /// @return string|nil
+        ///
+        /// # Parameters
+        /// - `type_id` — `integer`.
+        ///
+        /// # Returns
+        /// `string|nil`.
+        methods.add_method("getTileDescription", |_, this, type_id: u32| {
+            Ok(this
+                .inner
+                .borrow()
+                .get_tile_description(type_id)
+                .map(|s| s.to_string()))
+        });
+
+        // ── Hover info ──
+
+        /// Get hover tooltip text for the element under the given screen coordinates.
+        ///
+        /// Returns the tile description for the hovered grid cell, or nil if outside the
+        /// minimap bounds or no description is set for that terrain type.
+        ///
+        /// @param sx : number
+        /// @param sy : number
+        /// @param minimap_x : number
+        /// @param minimap_y : number
+        /// @return string|nil
+        ///
+        /// # Parameters
+        /// - `sx` — `number`.
+        /// - `sy` — `number`.
+        /// - `minimap_x` — `number`.
+        /// - `minimap_y` — `number`.
+        ///
+        /// # Returns
+        /// `string|nil`.
+        methods.add_method(
+            "getHoverInfo",
+            |_, this, (sx, sy, mx, my): (f32, f32, f32, f32)| {
+                Ok(this
+                    .inner
+                    .borrow()
+                    .get_hover_info(sx, sy, mx, my)
+                    .map(|s| s.to_string()))
+            },
+        );
+
+        // ── Clickable ──
+
+        /// Set whether this minimap responds to click hit-testing.
+        /// @param enabled : boolean
+        ///
+        /// # Parameters
+        /// - `enabled` — `boolean`.
+        methods.add_method_mut("setClickable", |_, this, enabled: bool| {
+            this.inner.borrow_mut().set_clickable(enabled);
+            Ok(())
+        });
+
+        /// Returns whether this minimap responds to click hit-testing.
+        /// @return boolean
+        ///
+        /// # Returns
+        /// `boolean`.
+        methods.add_method("isClickable", |_, this, ()| {
+            Ok(this.inner.borrow().is_clickable())
+        });
+
+        // ── Individual center getters ──
+
+        /// Returns the center X coordinate.
+        /// @return number
+        ///
+        /// # Returns
+        /// `number`.
+        methods.add_method("getCenterX", |_, this, ()| {
+            Ok(this.inner.borrow().center_x())
+        });
+
+        /// Returns the center Y coordinate.
+        /// @return number
+        ///
+        /// # Returns
+        /// `number`.
+        methods.add_method("getCenterY", |_, this, ()| {
+            Ok(this.inner.borrow().center_y())
+        });
+
         // ── Coordinate conversion ──
 
         methods.add_method(

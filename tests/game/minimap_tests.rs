@@ -615,3 +615,116 @@ fn minimap_full_workflow() {
     .exec()
     .expect("minimap_full_workflow failed");
 }
+
+// ── setTerrainData ──
+
+#[test]
+fn minimap_terrain_data_bulk() {
+    let lua = make_vm();
+    lua.load(
+        r#"
+        local m = luna.minimap.newMinimap(3, 2)
+        -- 3x2 grid, row-major: row 1 = types 1,2,3; row 2 = types 4,5,6
+        m:setTerrainData({1, 2, 3, 4, 5, 6})
+        assert(m:getTerrain(1, 1) == 1)
+        assert(m:getTerrain(2, 1) == 2)
+        assert(m:getTerrain(3, 1) == 3)
+        assert(m:getTerrain(1, 2) == 4)
+        assert(m:getTerrain(2, 2) == 5)
+        assert(m:getTerrain(3, 2) == 6)
+    "#,
+    )
+    .exec()
+    .expect("minimap_terrain_data_bulk failed");
+}
+
+// ── Tile descriptions ──
+
+#[test]
+fn minimap_tile_descriptions() {
+    let lua = make_vm();
+    lua.load(
+        r#"
+        local m = luna.minimap.newMinimap(5, 5)
+        assert(m:getTileDescription(0) == nil)
+        m:setTileDescription(0, "Water")
+        m:setTileDescription(1, "Grass")
+        assert(m:getTileDescription(0) == "Water")
+        assert(m:getTileDescription(1) == "Grass")
+        assert(m:getTileDescription(2) == nil)
+        -- overwrite
+        m:setTileDescription(0, "Deep water")
+        assert(m:getTileDescription(0) == "Deep water")
+    "#,
+    )
+    .exec()
+    .expect("minimap_tile_descriptions failed");
+}
+
+// ── getHoverInfo ──
+
+#[test]
+fn minimap_hover_info() {
+    let lua = make_vm();
+    lua.load(
+        r#"
+        -- 4x4 grid, 100x100 display, centered at (2,2)
+        local m = luna.minimap.newMinimap(4, 4, 100, 100)
+        m:setTerrainData({1,1,1,1, 1,2,2,1, 1,2,2,1, 1,1,1,1})
+        m:setTileDescription(1, "Plains")
+        m:setTileDescription(2, "Forest")
+
+        -- screen coords outside minimap should return nil
+        assert(m:getHoverInfo(-10, -10, 0, 0) == nil)
+        assert(m:getHoverInfo(110, 110, 0, 0) == nil)
+
+        -- top-left cell (0,0 in grid) = terrain 1 → "Plains"
+        local info = m:getHoverInfo(1, 1, 0, 0)
+        assert(info == "Plains", "expected Plains got " .. tostring(info))
+
+        -- terrain type with no description → nil
+        local m2 = luna.minimap.newMinimap(4, 4, 100, 100)
+        m2:setTerrain(1, 1, 99)
+        assert(m2:getHoverInfo(1, 1, 0, 0) == nil)
+    "#,
+    )
+    .exec()
+    .expect("minimap_hover_info failed");
+}
+
+// ── setClickable / isClickable ──
+
+#[test]
+fn minimap_clickable() {
+    let lua = make_vm();
+    lua.load(
+        r#"
+        local m = luna.minimap.newMinimap(10, 10)
+        -- default is true
+        assert(m:isClickable())
+        m:setClickable(false)
+        assert(not m:isClickable())
+        m:setClickable(true)
+        assert(m:isClickable())
+    "#,
+    )
+    .exec()
+    .expect("minimap_clickable failed");
+}
+
+// ── getCenterX / getCenterY ──
+
+#[test]
+fn minimap_center_individual_getters() {
+    let lua = make_vm();
+    lua.load(
+        r#"
+        local m = luna.minimap.newMinimap(10, 10)
+        m:setCenter(3.5, 7.25)
+        assert(math.abs(m:getCenterX() - 3.5) < 0.001)
+        assert(math.abs(m:getCenterY() - 7.25) < 0.001)
+    "#,
+    )
+    .exec()
+    .expect("minimap_center_individual_getters failed");
+}
