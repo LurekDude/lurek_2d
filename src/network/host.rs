@@ -183,8 +183,7 @@ impl NetworkHost {
         packet: Packet,
     ) -> Result<(), NetworkError> {
         let host = self.host_mut()?;
-        let peer = host
-            .peer_mut(peer_id);
+        let peer = host.peer_mut(peer_id);
         let _ = peer.send(channel_id, &packet);
         Ok(())
     }
@@ -269,7 +268,9 @@ impl NetworkHost {
     /// `Result<Duration, NetworkError>`.
     pub fn round_trip_time(&self, peer_id: PeerID) -> Result<Duration, NetworkError> {
         let host = self.host()?;
-        let peer = host.get_peer(peer_id).ok_or(NetworkError::InvalidPeer(peer_id.0))?;
+        let peer = host
+            .get_peer(peer_id)
+            .ok_or(NetworkError::InvalidPeer(peer_id.0))?;
         Ok(peer.round_trip_time())
     }
 
@@ -282,7 +283,9 @@ impl NetworkHost {
     /// `Result<&'static str, NetworkError>`.
     pub fn peer_state(&self, peer_id: PeerID) -> Result<&'static str, NetworkError> {
         let host = self.host()?;
-        let peer = host.get_peer(peer_id).ok_or(NetworkError::InvalidPeer(peer_id.0))?;
+        let peer = host
+            .get_peer(peer_id)
+            .ok_or(NetworkError::InvalidPeer(peer_id.0))?;
         let state_str = match peer.state() {
             enet::PeerState::Disconnected => "disconnected",
             enet::PeerState::Connecting => "connecting",
@@ -307,7 +310,9 @@ impl NetworkHost {
     /// `Result<Option<SocketAddr>, NetworkError>`.
     pub fn peer_address(&self, peer_id: PeerID) -> Result<Option<SocketAddr>, NetworkError> {
         let host = self.host()?;
-        let peer = host.get_peer(peer_id).ok_or(NetworkError::InvalidPeer(peer_id.0))?;
+        let peer = host
+            .get_peer(peer_id)
+            .ok_or(NetworkError::InvalidPeer(peer_id.0))?;
         Ok(peer.address())
     }
 
@@ -410,7 +415,9 @@ impl NetworkHost {
     /// `Result<PeerStats, NetworkError>`.
     pub fn peer_stats(&self, peer_id: PeerID) -> Result<PeerStats, NetworkError> {
         let host = self.host()?;
-        let peer = host.get_peer(peer_id).ok_or(NetworkError::InvalidPeer(peer_id.0))?;
+        let peer = host
+            .get_peer(peer_id)
+            .ok_or(NetworkError::InvalidPeer(peer_id.0))?;
         Ok(PeerStats {
             round_trip_time: peer.round_trip_time().as_millis() as u32,
             round_trip_time_variance: peer.round_trip_time_variance().as_millis() as u32,

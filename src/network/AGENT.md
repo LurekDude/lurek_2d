@@ -5,7 +5,7 @@
 | **Tier** | Design-stage / Stub |
 | **Lua API** | `luna.network` |
 | **Source** | `src/network/` |
-| **Tests** | `tests/network_tests.rs` |
+| **Tests** | `tests/unit/network_tests.rs` |
 | **Lua Tests** | `tests/lua/unit/test_network.lua` |
 
 ## Summary

@@ -181,7 +181,8 @@ fn test_double_destroy_safe() {
 fn test_set_bandwidth_limit() {
     let addr: SocketAddr = "0.0.0.0:0".parse().unwrap();
     let mut host = NetworkHost::new(addr, None, None, None, None).unwrap();
-    host.set_bandwidth_limit(Some(100_000), Some(50_000)).unwrap();
+    host.set_bandwidth_limit(Some(100_000), Some(50_000))
+        .unwrap();
     let (in_bw, out_bw) = host.bandwidth_limit().unwrap();
     assert_eq!(in_bw, Some(100_000));
     assert_eq!(out_bw, Some(50_000));
