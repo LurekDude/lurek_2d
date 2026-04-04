@@ -1,4 +1,12 @@
 //! Main tile map container with layers, tiles, viewport, collision, and autotile support.
+//!
+//! This module is part of Luna2D's `tilemap` subsystem and provides the implementation
+//! details for tilemap-related operations and data management.
+//! Key types exported from this module: `TileLayer`, `SweepResult`, `TileMap`.
+//! Primary functions: `new()`, `add_tileset()`, `get_tileset()`, `get_tileset_count()`.
+//!
+//! All public items are documented. See the parent module for architectural context
+//! and the `luna.*` Lua API for the scripting interface.
 
 use std::collections::HashMap;
 
@@ -8,6 +16,15 @@ use super::mapgen::MapOrientation;
 use super::tileset::TileSet;
 
 /// A single layer of tiles in a [`TileMap`].
+///
+/// # Fields
+/// - `name` — `String`.
+/// - `width` — `u32`.
+/// - `height` — `u32`.
+/// - `visible` — `bool`.
+/// - `tint` — `[f32; 4]`.
+/// - `offset` — `Vec2`.
+/// - `parallax` — `Vec2`.
 ///
 /// Tiles are stored in row-major order. GID 0 means "empty / no tile".
 #[derive(Debug, Clone)]
@@ -60,6 +77,13 @@ impl TileLayer {
 }
 
 /// Result of a swept-AABB collision test against solid tiles.
+///
+/// # Fields
+/// - `contact_point` — `Vec2`.
+/// - `normal` — `Vec2`.
+/// - `tile_x` — `u32`.
+/// - `tile_y` — `u32`.
+/// - `t` — `f32`.
 #[derive(Debug, Clone, Copy)]
 pub struct SweepResult {
     /// World-space contact point on the tile edge.
@@ -77,6 +101,16 @@ pub struct SweepResult {
 /// A 2D tile map composed of layers, tilesets, and viewport-clipped rendering state.
 ///
 /// All tile coordinates are **0-based**. Lua helpers add 1-based conversion externally.
+///
+/// # Fields
+/// - `tile_width` — `u32`.
+/// - `tile_height` — `u32`.
+/// - `chunk_size` — `u32`.
+/// - `orientation` — `MapOrientation`.
+/// - `tilesets` — `Vec<TileSet>`.
+/// - `layers` — `Vec<TileLayer>`.
+/// - `viewport` — `Option<Rect>`.
+/// - `anim_timers` — `HashMap<u32`.
 #[derive(Debug, Clone)]
 pub struct TileMap {
     tile_width: u32,
@@ -95,6 +129,14 @@ impl TileMap {
     // ------------------------------------------------------------------
 
     /// Creates a new tile map with the given tile size and chunk size.
+    ///
+    /// # Parameters
+    /// - `tile_width` — `u32`.
+    /// - `tile_height` — `u32`.
+    /// - `chunk_size` — `u32`.
+    ///
+    /// # Returns
+    /// `Self`.
     pub fn new(tile_width: u32, tile_height: u32, chunk_size: u32) -> Self {
         Self {
             tile_width,
@@ -112,17 +154,29 @@ impl TileMap {
     // TileSet management
     // ------------------------------------------------------------------
 
-    /// Adds a tileset to this map.
+    /// Adds a tileset to this map. The insertion is O(1) amortised unless a resize is triggered.
+    ///
+    /// # Parameters
+    /// - `ts` — `TileSet`.
     pub fn add_tileset(&mut self, ts: TileSet) {
         self.tilesets.push(ts);
     }
 
     /// Returns a reference to a tileset by index.
+    ///
+    /// # Parameters
+    /// - `index` — `usize`.
+    ///
+    /// # Returns
+    /// `Option<&TileSet>`.
     pub fn get_tileset(&self, index: usize) -> Option<&TileSet> {
         self.tilesets.get(index)
     }
 
     /// Returns the number of tilesets attached to this map.
+    ///
+    /// # Returns
+    /// `usize`.
     pub fn get_tileset_count(&self) -> usize {
         self.tilesets.len()
     }
@@ -132,22 +186,43 @@ impl TileMap {
     // ------------------------------------------------------------------
 
     /// Adds a new empty layer and returns its 0-based index.
+    ///
+    /// # Parameters
+    /// - `name` — `&str`.
+    /// - `width` — `u32`.
+    /// - `height` — `u32`.
+    ///
+    /// # Returns
+    /// `usize`.
     pub fn add_layer(&mut self, name: &str, width: u32, height: u32) -> usize {
         self.layers.push(TileLayer::new(name, width, height));
         self.layers.len() - 1
     }
 
-    /// Returns the number of layers.
+    /// Returns the number of layers. This accessor incurs no allocation; call it freely in hot paths.
+    ///
+    /// # Returns
+    /// `usize`.
     pub fn get_layer_count(&self) -> usize {
         self.layers.len()
     }
 
     /// Returns the name of a layer by index.
+    ///
+    /// # Parameters
+    /// - `idx` — `usize`.
+    ///
+    /// # Returns
+    /// `Option<&str>`.
     pub fn get_layer_name(&self, idx: usize) -> Option<&str> {
         self.layers.get(idx).map(|l| l.name.as_str())
     }
 
-    /// Sets layer visibility.
+    /// Sets layer visibility. Replaces the current layer visible value; callers hold responsibility for maintaining consistency with related fields.
+    ///
+    /// # Parameters
+    /// - `idx` — `usize`.
+    /// - `visible` — `bool`.
     pub fn set_layer_visible(&mut self, idx: usize, visible: bool) {
         if let Some(layer) = self.layers.get_mut(idx) {
             layer.visible = visible;
@@ -155,11 +230,24 @@ impl TileMap {
     }
 
     /// Returns layer visibility. Defaults to `false` for invalid index.
+    ///
+    /// # Parameters
+    /// - `idx` — `usize`.
+    ///
+    /// # Returns
+    /// `bool`.
     pub fn get_layer_visible(&self, idx: usize) -> bool {
         self.layers.get(idx).is_some_and(|l| l.visible)
     }
 
     /// Sets the RGBA tint color for a layer.
+    ///
+    /// # Parameters
+    /// - `idx` — `usize`.
+    /// - `r` — `f32`.
+    /// - `g` — `f32`.
+    /// - `b` — `f32`.
+    /// - `a` — `f32`.
     pub fn set_layer_color(&mut self, idx: usize, r: f32, g: f32, b: f32, a: f32) {
         if let Some(layer) = self.layers.get_mut(idx) {
             layer.tint = [r, g, b, a];
@@ -167,30 +255,58 @@ impl TileMap {
     }
 
     /// Returns the RGBA tint color of a layer. Defaults to `[0,0,0,0]` for invalid index.
+    ///
+    /// # Parameters
+    /// - `idx` — `usize`.
+    ///
+    /// # Returns
+    /// `[f32; 4]`.
     pub fn get_layer_color(&self, idx: usize) -> [f32; 4] {
         self.layers.get(idx).map_or([0.0; 4], |l| l.tint)
     }
 
-    /// Sets the pixel offset for a layer.
+    /// Sets the pixel offset for a layer. Replaces the current layer offset value; callers hold responsibility for maintaining consistency with related fields.
+    ///
+    /// # Parameters
+    /// - `idx` — `usize`.
+    /// - `ox` — `f32`.
+    /// - `oy` — `f32`.
     pub fn set_layer_offset(&mut self, idx: usize, ox: f32, oy: f32) {
         if let Some(layer) = self.layers.get_mut(idx) {
             layer.offset = Vec2::new(ox, oy);
         }
     }
 
-    /// Returns the pixel offset of a layer.
+    /// Returns the pixel offset of a layer. This accessor incurs no allocation; call it freely in hot paths.
+    ///
+    /// # Parameters
+    /// - `idx` — `usize`.
+    ///
+    /// # Returns
+    /// `Vec2`.
     pub fn get_layer_offset(&self, idx: usize) -> Vec2 {
         self.layers.get(idx).map_or(Vec2::ZERO, |l| l.offset)
     }
 
     /// Sets the parallax scrolling factor for a layer.
+    ///
+    /// # Parameters
+    /// - `idx` — `usize`.
+    /// - `px` — `f32`.
+    /// - `py` — `f32`.
     pub fn set_layer_parallax(&mut self, idx: usize, px: f32, py: f32) {
         if let Some(layer) = self.layers.get_mut(idx) {
             layer.parallax = Vec2::new(px, py);
         }
     }
 
-    /// Returns the parallax factor of a layer.
+    /// Returns the parallax factor of a layer. This accessor incurs no allocation; call it freely in hot paths.
+    ///
+    /// # Parameters
+    /// - `idx` — `usize`.
+    ///
+    /// # Returns
+    /// `Vec2`.
     pub fn get_layer_parallax(&self, idx: usize) -> Vec2 {
         self.layers
             .get(idx)
@@ -198,6 +314,12 @@ impl TileMap {
     }
 
     /// Returns the (width, height) of a layer in tiles, or `None` if out of range.
+    ///
+    /// # Parameters
+    /// - `idx` — `usize`.
+    ///
+    /// # Returns
+    /// `Option<(u32, u32)>`.
     pub fn get_layer_dimensions(&self, idx: usize) -> Option<(u32, u32)> {
         self.layers.get(idx).map(|l| (l.width, l.height))
     }
@@ -207,6 +329,12 @@ impl TileMap {
     // ------------------------------------------------------------------
 
     /// Sets the GID of a tile at `(x, y)` on the given layer.
+    ///
+    /// # Parameters
+    /// - `layer` — `usize`.
+    /// - `x` — `u32`.
+    /// - `y` — `u32`.
+    /// - `gid` — `u32`.
     pub fn set_tile(&mut self, layer: usize, x: u32, y: u32, gid: u32) {
         if let Some(l) = self.layers.get_mut(layer) {
             if let Some(idx) = l.index(x, y) {
@@ -216,6 +344,14 @@ impl TileMap {
     }
 
     /// Returns the GID at `(x, y)` on the given layer. Returns 0 if out of bounds.
+    ///
+    /// # Parameters
+    /// - `layer` — `usize`.
+    /// - `x` — `u32`.
+    /// - `y` — `u32`.
+    ///
+    /// # Returns
+    /// `u32`.
     pub fn get_tile(&self, layer: usize, x: u32, y: u32) -> u32 {
         if let Some(l) = self.layers.get(layer) {
             if let Some(idx) = l.index(x, y) {
@@ -225,7 +361,16 @@ impl TileMap {
         0
     }
 
-    /// Sets a per-tile RGBA tint override.
+    /// Sets a per-tile RGBA tint override. Replaces the current tile tint value; callers hold responsibility for maintaining consistency with related fields.
+    ///
+    /// # Parameters
+    /// - `layer` — `usize`.
+    /// - `x` — `u32`.
+    /// - `y` — `u32`.
+    /// - `r` — `f32`.
+    /// - `g` — `f32`.
+    /// - `b` — `f32`.
+    /// - `a` — `f32`.
     #[allow(clippy::too_many_arguments)]
     pub fn set_tile_tint(&mut self, layer: usize, x: u32, y: u32, r: f32, g: f32, b: f32, a: f32) {
         if let Some(l) = self.layers.get_mut(layer) {
@@ -236,11 +381,20 @@ impl TileMap {
     }
 
     /// Clears a tile (sets GID to 0) at `(x, y)` on the given layer.
+    ///
+    /// # Parameters
+    /// - `layer` — `usize`.
+    /// - `x` — `u32`.
+    /// - `y` — `u32`.
     pub fn clear_tile(&mut self, layer: usize, x: u32, y: u32) {
         self.set_tile(layer, x, y, 0);
     }
 
     /// Fills an entire layer with the given GID.
+    ///
+    /// # Parameters
+    /// - `layer` — `usize`.
+    /// - `gid` — `u32`.
     pub fn fill(&mut self, layer: usize, gid: u32) {
         if let Some(l) = self.layers.get_mut(layer) {
             for tile in l.tiles.iter_mut() {
@@ -254,11 +408,20 @@ impl TileMap {
     // ------------------------------------------------------------------
 
     /// Sets the viewport rectangle for rendering culling.
+    ///
+    /// # Parameters
+    /// - `x` — `f32`.
+    /// - `y` — `f32`.
+    /// - `w` — `f32`.
+    /// - `h` — `f32`.
     pub fn set_viewport(&mut self, x: f32, y: f32, w: f32, h: f32) {
         self.viewport = Some(Rect::new(x, y, w, h));
     }
 
     /// Returns the viewport as `(x, y, w, h)`, if set.
+    ///
+    /// # Returns
+    /// `Option<(f32, f32, f32, f32)>`.
     pub fn get_viewport(&self) -> Option<(f32, f32, f32, f32)> {
         self.viewport.map(|v| (v.x, v.y, v.width, v.height))
     }
@@ -268,6 +431,9 @@ impl TileMap {
     // ------------------------------------------------------------------
 
     /// Advances tile animation timers by `dt` seconds.
+    ///
+    /// # Parameters
+    /// - `dt` — `f32`.
     ///
     /// For each tileset animation, the timer accumulates milliseconds. When the
     /// elapsed time exceeds the current frame's duration, the frame index advances
@@ -299,6 +465,13 @@ impl TileMap {
     // ------------------------------------------------------------------
 
     /// Converts world pixel coordinates to tile coordinates.
+    ///
+    /// # Parameters
+    /// - `wx` — `f32`.
+    /// - `wy` — `f32`.
+    ///
+    /// # Returns
+    /// `(u32, u32)`.
     pub fn world_to_tile(&self, wx: f32, wy: f32) -> (u32, u32) {
         let tx = if wx < 0.0 {
             0
@@ -314,6 +487,13 @@ impl TileMap {
     }
 
     /// Converts tile coordinates to world pixel coordinates (top-left of tile).
+    ///
+    /// # Parameters
+    /// - `tx` — `u32`.
+    /// - `ty` — `u32`.
+    ///
+    /// # Returns
+    /// `(f32, f32)`.
     pub fn tile_to_world(&self, tx: u32, ty: u32) -> (f32, f32) {
         (
             tx as f32 * self.tile_width as f32,
@@ -325,32 +505,50 @@ impl TileMap {
     // Dimensions
     // ------------------------------------------------------------------
 
-    /// Returns the tile width in pixels.
+    /// Returns the tile width in pixels. This accessor incurs no allocation; call it freely in hot paths.
+    ///
+    /// # Returns
+    /// `u32`.
     pub fn get_tile_width(&self) -> u32 {
         self.tile_width
     }
 
-    /// Returns the tile height in pixels.
+    /// Returns the tile height in pixels. This accessor incurs no allocation; call it freely in hot paths.
+    ///
+    /// # Returns
+    /// `u32`.
     pub fn get_tile_height(&self) -> u32 {
         self.tile_height
     }
 
     /// Returns tile dimensions as `(width, height)`.
+    ///
+    /// # Returns
+    /// `(u32, u32)`.
     pub fn get_tile_dimensions(&self) -> (u32, u32) {
         (self.tile_width, self.tile_height)
     }
 
     /// Returns the chunk size used for spatial partitioning.
+    ///
+    /// # Returns
+    /// `u32`.
     pub fn get_chunk_size(&self) -> u32 {
         self.chunk_size
     }
 
     /// Returns the map orientation (top-down or side-view).
+    ///
+    /// # Returns
+    /// `MapOrientation`.
     pub fn get_orientation(&self) -> MapOrientation {
         self.orientation
     }
 
-    /// Sets the map orientation.
+    /// Sets the map orientation. Replaces the current orientation value; callers hold responsibility for maintaining consistency with related fields.
+    ///
+    /// # Parameters
+    /// - `orientation` — `MapOrientation`.
     pub fn set_orientation(&mut self, orientation: MapOrientation) {
         self.orientation = orientation;
     }
@@ -375,6 +573,14 @@ impl TileMap {
 
     /// Returns `true` if the tile at `(x, y)` on `layer` is solid.
     ///
+    /// # Parameters
+    /// - `layer` — `usize`.
+    /// - `x` — `u32`.
+    /// - `y` — `u32`.
+    ///
+    /// # Returns
+    /// `bool`.
+    ///
     /// Resolves the GID to its owning tileset and checks the solid flag.
     pub fn is_solid(&self, layer: usize, x: u32, y: u32) -> bool {
         let gid = self.get_tile(layer, x, y);
@@ -386,6 +592,13 @@ impl TileMap {
     }
 
     /// Returns `true` if any solid tile overlaps the given world-space rectangle on `layer`.
+    ///
+    /// # Parameters
+    /// - `layer` — `usize`.
+    /// - `rect` — `Rect`.
+    ///
+    /// # Returns
+    /// `bool`.
     pub fn rect_overlaps_solid(&self, layer: usize, rect: Rect) -> bool {
         let (tx0, ty0) = self.world_to_tile(rect.x, rect.y);
         let (tx1, ty1) =
@@ -401,6 +614,15 @@ impl TileMap {
     }
 
     /// Performs a swept AABB collision test against solid tiles on `layer`.
+    ///
+    /// # Parameters
+    /// - `layer` — `usize`.
+    /// - `rect` — `Rect`.
+    /// - `dx` — `f32`.
+    /// - `dy` — `f32`.
+    ///
+    /// # Returns
+    /// `Option<SweepResult>`.
     ///
     /// Moves `rect` by `(dx, dy)` and returns the earliest collision, if any.
     pub fn sweep_rect(&self, layer: usize, rect: Rect, dx: f32, dy: f32) -> Option<SweepResult> {
@@ -447,6 +669,10 @@ impl TileMap {
 
     /// Applies 4-bit cardinal autotile rules to every tile on `layer`.
     ///
+    /// # Parameters
+    /// - `layer` — `usize`.
+    /// - `type_name` — `&str`.
+    ///
     /// Bitmask: N=1, E=2, S=4, W=8. A neighbor "matches" if its GID is non-zero.
     pub fn apply_autotile(&mut self, layer: usize, type_name: &str) {
         let (width, height) = match self.layers.get(layer) {
@@ -471,6 +697,12 @@ impl TileMap {
     }
 
     /// Applies 4-bit cardinal autotile at a single cell and its 3×3 neighborhood.
+    ///
+    /// # Parameters
+    /// - `layer` — `usize`.
+    /// - `x` — `u32`.
+    /// - `y` — `u32`.
+    /// - `type_name` — `&str`.
     pub fn apply_autotile_at(&mut self, layer: usize, x: u32, y: u32, type_name: &str) {
         let (width, height) = match self.layers.get(layer) {
             Some(l) => (l.width, l.height),
@@ -499,6 +731,10 @@ impl TileMap {
 
     /// Applies 8-bit directional autotile rules to every tile on `layer`.
     ///
+    /// # Parameters
+    /// - `layer` — `usize`.
+    /// - `type_name` — `&str`.
+    ///
     /// Bitmask: N=1, E=2, S=4, W=8, NE=16, SE=32, SW=64, NW=128.
     /// Diagonals only count if both adjacent cardinals are present.
     pub fn apply_autotile_8(&mut self, layer: usize, type_name: &str) {
@@ -524,6 +760,12 @@ impl TileMap {
     }
 
     /// Applies 8-bit directional autotile at a single cell and its 3×3 neighborhood.
+    ///
+    /// # Parameters
+    /// - `layer` — `usize`.
+    /// - `x` — `u32`.
+    /// - `y` — `u32`.
+    /// - `type_name` — `&str`.
     pub fn apply_autotile_8_at(&mut self, layer: usize, x: u32, y: u32, type_name: &str) {
         let (width, height) = match self.layers.get(layer) {
             Some(l) => (l.width, l.height),

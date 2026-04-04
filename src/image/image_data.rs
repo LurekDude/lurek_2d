@@ -1,11 +1,24 @@
 //! CPU-side RGBA8 pixel buffer for image manipulation.
+//!
+//! This module is part of Luna2D's `image` subsystem and provides the implementation
+//! details for image data-related operations and data management.
+//! Key types exported from this module: `ImageData`.
+//! Primary functions: `new()`, `from_file()`, `from_bytes()`, `width()`.
+//!
+//! All public items are documented. See the parent module for architectural context
+//! and the `luna.*` Lua API for the scripting interface.
 
 use mlua::prelude::*;
 
-/// CPU-side pixel buffer in RGBA8 format.
+/// CPU-side pixel buffer in RGBA8 format. Consult the module-level documentation for the broader usage context and preconditions.
 ///
 /// Stores pixel data in row-major order, 4 bytes per pixel (R, G, B, A).
 /// Can be created empty, from a file, or from raw bytes.
+///
+/// # Fields
+/// - `width` — `u32`.
+/// - `height` — `u32`.
+/// - `pixels` — `Vec<u8>`.
 #[derive(Debug, Clone)]
 pub struct ImageData {
     width: u32,
@@ -15,6 +28,13 @@ pub struct ImageData {
 
 impl ImageData {
     /// Create a new blank (transparent black) image.
+    ///
+    /// # Parameters
+    /// - `width` — `u32`.
+    /// - `height` — `u32`.
+    ///
+    /// # Returns
+    /// `Self`.
     pub fn new(width: u32, height: u32) -> Self {
         Self {
             width,
@@ -23,7 +43,13 @@ impl ImageData {
         }
     }
 
-    /// Load an image from a file path.
+    /// Load an image from a file path. Returns a fully initialised instance with all fields set to their initial values.
+    ///
+    /// # Parameters
+    /// - `path` — `&str`.
+    ///
+    /// # Returns
+    /// `Result<Self, String>`.
     pub fn from_file(path: &str) -> Result<Self, String> {
         let img =
             ::image::open(path).map_err(|e| format!("Failed to load image '{}': {}", path, e))?;
@@ -36,7 +62,15 @@ impl ImageData {
         })
     }
 
-    /// Create from raw RGBA bytes.
+    /// Create from raw RGBA bytes. Returns a fully initialised instance with all fields set to their initial values.
+    ///
+    /// # Parameters
+    /// - `width` — `u32`.
+    /// - `height` — `u32`.
+    /// - `bytes` — `Vec<u8>`.
+    ///
+    /// # Returns
+    /// `Result<Self, String>`.
     pub fn from_bytes(width: u32, height: u32, bytes: Vec<u8>) -> Result<Self, String> {
         let expected = (width * height * 4) as usize;
         if bytes.len() != expected {
@@ -55,22 +89,38 @@ impl ImageData {
         })
     }
 
-    /// Get the width of the image.
+    /// Get the width of the image. Consult the module-level documentation for the broader usage context and preconditions.
+    ///
+    /// # Returns
+    /// `u32`.
     pub fn width(&self) -> u32 {
         self.width
     }
 
-    /// Get the height of the image.
+    /// Get the height of the image. Consult the module-level documentation for the broader usage context and preconditions.
+    ///
+    /// # Returns
+    /// `u32`.
     pub fn height(&self) -> u32 {
         self.height
     }
 
-    /// Get both dimensions.
+    /// Get both dimensions. Consult the module-level documentation for the broader usage context and preconditions.
+    ///
+    /// # Returns
+    /// `(u32, u32)`.
     pub fn dimensions(&self) -> (u32, u32) {
         (self.width, self.height)
     }
 
     /// Get the RGBA values of a pixel at (x, y). Values are 0-255.
+    ///
+    /// # Parameters
+    /// - `x` — `u32`.
+    /// - `y` — `u32`.
+    ///
+    /// # Returns
+    /// `Option<(u8, u8, u8, u8)>`.
     pub fn get_pixel(&self, x: u32, y: u32) -> Option<(u8, u8, u8, u8)> {
         if x >= self.width || y >= self.height {
             return None;
@@ -85,6 +135,17 @@ impl ImageData {
     }
 
     /// Set the RGBA values of a pixel at (x, y). Values are 0-255.
+    ///
+    /// # Parameters
+    /// - `x` — `u32`.
+    /// - `y` — `u32`.
+    /// - `r` — `u8`.
+    /// - `g` — `u8`.
+    /// - `b` — `u8`.
+    /// - `a` — `u8`.
+    ///
+    /// # Returns
+    /// `bool`.
     pub fn set_pixel(&mut self, x: u32, y: u32, r: u8, g: u8, b: u8, a: u8) -> bool {
         if x >= self.width || y >= self.height {
             return false;
@@ -98,6 +159,11 @@ impl ImageData {
     }
 
     /// Paste source image onto self at position (dx, dy).
+    ///
+    /// # Parameters
+    /// - `source` — `&ImageData`.
+    /// - `dx` — `u32`.
+    /// - `dy` — `u32`.
     pub fn paste(&mut self, source: &ImageData, dx: u32, dy: u32) {
         for sy in 0..source.height {
             for sx in 0..source.width {
@@ -113,6 +179,12 @@ impl ImageData {
     }
 
     /// Apply a function to every pixel, replacing each (r,g,b,a) with the return value.
+    ///
+    /// # Parameters
+    /// - `f` — `F`.
+    ///
+    /// # Returns
+    /// `(u8, u8, u8, u8),`.
     ///
     /// The function receives `(x, y, r, g, b, a)` and returns `(r, g, b, a)`.
     pub fn map_pixel<F>(&mut self, f: F)
@@ -135,7 +207,10 @@ impl ImageData {
         }
     }
 
-    /// Encode the image as PNG bytes.
+    /// Encode the image as PNG bytes. Consult the module-level documentation for the broader usage context and preconditions.
+    ///
+    /// # Returns
+    /// `Result<Vec<u8>, String>`.
     pub fn encode_png(&self) -> Result<Vec<u8>, String> {
         let img: ::image::ImageBuffer<::image::Rgba<u8>, Vec<u8>> =
             ::image::ImageBuffer::from_raw(self.width, self.height, self.pixels.clone())
@@ -150,11 +225,17 @@ impl ImageData {
     }
 
     /// Get a reference to the raw pixel bytes.
+    ///
+    /// # Returns
+    /// `&[u8]`.
     pub fn as_bytes(&self) -> &[u8] {
         &self.pixels
     }
 
     /// Get the raw pixel bytes as a vector (for Lua getString() compatibility).
+    ///
+    /// # Returns
+    /// `Vec<u8>`.
     pub fn get_string(&self) -> Vec<u8> {
         self.pixels.clone()
     }

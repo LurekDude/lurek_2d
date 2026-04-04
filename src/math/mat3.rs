@@ -1,3 +1,13 @@
+//! Mat3 implementation for the `math` subsystem.
+//!
+//! This module is part of Luna2D's `math` subsystem and provides the implementation
+//! details for mat3-related operations and data management.
+//! Key types exported from this module: `Mat3`.
+//! Primary functions: `identity()`, `from_row_major()`, `from_translation()`, `from_rotation()`.
+//!
+//! All public items are documented. See the parent module for architectural context
+//! and the `luna.*` Lua API for the scripting interface.
+//!
 use super::vec2::Vec2;
 
 /// A 3×3 column-major matrix used for 2D affine transforms (translation, rotation, scale).
@@ -13,7 +23,7 @@ pub struct Mat3 {
 }
 
 impl Mat3 {
-    /// Returns the 3×3 identity matrix.
+    /// Returns the 3×3 identity matrix. Consult the module-level documentation for the broader usage context and preconditions.
     ///
     /// # Returns
     /// `Mat3` — Identity: no translation, no rotation, scale 1.
@@ -24,6 +34,12 @@ impl Mat3 {
     }
 
     /// Creates a `Mat3` from a flat 9-element array in row-major order.
+    ///
+    /// # Parameters
+    /// - `data` — `&[f32; 9]`.
+    ///
+    /// # Returns
+    /// `Self`.
     pub fn from_row_major(data: &[f32; 9]) -> Self {
         Mat3 {
             m: [
@@ -62,7 +78,7 @@ impl Mat3 {
         }
     }
 
-    /// Creates a shear (skew) matrix.
+    /// Creates a shear (skew) matrix. Returns a fully initialised instance with all fields set to their initial values.
     ///
     /// # Parameters
     /// - `kx` — Shear factor along the X axis.
@@ -89,7 +105,7 @@ impl Mat3 {
         }
     }
 
-    /// Compute the inverse of this 3×3 matrix.
+    /// Compute the inverse of this 3×3 matrix. Consult the module-level documentation for the broader usage context and preconditions.
     ///
     /// # Returns
     /// The inverse matrix, or the identity matrix if the determinant is ≈ 0.

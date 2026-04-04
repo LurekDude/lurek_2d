@@ -2,6 +2,14 @@
 //!
 //! Cells are addressed with 0-based `(x, y)` coordinates. The Lua layer
 //! converts to/from 1-based indices.
+//!
+//! This module is part of Luna2D's `math` subsystem and provides the implementation
+//! details for grid-related operations and data management.
+//! Key types exported from this module: `Grid`.
+//! Primary functions: `new()`, `width()`, `height()`, `set_walkable()`.
+//!
+//! All public items are documented. See the parent module for architectural context
+//! and the `luna.*` Lua API for the scripting interface.
 
 use std::cmp::Ordering;
 use std::collections::{BinaryHeap, VecDeque};
@@ -42,6 +50,12 @@ impl PartialOrd for Node {
 ///
 /// Supports A*, Dijkstra, and BFS pathfinding as well as flow field generation.
 /// All coordinates are 0-based.
+///
+/// # Fields
+/// - `width` — `u32`.
+/// - `height` — `u32`.
+/// - `walkable` — `Vec<bool>`.
+/// - `costs` — `Vec<f32>`.
 pub struct Grid {
     width: u32,
     height: u32,
@@ -51,6 +65,9 @@ pub struct Grid {
 
 impl Grid {
     /// Creates a new grid where every cell is walkable with the given movement cost.
+    ///
+    /// # Returns
+    /// `Self`.
     ///
     /// # Parameters
     /// - `width`  — Number of columns.
@@ -66,12 +83,18 @@ impl Grid {
         }
     }
 
-    /// Returns the grid width in cells.
+    /// Returns the grid width in cells. Consult the module-level documentation for the broader usage context and preconditions.
+    ///
+    /// # Returns
+    /// `u32`.
     pub fn width(&self) -> u32 {
         self.width
     }
 
-    /// Returns the grid height in cells.
+    /// Returns the grid height in cells. Consult the module-level documentation for the broader usage context and preconditions.
+    ///
+    /// # Returns
+    /// `u32`.
     pub fn height(&self) -> u32 {
         self.height
     }
@@ -87,6 +110,11 @@ impl Grid {
     }
 
     /// Sets whether the cell at `(x, y)` is walkable.
+    ///
+    /// # Parameters
+    /// - `x` — `u32`.
+    /// - `y` — `u32`.
+    /// - `walkable` — `bool`.
     pub fn set_walkable(&mut self, x: u32, y: u32, walkable: bool) {
         if let Some(i) = self.idx(x, y) {
             self.walkable[i] = walkable;
@@ -94,12 +122,23 @@ impl Grid {
     }
 
     /// Returns whether the cell at `(x, y)` is walkable.
+    ///
+    /// # Parameters
+    /// - `x` — `u32`.
+    /// - `y` — `u32`.
+    ///
+    /// # Returns
+    /// `bool`.
     pub fn is_walkable(&self, x: u32, y: u32) -> bool {
-        self.idx(x, y)
-            .is_some_and(|i| self.walkable[i])
+        self.idx(x, y).is_some_and(|i| self.walkable[i])
     }
 
     /// Sets the movement cost of the cell at `(x, y)`.
+    ///
+    /// # Parameters
+    /// - `x` — `u32`.
+    /// - `y` — `u32`.
+    /// - `cost` — `f32`.
     pub fn set_cost(&mut self, x: u32, y: u32, cost: f32) {
         if let Some(i) = self.idx(x, y) {
             self.costs[i] = cost;
@@ -107,6 +146,13 @@ impl Grid {
     }
 
     /// Returns the movement cost of the cell at `(x, y)`.
+    ///
+    /// # Parameters
+    /// - `x` — `u32`.
+    /// - `y` — `u32`.
+    ///
+    /// # Returns
+    /// `f32`.
     pub fn get_cost(&self, x: u32, y: u32) -> f32 {
         self.idx(x, y).map_or(1.0, |i| self.costs[i])
     }
@@ -152,6 +198,16 @@ impl Grid {
     // ── A* ─────────────────────────────────────────────────────────────
 
     /// Finds a path from `(sx, sy)` to `(gx, gy)` using A*.
+    ///
+    /// # Parameters
+    /// - `sx` — `u32`.
+    /// - `sy` — `u32`.
+    /// - `gx` — `u32`.
+    /// - `gy` — `u32`.
+    /// - `diagonal` — `bool`.
+    ///
+    /// # Returns
+    /// `Option<Vec<(u32, u32)>>`.
     ///
     /// When `diagonal` is `true`, 8-directional movement is allowed and the
     /// heuristic uses Euclidean distance; otherwise 4-directional movement with
@@ -237,6 +293,16 @@ impl Grid {
 
     /// Finds a path from `(sx, sy)` to `(gx, gy)` using Dijkstra's algorithm.
     ///
+    /// # Parameters
+    /// - `sx` — `u32`.
+    /// - `sy` — `u32`.
+    /// - `gx` — `u32`.
+    /// - `gy` — `u32`.
+    /// - `diagonal` — `bool`.
+    ///
+    /// # Returns
+    /// `Option<Vec<(u32, u32)>>`.
+    ///
     /// Equivalent to A* with heuristic = 0. Respects cell costs.
     pub fn find_path_dijkstra(
         &self,
@@ -307,6 +373,16 @@ impl Grid {
 
     /// Finds a shortest-hop path from `(sx, sy)` to `(gx, gy)` using BFS.
     ///
+    /// # Parameters
+    /// - `sx` — `u32`.
+    /// - `sy` — `u32`.
+    /// - `gx` — `u32`.
+    /// - `gy` — `u32`.
+    /// - `diagonal` — `bool`.
+    ///
+    /// # Returns
+    /// `Option<Vec<(u32, u32)>>`.
+    ///
     /// Ignores cell costs — every walkable step has equal weight.
     pub fn find_path_bfs(
         &self,
@@ -373,6 +449,13 @@ impl Grid {
     // ── Flow field ─────────────────────────────────────────────────────
 
     /// Builds a flow field pointing toward `(gx, gy)`.
+    ///
+    /// # Parameters
+    /// - `gx` — `u32`.
+    /// - `gy` — `u32`.
+    ///
+    /// # Returns
+    /// `Vec<(f32, f32)>`.
     ///
     /// Returns a flat `width * height` vector of `(dx, dy)` direction pairs.
     /// Unreachable or wall cells get `(0.0, 0.0)`.

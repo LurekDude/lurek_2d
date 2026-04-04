@@ -1,10 +1,31 @@
 //! Simulation engine — update(dt) and step() for item flow, decay, transit, and conversions.
+//!
+//! This module is part of Luna2D's `graph` subsystem and provides the implementation
+//! details for simulation-related operations and data management.
+//! Key types exported from this module: `GraphEvent`.
+//! Primary functions: `update()`, `step()`.
+//!
+//! All public items are documented. See the parent module for architectural context
+//! and the `luna.*` Lua API for the scripting interface.
 
 use super::core::Graph;
 use super::item::ItemPosition;
 use super::node::FlowMode;
 
 /// Events generated during simulation for the Lua callback layer to dispatch.
+///
+/// # Variants
+/// - `ItemEnter` — ItemEnter variant.
+/// - `ItemLeave` — ItemLeave variant.
+/// - `ItemDecay` — ItemDecay variant.
+/// - `ItemConvert` — ItemConvert variant.
+/// - `ItemLost` — ItemLost variant.
+/// - `EdgeEnter` — EdgeEnter variant.
+/// - `EdgeLeave` — EdgeLeave variant.
+/// - `DemandFulfilled` — DemandFulfilled variant.
+/// - `SupplyDepleted` — SupplyDepleted variant.
+/// - `ItemQueued` — ItemQueued variant.
+/// - `ItemDequeued` — ItemDequeued variant.
 #[derive(Debug, Clone)]
 pub enum GraphEvent {
     /// An item arrived at a node.
@@ -92,6 +113,12 @@ pub enum GraphEvent {
 
 impl Graph {
     /// Advance the simulation by `dt` seconds. Returns events for callback dispatch.
+    ///
+    /// # Parameters
+    /// - `dt` — `f64`.
+    ///
+    /// # Returns
+    /// `Vec<GraphEvent>`.
     pub fn update(&mut self, dt: f64) -> Vec<GraphEvent> {
         let mut events = Vec::new();
         self.process_decay(dt, &mut events);
@@ -105,6 +132,9 @@ impl Graph {
     }
 
     /// One discrete simulation step (equivalent to `update(1.0)`).
+    ///
+    /// # Returns
+    /// `Vec<GraphEvent>`.
     pub fn step(&mut self) -> Vec<GraphEvent> {
         self.update(1.0)
     }
@@ -600,7 +630,9 @@ mod tests {
         // Advance 0.6s — should decay
         let events = g.update(0.6);
         assert!(!g.items[&i].is_alive());
-        assert!(events.iter().any(|e| matches!(e, GraphEvent::ItemDecay { item_id } if *item_id == i)));
+        assert!(events
+            .iter()
+            .any(|e| matches!(e, GraphEvent::ItemDecay { item_id } if *item_id == i)));
     }
 
     #[test]

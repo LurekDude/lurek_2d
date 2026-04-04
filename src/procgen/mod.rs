@@ -3,12 +3,12 @@
 //! Cave maps, Voronoi diagrams, flood fill, Poisson disk sampling,
 //! and periodic Perlin noise for tileable textures.
 
-/// Linear congruential generator for deterministic procgen.
-pub(crate) mod lcg;
 /// Cellular automata cave/dungeon generation.
 pub mod cellular;
 /// BFS flood fill on a flat grid.
 pub mod flood_fill;
+/// Linear congruential generator for deterministic procgen.
+pub(crate) mod lcg;
 /// Periodic Perlin noise for tileable textures.
 pub mod noise_ext;
 /// Poisson disk sampling for point distribution.

@@ -8,11 +8,7 @@
 //! All public items are documented. See the parent module for architectural context
 //! and the `luna.*` Lua API for the scripting interface.
 
-use std::cell::RefCell;
 use std::f32::consts::PI;
-use std::rc::Rc;
-
-use crate::raycaster::Raycaster2D;
 
 /// Cardinal facing direction. Consult the module-level documentation for the broader usage context and preconditions.
 ///
@@ -138,7 +134,6 @@ impl Facing {
 /// Tile-based movement controller for first-person grid navigation.
 ///
 /// Operates on integer grid coordinates with cardinal facing directions.
-/// Optionally references a `Raycaster2D` for collision checking.
 ///
 /// # Fields
 /// - `x` — `i32`.
@@ -147,7 +142,6 @@ impl Facing {
 /// - `prev_x` — `i32`.
 /// - `prev_y` — `i32`.
 /// - `prev_facing` — `Facing`.
-/// - `raycaster` — `Option<Rc<RefCell<Raycaster2D>>>`.
 pub struct TileWalker {
     x: i32,
     y: i32,
@@ -155,7 +149,6 @@ pub struct TileWalker {
     prev_x: i32,
     prev_y: i32,
     prev_facing: Facing,
-    raycaster: Option<Rc<RefCell<Raycaster2D>>>,
 }
 
 impl TileWalker {
@@ -176,7 +169,6 @@ impl TileWalker {
             prev_x: x,
             prev_y: y,
             prev_facing: facing,
-            raycaster: None,
         }
     }
 
@@ -222,25 +214,10 @@ impl TileWalker {
         self.facing = facing;
     }
 
-    /// Attaches a raycaster for collision checking.
-    ///
-    /// # Parameters
-    /// - `rc` — `Rc<RefCell<Raycaster2D>>`.
-    pub fn set_raycaster(&mut self, rc: Rc<RefCell<Raycaster2D>>) {
-        self.raycaster = Some(rc);
-    }
-
-    /// Checks if a target cell is passable (not blocked by raycaster).
-    fn can_move_to(&self, tx: i32, ty: i32) -> bool {
-        if let Some(ref rc) = self.raycaster {
-            let rc = rc.borrow();
-            if tx < 0 || ty < 0 || tx >= rc.width() as i32 || ty >= rc.height() as i32 {
-                return false;
-            }
-            !rc.is_blocked(tx as u32, ty as u32)
-        } else {
-            true // no collision, always passable
-        }
+    /// Checks if a target cell is passable. Always returns `true`;
+    /// collision checking is handled by the Lua layer.
+    fn can_move_to(&self, _tx: i32, _ty: i32) -> bool {
+        true
     }
 
     /// Returns true if the walker can move forward without actually moving.
@@ -464,8 +441,6 @@ impl TileWalker {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use std::cell::RefCell;
-    use std::rc::Rc;
 
     #[test]
     fn test_basic_movement() {
@@ -483,18 +458,6 @@ mod tests {
         assert!(walker.move_forward());
         assert_eq!(walker.x(), 4);
         assert_eq!(walker.y(), 3);
-    }
-
-    #[test]
-    fn test_collision_blocks_movement() {
-        let rc = Rc::new(RefCell::new(Raycaster2D::new(8, 8)));
-        rc.borrow_mut().set_cell(3, 2, 1); // wall north of (3,3)
-
-        let mut walker = TileWalker::new(3, 3, Facing::North);
-        walker.set_raycaster(rc);
-        assert!(!walker.can_move_forward());
-        assert!(!walker.move_forward());
-        assert_eq!(walker.y(), 3); // didn't move
     }
 
     #[test]

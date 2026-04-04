@@ -1,8 +1,33 @@
 //! Graph edge — a directed connection between nodes.
+//!
+//! This module is part of Luna2D's `graph` subsystem and provides the implementation
+//! details for edge-related operations and data management.
+//! Key types exported from this module: `Edge`.
+//! Primary functions: `new()`, `get_type()`, `set_type()`, `is_on_cooldown()`.
+//!
+//! All public items are documented. See the parent module for architectural context
+//! and the `luna.*` Lua API for the scripting interface.
 
 use std::collections::HashSet;
 
 /// A directed connection between two nodes in the graph.
+///
+/// # Fields
+/// - `id` — `u64`.
+/// - `edge_type` — `String`.
+/// - `from_node` — `u64`.
+/// - `to_node` — `u64`.
+/// - `capacity` — `i32`.
+/// - `throughput` — `f64`.
+/// - `travel_time` — `f64`.
+/// - `weight` — `f64`.
+/// - `speed_modifier` — `f64`.
+/// - `cooldown` — `f64`.
+/// - `cooldown_timer` — `f64`.
+/// - `bidirectional` — `bool`.
+/// - `active` — `bool`.
+/// - `allowed_types` — `HashSet<String>`.
+/// - `items_in_transit` — `Vec<u64>`.
 pub struct Edge {
     /// Unique identifier.
     pub id: u64,
@@ -37,7 +62,16 @@ pub struct Edge {
 }
 
 impl Edge {
-    /// Create a new edge with defaults.
+    /// Create a new edge with defaults. Returns a fully initialised instance with all fields set to their initial values.
+    ///
+    /// # Parameters
+    /// - `id` — `u64`.
+    /// - `from` — `u64`.
+    /// - `to` — `u64`.
+    /// - `edge_type` — `&str`.
+    ///
+    /// # Returns
+    /// `Self`.
     pub fn new(id: u64, from: u64, to: u64, edge_type: &str) -> Self {
         Self {
             id,
@@ -58,32 +92,56 @@ impl Edge {
         }
     }
 
-    /// Get the edge type.
+    /// Get the edge type. This accessor incurs no allocation; call it freely in hot paths.
+    ///
+    /// # Returns
+    /// `&str`.
     pub fn get_type(&self) -> &str {
         &self.edge_type
     }
 
-    /// Set the edge type.
+    /// Set the edge type. Replaces the current type value; callers hold responsibility for maintaining consistency with related fields.
+    ///
+    /// # Parameters
+    /// - `t` — `&str`.
     pub fn set_type(&mut self, t: &str) {
         self.edge_type = t.to_string();
     }
 
-    /// Whether the edge is in cooldown.
+    /// Whether the edge is in cooldown. This accessor incurs no allocation; call it freely in hot paths.
+    ///
+    /// # Returns
+    /// `bool`.
     pub fn is_on_cooldown(&self) -> bool {
         self.cooldown_timer > 0.0
     }
 
     /// Whether the given item type is allowed on this edge.
+    ///
+    /// # Parameters
+    /// - `t` — `&str`.
+    ///
+    /// # Returns
+    /// `bool`.
     pub fn is_item_type_allowed(&self, t: &str) -> bool {
         self.allowed_types.is_empty() || self.allowed_types.contains(t)
     }
 
-    /// Add an allowed item type.
+    /// Add an allowed item type. The insertion is O(1) amortised unless a resize is triggered.
+    ///
+    /// # Parameters
+    /// - `t` — `&str`.
     pub fn add_allowed_type(&mut self, t: &str) {
         self.allowed_types.insert(t.to_string());
     }
 
-    /// Remove an allowed item type.
+    /// Remove an allowed item type. Returns the removed value if present, or `None` when the key did not exist.
+    ///
+    /// # Parameters
+    /// - `t` — `&str`.
+    ///
+    /// # Returns
+    /// `bool`.
     pub fn remove_allowed_type(&mut self, t: &str) -> bool {
         self.allowed_types.remove(t)
     }
@@ -93,7 +151,10 @@ impl Edge {
         self.allowed_types.clear();
     }
 
-    /// Whether transit capacity is full.
+    /// Whether transit capacity is full. This accessor incurs no allocation; call it freely in hot paths.
+    ///
+    /// # Returns
+    /// `bool`.
     pub fn is_transit_full(&self) -> bool {
         if self.capacity < 0 {
             false

@@ -2,20 +2,57 @@
 //!
 //! Free functions for common geometric computations: intersections, containment,
 //! polygon operations, and rasterization.
+//!
+//! This module is part of Luna2D's `math` subsystem and provides the implementation
+//! details for geometry-related operations and data management.
+//! Primary functions: `angle_between()`, `circle_contains_point()`, `circle_intersects_circle()`, `circle_intersects_line()`.
+//!
+//! All public items are documented. See the parent module for architectural context
+//! and the `luna.*` Lua API for the scripting interface.
 
 /// Returns the angle in radians from (x1, y1) to (x2, y2).
+///
+/// # Parameters
+/// - `x1` — `f32`.
+/// - `y1` — `f32`.
+/// - `x2` — `f32`.
+/// - `y2` — `f32`.
+///
+/// # Returns
+/// `f32`.
 pub fn angle_between(x1: f32, y1: f32, x2: f32, y2: f32) -> f32 {
     (y2 - y1).atan2(x2 - x1)
 }
 
 /// Returns true if the point (px, py) is inside the circle centered at (cx, cy) with radius r.
+///
+/// # Parameters
+/// - `cx` — `f32`.
+/// - `cy` — `f32`.
+/// - `r` — `f32`.
+/// - `px` — `f32`.
+/// - `py` — `f32`.
+///
+/// # Returns
+/// `bool`.
 pub fn circle_contains_point(cx: f32, cy: f32, r: f32, px: f32, py: f32) -> bool {
     let dx = px - cx;
     let dy = py - cy;
     dx * dx + dy * dy <= r * r
 }
 
-/// Returns true if two circles overlap.
+/// Returns true if two circles overlap. Consult the module-level documentation for the broader usage context and preconditions.
+///
+/// # Parameters
+/// - `x1` — `f32`.
+/// - `y1` — `f32`.
+/// - `r1` — `f32`.
+/// - `x2` — `f32`.
+/// - `y2` — `f32`.
+/// - `r2` — `f32`.
+///
+/// # Returns
+/// `bool`.
 pub fn circle_intersects_circle(x1: f32, y1: f32, r1: f32, x2: f32, y2: f32, r2: f32) -> bool {
     let dx = x2 - x1;
     let dy = y2 - y1;
@@ -24,6 +61,18 @@ pub fn circle_intersects_circle(x1: f32, y1: f32, r1: f32, x2: f32, y2: f32, r2:
 }
 
 /// Line-circle intersection. Returns (intersects, hit1, hit2).
+///
+/// # Parameters
+/// - `cx` — `f32`.
+/// - `cy` — `f32`.
+/// - `r` — `f32`.
+/// - `lx1` — `f32`.
+/// - `ly1` — `f32`.
+/// - `lx2` — `f32`.
+/// - `ly2` — `f32`.
+///
+/// # Returns
+/// `(bool, Option<(f32, f32)>, Option<(f32, f32)>)`.
 ///
 /// Points are along the infinite line through (lx1,ly1)-(lx2,ly2).
 #[allow(clippy::type_complexity)]
@@ -68,6 +117,18 @@ pub fn circle_intersects_line(
 }
 
 /// Segment-circle intersection. Same as line-circle but clamped to the segment.
+///
+/// # Parameters
+/// - `cx` — `f32`.
+/// - `cy` — `f32`.
+/// - `r` — `f32`.
+/// - `sx1` — `f32`.
+/// - `sy1` — `f32`.
+/// - `sx2` — `f32`.
+/// - `sy2` — `f32`.
+///
+/// # Returns
+/// `(bool, Option<(f32, f32)>, Option<(f32, f32)>)`.
 #[allow(clippy::type_complexity)]
 pub fn circle_intersects_segment(
     cx: f32,
@@ -116,6 +177,12 @@ pub fn circle_intersects_segment(
 
 /// Computes the signed area of a polygon using the Shoelace formula.
 ///
+/// # Parameters
+/// - `vertices` — `&[f32]`.
+///
+/// # Returns
+/// `f32`.
+///
 /// `vertices` is a flat array `[x0, y0, x1, y1, ...]`.
 pub fn polygon_area(vertices: &[f32]) -> f32 {
     let n = vertices.len() / 2;
@@ -134,7 +201,13 @@ pub fn polygon_area(vertices: &[f32]) -> f32 {
     area * 0.5
 }
 
-/// Computes the centroid of a polygon.
+/// Computes the centroid of a polygon. Consult the module-level documentation for the broader usage context and preconditions.
+///
+/// # Parameters
+/// - `vertices` — `&[f32]`.
+///
+/// # Returns
+/// `(f32, f32)`.
 ///
 /// `vertices` is a flat array `[x0, y0, x1, y1, ...]`.
 pub fn polygon_centroid(vertices: &[f32]) -> (f32, f32) {
@@ -172,6 +245,19 @@ pub fn polygon_centroid(vertices: &[f32]) -> (f32, f32) {
 }
 
 /// Tests if two line segments intersect. Returns (intersects, intersection_point).
+///
+/// # Parameters
+/// - `x1` — `f32`.
+/// - `y1` — `f32`.
+/// - `x2` — `f32`.
+/// - `y2` — `f32`.
+/// - `x3` — `f32`.
+/// - `y3` — `f32`.
+/// - `x4` — `f32`.
+/// - `y4` — `f32`.
+///
+/// # Returns
+/// `(bool, Option<(f32, f32)>)`.
 #[allow(clippy::too_many_arguments)]
 pub fn segment_intersects_segment(
     x1: f32,
@@ -200,7 +286,25 @@ pub fn segment_intersects_segment(
 }
 
 /// Returns the closest point on a line segment to a given point.
-pub fn closest_point_on_segment(px: f32, py: f32, x1: f32, y1: f32, x2: f32, y2: f32) -> (f32, f32) {
+///
+/// # Parameters
+/// - `px` — `f32`.
+/// - `py` — `f32`.
+/// - `x1` — `f32`.
+/// - `y1` — `f32`.
+/// - `x2` — `f32`.
+/// - `y2` — `f32`.
+///
+/// # Returns
+/// `(f32, f32)`.
+pub fn closest_point_on_segment(
+    px: f32,
+    py: f32,
+    x1: f32,
+    y1: f32,
+    x2: f32,
+    y2: f32,
+) -> (f32, f32) {
     let dx = x2 - x1;
     let dy = y2 - y1;
     let len_sq = dx * dx + dy * dy;
@@ -213,6 +317,14 @@ pub fn closest_point_on_segment(px: f32, py: f32, x1: f32, y1: f32, x2: f32, y2:
 }
 
 /// Tests if a point is inside a polygon using the ray casting algorithm.
+///
+/// # Parameters
+/// - `vertices` — `&[f32]`.
+/// - `px` — `f32`.
+/// - `py` — `f32`.
+///
+/// # Returns
+/// `bool`.
 ///
 /// `vertices` is a flat array `[x0, y0, x1, y1, ...]`.
 pub fn point_in_polygon(vertices: &[f32], px: f32, py: f32) -> bool {
@@ -237,6 +349,19 @@ pub fn point_in_polygon(vertices: &[f32], px: f32, py: f32) -> bool {
 }
 
 /// Infinite line intersection. Returns the intersection point if lines are not parallel.
+///
+/// # Parameters
+/// - `x1` — `f32`.
+/// - `y1` — `f32`.
+/// - `x2` — `f32`.
+/// - `y2` — `f32`.
+/// - `x3` — `f32`.
+/// - `y3` — `f32`.
+/// - `x4` — `f32`.
+/// - `y4` — `f32`.
+///
+/// # Returns
+/// `Option<(f32, f32)>`.
 #[allow(clippy::too_many_arguments)]
 pub fn line_intersect(
     x1: f32,
@@ -257,6 +382,15 @@ pub fn line_intersect(
 }
 
 /// Bresenham line rasterization from (x1, y1) to (x2, y2).
+///
+/// # Parameters
+/// - `x1` — `i32`.
+/// - `y1` — `i32`.
+/// - `x2` — `i32`.
+/// - `y2` — `i32`.
+///
+/// # Returns
+/// `Vec<(i32, i32)>`.
 ///
 /// Returns all integer grid cells the line passes through.
 pub fn bresenham(x1: i32, y1: i32, x2: i32, y2: i32) -> Vec<(i32, i32)> {
@@ -289,6 +423,12 @@ pub fn bresenham(x1: i32, y1: i32, x2: i32, y2: i32) -> Vec<(i32, i32)> {
 
 /// Computes the convex hull of a set of 2D points using Andrew's monotone chain algorithm.
 ///
+/// # Parameters
+/// - `points` — `&[f32]`.
+///
+/// # Returns
+/// `Vec<f32>`.
+///
 /// `points` is a flat array `[x0, y0, x1, y1, ...]`. Returns flat `[x0, y0, ...]`.
 pub fn convex_hull(points: &[f32]) -> Vec<f32> {
     let n = points.len() / 2;
@@ -298,7 +438,11 @@ pub fn convex_hull(points: &[f32]) -> Vec<f32> {
 
     // Extract and sort points by x, then y
     let mut pts: Vec<(f32, f32)> = (0..n).map(|i| (points[i * 2], points[i * 2 + 1])).collect();
-    pts.sort_by(|a, b| a.0.partial_cmp(&b.0).unwrap().then(a.1.partial_cmp(&b.1).unwrap()));
+    pts.sort_by(|a, b| {
+        a.0.partial_cmp(&b.0)
+            .unwrap()
+            .then(a.1.partial_cmp(&b.1).unwrap())
+    });
 
     let cross = |o: (f32, f32), a: (f32, f32), b: (f32, f32)| -> f32 {
         (a.0 - o.0) * (b.1 - o.1) - (a.1 - o.1) * (b.0 - o.0)
@@ -337,6 +481,12 @@ pub fn convex_hull(points: &[f32]) -> Vec<f32> {
 
 /// Delaunay triangulation using the Bowyer-Watson algorithm.
 ///
+/// # Parameters
+/// - `points` — `&[(f64, f64)]`.
+///
+/// # Returns
+/// `Vec<[f64; 6]>`.
+///
 /// Returns a list of triangles, each as `[x1, y1, x2, y2, x3, y3]`.
 pub fn delaunay_triangulate(points: &[(f64, f64)]) -> Vec<[f64; 6]> {
     if points.len() < 3 {
@@ -349,10 +499,18 @@ pub fn delaunay_triangulate(points: &[(f64, f64)]) -> Vec<[f64; 6]> {
     let mut max_x = f64::MIN;
     let mut max_y = f64::MIN;
     for &(x, y) in points {
-        if x < min_x { min_x = x; }
-        if y < min_y { min_y = y; }
-        if x > max_x { max_x = x; }
-        if y > max_y { max_y = y; }
+        if x < min_x {
+            min_x = x;
+        }
+        if y < min_y {
+            min_y = y;
+        }
+        if x > max_x {
+            max_x = x;
+        }
+        if y > max_y {
+            max_y = y;
+        }
     }
 
     let dx = max_x - min_x;
@@ -401,8 +559,7 @@ pub fn delaunay_triangulate(points: &[(f64, f64)]) -> Vec<[f64; 6]> {
                     let ot = triangles[oi];
                     let oe = [[ot[0], ot[1]], [ot[1], ot[2]], [ot[2], ot[0]]];
                     oe.iter().any(|e| {
-                        (e[0] == edge[0] && e[1] == edge[1])
-                            || (e[0] == edge[1] && e[1] == edge[0])
+                        (e[0] == edge[0] && e[1] == edge[1]) || (e[0] == edge[1] && e[1] == edge[0])
                     })
                 });
                 if !shared {

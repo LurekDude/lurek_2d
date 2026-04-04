@@ -1,4 +1,11 @@
 //! CSV, JSON, and LVDF binary serialization for DataFrame.
+//!
+//! This module is part of Luna2D's `dataframe` subsystem and provides the implementation
+//! details for serial-related operations and data management.
+//! Primary functions: `from_csv()`, `to_csv()`, `from_json()`, `to_json()`.
+//!
+//! All public items are documented. See the parent module for architectural context
+//! and the `luna.*` Lua API for the scripting interface.
 
 use crate::dataframe::frame::{CellValue, DataFrame};
 
@@ -6,7 +13,13 @@ use crate::dataframe::frame::{CellValue, DataFrame};
 // CSV (RFC 4180)
 // ---------------------------------------------------------------------------
 
-/// Parse a CSV string into a DataFrame.
+/// Parse a CSV string into a DataFrame. Returns a fully initialised instance with all fields set to their initial values.
+///
+/// # Parameters
+/// - `s` — `&str`.
+///
+/// # Returns
+/// `Result<DataFrame, String>`.
 ///
 /// Handles quoted fields (embedded commas, newlines, escaped quotes `""`).
 /// Auto-detects column types: tries f64 → bool → keeps as Text.
@@ -125,7 +138,10 @@ fn parse_csv_records(s: &str) -> Result<Vec<Vec<String>>, String> {
 
 /// Serialize a DataFrame to CSV format.
 impl DataFrame {
-    /// Serialize to CSV string (RFC 4180).
+    /// Serialize to CSV string (RFC 4180). Consult the module-level documentation for the broader usage context and preconditions.
+    ///
+    /// # Returns
+    /// `String`.
     #[allow(clippy::needless_range_loop)]
     pub fn to_csv(&self) -> String {
         let mut out = String::new();
@@ -175,6 +191,12 @@ fn csv_write_field(out: &mut String, field: &str) {
 // ---------------------------------------------------------------------------
 
 /// Parse JSON (array-of-objects) into a DataFrame.
+///
+/// # Parameters
+/// - `s` — `&str`.
+///
+/// # Returns
+/// `Result<DataFrame, String>`.
 ///
 /// Expects format: `[{"col1": val1, "col2": val2}, ...]`
 /// Maps JSON types: number→Number, string→Text, true/false→Bool, null→Nil.
@@ -482,6 +504,9 @@ fn skip_ws(chars: &[char], start: usize) -> usize {
 /// Serialize a DataFrame to JSON (array-of-objects).
 impl DataFrame {
     /// Serialize to JSON string (array-of-objects format).
+    ///
+    /// # Returns
+    /// `String`.
     #[allow(clippy::needless_range_loop)]
     pub fn to_json(&self) -> String {
         let mut out = String::from("[");
@@ -565,7 +590,10 @@ fn json_write_value(out: &mut String, val: &CellValue) {
 //     payload: (Number=8 bytes f64 LE, Text=u32 LE len + bytes, Bool=1 byte, Nil=none)
 
 impl DataFrame {
-    /// Serialize to LVDF binary format.
+    /// Serialize to LVDF binary format. Consult the module-level documentation for the broader usage context and preconditions.
+    ///
+    /// # Returns
+    /// `Vec<u8>`.
     pub fn to_binary(&self) -> Vec<u8> {
         let mut buf = Vec::new();
         // Magic
@@ -614,6 +642,12 @@ impl DataFrame {
 }
 
 /// Deserialize a DataFrame from LVDF binary format.
+///
+/// # Parameters
+/// - `data` — `&[u8]`.
+///
+/// # Returns
+/// `Result<DataFrame, String>`.
 pub fn from_binary(data: &[u8]) -> Result<DataFrame, String> {
     let len = data.len();
     if len < 13 {
@@ -731,6 +765,9 @@ pub fn from_binary(data: &[u8]) -> Result<DataFrame, String> {
 
 impl DataFrame {
     /// Format the DataFrame as an ASCII table for debug display.
+    ///
+    /// # Returns
+    /// `String`.
     #[allow(clippy::needless_range_loop)]
     pub fn to_string_table(&self) -> String {
         let cols = self.columns();

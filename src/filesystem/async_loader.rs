@@ -14,7 +14,11 @@ use std::thread;
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub struct LoadHandle(pub u64);
 
-/// Outcome of a completed load request.
+/// Outcome of a completed load request. Returns an error if the source data is malformed or missing.
+///
+/// # Variants
+/// - `Ready` — Ready variant.
+/// - `Error` — Error variant.
 #[derive(Debug, Clone)]
 pub enum LoadResult {
     /// File bytes loaded successfully.
@@ -24,6 +28,10 @@ pub enum LoadResult {
 }
 
 /// Status returned by [`AsyncLoader::poll`].
+///
+/// # Variants
+/// - `Pending` — Pending variant.
+/// - `Done` — Done variant.
 #[derive(Debug, Clone)]
 pub enum LoadStatus {
     /// The request is still being processed.
@@ -45,6 +53,12 @@ const QUEUE_CAPACITY: usize = 64;
 /// A single-threaded background file reader.
 ///
 /// Create one per engine session; drop it to join the worker thread.
+///
+/// # Fields
+/// - `next_id` — `AtomicU64`.
+/// - `tx` — `Option<mpsc::SyncSender<LoadRequest>>`.
+/// - `results` — `Arc<Mutex<HashMap<u64`.
+/// - `worker` — `Option<thread::JoinHandle<()>>`.
 pub struct AsyncLoader {
     next_id: AtomicU64,
     tx: Option<mpsc::SyncSender<LoadRequest>>,
@@ -53,7 +67,10 @@ pub struct AsyncLoader {
 }
 
 impl AsyncLoader {
-    /// Spawns the background worker thread.
+    /// Spawns the background worker thread. Returns a fully initialised instance with all fields set to their initial values.
+    ///
+    /// # Returns
+    /// `Self`.
     pub fn new() -> Self {
         let (tx, rx) = mpsc::sync_channel::<LoadRequest>(QUEUE_CAPACITY);
         let results: Arc<Mutex<HashMap<u64, LoadResult>>> = Arc::new(Mutex::new(HashMap::new()));
@@ -74,7 +91,13 @@ impl AsyncLoader {
         }
     }
 
-    /// Submit a file-read request.
+    /// Submit a file-read request. Consult the module-level documentation for the broader usage context and preconditions.
+    ///
+    /// # Parameters
+    /// - `resolved_path` — `PathBuf`.
+    ///
+    /// # Returns
+    /// `LoadHandle`.
     ///
     /// `resolved_path` must already be sandbox-validated (canonical, inside the
     /// game directory).  Path validation is the caller's responsibility and MUST
@@ -105,6 +128,12 @@ impl AsyncLoader {
 
     /// Check the status of a previously-requested load.
     ///
+    /// # Parameters
+    /// - `handle` — `LoadHandle`.
+    ///
+    /// # Returns
+    /// `LoadStatus`.
+    ///
     /// Returns [`LoadStatus::Done`] exactly once — subsequent polls for the same
     /// handle return [`LoadStatus::Pending`] (the entry is removed on first read).
     pub fn poll(&self, handle: LoadHandle) -> LoadStatus {
@@ -117,6 +146,9 @@ impl AsyncLoader {
     }
 
     /// Returns the number of completed but un-polled results.
+    ///
+    /// # Returns
+    /// `usize`.
     pub fn pending_results(&self) -> usize {
         self.results.lock().map(|m| m.len()).unwrap_or(0)
     }

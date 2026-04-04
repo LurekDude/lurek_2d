@@ -1,4 +1,10 @@
 //! Tilemap engine module — TileSet, TileMap, AutoTileSheet, IsoMap, ChunkMap, TMX loader, and procedural generation types.
+//!
+//! This module is part of Luna2D's `tilemap` subsystem and provides the implementation
+//! details for mod-related operations and data management.
+//!
+//! All public items are documented. See the parent module for architectural context
+//! and the `luna.*` Lua API for the scripting interface.
 
 /// Auto-tile atlas with bitmask-based tile selection.
 pub mod autotile_sheet;
@@ -28,4 +34,8 @@ pub use mapgen::{
 };
 pub use tilemap::{SweepResult, TileLayer, TileMap};
 pub use tileset::{TileAnimFrame, TileSet};
-pub use tmx::{load_tmx, TmxLayer, TmxMap, TmxObject, TmxObjectLayer, TmxOrientation, TmxTileLayer, TmxTileset};
+pub use tmx::{
+    load_tmx, TmxLayer, TmxMap, TmxObject, TmxObjectLayer, TmxOrientation, TmxTileLayer, TmxTileset,
+};
+/// Grid-direction walker for tile stepping.
+pub mod tile_walker;
