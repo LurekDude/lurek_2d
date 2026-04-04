@@ -356,6 +356,7 @@ fn test_drawex_defaults_rotation_scale_origin_to_identity() {
         sy,
         ox,
         oy,
+        ..
     }) = st.draw_commands.last()
     {
         let _ = texture_key;
@@ -388,6 +389,7 @@ fn test_drawex_with_all_params_queues_correct_values() {
         sy,
         ox,
         oy,
+        ..
     }) = st.draw_commands.last()
     {
         let _ = texture_key;
@@ -429,6 +431,7 @@ fn test_newquad_and_drawquad_queue_draw_quad_command() {
         sy,
         ox,
         oy,
+        ..
     }) = st.draw_commands.last()
     {
         let _ = texture_key;

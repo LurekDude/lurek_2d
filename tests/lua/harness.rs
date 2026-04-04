@@ -338,6 +338,11 @@ fn lua_test_minimap() {
 }
 
 #[test]
+fn lua_test_network() {
+    run_lua_test("unit/test_network.lua");
+}
+
+#[test]
 fn lua_test_particle() {
     run_lua_test("unit/test_particle.lua");
 }
@@ -380,6 +385,11 @@ fn lua_test_font() {
 #[test]
 fn lua_test_window_scaling() {
     run_lua_test("unit/test_window_scaling.lua");
+}
+
+#[test]
+fn lua_test_tilemap() {
+    run_lua_test("unit/test_tilemap.lua");
 }
 
 // === Additional Stress Tests ===

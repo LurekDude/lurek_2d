@@ -68,6 +68,9 @@ rapier2d = "0.32"
 # Gamepad hardware input (cross-platform, includes bundled SDL_GameControllerDB)
 gilrs = "0.11"
 
+# Pure Rust ENet networking (reliable UDP, channels, sequencing)
+rusty_enet = "0.4"
+
 # Generational ID-based resource pools
 slotmap = "1"
 
@@ -250,6 +253,10 @@ name = "modding_tests"
 path = "tests/unit/modding_tests.rs"
 
 [[test]]
+name = "network_tests"
+path = "tests/unit/network_tests.rs"
+
+[[test]]
 name = "particle_tests"
 path = "tests/unit/particle_tests.rs"
 
@@ -315,45 +322,54 @@ path = "tests/ext/math_ext_tests.rs"
 name = "ai_tests"
 path = "tests/game/ai_tests.rs"
 
-[[test]]
-name = "combat_tests"
-path = "tests/game/combat_tests.rs"
+# migration-state: lua_api/combat_api.rs deleted; test disabled until Lua migration is complete
+# [[test]]
+# name = "combat_tests"
+# path = "tests/game/combat_tests.rs"
 
-[[test]]
-name = "battle_tests"
-path = "tests/game/battle_tests.rs"
+# migration-state: lua_api/battle_api.rs deleted; test disabled until Lua migration is complete
+# [[test]]
+# name = "battle_tests"
+# path = "tests/game/battle_tests.rs"
 
-[[test]]
-name = "crafting_tests"
-path = "tests/game/crafting_tests.rs"
+# migration-state: module moved to library/crafting/ (Lua); test disabled until Lua migration is complete
+# [[test]]
+# name = "crafting_tests"
+# path = "tests/game/crafting_tests.rs"
 
-[[test]]
-name = "inventory_tests"
-path = "tests/game/inventory_tests.rs"
+# migration-state: lua_api/inventory_api.rs deleted; test disabled until Lua migration is complete
+# [[test]]
+# name = "inventory_tests"
+# path = "tests/game/inventory_tests.rs"
 
-[[test]]
-name = "cardgame_tests"
-path = "tests/game/cardgame_tests.rs"
+# migration-state: lua_api/cardgame_api.rs deleted; test disabled until Lua migration is complete
+# [[test]]
+# name = "cardgame_tests"
+# path = "tests/game/cardgame_tests.rs"
 
 [[test]]
 name = "minimap_tests"
 path = "tests/game/minimap_tests.rs"
 
-[[test]]
-name = "quest_tests"
-path = "tests/game/quest_tests.rs"
+# migration-state: lua_api/quest_api.rs deleted; test disabled until Lua migration is complete
+# [[test]]
+# name = "quest_tests"
+# path = "tests/game/quest_tests.rs"
 
-[[test]]
-name = "province_map_tests"
-path = "tests/game/province_map_tests.rs"
+# migration-state: module moved to library/province_map/ (Lua); test disabled until Lua migration is complete
+# [[test]]
+# name = "province_map_tests"
+# path = "tests/game/province_map_tests.rs"
 
-[[test]]
-name = "resource_tests"
-path = "tests/game/resource_tests.rs"
+# migration-state: lua_api resource binding deleted; test disabled until Lua migration is complete
+# [[test]]
+# name = "resource_tests"
+# path = "tests/game/resource_tests.rs"
 
-[[test]]
-name = "stats_tests"
-path = "tests/game/stats_tests.rs"
+# migration-state: lua_api/stats_api.rs deleted; test disabled until Lua migration is complete
+# [[test]]
+# name = "stats_tests"
+# path = "tests/game/stats_tests.rs"
 
 # === Harnesses ===
 [[test]]
