@@ -2,11 +2,14 @@
 
 | Property | Value |
 |----------|-------|
-| **Tier** | Tier 1 — Basic Core |
+| **Tier** | Tier 2 — Reusable Engine Extensions |
+| **Status** | Implemented — Full |
 | **Lua API** | `luna.minimap` |
-| **Source** | `src/minimap/` |
-| **Tests** | `tests/minimap_tests.rs` |
-| **Lua Tests** | `tests/lua/unit/test_minimap.lua` |
+| **Source** | `src/minimap/mod.rs`, `src/minimap/minimap.rs`, `src/minimap/types.rs` |
+| **Lua Bindings** | `src/lua_api/minimap_api.rs` |
+| **Tests** | `tests/game/minimap_tests.rs` — 35 tests |
+| **Lua Tests** | `tests/lua/unit/test_minimap.lua` — 61 tests |
+| **Design Spec** | `docs/API/minimap-design.md` |
 
 ## Summary
 
@@ -30,56 +33,44 @@ grid indices for click-to-navigate interactions. The `Minimap` extends
 
 ```
 Minimap (2D data + render object)
-  ├── terrain_grid: Vec<u8>    (cell terrain type IDs; W × H)
-  ├── fog_grid: Vec<u8>        (0=hidden / 1=explored / 2=visible)
-  ├── objects: HashMap<id, TrackedObject { x, y, type, owner }>
-  ├── markers: Vec<Marker { x, y, icon, label }>
-  ├── pings: Vec<Ping { x, y, duration, elapsed }>
-  ├── viewport_rect: Rect         (current camera view on the world)
+  ├── terrain_grid: Vec<u8>           (cell terrain type IDs; W × H)
+  ├── fog_grid: Vec<u8>               (0=hidden / 1=explored / 2=visible)
+  ├── tile_descriptions: HashMap<u32, String>  (hover tooltip per terrain type)
+  ├── objects: HashMap<id, MinimapObject { x, y, type_index, owner }>
+  ├── object_types: Vec<MinimapObjectType { name, color, visible }>
+  ├── markers: Vec<MinimapMarker { id, x, y, desc, color }>
+  ├── pings: Vec<MinimapPing { x, y, duration, elapsed, color }>
+  ├── viewport_rect: (x, y, w, h)     (current camera view on the world)
+  ├── clickable: bool                  (enables hit-testing for click events)
   │
   ├── config
   │     ├── terrain_colors: HashMap<type_id, Color>
   │     ├── owner_colors: HashMap<owner_id, Color>
   │     ├── fog_colors: { hidden, explored, visible }
-  │     └── color_mode: Terrain | Owner
+  │     └── color_mode: Terrain | Political
   │
   ├── zoom, pan_x, pan_y
   ├── update(dt) → ticks ping lifetimes
-  ├── draw() → renders terrain + fog + objects + markers + viewport box
-  └── screen_to_grid(sx, sy) → (gx, gy)
+  └── screen_to_grid(sx, sy, draw_x, draw_y) → Option<(gx, gy)>
 
 Dependency: luna.graphics (internal texture + Drawable rendering)
 ```
 
+## Key Types
+
+| Type | File | Description |
+|------|------|-------------|
+| `Minimap` | `minimap.rs` | Main struct — terrain grid, fog, objects, markers, pings, click state |
+| `ColorMode` | `types.rs` | `Terrain` or `Political` rendering mode |
+| `FogLevel` | `types.rs` | `Hidden`, `Explored`, or `Visible` cell visibility |
+| `MinimapObjectType` | `types.rs` | Named object category with default color and visibility flag |
+| `MinimapObject` | `types.rs` | Tracked entity with grid position, type index, and owner |
+| `MinimapPing` | `types.rs` | Timed animated pulse effect at a grid cell |
+| `MinimapMarker` | `types.rs` | Persistent labeled point at a grid cell |
+
 ## Lua API
 
-Exposed under `luna.minimap.*` by `src/lua_api/minimap_api/`.
-
-## minimap — Strategy Game Minimap Module
-
-> **Lua namespace:** `luna.minimap`
-> **C++ module:** `src/modules/minimap/`
-> **Purpose:** Provides a data-driven minimap system for strategy/RPG games with terrain rendering, fog of war, trackable objects with ownership, markers, animated pings, viewport overlay, zoom/pan navigation, and mouse interaction. The Minimap type extends `Drawable` — it can be drawn directly with `luna.graphics.draw()`.
-
-## Reimplementation Notes
-
-- Minimap inherits from `engine::graphics::Drawable` — the C++ implementation renders to an internal texture
-- Data model is a 2D integer grid where each cell stores a terrain type ID
-- Fog of war is a separate per-cell byte array with three levels: hidden, explored, visible
-- Objects are tracked by numeric ID with position, type, and owner
-- Terrain colors, fog colors, and owner colors are set independently
-- Color mode switches between terrain-based and owner/political-based rendering
-- The viewport rectangle overlay shows the player's current view area on the minimap
-- Mouse interaction supports screen-to-grid coordinate conversion and hover tooltips
-- Pings are animated effects with a duration that auto-expire via `update(dt)`
-- No external dependencies beyond the standard graphics module
-
-## Dependencies
-
-- `luna.graphics` (Drawable base, internal texture rendering)
-- No external library dependencies
-
----
+Exposed under `luna.minimap.*` by `src/lua_api/minimap_api.rs`.
 
 ## Module Functions
 
