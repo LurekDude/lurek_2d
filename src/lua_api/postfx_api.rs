@@ -141,6 +141,18 @@ impl LuaUserData for LuaPostFxEffect {
             Ok(this.inner.borrow().get_type_name().to_string())
         });
 
+        // getEffectType() -> string  (alias for getType)
+        /// Returns the string name of this effect's type.
+        ///
+        /// Alias for `getType`. Provided for API consistency — both names
+        /// return the same value.
+        ///
+        /// # Returns
+        /// `string` — Effect type name.
+        methods.add_method("getEffectType", |_, this, ()| {
+            Ok(this.inner.borrow().get_type_name().to_string())
+        });
+
         // isBuiltIn() -> boolean
         /// Returns `true` if this is a built-in effect (not a custom shader pass).
         ///
