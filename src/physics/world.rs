@@ -1647,6 +1647,31 @@ impl World {
         results
     }
 
+    /// Returns the first body whose collider contains the given world-space point.
+    ///
+    /// Uses a point-sized AABB query filter.
+    ///
+    /// # Parameters
+    /// - `x` — World-space X coordinate.
+    /// - `y` — World-space Y coordinate.
+    ///
+    /// # Returns
+    /// `Option<usize>` — body index, or `None` if no body at that point.
+    pub fn get_body_at_point(&self, x: f32, y: f32) -> Option<usize> {
+        let epsilon = 0.01;
+        let aabb = Aabb {
+            mins: Vector::new(x - epsilon, y - epsilon),
+            maxs: Vector::new(x + epsilon, y + epsilon),
+        };
+        let qp = self.query_pipeline();
+        for (col_handle, _co) in qp.intersect_aabb_conservative(aabb) {
+            if let Some(body_id) = self.body_for_collider(col_handle) {
+                return Some(body_id);
+            }
+        }
+        None
+    }
+
     // ── Extended joint types ──────────────────────────────────────────────────
 
     /// Creates a wheel joint (prismatic + rotation) between two bodies.

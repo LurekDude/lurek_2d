@@ -64,6 +64,7 @@ DataFrame (column-oriented table)
 
 | File | Purpose |
 |------|---------|
+| `mod.rs` | Module root; re-exports DataFrame, Database, CellValue, and submodule access |
 | `frame.rs` | Core DataFrame and Database types with CellValue cells |
 | `query.rs` | DataFrame query, filter, sort, join, analytics, and mutation |
 | `serial.rs` | CSV, JSON, and LVDF binary serialization for DataFrame |

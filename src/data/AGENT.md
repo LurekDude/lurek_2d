@@ -10,22 +10,33 @@
 
 ## Summary
 
-The data module provides a runtime key-value store and a TOML serialisation
-surface that together fill the gap between ephemeral Lua local variables and
-full save-game persistence.  Global game flags, player preferences,
-cross-scene statistics, and configuration values live here: any Lua script can
-read or write a named key without passing values through the call stack or
-storing them in globals.
+The `data` module is the LÖVE2D-compatible binary data layer for Luna2D.  It
+mirrors the `love.data.*` API surface so that games ported from LÖVE2D compile
+without modification and new games can use familiar idioms.
 
-The TOML marshaller (`luna.data.parseToml` / `luna.data.encodeToml`) handles
-the full TOML value space — strings, integers, floats, booleans, datetime
-strings, inline tables, and arrays — mapping each TOML type to the nearest Lua
-equivalent and back with round-trip fidelity for typical config patterns.
-Beyond TOML the module also exposes hash functions (MD5, SHA-1, CRC32) for
-save-data integrity checksums and deflate/inflate compression for binary
-storage and network transfer.
+The distinguishing feature is **`luna.data.pack` / `luna.data.unpack`**: a
+format-string binary serializer that uses LÖVE2D's single-character type codes
+(`b`, `B`, `h`, `H`, `i`, `I`, `l`, `L`, `f`, `d`, `z`, `s`, `x`) with `<` /
+`>` byte-order prefixes, producing byte-for-byte identical output to LÖVE2D for
+the same inputs.  This is deliberately different from `luna.binary.write` /
+`luna.binary.read`, which use Luna2D's own space-separated token format
+(`"le u32 f32 str"`).
 
-## Architecture
+Along with the pack API the module provides the same primitives as `luna.binary`
+(ByteData, compress, decompress, encode, decode, hash) using identical
+implementations, and adds low-level TOML parsing/encoding helpers
+(`parseToml` / `encodeToml`) that work directly at the `toml::Value` level.
+
+**Separation boundary** — use `luna.data` when:
+- Porting a LÖVE2D game or using LÖVE2D binary data files
+- Needing the `<bHif>` format-string pack convention
+
+Use `luna.binary` when:
+- Writing new Luna2D-native binary files with the space-token format
+- Using `luna.binary.size` for fixed-layout struct arithmetic
+
+Use `luna.serial` for text-format serialization (JSON / TOML / CSV / YAML).
+Use `luna.filesystem` for file I/O.
 
 ```
 data/
@@ -52,6 +63,7 @@ data/
 | `encode.rs` | Base64 and hex encoding/decoding for data serialization |
 | `hash.rs` | Cryptographic hash functions for data integrity verification |
 | `pack.rs` | Binary pack/unpack utilities compatible with LÖVE2D `data.pack` API |
+| `toml_convert.rs` | TOML parsing and encoding for Luna2D |
 ### `data::byte_data`
 
 Contiguous byte buffer accessible from Lua.
@@ -148,7 +160,7 @@ Typed value that can be packed or unpacked: Bool, Int, Float, String, Bytes.
 
 ## Lua API
 
-Exposed under `luna.data.*` by `src/lua_api/data_api/`.
+Exposed under `luna.data.*` by `src/lua_api/data_api.rs`.
 
 ## Item Summary
 

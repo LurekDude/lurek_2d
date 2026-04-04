@@ -27,7 +27,7 @@
 //! | [`combat`] | Vehicle combat: chassis, turrets, weapons, projectiles |
 //! | [`compute`] | N-dimensional numerical arrays (luna.compute) |
 //! | [`crafting`] | Recipe-based crafting queues and upgrade trees |
-//! | [`data`] | Binary data, compression, hashing, base64/hex encoding |
+//! | [`data`] | LÖVE2D-compatible binary data: ByteData, compress, hash, encode, LÖVE2D pack format |
 //! | [`dataframe`] | In-memory column-major tabular data |
 //! | [`dialog`] | Dialogue sequencer for branching narrative with typewriter effect |
 //! | [`economy`] | Named resource economy: capacity, flow rates, decay, and reservations |
@@ -51,6 +51,7 @@
 //! | [`postfx`] | Post-processing effects data model: bloom, blur, color grading |
 //! | [`province_map`] | Province/territory spatial data from colour-coded PNG images |
 //! | [`quest`] | Quest tracking, objectives, branching completion states |
+//! | [`raycaster`] | DDA grid raycaster for FPS/dungeon-crawler: walls, sprites, lighting, minimap |
 //! | [`savegame`] | Slot-based save/load with schema versioning and auto-save |
 //! | [`scene`] | Scene stack, depth-sorted rendering, visual transitions |
 //! | [`stats`] | Character attributes, derived stats, and buff modifiers |
@@ -84,6 +85,8 @@ pub mod compute;
 // migration-state: pub mod crafting; — now library/crafting/init.lua
 /// Binary buffers, compression, encoding, hashing, and Luna2D Binary Pack Format.
 pub mod binary;
+/// LÖVE2D-compatible binary data API: ByteData, compress, hash, encode, and LÖVE2D pack format.
+pub mod data;
 /// Format-agnostic serialization: JSON, TOML, CSV, and YAML via shared SerialValue.
 pub mod serial;
 /// In-memory column-major tabular data (luna.dataframe).
@@ -134,12 +137,16 @@ pub mod pipeline;
 pub mod postfx;
 /// Procedural world generation: cellular automata, Voronoi, flood fill, Poisson disk, periodic noise.
 pub mod procgen;
+/// Grid-based DDA raycaster for retro FPS and dungeon-crawler games: wall rendering, sprite projection, lighting, doors, heightmaps, minimap.
+pub mod raycaster;
 // migration-state: pub mod province_map; — now library/province_map/init.lua
 // migration-state: pub mod quest; — now library/quest/init.lua
 /// Slot-based save/load system with collectors, schema versioning, and auto-save.
 pub mod savegame;
 /// Scene stack for managing game scene lifecycle, transitions, and depth-sorted rendering.
 pub mod scene;
+/// Skeletal animation: bone hierarchies, slots, and world-transform propagation.
+pub mod spine;
 // migration-state: pub mod stats; — now library/stats/init.lua
 /// Background Rust worker threads and `Channel` inter-thread communication.
 pub mod thread;

@@ -59,7 +59,9 @@ GameFS (sandbox root = game directory)
 
 | File | Purpose |
 |------|---------|
+| `mod.rs` | Module root; re-exports GameFS, AsyncLoader, FileHandle, FileData, and Vfs access |
 | `async_loader.rs` | Background asset-loading worker that reads files off the main thread |
+| `file_data.rs` | Raw file data buffer loaded from the VFS |
 | `file_handle.rs` | File handle with buffered read/write and sandboxed path resolution |
 | `vfs.rs` | Vfs implementation for the `filesystem` subsystem |
 

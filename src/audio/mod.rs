@@ -52,6 +52,10 @@ pub use sound_data::SoundData;
 pub mod midi;
 pub use midi::MidiState;
 
+/// DSP effect chain sources for dynamic audio processing.
+pub mod dsp;
+pub use dsp::{AtomicParam, DynamicEffectSource, EffectParams, EffectType};
+
 /// Returns the names of all available audio output devices.
 ///
 /// On most systems this returns at least `"Default"`. Uses `cpal` enumeration

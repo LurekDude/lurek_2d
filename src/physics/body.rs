@@ -329,4 +329,42 @@ impl Body {
     pub fn collides_with_layer(&self, other: &Body) -> bool {
         (self.layer & other.mask) != 0 && (other.layer & self.mask) != 0
     }
+
+    /// Transforms a point from body-local coordinates to world coordinates.
+    ///
+    /// Applies the body's rotation and then translates by the body's position.
+    ///
+    /// # Parameters
+    /// - `local_x` — `f32`. X coordinate in body-local space.
+    /// - `local_y` — `f32`. Y coordinate in body-local space.
+    ///
+    /// # Returns
+    /// `(f32, f32)` — world-space `(x, y)`.
+    pub fn get_world_point(&self, local_x: f32, local_y: f32) -> (f32, f32) {
+        let cos_a = self.angle.cos();
+        let sin_a = self.angle.sin();
+        let wx = self.position.x + local_x * cos_a - local_y * sin_a;
+        let wy = self.position.y + local_x * sin_a + local_y * cos_a;
+        (wx, wy)
+    }
+
+    /// Transforms a point from world coordinates to body-local coordinates.
+    ///
+    /// Translates relative to the body's position, then applies the inverse rotation.
+    ///
+    /// # Parameters
+    /// - `world_x` — `f32`. X coordinate in world space.
+    /// - `world_y` — `f32`. Y coordinate in world space.
+    ///
+    /// # Returns
+    /// `(f32, f32)` — body-local `(x, y)`.
+    pub fn get_local_point(&self, world_x: f32, world_y: f32) -> (f32, f32) {
+        let dx = world_x - self.position.x;
+        let dy = world_y - self.position.y;
+        let cos_a = self.angle.cos();
+        let sin_a = self.angle.sin();
+        let lx = dx * cos_a + dy * sin_a;
+        let ly = -dx * sin_a + dy * cos_a;
+        (lx, ly)
+    }
 }

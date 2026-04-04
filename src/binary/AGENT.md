@@ -21,7 +21,9 @@ The Luna2D Binary Pack Format (`luna.binary.write` / `luna.binary.read` /
 to write and read structured binary data with explicit endianness (`le` / `be`).
 Supported token types: `u8 u16 u32 u64 i8 i16 i32 i64 f32 f64 bool str cstr pad`.
 
-Format serialization belongs in `src/serial/` (`luna.serial.*`).
+**Separation boundary** — `luna.binary` uses Luna2D's own token format.  For
+the LÖVE2D-compatible `<bHif>` format-string convention, use `luna.data`.
+Format serialization (JSON / TOML / CSV / YAML) belongs in `src/serial/`.
 
 ## Architecture
 
@@ -45,6 +47,7 @@ binary/
 
 | File | Purpose |
 |------|---------|
+| `mod.rs` | Module root; re-exports ByteData, compress, decompress, DataView, encode, decode, hash, and pack primitives |
 | `byte_data.rs` | Contiguous byte buffer accessible from Lua |
 | `compress.rs` | Data compression and decompression using deflate, gzip, zlib, and LZ4 |
 | `encode.rs` | Base64 and hex encoding/decoding for data serialization |

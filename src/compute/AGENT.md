@@ -62,6 +62,7 @@ NdArray (core container)
 
 | File | Purpose |
 |------|---------|
+| `mod.rs` | Module root; re-exports NdArray, DataType, and all operation modules |
 | `array.rs` | Core NdArray type and DataType enum |
 | `ops.rs` | Element-wise, reduction, comparison, masking, shape, and bitwise operations on... |
 | `spatial.rs` | 2D spatial operations and linear algebra for NdArray |

@@ -19,7 +19,8 @@ API (`luna.serial.*`) converts between `SerialValue` and Lua tables
 automatically. Map keys are always strings; sequences use consecutive integer
 indices when returned to Lua.
 
-Binary data persistence belongs in `src/binary/` (`luna.binary.*`).
+Binary data persistence belongs in `src/binary/` (`luna.binary.*`) or
+`src/data/` (`luna.data.*` for LÖVE2D-compat).
 Full save-game orchestration belongs in `src/savegame/` (`luna.savegame.*`).
 
 ## Architecture
@@ -43,9 +44,10 @@ serial/
 
 | File | Purpose |
 |------|---------|
+| `mod.rs` | Module root; re-exports SerialValue, SerialError, and all format submodules |
 | `lua_table.rs` | `SerialValue` intermediate enum and `SerialError` type |
 | `json.rs` | JSON parsing and encoding |
-| `toml.rs` | TOML parsing and encoding (migrated from `binary::toml_convert`) |
+| `toml.rs` | TOML parsing and encoding (migrated from `data::toml_convert`) |
 | `csv.rs` | CSV parsing and encoding with configurable delimiter and header options |
 | `yaml.rs` | YAML parsing and encoding |
 

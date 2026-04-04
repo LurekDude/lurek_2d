@@ -2,10 +2,10 @@
 
 | Property | Value |
 |----------|-------|
-| **Tier** | Design-stage / Stub |
-| **Lua API** | `None` |
-| **Source** | `src/doll/` |
-| **Tests** | `tests/doll_tests.rs` |
+| **Tier** | Design-stage / Stub (Rust) → **Implemented as Tier 3 Lunasome** |
+| **Lua API** | `require("library.doll")` |
+| **Source** | `library/doll/init.lua` (active), `src/doll/` (legacy stub) |
+| **Tests** | `tests/lua/library/test_library_doll.lua` |
 
 ## Summary
 
