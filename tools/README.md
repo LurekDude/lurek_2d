@@ -25,7 +25,8 @@ This directory contains **permanent** CLI scripts for the Luna2D engine pipeline
 | `gen_docs_rust.py` | Compact Rust API reference | `docs/API/rust-api.md` |
 | `gen_docs_tests.py` | Test catalog from Rust test files | `docs/API/test-docs.md` |
 | `gen_wiki_api.py` | Game-developer API cheatsheet | `wiki/API-Reference.md` |
-| `gen_lua_api.py` | Legacy Lua reference (VS Code extension) | `docs/API/lua_api_reference_generated.md` |
+| `gen_lua_api.py` | Lua API reference from `@param`/`@return` tags in `src/lua_api/` | `docs/API/lua_api_reference_generated.md` |
+| `gen_lua_api_skeleton.py` | Generate `src/lua_api/*_api.rs` skeletons from Rust module docstrings | `src/lua_api/*.rs` |
 | `collect_docs.py` | Rich Rust API collector with missing-doc report | `docs/API/api_generated.md` |
 | `doc_coverage.py` | Rust + Lua docstring coverage analytics | `docs/API/doc_coverage.json` |
 | `gen_test_docs.py` | Human-readable test documentation from metadata | `docs/API/test_docs.md` |
@@ -58,7 +59,8 @@ This directory contains **permanent** CLI scripts for the Luna2D engine pipeline
 | Script | Purpose |
 |---|---|
 | `gen_docs_lua.py` | Lua-facing API reference Markdown |
-| `gen_lua_api.py` | Legacy Lua API reference (IDE extension) |
+| `gen_lua_api.py` | Lua API reference scanner — reads `@param`/`@return` tags from named `pub fn` in `src/lua_api/` |
+| `gen_lua_api_skeleton.py` | One-time skeleton generator — converts Rust module docstrings into `src/lua_api/*_api.rs` stubs with named `pub fn` pattern |
 
 ### Build & Distribution
 

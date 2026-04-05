@@ -78,6 +78,11 @@ Run these checks after every feature implementation, in order:
   python tools/gen_lua_api.py
   python tools/gen_all_docs.py --skip-legacy
   ```
+- To generate a new `src/lua_api/<module>_api.rs` skeleton from an existing Rust module:
+  ```powershell
+  python tools/gen_lua_api_skeleton.py --module <name> --dry-run   # preview first
+  python tools/gen_lua_api_skeleton.py --module <name>              # write file
+  ```
 - If only Rust internals changed: `python tools/collect_docs.py`
 
 ### 3. Test coverage

@@ -368,6 +368,10 @@ work/{session}/
 | `python tools/test_coverage.py --suggest` | Print test stubs for uncovered items |
 | `python tools/gen_test_docs.py` | Generate `docs/API/test_docs.md` from coverage metadata |
 | `python tools/gen_lua_api.py` | Generate `docs/API/lua_api_reference_generated.md` |
+| `python tools/gen_lua_api_skeleton.py` | Generate `src/lua_api/*_api.rs` skeletons from Rust module docstrings |
+| `python tools/gen_lua_api_skeleton.py --list` | List all scannable module names |
+| `python tools/gen_lua_api_skeleton.py --module <name> --dry-run` | Preview skeleton for a single module |
+| `python tools/gen_lua_api_skeleton.py --all` | Generate skeletons for all non-existing modules |
 | `python tools/gen_wiki_api.py` | Regenerate `wiki/API-Reference.md` cheatsheet |
 | `python tools/gen_splash.py` | Regenerate splash screen asset |
 | `python tools/gen_icon.py` | Regenerate window icon asset |

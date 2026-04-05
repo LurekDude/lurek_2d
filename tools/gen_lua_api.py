@@ -371,10 +371,26 @@ def extract_lua_functions(api_file: Path) -> List[LuaFunction]:
 
     set_multiline_re = re.compile(r'(\w+)\.set\(\s*$')
     set_inline_re = re.compile(r'(\w+)\.set\(\s*"(\w+)"\s*,\s*lua\.create_function')
+    # NEW: named fn reference pattern — .set("luaName", lua.create_function(fn_name)?)
+    set_named_fn_re = re.compile(
+        r'\.set\(\s*"(\w+)"\s*,\s*lua\.create_function\(\s*(\w+)\s*\??\)'
+    )
     name_next_re = re.compile(r'^\s*"(\w+)"\s*,')
     method_re = re.compile(r'methods\.add_method(?:_mut)?\(\s*"(\w+)"')
+    # NEW: Self:: reference pattern — methods.add_method("luaName", Self::fn_name)
+    method_self_re = re.compile(
+        r'methods\.add_method(?:_mut)?\(\s*"(\w+)"\s*,\s*Self::(\w+)'
+    )
     impl_re = re.compile(r'^\s*impl(?:<[^>]*>)?\s+(?:LuaUserData\s+for\s+)?(\w+)')
     add_method_re = re.compile(r'fn\s+add_(\w+)_methods\(')
+
+    def _find_pub_fn_docstring(fn_name: str) -> Optional[str]:
+        """Find `pub fn fn_name(` in the file and return its docstring."""
+        pub_fn_pat = re.compile(r'pub fn ' + re.escape(fn_name) + r'\s*[<(]')
+        for idx2, ln2 in enumerate(lines):
+            if pub_fn_pat.search(ln2):
+                return _collect_docstring_above(lines, idx2)
+        return None
 
     i = 0
     while i < len(lines):
@@ -414,14 +430,14 @@ def extract_lua_functions(api_file: Path) -> List[LuaFunction]:
                     owner = current_widget_type if current_widget_type else ""
                     kind = "method" if owner else "function"
                     lua_name = f"{owner}:{func_name}" if owner else f"luna.{module}.{func_name}"
-                    
+
                     if not docstring and owner:
                         docstring = f"/// Returns a value for {func_name} (auto-generated)."
-                        
+
                     desc = docstring.split("\n")[0] if docstring else ""
                     params, returns = _extract_params_returns(docstring)
                     inferred = _infer_signature(lines, i)
-                    
+
                     functions.append(LuaFunction(
                         module=module, name=func_name,
                         lua_name=lua_name,
@@ -442,14 +458,14 @@ def extract_lua_functions(api_file: Path) -> List[LuaFunction]:
             owner = current_widget_type if current_widget_type else ""
             kind = "method" if owner else "function"
             lua_name = f"{owner}:{func_name}" if owner else f"luna.{module}.{func_name}"
-            
+
             if not docstring and owner:
                 docstring = f"/// Returns a value for {func_name} (auto-generated)."
 
             desc = docstring.split("\n")[0] if docstring else ""
             params, returns = _extract_params_returns(docstring)
             inferred = _infer_signature(lines, i)
-            
+
             functions.append(LuaFunction(
                 module=module, name=func_name,
                 lua_name=lua_name,
@@ -462,9 +478,9 @@ def extract_lua_functions(api_file: Path) -> List[LuaFunction]:
                 inferred_return=_parse_tagged_return(docstring),
             ))
 
-        # Userdata methods
+        # Userdata methods — existing pattern (docstring directly above the add_method line)
         method_m = method_re.search(stripped)
-        if method_m:
+        if method_m and not method_self_re.search(stripped):
             func_name = method_m.group(1)
             owner = current_impl_type or "Unknown"
             display_owner = type_names.get(owner, owner.replace("Lua", "") if owner.startswith("Lua") else owner)
@@ -483,6 +499,57 @@ def extract_lua_functions(api_file: Path) -> List[LuaFunction]:
                 typed_params=_parse_tagged_params(docstring),
                 inferred_return=_parse_tagged_return(docstring),
             ))
+
+        # NEW: methods.add_method("luaName", Self::fn_name) — named fn pattern
+        method_self_m = method_self_re.search(stripped)
+        if method_self_m:
+            func_name = method_self_m.group(1)   # Lua name (string key)
+            rust_fn   = method_self_m.group(2)   # Rust fn name after Self::
+            owner = current_impl_type or "Unknown"
+            display_owner = type_names.get(owner, owner.replace("Lua", "") if owner.startswith("Lua") else owner)
+            # Look up docstring on the named pub fn declaration
+            docstring = _find_pub_fn_docstring(rust_fn) or _collect_docstring_above(lines, i)
+            desc = docstring.split("\n")[0] if docstring else ""
+            params, returns = _extract_params_returns(docstring)
+            inferred = _infer_signature(lines, i)
+            functions.append(LuaFunction(
+                module=module, name=func_name,
+                lua_name=f"{display_owner}:{func_name}",
+                owner_type=display_owner, description=desc,
+                full_doc=docstring, params=params,
+                returns=returns, line=i + 1,
+                file=rel_path, kind="method",
+                inferred_sig=inferred,
+                typed_params=_parse_tagged_params(docstring),
+                inferred_return=_parse_tagged_return(docstring),
+            ))
+
+        # NEW: .set("luaName", lua.create_function(named_fn)?) — named fn reference
+        set_named_m = set_named_fn_re.search(stripped)
+        if set_named_m:
+            func_name = set_named_m.group(1)    # Lua name (string key)
+            rust_fn   = set_named_m.group(2)    # Rust fn name reference
+            # Skip if already handled by set_inline_re (anonymous closure)
+            if not set_inline_re.search(stripped) or rust_fn:
+                owner = current_widget_type if current_widget_type else ""
+                kind = "method" if owner else "function"
+                lua_name = f"{owner}:{func_name}" if owner else f"luna.{module}.{func_name}"
+                # Look up docstring from the named pub fn declaration
+                docstring = _find_pub_fn_docstring(rust_fn) or _collect_docstring_above(lines, i)
+                desc = docstring.split("\n")[0] if docstring else ""
+                params, returns = _extract_params_returns(docstring)
+                inferred = _infer_signature(lines, i)
+                functions.append(LuaFunction(
+                    module=module, name=func_name,
+                    lua_name=lua_name,
+                    owner_type=owner, description=desc,
+                    full_doc=docstring, params=params,
+                    returns=returns, line=i + 1,
+                    file=rel_path, kind=kind,
+                    inferred_sig=inferred,
+                    typed_params=_parse_tagged_params(docstring),
+                    inferred_return=_parse_tagged_return(docstring),
+                ))
 
         i += 1
     return functions

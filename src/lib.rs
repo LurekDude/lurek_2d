@@ -3,14 +3,13 @@
 //! This crate is the engine library. It re-exports every subsystem through public submodules so
 //! that the `luna2d` binary, integration tests, and tooling can all share the same code paths.
 //! Game developers do not interact with this crate directly; they write Lua scripts that call
-//! the `luna.*` API, which is registered by [`lua_api`] on top of the types defined here.
+//! the `luna.*` API, which is registered by the Lua API layer on top of the types defined here.
 //!
 //! # Architecture overview
 //!
 //! The engine is split into domain modules with a strict dependency direction:
-//! `engine` may depend on all modules; `lua_api` bridges engine types to the Lua VM;
-//! domain modules (`graphics`, `physics`, `audio`, `input`, `timer`, `filesystem`, `math`,
-//! `window`) must not depend on each other except through `math`.
+//! `engine` may depend on all modules; domain modules (`graphics`, `physics`, `audio`, `input`,
+//! `timer`, `filesystem`, `math`, `window`) must not depend on each other except through `math`.
 //!
 //! The main entry point is [`luna_run`], which is called by both the `luna` (console) and
 //! `lunec` (no-console) binaries. It installs the panic hook, parses CLI arguments, loads
@@ -41,7 +40,6 @@
 //! | [`input`] | Keyboard, mouse, gamepad, and touch input state |
 //! | [`inventory`] | Inventory slots, stacking, weight limits, equip slots |
 //! | [`item`] | Item definitions, attributes, and loot-table rarity |
-//! | [`lua_api`] | Lua VM creation and all `luna.*` API bindings |
 //! | [`math`] | Vec2, Mat3, Rect, polygon utilities, easing, noise |
 //! | [`minimap`] | Minimap content extraction and FOV mask rendering |
 //! | [`modding`] | Mod metadata, dependency resolution, and hook dispatch |
@@ -115,8 +113,6 @@ pub mod light;
 // migration-state: pub mod item; — now library/item/init.lua
 /// Composable visual effects layer: post-processing pipeline (bloom, blur, CRT, color grading) and screen overlays (weather, ambient, shake, fog).
 pub mod fx;
-/// Lua VM creation and the luna.* API bindings.
-pub mod lua_api;
 /// Foundational math types: Vec2, Mat3, Rect.
 pub mod math;
 /// Minimap content extraction, FOV mask, and tile sampling.
@@ -160,6 +156,8 @@ pub mod tilemap;
 pub mod timer;
 /// Window event loop placeholder.
 pub mod window;
+/// Lua API registration layer: LuaJIT VM creation and `luna.*` module binding.
+pub mod lua_api;
 
 /// Entry-point shared by both `luna` (console) and `lunec` (no-console) binaries.
 ///
