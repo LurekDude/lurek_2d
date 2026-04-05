@@ -20,13 +20,6 @@ pub struct LuaRelationType(/* TODO: add key + state fields */);
 impl LuaRelationType {
     /// Return `true` if `level` is a valid level for this type.
     ///
-    ///
-    /// # Parameters
-    /// - `level` — `str` ...
-    ///
-    /// # Returns
-    /// `boolean`.
-    ///
     /// @param level : str
     /// @return boolean
     pub fn has_level(&self, _lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
@@ -48,13 +41,6 @@ pub struct LuaRelationshipManager(/* TODO: add key + state fields */);
 impl LuaRelationshipManager {
     /// Get a reference to a relation type definition.
     ///
-    ///
-    /// # Parameters
-    /// - `name` — `str` ...
-    ///
-    /// # Returns
-    /// `Option<`.
-    ///
     /// @param name : str
     /// @return Option<
     pub fn get_type(&self, _lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
@@ -63,22 +49,11 @@ impl LuaRelationshipManager {
     /// Get the names of all defined relation types.
     ///
     ///
-    /// # Returns
-    /// `table`.
-    ///
     /// @return table
     pub fn type_names(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
         todo!()
     }
     /// Get the numeric relation value between two entities.
-    ///
-    ///
-    /// # Parameters
-    /// - `a` — `integer` ...
-    /// - `b` — `integer` ...
-    ///
-    /// # Returns
-    /// `number`.
     ///
     /// @param a : integer
     /// @param b : integer
@@ -91,15 +66,6 @@ impl LuaRelationshipManager {
     /// Falls back to the type's `default_level` if no explicit level has been set.
     /// Returns `None` if the type name is unknown.
     ///
-    ///
-    /// # Parameters
-    /// - `a` — `integer` ...
-    /// - `b` — `integer` ...
-    /// - `ype_name` — `str` ...
-    ///
-    /// # Returns
-    /// `string?`.
-    ///
     /// @param a : integer
     /// @param b : integer
     /// @param ype_name : str
@@ -109,14 +75,6 @@ impl LuaRelationshipManager {
     }
     /// Return `true` if a relationship record exists for this pair.
     ///
-    ///
-    /// # Parameters
-    /// - `a` — `integer` ...
-    /// - `b` — `integer` ...
-    ///
-    /// # Returns
-    /// `boolean`.
-    ///
     /// @param a : integer
     /// @param b : integer
     /// @return boolean
@@ -124,13 +82,6 @@ impl LuaRelationshipManager {
         todo!()
     }
     /// Get all relationships involving a given entity.
-    ///
-    ///
-    /// # Parameters
-    /// - `entity_id` — `integer` ...
-    ///
-    /// # Returns
-    /// `Vec<`.
     ///
     /// @param entity_id : integer
     /// @return Vec<
@@ -140,18 +91,12 @@ impl LuaRelationshipManager {
     /// Get all relationships as an iterator. Consult the module-level documentation for the broader usage context and preconditions.
     ///
     ///
-    /// # Returns
-    /// `impl`.
-    ///
     /// @return impl
     pub fn all_relations(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
         todo!()
     }
     /// Get the total number of relationship records.
     ///
-    ///
-    /// # Returns
-    /// `integer`.
     ///
     /// @return integer
     pub fn relation_count(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
@@ -180,26 +125,12 @@ pub struct LuaUniverse(/* TODO: add key + state fields */);
 impl LuaUniverse {
     /// get_system_store. This accessor incurs no allocation; call it freely in hot paths.
     ///
-    ///
-    /// # Parameters
-    /// - `lua` — `'lua Lua` ...
-    ///
-    /// # Returns
-    /// `LuaResult<Table<`.
-    ///
     /// @param lua : 'lua Lua
     /// @return LuaResult<Table<
     pub fn get_system_store(&self, _lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
         todo!()
     }
     /// Returns the parent of `entity`, or `None` if unparented.
-    ///
-    ///
-    /// # Parameters
-    /// - `entity` — `integer` ...
-    ///
-    /// # Returns
-    /// `integer?`.
     ///
     /// @param entity : integer
     /// @return integer?
@@ -208,26 +139,12 @@ impl LuaUniverse {
     }
     /// Returns the direct children of `entity`. Returns an empty `Vec` if none.
     ///
-    ///
-    /// # Parameters
-    /// - `entity` — `integer` ...
-    ///
-    /// # Returns
-    /// `table`.
-    ///
     /// @param entity : integer
     /// @return table
     pub fn get_children(&self, _lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
         todo!()
     }
     /// Returns whether an entity ID is currently alive.
-    ///
-    ///
-    /// # Parameters
-    /// - `id` — `integer` ...
-    ///
-    /// # Returns
-    /// `boolean`.
     ///
     /// @param id : integer
     /// @return boolean
@@ -237,9 +154,6 @@ impl LuaUniverse {
     /// Returns the number of alive entities. This accessor incurs no allocation; call it freely in hot paths.
     ///
     ///
-    /// # Returns
-    /// `integer`.
-    ///
     /// @return integer
     pub fn get_entity_count(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
         todo!()
@@ -247,23 +161,11 @@ impl LuaUniverse {
     /// Returns all alive entity IDs (unordered).
     ///
     ///
-    /// # Returns
-    /// `table`.
-    ///
     /// @return table
     pub fn get_entities(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
         todo!()
     }
     /// Returns whether an entity has a named component.
-    ///
-    ///
-    /// # Parameters
-    /// - `lua` — `Lua` ...
-    /// - `id` — `integer` ...
-    /// - `name` — `str` ...
-    ///
-    /// # Returns
-    /// `LuaResult<bool>`.
     ///
     /// @param lua : Lua
     /// @param id : integer
@@ -274,15 +176,6 @@ impl LuaUniverse {
     }
     /// Removes a component from an entity. Returns the removed value if present, or `None` when the key did not exist.
     ///
-    ///
-    /// # Parameters
-    /// - `lua` — `Lua` ...
-    /// - `id` — `integer` ...
-    /// - `name` — `str` ...
-    ///
-    /// # Returns
-    /// `LuaResult<()>`.
-    ///
     /// @param lua : Lua
     /// @param id : integer
     /// @param name : str
@@ -292,14 +185,6 @@ impl LuaUniverse {
     }
     /// Returns all component names for an entity.
     ///
-    ///
-    /// # Parameters
-    /// - `lua` — `Lua` ...
-    /// - `id` — `integer` ...
-    ///
-    /// # Returns
-    /// `LuaResult<Vec<String>>`.
-    ///
     /// @param lua : Lua
     /// @param id : integer
     /// @return LuaResult<Vec<String>>
@@ -308,14 +193,6 @@ impl LuaUniverse {
     }
     /// Returns all alive entities that have ALL listed component names.
     ///
-    ///
-    /// # Parameters
-    /// - `lua` — `Lua` ...
-    /// - `names` — `[String]` ...
-    ///
-    /// # Returns
-    /// `LuaResult<Vec<u32>>`.
-    ///
     /// @param lua : Lua
     /// @param names : [String]
     /// @return LuaResult<Vec<u32>>
@@ -323,15 +200,6 @@ impl LuaUniverse {
         todo!()
     }
     /// Calls `callback(id, value)` for every alive entity that has the named component.
-    ///
-    ///
-    /// # Parameters
-    /// - `lua` — `Lua` ...
-    /// - `name` — `str` ...
-    /// - `callback` — `Function` ...
-    ///
-    /// # Returns
-    /// `LuaResult<()>`.
     ///
     /// @param lua : Lua
     /// @param name : str
@@ -342,14 +210,6 @@ impl LuaUniverse {
     }
     /// Returns whether an entity has a specific string tag.
     ///
-    ///
-    /// # Parameters
-    /// - `id` — `integer` ...
-    /// - `tag` — `str` ...
-    ///
-    /// # Returns
-    /// `boolean`.
-    ///
     /// @param id : integer
     /// @param tag : str
     /// @return boolean
@@ -358,13 +218,6 @@ impl LuaUniverse {
     }
     /// Returns all string tags for an entity. This accessor incurs no allocation; call it freely in hot paths.
     ///
-    ///
-    /// # Parameters
-    /// - `id` — `integer` ...
-    ///
-    /// # Returns
-    /// `table`.
-    ///
     /// @param id : integer
     /// @return table
     pub fn get_tags(&self, _lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
@@ -372,27 +225,12 @@ impl LuaUniverse {
     }
     /// Returns all alive entities that have the given string tag.
     ///
-    ///
-    /// # Parameters
-    /// - `tag` — `str` ...
-    ///
-    /// # Returns
-    /// `table`.
-    ///
     /// @param tag : str
     /// @return table
     pub fn get_entities_by_tag(&self, _lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
         todo!()
     }
     /// Returns whether an entity has a specific bitmap tag.
-    ///
-    ///
-    /// # Parameters
-    /// - `id` — `integer` ...
-    /// - `name` — `str` ...
-    ///
-    /// # Returns
-    /// `boolean`.
     ///
     /// @param id : integer
     /// @param name : str
@@ -402,26 +240,12 @@ impl LuaUniverse {
     }
     /// Returns all alive entities with the given bitmap tag.
     ///
-    ///
-    /// # Parameters
-    /// - `name` — `str` ...
-    ///
-    /// # Returns
-    /// `table`.
-    ///
     /// @param name : str
     /// @return table
     pub fn query_bitmap_tag(&self, _lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
         todo!()
     }
     /// Returns all alive entities that have ANY of the listed bitmap tags.
-    ///
-    ///
-    /// # Parameters
-    /// - `names` — `[String]` ...
-    ///
-    /// # Returns
-    /// `table`.
     ///
     /// @param names : [String]
     /// @return table
@@ -430,26 +254,12 @@ impl LuaUniverse {
     }
     /// Returns all alive entities that have ALL of the listed bitmap tags.
     ///
-    ///
-    /// # Parameters
-    /// - `names` — `[String]` ...
-    ///
-    /// # Returns
-    /// `table`.
-    ///
     /// @param names : [String]
     /// @return table
     pub fn query_bitmap_all(&self, _lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
         todo!()
     }
     /// Returns the bit index for a bitmap tag name, if defined.
-    ///
-    ///
-    /// # Parameters
-    /// - `name` — `str` ...
-    ///
-    /// # Returns
-    /// `u8?`.
     ///
     /// @param name : str
     /// @return u8?
@@ -458,26 +268,12 @@ impl LuaUniverse {
     }
     /// Returns the layer for an entity (defaults to 0).
     ///
-    ///
-    /// # Parameters
-    /// - `id` — `integer` ...
-    ///
-    /// # Returns
-    /// `integer`.
-    ///
     /// @param id : integer
     /// @return integer
     pub fn get_layer(&self, _lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
         todo!()
     }
     /// Returns all alive entities on a specific layer.
-    ///
-    ///
-    /// # Parameters
-    /// - `layer` — `integer` ...
-    ///
-    /// # Returns
-    /// `table`.
     ///
     /// @param layer : integer
     /// @return table
@@ -487,22 +283,11 @@ impl LuaUniverse {
     /// Returns all alive entities sorted by layer (ascending), then by ID.
     ///
     ///
-    /// # Returns
-    /// `table`.
-    ///
     /// @return table
     pub fn get_entities_sorted(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
         todo!()
     }
     /// Returns whether a blueprint with the given name exists.
-    ///
-    ///
-    /// # Parameters
-    /// - `lua` — `Lua` ...
-    /// - `name` — `str` ...
-    ///
-    /// # Returns
-    /// `LuaResult<bool>`.
     ///
     /// @param lua : Lua
     /// @param name : str
@@ -512,14 +297,6 @@ impl LuaUniverse {
     }
     /// Removes a blueprint definition. Returns the removed value if present, or `None` when the key did not exist.
     ///
-    ///
-    /// # Parameters
-    /// - `lua` — `Lua` ...
-    /// - `name` — `str` ...
-    ///
-    /// # Returns
-    /// `LuaResult<()>`.
-    ///
     /// @param lua : Lua
     /// @param name : str
     /// @return LuaResult<()>
@@ -528,26 +305,12 @@ impl LuaUniverse {
     }
     /// Lists all defined blueprint names. Consult the module-level documentation for the broader usage context and preconditions.
     ///
-    ///
-    /// # Parameters
-    /// - `lua` — `Lua` ...
-    ///
-    /// # Returns
-    /// `LuaResult<Vec<String>>`.
-    ///
     /// @param lua : Lua
     /// @return LuaResult<Vec<String>>
     pub fn list_blueprints(&self, _lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
         todo!()
     }
     /// Returns the number of registered systems.
-    ///
-    ///
-    /// # Parameters
-    /// - `lua` — `Lua` ...
-    ///
-    /// # Returns
-    /// `LuaResult<usize>`.
     ///
     /// @param lua : Lua
     /// @return LuaResult<usize>
@@ -594,11 +357,6 @@ impl UserData for LuaUniverse {
 /// Replaces any existing type with the same name.
 ///
 ///
-/// # Parameters
-/// - `name` — `str` ...
-/// - `levels` — `table` ...
-/// - `default_level` — `str` ...
-///
 /// @param name : str
 /// @param levels : table
 /// @param default_level : str
@@ -611,13 +369,6 @@ pub fn define_type(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 /// Existing relationships keep their data but the removed type's levels
 /// are cleaned from all records.
 ///
-///
-/// # Parameters
-/// - `name` — `str` ...
-///
-/// # Returns
-/// `boolean`.
-///
 /// @param name : str
 /// @return boolean
 pub fn remove_type(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
@@ -626,11 +377,6 @@ pub fn remove_type(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 
 /// Set the numeric relation value between two entities.
 ///
-///
-/// # Parameters
-/// - `a` — `integer` ...
-/// - `b` — `integer` ...
-/// - `value` — `number` ...
 ///
 /// @param a : integer
 /// @param b : integer
@@ -641,11 +387,6 @@ pub fn set_value(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 
 /// Adjust the numeric relation value by `delta`.
 ///
-///
-/// # Parameters
-/// - `a` — `integer` ...
-/// - `b` — `integer` ...
-/// - `delta` — `number` ...
 ///
 /// @param a : integer
 /// @param b : integer
@@ -658,16 +399,6 @@ pub fn adjust_value(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 ///
 /// Returns `false` if the type is unknown or the level is not valid for that type.
 ///
-///
-/// # Parameters
-/// - `a` — `integer` ...
-/// - `b` — `integer` ...
-/// - `ype_name` — `str` ...
-/// - `level` — `str` ...
-///
-/// # Returns
-/// `boolean`.
-///
 /// @param a : integer
 /// @param b : integer
 /// @param ype_name : str
@@ -679,14 +410,6 @@ pub fn set_level(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 
 /// Remove a relationship record. Returns `true` if it existed.
 ///
-///
-/// # Parameters
-/// - `a` — `integer` ...
-/// - `b` — `integer` ...
-///
-/// # Returns
-/// `boolean`.
-///
 /// @param a : integer
 /// @param b : integer
 /// @return boolean
@@ -697,23 +420,12 @@ pub fn remove_relation(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 /// Spawns a new entity and returns its ID. Recycles from the free list when possible.
 ///
 ///
-/// # Returns
-/// `integer`.
-///
 /// @return integer
 pub fn spawn(_lua: &Lua, _: ()) -> LuaResult<()> {
     todo!()
 }
 
 /// Kills an entity, cleaning up all associated data and recycling the ID.
-///
-///
-/// # Parameters
-/// - `id` — `integer` ...
-/// - `lua` — `Lua` ...
-///
-/// # Returns
-/// `LuaResult<()>`.
 ///
 /// @param id : integer
 /// @param lua : Lua
@@ -725,10 +437,6 @@ pub fn kill(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 /// Sets or clears the parent of `entity`. Pass `Some(parent_id)` to attach, `None` to detach.
 ///
 ///
-/// # Parameters
-/// - `entity` — `integer` ...
-/// - `parent` — `integer?` ...
-///
 /// @param entity : integer
 /// @param parent : integer?
 pub fn set_parent(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
@@ -736,14 +444,6 @@ pub fn set_parent(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 }
 
 /// Kills `root` and all of its descendants recursively.
-///
-///
-/// # Parameters
-/// - `root` — `integer` ...
-/// - `lua` — `Lua` ...
-///
-/// # Returns
-/// `LuaResult<()>`.
 ///
 /// @param root : integer
 /// @param lua : Lua
@@ -753,16 +453,6 @@ pub fn kill_recursive(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 }
 
 /// Sets a component value on an entity. Replaces the current component value; callers hold responsibility for maintaining consistency with related fields.
-///
-///
-/// # Parameters
-/// - `lua` — `Lua` ...
-/// - `id` — `integer` ...
-/// - `name` — `str` ...
-/// - `value` — `any` ...
-///
-/// # Returns
-/// `LuaResult<()>`.
 ///
 /// @param lua : Lua
 /// @param id : integer
@@ -775,15 +465,6 @@ pub fn set_component(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 
 /// Gets a component value from an entity (returns Nil if missing or dead).
 ///
-///
-/// # Parameters
-/// - `lua` — `'lua Lua` ...
-/// - `id` — `integer` ...
-/// - `name` — `str` ...
-///
-/// # Returns
-/// `LuaResult<LuaValue<`.
-///
 /// @param lua : 'lua Lua
 /// @param id : integer
 /// @param name : str
@@ -795,10 +476,6 @@ pub fn get_component(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 /// Adds a string tag to an entity (no-op if already present or entity is dead).
 ///
 ///
-/// # Parameters
-/// - `id` — `integer` ...
-/// - `tag` — `str` ...
-///
 /// @param id : integer
 /// @param tag : str
 pub fn add_tag(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
@@ -808,10 +485,6 @@ pub fn add_tag(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 /// Removes a string tag from an entity. Returns the removed value if present, or `None` when the key did not exist.
 ///
 ///
-/// # Parameters
-/// - `id` — `integer` ...
-/// - `tag` — `str` ...
-///
 /// @param id : integer
 /// @param tag : str
 pub fn remove_tag(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
@@ -820,13 +493,6 @@ pub fn remove_tag(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 
 /// Defines a bitmap tag name, returning its bit index.
 ///
-///
-/// # Parameters
-/// - `name` — `str` ...
-///
-/// # Returns
-/// `LuaResult<u8>`.
-///
 /// @param name : str
 /// @return LuaResult<u8>
 pub fn define_tag(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
@@ -834,14 +500,6 @@ pub fn define_tag(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 }
 
 /// Adds a bitmap tag to an entity (auto-defines the tag if needed).
-///
-///
-/// # Parameters
-/// - `id` — `integer` ...
-/// - `name` — `str` ...
-///
-/// # Returns
-/// `LuaResult<()>`.
 ///
 /// @param id : integer
 /// @param name : str
@@ -853,10 +511,6 @@ pub fn bitmap_tag(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 /// Removes a bitmap tag from an entity. Consult the module-level documentation for the broader usage context and preconditions.
 ///
 ///
-/// # Parameters
-/// - `id` — `integer` ...
-/// - `name` — `str` ...
-///
 /// @param id : integer
 /// @param name : str
 pub fn bitmap_untag(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
@@ -866,10 +520,6 @@ pub fn bitmap_untag(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 /// Sets the layer for an entity (default layer is 0).
 ///
 ///
-/// # Parameters
-/// - `id` — `integer` ...
-/// - `layer` — `integer` ...
-///
 /// @param id : integer
 /// @param layer : integer
 pub fn set_layer(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
@@ -877,15 +527,6 @@ pub fn set_layer(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 }
 
 /// Defines a blueprint by deep-copying the given component table.
-///
-///
-/// # Parameters
-/// - `lua` — `Lua` ...
-/// - `name` — `str` ...
-/// - `components` — `Table` ...
-///
-/// # Returns
-/// `LuaResult<()>`.
 ///
 /// @param lua : Lua
 /// @param name : str
@@ -896,16 +537,6 @@ pub fn define_blueprint(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 }
 
 /// Defines a blueprint by extending a parent blueprint with overrides.
-///
-///
-/// # Parameters
-/// - `lua` — `Lua` ...
-/// - `name` — `str` ...
-/// - `parent` — `str` ...
-/// - `overrides` — `Table` ...
-///
-/// # Returns
-/// `LuaResult<()>`.
 ///
 /// @param lua : Lua
 /// @param name : str
@@ -918,15 +549,6 @@ pub fn extend_blueprint(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 
 /// Spawns an entity from a blueprint, applying optional overrides.
 ///
-///
-/// # Parameters
-/// - `lua` — `Lua` ...
-/// - `name` — `str` ...
-/// - `overrides` — `Table?` ...
-///
-/// # Returns
-/// `LuaResult<u32>`.
-///
 /// @param lua : Lua
 /// @param name : str
 /// @param overrides : Table?
@@ -937,14 +559,6 @@ pub fn spawn_blueprint(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 
 /// Returns a deep copy of a blueprint's component table, or Nil if not found.
 ///
-///
-/// # Parameters
-/// - `lua` — `'lua Lua` ...
-/// - `name` — `str` ...
-///
-/// # Returns
-/// `LuaResult<LuaValue<`.
-///
 /// @param lua : 'lua Lua
 /// @param name : str
 /// @return LuaResult<LuaValue<
@@ -953,14 +567,6 @@ pub fn get_blueprint_components(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResu
 }
 
 /// Adds a system (Lua table) to the system list.
-///
-///
-/// # Parameters
-/// - `lua` — `Lua` ...
-/// - `system` — `Table` ...
-///
-/// # Returns
-/// `LuaResult<()>`.
 ///
 /// @param lua : Lua
 /// @param system : Table
@@ -971,14 +577,6 @@ pub fn add_system(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 
 /// Removes a system by pointer identity from the system list.
 ///
-///
-/// # Parameters
-/// - `lua` — `Lua` ...
-/// - `system` — `Table` ...
-///
-/// # Returns
-/// `LuaResult<()>`.
-///
 /// @param lua : Lua
 /// @param system : Table
 /// @return LuaResult<()>
@@ -988,13 +586,6 @@ pub fn remove_system(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 
 /// Clears all entities, components, tags, layers, and systems. Blueprints are preserved.
 ///
-///
-/// # Parameters
-/// - `lua` — `Lua` ...
-///
-/// # Returns
-/// `LuaResult<()>`.
-///
 /// @param lua : Lua
 /// @return LuaResult<()>
 pub fn clear(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
@@ -1002,14 +593,6 @@ pub fn clear(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 }
 
 /// Deep-copies a Lua table recursively. Consult the module-level documentation for the broader usage context and preconditions.
-///
-///
-/// # Parameters
-/// - `lua` — `'lua Lua` ...
-/// - `t` — `Table<'lua>` ...
-///
-/// # Returns
-/// `LuaResult<Table<`.
 ///
 /// @param lua : 'lua Lua
 /// @param t : Table<'lua>
@@ -1019,14 +602,6 @@ pub fn deep_copy_table(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 }
 
 /// Registers the `luna.entity` API table.
-///
-/// # Parameters
-/// - `lua` — `&Lua` The Lua VM.
-/// - `luna` — `&LuaTable<'_>` The top-level `luna` table.
-/// - `state` — `Rc<RefCell<SharedState>>` Shared engine state.
-///
-/// # Returns
-/// `LuaResult<()>`.
 pub fn register(
     lua: &Lua,
     luna: &mlua::Table,

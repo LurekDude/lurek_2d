@@ -20,13 +20,6 @@ pub struct LuaAIWorld(/* TODO: add key + state fields */);
 impl LuaAIWorld {
     /// Returns the index of an agent by name.
     ///
-    ///
-    /// # Parameters
-    /// - `name` — `str` ...
-    ///
-    /// # Returns
-    /// `integer?`.
-    ///
     /// @param name : str
     /// @return integer?
     pub fn get_agent_index(&self, _lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
@@ -34,9 +27,6 @@ impl LuaAIWorld {
     }
     /// Returns the number of agents. Consult the module-level documentation for the broader usage context and preconditions.
     ///
-    ///
-    /// # Returns
-    /// `integer`.
     ///
     /// @return integer
     pub fn agent_count(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
@@ -64,9 +54,6 @@ impl LuaBTNode {
     /// - Leaves (Action, Condition): always 0.
     ///
     ///
-    /// # Returns
-    /// `integer`.
-    ///
     /// @return integer
     pub fn child_count(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
         todo!()
@@ -87,14 +74,6 @@ pub struct LuaBlackboard(/* TODO: add key + state fields */);
 impl LuaBlackboard {
     /// Gets a number value, walking the parent chain. Returns `default` if not found.
     ///
-    ///
-    /// # Parameters
-    /// - `key` — `str` ...
-    /// - `default` — `number` ...
-    ///
-    /// # Returns
-    /// `number`.
-    ///
     /// @param key : str
     /// @param default : number
     /// @return number
@@ -102,14 +81,6 @@ impl LuaBlackboard {
         todo!()
     }
     /// Gets a boolean value, walking the parent chain. Returns `default` if not found.
-    ///
-    ///
-    /// # Parameters
-    /// - `key` — `str` ...
-    /// - `default` — `boolean` ...
-    ///
-    /// # Returns
-    /// `boolean`.
     ///
     /// @param key : str
     /// @param default : boolean
@@ -119,14 +90,6 @@ impl LuaBlackboard {
     }
     /// Gets a string value, walking the parent chain. Returns `default` if not found.
     ///
-    ///
-    /// # Parameters
-    /// - `key` — `str` ...
-    /// - `default` — `str` ...
-    ///
-    /// # Returns
-    /// `string`.
-    ///
     /// @param key : str
     /// @param default : str
     /// @return string
@@ -134,13 +97,6 @@ impl LuaBlackboard {
         todo!()
     }
     /// Checks if a key exists locally or in any ancestor.
-    ///
-    ///
-    /// # Parameters
-    /// - `key` — `str` ...
-    ///
-    /// # Returns
-    /// `boolean`.
     ///
     /// @param key : str
     /// @return boolean
@@ -150,9 +106,6 @@ impl LuaBlackboard {
     /// Returns all local key names. Consult the module-level documentation for the broader usage context and preconditions.
     ///
     ///
-    /// # Returns
-    /// `table`.
-    ///
     /// @return table
     pub fn keys(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
         todo!()
@@ -160,18 +113,12 @@ impl LuaBlackboard {
     /// Returns the number of local entries. Runs in O(1) time.
     ///
     ///
-    /// # Returns
-    /// `integer`.
-    ///
     /// @return integer
     pub fn size(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
         todo!()
     }
     /// Returns a reference to the parent Blackboard, if any.
     ///
-    ///
-    /// # Returns
-    /// `Option<`.
     ///
     /// @return Option<
     pub fn parent(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
@@ -200,9 +147,6 @@ impl LuaCommandQueue {
     /// Returns the number of queued commands.
     ///
     ///
-    /// # Returns
-    /// `integer`.
-    ///
     /// @return integer
     pub fn count(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
         todo!()
@@ -210,18 +154,12 @@ impl LuaCommandQueue {
     /// Returns whether the queue is empty.
     ///
     ///
-    /// # Returns
-    /// `boolean`.
-    ///
     /// @return boolean
     pub fn is_empty(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
         todo!()
     }
     /// Returns the type of the front command, if any.
     ///
-    ///
-    /// # Returns
-    /// `Option<`.
     ///
     /// @return Option<
     pub fn current_type(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
@@ -244,14 +182,6 @@ pub struct LuaGOAPPlanner(/* TODO: add key + state fields */);
 
 impl LuaGOAPPlanner {
     /// Plans a sequence of actions to satisfy the highest-priority goal.
-    ///
-    ///
-    /// # Parameters
-    /// - `world_state` — `HashMap<String, bool>` ...
-    /// - `max_depth` — `integer` ...
-    ///
-    /// # Returns
-    /// `table`.
     ///
     /// @param world_state : HashMap<String, bool>
     /// @param max_depth : integer
@@ -279,13 +209,6 @@ impl LuaQLearner {
     /// Otherwise, returns the action with the highest Q-value for the
     /// given state (exploitation). Returns 0 if `state` is out of range.
     ///
-    ///
-    /// # Parameters
-    /// - `state` — `integer` ...
-    ///
-    /// # Returns
-    /// `integer`.
-    ///
     /// @param state : integer
     /// @return integer
     pub fn choose_action(&self, _lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
@@ -296,27 +219,12 @@ impl LuaQLearner {
     /// Ties are broken by first-encountered order. Returns 0 if `state`
     /// is out of range.
     ///
-    ///
-    /// # Parameters
-    /// - `state` — `integer` ...
-    ///
-    /// # Returns
-    /// `integer`.
-    ///
     /// @param state : integer
     /// @return integer
     pub fn best_action(&self, _lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
         todo!()
     }
     /// Returns the Q-value for a (state, action) pair, or 0.0 if out of range.
-    ///
-    ///
-    /// # Parameters
-    /// - `state` — `integer` ...
-    /// - `action` — `integer` ...
-    ///
-    /// # Returns
-    /// `number`.
     ///
     /// @param state : integer
     /// @param action : integer
@@ -329,9 +237,6 @@ impl LuaQLearner {
     /// Format: `[[q(s0,a0), q(s0,a1), ...], [q(s1,a0), ...], ...]`
     /// Use [`deserialize`](Self::deserialize) to restore from this format.
     ///
-    ///
-    /// # Returns
-    /// `string`.
     ///
     /// @return string
     pub fn serialize(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
@@ -360,16 +265,6 @@ impl LuaResponseCurve {
     ///
     /// Input is not clamped before transformation except for Logit, which
     /// clamps to `[0.001, 0.999]` to avoid division by zero.
-    ///
-    ///
-    /// # Parameters
-    /// - `input` — `number` ...
-    /// - `p1` — `number` ...
-    /// - `p2` — `number` ...
-    /// - `p3` — `number` ...
-    ///
-    /// # Returns
-    /// `number`.
     ///
     /// @param input : number
     /// @param p1 : number
@@ -404,10 +299,6 @@ impl LuaSquad {
     /// - **Column**: vertical stack behind the leader.
     ///
     ///
-    /// # Parameters
-    /// - `member_idx` — `integer` ...
-    /// - `leader_pos` — `(f32, f32)` ...
-    ///
     /// @param member_idx : integer
     /// @param leader_pos : (f32, f32)
     pub fn get_formation_position(&self, _lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
@@ -430,18 +321,12 @@ impl LuaStateMachine {
     /// Returns the current state name, if any. Consult the module-level documentation for the broader usage context and preconditions.
     ///
     ///
-    /// # Returns
-    /// `Option<`.
-    ///
     /// @return Option<
     pub fn current_state(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
         todo!()
     }
     /// Returns the time spent in the current state in seconds.
     ///
-    ///
-    /// # Returns
-    /// `number`.
     ///
     /// @return number
     pub fn time_in_state(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
@@ -464,13 +349,6 @@ impl UserData for LuaStateMachine {
 /// Returns `None` for unrecognized input, allowing the Lua binding to emit
 /// a descriptive error rather than silently defaulting.
 ///
-///
-/// # Parameters
-/// - `s` — `str` ...
-///
-/// # Returns
-/// `Self?`.
-///
 /// @param s : str
 /// @return Self?
 pub fn parse_str(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
@@ -484,33 +362,15 @@ pub fn parse_str(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 /// ensures that a Lua callback returning an unrecognized string keeps
 /// the behavior alive rather than silently succeeding or failing.
 ///
-///
-/// # Parameters
-/// - `s` — `str` ...
-///
-/// # Returns
-/// `Self`.
-///
 /// @param s : str
 /// @return Self
 /// Parses a Lua string (`"requireOne"` or `"requireAll"`) into a policy.
 /// Defaults to `RequireOne` for unrecognized strings.
 ///
-///
-/// # Parameters
-/// - `s` — `str` ...
-///
-/// # Returns
-/// `Self`.
-///
 /// @param s : str
 /// @return Self
 /// Sets a number value in the local store.
 ///
-///
-/// # Parameters
-/// - `key` — `str` ...
-/// - `value` — `number` ...
 ///
 /// @param key : str
 /// @param value : number
@@ -521,10 +381,6 @@ pub fn set_number(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 /// Sets a boolean value in the local store.
 ///
 ///
-/// # Parameters
-/// - `key` — `str` ...
-/// - `value` — `boolean` ...
-///
 /// @param key : str
 /// @param value : boolean
 pub fn set_bool(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
@@ -533,10 +389,6 @@ pub fn set_bool(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 
 /// Sets a string value in the local store.
 ///
-///
-/// # Parameters
-/// - `key` — `str` ...
-/// - `value` — `str` ...
 ///
 /// @param key : str
 /// @param value : str
@@ -547,9 +399,6 @@ pub fn set_string(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 /// Removes a key from the local store only.
 ///
 ///
-/// # Parameters
-/// - `key` — `str` ...
-///
 /// @param key : str
 pub fn remove(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
     todo!()
@@ -557,9 +406,6 @@ pub fn remove(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 
 /// Sets the parent Blackboard for hierarchical lookup.
 ///
-///
-/// # Parameters
-/// - `parent` — `Blackboard` ...
 ///
 /// @param parent : Blackboard
 pub fn set_parent(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
@@ -569,9 +415,6 @@ pub fn set_parent(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 /// Appends a command to the back of the queue.
 ///
 ///
-/// # Parameters
-/// - `cmd` — `Command` ...
-///
 /// @param cmd : Command
 pub fn enqueue(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
     todo!()
@@ -579,9 +422,6 @@ pub fn enqueue(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 
 /// Inserts a command at the front (interrupts current without clearing).
 ///
-///
-/// # Parameters
-/// - `cmd` — `Command` ...
 ///
 /// @param cmd : Command
 pub fn push_front(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
@@ -591,9 +431,6 @@ pub fn push_front(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 /// Clears the queue and enqueues one new command.
 ///
 ///
-/// # Parameters
-/// - `cmd` — `Command` ...
-///
 /// @param cmd : Command
 pub fn replace(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
     todo!()
@@ -601,9 +438,6 @@ pub fn replace(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 
 /// Cancels the current (front) command if it's interruptible.
 ///
-///
-/// # Returns
-/// `boolean`.
 ///
 /// @return boolean
 pub fn cancel_current(_lua: &Lua, _: ()) -> LuaResult<()> {
@@ -613,24 +447,12 @@ pub fn cancel_current(_lua: &Lua, _: ()) -> LuaResult<()> {
 /// Adds a transition and re-sorts by descending priority.
 ///
 ///
-/// # Parameters
-/// - `transition` — `Transition` ...
-///
 /// @param transition : Transition
 pub fn add_transition(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
     todo!()
 }
 
 /// Plans for a specific goal index. Consult the module-level documentation for the broader usage context and preconditions.
-///
-///
-/// # Parameters
-/// - `goal_idx` — `integer` ...
-/// - `world_state` — `HashMap<String, bool>` ...
-/// - `max_depth` — `integer` ...
-///
-/// # Returns
-/// `table`.
 ///
 /// @param goal_idx : integer
 /// @param world_state : HashMap<String, bool>
@@ -650,12 +472,6 @@ pub fn plan_for_goal_idx(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> 
 /// Silently no-ops if any index is out of range.
 ///
 ///
-/// # Parameters
-/// - `state` — `integer` ...
-/// - `action` — `integer` ...
-/// - `reward` — `number` ...
-/// - `next_state` — `integer` ...
-///
 /// @param state : integer
 /// @param action : integer
 /// @param reward : number
@@ -666,11 +482,6 @@ pub fn learn(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 
 /// Overwrites the Q-value for a (state, action) pair. No-ops if out of range.
 ///
-///
-/// # Parameters
-/// - `state` — `integer` ...
-/// - `action` — `integer` ...
-/// - `value` — `number` ...
 ///
 /// @param state : integer
 /// @param action : integer
@@ -684,13 +495,6 @@ pub fn set_q(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 /// Returns `Err` if the outer dimensions don't match `state_count` or
 /// any row length doesn't match `action_count`.
 ///
-///
-/// # Parameters
-/// - `json` — `str` ...
-///
-/// # Returns
-/// `Result<()`.
-///
 /// @param json : str
 /// @return Result<()
 pub fn deserialize(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
@@ -700,23 +504,9 @@ pub fn deserialize(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 /// Parses a Lua string into a `FormationType`. Unrecognised strings
 /// default to `FormationType::None`.
 ///
-///
-/// # Parameters
-/// - `s` — `str` ...
-///
-/// # Returns
-/// `Self`.
-///
 /// @param s : str
 /// @return Self
 /// Parses from Lua string. Returns an error if the source data is malformed or missing.
-///
-///
-/// # Parameters
-/// - `s` — `str` ...
-///
-/// # Returns
-/// `Self`.
 ///
 /// @param s : str
 /// @return Self
@@ -727,16 +517,6 @@ pub fn deserialize(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 /// For Pursue, Evade, and Flock, this returns `(0.0, 0.0)` because
 /// those behaviors need access to other agents' states, which is
 /// handled at the AIWorld level.
-///
-///
-/// # Parameters
-/// - `agent_pos` — `(f32, f32)` ...
-/// - `agent_vel` — `(f32, f32)` ...
-/// - `max_speed` — `number` ...
-/// - `_dt` — `number` ...
-///
-/// # Returns
-/// `Force`.
 ///
 /// @param agent_pos : (f32, f32)
 /// @param agent_vel : (f32, f32)
@@ -749,17 +529,6 @@ pub fn calculate(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 
 /// Computes the combined steering force for the given agent state.
 ///
-///
-/// # Parameters
-/// - `agent_pos` — `(f32, f32)` ...
-/// - `agent_vel` — `(f32, f32)` ...
-/// - `max_speed` — `number` ...
-/// - `max_force` — `number` ...
-/// - `dt` — `number` ...
-///
-/// # Returns
-/// `Force`.
-///
 /// @param agent_pos : (f32, f32)
 /// @param agent_vel : (f32, f32)
 /// @param max_speed : number
@@ -768,23 +537,9 @@ pub fn calculate(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 /// @return Force
 /// Parses from Lua string. Returns an error if the source data is malformed or missing.
 ///
-///
-/// # Parameters
-/// - `s` — `str` ...
-///
-/// # Returns
-/// `Self`.
-///
 /// @param s : str
 /// @return Self
 /// Adds a new agent with the given name. Returns the agent's index.
-///
-///
-/// # Parameters
-/// - `name` — `str` ...
-///
-/// # Returns
-/// `Result<usize`.
 ///
 /// @param name : str
 /// @return Result<usize
@@ -794,13 +549,6 @@ pub fn add_agent(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 
 /// Removes an agent by name. Rebuilds the name→index map.
 ///
-///
-/// # Parameters
-/// - `name` — `str` ...
-///
-/// # Returns
-/// `boolean`.
-///
 /// @param name : str
 /// @return boolean
 pub fn remove_agent(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
@@ -808,14 +556,6 @@ pub fn remove_agent(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 }
 
 /// Registers the `luna.ai` API table.
-///
-/// # Parameters
-/// - `lua` — `&Lua` The Lua VM.
-/// - `luna` — `&LuaTable<'_>` The top-level `luna` table.
-/// - `state` — `Rc<RefCell<SharedState>>` Shared engine state.
-///
-/// # Returns
-/// `LuaResult<()>`.
 pub fn register(
     lua: &Lua,
     luna: &mlua::Table,

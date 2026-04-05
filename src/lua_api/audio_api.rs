@@ -21,18 +21,12 @@ impl LuaAtomicParam {
     /// Returns the current value, loaded with `Relaxed` ordering.
     ///
     ///
-    /// # Returns
-    /// `number`.
-    ///
     /// @return number
     pub fn get(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
         todo!()
     }
     /// Stores a new value with `Relaxed` ordering.
     ///
-    ///
-    /// # Parameters
-    /// - `val` — `number` ...
     ///
     /// @param val : number
     pub fn set(&self, _lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
@@ -56,9 +50,6 @@ impl LuaBus {
     /// Returns the bus volume (always `>= 0.0`).
     ///
     ///
-    /// # Returns
-    /// `number`.
-    ///
     /// @return number
     pub fn volume(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
         todo!()
@@ -66,18 +57,12 @@ impl LuaBus {
     /// Returns the bus pitch multiplier (always `>= 0.0`).
     ///
     ///
-    /// # Returns
-    /// `number`.
-    ///
     /// @return number
     pub fn pitch(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
         todo!()
     }
     /// Returns whether the bus is paused. This accessor incurs no allocation; call it freely in hot paths.
     ///
-    ///
-    /// # Returns
-    /// `boolean`.
     ///
     /// @return boolean
     pub fn is_paused(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
@@ -102,18 +87,12 @@ impl LuaDecoder {
     /// Return the total duration in seconds.
     ///
     ///
-    /// # Returns
-    /// `number`.
-    ///
     /// @return number
     pub fn get_duration(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
         todo!()
     }
     /// Return the current playback position in seconds.
     ///
-    ///
-    /// # Returns
-    /// `number`.
     ///
     /// @return number
     pub fn tell(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
@@ -123,9 +102,6 @@ impl LuaDecoder {
     ///
     /// Always `true` because PCM data is fully buffered in memory.
     ///
-    ///
-    /// # Returns
-    /// `boolean`.
     ///
     /// @return boolean
     pub fn is_seekable(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
@@ -150,18 +126,12 @@ impl LuaMidiPlayer {
     /// Returns whether a MIDI file is currently loaded.
     ///
     ///
-    /// # Returns
-    /// `boolean`.
-    ///
     /// @return boolean
     pub fn is_loaded(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
         todo!()
     }
     /// Returns the file path of the loaded MIDI, if any.
     ///
-    ///
-    /// # Returns
-    /// `Option<`.
     ///
     /// @return Option<
     pub fn file_path(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
@@ -170,18 +140,12 @@ impl LuaMidiPlayer {
     /// Returns whether the player is currently playing.
     ///
     ///
-    /// # Returns
-    /// `boolean`.
-    ///
     /// @return boolean
     pub fn is_playing(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
         todo!()
     }
     /// Returns whether the player is paused. This accessor incurs no allocation; call it freely in hot paths.
     ///
-    ///
-    /// # Returns
-    /// `boolean`.
     ///
     /// @return boolean
     pub fn is_paused(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
@@ -190,18 +154,12 @@ impl LuaMidiPlayer {
     /// Returns the current playback position in seconds.
     ///
     ///
-    /// # Returns
-    /// `number`.
-    ///
     /// @return number
     pub fn tell(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
         todo!()
     }
     /// Returns the duration of the loaded MIDI in seconds.
     ///
-    ///
-    /// # Returns
-    /// `number`.
     ///
     /// @return number
     pub fn duration(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
@@ -210,18 +168,12 @@ impl LuaMidiPlayer {
     /// Returns the master volume. Consult the module-level documentation for the broader usage context and preconditions.
     ///
     ///
-    /// # Returns
-    /// `number`.
-    ///
     /// @return number
     pub fn volume(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
         todo!()
     }
     /// Returns whether playback is set to loop.
     ///
-    ///
-    /// # Returns
-    /// `boolean`.
     ///
     /// @return boolean
     pub fn is_looping(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
@@ -230,18 +182,12 @@ impl LuaMidiPlayer {
     /// Returns the current tempo scale factor. Consult the module-level documentation for the broader usage context and preconditions.
     ///
     ///
-    /// # Returns
-    /// `number`.
-    ///
     /// @return number
     pub fn tempo_scale(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
         todo!()
     }
     /// Returns the current effective BPM. Consult the module-level documentation for the broader usage context and preconditions.
     ///
-    ///
-    /// # Returns
-    /// `number`.
     ///
     /// @return number
     pub fn current_bpm(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
@@ -250,9 +196,6 @@ impl LuaMidiPlayer {
     /// Returns the original tempo in BPM from the MIDI file.
     ///
     ///
-    /// # Returns
-    /// `number`.
-    ///
     /// @return number
     pub fn original_tempo(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
         todo!()
@@ -260,21 +203,11 @@ impl LuaMidiPlayer {
     /// Returns the ticks-per-beat value from the MIDI header.
     ///
     ///
-    /// # Returns
-    /// `u16`.
-    ///
     /// @return u16
     pub fn ticks_per_beat(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
         todo!()
     }
     /// Returns the volume for a specific MIDI channel (0-15).
-    ///
-    ///
-    /// # Parameters
-    /// - `ch` — `integer` ...
-    ///
-    /// # Returns
-    /// `number`.
     ///
     /// @param ch : integer
     /// @return number
@@ -283,26 +216,12 @@ impl LuaMidiPlayer {
     }
     /// Returns whether a specific MIDI channel (0-15) is muted.
     ///
-    ///
-    /// # Parameters
-    /// - `ch` — `integer` ...
-    ///
-    /// # Returns
-    /// `boolean`.
-    ///
     /// @param ch : integer
     /// @return boolean
     pub fn is_channel_muted(&self, _lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
         todo!()
     }
     /// Returns the instrument (program number) for a MIDI channel (0-15).
-    ///
-    ///
-    /// # Parameters
-    /// - `ch` — `integer` ...
-    ///
-    /// # Returns
-    /// `u8`.
     ///
     /// @param ch : integer
     /// @return u8
@@ -312,9 +231,6 @@ impl LuaMidiPlayer {
     /// Returns the number of unique MIDI channels used in the loaded file.
     ///
     ///
-    /// # Returns
-    /// `integer`.
-    ///
     /// @return integer
     pub fn channel_count(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
         todo!()
@@ -322,21 +238,11 @@ impl LuaMidiPlayer {
     /// Returns the number of tracks in the loaded MIDI file.
     ///
     ///
-    /// # Returns
-    /// `integer`.
-    ///
     /// @return integer
     pub fn track_count(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
         todo!()
     }
     /// Returns the name of a track by index, if it has one.
-    ///
-    ///
-    /// # Parameters
-    /// - `idx` — `integer` ...
-    ///
-    /// # Returns
-    /// `Option<`.
     ///
     /// @param idx : integer
     /// @return Option<
@@ -344,13 +250,6 @@ impl LuaMidiPlayer {
         todo!()
     }
     /// Returns whether a specific track is muted.
-    ///
-    ///
-    /// # Parameters
-    /// - `idx` — `integer` ...
-    ///
-    /// # Returns
-    /// `boolean`.
     ///
     /// @param idx : integer
     /// @return boolean
@@ -360,9 +259,6 @@ impl LuaMidiPlayer {
     /// Returns the total number of NoteOn events in the loaded MIDI.
     ///
     ///
-    /// # Returns
-    /// `integer`.
-    ///
     /// @return integer
     pub fn note_count(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
         todo!()
@@ -370,18 +266,12 @@ impl LuaMidiPlayer {
     /// Returns the audio bus key, if assigned. Consult the module-level documentation for the broader usage context and preconditions.
     ///
     ///
-    /// # Returns
-    /// `BusKey?`.
-    ///
     /// @return BusKey?
     pub fn bus_key(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
         todo!()
     }
     /// Returns the current playback state. Consult the module-level documentation for the broader usage context and preconditions.
     ///
-    ///
-    /// # Returns
-    /// `PlayState`.
     ///
     /// @return PlayState
     pub fn play_state(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
@@ -425,9 +315,6 @@ impl LuaMidiState {
     /// Check whether a SoundFont is currently loaded.
     ///
     ///
-    /// # Returns
-    /// `boolean`.
-    ///
     /// @return boolean
     pub fn has_soundfont(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
         todo!()
@@ -435,18 +322,12 @@ impl LuaMidiState {
     /// Get the path of the loaded SoundFont, if any.
     ///
     ///
-    /// # Returns
-    /// `Option<`.
-    ///
     /// @return Option<
     pub fn soundfont_path(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
         todo!()
     }
     /// Get a reference to the raw SoundFont data, if loaded.
     ///
-    ///
-    /// # Returns
-    /// `Option<`.
     ///
     /// @return Option<
     pub fn soundfont_data(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
@@ -471,21 +352,11 @@ impl LuaMixer {
     /// Returns a reference to the output stream handle, if available.
     ///
     ///
-    /// # Returns
-    /// `Option<`.
-    ///
     /// @return Option<
     pub fn stream_handle(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
         todo!()
     }
     /// Returns the per-source playback volume. Defaults to `1.0`.
-    ///
-    ///
-    /// # Parameters
-    /// - `key` — `SoundKey` ...
-    ///
-    /// # Returns
-    /// `number`.
     ///
     /// @param key : SoundKey
     /// @return number
@@ -494,26 +365,12 @@ impl LuaMixer {
     }
     /// Returns the pitch (playback speed) for the source. Defaults to `1.0`.
     ///
-    ///
-    /// # Parameters
-    /// - `key` — `SoundKey` ...
-    ///
-    /// # Returns
-    /// `number`.
-    ///
     /// @param key : SoundKey
     /// @return number
     pub fn get_pitch(&self, _lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
         todo!()
     }
     /// Returns whether the audio source is currently playing (not paused and not empty).
-    ///
-    ///
-    /// # Parameters
-    /// - `key` — `SoundKey` ...
-    ///
-    /// # Returns
-    /// `boolean`.
     ///
     /// @param key : SoundKey
     /// @return boolean
@@ -522,26 +379,12 @@ impl LuaMixer {
     }
     /// Returns the playback state of the source, synced with the underlying sink.
     ///
-    ///
-    /// # Parameters
-    /// - `key` — `SoundKey` ...
-    ///
-    /// # Returns
-    /// `PlayState`.
-    ///
     /// @param key : SoundKey
     /// @return PlayState
     pub fn get_play_state(&self, _lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
         todo!()
     }
     /// Returns whether the source is paused. This accessor incurs no allocation; call it freely in hot paths.
-    ///
-    ///
-    /// # Parameters
-    /// - `key` — `SoundKey` ...
-    ///
-    /// # Returns
-    /// `boolean`.
     ///
     /// @param key : SoundKey
     /// @return boolean
@@ -550,13 +393,6 @@ impl LuaMixer {
     }
     /// Returns whether the source is stopped. This accessor incurs no allocation; call it freely in hot paths.
     ///
-    ///
-    /// # Parameters
-    /// - `key` — `SoundKey` ...
-    ///
-    /// # Returns
-    /// `boolean`.
-    ///
     /// @param key : SoundKey
     /// @return boolean
     pub fn is_stopped(&self, _lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
@@ -564,26 +400,12 @@ impl LuaMixer {
     }
     /// Returns whether the source is set to loop.
     ///
-    ///
-    /// # Parameters
-    /// - `key` — `SoundKey` ...
-    ///
-    /// # Returns
-    /// `boolean`.
-    ///
     /// @param key : SoundKey
     /// @return boolean
     pub fn is_looping(&self, _lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
         todo!()
     }
     /// Returns the stereo pan for the source. Defaults to `0.0` (center).
-    ///
-    ///
-    /// # Parameters
-    /// - `key` — `SoundKey` ...
-    ///
-    /// # Returns
-    /// `number`.
     ///
     /// @param key : SoundKey
     /// @return number
@@ -593,21 +415,11 @@ impl LuaMixer {
     /// Returns the master volume. Defaults to `1.0`.
     ///
     ///
-    /// # Returns
-    /// `number`.
-    ///
     /// @return number
     pub fn get_master_volume(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
         todo!()
     }
     /// Returns the source type for the given key.
-    ///
-    ///
-    /// # Parameters
-    /// - `key` — `SoundKey` ...
-    ///
-    /// # Returns
-    /// `SourceType?`.
     ///
     /// @param key : SoundKey
     /// @return SourceType?
@@ -617,9 +429,6 @@ impl LuaMixer {
     /// Returns the number of actively playing (not paused, not empty) sources.
     ///
     ///
-    /// # Returns
-    /// `integer`.
-    ///
     /// @return integer
     pub fn get_active_source_count(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
         todo!()
@@ -627,21 +436,11 @@ impl LuaMixer {
     /// Returns the total number of loaded sources.
     ///
     ///
-    /// # Returns
-    /// `integer`.
-    ///
     /// @return integer
     pub fn get_source_count(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
         todo!()
     }
     /// Returns whether the given source key still refers to a loaded audio source.
-    ///
-    ///
-    /// # Parameters
-    /// - `key` — `SoundKey` ...
-    ///
-    /// # Returns
-    /// `boolean`.
     ///
     /// @param key : SoundKey
     /// @return boolean
@@ -649,13 +448,6 @@ impl LuaMixer {
         todo!()
     }
     /// Returns an immutable reference to the bus, if it exists.
-    ///
-    ///
-    /// # Parameters
-    /// - `key` — `BusKey` ...
-    ///
-    /// # Returns
-    /// `Option<`.
     ///
     /// @param key : BusKey
     /// @return Option<
@@ -665,21 +457,11 @@ impl LuaMixer {
     /// Gets a bus by key.
     ///
     ///
-    /// # Returns
-    /// `Option<`.
-    ///
     /// @return Option<
     pub fn get_bus(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
         todo!()
     }
     /// Returns the bus key assigned to a source, if any.
-    ///
-    ///
-    /// # Parameters
-    /// - `key` — `SoundKey` ...
-    ///
-    /// # Returns
-    /// `BusKey?`.
     ///
     /// @param key : SoundKey
     /// @return BusKey?
@@ -688,26 +470,12 @@ impl LuaMixer {
     }
     /// Returns the cached duration of the audio source in seconds, if known.
     ///
-    ///
-    /// # Parameters
-    /// - `key` — `SoundKey` ...
-    ///
-    /// # Returns
-    /// `number?`.
-    ///
     /// @param key : SoundKey
     /// @return number?
     pub fn get_duration(&self, _lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
         todo!()
     }
     /// Returns the approximate current playback position in seconds.
-    ///
-    ///
-    /// # Parameters
-    /// - `key` — `SoundKey` ...
-    ///
-    /// # Returns
-    /// `number`.
     ///
     /// @param key : SoundKey
     /// @return number
@@ -716,13 +484,6 @@ impl LuaMixer {
     }
     /// Returns the lowpass cutoff frequency in Hz, if set.
     ///
-    ///
-    /// # Parameters
-    /// - `key` — `SoundKey` ...
-    ///
-    /// # Returns
-    /// `integer?`.
-    ///
     /// @param key : SoundKey
     /// @return integer?
     pub fn get_lowpass(&self, _lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
@@ -730,26 +491,12 @@ impl LuaMixer {
     }
     /// Returns the highpass cutoff frequency in Hz, if set.
     ///
-    ///
-    /// # Parameters
-    /// - `key` — `SoundKey` ...
-    ///
-    /// # Returns
-    /// `integer?`.
-    ///
     /// @param key : SoundKey
     /// @return integer?
     pub fn get_highpass(&self, _lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
         todo!()
     }
     /// Returns the fade-in duration in seconds, if set.
-    ///
-    ///
-    /// # Parameters
-    /// - `key` — `SoundKey` ...
-    ///
-    /// # Returns
-    /// `number?`.
     ///
     /// @param key : SoundKey
     /// @return number?
@@ -759,18 +506,12 @@ impl LuaMixer {
     /// Returns the 3D spatial position of an audio source.
     ///
     ///
-    /// # Parameters
-    /// - `key` — `SoundKey` ...
-    ///
     /// @param key : SoundKey
     pub fn get_source_position(&self, _lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
         todo!()
     }
     /// Returns the spatial velocity of an audio source.
     ///
-    ///
-    /// # Parameters
-    /// - `key` — `SoundKey` ...
     ///
     /// @param key : SoundKey
     pub fn get_source_velocity(&self, _lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
@@ -779,9 +520,6 @@ impl LuaMixer {
     /// Returns the spatial orientation of an audio source.
     ///
     ///
-    /// # Parameters
-    /// - `key` — `SoundKey` ...
-    ///
     /// @param key : SoundKey
     pub fn get_source_orientation(&self, _lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
         todo!()
@@ -789,21 +527,11 @@ impl LuaMixer {
     /// Returns the global Doppler effect scale.
     ///
     ///
-    /// # Returns
-    /// `number`.
-    ///
     /// @return number
     pub fn get_doppler_scale(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
         todo!()
     }
     /// Returns the number of free buffer slots for a queueable source.
-    ///
-    ///
-    /// # Parameters
-    /// - `key` — `QueueableKey` ...
-    ///
-    /// # Returns
-    /// `integer`.
     ///
     /// @param key : QueueableKey
     /// @return integer
@@ -853,9 +581,6 @@ impl LuaQueueableSource {
     /// Returns the number of buffer slots currently available.
     ///
     ///
-    /// # Returns
-    /// `integer`.
-    ///
     /// @return integer
     pub fn free_buffer_count(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
         todo!()
@@ -876,13 +601,6 @@ pub struct LuaSoundData(/* TODO: add key + state fields */);
 impl LuaSoundData {
     /// Get a sample at the given index (interleaved).
     ///
-    ///
-    /// # Parameters
-    /// - `index` — `integer` ...
-    ///
-    /// # Returns
-    /// `number?`.
-    ///
     /// @param index : integer
     /// @return number?
     pub fn get_sample(&self, _lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
@@ -891,18 +609,12 @@ impl LuaSoundData {
     /// Get the number of samples per channel. Consult the module-level documentation for the broader usage context and preconditions.
     ///
     ///
-    /// # Returns
-    /// `integer`.
-    ///
     /// @return integer
     pub fn sample_count(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
         todo!()
     }
     /// Get the sample rate in Hz. Consult the module-level documentation for the broader usage context and preconditions.
     ///
-    ///
-    /// # Returns
-    /// `integer`.
     ///
     /// @return integer
     pub fn sample_rate(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
@@ -911,9 +623,6 @@ impl LuaSoundData {
     /// Get the number of audio channels. Consult the module-level documentation for the broader usage context and preconditions.
     ///
     ///
-    /// # Returns
-    /// `u16`.
-    ///
     /// @return u16
     pub fn channel_count(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
         todo!()
@@ -921,18 +630,12 @@ impl LuaSoundData {
     /// Get the bit depth. Consult the module-level documentation for the broader usage context and preconditions.
     ///
     ///
-    /// # Returns
-    /// `u16`.
-    ///
     /// @return u16
     pub fn bit_depth(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
         todo!()
     }
     /// Get the duration in seconds. Consult the module-level documentation for the broader usage context and preconditions.
     ///
-    ///
-    /// # Returns
-    /// `number`.
     ///
     /// @return number
     pub fn duration(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
@@ -956,9 +659,6 @@ impl UserData for LuaSoundData {
 /// Sets the bus volume, clamped to `>= 0.0`.
 ///
 ///
-/// # Parameters
-/// - `volume` — `number` ...
-///
 /// @param volume : number
 pub fn set_volume(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
     todo!()
@@ -967,23 +667,12 @@ pub fn set_volume(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 /// Sets the bus pitch multiplier, clamped to `>= 0.0`.
 ///
 ///
-/// # Parameters
-/// - `pitch` — `number` ...
-///
 /// @param pitch : number
 pub fn set_pitch(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
     todo!()
 }
 
 /// Load an audio file and prepare it for chunked decoding.
-///
-///
-/// # Parameters
-/// - `path` — `str` ...
-/// - `buffer_size` — `integer` ...
-///
-/// # Returns
-/// `Result<Self`.
 ///
 /// @param path : str
 /// @param buffer_size : integer
@@ -995,9 +684,6 @@ pub fn from_file(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 /// Return the next chunk of samples, or `None` at EOF.
 ///
 ///
-/// # Returns
-/// `table?`.
-///
 /// @return table?
 pub fn decode(_lua: &Lua, _: ()) -> LuaResult<()> {
     todo!()
@@ -1006,24 +692,12 @@ pub fn decode(_lua: &Lua, _: ()) -> LuaResult<()> {
 /// Seek to a time offset in seconds.
 ///
 ///
-/// # Parameters
-/// - `offset` — `number` ...
-///
 /// @param offset : number
 pub fn seek(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
     todo!()
 }
 
 /// Applies this effect's DSP algorithm to a single PCM sample.
-///
-///
-/// # Parameters
-/// - `sample` — `number` ...
-/// - `channel` — `u16` ...
-/// - `sample_rate` — `integer` ...
-///
-/// # Returns
-/// `number`.
 ///
 /// @param sample : number
 /// @param channel : u16
@@ -1035,14 +709,6 @@ pub fn process(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 
 /// Load a SoundFont from raw SF2 data. Replaces the current soundfont value; callers hold responsibility for maintaining consistency with related fields.
 ///
-///
-/// # Parameters
-/// - `data` — `table` ...
-/// - `path` — `string?` ...
-///
-/// # Returns
-/// `Result<()`.
-///
 /// @param data : table
 /// @param path : string?
 /// @return Result<()
@@ -1052,13 +718,6 @@ pub fn set_soundfont(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 
 /// Loads and parses a MIDI file from the given path.
 ///
-///
-/// # Parameters
-/// - `path` — `Path` ...
-///
-/// # Returns
-/// `boolean`.
-///
 /// @param path : Path
 /// @return boolean
 pub fn load(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
@@ -1066,13 +725,6 @@ pub fn load(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 }
 
 /// Loads MIDI from raw bytes (e.g., embedded data).
-///
-///
-/// # Parameters
-/// - `data` — `table` ...
-///
-/// # Returns
-/// `boolean`.
 ///
 /// @param data : table
 /// @return boolean
@@ -1083,9 +735,6 @@ pub fn load_data(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 /// Plays the loaded MIDI through the given output stream handle.
 ///
 ///
-/// # Parameters
-/// - `stream_handle` — `rodio::OutputStreamHandle` ...
-///
 /// @param stream_handle : rodio::OutputStreamHandle
 pub fn play(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
     todo!()
@@ -1094,22 +743,13 @@ pub fn play(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 /// Seeks to a position in seconds. Consult the module-level documentation for the broader usage context and preconditions.
 ///
 ///
-/// # Parameters
-/// - `secs` — `number` ...
-///
 /// @param secs : number
 /// Sets the master volume (0.0 = silent, values above 1.0 amplify).
 ///
 ///
-/// # Parameters
-/// - `vol` — `number` ...
-///
 /// @param vol : number
 /// Sets whether playback should loop. Replaces the current looping value; callers hold responsibility for maintaining consistency with related fields.
 ///
-///
-/// # Parameters
-/// - `looping` — `boolean` ...
 ///
 /// @param looping : boolean
 pub fn set_looping(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
@@ -1119,9 +759,6 @@ pub fn set_looping(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 /// Sets the tempo scale factor (minimum 0.01).
 ///
 ///
-/// # Parameters
-/// - `scale` — `number` ...
-///
 /// @param scale : number
 pub fn set_tempo_scale(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
     todo!()
@@ -1129,10 +766,6 @@ pub fn set_tempo_scale(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 
 /// Sets the volume for a specific MIDI channel (0-15).
 ///
-///
-/// # Parameters
-/// - `ch` — `integer` ...
-/// - `vol` — `number` ...
 ///
 /// @param ch : integer
 /// @param vol : number
@@ -1143,10 +776,6 @@ pub fn set_channel_volume(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()>
 /// Sets the mute state for a specific MIDI channel (0-15).
 ///
 ///
-/// # Parameters
-/// - `ch` — `integer` ...
-/// - `muted` — `boolean` ...
-///
 /// @param ch : integer
 /// @param muted : boolean
 pub fn set_channel_muted(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
@@ -1155,10 +784,6 @@ pub fn set_channel_muted(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> 
 
 /// Sets the instrument (program number) for a MIDI channel (0-15).
 ///
-///
-/// # Parameters
-/// - `ch` — `integer` ...
-/// - `inst` — `u8` ...
 ///
 /// @param ch : integer
 /// @param inst : u8
@@ -1169,9 +794,6 @@ pub fn set_channel_instrument(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult
 /// Solos a channel (mutes all others). Consult the module-level documentation for the broader usage context and preconditions.
 ///
 ///
-/// # Parameters
-/// - `ch` — `integer` ...
-///
 /// @param ch : integer
 pub fn solo_channel(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
     todo!()
@@ -1179,10 +801,6 @@ pub fn solo_channel(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 
 /// Sets the mute state for a specific track by index.
 ///
-///
-/// # Parameters
-/// - `idx` — `integer` ...
-/// - `muted` — `boolean` ...
 ///
 /// @param idx : integer
 /// @param muted : boolean
@@ -1193,9 +811,6 @@ pub fn set_track_muted(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 /// Sets the audio bus key for mixer routing.
 ///
 ///
-/// # Parameters
-/// - `key` — `BusKey?` ...
-///
 /// @param key : BusKey?
 pub fn set_bus_key(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
     todo!()
@@ -1205,13 +820,6 @@ pub fn set_bus_key(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 ///
 /// Returns `Err` if no free buffer slots remain.
 ///
-///
-/// # Parameters
-/// - `data` — `[f32]` ...
-///
-/// # Returns
-/// `Result<()`.
-///
 /// @param data : [f32]
 /// @return Result<()
 pub fn queue_buffer(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
@@ -1219,14 +827,6 @@ pub fn queue_buffer(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 }
 
 /// Registers a new audio file path with the given source type and returns its key.
-///
-///
-/// # Parameters
-/// - `file_path` — `str` ...
-/// - `source_type` — `SourceType` ...
-///
-/// # Returns
-/// `SoundKey`.
 ///
 /// @param file_path : str
 /// @param source_type : SourceType
@@ -1238,17 +838,10 @@ pub fn load_source(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 /// Plays the audio source identified by `key`, loading and decoding the file on demand.
 ///
 ///
-/// # Parameters
-/// - `key` — `SoundKey` ...
-/// - `game_dir` — `Path` ...
-///
 /// @param key : SoundKey
 /// @param game_dir : Path
 /// Stops playback of a sound and resets its position to the beginning.
 ///
-///
-/// # Parameters
-/// - `key` — `SoundKey` ...
 ///
 /// @param key : SoundKey
 pub fn stop(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
@@ -1258,17 +851,10 @@ pub fn stop(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 /// Sets the per-source playback volume, clamped to `[0.0, 2.0]`.
 ///
 ///
-/// # Parameters
-/// - `key` — `SoundKey` ...
-/// - `volume` — `number` ...
-///
 /// @param key : SoundKey
 /// @param volume : number
 /// Pauses playback of the audio source identified by \key\.
 ///
-///
-/// # Parameters
-/// - `key` — `SoundKey` ...
 ///
 /// @param key : SoundKey
 pub fn pause(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
@@ -1278,9 +864,6 @@ pub fn pause(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 /// Resumes playback of a paused audio source identified by \key\.
 ///
 ///
-/// # Parameters
-/// - `key` — `SoundKey` ...
-///
 /// @param key : SoundKey
 pub fn resume(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
     todo!()
@@ -1289,18 +872,10 @@ pub fn resume(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 /// Sets the playback speed (pitch) for the source, clamped to `[0.1, 4.0]`.
 ///
 ///
-/// # Parameters
-/// - `key` — `SoundKey` ...
-/// - `pitch` — `number` ...
-///
 /// @param key : SoundKey
 /// @param pitch : number
 /// Sets the playback speed (pitch) for the source, clamped to `[0.1, 4.0]`.
 ///
-///
-/// # Parameters
-/// - `key` — `SoundKey` ...
-/// - `speed` — `number` ...
 ///
 /// @param key : SoundKey
 /// @param speed : number
@@ -1311,18 +886,10 @@ pub fn set_speed(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 /// Sets the looping flag for the source. Takes effect on next `play` call.
 ///
 ///
-/// # Parameters
-/// - `key` — `SoundKey` ...
-/// - `looping` — `boolean` ...
-///
 /// @param key : SoundKey
 /// @param looping : boolean
 /// Plays the audio source in an infinite loop.
 ///
-///
-/// # Parameters
-/// - `key` — `SoundKey` ...
-/// - `game_dir` — `Path` ...
 ///
 /// @param key : SoundKey
 /// @param game_dir : Path
@@ -1333,10 +900,6 @@ pub fn play_looping(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 /// Sets the stereo pan for the source, clamped to `[-1.0, 1.0]`.
 ///
 ///
-/// # Parameters
-/// - `key` — `SoundKey` ...
-/// - `pan` — `number` ...
-///
 /// @param key : SoundKey
 /// @param pan : number
 pub fn set_pan(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
@@ -1346,22 +909,12 @@ pub fn set_pan(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 /// Sets the master volume applied to all sources, clamped to `[0.0, 1.0]`.
 ///
 ///
-/// # Parameters
-/// - `volume` — `number` ...
-///
 /// @param volume : number
 pub fn set_master_volume(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
     todo!()
 }
 
 /// Clones a source, sharing cached decoded data (for static sources).
-///
-///
-/// # Parameters
-/// - `key` — `SoundKey` ...
-///
-/// # Returns
-/// `SoundKey?`.
 ///
 /// @param key : SoundKey
 /// @return SoundKey?
@@ -1371,13 +924,6 @@ pub fn clone_source(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 
 /// Stops and removes the audio source identified by `key`.
 ///
-///
-/// # Parameters
-/// - `key` — `SoundKey` ...
-///
-/// # Returns
-/// `boolean`.
-///
 /// @param key : SoundKey
 /// @return boolean
 pub fn release(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
@@ -1386,13 +932,6 @@ pub fn release(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 
 /// Creates a new named bus and returns its key.
 ///
-///
-/// # Parameters
-/// - `name` — `impl Into<String>` ...
-///
-/// # Returns
-/// `BusKey`.
-///
 /// @param name : impl Into<String>
 /// @return BusKey
 pub fn new_bus(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
@@ -1400,13 +939,6 @@ pub fn new_bus(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 }
 
 /// Returns a mutable reference to the bus, if it exists.
-///
-///
-/// # Parameters
-/// - `key` — `BusKey` ...
-///
-/// # Returns
-/// `Option<`.
 ///
 /// @param key : BusKey
 /// @return Option<
@@ -1417,10 +949,6 @@ pub fn get_bus_mut(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 /// Assigns a source to a bus. Pass `None` to remove the bus assignment.
 ///
 ///
-/// # Parameters
-/// - `key` — `SoundKey` ...
-/// - `bus_key` — `BusKey?` ...
-///
 /// @param key : SoundKey
 /// @param bus_key : BusKey?
 pub fn set_source_bus(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
@@ -1430,20 +958,11 @@ pub fn set_source_bus(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 /// Seeks the source to `position_secs` by rebuilding the sink from the new offset.
 ///
 ///
-/// # Parameters
-/// - `key` — `SoundKey` ...
-/// - `position_secs` — `number` ...
-/// - `game_dir` — `Path` ...
-///
 /// @param key : SoundKey
 /// @param position_secs : number
 /// @param game_dir : Path
 /// Sets a lowpass filter cutoff in Hz. Applied on next `play` or `seek`.
 ///
-///
-/// # Parameters
-/// - `key` — `SoundKey` ...
-/// - `cutoff_hz` — `integer` ...
 ///
 /// @param key : SoundKey
 /// @param cutoff_hz : integer
@@ -1454,9 +973,6 @@ pub fn set_lowpass(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 /// Removes the lowpass filter from the source.
 ///
 ///
-/// # Parameters
-/// - `key` — `SoundKey` ...
-///
 /// @param key : SoundKey
 pub fn clear_lowpass(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
     todo!()
@@ -1464,10 +980,6 @@ pub fn clear_lowpass(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 
 /// Sets a highpass filter cutoff in Hz. Applied on next `play` or `seek`.
 ///
-///
-/// # Parameters
-/// - `key` — `SoundKey` ...
-/// - `cutoff_hz` — `integer` ...
 ///
 /// @param key : SoundKey
 /// @param cutoff_hz : integer
@@ -1478,9 +990,6 @@ pub fn set_highpass(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 /// Removes the highpass filter from the source.
 ///
 ///
-/// # Parameters
-/// - `key` — `SoundKey` ...
-///
 /// @param key : SoundKey
 pub fn clear_highpass(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
     todo!()
@@ -1488,9 +997,6 @@ pub fn clear_highpass(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 
 /// Removes all filters (lowpass and highpass) from the source.
 ///
-///
-/// # Parameters
-/// - `key` — `SoundKey` ...
 ///
 /// @param key : SoundKey
 pub fn clear_filter(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
@@ -1500,10 +1006,6 @@ pub fn clear_filter(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 /// Sets the fade-in duration in seconds. Applied on next `play`.
 ///
 ///
-/// # Parameters
-/// - `key` — `SoundKey` ...
-/// - `duration_secs` — `number` ...
-///
 /// @param key : SoundKey
 /// @param duration_secs : number
 pub fn set_fade_in(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
@@ -1512,9 +1014,6 @@ pub fn set_fade_in(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 
 /// Removes the fade-in setting from the source.
 ///
-///
-/// # Parameters
-/// - `key` — `SoundKey` ...
 ///
 /// @param key : SoundKey
 pub fn clear_fade_in(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
@@ -1527,12 +1026,6 @@ pub fn clear_fade_in(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 /// effect immediately on the next `play` call.
 ///
 ///
-/// # Parameters
-/// - `key` — `SoundKey` ...
-/// - `x` — `number` ...
-/// - `y` — `number` ...
-/// - `z` — `number` ...
-///
 /// @param key : SoundKey
 /// @param x : number
 /// @param y : number
@@ -1544,12 +1037,6 @@ pub fn set_source_position(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()
 /// Sets the spatial velocity of an audio source (used for Doppler calculation).
 ///
 ///
-/// # Parameters
-/// - `key` — `SoundKey` ...
-/// - `x` — `number` ...
-/// - `y` — `number` ...
-/// - `z` — `number` ...
-///
 /// @param key : SoundKey
 /// @param x : number
 /// @param y : number
@@ -1560,15 +1047,6 @@ pub fn set_source_velocity(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()
 
 /// Sets the spatial orientation of an audio source.
 ///
-///
-/// # Parameters
-/// - `key` — `SoundKey` ...
-/// - `fx` — `number` ...
-/// - `fy` — `number` ...
-/// - `fz` — `number` ...
-/// - `ux` — `number` ...
-/// - `uy` — `number` ...
-/// - `uz` — `number` ...
 ///
 /// @param key : SoundKey
 /// @param fx : number
@@ -1584,11 +1062,6 @@ pub fn set_source_orientation(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult
 /// Sets the 3D listener position for spatial audio.
 ///
 ///
-/// # Parameters
-/// - `x` — `number` ...
-/// - `y` — `number` ...
-/// - `z` — `number` ...
-///
 /// @param x : number
 /// @param y : number
 /// @param z : number
@@ -1598,14 +1071,6 @@ pub fn set_listener_position(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<
 
 /// Sets the listener orientation (forward + up vectors).
 ///
-///
-/// # Parameters
-/// - `fx` — `number` ...
-/// - `fy` — `number` ...
-/// - `fz` — `number` ...
-/// - `ux` — `number` ...
-/// - `uy` — `number` ...
-/// - `uz` — `number` ...
 ///
 /// @param fx : number
 /// @param fy : number
@@ -1620,11 +1085,6 @@ pub fn set_listener_orientation(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResu
 /// Sets the listener velocity for Doppler calculation.
 ///
 ///
-/// # Parameters
-/// - `x` — `number` ...
-/// - `y` — `number` ...
-/// - `z` — `number` ...
-///
 /// @param x : number
 /// @param y : number
 /// @param z : number
@@ -1635,9 +1095,6 @@ pub fn set_listener_velocity(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<
 /// Sets the global Doppler effect scale.
 ///
 ///
-/// # Parameters
-/// - `scale` — `number` ...
-///
 /// @param scale : number
 pub fn set_doppler_scale(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
     todo!()
@@ -1646,25 +1103,12 @@ pub fn set_doppler_scale(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> 
 /// Sets the distance attenuation model.
 ///
 ///
-/// # Parameters
-/// - `model` — `str` ...
-///
 /// @param model : str
 pub fn set_distance_model(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
     todo!()
 }
 
 /// Creates a new queueable source and returns its key.
-///
-///
-/// # Parameters
-/// - `sample_rate` — `integer` ...
-/// - `bit_depth` — `u8` ...
-/// - `channels` — `u8` ...
-/// - `buffer_count` — `integer` ...
-///
-/// # Returns
-/// `QueueableKey`.
 ///
 /// @param sample_rate : integer
 /// @param bit_depth : u8
@@ -1677,23 +1121,12 @@ pub fn new_queueable(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 
 /// Pushes a buffer of f32 PCM samples into a queueable source.
 ///
-///
-/// # Parameters
-/// - `key` — `QueueableKey` ...
-/// - `data` — `[f32]` ...
-///
-/// # Returns
-/// `Result<()`.
-///
 /// @param key : QueueableKey
 /// @param data : [f32]
 /// @return Result<()
 /// Marks a queueable source as playing (state bookkeeping only; actual PCM playback
 /// is driven by game code dequeuing buffers via `queue_buffer`).
 ///
-///
-/// # Parameters
-/// - `key` — `QueueableKey` ...
 ///
 /// @param key : QueueableKey
 pub fn play_queueable(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
@@ -1703,22 +1136,12 @@ pub fn play_queueable(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 /// Stops a queueable source, draining all queued buffers.
 ///
 ///
-/// # Parameters
-/// - `key` — `QueueableKey` ...
-///
 /// @param key : QueueableKey
 pub fn stop_queueable(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
     todo!()
 }
 
 /// Releases a queueable source, removing it from the slot-map.
-///
-///
-/// # Parameters
-/// - `key` — `QueueableKey` ...
-///
-/// # Returns
-/// `boolean`.
 ///
 /// @param key : QueueableKey
 /// @return boolean
@@ -1732,9 +1155,6 @@ pub fn release_queueable(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> 
 /// when available; falls back to a single-entry stub list otherwise.
 ///
 ///
-/// # Returns
-/// `table`.
-///
 /// @return table
 pub fn get_playback_devices(_lua: &Lua, _: ()) -> LuaResult<()> {
     todo!()
@@ -1742,9 +1162,6 @@ pub fn get_playback_devices(_lua: &Lua, _: ()) -> LuaResult<()> {
 
 /// Returns the name of the currently active audio output device.
 ///
-///
-/// # Returns
-/// `string`.
 ///
 /// @return string
 pub fn get_playback_device(_lua: &Lua, _: ()) -> LuaResult<()> {
@@ -1756,13 +1173,6 @@ pub fn get_playback_device(_lua: &Lua, _: ()) -> LuaResult<()> {
 /// Accepts any name returned by [`get_playback_devices`].  Passing an unknown
 /// name returns `Err(EngineError::AudioError)`.
 ///
-///
-/// # Parameters
-/// - `name` — `str` ...
-///
-/// # Returns
-/// `Result<()`.
-///
 /// @param name : str
 /// @return Result<()
 pub fn set_playback_device(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
@@ -1770,15 +1180,6 @@ pub fn set_playback_device(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()
 }
 
 /// Create a `SoundData` from an existing f32 sample buffer.
-///
-///
-/// # Parameters
-/// - `samples` — `table` ...
-/// - `sample_rate` — `integer` ...
-/// - `channels` — `u16` ...
-///
-/// # Returns
-/// `Self`.
 ///
 /// @param samples : table
 /// @param sample_rate : integer
@@ -1790,24 +1191,9 @@ pub fn from_samples(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 
 /// Decode an audio file to SoundData. Returns a fully initialised instance with all fields set to their initial values.
 ///
-///
-/// # Parameters
-/// - `path` — `str` ...
-///
-/// # Returns
-/// `Result<Self`.
-///
 /// @param path : str
 /// @return Result<Self
 /// Set a sample at the given index (clamped to [-1.0, 1.0]).
-///
-///
-/// # Parameters
-/// - `index` — `integer` ...
-/// - `value` — `number` ...
-///
-/// # Returns
-/// `boolean`.
 ///
 /// @param index : integer
 /// @param value : number
@@ -1817,14 +1203,6 @@ pub fn set_sample(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 }
 
 /// Registers the `luna.audio` API table.
-///
-/// # Parameters
-/// - `lua` — `&Lua` The Lua VM.
-/// - `luna` — `&LuaTable<'_>` The top-level `luna` table.
-/// - `state` — `Rc<RefCell<SharedState>>` Shared engine state.
-///
-/// # Returns
-/// `LuaResult<()>`.
 pub fn register(
     lua: &Lua,
     luna: &mlua::Table,

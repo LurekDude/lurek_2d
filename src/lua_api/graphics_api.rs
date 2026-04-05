@@ -23,9 +23,6 @@ impl LuaColor {
     /// Alpha is discarded. Bit layout: `0x00RRGGBB`.
     ///
     ///
-    /// # Returns
-    /// `integer`.
-    ///
     /// @return integer
     pub fn to_rgb_u32(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
         todo!()
@@ -46,9 +43,6 @@ pub struct LuaCompoundShape(/* TODO: add key + state fields */);
 impl LuaCompoundShape {
     /// Returns the number of commands currently in the queue.
     ///
-    ///
-    /// # Returns
-    /// `integer`.
     ///
     /// @return integer
     pub fn command_count(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
@@ -71,18 +65,12 @@ impl LuaDecalSurface {
     /// Returns the surface width in pixels. This accessor incurs no allocation; call it freely in hot paths.
     ///
     ///
-    /// # Returns
-    /// `integer`.
-    ///
     /// @return integer
     pub fn get_width(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
         todo!()
     }
     /// Returns the surface height in pixels. This accessor incurs no allocation; call it freely in hot paths.
     ///
-    ///
-    /// # Returns
-    /// `integer`.
     ///
     /// @return integer
     pub fn get_height(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
@@ -106,9 +94,6 @@ impl LuaDrawLayer {
     /// Returns the number of queued entries. This accessor incurs no allocation; call it freely in hot paths.
     ///
     ///
-    /// # Returns
-    /// `integer`.
-    ///
     /// @return integer
     pub fn get_count(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
         todo!()
@@ -130,18 +115,12 @@ impl LuaFont {
     /// Returns the vertical line height (ascent - descent + line gap) in pixels.
     ///
     ///
-    /// # Returns
-    /// `number`.
-    ///
     /// @return number
     pub fn line_height(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
         todo!()
     }
     /// Returns the font's ascent (distance from baseline to top) in pixels.
     ///
-    ///
-    /// # Returns
-    /// `number`.
     ///
     /// @return number
     pub fn ascent(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
@@ -150,9 +129,6 @@ impl LuaFont {
     /// Returns the font's descent (distance from baseline to bottom, typically negative) in pixels.
     ///
     ///
-    /// # Returns
-    /// `number`.
-    ///
     /// @return number
     pub fn descent(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
         todo!()
@@ -160,18 +136,12 @@ impl LuaFont {
     /// Returns `true` if the atlas has been modified since the last `mark_clean()` call.
     ///
     ///
-    /// # Returns
-    /// `boolean`.
-    ///
     /// @return boolean
     pub fn is_dirty(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
         todo!()
     }
     /// Returns the font size in pixels that this font was created with.
     ///
-    ///
-    /// # Returns
-    /// `number`.
     ///
     /// @return number
     pub fn size(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
@@ -197,13 +167,6 @@ pub struct LuaMesh(/* TODO: add key + state fields */);
 impl LuaMesh {
     /// Gets a vertex at the given index. This accessor incurs no allocation; call it freely in hot paths.
     ///
-    ///
-    /// # Parameters
-    /// - `index` — `integer` ...
-    ///
-    /// # Returns
-    /// `Option<`.
-    ///
     /// @param index : integer
     /// @return Option<
     pub fn get_vertex(&self, _lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
@@ -212,18 +175,12 @@ impl LuaMesh {
     /// Returns the number of vertices. Consult the module-level documentation for the broader usage context and preconditions.
     ///
     ///
-    /// # Returns
-    /// `integer`.
-    ///
     /// @return integer
     pub fn vertex_count(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
         todo!()
     }
     /// Expands vertices into a list of triangle indices based on the draw mode.
     ///
-    ///
-    /// # Returns
-    /// `table`.
     ///
     /// @return table
     pub fn triangulate(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
@@ -249,16 +206,6 @@ impl LuaNineSlice {
     ///
     /// Each entry is `(src_x, src_y, src_w, src_h, dst_x, dst_y, dst_w, dst_h)`.
     ///
-    ///
-    /// # Parameters
-    /// - `x` — `Destination` ...
-    /// - `y` — `Destination` ...
-    /// - `w` — `Destination` ...
-    /// - `h` — `Destination` ...
-    ///
-    /// # Returns
-    /// `An`.
-    ///
     /// @param x : Destination
     /// @param y : Destination
     /// @param w : Destination
@@ -283,13 +230,6 @@ pub struct LuaShader(/* TODO: add key + state fields */);
 impl LuaShader {
     /// Returns whether a uniform with the given name has been set.
     ///
-    ///
-    /// # Parameters
-    /// - `name` — `str` ...
-    ///
-    /// # Returns
-    /// `boolean`.
-    ///
     /// @param name : str
     /// @return boolean
     pub fn has_uniform(&self, _lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
@@ -312,18 +252,12 @@ impl LuaSpriteBatch {
     /// Returns the texture key this batch draws from.
     ///
     ///
-    /// # Returns
-    /// `TextureKey`.
-    ///
     /// @return TextureKey
     pub fn texture_key(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
         todo!()
     }
     /// Returns the number of entries in the batch.
     ///
-    ///
-    /// # Returns
-    /// `integer`.
     ///
     /// @return integer
     pub fn len(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
@@ -332,18 +266,12 @@ impl LuaSpriteBatch {
     /// Returns true if the batch has no entries.
     ///
     ///
-    /// # Returns
-    /// `boolean`.
-    ///
     /// @return boolean
     pub fn is_empty(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
         todo!()
     }
     /// Returns the maximum number of entries (buffer size). 0 means unlimited.
     ///
-    ///
-    /// # Returns
-    /// `integer`.
     ///
     /// @return integer
     pub fn buffer_size(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
@@ -368,13 +296,6 @@ pub struct LuaSpriteSheet(/* TODO: add key + state fields */);
 impl LuaSpriteSheet {
     /// Return the quad for a 0-based frame index.
     ///
-    ///
-    /// # Parameters
-    /// - `index` — `integer` ...
-    ///
-    /// # Returns
-    /// `Rect?`.
-    ///
     /// @param index : integer
     /// @return Rect?
     pub fn get_frame(&self, _lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
@@ -383,21 +304,11 @@ impl LuaSpriteSheet {
     /// Total number of frames in the sheet. This accessor incurs no allocation; call it freely in hot paths.
     ///
     ///
-    /// # Returns
-    /// `integer`.
-    ///
     /// @return integer
     pub fn get_frame_count(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
         todo!()
     }
     /// Return all frame quads in a 0-based row.
-    ///
-    ///
-    /// # Parameters
-    /// - `row` — `integer` ...
-    ///
-    /// # Returns
-    /// `table`.
     ///
     /// @param row : integer
     /// @return table
@@ -406,27 +317,12 @@ impl LuaSpriteSheet {
     }
     /// Return all frame quads in a 0-based column.
     ///
-    ///
-    /// # Parameters
-    /// - `col` — `integer` ...
-    ///
-    /// # Returns
-    /// `table`.
-    ///
     /// @param col : integer
     /// @return table
     pub fn get_column(&self, _lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
         todo!()
     }
     /// Return a contiguous range of frame quads starting at `start` (0-based).
-    ///
-    ///
-    /// # Parameters
-    /// - `start` — `integer` ...
-    /// - `count` — `integer` ...
-    ///
-    /// # Returns
-    /// `table`.
     ///
     /// @param start : integer
     /// @param count : integer
@@ -436,13 +332,6 @@ impl LuaSpriteSheet {
     }
     /// Return the frame quads for a named group.
     ///
-    ///
-    /// # Parameters
-    /// - `name` — `str` ...
-    ///
-    /// # Returns
-    /// `table?`.
-    ///
     /// @param name : str
     /// @return table?
     pub fn get_group(&self, _lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
@@ -451,21 +340,11 @@ impl LuaSpriteSheet {
     /// Return the names of all defined groups. This accessor incurs no allocation; call it freely in hot paths.
     ///
     ///
-    /// # Returns
-    /// `table`.
-    ///
     /// @return table
     pub fn get_group_names(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
         todo!()
     }
     /// Return the frame quads for a 0-based direction index.
-    ///
-    ///
-    /// # Parameters
-    /// - `direction` — `integer` ...
-    ///
-    /// # Returns
-    /// `table?`.
     ///
     /// @param direction : integer
     /// @return table?
@@ -495,13 +374,6 @@ pub struct LuaTextureAtlas(/* TODO: add key + state fields */);
 impl LuaTextureAtlas {
     /// Looks up a previously packed region by name.
     ///
-    ///
-    /// # Parameters
-    /// - `name` — `str` ...
-    ///
-    /// # Returns
-    /// `Option<`.
-    ///
     /// @param name : str
     /// @return Option<
     pub fn get_region(&self, _lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
@@ -510,18 +382,12 @@ impl LuaTextureAtlas {
     /// Returns the number of packed regions. This accessor incurs no allocation; call it freely in hot paths.
     ///
     ///
-    /// # Returns
-    /// `integer`.
-    ///
     /// @return integer
     pub fn get_region_count(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
         todo!()
     }
     /// Returns all packed regions in arbitrary order.
     ///
-    ///
-    /// # Returns
-    /// `Vec<`.
     ///
     /// @return Vec<
     pub fn get_regions(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
@@ -542,12 +408,6 @@ impl UserData for LuaTextureAtlas {
 /// Creates a color from `u8` RGBA components in `[0, 255]`, normalizing to `[0.0, 1.0]`.
 ///
 ///
-/// # Parameters
-/// - `r` — `Red` ...
-/// - `g` — `Green` ...
-/// - `b` — `Blue` ...
-/// - `a` — `Alpha` ...
-///
 /// @param r : Red
 /// @param g : Green
 /// @param b : Blue
@@ -558,13 +418,6 @@ pub fn from_u8(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 
 /// Queues an entry with the given z-order. Consult the module-level documentation for the broader usage context and preconditions.
 ///
-///
-/// # Parameters
-/// - `z_order` — `number` ...
-///
-/// # Returns
-/// `integer`.
-///
 /// @param z_order : number
 /// @return integer
 pub fn queue(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
@@ -574,9 +427,6 @@ pub fn queue(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 /// Sorts entries by z-order ascending and drains the queue.
 ///
 ///
-/// # Returns
-/// `table`.
-///
 /// @return table
 pub fn flush(_lua: &Lua, _: ()) -> LuaResult<()> {
     todo!()
@@ -584,10 +434,6 @@ pub fn flush(_lua: &Lua, _: ()) -> LuaResult<()> {
 
 /// Parses a TTF/OTF font from raw bytes and pre-rasterizes printable ASCII glyphs.
 ///
-///
-/// # Parameters
-/// - `data` — `Raw` ...
-/// - `size` — `Font` ...
 ///
 /// @param data : Raw
 /// @param size : Font
@@ -601,9 +447,6 @@ pub fn from_bytes(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 /// Otherwise the glyph is rasterized via fontdue and packed into the atlas.
 ///
 ///
-/// # Parameters
-/// - `ch` — `The` ...
-///
 /// @param ch : The
 pub fn ensure_glyph(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
     todo!()
@@ -612,13 +455,6 @@ pub fn ensure_glyph(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 /// Returns the total advance width of the given text string in pixels.
 ///
 /// Ensures all characters are rasterized before measuring.
-///
-///
-/// # Parameters
-/// - `text` — `The` ...
-///
-/// # Returns
-/// `The`.
 ///
 /// @param text : The
 /// @return The
@@ -629,9 +465,6 @@ pub fn text_width(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 /// Sets the vertical line height in pixels.
 ///
 ///
-/// # Parameters
-/// - `height` — `number` ...
-///
 /// @param height : number
 pub fn set_line_height(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
     todo!()
@@ -640,23 +473,12 @@ pub fn set_line_height(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 /// Returns glyph information for a character, rasterizing it on demand if needed.
 ///
 ///
-/// # Parameters
-/// - `ch` — `The` ...
-///
 /// @param ch : The
 pub fn glyph(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
     todo!()
 }
 
 /// Break text into lines that fit within `limit` pixel width.
-///
-///
-/// # Parameters
-/// - `text` — `str` ...
-/// - `limit` — `number` ...
-///
-/// # Returns
-/// `table`.
 ///
 /// @param text : str
 /// @param limit : number
@@ -668,10 +490,6 @@ pub fn wrap_text(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 /// Updates the viewport uniform after a window resize.
 ///
 ///
-/// # Parameters
-/// - `width` — `integer` ...
-/// - `height` — `integer` ...
-///
 /// @param width : integer
 /// @param height : integer
 pub fn resize(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
@@ -680,13 +498,6 @@ pub fn resize(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 
 /// Uploads raw RGBA8 pixel data as a new GPU texture stored under the given key.
 ///
-///
-/// # Parameters
-/// - `key` — `TextureKey` ...
-/// - `pixels` — `[u8]` ...
-/// - `width` — `integer` ...
-/// - `height` — `integer` ...
-/// - `default_filter` — `(String, String, u32)` ...
 ///
 /// @param key : TextureKey
 /// @param pixels : [u8]
@@ -700,12 +511,6 @@ pub fn upload_texture(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 /// Creates an off-screen GPU canvas texture stored under the given key.
 ///
 ///
-/// # Parameters
-/// - `key` — `CanvasKey` ...
-/// - `width` — `integer` ...
-/// - `height` — `integer` ...
-/// - `default_filter` — `(String, String, u32)` ...
-///
 /// @param key : CanvasKey
 /// @param width : integer
 /// @param height : integer
@@ -716,19 +521,6 @@ pub fn create_canvas(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 
 /// Processes a frame: uploads new textures, tessellates commands, renders to surface, presents.
 ///
-///
-/// # Parameters
-/// - `surface` — `wgpu::Surface<'static>` ...
-/// - `commands` — `[DrawCommand]` ...
-/// - `textures` — `SlotMap<TextureKey, TextureData>` ...
-/// - `fonts` — `mut SlotMap<FontKey, crate::graphics::Font>` ...
-/// - `sprite_batches` — `SlotMap<SpriteBatchKey, crate::graphics::SpriteBatch>` ...
-/// - `canvases` — `SlotMap<CanvasKey, crate::graphics::Canvas>` ...
-/// - `meshes` — `SlotMap<MeshKey, Mesh>` ...
-/// - `shaders` — `SlotMap<ShaderKey, Shader>` ...
-/// - `default_filter` — `(String, String, u32)` ...
-/// - `background_color` — `[f32` ...
-/// - `capture_screenshot` — `boolean` ...
 ///
 /// @param surface : wgpu::Surface<'static>
 /// @param commands : [DrawCommand]
@@ -747,14 +539,6 @@ pub fn render_frame(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 
 /// Creates a mesh from a vector of vertices.
 ///
-///
-/// # Parameters
-/// - `vertices` — `table` ...
-/// - `mode` — `MeshDrawMode` ...
-///
-/// # Returns
-/// `Self`.
-///
 /// @param vertices : table
 /// @param mode : MeshDrawMode
 /// @return Self
@@ -765,10 +549,6 @@ pub fn from_vertices(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 /// Sets a single vertex at the given index.
 ///
 ///
-/// # Parameters
-/// - `index` — `integer` ...
-/// - `vertex` — `MeshVertex` ...
-///
 /// @param index : integer
 /// @param vertex : MeshVertex
 pub fn set_vertex(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
@@ -778,9 +558,6 @@ pub fn set_vertex(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 /// Sets the index buffer for indexed drawing.
 ///
 ///
-/// # Parameters
-/// - `indices` — `table` ...
-///
 /// @param indices : table
 pub fn set_vertex_map(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
     todo!()
@@ -788,9 +565,6 @@ pub fn set_vertex_map(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 
 /// Sets the texture for this mesh. Replaces the current texture value; callers hold responsibility for maintaining consistency with related fields.
 ///
-///
-/// # Parameters
-/// - `texture` — `TextureKey?` ...
 ///
 /// @param texture : TextureKey?
 pub fn set_texture(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
@@ -800,9 +574,6 @@ pub fn set_texture(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 /// Sets the draw mode. Replaces the current draw mode value; callers hold responsibility for maintaining consistency with related fields.
 ///
 ///
-/// # Parameters
-/// - `mode` — `MeshDrawMode` ...
-///
 /// @param mode : MeshDrawMode
 pub fn set_draw_mode(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
     todo!()
@@ -810,10 +581,6 @@ pub fn set_draw_mode(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 
 /// Sets a uniform value by name. Delivery is immediate and synchronous; all connected handlers run before this method returns.
 ///
-///
-/// # Parameters
-/// - `name` — `string` ...
-/// - `value` — `UniformValue` ...
 ///
 /// @param name : string
 /// @param value : UniformValue
@@ -824,9 +591,6 @@ pub fn send(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 /// Appends a drawing command to the shape's command queue.
 ///
 ///
-/// # Parameters
-/// - `cmd` — `ShapeCommand` ...
-///
 /// @param cmd : ShapeCommand
 pub fn push_command(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
     todo!()
@@ -834,10 +598,6 @@ pub fn push_command(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 
 /// Sets the world-space position of the sprite.
 ///
-///
-/// # Parameters
-/// - `x` — `New` ...
-/// - `y` — `New` ...
 ///
 /// @param x : New
 /// @param y : New
@@ -848,10 +608,6 @@ pub fn set_position(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 /// Sets the per-axis scale of the sprite. Replaces the current scale value; callers hold responsibility for maintaining consistency with related fields.
 ///
 ///
-/// # Parameters
-/// - `sx` — `Horizontal` ...
-/// - `sy` — `Vertical` ...
-///
 /// @param sx : Horizontal
 /// @param sy : Vertical
 pub fn set_scale(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
@@ -861,9 +617,6 @@ pub fn set_scale(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 /// Sets the rotation of the sprite in radians.
 ///
 ///
-/// # Parameters
-/// - `rotation` — `Rotation` ...
-///
 /// @param rotation : Rotation
 pub fn set_rotation(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
     todo!()
@@ -872,22 +625,12 @@ pub fn set_rotation(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 /// Sets the multiplicative tint color applied to the sprite.
 ///
 ///
-/// # Parameters
-/// - `color` — `New` ...
-///
 /// @param color : New
 pub fn set_color(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
     todo!()
 }
 
 /// Adds a sprite entry to the batch. Returns the index of the added entry.
-///
-///
-/// # Parameters
-/// - `entry` — `BatchEntry` ...
-///
-/// # Returns
-/// `integer?`.
 ///
 /// @param entry : BatchEntry
 /// @return integer?
@@ -897,11 +640,6 @@ pub fn add(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 
 /// Store a named frame group. Consult the module-level documentation for the broader usage context and preconditions.
 ///
-///
-/// # Parameters
-/// - `name` — `impl Into<String>` ...
-/// - `start_frame` — `integer` ...
-/// - `count` — `integer` ...
 ///
 /// @param name : impl Into<String>
 /// @param start_frame : integer
@@ -913,10 +651,6 @@ pub fn name_group(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 /// Set the directional mode (4 or 8 directions) and layout.
 ///
 ///
-/// # Parameters
-/// - `count` — `integer` ...
-/// - `layout` — `DirectionLayout` ...
-///
 /// @param count : integer
 /// @param layout : DirectionLayout
 pub fn set_directions(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
@@ -924,16 +658,6 @@ pub fn set_directions(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 }
 
 /// Creates a texture from raw RGBA pixel data (not premultiplied).
-///
-///
-/// # Parameters
-/// - `width` — `integer` ...
-/// - `height` — `integer` ...
-/// - `pixels` — `table` ...
-/// - `textures` — `mut SlotMap<TextureKey, TextureData>` ...
-///
-/// # Returns
-/// `EngineResult<Self>`.
 ///
 /// @param width : integer
 /// @param height : integer
@@ -946,15 +670,6 @@ pub fn from_rgba(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 
 /// Packs a named region of size `w` x `h` into the atlas.
 ///
-///
-/// # Parameters
-/// - `name` — `str` ...
-/// - `w` — `integer` ...
-/// - `h` — `integer` ...
-///
-/// # Returns
-/// `boolean`.
-///
 /// @param name : str
 /// @param w : integer
 /// @param h : integer
@@ -964,14 +679,6 @@ pub fn pack(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 }
 
 /// Registers the `luna.graphics` API table.
-///
-/// # Parameters
-/// - `lua` — `&Lua` The Lua VM.
-/// - `luna` — `&LuaTable<'_>` The top-level `luna` table.
-/// - `state` — `Rc<RefCell<SharedState>>` Shared engine state.
-///
-/// # Returns
-/// `LuaResult<()>`.
 pub fn register(
     lua: &Lua,
     luna: &mlua::Table,

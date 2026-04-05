@@ -20,26 +20,12 @@ pub struct LuaAsyncLoader(/* TODO: add key + state fields */);
 impl LuaAsyncLoader {
     /// Submit a file-read request. Consult the module-level documentation for the broader usage context and preconditions.
     ///
-    ///
-    /// # Parameters
-    /// - `resolved_path` — `PathBuf` ...
-    ///
-    /// # Returns
-    /// `LoadHandle`.
-    ///
     /// @param resolved_path : PathBuf
     /// @return LoadHandle
     pub fn request_load(&self, _lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
         todo!()
     }
     /// Check the status of a previously-requested load.
-    ///
-    ///
-    /// # Parameters
-    /// - `handle` — `LoadHandle` ...
-    ///
-    /// # Returns
-    /// `LoadStatus`.
     ///
     /// @param handle : LoadHandle
     /// @return LoadStatus
@@ -48,9 +34,6 @@ impl LuaAsyncLoader {
     }
     /// Returns the number of completed but un-polled results.
     ///
-    ///
-    /// # Returns
-    /// `integer`.
     ///
     /// @return integer
     pub fn pending_results(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
@@ -75,9 +58,6 @@ impl LuaFileData {
     /// Returns the number of bytes in this buffer.
     ///
     ///
-    /// # Returns
-    /// `integer`.
-    ///
     /// @return integer
     pub fn len(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
         todo!()
@@ -85,18 +65,12 @@ impl LuaFileData {
     /// Returns `true` if the buffer is empty.
     ///
     ///
-    /// # Returns
-    /// `boolean`.
-    ///
     /// @return boolean
     pub fn is_empty(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
         todo!()
     }
     /// Returns the bytes as a UTF-8 string slice, or an error if invalid.
     ///
-    ///
-    /// # Returns
-    /// `Result<`.
     ///
     /// @return Result<
     pub fn as_str(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
@@ -121,9 +95,6 @@ impl LuaFileHandle {
     /// Get the file size in bytes (cached at open time).
     ///
     ///
-    /// # Returns
-    /// `File`.
-    ///
     /// @return File
     pub fn get_size(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
         todo!()
@@ -131,18 +102,12 @@ impl LuaFileHandle {
     /// Get the current file access mode. This accessor incurs no allocation; call it freely in hot paths.
     ///
     ///
-    /// # Returns
-    /// `The`.
-    ///
     /// @return The
     pub fn get_mode(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
         todo!()
     }
     /// Get the logical (game-relative) path of this file.
     ///
-    ///
-    /// # Returns
-    /// `The`.
     ///
     /// @return The
     pub fn get_path(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
@@ -169,13 +134,6 @@ impl LuaGameFS {
     /// Canonicalises the path and rejects any path that escapes the base directory,
     /// preventing path-traversal attacks.
     ///
-    ///
-    /// # Parameters
-    /// - `path` — `Relative` ...
-    ///
-    /// # Returns
-    /// `Ok(String)`.
-    ///
     /// @param path : Relative
     /// @return Ok(String)
     pub fn read_string(&self, _lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
@@ -184,13 +142,6 @@ impl LuaGameFS {
     /// Reads the file at `path` as raw bytes.
     ///
     /// Applies the same path-traversal check as `read_string`.
-    ///
-    ///
-    /// # Parameters
-    /// - `path` — `Relative` ...
-    ///
-    /// # Returns
-    /// `Ok(Vec<u8>)`.
     ///
     /// @param path : Relative
     /// @return Ok(Vec<u8>)
@@ -201,14 +152,6 @@ impl LuaGameFS {
     ///
     /// Creates parent directories automatically. Rejects any path outside `save/`
     /// to prevent scripts from writing arbitrary files to the system.
-    ///
-    ///
-    /// # Parameters
-    /// - `path` — `Relative` ...
-    /// - `content` — `string` ...
-    ///
-    /// # Returns
-    /// `Ok(())`.
     ///
     /// @param path : Relative
     /// @param content : string
@@ -221,14 +164,6 @@ impl LuaGameFS {
     /// Creates parent directories automatically. Rejects any path outside `save/`
     /// to prevent scripts from writing arbitrary files to the host filesystem.
     ///
-    ///
-    /// # Parameters
-    /// - `path` — `Relative` ...
-    /// - `bytes` — `Raw` ...
-    ///
-    /// # Returns
-    /// `Ok(())`.
-    ///
     /// @param path : Relative
     /// @param bytes : Raw
     /// @return Ok(())
@@ -237,26 +172,12 @@ impl LuaGameFS {
     }
     /// Returns `true` if the file or directory at `path` exists within the game directory.
     ///
-    ///
-    /// # Parameters
-    /// - `path` — `Relative` ...
-    ///
-    /// # Returns
-    /// `boolean`.
-    ///
     /// @param path : Relative
     /// @return boolean
     pub fn exists(&self, _lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
         todo!()
     }
     /// Lists all entries in the directory at `path` relative to the game directory.
-    ///
-    ///
-    /// # Parameters
-    /// - `path` — `Relative` ...
-    ///
-    /// # Returns
-    /// `Ok(Vec<String>)`.
     ///
     /// @param path : Relative
     /// @return Ok(Vec<String>)
@@ -265,26 +186,12 @@ impl LuaGameFS {
     }
     /// Get sorted directory items relative to `base_dir`.
     ///
-    ///
-    /// # Parameters
-    /// - `path` — `directory` ...
-    ///
-    /// # Returns
-    /// `Sorted`.
-    ///
     /// @param path : directory
     /// @return Sorted
     pub fn get_directory_items(&self, _lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
         todo!()
     }
     /// Check if the given path refers to a regular file.
-    ///
-    ///
-    /// # Parameters
-    /// - `path` — `path` ...
-    ///
-    /// # Returns
-    /// `true`.
     ///
     /// @param path : path
     /// @return true
@@ -293,26 +200,12 @@ impl LuaGameFS {
     }
     /// Check if the given path refers to a directory.
     ///
-    ///
-    /// # Parameters
-    /// - `path` — `path` ...
-    ///
-    /// # Returns
-    /// `true`.
-    ///
     /// @param path : path
     /// @return true
     pub fn is_directory(&self, _lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
         todo!()
     }
     /// Create a directory (and all parent directories) inside the save area.
-    ///
-    ///
-    /// # Parameters
-    /// - `path` — `target` ...
-    ///
-    /// # Returns
-    /// `Ok(())`.
     ///
     /// @param path : target
     /// @return Ok(())
@@ -321,26 +214,12 @@ impl LuaGameFS {
     }
     /// Remove a file or empty directory from the save area.
     ///
-    ///
-    /// # Parameters
-    /// - `path` — `path` ...
-    ///
-    /// # Returns
-    /// `Ok(())`.
-    ///
     /// @param path : path
     /// @return Ok(())
     pub fn remove(&self, _lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
         todo!()
     }
     /// Get file or directory metadata. This accessor incurs no allocation; call it freely in hot paths.
-    ///
-    ///
-    /// # Parameters
-    /// - `path` — `path` ...
-    ///
-    /// # Returns
-    /// `returns`.
     ///
     /// @param path : path
     /// @return returns
@@ -351,14 +230,6 @@ impl LuaGameFS {
     ///
     /// Creates the file and any parent directories if they do not exist.
     ///
-    ///
-    /// # Parameters
-    /// - `path` — `target` ...
-    /// - `content` — `string` ...
-    ///
-    /// # Returns
-    /// `Ok(())`.
-    ///
     /// @param path : target
     /// @param content : string
     /// @return Ok(())
@@ -368,9 +239,6 @@ impl LuaGameFS {
     /// Get the game source directory (where `main.lua` lives).
     ///
     ///
-    /// # Returns
-    /// `Absolute`.
-    ///
     /// @return Absolute
     pub fn get_source(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
         todo!()
@@ -378,18 +246,12 @@ impl LuaGameFS {
     /// Get the save directory path. This accessor incurs no allocation; call it freely in hot paths.
     ///
     ///
-    /// # Returns
-    /// `Path`.
-    ///
     /// @return Path
     pub fn get_save_directory(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
         todo!()
     }
     /// Get the game identity string used for save directory naming.
     ///
-    ///
-    /// # Returns
-    /// `The`.
     ///
     /// @return The
     pub fn get_identity(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
@@ -400,26 +262,12 @@ impl LuaGameFS {
     ///
     /// Useful for `luna.filesystem.load()` — returns raw bytes for Lua compilation.
     ///
-    ///
-    /// # Parameters
-    /// - `path` — `str` ...
-    ///
-    /// # Returns
-    /// `Result<Vec<u8>`.
-    ///
     /// @param path : str
     /// @return Result<Vec<u8>
     pub fn load_chunk(&self, _lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
         todo!()
     }
     /// Lists entries visible under a virtual path, merging all mount layers.
-    ///
-    ///
-    /// # Parameters
-    /// - `path` — `str` ...
-    ///
-    /// # Returns
-    /// `Result<Vec<String>`.
     ///
     /// @param path : str
     /// @return Result<Vec<String>
@@ -430,13 +278,6 @@ impl LuaGameFS {
     ///
     /// Rejects path-traversal sequences (`..`) via `canonicalize()`.
     ///
-    ///
-    /// # Parameters
-    /// - `path` — `logical` ...
-    ///
-    /// # Returns
-    /// `Canonical`.
-    ///
     /// @param path : logical
     /// @return Canonical
     pub fn resolve_read_path(&self, _lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
@@ -445,13 +286,6 @@ impl LuaGameFS {
     /// Resolve a logical path to an absolute path for writing.
     ///
     /// Enforces that the target is inside the `save/` subdirectory.
-    ///
-    ///
-    /// # Parameters
-    /// - `path` — `logical` ...
-    ///
-    /// # Returns
-    /// `Absolute`.
     ///
     /// @param path : logical
     /// @return Absolute
@@ -489,13 +323,6 @@ impl UserData for LuaGameFS {
 
 /// Convert a mode string ("r", "w", "a") to a `FileMode`.
 ///
-///
-/// # Parameters
-/// - `s` — `mode` ...
-///
-/// # Returns
-/// `The`.
-///
 /// @param s : mode
 /// @return The
 pub fn parse_mode(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
@@ -505,15 +332,6 @@ pub fn parse_mode(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 /// Open a file within the sandbox. Consult the module-level documentation for the broader usage context and preconditions.
 ///
 /// Read mode is allowed from `base_dir`; Write and Append are restricted to `save/`.
-///
-///
-/// # Parameters
-/// - `vfs` — `the` ...
-/// - `path` — `logical` ...
-/// - `mode` — `Read` ...
-///
-/// # Returns
-/// `An`.
 ///
 /// @param vfs : the
 /// @param path : logical
@@ -525,13 +343,6 @@ pub fn open(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 
 /// Read up to `count` bytes, or all remaining bytes when `count` is `None`.
 ///
-///
-/// # Parameters
-/// - `count` — `maximum` ...
-///
-/// # Returns
-/// `The`.
-///
 /// @param count : maximum
 /// @return The
 pub fn read(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
@@ -541,22 +352,12 @@ pub fn read(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 /// Read a single line without the trailing newline character.
 ///
 ///
-/// # Returns
-/// `Some(line)`.
-///
 /// @return Some(line)
 pub fn read_line(_lua: &Lua, _: ()) -> LuaResult<()> {
     todo!()
 }
 
 /// Write raw bytes to the file. Returns an error if the underlying I/O operation fails.
-///
-///
-/// # Parameters
-/// - `data` — `byte` ...
-///
-/// # Returns
-/// `The`.
 ///
 /// @param data : byte
 /// @return The
@@ -565,13 +366,6 @@ pub fn write(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 }
 
 /// Seek to an absolute byte position in the file.
-///
-///
-/// # Parameters
-/// - `pos` — `byte` ...
-///
-/// # Returns
-/// `The`.
 ///
 /// @param pos : byte
 /// @return The
@@ -582,9 +376,6 @@ pub fn seek(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 /// Get the current byte position within the file.
 ///
 ///
-/// # Returns
-/// `The`.
-///
 /// @return The
 pub fn tell(_lua: &Lua, _: ()) -> LuaResult<()> {
     todo!()
@@ -592,9 +383,6 @@ pub fn tell(_lua: &Lua, _: ()) -> LuaResult<()> {
 
 /// Flush buffered writes to disk. Returns an error if the underlying I/O operation fails.
 ///
-///
-/// # Returns
-/// `Ok(())`.
 ///
 /// @return Ok(())
 pub fn flush(_lua: &Lua, _: ()) -> LuaResult<()> {
@@ -604,9 +392,6 @@ pub fn flush(_lua: &Lua, _: ()) -> LuaResult<()> {
 /// Close the file handle, flushing any pending writes first.
 ///
 ///
-/// # Returns
-/// `Ok(())`.
-///
 /// @return Ok(())
 pub fn close(_lua: &Lua, _: ()) -> LuaResult<()> {
     todo!()
@@ -614,9 +399,6 @@ pub fn close(_lua: &Lua, _: ()) -> LuaResult<()> {
 
 /// Check whether the end of file has been reached (Read mode only).
 ///
-///
-/// # Returns
-/// `true`.
 ///
 /// @return true
 pub fn is_eof(_lua: &Lua, _: ()) -> LuaResult<()> {
@@ -626,9 +408,6 @@ pub fn is_eof(_lua: &Lua, _: ()) -> LuaResult<()> {
 /// Get the current working directory of the process.
 ///
 ///
-/// # Returns
-/// `The`.
-///
 /// @return The
 pub fn get_working_directory(_lua: &Lua, _: ()) -> LuaResult<()> {
     todo!()
@@ -637,9 +416,6 @@ pub fn get_working_directory(_lua: &Lua, _: ()) -> LuaResult<()> {
 /// Get the current user's home directory. This accessor incurs no allocation; call it freely in hot paths.
 ///
 ///
-/// # Returns
-/// `Home`.
-///
 /// @return Home
 pub fn get_user_directory(_lua: &Lua, _: ()) -> LuaResult<()> {
     todo!()
@@ -647,9 +423,6 @@ pub fn get_user_directory(_lua: &Lua, _: ()) -> LuaResult<()> {
 
 /// Set the game identity string. Replaces the current identity value; callers hold responsibility for maintaining consistency with related fields.
 ///
-///
-/// # Parameters
-/// - `identity` — `short` ...
 ///
 /// @param identity : short
 pub fn set_identity(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
@@ -660,14 +433,6 @@ pub fn set_identity(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 ///
 /// The source path must not contain `..` components and must resolve to a
 /// directory inside the game directory, preventing arbitrary filesystem access.
-///
-///
-/// # Parameters
-/// - `source_path` — `str` ...
-/// - `mountpoint` — `str` ...
-///
-/// # Returns
-/// `Result<()`.
 ///
 /// @param source_path : str
 /// @param mountpoint : str
@@ -680,14 +445,6 @@ pub fn mount(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 ///
 /// The caller is responsible for ensuring the path is safe to expose.
 ///
-///
-/// # Parameters
-/// - `source_path` — `Path` ...
-/// - `mountpoint` — `str` ...
-///
-/// # Returns
-/// `Result<()`.
-///
 /// @param source_path : Path
 /// @param mountpoint : str
 /// @return Result<()
@@ -697,13 +454,6 @@ pub fn mount_full(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 
 /// Removes the first mount layer matching `mountpoint`.
 ///
-///
-/// # Parameters
-/// - `mountpoint` — `str` ...
-///
-/// # Returns
-/// `boolean`.
-///
 /// @param mountpoint : str
 /// @return boolean
 pub fn unmount(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
@@ -711,14 +461,6 @@ pub fn unmount(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 }
 
 /// Registers the `luna.filesystem` API table.
-///
-/// # Parameters
-/// - `lua` — `&Lua` The Lua VM.
-/// - `luna` — `&LuaTable<'_>` The top-level `luna` table.
-/// - `state` — `Rc<RefCell<SharedState>>` Shared engine state.
-///
-/// # Returns
-/// `LuaResult<()>`.
 pub fn register(
     lua: &Lua,
     luna: &mlua::Table,

@@ -21,9 +21,6 @@ impl LuaCamera {
     /// Computes the view transformation matrix for this camera.
     ///
     ///
-    /// # Returns
-    /// `Mat3`.
-    ///
     /// @return Mat3
     pub fn view_matrix(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
         todo!()
@@ -45,18 +42,12 @@ impl LuaCamera2D {
     /// Returns the current zoom factor. This accessor incurs no allocation; call it freely in hot paths.
     ///
     ///
-    /// # Returns
-    /// `number`.
-    ///
     /// @return number
     pub fn get_zoom(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
         todo!()
     }
     /// Returns the current rotation in radians.
     ///
-    ///
-    /// # Returns
-    /// `number`.
     ///
     /// @return number
     pub fn get_rotation(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
@@ -65,9 +56,6 @@ impl LuaCamera2D {
     /// Returns the world-space bounds, if set. This accessor incurs no allocation; call it freely in hot paths.
     ///
     ///
-    /// # Returns
-    /// `Option<(f32`.
-    ///
     /// @return Option<(f32
     pub fn get_bounds(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
         todo!()
@@ -75,22 +63,11 @@ impl LuaCamera2D {
     /// Returns `true` if world-space bounds are set.
     ///
     ///
-    /// # Returns
-    /// `boolean`.
-    ///
     /// @return boolean
     pub fn has_bounds(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
         todo!()
     }
     /// Converts screen coordinates to world coordinates.
-    ///
-    ///
-    /// # Parameters
-    /// - `screen_x` — `number` ...
-    /// - `screen_y` — `number` ...
-    ///
-    /// # Returns
-    /// `This`.
     ///
     /// @param screen_x : number
     /// @param screen_y : number
@@ -101,10 +78,6 @@ impl LuaCamera2D {
     /// Converts world coordinates to screen coordinates.
     ///
     ///
-    /// # Parameters
-    /// - `world_x` — `number` ...
-    /// - `world_y` — `number` ...
-    ///
     /// @param world_x : number
     /// @param world_y : number
     pub fn to_screen_coords(&self, _lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
@@ -113,18 +86,12 @@ impl LuaCamera2D {
     /// Returns the world-space axis-aligned bounding box of the visible area
     ///
     ///
-    /// # Returns
-    /// `as`.
-    ///
     /// @return as
     pub fn get_visible_area(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
         todo!()
     }
     /// Returns the dead zone as `(width, height)` (full extents), if set.
     ///
-    ///
-    /// # Returns
-    /// `Option<(f32`.
     ///
     /// @return Option<(f32
     pub fn get_dead_zone(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
@@ -133,18 +100,12 @@ impl LuaCamera2D {
     /// Returns the current follow target, if any.
     ///
     ///
-    /// # Returns
-    /// `Option<(f32`.
-    ///
     /// @return Option<(f32
     pub fn get_target(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
         todo!()
     }
     /// Returns the smooth follow speed. This accessor incurs no allocation; call it freely in hot paths.
     ///
-    ///
-    /// # Returns
-    /// `number`.
     ///
     /// @return number
     pub fn get_follow_smooth(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
@@ -153,18 +114,12 @@ impl LuaCamera2D {
     /// Returns the look-ahead multiplier. This accessor incurs no allocation; call it freely in hot paths.
     ///
     ///
-    /// # Returns
-    /// `number`.
-    ///
     /// @return number
     pub fn get_look_ahead(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
         todo!()
     }
     /// Computes the view matrix including the shake offset.
     ///
-    ///
-    /// # Returns
-    /// `Mat3`.
     ///
     /// @return Mat3
     pub fn view_matrix(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
@@ -198,10 +153,6 @@ impl LuaViewport {
     /// Convert screen coordinates to game coordinates.
     ///
     ///
-    /// # Parameters
-    /// - `screen_x` — `number` ...
-    /// - `screen_y` — `number` ...
-    ///
     /// @param screen_x : number
     /// @param screen_y : number
     pub fn to_game(&self, _lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
@@ -209,10 +160,6 @@ impl LuaViewport {
     }
     /// Convert game coordinates to screen coordinates.
     ///
-    ///
-    /// # Parameters
-    /// - `game_x` — `number` ...
-    /// - `game_y` — `number` ...
     ///
     /// @param game_x : number
     /// @param game_y : number
@@ -237,10 +184,6 @@ impl LuaViewportScale {
     /// Convert screen coordinates to game coordinates.
     ///
     ///
-    /// # Parameters
-    /// - `screen_x` — `number` ...
-    /// - `screen_y` — `number` ...
-    ///
     /// @param screen_x : number
     /// @param screen_y : number
     pub fn to_game_coords(&self, _lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
@@ -248,10 +191,6 @@ impl LuaViewportScale {
     }
     /// Convert game coordinates to screen coordinates.
     ///
-    ///
-    /// # Parameters
-    /// - `game_x` — `number` ...
-    /// - `game_y` — `number` ...
     ///
     /// @param game_x : number
     /// @param game_y : number
@@ -272,9 +211,6 @@ impl UserData for LuaViewportScale {
 /// Moves the camera to `position` in world space.
 ///
 ///
-/// # Parameters
-/// - `position` — `Vec2` ...
-///
 /// @param position : Vec2
 pub fn set_position(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
     todo!()
@@ -282,9 +218,6 @@ pub fn set_position(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 
 /// Sets the camera's zoom level. Replaces the current zoom value; callers hold responsibility for maintaining consistency with related fields.
 ///
-///
-/// # Parameters
-/// - `zoom` — `number` ...
 ///
 /// @param zoom : number
 pub fn set_zoom(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
@@ -294,9 +227,6 @@ pub fn set_zoom(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 /// Sets the camera's rotation in radians. Replaces the current rotation value; callers hold responsibility for maintaining consistency with related fields.
 ///
 ///
-/// # Parameters
-/// - `rotation` — `number` ...
-///
 /// @param rotation : number
 pub fn set_rotation(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
     todo!()
@@ -305,34 +235,18 @@ pub fn set_rotation(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 /// Sets the camera position in world space.
 ///
 ///
-/// # Parameters
-/// - `x` — `number` ...
-/// - `y` — `number` ...
-///
 /// @param x : number
 /// @param y : number
 /// Sets the uniform zoom factor. Replaces the current zoom value; callers hold responsibility for maintaining consistency with related fields.
 ///
 ///
-/// # Parameters
-/// - `z` — `number` ...
-///
 /// @param z : number
 /// Sets the rotation in radians. Replaces the current rotation value; callers hold responsibility for maintaining consistency with related fields.
 ///
 ///
-/// # Parameters
-/// - `r` — `number` ...
-///
 /// @param r : number
 /// Sets the viewport rectangle in screen pixels.
 ///
-///
-/// # Parameters
-/// - `x` — `number` ...
-/// - `y` — `number` ...
-/// - `w` — `number` ...
-/// - `h` — `number` ...
 ///
 /// @param x : number
 /// @param y : number
@@ -345,12 +259,6 @@ pub fn set_viewport(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 /// Sets world-space bounds for camera clamping.
 ///
 ///
-/// # Parameters
-/// - `x` — `number` ...
-/// - `y` — `number` ...
-/// - `w` — `number` ...
-/// - `h` — `number` ...
-///
 /// @param x : number
 /// @param y : number
 /// @param w : number
@@ -362,10 +270,6 @@ pub fn set_bounds(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 /// Translates the camera by `(dx, dy)` in world space.
 ///
 ///
-/// # Parameters
-/// - `dx` — `number` ...
-/// - `dy` — `number` ...
-///
 /// @param dx : number
 /// @param dy : number
 pub fn move_by(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
@@ -374,10 +278,6 @@ pub fn move_by(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 
 /// Sets the camera position directly (shorthand for [`set_position`](Self::set_position)).
 ///
-///
-/// # Parameters
-/// - `x` — `number` ...
-/// - `y` — `number` ...
 ///
 /// @param x : number
 /// @param y : number
@@ -388,10 +288,6 @@ pub fn look_at(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 /// Sets the dead zone half-extents. Pass `(0, 0)` for no dead zone.
 ///
 ///
-/// # Parameters
-/// - `w` — `number` ...
-/// - `h` — `number` ...
-///
 /// @param w : number
 /// @param h : number
 pub fn set_dead_zone(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
@@ -400,10 +296,6 @@ pub fn set_dead_zone(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 
 /// Sets the follow target position. Replaces the current target value; callers hold responsibility for maintaining consistency with related fields.
 ///
-///
-/// # Parameters
-/// - `x` — `number` ...
-/// - `y` — `number` ...
 ///
 /// @param x : number
 /// @param y : number
@@ -414,9 +306,6 @@ pub fn set_target(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 /// Sets the smooth follow interpolation speed.
 ///
 ///
-/// # Parameters
-/// - `speed` — `number` ...
-///
 /// @param speed : number
 pub fn set_follow_smooth(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
     todo!()
@@ -425,9 +314,6 @@ pub fn set_follow_smooth(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> 
 /// Sets the look-ahead multiplier. Replaces the current look ahead value; callers hold responsibility for maintaining consistency with related fields.
 ///
 ///
-/// # Parameters
-/// - `mul` — `number` ...
-///
 /// @param mul : number
 pub fn set_look_ahead(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
     todo!()
@@ -435,10 +321,6 @@ pub fn set_look_ahead(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 
 /// Starts a camera shake effect. Consult the module-level documentation for the broader usage context and preconditions.
 ///
-///
-/// # Parameters
-/// - `intensity` — `Maximum` ...
-/// - `duration` — `How` ...
 ///
 /// @param intensity : Maximum
 /// @param duration : How
@@ -449,9 +331,6 @@ pub fn shake(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 /// Processes smooth follow, camera shake, and bounds clamping.
 ///
 ///
-/// # Parameters
-/// - `dt` — `number` ...
-///
 /// @param dt : number
 pub fn update(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
     todo!()
@@ -459,10 +338,6 @@ pub fn update(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 
 /// Recompute scale and offset based on the current window size.
 ///
-///
-/// # Parameters
-/// - `window_width` — `number` ...
-/// - `window_height` — `number` ...
 ///
 /// @param window_width : number
 /// @param window_height : number
@@ -473,9 +348,6 @@ pub fn resize(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 /// Set the scale mode. Call `resize()` afterwards to recompute.
 ///
 ///
-/// # Parameters
-/// - `mode` — `ScaleMode` ...
-///
 /// @param mode : ScaleMode
 pub fn set_scale_mode(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
     todo!()
@@ -484,21 +356,9 @@ pub fn set_scale_mode(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 /// Recompute all derived values from the current window size.
 ///
 ///
-/// # Parameters
-/// - `window_width` — `number` ...
-/// - `window_height` — `number` ...
-///
 /// @param window_width : number
 /// @param window_height : number
 /// Registers the `luna.camera` API table.
-///
-/// # Parameters
-/// - `lua` — `&Lua` The Lua VM.
-/// - `luna` — `&LuaTable<'_>` The top-level `luna` table.
-/// - `state` — `Rc<RefCell<SharedState>>` Shared engine state.
-///
-/// # Returns
-/// `LuaResult<()>`.
 pub fn register(
     lua: &Lua,
     luna: &mlua::Table,

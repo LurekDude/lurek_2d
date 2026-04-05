@@ -22,13 +22,6 @@ impl LuaBody {
     ///
     /// Both bodies must accept each other's layer for collision to occur.
     ///
-    ///
-    /// # Parameters
-    /// - `other` — `The` ...
-    ///
-    /// # Returns
-    /// `true`.
-    ///
     /// @param other : The
     /// @return true
     pub fn collides_with_layer(&self, _lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
@@ -39,10 +32,6 @@ impl LuaBody {
     /// Applies the body's rotation and then translates by the body's position.
     ///
     ///
-    /// # Parameters
-    /// - `local_x` — `number` ...
-    /// - `local_y` — `number` ...
-    ///
     /// @param local_x : number
     /// @param local_y : number
     pub fn get_world_point(&self, _lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
@@ -52,10 +41,6 @@ impl LuaBody {
     ///
     /// Translates relative to the body's position, then applies the inverse rotation.
     ///
-    ///
-    /// # Parameters
-    /// - `world_x` — `number` ...
-    /// - `world_y` — `number` ...
     ///
     /// @param world_x : number
     /// @param world_y : number
@@ -81,18 +66,12 @@ impl LuaStandaloneShape {
     /// Returns the shape type name.
     ///
     ///
-    /// # Returns
-    /// `One`.
-    ///
     /// @return One
     pub fn get_type(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
         todo!()
     }
     /// Returns the radius for circle shapes.
     ///
-    ///
-    /// # Returns
-    /// `Some(f32)`.
     ///
     /// @return Some(f32)
     pub fn get_radius(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
@@ -115,13 +94,6 @@ pub struct LuaWorld(/* TODO: add key + state fields */);
 impl LuaWorld {
     /// Returns the number of fixtures on a body (1 = primary only).
     ///
-    ///
-    /// # Parameters
-    /// - `body_id` — `Index` ...
-    ///
-    /// # Returns
-    /// `Fixture`.
-    ///
     /// @param body_id : Index
     /// @return Fixture
     pub fn fixture_count(&self, _lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
@@ -130,18 +102,12 @@ impl LuaWorld {
     /// Returns an immutable reference to body `id`, or `None` if out of range.
     ///
     ///
-    /// # Parameters
-    /// - `id` — `Body` ...
-    ///
     /// @param id : Body
     pub fn get_body(&self, _lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
         todo!()
     }
     /// Returns the total number of bodies. Consult the module-level documentation for the broader usage context and preconditions.
     ///
-    ///
-    /// # Returns
-    /// `The`.
     ///
     /// @return The
     pub fn body_count(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
@@ -150,16 +116,6 @@ impl LuaWorld {
     /// Casts a ray from `(x1, y1)` toward `(x2, y2)` and returns the nearest hit.
     ///
     /// Uses a brute-force O(n) test against all colliders.
-    ///
-    ///
-    /// # Parameters
-    /// - `x1` — `Ray` ...
-    /// - `y1` — `Ray` ...
-    /// - `x2` — `Ray` ...
-    /// - `y2` — `Ray` ...
-    ///
-    /// # Returns
-    /// `The`.
     ///
     /// @param x1 : Ray
     /// @param y1 : Ray
@@ -171,26 +127,12 @@ impl LuaWorld {
     }
     /// Returns the angular velocity of a body. This accessor incurs no allocation; call it freely in hot paths.
     ///
-    ///
-    /// # Parameters
-    /// - `id` — `Body` ...
-    ///
-    /// # Returns
-    /// `Angular`.
-    ///
     /// @param id : Body
     /// @return Angular
     pub fn get_angular_velocity(&self, _lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
         todo!()
     }
     /// Returns the angle (rotation) of a body in radians.
-    ///
-    ///
-    /// # Parameters
-    /// - `id` — `Body` ...
-    ///
-    /// # Returns
-    /// `The`.
     ///
     /// @param id : Body
     /// @return The
@@ -199,26 +141,12 @@ impl LuaWorld {
     }
     /// Returns the mass of a body. This accessor incurs no allocation; call it freely in hot paths.
     ///
-    ///
-    /// # Parameters
-    /// - `id` — `Body` ...
-    ///
-    /// # Returns
-    /// `The`.
-    ///
     /// @param id : Body
     /// @return The
     pub fn get_body_mass(&self, _lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
         todo!()
     }
     /// Returns the gravity scale multiplier for a body.
-    ///
-    ///
-    /// # Parameters
-    /// - `id` — `Body` ...
-    ///
-    /// # Returns
-    /// `The`.
     ///
     /// @param id : Body
     /// @return The
@@ -227,26 +155,12 @@ impl LuaWorld {
     }
     /// Returns `true` if the body has rotation locked.
     ///
-    ///
-    /// # Parameters
-    /// - `id` — `Body` ...
-    ///
-    /// # Returns
-    /// `true`.
-    ///
     /// @param id : Body
     /// @return true
     pub fn is_fixed_rotation(&self, _lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
         todo!()
     }
     /// Returns the linear damping coefficient for a body.
-    ///
-    ///
-    /// # Parameters
-    /// - `id` — `Body` ...
-    ///
-    /// # Returns
-    /// `The`.
     ///
     /// @param id : Body
     /// @return The
@@ -255,26 +169,12 @@ impl LuaWorld {
     }
     /// Returns the angular damping coefficient for a body.
     ///
-    ///
-    /// # Parameters
-    /// - `id` — `Body` ...
-    ///
-    /// # Returns
-    /// `The`.
-    ///
     /// @param id : Body
     /// @return The
     pub fn get_angular_damping(&self, _lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
         todo!()
     }
     /// Returns whether CCD is enabled for a body.
-    ///
-    ///
-    /// # Parameters
-    /// - `id` — `Body` ...
-    ///
-    /// # Returns
-    /// `true`.
     ///
     /// @param id : Body
     /// @return true
@@ -283,26 +183,12 @@ impl LuaWorld {
     }
     /// Returns the body type as a string. This accessor incurs no allocation; call it freely in hot paths.
     ///
-    ///
-    /// # Parameters
-    /// - `id` — `Body` ...
-    ///
-    /// # Returns
-    /// `One`.
-    ///
     /// @param id : Body
     /// @return One
     pub fn get_body_type_str(&self, _lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
         todo!()
     }
     /// Returns whether sleeping is allowed for a body.
-    ///
-    ///
-    /// # Parameters
-    /// - `id` — `Body` ...
-    ///
-    /// # Returns
-    /// `true`.
     ///
     /// @param id : Body
     /// @return true
@@ -312,9 +198,6 @@ impl LuaWorld {
     /// Returns the total number of joints. Consult the module-level documentation for the broader usage context and preconditions.
     ///
     ///
-    /// # Returns
-    /// `The`.
-    ///
     /// @return The
     pub fn joint_count(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
         todo!()
@@ -322,21 +205,12 @@ impl LuaWorld {
     /// Returns the two body IDs connected by a joint.
     ///
     ///
-    /// # Parameters
-    /// - `joint_id` — `Joint` ...
-    ///
     /// @param joint_id : Joint
     pub fn get_joint_bodies(&self, _lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
         todo!()
     }
     /// Returns body IDs with colliders intersecting the given AABB.
     ///
-    ///
-    /// # Parameters
-    /// - `x` — `AABB` ...
-    /// - `y` — `AABB` ...
-    /// - `w` — `AABB` ...
-    /// - `h` — `AABB` ...
     ///
     /// @param x : AABB
     /// @param y : AABB
@@ -349,14 +223,6 @@ impl LuaWorld {
     ///
     /// Uses a point-sized AABB query filter.
     ///
-    ///
-    /// # Parameters
-    /// - `x` — `World-space` ...
-    /// - `y` — `World-space` ...
-    ///
-    /// # Returns
-    /// `integer?`.
-    ///
     /// @param x : World-space
     /// @param y : World-space
     /// @return integer?
@@ -364,13 +230,6 @@ impl LuaWorld {
         todo!()
     }
     /// Returns the motor target velocity on the angular axis of a joint.
-    ///
-    ///
-    /// # Parameters
-    /// - `joint_id` — `Joint` ...
-    ///
-    /// # Returns
-    /// `The`.
     ///
     /// @param joint_id : Joint
     /// @return The
@@ -380,21 +239,11 @@ impl LuaWorld {
     /// Returns the angular limits `(lower, upper)` on a joint.
     ///
     ///
-    /// # Parameters
-    /// - `joint_id` — `Joint` ...
-    ///
     /// @param joint_id : Joint
     pub fn get_joint_limits(&self, _lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
         todo!()
     }
     /// Returns the type name of a joint. This accessor incurs no allocation; call it freely in hot paths.
-    ///
-    ///
-    /// # Parameters
-    /// - `joint_id` — `Joint` ...
-    ///
-    /// # Returns
-    /// `One`.
     ///
     /// @param joint_id : Joint
     /// @return One
@@ -404,21 +253,11 @@ impl LuaWorld {
     /// Returns the pixels-per-meter scaling factor.
     ///
     ///
-    /// # Returns
-    /// `The`.
-    ///
     /// @return The
     pub fn get_meter(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
         todo!()
     }
     /// Converts a pixel value to physics units.
-    ///
-    ///
-    /// # Parameters
-    /// - `px` — `Pixel` ...
-    ///
-    /// # Returns
-    /// `The`.
     ///
     /// @param px : Pixel
     /// @return The
@@ -427,13 +266,6 @@ impl LuaWorld {
     }
     /// Converts a physics-unit value to pixels.
     ///
-    ///
-    /// # Parameters
-    /// - `m` — `Physics-unit` ...
-    ///
-    /// # Returns
-    /// `The`.
-    ///
     /// @param m : Physics-unit
     /// @return The
     pub fn to_pixels(&self, _lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
@@ -441,9 +273,6 @@ impl LuaWorld {
     }
     /// Returns contacts involving a specific body.
     ///
-    ///
-    /// # Parameters
-    /// - `body_id` — `Body` ...
     ///
     /// @param body_id : Body
     pub fn get_body_contacts(&self, _lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
@@ -488,12 +317,6 @@ impl UserData for LuaWorld {
 /// Defaults: velocity = `Vec2::ZERO`, mass = 1.0, restitution = 0.3, layer/mask = 1.
 ///
 ///
-/// # Parameters
-/// - `x` — `X` ...
-/// - `y` — `Y` ...
-/// - `radius` — `Circle` ...
-/// - `body_type` — `Static,` ...
-///
 /// @param x : X
 /// @param y : Y
 /// @param radius : Circle
@@ -508,12 +331,6 @@ pub fn new_circle(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 /// are computed from the bounding box of the vertices.
 ///
 ///
-/// # Parameters
-/// - `x` — `X` ...
-/// - `y` — `Y` ...
-/// - `vertices` — `Convex` ...
-/// - `body_type` — `Static,` ...
-///
 /// @param x : X
 /// @param y : Y
 /// @param vertices : Convex
@@ -526,13 +343,6 @@ pub fn new_polygon(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 ///
 /// The body position `(x, y)` is the world-space origin of the edge.
 ///
-///
-/// # Parameters
-/// - `x` — `Origin` ...
-/// - `y` — `Origin` ...
-/// - `v1` — `Start` ...
-/// - `v2` — `End` ...
-/// - `body_type` — `Static,` ...
 ///
 /// @param x : Origin
 /// @param y : Origin
@@ -547,13 +357,6 @@ pub fn new_edge(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 ///
 /// The body position `(x, y)` is the world-space origin of the chain.
 ///
-///
-/// # Parameters
-/// - `x` — `Origin` ...
-/// - `y` — `Origin` ...
-/// - `vertices` — `Chain` ...
-/// - `closed` — `Whether` ...
-/// - `body_type` — `Static,` ...
 ///
 /// @param x : Origin
 /// @param y : Origin
@@ -570,10 +373,6 @@ pub fn new_chain(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 /// Minimum 3 sides, maximum 8 sides (clamped).
 ///
 ///
-/// # Parameters
-/// - `radius` — `Circumscribed` ...
-/// - `sides` — `Number` ...
-///
 /// @param radius : Circumscribed
 /// @param sides : Number
 pub fn regular_polygon(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
@@ -581,13 +380,6 @@ pub fn regular_polygon(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 }
 
 /// Adds a `body` to the world and returns its stable integer id.
-///
-///
-/// # Parameters
-/// - `body` — `The` ...
-///
-/// # Returns
-/// `The`.
 ///
 /// @param body : The
 /// @return The
@@ -598,18 +390,6 @@ pub fn add_body(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 /// Adds an extra fixture (collider) to an existing body.
 ///
 /// Returns the fixture index (0 = primary, 1+ = extra fixtures).
-///
-///
-/// # Parameters
-/// - `body_id` — `Index` ...
-/// - `shape` — `Collision` ...
-/// - `density` — `Mass` ...
-/// - `friction` — `Surface` ...
-/// - `restitution` — `Bounciness` ...
-/// - `sensor` — `Whether` ...
-///
-/// # Returns
-/// `The`.
 ///
 /// @param body_id : Index
 /// @param shape : Collision
@@ -627,11 +407,6 @@ pub fn add_fixture(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 /// Index 0 = primary fixture, 1+ = extra fixtures.
 ///
 ///
-/// # Parameters
-/// - `body_id` — `Index` ...
-/// - `fixture_idx` — `Fixture` ...
-/// - `friction` — `New` ...
-///
 /// @param body_id : Index
 /// @param fixture_idx : Fixture
 /// @param friction : New
@@ -642,11 +417,6 @@ pub fn set_fixture_friction(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<(
 /// Sets the restitution of a fixture by index.
 ///
 ///
-/// # Parameters
-/// - `body_id` — `Index` ...
-/// - `fixture_idx` — `Fixture` ...
-/// - `restitution` — `New` ...
-///
 /// @param body_id : Index
 /// @param fixture_idx : Fixture
 /// @param restitution : New
@@ -656,11 +426,6 @@ pub fn set_fixture_restitution(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResul
 
 /// Sets whether a fixture is a sensor. Replaces the current fixture sensor value; callers hold responsibility for maintaining consistency with related fields.
 ///
-///
-/// # Parameters
-/// - `body_id` — `Index` ...
-/// - `fixture_idx` — `Fixture` ...
-/// - `sensor` — `Whether` ...
 ///
 /// @param body_id : Index
 /// @param fixture_idx : Fixture
@@ -675,9 +440,6 @@ pub fn set_fixture_sensor(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()>
 /// flushed into the rapier simulation on the next `step()` call.
 ///
 ///
-/// # Parameters
-/// - `id` — `Body` ...
-///
 /// @param id : Body
 pub fn get_body_mut(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
     todo!()
@@ -686,16 +448,6 @@ pub fn get_body_mut(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 /// Creates a revolute (pin) joint between two bodies at a local anchor on body_a.
 ///
 /// Returns a stable joint id.
-///
-///
-/// # Parameters
-/// - `body_a` — `Index` ...
-/// - `body_b` — `Index` ...
-/// - `anchor_x` — `Local` ...
-/// - `anchor_y` — `Local` ...
-///
-/// # Returns
-/// `The`.
 ///
 /// @param body_a : Index
 /// @param body_b : Index
@@ -715,9 +467,6 @@ pub fn add_revolute_joint(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()>
 /// 5. Record collision events.
 ///
 ///
-/// # Parameters
-/// - `dt` — `Time` ...
-///
 /// @param dt : Time
 pub fn step(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
     todo!()
@@ -727,11 +476,6 @@ pub fn step(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 ///
 /// Has no effect on static or sensor bodies.
 ///
-///
-/// # Parameters
-/// - `id` — `Body` ...
-/// - `ix` — `Impulse` ...
-/// - `iy` — `Impulse` ...
 ///
 /// @param id : Body
 /// @param ix : Impulse
@@ -743,11 +487,6 @@ pub fn apply_impulse(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 /// Teleports a body to a new position. Replaces the current body position value; callers hold responsibility for maintaining consistency with related fields.
 ///
 ///
-/// # Parameters
-/// - `id` — `Body` ...
-/// - `x` — `New` ...
-/// - `y` — `New` ...
-///
 /// @param id : Body
 /// @param x : New
 /// @param y : New
@@ -757,11 +496,6 @@ pub fn set_body_position(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> 
 
 /// Applies a continuous force to a body (accumulated over the next step).
 ///
-///
-/// # Parameters
-/// - `id` — `Body` ...
-/// - `fx` — `Force` ...
-/// - `fy` — `Force` ...
 ///
 /// @param id : Body
 /// @param fx : Force
@@ -773,10 +507,6 @@ pub fn apply_force(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 /// Applies a torque (rotational force) to a body.
 ///
 ///
-/// # Parameters
-/// - `id` — `Body` ...
-/// - `torque` — `Torque` ...
-///
 /// @param id : Body
 /// @param torque : Torque
 pub fn apply_torque(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
@@ -785,10 +515,6 @@ pub fn apply_torque(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 
 /// Sets the angular velocity (spin rate) of a body.
 ///
-///
-/// # Parameters
-/// - `id` — `Body` ...
-/// - `omega` — `Angular` ...
 ///
 /// @param id : Body
 /// @param omega : Angular
@@ -799,10 +525,6 @@ pub fn set_angular_velocity(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<(
 /// Sets the angle (rotation) of a body in radians.
 ///
 ///
-/// # Parameters
-/// - `id` — `Body` ...
-/// - `angle` — `New` ...
-///
 /// @param id : Body
 /// @param angle : New
 pub fn set_body_angle(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
@@ -811,10 +533,6 @@ pub fn set_body_angle(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 
 /// Sets the mass of a body. Replaces the current body mass value; callers hold responsibility for maintaining consistency with related fields.
 ///
-///
-/// # Parameters
-/// - `id` — `Body` ...
-/// - `mass` — `New` ...
 ///
 /// @param id : Body
 /// @param mass : New
@@ -825,10 +543,6 @@ pub fn set_body_mass(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 /// Sets the per-body gravity multiplier. Replaces the current gravity scale value; callers hold responsibility for maintaining consistency with related fields.
 ///
 ///
-/// # Parameters
-/// - `id` — `Body` ...
-/// - `scale` — `Gravity` ...
-///
 /// @param id : Body
 /// @param scale : Gravity
 pub fn set_gravity_scale(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
@@ -837,10 +551,6 @@ pub fn set_gravity_scale(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> 
 
 /// Locks or unlocks rotation for a body. Replaces the current fixed rotation value; callers hold responsibility for maintaining consistency with related fields.
 ///
-///
-/// # Parameters
-/// - `id` — `Body` ...
-/// - `fixed` — `true` ...
 ///
 /// @param id : Body
 /// @param fixed : true
@@ -851,10 +561,6 @@ pub fn set_fixed_rotation(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()>
 /// Sets linear damping (air resistance) for a body.
 ///
 ///
-/// # Parameters
-/// - `id` — `Body` ...
-/// - `damping` — `Damping` ...
-///
 /// @param id : Body
 /// @param damping : Damping
 pub fn set_linear_damping(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
@@ -864,10 +570,6 @@ pub fn set_linear_damping(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()>
 /// Sets angular damping (rotational resistance) for a body.
 ///
 ///
-/// # Parameters
-/// - `id` — `Body` ...
-/// - `damping` — `Damping` ...
-///
 /// @param id : Body
 /// @param damping : Damping
 pub fn set_angular_damping(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
@@ -876,10 +578,6 @@ pub fn set_angular_damping(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()
 
 /// Enables or disables continuous collision detection (CCD) for a body.
 ///
-///
-/// # Parameters
-/// - `id` — `Body` ...
-/// - `bullet` — `true` ...
 ///
 /// @param id : Body
 /// @param bullet : true
@@ -891,13 +589,6 @@ pub fn set_bullet(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 ///
 /// A force applied off-centre generates torque in addition to linear acceleration.
 ///
-///
-/// # Parameters
-/// - `id` — `Body` ...
-/// - `fx` — `Force` ...
-/// - `fy` — `Force` ...
-/// - `px` — `Application` ...
-/// - `py` — `Application` ...
 ///
 /// @param id : Body
 /// @param fx : Force
@@ -914,10 +605,6 @@ pub fn apply_force_at_point(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<(
 /// the next `step()` sync does not discard it.
 ///
 ///
-/// # Parameters
-/// - `id` — `Body` ...
-/// - `impulse` — `Angular` ...
-///
 /// @param id : Body
 /// @param impulse : Angular
 pub fn apply_angular_impulse(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
@@ -927,10 +614,6 @@ pub fn apply_angular_impulse(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<
 /// Changes the body type of an existing body.
 ///
 ///
-/// # Parameters
-/// - `id` — `Body` ...
-/// - `bt` — `New` ...
-///
 /// @param id : Body
 /// @param bt : New
 pub fn set_body_type(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
@@ -939,10 +622,6 @@ pub fn set_body_type(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 
 /// Sets the gravity vector. Replaces the current gravity value; callers hold responsibility for maintaining consistency with related fields.
 ///
-///
-/// # Parameters
-/// - `gx` — `Horizontal` ...
-/// - `gy` — `Vertical` ...
 ///
 /// @param gx : Horizontal
 /// @param gy : Vertical
@@ -956,10 +635,6 @@ pub fn set_gravity(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 /// bodies to save CPU. When disabled, the body stays awake indefinitely.
 ///
 ///
-/// # Parameters
-/// - `id` — `Body` ...
-/// - `allowed` — `true` ...
-///
 /// @param id : Body
 /// @param allowed : true
 pub fn set_sleeping_allowed(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
@@ -972,28 +647,12 @@ pub fn set_sleeping_allowed(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<(
 /// and its rapier rigid body is disabled.
 ///
 ///
-/// # Parameters
-/// - `id` — `Body` ...
-///
 /// @param id : Body
 pub fn destroy_body(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
     todo!()
 }
 
 /// Creates a distance joint that tries to maintain a fixed distance between two bodies.
-///
-///
-/// # Parameters
-/// - `body_a` — `Index` ...
-/// - `body_b` — `Index` ...
-/// - `ax1` — `Local` ...
-/// - `ay1` — `Local` ...
-/// - `ax2` — `Local` ...
-/// - `ay2` — `Local` ...
-/// - `length` — `Rest` ...
-///
-/// # Returns
-/// `The`.
 ///
 /// @param body_a : Index
 /// @param body_b : Index
@@ -1009,18 +668,6 @@ pub fn add_distance_joint(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()>
 
 /// Creates a prismatic (slider) joint allowing motion along one axis.
 ///
-///
-/// # Parameters
-/// - `body_a` — `Index` ...
-/// - `body_b` — `Index` ...
-/// - `anchor_x` — `Local` ...
-/// - `anchor_y` — `Local` ...
-/// - `axis_x` — `Slide` ...
-/// - `axis_y` — `Slide` ...
-///
-/// # Returns
-/// `The`.
-///
 /// @param body_a : Index
 /// @param body_b : Index
 /// @param anchor_x : Local
@@ -1034,16 +681,6 @@ pub fn add_prismatic_joint(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()
 
 /// Creates a weld (rigid) joint that locks two bodies together.
 ///
-///
-/// # Parameters
-/// - `body_a` — `Index` ...
-/// - `body_b` — `Index` ...
-/// - `anchor_x` — `Local` ...
-/// - `anchor_y` — `Local` ...
-///
-/// # Returns
-/// `The`.
-///
 /// @param body_a : Index
 /// @param body_b : Index
 /// @param anchor_x : Local
@@ -1054,19 +691,6 @@ pub fn add_weld_joint(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 }
 
 /// Creates a rope joint with a maximum distance constraint.
-///
-///
-/// # Parameters
-/// - `body_a` — `Index` ...
-/// - `body_b` — `Index` ...
-/// - `ax1` — `Local` ...
-/// - `ay1` — `Local` ...
-/// - `ax2` — `Local` ...
-/// - `ay2` — `Local` ...
-/// - `max_length` — `Maximum` ...
-///
-/// # Returns
-/// `The`.
 ///
 /// @param body_a : Index
 /// @param body_b : Index
@@ -1083,26 +707,12 @@ pub fn add_rope_joint(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 /// Removes a joint from the world. After this call the associated key is invalid and must not be reused.
 ///
 ///
-/// # Parameters
-/// - `joint_id` — `Joint` ...
-///
 /// @param joint_id : Joint
 pub fn destroy_joint(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
     todo!()
 }
 
 /// Casts a ray and returns the closest hit using the query pipeline.
-///
-///
-/// # Parameters
-/// - `x1` — `Ray` ...
-/// - `y1` — `Ray` ...
-/// - `dx` — `Ray` ...
-/// - `dy` — `Ray` ...
-/// - `max_dist` — `Maximum` ...
-///
-/// # Returns
-/// `The`.
 ///
 /// @param x1 : Ray
 /// @param y1 : Ray
@@ -1117,13 +727,6 @@ pub fn raycast_closest(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 /// Casts a ray and returns all hits along it.
 ///
 ///
-/// # Parameters
-/// - `x1` — `Ray` ...
-/// - `y1` — `Ray` ...
-/// - `dx` — `Ray` ...
-/// - `dy` — `Ray` ...
-/// - `max_dist` — `Maximum` ...
-///
 /// @param x1 : Ray
 /// @param y1 : Ray
 /// @param dx : Ray
@@ -1136,18 +739,6 @@ pub fn raycast_all(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 /// Creates a wheel joint (prismatic + rotation) between two bodies.
 ///
 /// Allows translation along the given axis and free rotation.
-///
-///
-/// # Parameters
-/// - `body_a` — `Index` ...
-/// - `body_b` — `Index` ...
-/// - `anchor_x` — `Local` ...
-/// - `anchor_y` — `Local` ...
-/// - `axis_x` — `Slide` ...
-/// - `axis_y` — `Slide` ...
-///
-/// # Returns
-/// `The`.
 ///
 /// @param body_a : Index
 /// @param body_b : Index
@@ -1164,18 +755,6 @@ pub fn add_wheel_joint(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 ///
 /// Uses a fixed joint with velocity motors tuned to the given force/torque limits.
 ///
-///
-/// # Parameters
-/// - `body_a` — `Index` ...
-/// - `body_b` — `Index` ...
-/// - `anchor_x` — `Local` ...
-/// - `anchor_y` — `Local` ...
-/// - `max_force` — `Maximum` ...
-/// - `max_torque` — `Maximum` ...
-///
-/// # Returns
-/// `The`.
-///
 /// @param body_a : Index
 /// @param body_b : Index
 /// @param anchor_x : Local
@@ -1191,15 +770,6 @@ pub fn add_friction_joint(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()>
 ///
 /// The correction factor controls how aggressively the motor corrects position.
 ///
-///
-/// # Parameters
-/// - `body_a` — `Index` ...
-/// - `body_b` — `Index` ...
-/// - `correction_factor` — `Motor` ...
-///
-/// # Returns
-/// `The`.
-///
 /// @param body_a : Index
 /// @param body_b : Index
 /// @param correction_factor : Motor
@@ -1213,16 +783,6 @@ pub fn add_motor_joint(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 /// Internally creates a kinematic anchor body at the target position
 /// and a spring joint between the body and the anchor.
 ///
-///
-/// # Parameters
-/// - `body_id` — `Index` ...
-/// - `target_x` — `Initial` ...
-/// - `target_y` — `Initial` ...
-/// - `max_force` — `Maximum` ...
-///
-/// # Returns
-/// `The`.
-///
 /// @param body_id : Index
 /// @param target_x : Initial
 /// @param target_y : Initial
@@ -1235,11 +795,6 @@ pub fn add_mouse_joint(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 /// Updates the target position of a mouse joint.
 ///
 ///
-/// # Parameters
-/// - `joint_id` — `Joint` ...
-/// - `x` — `New` ...
-/// - `y` — `New` ...
-///
 /// @param joint_id : Joint
 /// @param x : New
 /// @param y : New
@@ -1248,16 +803,6 @@ pub fn set_mouse_joint_target(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult
 }
 
 /// Stub: pulley joint is not supported by rapier2d. Returns a fixed joint fallback.
-///
-///
-/// # Parameters
-/// - `body_a` — `Index` ...
-/// - `body_b` — `Index` ...
-/// - `anchor_x` — `Local` ...
-/// - `anchor_y` — `Local` ...
-///
-/// # Returns
-/// `The`.
 ///
 /// @param body_a : Index
 /// @param body_b : Index
@@ -1269,16 +814,6 @@ pub fn add_pulley_joint(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 }
 
 /// Stub: gear joint is not supported by rapier2d. Returns a fixed joint fallback.
-///
-///
-/// # Parameters
-/// - `body_a` — `Index` ...
-/// - `body_b` — `Index` ...
-/// - `anchor_x` — `Local` ...
-/// - `anchor_y` — `Local` ...
-///
-/// # Returns
-/// `The`.
 ///
 /// @param body_a : Index
 /// @param body_b : Index
@@ -1292,10 +827,6 @@ pub fn add_gear_joint(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 /// Sets the motor speed on the angular axis of a joint.
 ///
 ///
-/// # Parameters
-/// - `joint_id` — `Joint` ...
-/// - `speed` — `Target` ...
-///
 /// @param joint_id : Joint
 /// @param speed : Target
 pub fn set_joint_motor_speed(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
@@ -1305,10 +836,6 @@ pub fn set_joint_motor_speed(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<
 /// Enables or disables limits on the angular axis of a joint.
 ///
 ///
-/// # Parameters
-/// - `joint_id` — `Joint` ...
-/// - `enabled` — `true` ...
-///
 /// @param joint_id : Joint
 /// @param enabled : true
 pub fn set_joint_limits_enabled(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
@@ -1317,11 +844,6 @@ pub fn set_joint_limits_enabled(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResu
 
 /// Sets the angular limits (lower, upper) on a joint in radians.
 ///
-///
-/// # Parameters
-/// - `joint_id` — `Joint` ...
-/// - `lower` — `Lower` ...
-/// - `upper` — `Upper` ...
 ///
 /// @param joint_id : Joint
 /// @param lower : Lower
@@ -1333,23 +855,12 @@ pub fn set_joint_limits(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 /// Sets the pixels-per-meter scaling factor.
 ///
 ///
-/// # Parameters
-/// - `ppm` — `Pixels` ...
-///
 /// @param ppm : Pixels
 pub fn set_meter(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
     todo!()
 }
 
 /// Registers the `luna.physics` API table.
-///
-/// # Parameters
-/// - `lua` — `&Lua` The Lua VM.
-/// - `luna` — `&LuaTable<'_>` The top-level `luna` table.
-/// - `state` — `Rc<RefCell<SharedState>>` Shared engine state.
-///
-/// # Returns
-/// `LuaResult<()>`.
 pub fn register(
     lua: &Lua,
     luna: &mlua::Table,

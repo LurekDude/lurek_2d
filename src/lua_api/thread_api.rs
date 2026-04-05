@@ -20,13 +20,6 @@ pub struct LuaChannel(/* TODO: add key + state fields */);
 impl LuaChannel {
     /// Push a value to the back of the channel. Returns the push ID.
     ///
-    ///
-    /// # Parameters
-    /// - `value` — `ChannelValue` ...
-    ///
-    /// # Returns
-    /// `integer`.
-    ///
     /// @param value : ChannelValue
     /// @return integer
     pub fn push(&self, _lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
@@ -35,9 +28,6 @@ impl LuaChannel {
     /// Pop a value from the front of the channel (non-blocking).
     ///
     ///
-    /// # Returns
-    /// `ChannelValue?`.
-    ///
     /// @return ChannelValue?
     pub fn pop(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
         todo!()
@@ -45,21 +35,11 @@ impl LuaChannel {
     /// Peek at the front value without removing it.
     ///
     ///
-    /// # Returns
-    /// `ChannelValue?`.
-    ///
     /// @return ChannelValue?
     pub fn peek(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
         todo!()
     }
     /// Wait for a value, blocking the calling thread.
-    ///
-    ///
-    /// # Parameters
-    /// - `timeout` — `number?` ...
-    ///
-    /// # Returns
-    /// `ChannelValue?`.
     ///
     /// @param timeout : number?
     /// @return ChannelValue?
@@ -69,21 +49,11 @@ impl LuaChannel {
     /// Get the number of values currently in the channel.
     ///
     ///
-    /// # Returns
-    /// `integer`.
-    ///
     /// @return integer
     pub fn get_count(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
         todo!()
     }
     /// Push a value only if the channel is currently empty.
-    ///
-    ///
-    /// # Parameters
-    /// - `value` — `ChannelValue` ...
-    ///
-    /// # Returns
-    /// `boolean`.
     ///
     /// @param value : ChannelValue
     /// @return boolean
@@ -92,9 +62,6 @@ impl LuaChannel {
     }
     /// Get the channel name, if it is a named channel.
     ///
-    ///
-    /// # Returns
-    /// `Option<`.
     ///
     /// @return Option<
     pub fn name(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
@@ -123,18 +90,12 @@ impl LuaLuaThread {
     /// Check whether the thread is currently running.
     ///
     ///
-    /// # Returns
-    /// `boolean`.
-    ///
     /// @return boolean
     pub fn is_running(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
         todo!()
     }
     /// Get the error message if the thread terminated with an error.
     ///
-    ///
-    /// # Returns
-    /// `string?`.
     ///
     /// @return string?
     pub fn get_error(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
@@ -153,13 +114,6 @@ impl UserData for LuaLuaThread {
 
 /// Create a named channel. Consult the module-level documentation for the broader usage context and preconditions.
 ///
-///
-/// # Parameters
-/// - `name` — `string` ...
-///
-/// # Returns
-/// `Arc<Self>`.
-///
 /// @param name : string
 /// @return Arc<Self>
 pub fn named(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
@@ -168,13 +122,6 @@ pub fn named(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 
 /// Convert a Lua value into a `ChannelValue` for cross-thread transfer.
 ///
-///
-/// # Parameters
-/// - `value` — `any` ...
-///
-/// # Returns
-/// `LuaResult<ChannelValue>`.
-///
 /// @param value : any
 /// @return LuaResult<ChannelValue>
 pub fn lua_to_channel_value(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
@@ -182,14 +129,6 @@ pub fn lua_to_channel_value(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<(
 }
 
 /// Convert a `ChannelValue` back into a Lua value.
-///
-///
-/// # Parameters
-/// - `lua` — `Lua` ...
-/// - `value` — `ChannelValue` ...
-///
-/// # Returns
-/// `LuaResult<LuaValue<`.
 ///
 /// @param lua : Lua
 /// @param value : ChannelValue
@@ -200,13 +139,6 @@ pub fn channel_value_to_lua(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<(
 
 /// Start the thread, spawning a new OS thread with its own Lua VM.
 ///
-///
-/// # Parameters
-/// - `args` — `table` ...
-///
-/// # Returns
-/// `Result<()`.
-///
 /// @param args : table
 /// @return Result<()
 pub fn start(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
@@ -214,14 +146,6 @@ pub fn start(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 }
 
 /// Registers the `luna.thread` API table.
-///
-/// # Parameters
-/// - `lua` — `&Lua` The Lua VM.
-/// - `luna` — `&LuaTable<'_>` The top-level `luna` table.
-/// - `state` — `Rc<RefCell<SharedState>>` Shared engine state.
-///
-/// # Returns
-/// `LuaResult<()>`.
 pub fn register(
     lua: &Lua,
     luna: &mlua::Table,

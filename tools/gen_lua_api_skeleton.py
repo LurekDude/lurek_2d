@@ -203,7 +203,7 @@ def _extract_fn_params(sig_line: str) -> List[str]:
 def scan_module_for_public_fns(module_dir: Path) -> List[FoundFn]:
     """Scan all .rs files in a module directory for documented pub fn items."""
     results: List[FoundFn] = []
-    rs_files = list(module_dir.glob("*.rs"))
+    rs_files = list(module_dir.rglob("*.rs"))
 
     for rs_file in sorted(rs_files):
         try:
@@ -298,21 +298,6 @@ def generate_fn_block(fn: FoundFn, module_name: str) -> str:
         else:
             lines.append("///")
 
-    # # Parameters section
-    if fn.doc.raw_params:
-        lines.append("///")
-        lines.append("/// # Parameters")
-        for pname, ptype in fn.doc.raw_params:
-            lua_type = rust_to_lua_type(ptype)
-            lines.append(_make_param_doc_line(pname, lua_type))
-
-    # # Returns section
-    if fn.doc.raw_returns:
-        lua_ret = rust_to_lua_type(fn.doc.raw_returns)
-        lines.append("///")
-        lines.append("/// # Returns")
-        lines.append(f"/// `{lua_ret}`.")
-
     # @param / @return tags (for gen_lua_api.py)
     lines.append("///")
     for pname, ptype in fn.doc.raw_params:
@@ -374,13 +359,10 @@ def generate_register_fn(module_name: str, module_fns: List[FoundFn]) -> str:
     lines: List[str] = []
     lines.append("/// Registers the `luna.{module_name}` API table.".replace("{module_name}", module_name))
     lines.append("///")
-    lines.append("/// # Parameters")
-    lines.append("/// - `lua` — `&Lua` The Lua VM.")
-    lines.append("/// - `luna` — `&LuaTable` The top-level `luna` table.")
-    lines.append("/// - `state` — `Rc<RefCell<SharedState>>` Shared engine state.")
-    lines.append("///")
-    lines.append("/// # Returns")
-    lines.append("/// `LuaResult<()>`.")
+    lines.append("/// @param lua : &Lua")
+    lines.append("/// @param luna : &LuaTable")
+    lines.append("/// @param state : Rc<RefCell<SharedState>>")
+    lines.append("/// @return LuaResult<()>")
     lines.append("pub fn register(")
     lines.append("    lua: &Lua,")
     lines.append("    luna: &mlua::Table,")
@@ -463,7 +445,7 @@ def list_modules() -> List[str]:
     modules = []
     for d in sorted(SRC_DIR.iterdir()):
         if d.is_dir() and d.name not in ("lua_api", "engine", "bin"):
-            rs_files = list(d.glob("*.rs"))
+            rs_files = list(d.rglob("*.rs"))
             if rs_files:
                 modules.append(d.name)
     return modules

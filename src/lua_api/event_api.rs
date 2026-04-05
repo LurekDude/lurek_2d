@@ -21,18 +21,12 @@ impl LuaEventQueue {
     /// Check if the queue is empty. This accessor incurs no allocation; call it freely in hot paths.
     ///
     ///
-    /// # Returns
-    /// `boolean`.
-    ///
     /// @return boolean
     pub fn is_empty(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
         todo!()
     }
     /// Get the number of events in the queue.
     ///
-    ///
-    /// # Returns
-    /// `integer`.
     ///
     /// @return integer
     pub fn len(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
@@ -57,26 +51,12 @@ impl LuaSignal {
     ///
     /// Returns an empty slice if no subscriptions exist for the name.
     ///
-    ///
-    /// # Parameters
-    /// - `name` — `str` ...
-    ///
-    /// # Returns
-    /// `table`.
-    ///
     /// @param name : str
     /// @return table
     pub fn get_handles(&self, _lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
         todo!()
     }
     /// Returns the number of subscriptions for the given event name.
-    ///
-    ///
-    /// # Parameters
-    /// - `name` — `str` ...
-    ///
-    /// # Returns
-    /// `integer`.
     ///
     /// @param name : str
     /// @return integer
@@ -85,9 +65,6 @@ impl LuaSignal {
     }
     /// Returns the total number of subscriptions across all event names.
     ///
-    ///
-    /// # Returns
-    /// `integer`.
     ///
     /// @return integer
     pub fn get_total_count(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
@@ -108,9 +85,6 @@ impl UserData for LuaSignal {
 /// Push an event onto the queue. Consult the module-level documentation for the broader usage context and preconditions.
 ///
 ///
-/// # Parameters
-/// - `event` — `Event` ...
-///
 /// @param event : Event
 pub fn push(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
     todo!()
@@ -118,10 +92,6 @@ pub fn push(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 
 /// Push an event by name and arguments. The insertion is O(1) amortised unless a resize is triggered.
 ///
-///
-/// # Parameters
-/// - `name` — `str` ...
-/// - `args` — `table` ...
 ///
 /// @param name : str
 /// @param args : table
@@ -131,9 +101,6 @@ pub fn push_event(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 
 /// Poll the next event from the queue. Consult the module-level documentation for the broader usage context and preconditions.
 ///
-///
-/// # Returns
-/// `Event?`.
 ///
 /// @return Event?
 pub fn poll(_lua: &Lua, _: ()) -> LuaResult<()> {
@@ -145,13 +112,6 @@ pub fn poll(_lua: &Lua, _: ()) -> LuaResult<()> {
 /// If the queue already contains an event it is returned immediately without sleeping.
 /// With a `Some(0)` timeout the queue is polled once and the function returns.
 ///
-///
-/// # Parameters
-/// - `timeout_ms` — `integer?` ...
-///
-/// # Returns
-/// `Event?`.
-///
 /// @param timeout_ms : integer?
 /// @return Event?
 pub fn wait(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
@@ -161,13 +121,6 @@ pub fn wait(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 /// Registers a subscription for the given event name.
 ///
 /// Returns a unique handle ID that can be used with [`remove`](Self::remove).
-///
-///
-/// # Parameters
-/// - `name` — `str` ...
-///
-/// # Returns
-/// `integer`.
 ///
 /// @param name : str
 /// @return integer
@@ -179,13 +132,6 @@ pub fn subscribe(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 ///
 /// Returns `true` if the handle existed and was removed.
 ///
-///
-/// # Parameters
-/// - `handle` — `integer` ...
-///
-/// # Returns
-/// `boolean`.
-///
 /// @param handle : integer
 /// @return boolean
 pub fn remove(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
@@ -195,13 +141,6 @@ pub fn remove(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 /// Removes all subscriptions for the given event name.
 ///
 /// Returns the number of subscriptions removed.
-///
-///
-/// # Parameters
-/// - `name` — `str` ...
-///
-/// # Returns
-/// `integer`.
 ///
 /// @param name : str
 /// @return integer
@@ -214,23 +153,12 @@ pub fn clear(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 /// Returns the total number of subscriptions removed.
 ///
 ///
-/// # Returns
-/// `integer`.
-///
 /// @return integer
 pub fn clear_all(_lua: &Lua, _: ()) -> LuaResult<()> {
     todo!()
 }
 
 /// Registers the `luna.event` API table.
-///
-/// # Parameters
-/// - `lua` — `&Lua` The Lua VM.
-/// - `luna` — `&LuaTable<'_>` The top-level `luna` table.
-/// - `state` — `Rc<RefCell<SharedState>>` Shared engine state.
-///
-/// # Returns
-/// `LuaResult<()>`.
 pub fn register(
     lua: &Lua,
     luna: &mlua::Table,

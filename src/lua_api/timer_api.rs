@@ -21,18 +21,12 @@ impl LuaClock {
     /// Returns the delta time for the most recently completed frame in seconds.
     ///
     ///
-    /// # Returns
-    /// `number`.
-    ///
     /// @return number
     pub fn delta(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
         todo!()
     }
     /// Returns the total elapsed time since the clock was created, in seconds.
     ///
-    ///
-    /// # Returns
-    /// `number`.
     ///
     /// @return number
     pub fn total(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
@@ -43,18 +37,12 @@ impl LuaClock {
     /// Updated once per second. Returns `0.0` during the first second of execution.
     ///
     ///
-    /// # Returns
-    /// `number`.
-    ///
     /// @return number
     pub fn fps(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
         todo!()
     }
     /// Returns the total number of frames that have elapsed since the clock was created.
     ///
-    ///
-    /// # Returns
-    /// `integer`.
     ///
     /// @return integer
     pub fn frame_count(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
@@ -65,9 +53,6 @@ impl LuaClock {
     /// Returns `0.0` if no frames have been ticked yet. Once the buffer is full,
     /// averages over the entire 60-frame window.
     ///
-    ///
-    /// # Returns
-    /// `number`.
     ///
     /// @return number
     pub fn average_delta(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
@@ -93,26 +78,12 @@ pub struct LuaScheduler(/* TODO: add key + state fields */);
 impl LuaScheduler {
     /// Returns `true` if the event with `id` is currently paused.
     ///
-    ///
-    /// # Parameters
-    /// - `id` — `integer` ...
-    ///
-    /// # Returns
-    /// `boolean`.
-    ///
     /// @param id : integer
     /// @return boolean
     pub fn is_paused(&self, _lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
         todo!()
     }
     /// Returns the time remaining until the next fire for event `id`, or `None` if not found.
-    ///
-    ///
-    /// # Parameters
-    /// - `id` — `integer` ...
-    ///
-    /// # Returns
-    /// `number?`.
     ///
     /// @param id : integer
     /// @return number?
@@ -121,26 +92,12 @@ impl LuaScheduler {
     }
     /// Returns the base interval for event `id`, or `None` if not found.
     ///
-    ///
-    /// # Parameters
-    /// - `id` — `integer` ...
-    ///
-    /// # Returns
-    /// `number?`.
-    ///
     /// @param id : integer
     /// @return number?
     pub fn get_interval(&self, _lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
         todo!()
     }
     /// Returns the repeat count remaining for event `id` (-1 = infinite), or `None` if not found.
-    ///
-    ///
-    /// # Parameters
-    /// - `id` — `integer` ...
-    ///
-    /// # Returns
-    /// `integer?`.
     ///
     /// @param id : integer
     /// @return integer?
@@ -150,18 +107,12 @@ impl LuaScheduler {
     /// Returns the current global time-scale.
     ///
     ///
-    /// # Returns
-    /// `number`.
-    ///
     /// @return number
     pub fn get_time_scale(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
         todo!()
     }
     /// Get the number of active (non-expired) scheduled events.
     ///
-    ///
-    /// # Returns
-    /// `integer`.
     ///
     /// @return integer
     pub fn count(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
@@ -170,18 +121,12 @@ impl LuaScheduler {
     /// Get the IDs of all active events.
     ///
     ///
-    /// # Returns
-    /// `table`.
-    ///
     /// @return table
     pub fn active_ids(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
         todo!()
     }
     /// Returns `true` if no events are scheduled.
     ///
-    ///
-    /// # Returns
-    /// `boolean`.
     ///
     /// @return boolean
     pub fn is_empty(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
@@ -210,22 +155,12 @@ impl UserData for LuaScheduler {
 /// every second using a frame-accumulation window.
 ///
 ///
-/// # Returns
-/// `number`.
-///
 /// @return number
 pub fn tick(_lua: &Lua, _: ()) -> LuaResult<()> {
     todo!()
 }
 
 /// Schedule a one-shot callback after `delay` seconds.
-///
-///
-/// # Parameters
-/// - `delay` — `number` ...
-///
-/// # Returns
-/// `integer`.
 ///
 /// @param delay : number
 /// @return integer
@@ -234,14 +169,6 @@ pub fn after(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 }
 
 /// Schedule a one-shot callback with a `name` for cancel-by-name support.
-///
-///
-/// # Parameters
-/// - `name` — `impl Into<String>` ...
-/// - `delay` — `number` ...
-///
-/// # Returns
-/// `integer`.
 ///
 /// @param name : impl Into<String>
 /// @param delay : number
@@ -252,14 +179,6 @@ pub fn after_named(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 
 /// Schedule a repeating callback at `interval` seconds.
 ///
-///
-/// # Parameters
-/// - `interval` — `number` ...
-/// - `count` — `integer` ...
-///
-/// # Returns
-/// `integer`.
-///
 /// @param interval : number
 /// @param count : integer
 /// @return integer
@@ -268,15 +187,6 @@ pub fn every(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 }
 
 /// Schedule a named repeating callback.
-///
-///
-/// # Parameters
-/// - `name` — `impl Into<String>` ...
-/// - `interval` — `number` ...
-/// - `count` — `integer` ...
-///
-/// # Returns
-/// `integer`.
 ///
 /// @param name : impl Into<String>
 /// @param interval : number
@@ -288,13 +198,6 @@ pub fn every_named(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 
 /// Cancel a scheduled event by its ID.
 ///
-///
-/// # Parameters
-/// - `id` — `integer` ...
-///
-/// # Returns
-/// `boolean`.
-///
 /// @param id : integer
 /// @return boolean
 pub fn cancel(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
@@ -302,13 +205,6 @@ pub fn cancel(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 }
 
 /// Cancel a scheduled event by its name.
-///
-///
-/// # Parameters
-/// - `name` — `str` ...
-///
-/// # Returns
-/// `integer?`.
 ///
 /// @param name : str
 /// @return integer?
@@ -319,22 +215,12 @@ pub fn cancel_named(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 /// Cancel all scheduled events.
 ///
 ///
-/// # Returns
-/// `integer`.
-///
 /// @return integer
 pub fn cancel_all(_lua: &Lua, _: ()) -> LuaResult<()> {
     todo!()
 }
 
 /// Pause a single event by ID. Its remaining time is frozen until resumed.
-///
-///
-/// # Parameters
-/// - `id` — `integer` ...
-///
-/// # Returns
-/// `boolean`.
 ///
 /// @param id : integer
 /// @return boolean
@@ -344,13 +230,6 @@ pub fn pause(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 
 /// Resume a previously paused event by ID.
 ///
-///
-/// # Parameters
-/// - `id` — `integer` ...
-///
-/// # Returns
-/// `boolean`.
-///
 /// @param id : integer
 /// @return boolean
 pub fn resume(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
@@ -358,14 +237,6 @@ pub fn resume(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 }
 
 /// Change the interval of a repeating event.
-///
-///
-/// # Parameters
-/// - `id` — `integer` ...
-/// - `new_interval` — `number` ...
-///
-/// # Returns
-/// `boolean`.
 ///
 /// @param id : integer
 /// @param new_interval : number
@@ -376,13 +247,6 @@ pub fn set_interval(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 
 /// Reset an event's remaining time to its original interval.
 ///
-///
-/// # Parameters
-/// - `id` — `integer` ...
-///
-/// # Returns
-/// `boolean`.
-///
 /// @param id : integer
 /// @return boolean
 pub fn reset_event(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
@@ -392,22 +256,12 @@ pub fn reset_event(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 /// Set the global time-scale multiplier for this scheduler.
 ///
 ///
-/// # Parameters
-/// - `scale` — `number` ...
-///
 /// @param scale : number
 pub fn set_time_scale(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
     todo!()
 }
 
 /// Advance all non-paused timers by `dt * time_scale` seconds.
-///
-///
-/// # Parameters
-/// - `dt` — `number` ...
-///
-/// # Returns
-/// `table`.
 ///
 /// @param dt : number
 /// @return table
@@ -416,14 +270,6 @@ pub fn update(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 }
 
 /// Registers the `luna.timer` API table.
-///
-/// # Parameters
-/// - `lua` — `&Lua` The Lua VM.
-/// - `luna` — `&LuaTable<'_>` The top-level `luna` table.
-/// - `state` — `Rc<RefCell<SharedState>>` Shared engine state.
-///
-/// # Returns
-/// `LuaResult<()>`.
 pub fn register(
     lua: &Lua,
     luna: &mlua::Table,

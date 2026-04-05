@@ -21,9 +21,6 @@ impl LuaByteData {
     /// Get the size of the buffer in bytes.
     ///
     ///
-    /// # Returns
-    /// `integer`.
-    ///
     /// @return integer
     pub fn len(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
         todo!()
@@ -31,21 +28,11 @@ impl LuaByteData {
     /// Check if the buffer is empty. This accessor incurs no allocation; call it freely in hot paths.
     ///
     ///
-    /// # Returns
-    /// `boolean`.
-    ///
     /// @return boolean
     pub fn is_empty(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
         todo!()
     }
     /// Get a byte at the given offset (0-based).
-    ///
-    ///
-    /// # Parameters
-    /// - `offset` — `integer` ...
-    ///
-    /// # Returns
-    /// `u8?`.
     ///
     /// @param offset : integer
     /// @return u8?
@@ -55,18 +42,12 @@ impl LuaByteData {
     /// Get the data as a lossy UTF-8 string.
     ///
     ///
-    /// # Returns
-    /// `string`.
-    ///
     /// @return string
     pub fn get_string(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
         todo!()
     }
     /// Clone the data into a new ByteData. Consult the module-level documentation for the broader usage context and preconditions.
     ///
-    ///
-    /// # Returns
-    /// `Self`.
     ///
     /// @return Self
     pub fn clone_data(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
@@ -93,21 +74,11 @@ impl LuaDataView {
     /// Returns the number of bytes in this view.
     ///
     ///
-    /// # Returns
-    /// `integer`.
-    ///
     /// @return integer
     pub fn get_size(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
         todo!()
     }
     /// Reads a `u8` at `idx` relative to this view's start offset.
-    ///
-    ///
-    /// # Parameters
-    /// - `idx` — `integer` ...
-    ///
-    /// # Returns
-    /// `Result<u8`.
     ///
     /// @param idx : integer
     /// @return Result<u8
@@ -116,26 +87,12 @@ impl LuaDataView {
     }
     /// Reads an `i8` at `idx`.
     ///
-    ///
-    /// # Parameters
-    /// - `idx` — `integer` ...
-    ///
-    /// # Returns
-    /// `Result<i8`.
-    ///
     /// @param idx : integer
     /// @return Result<i8
     pub fn get_i8(&self, _lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
         todo!()
     }
     /// Reads a little-endian `u16` at `idx`.
-    ///
-    ///
-    /// # Parameters
-    /// - `idx` — `integer` ...
-    ///
-    /// # Returns
-    /// `Result<u16`.
     ///
     /// @param idx : integer
     /// @return Result<u16
@@ -144,26 +101,12 @@ impl LuaDataView {
     }
     /// Reads a little-endian `i16` at `idx`.
     ///
-    ///
-    /// # Parameters
-    /// - `idx` — `integer` ...
-    ///
-    /// # Returns
-    /// `Result<i16`.
-    ///
     /// @param idx : integer
     /// @return Result<i16
     pub fn get_i16(&self, _lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
         todo!()
     }
     /// Reads a little-endian `u32` at `idx`.
-    ///
-    ///
-    /// # Parameters
-    /// - `idx` — `integer` ...
-    ///
-    /// # Returns
-    /// `Result<u32`.
     ///
     /// @param idx : integer
     /// @return Result<u32
@@ -172,13 +115,6 @@ impl LuaDataView {
     }
     /// Reads a little-endian `i32` at `idx`.
     ///
-    ///
-    /// # Parameters
-    /// - `idx` — `integer` ...
-    ///
-    /// # Returns
-    /// `Result<i32`.
-    ///
     /// @param idx : integer
     /// @return Result<i32
     pub fn get_i32(&self, _lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
@@ -186,26 +122,12 @@ impl LuaDataView {
     }
     /// Reads a little-endian `f32` at `idx`.
     ///
-    ///
-    /// # Parameters
-    /// - `idx` — `integer` ...
-    ///
-    /// # Returns
-    /// `Result<f32`.
-    ///
     /// @param idx : integer
     /// @return Result<f32
     pub fn get_f32(&self, _lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
         todo!()
     }
     /// Reads a little-endian `f64` at `idx`.
-    ///
-    ///
-    /// # Parameters
-    /// - `idx` — `integer` ...
-    ///
-    /// # Returns
-    /// `Result<f64`.
     ///
     /// @param idx : integer
     /// @return Result<f64
@@ -232,14 +154,6 @@ impl UserData for LuaDataView {
 
 /// Write values into a binary buffer according to a Luna2D format string.
 ///
-///
-/// # Parameters
-/// - `format` — `str` ...
-/// - `values` — `[BinValue]` ...
-///
-/// # Returns
-/// `Result<ByteData`.
-///
 /// @param format : str
 /// @param values : [BinValue]
 /// @return Result<ByteData
@@ -248,15 +162,6 @@ pub fn write(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 }
 
 /// Read values from a binary buffer according to a Luna2D format string.
-///
-///
-/// # Parameters
-/// - `format` — `str` ...
-/// - `data` — `[u8]` ...
-/// - `offset` — `integer` ...
-///
-/// # Returns
-/// `Result<(Vec<BinValue>`.
 ///
 /// @param format : str
 /// @param data : [u8]
@@ -271,13 +176,6 @@ pub fn read(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 /// Returns an error if the format contains `str` or `cstr` tokens since their
 /// encoded size depends on the string content.
 ///
-///
-/// # Parameters
-/// - `format` — `str` ...
-///
-/// # Returns
-/// `Result<usize`.
-///
 /// @param format : str
 /// @return Result<usize
 pub fn measure_size(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
@@ -285,13 +183,6 @@ pub fn measure_size(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 }
 
 /// Create from an existing byte vector. Returns a fully initialised instance with all fields set to their initial values.
-///
-///
-/// # Parameters
-/// - `bytes` — `table` ...
-///
-/// # Returns
-/// `Self`.
 ///
 /// @param bytes : table
 /// @return Self
@@ -301,13 +192,6 @@ pub fn from_bytes(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 
 /// Create from a string. Returns a fully initialised instance with all fields set to their initial values.
 ///
-///
-/// # Parameters
-/// - `s` — `str` ...
-///
-/// # Returns
-/// `Self`.
-///
 /// @param s : str
 /// @return Self
 pub fn from_string(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
@@ -315,14 +199,6 @@ pub fn from_string(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 }
 
 /// Set a byte at the given offset (0-based). Returns false if out of bounds.
-///
-///
-/// # Parameters
-/// - `offset` — `integer` ...
-/// - `value` — `u8` ...
-///
-/// # Returns
-/// `boolean`.
 ///
 /// @param offset : integer
 /// @param value : u8
@@ -333,13 +209,6 @@ pub fn set_byte(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 
 /// Parse a format name string. Returns an error if the source data is malformed or missing.
 ///
-///
-/// # Parameters
-/// - `s` — `str` ...
-///
-/// # Returns
-/// `Result<Self`.
-///
 /// @param s : str
 /// @return Result<Self
 pub fn parse_str(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
@@ -347,15 +216,6 @@ pub fn parse_str(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 }
 
 /// Compress data using the specified format and compression level (0-9).
-///
-///
-/// # Parameters
-/// - `data` — `[u8]` ...
-/// - `format` — `CompressFormat` ...
-/// - `level` — `integer` ...
-///
-/// # Returns
-/// `Result<Vec<u8>`.
 ///
 /// @param data : [u8]
 /// @param format : CompressFormat
@@ -366,14 +226,6 @@ pub fn compress(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 }
 
 /// Decompress data using the specified format.
-///
-///
-/// # Parameters
-/// - `data` — `[u8]` ...
-/// - `format` — `CompressFormat` ...
-///
-/// # Returns
-/// `Result<Vec<u8>`.
 ///
 /// @param data : [u8]
 /// @param format : CompressFormat
@@ -386,15 +238,6 @@ pub fn decompress(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 ///
 /// Returns an error if `offset + size` exceeds the buffer length.
 ///
-///
-/// # Parameters
-/// - `data` — `Arc<Vec<u8>>` ...
-/// - `offset` — `integer` ...
-/// - `size` — `integer` ...
-///
-/// # Returns
-/// `Result<Self`.
-///
 /// @param data : Arc<Vec<u8>>
 /// @param offset : integer
 /// @param size : integer
@@ -405,24 +248,9 @@ pub fn new_slice(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 
 /// Parse a format name string. Returns an error if the source data is malformed or missing.
 ///
-///
-/// # Parameters
-/// - `s` — `str` ...
-///
-/// # Returns
-/// `Result<Self`.
-///
 /// @param s : str
 /// @return Result<Self
 /// Encode bytes into a string using the specified format.
-///
-///
-/// # Parameters
-/// - `format` — `EncodeFormat` ...
-/// - `data` — `[u8]` ...
-///
-/// # Returns
-/// `string`.
 ///
 /// @param format : EncodeFormat
 /// @param data : [u8]
@@ -433,14 +261,6 @@ pub fn encode(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 
 /// Decode a string back into bytes using the specified format.
 ///
-///
-/// # Parameters
-/// - `format` — `EncodeFormat` ...
-/// - `text` — `str` ...
-///
-/// # Returns
-/// `Result<Vec<u8>`.
-///
 /// @param format : EncodeFormat
 /// @param text : str
 /// @return Result<Vec<u8>
@@ -450,24 +270,9 @@ pub fn decode(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 
 /// Parse an algorithm name string. Returns an error if the source data is malformed or missing.
 ///
-///
-/// # Parameters
-/// - `s` — `str` ...
-///
-/// # Returns
-/// `Result<Self`.
-///
 /// @param s : str
 /// @return Result<Self
 /// Compute the hash of data using the specified algorithm, returned as a hex string.
-///
-///
-/// # Parameters
-/// - `algorithm` — `HashAlgorithm` ...
-/// - `data` — `[u8]` ...
-///
-/// # Returns
-/// `string`.
 ///
 /// @param algorithm : HashAlgorithm
 /// @param data : [u8]
@@ -491,14 +296,6 @@ pub fn hash(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 /// - `z` — null-terminated string
 /// - `x` — padding byte (zero)
 ///
-///
-/// # Parameters
-/// - `format` — `str` ...
-/// - `values` — `[PackValue]` ...
-///
-/// # Returns
-/// `Result<ByteData`.
-///
 /// @param format : str
 /// @param values : [PackValue]
 /// @return Result<ByteData
@@ -509,15 +306,6 @@ pub fn pack(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 /// Unpacks values from a byte buffer according to a format string.
 ///
 /// Returns all decoded values followed by the next unread byte offset.
-///
-///
-/// # Parameters
-/// - `format` — `str` ...
-/// - `data` — `[u8]` ...
-/// - `offset` — `integer` ...
-///
-/// # Returns
-/// `Result<(Vec<PackValue>`.
 ///
 /// @param format : str
 /// @param data : [u8]
@@ -533,14 +321,6 @@ pub fn unpack(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 /// accessed, so an empty slice may be passed. String types (`s`/`z`) require the corresponding
 /// `PackValue::Str` entry to compute the size.
 ///
-///
-/// # Parameters
-/// - `format` — `str` ...
-/// - `values` — `[PackValue]` ...
-///
-/// # Returns
-/// `Result<usize`.
-///
 /// @param format : str
 /// @param values : [PackValue]
 /// @return Result<usize
@@ -550,13 +330,6 @@ pub fn get_packed_size(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 
 /// Parse a TOML string into a `toml::Value`.
 ///
-///
-/// # Parameters
-/// - `input` — `str` ...
-///
-/// # Returns
-/// `Result<toml`.
-///
 /// @param input : str
 /// @return Result<toml
 pub fn parse_toml(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
@@ -565,13 +338,6 @@ pub fn parse_toml(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 
 /// Encode a `toml::Value` into a TOML string.
 ///
-///
-/// # Parameters
-/// - `value` — `toml::Value` ...
-///
-/// # Returns
-/// `Result<String`.
-///
 /// @param value : toml::Value
 /// @return Result<String
 pub fn encode_toml(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
@@ -579,14 +345,6 @@ pub fn encode_toml(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 }
 
 /// Registers the `luna.data` API table.
-///
-/// # Parameters
-/// - `lua` — `&Lua` The Lua VM.
-/// - `luna` — `&LuaTable<'_>` The top-level `luna` table.
-/// - `state` — `Rc<RefCell<SharedState>>` Shared engine state.
-///
-/// # Returns
-/// `LuaResult<()>`.
 pub fn register(
     lua: &Lua,
     luna: &mlua::Table,

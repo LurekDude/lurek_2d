@@ -20,26 +20,12 @@ pub struct LuaColumnBatch(/* TODO: add key + state fields */);
 impl LuaColumnBatch {
     /// Reference to a single column by 0-based index.
     ///
-    ///
-    /// # Parameters
-    /// - `col` — `integer` ...
-    ///
-    /// # Returns
-    /// `Option<`.
-    ///
     /// @param col : integer
     /// @return Option<
     pub fn get_column(&self, _lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
         todo!()
     }
     /// Depth value at a 0-based column index. This accessor incurs no allocation; call it freely in hot paths.
-    ///
-    ///
-    /// # Parameters
-    /// - `col` — `integer` ...
-    ///
-    /// # Returns
-    /// `number?`.
     ///
     /// @param col : integer
     /// @return number?
@@ -49,18 +35,12 @@ impl LuaColumnBatch {
     /// Depth buffer as a flat vector (one entry per column).
     ///
     ///
-    /// # Returns
-    /// `table`.
-    ///
     /// @return table
     pub fn get_depth_buffer(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
         todo!()
     }
     /// Number of columns. This accessor incurs no allocation; call it freely in hot paths.
     ///
-    ///
-    /// # Returns
-    /// `integer`.
     ///
     /// @return integer
     pub fn get_column_count(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
@@ -69,18 +49,12 @@ impl LuaColumnBatch {
     /// Screen width in pixels. This accessor incurs no allocation; call it freely in hot paths.
     ///
     ///
-    /// # Returns
-    /// `number`.
-    ///
     /// @return number
     pub fn get_screen_width(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
         todo!()
     }
     /// Screen height in pixels. This accessor incurs no allocation; call it freely in hot paths.
     ///
-    ///
-    /// # Returns
-    /// `number`.
     ///
     /// @return number
     pub fn get_screen_height(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
@@ -107,27 +81,12 @@ pub struct LuaDepthBuffer(/* TODO: add key + state fields */);
 impl LuaDepthBuffer {
     /// Gets the depth for a specific column. Returns `f32::MAX` for out-of-bounds.
     ///
-    ///
-    /// # Parameters
-    /// - `column` — `integer` ...
-    ///
-    /// # Returns
-    /// `number`.
-    ///
     /// @param column : integer
     /// @return number
     pub fn get(&self, _lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
         todo!()
     }
     /// Returns true if the given depth is closer than the stored depth at this column.
-    ///
-    ///
-    /// # Parameters
-    /// - `column` — `integer` ...
-    /// - `depth` — `number` ...
-    ///
-    /// # Returns
-    /// `boolean`.
     ///
     /// @param column : integer
     /// @param depth : number
@@ -137,9 +96,6 @@ impl LuaDepthBuffer {
     }
     /// Returns the buffer width.
     ///
-    ///
-    /// # Returns
-    /// `integer`.
     ///
     /// @return integer
     pub fn width(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
@@ -163,14 +119,6 @@ pub struct LuaDoorManager(/* TODO: add key + state fields */);
 impl LuaDoorManager {
     /// Finds a door at grid position (x, y), if any.
     ///
-    ///
-    /// # Parameters
-    /// - `x` — `integer` ...
-    /// - `y` — `integer` ...
-    ///
-    /// # Returns
-    /// `Option<`.
-    ///
     /// @param x : integer
     /// @param y : integer
     /// @return Option<
@@ -193,14 +141,6 @@ pub struct LuaHeightMap(/* TODO: add key + state fields */);
 impl LuaHeightMap {
     /// Returns the floor height at (x, y). Returns 0.0 for out-of-bounds.
     ///
-    ///
-    /// # Parameters
-    /// - `x` — `integer` ...
-    /// - `y` — `integer` ...
-    ///
-    /// # Returns
-    /// `number`.
-    ///
     /// @param x : integer
     /// @param y : integer
     /// @return number
@@ -208,14 +148,6 @@ impl LuaHeightMap {
         todo!()
     }
     /// Returns the ceiling height at (x, y). Returns 1.0 for out-of-bounds.
-    ///
-    ///
-    /// # Parameters
-    /// - `x` — `integer` ...
-    /// - `y` — `integer` ...
-    ///
-    /// # Returns
-    /// `number`.
     ///
     /// @param x : integer
     /// @param y : integer
@@ -240,14 +172,6 @@ pub struct LuaRaycaster2D(/* TODO: add key + state fields */);
 impl LuaRaycaster2D {
     /// Gets the value of a cell at (x, y). Returns 0 for out-of-bounds.
     ///
-    ///
-    /// # Parameters
-    /// - `x` — `integer` ...
-    /// - `y` — `integer` ...
-    ///
-    /// # Returns
-    /// `integer`.
-    ///
     /// @param x : integer
     /// @param y : integer
     /// @return integer
@@ -255,14 +179,6 @@ impl LuaRaycaster2D {
         todo!()
     }
     /// Returns true if the cell at (x, y) is blocked (value > 0).
-    ///
-    ///
-    /// # Parameters
-    /// - `x` — `integer` ...
-    /// - `y` — `integer` ...
-    ///
-    /// # Returns
-    /// `boolean`.
     ///
     /// @param x : integer
     /// @param y : integer
@@ -273,9 +189,6 @@ impl LuaRaycaster2D {
     /// Returns the grid width.
     ///
     ///
-    /// # Returns
-    /// `integer`.
-    ///
     /// @return integer
     pub fn width(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
         todo!()
@@ -283,24 +196,11 @@ impl LuaRaycaster2D {
     /// Returns the grid height.
     ///
     ///
-    /// # Returns
-    /// `integer`.
-    ///
     /// @return integer
     pub fn height(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
         todo!()
     }
     /// Casts a single ray from (ox, oy) at the given angle using the DDA algorithm.
-    ///
-    ///
-    /// # Parameters
-    /// - `ox` — `number` ...
-    /// - `oy` — `number` ...
-    /// - `angle` — `number` ...
-    /// - `max_dist` — `number` ...
-    ///
-    /// # Returns
-    /// `RayHit?`.
     ///
     /// @param ox : number
     /// @param oy : number
@@ -311,16 +211,6 @@ impl LuaRaycaster2D {
         todo!()
     }
     /// Checks line of sight between two points using DDA traversal.
-    ///
-    ///
-    /// # Parameters
-    /// - `x1` — `number` ...
-    /// - `y1` — `number` ...
-    /// - `x2` — `number` ...
-    /// - `y2` — `number` ...
-    ///
-    /// # Returns
-    /// `boolean`.
     ///
     /// @param x1 : number
     /// @param y1 : number
@@ -348,14 +238,6 @@ impl UserData for LuaRaycaster2D {
 /// Set the data for a single 0-based column index.
 ///
 ///
-/// # Parameters
-/// - `col` — `integer` ...
-/// - `tex_u` — `number` ...
-/// - `start` — `number` ...
-/// - `end` — `number` ...
-/// - `shade` — `number` ...
-/// - `cell_val` — `integer` ...
-///
 /// @param col : integer
 /// @param tex_u : number
 /// @param start : number
@@ -369,11 +251,6 @@ pub fn set_column(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 /// Bulk-update columns from raw ray data. Consult the module-level documentation for the broader usage context and preconditions.
 ///
 ///
-/// # Parameters
-/// - `rays` — `[f32]` ...
-/// - `_fov` — `number` ...
-/// - `max_shade_dist` — `number?` ...
-///
 /// @param rays : [f32]
 /// @param _fov : number
 /// @param max_shade_dist : number?
@@ -384,9 +261,6 @@ pub fn update_from_ray_data(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<(
 /// Set the floor color. Replaces the current floor color value; callers hold responsibility for maintaining consistency with related fields.
 ///
 ///
-/// # Parameters
-/// - `color` — `Color` ...
-///
 /// @param color : Color
 pub fn set_floor_color(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
     todo!()
@@ -395,9 +269,6 @@ pub fn set_floor_color(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 /// Set the ceiling color. Replaces the current ceiling color value; callers hold responsibility for maintaining consistency with related fields.
 ///
 ///
-/// # Parameters
-/// - `color` — `Color` ...
-///
 /// @param color : Color
 pub fn set_ceiling_color(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
     todo!()
@@ -405,11 +276,6 @@ pub fn set_ceiling_color(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> 
 
 /// Sets the value of a cell at (x, y). 0-based coordinates.
 ///
-///
-/// # Parameters
-/// - `x` — `integer` ...
-/// - `y` — `integer` ...
-/// - `value` — `integer` ...
 ///
 /// @param x : integer
 /// @param y : integer
@@ -421,27 +287,12 @@ pub fn set_cell(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 /// Bulk-sets all cells from a flat vector. Length must match width*height.
 ///
 ///
-/// # Parameters
-/// - `data` — `table` ...
-///
 /// @param data : table
 pub fn set_cells(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
     todo!()
 }
 
 /// Casts multiple rays spread across a field of view.
-///
-///
-/// # Parameters
-/// - `ox` — `number` ...
-/// - `oy` — `number` ...
-/// - `angle` — `number` ...
-/// - `fov` — `number` ...
-/// - `count` — `integer` ...
-/// - `max_dist` — `number` ...
-///
-/// # Returns
-/// `table`.
 ///
 /// @param ox : number
 /// @param oy : number
@@ -456,18 +307,6 @@ pub fn cast_rays(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 
 /// Casts multiple rays and returns a flat `Vec<f32>` with 5 values per ray.
 ///
-///
-/// # Parameters
-/// - `ox` — `number` ...
-/// - `oy` — `number` ...
-/// - `angle` — `number` ...
-/// - `fov` — `number` ...
-/// - `count` — `integer` ...
-/// - `max_dist` — `number` ...
-///
-/// # Returns
-/// `table`.
-///
 /// @param ox : number
 /// @param oy : number
 /// @param angle : number
@@ -480,19 +319,6 @@ pub fn cast_rays_flat(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 }
 
 /// Projects a world-space sprite onto screen space.
-///
-///
-/// # Parameters
-/// - `sx` — `number` ...
-/// - `sy` — `number` ...
-/// - `px` — `number` ...
-/// - `py` — `number` ...
-/// - `pa` — `number` ...
-/// - `fov` — `number` ...
-/// - `screen_w` — `number` ...
-///
-/// # Returns
-/// `SpriteProjection`.
 ///
 /// @param sx : number
 /// @param sy : number
@@ -509,10 +335,6 @@ pub fn project_sprite(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 /// Sets the depth for a specific column.
 ///
 ///
-/// # Parameters
-/// - `column` — `integer` ...
-/// - `depth` — `number` ...
-///
 /// @param column : integer
 /// @param depth : number
 pub fn set(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
@@ -520,16 +342,6 @@ pub fn set(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 }
 
 /// Adds a door at (x, y) with the given direction and speed.
-///
-///
-/// # Parameters
-/// - `x` — `integer` ...
-/// - `y` — `integer` ...
-/// - `direction` — `DoorDirection` ...
-/// - `speed` — `number` ...
-///
-/// # Returns
-/// `integer`.
 ///
 /// @param x : integer
 /// @param y : integer
@@ -543,9 +355,6 @@ pub fn add_door(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 /// Begins opening a door by index.
 ///
 ///
-/// # Parameters
-/// - `index` — `integer` ...
-///
 /// @param index : integer
 pub fn open_door(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
     todo!()
@@ -553,9 +362,6 @@ pub fn open_door(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 
 /// Begins closing a door by index.
 ///
-///
-/// # Parameters
-/// - `index` — `integer` ...
 ///
 /// @param index : integer
 pub fn close_door(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
@@ -569,9 +375,6 @@ pub fn close_door(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 /// `open_amount` and transition to `Closed` when fully closed.
 ///
 ///
-/// # Parameters
-/// - `dt` — `number` ...
-///
 /// @param dt : number
 pub fn update(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
     todo!()
@@ -579,11 +382,6 @@ pub fn update(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 
 /// Sets the floor height at (x, y).
 ///
-///
-/// # Parameters
-/// - `x` — `integer` ...
-/// - `y` — `integer` ...
-/// - `h` — `number` ...
 ///
 /// @param x : integer
 /// @param y : integer
@@ -595,11 +393,6 @@ pub fn set_floor(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 /// Sets the ceiling height at (x, y).
 ///
 ///
-/// # Parameters
-/// - `x` — `integer` ...
-/// - `y` — `integer` ...
-/// - `h` — `number` ...
-///
 /// @param x : integer
 /// @param y : integer
 /// @param h : number
@@ -609,13 +402,6 @@ pub fn set_ceiling(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 
 /// Sets the floor height for a rectangular region.
 ///
-///
-/// # Parameters
-/// - `x` — `integer` ...
-/// - `y` — `integer` ...
-/// - `w` — `integer` ...
-/// - `h` — `integer` ...
-/// - `height` — `number` ...
 ///
 /// @param x : integer
 /// @param y : integer
@@ -628,13 +414,6 @@ pub fn set_floor_rect(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 
 /// Sets the ceiling height for a rectangular region.
 ///
-///
-/// # Parameters
-/// - `x` — `integer` ...
-/// - `y` — `integer` ...
-/// - `w` — `integer` ...
-/// - `h` — `integer` ...
-/// - `height` — `number` ...
 ///
 /// @param x : integer
 /// @param y : integer
@@ -652,12 +431,6 @@ pub fn set_ceiling_rect(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 /// clamped per-channel to [0, 1].
 ///
 ///
-/// # Parameters
-/// - `x` — `number` ...
-/// - `y` — `number` ...
-/// - `ambient` — `number` ...
-/// - `lights` — `[PointLight]` ...
-///
 /// @param x : number
 /// @param y : number
 /// @param ambient : number
@@ -672,10 +445,6 @@ pub fn compute_lighting(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 /// producing a final lit RGB value.
 ///
 ///
-/// # Parameters
-/// - `base_shade` — `number` ...
-/// - `light_color` — `[f32; 3]` ...
-///
 /// @param base_shade : number
 /// @param light_color : [f32; 3]
 pub fn apply_lit_shade(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
@@ -686,21 +455,6 @@ pub fn apply_lit_shade(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 ///
 /// Returns flat RGBA pixel data (4 bytes per pixel, row-major) centered on
 /// the player position, with a configurable view radius and cell size.
-///
-///
-/// # Parameters
-/// - `raycaster` — `Raycaster2D` ...
-/// - `player_x` — `number` ...
-/// - `player_y` — `number` ...
-/// - `player_angle` — `number` ...
-/// - `view_radius` — `integer` ...
-/// - `cell_size` — `integer` ...
-/// - `wall_color` — `[u8; 4]` ...
-/// - `floor_color` — `[u8; 4]` ...
-/// - `player_color` — `[u8; 4]` ...
-///
-/// # Returns
-/// `Returns`.
 ///
 /// @param raycaster : Raycaster2D
 /// @param player_x : number
@@ -722,15 +476,6 @@ pub fn extract_minimap(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 /// centered at `(center_x, center_y)` in the pixel buffer.
 ///
 ///
-/// # Parameters
-/// - `pixels` — `mut [u8]` ...
-/// - `img_width` — `integer` ...
-/// - `center_x` — `integer` ...
-/// - `center_y` — `integer` ...
-/// - `angle` — `number` ...
-/// - `size` — `integer` ...
-/// - `color` — `[u8; 4]` ...
-///
 /// @param pixels : mut [u8]
 /// @param img_width : integer
 /// @param center_x : integer
@@ -744,15 +489,6 @@ pub fn draw_player_arrow(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> 
 
 /// Projects a wall column distance to screen-space drawing parameters.
 ///
-///
-/// # Parameters
-/// - `distance` — `number` ...
-/// - `fov` — `number` ...
-/// - `screen_height` — `number` ...
-///
-/// # Returns
-/// `Returns`.
-///
 /// @param distance : number
 /// @param fov : number
 /// @param screen_height : number
@@ -763,14 +499,6 @@ pub fn project_column(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 
 /// Distance-based shading. Returns brightness in [0, 1].
 ///
-///
-/// # Parameters
-/// - `distance` — `number` ...
-/// - `max_distance` — `number` ...
-///
-/// # Returns
-/// `number`.
-///
 /// @param distance : number
 /// @param max_distance : number
 /// @return number
@@ -779,18 +507,6 @@ pub fn distance_shade(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 }
 
 /// Casts a ray from (ox, oy) in direction (dx, dy) against a list of segments.
-///
-///
-/// # Parameters
-/// - `ox` — `number` ...
-/// - `oy` — `number` ...
-/// - `dx` — `number` ...
-/// - `dy` — `number` ...
-/// - `max_dist` — `number` ...
-/// - `segments` — `[Segment]` ...
-///
-/// # Returns
-/// `Option<(f32`.
 ///
 /// @param ox : number
 /// @param oy : number
@@ -805,16 +521,6 @@ pub fn cast_ray_2d(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 
 /// Computes a visibility polygon by casting rays at segment endpoints.
 ///
-///
-/// # Parameters
-/// - `ox` — `number` ...
-/// - `oy` — `number` ...
-/// - `segments` — `[Segment]` ...
-/// - `radius` — `number` ...
-///
-/// # Returns
-/// `table`.
-///
 /// @param ox : number
 /// @param oy : number
 /// @param segments : [Segment]
@@ -825,14 +531,6 @@ pub fn field_of_view(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 }
 
 /// Registers the `luna.raycaster` API table.
-///
-/// # Parameters
-/// - `lua` — `&Lua` The Lua VM.
-/// - `luna` — `&LuaTable<'_>` The top-level `luna` table.
-/// - `state` — `Rc<RefCell<SharedState>>` Shared engine state.
-///
-/// # Returns
-/// `LuaResult<()>`.
 pub fn register(
     lua: &Lua,
     luna: &mlua::Table,

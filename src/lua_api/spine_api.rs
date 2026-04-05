@@ -20,26 +20,12 @@ pub struct LuaSkeleton(/* TODO: add key + state fields */);
 impl LuaSkeleton {
     /// Finds a bone by name and returns its index.
     ///
-    ///
-    /// # Parameters
-    /// - `name` — `str` ...
-    ///
-    /// # Returns
-    /// `integer?`.
-    ///
     /// @param name : str
     /// @return integer?
     pub fn find_bone(&self, _lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
         todo!()
     }
     /// Finds a slot by name and returns its index.
-    ///
-    ///
-    /// # Parameters
-    /// - `name` — `str` ...
-    ///
-    /// # Returns
-    /// `integer?`.
     ///
     /// @param name : str
     /// @return integer?
@@ -59,16 +45,6 @@ impl UserData for LuaSkeleton {
 
 /// Creates a bone with a parent index and local offset.
 ///
-///
-/// # Parameters
-/// - `name` — `impl Into<String>` ...
-/// - `parent` — `integer` ...
-/// - `x` — `number` ...
-/// - `y` — `number` ...
-///
-/// # Returns
-/// `Bone`.
-///
 /// @param name : impl Into<String>
 /// @param parent : integer
 /// @param x : number
@@ -82,13 +58,6 @@ pub fn with_parent(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 ///
 /// Bones must be added in topological order (parent before child).
 ///
-///
-/// # Parameters
-/// - `bone` — `Bone` ...
-///
-/// # Returns
-/// `integer`.
-///
 /// @param bone : Bone
 /// @return integer
 pub fn add_bone(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
@@ -97,13 +66,6 @@ pub fn add_bone(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 
 /// Adds a slot to the skeleton and returns its index.
 ///
-///
-/// # Parameters
-/// - `slot` — `Slot` ...
-///
-/// # Returns
-/// `integer`.
-///
 /// @param slot : Slot
 /// @return integer
 pub fn add_slot(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
@@ -111,14 +73,6 @@ pub fn add_slot(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 }
 
 /// Registers the `luna.spine` API table.
-///
-/// # Parameters
-/// - `lua` — `&Lua` The Lua VM.
-/// - `luna` — `&LuaTable<'_>` The top-level `luna` table.
-/// - `state` — `Rc<RefCell<SharedState>>` Shared engine state.
-///
-/// # Returns
-/// `LuaResult<()>`.
 pub fn register(
     lua: &Lua,
     luna: &mlua::Table,

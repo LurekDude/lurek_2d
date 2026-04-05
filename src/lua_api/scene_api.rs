@@ -21,18 +21,12 @@ impl LuaActiveTransition {
     /// Normalized progress of the transition, clamped to [0, 1].
     ///
     ///
-    /// # Returns
-    /// `number`.
-    ///
     /// @return number
     pub fn progress(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
         todo!()
     }
     /// Whether the transition has completed. This accessor incurs no allocation; call it freely in hot paths.
     ///
-    ///
-    /// # Returns
-    /// `boolean`.
     ///
     /// @return boolean
     pub fn is_complete(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
@@ -56,9 +50,6 @@ impl LuaDepthSorter {
     /// Number of queued entries. This accessor incurs no allocation; call it freely in hot paths.
     ///
     ///
-    /// # Returns
-    /// `integer`.
-    ///
     /// @return integer
     pub fn get_count(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
         todo!()
@@ -79,13 +70,6 @@ pub struct LuaSceneStack(/* TODO: add key + state fields */);
 impl LuaSceneStack {
     /// Look up a registered scene ID by name.
     ///
-    ///
-    /// # Parameters
-    /// - `name` — `str` ...
-    ///
-    /// # Returns
-    /// `SceneId?`.
-    ///
     /// @param name : str
     /// @return SceneId?
     pub fn pop_to(&self, _lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
@@ -94,18 +78,12 @@ impl LuaSceneStack {
     /// Number of scenes on the stack. This accessor incurs no allocation; call it freely in hot paths.
     ///
     ///
-    /// # Returns
-    /// `integer`.
-    ///
     /// @return integer
     pub fn get_stack_size(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
         todo!()
     }
     /// Whether the stack is empty. This accessor incurs no allocation; call it freely in hot paths.
     ///
-    ///
-    /// # Returns
-    /// `boolean`.
     ///
     /// @return boolean
     pub fn is_empty(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
@@ -114,18 +92,12 @@ impl LuaSceneStack {
     /// Get the top scene ID, or `None` if empty.
     ///
     ///
-    /// # Returns
-    /// `SceneId?`.
-    ///
     /// @return SceneId?
     pub fn get_current(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
         todo!()
     }
     /// Whether a transition is currently active.
     ///
-    ///
-    /// # Returns
-    /// `boolean`.
     ///
     /// @return boolean
     pub fn is_transitioning(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
@@ -134,21 +106,11 @@ impl LuaSceneStack {
     /// Get transition progress [0, 1], or 0 if no transition.
     ///
     ///
-    /// # Returns
-    /// `number`.
-    ///
     /// @return number
     pub fn get_transition_progress(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
         todo!()
     }
     /// Get a registered scene ID by name. This accessor incurs no allocation; call it freely in hot paths.
-    ///
-    ///
-    /// # Parameters
-    /// - `name` — `str` ...
-    ///
-    /// # Returns
-    /// `SceneId?`.
     ///
     /// @param name : str
     /// @return SceneId?
@@ -156,13 +118,6 @@ impl LuaSceneStack {
         todo!()
     }
     /// Check if a name is registered. This accessor incurs no allocation; call it freely in hot paths.
-    ///
-    ///
-    /// # Parameters
-    /// - `name` — `str` ...
-    ///
-    /// # Returns
-    /// `boolean`.
     ///
     /// @param name : str
     /// @return boolean
@@ -172,21 +127,11 @@ impl LuaSceneStack {
     /// Get all registered scene names. This accessor incurs no allocation; call it freely in hot paths.
     ///
     ///
-    /// # Returns
-    /// `table`.
-    ///
     /// @return table
     pub fn get_registered_names(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
         todo!()
     }
     /// Get a stored data value reference by key.
-    ///
-    ///
-    /// # Parameters
-    /// - `key` — `str` ...
-    ///
-    /// # Returns
-    /// `SceneId?`.
     ///
     /// @param key : str
     /// @return SceneId?
@@ -194,13 +139,6 @@ impl LuaSceneStack {
         todo!()
     }
     /// Check if a data key exists. This accessor incurs no allocation; call it freely in hot paths.
-    ///
-    ///
-    /// # Parameters
-    /// - `key` — `str` ...
-    ///
-    /// # Returns
-    /// `boolean`.
     ///
     /// @param key : str
     /// @return boolean
@@ -230,10 +168,6 @@ impl UserData for LuaSceneStack {
 /// Add a callback at the given depth. Consult the module-level documentation for the broader usage context and preconditions.
 ///
 ///
-/// # Parameters
-/// - `callback_index` — `integer` ...
-/// - `depth` — `number` ...
-///
 /// @param callback_index : integer
 /// @param depth : number
 pub fn add(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
@@ -242,10 +176,6 @@ pub fn add(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 
 /// Add an object with a `:drawSorted()` method at the given depth.
 ///
-///
-/// # Parameters
-/// - `callback_index` — `integer` ...
-/// - `depth` — `number` ...
 ///
 /// @param callback_index : integer
 /// @param depth : number
@@ -256,24 +186,12 @@ pub fn add_object(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 /// Allocate a new unique scene ID. Consult the module-level documentation for the broader usage context and preconditions.
 ///
 ///
-/// # Returns
-/// `SceneId`.
-///
 /// @return SceneId
 pub fn next_scene_id(_lua: &Lua, _: ()) -> LuaResult<()> {
     todo!()
 }
 
 /// Push a scene ID onto the stack and start a transition.
-///
-///
-/// # Parameters
-/// - `scene_id` — `SceneId` ...
-/// - `transition_type` — `TransitionType` ...
-/// - `duration` — `number` ...
-///
-/// # Returns
-/// `SceneId?`.
 ///
 /// @param scene_id : SceneId
 /// @param transition_type : TransitionType
@@ -285,14 +203,6 @@ pub fn push(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 
 /// Pop the top scene from the stack. Consult the module-level documentation for the broader usage context and preconditions.
 ///
-///
-/// # Parameters
-/// - `transition_type` — `TransitionType` ...
-/// - `duration` — `number` ...
-///
-/// # Returns
-/// `Result<(SceneId`.
-///
 /// @param transition_type : TransitionType
 /// @param duration : number
 /// @return Result<(SceneId
@@ -301,15 +211,6 @@ pub fn pop(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 }
 
 /// Replace the top scene with a new one.
-///
-///
-/// # Parameters
-/// - `scene_id` — `SceneId` ...
-/// - `transition_type` — `TransitionType` ...
-/// - `duration` — `number` ...
-///
-/// # Returns
-/// `SceneId?`.
 ///
 /// @param scene_id : SceneId
 /// @param transition_type : TransitionType
@@ -322,22 +223,12 @@ pub fn switch_to(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 /// Remove all scenes from the stack. Returns all removed scene IDs.
 ///
 ///
-/// # Returns
-/// `table`.
-///
 /// @return table
 pub fn clear(_lua: &Lua, _: ()) -> LuaResult<()> {
     todo!()
 }
 
 /// Pop scenes until `target_id` is on top of the stack.
-///
-///
-/// # Parameters
-/// - `target_id` — `SceneId` ...
-///
-/// # Returns
-/// `table`.
 ///
 /// @param target_id : SceneId
 /// @return table
@@ -346,13 +237,6 @@ pub fn pop_until(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 }
 
 /// Update the active transition timer. Returns true if the transition just completed.
-///
-///
-/// # Parameters
-/// - `dt` — `number` ...
-///
-/// # Returns
-/// `boolean`.
 ///
 /// @param dt : number
 /// @return boolean
@@ -363,10 +247,6 @@ pub fn update_transition(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> 
 /// Register a scene by name. Panics in debug mode if the same entity is registered twice.
 ///
 ///
-/// # Parameters
-/// - `name` — `string` ...
-/// - `scene_id` — `SceneId` ...
-///
 /// @param name : string
 /// @param scene_id : SceneId
 pub fn register_scene(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
@@ -376,9 +256,6 @@ pub fn register_scene(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 /// Unregister a scene by name. Consult the module-level documentation for the broader usage context and preconditions.
 ///
 ///
-/// # Parameters
-/// - `name` — `str` ...
-///
 /// @param name : str
 pub fn unregister_scene(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
     todo!()
@@ -386,10 +263,6 @@ pub fn unregister_scene(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 
 /// Store a data value reference by key. Replaces the current data value; callers hold responsibility for maintaining consistency with related fields.
 ///
-///
-/// # Parameters
-/// - `key` — `string` ...
-/// - `value_id` — `SceneId` ...
 ///
 /// @param key : string
 /// @param value_id : SceneId
@@ -400,22 +273,12 @@ pub fn set_data(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 /// Remove a data value by key. Returns the removed value if present, or `None` when the key did not exist.
 ///
 ///
-/// # Parameters
-/// - `key` — `str` ...
-///
 /// @param key : str
 pub fn remove_data(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
     todo!()
 }
 
 /// Parse a transition type from a Lua string.
-///
-///
-/// # Parameters
-/// - `s` — `str` ...
-///
-/// # Returns
-/// `Self`.
 ///
 /// @param s : str
 /// @return Self
@@ -426,23 +289,12 @@ pub fn from_lua_str(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 /// Advance the transition timer by `dt` seconds.
 ///
 ///
-/// # Parameters
-/// - `dt` — `number` ...
-///
 /// @param dt : number
 pub fn update(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
     todo!()
 }
 
 /// Registers the `luna.scene` API table.
-///
-/// # Parameters
-/// - `lua` — `&Lua` The Lua VM.
-/// - `luna` — `&LuaTable<'_>` The top-level `luna` table.
-/// - `state` — `Rc<RefCell<SharedState>>` Shared engine state.
-///
-/// # Returns
-/// `LuaResult<()>`.
 pub fn register(
     lua: &Lua,
     luna: &mlua::Table,

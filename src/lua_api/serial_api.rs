@@ -19,14 +19,6 @@ use crate::engine::SharedState;
 /// keyed by column headers when `has_headers` is true, or a `SerialValue::Seq`
 /// of string values otherwise.
 ///
-///
-/// # Parameters
-/// - `s` — `str` ...
-/// - `opts` — `CsvOptions` ...
-///
-/// # Returns
-/// `Result<SerialValue`.
-///
 /// @param s : str
 /// @param opts : CsvOptions
 /// @return Result<SerialValue
@@ -38,14 +30,6 @@ pub fn from_csv(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 ///
 /// Converts a `SerialValue::Seq` of `SerialValue::Map` rows to CSV.
 ///
-///
-/// # Parameters
-/// - `val` — `SerialValue` ...
-/// - `opts` — `CsvOptions` ...
-///
-/// # Returns
-/// `Result<String`.
-///
 /// @param val : SerialValue
 /// @param opts : CsvOptions
 /// @return Result<String
@@ -55,13 +39,6 @@ pub fn to_csv(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 
 /// Parse a JSON string into a `SerialValue`.
 ///
-///
-/// # Parameters
-/// - `s` — `str` ...
-///
-/// # Returns
-/// `Result<SerialValue`.
-///
 /// @param s : str
 /// @return Result<SerialValue
 pub fn from_json(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
@@ -69,14 +46,6 @@ pub fn from_json(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 }
 
 /// Serialize a `SerialValue` to a JSON string.
-///
-///
-/// # Parameters
-/// - `val` — `SerialValue` ...
-/// - `pretty` — `boolean` ...
-///
-/// # Returns
-/// `Result<String`.
 ///
 /// @param val : SerialValue
 /// @param pretty : boolean
@@ -87,13 +56,6 @@ pub fn to_json(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 
 /// Parse a TOML string into a `SerialValue`.
 ///
-///
-/// # Parameters
-/// - `s` — `str` ...
-///
-/// # Returns
-/// `Result<SerialValue`.
-///
 /// @param s : str
 /// @return Result<SerialValue
 pub fn from_toml(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
@@ -101,13 +63,6 @@ pub fn from_toml(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 }
 
 /// Serialize a `SerialValue` to a TOML string.
-///
-///
-/// # Parameters
-/// - `val` — `SerialValue` ...
-///
-/// # Returns
-/// `Result<String`.
 ///
 /// @param val : SerialValue
 /// @return Result<String
@@ -117,13 +72,6 @@ pub fn to_toml(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 
 /// Parse a YAML string into a `SerialValue`.
 ///
-///
-/// # Parameters
-/// - `s` — `str` ...
-///
-/// # Returns
-/// `Result<SerialValue`.
-///
 /// @param s : str
 /// @return Result<SerialValue
 pub fn from_yaml(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
@@ -132,13 +80,6 @@ pub fn from_yaml(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 
 /// Serialize a `SerialValue` to a YAML string.
 ///
-///
-/// # Parameters
-/// - `val` — `SerialValue` ...
-///
-/// # Returns
-/// `Result<String`.
-///
 /// @param val : SerialValue
 /// @return Result<String
 pub fn to_yaml(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
@@ -146,14 +87,6 @@ pub fn to_yaml(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 }
 
 /// Registers the `luna.serial` API table.
-///
-/// # Parameters
-/// - `lua` — `&Lua` The Lua VM.
-/// - `luna` — `&LuaTable<'_>` The top-level `luna` table.
-/// - `state` — `Rc<RefCell<SharedState>>` Shared engine state.
-///
-/// # Returns
-/// `LuaResult<()>`.
 pub fn register(
     lua: &Lua,
     luna: &mlua::Table,

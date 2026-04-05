@@ -22,14 +22,6 @@ impl LuaTerminal {
     ///
     /// Returns a default cell if coordinates are out of bounds.
     ///
-    ///
-    /// # Parameters
-    /// - `col` — `integer` ...
-    /// - `row` — `integer` ...
-    ///
-    /// # Returns
-    /// `TCell`.
-    ///
     /// @param col : integer
     /// @param row : integer
     /// @return TCell
@@ -39,21 +31,11 @@ impl LuaTerminal {
     /// Get the number of attached widgets.
     ///
     ///
-    /// # Returns
-    /// `integer`.
-    ///
     /// @return integer
     pub fn get_widget_count(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
         todo!()
     }
     /// Get a reference to a widget by index.
-    ///
-    ///
-    /// # Parameters
-    /// - `index` — `integer` ...
-    ///
-    /// # Returns
-    /// `Option<`.
     ///
     /// @param index : integer
     /// @return Option<
@@ -63,18 +45,12 @@ impl LuaTerminal {
     /// Get the currently focused widget index.
     ///
     ///
-    /// # Returns
-    /// `integer?`.
-    ///
     /// @return integer?
     pub fn get_focused(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
         todo!()
     }
     /// Returns the number of columns.
     ///
-    ///
-    /// # Returns
-    /// `integer`.
     ///
     /// @return integer
     pub fn cols(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
@@ -83,22 +59,11 @@ impl LuaTerminal {
     /// Returns the number of rows.
     ///
     ///
-    /// # Returns
-    /// `integer`.
-    ///
     /// @return integer
     pub fn rows(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
         todo!()
     }
     /// Get a cell at 1-based coordinates, returning `None` if out of bounds.
-    ///
-    ///
-    /// # Parameters
-    /// - `col` — `integer` ...
-    /// - `row` — `integer` ...
-    ///
-    /// # Returns
-    /// `TCell?`.
     ///
     /// @param col : integer
     /// @param row : integer
@@ -109,21 +74,11 @@ impl LuaTerminal {
     /// Returns the number of attached widgets.
     ///
     ///
-    /// # Returns
-    /// `integer`.
-    ///
     /// @return integer
     pub fn widget_count(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
         todo!()
     }
     /// Find the first widget whose `base.tag` equals `tag`.
-    ///
-    ///
-    /// # Parameters
-    /// - `tag` — `str` ...
-    ///
-    /// # Returns
-    /// `Option<`.
     ///
     /// @param tag : str
     /// @return Option<
@@ -153,13 +108,6 @@ impl UserData for LuaTerminal {
 /// Out-of-bounds coordinates are silently ignored.
 ///
 ///
-/// # Parameters
-/// - `col` — `integer` ...
-/// - `row` — `integer` ...
-/// - `ch` — `integer` ...
-/// - `fg` — `[f32; 4]` ...
-/// - `bg` — `[f32; 4]` ...
-///
 /// @param col : integer
 /// @param row : integer
 /// @param ch : integer
@@ -172,10 +120,6 @@ pub fn set(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 /// Set the cursor position from 1-based coordinates.
 ///
 ///
-/// # Parameters
-/// - `col` — `integer` ...
-/// - `row` — `integer` ...
-///
 /// @param col : integer
 /// @param row : integer
 pub fn set_cursor(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
@@ -183,13 +127,6 @@ pub fn set_cursor(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 }
 
 /// Add a widget to the terminal.
-///
-///
-/// # Parameters
-/// - `widget` — `Widget` ...
-///
-/// # Returns
-/// `integer`.
 ///
 /// @param widget : Widget
 /// @return integer
@@ -199,13 +136,6 @@ pub fn add_widget(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 
 /// Remove a widget by index.
 ///
-///
-/// # Parameters
-/// - `index` — `integer` ...
-///
-/// # Returns
-/// `boolean`.
-///
 /// @param index : integer
 /// @return boolean
 pub fn remove_widget(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
@@ -213,13 +143,6 @@ pub fn remove_widget(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 }
 
 /// Get a mutable reference to a widget by index.
-///
-///
-/// # Parameters
-/// - `index` — `integer` ...
-///
-/// # Returns
-/// `Option<`.
 ///
 /// @param index : integer
 /// @return Option<
@@ -230,22 +153,12 @@ pub fn get_widget_mut(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 /// Set the focused widget by index.
 ///
 ///
-/// # Parameters
-/// - `index` — `integer?` ...
-///
 /// @param index : integer?
 pub fn set_focus(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
     todo!()
 }
 
 /// Route a key press to the focused widget.
-///
-///
-/// # Parameters
-/// - `key` — `str` ...
-///
-/// # Returns
-/// `boolean`.
 ///
 /// @param key : str
 /// @return boolean
@@ -255,13 +168,6 @@ pub fn keypressed(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 
 /// Route text input to the focused widget.
 ///
-///
-/// # Parameters
-/// - `text_input` — `str` ...
-///
-/// # Returns
-/// `boolean`.
-///
 /// @param text_input : str
 /// @return boolean
 pub fn textinput(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
@@ -269,15 +175,6 @@ pub fn textinput(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 }
 
 /// Route a mouse press to widgets using 1-based grid coordinates.
-///
-///
-/// # Parameters
-/// - `grid_col` — `integer` ...
-/// - `grid_row` — `integer` ...
-/// - `button` — `integer` ...
-///
-/// # Returns
-/// `boolean`.
 ///
 /// @param grid_col : integer
 /// @param grid_row : integer
@@ -290,11 +187,6 @@ pub fn mousepressed(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 /// Set only the character at a cell, keeping existing colours.
 ///
 ///
-/// # Parameters
-/// - `col` — `integer` ...
-/// - `row` — `integer` ...
-/// - `ch` — `integer` ...
-///
 /// @param col : integer
 /// @param row : integer
 /// @param ch : integer
@@ -304,11 +196,6 @@ pub fn set_char(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 
 /// Set only the foreground colour at a cell.
 ///
-///
-/// # Parameters
-/// - `col` — `integer` ...
-/// - `row` — `integer` ...
-/// - `fg` — `[f32; 4]` ...
 ///
 /// @param col : integer
 /// @param row : integer
@@ -320,11 +207,6 @@ pub fn set_fg(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 /// Set only the background colour at a cell.
 ///
 ///
-/// # Parameters
-/// - `col` — `integer` ...
-/// - `row` — `integer` ...
-/// - `bg` — `[f32; 4]` ...
-///
 /// @param col : integer
 /// @param row : integer
 /// @param bg : [f32; 4]
@@ -334,11 +216,6 @@ pub fn set_bg(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 
 /// Write a UTF-8 string left-to-right starting at a 1-based position.
 ///
-///
-/// # Parameters
-/// - `col` — `integer` ...
-/// - `row` — `integer` ...
-/// - `text` — `str` ...
 ///
 /// @param col : integer
 /// @param row : integer
@@ -350,10 +227,6 @@ pub fn print(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 /// Resize the terminal grid.
 ///
 ///
-/// # Parameters
-/// - `new_cols` — `integer` ...
-/// - `new_rows` — `integer` ...
-///
 /// @param new_cols : integer
 /// @param new_rows : integer
 pub fn resize(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
@@ -361,13 +234,6 @@ pub fn resize(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 }
 
 /// Parse a style name string.
-///
-///
-/// # Parameters
-/// - `s` — `str` ...
-///
-/// # Returns
-/// `BorderStyle?`.
 ///
 /// @param s : str
 /// @return BorderStyle?
@@ -378,10 +244,6 @@ pub fn from_str_name(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 /// Set the widget position from 1-based coordinates.
 ///
 ///
-/// # Parameters
-/// - `col` — `integer` ...
-/// - `row` — `integer` ...
-///
 /// @param col : integer
 /// @param row : integer
 pub fn set_position_1based(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
@@ -389,15 +251,6 @@ pub fn set_position_1based(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()
 }
 
 /// Create a new label widget.
-///
-///
-/// # Parameters
-/// - `col` — `integer` ...
-/// - `row` — `integer` ...
-/// - `text` — `impl Into<String>` ...
-///
-/// # Returns
-/// `Widget`.
 ///
 /// @param col : integer
 /// @param row : integer
@@ -408,17 +261,6 @@ pub fn new_label(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 }
 
 /// Create a new button widget.
-///
-///
-/// # Parameters
-/// - `col` — `integer` ...
-/// - `row` — `integer` ...
-/// - `width` — `integer` ...
-/// - `height` — `integer` ...
-/// - `text` — `impl Into<String>` ...
-///
-/// # Returns
-/// `Widget`.
 ///
 /// @param col : integer
 /// @param row : integer
@@ -432,15 +274,6 @@ pub fn new_button(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 
 /// Create a new text box widget.
 ///
-///
-/// # Parameters
-/// - `col` — `integer` ...
-/// - `row` — `integer` ...
-/// - `width` — `integer` ...
-///
-/// # Returns
-/// `Widget`.
-///
 /// @param col : integer
 /// @param row : integer
 /// @param width : integer
@@ -450,16 +283,6 @@ pub fn new_text_box(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 }
 
 /// Create a new list widget.
-///
-///
-/// # Parameters
-/// - `col` — `integer` ...
-/// - `row` — `integer` ...
-/// - `width` — `integer` ...
-/// - `height` — `integer` ...
-///
-/// # Returns
-/// `Widget`.
 ///
 /// @param col : integer
 /// @param row : integer
@@ -472,16 +295,6 @@ pub fn new_list(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 
 /// Create a new border widget.
 ///
-///
-/// # Parameters
-/// - `col` — `integer` ...
-/// - `row` — `integer` ...
-/// - `width` — `integer` ...
-/// - `height` — `integer` ...
-///
-/// # Returns
-/// `Widget`.
-///
 /// @param col : integer
 /// @param row : integer
 /// @param width : integer
@@ -493,16 +306,6 @@ pub fn new_border(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 
 /// Create a new panel widget.
 ///
-///
-/// # Parameters
-/// - `col` — `integer` ...
-/// - `row` — `integer` ...
-/// - `width` — `integer` ...
-/// - `height` — `integer` ...
-///
-/// # Returns
-/// `Widget`.
-///
 /// @param col : integer
 /// @param row : integer
 /// @param width : integer
@@ -513,14 +316,6 @@ pub fn new_panel(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 }
 
 /// Registers the `luna.terminal` API table.
-///
-/// # Parameters
-/// - `lua` — `&Lua` The Lua VM.
-/// - `luna` — `&LuaTable<'_>` The top-level `luna` table.
-/// - `state` — `Rc<RefCell<SharedState>>` Shared engine state.
-///
-/// # Returns
-/// `LuaResult<()>`.
 pub fn register(
     lua: &Lua,
     luna: &mlua::Table,

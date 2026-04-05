@@ -20,26 +20,12 @@ pub struct LuaModManager(/* TODO: add key + state fields */);
 impl LuaModManager {
     /// Get a reference to a mod by ID.
     ///
-    ///
-    /// # Parameters
-    /// - `id` — `str` ...
-    ///
-    /// # Returns
-    /// `Option<`.
-    ///
     /// @param id : str
     /// @return Option<
     pub fn get_mod(&self, _lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
         todo!()
     }
     /// Check if a mod is registered. This accessor incurs no allocation; call it freely in hot paths.
-    ///
-    ///
-    /// # Parameters
-    /// - `id` — `str` ...
-    ///
-    /// # Returns
-    /// `boolean`.
     ///
     /// @param id : str
     /// @return boolean
@@ -49,18 +35,12 @@ impl LuaModManager {
     /// Get the number of registered mods. Consult the module-level documentation for the broader usage context and preconditions.
     ///
     ///
-    /// # Returns
-    /// `integer`.
-    ///
     /// @return integer
     pub fn mod_count(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
         todo!()
     }
     /// Get mods in their effective load order. Returns an error if the source data is malformed or missing.
     ///
-    ///
-    /// # Returns
-    /// `Vec<`.
     ///
     /// @return Vec<
     pub fn load_order(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
@@ -69,9 +49,6 @@ impl LuaModManager {
     /// Returns a reference to the current custom load order, if any.
     ///
     ///
-    /// # Returns
-    /// `Option<`.
-    ///
     /// @return Option<
     pub fn get_custom_load_order(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
         todo!()
@@ -79,18 +56,12 @@ impl LuaModManager {
     /// List mod IDs whose dependencies are missing.
     ///
     ///
-    /// # Returns
-    /// `table`.
-    ///
     /// @return table
     pub fn validate_dependencies(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
         todo!()
     }
     /// Check for circular dependency cycles. This accessor incurs no allocation; call it freely in hot paths.
     ///
-    ///
-    /// # Returns
-    /// `boolean`.
     ///
     /// @return boolean
     pub fn has_circular_dependencies(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
@@ -115,22 +86,12 @@ impl UserData for LuaModManager {
 /// Register a mod with the manager. Panics in debug mode if the same entity is registered twice.
 ///
 ///
-/// # Parameters
-/// - `info` — `ModInfo` ...
-///
 /// @param info : ModInfo
 pub fn register_mod(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
     todo!()
 }
 
 /// Remove a mod by ID. Consult the module-level documentation for the broader usage context and preconditions.
-///
-///
-/// # Parameters
-/// - `id` — `str` ...
-///
-/// # Returns
-/// `boolean`.
 ///
 /// @param id : str
 /// @return boolean
@@ -139,13 +100,6 @@ pub fn unregister_mod(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 }
 
 /// Get a mutable reference to a mod by ID.
-///
-///
-/// # Parameters
-/// - `id` — `str` ...
-///
-/// # Returns
-/// `Option<`.
 ///
 /// @param id : str
 /// @return Option<
@@ -156,22 +110,12 @@ pub fn get_mod_mut(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 /// Set an explicit load order by providing a list of mod IDs.
 ///
 ///
-/// # Parameters
-/// - `order` — `table` ...
-///
 /// @param order : table
 pub fn set_load_order(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
     todo!()
 }
 
 /// Scan a directory for mods and register them.
-///
-///
-/// # Parameters
-/// - `path` — `str` ...
-///
-/// # Returns
-/// `table`.
 ///
 /// @param path : str
 /// @return table
@@ -181,13 +125,6 @@ pub fn scan_folder(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 
 /// Mark a registered mod for hot-reload. Consult the module-level documentation for the broader usage context and preconditions.
 ///
-///
-/// # Parameters
-/// - `id` — `str` ...
-///
-/// # Returns
-/// `boolean`.
-///
 /// @param id : str
 /// @return boolean
 pub fn mark_for_reload(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
@@ -195,14 +132,6 @@ pub fn mark_for_reload(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 }
 
 /// Registers the `luna.modding` API table.
-///
-/// # Parameters
-/// - `lua` — `&Lua` The Lua VM.
-/// - `luna` — `&LuaTable<'_>` The top-level `luna` table.
-/// - `state` — `Rc<RefCell<SharedState>>` Shared engine state.
-///
-/// # Returns
-/// `LuaResult<()>`.
 pub fn register(
     lua: &Lua,
     luna: &mlua::Table,

@@ -20,13 +20,6 @@ pub struct LuaAttenuation(/* TODO: add key + state fields */);
 impl LuaAttenuation {
     /// Computes the attenuation factor at a given distance.
     ///
-    ///
-    /// # Parameters
-    /// - `distance` — `number` ...
-    ///
-    /// # Returns
-    /// `number`.
-    ///
     /// @param distance : number
     /// @return number
     pub fn factor(&self, _lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
@@ -49,9 +42,6 @@ impl LuaFlickerConfig {
     /// Computes the intensity multiplier for the current phase.
     ///
     ///
-    /// # Returns
-    /// `number`.
-    ///
     /// @return number
     pub fn multiplier(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
         todo!()
@@ -73,18 +63,12 @@ impl LuaLight2D {
     /// Returns the light's influence radius. This accessor incurs no allocation; call it freely in hot paths.
     ///
     ///
-    /// # Returns
-    /// `number`.
-    ///
     /// @return number
     pub fn get_radius(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
         todo!()
     }
     /// Returns the light's tint color. This accessor incurs no allocation; call it freely in hot paths.
     ///
-    ///
-    /// # Returns
-    /// `Color`.
     ///
     /// @return Color
     pub fn get_color(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
@@ -93,18 +77,12 @@ impl LuaLight2D {
     /// Returns the light's brightness multiplier.
     ///
     ///
-    /// # Returns
-    /// `number`.
-    ///
     /// @return number
     pub fn get_intensity(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
         todo!()
     }
     /// Returns whether the light is active. This accessor incurs no allocation; call it freely in hot paths.
     ///
-    ///
-    /// # Returns
-    /// `boolean`.
     ///
     /// @return boolean
     pub fn is_enabled(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
@@ -113,18 +91,12 @@ impl LuaLight2D {
     /// Returns the energy scaling factor.
     ///
     ///
-    /// # Returns
-    /// `number`.
-    ///
     /// @return number
     pub fn get_energy(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
         todo!()
     }
     /// Returns the light blend mode.
     ///
-    ///
-    /// # Returns
-    /// `LightBlendMode`.
     ///
     /// @return LightBlendMode
     pub fn get_blend_mode(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
@@ -133,18 +105,12 @@ impl LuaLight2D {
     /// Returns the falloff mode.
     ///
     ///
-    /// # Returns
-    /// `FalloffMode`.
-    ///
     /// @return FalloffMode
     pub fn get_falloff(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
         todo!()
     }
     /// Returns whether this light casts shadows.
     ///
-    ///
-    /// # Returns
-    /// `boolean`.
     ///
     /// @return boolean
     pub fn is_shadow_enabled(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
@@ -153,18 +119,12 @@ impl LuaLight2D {
     /// Returns the shadow region color.
     ///
     ///
-    /// # Returns
-    /// `Color`.
-    ///
     /// @return Color
     pub fn get_shadow_color(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
         todo!()
     }
     /// Returns the shadow edge filter quality.
     ///
-    ///
-    /// # Returns
-    /// `ShadowFilter`.
     ///
     /// @return ShadowFilter
     pub fn get_shadow_filter(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
@@ -173,18 +133,12 @@ impl LuaLight2D {
     /// Returns the shadow edge smoothing factor.
     ///
     ///
-    /// # Returns
-    /// `number`.
-    ///
     /// @return number
     pub fn get_shadow_smooth(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
         todo!()
     }
     /// Returns the light interaction bitmask.
     ///
-    ///
-    /// # Returns
-    /// `u16`.
     ///
     /// @return u16
     pub fn get_light_mask(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
@@ -193,18 +147,12 @@ impl LuaLight2D {
     /// Returns the shadow casting bitmask.
     ///
     ///
-    /// # Returns
-    /// `u16`.
-    ///
     /// @return u16
     pub fn get_shadow_mask(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
         todo!()
     }
     /// Returns the geometric light type.
     ///
-    ///
-    /// # Returns
-    /// `LightType`.
     ///
     /// @return LightType
     pub fn get_light_type(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
@@ -213,18 +161,12 @@ impl LuaLight2D {
     /// Returns the direction angle in radians.
     ///
     ///
-    /// # Returns
-    /// `number`.
-    ///
     /// @return number
     pub fn get_direction(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
         todo!()
     }
     /// Returns the inner cone angle in radians.
     ///
-    ///
-    /// # Returns
-    /// `number`.
     ///
     /// @return number
     pub fn get_inner_angle(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
@@ -233,18 +175,12 @@ impl LuaLight2D {
     /// Returns the outer cone angle in radians.
     ///
     ///
-    /// # Returns
-    /// `number`.
-    ///
     /// @return number
     pub fn get_outer_angle(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
         todo!()
     }
     /// Returns the custom attenuation coefficients.
     ///
-    ///
-    /// # Returns
-    /// `Attenuation`.
     ///
     /// @return Attenuation
     pub fn get_attenuation(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
@@ -253,18 +189,12 @@ impl LuaLight2D {
     /// Returns the group identifier.
     ///
     ///
-    /// # Returns
-    /// `u16`.
-    ///
     /// @return u16
     pub fn get_group_id(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
         todo!()
     }
     /// Returns whether this light hints at volumetric scattering.
     ///
-    ///
-    /// # Returns
-    /// `boolean`.
     ///
     /// @return boolean
     pub fn is_volumetric(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
@@ -305,26 +235,12 @@ pub struct LuaLightWorld(/* TODO: add key + state fields */);
 impl LuaLightWorld {
     /// Returns a shared reference to a light by key.
     ///
-    ///
-    /// # Parameters
-    /// - `key` — `LightKey` ...
-    ///
-    /// # Returns
-    /// `Option<`.
-    ///
     /// @param key : LightKey
     /// @return Option<
     pub fn get_light(&self, _lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
         todo!()
     }
     /// Returns a shared reference to an occluder by key.
-    ///
-    ///
-    /// # Parameters
-    /// - `key` — `OccluderKey` ...
-    ///
-    /// # Returns
-    /// `Option<`.
     ///
     /// @param key : OccluderKey
     /// @return Option<
@@ -334,18 +250,12 @@ impl LuaLightWorld {
     /// Returns the number of lights in the world.
     ///
     ///
-    /// # Returns
-    /// `integer`.
-    ///
     /// @return integer
     pub fn light_count(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
         todo!()
     }
     /// Returns the number of occluders in the world.
     ///
-    ///
-    /// # Returns
-    /// `integer`.
     ///
     /// @return integer
     pub fn occluder_count(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
@@ -354,21 +264,11 @@ impl LuaLightWorld {
     /// Returns `true` if any light in the world is enabled.
     ///
     ///
-    /// # Returns
-    /// `boolean`.
-    ///
     /// @return boolean
     pub fn has_active_lights(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
         todo!()
     }
     /// Returns the number of lights in the given group.
-    ///
-    ///
-    /// # Parameters
-    /// - `group_id` — `u16` ...
-    ///
-    /// # Returns
-    /// `integer`.
     ///
     /// @param group_id : u16
     /// @return integer
@@ -397,18 +297,12 @@ impl LuaOccluder {
     /// Returns the translation offset.
     ///
     ///
-    /// # Returns
-    /// `Vec2`.
-    ///
     /// @return Vec2
     pub fn get_position(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
         todo!()
     }
     /// Returns the shadow opacity.
     ///
-    ///
-    /// # Returns
-    /// `number`.
     ///
     /// @return number
     pub fn get_opacity(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
@@ -417,18 +311,12 @@ impl LuaOccluder {
     /// Returns the light interaction bitmask.
     ///
     ///
-    /// # Returns
-    /// `u16`.
-    ///
     /// @return u16
     pub fn get_light_mask(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
         todo!()
     }
     /// Returns whether this occluder is active.
     ///
-    ///
-    /// # Returns
-    /// `boolean`.
     ///
     /// @return boolean
     pub fn is_enabled(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
@@ -450,9 +338,6 @@ impl UserData for LuaOccluder {
 /// Advances the phase by `dt` seconds.
 ///
 ///
-/// # Parameters
-/// - `dt` — `number` ...
-///
 /// @param dt : number
 pub fn advance(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
     todo!()
@@ -460,10 +345,6 @@ pub fn advance(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 
 /// Sets the light's world-space position. Replaces the current position value; callers hold responsibility for maintaining consistency with related fields.
 ///
-///
-/// # Parameters
-/// - `x` — `number` ...
-/// - `y` — `number` ...
 ///
 /// @param x : number
 /// @param y : number
@@ -474,9 +355,6 @@ pub fn set_position(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 /// Sets the light's influence radius. Replaces the current radius value; callers hold responsibility for maintaining consistency with related fields.
 ///
 ///
-/// # Parameters
-/// - `radius` — `number` ...
-///
 /// @param radius : number
 pub fn set_radius(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
     todo!()
@@ -484,9 +362,6 @@ pub fn set_radius(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 
 /// Sets the light's tint color. Replaces the current color value; callers hold responsibility for maintaining consistency with related fields.
 ///
-///
-/// # Parameters
-/// - `color` — `Color` ...
 ///
 /// @param color : Color
 pub fn set_color(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
@@ -496,9 +371,6 @@ pub fn set_color(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 /// Sets the light's brightness multiplier. Replaces the current intensity value; callers hold responsibility for maintaining consistency with related fields.
 ///
 ///
-/// # Parameters
-/// - `intensity` — `number` ...
-///
 /// @param intensity : number
 pub fn set_intensity(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
     todo!()
@@ -506,9 +378,6 @@ pub fn set_intensity(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 
 /// Sets whether the light is active. Replaces the current enabled value; callers hold responsibility for maintaining consistency with related fields.
 ///
-///
-/// # Parameters
-/// - `enabled` — `boolean` ...
 ///
 /// @param enabled : boolean
 pub fn set_enabled(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
@@ -518,9 +387,6 @@ pub fn set_enabled(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 /// Sets the energy scaling factor (scales radius and intensity together).
 ///
 ///
-/// # Parameters
-/// - `energy` — `number` ...
-///
 /// @param energy : number
 pub fn set_energy(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
     todo!()
@@ -528,9 +394,6 @@ pub fn set_energy(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 
 /// Sets the light blend mode.
 ///
-///
-/// # Parameters
-/// - `mode` — `LightBlendMode` ...
 ///
 /// @param mode : LightBlendMode
 pub fn set_blend_mode(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
@@ -540,9 +403,6 @@ pub fn set_blend_mode(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 /// Sets the falloff mode controlling intensity decay.
 ///
 ///
-/// # Parameters
-/// - `mode` — `FalloffMode` ...
-///
 /// @param mode : FalloffMode
 pub fn set_falloff(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
     todo!()
@@ -550,9 +410,6 @@ pub fn set_falloff(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 
 /// Sets whether this light casts shadows.
 ///
-///
-/// # Parameters
-/// - `enabled` — `boolean` ...
 ///
 /// @param enabled : boolean
 pub fn set_shadow_enabled(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
@@ -562,9 +419,6 @@ pub fn set_shadow_enabled(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()>
 /// Sets the shadow region color.
 ///
 ///
-/// # Parameters
-/// - `color` — `Color` ...
-///
 /// @param color : Color
 pub fn set_shadow_color(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
     todo!()
@@ -572,9 +426,6 @@ pub fn set_shadow_color(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 
 /// Sets the shadow edge filter quality.
 ///
-///
-/// # Parameters
-/// - `filter` — `ShadowFilter` ...
 ///
 /// @param filter : ShadowFilter
 pub fn set_shadow_filter(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
@@ -584,9 +435,6 @@ pub fn set_shadow_filter(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> 
 /// Sets the shadow edge smoothing factor.
 ///
 ///
-/// # Parameters
-/// - `smooth` — `number` ...
-///
 /// @param smooth : number
 pub fn set_shadow_smooth(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
     todo!()
@@ -594,9 +442,6 @@ pub fn set_shadow_smooth(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> 
 
 /// Sets the light interaction bitmask.
 ///
-///
-/// # Parameters
-/// - `mask` — `u16` ...
 ///
 /// @param mask : u16
 pub fn set_light_mask(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
@@ -606,9 +451,6 @@ pub fn set_light_mask(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 /// Sets the shadow casting bitmask.
 ///
 ///
-/// # Parameters
-/// - `mask` — `u16` ...
-///
 /// @param mask : u16
 pub fn set_shadow_mask(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
     todo!()
@@ -616,9 +458,6 @@ pub fn set_shadow_mask(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 
 /// Sets the geometric light type.
 ///
-///
-/// # Parameters
-/// - `light_type` — `LightType` ...
 ///
 /// @param light_type : LightType
 pub fn set_light_type(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
@@ -628,9 +467,6 @@ pub fn set_light_type(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 /// Sets the direction angle in radians (for Directional and Spot lights).
 ///
 ///
-/// # Parameters
-/// - `direction` — `number` ...
-///
 /// @param direction : number
 pub fn set_direction(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
     todo!()
@@ -638,9 +474,6 @@ pub fn set_direction(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 
 /// Sets the inner cone angle in radians for Spot lights.
 ///
-///
-/// # Parameters
-/// - `angle` — `number` ...
 ///
 /// @param angle : number
 pub fn set_inner_angle(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
@@ -650,9 +483,6 @@ pub fn set_inner_angle(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 /// Sets the outer cone angle in radians for Spot lights.
 ///
 ///
-/// # Parameters
-/// - `angle` — `number` ...
-///
 /// @param angle : number
 pub fn set_outer_angle(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
     todo!()
@@ -660,9 +490,6 @@ pub fn set_outer_angle(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 
 /// Sets the custom attenuation coefficients.
 ///
-///
-/// # Parameters
-/// - `attenuation` — `Attenuation` ...
 ///
 /// @param attenuation : Attenuation
 pub fn set_attenuation(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
@@ -672,9 +499,6 @@ pub fn set_attenuation(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 /// Sets the group identifier for batch operations.
 ///
 ///
-/// # Parameters
-/// - `group_id` — `u16` ...
-///
 /// @param group_id : u16
 pub fn set_group_id(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
     todo!()
@@ -683,22 +507,12 @@ pub fn set_group_id(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 /// Sets whether this light hints at volumetric scattering.
 ///
 ///
-/// # Parameters
-/// - `volumetric` — `boolean` ...
-///
 /// @param volumetric : boolean
 pub fn set_volumetric(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
     todo!()
 }
 
 /// Inserts a light and returns its key. Auto-enables the system on first light.
-///
-///
-/// # Parameters
-/// - `light` — `Light2D` ...
-///
-/// # Returns
-/// `LightKey`.
 ///
 /// @param light : Light2D
 /// @return LightKey
@@ -708,13 +522,6 @@ pub fn add_light(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 
 /// Inserts an occluder and returns its key.
 ///
-///
-/// # Parameters
-/// - `occluder` — `Occluder` ...
-///
-/// # Returns
-/// `OccluderKey`.
-///
 /// @param occluder : Occluder
 /// @return OccluderKey
 pub fn add_occluder(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
@@ -722,13 +529,6 @@ pub fn add_occluder(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 }
 
 /// Removes a light by key, returning it if found.
-///
-///
-/// # Parameters
-/// - `key` — `LightKey` ...
-///
-/// # Returns
-/// `Light2D?`.
 ///
 /// @param key : LightKey
 /// @return Light2D?
@@ -738,13 +538,6 @@ pub fn remove_light(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 
 /// Removes an occluder by key, returning it if found.
 ///
-///
-/// # Parameters
-/// - `key` — `OccluderKey` ...
-///
-/// # Returns
-/// `Occluder?`.
-///
 /// @param key : OccluderKey
 /// @return Occluder?
 pub fn remove_occluder(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
@@ -753,13 +546,6 @@ pub fn remove_occluder(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 
 /// Returns a mutable reference to a light by key.
 ///
-///
-/// # Parameters
-/// - `key` — `LightKey` ...
-///
-/// # Returns
-/// `Option<`.
-///
 /// @param key : LightKey
 /// @return Option<
 pub fn get_light_mut(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
@@ -767,13 +553,6 @@ pub fn get_light_mut(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 }
 
 /// Returns a mutable reference to an occluder by key.
-///
-///
-/// # Parameters
-/// - `key` — `OccluderKey` ...
-///
-/// # Returns
-/// `Option<`.
 ///
 /// @param key : OccluderKey
 /// @return Option<
@@ -784,10 +563,6 @@ pub fn get_occluder_mut(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 /// Sets the enabled state for all lights in the given group.
 ///
 ///
-/// # Parameters
-/// - `group_id` — `u16` ...
-/// - `enabled` — `boolean` ...
-///
 /// @param group_id : u16
 /// @param enabled : boolean
 pub fn set_group_enabled(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
@@ -796,10 +571,6 @@ pub fn set_group_enabled(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> 
 
 /// Sets the intensity for all lights in the given group.
 ///
-///
-/// # Parameters
-/// - `group_id` — `u16` ...
-/// - `intensity` — `number` ...
 ///
 /// @param group_id : u16
 /// @param intensity : number
@@ -810,10 +581,6 @@ pub fn set_group_intensity(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()
 /// Sets the color for all lights in the given group.
 ///
 ///
-/// # Parameters
-/// - `group_id` — `u16` ...
-/// - `color` — `Color` ...
-///
 /// @param group_id : u16
 /// @param color : Color
 pub fn set_group_color(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
@@ -823,9 +590,6 @@ pub fn set_group_color(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 /// Advances flicker phase for all lights with flicker enabled.
 ///
 ///
-/// # Parameters
-/// - `dt` — `number` ...
-///
 /// @param dt : number
 pub fn advance_flickers(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
     todo!()
@@ -833,9 +597,6 @@ pub fn advance_flickers(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 
 /// Sets the polygon vertices.
 ///
-///
-/// # Parameters
-/// - `vertices` — `table` ...
 ///
 /// @param vertices : table
 pub fn set_vertices(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
@@ -845,15 +606,9 @@ pub fn set_vertices(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 /// Sets the translation offset.
 ///
 ///
-/// # Parameters
-/// - `position` — `Vec2` ...
-///
 /// @param position : Vec2
 /// Sets the shadow opacity (0.0–1.0).
 ///
-///
-/// # Parameters
-/// - `opacity` — `number` ...
 ///
 /// @param opacity : number
 pub fn set_opacity(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
@@ -863,26 +618,12 @@ pub fn set_opacity(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 /// Sets the light interaction bitmask.
 ///
 ///
-/// # Parameters
-/// - `mask` — `u16` ...
-///
 /// @param mask : u16
 /// Sets whether this occluder is active.
 ///
 ///
-/// # Parameters
-/// - `enabled` — `boolean` ...
-///
 /// @param enabled : boolean
 /// Registers the `luna.light` API table.
-///
-/// # Parameters
-/// - `lua` — `&Lua` The Lua VM.
-/// - `luna` — `&LuaTable<'_>` The top-level `luna` table.
-/// - `state` — `Rc<RefCell<SharedState>>` Shared engine state.
-///
-/// # Returns
-/// `LuaResult<()>`.
 pub fn register(
     lua: &Lua,
     luna: &mlua::Table,

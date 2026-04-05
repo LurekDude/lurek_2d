@@ -20,26 +20,12 @@ pub struct LuaGamepadMappings(/* TODO: add key + state fields */);
 impl LuaGamepadMappings {
     /// Returns the mapping string for `guid`, or `None` if unknown.
     ///
-    ///
-    /// # Parameters
-    /// - `guid` — `SDL-format` ...
-    ///
-    /// # Returns
-    /// `Option<`.
-    ///
     /// @param guid : SDL-format
     /// @return Option<
     pub fn get_mapping_string(&self, _lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
         todo!()
     }
     /// Writes all stored mappings to a plain-text file, one per line.
-    ///
-    ///
-    /// # Parameters
-    /// - `path` — `Destination` ...
-    ///
-    /// # Returns
-    /// `Result<()`.
     ///
     /// @param path : Destination
     /// @return Result<()
@@ -63,26 +49,12 @@ pub struct LuaGamepadState(/* TODO: add key + state fields */);
 impl LuaGamepadState {
     /// Returns `true` if the button at `button` index is currently pressed.
     ///
-    ///
-    /// # Parameters
-    /// - `button` — `Button` ...
-    ///
-    /// # Returns
-    /// `boolean`.
-    ///
     /// @param button : Button
     /// @return boolean
     pub fn is_button_pressed(&self, _lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
         todo!()
     }
     /// Returns the current value of the analog axis at `axis` index.
-    ///
-    ///
-    /// # Parameters
-    /// - `axis` — `Axis` ...
-    ///
-    /// # Returns
-    /// `number`.
     ///
     /// @param axis : Axis
     /// @return number
@@ -92,18 +64,12 @@ impl LuaGamepadState {
     /// Returns whether this gamepad is currently connected.
     ///
     ///
-    /// # Returns
-    /// `boolean`.
-    ///
     /// @return boolean
     pub fn is_connected(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
         todo!()
     }
     /// Returns the number of distinct buttons that have been reported.
     ///
-    ///
-    /// # Returns
-    /// `integer`.
     ///
     /// @return integer
     pub fn get_button_count(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
@@ -112,18 +78,12 @@ impl LuaGamepadState {
     /// Returns the number of distinct axes that have been reported.
     ///
     ///
-    /// # Returns
-    /// `integer`.
-    ///
     /// @return integer
     pub fn get_axis_count(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
         todo!()
     }
     /// Returns the d-pad hat direction string for the requested hat index.
     ///
-    ///
-    /// # Parameters
-    /// - `hat` — `integer` ...
     ///
     /// @param hat : integer
     pub fn get_hat(&self, _lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
@@ -150,13 +110,6 @@ pub struct LuaKeyboardState(/* TODO: add key + state fields */);
 impl LuaKeyboardState {
     /// Returns `true` if the given physical scancode is currently held down.
     ///
-    ///
-    /// # Parameters
-    /// - `scancode` — `str` ...
-    ///
-    /// # Returns
-    /// `boolean`.
-    ///
     /// @param scancode : str
     /// @return boolean
     pub fn is_scancode_down(&self, _lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
@@ -165,9 +118,6 @@ impl LuaKeyboardState {
     /// Returns `true` if key repeat event delivery is enabled.
     ///
     ///
-    /// # Returns
-    /// `boolean`.
-    ///
     /// @return boolean
     pub fn has_key_repeat(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
         todo!()
@@ -175,21 +125,11 @@ impl LuaKeyboardState {
     /// Returns `true` if text input (IME) event delivery is enabled.
     ///
     ///
-    /// # Returns
-    /// `boolean`.
-    ///
     /// @return boolean
     pub fn has_text_input(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
         todo!()
     }
     /// Returns `true` if `key` is currently held down.
-    ///
-    ///
-    /// # Parameters
-    /// - `key` — `Lowercase` ...
-    ///
-    /// # Returns
-    /// `boolean`.
     ///
     /// @param key : Lowercase
     /// @return boolean
@@ -197,13 +137,6 @@ impl LuaKeyboardState {
         todo!()
     }
     /// Returns `true` if the named modifier key is currently held.
-    ///
-    ///
-    /// # Parameters
-    /// - `modifier` — `str` ...
-    ///
-    /// # Returns
-    /// `boolean`.
     ///
     /// @param modifier : str
     /// @return boolean
@@ -230,13 +163,6 @@ pub struct LuaMouseState(/* TODO: add key + state fields */);
 impl LuaMouseState {
     /// Returns `true` if the button at `button` index is currently held down.
     ///
-    ///
-    /// # Parameters
-    /// - `button` — `Button` ...
-    ///
-    /// # Returns
-    /// `boolean`.
-    ///
     /// @param button : Button
     /// @return boolean
     pub fn is_down(&self, _lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
@@ -245,18 +171,12 @@ impl LuaMouseState {
     /// Returns whether the cursor is visible. This accessor incurs no allocation; call it freely in hot paths.
     ///
     ///
-    /// # Returns
-    /// `boolean`.
-    ///
     /// @return boolean
     pub fn is_visible(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
         todo!()
     }
     /// Returns whether the cursor is confined to the window.
     ///
-    ///
-    /// # Returns
-    /// `boolean`.
     ///
     /// @return boolean
     pub fn is_grabbed(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
@@ -265,18 +185,12 @@ impl LuaMouseState {
     /// Returns whether relative mouse mode is active.
     ///
     ///
-    /// # Returns
-    /// `boolean`.
-    ///
     /// @return boolean
     pub fn get_relative_mode(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
         todo!()
     }
     /// Returns the current system cursor shape.
     ///
-    ///
-    /// # Returns
-    /// `SystemCursor`.
     ///
     /// @return SystemCursor
     pub fn get_cursor(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
@@ -303,21 +217,11 @@ impl LuaTouchState {
     /// Returns all active touch points. This accessor incurs no allocation; call it freely in hot paths.
     ///
     ///
-    /// # Returns
-    /// `table`.
-    ///
     /// @return table
     pub fn get_touches(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
         todo!()
     }
     /// Returns a specific touch point by ID. This accessor incurs no allocation; call it freely in hot paths.
-    ///
-    ///
-    /// # Parameters
-    /// - `id` — `integer` ...
-    ///
-    /// # Returns
-    /// `TouchPoint?`.
     ///
     /// @param id : integer
     /// @return TouchPoint?
@@ -326,9 +230,6 @@ impl LuaTouchState {
     }
     /// Returns the number of active touches. This accessor incurs no allocation; call it freely in hot paths.
     ///
-    ///
-    /// # Returns
-    /// `integer`.
     ///
     /// @return integer
     pub fn get_touch_count(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
@@ -349,10 +250,6 @@ impl UserData for LuaTouchState {
 /// Updates the pressed state for a specific button.
 ///
 ///
-/// # Parameters
-/// - `button` — `Button` ...
-/// - `pressed` — `true` ...
-///
 /// @param button : Button
 /// @param pressed : true
 pub fn update_button(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
@@ -361,10 +258,6 @@ pub fn update_button(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 
 /// Updates the value for a specific analog axis.
 ///
-///
-/// # Parameters
-/// - `axis` — `Axis` ...
-/// - `value` — `Axis` ...
 ///
 /// @param axis : Axis
 /// @param value : Axis
@@ -375,9 +268,6 @@ pub fn update_axis(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 /// Converts a `gilrs::Button` to a engine-compatible string name.
 ///
 ///
-/// # Parameters
-/// - `button` — `gilrs::Button` ...
-///
 /// @param button : gilrs::Button
 pub fn gilrs_button_to_string(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
     todo!()
@@ -386,9 +276,6 @@ pub fn gilrs_button_to_string(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult
 /// Converts a `gilrs::Axis` to a engine-compatible string name.
 ///
 ///
-/// # Parameters
-/// - `axis` — `gilrs::Axis` ...
-///
 /// @param axis : gilrs::Axis
 pub fn gilrs_axis_to_string(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
     todo!()
@@ -396,10 +283,6 @@ pub fn gilrs_axis_to_string(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<(
 
 /// Inserts or replaces the mapping string for the given GUID.
 ///
-///
-/// # Parameters
-/// - `guid` — `SDL-format` ...
-/// - `mapping` — `Full` ...
 ///
 /// @param guid : SDL-format
 /// @param mapping : Full
@@ -412,13 +295,6 @@ pub fn set_mapping(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 /// Lines that start with `#` are treated as comments and skipped.
 /// Empty lines are also skipped.  Returns the number of mappings loaded.
 ///
-///
-/// # Parameters
-/// - `path` — `File` ...
-///
-/// # Returns
-/// `Result<usize`.
-///
 /// @param path : File
 /// @return Result<usize
 pub fn load_from_file(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
@@ -428,9 +304,6 @@ pub fn load_from_file(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 /// Records that `key` is now held down, adding it to the pressed list if newly down.
 ///
 ///
-/// # Parameters
-/// - `key` — `Lowercase` ...
-///
 /// @param key : Lowercase
 pub fn set_key_down(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
     todo!()
@@ -439,9 +312,6 @@ pub fn set_key_down(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 /// Records that `key` was released, adding it to the released list if it was down.
 ///
 ///
-/// # Parameters
-/// - `key` — `Lowercase` ...
-///
 /// @param key : Lowercase
 pub fn set_key_up(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
     todo!()
@@ -449,12 +319,6 @@ pub fn set_key_up(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 
 /// Sets the modifier bitmask when modifiers change.
 ///
-///
-/// # Parameters
-/// - `shift` — `boolean` ...
-/// - `ctrl` — `boolean` ...
-/// - `alt` — `boolean` ...
-/// - `meta` — `boolean` ...
 ///
 /// @param shift : boolean
 /// @param ctrl : boolean
@@ -469,13 +333,6 @@ pub fn set_modifiers(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 /// Returns `Some(name)` for recognised keys, `None` for keys without a mapping
 /// (which the engine skips silently).
 ///
-///
-/// # Parameters
-/// - `key` — `A` ...
-///
-/// # Returns
-/// `string?`.
-///
 /// @param key : A
 /// @return string?
 pub fn winit_key_to_string(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
@@ -486,13 +343,6 @@ pub fn winit_key_to_string(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()
 ///
 /// Scancodes represent physical key positions and are layout-independent.
 ///
-///
-/// # Parameters
-/// - `code` — `A` ...
-///
-/// # Returns
-/// `Option<`.
-///
 /// @param code : A
 /// @return Option<
 pub fn winit_scancode_to_string(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
@@ -500,13 +350,6 @@ pub fn winit_scancode_to_string(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResu
 }
 
 /// Parses a cursor name string into a `SystemCursor` variant.
-///
-///
-/// # Parameters
-/// - `name` — `str` ...
-///
-/// # Returns
-/// `Self`.
 ///
 /// @param name : str
 /// @return Self
@@ -517,10 +360,6 @@ pub fn from_name(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 /// Updates the cursor position. Consult the module-level documentation for the broader usage context and preconditions.
 ///
 ///
-/// # Parameters
-/// - `x` — `number` ...
-/// - `y` — `number` ...
-///
 /// @param x : number
 /// @param y : number
 pub fn update_position(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
@@ -529,10 +368,6 @@ pub fn update_position(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 
 /// Requests that the backend cursor move to a new position.
 ///
-///
-/// # Parameters
-/// - `x` — `number` ...
-/// - `y` — `number` ...
 ///
 /// @param x : number
 /// @param y : number
@@ -543,10 +378,6 @@ pub fn request_position(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 /// Records a button press or release event, updating the transient pressed/released flags.
 ///
 ///
-/// # Parameters
-/// - `button` — `Button` ...
-/// - `pressed` — `true` ...
-///
 /// @param button : Button
 /// @param pressed : true
 pub fn set_button(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
@@ -556,9 +387,6 @@ pub fn set_button(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 /// Sets cursor visibility. Replaces the current visible value; callers hold responsibility for maintaining consistency with related fields.
 ///
 ///
-/// # Parameters
-/// - `visible` — `boolean` ...
-///
 /// @param visible : boolean
 pub fn set_visible(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
     todo!()
@@ -566,9 +394,6 @@ pub fn set_visible(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 
 /// Sets whether the cursor is confined to the window.
 ///
-///
-/// # Parameters
-/// - `grabbed` — `boolean` ...
 ///
 /// @param grabbed : boolean
 pub fn set_grabbed(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
@@ -578,9 +403,6 @@ pub fn set_grabbed(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 /// Sets relative (FPS) mouse mode. Replaces the current relative mode value; callers hold responsibility for maintaining consistency with related fields.
 ///
 ///
-/// # Parameters
-/// - `relative` — `boolean` ...
-///
 /// @param relative : boolean
 pub fn set_relative_mode(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
     todo!()
@@ -588,10 +410,6 @@ pub fn set_relative_mode(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> 
 
 /// Accumulates scroll delta for the current frame.
 ///
-///
-/// # Parameters
-/// - `dx` — `number` ...
-/// - `dy` — `number` ...
 ///
 /// @param dx : number
 /// @param dy : number
@@ -602,9 +420,6 @@ pub fn accumulate_scroll(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> 
 /// Sets the system cursor shape. Replaces the current cursor value; callers hold responsibility for maintaining consistency with related fields.
 ///
 ///
-/// # Parameters
-/// - `cursor` — `SystemCursor` ...
-///
 /// @param cursor : SystemCursor
 pub fn set_cursor(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
     todo!()
@@ -613,9 +428,6 @@ pub fn set_cursor(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 /// Returns whether cursor customisation is supported on this platform.
 ///
 ///
-/// # Returns
-/// `boolean`.
-///
 /// @return boolean
 pub fn is_cursor_supported(_lua: &Lua, _: ()) -> LuaResult<()> {
     todo!()
@@ -623,12 +435,6 @@ pub fn is_cursor_supported(_lua: &Lua, _: ()) -> LuaResult<()> {
 
 /// Registers or updates a touch point. Consult the module-level documentation for the broader usage context and preconditions.
 ///
-///
-/// # Parameters
-/// - `id` — `integer` ...
-/// - `x` — `number` ...
-/// - `y` — `number` ...
-/// - `pressure` — `number` ...
 ///
 /// @param id : integer
 /// @param x : number
@@ -641,12 +447,6 @@ pub fn touch_start(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 /// Updates the position of an existing touch point.
 ///
 ///
-/// # Parameters
-/// - `id` — `integer` ...
-/// - `x` — `number` ...
-/// - `y` — `number` ...
-/// - `pressure` — `number` ...
-///
 /// @param id : integer
 /// @param x : number
 /// @param y : number
@@ -658,23 +458,12 @@ pub fn touch_move(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 /// Removes a touch point. Consult the module-level documentation for the broader usage context and preconditions.
 ///
 ///
-/// # Parameters
-/// - `id` — `integer` ...
-///
 /// @param id : integer
 pub fn touch_end(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
     todo!()
 }
 
 /// Registers the `luna.input` API table.
-///
-/// # Parameters
-/// - `lua` — `&Lua` The Lua VM.
-/// - `luna` — `&LuaTable<'_>` The top-level `luna` table.
-/// - `state` — `Rc<RefCell<SharedState>>` Shared engine state.
-///
-/// # Returns
-/// `LuaResult<()>`.
 pub fn register(
     lua: &Lua,
     luna: &mlua::Table,

@@ -24,9 +24,6 @@ impl LuaScript {
     /// Returns `0` for an empty script.
     ///
     ///
-    /// # Returns
-    /// `integer`.
-    ///
     /// @return integer
     pub fn step_count(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
         todo!()
@@ -50,13 +47,6 @@ impl LuaSimulator {
     /// Does not distinguish between whether the script is currently active
     /// or idle. Use [`Simulator::current_script`] to identify the active one.
     ///
-    ///
-    /// # Parameters
-    /// - `name` — `str` ...
-    ///
-    /// # Returns
-    /// `boolean`.
-    ///
     /// @param name : str
     /// @return boolean
     pub fn has_script(&self, _lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
@@ -69,9 +59,6 @@ impl LuaSimulator {
     /// `Vec` when no scripts are loaded.
     ///
     ///
-    /// # Returns
-    /// `table`.
-    ///
     /// @return table
     pub fn get_scripts(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
         todo!()
@@ -82,18 +69,12 @@ impl LuaSimulator {
     /// code that should only execute while a simulation is actively running.
     ///
     ///
-    /// # Returns
-    /// `boolean`.
-    ///
     /// @return boolean
     pub fn is_running(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
         todo!()
     }
     /// Return `true` if the simulator is in the `Paused` state.
     ///
-    ///
-    /// # Returns
-    /// `boolean`.
     ///
     /// @return boolean
     pub fn is_paused(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
@@ -106,9 +87,6 @@ impl LuaSimulator {
     /// restart the same or a different script.
     ///
     ///
-    /// # Returns
-    /// `boolean`.
-    ///
     /// @return boolean
     pub fn is_complete(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
         todo!()
@@ -118,9 +96,6 @@ impl LuaSimulator {
     /// Steps at indices `0..current_step()` have already been dispatched.
     /// Returns `0` when idle or when the script has not yet advanced.
     ///
-    ///
-    /// # Returns
-    /// `integer`.
     ///
     /// @return integer
     pub fn current_step(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
@@ -133,9 +108,6 @@ impl LuaSimulator {
     /// active script is replaced via [`Simulator::load`].
     ///
     ///
-    /// # Returns
-    /// `integer`.
-    ///
     /// @return integer
     pub fn step_count(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
         todo!()
@@ -147,9 +119,6 @@ impl LuaSimulator {
     /// [`Simulator::start`] call.
     ///
     ///
-    /// # Returns
-    /// `Option<`.
-    ///
     /// @return Option<
     pub fn current_script(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
         todo!()
@@ -159,9 +128,6 @@ impl LuaSimulator {
     /// Returns `0.0` when idle. Frozen at the pause point when paused.
     /// Continues to increase until the script completes or `stop` is called.
     ///
-    ///
-    /// # Returns
-    /// `number`.
     ///
     /// @return number
     pub fn elapsed_time(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
@@ -196,9 +162,6 @@ impl LuaStep {
     /// steps should always have at least one of these set.
     ///
     ///
-    /// # Returns
-    /// `Option<`.
-    ///
     /// @return Option<
     pub fn effective_scancode(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
         todo!()
@@ -219,15 +182,6 @@ impl UserData for LuaStep {
 /// `description` field. Useful when constructing scripts in Rust code
 /// that should carry human-readable metadata.
 ///
-///
-/// # Parameters
-/// - `name` — `impl Into<String>` ...
-/// - `description` — `impl Into<String>` ...
-/// - `steps` — `table` ...
-///
-/// # Returns
-/// `Script`.
-///
 /// @param name : impl Into<String>
 /// @param description : impl Into<String>
 /// @param steps : table
@@ -244,9 +198,6 @@ pub fn with_description(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 /// case the replacement takes effect at the next [`Simulator::update`].
 ///
 ///
-/// # Parameters
-/// - `script` — `Script` ...
-///
 /// @param script : Script
 pub fn load(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
     todo!()
@@ -258,13 +209,6 @@ pub fn load(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 /// script with that name was loaded. If the removed script is currently
 /// active, [`Simulator::stop`] is called automatically, resetting
 /// playback to `Idle`.
-///
-///
-/// # Parameters
-/// - `name` — `str` ...
-///
-/// # Returns
-/// `boolean`.
 ///
 /// @param name : str
 /// @return boolean
@@ -278,13 +222,6 @@ pub fn unload(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 /// transitions to `Running`. Calling `start` while already running or
 /// paused restarts the same or a different script from scratch. Returns
 /// `Err` if the script name is not registered.
-///
-///
-/// # Parameters
-/// - `name` — `str` ...
-///
-/// # Returns
-/// `Result<()`.
 ///
 /// @param name : str
 /// @return Result<()
@@ -303,10 +240,6 @@ pub fn start(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 /// Is a no-op when `state != Running`.
 ///
 ///
-/// # Parameters
-/// - `dt` — `number` ...
-/// - `event_queue` — `mut EventQueue` ...
-///
 /// @param dt : number
 /// @param event_queue : mut EventQueue
 pub fn update(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
@@ -322,13 +255,6 @@ pub fn update(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 /// Returns `None` for any unrecognised string. The match is case-sensitive;
 /// `"KeyPress"` and `"KEYPRESS"` are not accepted.
 ///
-///
-/// # Parameters
-/// - `s` — `str` ...
-///
-/// # Returns
-/// `Action?`.
-///
 /// @param s : str
 /// @return Action?
 pub fn parse_action(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
@@ -336,14 +262,6 @@ pub fn parse_action(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 }
 
 /// Registers the `luna.automation` API table.
-///
-/// # Parameters
-/// - `lua` — `&Lua` The Lua VM.
-/// - `luna` — `&LuaTable<'_>` The top-level `luna` table.
-/// - `state` — `Rc<RefCell<SharedState>>` Shared engine state.
-///
-/// # Returns
-/// `LuaResult<()>`.
 pub fn register(
     lua: &Lua,
     luna: &mlua::Table,

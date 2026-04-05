@@ -21,18 +21,12 @@ impl LuaCellValue {
     /// Returns `true` if this cell is `Nil`. This accessor incurs no allocation; call it freely in hot paths.
     ///
     ///
-    /// # Returns
-    /// `boolean`.
-    ///
     /// @return boolean
     pub fn is_nil(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
         todo!()
     }
     /// Returns the contained number, or `None`.
     ///
-    ///
-    /// # Returns
-    /// `number?`.
     ///
     /// @return number?
     pub fn as_number(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
@@ -41,9 +35,6 @@ impl LuaCellValue {
     /// Returns the contained text as a string slice, or `None`.
     ///
     ///
-    /// # Returns
-    /// `Option<`.
-    ///
     /// @return Option<
     pub fn as_text(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
         todo!()
@@ -51,21 +42,11 @@ impl LuaCellValue {
     /// Returns the contained boolean, or `None`.
     ///
     ///
-    /// # Returns
-    /// `boolean?`.
-    ///
     /// @return boolean?
     pub fn as_bool(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
         todo!()
     }
     /// Comparison for sorting. Nil sorts to end; among non-nil values
-    ///
-    ///
-    /// # Parameters
-    /// - `other` — `CellValue` ...
-    ///
-    /// # Returns
-    /// `Ordering`.
     ///
     /// @param other : CellValue
     /// @return Ordering
@@ -93,18 +74,12 @@ impl LuaDataFrame {
     /// Return the number of rows. Consult the module-level documentation for the broader usage context and preconditions.
     ///
     ///
-    /// # Returns
-    /// `integer`.
-    ///
     /// @return integer
     pub fn nrows(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
         todo!()
     }
     /// Return the number of columns. Consult the module-level documentation for the broader usage context and preconditions.
     ///
-    ///
-    /// # Returns
-    /// `integer`.
     ///
     /// @return integer
     pub fn ncols(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
@@ -113,21 +88,11 @@ impl LuaDataFrame {
     /// Alias for `nrows()`; returns the row count in O(1) time.
     ///
     ///
-    /// # Returns
-    /// `integer`.
-    ///
     /// @return integer
     pub fn count(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
         todo!()
     }
     /// Resolve a `ColRef` to a 0-based column index.
-    ///
-    ///
-    /// # Parameters
-    /// - `col` — `ColRef` ...
-    ///
-    /// # Returns
-    /// `Result<usize`.
     ///
     /// @param col : ColRef
     /// @return Result<usize
@@ -136,13 +101,6 @@ impl LuaDataFrame {
     }
     /// Return a reference to the column data. This accessor incurs no allocation; call it freely in hot paths.
     ///
-    ///
-    /// # Parameters
-    /// - `col` — `ColRef` ...
-    ///
-    /// # Returns
-    /// `Result<`.
-    ///
     /// @param col : ColRef
     /// @return Result<
     pub fn get_column(&self, _lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
@@ -150,27 +108,12 @@ impl LuaDataFrame {
     }
     /// Get a full row as name-value pairs (0-based index).
     ///
-    ///
-    /// # Parameters
-    /// - `row` — `integer` ...
-    ///
-    /// # Returns
-    /// `Result<Vec<(String`.
-    ///
     /// @param row : integer
     /// @return Result<Vec<(String
     pub fn get_row(&self, _lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
         todo!()
     }
     /// Get a single cell value (0-based row, ColRef for column).
-    ///
-    ///
-    /// # Parameters
-    /// - `row` — `integer` ...
-    /// - `col` — `ColRef` ...
-    ///
-    /// # Returns
-    /// `Result<CellValue`.
     ///
     /// @param row : integer
     /// @param col : ColRef
@@ -181,23 +124,11 @@ impl LuaDataFrame {
     /// Deep-clone this DataFrame. Consult the module-level documentation for the broader usage context and preconditions.
     ///
     ///
-    /// # Returns
-    /// `DataFrame`.
-    ///
     /// @return DataFrame
     pub fn clone_df(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
         todo!()
     }
     /// Filter rows where `col op val` is true.
-    ///
-    ///
-    /// # Parameters
-    /// - `col` — `ColRef` ...
-    /// - `op` — `str` ...
-    /// - `val` — `CellValue` ...
-    ///
-    /// # Returns
-    /// `Result<DataFrame`.
     ///
     /// @param col : ColRef
     /// @param op : str
@@ -208,14 +139,6 @@ impl LuaDataFrame {
     }
     /// Sort by column, stable sort. Nils sort to end.
     ///
-    ///
-    /// # Parameters
-    /// - `col` — `ColRef` ...
-    /// - `ascending` — `boolean` ...
-    ///
-    /// # Returns
-    /// `Result<DataFrame`.
-    ///
     /// @param col : ColRef
     /// @param ascending : boolean
     /// @return Result<DataFrame
@@ -224,13 +147,6 @@ impl LuaDataFrame {
     }
     /// Return the first `n` rows. Consult the module-level documentation for the broader usage context and preconditions.
     ///
-    ///
-    /// # Parameters
-    /// - `n` — `integer` ...
-    ///
-    /// # Returns
-    /// `DataFrame`.
-    ///
     /// @param n : integer
     /// @return DataFrame
     pub fn head(&self, _lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
@@ -238,27 +154,12 @@ impl LuaDataFrame {
     }
     /// Return the last `n` rows. Consult the module-level documentation for the broader usage context and preconditions.
     ///
-    ///
-    /// # Parameters
-    /// - `n` — `integer` ...
-    ///
-    /// # Returns
-    /// `DataFrame`.
-    ///
     /// @param n : integer
     /// @return DataFrame
     pub fn tail(&self, _lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
         todo!()
     }
     /// Return a slice of rows from `start` to `end` (0-based, inclusive on both ends).
-    ///
-    ///
-    /// # Parameters
-    /// - `start` — `integer` ...
-    /// - `end` — `integer` ...
-    ///
-    /// # Returns
-    /// `Result<DataFrame`.
     ///
     /// @param start : integer
     /// @param end : integer
@@ -268,26 +169,12 @@ impl LuaDataFrame {
     }
     /// Column projection: select a subset of columns.
     ///
-    ///
-    /// # Parameters
-    /// - `cols` — `[ColRef]` ...
-    ///
-    /// # Returns
-    /// `Result<DataFrame`.
-    ///
     /// @param cols : [ColRef]
     /// @return Result<DataFrame
     pub fn select_columns(&self, _lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
         todo!()
     }
     /// Return unique values in a column (O(n^2) dedup).
-    ///
-    ///
-    /// # Parameters
-    /// - `col` — `ColRef` ...
-    ///
-    /// # Returns
-    /// `Result<Vec<CellValue>`.
     ///
     /// @param col : ColRef
     /// @return Result<Vec<CellValue>
@@ -296,26 +183,12 @@ impl LuaDataFrame {
     }
     /// Group rows by the value in a column. Returns (group_key, sub-DataFrame) pairs.
     ///
-    ///
-    /// # Parameters
-    /// - `col` — `ColRef` ...
-    ///
-    /// # Returns
-    /// `Result<Vec<(CellValue`.
-    ///
     /// @param col : ColRef
     /// @return Result<Vec<(CellValue
     pub fn group_by(&self, _lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
         todo!()
     }
     /// Count distinct values in a column, returning a DataFrame with "value" and "count" columns.
-    ///
-    ///
-    /// # Parameters
-    /// - `col` — `ColRef` ...
-    ///
-    /// # Returns
-    /// `Result<DataFrame`.
     ///
     /// @param col : ColRef
     /// @return Result<DataFrame
@@ -324,27 +197,12 @@ impl LuaDataFrame {
     }
     /// Remove rows where the given column is Nil.
     ///
-    ///
-    /// # Parameters
-    /// - `col` — `ColRef` ...
-    ///
-    /// # Returns
-    /// `Result<DataFrame`.
-    ///
     /// @param col : ColRef
     /// @return Result<DataFrame
     pub fn drop_nil(&self, _lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
         todo!()
     }
     /// Random sample of `n` rows using Fisher-Yates shuffle.
-    ///
-    ///
-    /// # Parameters
-    /// - `n` — `integer` ...
-    /// - `seed` — `integer?` ...
-    ///
-    /// # Returns
-    /// `DataFrame`.
     ///
     /// @param n : integer
     /// @param seed : integer?
@@ -354,26 +212,12 @@ impl LuaDataFrame {
     }
     /// Sum of numeric values in a column (skipping nils).
     ///
-    ///
-    /// # Parameters
-    /// - `col` — `ColRef` ...
-    ///
-    /// # Returns
-    /// `Result<f64`.
-    ///
     /// @param col : ColRef
     /// @return Result<f64
     pub fn sum(&self, _lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
         todo!()
     }
     /// Mean of numeric values in a column (skipping nils).
-    ///
-    ///
-    /// # Parameters
-    /// - `col` — `ColRef` ...
-    ///
-    /// # Returns
-    /// `Result<f64`.
     ///
     /// @param col : ColRef
     /// @return Result<f64
@@ -382,26 +226,12 @@ impl LuaDataFrame {
     }
     /// Minimum numeric value in a column (skipping nils).
     ///
-    ///
-    /// # Parameters
-    /// - `col` — `ColRef` ...
-    ///
-    /// # Returns
-    /// `Result<f64`.
-    ///
     /// @param col : ColRef
     /// @return Result<f64
     pub fn min_val(&self, _lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
         todo!()
     }
     /// Maximum numeric value in a column (skipping nils).
-    ///
-    ///
-    /// # Parameters
-    /// - `col` — `ColRef` ...
-    ///
-    /// # Returns
-    /// `Result<f64`.
     ///
     /// @param col : ColRef
     /// @return Result<f64
@@ -410,13 +240,6 @@ impl LuaDataFrame {
     }
     /// Median of numeric values in a column (skipping nils).
     ///
-    ///
-    /// # Parameters
-    /// - `col` — `ColRef` ...
-    ///
-    /// # Returns
-    /// `Result<f64`.
-    ///
     /// @param col : ColRef
     /// @return Result<f64
     pub fn median(&self, _lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
@@ -424,26 +247,12 @@ impl LuaDataFrame {
     }
     /// Standard deviation of numeric values in a column (population stddev, skipping nils).
     ///
-    ///
-    /// # Parameters
-    /// - `col` — `ColRef` ...
-    ///
-    /// # Returns
-    /// `Result<f64`.
-    ///
     /// @param col : ColRef
     /// @return Result<f64
     pub fn stddev(&self, _lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
         todo!()
     }
     /// Variance of numeric values in a column (population variance, skipping nils).
-    ///
-    ///
-    /// # Parameters
-    /// - `col` — `ColRef` ...
-    ///
-    /// # Returns
-    /// `Result<f64`.
     ///
     /// @param col : ColRef
     /// @return Result<f64
@@ -453,18 +262,12 @@ impl LuaDataFrame {
     /// Descriptive statistics for all numeric columns.
     ///
     ///
-    /// # Returns
-    /// `DataFrame`.
-    ///
     /// @return DataFrame
     pub fn describe(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
         todo!()
     }
     /// Serialize to CSV string (RFC 4180). Consult the module-level documentation for the broader usage context and preconditions.
     ///
-    ///
-    /// # Returns
-    /// `string`.
     ///
     /// @return string
     pub fn to_csv(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
@@ -473,9 +276,6 @@ impl LuaDataFrame {
     /// Serialize to JSON string (array-of-objects format).
     ///
     ///
-    /// # Returns
-    /// `string`.
-    ///
     /// @return string
     pub fn to_json(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
         todo!()
@@ -483,18 +283,12 @@ impl LuaDataFrame {
     /// Serialize to LVDF binary format. Consult the module-level documentation for the broader usage context and preconditions.
     ///
     ///
-    /// # Returns
-    /// `table`.
-    ///
     /// @return table
     pub fn to_binary(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
         todo!()
     }
     /// Format the DataFrame as an ASCII table for debug display.
     ///
-    ///
-    /// # Returns
-    /// `string`.
     ///
     /// @return string
     pub fn to_string_table(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
@@ -546,26 +340,12 @@ pub struct LuaDatabase(/* TODO: add key + state fields */);
 impl LuaDatabase {
     /// Get a shared reference to a table by name.
     ///
-    ///
-    /// # Parameters
-    /// - `name` — `str` ...
-    ///
-    /// # Returns
-    /// `Option<`.
-    ///
     /// @param name : str
     /// @return Option<
     pub fn get_table(&self, _lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
         todo!()
     }
     /// Check whether a table with the given name exists.
-    ///
-    ///
-    /// # Parameters
-    /// - `name` — `str` ...
-    ///
-    /// # Returns
-    /// `boolean`.
     ///
     /// @param name : str
     /// @return boolean
@@ -575,18 +355,12 @@ impl LuaDatabase {
     /// Return the names of all tables, sorted alphabetically.
     ///
     ///
-    /// # Returns
-    /// `table`.
-    ///
     /// @return table
     pub fn list_tables(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
         todo!()
     }
     /// Return the number of tables. Consult the module-level documentation for the broader usage context and preconditions.
     ///
-    ///
-    /// # Returns
-    /// `integer`.
     ///
     /// @return integer
     pub fn table_count(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
@@ -607,14 +381,6 @@ impl UserData for LuaDatabase {
 
 /// Add a new column, filling existing rows with `default`.
 ///
-///
-/// # Parameters
-/// - `name` — `str` ...
-/// - `default` — `CellValue` ...
-///
-/// # Returns
-/// `Result<()`.
-///
 /// @param name : str
 /// @param default : CellValue
 /// @return Result<()
@@ -624,13 +390,6 @@ pub fn add_column(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 
 /// Remove a column by reference. Returns the removed value if present, or `None` when the key did not exist.
 ///
-///
-/// # Parameters
-/// - `col` — `ColRef` ...
-///
-/// # Returns
-/// `Result<()`.
-///
 /// @param col : ColRef
 /// @return Result<()
 pub fn remove_column(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
@@ -638,14 +397,6 @@ pub fn remove_column(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 }
 
 /// Rename a column. Consult the module-level documentation for the broader usage context and preconditions.
-///
-///
-/// # Parameters
-/// - `col` — `ColRef` ...
-/// - `new_name` — `str` ...
-///
-/// # Returns
-/// `Result<()`.
 ///
 /// @param col : ColRef
 /// @param new_name : str
@@ -656,13 +407,6 @@ pub fn rename_column(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 
 /// Add a row from name-value pairs. Missing columns receive `Nil`.
 ///
-///
-/// # Parameters
-/// - `values` — `[(String, CellValue)]` ...
-///
-/// # Returns
-/// `integer`.
-///
 /// @param values : [(String, CellValue)]
 /// @return integer
 pub fn add_row(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
@@ -671,13 +415,6 @@ pub fn add_row(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 
 /// Remove a row by 0-based index. Returns the removed value if present, or `None` when the key did not exist.
 ///
-///
-/// # Parameters
-/// - `row` — `integer` ...
-///
-/// # Returns
-/// `Result<()`.
-///
 /// @param row : integer
 /// @return Result<()
 pub fn remove_row(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
@@ -685,15 +422,6 @@ pub fn remove_row(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 }
 
 /// Set a single cell value (0-based row, ColRef for column).
-///
-///
-/// # Parameters
-/// - `row` — `integer` ...
-/// - `col` — `ColRef` ...
-/// - `val` — `CellValue` ...
-///
-/// # Returns
-/// `Result<()`.
 ///
 /// @param row : integer
 /// @param col : ColRef
@@ -705,14 +433,6 @@ pub fn set_value(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 
 /// Create a DataFrame from raw column names and column-major data.
 ///
-///
-/// # Parameters
-/// - `column_names` — `table` ...
-/// - `data` — `table` ...
-///
-/// # Returns
-/// `Self`.
-///
 /// @param column_names : table
 /// @param data : table
 /// @return Self
@@ -721,15 +441,6 @@ pub fn from_raw(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 }
 
 /// Generate a DataFrame with random data. Consult the module-level documentation for the broader usage context and preconditions.
-///
-///
-/// # Parameters
-/// - `defs` — `[(String, String)]` ...
-/// - `n_rows` — `integer` ...
-/// - `seed` — `integer?` ...
-///
-/// # Returns
-/// `DataFrame`.
 ///
 /// @param defs : [(String, String)]
 /// @param n_rows : integer
@@ -742,10 +453,6 @@ pub fn random(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 /// Add or replace a table. The insertion is O(1) amortised unless a resize is triggered.
 ///
 ///
-/// # Parameters
-/// - `name` — `str` ...
-/// - `df` — `DataFrame` ...
-///
 /// @param name : str
 /// @param df : DataFrame
 pub fn add_table(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
@@ -754,13 +461,6 @@ pub fn add_table(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 
 /// Get a mutable reference to a table by name.
 ///
-///
-/// # Parameters
-/// - `name` — `str` ...
-///
-/// # Returns
-/// `Option<`.
-///
 /// @param name : str
 /// @return Option<
 pub fn get_table_mut(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
@@ -768,13 +468,6 @@ pub fn get_table_mut(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 }
 
 /// Remove a table by name. Returns error if not found.
-///
-///
-/// # Parameters
-/// - `name` — `str` ...
-///
-/// # Returns
-/// `Result<()`.
 ///
 /// @param name : str
 /// @return Result<()
@@ -785,25 +478,12 @@ pub fn remove_table(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 /// Merge all tables from `other` into this database.
 ///
 ///
-/// # Parameters
-/// - `other` — `Database` ...
-///
 /// @param other : Database
 pub fn merge(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
     todo!()
 }
 
 /// Join with another DataFrame on matching columns.
-///
-///
-/// # Parameters
-/// - `other` — `DataFrame` ...
-/// - `this_col` — `ColRef` ...
-/// - `other_col` — `ColRef` ...
-/// - `join_type` — `str` ...
-///
-/// # Returns
-/// `Result<DataFrame`.
 ///
 /// @param other : DataFrame
 /// @param this_col : ColRef
@@ -817,19 +497,8 @@ pub fn join(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 /// Append rows from another DataFrame in-place. Adds missing columns as Nil.
 ///
 ///
-/// # Parameters
-/// - `other` — `DataFrame` ...
-///
 /// @param other : DataFrame
 /// Replace Nil values in a column with the given value (in-place).
-///
-///
-/// # Parameters
-/// - `col` — `ColRef` ...
-/// - `val` — `CellValue` ...
-///
-/// # Returns
-/// `Result<()`.
 ///
 /// @param col : ColRef
 /// @param val : CellValue
@@ -840,13 +509,6 @@ pub fn fill_nil(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 
 /// Parse a CSV string into a DataFrame. Returns a fully initialised instance with all fields set to their initial values.
 ///
-///
-/// # Parameters
-/// - `s` — `str` ...
-///
-/// # Returns
-/// `Result<DataFrame`.
-///
 /// @param s : str
 /// @return Result<DataFrame
 pub fn from_csv(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
@@ -854,13 +516,6 @@ pub fn from_csv(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 }
 
 /// Parse JSON (array-of-objects) into a DataFrame.
-///
-///
-/// # Parameters
-/// - `s` — `str` ...
-///
-/// # Returns
-/// `Result<DataFrame`.
 ///
 /// @param s : str
 /// @return Result<DataFrame
@@ -870,13 +525,6 @@ pub fn from_json(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 
 /// Deserialize a DataFrame from LVDF binary format.
 ///
-///
-/// # Parameters
-/// - `data` — `[u8]` ...
-///
-/// # Returns
-/// `Result<DataFrame`.
-///
 /// @param data : [u8]
 /// @return Result<DataFrame
 pub fn from_binary(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
@@ -884,14 +532,6 @@ pub fn from_binary(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 }
 
 /// Execute a SQL query on a single DataFrame.
-///
-///
-/// # Parameters
-/// - `df` — `DataFrame` ...
-/// - `sql` — `str` ...
-///
-/// # Returns
-/// `Result<DataFrame`.
 ///
 /// @param df : DataFrame
 /// @param sql : str
@@ -902,14 +542,6 @@ pub fn query_sql(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 
 /// Execute a SQL query on a Database (supports FROM and JOIN).
 ///
-///
-/// # Parameters
-/// - `db` — `Database` ...
-/// - `sql` — `str` ...
-///
-/// # Returns
-/// `Result<DataFrame`.
-///
 /// @param db : Database
 /// @param sql : str
 /// @return Result<DataFrame
@@ -918,14 +550,6 @@ pub fn query_sql_database(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()>
 }
 
 /// Registers the `luna.dataframe` API table.
-///
-/// # Parameters
-/// - `lua` — `&Lua` The Lua VM.
-/// - `luna` — `&LuaTable<'_>` The top-level `luna` table.
-/// - `state` — `Rc<RefCell<SharedState>>` Shared engine state.
-///
-/// # Returns
-/// `LuaResult<()>`.
 pub fn register(
     lua: &Lua,
     luna: &mlua::Table,

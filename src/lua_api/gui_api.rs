@@ -21,9 +21,6 @@ impl LuaComboBox {
     /// Get the currently selected item text, if any.
     ///
     ///
-    /// # Returns
-    /// `Option<`.
-    ///
     /// @return Option<
     pub fn selected_item(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
         todo!()
@@ -45,18 +42,12 @@ impl LuaGraphRenderer {
     /// Returns the names of all registered series.
     ///
     ///
-    /// # Returns
-    /// `table`.
-    ///
     /// @return table
     pub fn get_series_names(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
         todo!()
     }
     /// Returns the current cursor position in data coordinates.
     ///
-    ///
-    /// # Returns
-    /// `Option<(f64`.
     ///
     /// @return Option<(f64
     pub fn get_cursor_value(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
@@ -65,10 +56,6 @@ impl LuaGraphRenderer {
     /// Maps world (data) coordinates to viewport screen-pixel coordinates.
     ///
     ///
-    /// # Parameters
-    /// - `wx` — `number` ...
-    /// - `wy` — `number` ...
-    ///
     /// @param wx : number
     /// @param wy : number
     pub fn world_to_screen(&self, _lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
@@ -76,10 +63,6 @@ impl LuaGraphRenderer {
     }
     /// Maps viewport screen-pixel coordinates back to world (data) coordinates.
     ///
-    ///
-    /// # Parameters
-    /// - `sx` — `number` ...
-    /// - `sy` — `number` ...
     ///
     /// @param sx : number
     /// @param sy : number
@@ -106,21 +89,11 @@ impl LuaGuiContext {
     /// Return the number of widgets in the pool (including the root).
     ///
     ///
-    /// # Returns
-    /// `integer`.
-    ///
     /// @return integer
     pub fn widget_count(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
         todo!()
     }
     /// Count the children of a container widget.
-    ///
-    ///
-    /// # Parameters
-    /// - `widget_idx` — `integer` ...
-    ///
-    /// # Returns
-    /// `integer`.
     ///
     /// @param widget_idx : integer
     /// @return integer
@@ -130,23 +103,12 @@ impl LuaGuiContext {
     /// Return the number of active (non-expired) toast notifications.
     ///
     ///
-    /// # Returns
-    /// `integer`.
-    ///
     /// @return integer
     pub fn toast_count(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
         todo!()
     }
     /// Recursively search for a widget by its `id` string, starting from
     /// `start_idx`.
-    ///
-    ///
-    /// # Parameters
-    /// - `start_idx` — `integer` ...
-    /// - `id` — `str` ...
-    ///
-    /// # Returns
-    /// `integer?`.
     ///
     /// @param start_idx : integer
     /// @param id : str
@@ -179,9 +141,6 @@ impl LuaLayout {
     /// `self.children`.
     ///
     ///
-    /// # Parameters
-    /// - `bases` — `mut [WidgetBase]` ...
-    ///
     /// @param bases : mut [WidgetBase]
     pub fn perform_layout(&self, _lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
         todo!()
@@ -202,9 +161,6 @@ pub struct LuaListBox(/* TODO: add key + state fields */);
 impl LuaListBox {
     /// Get the currently selected item text, if any.
     ///
-    ///
-    /// # Returns
-    /// `Option<`.
     ///
     /// @return Option<
     pub fn selected_item(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
@@ -231,9 +187,6 @@ impl LuaNinePatch {
     /// the widget.
     ///
     ///
-    /// # Returns
-    /// `Vec<(f32`.
-    ///
     /// @return Vec<(f32
     pub fn get_slices(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
         todo!()
@@ -254,9 +207,6 @@ pub struct LuaProgressBar(/* TODO: add key + state fields */);
 impl LuaProgressBar {
     /// Return the normalized progress in `[0.0, 1.0]`.
     ///
-    ///
-    /// # Returns
-    /// `number`.
     ///
     /// @return number
     pub fn progress(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
@@ -281,14 +231,6 @@ impl LuaTheme {
     /// Falls back to the `Normal` state entry if no state-specific entry
     /// exists.  Returns `None` only if the type has no theme entries at all.
     ///
-    ///
-    /// # Parameters
-    /// - `widget_type` — `WidgetType` ...
-    /// - `state` — `WidgetState` ...
-    ///
-    /// # Returns
-    /// `Option<`.
-    ///
     /// @param widget_type : WidgetType
     /// @param state : WidgetState
     /// @return Option<
@@ -312,18 +254,12 @@ impl LuaToast {
     /// Return the progress through the toast's lifetime as `[0.0, 1.0]`.
     ///
     ///
-    /// # Returns
-    /// `number`.
-    ///
     /// @return number
     pub fn progress(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
         todo!()
     }
     /// Return `true` if the toast has exceeded its display duration.
     ///
-    ///
-    /// # Returns
-    /// `boolean`.
     ///
     /// @return boolean
     pub fn is_expired(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
@@ -346,26 +282,12 @@ pub struct LuaToolbar(/* TODO: add key + state fields */);
 impl LuaToolbar {
     /// Return the 0-based index of the button with the given `id`, or `None`.
     ///
-    ///
-    /// # Parameters
-    /// - `id` — `str` ...
-    ///
-    /// # Returns
-    /// `integer?`.
-    ///
     /// @param id : str
     /// @return integer?
     pub fn get_button_index(&self, _lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
         todo!()
     }
     /// Return whether the button identified by `id` is in the toggled state.
-    ///
-    ///
-    /// # Parameters
-    /// - `id` — `str` ...
-    ///
-    /// # Returns
-    /// `boolean?`.
     ///
     /// @param id : str
     /// @return boolean?
@@ -390,21 +312,11 @@ impl LuaTreeView {
     /// Return the total number of nodes.
     ///
     ///
-    /// # Returns
-    /// `integer`.
-    ///
     /// @return integer
     pub fn node_count(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
         todo!()
     }
     /// Return the display text of the node at `index`, or `None` if out of range.
-    ///
-    ///
-    /// # Parameters
-    /// - `index` — `integer` ...
-    ///
-    /// # Returns
-    /// `Option<`.
     ///
     /// @param index : integer
     /// @return Option<
@@ -412,13 +324,6 @@ impl LuaTreeView {
         todo!()
     }
     /// Return whether the node at `index` is expanded.
-    ///
-    ///
-    /// # Parameters
-    /// - `index` — `integer` ...
-    ///
-    /// # Returns
-    /// `boolean?`.
     ///
     /// @param index : integer
     /// @return boolean?
@@ -428,21 +333,11 @@ impl LuaTreeView {
     /// Return the selected node index, or `None` if nothing is selected.
     ///
     ///
-    /// # Returns
-    /// `integer?`.
-    ///
     /// @return integer?
     pub fn get_selected_node(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
         todo!()
     }
     /// Return a slice of child indices for the node at `index`.
-    ///
-    ///
-    /// # Parameters
-    /// - `index` — `integer` ...
-    ///
-    /// # Returns
-    /// `Option<`.
     ///
     /// @param index : integer
     /// @return Option<
@@ -454,13 +349,6 @@ impl LuaTreeView {
     /// Returns `Some(None)` for root-level nodes and `None` if the index is
     /// out of range.
     ///
-    ///
-    /// # Parameters
-    /// - `index` — `integer` ...
-    ///
-    /// # Returns
-    /// `integer??`.
-    ///
     /// @param index : integer
     /// @return integer??
     pub fn get_parent_node(&self, _lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
@@ -469,13 +357,6 @@ impl LuaTreeView {
     /// Return the depth of the node at `index` (0 for root-level nodes).
     ///
     /// Traverses the parent chain; returns `None` if the index is out of range.
-    ///
-    ///
-    /// # Parameters
-    /// - `index` — `integer` ...
-    ///
-    /// # Returns
-    /// `integer?`.
     ///
     /// @param index : integer
     /// @return integer?
@@ -505,14 +386,6 @@ impl LuaWidgetBase {
     /// Test whether a point `(px, py)` lies within this widget's bounding
     /// rectangle.
     ///
-    ///
-    /// # Parameters
-    /// - `px` — `number` ...
-    /// - `py` — `number` ...
-    ///
-    /// # Returns
-    /// `boolean`.
-    ///
     /// @param px : number
     /// @param py : number
     /// @return boolean
@@ -536,9 +409,6 @@ impl LuaWidgetKind {
     /// Return the child indices if this widget is a container type.
     ///
     ///
-    /// # Returns
-    /// `Option<`.
-    ///
     /// @return Option<
     pub fn children(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
         todo!()
@@ -555,13 +425,6 @@ impl UserData for LuaWidgetKind {
 
 /// Parse a direction string.  Accepted: `"vertical"`, `"horizontal"`, `"grid"`.
 ///
-///
-/// # Parameters
-/// - `s` — `str` ...
-///
-/// # Returns
-/// `LayoutDirection?`.
-///
 /// @param s : str
 /// @return LayoutDirection?
 pub fn parse_str(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
@@ -571,22 +434,12 @@ pub fn parse_str(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 /// Return mutable child indices if this widget is a container type.
 ///
 ///
-/// # Returns
-/// `Option<`.
-///
 /// @return Option<
 pub fn children_mut(_lua: &Lua, _: ()) -> LuaResult<()> {
     todo!()
 }
 
 /// Add a button and return its pool index.
-///
-///
-/// # Parameters
-/// - `text` — `impl Into<String>` ...
-///
-/// # Returns
-/// `integer`.
 ///
 /// @param text : impl Into<String>
 /// @return integer
@@ -595,13 +448,6 @@ pub fn add_button(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 }
 
 /// Add a label and return its pool index.
-///
-///
-/// # Parameters
-/// - `text` — `impl Into<String>` ...
-///
-/// # Returns
-/// `integer`.
 ///
 /// @param text : impl Into<String>
 /// @return integer
@@ -612,22 +458,12 @@ pub fn add_label(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 /// Add a text input and return its pool index.
 ///
 ///
-/// # Returns
-/// `integer`.
-///
 /// @return integer
 pub fn add_text_input(_lua: &Lua, _: ()) -> LuaResult<()> {
     todo!()
 }
 
 /// Add a check box and return its pool index.
-///
-///
-/// # Parameters
-/// - `text` — `impl Into<String>` ...
-///
-/// # Returns
-/// `integer`.
 ///
 /// @param text : impl Into<String>
 /// @return integer
@@ -637,14 +473,6 @@ pub fn add_checkbox(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 
 /// Add a slider and return its pool index.
 ///
-///
-/// # Parameters
-/// - `min` — `number` ...
-/// - `max` — `number` ...
-///
-/// # Returns
-/// `integer`.
-///
 /// @param min : number
 /// @param max : number
 /// @return integer
@@ -653,14 +481,6 @@ pub fn add_slider(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 }
 
 /// Add a progress bar and return its pool index.
-///
-///
-/// # Parameters
-/// - `min` — `number` ...
-/// - `max` — `number` ...
-///
-/// # Returns
-/// `integer`.
 ///
 /// @param min : number
 /// @param max : number
@@ -672,9 +492,6 @@ pub fn add_progress_bar(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 /// Add a combo box and return its pool index.
 ///
 ///
-/// # Returns
-/// `integer`.
-///
 /// @return integer
 pub fn add_combo_box(_lua: &Lua, _: ()) -> LuaResult<()> {
     todo!()
@@ -682,9 +499,6 @@ pub fn add_combo_box(_lua: &Lua, _: ()) -> LuaResult<()> {
 
 /// Add a list box and return its pool index.
 ///
-///
-/// # Returns
-/// `integer`.
 ///
 /// @return integer
 pub fn add_list_box(_lua: &Lua, _: ()) -> LuaResult<()> {
@@ -694,22 +508,12 @@ pub fn add_list_box(_lua: &Lua, _: ()) -> LuaResult<()> {
 /// Add a panel and return its pool index.
 ///
 ///
-/// # Returns
-/// `integer`.
-///
 /// @return integer
 pub fn add_panel(_lua: &Lua, _: ()) -> LuaResult<()> {
     todo!()
 }
 
 /// Add a layout and return its pool index.
-///
-///
-/// # Parameters
-/// - `direction` — `LayoutDirection` ...
-///
-/// # Returns
-/// `integer`.
 ///
 /// @param direction : LayoutDirection
 /// @return integer
@@ -720,9 +524,6 @@ pub fn add_layout(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 /// Add a scroll panel and return its pool index.
 ///
 ///
-/// # Returns
-/// `integer`.
-///
 /// @return integer
 pub fn add_scroll_panel(_lua: &Lua, _: ()) -> LuaResult<()> {
     todo!()
@@ -730,9 +531,6 @@ pub fn add_scroll_panel(_lua: &Lua, _: ()) -> LuaResult<()> {
 
 /// Add a nine-patch and return its pool index.
 ///
-///
-/// # Returns
-/// `integer`.
 ///
 /// @return integer
 pub fn add_nine_patch(_lua: &Lua, _: ()) -> LuaResult<()> {
@@ -742,22 +540,12 @@ pub fn add_nine_patch(_lua: &Lua, _: ()) -> LuaResult<()> {
 /// Add a tab bar and return its pool index.
 ///
 ///
-/// # Returns
-/// `integer`.
-///
 /// @return integer
 pub fn add_tab_bar(_lua: &Lua, _: ()) -> LuaResult<()> {
     todo!()
 }
 
 /// Add a separator and return its pool index.
-///
-///
-/// # Parameters
-/// - `vertical` — `boolean` ...
-///
-/// # Returns
-/// `integer`.
 ///
 /// @param vertical : boolean
 /// @return integer
@@ -766,14 +554,6 @@ pub fn add_separator(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 }
 
 /// Add a spacer and return its pool index.
-///
-///
-/// # Parameters
-/// - `width` — `number` ...
-/// - `height` — `number` ...
-///
-/// # Returns
-/// `integer`.
 ///
 /// @param width : number
 /// @param height : number
@@ -785,23 +565,12 @@ pub fn add_spacer(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 /// Add a tree view and return its pool index.
 ///
 ///
-/// # Returns
-/// `integer`.
-///
 /// @return integer
 pub fn add_tree_view(_lua: &Lua, _: ()) -> LuaResult<()> {
     todo!()
 }
 
 /// Add a radio button and return its pool index.
-///
-///
-/// # Parameters
-/// - `text` — `impl Into<String>` ...
-/// - `group` — `impl Into<String>` ...
-///
-/// # Returns
-/// `integer`.
 ///
 /// @param text : impl Into<String>
 /// @param group : impl Into<String>
@@ -812,13 +581,6 @@ pub fn add_radio_button(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 
 /// Add a scroll bar and return its pool index.
 ///
-///
-/// # Parameters
-/// - `vertical` — `boolean` ...
-///
-/// # Returns
-/// `integer`.
-///
 /// @param vertical : boolean
 /// @return integer
 pub fn add_scroll_bar(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
@@ -827,13 +589,6 @@ pub fn add_scroll_bar(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 
 /// Add a GUI window and return its pool index.
 ///
-///
-/// # Parameters
-/// - `title` — `impl Into<String>` ...
-///
-/// # Returns
-/// `integer`.
-///
 /// @param title : impl Into<String>
 /// @return integer
 pub fn add_gui_window(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
@@ -841,13 +596,6 @@ pub fn add_gui_window(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 }
 
 /// Add a split panel and return its pool index.
-///
-///
-/// # Parameters
-/// - `orientation` — `impl Into<String>` ...
-///
-/// # Returns
-/// `integer`.
 ///
 /// @param orientation : impl Into<String>
 /// @return integer
@@ -858,22 +606,12 @@ pub fn add_split_panel(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 /// Add a dock panel and return its pool index.
 ///
 ///
-/// # Returns
-/// `integer`.
-///
 /// @return integer
 pub fn add_dock_panel(_lua: &Lua, _: ()) -> LuaResult<()> {
     todo!()
 }
 
 /// Add a toolbar and return its pool index.
-///
-///
-/// # Parameters
-/// - `orientation` — `impl Into<String>` ...
-///
-/// # Returns
-/// `integer`.
 ///
 /// @param orientation : impl Into<String>
 /// @return integer
@@ -884,22 +622,12 @@ pub fn add_toolbar(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 /// Add a menu bar and return its pool index.
 ///
 ///
-/// # Returns
-/// `integer`.
-///
 /// @return integer
 pub fn add_menu_bar(_lua: &Lua, _: ()) -> LuaResult<()> {
     todo!()
 }
 
 /// Add a menu item and return its pool index.
-///
-///
-/// # Parameters
-/// - `text` — `impl Into<String>` ...
-///
-/// # Returns
-/// `integer`.
 ///
 /// @param text : impl Into<String>
 /// @return integer
@@ -908,13 +636,6 @@ pub fn add_menu_item(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 }
 
 /// Add a dialog and return its pool index.
-///
-///
-/// # Parameters
-/// - `title` — `impl Into<String>` ...
-///
-/// # Returns
-/// `integer`.
 ///
 /// @param title : impl Into<String>
 /// @return integer
@@ -925,9 +646,6 @@ pub fn add_dialog(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 /// Add a status bar and return its pool index.
 ///
 ///
-/// # Returns
-/// `integer`.
-///
 /// @return integer
 pub fn add_status_bar(_lua: &Lua, _: ()) -> LuaResult<()> {
     todo!()
@@ -936,22 +654,12 @@ pub fn add_status_bar(_lua: &Lua, _: ()) -> LuaResult<()> {
 /// Add an accordion and return its pool index.
 ///
 ///
-/// # Returns
-/// `integer`.
-///
 /// @return integer
 pub fn add_accordion(_lua: &Lua, _: ()) -> LuaResult<()> {
     todo!()
 }
 
 /// Add a tooltip panel and return its pool index.
-///
-///
-/// # Parameters
-/// - `text` — `impl Into<String>` ...
-///
-/// # Returns
-/// `integer`.
 ///
 /// @param text : impl Into<String>
 /// @return integer
@@ -962,9 +670,6 @@ pub fn add_tooltip_panel(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> 
 /// Add a color picker and return its pool index.
 ///
 ///
-/// # Returns
-/// `integer`.
-///
 /// @return integer
 pub fn add_color_picker(_lua: &Lua, _: ()) -> LuaResult<()> {
     todo!()
@@ -973,9 +678,6 @@ pub fn add_color_picker(_lua: &Lua, _: ()) -> LuaResult<()> {
 /// Add a GUI table and return its pool index.
 ///
 ///
-/// # Returns
-/// `integer`.
-///
 /// @return integer
 pub fn add_gui_table(_lua: &Lua, _: ()) -> LuaResult<()> {
     todo!()
@@ -983,9 +685,6 @@ pub fn add_gui_table(_lua: &Lua, _: ()) -> LuaResult<()> {
 
 /// Add an image widget and return its pool index.
 ///
-///
-/// # Returns
-/// `integer`.
 ///
 /// @return integer
 pub fn add_image_widget(_lua: &Lua, _: ()) -> LuaResult<()> {
@@ -996,14 +695,6 @@ pub fn add_image_widget(_lua: &Lua, _: ()) -> LuaResult<()> {
 ///
 /// Returns `false` if the parent is not a container or indices are invalid.
 ///
-///
-/// # Parameters
-/// - `parent_idx` — `integer` ...
-/// - `child_idx` — `integer` ...
-///
-/// # Returns
-/// `boolean`.
-///
 /// @param parent_idx : integer
 /// @param child_idx : integer
 /// @return boolean
@@ -1012,14 +703,6 @@ pub fn add_child(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 }
 
 /// Remove `child_idx` from the container at `parent_idx`.
-///
-///
-/// # Parameters
-/// - `parent_idx` — `integer` ...
-/// - `child_idx` — `integer` ...
-///
-/// # Returns
-/// `boolean`.
 ///
 /// @param parent_idx : integer
 /// @param child_idx : integer
@@ -1032,9 +715,6 @@ pub fn remove_child(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 /// previous widget.
 ///
 ///
-/// # Parameters
-/// - `widget_idx` — `integer?` ...
-///
 /// @param widget_idx : integer?
 pub fn set_focus(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
     todo!()
@@ -1043,9 +723,6 @@ pub fn set_focus(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 /// Queue a toast notification for display.
 ///
 ///
-/// # Parameters
-/// - `toast` — `Toast` ...
-///
 /// @param toast : Toast
 pub fn add_toast(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
     todo!()
@@ -1053,9 +730,6 @@ pub fn add_toast(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 
 /// Advance toast timers and remove expired toasts.
 ///
-///
-/// # Parameters
-/// - `dt` — `number` ...
 ///
 /// @param dt : number
 pub fn update(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
@@ -1067,15 +741,6 @@ pub fn update(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 /// Hit-tests all visible, enabled widgets and sets focus + state
 /// accordingly.
 ///
-///
-/// # Parameters
-/// - `x` — `number` ...
-/// - `y` — `number` ...
-/// - `_button` — `integer` ...
-///
-/// # Returns
-/// `boolean`.
-///
 /// @param x : number
 /// @param y : number
 /// @param _button : integer
@@ -1085,15 +750,6 @@ pub fn mouse_pressed(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 }
 
 /// Forward a mouse release event to the widget tree.
-///
-///
-/// # Parameters
-/// - `x` — `number` ...
-/// - `y` — `number` ...
-/// - `_button` — `integer` ...
-///
-/// # Returns
-/// `boolean`.
 ///
 /// @param x : number
 /// @param y : number
@@ -1105,14 +761,6 @@ pub fn mouse_released(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 
 /// Forward a mouse move event to update hover states.
 ///
-///
-/// # Parameters
-/// - `x` — `number` ...
-/// - `y` — `number` ...
-///
-/// # Returns
-/// `boolean`.
-///
 /// @param x : number
 /// @param y : number
 /// @return boolean
@@ -1123,13 +771,6 @@ pub fn mouse_moved(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 /// Forward a key press event.  Handles tab focus navigation and
 /// delegates to focused text inputs.
 ///
-///
-/// # Parameters
-/// - `key` — `str` ...
-///
-/// # Returns
-/// `boolean`.
-///
 /// @param key : str
 /// @return boolean
 pub fn key_pressed(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
@@ -1138,13 +779,6 @@ pub fn key_pressed(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 
 /// Forward a text input event to the focused text input widget.
 ///
-///
-/// # Parameters
-/// - `text` — `str` ...
-///
-/// # Returns
-/// `boolean`.
-///
 /// @param text : str
 /// @return boolean
 pub fn text_input(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
@@ -1152,14 +786,6 @@ pub fn text_input(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 }
 
 /// Forward a mouse wheel event.
-///
-///
-/// # Parameters
-/// - `_x` — `number` ...
-/// - `y` — `number` ...
-///
-/// # Returns
-/// `boolean`.
 ///
 /// @param _x : number
 /// @param y : number
@@ -1170,13 +796,6 @@ pub fn wheel_moved(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 
 /// Insert text at the cursor position, respecting `max_length`.
 ///
-///
-/// # Parameters
-/// - `input` — `str` ...
-///
-/// # Returns
-/// `boolean`.
-///
 /// @param input : str
 /// @return boolean
 pub fn insert_text(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
@@ -1185,9 +804,6 @@ pub fn insert_text(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 
 /// Delete the character before the cursor (backspace).
 ///
-///
-/// # Returns
-/// `boolean`.
 ///
 /// @return boolean
 pub fn backspace(_lua: &Lua, _: ()) -> LuaResult<()> {
@@ -1198,9 +814,6 @@ pub fn backspace(_lua: &Lua, _: ()) -> LuaResult<()> {
 /// snapping to `step` if non-zero.
 ///
 ///
-/// # Parameters
-/// - `v` — `number` ...
-///
 /// @param v : number
 pub fn set_value(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
     todo!()
@@ -1208,9 +821,6 @@ pub fn set_value(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 
 /// Add an item to the end of the list.
 ///
-///
-/// # Parameters
-/// - `text` — `impl Into<String>` ...
 ///
 /// @param text : impl Into<String>
 pub fn add_item(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
@@ -1221,13 +831,6 @@ pub fn add_item(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 ///
 /// Returns `false` if the index is out of bounds.
 ///
-///
-/// # Parameters
-/// - `index` — `integer` ...
-///
-/// # Returns
-/// `boolean`.
-///
 /// @param index : integer
 /// @return boolean
 pub fn remove_item(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
@@ -1237,26 +840,13 @@ pub fn remove_item(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 /// Add an item to the end of the list.
 ///
 ///
-/// # Parameters
-/// - `text` — `impl Into<String>` ...
-///
 /// @param text : impl Into<String>
 /// Remove an item at the given 0-based index.
-///
-///
-/// # Parameters
-/// - `index` — `integer` ...
-///
-/// # Returns
-/// `boolean`.
 ///
 /// @param index : integer
 /// @return boolean
 /// Add a tab with the given label.
 ///
-///
-/// # Parameters
-/// - `label` — `impl Into<String>` ...
 ///
 /// @param label : impl Into<String>
 pub fn add_tab(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
@@ -1264,13 +854,6 @@ pub fn add_tab(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 }
 
 /// Remove a tab at the given 0-based index.
-///
-///
-/// # Parameters
-/// - `index` — `integer` ...
-///
-/// # Returns
-/// `boolean`.
 ///
 /// @param index : integer
 /// @return boolean
@@ -1280,12 +863,6 @@ pub fn remove_tab(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 
 /// Sets the screen-pixel viewport for chart rendering.
 ///
-///
-/// # Parameters
-/// - `x` — `number` ...
-/// - `y` — `number` ...
-/// - `w` — `number` ...
-/// - `h` — `number` ...
 ///
 /// @param x : number
 /// @param y : number
@@ -1298,12 +875,6 @@ pub fn set_viewport(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 /// Sets the world (data) coordinate range. Replaces the current range value; callers hold responsibility for maintaining consistency with related fields.
 ///
 ///
-/// # Parameters
-/// - `x_min` — `number` ...
-/// - `x_max` — `number` ...
-/// - `y_min` — `number` ...
-/// - `y_max` — `number` ...
-///
 /// @param x_min : number
 /// @param x_max : number
 /// @param y_min : number
@@ -1315,11 +886,6 @@ pub fn set_range(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 /// Adds a line series with the given name, data points, and color.
 ///
 ///
-/// # Parameters
-/// - `name` — `str` ...
-/// - `points` — `table` ...
-/// - `color` — `Color` ...
-///
 /// @param name : str
 /// @param points : table
 /// @param color : Color
@@ -1329,12 +895,6 @@ pub fn add_line_series(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 
 /// Adds a scatter series. The insertion is O(1) amortised unless a resize is triggered.
 ///
-///
-/// # Parameters
-/// - `name` — `str` ...
-/// - `points` — `table` ...
-/// - `color` — `Color` ...
-/// - `size` — `number` ...
 ///
 /// @param name : str
 /// @param points : table
@@ -1347,11 +907,6 @@ pub fn add_scatter_series(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()>
 /// Adds a bar series. Each value maps to category index 0, 1, 2, ….
 ///
 ///
-/// # Parameters
-/// - `name` — `str` ...
-/// - `values` — `table` ...
-/// - `color` — `Color` ...
-///
 /// @param name : str
 /// @param values : table
 /// @param color : Color
@@ -1360,13 +915,6 @@ pub fn add_bar_series(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 }
 
 /// Removes a series by name. Returns `true` if it existed.
-///
-///
-/// # Parameters
-/// - `name` — `str` ...
-///
-/// # Returns
-/// `boolean`.
 ///
 /// @param name : str
 /// @return boolean
@@ -1377,9 +925,6 @@ pub fn remove_series(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 /// Enables or disables the background grid.
 ///
 ///
-/// # Parameters
-/// - `b` — `boolean` ...
-///
 /// @param b : boolean
 pub fn set_show_grid(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
     todo!()
@@ -1387,9 +932,6 @@ pub fn set_show_grid(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 
 /// Enables or disables the x/y axes. Replaces the current show axes value; callers hold responsibility for maintaining consistency with related fields.
 ///
-///
-/// # Parameters
-/// - `b` — `boolean` ...
 ///
 /// @param b : boolean
 pub fn set_show_axes(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
@@ -1399,9 +941,6 @@ pub fn set_show_axes(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 /// Enables or disables axis labels and chart title.
 ///
 ///
-/// # Parameters
-/// - `b` — `boolean` ...
-///
 /// @param b : boolean
 pub fn set_show_labels(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
     todo!()
@@ -1409,9 +948,6 @@ pub fn set_show_labels(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 
 /// Sets the grid line color. Replaces the current grid color value; callers hold responsibility for maintaining consistency with related fields.
 ///
-///
-/// # Parameters
-/// - `c` — `Color` ...
 ///
 /// @param c : Color
 pub fn set_grid_color(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
@@ -1421,9 +957,6 @@ pub fn set_grid_color(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 /// Sets the axis line color. Replaces the current axis color value; callers hold responsibility for maintaining consistency with related fields.
 ///
 ///
-/// # Parameters
-/// - `c` — `Color` ...
-///
 /// @param c : Color
 pub fn set_axis_color(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
     todo!()
@@ -1431,9 +964,6 @@ pub fn set_axis_color(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 
 /// Sets the chart background color. Replaces the current bg color value; callers hold responsibility for maintaining consistency with related fields.
 ///
-///
-/// # Parameters
-/// - `c` — `Color` ...
 ///
 /// @param c : Color
 pub fn set_bg_color(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
@@ -1443,9 +973,6 @@ pub fn set_bg_color(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 /// Sets the chart title. Replaces the current title value; callers hold responsibility for maintaining consistency with related fields.
 ///
 ///
-/// # Parameters
-/// - `text` — `str` ...
-///
 /// @param text : str
 pub fn set_title(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
     todo!()
@@ -1453,10 +980,6 @@ pub fn set_title(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 
 /// Sets the x-axis and y-axis labels. Replaces the current axis labels value; callers hold responsibility for maintaining consistency with related fields.
 ///
-///
-/// # Parameters
-/// - `x_label` — `str` ...
-/// - `y_label` — `str` ...
 ///
 /// @param x_label : str
 /// @param y_label : str
@@ -1467,10 +990,6 @@ pub fn set_axis_labels(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 /// Sets the cursor position in data (world) coordinates.
 ///
 ///
-/// # Parameters
-/// - `x` — `number` ...
-/// - `y` — `number` ...
-///
 /// @param x : number
 /// @param y : number
 pub fn set_cursor_position(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
@@ -1480,23 +999,12 @@ pub fn set_cursor_position(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()
 /// Advance the elapsed timer by `dt` seconds.
 ///
 ///
-/// # Parameters
-/// - `dt` — `number` ...
-///
 /// @param dt : number
 /// Add a node to the tree.
 ///
 /// If `parent_index` is `None`, the node is a root-level entry.
 /// If `parent_index` is `Some(idx)`, the node is added as a child of node
 /// at index `idx`.
-///
-///
-/// # Parameters
-/// - `text` — `impl Into<String>` ...
-/// - `parent_index` — `integer?` ...
-///
-/// # Returns
-/// `integer`.
 ///
 /// @param text : impl Into<String>
 /// @param parent_index : integer?
@@ -1506,13 +1014,6 @@ pub fn add_node(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 }
 
 /// Toggle the expanded state of a node.
-///
-///
-/// # Parameters
-/// - `index` — `integer` ...
-///
-/// # Returns
-/// `boolean`.
 ///
 /// @param index : integer
 /// @return boolean
@@ -1524,13 +1025,6 @@ pub fn toggle_node(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 /// all stored indices that follow.  Children of the removed node are
 /// orphaned (their `parent` becomes `None`).
 ///
-///
-/// # Parameters
-/// - `index` — `integer` ...
-///
-/// # Returns
-/// `boolean`.
-///
 /// @param index : integer
 /// @return boolean
 pub fn remove_node(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
@@ -1538,14 +1032,6 @@ pub fn remove_node(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 }
 
 /// Set the display text of the node at `index`.
-///
-///
-/// # Parameters
-/// - `index` — `integer` ...
-/// - `text` — `impl Into<String>` ...
-///
-/// # Returns
-/// `boolean`.
 ///
 /// @param index : integer
 /// @param text : impl Into<String>
@@ -1558,14 +1044,6 @@ pub fn set_node_text(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 ///
 /// Passing an empty string clears the icon.
 ///
-///
-/// # Parameters
-/// - `index` — `integer` ...
-/// - `icon` — `impl Into<String>` ...
-///
-/// # Returns
-/// `boolean`.
-///
 /// @param index : integer
 /// @param icon : impl Into<String>
 /// @return boolean
@@ -1575,13 +1053,6 @@ pub fn set_node_icon(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 
 /// Expand the node at `index` (make its children visible).
 ///
-///
-/// # Parameters
-/// - `index` — `integer` ...
-///
-/// # Returns
-/// `boolean`.
-///
 /// @param index : integer
 /// @return boolean
 pub fn expand_node(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
@@ -1589,13 +1060,6 @@ pub fn expand_node(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 }
 
 /// Collapse the node at `index` (hide its children).
-///
-///
-/// # Parameters
-/// - `index` — `integer` ...
-///
-/// # Returns
-/// `boolean`.
 ///
 /// @param index : integer
 /// @return boolean
@@ -1606,13 +1070,6 @@ pub fn collapse_node(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 /// Set the selected node.
 ///
 /// Passing an out-of-range index clears the selection and returns `false`.
-///
-///
-/// # Parameters
-/// - `index` — `integer` ...
-///
-/// # Returns
-/// `boolean`.
 ///
 /// @param index : integer
 /// @return boolean
@@ -1625,14 +1082,6 @@ pub fn set_selected_node(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> 
 /// If a button with the same `id` already exists, its existing index is
 /// returned without creating a duplicate.
 ///
-///
-/// # Parameters
-/// - `id` — `impl Into<String>` ...
-/// - `tooltip` — `impl Into<String>` ...
-///
-/// # Returns
-/// `integer`.
-///
 /// @param id : impl Into<String>
 /// @param tooltip : impl Into<String>
 /// @return integer
@@ -1641,19 +1090,8 @@ pub fn set_selected_node(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> 
 /// This is a placeholder; layout and rendering are handled externally.
 ///
 ///
-/// # Parameters
-/// - `_width` — `number` ...
-///
 /// @param _width : number
 /// Enable or disable the button identified by `id`.
-///
-///
-/// # Parameters
-/// - `id` — `str` ...
-/// - `enabled` — `boolean` ...
-///
-/// # Returns
-/// `boolean`.
 ///
 /// @param id : str
 /// @param enabled : boolean
@@ -1664,14 +1102,6 @@ pub fn set_button_enabled(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()>
 
 /// Set the toggled (latched pressed) state of the button identified by `id`.
 ///
-///
-/// # Parameters
-/// - `id` — `str` ...
-/// - `toggled` — `boolean` ...
-///
-/// # Returns
-/// `boolean`.
-///
 /// @param id : str
 /// @param toggled : boolean
 /// @return boolean
@@ -1681,11 +1111,6 @@ pub fn set_button_toggled(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()>
 
 /// Insert or replace a style entry for the given widget type and state.
 ///
-///
-/// # Parameters
-/// - `widget_type` — `WidgetType` ...
-/// - `state` — `WidgetState` ...
-/// - `style` — `WidgetStyle` ...
 ///
 /// @param widget_type : WidgetType
 /// @param state : WidgetState
@@ -1699,24 +1124,9 @@ pub fn set_style(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 /// Accepted values (case-sensitive): `"normal"`, `"hovered"`, `"pressed"`,
 /// `"focused"`, `"disabled"`.
 ///
-///
-/// # Parameters
-/// - `s` — `str` ...
-///
-/// # Returns
-/// `WidgetState?`.
-///
 /// @param s : str
 /// @return WidgetState?
 /// Registers the `luna.gui` API table.
-///
-/// # Parameters
-/// - `lua` — `&Lua` The Lua VM.
-/// - `luna` — `&LuaTable<'_>` The top-level `luna` table.
-/// - `state` — `Rc<RefCell<SharedState>>` Shared engine state.
-///
-/// # Returns
-/// `LuaResult<()>`.
 pub fn register(
     lua: &Lua,
     luna: &mlua::Table,

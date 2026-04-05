@@ -15,15 +15,6 @@ use crate::engine::SharedState;
 
 /// Generates a cave/dungeon map using cellular automata.
 ///
-///
-/// # Parameters
-/// - `width` — `integer` ...
-/// - `height` — `integer` ...
-/// - `opts` — `CellularOpts` ...
-///
-/// # Returns
-/// `table`.
-///
 /// @param width : integer
 /// @param height : integer
 /// @param opts : CellularOpts
@@ -33,19 +24,6 @@ pub fn cellular_automata(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> 
 }
 
 /// BFS flood fill on a grid. Consult the module-level documentation for the broader usage context and preconditions.
-///
-///
-/// # Parameters
-/// - `data` — `[u8]` ...
-/// - `width` — `integer` ...
-/// - `height` — `integer` ...
-/// - `sx` — `integer` ...
-/// - `sy` — `integer` ...
-/// - `threshold` — `u8` ...
-/// - `above` — `boolean` ...
-///
-/// # Returns
-/// `table`.
 ///
 /// @param data : [u8]
 /// @param width : integer
@@ -61,16 +39,6 @@ pub fn flood_fill(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 
 /// Periodic Perlin noise that tiles over period (px, py).
 ///
-///
-/// # Parameters
-/// - `x` — `number` ...
-/// - `y` — `number` ...
-/// - `px` — `number` ...
-/// - `py` — `number` ...
-///
-/// # Returns
-/// `number`.
-///
 /// @param x : number
 /// @param y : number
 /// @param px : number
@@ -81,17 +49,6 @@ pub fn perlin_noise_periodic(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<
 }
 
 /// Generates Poisson disk sample points using Bridson's algorithm.
-///
-///
-/// # Parameters
-/// - `width` — `number` ...
-/// - `height` — `number` ...
-/// - `min_dist` — `number` ...
-/// - `max_attempts` — `integer` ...
-/// - `seed` — `integer` ...
-///
-/// # Returns
-/// `Vec<(f32`.
 ///
 /// @param width : number
 /// @param height : number
@@ -105,16 +62,6 @@ pub fn poisson_disk(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 
 /// Generates a Voronoi diagram. Consult the module-level documentation for the broader usage context and preconditions.
 ///
-///
-/// # Parameters
-/// - `width` — `integer` ...
-/// - `height` — `integer` ...
-/// - `points` — `[(f32, f32)]` ...
-/// - `opts` — `VoronoiOpts` ...
-///
-/// # Returns
-/// `Returns`.
-///
 /// @param width : integer
 /// @param height : integer
 /// @param points : [(f32, f32)]
@@ -125,14 +72,6 @@ pub fn voronoi_diagram(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 }
 
 /// Registers the `luna.procgen` API table.
-///
-/// # Parameters
-/// - `lua` — `&Lua` The Lua VM.
-/// - `luna` — `&LuaTable<'_>` The top-level `luna` table.
-/// - `state` — `Rc<RefCell<SharedState>>` Shared engine state.
-///
-/// # Returns
-/// `LuaResult<()>`.
 pub fn register(
     lua: &Lua,
     luna: &mlua::Table,

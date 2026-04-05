@@ -20,13 +20,6 @@ pub struct LuaPipeline(/* TODO: add key + state fields */);
 impl LuaPipeline {
     /// Returns a shared reference to the step with the given name, if it exists.
     ///
-    ///
-    /// # Parameters
-    /// - `name` — `str` ...
-    ///
-    /// # Returns
-    /// `Option<`.
-    ///
     /// @param name : str
     /// @return Option<
     pub fn get_step(&self, _lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
@@ -35,18 +28,12 @@ impl LuaPipeline {
     /// Returns an iterator over all steps in unspecified order.
     ///
     ///
-    /// # Returns
-    /// `impl`.
-    ///
     /// @return impl
     pub fn get_steps(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
         todo!()
     }
     /// Returns the total number of steps in the pipeline.
     ///
-    ///
-    /// # Returns
-    /// `integer`.
     ///
     /// @return integer
     pub fn get_step_count(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
@@ -56,9 +43,6 @@ impl LuaPipeline {
     ///
     /// Returns `Err` if a cycle is detected, naming the steps involved where possible.
     ///
-    ///
-    /// # Returns
-    /// `Result<Vec<String>`.
     ///
     /// @return Result<Vec<String>
     pub fn get_execution_order(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
@@ -72,9 +56,6 @@ impl LuaPipeline {
     ///
     /// Returns `Err` if there is a dependency cycle.
     ///
-    ///
-    /// # Returns
-    /// `Result<Vec<Vec<String>>`.
     ///
     /// @return Result<Vec<Vec<String>>
     pub fn get_parallel_groups(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
@@ -101,18 +82,12 @@ impl LuaPipelineResult {
     /// Returns `true` if no steps failed.
     ///
     ///
-    /// # Returns
-    /// `boolean`.
-    ///
     /// @return boolean
     pub fn is_success(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
         todo!()
     }
     /// Returns a human-readable one-line summary of this result.
     ///
-    ///
-    /// # Returns
-    /// `string`.
     ///
     /// @return string
     pub fn summary(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
@@ -133,13 +108,6 @@ impl UserData for LuaPipelineResult {
 ///
 /// Returns `Err` if a step with the same name already exists.
 ///
-///
-/// # Parameters
-/// - `step` — `PipelineStep` ...
-///
-/// # Returns
-/// `Result<()`.
-///
 /// @param step : PipelineStep
 /// @return Result<()
 pub fn add_step(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
@@ -150,13 +118,6 @@ pub fn add_step(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 ///
 /// Returns `true` if the step was found and removed, `false` if it did not exist.
 ///
-///
-/// # Parameters
-/// - `name` — `str` ...
-///
-/// # Returns
-/// `boolean`.
-///
 /// @param name : str
 /// @return boolean
 pub fn remove_step(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
@@ -164,13 +125,6 @@ pub fn remove_step(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 }
 
 /// Returns a mutable reference to the step with the given name, if it exists.
-///
-///
-/// # Parameters
-/// - `name` — `str` ...
-///
-/// # Returns
-/// `Option<`.
 ///
 /// @param name : str
 /// @return Option<
@@ -184,9 +138,6 @@ pub fn get_step_mut(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 /// the delay timer map with each step's configured delay.
 ///
 ///
-/// # Parameters
-/// - `pipeline` — `Pipeline` ...
-///
 /// @param pipeline : Pipeline
 pub fn start(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
     todo!()
@@ -196,14 +147,6 @@ pub fn start(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 /// whose delay has elapsed and that are ready to execute.
 ///
 /// A step is "ready" when its status is `Waiting` and its remaining timer is ≤ 0.
-///
-///
-/// # Parameters
-/// - `dt` — `number` ...
-/// - `pipeline` — `Pipeline` ...
-///
-/// # Returns
-/// `table`.
 ///
 /// @param dt : number
 /// @param pipeline : Pipeline
@@ -218,10 +161,6 @@ pub fn update(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 /// its delay is fetched from the pipeline definition.
 ///
 ///
-/// # Parameters
-/// - `name` — `str` ...
-/// - `pipeline` — `Pipeline` ...
-///
 /// @param name : str
 /// @param pipeline : Pipeline
 pub fn mark_step_waiting(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
@@ -229,14 +168,6 @@ pub fn mark_step_waiting(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> 
 }
 
 /// Registers the `luna.pipeline` API table.
-///
-/// # Parameters
-/// - `lua` — `&Lua` The Lua VM.
-/// - `luna` — `&LuaTable<'_>` The top-level `luna` table.
-/// - `state` — `Rc<RefCell<SharedState>>` Shared engine state.
-///
-/// # Returns
-/// `LuaResult<()>`.
 pub fn register(
     lua: &Lua,
     luna: &mlua::Table,

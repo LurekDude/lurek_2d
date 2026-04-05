@@ -739,9 +739,12 @@ def render_markdown(items: list[ApiItem], src_dir: Path = SRC_DIR) -> str:
 
 
 def _has_explicit_params(sig: str) -> bool:
-    """Return True if a fn signature has parameters other than self variants."""
+    """Return True if a fn has parameters other than self variants and Lua plumbing."""
+    # Pre-normalise _:()\n patterns so the [^)]* regex isn't confused by the
+    # closing paren inside `_: ()` — the unit-tuple "no Lua args" marker.
+    sig_norm = re.sub(r"_\s*:\s*\(\)", "_: __UNIT__", sig)
     # Anchor to fn name to skip pub(super)/pub(crate) visibility qualifiers.
-    m = re.search(r"\bfn\s+\w+(?:<[^>]*>)?\s*\(([^)]*)\)", sig)
+    m = re.search(r"\bfn\s+\w+(?:<[^>]*>)?\s*\(([^)]*)\)", sig_norm)
     if not m:
         return False
     params_str = m.group(1).strip()
@@ -751,19 +754,51 @@ def _has_explicit_params(sig: str) -> bool:
         p = param.strip()
         if not p:
             continue
+        # Skip self variants
         if re.match(r"^(&\s*(mut\s+)?)?self\s*$", p):
+            continue
+        # Skip Lua VM context: lua: &Lua, _lua: &Lua, _lua: &mlua::Lua
+        if re.match(r"^_?lua\s*:\s*&\s*(mut\s+)?(?:mlua::)?Lua\b", p):
+            continue
+        # Skip unit-tuple args: _: () → normalised to _: __UNIT__
+        if p == "_: __UNIT__":
+            continue
+        # Skip Lua registration plumbing: luna: &Table/&mlua::Table
+        if re.match(r"^_?\w+\s*:\s*&\s*(mut\s+)?(?:mlua::)?Table\b", p):
+            continue
+        # Skip shared-state plumbing: _state: Rc<...>, Arc<...>
+        if re.match(r"^_?\w+\s*:\s*(?:Rc<|Arc<)", p):
             continue
         return True
     return False
 
 
 def _has_return_type(sig: str) -> bool:
-    """Return True if a fn signature has a non-() return type."""
+    """Return True if a fn signature has a non-trivial return type.
+
+    ``LuaResult<()>`` is treated as "no meaningful return" because it just
+    signals Lua error/ok without returning a value to Lua scripts.
+    """
     m = re.search(r"\)\s*->\s*(.+)$", sig.strip())
     if not m:
         return False
     ret = m.group(1).strip()
-    return bool(ret) and ret != "()"
+    if not ret or ret == "()":
+        return False
+    # LuaResult<()> wraps a unit — no actual return value to document
+    if re.match(r"^LuaResult\s*<\s*\(\)\s*>$", ret):
+        return False
+    return True
+
+
+def _has_tagged_params(raw_doc: list) -> bool:
+    """Return True if any ``@param`` tag is present in the raw doc lines."""
+    return any(ln.strip().startswith("@param") for ln in raw_doc)
+
+
+def _has_tagged_return(raw_doc: list) -> bool:
+    """Return True if any ``@return`` tag is present in the raw doc lines."""
+    return any(ln.strip().startswith("@return") for ln in raw_doc)
 
 
 def report_missing(items: list[ApiItem]) -> int:
@@ -791,10 +826,10 @@ def report_missing(items: list[ApiItem]) -> int:
         has = {s.lower() for s in item.sections}
 
         if item.kind == "fn":
-            if _has_explicit_params(item.signature) and "parameters" not in has:
+            if _has_explicit_params(item.signature) and "parameters" not in has and not _has_tagged_params(item.raw_doc):
                 print(f"[WARN]  {loc:<50}  {kind_name} -- missing # Parameters section")
                 warn_count += 1
-            if _has_return_type(item.signature) and "returns" not in has:
+            if _has_return_type(item.signature) and "returns" not in has and not _has_tagged_return(item.raw_doc):
                 print(f"[WARN]  {loc:<50}  {kind_name} -- missing # Returns section")
                 warn_count += 1
 

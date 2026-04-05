@@ -21,9 +21,6 @@ impl LuaCompressedImageData {
     /// Return the number of mipmap levels stored.
     ///
     ///
-    /// # Returns
-    /// `integer`.
-    ///
     /// @return integer
     pub fn get_mipmap_count(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
         todo!()
@@ -45,9 +42,6 @@ impl LuaImageData {
     /// Get the width of the image. Consult the module-level documentation for the broader usage context and preconditions.
     ///
     ///
-    /// # Returns
-    /// `integer`.
-    ///
     /// @return integer
     pub fn width(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
         todo!()
@@ -55,22 +49,11 @@ impl LuaImageData {
     /// Get the height of the image. Consult the module-level documentation for the broader usage context and preconditions.
     ///
     ///
-    /// # Returns
-    /// `integer`.
-    ///
     /// @return integer
     pub fn height(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
         todo!()
     }
     /// Get the RGBA values of a pixel at (x, y). Values are 0-255.
-    ///
-    ///
-    /// # Parameters
-    /// - `x` — `integer` ...
-    /// - `y` — `integer` ...
-    ///
-    /// # Returns
-    /// `Option<(u8`.
     ///
     /// @param x : integer
     /// @param y : integer
@@ -81,18 +64,12 @@ impl LuaImageData {
     /// Encode the image as PNG bytes. Consult the module-level documentation for the broader usage context and preconditions.
     ///
     ///
-    /// # Returns
-    /// `Result<Vec<u8>`.
-    ///
     /// @return Result<Vec<u8>
     pub fn encode_png(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
         todo!()
     }
     /// Get the raw pixel bytes as a vector (for Lua getString() compatibility).
     ///
-    ///
-    /// # Returns
-    /// `table`.
     ///
     /// @return table
     pub fn get_string(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
@@ -119,21 +96,11 @@ impl LuaPaletteLUT {
     /// Returns the number of color mappings. This accessor incurs no allocation; call it freely in hot paths.
     ///
     ///
-    /// # Returns
-    /// `integer`.
-    ///
     /// @return integer
     pub fn get_color_count(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
         todo!()
     }
     /// Returns the source color at the given 0-based index, if it exists.
-    ///
-    ///
-    /// # Parameters
-    /// - `index` — `integer` ...
-    ///
-    /// # Returns
-    /// `Color?`.
     ///
     /// @param index : integer
     /// @return Color?
@@ -141,13 +108,6 @@ impl LuaPaletteLUT {
         todo!()
     }
     /// Returns the target color at the given 0-based index, if it exists.
-    ///
-    ///
-    /// # Parameters
-    /// - `index` — `integer` ...
-    ///
-    /// # Returns
-    /// `Color?`.
     ///
     /// @param index : integer
     /// @return Color?
@@ -170,13 +130,6 @@ impl UserData for LuaPaletteLUT {
 ///
 /// Returns `Unknown` format rather than failing when the format is unrecognised.
 ///
-///
-/// # Parameters
-/// - `bytes` — `[u8]` ...
-///
-/// # Returns
-/// `Result<Self`.
-///
 /// @param bytes : [u8]
 /// @return Result<Self
 pub fn from_dds(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
@@ -185,13 +138,6 @@ pub fn from_dds(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 
 /// Load an image from a file path. Returns a fully initialised instance with all fields set to their initial values.
 ///
-///
-/// # Parameters
-/// - `path` — `str` ...
-///
-/// # Returns
-/// `Result<Self`.
-///
 /// @param path : str
 /// @return Result<Self
 pub fn from_file(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
@@ -199,15 +145,6 @@ pub fn from_file(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 }
 
 /// Create from raw RGBA bytes. Returns a fully initialised instance with all fields set to their initial values.
-///
-///
-/// # Parameters
-/// - `width` — `integer` ...
-/// - `height` — `integer` ...
-/// - `bytes` — `table` ...
-///
-/// # Returns
-/// `Result<Self`.
 ///
 /// @param width : integer
 /// @param height : integer
@@ -218,18 +155,6 @@ pub fn from_bytes(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 }
 
 /// Set the RGBA values of a pixel at (x, y). Values are 0-255.
-///
-///
-/// # Parameters
-/// - `x` — `integer` ...
-/// - `y` — `integer` ...
-/// - `r` — `u8` ...
-/// - `g` — `u8` ...
-/// - `b` — `u8` ...
-/// - `a` — `u8` ...
-///
-/// # Returns
-/// `boolean`.
 ///
 /// @param x : integer
 /// @param y : integer
@@ -245,11 +170,6 @@ pub fn set_pixel(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 /// Paste source image onto self at position (dx, dy).
 ///
 ///
-/// # Parameters
-/// - `source` — `ImageData` ...
-/// - `dx` — `integer` ...
-/// - `dy` — `integer` ...
-///
 /// @param source : ImageData
 /// @param dx : integer
 /// @param dy : integer
@@ -258,13 +178,6 @@ pub fn paste(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 }
 
 /// Apply a function to every pixel, replacing each (r,g,b,a) with the return value.
-///
-///
-/// # Parameters
-/// - `f` — `F` ...
-///
-/// # Returns
-/// `The`.
 ///
 /// @param f : F
 /// @return The
@@ -275,11 +188,6 @@ pub fn map_pixel(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 /// Sets the color mapping at the given 0-based index.
 ///
 ///
-/// # Parameters
-/// - `index` — `integer` ...
-/// - `from` — `Color` ...
-/// - `to` — `Color` ...
-///
 /// @param index : integer
 /// @param from : Color
 /// @param to : Color
@@ -288,14 +196,6 @@ pub fn set_color(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 }
 
 /// Registers the `luna.image` API table.
-///
-/// # Parameters
-/// - `lua` — `&Lua` The Lua VM.
-/// - `luna` — `&LuaTable<'_>` The top-level `luna` table.
-/// - `state` — `Rc<RefCell<SharedState>>` Shared engine state.
-///
-/// # Returns
-/// `LuaResult<()>`.
 pub fn register(
     lua: &Lua,
     luna: &mlua::Table,

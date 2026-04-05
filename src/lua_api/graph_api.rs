@@ -21,21 +21,11 @@ impl LuaEdge {
     /// Whether the edge is in cooldown. This accessor incurs no allocation; call it freely in hot paths.
     ///
     ///
-    /// # Returns
-    /// `boolean`.
-    ///
     /// @return boolean
     pub fn is_on_cooldown(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
         todo!()
     }
     /// Whether the given item type is allowed on this edge.
-    ///
-    ///
-    /// # Parameters
-    /// - `t` — `str` ...
-    ///
-    /// # Returns
-    /// `boolean`.
     ///
     /// @param t : str
     /// @return boolean
@@ -44,9 +34,6 @@ impl LuaEdge {
     }
     /// Whether transit capacity is full. This accessor incurs no allocation; call it freely in hot paths.
     ///
-    ///
-    /// # Returns
-    /// `boolean`.
     ///
     /// @return boolean
     pub fn is_transit_full(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
@@ -71,18 +58,12 @@ impl LuaGraph {
     /// Find weakly connected components (treating all edges as undirected).
     ///
     ///
-    /// # Returns
-    /// `table`.
-    ///
     /// @return table
     pub fn get_components(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
         todo!()
     }
     /// Detect whether the directed graph contains a cycle (DFS-based).
     ///
-    ///
-    /// # Returns
-    /// `boolean`.
     ///
     /// @return boolean
     pub fn has_cycle(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
@@ -91,21 +72,11 @@ impl LuaGraph {
     /// Topological sort using Kahn's algorithm.
     ///
     ///
-    /// # Returns
-    /// `table?`.
-    ///
     /// @return table?
     pub fn topological_sort(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
         todo!()
     }
     /// Whether a node with the given ID exists.
-    ///
-    ///
-    /// # Parameters
-    /// - `node_id` — `integer` ...
-    ///
-    /// # Returns
-    /// `boolean`.
     ///
     /// @param node_id : integer
     /// @return boolean
@@ -115,9 +86,6 @@ impl LuaGraph {
     /// Get all node IDs. This accessor incurs no allocation; call it freely in hot paths.
     ///
     ///
-    /// # Returns
-    /// `table`.
-    ///
     /// @return table
     pub fn get_node_ids(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
         todo!()
@@ -125,21 +93,11 @@ impl LuaGraph {
     /// Get the number of nodes. This accessor incurs no allocation; call it freely in hot paths.
     ///
     ///
-    /// # Returns
-    /// `integer`.
-    ///
     /// @return integer
     pub fn get_node_count(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
         todo!()
     }
     /// Whether an edge with the given ID exists.
-    ///
-    ///
-    /// # Parameters
-    /// - `edge_id` — `integer` ...
-    ///
-    /// # Returns
-    /// `boolean`.
     ///
     /// @param edge_id : integer
     /// @return boolean
@@ -149,9 +107,6 @@ impl LuaGraph {
     /// Get all edge IDs. This accessor incurs no allocation; call it freely in hot paths.
     ///
     ///
-    /// # Returns
-    /// `table`.
-    ///
     /// @return table
     pub fn get_edge_ids(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
         todo!()
@@ -159,22 +114,11 @@ impl LuaGraph {
     /// Get the number of edges. This accessor incurs no allocation; call it freely in hot paths.
     ///
     ///
-    /// # Returns
-    /// `integer`.
-    ///
     /// @return integer
     pub fn get_edge_count(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
         todo!()
     }
     /// Find an edge from `from` to `to` (returns the first match).
-    ///
-    ///
-    /// # Parameters
-    /// - `from` — `integer` ...
-    /// - `to` — `integer` ...
-    ///
-    /// # Returns
-    /// `integer?`.
     ///
     /// @param from : integer
     /// @param to : integer
@@ -184,13 +128,6 @@ impl LuaGraph {
     }
     /// Whether an item with the given ID exists.
     ///
-    ///
-    /// # Parameters
-    /// - `item_id` — `integer` ...
-    ///
-    /// # Returns
-    /// `boolean`.
-    ///
     /// @param item_id : integer
     /// @return boolean
     pub fn has_item(&self, _lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
@@ -199,18 +136,12 @@ impl LuaGraph {
     /// Get all item IDs. This accessor incurs no allocation; call it freely in hot paths.
     ///
     ///
-    /// # Returns
-    /// `table`.
-    ///
     /// @return table
     pub fn get_item_ids(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
         todo!()
     }
     /// Get the number of items. This accessor incurs no allocation; call it freely in hot paths.
     ///
-    ///
-    /// # Returns
-    /// `integer`.
     ///
     /// @return integer
     pub fn get_item_count(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
@@ -219,21 +150,11 @@ impl LuaGraph {
     /// Compute a statistics snapshot. This accessor incurs no allocation; call it freely in hot paths.
     ///
     ///
-    /// # Returns
-    /// `GraphStats`.
-    ///
     /// @return GraphStats
     pub fn get_stats(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
         todo!()
     }
     /// Get IDs of edges leaving a node. This accessor incurs no allocation; call it freely in hot paths.
-    ///
-    ///
-    /// # Parameters
-    /// - `node_id` — `integer` ...
-    ///
-    /// # Returns
-    /// `table`.
     ///
     /// @param node_id : integer
     /// @return table
@@ -242,13 +163,6 @@ impl LuaGraph {
     }
     /// Get IDs of edges arriving at a node.
     ///
-    ///
-    /// # Parameters
-    /// - `node_id` — `integer` ...
-    ///
-    /// # Returns
-    /// `table`.
-    ///
     /// @param node_id : integer
     /// @return table
     pub fn get_incoming_edges(&self, _lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
@@ -256,131 +170,59 @@ impl LuaGraph {
     }
     /// Whether a node with the given ID exists.
     ///
-    ///
-    /// # Parameters
-    /// - `node_id` — `integer` ...
-    ///
-    /// # Returns
-    /// `boolean`.
-    ///
     /// @param node_id : integer
     /// @return boolean
     /// Get all node IDs.
     ///
     ///
-    /// # Returns
-    /// `table`.
-    ///
     /// @return table
     /// Get the number of nodes.
     ///
     ///
-    /// # Returns
-    /// `integer`.
-    ///
     /// @return integer
     /// Whether an edge with the given ID exists.
-    ///
-    ///
-    /// # Parameters
-    /// - `edge_id` — `integer` ...
-    ///
-    /// # Returns
-    /// `boolean`.
     ///
     /// @param edge_id : integer
     /// @return boolean
     /// Get all edge IDs.
     ///
     ///
-    /// # Returns
-    /// `table`.
-    ///
     /// @return table
     /// Get the number of edges.
     ///
     ///
-    /// # Returns
-    /// `integer`.
-    ///
     /// @return integer
     /// Find an edge from `from` to `to` (returns the first match).
-    ///
-    ///
-    /// # Parameters
-    /// - `from` — `integer` ...
-    /// - `to` — `integer` ...
-    ///
-    /// # Returns
-    /// `integer?`.
     ///
     /// @param from : integer
     /// @param to : integer
     /// @return integer?
     /// Whether an item with the given ID exists.
     ///
-    ///
-    /// # Parameters
-    /// - `item_id` — `integer` ...
-    ///
-    /// # Returns
-    /// `boolean`.
-    ///
     /// @param item_id : integer
     /// @return boolean
     /// Get all item IDs.
     ///
     ///
-    /// # Returns
-    /// `table`.
-    ///
     /// @return table
     /// Get the number of items.
     ///
-    ///
-    /// # Returns
-    /// `integer`.
     ///
     /// @return integer
     /// Compute a statistics snapshot.
     ///
     ///
-    /// # Returns
-    /// `GraphStats`.
-    ///
     /// @return GraphStats
     /// Get IDs of edges leaving a node.
-    ///
-    ///
-    /// # Parameters
-    /// - `node_id` — `integer` ...
-    ///
-    /// # Returns
-    /// `table`.
     ///
     /// @param node_id : integer
     /// @return table
     /// Get IDs of edges arriving at a node.
     ///
-    ///
-    /// # Parameters
-    /// - `node_id` — `integer` ...
-    ///
-    /// # Returns
-    /// `table`.
-    ///
     /// @param node_id : integer
     /// @return table
     /// Find the shortest path from `from` to `to` using Dijkstra's algorithm.
     /// Uses edge `weight` as cost. Returns `None` if no path exists.
-    ///
-    ///
-    /// # Parameters
-    /// - `from` — `integer` ...
-    /// - `to` — `integer` ...
-    ///
-    /// # Returns
-    /// `PathResult?`.
     ///
     /// @param from : integer
     /// @param to : integer
@@ -391,15 +233,6 @@ impl LuaGraph {
     /// Find a path that only uses edges the given item can traverse.
     /// Filters by: edge active, item type allowed, not on cooldown.
     ///
-    ///
-    /// # Parameters
-    /// - `item_id` — `integer` ...
-    /// - `from` — `integer` ...
-    /// - `to` — `integer` ...
-    ///
-    /// # Returns
-    /// `PathResult?`.
-    ///
     /// @param item_id : integer
     /// @param from : integer
     /// @param to : integer
@@ -409,14 +242,6 @@ impl LuaGraph {
     }
     /// Get the shortest-path distance between two nodes, or `None` if unreachable.
     ///
-    ///
-    /// # Parameters
-    /// - `from` — `integer` ...
-    /// - `to` — `integer` ...
-    ///
-    /// # Returns
-    /// `number?`.
-    ///
     /// @param from : integer
     /// @param to : integer
     /// @return number?
@@ -425,14 +250,6 @@ impl LuaGraph {
     }
     /// Get all nodes reachable from `from`, optionally limited by max distance.
     ///
-    ///
-    /// # Parameters
-    /// - `from` — `integer` ...
-    /// - `max_dist` — `number?` ...
-    ///
-    /// # Returns
-    /// `table`.
-    ///
     /// @param from : integer
     /// @param max_dist : number?
     /// @return table
@@ -440,13 +257,6 @@ impl LuaGraph {
         todo!()
     }
     /// Get direct outgoing neighbors of a node.
-    ///
-    ///
-    /// # Parameters
-    /// - `node_id` — `integer` ...
-    ///
-    /// # Returns
-    /// `table`.
     ///
     /// @param node_id : integer
     /// @return table
@@ -508,18 +318,12 @@ impl LuaGraphItem {
     /// Whether the item is still alive. This accessor incurs no allocation; call it freely in hot paths.
     ///
     ///
-    /// # Returns
-    /// `boolean`.
-    ///
     /// @return boolean
     pub fn is_alive(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
         todo!()
     }
     /// Get the decay time (`-1.0` = no decay).
     ///
-    ///
-    /// # Returns
-    /// `number`.
     ///
     /// @return number
     pub fn get_decay_time(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
@@ -528,18 +332,12 @@ impl LuaGraphItem {
     /// Get remaining life in seconds. This accessor incurs no allocation; call it freely in hot paths.
     ///
     ///
-    /// # Returns
-    /// `number`.
-    ///
     /// @return number
     pub fn get_remaining_life(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
         todo!()
     }
     /// Get the priority value. This accessor incurs no allocation; call it freely in hot paths.
     ///
-    ///
-    /// # Returns
-    /// `integer`.
     ///
     /// @return integer
     pub fn get_priority(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
@@ -565,18 +363,12 @@ impl LuaNode {
     /// Get the capacity (`-1` = unlimited). This accessor incurs no allocation; call it freely in hot paths.
     ///
     ///
-    /// # Returns
-    /// `integer`.
-    ///
     /// @return integer
     pub fn get_capacity(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
         todo!()
     }
     /// Whether the node is at capacity. This accessor incurs no allocation; call it freely in hot paths.
     ///
-    ///
-    /// # Returns
-    /// `boolean`.
     ///
     /// @return boolean
     pub fn is_full(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
@@ -585,21 +377,11 @@ impl LuaNode {
     /// Number of items currently at this node. Consult the module-level documentation for the broader usage context and preconditions.
     ///
     ///
-    /// # Returns
-    /// `integer`.
-    ///
     /// @return integer
     pub fn item_count(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
         todo!()
     }
     /// Check if a tag is present. This accessor incurs no allocation; call it freely in hot paths.
-    ///
-    ///
-    /// # Parameters
-    /// - `tag` — `str` ...
-    ///
-    /// # Returns
-    /// `boolean`.
     ///
     /// @param tag : str
     /// @return boolean
@@ -609,21 +391,11 @@ impl LuaNode {
     /// Get all tags as a sorted vector. This accessor incurs no allocation; call it freely in hot paths.
     ///
     ///
-    /// # Returns
-    /// `table`.
-    ///
     /// @return table
     pub fn get_tags(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
         todo!()
     }
     /// Get the supply for a given item type.
-    ///
-    ///
-    /// # Parameters
-    /// - `item_type` — `str` ...
-    ///
-    /// # Returns
-    /// `Option<`.
     ///
     /// @param item_type : str
     /// @return Option<
@@ -632,26 +404,12 @@ impl LuaNode {
     }
     /// Get the available supply quantity for a type (returns 0 if not found).
     ///
-    ///
-    /// # Parameters
-    /// - `item_type` — `str` ...
-    ///
-    /// # Returns
-    /// `integer`.
-    ///
     /// @param item_type : str
     /// @return integer
     pub fn get_available_supply(&self, _lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
         todo!()
     }
     /// Get the demand for a given item type.
-    ///
-    ///
-    /// # Parameters
-    /// - `item_type` — `str` ...
-    ///
-    /// # Returns
-    /// `Option<`.
     ///
     /// @param item_type : str
     /// @return Option<
@@ -677,14 +435,6 @@ impl UserData for LuaNode {
 
 /// Add a node with the given type and capacity. Returns the new node ID.
 ///
-///
-/// # Parameters
-/// - `node_type` — `str` ...
-/// - `capacity` — `integer` ...
-///
-/// # Returns
-/// `integer`.
-///
 /// @param node_type : str
 /// @param capacity : integer
 /// @return integer
@@ -694,13 +444,6 @@ pub fn add_node(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 
 /// Remove a node and all connected edges. Items at the node become `Unplaced`.
 ///
-///
-/// # Parameters
-/// - `node_id` — `integer` ...
-///
-/// # Returns
-/// `boolean`.
-///
 /// @param node_id : integer
 /// @return boolean
 pub fn remove_node(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
@@ -708,15 +451,6 @@ pub fn remove_node(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 }
 
 /// Add a directed edge between two existing nodes. Returns the edge ID.
-///
-///
-/// # Parameters
-/// - `from` — `integer` ...
-/// - `to` — `integer` ...
-/// - `edge_type` — `str?` ...
-///
-/// # Returns
-/// `Result<u64`.
 ///
 /// @param from : integer
 /// @param to : integer
@@ -728,13 +462,6 @@ pub fn add_edge(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 
 /// Remove an edge. Items in transit on it become `Unplaced`. Returns `true` if it existed.
 ///
-///
-/// # Parameters
-/// - `edge_id` — `integer` ...
-///
-/// # Returns
-/// `boolean`.
-///
 /// @param edge_id : integer
 /// @return boolean
 pub fn remove_edge(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
@@ -742,14 +469,6 @@ pub fn remove_edge(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 }
 
 /// Create a new item (starts `Unplaced`). Returns the item ID.
-///
-///
-/// # Parameters
-/// - `item_type` — `str` ...
-/// - `decay_time` — `number` ...
-///
-/// # Returns
-/// `integer`.
 ///
 /// @param item_type : str
 /// @param decay_time : number
@@ -760,14 +479,6 @@ pub fn create_item(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 
 /// Try to add an existing item to a node, respecting capacity and overflow policy.
 ///
-///
-/// # Parameters
-/// - `item_id` — `integer` ...
-/// - `node_id` — `integer` ...
-///
-/// # Returns
-/// `Result<bool`.
-///
 /// @param item_id : integer
 /// @param node_id : integer
 /// @return Result<bool
@@ -777,13 +488,6 @@ pub fn add_item_to_node(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 
 /// Remove an item from the graph entirely. Returns the removed value if present, or `None` when the key did not exist.
 ///
-///
-/// # Parameters
-/// - `item_id` — `integer` ...
-///
-/// # Returns
-/// `boolean`.
-///
 /// @param item_id : integer
 /// @return boolean
 pub fn remove_item(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
@@ -791,14 +495,6 @@ pub fn remove_item(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 }
 
 /// Send an item onto an edge (start transit). Returns `Ok(true)` if sent.
-///
-///
-/// # Parameters
-/// - `item_id` — `integer` ...
-/// - `edge_id` — `integer` ...
-///
-/// # Returns
-/// `Result<bool`.
 ///
 /// @param item_id : integer
 /// @param edge_id : integer
@@ -810,9 +506,6 @@ pub fn send_item(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 /// Set the edge type. Replaces the current type value; callers hold responsibility for maintaining consistency with related fields.
 ///
 ///
-/// # Parameters
-/// - `t` — `str` ...
-///
 /// @param t : str
 pub fn set_type(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
     todo!()
@@ -821,22 +514,12 @@ pub fn set_type(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 /// Add an allowed item type. The insertion is O(1) amortised unless a resize is triggered.
 ///
 ///
-/// # Parameters
-/// - `t` — `str` ...
-///
 /// @param t : str
 pub fn add_allowed_type(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
     todo!()
 }
 
 /// Remove an allowed item type. Returns the removed value if present, or `None` when the key did not exist.
-///
-///
-/// # Parameters
-/// - `t` — `str` ...
-///
-/// # Returns
-/// `boolean`.
 ///
 /// @param t : str
 /// @return boolean
@@ -846,39 +529,15 @@ pub fn remove_allowed_type(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()
 
 /// Add a node with the given type and capacity. Returns the new node ID.
 ///
-///
-/// # Parameters
-/// - `node_type` — `str` ...
-/// - `capacity` — `integer` ...
-///
-/// # Returns
-/// `integer`.
-///
 /// @param node_type : str
 /// @param capacity : integer
 /// @return integer
 /// Remove a node and all connected edges. Items at the node become `Unplaced`.
 /// Returns `true` if the node existed.
 ///
-///
-/// # Parameters
-/// - `node_id` — `integer` ...
-///
-/// # Returns
-/// `boolean`.
-///
 /// @param node_id : integer
 /// @return boolean
 /// Add a directed edge between two existing nodes. Returns the edge ID.
-///
-///
-/// # Parameters
-/// - `from` — `integer` ...
-/// - `to` — `integer` ...
-/// - `edge_type` — `str?` ...
-///
-/// # Returns
-/// `Result<u64`.
 ///
 /// @param from : integer
 /// @param to : integer
@@ -886,24 +545,9 @@ pub fn remove_allowed_type(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()
 /// @return Result<u64
 /// Remove an edge. Items in transit on it become `Unplaced`. Returns `true` if it existed.
 ///
-///
-/// # Parameters
-/// - `edge_id` — `integer` ...
-///
-/// # Returns
-/// `boolean`.
-///
 /// @param edge_id : integer
 /// @return boolean
 /// Create a new item (starts `Unplaced`). Returns the item ID.
-///
-///
-/// # Parameters
-/// - `item_type` — `str` ...
-/// - `decay_time` — `number` ...
-///
-/// # Returns
-/// `integer`.
 ///
 /// @param item_type : str
 /// @param decay_time : number
@@ -911,37 +555,14 @@ pub fn remove_allowed_type(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()
 /// Try to add an existing item to a node, respecting capacity and overflow policy.
 /// Returns `Ok(true)` if placed, `Ok(false)` if rejected or destroyed, `Err` on invalid IDs.
 ///
-///
-/// # Parameters
-/// - `item_id` — `integer` ...
-/// - `node_id` — `integer` ...
-///
-/// # Returns
-/// `Result<bool`.
-///
 /// @param item_id : integer
 /// @param node_id : integer
 /// @return Result<bool
 /// Remove an item from the graph entirely.
 ///
-///
-/// # Parameters
-/// - `item_id` — `integer` ...
-///
-/// # Returns
-/// `boolean`.
-///
 /// @param item_id : integer
 /// @return boolean
 /// Send an item onto an edge (start transit). Returns `Ok(true)` if sent.
-///
-///
-/// # Parameters
-/// - `item_id` — `integer` ...
-/// - `edge_id` — `integer` ...
-///
-/// # Returns
-/// `Result<bool`.
 ///
 /// @param item_id : integer
 /// @param edge_id : integer
@@ -949,15 +570,9 @@ pub fn remove_allowed_type(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()
 /// Set the item type. Replaces the current type value; callers hold responsibility for maintaining consistency with related fields.
 ///
 ///
-/// # Parameters
-/// - `item_type` — `str` ...
-///
 /// @param item_type : str
 /// Set the decay time. Also resets remaining life if positive.
 ///
-///
-/// # Parameters
-/// - `t` — `number` ...
 ///
 /// @param t : number
 pub fn set_decay_time(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
@@ -967,9 +582,6 @@ pub fn set_decay_time(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 /// Set remaining life in seconds. Replaces the current remaining life value; callers hold responsibility for maintaining consistency with related fields.
 ///
 ///
-/// # Parameters
-/// - `t` — `number` ...
-///
 /// @param t : number
 pub fn set_remaining_life(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
     todo!()
@@ -977,9 +589,6 @@ pub fn set_remaining_life(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()>
 
 /// Set the priority value. Replaces the current priority value; callers hold responsibility for maintaining consistency with related fields.
 ///
-///
-/// # Parameters
-/// - `p` — `integer` ...
 ///
 /// @param p : integer
 pub fn set_priority(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
@@ -989,9 +598,6 @@ pub fn set_priority(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 /// Set the current position. Replaces the current position value; callers hold responsibility for maintaining consistency with related fields.
 ///
 ///
-/// # Parameters
-/// - `pos` — `ItemPosition` ...
-///
 /// @param pos : ItemPosition
 pub fn set_position(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
     todo!()
@@ -1000,15 +606,9 @@ pub fn set_position(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 /// Set the node type. Replaces the current type value; callers hold responsibility for maintaining consistency with related fields.
 ///
 ///
-/// # Parameters
-/// - `t` — `str` ...
-///
 /// @param t : str
 /// Set the capacity. Replaces the current capacity value; callers hold responsibility for maintaining consistency with related fields.
 ///
-///
-/// # Parameters
-/// - `c` — `integer` ...
 ///
 /// @param c : integer
 pub fn set_capacity(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
@@ -1018,22 +618,12 @@ pub fn set_capacity(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 /// Add a tag. The insertion is O(1) amortised unless a resize is triggered.
 ///
 ///
-/// # Parameters
-/// - `tag` — `str` ...
-///
 /// @param tag : str
 pub fn add_tag(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
     todo!()
 }
 
 /// Remove a tag. Returns whether it was present.
-///
-///
-/// # Parameters
-/// - `tag` — `str` ...
-///
-/// # Returns
-/// `boolean`.
 ///
 /// @param tag : str
 /// @return boolean
@@ -1044,10 +634,6 @@ pub fn remove_tag(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 /// Add a supply declaration. The insertion is O(1) amortised unless a resize is triggered.
 ///
 ///
-/// # Parameters
-/// - `item_type` — `str` ...
-/// - `quantity` — `integer` ...
-///
 /// @param item_type : str
 /// @param quantity : integer
 pub fn add_supply(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
@@ -1055,13 +641,6 @@ pub fn add_supply(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 }
 
 /// Remove supply declarations for the given item type. Returns whether any were removed.
-///
-///
-/// # Parameters
-/// - `item_type` — `str` ...
-///
-/// # Returns
-/// `boolean`.
 ///
 /// @param item_type : str
 /// @return boolean
@@ -1072,11 +651,6 @@ pub fn remove_supply(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 /// Add a demand declaration. The insertion is O(1) amortised unless a resize is triggered.
 ///
 ///
-/// # Parameters
-/// - `item_type` — `str` ...
-/// - `quantity` — `integer` ...
-/// - `priority` — `integer` ...
-///
 /// @param item_type : str
 /// @param quantity : integer
 /// @param priority : integer
@@ -1085,13 +659,6 @@ pub fn add_demand(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 }
 
 /// Remove demand declarations for the given item type. Returns whether any were removed.
-///
-///
-/// # Parameters
-/// - `item_type` — `str` ...
-///
-/// # Returns
-/// `boolean`.
 ///
 /// @param item_type : str
 /// @return boolean
@@ -1102,22 +669,12 @@ pub fn remove_demand(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 /// Set a conversion rule (keyed by input type).
 ///
 ///
-/// # Parameters
-/// - `rule` — `ConversionRule` ...
-///
 /// @param rule : ConversionRule
 pub fn set_conversion(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
     todo!()
 }
 
 /// Remove a conversion rule by input type. Returns whether it was present.
-///
-///
-/// # Parameters
-/// - `in_type` — `str` ...
-///
-/// # Returns
-/// `boolean`.
 ///
 /// @param in_type : str
 /// @return boolean
@@ -1126,13 +683,6 @@ pub fn clear_conversion(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 }
 
 /// Push an item ID onto the back of the queue.
-///
-///
-/// # Parameters
-/// - `item_id` — `integer` ...
-///
-/// # Returns
-/// `boolean`.
 ///
 /// @param item_id : integer
 /// @return boolean
@@ -1143,22 +693,12 @@ pub fn enqueue(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 /// Pop an item ID from the front of the queue.
 ///
 ///
-/// # Returns
-/// `integer?`.
-///
 /// @return integer?
 pub fn dequeue(_lua: &Lua, _: ()) -> LuaResult<()> {
     todo!()
 }
 
 /// Advance the simulation by `dt` seconds. Returns events for callback dispatch.
-///
-///
-/// # Parameters
-/// - `dt` — `number` ...
-///
-/// # Returns
-/// `table`.
 ///
 /// @param dt : number
 /// @return table
@@ -1169,9 +709,6 @@ pub fn update(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 /// One discrete simulation step (equivalent to `update(1.0)`).
 ///
 ///
-/// # Returns
-/// `table`.
-///
 /// @return table
 pub fn step(_lua: &Lua, _: ()) -> LuaResult<()> {
     todo!()
@@ -1180,23 +717,12 @@ pub fn step(_lua: &Lua, _: ()) -> LuaResult<()> {
 /// Process all demand/supply declarations. Consult the module-level documentation for the broader usage context and preconditions.
 ///
 ///
-/// # Returns
-/// `table`.
-///
 /// @return table
 pub fn process_demand(_lua: &Lua, _: ()) -> LuaResult<()> {
     todo!()
 }
 
 /// Registers the `luna.graph` API table.
-///
-/// # Parameters
-/// - `lua` — `&Lua` The Lua VM.
-/// - `luna` — `&LuaTable<'_>` The top-level `luna` table.
-/// - `state` — `Rc<RefCell<SharedState>>` Shared engine state.
-///
-/// # Returns
-/// `LuaResult<()>`.
 pub fn register(
     lua: &Lua,
     luna: &mlua::Table,

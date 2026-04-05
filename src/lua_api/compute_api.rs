@@ -20,13 +20,6 @@ pub struct LuaNdArray(/* TODO: add key + state fields */);
 impl LuaNdArray {
     /// Read element at flat index as f64 (works for any dtype).
     ///
-    ///
-    /// # Parameters
-    /// - `flat` — `integer` ...
-    ///
-    /// # Returns
-    /// `number`.
-    ///
     /// @param flat : integer
     /// @return number
     pub fn get_f64(&self, _lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
@@ -34,26 +27,12 @@ impl LuaNdArray {
     }
     /// Read element at flat index as i32. Only meaningful for Int32 arrays.
     ///
-    ///
-    /// # Parameters
-    /// - `flat` — `integer` ...
-    ///
-    /// # Returns
-    /// `integer`.
-    ///
     /// @param flat : integer
     /// @return integer
     pub fn get_i32(&self, _lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
         todo!()
     }
     /// Convert a multi-dimensional index to a flat element offset.
-    ///
-    ///
-    /// # Parameters
-    /// - `indices` — `[usize]` ...
-    ///
-    /// # Returns
-    /// `Result<usize`.
     ///
     /// @param indices : [usize]
     /// @return Result<usize
@@ -63,9 +42,6 @@ impl LuaNdArray {
     /// Returns the element data type of this array.
     ///
     ///
-    /// # Returns
-    /// `DataType`.
-    ///
     /// @return DataType
     pub fn dtype(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
         todo!()
@@ -73,18 +49,12 @@ impl LuaNdArray {
     /// Returns the total number of elements in this array.
     ///
     ///
-    /// # Returns
-    /// `integer`.
-    ///
     /// @return integer
     pub fn size(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
         todo!()
     }
     /// Returns the number of dimensions (1, 2, or 3).
     ///
-    ///
-    /// # Returns
-    /// `integer`.
     ///
     /// @return integer
     pub fn ndim(&self, _lua: &Lua, _: ()) -> LuaResult<()> {
@@ -107,13 +77,6 @@ impl UserData for LuaNdArray {
 
 /// Parse a dtype from a string name (`"float32"`, `"float64"`, `"int32"`).
 ///
-///
-/// # Parameters
-/// - `s` — `str` ...
-///
-/// # Returns
-/// `Result<Self`.
-///
 /// @param s : str
 /// @return Result<Self
 pub fn parse(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
@@ -123,23 +86,12 @@ pub fn parse(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 /// Number of bytes per element for this dtype.
 ///
 ///
-/// # Returns
-/// `integer`.
-///
 /// @return integer
 pub fn byte_size(_lua: &Lua, _: ()) -> LuaResult<()> {
     todo!()
 }
 
 /// Create a zero-initialized NdArray. Consult the module-level documentation for the broader usage context and preconditions.
-///
-///
-/// # Parameters
-/// - `shape` — `[usize]` ...
-/// - `dtype` — `DataType` ...
-///
-/// # Returns
-/// `Result<Self`.
 ///
 /// @param shape : [usize]
 /// @param dtype : DataType
@@ -150,14 +102,6 @@ pub fn zeros(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 
 /// Create an NdArray filled with ones (1.0 for floats, 1 for int32).
 ///
-///
-/// # Parameters
-/// - `shape` — `[usize]` ...
-/// - `dtype` — `DataType` ...
-///
-/// # Returns
-/// `Result<Self`.
-///
 /// @param shape : [usize]
 /// @param dtype : DataType
 /// @return Result<Self
@@ -166,16 +110,6 @@ pub fn ones(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 }
 
 /// Create a 1D NdArray with values from `start` to `stop` (exclusive) with given step.
-///
-///
-/// # Parameters
-/// - `start` — `number` ...
-/// - `stop` — `number` ...
-/// - `step` — `number` ...
-/// - `dtype` — `DataType` ...
-///
-/// # Returns
-/// `Result<Self`.
 ///
 /// @param start : number
 /// @param stop : number
@@ -188,15 +122,6 @@ pub fn range(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 
 /// Create an NdArray from a slice of f64 values, converting to the target dtype.
 ///
-///
-/// # Parameters
-/// - `values` — `[f64]` ...
-/// - `shape` — `[usize]` ...
-/// - `dtype` — `DataType` ...
-///
-/// # Returns
-/// `Result<Self`.
-///
 /// @param values : [f64]
 /// @param shape : [usize]
 /// @param dtype : DataType
@@ -208,10 +133,6 @@ pub fn from_slice(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 /// Write a value (as f64) to the flat index, converting to the array's dtype.
 ///
 ///
-/// # Parameters
-/// - `flat` — `integer` ...
-/// - `val` — `number` ...
-///
 /// @param flat : integer
 /// @param val : number
 pub fn set_f64(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
@@ -221,10 +142,6 @@ pub fn set_f64(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 /// Write an i32 value at the flat index. Only meaningful for Int32 arrays.
 ///
 ///
-/// # Parameters
-/// - `flat` — `integer` ...
-/// - `val` — `integer` ...
-///
 /// @param flat : integer
 /// @param val : integer
 pub fn set_i32(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
@@ -233,13 +150,6 @@ pub fn set_i32(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 
 /// Compute row-major strides for a given shape.
 ///
-///
-/// # Parameters
-/// - `shape` — `[usize]` ...
-///
-/// # Returns
-/// `table`.
-///
 /// @param shape : [usize]
 /// @return table
 pub fn compute_strides(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
@@ -247,14 +157,6 @@ pub fn compute_strides(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 }
 
 /// Element-wise addition of two arrays (same shape and dtype).
-///
-///
-/// # Parameters
-/// - `a` — `NdArray` ...
-/// - `b` — `NdArray` ...
-///
-/// # Returns
-/// `Result<NdArray`.
 ///
 /// @param a : NdArray
 /// @param b : NdArray
@@ -265,14 +167,6 @@ pub fn add(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 
 /// Add a scalar to every element. The insertion is O(1) amortised unless a resize is triggered.
 ///
-///
-/// # Parameters
-/// - `a` — `NdArray` ...
-/// - `s` — `number` ...
-///
-/// # Returns
-/// `Result<NdArray`.
-///
 /// @param a : NdArray
 /// @param s : number
 /// @return Result<NdArray
@@ -281,14 +175,6 @@ pub fn add_scalar(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 }
 
 /// Element-wise subtraction of two arrays (same shape and dtype).
-///
-///
-/// # Parameters
-/// - `a` — `NdArray` ...
-/// - `b` — `NdArray` ...
-///
-/// # Returns
-/// `Result<NdArray`.
 ///
 /// @param a : NdArray
 /// @param b : NdArray
@@ -299,14 +185,6 @@ pub fn sub(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 
 /// Subtract a scalar from every element. Consult the module-level documentation for the broader usage context and preconditions.
 ///
-///
-/// # Parameters
-/// - `a` — `NdArray` ...
-/// - `s` — `number` ...
-///
-/// # Returns
-/// `Result<NdArray`.
-///
 /// @param a : NdArray
 /// @param s : number
 /// @return Result<NdArray
@@ -315,14 +193,6 @@ pub fn sub_scalar(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 }
 
 /// Element-wise multiplication of two arrays (same shape and dtype).
-///
-///
-/// # Parameters
-/// - `a` — `NdArray` ...
-/// - `b` — `NdArray` ...
-///
-/// # Returns
-/// `Result<NdArray`.
 ///
 /// @param a : NdArray
 /// @param b : NdArray
@@ -333,14 +203,6 @@ pub fn mul(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 
 /// Multiply every element by a scalar. Consult the module-level documentation for the broader usage context and preconditions.
 ///
-///
-/// # Parameters
-/// - `a` — `NdArray` ...
-/// - `s` — `number` ...
-///
-/// # Returns
-/// `Result<NdArray`.
-///
 /// @param a : NdArray
 /// @param s : number
 /// @return Result<NdArray
@@ -349,14 +211,6 @@ pub fn mul_scalar(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 }
 
 /// Element-wise division of two arrays (same shape and dtype).
-///
-///
-/// # Parameters
-/// - `a` — `NdArray` ...
-/// - `b` — `NdArray` ...
-///
-/// # Returns
-/// `Result<NdArray`.
 ///
 /// @param a : NdArray
 /// @param b : NdArray
@@ -367,14 +221,6 @@ pub fn div(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 
 /// Divide every element by a scalar. Consult the module-level documentation for the broader usage context and preconditions.
 ///
-///
-/// # Parameters
-/// - `a` — `NdArray` ...
-/// - `s` — `number` ...
-///
-/// # Returns
-/// `Result<NdArray`.
-///
 /// @param a : NdArray
 /// @param s : number
 /// @return Result<NdArray
@@ -383,14 +229,6 @@ pub fn div_scalar(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 }
 
 /// Raise every element to a scalar exponent.
-///
-///
-/// # Parameters
-/// - `a` — `NdArray` ...
-/// - `exp` — `number` ...
-///
-/// # Returns
-/// `Result<NdArray`.
 ///
 /// @param a : NdArray
 /// @param exp : number
@@ -401,13 +239,6 @@ pub fn pow_scalar(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 
 /// Element-wise square root. Consult the module-level documentation for the broader usage context and preconditions.
 ///
-///
-/// # Parameters
-/// - `a` — `NdArray` ...
-///
-/// # Returns
-/// `Result<NdArray`.
-///
 /// @param a : NdArray
 /// @return Result<NdArray
 pub fn sqrt(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
@@ -415,13 +246,6 @@ pub fn sqrt(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 }
 
 /// Element-wise absolute value. Consult the module-level documentation for the broader usage context and preconditions.
-///
-///
-/// # Parameters
-/// - `a` — `NdArray` ...
-///
-/// # Returns
-/// `Result<NdArray`.
 ///
 /// @param a : NdArray
 /// @return Result<NdArray
@@ -431,13 +255,6 @@ pub fn abs(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 
 /// Element-wise negation. Consult the module-level documentation for the broader usage context and preconditions.
 ///
-///
-/// # Parameters
-/// - `a` — `NdArray` ...
-///
-/// # Returns
-/// `Result<NdArray`.
-///
 /// @param a : NdArray
 /// @return Result<NdArray
 pub fn neg(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
@@ -445,15 +262,6 @@ pub fn neg(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 }
 
 /// Clamp every element to `[min_val, max_val]`.
-///
-///
-/// # Parameters
-/// - `a` — `NdArray` ...
-/// - `min_val` — `number` ...
-/// - `max_val` — `number` ...
-///
-/// # Returns
-/// `Result<NdArray`.
 ///
 /// @param a : NdArray
 /// @param min_val : number
@@ -465,14 +273,6 @@ pub fn clamp(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 
 /// Element-wise equality comparison of two arrays. Returns Float32 with 0/1.
 ///
-///
-/// # Parameters
-/// - `a` — `NdArray` ...
-/// - `b` — `NdArray` ...
-///
-/// # Returns
-/// `Result<NdArray`.
-///
 /// @param a : NdArray
 /// @param b : NdArray
 /// @return Result<NdArray
@@ -481,14 +281,6 @@ pub fn eq(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 }
 
 /// Element-wise equality comparison against a scalar. Returns Float32.
-///
-///
-/// # Parameters
-/// - `a` — `NdArray` ...
-/// - `s` — `number` ...
-///
-/// # Returns
-/// `Result<NdArray`.
 ///
 /// @param a : NdArray
 /// @param s : number
@@ -499,14 +291,6 @@ pub fn eq_scalar(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 
 /// Element-wise not-equal comparison of two arrays. Returns Float32.
 ///
-///
-/// # Parameters
-/// - `a` — `NdArray` ...
-/// - `b` — `NdArray` ...
-///
-/// # Returns
-/// `Result<NdArray`.
-///
 /// @param a : NdArray
 /// @param b : NdArray
 /// @return Result<NdArray
@@ -515,14 +299,6 @@ pub fn neq(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 }
 
 /// Element-wise not-equal comparison against a scalar. Returns Float32.
-///
-///
-/// # Parameters
-/// - `a` — `NdArray` ...
-/// - `s` — `number` ...
-///
-/// # Returns
-/// `Result<NdArray`.
 ///
 /// @param a : NdArray
 /// @param s : number
@@ -533,14 +309,6 @@ pub fn neq_scalar(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 
 /// Element-wise greater-than comparison of two arrays. Returns Float32.
 ///
-///
-/// # Parameters
-/// - `a` — `NdArray` ...
-/// - `b` — `NdArray` ...
-///
-/// # Returns
-/// `Result<NdArray`.
-///
 /// @param a : NdArray
 /// @param b : NdArray
 /// @return Result<NdArray
@@ -549,14 +317,6 @@ pub fn gt(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 }
 
 /// Element-wise greater-than comparison against a scalar. Returns Float32.
-///
-///
-/// # Parameters
-/// - `a` — `NdArray` ...
-/// - `s` — `number` ...
-///
-/// # Returns
-/// `Result<NdArray`.
 ///
 /// @param a : NdArray
 /// @param s : number
@@ -567,14 +327,6 @@ pub fn gt_scalar(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 
 /// Element-wise less-than comparison of two arrays. Returns Float32.
 ///
-///
-/// # Parameters
-/// - `a` — `NdArray` ...
-/// - `b` — `NdArray` ...
-///
-/// # Returns
-/// `Result<NdArray`.
-///
 /// @param a : NdArray
 /// @param b : NdArray
 /// @return Result<NdArray
@@ -583,14 +335,6 @@ pub fn lt(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 }
 
 /// Element-wise less-than comparison against a scalar. Returns Float32.
-///
-///
-/// # Parameters
-/// - `a` — `NdArray` ...
-/// - `s` — `number` ...
-///
-/// # Returns
-/// `Result<NdArray`.
 ///
 /// @param a : NdArray
 /// @param s : number
@@ -601,14 +345,6 @@ pub fn lt_scalar(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 
 /// Element-wise greater-than-or-equal comparison of two arrays. Returns Float32.
 ///
-///
-/// # Parameters
-/// - `a` — `NdArray` ...
-/// - `b` — `NdArray` ...
-///
-/// # Returns
-/// `Result<NdArray`.
-///
 /// @param a : NdArray
 /// @param b : NdArray
 /// @return Result<NdArray
@@ -617,14 +353,6 @@ pub fn gte(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 }
 
 /// Element-wise greater-than-or-equal comparison against a scalar. Returns Float32.
-///
-///
-/// # Parameters
-/// - `a` — `NdArray` ...
-/// - `s` — `number` ...
-///
-/// # Returns
-/// `Result<NdArray`.
 ///
 /// @param a : NdArray
 /// @param s : number
@@ -635,14 +363,6 @@ pub fn gte_scalar(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 
 /// Element-wise less-than-or-equal comparison of two arrays. Returns Float32.
 ///
-///
-/// # Parameters
-/// - `a` — `NdArray` ...
-/// - `b` — `NdArray` ...
-///
-/// # Returns
-/// `Result<NdArray`.
-///
 /// @param a : NdArray
 /// @param b : NdArray
 /// @return Result<NdArray
@@ -651,14 +371,6 @@ pub fn lte(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 }
 
 /// Element-wise less-than-or-equal comparison against a scalar. Returns Float32.
-///
-///
-/// # Parameters
-/// - `a` — `NdArray` ...
-/// - `s` — `number` ...
-///
-/// # Returns
-/// `Result<NdArray`.
 ///
 /// @param a : NdArray
 /// @param s : number
@@ -669,14 +381,6 @@ pub fn lte_scalar(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 
 /// Threshold mask: returns Float32 array with 1.0 where `a >= val`, 0.0 otherwise.
 ///
-///
-/// # Parameters
-/// - `a` — `NdArray` ...
-/// - `val` — `number` ...
-///
-/// # Returns
-/// `Result<NdArray`.
-///
 /// @param a : NdArray
 /// @param val : number
 /// @return Result<NdArray
@@ -685,15 +389,6 @@ pub fn threshold(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 }
 
 /// Conditional selection: where `cond != 0`, choose from `a`; otherwise from `b`.
-///
-///
-/// # Parameters
-/// - `cond` — `NdArray` ...
-/// - `a` — `NdArray` ...
-/// - `b` — `NdArray` ...
-///
-/// # Returns
-/// `Result<NdArray`.
 ///
 /// @param cond : NdArray
 /// @param a : NdArray
@@ -705,13 +400,6 @@ pub fn where_mask(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 
 /// Count the number of non-zero elements. Runs in O(1) time.
 ///
-///
-/// # Parameters
-/// - `a` — `NdArray` ...
-///
-/// # Returns
-/// `integer`.
-///
 /// @param a : NdArray
 /// @return integer
 pub fn count_nonzero(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
@@ -719,13 +407,6 @@ pub fn count_nonzero(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 }
 
 /// Return the flat index of the minimum element (0-based).
-///
-///
-/// # Parameters
-/// - `a` — `NdArray` ...
-///
-/// # Returns
-/// `integer`.
 ///
 /// @param a : NdArray
 /// @return integer
@@ -735,13 +416,6 @@ pub fn argmin(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 
 /// Return the flat index of the maximum element (0-based).
 ///
-///
-/// # Parameters
-/// - `a` — `NdArray` ...
-///
-/// # Returns
-/// `integer`.
-///
 /// @param a : NdArray
 /// @return integer
 pub fn argmax(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
@@ -749,13 +423,6 @@ pub fn argmax(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 }
 
 /// Returns `true` if any element is non-zero.
-///
-///
-/// # Parameters
-/// - `a` — `NdArray` ...
-///
-/// # Returns
-/// `boolean`.
 ///
 /// @param a : NdArray
 /// @return boolean
@@ -765,13 +432,6 @@ pub fn any(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 
 /// Returns `true` if all elements are non-zero.
 ///
-///
-/// # Parameters
-/// - `a` — `NdArray` ...
-///
-/// # Returns
-/// `boolean`.
-///
 /// @param a : NdArray
 /// @return boolean
 pub fn all(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
@@ -779,13 +439,6 @@ pub fn all(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 }
 
 /// Sum of all elements. Consult the module-level documentation for the broader usage context and preconditions.
-///
-///
-/// # Parameters
-/// - `a` — `NdArray` ...
-///
-/// # Returns
-/// `number`.
 ///
 /// @param a : NdArray
 /// @return number
@@ -795,13 +448,6 @@ pub fn sum(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 
 /// Mean of all elements. Consult the module-level documentation for the broader usage context and preconditions.
 ///
-///
-/// # Parameters
-/// - `a` — `NdArray` ...
-///
-/// # Returns
-/// `number`.
-///
 /// @param a : NdArray
 /// @return number
 pub fn mean(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
@@ -809,13 +455,6 @@ pub fn mean(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 }
 
 /// Minimum value across all elements. Consult the module-level documentation for the broader usage context and preconditions.
-///
-///
-/// # Parameters
-/// - `a` — `NdArray` ...
-///
-/// # Returns
-/// `number`.
 ///
 /// @param a : NdArray
 /// @return number
@@ -825,13 +464,6 @@ pub fn min_val(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 
 /// Maximum value across all elements. Consult the module-level documentation for the broader usage context and preconditions.
 ///
-///
-/// # Parameters
-/// - `a` — `NdArray` ...
-///
-/// # Returns
-/// `number`.
-///
 /// @param a : NdArray
 /// @return number
 pub fn max_val(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
@@ -839,14 +471,6 @@ pub fn max_val(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 }
 
 /// Sum along a given axis, producing an array with that axis removed.
-///
-///
-/// # Parameters
-/// - `a` — `NdArray` ...
-/// - `axis` — `integer` ...
-///
-/// # Returns
-/// `Result<NdArray`.
 ///
 /// @param a : NdArray
 /// @param axis : integer
@@ -857,14 +481,6 @@ pub fn sum_axis(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 
 /// Mean along a given axis. Consult the module-level documentation for the broader usage context and preconditions.
 ///
-///
-/// # Parameters
-/// - `a` — `NdArray` ...
-/// - `axis` — `integer` ...
-///
-/// # Returns
-/// `Result<NdArray`.
-///
 /// @param a : NdArray
 /// @param axis : integer
 /// @return Result<NdArray
@@ -873,14 +489,6 @@ pub fn mean_axis(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 }
 
 /// Minimum along a given axis. Consult the module-level documentation for the broader usage context and preconditions.
-///
-///
-/// # Parameters
-/// - `a` — `NdArray` ...
-/// - `axis` — `integer` ...
-///
-/// # Returns
-/// `Result<NdArray`.
 ///
 /// @param a : NdArray
 /// @param axis : integer
@@ -891,14 +499,6 @@ pub fn min_axis(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 
 /// Maximum along a given axis. Consult the module-level documentation for the broader usage context and preconditions.
 ///
-///
-/// # Parameters
-/// - `a` — `NdArray` ...
-/// - `axis` — `integer` ...
-///
-/// # Returns
-/// `Result<NdArray`.
-///
 /// @param a : NdArray
 /// @param axis : integer
 /// @return Result<NdArray
@@ -907,14 +507,6 @@ pub fn max_axis(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 }
 
 /// Reshape an array to a new shape with the same total element count.
-///
-///
-/// # Parameters
-/// - `a` — `NdArray` ...
-/// - `new_shape` — `[usize]` ...
-///
-/// # Returns
-/// `Result<NdArray`.
 ///
 /// @param a : NdArray
 /// @param new_shape : [usize]
@@ -925,13 +517,6 @@ pub fn reshape(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 
 /// Transpose a 2D array (swap rows and columns).
 ///
-///
-/// # Parameters
-/// - `a` — `NdArray` ...
-///
-/// # Returns
-/// `Result<NdArray`.
-///
 /// @param a : NdArray
 /// @return Result<NdArray
 pub fn transpose_2d(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
@@ -941,10 +526,6 @@ pub fn transpose_2d(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 /// Fill all elements of an array with a value (in-place).
 ///
 ///
-/// # Parameters
-/// - `a` — `mut NdArray` ...
-/// - `val` — `number` ...
-///
 /// @param a : mut NdArray
 /// @param val : number
 pub fn fill(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
@@ -953,13 +534,6 @@ pub fn fill(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 
 /// Clone an array (convenience wrapper). Consult the module-level documentation for the broader usage context and preconditions.
 ///
-///
-/// # Parameters
-/// - `a` — `NdArray` ...
-///
-/// # Returns
-/// `NdArray`.
-///
 /// @param a : NdArray
 /// @return NdArray
 pub fn clone_array(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
@@ -967,14 +541,6 @@ pub fn clone_array(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 }
 
 /// Bitwise AND of two Int32 arrays. Consult the module-level documentation for the broader usage context and preconditions.
-///
-///
-/// # Parameters
-/// - `a` — `NdArray` ...
-/// - `b` — `NdArray` ...
-///
-/// # Returns
-/// `Result<NdArray`.
 ///
 /// @param a : NdArray
 /// @param b : NdArray
@@ -985,14 +551,6 @@ pub fn bitwise_and(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 
 /// Bitwise OR of two Int32 arrays. Consult the module-level documentation for the broader usage context and preconditions.
 ///
-///
-/// # Parameters
-/// - `a` — `NdArray` ...
-/// - `b` — `NdArray` ...
-///
-/// # Returns
-/// `Result<NdArray`.
-///
 /// @param a : NdArray
 /// @param b : NdArray
 /// @return Result<NdArray
@@ -1001,14 +559,6 @@ pub fn bitwise_or(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 }
 
 /// Bitwise XOR of two Int32 arrays. Consult the module-level documentation for the broader usage context and preconditions.
-///
-///
-/// # Parameters
-/// - `a` — `NdArray` ...
-/// - `b` — `NdArray` ...
-///
-/// # Returns
-/// `Result<NdArray`.
 ///
 /// @param a : NdArray
 /// @param b : NdArray
@@ -1019,13 +569,6 @@ pub fn bitwise_xor(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 
 /// Bitwise NOT of an Int32 array. Consult the module-level documentation for the broader usage context and preconditions.
 ///
-///
-/// # Parameters
-/// - `a` — `NdArray` ...
-///
-/// # Returns
-/// `Result<NdArray`.
-///
 /// @param a : NdArray
 /// @return Result<NdArray
 pub fn bitwise_not(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
@@ -1033,14 +576,6 @@ pub fn bitwise_not(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 }
 
 /// Bitwise left shift of an Int32 array by `amount` bits.
-///
-///
-/// # Parameters
-/// - `a` — `NdArray` ...
-/// - `amount` — `integer` ...
-///
-/// # Returns
-/// `Result<NdArray`.
 ///
 /// @param a : NdArray
 /// @param amount : integer
@@ -1051,14 +586,6 @@ pub fn bitwise_lshift(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 
 /// Bitwise right shift (arithmetic) of an Int32 array by `amount` bits.
 ///
-///
-/// # Parameters
-/// - `a` — `NdArray` ...
-/// - `amount` — `integer` ...
-///
-/// # Returns
-/// `Result<NdArray`.
-///
 /// @param a : NdArray
 /// @param amount : integer
 /// @return Result<NdArray
@@ -1067,14 +594,6 @@ pub fn bitwise_rshift(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 }
 
 /// 2D convolution with zero-padding (same-size output).
-///
-///
-/// # Parameters
-/// - `input` — `NdArray` ...
-/// - `kernel` — `NdArray` ...
-///
-/// # Returns
-/// `Result<NdArray`.
 ///
 /// @param input : NdArray
 /// @param kernel : NdArray
@@ -1085,14 +604,6 @@ pub fn convolve2d(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 
 /// Morphological dilation with a Manhattan-diamond structuring element.
 ///
-///
-/// # Parameters
-/// - `a` — `NdArray` ...
-/// - `radius` — `integer` ...
-///
-/// # Returns
-/// `Result<NdArray`.
-///
 /// @param a : NdArray
 /// @param radius : integer
 /// @return Result<NdArray
@@ -1102,14 +613,6 @@ pub fn dilate(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 
 /// Morphological erosion with a Manhattan-diamond structuring element.
 ///
-///
-/// # Parameters
-/// - `a` — `NdArray` ...
-/// - `radius` — `integer` ...
-///
-/// # Returns
-/// `Result<NdArray`.
-///
 /// @param a : NdArray
 /// @param radius : integer
 /// @return Result<NdArray
@@ -1118,16 +621,6 @@ pub fn erode(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 }
 
 /// Flood fill using BFS with 4-connectivity.
-///
-///
-/// # Parameters
-/// - `a` — `NdArray` ...
-/// - `row` — `integer` ...
-/// - `col` — `integer` ...
-/// - `val` — `number` ...
-///
-/// # Returns
-/// `Result<NdArray`.
 ///
 /// @param a : NdArray
 /// @param row : integer
@@ -1139,17 +632,6 @@ pub fn flood_fill(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 }
 
 /// Extract a rectangular sub-region from a 2D array.
-///
-///
-/// # Parameters
-/// - `a` — `NdArray` ...
-/// - `row` — `integer` ...
-/// - `col` — `integer` ...
-/// - `sub_rows` — `integer` ...
-/// - `sub_cols` — `integer` ...
-///
-/// # Returns
-/// `Result<NdArray`.
 ///
 /// @param a : NdArray
 /// @param row : integer
@@ -1163,16 +645,6 @@ pub fn get_region(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 
 /// Copy a source 2D array into a target 2D array at position `(row, col)`.
 ///
-///
-/// # Parameters
-/// - `a` — `mut NdArray` ...
-/// - `row` — `integer` ...
-/// - `col` — `integer` ...
-/// - `src` — `NdArray` ...
-///
-/// # Returns
-/// `Result<()`.
-///
 /// @param a : mut NdArray
 /// @param row : integer
 /// @param col : integer
@@ -1184,14 +656,6 @@ pub fn set_region(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 
 /// Matrix multiplication of two 2D arrays: (m,k) × (k,n) → (m,n).
 ///
-///
-/// # Parameters
-/// - `a` — `NdArray` ...
-/// - `b` — `NdArray` ...
-///
-/// # Returns
-/// `Result<NdArray`.
-///
 /// @param a : NdArray
 /// @param b : NdArray
 /// @return Result<NdArray
@@ -1201,14 +665,6 @@ pub fn matmul(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 
 /// Dot product of two 1D arrays (same length). Returns a scalar.
 ///
-///
-/// # Parameters
-/// - `a` — `NdArray` ...
-/// - `b` — `NdArray` ...
-///
-/// # Returns
-/// `Result<f64`.
-///
 /// @param a : NdArray
 /// @param b : NdArray
 /// @return Result<f64
@@ -1217,14 +673,6 @@ pub fn dot(_lua: &Lua, _args: LuaMultiValue<'_>) -> LuaResult<()> {
 }
 
 /// Registers the `luna.compute` API table.
-///
-/// # Parameters
-/// - `lua` — `&Lua` The Lua VM.
-/// - `luna` — `&LuaTable<'_>` The top-level `luna` table.
-/// - `state` — `Rc<RefCell<SharedState>>` Shared engine state.
-///
-/// # Returns
-/// `LuaResult<()>`.
 pub fn register(
     lua: &Lua,
     luna: &mlua::Table,

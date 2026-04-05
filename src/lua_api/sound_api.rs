@@ -12,14 +12,6 @@ use crate::engine::SharedState;
 
 /// Registers the `luna.sound` API table.
 ///
-/// # Parameters
-/// - `lua` — `&Lua`.
-/// - `luna` — `&LuaTable<'_>`.
-/// - `state` — `Rc<RefCell<SharedState>>`.
-///
-/// # Returns
-/// `LuaResult<()>`.
-///
 /// @param lua : &Lua
 /// @param luna : &LuaTable<'_>
 /// @param state : Rc<RefCell<SharedState>>
