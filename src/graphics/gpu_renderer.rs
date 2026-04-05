@@ -2054,6 +2054,11 @@ impl GpuRenderer {
                 // silence non-exhaustive-pattern error until renderer support is added.
                 DrawCommand::DrawShape { .. } => {}
                 DrawCommand::DrawParticleSystem { .. } => {}
+                // Post-FX capture/apply are managed by the PostFxStack at a higher level;
+                // the GPU renderer acknowledges these commands but does not process them here.
+                DrawCommand::BeginPostFx { .. } => {}
+                DrawCommand::EndPostFx { .. } => {}
+                DrawCommand::ApplyPostFx { .. } => {}
             }
         }
 

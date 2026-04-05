@@ -55,6 +55,8 @@ pub mod gui_api;
 pub mod image_api;
 /// Registers the `luna.keyboard.*` and `luna.mouse.*` input API.
 pub mod input_api;
+/// Registers the `luna.light.*` 2D lighting API.
+pub mod light_api;
 /// Registers the `luna.localization.*` internationalization API.
 pub mod localization_api;
 /// Registers the `luna.log.*` structured game-level logging API.
@@ -93,6 +95,8 @@ pub mod steering_api;
 // sound_api removed – functions merged into audio_api
 /// Registers the `luna.system.*` platform query API.
 pub mod system_api;
+/// Registers the `luna.terminal.*` text-mode terminal emulator API.
+pub mod terminal_api;
 /// Registers the `luna.thread.*` multithreading API.
 pub mod thread_api;
 /// Re-export thread channel from src/thread.
@@ -150,6 +154,11 @@ pub fn create_lua_vm(state: Rc<RefCell<SharedState>>, modules: &ModulesConfig) -
         graphics_api::register(&lua, &luna, state.clone())?;
         font_api::register(&lua, &luna, state.clone())?;
         sprite_api::register(&lua, &luna)?;
+    }
+
+    // light: luna.light (requires graphics for GPU rendering)
+    if modules.graphics {
+        light_api::register(&lua, &luna, state.clone())?;
     }
 
     // audio: luna.audio
@@ -253,7 +262,7 @@ pub fn create_lua_vm(state: Rc<RefCell<SharedState>>, modules: &ModulesConfig) -
     // overlay: luna.overlay, luna.postfx
     if modules.overlay {
         overlay_api::register(&lua, &luna)?;
-        postfx_api::register(&lua, &luna)?;
+        postfx_api::register(&lua, &luna, state.clone())?;
     }
 
     // entity: luna.entity
@@ -310,6 +319,11 @@ pub fn create_lua_vm(state: Rc<RefCell<SharedState>>, modules: &ModulesConfig) -
     // spine: luna.spine
     if modules.spine {
         spine_api::register(&lua, &luna)?;
+    }
+
+    // terminal: luna.terminal
+    if modules.terminal {
+        terminal_api::register(&lua, &luna, state.clone())?;
     }
 
     // debug: luna.debug, luna.debugbridge, luna.docs, luna.simulator

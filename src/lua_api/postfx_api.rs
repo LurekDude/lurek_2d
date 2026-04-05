@@ -1,26 +1,26 @@
-//! Lua API bindings for the `luna.postfx.*` post-processing effects module.
+﻿//! Lua API bindings for the `luna.postfx.*` post-processing effects module.
 //!
 //! Registers the `luna.postfx` table and exposes factory functions:
 //!
-//! - `luna.postfx.newEffect(name)` — creates a built-in `PostFxEffect`
+//! - `luna.postfx.newEffect(name)` â€” creates a built-in `PostFxEffect`
 //!   by name (`"bloom"`, `"blur"`, `"crt"`, `"godrays"`, `"vignette"`,
 //!   `"colourgrade"`, `"chromatic"`).
-//! - `luna.postfx.newPass(shaderId)` — creates a `Custom` `PostFxEffect`
+//! - `luna.postfx.newPass(shaderId)` â€” creates a `Custom` `PostFxEffect`
 //!   backed by an external shader resource ID.
-//! - `luna.postfx.newStack(width?, height?)` — creates an empty
+//! - `luna.postfx.newStack(width?, height?)` â€” creates an empty
 //!   `PostFxStack` with the given canvas dimensions.
-//! - `luna.postfx.newImageEffect(...)` — creates a per-image
+//! - `luna.postfx.newImageEffect(...)` â€” creates a per-image
 //!   [`LuaImageEffect`] chain (empty, single-effect, chain-table, or
 //!   options-table overloads).
-//! - `luna.postfx.loadImageEffect(path)` — loads a [`LuaImageEffect`]
+//! - `luna.postfx.loadImageEffect(path)` â€” loads a [`LuaImageEffect`]
 //!   chain from a TOML preset file.
 //!
 //! `LuaPostFxEffect`, `LuaPostFxStack`, and `LuaImageEffect` are thin
 //! `mlua` UserData wrappers that hold `Rc<RefCell<...>>` smart pointers.
 //! `LuaPostFxStack` additionally owns the concrete effect vector so that
 //! effect objects added via Lua are kept alive as long as the stack is alive.
-//! `LuaImageEffect` stores [`crate::postfx::PostFxEffect`] values directly
-//! inside its [`crate::postfx::ImageEffect`] and is passed to
+//! `LuaImageEffect` stores [`crate::fx::post::PostFxEffect`] values directly
+//! inside its [`crate::fx::post::ImageEffect`] and is passed to
 //! `luna.graphics.draw` via the `effect` key of the options-table overload.
 //!
 //! The `register` function is called once during engine startup.
@@ -30,8 +30,10 @@ use std::rc::Rc;
 
 use mlua::prelude::*;
 
+use crate::engine::SharedState;
+use crate::graphics::renderer::DrawCommand;
 use crate::lua_api::lua_types::{add_type_methods, LunaType};
-use crate::postfx::{PostFxEffect, PostFxEffectType, PostFxStack};
+use crate::fx::post::{PostFxEffect, PostFxEffectType, PostFxStack};
 
 // ---------------------------------------------------------------------------
 // LuaPostFxEffect
@@ -45,7 +47,7 @@ use crate::postfx::{PostFxEffect, PostFxEffectType, PostFxStack};
 /// borrow the inner effect only for the duration of the call.
 ///
 /// # Fields
-/// - `inner` — `Rc<RefCell<PostFxEffect>>` — Shared reference to the effect.
+/// - `inner` â€” `Rc<RefCell<PostFxEffect>>` â€” Shared reference to the effect.
 #[derive(Clone)]
 pub(crate) struct LuaPostFxEffect {
     inner: Rc<RefCell<PostFxEffect>>,
@@ -70,8 +72,8 @@ impl LuaUserData for LuaPostFxEffect {
         /// `"brightness"`, `"contrast"`, `"saturation"` for colour grading.
         ///
         /// # Parameters
-        /// - `name` — `string` — Parameter key.
-        /// - `value` — `number` — New float value.
+        /// - `name` â€” `string` â€” Parameter key.
+        /// - `value` â€” `number` â€” New float value.
         methods.add_method("setParameter", |_, this, (name, value): (String, f32)| {
             if !value.is_finite() {
                 return Err(LuaError::RuntimeError(format!(
@@ -102,10 +104,10 @@ impl LuaUserData for LuaPostFxEffect {
         /// name until `setParameter` is called.
         ///
         /// # Parameters
-        /// - `name` — `string` — Parameter key to test.
+        /// - `name` â€” `string` â€” Parameter key to test.
         ///
         /// # Returns
-        /// `boolean` — `true` if the key is present in the params map.
+        /// `boolean` â€” `true` if the key is present in the params map.
         methods.add_method("hasParameter", |_, this, name: String| {
             Ok(this.inner.borrow().has_parameter(&name))
         });
@@ -118,7 +120,7 @@ impl LuaUserData for LuaPostFxEffect {
         /// building a parameter UI.
         ///
         /// # Returns
-        /// `table<string>` — Sorted array of parameter name strings.
+        /// `table<string>` â€” Sorted array of parameter name strings.
         methods.add_method("getParameterNames", |lua, this, ()| {
             let names = this.inner.borrow().get_parameter_names();
             let table = lua.create_table()?;
@@ -135,7 +137,7 @@ impl LuaUserData for LuaPostFxEffect {
         /// custom shader pass effects created with `newPass`.
         ///
         /// # Returns
-        /// `string` — One of `"bloom"`, `"blur"`, `"crt"`, `"godrays"`,
+        /// `string` â€” One of `"bloom"`, `"blur"`, `"crt"`, `"godrays"`,
         /// `"vignette"`, `"colourgrade"`, `"chromatic"`, or `"custom"`.
         methods.add_method("getType", |_, this, ()| {
             Ok(this.inner.borrow().get_type_name().to_string())
@@ -144,11 +146,11 @@ impl LuaUserData for LuaPostFxEffect {
         // getEffectType() -> string  (alias for getType)
         /// Returns the string name of this effect's type.
         ///
-        /// Alias for `getType`. Provided for API consistency — both names
+        /// Alias for `getType`. Provided for API consistency â€” both names
         /// return the same value.
         ///
         /// # Returns
-        /// `string` — Effect type name.
+        /// `string` â€” Effect type name.
         methods.add_method("getEffectType", |_, this, ()| {
             Ok(this.inner.borrow().get_type_name().to_string())
         });
@@ -183,7 +185,7 @@ impl LuaUserData for LuaPostFxEffect {
         /// the pass at the same position.
         ///
         /// # Parameters
-        /// - `enabled` — `boolean` — `true` to activate, `false` to skip.
+        /// - `enabled` â€” `boolean` â€” `true` to activate, `false` to skip.
         methods.add_method("setEnabled", |_, this, enabled: bool| {
             this.inner.borrow_mut().enabled = enabled;
             Ok(())
@@ -191,15 +193,15 @@ impl LuaUserData for LuaPostFxEffect {
 
         // --- Convenience setters ---
 
-        // setThreshold(value) — bloom bright-pass threshold
+        // setThreshold(value) â€” bloom bright-pass threshold
         /// Sets the bloom bright-pass threshold.
         ///
         /// Pixels with luminance above this threshold contribute to the bloom
-        /// effect. Typical values are 0.5–0.9; lower values bleed bloom onto
+        /// effect. Typical values are 0.5â€“0.9; lower values bleed bloom onto
         /// more of the scene.
         ///
         /// # Parameters
-        /// - `value` — `number` — Threshold luminance (0.0–1.0).
+        /// - `value` â€” `number` â€” Threshold luminance (0.0â€“1.0).
         methods.add_method("setThreshold", |_, this, value: f32| {
             if !value.is_finite() {
                 return Err(LuaError::RuntimeError(format!(
@@ -211,7 +213,7 @@ impl LuaUserData for LuaPostFxEffect {
             Ok(())
         });
 
-        // setIntensity(value) — bloom/godrays intensity
+        // setIntensity(value) â€” bloom/godrays intensity
         /// Sets the intensity for bloom or godrays effects.
         ///
         /// For bloom: scales the brightness of the blurred highlight layer
@@ -219,7 +221,7 @@ impl LuaUserData for LuaPostFxEffect {
         /// the overall brightness of the light ray overlay.
         ///
         /// # Parameters
-        /// - `value` — `number` — Intensity multiplier (typically 0.0–2.0).
+        /// - `value` â€” `number` â€” Intensity multiplier (typically 0.0â€“2.0).
         methods.add_method("setIntensity", |_, this, value: f32| {
             if !value.is_finite() {
                 return Err(LuaError::RuntimeError(format!(
@@ -231,7 +233,7 @@ impl LuaUserData for LuaPostFxEffect {
             Ok(())
         });
 
-        // setScanlineStrength(value) — CRT scanline visibility
+        // setScanlineStrength(value) â€” CRT scanline visibility
         /// Sets the CRT scanline strength.
         ///
         /// Controls how prominent the dark horizontal scanlines are in the
@@ -239,7 +241,7 @@ impl LuaUserData for LuaPostFxEffect {
         /// 1.0 produces fully black lines every other row.
         ///
         /// # Parameters
-        /// - `value` — `number` — Scanline opacity (0.0–1.0).
+        /// - `value` â€” `number` â€” Scanline opacity (0.0â€“1.0).
         methods.add_method("setScanlineStrength", |_, this, value: f32| {
             this.inner
                 .borrow_mut()
@@ -247,14 +249,14 @@ impl LuaUserData for LuaPostFxEffect {
             Ok(())
         });
 
-        // setRadius(value) — blur radius
+        // setRadius(value) â€” blur radius
         /// Sets the Gaussian blur radius.
         ///
         /// Larger values spread the blur sample footprint across more pixels.
         /// Values above ~8 may be expensive on integrated GPUs.
         ///
         /// # Parameters
-        /// - `value` — `number` — Blur radius in pixels.
+        /// - `value` â€” `number` â€” Blur radius in pixels.
         methods.add_method("setRadius", |_, this, value: f32| {
             if !value.is_finite() {
                 return Err(LuaError::RuntimeError(format!(
@@ -266,14 +268,14 @@ impl LuaUserData for LuaPostFxEffect {
             Ok(())
         });
 
-        // setStrength(value) — vignette/blur strength
+        // setStrength(value) â€” vignette/blur strength
         /// Sets the vignette or blur strength.
         ///
         /// For vignette: 0.0 is invisible; 1.0 darkens the corners to black.
         /// For blur: scales the overall blur weight applied per sample.
         ///
         /// # Parameters
-        /// - `value` — `number` — Strength factor (0.0–1.0).
+        /// - `value` â€” `number` â€” Strength factor (0.0â€“1.0).
         methods.add_method("setStrength", |_, this, value: f32| {
             if !value.is_finite() {
                 return Err(LuaError::RuntimeError(format!(
@@ -285,15 +287,15 @@ impl LuaUserData for LuaPostFxEffect {
             Ok(())
         });
 
-        // setOffset(value) — chromatic aberration offset
+        // setOffset(value) â€” chromatic aberration offset
         /// Sets the chromatic aberration pixel offset.
         ///
         /// The R, G, and B channels are sampled at offsets proportional to
         /// this value. Larger values produce a more extreme colour-fringing
-        /// effect. Typical range is 1–5 pixels.
+        /// effect. Typical range is 1â€“5 pixels.
         ///
         /// # Parameters
-        /// - `value` — `number` — Pixel offset for channel separation.
+        /// - `value` â€” `number` â€” Pixel offset for channel separation.
         methods.add_method("setOffset", |_, this, value: f32| {
             if !value.is_finite() {
                 return Err(LuaError::RuntimeError(format!(
@@ -305,7 +307,7 @@ impl LuaUserData for LuaPostFxEffect {
             Ok(())
         });
 
-        // setBrightness(value) — colour grading brightness
+        // setBrightness(value) â€” colour grading brightness
         /// Sets the colour grading brightness multiplier.
         ///
         /// Applied as a uniform scale across all channels before contrast
@@ -313,7 +315,7 @@ impl LuaUserData for LuaPostFxEffect {
         /// darken the scene; values above 1.0 brighten it.
         ///
         /// # Parameters
-        /// - `value` — `number` — Brightness multiplier (default 1.0).
+        /// - `value` â€” `number` â€” Brightness multiplier (default 1.0).
         methods.add_method("setBrightness", |_, this, value: f32| {
             if !value.is_finite() {
                 return Err(LuaError::RuntimeError(format!(
@@ -325,14 +327,14 @@ impl LuaUserData for LuaPostFxEffect {
             Ok(())
         });
 
-        // setContrast(value) — colour grading contrast
+        // setContrast(value) â€” colour grading contrast
         /// Sets the colour grading contrast.
         ///
         /// Pivots around mid-grey (0.5). Values above 1.0 push darks darker
         /// and lights lighter; values below 1.0 flatten the tonal range.
         ///
         /// # Parameters
-        /// - `value` — `number` — Contrast multiplier (default 1.0).
+        /// - `value` â€” `number` â€” Contrast multiplier (default 1.0).
         methods.add_method("setContrast", |_, this, value: f32| {
             if !value.is_finite() {
                 return Err(LuaError::RuntimeError(format!(
@@ -344,14 +346,14 @@ impl LuaUserData for LuaPostFxEffect {
             Ok(())
         });
 
-        // setSaturation(value) — colour grading saturation
+        // setSaturation(value) â€” colour grading saturation
         /// Sets the colour grading saturation.
         ///
         /// 0.0 produces a greyscale image; 1.0 is neutral; values above 1.0
         /// boost colour vividness. Applied after brightness and contrast.
         ///
         /// # Parameters
-        /// - `value` — `number` — Saturation multiplier (0.0–2.0, default 1.0).
+        /// - `value` â€” `number` â€” Saturation multiplier (0.0â€“2.0, default 1.0).
         methods.add_method("setSaturation", |_, this, value: f32| {
             if !value.is_finite() {
                 return Err(LuaError::RuntimeError(format!(
@@ -381,8 +383,11 @@ struct LuaPostFxStack {
     inner: Rc<RefCell<PostFxStack>>,
     /// Local effect storage — each effect gets an incrementing index.
     effects: Rc<RefCell<Vec<Rc<RefCell<PostFxEffect>>>>>,
+    /// Shared engine state used to push DrawCommand entries.
+    state: Rc<RefCell<SharedState>>,
+    /// Stable identifier for this stack, derived from its allocation address.
+    stack_id: u64,
 }
-
 impl LunaType for LuaPostFxStack {
     const TYPE_NAME: &'static str = "PostFxStack";
     const TYPE_HIERARCHY: &'static [&'static str] = &["Object"];
@@ -392,7 +397,7 @@ impl LuaUserData for LuaPostFxStack {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
         add_type_methods::<Self>(methods);
 
-        // add(effect) — append an effect to the end of the chain
+        // add(effect) â€” append an effect to the end of the chain
         /// Appends a `PostFxEffect` to the end of the stack.
         ///
         /// Effects are applied in insertion order during `apply()`. The effect
@@ -400,7 +405,7 @@ impl LuaUserData for LuaPostFxStack {
         /// appended to the `PostFxStack` chain. The effect is enabled by default.
         ///
         /// # Parameters
-        /// - `effect` — `PostFxEffect` userdata — The effect to append.
+        /// - `effect` â€” `PostFxEffect` userdata â€” The effect to append.
         methods.add_method("add", |_, this, effect: LuaAnyUserData| {
             let effect: LuaPostFxEffect = effect.borrow::<LuaPostFxEffect>()?.clone();
             let idx = {
@@ -421,10 +426,10 @@ impl LuaUserData for LuaPostFxStack {
         /// Returns `false` if the effect is not in this stack's registry.
         ///
         /// # Parameters
-        /// - `effect` — `PostFxEffect` userdata — The effect to remove.
+        /// - `effect` â€” `PostFxEffect` userdata â€” The effect to remove.
         ///
         /// # Returns
-        /// `boolean` — `true` if the effect was found and removed.
+        /// `boolean` â€” `true` if the effect was found and removed.
         methods.add_method("remove", |_, this, effect: LuaAnyUserData| {
             let effect: LuaPostFxEffect = effect.borrow::<LuaPostFxEffect>()?.clone();
             let effect_idx = this
@@ -439,7 +444,7 @@ impl LuaUserData for LuaPostFxStack {
             }
         });
 
-        // insert(position, effect) — insert at 1-based index
+        // insert(position, effect) â€” insert at 1-based index
         /// Inserts a `PostFxEffect` at a specific 1-based position in the chain.
         ///
         /// A `position` of 1 places the effect as the very first shader pass
@@ -448,8 +453,8 @@ impl LuaUserData for LuaPostFxStack {
         /// registered in the local registry and enabled by default.
         ///
         /// # Parameters
-        /// - `position` — `integer` — 1-based insertion index.
-        /// - `effect` — `PostFxEffect` userdata — The effect to insert.
+        /// - `position` â€” `integer` â€” 1-based insertion index.
+        /// - `effect` â€” `PostFxEffect` userdata â€” The effect to insert.
         methods.add_method(
             "insert",
             |_, this, (position, effect): (usize, LuaAnyUserData)| {
@@ -474,8 +479,8 @@ impl LuaUserData for LuaPostFxStack {
         /// `enabled` flag on the `PostFxEffect` object itself.
         ///
         /// # Parameters
-        /// - `effect` — `PostFxEffect` userdata — The effect to toggle.
-        /// - `enabled` — `boolean` — `true` to activate, `false` to skip.
+        /// - `effect` â€” `PostFxEffect` userdata â€” The effect to toggle.
+        /// - `enabled` â€” `boolean` â€” `true` to activate, `false` to skip.
         methods.add_method(
             "setEffectEnabled",
             |_, this, (effect, enabled): (LuaAnyUserData, bool)| {
@@ -502,10 +507,10 @@ impl LuaUserData for LuaPostFxStack {
         /// `true` for the pass to execute during `apply()`.
         ///
         /// # Parameters
-        /// - `effect` — `PostFxEffect` userdata — The effect to query.
+        /// - `effect` â€” `PostFxEffect` userdata â€” The effect to query.
         ///
         /// # Returns
-        /// `boolean` — `false` if the effect is absent from the chain.
+        /// `boolean` â€” `false` if the effect is absent from the chain.
         methods.add_method("isEffectEnabled", |_, this, effect: LuaAnyUserData| {
             let effect: LuaPostFxEffect = effect.borrow::<LuaPostFxEffect>()?.clone();
             let effect_idx = this
@@ -524,7 +529,7 @@ impl LuaUserData for LuaPostFxStack {
         /// Useful for iterating via `getEffect(i)` from Lua.
         ///
         /// # Returns
-        /// `integer` — Total effects in the chain.
+        /// `integer` â€” Total effects in the chain.
         methods.add_method("getEffectCount", |_, this, ()| {
             Ok(this.inner.borrow().get_effect_count())
         });
@@ -534,12 +539,12 @@ impl LuaUserData for LuaPostFxStack {
         ///
         /// Provides random access into the chain. Returns the
         /// `LuaPostFxEffect` UserData at that position, or `nil` if `index`
-        /// is out of range. The returned object is shared — mutations to it
+        /// is out of range. The returned object is shared â€” mutations to it
         /// are visible immediately through any other Lua variable holding the
         /// same effect.
         ///
         /// # Parameters
-        /// - `index` — `integer` — 1-based position in the chain.
+        /// - `index` â€” `integer` â€” 1-based position in the chain.
         ///
         /// # Returns
         /// `PostFxEffect | nil`.
@@ -564,7 +569,7 @@ impl LuaUserData for LuaPostFxStack {
         /// is 1-indexed and contains `PostFxEffect` UserData objects.
         ///
         /// # Returns
-        /// `table<PostFxEffect>` — Enabled effects in chain order.
+        /// `table<PostFxEffect>` â€” Enabled effects in chain order.
         methods.add_method("getEnabledEffects", |lua, this, ()| {
             let stack = this.inner.borrow();
             let effects = this.effects.borrow();
@@ -583,7 +588,7 @@ impl LuaUserData for LuaPostFxStack {
             Ok(table)
         });
 
-        // resize(width, height) — recreate internal canvases at new resolution
+        // resize(width, height) â€” recreate internal canvases at new resolution
         /// Resizes the internal canvas dimensions.
         ///
         /// Call this whenever the window or render target changes size so the
@@ -591,8 +596,8 @@ impl LuaUserData for LuaPostFxStack {
         /// Does not remove or invalidate any effects in the chain.
         ///
         /// # Parameters
-        /// - `w` — `integer` — New canvas width in pixels.
-        /// - `h` — `integer` — New canvas height in pixels.
+        /// - `w` â€” `integer` â€” New canvas width in pixels.
+        /// - `h` â€” `integer` â€” New canvas height in pixels.
         methods.add_method("resize", |_, this, (w, h): (u32, u32)| {
             this.inner.borrow_mut().resize(w, h);
             Ok(())
@@ -620,7 +625,7 @@ impl LuaUserData for LuaPostFxStack {
         /// Returns both canvas dimensions as `(width, height)`.
         ///
         /// # Returns
-        /// `integer, integer` — Width and height in pixels.
+        /// `integer, integer` â€” Width and height in pixels.
         methods.add_method("getDimensions", |_, this, ()| {
             Ok(this.inner.borrow().get_dimensions())
         });
@@ -635,6 +640,57 @@ impl LuaUserData for LuaPostFxStack {
         methods.add_method("isCapturing", |_, this, ()| {
             Ok(this.inner.borrow().capturing)
         });
+
+        // beginCapture() — redirect subsequent draws into the PostFx capture target.
+        /// Starts a post-processing capture pass.
+        ///
+        /// All `luna.graphics.*` draw calls between `beginCapture` and `endCapture`
+        /// will target the post-FX canvas instead of the screen. Pair with
+        /// `endCapture()` and `apply()` to see the effects.
+        ///
+        /// Returns an error if a capture is already in progress.
+        methods.add_method("beginCapture", |_, this, ()| {
+            if this.inner.borrow().capturing {
+                return Err(LuaError::RuntimeError(
+                    "PostFxStack.beginCapture: capture already in progress".to_string(),
+                ));
+            }
+            this.inner.borrow_mut().capturing = true;
+            this.state
+                .borrow_mut()
+                .draw_commands
+                .push(DrawCommand::BeginPostFx { stack_id: this.stack_id });
+            Ok(())
+        });
+
+        // endCapture() — stop capturing and return to the previous render target.
+        /// Ends a post-processing capture pass.
+        ///
+        /// Must be called after `beginCapture()`. After this returns the engine
+        /// resumes drawing to the normal screen target. Call `apply()` afterwards
+        /// to composite the captured frame through the effect chain.
+        methods.add_method("endCapture", |_, this, ()| {
+            this.inner.borrow_mut().capturing = false;
+            this.state
+                .borrow_mut()
+                .draw_commands
+                .push(DrawCommand::EndPostFx { stack_id: this.stack_id });
+            Ok(())
+        });
+
+        // apply() — composite enabled effects onto the current render target.
+        /// Applies all enabled effects in the stack.
+        ///
+        /// Composites the captured image through each enabled effect in chain order
+        /// and blends the result onto the current render target. Call this after
+        /// `endCapture()` in `luna.draw`.
+        methods.add_method("apply", |_, this, ()| {
+            this.state
+                .borrow_mut()
+                .draw_commands
+                .push(DrawCommand::ApplyPostFx { stack_id: this.stack_id });
+            Ok(())
+        });
     }
 }
 
@@ -644,16 +700,16 @@ impl LuaUserData for LuaPostFxStack {
 
 /// Lua UserData wrapper for a per-image shader effect chain.
 ///
-/// Wraps an [`crate::postfx::ImageEffect`] in an `Rc<RefCell<...>>` so it
+/// Wraps an [`crate::fx::post::ImageEffect`] in an `Rc<RefCell<...>>` so it
 /// can be safely passed between Lua variables and to `luna.graphics.draw`.
-/// The inner [`crate::postfx::ImageEffect`] stores [`crate::postfx::PostFxEffect`]
+/// The inner [`crate::fx::post::ImageEffect`] stores [`crate::fx::post::PostFxEffect`]
 /// objects directly (as owned values, not shared references).
 ///
 /// # Fields
-/// - `inner` — `Rc<RefCell<ImageEffect>>` — Shared reference to the effect chain.
+/// - `inner` â€” `Rc<RefCell<ImageEffect>>` â€” Shared reference to the effect chain.
 #[derive(Clone)]
 pub(crate) struct LuaImageEffect {
-    pub(crate) inner: Rc<RefCell<crate::postfx::ImageEffect>>,
+    pub(crate) inner: Rc<RefCell<crate::fx::post::ImageEffect>>,
 }
 
 impl LunaType for LuaImageEffect {
@@ -671,10 +727,10 @@ impl LuaUserData for LuaImageEffect {
         /// parameter mutations through the returned object are visible in the chain.
         ///
         /// # Parameters
-        /// - `name` — `string` — Effect type name (e.g. `"blur"`, `"sepia"`).
+        /// - `name` â€” `string` â€” Effect type name (e.g. `"blur"`, `"sepia"`).
         ///
         /// # Returns
-        /// `PostFxEffect` — Shared handle to the newly added effect.
+        /// `PostFxEffect` â€” Shared handle to the newly added effect.
         methods.add_method("addEffect", |_, this, name: String| {
             let effect_type = PostFxEffectType::from_name(&name).ok_or_else(|| {
                 LuaError::RuntimeError(format!(
@@ -752,7 +808,7 @@ impl LuaUserData for LuaImageEffect {
         /// `ImageEffect`.
         methods.add_method("clone", |_, this, ()| {
             let inner = this.inner.borrow();
-            let mut cloned = crate::postfx::ImageEffect::new(&inner.name);
+            let mut cloned = crate::fx::post::ImageEffect::new(&inner.name);
             for effect in &inner.effects {
                 cloned.add_effect(effect.borrow().clone());
             }
@@ -818,12 +874,12 @@ impl LuaUserData for LuaImageEffect {
 /// types via `LuaUserData` impls.
 ///
 /// # Parameters
-/// - `lua` — `&Lua` — The active Lua VM.
-/// - `luna` — `&LuaTable` — The root `luna` global table.
+/// - `lua` â€” `&Lua` â€” The active Lua VM.
+/// - `luna` â€” `&LuaTable` â€” The root `luna` global table.
 ///
 /// # Returns
 /// `LuaResult<()>`.
-pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
+pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> LuaResult<()> {
     let postfx = lua.create_table()?;
 
     // luna.postfx.newEffect(name) -> PostFxEffect
@@ -875,24 +931,31 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
     ///
     /// The stack starts with no effects. Call `stack:add(effect)` to build
     /// the chain, then use `stack:beginCapture()` / `stack:endCapture()` /
-    /// `stack:apply()` in `luna.draw`. Width and height default to 800×600
+    /// `stack:apply()` in `luna.draw`. Width and height default to 800Ă—600
     /// if not supplied; call `stack:resize(w, h)` if the window size changes.
     ///
     /// @param w : integer?
     /// @param h : integer?
     /// @return PostFxStack
-    postfx.set(
-        "newStack",
-        lua.create_function(|_, (w, h): (Option<u32>, Option<u32>)| {
-            Ok(LuaPostFxStack {
-                inner: Rc::new(RefCell::new(PostFxStack::new(
+    {
+        let state = state.clone();
+        postfx.set(
+            "newStack",
+            lua.create_function(move |_, (w, h): (Option<u32>, Option<u32>)| {
+                let inner = Rc::new(RefCell::new(PostFxStack::new(
                     w.unwrap_or(800),
                     h.unwrap_or(600),
-                ))),
-                effects: Rc::new(RefCell::new(Vec::new())),
-            })
-        })?,
-    )?;
+                )));
+                let stack_id = Rc::as_ptr(&inner) as u64;
+                Ok(LuaPostFxStack {
+                    inner,
+                    effects: Rc::new(RefCell::new(Vec::new())),
+                    state: state.clone(),
+                    stack_id,
+                })
+            })?,
+        )?;
+    }
 
     // luna.postfx.getEffectTypes() -> table of valid effect type names
     /// Returns a Lua table listing all valid built-in effect type names.
@@ -933,10 +996,10 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
     /// Creates a per-image effect chain.
     ///
     /// Overloads:
-    /// - `newImageEffect()` — empty chain.
-    /// - `newImageEffect("blur")` — chain with a single named effect.
-    /// - `newImageEffect("blur", {radius=4})` — single effect with initial parameters.
-    /// - `newImageEffect({{type="blur",radius=2},{type="sepia"}})` — chain from an array of spec tables.
+    /// - `newImageEffect()` â€” empty chain.
+    /// - `newImageEffect("blur")` â€” chain with a single named effect.
+    /// - `newImageEffect("blur", {radius=4})` â€” single effect with initial parameters.
+    /// - `newImageEffect({{type="blur",radius=2},{type="sepia"}})` â€” chain from an array of spec tables.
     ///
     /// @return ImageEffect
     postfx.set(
@@ -946,7 +1009,7 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
             match it.next() {
                 None | Some(LuaValue::Nil) => {
                     Ok(LuaImageEffect {
-                        inner: Rc::new(RefCell::new(crate::postfx::ImageEffect::new(""))),
+                        inner: Rc::new(RefCell::new(crate::fx::post::ImageEffect::new(""))),
                     })
                 }
                 Some(LuaValue::String(s)) => {
@@ -968,14 +1031,14 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
                             }
                         }
                     }
-                    let mut chain = crate::postfx::ImageEffect::new(&name);
+                    let mut chain = crate::fx::post::ImageEffect::new(&name);
                     chain.add_effect_rc(rc);
                     Ok(LuaImageEffect {
                         inner: Rc::new(RefCell::new(chain)),
                     })
                 }
                 Some(LuaValue::Table(t)) => {
-                    let mut chain = crate::postfx::ImageEffect::new("");
+                    let mut chain = crate::fx::post::ImageEffect::new("");
                     let mut idx: i64 = 1;
                     loop {
                         let entry: Option<LuaTable> = t.get(idx)?;
@@ -1054,7 +1117,7 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
                 LuaError::RuntimeError(format!("loadImageEffect: TOML parse error: {}", e))
             })?;
             let name = doc.get("name").and_then(|v| v.as_str()).unwrap_or("").to_owned();
-            let mut chain = crate::postfx::ImageEffect::new(&name);
+            let mut chain = crate::fx::post::ImageEffect::new(&name);
             if let Some(effects) = doc.get("effects").and_then(|v| v.as_array()) {
                 for spec in effects {
                     let type_name = spec.get("type").and_then(|v| v.as_str()).unwrap_or("");
@@ -1098,3 +1161,4 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
 
     Ok(())
 }
+

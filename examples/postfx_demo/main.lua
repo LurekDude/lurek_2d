@@ -35,6 +35,9 @@ function luna.update(dt)
 end
 
 function luna.draw()
+    -- Capture the scene into the PostFX stack so effects are applied
+    stack:beginCapture()
+
     -- Draw a colourful scene to show effects on
     -- Background shapes
     luna.graphics.setColor(0.2, 0.1, 0.4)
@@ -67,6 +70,10 @@ function luna.draw()
         local len = 100
         luna.graphics.line(cx, cy, cx + math.cos(rad) * len, cy + math.sin(rad) * len)
     end
+
+    -- HUD — drawn after apply() so it renders on top of the post-processed scene
+    stack:endCapture()
+    stack:apply()
 
     -- HUD — show effect info
     luna.graphics.setColor(1, 1, 1)

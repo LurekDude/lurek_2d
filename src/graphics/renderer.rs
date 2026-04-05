@@ -1,4 +1,4 @@
-//! Draw command types, blend modes, and texture data for the Luna2D rendering pipeline.
+﻿//! Draw command types, blend modes, and texture data for the Luna2D rendering pipeline.
 //!
 //! This module is part of Luna2D's `graphics` subsystem and provides the implementation
 //! details for renderer-related operations and data management.
@@ -10,7 +10,7 @@
 use crate::engine::resource_keys::{
     CanvasKey, FontKey, MeshKey, ShaderKey, ShapeKey, SpriteBatchKey, TextureKey,
 };
-use crate::graphics::image_effect::ImageEffectPass;
+use crate::graphics::image_effect::ShaderPassDescriptor;
 use crate::graphics::mesh::Mesh;
 
 /// Stencil comparison mode for `luna.graphics.setStencilTest`.
@@ -216,6 +216,9 @@ pub enum BlendMode {
 /// - `Arc` — Draws an arc (sector or outline) of a circle.
 /// - `DrawShape` — Draw all primitives in a compound shape with a unified affine transform.
 /// - `DrawParticleSystem` — Renders all particles in a single batched command, dispatching per-shape geometry helpers internally.
+/// - `BeginPostFx` — Start capturing the framebuffer for post-processing; subsequent draw calls render into the capture target.
+/// - `EndPostFx` — Stop capturing; resume rendering to the previous target.
+/// - `ApplyPostFx` — Apply the registered post-processing effects from the named stack and composite the result onto the current target.
 #[derive(Debug, Clone)]
 pub enum DrawCommand {
     SetColor(f32, f32, f32, f32),
@@ -276,7 +279,7 @@ pub enum DrawCommand {
         x: f32,
         y: f32,
         /// Optional per-image effect chain applied at draw time.
-        effect: Option<Vec<ImageEffectPass>>,
+        effect: Option<Vec<ShaderPassDescriptor>>,
     },
     /// Draw a texture with full affine transform: rotation (radians), scale, origin offset.
     DrawImageEx {
@@ -289,7 +292,7 @@ pub enum DrawCommand {
         ox: f32,
         oy: f32,
         /// Optional per-image effect chain applied at draw time.
-        effect: Option<Vec<ImageEffectPass>>,
+        effect: Option<Vec<ShaderPassDescriptor>>,
     },
     /// Draw a sub-region of a texture (sprite-sheet) with full transform.
     DrawQuad {
@@ -311,7 +314,7 @@ pub enum DrawCommand {
         ox: f32,
         oy: f32,
         /// Optional per-image effect chain applied at draw time.
-        effect: Option<Vec<ImageEffectPass>>,
+        effect: Option<Vec<ShaderPassDescriptor>>,
     },
     Print {
         text: String,
@@ -526,6 +529,25 @@ pub enum DrawCommand {
         /// Pre-computed per-particle render data for this frame.
         particles: Vec<ParticleInstance>,
     },
+    /// Begin capturing the framebuffer for post-processing.
+    ///
+    /// Subsequent draw calls render into the capture target associated with the named post-FX
+    /// stack. Call [`DrawCommand::EndPostFx`] to stop capturing, then
+    /// [`DrawCommand::ApplyPostFx`] to composite the effects back onto the screen.
+    BeginPostFx {
+        /// Identifier for the post-FX stack managing this capture pass.
+        stack_id: u64,
+    },
+    /// Stop capturing; resume rendering to the previous render target.
+    EndPostFx {
+        /// Identifier for the post-FX stack that started the capture pass.
+        stack_id: u64,
+    },
+    /// Apply the post-processing effects in the named stack and composite onto the current target.
+    ApplyPostFx {
+        /// Identifier for the post-FX stack whose effects will be applied.
+        stack_id: u64,
+    },
 }
 
 /// Raw RGBA pixel data for a loaded texture, stored in the renderer's texture atlas.
@@ -637,3 +659,4 @@ pub enum DrawableKind {
     /// A custom geometry mesh.
     Mesh(MeshKey),
 }
+
