@@ -1,4 +1,4 @@
-//! Luna2D application lifecycle using winit 0.30 + wgpu GPU rendering.
+﻿//! Luna2D application lifecycle using winit 0.30 + wgpu GPU rendering.
 //!
 //! Uses a `winit` event loop with `GpuRenderer` for hardware-accelerated rendering.
 //! The game loop structure (callbacks, SharedState, Lua VM) follows the standard pattern.
@@ -37,6 +37,9 @@ use gilrs::{
 };
 
 use super::config::Config;
+use crate::engine::log_messages::{L003_GAME_LOADED, L006_SPLASH_SCREEN, L007_NO_MAIN_LUA, L010_RENDER_ERROR, L011_LUA_ERROR, L016_LUA_VM_INIT_FAIL, L017_MAIN_LUA_READ_FAIL, L023_GPU_TEX_TOO_SMALL, L024_SURFACE_LOST, L033_GPU_ADAPTER, L034_GPU_TEX_DIM, L035_GPU_INIT, L036_GAMEPAD_CONNECTED, L037_GAMEPAD_DISCONNECTED, L038_GILRS_UNAVAILABLE, L039_WINDOW_CLOSE, L040_ICON_LOAD_FAIL, L041_ICON_CONV_FAIL, L042_DISPLAY_INDEX_UNAVAIL, L043_DROP_FILE, L044_DROP_GAME, L070_SURFACE_NO_READBACK, L071_CURSOR_GRAB_FAIL, L072_CURSOR_GRAB_LOCK_FAIL, L073_CURSOR_POS_FAIL, L074_SCREENSHOT_NO_READBACK, L075_SCREENSHOT_SAVE_FAIL, L076_SCREENSHOT_ENCODE_FAIL, L077_DRAG_HOVER, L078_DRAG_HOVER_CANCEL, L079_DRAG_DROP_IGNORED, L080_GAME_DIR, L081_LOG_FILE, L082_LOG_FILE_FAIL};
+#[allow(unused_imports)]
+use crate::log_msg;
 
 /// Recomputes viewport scale and offset based on game and window dimensions.
 ///
@@ -109,6 +112,7 @@ struct LunaApp {
     surface_alpha_mode: wgpu::CompositeAlphaMode,
     surface_present_modes: Vec<wgpu::PresentMode>,
     surface_present_mode: wgpu::PresentMode,
+    surface_usage: wgpu::TextureUsages,
     renderer: Option<GpuRenderer>,
 
     // Lua runtime.
@@ -180,6 +184,7 @@ impl LunaApp {
             surface_alpha_mode: wgpu::CompositeAlphaMode::Auto,
             surface_present_modes: Vec::new(),
             surface_present_mode: wgpu::PresentMode::Fifo,
+            surface_usage: wgpu::TextureUsages::RENDER_ATTACHMENT,
             renderer: None,
             lua: None,
             state: None,
@@ -264,7 +269,7 @@ impl LunaApp {
 
     fn surface_configuration(&self, width: u32, height: u32) -> wgpu::SurfaceConfiguration {
         wgpu::SurfaceConfiguration {
-            usage: wgpu::TextureUsages::RENDER_ATTACHMENT,
+            usage: self.surface_usage,
             format: self.surface_format,
             width,
             height,
@@ -331,8 +336,10 @@ impl LunaApp {
         .expect("No compatible GPU adapter found. Try installing a display driver.");
 
         let adapter_info = adapter.get_info();
-        log::info!(
-            "GPU adapter: {} ({:?}, {:?}) [backend={}, power={}]",
+        log_msg!(
+            info,
+            L033_GPU_ADAPTER,
+            "{} ({:?}, {:?}) [backend={}, power={}]",
             adapter_info.name,
             adapter_info.backend,
             adapter_info.device_type,
@@ -362,17 +369,25 @@ impl LunaApp {
         self.surface_format = surface_format;
         self.surface_alpha_mode = caps.alpha_modes[0];
         self.surface_present_modes = caps.present_modes.clone();
+        self.surface_usage = if caps.usages.contains(wgpu::TextureUsages::COPY_SRC) {
+            wgpu::TextureUsages::RENDER_ATTACHMENT | wgpu::TextureUsages::COPY_SRC
+        } else {
+            log_msg!(warn, L070_SURFACE_NO_READBACK);
+            wgpu::TextureUsages::RENDER_ATTACHMENT
+        };
         (self.surface_present_mode, self.window_vsync_mode) =
             Self::resolve_present_mode(&self.surface_present_modes, self.window_vsync_mode);
 
         // Read GPU limits and store the max surface dimension to prevent surface configure panics.
         self.max_surface_dim = device.limits().max_texture_dimension_2d;
-        log::info!("GPU max_texture_dimension_2d = {}", self.max_surface_dim);
+        log_msg!(info, L034_GPU_TEX_DIM, "{}", self.max_surface_dim);
 
         let (cw, ch) = self.clamp_surface_dims(width, height);
         if cw != width || ch != height {
-            log::warn!(
-                "Initial window size {}\u{d7}{} exceeds GPU max texture size {}. Clamping to {}\u{d7}{}.",
+            log_msg!(
+                warn,
+                L023_GPU_TEX_TOO_SMALL,
+                "initial window {}x{} exceeds GPU max {}; clamping to {}x{}",
                 width, height, self.max_surface_dim, cw, ch
             );
         }
@@ -383,8 +398,10 @@ impl LunaApp {
         self.surface = Some(surface);
         self.renderer = Some(renderer);
         self.window = Some(window);
-        log::info!(
-            "GPU initialised in {:.0?} (format={:?}, present={:?}, {}×{})",
+        log_msg!(
+            info,
+            L035_GPU_INIT,
+            "{:.0?} (format={:?}, present={:?}, {}x{})",
             t0.elapsed(),
             surface_format,
             self.surface_present_mode,
@@ -437,7 +454,7 @@ impl LunaApp {
         let lua = match create_lua_vm(state.clone(), &self.config.modules) {
             Ok(l) => l,
             Err(e) => {
-                log::error!("Failed to initialise Lua VM: {}", e);
+                log_msg!(error, L016_LUA_VM_INIT_FAIL, "{}", e);
                 self.run_state = RunState::Error(ErrorScreen::from_error(&format!(
                     "Lua VM Initialization Failed\n{}",
                     e
@@ -449,11 +466,11 @@ impl LunaApp {
 
         let main_lua = self.game_dir.join("main.lua");
         if main_lua.exists() {
-            log::info!("Loading game from: {}", main_lua.display());
+            log_msg!(info, L003_GAME_LOADED, "{}", main_lua.display());
             match std::fs::read_to_string(&main_lua) {
                 Ok(code) => {
                     if let Err(e) = lua.load(&code).set_name("main.lua").exec() {
-                        log::error!("Lua error in main.lua: {}", e);
+                        log_msg!(error, L011_LUA_ERROR, "main.lua: {}", e);
                         self.run_state = RunState::Error(ErrorScreen::from_lua_error(&e));
                     } else {
                         if let Err(e) = call_lua_callback_checked(&lua, "load", ()) {
@@ -463,7 +480,7 @@ impl LunaApp {
                     }
                 }
                 Err(e) => {
-                    log::error!("Failed to read main.lua: {}", e);
+                    log_msg!(error, L017_MAIN_LUA_READ_FAIL, "{}", e);
                     self.run_state = RunState::Error(ErrorScreen::from_error(&format!(
                         "Failed to read main.lua\n{}",
                         e
@@ -473,10 +490,10 @@ impl LunaApp {
         } else if self.explicit_game_dir {
             // Explicitly passed a directory but it has no main.lua
             let msg = format!("No game found\nNo main.lua at: {}", self.game_dir.display());
-            log::warn!("{}", msg);
+            log_msg!(warn, L007_NO_MAIN_LUA, "{}", self.game_dir.display());
             self.run_state = RunState::Error(ErrorScreen::from_error(&msg));
         } else {
-            log::info!("No game loaded — showing splash screen.");
+            log_msg!(info, L006_SPLASH_SCREEN);
         }
 
         self.lua = Some(lua);
@@ -641,13 +658,10 @@ impl LunaApp {
         if let Err(error) = window.set_cursor_grab(requested_grab_mode) {
             if mouse_relative_mode {
                 if let Err(confined_error) = window.set_cursor_grab(CursorGrabMode::Confined) {
-                    log::debug!(
-                        "Failed to apply relative cursor grab mode: {}",
-                        confined_error
-                    );
+                    log_msg!(debug, L071_CURSOR_GRAB_FAIL, "{}", confined_error);
                 }
             } else if mouse_grabbed {
-                log::debug!("Failed to apply cursor grab mode: {}", error);
+                log_msg!(debug, L072_CURSOR_GRAB_LOCK_FAIL, "{}", error);
             }
         }
 
@@ -661,7 +675,7 @@ impl LunaApp {
         if let Some((x, y)) = pending_cursor_position {
             let cursor_position = winit::dpi::PhysicalPosition::new(x as f64, y as f64);
             if let Err(error) = window.set_cursor_position(cursor_position) {
-                log::debug!("Failed to set cursor position: {}", error);
+                log_msg!(debug, L073_CURSOR_POS_FAIL, "{}", error);
             }
         }
 
@@ -735,6 +749,7 @@ impl LunaApp {
             vp_mode,
             game_w,
             game_h,
+            screenshot_request,
         ) = {
             let st = state.borrow();
             (
@@ -752,6 +767,7 @@ impl LunaApp {
                 st.window_state.scale_mode_str.clone(),
                 st.window_state.game_width,
                 st.window_state.game_height,
+                st.pending_screenshot.clone(),
             )
         };
 
@@ -795,8 +811,12 @@ impl LunaApp {
         let sprite_batches = std::mem::take(&mut state.borrow_mut().sprite_batches);
         let canvases = state.borrow().canvases.clone();
         let meshes = state.borrow().meshes.clone();
+        let screenshot_supported = self
+            .surface_usage
+            .contains(wgpu::TextureUsages::COPY_SRC);
+        let capture_screenshot = screenshot_request.is_some() && screenshot_supported;
 
-        if let Err(e) = renderer.render_frame(
+        let screenshot_pixels = match renderer.render_frame(
             surface,
             final_commands,
             &textures,
@@ -809,17 +829,22 @@ impl LunaApp {
             bg,
             &cam_matrix,
             frame_time,
+            capture_screenshot,
         ) {
-            if e == wgpu::SurfaceError::Lost || e == wgpu::SurfaceError::Outdated {
-                log::warn!("Surface lost/outdated — reconfiguring…");
-                state.borrow_mut().fonts = fonts;
-                state.borrow_mut().sprite_batches = sprite_batches;
-                self.reconfigure_surface();
-                return;
-            } else {
-                log::error!("Render error: {:?}", e);
+            Ok(screenshot) => screenshot,
+            Err(e) => {
+                if e == wgpu::SurfaceError::Lost || e == wgpu::SurfaceError::Outdated {
+                    log_msg!(warn, L024_SURFACE_LOST);
+                    state.borrow_mut().fonts = fonts;
+                    state.borrow_mut().sprite_batches = sprite_batches;
+                    self.reconfigure_surface();
+                    return;
+                } else {
+                    log_msg!(error, L010_RENDER_ERROR, "{:?}", e);
+                }
+                None
             }
-        }
+        };
 
         // Put fonts and sprite batches back.
         state.borrow_mut().fonts = fonts;
@@ -827,6 +852,26 @@ impl LunaApp {
 
         // Copy render stats to SharedState for Lua access.
         state.borrow_mut().render_stats = renderer.render_stats.clone();
+
+        if let Some(request) = screenshot_request {
+            if !screenshot_supported {
+                log_msg!(error, L074_SCREENSHOT_NO_READBACK, "path: {}", request.path);
+            } else if let Some((width, height, pixels)) = screenshot_pixels {
+                match crate::image::ImageData::from_bytes(width, height, pixels)
+                    .and_then(|image| image.encode_png())
+                {
+                    Ok(png) => {
+                        if let Err(err) = state.borrow().fs.write_bytes(&request.path, &png) {
+                            log_msg!(error, L075_SCREENSHOT_SAVE_FAIL, "path: {}, err: {}", request.path, err);
+                        }
+                    }
+                    Err(err) => {
+                        log_msg!(error, L076_SCREENSHOT_ENCODE_FAIL, "path: {}, err: {}", request.path, err);
+                    }
+                }
+            }
+            state.borrow_mut().pending_screenshot = None;
+        }
     }
 
     fn render_splash(&mut self) {
@@ -881,6 +926,7 @@ impl LunaApp {
             bg,
             &crate::math::Mat3::identity(),
             total_time as f32,
+            false,
         ) {
             if e == wgpu::SurfaceError::Lost || e == wgpu::SurfaceError::Outdated {
                 self.reconfigure_surface();
@@ -933,6 +979,7 @@ impl LunaApp {
             bg,
             &crate::math::Mat3::identity(),
             0.0,
+            false,
         ) {
             if e == wgpu::SurfaceError::Lost || e == wgpu::SurfaceError::Outdated {
                 self.reconfigure_surface();
@@ -1057,7 +1104,7 @@ impl LunaApp {
                         entry.name = name;
                         entry.set_guid(guid);
                     }
-                    log::info!("Gamepad {} connected", id_usize);
+                    log_msg!(info, L036_GAMEPAD_CONNECTED, "id={}", id_usize);
                     if has_game {
                         if let Some(lua) = lua {
                             call_lua_callback(lua, "joystickadded", (id_u32,));
@@ -1070,7 +1117,7 @@ impl LunaApp {
                         let gamepad = ensure_gamepad_slot(&mut st.gamepads, id_usize);
                         gamepad.connected = false;
                     }
-                    log::info!("Gamepad {} disconnected", id_usize);
+                    log_msg!(info, L037_GAMEPAD_DISCONNECTED, "id={}", id_usize);
                     if has_game {
                         if let Some(lua) = lua {
                             call_lua_callback(lua, "joystickremoved", (id_u32,));
@@ -1178,8 +1225,10 @@ fn load_window_icon(game_dir: &Path, icon_path: &str) -> Option<winit::window::I
     let image = match ::image::open(&resolved_path) {
         Ok(image) => image,
         Err(error) => {
-            log::warn!(
-                "Failed to load window icon '{}': {}",
+            log_msg!(
+                warn,
+                L040_ICON_LOAD_FAIL,
+                "'{}': {}",
                 resolved_path.display(),
                 error
             );
@@ -1192,8 +1241,10 @@ fn load_window_icon(game_dir: &Path, icon_path: &str) -> Option<winit::window::I
     match winit::window::Icon::from_rgba(rgba.into_raw(), width, height) {
         Ok(icon) => Some(icon),
         Err(error) => {
-            log::warn!(
-                "Failed to convert window icon '{}': {}",
+            log_msg!(
+                warn,
+                L041_ICON_CONV_FAIL,
+                "'{}': {}",
                 resolved_path.display(),
                 error
             );
@@ -1215,8 +1266,10 @@ fn select_startup_monitor(
 
     let monitor = event_loop.available_monitors().nth(display_index as usize);
     if monitor.is_none() {
-        log::warn!(
-            "Configured display index {} is unavailable; falling back to the primary monitor",
+        log_msg!(
+            warn,
+            L042_DISPLAY_INDEX_UNAVAIL,
+            "index {}, falling back to primary",
             display_index
         );
     }
@@ -1292,7 +1345,7 @@ impl ApplicationHandler for LunaApp {
         // Initialize gilrs gamepad polling (can happen before Lua VM).
         match Gilrs::new() {
             Ok(g) => self.gilrs = Some(g),
-            Err(e) => log::warn!("Gilrs init failed (gamepads unavailable): {}", e),
+            Err(e) => log_msg!(warn, L038_GILRS_UNAVAILABLE, "{}", e),
         }
         self.last_frame = Instant::now();
 
@@ -1307,7 +1360,7 @@ impl ApplicationHandler for LunaApp {
     fn window_event(&mut self, event_loop: &ActiveEventLoop, _id: WindowId, event: WindowEvent) {
         match event {
             WindowEvent::CloseRequested => {
-                log::info!("Window close requested.");
+                log_msg!(info, L039_WINDOW_CLOSE);
                 event_loop.exit();
             }
 
@@ -1731,7 +1784,7 @@ impl ApplicationHandler for LunaApp {
 
             // Drag-and-drop: allow loading a game folder by dropping it onto the window.
             WindowEvent::HoveredFile(path) => {
-                log::debug!("HoveredFile: {}", path.display());
+                log_msg!(debug, L077_DRAG_HOVER, "{}", path.display());
                 if !self.has_game {
                     self.drag_hover = true;
                     if let Some(win) = &self.window {
@@ -1741,7 +1794,7 @@ impl ApplicationHandler for LunaApp {
             }
 
             WindowEvent::HoveredFileCancelled => {
-                log::debug!("HoveredFileCancelled");
+                log_msg!(debug, L078_DRAG_HOVER_CANCEL);
                 if self.drag_hover {
                     self.drag_hover = false;
                     if let Some(win) = &self.window {
@@ -1752,7 +1805,7 @@ impl ApplicationHandler for LunaApp {
 
             WindowEvent::DroppedFile(path) => {
                 eprintln!("[luna2d drag-drop] DroppedFile: {}", path.display());
-                log::info!("DroppedFile: {}", path.display());
+                log_msg!(info, L043_DROP_FILE, "{}", path.display());
                 if self.drag_hover {
                     self.drag_hover = false;
                     if let Some(win) = &self.window {
@@ -1762,27 +1815,24 @@ impl ApplicationHandler for LunaApp {
                 if !self.has_game {
                     let main_lua = path.join("main.lua");
                     if path.is_dir() && main_lua.exists() {
-                        log::info!("Game folder dropped — loading: {}", path.display());
+                        log_msg!(info, L044_DROP_GAME, "{}", path.display());
                         self.game_dir = path;
                         self.explicit_game_dir = true;
                         self.restart_game();
                     } else if path.is_dir() {
-                        log::warn!("Dropped folder has no main.lua: {}", path.display());
+                        log_msg!(warn, L007_NO_MAIN_LUA, "no main.lua in: {}", path.display());
                     } else if let Some(parent) = path.parent() {
                         // User may have dropped a file inside the game folder.
                         let parent_main = parent.join("main.lua");
                         if parent_main.exists() {
-                            log::info!(
-                                "Game file dropped — loading parent folder: {}",
-                                parent.display()
-                            );
+                            log_msg!(info, L044_DROP_GAME, "parent folder: {}", parent.display());
                             self.game_dir = parent.to_path_buf();
                             self.explicit_game_dir = true;
                             self.restart_game();
                         }
                     }
                 } else {
-                    log::info!("Drag-drop ignored: game already running");
+                    log_msg!(debug, L079_DRAG_DROP_IGNORED);
                 }
             }
 
@@ -1847,11 +1897,15 @@ impl App {
             self.config.log_append,
             self.config.log_level.as_deref(),
         );
-        log::info!(
-            "Luna2D Engine v{} starting (wgpu GPU backend)",
+        // Initialise the message catalog before any log_msg! calls.
+        crate::engine::messages::init();
+        log_msg!(
+            info,
+            crate::engine::log_messages::L001_ENGINE_START,
+            "v{} (wgpu GPU backend)",
             env!("CARGO_PKG_VERSION"),
         );
-        log::info!("Game directory: {}", game_dir.display());
+        log_msg!(info, L080_GAME_DIR, "{}", game_dir.display());
 
         let event_loop = EventLoop::new().expect("Failed to create event loop");
         // Start with Poll so the first frame and init_lua run as fast as
@@ -1861,7 +1915,7 @@ impl App {
         let mut app = LunaApp::new(self.config, game_dir, self.conf_error, explicit_game_dir);
         event_loop.run_app(&mut app).expect("Event loop error");
 
-        log::info!("Luna2D Engine shut down.");
+        log_msg!(info, crate::engine::log_messages::L002_ENGINE_STOP);
     }
 }
 
@@ -1964,7 +2018,7 @@ fn init_logging(
                     Ok(())
                 })
                 .init();
-            log::info!("Log file: {}", log_path.display());
+            log_msg!(info, L081_LOG_FILE, "{}", log_path.display());
         }
         Err(e) => {
             env_logger::Builder::new()
@@ -1976,11 +2030,7 @@ fn init_logging(
                 .filter_module("naga", wgpu_level)
                 .format_timestamp_millis()
                 .init();
-            log::warn!(
-                "Could not create log file '{}': {} — logging to stderr only",
-                log_path.display(),
-                e
-            );
+            log_msg!(warn, L082_LOG_FILE_FAIL, "path: {}, err: {}", log_path.display(), e);
         }
     }
 }
@@ -1991,7 +2041,7 @@ fn call_lua_callback<'a, A: IntoLuaMulti<'a>>(lua: &'a Lua, name: &str, args: A)
     if let Ok(luna) = lua.globals().get::<_, LuaTable>("luna") {
         if let Ok(func) = luna.get::<_, LuaFunction>(name) {
             if let Err(e) = func.call::<_, ()>(args) {
-                log::error!("Lua error in luna.{}(): {}", name, e);
+                log_msg!(error, L011_LUA_ERROR, "luna.{}(): {}", name, e);
             }
         }
     }
@@ -2016,7 +2066,7 @@ fn call_lua_callback_checked<'a, A: IntoLuaMulti<'a>>(
 /// returns the default error screen for the original error.
 fn try_errorhandler_or_screen(lua: &Lua, err: &mlua::Error) -> ErrorScreen {
     let msg = format!("{}", err);
-    log::error!("Lua runtime error: {}", msg);
+    log_msg!(error, L011_LUA_ERROR, "runtime: {}", msg);
     if let Ok(luna) = lua.globals().get::<_, LuaTable>("luna") {
         if let Ok(handler) = luna.get::<_, LuaFunction>("errorhandler") {
             match handler.call::<_, ()>(msg.clone()) {

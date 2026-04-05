@@ -188,7 +188,7 @@ pub fn luna_run() {
             .unwrap_or_default();
 
         let msg = format!("Luna2D panicked: {}{}", payload, location);
-        log::error!("{}", msg);
+        log_msg!(error, crate::engine::log_messages::L060_LUA_CALLBACK_ERROR, "{}", msg);
 
         #[cfg(target_os = "windows")]
         {
@@ -220,7 +220,7 @@ pub fn luna_run() {
                 }
                 Err(e) => {
                     let msg = format!("Failed to open .lunar archive '{}': {}", path.display(), e);
-                    log::error!("{}", msg);
+                    log_msg!(error, crate::engine::log_messages::L060_LUA_CALLBACK_ERROR, "{}", msg);
                     #[cfg(target_os = "windows")]
                     show_windows_error_box(&msg);
                     eprintln!("{}", msg);

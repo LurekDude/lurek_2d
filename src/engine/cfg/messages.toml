@@ -1,0 +1,176 @@
+# Luna2D Engine Message Catalog
+#
+# Format: ID = "human-readable message text"
+# IDs are stable across versions — never reuse a retired ID.
+#
+# The catalog is organized by tier to reflect the engine module hierarchy.
+# The loader flattens all nested tables into a single ID → text map, so IDs
+# must be globally unique regardless of which section they appear in.
+#
+# Tiers:
+#   baseline — engine + math (no external dependencies)
+#   tier1    — core subsystems: graphics, audio, physics, input, timer, …
+#   tier2    — engine extensions: ai, tilemap, scene, resource, …
+#   tier3    — gameplay / library: dialog, inventory, quest, …
+
+# =============================================================================
+# BASELINE — engine module
+# =============================================================================
+
+[baseline.lifecycle]
+L001 = "Luna2D Engine starting"
+L002 = "Luna2D Engine stopped"
+L003 = "Game loaded"
+L004 = "Game restarted"
+L005 = "conf.lua loaded"
+L006 = "Splash screen — no game loaded"
+L007 = "No main.lua found in game directory"
+
+[baseline.gpu]
+L033 = "GPU adapter selected"
+L034 = "GPU texture dimension limit"
+L035 = "GPU initialised"
+
+[baseline.errors]
+L010 = "Render error"
+L011 = "Lua error"
+L012 = "Audio error"
+L013 = "Filesystem error"
+L014 = "Physics error"
+L015 = "Resource not found"
+L016 = "Lua VM initialisation failed"
+L017 = "Failed to read main.lua"
+
+[baseline.warnings]
+L020 = "No audio device available"
+L021 = "Clipboard access failed"
+L022 = "Unknown log level requested"
+L023 = "GPU texture dimension below minimum"
+L024 = "Surface lost — reconfiguring"
+L050 = "Module dependency disabled"
+L051 = "Failed to read conf.lua"
+L052 = "Error in conf.lua"
+L053 = "Error calling luna.conf()"
+
+[baseline.subsystems]
+L036 = "Gamepad connected"
+L037 = "Gamepad disconnected"
+L038 = "Gamepad input library unavailable"
+L039 = "Window close requested"
+L040 = "Window icon load failed"
+L041 = "Window icon conversion failed"
+L042 = "Display index unavailable"
+L043 = "Drag-and-drop file event"
+L044 = "Drag-and-drop game loaded"
+
+[baseline.debug]
+L030 = "Async asset load requested"
+L031 = "Async asset load completed"
+L032 = "Draw batch statistics"
+
+# =============================================================================
+# TIER 1 — core subsystems (graphics, audio, physics, input, timer, …)
+# =============================================================================
+
+
+
+
+[tier1.input]
+# Reserved: I001–I099
+
+# =============================================================================
+# TIER 2 — engine extensions (ai, tilemap, scene, resource, …)
+# =============================================================================
+
+[tier2.scene]
+# Reserved: S001–S099
+
+[tier2.resource]
+# Reserved: R001–R099
+
+# =============================================================================
+# TIER 3 — gameplay / library systems
+# =============================================================================
+
+[tier3.dialog]
+# Reserved: D001–D099
+
+[tier3.quest]
+# Reserved: Q001–Q099
+
+# =============================================================================
+# TIER 1 — audio
+# =============================================================================
+
+[tier1.audio]
+A001 = "Failed to read MIDI file"
+A002 = "MIDI playback disabled in this build"
+A003 = "Audio output not available"
+A004 = "Audio queue entry started"
+
+# =============================================================================
+# TIER 1 — graphics
+# =============================================================================
+
+[tier1.graphics]
+G001 = "Failed to rasterize font glyph"
+G002 = "Screenshot failed: zero-sized surface"
+G003 = "Screenshot failed: readback buffer map error"
+G004 = "Screenshot failed: readback status receive error"
+G005 = "Screenshot failed: pixel data read error"
+G006 = "Font atlas at maximum size, cannot grow"
+
+# =============================================================================
+# TIER 1 — physics
+# =============================================================================
+
+[tier1.physics]
+P001 = "Pulley joints unsupported: using fixed joint fallback"
+P002 = "Gear joints unsupported: using fixed joint fallback"
+
+# =============================================================================
+# TIER 2 — dataframe
+# =============================================================================
+
+[tier2.dataframe]
+DF01 = "Right join not yet implemented"
+
+# =============================================================================
+# LUA API layer messages
+# =============================================================================
+
+[baseline.lua_api]
+LA01 = "Lua API stub not yet implemented"
+LA02 = "Pipeline Lua callback failed"
+LA03 = "openURL rejected: scheme not in allowlist"
+LA04 = "Clipboard write failed"
+LA05 = "Clipboard unavailable"
+LA06 = "Clipboard read failed"
+LA07 = "Unknown window scale mode, ignoring"
+LA08 = "setThreadCount: async pathfinding not yet exposed to Lua"
+
+# =============================================================================
+# BASELINE — Lua callback errors
+# =============================================================================
+
+[baseline.callbacks]
+L060 = "Lua callback error"
+
+# =============================================================================
+# APP — surface, cursor, screenshot, drag-drop
+# =============================================================================
+
+[baseline.app]
+L070 = "Surface does not support readback; screenshots unavailable"
+L071 = "Failed to apply relative cursor grab mode"
+L072 = "Failed to apply cursor grab mode"
+L073 = "Failed to set cursor position"
+L074 = "Screenshot requested but surface does not support readback"
+L075 = "Failed to save screenshot"
+L076 = "Failed to encode screenshot"
+L077 = "Drag-drop file hovered"
+L078 = "Drag-drop hover cancelled"
+L079 = "Drag-drop ignored: game already running"
+L080 = "Game directory"
+L081 = "Log file"
+L082 = "Could not create log file; logging to stderr only"

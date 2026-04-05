@@ -15,6 +15,11 @@ const LIST_SELECTED_FG: [f32; 4] = [0.7, 0.95, 1.0, 1.0];
 const CURSOR_CHAR: char = '_';
 
 /// Internal terminal event emitted by input routing.
+///
+/// # Variants
+/// - `ButtonClicked` — Button activation event with the widget index.
+/// - `TextChanged` — Text input change event with the widget index.
+/// - `SelectionChanged` — List selection change event with the widget index.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub(crate) enum TerminalEvent {
     ButtonClicked { index: usize },
@@ -54,6 +59,7 @@ fn set_render_cell(
     cells[idx].fg = fg;
 }
 
+#[allow(clippy::too_many_arguments)]
 fn clear_render_rect(
     cells: &mut [TCell],
     cols: usize,
@@ -71,6 +77,7 @@ fn clear_render_rect(
     }
 }
 
+#[allow(clippy::too_many_arguments)]
 fn write_render_text(
     cells: &mut [TCell],
     cols: usize,
@@ -270,6 +277,13 @@ impl Terminal {
     }
 
     /// Add a child widget to a panel.
+    ///
+    /// # Parameters
+    /// - `panel_index` — `usize`. Index of the panel widget.
+    /// - `child_index` — `usize`. Index of the widget to attach as a child.
+    ///
+    /// # Returns
+    /// `bool`.
     pub(crate) fn add_panel_child(&mut self, panel_index: usize, child_index: usize) -> bool {
         if panel_index >= self.widgets.len()
             || child_index >= self.widgets.len()
@@ -290,6 +304,13 @@ impl Terminal {
     }
 
     /// Remove a child widget from a panel.
+    ///
+    /// # Parameters
+    /// - `panel_index` — `usize`. Index of the panel widget.
+    /// - `child_index` — `usize`. Index of the child widget to detach.
+    ///
+    /// # Returns
+    /// `bool`.
     pub(crate) fn remove_panel_child(&mut self, panel_index: usize, child_index: usize) -> bool {
         if panel_index >= self.widgets.len() {
             return false;
@@ -306,6 +327,12 @@ impl Terminal {
     }
 
     /// Clear all children from a panel.
+    ///
+    /// # Parameters
+    /// - `panel_index` — `usize`. Index of the panel widget.
+    ///
+    /// # Returns
+    /// `bool`.
     pub(crate) fn clear_panel_children(&mut self, panel_index: usize) -> bool {
         if panel_index >= self.widgets.len() {
             return false;
@@ -375,10 +402,13 @@ impl Terminal {
     }
 
     /// Route a key press to the focused widget and collect emitted events.
-    pub(crate) fn keypressed_with_events(
-        &mut self,
-        key: &str,
-    ) -> (bool, Vec<TerminalEvent>) {
+    ///
+    /// # Parameters
+    /// - `key` — `&str`. Logical key name to route to the focused widget.
+    ///
+    /// # Returns
+    /// `(bool, Vec<TerminalEvent>)`.
+    pub(crate) fn keypressed_with_events(&mut self, key: &str) -> (bool, Vec<TerminalEvent>) {
         let focused_index = match self.focused {
             Some(index) if index < self.widgets.len() => index,
             _ => return (false, Vec::new()),
@@ -510,10 +540,13 @@ impl Terminal {
     }
 
     /// Route text input to the focused widget and collect emitted events.
-    pub(crate) fn textinput_with_events(
-        &mut self,
-        text_input: &str,
-    ) -> (bool, Vec<TerminalEvent>) {
+    ///
+    /// # Parameters
+    /// - `text_input` — `&str`. UTF-8 text to insert into the focused widget.
+    ///
+    /// # Returns
+    /// `(bool, Vec<TerminalEvent>)`.
+    pub(crate) fn textinput_with_events(&mut self, text_input: &str) -> (bool, Vec<TerminalEvent>) {
         let focused_index = match self.focused {
             Some(index) if index < self.widgets.len() => index,
             _ => return (false, Vec::new()),
@@ -550,6 +583,14 @@ impl Terminal {
     }
 
     /// Route a mouse press to widgets and collect emitted events.
+    ///
+    /// # Parameters
+    /// - `grid_col` — `usize`. 1-based grid column of the mouse press.
+    /// - `grid_row` — `usize`. 1-based grid row of the mouse press.
+    /// - `button` — `usize`. Mouse button index.
+    ///
+    /// # Returns
+    /// `(bool, Vec<TerminalEvent>)`.
     pub(crate) fn mousepressed_with_events(
         &mut self,
         grid_col: usize,
@@ -578,9 +619,7 @@ impl Terminal {
                     events.push(TerminalEvent::ButtonClicked { index });
                 }
                 WidgetKind::TextBox {
-                    text,
-                    cursor_pos,
-                    ..
+                    text, cursor_pos, ..
                 } => {
                     let relative_col = col.saturating_sub(widget.base.x);
                     *cursor_pos = relative_col.min(char_count(text));
@@ -607,6 +646,9 @@ impl Terminal {
     }
 
     /// Render the current grid with all visible widgets composited on top.
+    ///
+    /// # Returns
+    /// `Vec<TCell>`.
     pub(crate) fn render_cells(&self) -> Vec<TCell> {
         let mut cells = self.grid.clone();
 
@@ -646,7 +688,8 @@ impl Terminal {
                     );
                     let row = widget.base.y + widget.base.height.saturating_sub(1) / 2;
                     let text_width = char_count(text).min(widget.base.width);
-                    let start_col = widget.base.x + widget.base.width.saturating_sub(text_width) / 2;
+                    let start_col =
+                        widget.base.x + widget.base.width.saturating_sub(text_width) / 2;
                     write_render_text(
                         &mut cells,
                         self.cols,
@@ -659,9 +702,7 @@ impl Terminal {
                     );
                 }
                 WidgetKind::TextBox {
-                    text,
-                    cursor_pos,
-                    ..
+                    text, cursor_pos, ..
                 } => {
                     clear_render_rect(
                         &mut cells,
@@ -722,7 +763,11 @@ impl Terminal {
                         }
 
                         let is_selected = *selected == Some(item_index);
-                        let fg = if is_selected { LIST_SELECTED_FG } else { DEFAULT_FG };
+                        let fg = if is_selected {
+                            LIST_SELECTED_FG
+                        } else {
+                            DEFAULT_FG
+                        };
                         let prefix = if is_selected { "> " } else { "  " };
                         let available = widget.base.width.saturating_sub(char_count(prefix));
                         let text = truncate_chars(&items[item_index], available);
@@ -748,7 +793,11 @@ impl Terminal {
                         );
                     }
                 }
-                WidgetKind::Border { style, title, color } => {
+                WidgetKind::Border {
+                    style,
+                    title,
+                    color,
+                } => {
                     self.render_border(&mut cells, widget, *style, title, *color);
                 }
                 WidgetKind::Panel { .. } => {}

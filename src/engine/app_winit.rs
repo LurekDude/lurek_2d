@@ -1,5 +1,8 @@
 //! Luna2D application lifecycle using winit 0.30 + wgpu GPU rendering.
 //!
+//! # DEAD FILE
+//! This file is NOT declared in `src/engine/mod.rs` and is not compiled.
+//! Preserved for reference only. Message catalog migration was NOT applied here.
 //! Replaces the minifb-based `App` with a `winit` event loop and `GpuRenderer`.
 //! The game loop structure (callbacks, SharedState, Lua VM) is preserved;
 //! only the rendering and windowing backends change.

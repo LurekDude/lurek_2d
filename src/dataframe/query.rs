@@ -8,6 +8,8 @@
 //! and the `luna.*` Lua API for the scripting interface.
 
 use crate::dataframe::frame::{CellValue, ColRef, DataFrame};
+use crate::engine::log_messages::DF01_RIGHT_JOIN_UNIMPL;
+use crate::log_msg;
 
 // ---------------------------------------------------------------------------
 // Simple xorshift64 RNG (duplicated here to avoid coupling to frame module)
@@ -256,7 +258,7 @@ impl DataFrame {
         join_type: &str,
     ) -> Result<DataFrame, String> {
         if join_type == "right" {
-            log::warn!("right join not yet implemented, returning empty DataFrame");
+            log_msg!(warn, DF01_RIGHT_JOIN_UNIMPL);
             let mut all_cols: Vec<String> = self.columns().to_vec();
             for name in other.columns() {
                 if !all_cols.contains(name) {

@@ -12,6 +12,10 @@ use std::rc::Rc;
 use mlua::prelude::*;
 
 use crate::lua_api::lua_types::{add_type_methods, LunaType};
+use crate::engine::log_messages::LA02_PIPELINE_CALLBACK_FAIL;
+#[allow(unused_imports)]
+use crate::log_msg;
+
 use crate::pipeline::{
     ErrorMode, Pipeline, PipelineScheduler, PipelineStep, StepStatus,
 };
@@ -550,7 +554,7 @@ fn execute_step_sync<'lua>(
     if let Some(key) = wrapper.on_error_key.borrow().as_ref() {
         let err_fn: LuaFunction = lua.registry_value(key)?;
         if let Err(e) = err_fn.call::<_, LuaValue<'_>>((name.clone(), err_msg)) {
-            log::warn!("pipeline on_error callback failed: {e}");
+            log_msg!(warn, LA02_PIPELINE_CALLBACK_FAIL, "on_error: {e}");
         }
     }
 
@@ -808,7 +812,7 @@ impl LuaUserData for LuaPipeline {
                     if let Some(key) = this.on_step_complete_key.borrow().as_ref() {
                         let f: LuaFunction = lua.registry_value(key)?;
                         if let Err(e) = f.call::<_, LuaValue<'_>>((step_name.clone(), ctx.clone())) {
-                            log::warn!("pipeline on_step_complete callback failed: {e}");
+                            log_msg!(warn, LA02_PIPELINE_CALLBACK_FAIL, "on_step_complete: {e}");
                         }
                     }
                 } else if step_status == StepStatus::Failed {
@@ -816,7 +820,7 @@ impl LuaUserData for LuaPipeline {
                         let f: LuaFunction = lua.registry_value(key)?;
                         let err = wrapper.inner.borrow().error_msg.clone().unwrap_or_default();
                         if let Err(e) = f.call::<_, LuaValue<'_>>((step_name.clone(), err)) {
-                            log::warn!("pipeline on_step_error callback failed: {e}");
+                            log_msg!(warn, LA02_PIPELINE_CALLBACK_FAIL, "on_step_error: {e}");
                         }
                     }
                 }
@@ -843,7 +847,7 @@ impl LuaUserData for LuaPipeline {
             if let Some(key) = this.on_complete_key.borrow().as_ref() {
                 let f: LuaFunction = lua.registry_value(key)?;
                 if let Err(e) = f.call::<_, LuaValue<'_>>(result.clone()) {
-                    log::warn!("pipeline on_complete callback failed: {e}");
+                    log_msg!(warn, LA02_PIPELINE_CALLBACK_FAIL, "on_complete: {e}");
                 }
             }
 
@@ -942,7 +946,7 @@ impl LuaUserData for LuaPipeline {
                     if let Some(key) = this.on_step_complete_key.borrow().as_ref() {
                         let f: LuaFunction = lua.registry_value(key)?;
                         if let Err(e) = f.call::<_, LuaValue<'_>>((step_name.clone(), ctx.clone())) {
-                            log::warn!("pipeline on_step_complete callback failed: {e}");
+                            log_msg!(warn, LA02_PIPELINE_CALLBACK_FAIL, "on_step_complete: {e}");
                         }
                     }
                 } else if step_status == StepStatus::Failed {
@@ -950,7 +954,7 @@ impl LuaUserData for LuaPipeline {
                         let f: LuaFunction = lua.registry_value(key)?;
                         let err = wrapper.inner.borrow().error_msg.clone().unwrap_or_default();
                         if let Err(e) = f.call::<_, LuaValue<'_>>((step_name.clone(), err)) {
-                            log::warn!("pipeline on_step_error callback failed: {e}");
+                            log_msg!(warn, LA02_PIPELINE_CALLBACK_FAIL, "on_step_error: {e}");
                         }
                     }
                 }
@@ -1020,7 +1024,7 @@ impl LuaUserData for LuaPipeline {
                 if let Some(key) = this.on_complete_key.borrow().as_ref() {
                     let f: LuaFunction = lua.registry_value(key)?;
                     if let Err(e) = f.call::<_, LuaValue<'_>>(result) {
-                        log::warn!("pipeline on_complete callback failed: {e}");
+                        log_msg!(warn, LA02_PIPELINE_CALLBACK_FAIL, "on_complete: {e}");
                     }
                 }
             }

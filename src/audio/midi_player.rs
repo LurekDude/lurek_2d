@@ -16,6 +16,8 @@ use crate::engine::resource_keys::BusKey;
 use rodio::Source;
 // use std::collections::HashSet; // only needed for MIDI load_data (disabled)
 use std::path::Path;
+use crate::engine::log_messages::{A001_MIDI_READ_FAIL, A002_MIDI_DISABLED};
+use crate::log_msg;
 
 /// Pre-parsed MIDI metadata extracted during `load()`.
 ///
@@ -130,7 +132,7 @@ impl MidiPlayer {
         let bytes = match std::fs::read(path) {
             Ok(b) => b,
             Err(e) => {
-                log::warn!("Failed to read MIDI file {:?}: {}", path, e);
+                log_msg!(warn, A001_MIDI_READ_FAIL, "{:?}: {}", path, e);
                 return false;
             }
         };
@@ -155,7 +157,7 @@ impl MidiPlayer {
         // MIDI disabled: midly crate removed from Cargo.toml.
         // To re-enable: restore midly = "0.5" in Cargo.toml, uncomment the
         // midly/HashSet imports above, and restore the function body from git history.
-        log::warn!("luna.audio.newMidiPlayer: MIDI playback is disabled in this build.");
+        log_msg!(warn, A002_MIDI_DISABLED);
         false
     }
 

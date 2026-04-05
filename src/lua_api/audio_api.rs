@@ -10,18 +10,21 @@
 //!
 use super::SharedState;
 use crate::audio::Decoder;
+use crate::audio::dsp::{AtomicParam, EffectParams, EffectType};
 use crate::audio::MidiPlayer;
 use crate::audio::SourceType;
+use crate::audio::sound_data::SoundData;
+use crate::engine::log_messages::LA01_API_STUB;
 use crate::engine::resource_keys::BusKey;
 use crate::engine::resource_keys::QueueableKey;
 use crate::engine::resource_keys::SoundKey;
-use crate::audio::dsp::{EffectType, EffectParams, AtomicParam};
-use std::sync::Arc;
 use crate::lua_api::lua_types::{add_type_methods, LunaType};
-use crate::audio::sound_data::SoundData;
 use mlua::prelude::*;
+use slotmap::Key;
 use std::cell::RefCell;
 use std::rc::Rc;
+use std::sync::Arc;
+use crate::log_msg;
 
 /// Lua UserData wrapper for an audio source resource.
 ///
@@ -490,7 +493,7 @@ impl LuaUserData for LuaMidiPlayer {
         /// # Parameters
         /// - `path` — File path to the .sf2 SoundFont file.
         methods.add_method("setSoundFont", |_, _this, _path: String| {
-            log::debug!("stub: MidiPlayer:setSoundFont called");
+            log_msg!(debug, LA01_API_STUB, "MidiPlayer:setSoundFont");
             Ok(())
         });
 
@@ -500,13 +503,13 @@ impl LuaUserData for LuaMidiPlayer {
         /// # Returns
         /// Path string, or nil if using built-in defaults.
         methods.add_method("getSoundFontPath", |_, _this, ()| {
-            log::debug!("stub: MidiPlayer:getSoundFontPath called");
+            log_msg!(debug, LA01_API_STUB, "MidiPlayer:getSoundFontPath");
             Ok(Option::<String>::None)
         });
 
         /// Reverts the player to using the built-in default SoundFont for rendering.
         methods.add_method("useDefaultSoundFont", |_, _this, ()| {
-            log::debug!("stub: MidiPlayer:useDefaultSoundFont called");
+            log_msg!(debug, LA01_API_STUB, "MidiPlayer:useDefaultSoundFont");
             Ok(())
         });
 
@@ -881,7 +884,7 @@ impl LuaUserData for LuaMidiPlayer {
         /// # Parameters
         /// - `callback` — Function called as callback(channel, note, velocity).
         methods.add_method("setOnNoteOn", |_, _this, _cb: LuaValue| {
-            log::debug!("stub: MidiPlayer:setOnNoteOn called");
+            log_msg!(debug, LA01_API_STUB, "MidiPlayer:setOnNoteOn");
             Ok(())
         });
 
@@ -891,7 +894,7 @@ impl LuaUserData for LuaMidiPlayer {
         /// # Parameters
         /// - `callback` — Function called as callback(channel, note, velocity).
         methods.add_method("setOnNoteOff", |_, _this, _cb: LuaValue| {
-            log::debug!("stub: MidiPlayer:setOnNoteOff called");
+            log_msg!(debug, LA01_API_STUB, "MidiPlayer:setOnNoteOff");
             Ok(())
         });
 
@@ -901,7 +904,7 @@ impl LuaUserData for LuaMidiPlayer {
         /// # Parameters
         /// - `callback` — Function called with no arguments when playback ends.
         methods.add_method("setOnEnd", |_, _this, _cb: LuaValue| {
-            log::debug!("stub: MidiPlayer:setOnEnd called");
+            log_msg!(debug, LA01_API_STUB, "MidiPlayer:setOnEnd");
             Ok(())
         });
     }
@@ -1121,7 +1124,6 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
 
             let game_dir = st.game_dir.clone();
             st.mixer.play(key, &game_dir);
-            use slotmap::Key;
             Ok(key.data().as_ffi())
         })?,
     )?;
@@ -1741,7 +1743,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
     audio.set(
         "setMeter",
         lua.create_function(|_, _scale: f32| {
-            log::debug!("stub: luna.audio.setMeter called");
+            log_msg!(debug, LA01_API_STUB, "luna.audio.setMeter");
             Ok(())
         })?,
     )?;
@@ -1752,7 +1754,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
     audio.set(
         "getMeter",
         lua.create_function(|_, ()| {
-            log::debug!("stub: luna.audio.getMeter called");
+            log_msg!(debug, LA01_API_STUB, "luna.audio.getMeter");
             Ok(1.0_f32)
         })?,
     )?;

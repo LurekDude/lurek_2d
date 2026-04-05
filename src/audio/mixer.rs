@@ -35,6 +35,10 @@ use std::collections::VecDeque;
 use std::io::BufReader;
 use std::path::Path;
 use std::sync::Arc;
+
+use crate::engine::log_messages::{A003_AUDIO_OUTPUT_UNAVAIL, A004_AUDIO_PLAY_QUEUED};
+#[allow(unused_imports)]
+use crate::log_msg;
 use std::time::Instant;
 
 use rodio::Source;
@@ -239,7 +243,7 @@ impl Mixer {
         let (stream, handle) = match rodio::OutputStream::try_default() {
             Ok((s, h)) => (Some(s), Some(h)),
             Err(e) => {
-                log::warn!("Audio output not available: {}", e);
+                log_msg!(warn, A003_AUDIO_OUTPUT_UNAVAIL, "{}", e);
                 (None, None)
             }
         };
@@ -1554,7 +1558,7 @@ impl Mixer {
     pub fn play_queueable(&mut self, key: QueueableKey) {
         // Queueable play is a no-op at the rodio level in this implementation;
         // game code controls output by queuing buffers.
-        log::debug!("play_queueable called");
+        log_msg!(debug, A004_AUDIO_PLAY_QUEUED);
         let _ = key;
     }
 

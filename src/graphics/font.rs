@@ -10,6 +10,9 @@
 
 use crate::engine::error::{EngineError, EngineResult};
 use std::collections::HashMap;
+use crate::engine::log_messages::G006_ATLAS_MAX_SIZE;
+#[allow(unused_imports)]
+use crate::log_msg;
 
 /// Initial atlas dimensions in pixels.
 const INITIAL_ATLAS_SIZE: u32 = 512;
@@ -371,11 +374,7 @@ impl Font {
         let new_height = (self.atlas_height * 2).min(MAX_ATLAS_SIZE);
 
         if new_width == self.atlas_width && new_height == self.atlas_height {
-            log::warn!(
-                "Font atlas at maximum size {}x{}, cannot grow further",
-                MAX_ATLAS_SIZE,
-                MAX_ATLAS_SIZE
-            );
+            log_msg!(warn, G006_ATLAS_MAX_SIZE, "{}x{}", MAX_ATLAS_SIZE, MAX_ATLAS_SIZE);
             return;
         }
 

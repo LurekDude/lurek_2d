@@ -16,6 +16,10 @@ use std::collections::HashMap;
 use super::body::{Body, BodyShape, BodyType};
 use super::shape::Shape;
 
+use crate::engine::log_messages::{P001_PULLEY_JOINT_FALLBACK, P002_GEAR_JOINT_FALLBACK};
+#[allow(unused_imports)]
+use crate::log_msg;
+
 // ── Internal event collector ─────────────────────────────────────────────────
 
 /// Collects rapier `CollisionEvent`s during a pipeline step.
@@ -1896,7 +1900,7 @@ impl World {
         anchor_x: f32,
         anchor_y: f32,
     ) -> usize {
-        log::warn!("Pulley joints are not supported by rapier2d; using fixed joint fallback");
+        log_msg!(warn, P001_PULLEY_JOINT_FALLBACK);
         self.add_weld_joint(body_a, body_b, anchor_x, anchor_y)
     }
 
@@ -1917,7 +1921,7 @@ impl World {
         anchor_x: f32,
         anchor_y: f32,
     ) -> usize {
-        log::warn!("Gear joints are not supported by rapier2d; using fixed joint fallback");
+        log_msg!(warn, P002_GEAR_JOINT_FALLBACK);
         self.add_weld_joint(body_a, body_b, anchor_x, anchor_y)
     }
 

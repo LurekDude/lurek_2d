@@ -13,7 +13,8 @@ use std::cell::RefCell;
 use std::rc::Rc;
 
 use super::SharedState;
-use crate::engine::log_messages;
+use crate::engine::log_messages::{self, LA03_OPEN_URL_REJECTED, LA04_CLIPBOARD_WRITE_FAIL, LA05_CLIPBOARD_UNAVAIL, LA06_CLIPBOARD_READ_FAIL};
+use crate::log_msg;
 
 /// Returns the number of logical processors available.
 ///
@@ -53,7 +54,7 @@ pub fn open_url(url: &str) -> bool {
         && !url_lower.starts_with("https://")
         && !url_lower.starts_with("mailto:")
     {
-        log::warn!("openURL rejected: only http, https, and mailto schemes allowed");
+        log_msg!(warn, LA03_OPEN_URL_REJECTED);
         return false;
     }
 
@@ -290,11 +291,11 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
             match arboard::Clipboard::new() {
                 Ok(mut cb) => {
                     if let Err(e) = cb.set_text(text) {
-                        log::warn!("luna.system.setClipboardText: {}", e);
+                        log_msg!(warn, LA04_CLIPBOARD_WRITE_FAIL, "{}", e);
                     }
                 }
                 Err(e) => {
-                    log::warn!("luna.system.setClipboardText: clipboard unavailable: {}", e);
+                    log_msg!(warn, LA05_CLIPBOARD_UNAVAIL, "setClipboardText: {}", e);
                 }
             }
             Ok(())
@@ -310,12 +311,12 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
             Ok(mut cb) => match cb.get_text() {
                 Ok(text) => Ok(text),
                 Err(e) => {
-                    log::warn!("luna.system.getClipboardText: {}", e);
+                    log_msg!(warn, LA06_CLIPBOARD_READ_FAIL, "{}", e);
                     Ok(String::new())
                 }
             },
             Err(e) => {
-                log::warn!("luna.system.getClipboardText: clipboard unavailable: {}", e);
+                log_msg!(warn, LA05_CLIPBOARD_UNAVAIL, "getClipboardText: {}", e);
                 Ok(String::new())
             }
         })?,

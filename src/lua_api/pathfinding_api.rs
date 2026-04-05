@@ -21,6 +21,9 @@ use crate::pathfinding::pathgrid::PathGrid;
 use crate::pathfinding::{DiagonalMode, FlowField, NavGrid, UnitPathfinder, Waypoint};
 
 use super::lua_types::{add_type_methods, LunaType};
+use crate::engine::log_messages::{LA08_PATHFINDING_THREAD_UNIMPL};
+#[allow(unused_imports)]
+use crate::log_msg;
 
 // ---------------------------------------------------------------------------
 // LuaNavGrid
@@ -898,7 +901,7 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
     pathfinding.set(
         "setThreadCount",
         lua.create_function(|_, _count: u32| {
-            log::warn!("luna.pathfinding.setThreadCount: async pathfinding not yet exposed to Lua");
+            log_msg!(warn, LA08_PATHFINDING_THREAD_UNIMPL);
             Ok(())
         })?,
     )?;

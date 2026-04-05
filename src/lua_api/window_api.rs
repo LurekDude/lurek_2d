@@ -11,6 +11,9 @@ use super::{FullscreenType, SharedState};
 use mlua::prelude::*;
 use std::cell::RefCell;
 use std::rc::Rc;
+use crate::engine::log_messages::{LA07_SCALE_MODE_UNKNOWN};
+#[allow(unused_imports)]
+use crate::log_msg;
 
 /// Registers `luna.window.*` functions into the Lua VM.
 ///
@@ -642,7 +645,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
             if matches!(mode.as_str(), "none" | "letterbox" | "stretch" | "pixel") {
                 s.borrow_mut().window_state.pending_scale_mode = Some(mode);
             } else {
-                log::warn!("luna.window.setScaleMode: unknown mode '{}', ignoring", mode);
+                log_msg!(warn, LA07_SCALE_MODE_UNKNOWN, "mode: {}", mode);
             }
             Ok(())
         })?,
