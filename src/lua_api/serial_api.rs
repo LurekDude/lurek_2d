@@ -1,7 +1,8 @@
 //! Registers the `luna.serial.*` format serialization API.
 //!
-//! Provides `luna.serial` with functions to parse and serialize JSON, TOML, CSV, and YAML
-//! to/from Lua tables. No file I/O — strings in, strings out.
+//! Provides `luna.serial` with functions to parse and serialize JSON, TOML, and CSV
+//! to/from Lua tables. YAML removed — use TOML for config (design-assumption B-05).
+//! No file I/O — strings in, strings out.
 
 use mlua::prelude::*;
 
@@ -38,8 +39,7 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
         "toJson",
         lua.create_function(|_, (table, pretty): (LuaValue, Option<bool>)| {
             let val = lua_value_to_serial(&table)?;
-            crate::serial::to_json(&val, pretty.unwrap_or(false))
-                .map_err(LuaError::RuntimeError)
+            crate::serial::to_json(&val, pretty.unwrap_or(false)).map_err(LuaError::RuntimeError)
         })?,
     )?;
 
@@ -72,18 +72,20 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
     /// @param has_headers : boolean?
     serial_table.set(
         "fromCsv",
-        lua.create_function(|lua, (s, delim, headers): (String, Option<String>, Option<bool>)| {
-            let delimiter = delim
-                .as_deref()
-                .and_then(|d| d.as_bytes().first().copied())
-                .unwrap_or(b',');
-            let opts = CsvOptions {
-                delimiter,
-                has_headers: headers.unwrap_or(true),
-            };
-            let val = crate::serial::from_csv(&s, opts).map_err(LuaError::RuntimeError)?;
-            serial_value_to_lua(lua, &val)
-        })?,
+        lua.create_function(
+            |lua, (s, delim, headers): (String, Option<String>, Option<bool>)| {
+                let delimiter = delim
+                    .as_deref()
+                    .and_then(|d| d.as_bytes().first().copied())
+                    .unwrap_or(b',');
+                let opts = CsvOptions {
+                    delimiter,
+                    has_headers: headers.unwrap_or(true),
+                };
+                let val = crate::serial::from_csv(&s, opts).map_err(LuaError::RuntimeError)?;
+                serial_value_to_lua(lua, &val)
+            },
+        )?,
     )?;
 
     // luna.serial.toCsv(table, delimiter?, hasHeaders?) -> string
@@ -109,27 +111,8 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
         )?,
     )?;
 
-    // luna.serial.fromYaml(str) -> table
-    /// Parses a YAML string and returns a Lua table.
-    /// @param s : string
-    serial_table.set(
-        "fromYaml",
-        lua.create_function(|lua, s: String| {
-            let val = crate::serial::from_yaml(&s).map_err(LuaError::RuntimeError)?;
-            serial_value_to_lua(lua, &val)
-        })?,
-    )?;
-
-    // luna.serial.toYaml(table) -> string
-    /// Serializes a Lua table to a YAML string.
-    /// @param table : table
-    serial_table.set(
-        "toYaml",
-        lua.create_function(|_, table: LuaValue| {
-            let val = lua_value_to_serial(&table)?;
-            crate::serial::to_yaml(&val).map_err(LuaError::RuntimeError)
-        })?,
-    )?;
+    // luna.serial.fromYaml / toYaml removed: YAML dep (serde_yml) dropped from Cargo.toml.
+    // Use luna.serial.fromToml / toToml instead.
 
     luna.set("serial", serial_table)?;
     Ok(())
@@ -176,13 +159,11 @@ fn lua_value_to_serial(val: &LuaValue) -> LuaResult<SerialValue> {
                 Ok(SerialValue::Float(*f))
             }
         }
-        LuaValue::String(s) => {
-            Ok(SerialValue::Str(
-                s.to_str()
-                    .map_err(|e| LuaError::RuntimeError(format!("Invalid UTF-8: {e}")))?
-                    .to_string(),
-            ))
-        }
+        LuaValue::String(s) => Ok(SerialValue::Str(
+            s.to_str()
+                .map_err(|e| LuaError::RuntimeError(format!("Invalid UTF-8: {e}")))?
+                .to_string(),
+        )),
         LuaValue::Table(t) => {
             // Detect sequence vs map by checking if keys are sequential integers
             let raw_len = t.raw_len();
@@ -216,9 +197,11 @@ fn lua_value_to_serial(val: &LuaValue) -> LuaResult<SerialValue> {
                         .to_string(),
                     LuaValue::Integer(n) => n.to_string(),
                     LuaValue::Number(f) => f.to_string(),
-                    _ => return Err(LuaError::RuntimeError(
-                        "serial: table keys must be strings or numbers".to_string(),
-                    )),
+                    _ => {
+                        return Err(LuaError::RuntimeError(
+                            "serial: table keys must be strings or numbers".to_string(),
+                        ))
+                    }
                 };
                 map.insert(key, lua_value_to_serial(&v)?);
             }

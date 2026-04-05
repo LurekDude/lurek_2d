@@ -1,0 +1,13 @@
+[game]
+title = "Test Game"
+version = "1.0.0"
+
+[physics]
+gravity_x = 0.0
+gravity_y = 9.8
+max_bodies = 1000
+
+[window]
+fullscreen = false
+height = 600
+width = 800

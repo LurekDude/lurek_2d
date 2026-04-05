@@ -1,0 +1,2 @@
+load ok
+draw ok

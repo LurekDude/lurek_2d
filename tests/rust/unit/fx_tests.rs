@@ -17,10 +17,22 @@ use luna2d::fx::screen::{
 
 #[test]
 fn effect_type_from_name_valid() {
-    assert_eq!(PostFxEffectType::from_name("bloom"), Some(PostFxEffectType::Bloom));
-    assert_eq!(PostFxEffectType::from_name("blur"), Some(PostFxEffectType::Blur));
-    assert_eq!(PostFxEffectType::from_name("crt"), Some(PostFxEffectType::Crt));
-    assert_eq!(PostFxEffectType::from_name("vignette"), Some(PostFxEffectType::Vignette));
+    assert_eq!(
+        PostFxEffectType::from_name("bloom"),
+        Some(PostFxEffectType::Bloom)
+    );
+    assert_eq!(
+        PostFxEffectType::from_name("blur"),
+        Some(PostFxEffectType::Blur)
+    );
+    assert_eq!(
+        PostFxEffectType::from_name("crt"),
+        Some(PostFxEffectType::Crt)
+    );
+    assert_eq!(
+        PostFxEffectType::from_name("vignette"),
+        Some(PostFxEffectType::Vignette)
+    );
 }
 
 #[test]
@@ -186,7 +198,11 @@ fn stack_disabled_effect_add_workflow() {
 #[test]
 fn image_effect_default() {
     let ie = ImageEffect::new("test");
-    assert_eq!(ie.effect_count(), 0, "new ImageEffect should have no passes");
+    assert_eq!(
+        ie.effect_count(),
+        0,
+        "new ImageEffect should have no passes"
+    );
 }
 
 // ═════════════════════════════════════════════════════════════════════════

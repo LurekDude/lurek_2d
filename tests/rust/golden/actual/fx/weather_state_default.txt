@@ -1,0 +1,1 @@
+weather_type=None intensity=0.5 particle_count=0 wind_direction=0 wind_speed=0

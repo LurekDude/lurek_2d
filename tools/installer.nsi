@@ -115,6 +115,26 @@ Section "Engine (required)" SecEngine
 
 SectionEnd
 
+; ── .lunar File Association ──────────────────────────────────────────────────
+; Registers the .lunar extension so double-clicking a game package opens it
+; with the Luna2D engine automatically.
+Section ".lunar File Association" SecFileAssoc
+    ; Map .lunar extension → ProgID
+    WriteRegStr HKCR ".lunar"                         ""           "Luna2DGame"
+    WriteRegStr HKCR ".lunar"                         "Content Type" "application/x-lunar-game"
+
+    ; ProgID display name and icon
+    WriteRegStr HKCR "Luna2DGame"                    ""            "Luna2D Game"
+    WriteRegStr HKCR "Luna2DGame\DefaultIcon"        ""            "$INSTDIR\${APP_EXE},0"
+
+    ; Open verb: pass the .lunar file as the first argument to luna.exe
+    WriteRegStr HKCR "Luna2DGame\shell\open"         ""            "Open with Luna2D"
+    WriteRegStr HKCR "Luna2DGame\shell\open\command" ""            '"$INSTDIR\${APP_EXE}" "%1"'
+
+    ; Notify Windows that file associations have changed
+    System::Call 'Shell32::SHChangeNotify(i 0x8000000, i 0, i 0, i 0)'
+SectionEnd
+
 Section "Start Menu Shortcuts" SecStartMenu
     CreateDirectory "$SMPROGRAMS\${APP_NAME}"
     CreateShortcut  "$SMPROGRAMS\${APP_NAME}\${APP_NAME}.lnk"       "$INSTDIR\${APP_EXE}" "" "$INSTDIR\${APP_EXE}"
@@ -148,7 +168,14 @@ Section "Uninstall"
     RMDir  "$SMPROGRAMS\${APP_NAME}"
     Delete "$DESKTOP\${APP_NAME}.lnk"
 
+    ; Remove .lunar file association
+    DeleteRegKey HKCR ".lunar"
+    DeleteRegKey HKCR "Luna2DGame"
+
     ; Remove registry keys
     DeleteRegKey HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APP_NAME}"
     DeleteRegKey HKLM "Software\${APP_NAME}"
+
+    ; Notify Windows that file associations have changed
+    System::Call 'Shell32::SHChangeNotify(i 0x8000000, i 0, i 0, i 0)'
 SectionEnd

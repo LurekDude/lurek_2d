@@ -16,6 +16,7 @@ use winit::window::Window;
 
 use crate::audio::midi::MidiState;
 use crate::audio::Mixer;
+use crate::camera::Camera;
 use crate::engine::resource_keys::{
     CanvasKey, FontKey, MeshKey, ParticleKey, ShaderKey, ShapeKey, SpriteBatchKey, TextureKey,
 };
@@ -23,9 +24,9 @@ use crate::event::EventQueue;
 use crate::filesystem::GameFS;
 use crate::graphics::gpu_renderer::RenderStats;
 use crate::graphics::renderer::{BlendMode, DepthMode, DrawCommand, StencilMode, TextureData};
-use crate::camera::Camera;
 use crate::graphics::{Canvas, CompoundShape, Mesh, Shader};
 use crate::input::{GamepadMappings, GamepadState, KeyboardState, MouseState, TouchState};
+use crate::light::LightWorld;
 use crate::particle::ParticleSystem;
 use crate::timer::Clock;
 
@@ -337,6 +338,8 @@ pub struct SharedState {
     ///
     /// The first field is the comparison function; the second controls depth writes.
     pub depth_mode: (DepthMode, bool),
+    /// 2D lighting system world containing lights and occluders.
+    pub light_world: LightWorld,
 }
 
 impl SharedState {
@@ -412,6 +415,7 @@ impl SharedState {
             pending_screenshot: false,
             stencil_mode: StencilMode::default(),
             depth_mode: (DepthMode::Always, false),
+            light_world: LightWorld::new(),
         }
     }
 }

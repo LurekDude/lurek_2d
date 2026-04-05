@@ -1,6 +1,6 @@
 //! Integration tests for the serial module.
 
-use luna2d::serial::{from_json, to_json, from_toml, to_toml, from_csv, to_csv, from_yaml, to_yaml};
+use luna2d::serial::{from_json, to_json, from_toml, to_toml, from_csv, to_csv};
 use luna2d::serial::{CsvOptions, SerialValue};
 
 // ── JSON ─────────────────────────────────────────────────────────────────────
@@ -133,40 +133,7 @@ fn serial_csv_roundtrip() {
     assert!(out.contains("1") && out.contains("2"));
 }
 
-// ── YAML ─────────────────────────────────────────────────────────────────────
-
-#[test]
-fn serial_yaml_basic_types() {
-    let input = "name: Luna2D\nversion: 4\nenabled: true\n";
-    let val = from_yaml(input).unwrap();
-    if let SerialValue::Map(map) = &val {
-        if let Some(SerialValue::Str(s)) = map.get("name") { assert_eq!(s, "Luna2D"); }
-        if let Some(SerialValue::Int(n)) = map.get("version") { assert_eq!(*n, 4); }
-        if let Some(SerialValue::Bool(b)) = map.get("enabled") { assert!(*b); }
-    } else {
-        panic!("expected Map");
-    }
-}
-
-#[test]
-fn serial_yaml_roundtrip() {
-    let input = "title: game\ndebug: true\n";
-    let val = from_yaml(input).unwrap();
-    let output = to_yaml(&val).unwrap();
-    assert!(output.contains("title"));
-    assert!(output.contains("game"));
-}
-
-#[test]
-fn serial_yaml_array() {
-    let input = "items:\n  - 1\n  - 2\n  - 3\n";
-    let val = from_yaml(input).unwrap();
-    if let SerialValue::Map(map) = &val {
-        if let Some(SerialValue::Seq(arr)) = map.get("items") {
-            assert_eq!(arr.len(), 3);
-        }
-    }
-}
+// YAML removed: design-assumption B-05 (use TOML for human-authored config).
 
 // ── Lua integration tests ─────────────────────────────────────────────────────
 

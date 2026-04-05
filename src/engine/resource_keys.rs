@@ -37,4 +37,8 @@ new_key_type! {
     pub struct MidiPlayerKey;
     /// Key for queueable audio source instances in the Mixer.
     pub struct QueueableKey;
+    /// Key for light source instances in LightWorld.
+    pub struct LightKey;
+    /// Key for shadow occluder instances in LightWorld.
+    pub struct OccluderKey;
 }

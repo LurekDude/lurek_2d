@@ -1,14 +1,14 @@
-//! Lua API bindings for the `luna.overlay.*` screen-effect overlay module.
+﻿//! Lua API bindings for the `luna.overlay.*` screen-effect overlay module.
 //!
 //! Registers the `luna.overlay` table and exposes a single factory:
 //!
-//! - `luna.overlay.newOverlay(width?, height?)` — creates a `LuaOverlay`
+//! - `luna.overlay.newOverlay(width?, height?)` â€” creates a `LuaOverlay`
 //!   UserData object.
 //!
 //! All overlay state lives entirely inside an `Rc<RefCell<Overlay>>`; the
 //! `LuaOverlay` wrapper holds a clone of that smart pointer. Calling any
 //! method borrows the `RefCell` for the duration of the call, then
-//! releases it — the engine never holds a long-lived `borrow_mut` across
+//! releases it â€” the engine never holds a long-lived `borrow_mut` across
 //! Lua callbacks.
 //!
 //! The `register` function is called once during engine startup by the
@@ -21,7 +21,7 @@ use std::rc::Rc;
 use mlua::prelude::*;
 
 use crate::lua_api::lua_types::{add_type_methods, LunaType};
-use crate::overlay::{Overlay, WeatherType};
+use crate::fx::screen::{Overlay, WeatherType};
 
 // ---------------------------------------------------------------------------
 // LuaOverlay
@@ -33,10 +33,10 @@ use crate::overlay::{Overlay, WeatherType};
 /// Lua method calls borrow the inner `Overlay` for the duration of the
 /// call and release it immediately, making it safe to pass the same
 /// `LuaOverlay` to multiple closures. Cloning the userdata shares the
-/// same underlying `Overlay` — there is no deep copy.
+/// same underlying `Overlay` â€” there is no deep copy.
 ///
 /// # Fields
-/// - `inner` — `Rc<RefCell<Overlay>>` — Shared reference to the overlay state.
+/// - `inner` â€” `Rc<RefCell<Overlay>>` â€” Shared reference to the overlay state.
 #[derive(Clone)]
 pub(crate) struct LuaOverlay {
     inner: Rc<RefCell<Overlay>>,
@@ -68,7 +68,7 @@ impl LuaUserData for LuaOverlay {
             Ok(())
         });
 
-        /// Placeholder for draw — actual rendering handled by the game loop.
+        /// Placeholder for draw â€” actual rendering handled by the game loop.
         methods.add_method("draw", |_, _this, ()| Ok(()));
 
         /// Updates the internal canvas dimensions on window resize.
@@ -114,7 +114,7 @@ impl LuaUserData for LuaOverlay {
 
         /// Resets all overlay subsystems to their inactive defaults.
         ///
-        /// Equivalent to calling `Overlay::clear()` — drops all live weather
+        /// Equivalent to calling `Overlay::clear()` â€” drops all live weather
         /// particles, deactivates flash/shake/fade/lightning, and disables
         /// ambient, clouds, fog, heat haze, vignette, and film grain.
         /// All parameters (intensity, colour, duration) are reset to
@@ -180,7 +180,7 @@ impl LuaUserData for LuaOverlay {
             Ok(())
         });
 
-        /// Returns the current time-of-day value (0.0–24.0).
+        /// Returns the current time-of-day value (0.0â€“24.0).
         /// @return number
         methods.add_method("getTimeOfDay", |_, this, ()| {
             Ok(this.inner.borrow().ambient.time_of_day)
@@ -211,7 +211,7 @@ impl LuaUserData for LuaOverlay {
         ///
         /// Valid names: `"none"`, `"rain"`, `"snow"`, `"hail"`, `"dust"`,
         /// `"leaves"`, `"ash"`, `"pollen"`. The new type takes effect on the
-        /// next `update` call — existing particles are not cleared, so there
+        /// next `update` call â€” existing particles are not cleared, so there
         /// may be a brief mix of old and new particle behaviors. Returns a
         /// Lua error if `name` is unrecognised.
         /// @param weather_type : string
@@ -243,7 +243,7 @@ impl LuaUserData for LuaOverlay {
             Ok(())
         });
 
-        /// Returns the weather particle density (0.0–1.0).
+        /// Returns the weather particle density (0.0â€“1.0).
         /// @return number
         methods.add_method("getWeatherIntensity", |_, this, ()| {
             Ok(this.inner.borrow().weather.intensity)
@@ -482,14 +482,14 @@ impl LuaUserData for LuaOverlay {
         /// Sets the cloud shadow overlay opacity (0.0 = invisible, 1.0 = fully dark).
         ///
         /// Controls how darkly the shadow blobs are blended over the scene.
-        /// 0.3 gives a subtle day-time look; 0.7–0.9 simulates heavy overcast.
+        /// 0.3 gives a subtle day-time look; 0.7â€“0.9 simulates heavy overcast.
         /// @param opacity : number
         methods.add_method("setCloudOpacity", |_, this, opacity: f32| {
             this.inner.borrow_mut().clouds.opacity = opacity;
             Ok(())
         });
 
-        /// Returns the cloud shadow opacity (0.0–1.0).
+        /// Returns the cloud shadow opacity (0.0â€“1.0).
         /// @return number
         methods.add_method("getCloudOpacity", |_, this, ()| {
             Ok(this.inner.borrow().clouds.opacity)
@@ -527,7 +527,7 @@ impl LuaUserData for LuaOverlay {
             Ok(())
         });
 
-        /// Returns the current fog density (0.0–1.0).
+        /// Returns the current fog density (0.0â€“1.0).
         /// @return number
         methods.add_method("getFogDensity", |_, this, ()| {
             Ok(this.inner.borrow().fog.density)
@@ -580,7 +580,7 @@ impl LuaUserData for LuaOverlay {
 
         /// Sets the heat haze distortion intensity.
         ///
-        /// Controls the peak UV displacement in pixels. 0.2–2.0 gives
+        /// Controls the peak UV displacement in pixels. 0.2â€“2.0 gives
         /// subtle mirage shimmer; higher values are suitable for extreme
         /// heat or magical warp effects.
         /// @param intensity : number
@@ -616,7 +616,7 @@ impl LuaUserData for LuaOverlay {
             Ok(this.inner.borrow().vignette.enabled)
         });
 
-        /// Sets the vignette darkening strength (0.0–1.0).
+        /// Sets the vignette darkening strength (0.0â€“1.0).
         ///
         /// 0.0 is invisible; 0.5 is a gentle filmic border; 1.0 crushes
         /// corners to near-black.
@@ -626,7 +626,7 @@ impl LuaUserData for LuaOverlay {
             Ok(())
         });
 
-        /// Returns the current vignette darkening strength (0.0–1.0).
+        /// Returns the current vignette darkening strength (0.0â€“1.0).
         /// @return number
         methods.add_method("getVignetteStrength", |_, this, ()| {
             Ok(this.inner.borrow().vignette.strength)
@@ -652,9 +652,9 @@ impl LuaUserData for LuaOverlay {
             Ok(this.inner.borrow().film_grain.enabled)
         });
 
-        /// Sets the film grain noise amplitude (0.0–1.0).
+        /// Sets the film grain noise amplitude (0.0â€“1.0).
         ///
-        /// 0.1–0.3 gives a subtle cinematic look. Values above 0.5
+        /// 0.1â€“0.3 gives a subtle cinematic look. Values above 0.5
         /// produce heavy grain that can obscure fine detail.
         /// @param intensity : number
         methods.add_method("setFilmGrainIntensity", |_, this, intensity: f32| {
@@ -662,7 +662,7 @@ impl LuaUserData for LuaOverlay {
             Ok(())
         });
 
-        /// Returns the current film grain noise amplitude (0.0–1.0).
+        /// Returns the current film grain noise amplitude (0.0â€“1.0).
         /// @return number
         methods.add_method("getFilmGrainIntensity", |_, this, ()| {
             Ok(this.inner.borrow().film_grain.intensity)
@@ -720,8 +720,8 @@ impl LuaUserData for LuaOverlay {
 /// the `LuaOverlay` UserData type via its `LuaUserData` impl.
 ///
 /// # Parameters
-/// - `lua` — `&Lua` — The active Lua VM.
-/// - `luna` — `&LuaTable` — The root `luna` global table.
+/// - `lua` â€” `&Lua` â€” The active Lua VM.
+/// - `luna` â€” `&LuaTable` â€” The root `luna` global table.
 ///
 /// # Returns
 /// `LuaResult<()>`.
@@ -743,3 +743,4 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
     luna.set("overlay", overlay_table)?;
     Ok(())
 }
+

@@ -16,3 +16,7 @@ pub use image_data::ImageData;
 /// DDS/DXT compressed GPU texture data, loaded without CPU decompression.
 pub mod compressed;
 pub use compressed::{CompressedFormat, CompressedImageData};
+
+/// Color palette lookup table mapping source colors to target colors for shader-based palette swapping.
+pub mod palette_lut;
+pub use palette_lut::PaletteLUT;

@@ -67,7 +67,9 @@ This directory contains **permanent** CLI scripts for the Luna2D engine pipeline
 | `dist.sh` | Linux/macOS release build + tarball |
 | `install.ps1` | Install `luna.exe` locally (Windows) |
 | `install.sh` | Install `luna2d` locally (Linux/macOS) |
-| `installer.nsi` | NSIS Windows installer definition |
+| `installer.nsi` | NSIS Windows installer (installs engine + registers `.lunar` file association) |
+| `pack.ps1` | Pack a game directory into a `.lunar` archive (PowerShell) |
+| `pack.py` | Pack a game directory into a `.lunar` archive (Python, cross-platform) |
 
 ### Assets
 

@@ -1,6 +1,7 @@
 //! Integration tests for the image data module.
 
-use luna2d::image::{CompressedImageData, ImageData};
+use luna2d::image::{CompressedImageData, ImageData, PaletteLUT};
+use luna2d::math::Color;
 
 #[test]
 fn image_data_new_blank() {
@@ -111,4 +112,65 @@ fn compressed_image_data_dimensions_nonzero_for_valid_file() {
     let (w, h) = cid.get_dimensions();
     assert!(w > 0, "width must be > 0 for a valid DDS file");
     assert!(h > 0, "height must be > 0 for a valid DDS file");
+}
+
+// ── PaletteLUT ─────────────────────────────────────────────────────────────
+
+#[test]
+fn palette_lut_new_is_empty() {
+    let lut = PaletteLUT::new();
+    assert_eq!(lut.get_color_count(), 0);
+}
+
+#[test]
+fn palette_lut_set_color_increments_count() {
+    let mut lut = PaletteLUT::new();
+    lut.set_color(0, Color::new(1.0, 0.0, 0.0, 1.0), Color::new(0.0, 1.0, 0.0, 1.0));
+    assert_eq!(lut.get_color_count(), 1);
+}
+
+#[test]
+fn palette_lut_get_from_and_to_color() {
+    let mut lut = PaletteLUT::new();
+    let from = Color::new(1.0, 0.0, 0.0, 1.0);
+    let to = Color::new(0.0, 0.0, 1.0, 1.0);
+    lut.set_color(0, from, to);
+    let got_from = lut.get_from_color(0).expect("expected a from color at index 0");
+    let got_to = lut.get_to_color(0).expect("expected a to color at index 0");
+    assert!((got_from.r - 1.0).abs() < 1e-5);
+    assert!((got_to.b - 1.0).abs() < 1e-5);
+}
+
+#[test]
+fn palette_lut_get_out_of_bounds_returns_none() {
+    let lut = PaletteLUT::new();
+    assert!(lut.get_from_color(0).is_none());
+    assert!(lut.get_to_color(99).is_none());
+}
+
+#[test]
+fn palette_lut_set_color_extends_to_index() {
+    let mut lut = PaletteLUT::new();
+    // Setting index 2 should extend both vectors to length 3
+    lut.set_color(2, Color::new(0.5, 0.5, 0.5, 1.0), Color::new(0.0, 0.0, 0.0, 1.0));
+    assert_eq!(lut.get_color_count(), 3);
+    // Entries at 0 and 1 are filled with WHITE defaults
+    let c0 = lut.get_from_color(0).unwrap();
+    assert!((c0.r - 1.0).abs() < 1e-5);
+}
+
+#[test]
+fn palette_lut_clear_resets_to_empty() {
+    let mut lut = PaletteLUT::new();
+    lut.set_color(0, Color::WHITE, Color::WHITE);
+    lut.set_color(1, Color::WHITE, Color::WHITE);
+    assert_eq!(lut.get_color_count(), 2);
+    lut.clear();
+    assert_eq!(lut.get_color_count(), 0);
+}
+
+#[test]
+fn palette_lut_default_equals_new() {
+    let lut: PaletteLUT = Default::default();
+    assert_eq!(lut.get_color_count(), 0);
 }

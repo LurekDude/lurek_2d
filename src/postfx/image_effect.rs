@@ -1,15 +1,15 @@
-//! `ImageEffect` — an ordered chain of `PostFxEffect` passes for per-image draw calls.
+﻿//! `ImageEffect` â€” an ordered chain of `PostFxEffect` passes for per-image draw calls.
 //!
 //! [`ImageEffect`] groups one or more [`PostFxEffect`] entries and converts them
-//! to lightweight [`crate::graphics::ImageEffectPass`] values via
+//! to lightweight [`crate::graphics::ShaderPassDescriptor`] values via
 //! [`ImageEffect::to_passes`]. This module lives in **Tier 2** and is permitted
 //! to import from `crate::graphics` (Tier 1).
 
 use std::cell::RefCell;
 use std::rc::Rc;
 
-use crate::graphics::ImageEffectPass;
-use crate::postfx::PostFxEffect;
+use crate::graphics::ShaderPassDescriptor;
+use crate::fx::post::PostFxEffect;
 
 /// An ordered shader-effect chain to apply when drawing a single image.
 ///
@@ -23,8 +23,8 @@ use crate::postfx::PostFxEffect;
 /// made through the chain itself.
 ///
 /// # Fields
-/// - `effects` — `Vec<Rc<RefCell<PostFxEffect>>>` — Ordered list of shader passes.
-/// - `name` — `String` — Optional human-readable label for the chain.
+/// - `effects` â€” `Vec<Rc<RefCell<PostFxEffect>>>` â€” Ordered list of shader passes.
+/// - `name` â€” `String` â€” Optional human-readable label for the chain.
 pub struct ImageEffect {
     /// Ordered list of shader passes in this chain (shared references).
     pub(crate) effects: Vec<Rc<RefCell<PostFxEffect>>>,
@@ -36,7 +36,7 @@ impl ImageEffect {
     /// Creates a new empty effect chain with the given label.
     ///
     /// # Parameters
-    /// - `name` — `&str` — Human-readable label (may be empty).
+    /// - `name` â€” `&str` â€” Human-readable label (may be empty).
     ///
     /// # Returns
     /// `Self`.
@@ -50,7 +50,7 @@ impl ImageEffect {
     /// Wraps `effect` in an `Rc<RefCell<>>` and appends it to the end of the chain.
     ///
     /// # Parameters
-    /// - `effect` — `PostFxEffect` — The pass to append.
+    /// - `effect` â€” `PostFxEffect` â€” The pass to append.
     pub fn add_effect(&mut self, effect: PostFxEffect) {
         self.effects.push(Rc::new(RefCell::new(effect)));
     }
@@ -61,7 +61,7 @@ impl ImageEffect {
     /// that the chain holds (e.g. from the Lua `addEffect` binding).
     ///
     /// # Parameters
-    /// - `effect` — `Rc<RefCell<PostFxEffect>>` — Shared reference to append.
+    /// - `effect` â€” `Rc<RefCell<PostFxEffect>>` â€” Shared reference to append.
     pub(crate) fn add_effect_rc(&mut self, effect: Rc<RefCell<PostFxEffect>>) {
         self.effects.push(effect);
     }
@@ -69,7 +69,7 @@ impl ImageEffect {
     /// Returns a shared reference to the effect at the given 0-based index, or `None`.
     ///
     /// # Parameters
-    /// - `idx` — `usize` — 0-based position.
+    /// - `idx` â€” `usize` â€” 0-based position.
     ///
     /// # Returns
     /// `Option<Rc<RefCell<PostFxEffect>>>`.
@@ -80,7 +80,7 @@ impl ImageEffect {
     /// Returns a shared reference to the first effect whose type name matches `name`, or `None`.
     ///
     /// # Parameters
-    /// - `name` — `&str` — Effect type name (e.g. `"blur"`).
+    /// - `name` â€” `&str` â€” Effect type name (e.g. `"blur"`).
     ///
     /// # Returns
     /// `Option<Rc<RefCell<PostFxEffect>>>`.
@@ -94,10 +94,10 @@ impl ImageEffect {
     /// Removes the effect at the given 0-based index.
     ///
     /// # Parameters
-    /// - `idx` — `usize` — 0-based position.
+    /// - `idx` â€” `usize` â€” 0-based position.
     ///
     /// # Returns
-    /// `bool` — `true` if the index was in range.
+    /// `bool` â€” `true` if the index was in range.
     pub fn remove_by_index(&mut self, idx: usize) -> bool {
         if idx < self.effects.len() {
             self.effects.remove(idx);
@@ -110,10 +110,10 @@ impl ImageEffect {
     /// Removes the first effect whose type name matches `name`.
     ///
     /// # Parameters
-    /// - `name` — `&str` — Effect type name.
+    /// - `name` â€” `&str` â€” Effect type name.
     ///
     /// # Returns
-    /// `bool` — `true` if a matching effect was found and removed.
+    /// `bool` â€” `true` if a matching effect was found and removed.
     pub fn remove_by_name(&mut self, name: &str) -> bool {
         if let Some(pos) = self
             .effects
@@ -140,19 +140,19 @@ impl ImageEffect {
         self.effects.len()
     }
 
-    /// Converts the effect chain to lightweight [`ImageEffectPass`] values for the Tier-1 graphics layer.
+    /// Converts the effect chain to lightweight [`ShaderPassDescriptor`] values for the Tier-1 graphics layer.
     ///
     /// Each [`PostFxEffect`] is converted by copying its type name, parameter map,
     /// and enabled flag. The result is embedded into a `DrawCommand` variant.
     ///
     /// # Returns
-    /// `Vec<ImageEffectPass>`.
-    pub fn to_passes(&self) -> Vec<ImageEffectPass> {
+    /// `Vec<ShaderPassDescriptor>`.
+    pub fn to_passes(&self) -> Vec<ShaderPassDescriptor> {
         self.effects
             .iter()
             .map(|e| {
                 let e = e.borrow();
-                ImageEffectPass {
+                ShaderPassDescriptor {
                     effect_name: e.get_type_name().to_owned(),
                     params: e.params.clone(),
                     enabled: e.enabled,
@@ -161,3 +161,4 @@ impl ImageEffect {
             .collect()
     }
 }
+

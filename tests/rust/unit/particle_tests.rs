@@ -1520,3 +1520,95 @@ fn particle_lua_default_shape_is_square() {
     .exec()
     .unwrap();
 }
+
+// ── Trail ──────────────────────────────────────────────────────────────────
+
+use luna2d::particle::Trail;
+use luna2d::math::Color;
+
+#[test]
+fn trail_new_starts_empty() {
+    let trail = Trail::new(2.0, 8.0);
+    assert_eq!(trail.get_point_count(), 0);
+    assert!((trail.get_lifetime() - 2.0).abs() < 1e-5);
+    let (sw, _ew) = trail.get_width();
+    assert!((sw - 8.0).abs() < 1e-5);
+}
+
+#[test]
+fn trail_push_point_adds_entry() {
+    let mut trail = Trail::new(5.0, 4.0);
+    trail.push_point(10.0, 20.0);
+    assert_eq!(trail.get_point_count(), 1);
+}
+
+#[test]
+fn trail_push_point_respects_min_distance() {
+    let mut trail = Trail::new(5.0, 4.0);
+    trail.set_min_distance(10.0);
+    trail.push_point(0.0, 0.0);
+    // Second point is only 1 unit away — below min_distance → rejected
+    trail.push_point(1.0, 0.0);
+    assert_eq!(trail.get_point_count(), 1);
+    // Third point is 15 units away — accepted
+    trail.push_point(15.0, 0.0);
+    assert_eq!(trail.get_point_count(), 2);
+}
+
+#[test]
+fn trail_update_removes_expired_points() {
+    let mut trail = Trail::new(0.5, 4.0);
+    trail.push_point(0.0, 0.0);
+    trail.push_point(100.0, 0.0); // force distance > min_distance
+    assert_eq!(trail.get_point_count(), 2);
+    // Advance past lifetime — both points should expire
+    trail.update(1.0);
+    assert_eq!(trail.get_point_count(), 0);
+}
+
+#[test]
+fn trail_set_width_updates_both_ends() {
+    let mut trail = Trail::new(2.0, 6.0);
+    trail.set_width(12.0, Some(3.0));
+    let (sw, ew) = trail.get_width();
+    assert!((sw - 12.0).abs() < 1e-5);
+    assert!((ew - 3.0).abs() < 1e-5);
+}
+
+#[test]
+fn trail_set_width_none_preserves_end_width() {
+    let mut trail = Trail::new(2.0, 6.0);
+    trail.set_width(6.0, Some(2.0));  // set end_width to 2.0
+    trail.set_width(10.0, None);       // None should leave end_width at 2.0
+    let (sw, ew) = trail.get_width();
+    assert!((sw - 10.0).abs() < 1e-5);
+    assert!((ew - 2.0).abs() < 1e-5);
+}
+
+#[test]
+fn trail_clear_removes_all_points() {
+    let mut trail = Trail::new(5.0, 4.0);
+    trail.push_point(0.0, 0.0);
+    trail.push_point(100.0, 0.0);
+    trail.push_point(200.0, 0.0);
+    assert_eq!(trail.get_point_count(), 3);
+    trail.clear();
+    assert_eq!(trail.get_point_count(), 0);
+}
+
+#[test]
+fn trail_set_and_get_lifetime() {
+    let mut trail = Trail::new(1.0, 4.0);
+    trail.set_lifetime(3.5);
+    assert!((trail.get_lifetime() - 3.5).abs() < 1e-5);
+}
+
+#[test]
+fn trail_set_colors_updates_head_and_tail() {
+    let mut trail = Trail::new(1.0, 4.0);
+    trail.set_head_color(Color::new(1.0, 0.0, 0.0, 1.0));
+    trail.set_tail_color(Color::new(0.0, 0.0, 1.0, 0.5));
+    assert!((trail.head_color.r - 1.0).abs() < 1e-5);
+    assert!((trail.tail_color.b - 1.0).abs() < 1e-5);
+    assert!((trail.tail_color.a - 0.5).abs() < 1e-5);
+}

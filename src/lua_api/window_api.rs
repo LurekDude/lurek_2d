@@ -670,6 +670,34 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
         lua.create_function(move |_, ()| Ok(s.borrow().window_state.game_height))?,
     )?;
 
+    /// Returns whether the window is currently in fullscreen mode.
+    ///
+    /// # Returns
+    /// `true` if fullscreen, `false` if windowed.
+    let s = state.clone();
+    window.set(
+        "isFullscreen",
+        lua.create_function(move |_, ()| Ok(s.borrow().window_state.fullscreen))?,
+    )?;
+
+    /// Returns whether the window can be resized by the user.
+    ///
+    /// # Returns
+    /// `true` if the window is resizable.
+    let s = state.clone();
+    window.set(
+        "isResizable",
+        lua.create_function(move |_, ()| {
+            let st = s.borrow();
+            let resizable = st
+                .window
+                .as_ref()
+                .map(|w| w.is_resizable())
+                .unwrap_or(false);
+            Ok(resizable)
+        })?,
+    )?;
+
     /// Window.
     luna.set("window", window)?;
     Ok(())

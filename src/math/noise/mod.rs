@@ -10,5 +10,7 @@
 pub mod functions;
 pub mod generator;
 
-pub use functions::{fbm, perlin2d, perlin3d, perlin4d, simplex2d, simplex_noise_2d, simplex_noise_3d};
+pub use functions::{
+    fbm, perlin2d, perlin3d, perlin4d, simplex2d, simplex_noise_2d, simplex_noise_3d,
+};
 pub use generator::{DistType, FractalType, MapGenOptions, NoiseGenerator, NoiseKind};

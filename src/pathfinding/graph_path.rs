@@ -62,7 +62,11 @@ impl ProvinceCostFn {
             return None;
         }
         let base = self.default_cost;
-        let extra = self.province_costs.get(&province_id).copied().unwrap_or(0.0);
+        let extra = self
+            .province_costs
+            .get(&province_id)
+            .copied()
+            .unwrap_or(0.0);
         let total = base + extra;
         if total.is_infinite() {
             None
@@ -290,8 +294,7 @@ pub fn province_reachable(
                 .unwrap_or(0.0);
 
             let new_dist = current_dist + step_cost + edge_extra;
-            if new_dist <= max_cost
-                && new_dist < *dist.get(&neighbor_id).unwrap_or(&f64::INFINITY)
+            if new_dist <= max_cost && new_dist < *dist.get(&neighbor_id).unwrap_or(&f64::INFINITY)
             {
                 dist.insert(neighbor_id, new_dist);
                 heap.push(AStarNode {

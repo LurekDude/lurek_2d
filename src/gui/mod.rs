@@ -58,3 +58,7 @@ pub use extras::{
 };
 pub use theme::{Theme, WidgetStyle};
 pub use widget::{WidgetBase, WidgetState, WidgetType};
+
+/// Mathematical function graph and chart renderer (data series, viewport mapping).
+pub mod data_graph_renderer;
+pub use data_graph_renderer::{GraphRenderer, GraphSeries};

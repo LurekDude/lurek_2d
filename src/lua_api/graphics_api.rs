@@ -1,4 +1,4 @@
-//! Registers the `luna.graphics.*` graphics API.
+﻿//! Registers the `luna.graphics.*` graphics API.
 //!
 
 use std::cell::RefCell;
@@ -10,18 +10,18 @@ use slotmap::Key;
 use crate::engine::resource_keys::{CanvasKey, FontKey, MeshKey, SpriteBatchKey, TextureKey, ShaderKey, ShapeKey};
 use crate::lua_api::lua_types::{add_type_methods, LunaType};
 use crate::lua_api::postfx_api::LuaImageEffect;
-use crate::graphics::ImageEffectPass;
+use crate::graphics::ShaderPassDescriptor;
 use crate::graphics::mesh::{Mesh, MeshDrawMode, MeshVertex};
 use crate::graphics::shader::{Shader, UniformValue};
 use crate::graphics::{CompoundShape, ShapeCommand};
 use mlua::prelude::*;
 
-// ── Helper types ──────────────────────────────────────────────────────────
+// â”€â”€ Helper types â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 /// Lua UserData wrapper for a loaded texture resource.
 ///
 /// # Fields
-/// - `state` — `Rc<RefCell<SharedState>>`.
-/// - `key` — `TextureKey`.
+/// - `state` â€” `Rc<RefCell<SharedState>>`.
+/// - `key` â€” `TextureKey`.
 #[derive(Clone)]
 pub struct LuaImage {
     pub(crate) state: Rc<RefCell<SharedState>>,
@@ -40,7 +40,7 @@ impl LuaUserData for LuaImage {
         /// Returns the image width in pixels.
         ///
         /// # Returns
-        /// `integer` ÔÇö pixel width.
+        /// `integer` Ă”Ă‡Ă¶ pixel width.
         methods.add_method("getWidth", |_, this, ()| {
             let st = this.state.borrow();
             if let Some(tex) = st.textures.get(this.key) {
@@ -55,7 +55,7 @@ impl LuaUserData for LuaImage {
         /// Returns the image height in pixels.
         ///
         /// # Returns
-        /// `integer` ÔÇö pixel height.
+        /// `integer` Ă”Ă‡Ă¶ pixel height.
         methods.add_method("getHeight", |_, this, ()| {
             let st = this.state.borrow();
             if let Some(tex) = st.textures.get(this.key) {
@@ -107,14 +107,14 @@ impl LuaUserData for LuaImage {
 /// corner and edge proportions.
 ///
 /// # Fields
-/// - `state` — `Rc<RefCell<SharedState>>`.
-/// - `texture_key` — `TextureKey`.
-/// - `top` — `f32`.
-/// - `right` — `f32`.
-/// - `bottom` — `f32`.
-/// - `left` — `f32`.
-/// - `tex_width` — `f32`.
-/// - `tex_height` — `f32`.
+/// - `state` â€” `Rc<RefCell<SharedState>>`.
+/// - `texture_key` â€” `TextureKey`.
+/// - `top` â€” `f32`.
+/// - `right` â€” `f32`.
+/// - `bottom` â€” `f32`.
+/// - `left` â€” `f32`.
+/// - `tex_width` â€” `f32`.
+/// - `tex_height` â€” `f32`.
 #[derive(Clone)]
 pub struct LuaNineSlice {
     pub(crate) state: Rc<RefCell<SharedState>>,
@@ -147,10 +147,10 @@ impl LuaUserData for LuaNineSlice {
         /// Returns the texture size.
         ///
         /// # Parameters
-        /// - `x` ÔÇö `number`.
-        /// - `y` ÔÇö `number`.
-        /// - `w` ÔÇö `number`.
-        /// - `h` ÔÇö `number`.
+        /// - `x` Ă”Ă‡Ă¶ `number`.
+        /// - `y` Ă”Ă‡Ă¶ `number`.
+        /// - `w` Ă”Ă‡Ă¶ `number`.
+        /// - `h` Ă”Ă‡Ă¶ `number`.
         ///
         /// # Returns
         /// The current texture size.
@@ -161,10 +161,10 @@ impl LuaUserData for LuaNineSlice {
         /// Draws to the current render target.
         ///
         /// # Parameters
-        /// - `x` ÔÇö `number`.
-        /// - `y` ÔÇö `number`.
-        /// - `w` ÔÇö `number`.
-        /// - `h` ÔÇö `number`.
+        /// - `x` Ă”Ă‡Ă¶ `number`.
+        /// - `y` Ă”Ă‡Ă¶ `number`.
+        /// - `w` Ă”Ă‡Ă¶ `number`.
+        /// - `h` Ă”Ă‡Ă¶ `number`.
         methods.add_method("draw", |_, this, (x, y, w, h): (f32, f32, f32, f32)| {
             let mut st = this.state.borrow_mut();
             st.draw_commands.push(DrawCommand::DrawNineSlice {
@@ -188,8 +188,8 @@ impl LuaUserData for LuaNineSlice {
 /// Lua UserData wrapper for a loaded font resource.
 ///
 /// # Fields
-/// - `state` ÔÇö `Rc<RefCell<SharedState>>`.
-/// - `key` ÔÇö `FontKey`.
+/// - `state` Ă”Ă‡Ă¶ `Rc<RefCell<SharedState>>`.
+/// - `key` Ă”Ă‡Ă¶ `FontKey`.
 ///
 /// Wraps a `FontKey` and shared state reference so the Lua side
 /// can call methods like `font:getHeight()` directly on the object.
@@ -211,10 +211,10 @@ impl LuaUserData for LuaFont {
         /// Measures the rendered width of `text` using this font's current size.
         ///
         /// # Parameters
-        /// - `text` ÔÇö `string`: The string to measure.
+        /// - `text` Ă”Ă‡Ă¶ `string`: The string to measure.
         ///
         /// # Returns
-        /// `number` ÔÇö rendered width in pixels.
+        /// `number` Ă”Ă‡Ă¶ rendered width in pixels.
         methods.add_method("getWidth", |_, this, text: String| {
             let mut st = this.state.borrow_mut();
             if let Some(font) = st.fonts.get_mut(this.key) {
@@ -229,7 +229,7 @@ impl LuaUserData for LuaFont {
         /// Returns the line height of this font at its loaded size, in pixels.
         ///
         /// # Returns
-        /// `integer` ÔÇö line height in pixels.
+        /// `integer` Ă”Ă‡Ă¶ line height in pixels.
         methods.add_method("getHeight", |_, this, ()| {
             let st = this.state.borrow();
             if let Some(font) = st.fonts.get(this.key) {
@@ -259,7 +259,7 @@ impl LuaUserData for LuaFont {
         /// Sets the line height multiplier used when laying out multi-line text.
         ///
         /// # Parameters
-        /// - `height` ÔÇö Line height factor (1.0 = normal, >1.0 = extra spacing).
+        /// - `height` Ă”Ă‡Ă¶ Line height factor (1.0 = normal, >1.0 = extra spacing).
         methods.add_method("setLineHeight", |_, this, height: f32| {
             let mut st = this.state.borrow_mut();
             if let Some(font) = st.fonts.get_mut(this.key) {
@@ -275,7 +275,7 @@ impl LuaUserData for LuaFont {
         /// Returns the ascent (distance from baseline to the top of the tallest glyph) in pixels.
         ///
         /// # Returns
-        /// `number` ÔÇö ascent in pixels.
+        /// `number` Ă”Ă‡Ă¶ ascent in pixels.
         methods.add_method("getAscent", |_, this, ()| {
             let st = this.state.borrow();
             if let Some(font) = st.fonts.get(this.key) {
@@ -290,7 +290,7 @@ impl LuaUserData for LuaFont {
         /// Returns the descent (distance below the baseline for descenders) in pixels.
         ///
         /// # Returns
-        /// `number` ÔÇö descent in pixels.
+        /// `number` Ă”Ă‡Ă¶ descent in pixels.
         methods.add_method("getDescent", |_, this, ()| {
             let st = this.state.borrow();
             if let Some(font) = st.fonts.get(this.key) {
@@ -307,8 +307,8 @@ impl LuaUserData for LuaFont {
 /// Lua UserData wrapper for a sprite batch resource.
 ///
 /// # Fields
-/// - `state` ÔÇö `Rc<RefCell<SharedState>>`.
-/// - `key` ÔÇö `SpriteBatchKey`.
+/// - `state` Ă”Ă‡Ă¶ `Rc<RefCell<SharedState>>`.
+/// - `key` Ă”Ă‡Ă¶ `SpriteBatchKey`.
 ///
 /// Wraps a `SpriteBatchKey` and shared state reference.
 #[derive(Clone)]
@@ -416,8 +416,8 @@ impl LuaUserData for LuaSpriteBatch {
 /// Lua UserData wrapper for an off-screen canvas resource.
 ///
 /// # Fields
-/// - `state` ÔÇö `Rc<RefCell<SharedState>>`.
-/// - `key` ÔÇö `CanvasKey`.
+/// - `state` Ă”Ă‡Ă¶ `Rc<RefCell<SharedState>>`.
+/// - `key` Ă”Ă‡Ă¶ `CanvasKey`.
 #[derive(Clone)]
 pub struct LuaCanvas {
     pub(crate) state: Rc<RefCell<SharedState>>,
@@ -436,7 +436,7 @@ impl LuaUserData for LuaCanvas {
         /// Returns the canvas width in pixels.
         ///
         /// # Returns
-        /// `integer` ÔÇö pixel width.
+        /// `integer` Ă”Ă‡Ă¶ pixel width.
         methods.add_method("getWidth", |_, this, ()| {
             let st = this.state.borrow();
             if let Some(canvas) = st.canvases.get(this.key) {
@@ -451,7 +451,7 @@ impl LuaUserData for LuaCanvas {
         /// Returns the canvas height in pixels.
         ///
         /// # Returns
-        /// `integer` ÔÇö pixel height.
+        /// `integer` Ă”Ă‡Ă¶ pixel height.
         methods.add_method("getHeight", |_, this, ()| {
             let st = this.state.borrow();
             if let Some(canvas) = st.canvases.get(this.key) {
@@ -486,8 +486,8 @@ impl LuaUserData for LuaCanvas {
 /// to free the slot-map entry and reclaim memory when the shape is no longer needed.
 ///
 /// # Fields
-/// - `state` — `Rc<RefCell<SharedState>>`.
-/// - `key` — `ShapeKey`. Generational key into `SharedState::shapes`.
+/// - `state` â€” `Rc<RefCell<SharedState>>`.
+/// - `key` â€” `ShapeKey`. Generational key into `SharedState::shapes`.
 #[derive(Clone)]
 pub struct LuaCompoundShape {
     pub(crate) state: Rc<RefCell<SharedState>>,
@@ -506,10 +506,10 @@ impl LuaUserData for LuaCompoundShape {
         /// Sets the active draw color for subsequent commands in this shape.
         ///
         /// # Parameters
-        /// - `r` — Red component in [0, 1].
-        /// - `g` — Green component in [0, 1].
-        /// - `b` — Blue component in [0, 1].
-        /// - `a` — Optional alpha component (default 1.0).
+        /// - `r` â€” Red component in [0, 1].
+        /// - `g` â€” Green component in [0, 1].
+        /// - `b` â€” Blue component in [0, 1].
+        /// - `a` â€” Optional alpha component (default 1.0).
         methods.add_method("setColor", |_, this, (r, g, b, a): (f32, f32, f32, Option<f32>)| {
             let a = a.unwrap_or(1.0);
             this.state
@@ -524,7 +524,7 @@ impl LuaUserData for LuaCompoundShape {
         /// Sets the stroke width for outlined primitives that follow in this shape.
         ///
         /// # Parameters
-        /// - `w` — Line width in pixels (must be > 0).
+        /// - `w` â€” Line width in pixels (must be > 0).
         methods.add_method("setLineWidth", |_, this, w: f32| {
             this.state
                 .borrow_mut()
@@ -538,13 +538,13 @@ impl LuaUserData for LuaCompoundShape {
         /// Appends a rectangle (filled or outlined, optionally rounded) to this shape.
         ///
         /// # Parameters
-        /// - `mode` — `'fill'` or `'line'`.
-        /// - `x` — Left edge X in object space.
-        /// - `y` — Top edge Y in object space.
-        /// - `w` — Width in pixels.
-        /// - `h` — Height in pixels.
-        /// - `rx` — Optional horizontal corner radius.
-        /// - `ry` — Optional vertical corner radius (defaults to `rx`).
+        /// - `mode` â€” `'fill'` or `'line'`.
+        /// - `x` â€” Left edge X in object space.
+        /// - `y` â€” Top edge Y in object space.
+        /// - `w` â€” Width in pixels.
+        /// - `h` â€” Height in pixels.
+        /// - `rx` â€” Optional horizontal corner radius.
+        /// - `ry` â€” Optional vertical corner radius (defaults to `rx`).
         methods.add_method(
             "rectangle",
             |_, this, (mode, x, y, w, h, rx, ry): (String, f32, f32, f32, f32, Option<f32>, Option<f32>)| {
@@ -574,13 +574,13 @@ impl LuaUserData for LuaCompoundShape {
         /// Appends a rounded rectangle to this shape (corner radius is required).
         ///
         /// # Parameters
-        /// - `mode` — `'fill'` or `'line'`.
-        /// - `x` — Left edge X in object space.
-        /// - `y` — Top edge Y in object space.
-        /// - `w` — Width in pixels.
-        /// - `h` — Height in pixels.
-        /// - `rx` — Horizontal corner radius (required).
-        /// - `ry` — Optional vertical corner radius (defaults to `rx`).
+        /// - `mode` â€” `'fill'` or `'line'`.
+        /// - `x` â€” Left edge X in object space.
+        /// - `y` â€” Top edge Y in object space.
+        /// - `w` â€” Width in pixels.
+        /// - `h` â€” Height in pixels.
+        /// - `rx` â€” Horizontal corner radius (required).
+        /// - `ry` â€” Optional vertical corner radius (defaults to `rx`).
         methods.add_method(
             "roundedRectangle",
             |_, this, (mode, x, y, w, h, rx, ry): (String, f32, f32, f32, f32, f32, Option<f32>)| {
@@ -599,10 +599,10 @@ impl LuaUserData for LuaCompoundShape {
         /// Appends a circle to this shape.
         ///
         /// # Parameters
-        /// - `mode` — `'fill'` or `'line'`.
-        /// - `x` — Centre X in object space.
-        /// - `y` — Centre Y in object space.
-        /// - `r` — Radius in pixels.
+        /// - `mode` â€” `'fill'` or `'line'`.
+        /// - `x` â€” Centre X in object space.
+        /// - `y` â€” Centre Y in object space.
+        /// - `r` â€” Radius in pixels.
         methods.add_method("circle", |_, this, (mode, x, y, r): (String, f32, f32, f32)| {
             let dm = if mode == "fill" { DrawMode::Fill } else { DrawMode::Line };
             this.state
@@ -617,11 +617,11 @@ impl LuaUserData for LuaCompoundShape {
         /// Appends an ellipse to this shape.
         ///
         /// # Parameters
-        /// - `mode` — `'fill'` or `'line'`.
-        /// - `x` — Centre X in object space.
-        /// - `y` — Centre Y in object space.
-        /// - `rx` — Horizontal semi-axis in pixels.
-        /// - `ry` — Vertical semi-axis in pixels.
+        /// - `mode` â€” `'fill'` or `'line'`.
+        /// - `x` â€” Centre X in object space.
+        /// - `y` â€” Centre Y in object space.
+        /// - `rx` â€” Horizontal semi-axis in pixels.
+        /// - `ry` â€” Vertical semi-axis in pixels.
         methods.add_method(
             "ellipse",
             |_, this, (mode, x, y, rx, ry): (String, f32, f32, f32, f32)| {
@@ -639,10 +639,10 @@ impl LuaUserData for LuaCompoundShape {
         /// Appends a triangle to this shape.
         ///
         /// # Parameters
-        /// - `mode` — `'fill'` or `'line'`.
-        /// - `x1`, `y1` — First vertex.
-        /// - `x2`, `y2` — Second vertex.
-        /// - `x3`, `y3` — Third vertex.
+        /// - `mode` â€” `'fill'` or `'line'`.
+        /// - `x1`, `y1` â€” First vertex.
+        /// - `x2`, `y2` â€” Second vertex.
+        /// - `x3`, `y3` â€” Third vertex.
         methods.add_method(
             "triangle",
             |_, this, (mode, x1, y1, x2, y2, x3, y3): (String, f32, f32, f32, f32, f32, f32)| {
@@ -660,8 +660,8 @@ impl LuaUserData for LuaCompoundShape {
         /// Appends a polygon to this shape from a flat vararg vertex list.
         ///
         /// # Parameters
-        /// - `mode` — `'fill'` or `'line'`.
-        /// - `x1, y1, x2, y2, ...` — Flat list of vertex coordinates (at least 6 numbers / 3 vertices).
+        /// - `mode` â€” `'fill'` or `'line'`.
+        /// - `x1, y1, x2, y2, ...` â€” Flat list of vertex coordinates (at least 6 numbers / 3 vertices).
         methods.add_method("polygon", |lua_ctx, this, args: LuaMultiValue| {
             let mut iter = args.into_iter();
             let mode_val = iter.next().ok_or_else(|| {
@@ -692,10 +692,10 @@ impl LuaUserData for LuaCompoundShape {
         /// Appends a single line segment to this shape.
         ///
         /// # Parameters
-        /// - `x1` — Start X in object space.
-        /// - `y1` — Start Y in object space.
-        /// - `x2` — End X in object space.
-        /// - `y2` — End Y in object space.
+        /// - `x1` â€” Start X in object space.
+        /// - `y1` â€” Start Y in object space.
+        /// - `x2` â€” End X in object space.
+        /// - `y2` â€” End Y in object space.
         methods.add_method("line", |_, this, (x1, y1, x2, y2): (f32, f32, f32, f32)| {
             this.state
                 .borrow_mut()
@@ -709,7 +709,7 @@ impl LuaUserData for LuaCompoundShape {
         /// Appends a polyline to this shape from a flat vararg point list.
         ///
         /// # Parameters
-        /// - `x1, y1, x2, y2, ...` — Flat list of point coordinates (at least 4 numbers / 2 points).
+        /// - `x1, y1, x2, y2, ...` â€” Flat list of point coordinates (at least 4 numbers / 2 points).
         methods.add_method("polyline", |lua_ctx, this, args: LuaMultiValue| {
             let mut points = Vec::new();
             for val in args.into_iter() {
@@ -734,13 +734,13 @@ impl LuaUserData for LuaCompoundShape {
         /// Appends an arc to this shape.
         ///
         /// # Parameters
-        /// - `mode` — `'fill'` or `'line'`.
-        /// - `x` — Centre X in object space.
-        /// - `y` — Centre Y in object space.
-        /// - `radius` — Arc radius in pixels.
-        /// - `angle1` — Start angle in radians.
-        /// - `angle2` — End angle in radians.
-        /// - `segments` — Optional number of line segments (default 32).
+        /// - `mode` â€” `'fill'` or `'line'`.
+        /// - `x` â€” Centre X in object space.
+        /// - `y` â€” Centre Y in object space.
+        /// - `radius` â€” Arc radius in pixels.
+        /// - `angle1` â€” Start angle in radians.
+        /// - `angle2` â€” End angle in radians.
+        /// - `segments` â€” Optional number of line segments (default 32).
         methods.add_method(
             "arc",
             |_, this, (mode, x, y, radius, angle1, angle2, segments): (String, f32, f32, f32, f32, f32, Option<u32>)| {
@@ -759,13 +759,13 @@ impl LuaUserData for LuaCompoundShape {
         /// Draws all primitives in this shape at the given world position with an optional transform.
         ///
         /// # Parameters
-        /// - `x` — Destination X in world pixels.
-        /// - `y` — Destination Y in world pixels.
-        /// - `angle` — Optional rotation in radians (default 0).
-        /// - `sx` — Optional horizontal scale (default 1).
-        /// - `sy` — Optional vertical scale (default 1).
-        /// - `ox` — Optional origin X offset in object space (default 0).
-        /// - `oy` — Optional origin Y offset in object space (default 0).
+        /// - `x` â€” Destination X in world pixels.
+        /// - `y` â€” Destination Y in world pixels.
+        /// - `angle` â€” Optional rotation in radians (default 0).
+        /// - `sx` â€” Optional horizontal scale (default 1).
+        /// - `sy` â€” Optional vertical scale (default 1).
+        /// - `ox` â€” Optional origin X offset in object space (default 0).
+        /// - `oy` â€” Optional origin Y offset in object space (default 0).
         #[allow(clippy::type_complexity)]
         methods.add_method(
             "draw",
@@ -806,7 +806,7 @@ impl LuaUserData for LuaCompoundShape {
         /// Returns the number of draw commands currently queued in this shape.
         ///
         /// # Returns
-        /// `integer` — command count.
+        /// `integer` â€” command count.
         methods.add_method("getCommandCount", |_, this, ()| {
             let count = this
                 .state
@@ -823,7 +823,7 @@ impl LuaUserData for LuaCompoundShape {
 /// Extract a `TextureKey` from either a `LuaImage` UserData or a numeric ID.
 ///
 /// # Parameters
-/// - `val` — `&LuaValue`.
+/// - `val` â€” `&LuaValue`.
 ///
 /// # Returns
 /// `LuaResult<TextureKey>`.
@@ -842,7 +842,7 @@ pub(super) fn texture_key_from_value(val: &LuaValue) -> LuaResult<TextureKey> {
 /// Extract a `FontKey` from either a `LuaFont` UserData or a numeric ID.
 ///
 /// # Parameters
-/// - `val` — `&LuaValue`.
+/// - `val` â€” `&LuaValue`.
 ///
 /// # Returns
 /// `LuaResult<FontKey>`.
@@ -861,7 +861,7 @@ pub(crate) fn font_key_from_value(val: &LuaValue) -> LuaResult<FontKey> {
 /// Extract a `SpriteBatchKey` from either a `LuaSpriteBatch` UserData or a numeric ID.
 ///
 /// # Parameters
-/// - `val` — `&LuaValue`.
+/// - `val` â€” `&LuaValue`.
 ///
 /// # Returns
 /// `LuaResult<SpriteBatchKey>`.
@@ -882,7 +882,7 @@ pub(super) fn batch_key_from_value(val: &LuaValue) -> LuaResult<SpriteBatchKey> 
 /// Extract a `CanvasKey` from either a `LuaCanvas` UserData or a numeric ID.
 ///
 /// # Parameters
-/// - `val` — `&LuaValue`.
+/// - `val` â€” `&LuaValue`.
 ///
 /// # Returns
 /// `LuaResult<CanvasKey>`.
@@ -903,7 +903,7 @@ pub(super) fn canvas_key_from_value(val: &LuaValue) -> LuaResult<CanvasKey> {
 /// Returns a `LuaError` for an invalid or released texture handle.
 ///
 /// # Parameters
-/// - `function_name` — `&str`.
+/// - `function_name` â€” `&str`.
 ///
 /// # Returns
 /// `LuaError`.
@@ -917,7 +917,7 @@ pub(super) fn invalid_texture_handle(function_name: &str) -> LuaError {
 /// Returns a `LuaError` for an invalid or released font handle.
 ///
 /// # Parameters
-/// - `function_name` — `&str`.
+/// - `function_name` â€” `&str`.
 ///
 /// # Returns
 /// `LuaError`.
@@ -931,7 +931,7 @@ pub(super) fn invalid_font_handle(function_name: &str) -> LuaError {
 /// Returns a `LuaError` for an invalid or released sprite batch handle.
 ///
 /// # Parameters
-/// - `function_name` — `&str`.
+/// - `function_name` â€” `&str`.
 ///
 /// # Returns
 /// `LuaError`.
@@ -945,7 +945,7 @@ pub(super) fn invalid_batch_handle(function_name: &str) -> LuaError {
 /// Returns a `LuaError` for an invalid or released canvas handle.
 ///
 /// # Parameters
-/// - `function_name` — `&str`.
+/// - `function_name` â€” `&str`.
 ///
 /// # Returns
 /// `LuaError`.
@@ -959,7 +959,7 @@ pub(super) fn invalid_canvas_handle(function_name: &str) -> LuaError {
 /// Returns a `LuaError` for an invalid or released mesh handle.
 ///
 /// # Parameters
-/// - `function_name` — `&str`.
+/// - `function_name` â€” `&str`.
 ///
 /// # Returns
 /// `LuaError`.
@@ -973,9 +973,9 @@ pub(super) fn invalid_mesh_handle(function_name: &str) -> LuaError {
 /// Resolves a texture key, validating the handle is still alive.
 ///
 /// # Parameters
-/// - `state` — `&SharedState`.
-/// - `val` — `&LuaValue`.
-/// - `function_name` — `&str`.
+/// - `state` â€” `&SharedState`.
+/// - `val` â€” `&LuaValue`.
+/// - `function_name` â€” `&str`.
 ///
 /// # Returns
 /// `LuaResult<TextureKey>`.
@@ -1011,9 +1011,9 @@ pub(super) fn require_texture_key(
 /// Resolves a font key and validates the font is still loaded.
 ///
 /// # Parameters
-/// - `state` — `&SharedState`.
-/// - `val` — `&LuaValue`.
-/// - `function_name` — `&str`.
+/// - `state` â€” `&SharedState`.
+/// - `val` â€” `&LuaValue`.
+/// - `function_name` â€” `&str`.
 ///
 /// # Returns
 /// `LuaResult<FontKey>`.
@@ -1033,9 +1033,9 @@ pub(crate) fn require_font_key(
 /// Resolves a sprite-batch key and validates the batch is still alive.
 ///
 /// # Parameters
-/// - `state` — `&SharedState`.
-/// - `val` — `&LuaValue`.
-/// - `function_name` — `&str`.
+/// - `state` â€” `&SharedState`.
+/// - `val` â€” `&LuaValue`.
+/// - `function_name` â€” `&str`.
 ///
 /// # Returns
 /// `LuaResult<SpriteBatchKey>`.
@@ -1055,9 +1055,9 @@ pub(super) fn require_batch_key(
 /// Resolves a canvas key and validates the canvas is still alive.
 ///
 /// # Parameters
-/// - `state` — `&SharedState`.
-/// - `val` — `&LuaValue`.
-/// - `function_name` — `&str`.
+/// - `state` â€” `&SharedState`.
+/// - `val` â€” `&LuaValue`.
+/// - `function_name` â€” `&str`.
 ///
 /// # Returns
 /// `LuaResult<CanvasKey>`.
@@ -1077,9 +1077,9 @@ pub(super) fn require_canvas_key(
 /// Resolves a mesh key and validates the mesh is still alive.
 ///
 /// # Parameters
-/// - `state` — `&SharedState`.
-/// - `id` — `u64`.
-/// - `function_name` — `&str`.
+/// - `state` â€” `&SharedState`.
+/// - `id` â€” `u64`.
+/// - `function_name` â€” `&str`.
 ///
 /// # Returns
 /// `LuaResult<MeshKey>`.
@@ -1093,20 +1093,20 @@ pub(super) fn require_mesh_key(state: &SharedState, id: u64, function_name: &str
 }
 
 
-// ── Extended registrations (second half) ──────────────────────────────────
+// â”€â”€ Extended registrations (second half) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 fn register_ext(
     lua: &Lua,
     graphics: &LuaTable,
     state: Rc<RefCell<SharedState>>,
 ) -> LuaResult<()> {
-    // ÔöÇÔöÇ Sprite batch API ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
+    // Ă”Ă¶Ă‡Ă”Ă¶Ă‡ Sprite batch API Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡
 
     #[allow(unused_doc_comments)]
     /// Creates a new SpriteBatch for efficiently drawing many sprites sharing one texture.
     ///
     /// # Parameters
-    /// - `texture` ÔÇö Texture ID that all sprites in this batch must share.
-    /// - `maxSprites` ÔÇö Maximum number of sprites the batch can hold.
+    /// - `texture` Ă”Ă‡Ă¶ Texture ID that all sprites in this batch must share.
+    /// - `maxSprites` Ă”Ă‡Ă¶ Maximum number of sprites the batch can hold.
     ///
     /// # Returns
     /// New SpriteBatch ID.
@@ -1147,12 +1147,12 @@ fn register_ext(
     /// Appends a new sprite to the batch with the given position and transform properties.
     ///
     /// # Parameters
-    /// - `batch` ÔÇö SpriteBatch ID.
-    /// - `x` ÔÇö Sprite X position in pixels.
-    /// - `y` ÔÇö Sprite Y position in pixels.
-    /// - `angle` ÔÇö Optional rotation in radians.
-    /// - `sx`, `sy` ÔÇö Optional scale factors.
-    /// - `ox`, `oy` ÔÇö Optional origin offsets.
+    /// - `batch` Ă”Ă‡Ă¶ SpriteBatch ID.
+    /// - `x` Ă”Ă‡Ă¶ Sprite X position in pixels.
+    /// - `y` Ă”Ă‡Ă¶ Sprite Y position in pixels.
+    /// - `angle` Ă”Ă‡Ă¶ Optional rotation in radians.
+    /// - `sx`, `sy` Ă”Ă‡Ă¶ Optional scale factors.
+    /// - `ox`, `oy` Ă”Ă‡Ă¶ Optional origin offsets.
     ///
     /// # Returns
     /// Index of the newly appended sprite within the batch.
@@ -1219,7 +1219,7 @@ fn register_ext(
     /// Removes all sprites from the batch, resetting its count to zero.
     ///
     /// # Parameters
-    /// - `batch` ÔÇö SpriteBatch ID to clear.
+    /// - `batch` Ă”Ă‡Ă¶ SpriteBatch ID to clear.
     #[allow(unused_doc_comments)]
     /// Luna graphics API function.
     ///
@@ -1250,9 +1250,9 @@ fn register_ext(
     /// Draws all sprites in a SpriteBatch using a single efficient GPU draw call.
     ///
     /// # Parameters
-    /// - `batch` ÔÇö SpriteBatch ID returned by newSpriteBatch.
-    /// - `x` ÔÇö Optional X offset in pixels.
-    /// - `y` ÔÇö Optional Y offset in pixels.
+    /// - `batch` Ă”Ă‡Ă¶ SpriteBatch ID returned by newSpriteBatch.
+    /// - `x` Ă”Ă‡Ă¶ Optional X offset in pixels.
+    /// - `y` Ă”Ă‡Ă¶ Optional Y offset in pixels.
     #[allow(unused_doc_comments)]
     /// Luna graphics API function.
     ///
@@ -1273,13 +1273,13 @@ fn register_ext(
         })?,
     )?;
 
-    // ÔöÇÔöÇ Blend modes ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
+    // Ă”Ă¶Ă‡Ă”Ă¶Ă‡ Blend modes Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡
 
     #[allow(unused_doc_comments)]
     /// Sets the blend equation used when drawing new pixels over the existing framebuffer.
     ///
     /// # Parameters
-    /// - `mode` ÔÇö Blend mode string: 'alpha', 'additive', 'multiply', 'none', etc.
+    /// - `mode` Ă”Ă‡Ă¶ Blend mode string: 'alpha', 'additive', 'multiply', 'none', etc.
     #[allow(unused_doc_comments)]
     /// Luna graphics API function.
     ///
@@ -1347,10 +1347,10 @@ fn register_ext(
     /// Sets the camera transform: position, rotation, and zoom applied to all draw calls.
     ///
     /// # Parameters
-    /// - `x` ÔÇö Camera center X in world units.
-    /// - `y` ÔÇö Camera center Y in world units.
-    /// - `angle` ÔÇö Optional camera rotation angle in radians.
-    /// - `zoom` ÔÇö Optional zoom scale (1.0 = no zoom).
+    /// - `x` Ă”Ă‡Ă¶ Camera center X in world units.
+    /// - `y` Ă”Ă‡Ă¶ Camera center Y in world units.
+    /// - `angle` Ă”Ă‡Ă¶ Optional camera rotation angle in radians.
+    /// - `zoom` Ă”Ă‡Ă¶ Optional zoom scale (1.0 = no zoom).
     #[allow(unused_doc_comments)]
     /// Luna graphics API function.
     ///
@@ -1442,7 +1442,7 @@ fn register_ext(
     )?;
 
     #[allow(unused_doc_comments)]
-    /// Resets the camera transform to identity ÔÇö no translation, rotation, or zoom.
+    /// Resets the camera transform to identity Ă”Ă‡Ă¶ no translation, rotation, or zoom.
     #[allow(unused_doc_comments)]
     /// Luna graphics API function.
     ///
@@ -1466,7 +1466,7 @@ fn register_ext(
     /// Releases a GPU resource handle and returns its memory to the pool early.
     ///
     /// # Parameters
-    /// - `handle` ÔÇö Resource ID to release (texture, canvas, shader, etc.).
+    /// - `handle` Ă”Ă‡Ă¶ Resource ID to release (texture, canvas, shader, etc.).
     let s = state.clone();
     graphics.set(
         "release",
@@ -1486,7 +1486,7 @@ fn register_ext(
     /// Releases the font resource for the given ID and frees its GPU atlas memory.
     ///
     /// # Parameters
-    /// - `font` ÔÇö Font ID returned by newFont.
+    /// - `font` Ă”Ă‡Ă¶ Font ID returned by newFont.
     let s = state.clone();
     graphics.set(
         "releaseFont",
@@ -1508,7 +1508,7 @@ fn register_ext(
     /// Releases the canvas render target and frees its GPU framebuffer memory.
     ///
     /// # Parameters
-    /// - `canvas` ÔÇö Canvas ID returned by newCanvas.
+    /// - `canvas` Ă”Ă‡Ă¶ Canvas ID returned by newCanvas.
     let s = state.clone();
     graphics.set(
         "releaseCanvas",
@@ -1531,7 +1531,7 @@ fn register_ext(
     /// Releases the sprite batch resource and frees its GPU instance buffer.
     ///
     /// # Parameters
-    /// - `batch` ÔÇö SpriteBatch ID returned by newSpriteBatch.
+    /// - `batch` Ă”Ă‡Ă¶ SpriteBatch ID returned by newSpriteBatch.
     let s = state.clone();
     graphics.set(
         "releaseBatch",
@@ -1551,7 +1551,7 @@ fn register_ext(
     /// Draws a list of (x, y) points using the current point size and color.
     ///
     /// # Parameters
-    /// - `...` ÔÇö Alternating x, y coordinate pairs, or a flat numeric table.
+    /// - `...` Ă”Ă‡Ă¶ Alternating x, y coordinate pairs, or a flat numeric table.
     let s = state.clone();
     graphics.set(
         "points",
@@ -1592,7 +1592,7 @@ fn register_ext(
     /// Sets the diameter in pixels used when drawing point primitives.
     ///
     /// # Parameters
-    /// - `size` ÔÇö Point diameter in pixels.
+    /// - `size` Ă”Ă‡Ă¶ Point diameter in pixels.
     let s = state.clone();
     graphics.set(
         "setPointSize",
@@ -1675,7 +1675,7 @@ fn register_ext(
         })?,
     )?;
 
-    // ÔöÇÔöÇ Scissor ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
+    // Ă”Ă¶Ă‡Ă”Ă¶Ă‡ Scissor Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡
 
     // luna.graphics.setScissor(x, y, w, h) or luna.graphics.setScissor() to disable
     /// Restricts drawing to the given rectangle; clears scissor if no args.
@@ -1761,16 +1761,16 @@ fn register_ext(
         })?,
     )?;
 
-    // ÔöÇÔöÇ Color mask ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
+    // Ă”Ă¶Ă‡Ă”Ă¶Ă‡ Color mask Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡
 
     // luna.graphics.setColorMask(r, g, b, a) or luna.graphics.setColorMask() to reset
     /// Sets which RGBA channels are written to the render target for subsequent draw calls.
     ///
     /// # Parameters
-    /// - `r` ÔÇö Write to the red channel (boolean).
-    /// - `g` ÔÇö Write to the green channel.
-    /// - `b` ÔÇö Write to the blue channel.
-    /// - `a` ÔÇö Write to the alpha channel.
+    /// - `r` Ă”Ă‡Ă¶ Write to the red channel (boolean).
+    /// - `g` Ă”Ă‡Ă¶ Write to the green channel.
+    /// - `b` Ă”Ă‡Ă¶ Write to the blue channel.
+    /// - `a` Ă”Ă‡Ă¶ Write to the alpha channel.
     let s = state.clone();
     graphics.set(
         "setColorMask",
@@ -1813,7 +1813,7 @@ fn register_ext(
         lua.create_function(move |_, ()| Ok(s.borrow().color_mask))?,
     )?;
 
-    // ÔöÇÔöÇ Wireframe mode ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
+    // Ă”Ă¶Ă‡Ă”Ă¶Ă‡ Wireframe mode Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡
 
     // luna.graphics.setWireframe(enabled)
     /// Enables or disables wireframe rendering mode.
@@ -1836,7 +1836,7 @@ fn register_ext(
         lua.create_function(move |_, ()| Ok(s.borrow().wireframe))?,
     )?;
 
-    // ÔöÇÔöÇ Canvas size ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
+    // Ă”Ă¶Ă‡Ă”Ă¶Ă‡ Canvas size Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡
 
     // luna.graphics.getCanvasSize(canvas_id) -> w, h
     /// Returns the dimensions (w, h) of the current canvas.
@@ -1854,7 +1854,7 @@ fn register_ext(
         })?,
     )?;
 
-    // ÔöÇÔöÇ Default filter ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
+    // Ă”Ă¶Ă‡Ă”Ă¶Ă‡ Default filter Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡
 
     // luna.graphics.setDefaultFilter(min, mag)
     /// Sets the default texture filter mode ('linear' or 'nearest').
@@ -1884,7 +1884,7 @@ fn register_ext(
         })?,
     )?;
 
-    // ÔöÇÔöÇ Graphics stats ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
+    // Ă”Ă¶Ă‡Ă”Ă¶Ă‡ Graphics stats Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡
 
     // luna.graphics.getStats() -> table
     /// Returns a table of renderer statistics (draw calls, triangles, etc.).
@@ -1921,7 +1921,7 @@ fn register_ext(
         })?,
     )?;
 
-    // ÔöÇÔöÇ Stencil ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
+    // Ă”Ă¶Ă‡Ă”Ă¶Ă‡ Stencil Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡
 
     // luna.graphics.stencil(func, action?, value?, keepvalues?)
     /// Draws to the stencil buffer using the given Lua draw function.
@@ -2147,9 +2147,9 @@ fn register_ext(
         })?,
     )?;
 
-    // ÔöÇÔöÇ Custom Shaders ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
+    // Ă”Ă¶Ă‡Ă”Ă¶Ă‡ Custom Shaders Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡
 
-    // luna.graphics.newShader(wgslCode) Ôćĺ shader_id
+    // luna.graphics.newShader(wgslCode) Ă”Ä‡Äş shader_id
     /// Compiles a custom WGSL shader program and returns its ID.
     let state_cl = state.clone();
     graphics.set(
@@ -2163,7 +2163,7 @@ fn register_ext(
         })?,
     )?;
 
-    // luna.graphics.setShader(shader_id?) ÔÇö set active shader or reset to default
+    // luna.graphics.setShader(shader_id?) Ă”Ă‡Ă¶ set active shader or reset to default
     /// Activates a custom WGSL shader for subsequent draw calls.
     let state_cl = state.clone();
     graphics.set(
@@ -2191,7 +2191,7 @@ fn register_ext(
         })?,
     )?;
 
-    // luna.graphics.getShader() Ôćĺ shader_id or nil
+    // luna.graphics.getShader() Ă”Ä‡Äş shader_id or nil
     /// Returns the currently active Shader ID, or nil.
     let state_cl = state.clone();
     graphics.set(
@@ -2209,8 +2209,8 @@ fn register_ext(
     /// Sends a named uniform variable value to the currently active shader program.
     ///
     /// # Parameters
-    /// - `name` ÔÇö Uniform variable name as defined in the WGSL shader.
-    /// - `value` ÔÇö Value to send (number, table of numbers, or boolean).
+    /// - `name` Ă”Ă‡Ă¶ Uniform variable name as defined in the WGSL shader.
+    /// - `value` Ă”Ă‡Ă¶ Value to send (number, table of numbers, or boolean).
     let state_cl = state.clone();
     graphics.set(
         "sendShader",
@@ -2266,7 +2266,7 @@ fn register_ext(
         })?,
     )?;
 
-    // luna.graphics.hasShaderUniform(shader_id, name) Ôćĺ bool
+    // luna.graphics.hasShaderUniform(shader_id, name) Ă”Ä‡Äş bool
     /// Returns whether the current shader has a uniform with the given name.
     let state_cl = state.clone();
     graphics.set(
@@ -2283,11 +2283,11 @@ fn register_ext(
         })?,
     )?;
 
-    // luna.graphics.releaseShader(shader_id) ÔÇö release a shader
+    // luna.graphics.releaseShader(shader_id) Ă”Ă‡Ă¶ release a shader
     /// Releases the compiled shader program and frees its GPU pipeline object.
     ///
     /// # Parameters
-    /// - `shader` ÔÇö Shader ID returned by newShader.
+    /// - `shader` Ă”Ă‡Ă¶ Shader ID returned by newShader.
     let state_cl = state.clone();
     graphics.set(
         "releaseShader",
@@ -2307,9 +2307,9 @@ fn register_ext(
         })?,
     )?;
 
-    // ÔöÇÔöÇ Mesh API ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
+    // Ă”Ă¶Ă‡Ă”Ă¶Ă‡ Mesh API Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡
 
-    // luna.graphics.newMesh(vertexTable, mode?) Ôćĺ mesh_id
+    // luna.graphics.newMesh(vertexTable, mode?) Ă”Ä‡Äş mesh_id
     /// Creates a custom Mesh from vertex data and returns its ID.
     let state_cl = state.clone();
     graphics.set(
@@ -2357,9 +2357,9 @@ fn register_ext(
     /// Draws the given custom Mesh geometry with the current transform and color.
     ///
     /// # Parameters
-    /// - `mesh` ÔÇö Mesh ID returned by newMesh.
-    /// - `x` ÔÇö Optional X position offset in pixels.
-    /// - `y` ÔÇö Optional Y position offset in pixels.
+    /// - `mesh` Ă”Ă‡Ă¶ Mesh ID returned by newMesh.
+    /// - `x` Ă”Ă‡Ă¶ Optional X position offset in pixels.
+    /// - `y` Ă”Ă‡Ă¶ Optional Y position offset in pixels.
     let state_cl = state.clone();
     #[allow(clippy::type_complexity)]
     graphics.set(
@@ -2428,8 +2428,8 @@ fn register_ext(
     /// Uploads a new flat vertex array to replace the mesh's current geometry.
     ///
     /// # Parameters
-    /// - `mesh` ÔÇö Mesh ID returned by newMesh.
-    /// - `vertices` ÔÇö Table of vertex attribute tables or a flat number array.
+    /// - `mesh` Ă”Ă‡Ă¶ Mesh ID returned by newMesh.
+    /// - `vertices` Ă”Ă‡Ă¶ Table of vertex attribute tables or a flat number array.
     let state_cl = state.clone();
     graphics.set(
         "setMeshVertices",
@@ -2467,7 +2467,7 @@ fn register_ext(
         })?,
     )?;
 
-    // luna.graphics.getMeshVertex(mesh_id, index) Ôćĺ x,y,u,v,r,g,b,a
+    // luna.graphics.getMeshVertex(mesh_id, index) Ă”Ä‡Äş x,y,u,v,r,g,b,a
     /// Returns position and UV data for a vertex in a Mesh.
     let state_cl = state.clone();
     graphics.set(
@@ -2487,7 +2487,7 @@ fn register_ext(
         })?,
     )?;
 
-    // luna.graphics.getMeshVertexCount(mesh_id) Ôćĺ number
+    // luna.graphics.getMeshVertexCount(mesh_id) Ă”Ä‡Äş number
     /// Returns the total number of vertices in a Mesh.
     let state_cl = state.clone();
     graphics.set(
@@ -2508,8 +2508,8 @@ fn register_ext(
     /// Binds a texture to the given mesh so it is sampled during rendering.
     ///
     /// # Parameters
-    /// - `mesh` ÔÇö Mesh ID returned by newMesh.
-    /// - `texture` ÔÇö Texture ID to bind, or nil to clear.
+    /// - `mesh` Ă”Ă‡Ă¶ Mesh ID returned by newMesh.
+    /// - `texture` Ă”Ă‡Ă¶ Texture ID to bind, or nil to clear.
     let state_cl = state.clone();
     graphics.set(
         "setMeshTexture",
@@ -2532,11 +2532,11 @@ fn register_ext(
         })?,
     )?;
 
-    // luna.graphics.getMeshTexture(mesh_id) Ôćĺ texture_id or nil
+    // luna.graphics.getMeshTexture(mesh_id) Ă”Ä‡Äş texture_id or nil
     /// Returns the texture ID currently bound to the given mesh for rendering.
     ///
     /// # Parameters
-    /// - `mesh` ÔÇö Mesh ID to query.
+    /// - `mesh` Ă”Ă‡Ă¶ Mesh ID to query.
     ///
     /// # Returns
     /// Texture ID, or nil if no texture is bound.
@@ -2559,8 +2559,8 @@ fn register_ext(
     /// Sets the vertex topology mode used when drawing a mesh ('triangles', 'fan', 'strip', 'points').
     ///
     /// # Parameters
-    /// - `mesh` ÔÇö Mesh ID returned by newMesh.
-    /// - `mode` ÔÇö Topology string: 'triangles', 'fan', 'strip', or 'points'.
+    /// - `mesh` Ă”Ă‡Ă¶ Mesh ID returned by newMesh.
+    /// - `mode` Ă”Ă‡Ă¶ Topology string: 'triangles', 'fan', 'strip', or 'points'.
     let state_cl = state.clone();
     graphics.set(
         "setMeshDrawMode",
@@ -2591,8 +2591,8 @@ fn register_ext(
     /// Sets an index array defining the vertex drawing order for a custom mesh.
     ///
     /// # Parameters
-    /// - `mesh` ÔÇö Mesh ID returned by newMesh.
-    /// - `map` ÔÇö Table of 1-based vertex indices specifying the draw order.
+    /// - `mesh` Ă”Ă‡Ă¶ Mesh ID returned by newMesh.
+    /// - `map` Ă”Ă‡Ă¶ Table of 1-based vertex indices specifying the draw order.
     let state_cl = state.clone();
     graphics.set(
         "setMeshVertexMap",
@@ -2622,7 +2622,7 @@ fn register_ext(
     /// Releases the custom mesh resource and frees the GPU vertex buffer.
     ///
     /// # Parameters
-    /// - `mesh` ÔÇö Mesh ID returned by newMesh.
+    /// - `mesh` Ă”Ă‡Ă¶ Mesh ID returned by newMesh.
     let state_cl = state.clone();
     graphics.set(
         "releaseMesh",
@@ -2634,17 +2634,17 @@ fn register_ext(
         })?,
     )?;
 
-    // ÔöÇÔöÇ Nine-Slice (9-patch) rendering ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
+    // Ă”Ă¶Ă‡Ă”Ă¶Ă‡ Nine-Slice (9-patch) rendering Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡
 
     // luna.graphics.newNineSlice(image, top, right, bottom, left) -> NineSlice userdata
     /// Creates a nine-slice definition from an image and border insets.
     ///
     /// # Parameters
-    /// - `image` ÔÇö Image UserData (LuaImage) or numeric image ID.
-    /// - `top` ÔÇö Pixel inset from the top edge.
-    /// - `right` ÔÇö Pixel inset from the right edge.
-    /// - `bottom` ÔÇö Pixel inset from the bottom edge.
-    /// - `left` ÔÇö Pixel inset from the left edge.
+    /// - `image` Ă”Ă‡Ă¶ Image UserData (LuaImage) or numeric image ID.
+    /// - `top` Ă”Ă‡Ă¶ Pixel inset from the top edge.
+    /// - `right` Ă”Ă‡Ă¶ Pixel inset from the right edge.
+    /// - `bottom` Ă”Ă‡Ă¶ Pixel inset from the bottom edge.
+    /// - `left` Ă”Ă‡Ă¶ Pixel inset from the left edge.
     ///
     /// # Returns
     /// A NineSlice UserData object.
@@ -2707,11 +2707,11 @@ fn register_ext(
     /// Draws a nine-slice image stretched to fill the given rectangle.
     ///
     /// # Parameters
-    /// - `nineslice` ÔÇö NineSlice UserData returned by newNineSlice.
-    /// - `x` ÔÇö Destination X position.
-    /// - `y` ÔÇö Destination Y position.
-    /// - `w` ÔÇö Destination width.
-    /// - `h` ÔÇö Destination height.
+    /// - `nineslice` Ă”Ă‡Ă¶ NineSlice UserData returned by newNineSlice.
+    /// - `x` Ă”Ă‡Ă¶ Destination X position.
+    /// - `y` Ă”Ă‡Ă¶ Destination Y position.
+    /// - `w` Ă”Ă‡Ă¶ Destination width.
+    /// - `h` Ă”Ă‡Ă¶ Destination height.
     let s = state.clone();
     graphics.set(
         "drawNineSlice",
@@ -2745,9 +2745,9 @@ fn register_ext(
 /// Registers all `luna.graphics.*` drawing and resource management functions into the Lua VM.
 ///
 /// # Parameters
-/// - `lua` — `&Lua`.
-/// - `luna` — `&LuaTable`.
-/// - `state` — `Rc<RefCell<SharedState>>`.
+/// - `lua` â€” `&Lua`.
+/// - `luna` â€” `&LuaTable`.
+/// - `state` â€” `Rc<RefCell<SharedState>>`.
 ///
 /// # Returns
 /// `LuaResult<()>`.
@@ -2783,10 +2783,10 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
     /// Sets the RGBA color used to clear the framebuffer at the start of each draw frame.
     ///
     /// # Parameters
-    /// - `r` ÔÇö Red component in [0, 1].
-    /// - `g` ÔÇö Green component in [0, 1].
-    /// - `b` ÔÇö Blue component in [0, 1].
-    /// - `a` ÔÇö Optional alpha component (default 1.0).
+    /// - `r` Ă”Ă‡Ă¶ Red component in [0, 1].
+    /// - `g` Ă”Ă‡Ă¶ Green component in [0, 1].
+    /// - `b` Ă”Ă‡Ă¶ Blue component in [0, 1].
+    /// - `a` Ă”Ă‡Ă¶ Optional alpha component (default 1.0).
     #[allow(unused_doc_comments)]
     /// Sets the background (clear) color.
     ///
@@ -2837,13 +2837,13 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
     /// Draws a filled or outlined rectangle at (x, y) with given width and height.
     ///
     /// # Parameters
-    /// - `mode` ÔÇö Draw mode: 'fill' or 'line'.
-    /// - `x` ÔÇö Top-left X coordinate in pixels.
-    /// - `y` ÔÇö Top-left Y coordinate in pixels.
-    /// - `width` ÔÇö Rectangle width in pixels.
-    /// - `height` ÔÇö Rectangle height in pixels.
-    /// - `rx` ÔÇö Optional horizontal corner radius for rounded rectangles.
-    /// - `ry` ÔÇö Optional vertical corner radius for rounded rectangles.
+    /// - `mode` Ă”Ă‡Ă¶ Draw mode: 'fill' or 'line'.
+    /// - `x` Ă”Ă‡Ă¶ Top-left X coordinate in pixels.
+    /// - `y` Ă”Ă‡Ă¶ Top-left Y coordinate in pixels.
+    /// - `width` Ă”Ă‡Ă¶ Rectangle width in pixels.
+    /// - `height` Ă”Ă‡Ă¶ Rectangle height in pixels.
+    /// - `rx` Ă”Ă‡Ă¶ Optional horizontal corner radius for rounded rectangles.
+    /// - `ry` Ă”Ă‡Ă¶ Optional vertical corner radius for rounded rectangles.
     #[allow(unused_doc_comments)]
     /// Draws a rectangle.
     ///
@@ -2906,11 +2906,11 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
     /// Draws a filled or outlined circle centered at (x, y) with the given radius.
     ///
     /// # Parameters
-    /// - `mode` ÔÇö Draw mode: 'fill' or 'line'.
-    /// - `x` ÔÇö Center X coordinate in pixels.
-    /// - `y` ÔÇö Center Y coordinate in pixels.
-    /// - `radius` ÔÇö Circle radius in pixels.
-    /// - `segments` ÔÇö Optional number of line segments (default auto).
+    /// - `mode` Ă”Ă‡Ă¶ Draw mode: 'fill' or 'line'.
+    /// - `x` Ă”Ă‡Ă¶ Center X coordinate in pixels.
+    /// - `y` Ă”Ă‡Ă¶ Center Y coordinate in pixels.
+    /// - `radius` Ă”Ă‡Ă¶ Circle radius in pixels.
+    /// - `segments` Ă”Ă‡Ă¶ Optional number of line segments (default auto).
     #[allow(unused_doc_comments)]
     /// Draws a circle.
     ///
@@ -2940,12 +2940,12 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
     /// Draws a filled or outlined ellipse centered at (x, y) with given horizontal and vertical radii.
     ///
     /// # Parameters
-    /// - `mode` ÔÇö Draw mode: 'fill' or 'line'.
-    /// - `x` ÔÇö Center X coordinate in pixels.
-    /// - `y` ÔÇö Center Y coordinate in pixels.
-    /// - `rx` ÔÇö Horizontal radius in pixels.
-    /// - `ry` ÔÇö Vertical radius in pixels.
-    /// - `segments` ÔÇö Optional segment count for smoothness.
+    /// - `mode` Ă”Ă‡Ă¶ Draw mode: 'fill' or 'line'.
+    /// - `x` Ă”Ă‡Ă¶ Center X coordinate in pixels.
+    /// - `y` Ă”Ă‡Ă¶ Center Y coordinate in pixels.
+    /// - `rx` Ă”Ă‡Ă¶ Horizontal radius in pixels.
+    /// - `ry` Ă”Ă‡Ă¶ Vertical radius in pixels.
+    /// - `segments` Ă”Ă‡Ă¶ Optional segment count for smoothness.
     #[allow(unused_doc_comments)]
     /// Draws an ellipse.
     ///
@@ -2981,10 +2981,10 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
     /// Draws a filled or outlined triangle with three (x, y) vertex coordinates.
     ///
     /// # Parameters
-    /// - `mode` ÔÇö Draw mode: 'fill' or 'line'.
-    /// - `x1`, `y1` ÔÇö First vertex.
-    /// - `x2`, `y2` ÔÇö Second vertex.
-    /// - `x3`, `y3` ÔÇö Third vertex.
+    /// - `mode` Ă”Ă‡Ă¶ Draw mode: 'fill' or 'line'.
+    /// - `x1`, `y1` Ă”Ă‡Ă¶ First vertex.
+    /// - `x2`, `y2` Ă”Ă‡Ă¶ Second vertex.
+    /// - `x3`, `y3` Ă”Ă‡Ă¶ Third vertex.
     #[allow(unused_doc_comments)]
     /// Draws a triangle.
     ///
@@ -3022,8 +3022,8 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
     /// Draws a filled or outlined polygon from a flat list of (x, y) vertex coordinates.
     ///
     /// # Parameters
-    /// - `mode` ÔÇö Draw mode: 'fill' or 'line'.
-    /// - `vertices` ÔÇö Flat table of numbers in (x, y, x, y, ...) order.
+    /// - `mode` Ă”Ă‡Ă¶ Draw mode: 'fill' or 'line'.
+    /// - `vertices` Ă”Ă‡Ă¶ Flat table of numbers in (x, y, x, y, ...) order.
     #[allow(unused_doc_comments)]
     /// Draws a polygon.
     ///
@@ -3069,10 +3069,10 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
     /// Draws a straight line from (x1, y1) to (x2, y2) using the current color.
     ///
     /// # Parameters
-    /// - `x1` ÔÇö Start X in pixels.
-    /// - `y1` ÔÇö Start Y in pixels.
-    /// - `x2` ÔÇö End X in pixels.
-    /// - `y2` ÔÇö End Y in pixels.
+    /// - `x1` Ă”Ă‡Ă¶ Start X in pixels.
+    /// - `y1` Ă”Ă‡Ă¶ Start Y in pixels.
+    /// - `x2` Ă”Ă‡Ă¶ End X in pixels.
+    /// - `y2` Ă”Ă‡Ă¶ End Y in pixels.
     #[allow(unused_doc_comments)]
     /// Draws a line between two points.
     ///
@@ -3106,19 +3106,19 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
     ///
     /// Lua API: luna.graphics.draw(image_id, x, y)
     // luna.graphics.draw(drawable, x?, y?, r?, sx?, sy?, ox?, oy?)
-    /// Draws any drawable object — Image, Canvas, or SpriteBatch — at the given position.
+    /// Draws any drawable object â€” Image, Canvas, or SpriteBatch â€” at the given position.
     ///
     /// Backward-compatible: still accepts raw integer image IDs.
     ///
     /// # Parameters
-    /// - `drawable` — `Drawable`. An Image, Canvas, SpriteBatch userdata, or integer image ID.
-    /// - `x` — `f32`. Destination X position (default 0).
-    /// - `y` — `f32`. Destination Y position (default 0).
-    /// - `r` — `f32`. Rotation in radians (default 0).
-    /// - `sx` — `f32`. X scale (default 1).
-    /// - `sy` — `f32`. Y scale (default 1).
-    /// - `ox` — `f32`. X origin offset (default 0).
-    /// - `oy` — `f32`. Y origin offset (default 0).
+    /// - `drawable` â€” `Drawable`. An Image, Canvas, SpriteBatch userdata, or integer image ID.
+    /// - `x` â€” `f32`. Destination X position (default 0).
+    /// - `y` â€” `f32`. Destination Y position (default 0).
+    /// - `r` â€” `f32`. Rotation in radians (default 0).
+    /// - `sx` â€” `f32`. X scale (default 1).
+    /// - `sy` â€” `f32`. Y scale (default 1).
+    /// - `ox` â€” `f32`. X origin offset (default 0).
+    /// - `oy` â€” `f32`. Y origin offset (default 0).
     ///
     /// # Returns
     /// `()`.
@@ -3146,7 +3146,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
                 let sy: f32 = opts.get::<_, Option<f32>>("sy")?.unwrap_or(sx);
                 let ox: f32 = opts.get::<_, Option<f32>>("ox")?.unwrap_or(0.0);
                 let oy: f32 = opts.get::<_, Option<f32>>("oy")?.unwrap_or(0.0);
-                let passes: Option<Vec<ImageEffectPass>> =
+                let passes: Option<Vec<ShaderPassDescriptor>> =
                     if let Ok(effect_ud) = opts.get::<_, LuaAnyUserData>("effect") {
                         let effect = effect_ud.borrow::<LuaImageEffect>()?;
                         let passes_vec = effect.inner.borrow().to_passes();
@@ -3267,12 +3267,12 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
     /// Draws the given text string at (x, y) using the active font and foreground color.
     ///
     /// # Parameters
-    /// - `text` ÔÇö String to draw.
-    /// - `x` ÔÇö Left edge X coordinate in pixels.
-    /// - `y` ÔÇö Top edge Y coordinate in pixels.
-    /// - `angle` ÔÇö Optional rotation angle in radians.
-    /// - `sx`, `sy` ÔÇö Optional scale factors.
-    /// - `ox`, `oy` ÔÇö Optional origin offsets.
+    /// - `text` Ă”Ă‡Ă¶ String to draw.
+    /// - `x` Ă”Ă‡Ă¶ Left edge X coordinate in pixels.
+    /// - `y` Ă”Ă‡Ă¶ Top edge Y coordinate in pixels.
+    /// - `angle` Ă”Ă‡Ă¶ Optional rotation angle in radians.
+    /// - `sx`, `sy` Ă”Ă‡Ă¶ Optional scale factors.
+    /// - `ox`, `oy` Ă”Ă‡Ă¶ Optional origin offsets.
     #[allow(unused_doc_comments)]
     /// Draws text at the given position.
     ///
@@ -3532,7 +3532,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
         })?,
     )?;
 
-    // ÔöÇÔöÇ Feature 4: getColor ÔÇô read back the current draw colour ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
+    // Ă”Ă¶Ă‡Ă”Ă¶Ă‡ Feature 4: getColor Ă”Ă‡Ă´ read back the current draw colour Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡
 
     #[allow(unused_doc_comments)]
     /// Returns the current drawing color (r, g, b, a).
@@ -3561,7 +3561,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
         })?,
     )?;
 
-    // ÔöÇÔöÇ Feature 1: Transform stack ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
+    // Ă”Ă¶Ă‡Ă”Ă¶Ă‡ Feature 1: Transform stack Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡
 
     #[allow(unused_doc_comments)]
     /// Pushes the current transform matrix onto the transform stack.
@@ -3649,7 +3649,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
     /// Rotates the current transform by the given angle in radians.
     ///
     /// Lua API: luna.graphics.rotate(angle)
-    // luna.graphics.rotate(angle)  ÔÇö radians
+    // luna.graphics.rotate(angle)  Ă”Ă‡Ă¶ radians
     let s = state.clone();
     graphics.set(
         "rotate",
@@ -3665,8 +3665,8 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
     /// Concatenates a scale factor onto the current transform matrix.
     ///
     /// # Parameters
-    /// - `sx` ÔÇö Horizontal scale factor.
-    /// - `sy` ÔÇö Vertical scale factor (defaults to sx if omitted).
+    /// - `sx` Ă”Ă‡Ă¶ Horizontal scale factor.
+    /// - `sy` Ă”Ă‡Ă¶ Vertical scale factor (defaults to sx if omitted).
     #[allow(unused_doc_comments)]
     /// Scales the current transform.
     ///
@@ -3701,7 +3701,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
         })?,
     )?;
 
-    // luna.graphics.origin() ÔÇö reset transform to identity
+    // luna.graphics.origin() Ă”Ă‡Ă¶ reset transform to identity
     /// Resets the transform to the identity (no translation, rotation, or scale).
     let s = state.clone();
     graphics.set(
@@ -3712,7 +3712,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
         })?,
     )?;
 
-    // luna.graphics.applyTransform(transform) ÔÇö apply a Transform object to the current matrix
+    // luna.graphics.applyTransform(transform) Ă”Ă‡Ă¶ apply a Transform object to the current matrix
     /// Applies the given Transform object to the current transform stack.
     let s = state.clone();
     graphics.set(
@@ -3782,7 +3782,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
         })?,
     )?;
 
-    // luna.graphics.reset() ÔÇö reset all graphics state to defaults
+    // luna.graphics.reset() Ă”Ă‡Ă¶ reset all graphics state to defaults
     /// Resets all graphics state to defaults: transform, color (1,1,1,1), shader, and scissor.
     let s = state.clone();
     graphics.set(
@@ -3819,19 +3819,19 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
         })?,
     )?;
 
-    // ÔöÇÔöÇ Feature 2: Arc ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
+    // Ă”Ă¶Ă‡Ă”Ă¶Ă‡ Feature 2: Arc Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡
 
     #[allow(unused_doc_comments)]
     /// Draws a filled or outlined arc segment centered at (x, y) with the given radius.
     ///
     /// # Parameters
-    /// - `mode` ÔÇö Draw mode: 'fill' or 'line'.
-    /// - `x` ÔÇö Center X coordinate in pixels.
-    /// - `y` ÔÇö Center Y coordinate in pixels.
-    /// - `radius` ÔÇö Arc radius in pixels.
-    /// - `angle1` ÔÇö Start angle in radians.
-    /// - `angle2` ÔÇö End angle in radians.
-    /// - `segments` ÔÇö Optional number of line segments for smoothness.
+    /// - `mode` Ă”Ă‡Ă¶ Draw mode: 'fill' or 'line'.
+    /// - `x` Ă”Ă‡Ă¶ Center X coordinate in pixels.
+    /// - `y` Ă”Ă‡Ă¶ Center Y coordinate in pixels.
+    /// - `radius` Ă”Ă‡Ă¶ Arc radius in pixels.
+    /// - `angle1` Ă”Ă‡Ă¶ Start angle in radians.
+    /// - `angle2` Ă”Ă‡Ă¶ End angle in radians.
+    /// - `segments` Ă”Ă‡Ă¶ Optional number of line segments for smoothness.
     #[allow(unused_doc_comments)]
     /// Draws an arc.
     ///
@@ -3875,7 +3875,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
         )?,
     )?;
 
-    // ÔöÇÔöÇ Feature 3: Quads (sprite-sheet regions) ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
+    // Ă”Ă¶Ă‡Ă”Ă¶Ă‡ Feature 3: Quads (sprite-sheet regions) Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡
 
     #[allow(unused_doc_comments)]
     /// Defines a sub-rectangle of a texture (a quad).
@@ -3921,14 +3921,14 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
     /// When `sy` is omitted it defaults to `sx` for uniform scaling.
     ///
     /// # Parameters
-    /// - `drawable` — `Drawable`. An Image, Canvas, SpriteBatch userdata or integer image ID.
-    /// - `x` — `f32`. Destination X position.
-    /// - `y` — `f32`. Destination Y position.
-    /// - `r` — `f32`. Rotation in radians (default 0).
-    /// - `sx` — `f32`. X scale (default 1).
-    /// - `sy` — `f32`. Y scale (default sx).
-    /// - `ox` — `f32`. X origin offset (default 0).
-    /// - `oy` — `f32`. Y origin offset (default 0).
+    /// - `drawable` â€” `Drawable`. An Image, Canvas, SpriteBatch userdata or integer image ID.
+    /// - `x` â€” `f32`. Destination X position.
+    /// - `y` â€” `f32`. Destination Y position.
+    /// - `r` â€” `f32`. Rotation in radians (default 0).
+    /// - `sx` â€” `f32`. X scale (default 1).
+    /// - `sy` â€” `f32`. Y scale (default sx).
+    /// - `ox` â€” `f32`. X origin offset (default 0).
+    /// - `oy` â€” `f32`. Y origin offset (default 0).
     ///
     /// # Returns
     /// `()`.
@@ -4145,7 +4145,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
         )?,
     )?;
 
-    // ÔöÇÔöÇ Feature 5: Polyline ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
+    // Ă”Ă¶Ă‡Ă”Ă¶Ă‡ Feature 5: Polyline Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡
 
     #[allow(unused_doc_comments)]
     /// Draws an open multi-segment polyline.
@@ -4159,7 +4159,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
     /// Draws an open multi-segment polyline.
     ///
     /// Lua API: luna.graphics.polyline(x1, y1, x2, y2, ...)
-    // luna.graphics.polyline(x1, y1, x2, y2, ...)  ÔÇö 2+ point pairs
+    // luna.graphics.polyline(x1, y1, x2, y2, ...)  Ă”Ă‡Ă¶ 2+ point pairs
     let s = state.clone();
     graphics.set(
         "polyline",
@@ -4182,7 +4182,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
         })?,
     )?;
 
-    // ÔöÇÔöÇ Font management ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
+    // Ă”Ă¶Ă‡Ă”Ă¶Ă‡ Font management Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡Ă”Ă¶Ă‡
 
     #[allow(unused_doc_comments)]
     /// Loads a TTF/OTF font file and returns its ID.
@@ -4336,7 +4336,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
     )?;
 
     // luna.graphics.getFontAscent(font_id) -> ascent
-    /// Returns the active font's ascent ÔÇö distance in pixels from baseline to the top of capital letters.
+    /// Returns the active font's ascent Ă”Ă‡Ă¶ distance in pixels from baseline to the top of capital letters.
     ///
     /// # Returns
     /// Ascent value in pixels as a number.
@@ -4357,7 +4357,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
     )?;
 
     // luna.graphics.getFontDescent(font_id) -> descent
-    /// Returns the active font's descent ÔÇö distance in pixels from the baseline to the bottom of descenders.
+    /// Returns the active font's descent Ă”Ă‡Ă¶ distance in pixels from the baseline to the bottom of descenders.
     ///
     /// # Returns
     /// Descent value in pixels as a number.
@@ -4381,7 +4381,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
     /// Sets the line height multiplier for the active font used in multi-line text rendering.
     ///
     /// # Parameters
-    /// - `height` ÔÇö Line height factor (1.0 = default spacing).
+    /// - `height` Ă”Ă‡Ă¶ Line height factor (1.0 = default spacing).
     let s = state.clone();
     graphics.set(
         "setFontLineHeight",
@@ -4432,7 +4432,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
     /// `SharedState` allows engine-side code to detect that a capture was requested.
     ///
     /// # Parameters
-    /// - `callback` — `function`. Called with one `ImageData` argument.
+    /// - `callback` â€” `function`. Called with one `ImageData` argument.
     ///
     /// # Returns
     /// Nothing.
@@ -4482,7 +4482,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
     /// Releases a compound shape resource and frees its slot-map entry.
     ///
     /// # Parameters
-    /// - `shape` — Shape userdata returned by newShape.
+    /// - `shape` â€” Shape userdata returned by newShape.
     {
         let state_cl = state.clone();
         graphics.set(
@@ -4510,3 +4510,4 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
 
     Ok(())
 }
+

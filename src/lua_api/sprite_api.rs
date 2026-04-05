@@ -14,14 +14,14 @@ use crate::animation::Animation;
 use crate::camera::Camera2D;
 use crate::raycaster::column_batch::ColumnBatch;
 use crate::graphics::decal_surface::DecalSurface;
-use crate::graphics::data_graph_renderer::GraphRenderer;
-use crate::graphics::large_map_renderer::LargeMapRenderer;
-use crate::graphics::light2d::Light2D;
-use crate::graphics::palette_lut::PaletteLUT;
-use crate::graphics::polygon_map::PolygonMap;
+use crate::gui::data_graph_renderer::GraphRenderer;
+use crate::tilemap::large_map_renderer::LargeMapRenderer;
+use crate::light::light2d::Light2D;
+use crate::image::palette_lut::PaletteLUT;
+use crate::tilemap::polygon_map::PolygonMap;
 use crate::graphics::sprite_sheet::{DirectionLayout, SpriteSheet};
 use crate::graphics::texture_atlas::TextureAtlas;
-use crate::graphics::trail::Trail;
+use crate::particle::trail::Trail;
 use crate::camera::{ScaleMode, Viewport};
 use crate::camera::ViewportScale;
 use crate::math::Color;
@@ -2685,6 +2685,14 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
         })?,
     )?;
 
+    // Merge all sprite factory functions into luna.graphics so they are
+    // accessible as luna.graphics.newDrawLayer() etc., while also keeping
+    // luna.sprite as an alias for backward-compatible scripts.
+    let graphics: LuaTable = luna.get("graphics")?;
+    for pair in sprite.clone().pairs::<mlua::Value, mlua::Value>() {
+        let (k, v) = pair?;
+        graphics.set(k, v)?;
+    }
     luna.set("sprite", sprite)?;
     Ok(())
 }

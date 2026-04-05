@@ -659,4 +659,3 @@ pub enum DrawableKind {
     /// A custom geometry mesh.
     Mesh(MeshKey),
 }
-

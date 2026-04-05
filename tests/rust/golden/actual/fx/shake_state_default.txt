@@ -1,0 +1,1 @@
+ShakeState { active: false, intensity: 5.0, duration: 0.5, elapsed: 0.0, offset_x: 0.0, offset_y: 0.0, seed: 12345 }

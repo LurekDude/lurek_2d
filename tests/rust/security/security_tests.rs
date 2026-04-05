@@ -49,20 +49,14 @@ fn lua_sandbox_io_open_is_nil() {
 #[test]
 fn lua_sandbox_load_is_nil() {
     let lua = make_vm();
-    let result: bool = lua
-        .load("return load == nil")
-        .eval()
-        .unwrap_or(true);
+    let result: bool = lua.load("return load == nil").eval().unwrap_or(true);
     assert!(result, "load() must not be accessible in the Lua sandbox");
 }
 
 #[test]
 fn lua_sandbox_debug_lib_absent() {
     let lua = make_vm();
-    let result: bool = lua
-        .load("return debug == nil")
-        .eval()
-        .unwrap_or(true);
+    let result: bool = lua.load("return debug == nil").eval().unwrap_or(true);
     assert!(result, "debug library must not be exposed in the sandbox");
 }
 
@@ -87,10 +81,7 @@ fn filesystem_reject_dotdot_path() {
     let fs = GameFS::new(PathBuf::from("tests/rust/fixtures"));
     // Attempt to escape sandbox via ..
     let result = fs.read_string("../../Cargo.toml");
-    assert!(
-        result.is_err(),
-        "Path traversal via ../ must be rejected"
-    );
+    assert!(result.is_err(), "Path traversal via ../ must be rejected");
 }
 
 #[test]
@@ -99,10 +90,7 @@ fn filesystem_reject_absolute_path() {
     let fs = GameFS::new(PathBuf::from("tests/rust/fixtures"));
     // Try absolute path
     let result = fs.read_string("/etc/passwd");
-    assert!(
-        result.is_err(),
-        "Absolute paths must be rejected by GameFS"
-    );
+    assert!(result.is_err(), "Absolute paths must be rejected by GameFS");
 }
 
 #[test]
@@ -111,10 +99,7 @@ fn filesystem_reject_null_byte_in_path() {
     let fs = GameFS::new(PathBuf::from("tests/rust/fixtures"));
     // Null-byte injection
     let result = fs.read_string("file\x00.lua");
-    assert!(
-        result.is_err(),
-        "Null bytes in path must be rejected"
-    );
+    assert!(result.is_err(), "Null bytes in path must be rejected");
 }
 
 // ═════════════════════════════════════════════════════════════════════════

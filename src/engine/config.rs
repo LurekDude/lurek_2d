@@ -208,6 +208,8 @@ pub struct ModulesConfig {
     pub raycaster: bool,
     /// Enable luna.spine skeletal animation API.
     pub spine: bool,
+    /// Enable luna.terminal text-mode terminal emulator API.
+    pub terminal: bool,
 }
 
 impl ModulesConfig {
@@ -236,6 +238,10 @@ impl ModulesConfig {
             if self.overlay {
                 log::warn!("modules.overlay disabled: requires modules.graphics");
                 self.overlay = false;
+            }
+            if self.terminal {
+                log::warn!("modules.terminal disabled: requires modules.graphics");
+                self.terminal = false;
             }
         }
     }
@@ -312,6 +318,7 @@ impl Default for Config {
                 procgen: true,
                 raycaster: true,
                 spine: true,
+                terminal: true,
             },
             performance: PerformanceConfig { target_fps: 60 },
             identity: None,
@@ -473,6 +480,7 @@ impl Config {
         modules.set("procgen", config.modules.procgen).unwrap();
         modules.set("raycaster", config.modules.raycaster).unwrap();
         modules.set("spine", config.modules.spine).unwrap();
+        modules.set("terminal", config.modules.terminal).unwrap();
         t.set("modules", modules).unwrap();
 
         let perf = lua.create_table().unwrap();
@@ -668,6 +676,9 @@ impl Config {
             }
             if let Ok(v) = modules.get::<_, bool>("spine") {
                 config.modules.spine = v;
+            }
+            if let Ok(v) = modules.get::<_, bool>("terminal") {
+                config.modules.terminal = v;
             }
         }
 

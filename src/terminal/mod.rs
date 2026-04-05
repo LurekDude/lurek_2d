@@ -17,7 +17,6 @@ mod terminal_state;
 mod widget;
 
 pub use cell::TCell;
-pub(crate) use terminal_state::TerminalEvent;
 pub use terminal_state::Terminal;
+pub(crate) use terminal_state::TerminalEvent;
 pub use widget::{BorderStyle, Widget, WidgetBase, WidgetKind};
-

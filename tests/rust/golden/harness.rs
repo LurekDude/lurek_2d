@@ -40,7 +40,6 @@ fn save_test_screenshot(name: &str, img: &ImageData) {
     println!("Screenshot saved: {}", path);
 }
 
-
 fn assert_golden(name: &str, actual: &[u8]) {
     let expected_path = format!("tests/rust/golden/expected/{}", name);
     let actual_path = format!("tests/rust/golden/actual/{}", name);
@@ -295,7 +294,11 @@ fn golden_fx_weather_state_default() {
     let state = WeatherState::default();
     let text = format!(
         "weather_type={:?} intensity={} particle_count={} wind_direction={} wind_speed={}",
-        state.weather_type, state.intensity, state.particles.len(), state.wind_direction, state.wind_speed
+        state.weather_type,
+        state.intensity,
+        state.particles.len(),
+        state.wind_direction,
+        state.wind_speed
     );
     assert_golden_text("fx/weather_state_default.txt", &text);
 }
@@ -367,7 +370,9 @@ fn make_enclosed_5x5() -> Raycaster2D {
 fn golden_raycaster_ray_hits_east_wall() {
     let rc = make_enclosed_5x5();
     // Origin: centre of inner area (2.5, 2.5), angle 0 = East (+x direction)
-    let hit = rc.cast_ray(2.5, 2.5, 0.0, 20.0).expect("ray must hit east wall");
+    let hit = rc
+        .cast_ray(2.5, 2.5, 0.0, 20.0)
+        .expect("ray must hit east wall");
     let text = format!(
         "hit={} cell_value={} side={} distance={:.4} tex_u={:.4} hit_x={:.4} hit_y={:.4}",
         hit.hit, hit.cell_value, hit.side, hit.distance, hit.tex_u, hit.hit_x, hit.hit_y
@@ -380,7 +385,9 @@ fn golden_raycaster_ray_hits_north_wall() {
     let rc = make_enclosed_5x5();
     // Angle PI*1.5 points North (-y direction) in standard grid
     let angle = -std::f32::consts::FRAC_PI_2;
-    let hit = rc.cast_ray(2.5, 2.5, angle, 20.0).expect("ray must hit north wall");
+    let hit = rc
+        .cast_ray(2.5, 2.5, angle, 20.0)
+        .expect("ray must hit north wall");
     let text = format!(
         "hit={} cell_value={} side={} distance={:.4} tex_u={:.4} hit_x={:.4} hit_y={:.4}",
         hit.hit, hit.cell_value, hit.side, hit.distance, hit.tex_u, hit.hit_x, hit.hit_y

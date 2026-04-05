@@ -125,34 +125,6 @@ describe("CSV round-trip", function()
     end)
 end)
 
-describe("YAML round-trip", function()
-    it("fromYaml is a function", function()
-        expect_type("function", luna.serial.fromYaml)
-    end)
-
-    it("toYaml is a function", function()
-        expect_type("function", luna.serial.toYaml)
-    end)
-
-    it("fromYaml parses a simple document", function()
-        local t = luna.serial.fromYaml("name: luna\nversion: 2\n")
-        expect_type("table", t)
-        expect_equal("luna", t.name)
-        expect_equal(2, t.version)
-    end)
-
-    it("toYaml serializes a table", function()
-        local s = luna.serial.toYaml({ level = 5 })
-        expect_type("string", s)
-        expect_true(#s > 0, "yaml string is non-empty")
-    end)
-
-    it("YAML round-trip preserves values", function()
-        local orig = { hp = 100 }
-        local yaml = luna.serial.toYaml(orig)
-        local back = luna.serial.fromYaml(yaml)
-        expect_equal(100, back.hp)
-    end)
-end)
+-- YAML removed: design-assumption B-05 (TOML is the human-authored config format; serde_yml dependency dropped)
 
 test_summary()

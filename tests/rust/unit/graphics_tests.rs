@@ -6,7 +6,7 @@ use std::rc::Rc;
 
 use luna2d::engine::resource_keys::TextureKey;
 use luna2d::graphics::renderer::{
-    CompareMode, DepthMode, DrawCommand, DrawMode, StencilAction, StencilMode, TextAlign,
+    CompareMode, DepthMode, DrawCommand, DrawMode, StencilAction, TextAlign,
     TextureData,
 };
 use luna2d::graphics::sprite_batch::BatchEntry;

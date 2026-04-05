@@ -334,6 +334,12 @@ pub fn create_lua_vm(state: Rc<RefCell<SharedState>>, modules: &ModulesConfig) -
         automation_api::register(&lua, &luna, state.clone())?;
     }
 
+    // Register luna.conf as a no-op runtime callback.
+    // During engine boot the real conf.lua is executed in a temporary Lua VM
+    // before this VM is created. At runtime, luna.conf() is a safe no-op so
+    // that test scripts and any post-boot calls don't error.
+    luna.set("conf", lua.create_function(|_, _: mlua::Value| Ok(()))?)?;
+
     lua.globals().set("luna", luna)?;
 
     // Add `library/` to the Lua package path so games can use

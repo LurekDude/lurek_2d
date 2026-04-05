@@ -1,9 +1,9 @@
-//! Lightweight per-image shader-effect pass data — Tier 1 graphics layer.
+﻿//! Lightweight per-image shader-effect pass data â€” Tier 1 graphics layer.
 //!
-//! [`ImageEffectPass`] describes one shader pass in a per-image effect chain.
+//! [`ShaderPassDescriptor`] describes one shader pass in a per-image effect chain.
 //! This type lives in Tier 1 and has **no imports from `src/postfx/`**.
 //!
-//! The bridge layer (`lua_api`) creates `Vec<ImageEffectPass>` values (via
+//! The bridge layer (`lua_api`) creates `Vec<ShaderPassDescriptor>` values (via
 //! `ImageEffect::to_passes()`) and embeds them into `DrawCommand` variants
 //! before the frame is submitted to the GPU renderer.
 
@@ -17,11 +17,11 @@ use std::collections::HashMap;
 /// `enabled = false` are skipped during rendering.
 ///
 /// # Fields
-/// - `effect_name` — `String` — Built-in effect name (e.g. `"blur"`, `"vignette"`).
-/// - `params` — `HashMap<String, f32>` — Named float parameters for the shader.
-/// - `enabled` — `bool` — When `false` this pass is skipped by the renderer.
+/// - `effect_name` â€” `String` â€” Built-in effect name (e.g. `"blur"`, `"vignette"`).
+/// - `params` â€” `HashMap<String, f32>` â€” Named float parameters for the shader.
+/// - `enabled` â€” `bool` â€” When `false` this pass is skipped by the renderer.
 #[derive(Debug, Clone)]
-pub struct ImageEffectPass {
+pub struct ShaderPassDescriptor {
     /// Built-in effect name (e.g. `"blur"`, `"vignette"`).
     pub effect_name: String,
     /// Named float parameters controlling this shader pass.
@@ -30,11 +30,11 @@ pub struct ImageEffectPass {
     pub enabled: bool,
 }
 
-impl ImageEffectPass {
+impl ShaderPassDescriptor {
     /// Creates a new enabled pass with the given effect name and an empty parameter map.
     ///
     /// # Parameters
-    /// - `effect_name` — `impl Into<String>` — Built-in effect name.
+    /// - `effect_name` â€” `impl Into<String>` â€” Built-in effect name.
     ///
     /// # Returns
     /// `Self`.
@@ -46,3 +46,4 @@ impl ImageEffectPass {
         }
     }
 }
+

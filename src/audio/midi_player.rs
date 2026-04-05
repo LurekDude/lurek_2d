@@ -11,9 +11,10 @@
 
 use crate::audio::PlayState;
 use crate::engine::resource_keys::BusKey;
-use midly::{MetaMessage, MidiMessage, Smf, TrackEventKind};
+// use midly::{MetaMessage, MidiMessage, Smf, TrackEventKind}; // MIDI disabled
+// To re-enable: restore midly = "0.5" in Cargo.toml and uncomment imports + restore fn bodies from git
 use rodio::Source;
-use std::collections::HashSet;
+// use std::collections::HashSet; // only needed for MIDI load_data (disabled)
 use std::path::Path;
 
 /// Pre-parsed MIDI metadata extracted during `load()`.
@@ -150,91 +151,12 @@ impl MidiPlayer {
     ///
     /// # Returns
     /// `bool`.
-    pub fn load_data(&mut self, data: Vec<u8>) -> bool {
-        let smf = match Smf::parse(&data) {
-            Ok(s) => s,
-            Err(e) => {
-                log::warn!("Failed to parse MIDI data: {}", e);
-                return false;
-            }
-        };
-
-        let ticks_per_beat = match smf.header.timing {
-            midly::Timing::Metrical(tpb) => tpb.as_int(),
-            midly::Timing::Timecode(_, _) => 480, // fallback
-        };
-
-        let mut original_tempo_bpm = 120.0;
-        let mut tempo_us_per_beat = 500_000.0_f64;
-        let mut found_tempo = false;
-        let mut note_count: usize = 0;
-        let mut channels_used = HashSet::new();
-        let mut track_names = Vec::new();
-        let mut max_duration_secs = 0.0_f64;
-
-        for track in &smf.tracks {
-            let mut track_name: Option<String> = None;
-            let mut abs_tick: u64 = 0;
-            let mut current_tempo = tempo_us_per_beat;
-
-            for event in track.iter() {
-                abs_tick += event.delta.as_int() as u64;
-
-                match event.kind {
-                    TrackEventKind::Meta(MetaMessage::Tempo(t)) => {
-                        current_tempo = t.as_int() as f64;
-                        if !found_tempo {
-                            tempo_us_per_beat = current_tempo;
-                            original_tempo_bpm = 60_000_000.0 / current_tempo;
-                            found_tempo = true;
-                        }
-                    }
-                    TrackEventKind::Meta(MetaMessage::TrackName(name_bytes)) => {
-                        if track_name.is_none() {
-                            track_name = Some(String::from_utf8_lossy(name_bytes).to_string());
-                        }
-                    }
-                    TrackEventKind::Midi { channel, message } => {
-                        channels_used.insert(channel.as_int());
-                        if let MidiMessage::NoteOn { vel, .. } = message {
-                            if vel.as_int() > 0 {
-                                note_count += 1;
-                            }
-                        }
-                    }
-                    _ => {}
-                }
-            }
-
-            // Compute duration for this track
-            let track_duration =
-                (abs_tick as f64 / ticks_per_beat as f64) * (current_tempo / 1_000_000.0);
-            if track_duration > max_duration_secs {
-                max_duration_secs = track_duration;
-            }
-
-            track_names.push(track_name);
-        }
-
-        let track_count = smf.tracks.len();
-        self.current_bpm = original_tempo_bpm;
-
-        self.midi_data = Some(MidiData {
-            duration_secs: max_duration_secs,
-            ticks_per_beat,
-            original_tempo_bpm,
-            track_count,
-            track_names,
-            note_count,
-            channel_count: channels_used.len(),
-        });
-
-        self.raw_midi = Some(data);
-        self.track_muted = vec![false; track_count];
-        self.play_state = PlayState::Stopped;
-        self.position_secs = 0.0;
-
-        true
+    pub fn load_data(&mut self, _data: Vec<u8>) -> bool {
+        // MIDI disabled: midly crate removed from Cargo.toml.
+        // To re-enable: restore midly = "0.5" in Cargo.toml, uncomment the
+        // midly/HashSet imports above, and restore the function body from git history.
+        log::warn!("luna.audio.newMidiPlayer: MIDI playback is disabled in this build.");
+        false
     }
 
     /// Returns whether a MIDI file is currently loaded.
@@ -601,123 +523,16 @@ impl MidiPlayer {
     /// Uses sine-additive synthesis: each active note generates a sine wave
     /// at the MIDI note frequency, amplitude scaled by `velocity/127` and channel volume.
     fn render_to_pcm(&self) -> Vec<i16> {
-        const SAMPLE_RATE: f64 = 44100.0;
-        let raw = match &self.raw_midi {
-            Some(data) => data,
-            None => return Vec::new(),
-        };
-        let smf = match Smf::parse(raw) {
-            Ok(s) => s,
-            Err(_) => return Vec::new(),
-        };
-
-        let ticks_per_beat = match smf.header.timing {
-            midly::Timing::Metrical(tpb) => tpb.as_int() as f64,
-            midly::Timing::Timecode(fps, tpf) => {
-                // Convert timecode to approximate ticks-per-beat
-                (fps.as_f32() as f64) * (tpf as f64)
-            }
-        };
-
-        // Compute total duration and allocate the PCM buffer
-        let duration_secs = self.midi_data.as_ref().map_or(5.0, |d| d.duration_secs);
-        let total_samples = ((duration_secs / self.tempo_scale as f64) * SAMPLE_RATE) as usize;
-        // Stereo: 2 samples per frame
-        let mut pcm = vec![0i16; total_samples * 2];
-
-        for (track_idx, track) in smf.tracks.iter().enumerate() {
-            if track_idx < self.track_muted.len() && self.track_muted[track_idx] {
-                continue;
-            }
-
-            let mut abs_tick: u64 = 0;
-            let mut current_tempo = 500_000.0_f64;
-            // Active notes: (channel, note, start_sample, velocity_amplitude, frequency)
-            let mut active_notes: Vec<(u8, u8, usize, f32, f64)> = Vec::new();
-
-            for event in track.iter() {
-                abs_tick += event.delta.as_int() as u64;
-
-                // Convert tick to sample position
-                let time_secs = (abs_tick as f64 / ticks_per_beat) * (current_tempo / 1_000_000.0)
-                    / self.tempo_scale as f64;
-                let sample_pos = (time_secs * SAMPLE_RATE) as usize;
-
-                match event.kind {
-                    TrackEventKind::Meta(MetaMessage::Tempo(t)) => {
-                        current_tempo = t.as_int() as f64;
-                    }
-                    TrackEventKind::Midi { channel, message } => {
-                        let ch = channel.as_int() as usize;
-                        match message {
-                            MidiMessage::NoteOn { key, vel } => {
-                                if vel.as_int() == 0 || self.channel_muted[ch] {
-                                    // NoteOn with vel 0 is NoteOff — find and render the note
-                                    if let Some(pos) = active_notes
-                                        .iter()
-                                        .position(|n| n.0 == ch as u8 && n.1 == key.as_int())
-                                    {
-                                        let (_, _, start, amp, freq) = active_notes.remove(pos);
-                                        let ch_vol = self.channel_volume[ch];
-                                        render_note(
-                                            &mut pcm,
-                                            start,
-                                            sample_pos,
-                                            freq,
-                                            amp * ch_vol,
-                                            SAMPLE_RATE,
-                                        );
-                                    }
-                                } else {
-                                    let freq = midi_note_to_freq(key.as_int());
-                                    let amp = vel.as_int() as f32 / 127.0;
-                                    active_notes.push((
-                                        ch as u8,
-                                        key.as_int(),
-                                        sample_pos,
-                                        amp,
-                                        freq,
-                                    ));
-                                }
-                            }
-                            MidiMessage::NoteOff { key, .. } => {
-                                if let Some(pos) = active_notes
-                                    .iter()
-                                    .position(|n| n.0 == ch as u8 && n.1 == key.as_int())
-                                {
-                                    let (_, _, start, amp, freq) = active_notes.remove(pos);
-                                    let ch_vol = self.channel_volume[ch];
-                                    render_note(
-                                        &mut pcm,
-                                        start,
-                                        sample_pos,
-                                        freq,
-                                        amp * ch_vol,
-                                        SAMPLE_RATE,
-                                    );
-                                }
-                            }
-                            _ => {}
-                        }
-                    }
-                    _ => {}
-                }
-            }
-
-            // Render any remaining active notes to the end of the buffer
-            let end_sample = total_samples;
-            for (ch, _, start, amp, freq) in active_notes {
-                let ch_vol = self.channel_volume[ch as usize];
-                render_note(&mut pcm, start, end_sample, freq, amp * ch_vol, SAMPLE_RATE);
-            }
-        }
-
-        pcm
+        // MIDI disabled: midly crate removed. Returns empty buffer.
+        // Original implementation is in git history.
+        Vec::new()
     }
 }
 
 /// Converts a MIDI note number (0-127) to frequency in Hz.
 /// A4 (note 69) = 440 Hz.
+/// Kept for when MIDI is re-enabled (midly restored in Cargo.toml).
+#[allow(dead_code)]
 fn midi_note_to_freq(note: u8) -> f64 {
     440.0 * 2.0_f64.powf((note as f64 - 69.0) / 12.0)
 }
@@ -726,6 +541,8 @@ fn midi_note_to_freq(note: u8) -> f64 {
 ///
 /// Writes from `start_sample` to `end_sample` (exclusive), adding the sine value
 /// to existing samples (additive synthesis). Amplitude is clamped to prevent overflow.
+/// Kept for when MIDI is re-enabled (midly restored in Cargo.toml).
+#[allow(dead_code)]
 fn render_note(
     pcm: &mut [i16],
     start: usize,

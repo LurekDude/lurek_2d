@@ -138,6 +138,7 @@ fn get_power_info_returns_valid_state() {
 // ── Phase 33 — System Extended ──────────────────────────────────
 
 use std::cell::RefCell;
+use std::fs;
 use std::path::PathBuf;
 use std::rc::Rc;
 

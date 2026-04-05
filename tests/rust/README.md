@@ -46,7 +46,7 @@ expected files stored in `golden/expected/`.
 // Compare bytes against expected/<category>/<name>.bin
 assert_golden(name, bytes: &[u8]);
 
-// Compare text against expected/<category>/<name>.txt  
+// Compare text against expected/<category>/<name>.txt
 assert_golden_text(name, text: &str);
 
 // Save a PNG visual evidence file to golden/screenshots/<name>.png

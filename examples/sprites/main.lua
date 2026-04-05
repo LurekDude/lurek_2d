@@ -11,10 +11,6 @@ function luna.load()
     luna.window.setTitle("Movement Demo - Luna2D")
     luna.graphics.setBackgroundColor(0.08, 0.08, 0.18)
     -- Load an Image; luna.graphics.draw() dispatches based on type
-    icon = luna.graphics.newImage("assets/icon.png"
-    luna.window.setTitle("Movement Demo - Luna2D")
-    luna.graphics.setBackgroundColor(0.08, 0.08, 0.18)
-    -- Load an Image; luna.graphics.draw() dispatches based on type
     icon = luna.graphics.newImage("assets/icon.png")
 end
 
@@ -59,12 +55,6 @@ function luna.draw()
     -- Outline
     luna.graphics.setColor(1, 1, 1)
     luna.graphics.rectangle("line", x, y, size, size)
-
-    -- Draw icon using polymorphic luna.graphics.draw(drawable, x, y)
-    luna.graphics.setColor(1, 1, 1)
-    if icon then
-        luna.graphics.draw(icon, x + size + 4, y)
-    end
 
     -- Instructions
     luna.graphics.setColor(0.6, 0.6, 0.6)

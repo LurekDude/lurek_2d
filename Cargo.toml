@@ -15,10 +15,9 @@ lua-jit = ["mlua/luajit", "mlua/vendored"]
 lua54 = ["mlua/lua54", "mlua/vendored"]
 
 [dependencies]
-# GPU-accelerated rendering
-# default-features disabled to drop `webgpu` (WGSL-output for browsers, not needed on desktop).
-# `vulkan-portability` adds the Vulkan backend required for Linux and as a fallback on Windows/macOS.
-wgpu = { version = "22", default-features = false, features = ["wgsl", "dx12", "metal", "vulkan-portability"] }
+# GPU-accelerated rendering — platform-split; see [target.'cfg(...)'.dependencies] sections near the end.
+# Windows: DX12 (native API, best for low-end/iGPU). macOS: Metal. Linux: Vulkan.
+# One backend per platform = smaller binary, no unused GPU driver code compiled in.
 
 # Windowing and input (replaces minifb)
 winit = "0.30"
@@ -37,16 +36,18 @@ pollster = "0.3"
 # Build with Lua 5.4: cargo build --no-default-features --features lua54
 mlua = { version = "0.9", default-features = false }
 
-# Image loading (minimal features for fast compile)
-image = { version = "0.24", default-features = false, features = ["png", "jpeg", "bmp"] }
+# Image loading — PNG only. JPEG and BMP decoders removed to reduce binary size.
+# To re-enable: add "jpeg" or "bmp" back to features array.
+image = { version = "0.24", default-features = false, features = ["png"] }
 # DDS compressed texture format parsing
 ddsfile = "0.5"
 
-# Audio playback (WAV, MP3, OGG, FLAC)
-rodio = "0.17"
+# Audio playback — OGG Vorbis + WAV only. FLAC (claxon) and MP3 (minimp3) decoders removed.
+# To re-enable: add "flac" or "mp3" back to features array.
+rodio = { version = "0.17", default-features = false, features = ["wav", "vorbis"] }
 
-# MIDI file parsing
-midly = "0.5"
+# MIDI file parsing — disabled; midly removed to reduce binary size.
+# Re-enable: restore `midly = "0.5"` here and uncomment code in src/audio/midi_player.rs
 
 # TTF/OTF font parsing and glyph rasterization
 fontdue = "0.9"
@@ -97,8 +98,7 @@ serde_json = "1"
 # CSV parsing and encoding
 csv = "1"
 
-# YAML parsing and encoding
-serde_yml = "0.0"
+# YAML removed — use TOML instead (design-assumption B-05). serde_yml dep dropped.
 
 # Ordered map (insertion-order preserved) for serial module
 indexmap = "2"
@@ -132,6 +132,17 @@ tempfile = "3"
 [target.'cfg(windows)'.dependencies]
 # Windows message box for panic handler
 windows-sys = { version = "0.59", features = ["Win32_UI_WindowsAndMessaging"] }
+# DX12 only — native Windows graphics API, best driver support for low-end/iGPU on Windows 10+.
+# Removing metal and vulkan-portability drops unused backend code from the Windows binary.
+wgpu = { version = "22", default-features = false, features = ["wgsl", "dx12"] }
+
+[target.'cfg(target_os = "macos")'.dependencies]
+# Metal only — native macOS graphics API.
+wgpu = { version = "22", default-features = false, features = ["wgsl", "metal"] }
+
+[target.'cfg(all(unix, not(target_os = "macos")))'.dependencies]
+# Vulkan (with portability extension) — for Linux desktop.
+wgpu = { version = "22", default-features = false, features = ["wgsl", "vulkan-portability"] }
 
 [build-dependencies]
 # Windows .exe icon + version-info embedding (only active on Windows targets)
@@ -162,10 +173,10 @@ debug = "line-tables-only"
 opt-level = 3
 
 [profile.release]
-# Maximum throughput: full inlining, LTO across all codegen units, strip all
-# debug symbols, and abort on panic (no unwinding overhead). overflow checks
-# are disabled for extra speed -- the debug build catches those first.
-opt-level = 3
+# Size + throughput: opt-level=z minimises binary size while LTO/codegen-units=1 maximises
+# dead-code elimination. strip+panic=abort remove unwinder and debug info.
+# overflow checks disabled for speed — the debug build catches those first.
+opt-level = "z"
 lto = true
 codegen-units = 1
 strip = "symbols"
@@ -176,10 +187,12 @@ debug = false
 # Size-optimised distribution profile: cargo build --profile dist
 # Trades some runtime speed for a smaller binary (~30–40% smaller than release).
 # Use for packaging / installer builds where download size matters.
+# Build time is longer than release (fat LTO link), but that is acceptable for
+# a one-shot packaging step.
 [profile.dist]
 inherits = "release"
-opt-level = "z"         # optimise for size instead of speed
-lto = "thin"            # thin LTO is faster to link and nearly as small
+opt-level = "z"         # optimise for size instead of speed (avoids vectorisation, limits inlining)
+lto = true              # fat LTO: full cross-crate dead-code elimination (better than thin for size)
 
 [[test]]
 name = "compute_stress_tests"

@@ -51,37 +51,37 @@ def generate_icon_image(size: int) -> Image.Image:
     # Center of Pac-Man
     px, py = int(s * 0.45), int(s * 0.5)
     r = int(s * 0.3)
-    
+
     # Glow light blue
     for gr in range(r + int(s * 0.12), r - 1, -2):
         alpha = max(0, int(35 * (1 - (gr - r) / (s * 0.12))))
         d.ellipse([px - gr, py - gr, px + gr, py + gr], fill=(130, 200, 250, alpha))
-        
+
     # Draw gear teeth along the outer rim
     num_teeth = 12
     tooth_h = int(s * 0.06)
     tooth_w_angle = math.pi * 2 / (num_teeth * 2)
-    
+
     start_angle = math.radians(35)
     end_angle = math.radians(360 - 35)
-    
+
     pts = [(px, py)]
     steps = 200
     for i in range(steps + 1):
         angle = start_angle + (end_angle - start_angle) * i / steps
         angle_norm = angle % (math.pi * 2)
         rem = angle_norm % (math.pi * 2 / num_teeth)
-        
+
         rad = r
         if rem > tooth_w_angle * 0.5 and rem < tooth_w_angle * 1.5:
             rad = r + tooth_h
-            
+
         x = px + rad * math.cos(angle)
         y = py + rad * math.sin(angle)
         pts.append((x, y))
-        
+
     d.polygon(pts, fill=(130, 200, 250, 255))
-    
+
     # Eye
     eye_x, eye_y = px + int(r * 0.1), py - int(r * 0.5)
     eye_r = int(s * 0.04)
@@ -90,7 +90,7 @@ def generate_icon_image(size: int) -> Image.Image:
     # Draw the gray cube
     cx, cy = px + int(s * 0.35), py
     cr = int(s * 0.12)
-    
+
     d.polygon([(cx, cy - cr), (cx + cr, cy - cr//2), (cx, cy), (cx - cr, cy - cr//2)], fill=(170, 170, 170, 255))
     d.polygon([(cx - cr, cy - cr//2), (cx, cy), (cx, cy + cr), (cx - cr, cy + cr//2)], fill=(130, 130, 130, 255))
     d.polygon([(cx, cy), (cx + cr, cy - cr//2), (cx + cr, cy + cr//2), (cx, cy + cr)], fill=(90, 90, 90, 255))

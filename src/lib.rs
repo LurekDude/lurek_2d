@@ -109,8 +109,12 @@ pub mod gui;
 pub mod image;
 /// Keyboard, mouse, and gamepad input state.
 pub mod input;
+/// 2D point-light data container for dynamic lighting systems.
+pub mod light;
 // migration-state: pub mod inventory; — now library/inventory/init.lua
 // migration-state: pub mod item; — now library/item/init.lua
+/// Composable visual effects layer: post-processing pipeline (bloom, blur, CRT, color grading) and screen overlays (weather, ambient, shake, fog).
+pub mod fx;
 /// Lua VM creation and the luna.* API bindings.
 pub mod lua_api;
 /// Foundational math types: Vec2, Mat3, Rect.
@@ -121,8 +125,8 @@ pub mod minimap;
 pub mod modding;
 /// UDP networking via ENet — reliable packet transport for multiplayer games.
 pub mod network;
-/// Composable per-frame screen-effect overlay: weather, ambient lighting, flash, shake, fade, fog.
-pub mod overlay;
+/// (Deprecated — use `fx::screen` instead.) Composable per-frame screen-effect overlay.
+// pub mod overlay; — superseded by fx::screen
 /// Emitter-based 2D particle effects.
 pub mod particle;
 /// Grid pathfinding: A★, HPA★, flow fields, and NavGrid unit-size navigation.
@@ -131,8 +135,8 @@ pub mod pathfinding;
 pub mod physics;
 /// DAG-based pipeline orchestrator for composing multi-step workflows.
 pub mod pipeline;
-/// Post-processing effects data model: bloom, blur, color grading, screen-space shaders.
-pub mod postfx;
+/// (Deprecated — use `fx::post` instead.) Post-processing effects data model.
+// pub mod postfx; — superseded by fx::post
 /// Procedural world generation: cellular automata, Voronoi, flood fill, Poisson disk, periodic noise.
 pub mod procgen;
 /// Grid-based DDA raycaster for retro FPS and dungeon-crawler games: wall rendering, sprite projection, lighting, doors, heightmaps, minimap.
@@ -146,6 +150,8 @@ pub mod scene;
 /// Skeletal animation: bone hierarchies, slots, and world-transform propagation.
 pub mod spine;
 // migration-state: pub mod stats; — now library/stats/init.lua
+/// Grid-based character-cell terminal emulator and widget toolkit.
+pub mod terminal;
 /// Background Rust worker threads and `Channel` inter-thread communication.
 pub mod thread;
 /// Tilemap engine: TileSet, TileMap, autotile, coords, and procedural generation.
@@ -159,10 +165,13 @@ pub mod window;
 ///
 /// Installs the panic hook, reads CLI arguments, loads the game config,
 /// and runs the main engine loop. Both binary crates call this function.
+///
+/// When the first argument is a `.lunar` file (a zip archive containing a game),
+/// the archive is extracted to a temporary directory and the engine runs from there.
+/// The temporary directory is cleaned up automatically when the engine exits.
 pub fn luna_run() {
     use engine::{App, Config};
     use std::env;
-    use std::path::PathBuf;
 
     std::panic::set_hook(Box::new(|info| {
         let payload = if let Some(s) = info.payload().downcast_ref::<&str>() {
@@ -191,9 +200,39 @@ pub fn luna_run() {
 
     let explicit_arg = env::args().nth(1);
     let explicit_game_dir = explicit_arg.is_some();
-    let game_dir = explicit_arg
-        .map(PathBuf::from)
-        .unwrap_or_else(|| env::current_dir().unwrap_or_else(|_| PathBuf::from(".")));
+
+    // Keep the temp dir alive for the entire engine session; it is dropped (and deleted)
+    // after app.run() returns.
+    let mut _lunar_temp_dir: Option<tempfile::TempDir> = None;
+
+    let game_dir = if let Some(ref arg) = explicit_arg {
+        let path = std::path::PathBuf::from(arg);
+        if path
+            .extension()
+            .map(|e| e.eq_ignore_ascii_case("lunar"))
+            .unwrap_or(false)
+        {
+            match extract_lunar_archive(&path) {
+                Ok(td) => {
+                    let dir = td.path().to_path_buf();
+                    _lunar_temp_dir = Some(td);
+                    dir
+                }
+                Err(e) => {
+                    let msg = format!("Failed to open .lunar archive '{}': {}", path.display(), e);
+                    log::error!("{}", msg);
+                    #[cfg(target_os = "windows")]
+                    show_windows_error_box(&msg);
+                    eprintln!("{}", msg);
+                    return;
+                }
+            }
+        } else {
+            path
+        }
+    } else {
+        env::current_dir().unwrap_or_else(|_| std::path::PathBuf::from("."))
+    };
 
     let (mut config, conf_error) = Config::load_from_conf_lua(&game_dir);
     config.modules.validate_and_fix();
@@ -225,4 +264,57 @@ fn show_windows_error_box(msg: &str) {
             0x10,
         );
     }
+}
+
+/// Extracts a `.lunar` zip archive into a fresh temporary directory and returns
+/// a handle to that directory.
+///
+/// The caller must keep the returned [`tempfile::TempDir`] alive for as long as
+/// the extracted files are needed; dropping it deletes the directory.
+///
+/// # Parameters
+/// - `archive_path` — `&std::path::Path`. Path to the `.lunar` file on disk.
+///
+/// # Returns
+/// `Result<tempfile::TempDir, Box<dyn std::error::Error>>`.
+fn extract_lunar_archive(
+    archive_path: &std::path::Path,
+) -> Result<tempfile::TempDir, Box<dyn std::error::Error>> {
+    use std::fs;
+    use std::io;
+
+    let file = fs::File::open(archive_path)?;
+    let mut archive = zip::ZipArchive::new(file)?;
+    let temp_dir = tempfile::tempdir()?;
+
+    for i in 0..archive.len() {
+        let mut entry = archive.by_index(i)?;
+        let entry_name = entry.name().to_owned();
+
+        // Sanitise path: reject absolute paths and any `..` components to
+        // prevent zip-slip directory traversal.
+        let relative = std::path::Path::new(&entry_name);
+        for component in relative.components() {
+            match component {
+                std::path::Component::Normal(_) | std::path::Component::CurDir => {}
+                _ => {
+                    return Err(format!("Unsafe path in .lunar archive: '{entry_name}'").into());
+                }
+            }
+        }
+
+        let dest = temp_dir.path().join(relative);
+
+        if entry.is_dir() {
+            fs::create_dir_all(&dest)?;
+        } else {
+            if let Some(parent) = dest.parent() {
+                fs::create_dir_all(parent)?;
+            }
+            let mut out = fs::File::create(&dest)?;
+            io::copy(&mut entry, &mut out)?;
+        }
+    }
+
+    Ok(temp_dir)
 }

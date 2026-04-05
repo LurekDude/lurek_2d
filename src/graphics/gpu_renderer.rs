@@ -1357,7 +1357,12 @@ impl GpuRenderer {
                     );
                 }
 
-                DrawCommand::DrawImage { texture_key, x, y, effect: _ } => {
+                DrawCommand::DrawImage {
+                    texture_key,
+                    x,
+                    y,
+                    effect: _,
+                } => {
                     if let Some(gt) = self.gpu_textures.get(*texture_key) {
                         let w = gt.width as f32;
                         let h = gt.height as f32;

@@ -1,0 +1,1 @@
+HeatHazeState { enabled: false, intensity: 0.5 }

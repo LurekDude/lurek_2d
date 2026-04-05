@@ -45,7 +45,8 @@ $Version       = "0.4.0"
 $ArchName      = "luna2d-windows-x86_64"
 $PackageDir    = Join-Path $OutDir $ArchName
 $ZipPath       = Join-Path $OutDir "$ArchName.zip"
-$BinarySource  = Join-Path $WorkspaceRoot 'build\release\luna2d.exe'
+# dist profile (opt-level=z + fat LTO) lives in build/dist/ not build/release/
+$BinarySource  = Join-Path $WorkspaceRoot 'build\dist\luna2d.exe'
 
 # ── Helpers ───────────────────────────────────────────────────────────────────
 function Write-Step([string]$Msg) { Write-Host "[dist] $Msg" -ForegroundColor Cyan }
@@ -73,11 +74,13 @@ if (-not (Test-Path $IconIco)) {
 
 # ── 2. Release build ──────────────────────────────────────────────────────────
 if (-not $SkipBuild) {
-    Write-Step "Building Luna2D (release) — this may take a minute …"
+    Write-Step "Building Luna2D (dist — size-optimised) — this may take several minutes …"
     Push-Location $WorkspaceRoot
     try {
-        cargo build --release 2>&1 | ForEach-Object { Write-Host "    $_" }
-        if ($LASTEXITCODE -ne 0) { Write-Fail "cargo build --release failed." }
+        # --profile dist uses opt-level=z + fat LTO for the smallest possible binary.
+        # Expect 15–30% smaller than --release at the cost of a longer link step.
+        cargo build --profile dist 2>&1 | ForEach-Object { Write-Host "    $_" }
+        if ($LASTEXITCODE -ne 0) { Write-Fail "cargo build --profile dist failed." }
     } finally { Pop-Location }
     Write-OK "Build succeeded."
 } else {
@@ -94,8 +97,28 @@ if (Test-Path $PackageDir) { Remove-Item $PackageDir -Recurse -Force }
 New-Item -ItemType Directory -Path $PackageDir -Force | Out-Null
 
 # Copy binary
-Copy-Item $BinarySource -Destination (Join-Path $PackageDir 'luna2d.exe') -Force
-Write-OK "Copied luna2d.exe"
+$DestBinary = Join-Path $PackageDir 'luna2d.exe'
+Copy-Item $BinarySource -Destination $DestBinary -Force
+$SizeBefore = [math]::Round((Get-Item $DestBinary).Length / 1MB, 2)
+Write-OK "Copied luna2d.exe ($SizeBefore MB)"
+
+# ── Optional UPX compression ──────────────────────────────────────────────────
+# UPX packs the executable using LZMA; typical result: 40–55% of original size.
+# Install: https://upx.github.io/  (place upx.exe anywhere on PATH)
+# Caveats: adds ~100 ms startup decompression; some AV scanners flag UPX'd bins.
+$upx = Get-Command upx -ErrorAction SilentlyContinue
+if ($upx) {
+    Write-Step "UPX found — compressing luna2d.exe …"
+    & upx --best --lzma $DestBinary 2>&1 | ForEach-Object { Write-Host "    $_" }
+    if ($LASTEXITCODE -eq 0) {
+        $SizeAfter = [math]::Round((Get-Item $DestBinary).Length / 1MB, 2)
+        Write-OK "UPX compressed: $SizeBefore MB → $SizeAfter MB"
+    } else {
+        Write-Host "[warn] UPX returned non-zero; binary unchanged." -ForegroundColor Yellow
+    }
+} else {
+    Write-Host "[dist] UPX not found on PATH — skipping compression (add upx to PATH to enable)." -ForegroundColor DarkGray
+}
 
 # Copy lunec.bat launcher (no-console shortcut)
 $LunecBat = Join-Path $WorkspaceRoot 'lunec.bat'

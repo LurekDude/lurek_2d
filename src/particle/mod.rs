@@ -42,3 +42,6 @@ pub use emitter::ParticleSystem;
 pub use math::{interpolate_alphas, interpolate_colors, interpolate_sizes, lerp};
 pub use particle::Particle;
 pub use shapes::ParticleShape;
+/// Time-fading ribbon effect (trail renderer).
+pub mod trail;
+pub use trail::{Trail, TrailPoint};

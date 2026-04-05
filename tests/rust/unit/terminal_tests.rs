@@ -5,6 +5,15 @@
 
 use luna2d::terminal::{BorderStyle, TCell, Terminal, Widget, WidgetBase, WidgetKind};
 
+fn assert_color_near(actual: [f32; 4], expected: [f32; 4]) {
+    for (index, (actual, expected)) in actual.iter().zip(expected.iter()).enumerate() {
+        assert!(
+            (*actual - *expected).abs() < 1e-5,
+            "component {index} expected {expected}, got {actual}"
+        );
+    }
+}
+
 // TCell defaults
 
 #[test]
@@ -95,6 +104,77 @@ fn terminal_clear_resets_cells() {
     }
 }
 
+#[test]
+fn terminal_try_get_respects_bounds() {
+    let t = Terminal::new(3, 2);
+
+    assert_eq!(t.try_get(1, 1), Some(TCell::default()));
+    assert_eq!(t.try_get(3, 2), Some(TCell::default()));
+    assert_eq!(t.try_get(0, 1), None);
+    assert_eq!(t.try_get(1, 0), None);
+    assert_eq!(t.try_get(4, 2), None);
+    assert_eq!(t.try_get(3, 3), None);
+}
+
+#[test]
+fn terminal_set_char_preserves_existing_colors() {
+    let mut t = Terminal::new(2, 2);
+    let fg = [0.2, 0.3, 0.4, 1.0];
+    let bg = [0.5, 0.6, 0.7, 0.8];
+
+    t.set(1, 1, b'A' as u32, fg, bg);
+    t.set_char(1, 1, b'Z' as u32);
+
+    let cell = t.get(1, 1);
+    assert_eq!(cell.ch, b'Z' as u32);
+    assert_color_near(cell.fg, fg);
+    assert_color_near(cell.bg, bg);
+}
+
+#[test]
+fn terminal_set_fg_preserves_character_and_background() {
+    let mut t = Terminal::new(2, 2);
+    let initial_fg = [0.2, 0.3, 0.4, 1.0];
+    let bg = [0.5, 0.6, 0.7, 0.8];
+    let updated_fg = [0.9, 0.1, 0.2, 0.7];
+
+    t.set(1, 1, b'Q' as u32, initial_fg, bg);
+    t.set_fg(1, 1, updated_fg);
+
+    let cell = t.get(1, 1);
+    assert_eq!(cell.ch, b'Q' as u32);
+    assert_color_near(cell.fg, updated_fg);
+    assert_color_near(cell.bg, bg);
+}
+
+#[test]
+fn terminal_set_bg_preserves_character_and_foreground() {
+    let mut t = Terminal::new(2, 2);
+    let fg = [0.2, 0.3, 0.4, 1.0];
+    let initial_bg = [0.5, 0.6, 0.7, 0.8];
+    let updated_bg = [0.1, 0.2, 0.3, 0.9];
+
+    t.set(1, 1, b'Q' as u32, fg, initial_bg);
+    t.set_bg(1, 1, updated_bg);
+
+    let cell = t.get(1, 1);
+    assert_eq!(cell.ch, b'Q' as u32);
+    assert_color_near(cell.fg, fg);
+    assert_color_near(cell.bg, updated_bg);
+}
+
+#[test]
+fn terminal_print_writes_utf8_chars_and_clips_at_right_edge() {
+    let mut t = Terminal::new(5, 2);
+
+    t.print(4, 1, "é界X");
+
+    assert_eq!(t.get(4, 1).ch, 'é' as u32);
+    assert_eq!(t.get(5, 1).ch, '界' as u32);
+    assert_eq!(t.get(3, 1), TCell::default());
+    assert_eq!(t.get(1, 2), TCell::default(), "print should not wrap");
+}
+
 // Terminal cursor
 
 #[test]
@@ -105,6 +185,40 @@ fn terminal_cursor_default_and_set() {
     assert_eq!(t.get_cursor(), (5, 3));
     t.set_cursor(100, 100);
     assert_eq!(t.get_cursor(), (10, 10));
+}
+
+#[test]
+fn terminal_resize_preserves_overlap_and_defaults_new_cells() {
+    let mut t = Terminal::new(3, 2);
+    let fg = [0.3, 0.4, 0.5, 1.0];
+    let bg = [0.1, 0.2, 0.3, 0.4];
+
+    t.set(1, 1, b'A' as u32, fg, bg);
+    t.set(3, 2, b'B' as u32, fg, bg);
+    t.resize(5, 4);
+
+    assert_eq!(t.get_dimensions(), (5, 4));
+    assert_eq!(t.get(1, 1).ch, b'A' as u32);
+    assert_eq!(t.get(3, 2).ch, b'B' as u32);
+    assert_eq!(t.get(5, 4), TCell::default());
+    assert_eq!(t.try_get(5, 4), Some(TCell::default()));
+}
+
+#[test]
+fn terminal_resize_shrink_clamps_cursor_and_discards_outside_cells() {
+    let mut t = Terminal::new(5, 4);
+    let fg = [0.9, 0.8, 0.7, 1.0];
+    let bg = [0.1, 0.2, 0.3, 0.4];
+
+    t.set(3, 2, b'K' as u32, fg, bg);
+    t.set(5, 4, b'Z' as u32, fg, bg);
+    t.set_cursor(5, 4);
+    t.resize(3, 2);
+
+    assert_eq!(t.get_dimensions(), (3, 2));
+    assert_eq!(t.get_cursor(), (3, 2));
+    assert_eq!(t.get(3, 2).ch, b'K' as u32);
+    assert_eq!(t.try_get(5, 4), None);
 }
 
 // BorderStyle
@@ -165,7 +279,11 @@ fn widget_base_visibility_enabled() {
 fn widget_label_creation() {
     let w = Widget::new_label(3, 2, "Hello");
     assert_eq!(w.base.position_1based(), (3, 2));
-    if let WidgetKind::Label { ref text, ref color } = w.kind {
+    if let WidgetKind::Label {
+        ref text,
+        ref color,
+    } = w.kind
+    {
         assert_eq!(text, "Hello");
         assert!((color[0] - 1.0).abs() < 1e-5);
     } else {
@@ -191,7 +309,12 @@ fn widget_textbox_creation() {
     assert_eq!(w.base.position_1based(), (5, 3));
     assert_eq!(w.base.width, 20);
     assert_eq!(w.base.height, 1);
-    if let WidgetKind::TextBox { ref text, max_length, cursor_pos } = w.kind {
+    if let WidgetKind::TextBox {
+        ref text,
+        max_length,
+        cursor_pos,
+    } = w.kind
+    {
         assert_eq!(text, "");
         assert_eq!(max_length, 0);
         assert_eq!(cursor_pos, 0);
@@ -203,7 +326,12 @@ fn widget_textbox_creation() {
 #[test]
 fn widget_list_operations() {
     let mut w = Widget::new_list(1, 1, 20, 10);
-    if let WidgetKind::List { ref mut items, ref mut selected, .. } = w.kind {
+    if let WidgetKind::List {
+        ref mut items,
+        ref mut selected,
+        ..
+    } = w.kind
+    {
         assert_eq!(items.len(), 0);
         assert_eq!(*selected, None);
         items.push("Apple".into());
@@ -269,6 +397,38 @@ fn terminal_get_widget_by_index() {
     assert!(t.get_widget(99).is_none());
 }
 
+#[test]
+fn terminal_widget_count_alias_matches_get_widget_count() {
+    let mut t = Terminal::new(40, 20);
+
+    assert_eq!(t.widget_count(), t.get_widget_count());
+    t.add_widget(Widget::new_label(1, 1, "A"));
+    assert_eq!(t.widget_count(), t.get_widget_count());
+    t.add_widget(Widget::new_button(1, 2, 8, 1, "Go"));
+    assert_eq!(t.widget_count(), t.get_widget_count());
+    t.remove_widget(0);
+    assert_eq!(t.widget_count(), t.get_widget_count());
+}
+
+#[test]
+fn terminal_find_by_tag_returns_match_and_none_when_missing() {
+    let mut t = Terminal::new(40, 20);
+    let label_index = t.add_widget(Widget::new_label(1, 1, "Status"));
+    let button_index = t.add_widget(Widget::new_button(1, 2, 8, 1, "Go"));
+
+    t.get_widget_mut(label_index).unwrap().base.tag = "status".into();
+    t.get_widget_mut(button_index).unwrap().base.tag = "primary".into();
+
+    let widget = t.find_by_tag("primary");
+    assert!(widget.is_some());
+    match &widget.unwrap().kind {
+        WidgetKind::Button { text } => assert_eq!(text, "Go"),
+        _ => panic!("expected tagged widget to be a button"),
+    }
+
+    assert!(t.find_by_tag("missing").is_none());
+}
+
 // Terminal focus management
 
 #[test]
@@ -310,7 +470,12 @@ fn terminal_textbox_textinput() {
     t.set_focus(Some(0));
     assert!(t.textinput("Hello"));
     let w = t.get_widget(0).unwrap();
-    if let WidgetKind::TextBox { ref text, cursor_pos, .. } = w.kind {
+    if let WidgetKind::TextBox {
+        ref text,
+        cursor_pos,
+        ..
+    } = w.kind
+    {
         assert_eq!(text, "Hello");
         assert_eq!(cursor_pos, 5);
     } else {
@@ -326,7 +491,12 @@ fn terminal_keypressed_backspace() {
     t.textinput("abc");
     assert!(t.keypressed("backspace"));
     let w = t.get_widget(0).unwrap();
-    if let WidgetKind::TextBox { ref text, cursor_pos, .. } = w.kind {
+    if let WidgetKind::TextBox {
+        ref text,
+        cursor_pos,
+        ..
+    } = w.kind
+    {
         assert_eq!(text, "ab");
         assert_eq!(cursor_pos, 2);
     } else {
@@ -338,7 +508,10 @@ fn terminal_keypressed_backspace() {
 fn widget_textbox_max_length() {
     let mut t = Terminal::new(40, 20);
     let mut tb = Widget::new_text_box(1, 1, 15);
-    if let WidgetKind::TextBox { ref mut max_length, .. } = tb.kind {
+    if let WidgetKind::TextBox {
+        ref mut max_length, ..
+    } = tb.kind
+    {
         *max_length = 5;
     }
     t.add_widget(tb);
@@ -402,6 +575,17 @@ fn terminal_list_keypressed_navigation() {
     }
 }
 
+#[test]
+fn terminal_button_key_activation_returns_consumed() {
+    let mut t = Terminal::new(20, 10);
+    t.add_widget(Widget::new_button(1, 1, 8, 1, "OK"));
+    t.set_focus(Some(0));
+
+    assert!(t.keypressed("space"));
+    assert!(t.keypressed("return"));
+    assert!(!t.keypressed("escape"));
+}
+
 // Widget panel children
 
 #[test]
@@ -455,6 +639,37 @@ fn terminal_mousepressed_focuses_widget() {
     assert_eq!(t.get_focused(), None);
 }
 
+#[test]
+fn terminal_mousepressed_miss_clears_focus() {
+    let mut t = Terminal::new(20, 10);
+    t.add_widget(Widget::new_button(3, 3, 5, 1, "OK"));
+    t.set_focus(Some(0));
+
+    assert_eq!(t.get_focused(), Some(0));
+    assert!(!t.mousepressed(1, 1, 1));
+    assert_eq!(t.get_focused(), None);
+}
+
+#[test]
+fn terminal_mousepressed_ignores_hidden_and_disabled_widgets() {
+    let mut t = Terminal::new(20, 10);
+    let mut hidden = Widget::new_button(2, 2, 4, 1, "Hide");
+    let mut disabled = Widget::new_button(8, 2, 4, 1, "Stop");
+    hidden.base.visible = false;
+    disabled.base.enabled = false;
+
+    t.add_widget(hidden);
+    t.add_widget(disabled);
+    t.set_focus(Some(1));
+
+    assert!(!t.mousepressed(2, 2, 1));
+    assert_eq!(t.get_focused(), None);
+
+    t.set_focus(Some(1));
+    assert!(!t.mousepressed(8, 2, 1));
+    assert_eq!(t.get_focused(), None);
+}
+
 // Border widget creation
 
 #[test]
@@ -463,7 +678,10 @@ fn widget_border_creation() {
     assert_eq!(w.base.position_1based(), (2, 3));
     assert_eq!(w.base.width, 30);
     assert_eq!(w.base.height, 10);
-    if let WidgetKind::Border { style, ref title, .. } = w.kind {
+    if let WidgetKind::Border {
+        style, ref title, ..
+    } = w.kind
+    {
         assert_eq!(style, BorderStyle::Single);
         assert_eq!(title, "");
     } else {

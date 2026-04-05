@@ -1,352 +1,365 @@
 ﻿-- tests/lua/unit/test_terminal.lua
--- BDD tests for the luna.terminal.* API (headless -- no GPU, no window).
---
--- NOTE: All method calls use DOT syntax (obj.method(args)) rather than
--- COLON syntax (obj:method(args)) because the terminal API registers plain
--- functions that do not accept a self parameter. This is a known API issue
--- (methods should accept self for idiomatic Lua colon-call usage).
+-- BDD tests for the luna.terminal.* API.
 
 require("tests/lua/init")
 
--- Module existence
+local function click_cell(term, col, row, button)
+    local cell_w, cell_h = term:getCellSize()
+    term:mousepressed((col - 1) * cell_w + 1, (row - 1) * cell_h + 1, button or 1)
+end
 
 describe("luna.terminal module", function()
-    it("luna.terminal is a table", function()
+    it("exposes terminal constructors", function()
         expect_type("table", luna.terminal)
-    end)
-
-    it("newTerminal is a function", function()
         expect_type("function", luna.terminal.newTerminal)
-    end)
-
-    it("newLabel is a function", function()
         expect_type("function", luna.terminal.newLabel)
-    end)
-
-    it("newButton is a function", function()
         expect_type("function", luna.terminal.newButton)
-    end)
-
-    it("newTextBox is a function", function()
         expect_type("function", luna.terminal.newTextBox)
-    end)
-
-    it("newList is a function", function()
         expect_type("function", luna.terminal.newList)
-    end)
-
-    it("newBorder is a function", function()
         expect_type("function", luna.terminal.newBorder)
-    end)
-
-    it("newPanel is a function", function()
         expect_type("function", luna.terminal.newPanel)
     end)
 end)
 
--- Terminal construction
+describe("terminal handles", function()
+    it("creates terminal userdata and accepts colon or explicit self syntax", function()
+        local term = luna.terminal.newTerminal(40, 20)
+        expect_equal("userdata", type(term))
 
-describe("luna.terminal.newTerminal", function()
-    it("creates a terminal with default dimensions (80x40)", function()
-        local t = luna.terminal.newTerminal()
-        local cols, rows = t.getDimensions()
-        expect_equal(cols, 80)
-        expect_equal(rows, 40)
+        local cols1, rows1 = term:getDimensions()
+        local cols2, rows2 = term.getDimensions(term)
+        expect_equal(40, cols1)
+        expect_equal(20, rows1)
+        expect_equal(40, cols2)
+        expect_equal(20, rows2)
     end)
 
-    it("creates a terminal with custom dimensions", function()
-        local t = luna.terminal.newTerminal(40, 20)
-        local cols, rows = t.getDimensions()
-        expect_equal(cols, 40)
-        expect_equal(rows, 20)
+    it("reports the default cell size through colon and explicit self syntax", function()
+        local term = luna.terminal.newTerminal(10, 5)
+        local cell_w1, cell_h1 = term:getCellSize()
+        local cell_w2, cell_h2 = term.getCellSize(term)
+
+        expect_near(8.0, cell_w1, 0.001)
+        expect_near(14.0, cell_h1, 0.001)
+        expect_near(8.0, cell_w2, 0.001)
+        expect_near(14.0, cell_h2, 0.001)
     end)
 
-    it("clamps terminal dimensions to max (512x256)", function()
-        local t = luna.terminal.newTerminal(1000, 500)
-        local cols, rows = t.getDimensions()
-        expect_equal(cols, 512)
-        expect_equal(rows, 256)
+    it("sets and gets cells with colon syntax", function()
+        local term = luna.terminal.newTerminal(10, 5)
+        term:set(2, 3, "A", 1, 0.5, 0, 1)
+
+        local ch, fr, fg, fb, fa = term:get(2, 3)
+        expect_equal(string.byte("A"), ch)
+        expect_near(1.0, fr, 0.01)
+        expect_near(0.5, fg, 0.01)
+        expect_near(0.0, fb, 0.01)
+        expect_near(1.0, fa, 0.01)
     end)
 
-    it("clamps terminal dimensions to min (1x1)", function()
-        local t = luna.terminal.newTerminal(0, 0)
-        local cols, rows = t.getDimensions()
-        expect_equal(cols >= 1, true)
-        expect_equal(rows >= 1, true)
-    end)
-end)
+    it("clears cells back to defaults", function()
+        local term = luna.terminal.newTerminal(10, 5)
+        term:set(2, 2, "X", 1, 0, 0, 1)
+        term:clear()
 
--- Cell operations
-
-describe("Terminal cell operations", function()
-    it("sets and gets a character by string", function()
-        local t = luna.terminal.newTerminal(10, 5)
-        t.set(1, 1, "A")
-        local ch = t.get(1, 1)
-        expect_equal(ch, string.byte("A"))
+        local ch = term:get(2, 2)
+        expect_equal(string.byte(" "), ch)
     end)
 
-    it("sets and gets a character by codepoint", function()
-        local t = luna.terminal.newTerminal(10, 5)
-        t.set(2, 2, 66)  -- 'B'
-        local ch = t.get(2, 2)
-        expect_equal(ch, 66)
-    end)
+    it("supports explicit self syntax on widget handles", function()
+        local label = luna.terminal.newLabel(1, 1, "Hello")
+        expect_equal("Hello", label.getText(label))
 
-    it("sets cell with custom colors", function()
-        local t = luna.terminal.newTerminal(10, 10)
-        t.set(1, 1, "X", 1, 0, 0, 1, 0, 0, 1, 1)
-        local ch, fr, fg, fb, fa, br, bg, bb, ba = t.get(1, 1)
-        expect_equal(ch, string.byte("X"))
-        expect_near(fr, 1.0, 0.01)
-        expect_near(fg, 0.0, 0.01)
-    end)
-
-    it("clear resets all cells to space", function()
-        local t = luna.terminal.newTerminal(5, 3)
-        t.set(1, 1, "X")
-        t.clear()
-        local ch = t.get(1, 1)
-        expect_equal(ch, string.byte(" "))
-    end)
-
-    it("out-of-bounds get returns default values", function()
-        local t = luna.terminal.newTerminal(5, 3)
-        local ch = t.get(0, 1)
-        expect_equal(ch, string.byte(" "))
-    end)
-
-    it("out-of-bounds set does not crash", function()
-        local t = luna.terminal.newTerminal(5, 3)
-        t.set(100, 100, "X")
-        expect_equal(true, true)
+        label.setText(label, "Updated")
+        expect_equal("Updated", label:getText())
     end)
 end)
 
--- Label widget
+describe("widget attachment and focus", function()
+    it("attaches detached widgets to a terminal", function()
+        local term = luna.terminal.newTerminal(20, 10)
+        local label = luna.terminal.newLabel(2, 3, "Status")
 
-describe("TLabel widget", function()
-    it("getText returns initial text", function()
-        local lbl = luna.terminal.newLabel(1, 1, "Hello")
-        expect_equal(lbl.getText(), "Hello")
+        expect_equal(0, term:getWidgetCount())
+        term:addWidget(label)
+        expect_equal(1, term:getWidgetCount())
+
+        local col, row = label:getPosition()
+        expect_equal(2, col)
+        expect_equal(3, row)
     end)
 
-    it("setText updates text", function()
-        local lbl = luna.terminal.newLabel(1, 1, "initial")
-        lbl.setText("updated")
-        expect_equal(lbl.getText(), "updated")
+    it("removeWidget detaches the handle and clears focus for the removed widget", function()
+        local term = luna.terminal.newTerminal(20, 10)
+        local button = luna.terminal.newButton(2, 2, 8, 1, "Play")
+
+        term:addWidget(button)
+        term:setFocus(button)
+        term:removeWidget(button)
+
+        expect_equal(0, term:getWidgetCount())
+        expect_nil(term:getFocused())
+
+        button:setText("Detached")
+        expect_equal("Detached", button:getText())
     end)
 
-    it("getPosition returns 1-based position", function()
-        local lbl = luna.terminal.newLabel(5, 3, "x")
-        local col, row = lbl.getPosition()
-        expect_equal(col, 5)
-        expect_equal(row, 3)
+    it("clearWidgets detaches all handles and clears focus", function()
+        local term = luna.terminal.newTerminal(20, 10)
+        local label = luna.terminal.newLabel(1, 1, "HUD")
+        local input = luna.terminal.newTextBox(1, 2, 10)
+
+        term:addWidget(label)
+        term:addWidget(input)
+        term:setFocus(input)
+        term:clearWidgets()
+
+        expect_equal(0, term:getWidgetCount())
+        expect_nil(term:getFocused())
+
+        label:setText("Detached HUD")
+        input:setText("after-clear")
+        expect_equal("Detached HUD", label:getText())
+        expect_equal("after-clear", input:getText())
     end)
 
-    it("setPosition updates position", function()
-        local lbl = luna.terminal.newLabel(1, 1, "x")
-        lbl.setPosition(10, 8)
-        local col, row = lbl.getPosition()
-        expect_equal(col, 10)
-        expect_equal(row, 8)
+    it("setFocus and getFocused work with attached widget handles", function()
+        local term = luna.terminal.newTerminal(20, 10)
+        local input = luna.terminal.newTextBox(1, 1, 10)
+
+        term:addWidget(input)
+        term:setFocus(input)
+
+        local focused = term:getFocused()
+        expect_equal("userdata", type(focused))
+
+        focused:setText("Hero")
+        expect_equal("Hero", input:getText())
     end)
 
-    it("isVisible is true by default", function()
-        local lbl = luna.terminal.newLabel(1, 1)
-        expect_equal(lbl.isVisible(), true)
+    it("panel addChild auto-attaches detached children when the panel is attached", function()
+        local term = luna.terminal.newTerminal(30, 12)
+        local panel = luna.terminal.newPanel(1, 1, 20, 8)
+        local child = luna.terminal.newLabel(2, 2, "Child")
+
+        term:addWidget(panel)
+        panel:addChild(child)
+
+        expect_equal(2, term:getWidgetCount())
+        expect_equal(1, panel:getChildCount())
+        expect_equal("Child", panel:getChild(1):getText())
     end)
 
-    it("setVisible false hides the widget", function()
-        local lbl = luna.terminal.newLabel(1, 1)
-        lbl.setVisible(false)
-        expect_equal(lbl.isVisible(), false)
-    end)
+    it("mousepressed miss clears focus", function()
+        local term = luna.terminal.newTerminal(20, 10)
+        local button = luna.terminal.newButton(3, 2, 8, 1, "OK")
 
-    it("isEnabled is true by default", function()
-        local lbl = luna.terminal.newLabel(1, 1)
-        expect_equal(lbl.isEnabled(), true)
-    end)
+        term:addWidget(button)
+        term:setFocus(button)
+        term:mousepressed(1, 1, 1)
 
-    it("setTag and getTag roundtrip", function()
-        local lbl = luna.terminal.newLabel(1, 1)
-        lbl.setTag("my_label")
-        expect_equal(lbl.getTag(), "my_label")
-    end)
-end)
-
--- Button widget
-
-describe("TButton widget", function()
-    it("getText returns initial text", function()
-        local btn = luna.terminal.newButton(1, 1, 10, 1, "Action")
-        expect_equal(btn.getText(), "Action")
-    end)
-
-    it("getSize returns expected dimensions", function()
-        local btn = luna.terminal.newButton(1, 1, 10, 2, "X")
-        local w, h = btn.getSize()
-        expect_equal(w, 10)
-        expect_equal(h, 2)
-    end)
-
-    it("setOnClick accepts a function", function()
-        local btn = luna.terminal.newButton(1, 1, 5, 1, "OK")
-        btn.setOnClick(function() end)
-        expect_equal(true, true)
-    end)
-end)
-
--- TextBox widget
-
-describe("TTextBox widget", function()
-    it("getText returns empty string initially", function()
-        local tb = luna.terminal.newTextBox(1, 1, 20)
-        expect_equal(tb.getText(), "")
-    end)
-
-    it("setText and getText roundtrip", function()
-        local tb = luna.terminal.newTextBox(1, 1, 20)
-        tb.setText("entered text")
-        expect_equal(tb.getText(), "entered text")
-    end)
-
-    it("getSize width matches constructor", function()
-        local tb = luna.terminal.newTextBox(1, 1, 15)
-        local w, _ = tb.getSize()
-        expect_equal(w, 15)
-    end)
-
-    it("setMaxLength and getMaxLength roundtrip", function()
-        local tb = luna.terminal.newTextBox(1, 1, 20)
-        tb.setMaxLength(5)
-        expect_equal(tb.getMaxLength(), 5)
+        expect_nil(term:getFocused())
     end)
 end)
 
--- List widget
+describe("widget property helpers", function()
+    it("supports visibility, enabled, and tag helpers on attached widgets", function()
+        local term = luna.terminal.newTerminal(20, 10)
+        local label = luna.terminal.newLabel(1, 1, "Status")
 
-describe("TList widget", function()
-    it("getItemCount starts at 0", function()
-        local list = luna.terminal.newList(1, 1, 20, 10)
-        expect_equal(list.getItemCount(), 0)
+        term:addWidget(label)
+
+        label:setVisible(false)
+        expect_false(label:isVisible())
+        label:setVisible(true)
+        expect_true(label:isVisible())
+
+        label:setEnabled(false)
+        expect_false(label:isEnabled())
+        label:setEnabled(true)
+        expect_true(label:isEnabled())
+
+        label:setTag("hud.status")
+        expect_equal("hud.status", label:getTag())
     end)
 
-    it("addItem increases count", function()
-        local list = luna.terminal.newList(1, 1, 20, 10)
-        list.addItem("Sword")
-        expect_equal(list.getItemCount(), 1)
+    it("supports setColor and getColor on labels and borders", function()
+        local label = luna.terminal.newLabel(1, 1, "Info")
+        local border = luna.terminal.newBorder(1, 2, 12, 4)
+
+        label:setColor(0.25, 0.5, 0.75, 0.9)
+        border:setColor(1.0, 0.2, 0.1, 0.8)
+
+        local lr, lg, lb, la = label:getColor()
+        local br, bg, bb, ba = border:getColor()
+
+        expect_near(0.25, lr, 0.001)
+        expect_near(0.5, lg, 0.001)
+        expect_near(0.75, lb, 0.001)
+        expect_near(0.9, la, 0.001)
+
+        expect_near(1.0, br, 0.001)
+        expect_near(0.2, bg, 0.001)
+        expect_near(0.1, bb, 0.001)
+        expect_near(0.8, ba, 0.001)
     end)
 
-    it("getItem returns correct item (1-based)", function()
-        local list = luna.terminal.newList(1, 1, 20, 10)
-        list.addItem("Alpha")
-        list.addItem("Beta")
-        expect_equal(list.getItem(1), "Alpha")
-        expect_equal(list.getItem(2), "Beta")
+    it("supports setText and getText on buttons and text boxes", function()
+        local button = luna.terminal.newButton(1, 1, 8, 1, "Old")
+        local textbox = luna.terminal.newTextBox(1, 2, 10)
+
+        button:setText("Launch")
+        textbox.setText(textbox, "Updated")
+
+        expect_equal("Launch", button:getText())
+        expect_equal("Updated", textbox.getText(textbox))
     end)
 
-    it("removeItem removes item by index (1-based)", function()
-        local list = luna.terminal.newList(1, 1, 20, 10)
-        list.addItem("A")
-        list.addItem("B")
-        list.addItem("C")
-        list.removeItem(2)
-        expect_equal(list.getItemCount(), 2)
-        expect_equal(list.getItem(2), "C")
+    it("supports setMaxLength and getMaxLength on text boxes", function()
+        local textbox = luna.terminal.newTextBox(1, 1, 10)
+
+        textbox:setMaxLength(4)
+        textbox:setText("abcdef")
+
+        expect_equal(4, textbox:getMaxLength())
+        expect_equal("abcd", textbox:getText())
     end)
 
-    it("clearItems empties the list", function()
-        local list = luna.terminal.newList(1, 1, 20, 10)
-        list.addItem("x")
-        list.clearItems()
-        expect_equal(list.getItemCount(), 0)
+    it("supports list item management helpers", function()
+        local list = luna.terminal.newList(1, 1, 20, 5)
+        list:addItem("Alpha")
+        list:addItem("Beta")
+        list:addItem("Gamma")
+
+        expect_equal(3, list:getItemCount())
+        expect_equal("Beta", list:getItem(2))
+
+        list:removeItem(2)
+        expect_equal(2, list:getItemCount())
+        expect_equal("Gamma", list:getItem(2))
+
+        list:clearItems()
+        expect_equal(0, list:getItemCount())
+        expect_equal("", list:getItem(1))
     end)
 
-    it("setSelected and getSelected roundtrip (1-based)", function()
-        local list = luna.terminal.newList(1, 1, 20, 10)
-        list.addItem("A")
-        list.addItem("B")
-        list.setSelected(2)
-        expect_equal(list.getSelected(), 2)
+    it("supports panel child management helpers", function()
+        local term = luna.terminal.newTerminal(30, 12)
+        local panel = luna.terminal.newPanel(1, 1, 20, 8)
+        local child1 = luna.terminal.newLabel(2, 2, "One")
+        local child2 = luna.terminal.newLabel(2, 3, "Two")
+
+        term:addWidget(panel)
+        panel:addChild(child1)
+        panel:addChild(child2)
+
+        expect_equal(2, panel:getChildCount())
+        expect_equal("One", panel:getChild(1):getText())
+        expect_equal("Two", panel:getChild(2):getText())
+
+        panel:removeChild(child1)
+        expect_equal(1, panel:getChildCount())
+        expect_equal("Two", panel:getChild(1):getText())
+
+        panel:clearChildren()
+        expect_equal(0, panel:getChildCount())
+        expect_nil(panel:getChild(1))
     end)
 
-    it("setSelected nil clears selection", function()
-        local list = luna.terminal.newList(1, 1, 20, 10)
-        list.addItem("A")
-        list.setSelected(1)
-        list.setSelected(nil)
-        expect_equal(list.getSelected(), nil)
+    it("supports border style and title updates", function()
+        local border = luna.terminal.newBorder(1, 1, 12, 5)
+        border:setStyle("double")
+        border:setTitle("Menu")
+
+        expect_equal("double", border:getStyle())
+        expect_equal("Menu", border:getTitle())
     end)
 end)
 
--- Border widget
+describe("button callbacks", function()
+    it("keeps onClick callbacks working after attachment and reattachment", function()
+        local term = luna.terminal.newTerminal(20, 10)
+        local button = luna.terminal.newButton(3, 2, 8, 1, "OK")
+        local clicks = 0
 
-describe("TBorder widget", function()
-    it("getSize matches constructor", function()
-        local b = luna.terminal.newBorder(2, 2, 30, 10)
-        local w, h = b.getSize()
-        expect_equal(w, 30)
-        expect_equal(h, 10)
-    end)
+        button:setOnClick(function()
+            clicks = clicks + 1
+        end)
 
-    it("getStyle returns single by default", function()
-        local b = luna.terminal.newBorder(1, 1, 10, 5)
-        expect_equal(b.getStyle(), "single")
-    end)
+        term:addWidget(button)
+        term:setFocus(button)
 
-    it("setStyle changes the style", function()
-        local b = luna.terminal.newBorder(1, 1, 10, 5)
-        b.setStyle("double")
-        expect_equal(b.getStyle(), "double")
-        b.setStyle("ascii")
-        expect_equal(b.getStyle(), "ascii")
-    end)
-end)
+        expect_equal(true, term:keypressed("return"))
+        expect_equal(1, clicks)
 
--- Panel widget
+        term:removeWidget(button)
+        expect_equal(0, term:getWidgetCount())
 
-describe("TPanel widget", function()
-    it("getChildCount starts at 0", function()
-        local panel = luna.terminal.newPanel(1, 1, 20, 10)
-        expect_equal(panel.getChildCount(), 0)
-    end)
+        term:addWidget(button)
+        term:setFocus(button)
+        click_cell(term, 3, 2)
+        expect_equal(2, clicks)
 
-    it("addChild increases count", function()
-        local panel = luna.terminal.newPanel(1, 1, 20, 10)
-        local lbl = luna.terminal.newLabel(1, 1, "Child")
-        panel.addChild(lbl)
-        expect_equal(panel.getChildCount(), 1)
-    end)
-
-    it("clearChildren empties children list", function()
-        local panel = luna.terminal.newPanel(1, 1, 20, 10)
-        local lbl = luna.terminal.newLabel(1, 1, "Child")
-        panel.addChild(lbl)
-        panel.clearChildren()
-        expect_equal(panel.getChildCount(), 0)
+        expect_equal(true, term:keypressed("space"))
+        expect_equal(3, clicks)
     end)
 end)
 
--- Terminal input routing
+describe("text box callbacks", function()
+    it("fires onChange for setText, textinput, backspace, and delete", function()
+        local term = luna.terminal.newTerminal(30, 10)
+        local input = luna.terminal.newTextBox(1, 1, 12)
+        local changes = 0
 
-describe("Terminal input routing", function()
-    it("keypressed returns boolean", function()
-        local t = luna.terminal.newTerminal(40, 20)
-        local consumed = t.keypressed("a")
-        expect_type("boolean", consumed)
+        input:setOnChange(function()
+            changes = changes + 1
+        end)
+
+        term:addWidget(input)
+        term:setFocus(input)
+
+        input:setText("abc")
+        expect_equal(1, changes)
+
+        expect_equal(true, term:textinput("d"))
+        expect_equal("abcd", input:getText())
+        expect_equal(2, changes)
+
+        expect_equal(true, term:keypressed("backspace"))
+        expect_equal("abc", input:getText())
+        expect_equal(3, changes)
+
+        expect_equal(true, term:keypressed("home"))
+        expect_equal(true, term:keypressed("delete"))
+        expect_equal("bc", input:getText())
+        expect_equal(4, changes)
     end)
+end)
 
-    it("textinput returns boolean", function()
-        local t = luna.terminal.newTerminal(40, 20)
-        local consumed = t.textinput("a")
-        expect_type("boolean", consumed)
-    end)
+describe("list callbacks", function()
+    it("fires onSelect for setSelected, keyboard navigation, and mouse presses", function()
+        local term = luna.terminal.newTerminal(30, 12)
+        local list = luna.terminal.newList(1, 1, 12, 4)
+        local selections = {}
 
-    it("mousepressed does not crash", function()
-        local t = luna.terminal.newTerminal(40, 20)
-        t.mousepressed(10, 20, 1)
-        expect_equal(true, true)
+        list:addItem("One")
+        list:addItem("Two")
+        list:addItem("Three")
+        list:setOnSelect(function()
+            selections[#selections + 1] = list:getSelected()
+        end)
+
+        term:addWidget(list)
+        list:setSelected(2)
+
+        term:setFocus(list)
+        expect_equal(true, term:keypressed("down"))
+        click_cell(term, 1, 1)
+
+        expect_equal(3, #selections)
+        expect_equal(2, selections[1])
+        expect_equal(3, selections[2])
+        expect_equal(1, selections[3])
     end)
 end)
 

@@ -64,7 +64,7 @@ describe("luna.system module flags", function()
 
     it("luna.system.getOS returns a known platform string", function()
         local os = luna.system.getOS()
-        local valid = { windows = true, linux = true, macos = true }
+        local valid = { Windows = true, Linux = true, macOS = true }
         expect_equal(valid[os] ~= nil, true)
     end)
 end)
