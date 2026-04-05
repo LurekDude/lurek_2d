@@ -57,7 +57,7 @@ AIWorld (central registry)
   ├── Spatial
   │     ├── PathGrid ──── A* with octile heuristic + LoS smoothing
   │     ├── FlowField ─── BFS-based 8-directional movement
-  │     └── InfluenceMap ─ named layers with stamp/propagate/decay
+  │     └── InfluenceMap ─ named layers with stamp/propagate/decay (re-exported from `crate::pathfinding`)
   │
   ├── Learning
   │     └── QLearner ──── tabular Q-learning with epsilon-greedy
@@ -80,7 +80,7 @@ AIWorld (central registry)
 | `command_queue.rs` | RTS-style ordered command queue for scheduling unit actions |
 | `fsm.rs` | Finite State Machine with priority-ordered guarded transitions |
 | `goap.rs` | Goal-Oriented Action Planning (GOAP) using A★ search over boolean world state |
-| `influence_map.rs` | Multi-layer spatial float grid for strategic area analysis and influence mapping |
+| ~~`influence_map.rs`~~ | **Moved** to `src/pathfinding/influence_map.rs` — re-exported as `crate::ai::InfluenceMap` |
 | `qlearner.rs` | Tabular epsilon-greedy Q-learner for discrete-state reinforcement learning |
 | `squad.rs` | Multi-agent formation groups with offset computation |
 | `steering.rs` | Reynolds-style steering behaviors with weighted/priority combination |
@@ -135,11 +135,10 @@ Goal-Oriented Action Planning (GOAP) using A★ search over boolean world state.
 - **`GOAPGoal`** (struct): A planning goal expressed as a desired boolean world state.  Goals represent what the agent wants to achieve. The...
 - **`GOAPPlanner`** (struct): A★ planner that finds optimal action sequences to satisfy goals over boolean world state.  The planner holds a set of...
 
-### `ai::influence_map`
+### `ai::influence_map` → moved
 
-Multi-layer spatial float grid for strategic area analysis and influence mapping.
-
-- **`InfluenceMap`** (struct): A multi-layer spatial float grid for influence mapping and strategic reasoning.  The grid has fixed dimensions (`width...
+`InfluenceMap` now lives in `src/pathfinding/influence_map.rs` and is re-exported from `crate::ai` for backward compatibility.
+See [`pathfinding::influence_map`](#pathfindinginfluence_map) for the full API reference.
 
 ### `ai::qlearner`
 
@@ -223,9 +222,10 @@ A planning goal expressed as a desired boolean world state.  Goals represent wha
 
 A★ planner that finds optimal action sequences to satisfy goals over boolean world state.  The planner holds a set of...
 
-#### `ai::influence_map::InfluenceMap`
+#### `pathfinding::influence_map::InfluenceMap` (re-exported as `ai::InfluenceMap`)
 
-A multi-layer spatial float grid for influence mapping and strategic reasoning.  The grid has fixed dimensions (`width...
+A multi-layer spatial float grid for influence mapping and strategic reasoning.
+Moved to `src/pathfinding/influence_map.rs`; accessible as `luna2d::ai::InfluenceMap` via re-export.
 
 #### `ai::qlearner::QLearner`
 

@@ -1,9 +1,9 @@
-use mlua::prelude::*;
+﻿use mlua::prelude::*;
 use std::cell::RefCell;
 use std::rc::Rc;
 
 use crate::math::bezier::BezierCurve;
-use crate::math::srgb;
+use crate::math::color;
 use crate::math::easing;
 use crate::math::noise;
 use crate::math::polygon;
@@ -65,7 +65,7 @@ impl LuaUserData for LuaRandomGenerator {
         /// Seeds this random generator with the given integer, resetting its sequence.
         ///
         /// # Parameters
-        /// - `seed` — Integer seed value. Use 0 to seed from system time.
+        /// - `seed` â€” Integer seed value. Use 0 to seed from system time.
         methods.add_method("setSeed", |_, this, seed: u64| {
             this.inner.borrow_mut().set_seed(seed);
             Ok(())
@@ -99,8 +99,8 @@ impl LuaUserData for LuaTransform {
         /// Applies a translation offset to the internal matrix.
         ///
         /// # Parameters
-        /// - `dx` — Horizontal offset in pixels.
-        /// - `dy` — Vertical offset in pixels.
+        /// - `dx` â€” Horizontal offset in pixels.
+        /// - `dy` â€” Vertical offset in pixels.
         methods.add_method("translate", |_, this, (dx, dy): (f32, f32)| {
             this.inner.borrow_mut().translate(dx, dy);
             Ok(())
@@ -109,7 +109,7 @@ impl LuaUserData for LuaTransform {
         /// Applies a rotation by the given angle to the internal matrix.
         ///
         /// # Parameters
-        /// - `angle` — Rotation angle in radians.
+        /// - `angle` â€” Rotation angle in radians.
         methods.add_method("rotate", |_, this, angle: f32| {
             this.inner.borrow_mut().rotate(angle);
             Ok(())
@@ -118,8 +118,8 @@ impl LuaUserData for LuaTransform {
         /// Applies a scale factor to the transform's internal matrix.
         ///
         /// # Parameters
-        /// - `sx` — Horizontal scale factor.
-        /// - `sy` — Vertical scale factor (defaults to sx if omitted).
+        /// - `sx` â€” Horizontal scale factor.
+        /// - `sy` â€” Vertical scale factor (defaults to sx if omitted).
         methods.add_method("scale", |_, this, (sx, sy): (f32, Option<f32>)| {
             let sy = sy.unwrap_or(sx);
             this.inner.borrow_mut().scale(sx, sy);
@@ -129,8 +129,8 @@ impl LuaUserData for LuaTransform {
         /// Applies a shear (skew) transformation to the internal matrix.
         ///
         /// # Parameters
-        /// - `kx` — Horizontal shear factor.
-        /// - `ky` — Vertical shear factor.
+        /// - `kx` â€” Horizontal shear factor.
+        /// - `ky` â€” Vertical shear factor.
         methods.add_method("shear", |_, this, (kx, ky): (f32, f32)| {
             this.inner.borrow_mut().shear(kx, ky);
             Ok(())
@@ -176,8 +176,8 @@ impl LuaUserData for LuaTransform {
         /// Transforms a point (x, y) by this matrix and returns the result.
         ///
         /// # Parameters
-        /// - `x` — Input X coordinate.
-        /// - `y` — Input Y coordinate.
+        /// - `x` â€” Input X coordinate.
+        /// - `y` â€” Input Y coordinate.
         ///
         /// # Returns
         /// Transformed x, y coordinates.
@@ -189,8 +189,8 @@ impl LuaUserData for LuaTransform {
         /// Applies the inverse of this transform to the given point.
         ///
         /// # Parameters
-        /// - `x` — Input X coordinate.
-        /// - `y` — Input Y coordinate.
+        /// - `x` â€” Input X coordinate.
+        /// - `y` â€” Input Y coordinate.
         ///
         /// # Returns
         /// Inverse-transformed x, y coordinates.
@@ -252,7 +252,7 @@ impl LuaUserData for LuaBezierCurve {
         /// Evaluates the curve at parameter t in [0, 1] and returns the world point.
         ///
         /// # Parameters
-        /// - `t` — Curve parameter in the range [0, 1].
+        /// - `t` â€” Curve parameter in the range [0, 1].
         ///
         /// # Returns
         /// x, y coordinates of the point on the curve.
@@ -264,7 +264,7 @@ impl LuaUserData for LuaBezierCurve {
         /// Subdivides the curve to the given depth and returns the sample points.
         ///
         /// # Parameters
-        /// - `depth` — Subdivision depth; higher values yield smoother output.
+        /// - `depth` â€” Subdivision depth; higher values yield smoother output.
         ///
         /// # Returns
         /// Flat list of (x, y) sample coordinates.
@@ -309,7 +309,7 @@ impl LuaUserData for LuaBezierCurve {
         /// Returns the position of the control point at the given index.
         ///
         /// # Parameters
-        /// - `i` — 1-based index of the control point.
+        /// - `i` â€” 1-based index of the control point.
         ///
         /// # Returns
         /// x, y coordinates of the control point.
@@ -359,7 +359,7 @@ impl LuaUserData for LuaBezierCurve {
         /// Removes the control point at the given index from the curve.
         ///
         /// # Parameters
-        /// - `i` — 1-based index of the control point to remove.
+        /// - `i` â€” 1-based index of the control point to remove.
         methods.add_method("removeControlPoint", |_, this, index: usize| {
             let mut curve = this.inner.borrow_mut();
             let idx = index.checked_sub(1).ok_or_else(|| {
@@ -384,8 +384,8 @@ impl LuaUserData for LuaBezierCurve {
         /// Shifts every control point by the given (dx, dy) offset in place.
         ///
         /// # Parameters
-        /// - `dx` — Horizontal offset in pixels.
-        /// - `dy` — Vertical offset in pixels.
+        /// - `dx` â€” Horizontal offset in pixels.
+        /// - `dy` â€” Vertical offset in pixels.
         methods.add_method("translate", |_, this, (dx, dy): (f32, f32)| {
             this.inner.borrow_mut().translate(dx, dy);
             Ok(())
@@ -430,7 +430,7 @@ fn parse_vec2_table(table: &LuaTable) -> LuaResult<Vec<Vec2>> {
     Ok(points)
 }
 
-// ── Types merged from math_ext_api ──────────────────────────────────────
+// â”€â”€ Types merged from math_ext_api â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 // ---------------------------------------------------------------------------
 // 1. LuaVec2
 // ---------------------------------------------------------------------------
@@ -445,7 +445,7 @@ impl LuaUserData for LuaVec2 {
         /// Returns the x.
         ///
         /// # Parameters
-        /// - `x` — `number`.
+        /// - `x` â€” `number`.
         ///
         /// # Returns
         /// The current x.
@@ -453,7 +453,7 @@ impl LuaUserData for LuaVec2 {
         /// Returns the y.
         ///
         /// # Parameters
-        /// - `x` — `number`.
+        /// - `x` â€” `number`.
         ///
         /// # Returns
         /// The current y.
@@ -461,7 +461,7 @@ impl LuaUserData for LuaVec2 {
         /// Sets the x.
         ///
         /// # Parameters
-        /// - `x` — `number`.
+        /// - `x` â€” `number`.
         methods.add_method("setX", |_, this, x: f32| {
             this.inner.borrow_mut().x = x;
             Ok(())
@@ -469,7 +469,7 @@ impl LuaUserData for LuaVec2 {
         /// Sets the y.
         ///
         /// # Parameters
-        /// - `y` — `number`.
+        /// - `y` â€” `number`.
         methods.add_method("setY", |_, this, y: f32| {
             this.inner.borrow_mut().y = y;
             Ok(())
@@ -477,8 +477,8 @@ impl LuaUserData for LuaVec2 {
         /// Returns the current value.
         ///
         /// # Parameters
-        /// - `x` — `number`.
-        /// - `y` — `number`.
+        /// - `x` â€” `number`.
+        /// - `y` â€” `number`.
         ///
         /// # Returns
         /// The current get.
@@ -489,8 +489,8 @@ impl LuaUserData for LuaVec2 {
         /// Sets the value.
         ///
         /// # Parameters
-        /// - `x` — `number`.
-        /// - `y` — `number`.
+        /// - `x` â€” `number`.
+        /// - `y` â€” `number`.
         methods.add_method("set", |_, this, (x, y): (f32, f32)| {
             let mut v = this.inner.borrow_mut();
             v.x = x;
@@ -500,7 +500,7 @@ impl LuaUserData for LuaVec2 {
         /// Returns the length.
         ///
         /// # Parameters
-        /// - `other` — `userdata`.
+        /// - `other` â€” `userdata`.
         ///
         /// # Returns
         /// The current length.
@@ -508,7 +508,7 @@ impl LuaUserData for LuaVec2 {
         /// Returns the length squared.
         ///
         /// # Parameters
-        /// - `other` — `userdata`.
+        /// - `other` â€” `userdata`.
         ///
         /// # Returns
         /// The current length squared.
@@ -518,7 +518,7 @@ impl LuaUserData for LuaVec2 {
         /// Returns the angle.
         ///
         /// # Parameters
-        /// - `other` — `userdata`.
+        /// - `other` â€” `userdata`.
         ///
         /// # Returns
         /// The current angle.
@@ -526,7 +526,7 @@ impl LuaUserData for LuaVec2 {
         /// Dot on this Vec2.
         ///
         /// # Parameters
-        /// - `other` — `userdata`.
+        /// - `other` â€” `userdata`.
         methods.add_method("dot", |_, this, other: LuaAnyUserData| {
             let a = *this.inner.borrow();
             let b = *other.borrow::<LuaVec2>()?.inner.borrow();
@@ -535,7 +535,7 @@ impl LuaUserData for LuaVec2 {
         /// Cross on this Vec2.
         ///
         /// # Parameters
-        /// - `other` — `userdata`.
+        /// - `other` â€” `userdata`.
         methods.add_method("cross", |_, this, other: LuaAnyUserData| {
             let a = *this.inner.borrow();
             let b = *other.borrow::<LuaVec2>()?.inner.borrow();
@@ -544,7 +544,7 @@ impl LuaUserData for LuaVec2 {
         /// Returns the distance.
         ///
         /// # Parameters
-        /// - `other` — `userdata`.
+        /// - `other` â€” `userdata`.
         ///
         /// # Returns
         /// The current distance.
@@ -556,7 +556,7 @@ impl LuaUserData for LuaVec2 {
         /// Returns the normalized.
         ///
         /// # Parameters
-        /// - `angle` — `number`.
+        /// - `angle` â€” `number`.
         ///
         /// # Returns
         /// The current normalized.
@@ -569,7 +569,7 @@ impl LuaUserData for LuaVec2 {
         /// Returns the rotated.
         ///
         /// # Parameters
-        /// - `angle` — `number`.
+        /// - `angle` â€” `number`.
         ///
         /// # Returns
         /// The current rotated.
@@ -585,8 +585,8 @@ impl LuaUserData for LuaVec2 {
         /// Returns the perpendicular.
         ///
         /// # Parameters
-        /// - `other` — `userdata`.
-        /// - `t` — `number`.
+        /// - `other` â€” `userdata`.
+        /// - `t` â€” `number`.
         ///
         /// # Returns
         /// The current perpendicular.
@@ -599,8 +599,8 @@ impl LuaUserData for LuaVec2 {
         /// Interpolates between start and target values.
         ///
         /// # Parameters
-        /// - `other` — `userdata`.
-        /// - `t` — `number`.
+        /// - `other` â€” `userdata`.
+        /// - `t` â€” `number`.
         methods.add_method("lerp", |lua, this, (other, t): (LuaAnyUserData, f32)| {
             let a = *this.inner.borrow();
             let b = *other.borrow::<LuaVec2>()?.inner.borrow();
@@ -611,7 +611,7 @@ impl LuaUserData for LuaVec2 {
         /// Returns a deep copy of this object.
         ///
         /// # Parameters
-        /// - `other` — `userdata`.
+        /// - `other` â€” `userdata`.
         methods.add_method("clone", |lua, this, ()| {
             lua.create_userdata(LuaVec2 {
                 inner: RefCell::new(*this.inner.borrow()),
@@ -699,7 +699,7 @@ impl LuaUserData for LuaNoiseGenerator {
         /// Sets the seed.
         ///
         /// # Parameters
-        /// - `seed` — `integer`.
+        /// - `seed` â€” `integer`.
         methods.add_method("setSeed", |_, this, seed: u64| {
             this.inner.borrow_mut().set_seed(seed);
             Ok(())
@@ -707,7 +707,7 @@ impl LuaUserData for LuaNoiseGenerator {
         /// Returns the seed.
         ///
         /// # Parameters
-        /// - `args` — `LuaMultiValue`.
+        /// - `args` â€” `LuaMultiValue`.
         ///
         /// # Returns
         /// The current seed.
@@ -716,7 +716,7 @@ impl LuaUserData for LuaNoiseGenerator {
         /// Perlin noise on this NoiseGenerator.
         ///
         /// # Parameters
-        /// - `args` — `LuaMultiValue`.
+        /// - `args` â€” `LuaMultiValue`.
         methods.add_method("perlinNoise", |_, this, args: LuaMultiValue| {
             let gen = this.inner.borrow();
             let n = args.len();
@@ -742,7 +742,7 @@ impl LuaUserData for LuaNoiseGenerator {
         /// Simplex noise on this NoiseGenerator.
         ///
         /// # Parameters
-        /// - `args` — `LuaMultiValue`.
+        /// - `args` â€” `LuaMultiValue`.
         methods.add_method("simplexNoise", |_, this, args: LuaMultiValue| {
             let gen = this.inner.borrow();
             let n = args.len();
@@ -926,9 +926,9 @@ impl LuaUserData for LuaGrid {
         /// Returns the width.
         ///
         /// # Parameters
-        /// - `x` — `integer`.
-        /// - `y` — `integer`.
-        /// - `w` — `boolean`.
+        /// - `x` â€” `integer`.
+        /// - `y` â€” `integer`.
+        /// - `w` â€” `boolean`.
         ///
         /// # Returns
         /// The current width.
@@ -936,9 +936,9 @@ impl LuaUserData for LuaGrid {
         /// Returns the height.
         ///
         /// # Parameters
-        /// - `x` — `integer`.
-        /// - `y` — `integer`.
-        /// - `w` — `boolean`.
+        /// - `x` â€” `integer`.
+        /// - `y` â€” `integer`.
+        /// - `w` â€” `boolean`.
         ///
         /// # Returns
         /// The current height.
@@ -946,9 +946,9 @@ impl LuaUserData for LuaGrid {
         /// Returns the dimensions.
         ///
         /// # Parameters
-        /// - `x` — `integer`.
-        /// - `y` — `integer`.
-        /// - `w` — `boolean`.
+        /// - `x` â€” `integer`.
+        /// - `y` â€” `integer`.
+        /// - `w` â€” `boolean`.
         ///
         /// # Returns
         /// The current dimensions.
@@ -960,9 +960,9 @@ impl LuaUserData for LuaGrid {
         /// Sets the walkable.
         ///
         /// # Parameters
-        /// - `x` — `integer`.
-        /// - `y` — `integer`.
-        /// - `w` — `boolean`.
+        /// - `x` â€” `integer`.
+        /// - `y` â€” `integer`.
+        /// - `w` â€” `boolean`.
         methods.add_method("setWalkable", |_, this, (x, y, w): (u32, u32, bool)| {
             this.inner.borrow_mut().set_walkable(x - 1, y - 1, w);
             Ok(())
@@ -970,8 +970,8 @@ impl LuaUserData for LuaGrid {
         /// Returns `true` if walkable.
         ///
         /// # Parameters
-        /// - `x` — `integer`.
-        /// - `y` — `integer`.
+        /// - `x` â€” `integer`.
+        /// - `y` â€” `integer`.
         ///
         /// # Returns
         /// `boolean`.
@@ -981,9 +981,9 @@ impl LuaUserData for LuaGrid {
         /// Sets the cost.
         ///
         /// # Parameters
-        /// - `x` — `integer`.
-        /// - `y` — `integer`.
-        /// - `cost` — `number`.
+        /// - `x` â€” `integer`.
+        /// - `y` â€” `integer`.
+        /// - `cost` â€” `number`.
         methods.add_method("setCost", |_, this, (x, y, cost): (u32, u32, f32)| {
             this.inner.borrow_mut().set_cost(x - 1, y - 1, cost);
             Ok(())
@@ -991,8 +991,8 @@ impl LuaUserData for LuaGrid {
         /// Returns the cost.
         ///
         /// # Parameters
-        /// - `x` — `integer`.
-        /// - `y` — `integer`.
+        /// - `x` â€” `integer`.
+        /// - `y` â€” `integer`.
         ///
         /// # Returns
         /// The current cost.
@@ -1050,8 +1050,8 @@ impl LuaUserData for LuaGrid {
         /// Build flow field on this Grid.
         ///
         /// # Parameters
-        /// - `gx` — `integer`.
-        /// - `gy` — `integer`.
+        /// - `gx` â€” `integer`.
+        /// - `gy` â€” `integer`.
         methods.add_method("buildFlowField", |lua, this, (gx, gy): (u32, u32)| {
             let g = this.inner.borrow();
             let field = g.build_flow_field(gx - 1, gy - 1);
@@ -1111,11 +1111,11 @@ impl LuaUserData for LuaSpatialHash {
         /// Returns the cell size.
         ///
         /// # Parameters
-        /// - `id` — `any`.
-        /// - `x` — `number`.
-        /// - `y` — `number`.
-        /// - `w` — `number`.
-        /// - `h` — `number`.
+        /// - `id` â€” `any`.
+        /// - `x` â€” `number`.
+        /// - `y` â€” `number`.
+        /// - `w` â€” `number`.
+        /// - `h` â€” `number`.
         ///
         /// # Returns
         /// The current cell size.
@@ -1133,11 +1133,11 @@ impl LuaUserData for LuaSpatialHash {
         /// Removes the entry from the collection.
         ///
         /// # Parameters
-        /// - `id` — `any`.
-        /// - `x` — `number`.
-        /// - `y` — `number`.
-        /// - `w` — `number`.
-        /// - `h` — `number`.
+        /// - `id` â€” `any`.
+        /// - `x` â€” `number`.
+        /// - `y` â€” `number`.
+        /// - `w` â€” `number`.
+        /// - `h` â€” `number`.
         methods.add_method("remove", |_, this, id: LuaValue| {
             let key = to_string_id(&id)?;
             this.inner.borrow_mut().remove(&key);
@@ -1154,10 +1154,10 @@ impl LuaUserData for LuaSpatialHash {
         /// Removes all entries.
         ///
         /// # Parameters
-        /// - `x` — `number`.
-        /// - `y` — `number`.
-        /// - `w` — `number`.
-        /// - `h` — `number`.
+        /// - `x` â€” `number`.
+        /// - `y` â€” `number`.
+        /// - `w` â€” `number`.
+        /// - `h` â€” `number`.
         methods.add_method("clear", |_, this, ()| {
             this.inner.borrow_mut().clear();
             Ok(())
@@ -1176,9 +1176,9 @@ impl LuaUserData for LuaSpatialHash {
         /// Query circle on this SpatialHash.
         ///
         /// # Parameters
-        /// - `cx` — `number`.
-        /// - `cy` — `number`.
-        /// - `r` — `number`.
+        /// - `cx` â€” `number`.
+        /// - `cy` â€” `number`.
+        /// - `r` â€” `number`.
         methods.add_method("queryCircle", |lua, this, (cx, cy, r): (f32, f32, f32)| {
             let ids = this.inner.borrow().query_circle(cx, cy, r);
             let tbl = lua.create_table_with_capacity(ids.len(), 0)?;
@@ -1214,7 +1214,7 @@ impl LuaUserData for LuaSpatialHash {
 
 /// Lua UserData wrapper for `Raycaster2D`.
 ///
-/// Uses `Rc<RefCell<…>>` so `LuaTileWalker` can share the same raycaster.
+/// Uses `Rc<RefCell<â€¦>>` so `LuaTileWalker` can share the same raycaster.
 struct LuaRaycaster2D {
     inner: Rc<RefCell<Raycaster2D>>,
 }
@@ -1224,9 +1224,9 @@ impl LuaUserData for LuaRaycaster2D {
         /// Returns the width.
         ///
         /// # Parameters
-        /// - `x` — `integer`.
-        /// - `y` — `integer`.
-        /// - `val` — `integer`.
+        /// - `x` â€” `integer`.
+        /// - `y` â€” `integer`.
+        /// - `val` â€” `integer`.
         ///
         /// # Returns
         /// The current width.
@@ -1234,9 +1234,9 @@ impl LuaUserData for LuaRaycaster2D {
         /// Returns the height.
         ///
         /// # Parameters
-        /// - `x` — `integer`.
-        /// - `y` — `integer`.
-        /// - `val` — `integer`.
+        /// - `x` â€” `integer`.
+        /// - `y` â€” `integer`.
+        /// - `val` â€” `integer`.
         ///
         /// # Returns
         /// The current height.
@@ -1244,9 +1244,9 @@ impl LuaUserData for LuaRaycaster2D {
         /// Returns the dimensions.
         ///
         /// # Parameters
-        /// - `x` — `integer`.
-        /// - `y` — `integer`.
-        /// - `val` — `integer`.
+        /// - `x` â€” `integer`.
+        /// - `y` â€” `integer`.
+        /// - `val` â€” `integer`.
         ///
         /// # Returns
         /// The current dimensions.
@@ -1258,9 +1258,9 @@ impl LuaUserData for LuaRaycaster2D {
         /// Sets the cell.
         ///
         /// # Parameters
-        /// - `x` — `integer`.
-        /// - `y` — `integer`.
-        /// - `val` — `integer`.
+        /// - `x` â€” `integer`.
+        /// - `y` â€” `integer`.
+        /// - `val` â€” `integer`.
         methods.add_method("setCell", |_, this, (x, y, val): (u32, u32, u32)| {
             this.inner.borrow_mut().set_cell(x - 1, y - 1, val);
             Ok(())
@@ -1268,8 +1268,8 @@ impl LuaUserData for LuaRaycaster2D {
         /// Returns the cell.
         ///
         /// # Parameters
-        /// - `x` — `integer`.
-        /// - `y` — `integer`.
+        /// - `x` â€” `integer`.
+        /// - `y` â€” `integer`.
         ///
         /// # Returns
         /// The current cell.
@@ -1279,7 +1279,7 @@ impl LuaUserData for LuaRaycaster2D {
         /// Sets the cells.
         ///
         /// # Parameters
-        /// - `data` — `table`.
+        /// - `data` â€” `table`.
         methods.add_method("setCells", |_, this, data: LuaTable| {
             let len = data.raw_len();
             let mut vec = Vec::with_capacity(len);
@@ -1293,8 +1293,8 @@ impl LuaUserData for LuaRaycaster2D {
         /// Returns `true` if blocked.
         ///
         /// # Parameters
-        /// - `x` — `integer`.
-        /// - `y` — `integer`.
+        /// - `x` â€” `integer`.
+        /// - `y` â€” `integer`.
         ///
         /// # Returns
         /// `boolean`.
@@ -1460,8 +1460,8 @@ impl LuaUserData for LuaTileWalker {
         /// Returns the position.
         ///
         /// # Parameters
-        /// - `x` — `integer`.
-        /// - `y` — `integer`.
+        /// - `x` â€” `integer`.
+        /// - `y` â€” `integer`.
         ///
         /// # Returns
         /// The current position.
@@ -1472,8 +1472,8 @@ impl LuaUserData for LuaTileWalker {
         /// Sets the position.
         ///
         /// # Parameters
-        /// - `x` — `integer`.
-        /// - `y` — `integer`.
+        /// - `x` â€” `integer`.
+        /// - `y` â€” `integer`.
         methods.add_method("setPosition", |_, this, (x, y): (i32, i32)| {
             this.inner.borrow_mut().set_position(x - 1, y - 1);
             Ok(())
@@ -1481,7 +1481,7 @@ impl LuaUserData for LuaTileWalker {
         /// Returns the facing.
         ///
         /// # Parameters
-        /// - `facing` — `string`.
+        /// - `facing` â€” `string`.
         ///
         /// # Returns
         /// The current facing.
@@ -1491,7 +1491,7 @@ impl LuaUserData for LuaTileWalker {
         /// Sets the facing.
         ///
         /// # Parameters
-        /// - `facing` — `string`.
+        /// - `facing` â€” `string`.
         methods.add_method("setFacing", |_, this, facing: String| {
             let f = Facing::parse(&facing)
                 .ok_or_else(|| LuaError::RuntimeError(format!("invalid facing: {facing}")))?;
@@ -1560,7 +1560,7 @@ impl LuaUserData for LuaTileWalker {
         /// Turn around on this TileWalker.
         ///
         /// # Parameters
-        /// - `rc_ud` — `userdata`.
+        /// - `rc_ud` â€” `userdata`.
         methods.add_method("turnAround", |_, this, ()| {
             this.inner.borrow_mut().turn_around();
             Ok(())
@@ -1589,7 +1589,7 @@ impl LuaUserData for LuaTileWalker {
         /// Returns `true` if strafe right.
         ///
         /// # Parameters
-        /// - `t` — `number`.
+        /// - `t` â€” `number`.
         ///
         /// # Returns
         /// `boolean`.
@@ -1599,7 +1599,7 @@ impl LuaUserData for LuaTileWalker {
         /// Begin move on this TileWalker.
         ///
         /// # Parameters
-        /// - `t` — `number`.
+        /// - `t` â€” `number`.
         methods.add_method("beginMove", |_, this, ()| {
             this.inner.borrow_mut().begin_move();
             Ok(())
@@ -1607,7 +1607,7 @@ impl LuaUserData for LuaTileWalker {
         /// Returns the interpolated position.
         ///
         /// # Parameters
-        /// - `t` — `number`.
+        /// - `t` â€” `number`.
         ///
         /// # Returns
         /// The current interpolated position.
@@ -1619,8 +1619,8 @@ impl LuaUserData for LuaTileWalker {
         /// Returns the interpolated angle.
         ///
         /// # Parameters
-        /// - `tx` — `integer`.
-        /// - `ty` — `integer`.
+        /// - `tx` â€” `integer`.
+        /// - `ty` â€” `integer`.
         ///
         /// # Returns
         /// The current interpolated angle.
@@ -1631,8 +1631,8 @@ impl LuaUserData for LuaTileWalker {
         /// Returns the relative facing.
         ///
         /// # Parameters
-        /// - `tx` — `integer`.
-        /// - `ty` — `integer`.
+        /// - `tx` â€” `integer`.
+        /// - `ty` â€” `integer`.
         ///
         /// # Returns
         /// The current relative facing.
@@ -1660,8 +1660,8 @@ impl LuaUserData for LuaTween {
         /// Adds value to the collection.
         ///
         /// # Parameters
-        /// - `start` — `number`.
-        /// - `target` — `number`.
+        /// - `start` â€” `number`.
+        /// - `target` â€” `number`.
         methods.add_method("addValue", |_, this, (start, target): (f64, f64)| {
             let idx = this.inner.borrow_mut().add_value(start, target);
             Ok(idx + 1) // 1-based
@@ -1669,14 +1669,14 @@ impl LuaUserData for LuaTween {
         /// Advances the simulation by `dt` seconds.
         ///
         /// # Parameters
-        /// - `dt` — `number`.
+        /// - `dt` â€” `number`.
         methods.add_method("update", |_, this, dt: f64| {
             Ok(this.inner.borrow_mut().update(dt))
         });
         /// Returns the value.
         ///
         /// # Parameters
-        /// - `index` — `integer` optional.
+        /// - `index` â€” `integer` optional.
         ///
         /// # Returns
         /// The current value.
@@ -1697,7 +1697,7 @@ impl LuaUserData for LuaTween {
         /// Returns the value count.
         ///
         /// # Parameters
-        /// - `time` — `number`.
+        /// - `time` â€” `number`.
         ///
         /// # Returns
         /// The current value count.
@@ -1707,7 +1707,7 @@ impl LuaUserData for LuaTween {
         /// Resets state to initial values.
         ///
         /// # Parameters
-        /// - `time` — `number`.
+        /// - `time` â€” `number`.
         methods.add_method("reset", |_, this, ()| {
             this.inner.borrow_mut().reset();
             Ok(())
@@ -1715,7 +1715,7 @@ impl LuaUserData for LuaTween {
         /// Sets the value.
         ///
         /// # Parameters
-        /// - `time` — `number`.
+        /// - `time` â€” `number`.
         methods.add_method("set", |_, this, time: f64| {
             this.inner.borrow_mut().set_time(time);
             Ok(())
@@ -1813,20 +1813,20 @@ fn read_segments(tbl: &LuaTable) -> LuaResult<Vec<Segment>> {
 // Registers extended math API bindings on the `luna.math` table.
 //
 // # Parameters
-// - `lua` — `&Lua`.
-// - `luna_table` — `&LuaTable`.
+// - `lua` â€” `&Lua`.
+// - `luna_table` â€” `&LuaTable`.
 //
 // # Returns
 // `LuaResult<()>`.
 
-// ── End merged math_ext_api types ────────────────────────────────────────
+// â”€â”€ End merged math_ext_api types â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 /// Registers `luna.math.*` into the Lua VM, including Vec2, noise, tween, spatial hash,
 /// raycasting, tile-walking, and all standard math utilities.
 ///
 /// # Parameters
-/// - `lua` — `&Lua`.
-/// - `luna` — `&LuaTable`.
+/// - `lua` â€” `&Lua`.
+/// - `luna` â€” `&LuaTable`.
 ///
 /// # Returns
 /// `LuaResult<()>`.
@@ -1836,7 +1836,7 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
     /// Pi.
     math_api.set("pi", std::f64::consts::PI)?;
 
-    // ── Global RandomGenerator ─────────────────────────────────────────
+    // â”€â”€ Global RandomGenerator â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     let global_rng = Rc::new(RefCell::new(RandomGenerator::new()));
 
     /// Returns a pseudo-random number. No args: [0,1). One arg max: [1,max]. Two args min,max: [min,max].
@@ -1878,7 +1878,7 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
     /// Seeds the engine global random number generator with the given integer.
     ///
     /// # Parameters
-    /// - `seed` — Integer seed value; use 0 to seed from system time.
+    /// - `seed` â€” Integer seed value; use 0 to seed from system time.
     let rng = global_rng.clone();
     math_api.set(
         "setRandomSeed",
@@ -1898,7 +1898,7 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
         lua.create_function(move |_, ()| Ok(rng.borrow().get_seed()))?,
     )?;
 
-    // ── RandomGenerator constructor ────────────────────────────────────
+    // â”€â”€ RandomGenerator constructor â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     /// Creates an independent random generator with its own seed.
     math_api.set(
         "newRandomGenerator",
@@ -1914,7 +1914,7 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
         })?,
     )?;
 
-    // ── Transform constructor ──────────────────────────────────────────
+    // â”€â”€ Transform constructor â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     #[allow(clippy::type_complexity)]
     /// Creates a new affine Transform object.
     math_api.set(
@@ -1955,7 +1955,7 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
         )?,
     )?;
 
-    // ── BezierCurve constructor ────────────────────────────────────────
+    // â”€â”€ BezierCurve constructor â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     /// Creates a new Bezier curve from the given control points.
     math_api.set(
         "newBezierCurve",
@@ -1996,7 +1996,7 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
         })?,
     )?;
 
-    // ── Polygon utilities ──────────────────────────────────────────────
+    // â”€â”€ Polygon utilities â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     /// Triangulates a simple polygon and returns index triples.
     math_api.set(
         "triangulate",
@@ -2072,11 +2072,11 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
         })?,
     )?;
 
-    // ── Color space conversion ─────────────────────────────────────────
+    // â”€â”€ Color space conversion â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     /// Converts a sRGB gamma-encoded channel value to linear light intensity.
     ///
     /// # Parameters
-    /// - `c` — Gamma-encoded channel value in [0, 1].
+    /// - `c` â€” Gamma-encoded channel value in [0, 1].
     ///
     /// # Returns
     /// Linear-light value in [0, 1].
@@ -2090,7 +2090,7 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
                         .and_then(|v| v.as_f32())
                         .ok_or_else(|| LuaError::RuntimeError("Expected number".to_string()))?;
                     Ok(LuaMultiValue::from_vec(vec![LuaValue::Number(
-                        srgb::gamma_to_linear(c) as f64,
+                        color::gamma_to_linear(c) as f64,
                     )]))
                 }
                 3 | 4 => {
@@ -2107,9 +2107,9 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
                         .and_then(|v| v.as_f32())
                         .ok_or_else(|| LuaError::RuntimeError("Expected number".to_string()))?;
                     let mut result = vec![
-                        LuaValue::Number(srgb::gamma_to_linear(r) as f64),
-                        LuaValue::Number(srgb::gamma_to_linear(g) as f64),
-                        LuaValue::Number(srgb::gamma_to_linear(b) as f64),
+                        LuaValue::Number(color::gamma_to_linear(r) as f64),
+                        LuaValue::Number(color::gamma_to_linear(g) as f64),
+                        LuaValue::Number(color::gamma_to_linear(b) as f64),
                     ];
                     if let Some(a) = args.get(3).and_then(|v| v.as_f32()) {
                         result.push(LuaValue::Number(a as f64)); // alpha passed through
@@ -2126,7 +2126,7 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
     /// Converts a linear-light channel value to sRGB gamma-encoded space.
     ///
     /// # Parameters
-    /// - `c` — Linear-light value in [0, 1].
+    /// - `c` â€” Linear-light value in [0, 1].
     ///
     /// # Returns
     /// Gamma-encoded value in [0, 1].
@@ -2140,7 +2140,7 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
                         .and_then(|v| v.as_f32())
                         .ok_or_else(|| LuaError::RuntimeError("Expected number".to_string()))?;
                     Ok(LuaMultiValue::from_vec(vec![LuaValue::Number(
-                        srgb::linear_to_gamma(c) as f64,
+                        color::linear_to_gamma(c) as f64,
                     )]))
                 }
                 3 | 4 => {
@@ -2157,9 +2157,9 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
                         .and_then(|v| v.as_f32())
                         .ok_or_else(|| LuaError::RuntimeError("Expected number".to_string()))?;
                     let mut result = vec![
-                        LuaValue::Number(srgb::linear_to_gamma(r) as f64),
-                        LuaValue::Number(srgb::linear_to_gamma(g) as f64),
-                        LuaValue::Number(srgb::linear_to_gamma(b) as f64),
+                        LuaValue::Number(color::linear_to_gamma(r) as f64),
+                        LuaValue::Number(color::linear_to_gamma(g) as f64),
+                        LuaValue::Number(color::linear_to_gamma(b) as f64),
                     ];
                     if let Some(a) = args.get(3).and_then(|v| v.as_f32()) {
                         result.push(LuaValue::Number(a as f64)); // alpha passed through
@@ -2173,7 +2173,7 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
         })?,
     )?;
 
-    // ── Noise ──────────────────────────────────────────────────────────
+    // â”€â”€ Noise â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     /// Returns a smooth noise value (1D, 2D, or 3D).
     math_api.set(
         "noise",
@@ -2192,7 +2192,7 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
         )?,
     )?;
 
-    // ── Easing ─────────────────────────────────────────────────────────
+    // â”€â”€ Easing â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     /// Applies an easing function to t in [0,1].
     math_api.set(
         "ease",
@@ -2202,11 +2202,11 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
         })?,
     )?;
 
-    // ── Basic math functions (existing) ────────────────────────────────
+    // â”€â”€ Basic math functions (existing) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     /// Returns the sine of the given angle in radians.
     ///
     /// # Parameters
-    /// - `angle` — Angle in radians.
+    /// - `angle` â€” Angle in radians.
     ///
     /// # Returns
     /// Sine value in the range [-1, 1].
@@ -2214,7 +2214,7 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
     /// Returns the cosine of the given angle in radians.
     ///
     /// # Parameters
-    /// - `angle` — Angle in radians.
+    /// - `angle` â€” Angle in radians.
     ///
     /// # Returns
     /// Cosine value in the range [-1, 1].
@@ -2222,7 +2222,7 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
     /// Returns the tangent of the given angle in radians.
     ///
     /// # Parameters
-    /// - `angle` — Angle in radians.
+    /// - `angle` â€” Angle in radians.
     ///
     /// # Returns
     /// Tangent value.
@@ -2230,8 +2230,8 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
     /// Returns the angle in radians between the positive x-axis and (y, x).
     ///
     /// # Parameters
-    /// - `y` — Y component.
-    /// - `x` — X component.
+    /// - `y` â€” Y component.
+    /// - `x` â€” X component.
     ///
     /// # Returns
     /// Angle in radians in the range (-pi, pi].
@@ -2242,7 +2242,7 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
     /// Returns the positive square root of x.
     ///
     /// # Parameters
-    /// - `x` — Non-negative input number.
+    /// - `x` â€” Non-negative input number.
     ///
     /// # Returns
     /// sqrt(x) as a number.
@@ -2250,7 +2250,7 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
     /// Returns the absolute (non-negative) value of x.
     ///
     /// # Parameters
-    /// - `x` — Input number.
+    /// - `x` â€” Input number.
     ///
     /// # Returns
     /// abs(x) as a number.
@@ -2258,7 +2258,7 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
     /// Returns the largest integer less than or equal to x (rounds down).
     ///
     /// # Parameters
-    /// - `x` — Input number.
+    /// - `x` â€” Input number.
     ///
     /// # Returns
     /// floor(x) as an integer.
@@ -2266,7 +2266,7 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
     /// Returns the smallest integer greater than or equal to x (rounds up).
     ///
     /// # Parameters
-    /// - `x` — Input number.
+    /// - `x` â€” Input number.
     ///
     /// # Returns
     /// ceil(x) as an integer.
@@ -2274,7 +2274,7 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
     /// Returns the smallest value from the given list of numbers.
     ///
     /// # Parameters
-    /// - `...` — One or more numeric arguments.
+    /// - `...` â€” One or more numeric arguments.
     ///
     /// # Returns
     /// The minimum value.
@@ -2285,7 +2285,7 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
     /// Returns the largest value from the given list of numbers.
     ///
     /// # Parameters
-    /// - `...` — One or more numeric arguments.
+    /// - `...` â€” One or more numeric arguments.
     ///
     /// # Returns
     /// The maximum value.
@@ -2318,7 +2318,7 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
     /// Normalizes an angle in radians into the canonical range [-pi, pi].
     ///
     /// # Parameters
-    /// - `angle` — Angle in radians.
+    /// - `angle` â€” Angle in radians.
     ///
     /// # Returns
     /// Equivalent angle in the range [-pi, pi].
@@ -2335,15 +2335,15 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
     )?;
 
 
-    // ── Functions merged from math_ext_api ──────────────────────────────
+    // â”€â”€ Functions merged from math_ext_api â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-    // ── Factory functions ──────────────────────────────────────────────
+    // â”€â”€ Factory functions â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     /// Creates a new 2-component vector object with x and y fields.
     ///
     /// # Parameters
-    /// - `x` — X component (default 0).
-    /// - `y` — Y component (default 0).
+    /// - `x` â€” X component (default 0).
+    /// - `y` â€” Y component (default 0).
     ///
     /// # Returns
     /// New Vec2 object.
@@ -2357,14 +2357,14 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
         })?,
     )?;
 
-    /// Standalone simplex noise: returns a value in approximately `[-1, 1]` for 1–3 coordinates.
+    /// Standalone simplex noise: returns a value in approximately `[-1, 1]` for 1â€“3 coordinates.
     ///
     /// Equivalent to calling `luna.math.newNoiseGenerator(0):simplexNoise(...)`.
     ///
     /// # Parameters
-    /// - `x` — X coordinate.
-    /// - `y` — Y coordinate (optional, defaults to 0).
-    /// - `z` — Z coordinate (optional; enables 3-D mode).
+    /// - `x` â€” X coordinate.
+    /// - `y` â€” Y coordinate (optional, defaults to 0).
+    /// - `z` â€” Z coordinate (optional; enables 3-D mode).
     ///
     /// # Returns
     /// Noise value in approximately `[-1.0, 1.0]`.
@@ -2393,7 +2393,7 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
     /// Creates a reusable Perlin/simplex noise generator with a given seed.
     ///
     /// # Parameters
-    /// - `seed` — Integer seed for the noise generator.
+    /// - `seed` â€” Integer seed for the noise generator.
     ///
     /// # Returns
     /// New NoiseGenerator object.
@@ -2421,7 +2421,7 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
     /// Creates a spatial hash grid for fast broad-phase proximity and overlap queries.
     ///
     /// # Parameters
-    /// - `cellSize` — Width and height of each hash cell in world units.
+    /// - `cellSize` â€” Width and height of each hash cell in world units.
     ///
     /// # Returns
     /// New SpatialHash object.
@@ -2472,7 +2472,7 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
         })?,
     )?;
 
-    // ── Geometry functions (14) ────────────────────────────────────────
+    // â”€â”€ Geometry functions (14) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     /// luna.math.angleBetween(x1, y1, x2, y2)
     #[allow(unused_doc_comments)]
@@ -2543,7 +2543,7 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
     /// Returns the signed area of a simple polygon described by its vertex list.
     ///
     /// # Parameters
-    /// - `vertices` — Table of {x, y} tables or flat coordinate array.
+    /// - `vertices` â€” Table of {x, y} tables or flat coordinate array.
     ///
     /// # Returns
     /// Signed area as a number (negative if clockwise, positive if counter-clockwise).
@@ -2634,7 +2634,7 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
     /// Computes and returns the convex hull of a set of 2D points as an ordered vertex list.
     ///
     /// # Parameters
-    /// - `points` — Table of {x, y} point tables or flat coordinate array.
+    /// - `points` â€” Table of {x, y} point tables or flat coordinate array.
     ///
     /// # Returns
     /// Ordered table of {x, y} hull vertex tables (counter-clockwise).
@@ -2671,7 +2671,7 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
         })?,
     )?;
 
-    // ── Raycasting functions (4) ───────────────────────────────────────
+    // â”€â”€ Raycasting functions (4) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     /// luna.math.castRay2D(ox, oy, dx, dy, maxDist, segments)
     #[allow(unused_doc_comments)]
@@ -2724,7 +2724,7 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
         })?,
     )?;
 
-    // ── Procedural generation functions (5) ────────────────────────────
+    // â”€â”€ Procedural generation functions (5) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     /// luna.math.cellularAutomata(width, height, opts)
     #[allow(unused_doc_comments)]
@@ -2865,3 +2865,4 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
     luna.set("math", math_api)?;
     Ok(())
 }
+

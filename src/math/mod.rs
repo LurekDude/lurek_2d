@@ -28,14 +28,10 @@ pub mod polygon;
 
 /// Seedable random number generator for reproducible sequences.
 pub mod random;
-/// 2D raycasting and visibility utility functions.
-pub mod raycasting;
 /// Axis-aligned rectangle with intersection and containment queries.
 pub mod rect;
 /// Spatial hash for efficient broad-phase AABB collision queries.
 pub mod spatial_hash;
-/// sRGB gamma ↔ linear color space conversion.
-pub mod srgb;
 /// 2D affine transform with chainable methods wrapping Mat3.
 pub mod transform;
 /// Value interpolator with easing curves.
@@ -44,13 +40,11 @@ pub mod tween;
 pub mod vec2;
 
 pub use bezier::BezierCurve;
-pub use color::Color;
+pub use color::{gamma_to_linear, linear_to_gamma, Color};
 pub use geometry::*;
 pub use mat3::Mat3;
 pub use noise::NoiseGenerator;
 pub use random::RandomGenerator;
-pub use raycasting::{cast_ray_2d, distance_shade, field_of_view, project_column, Segment};
-pub use raycasting::{RayHit, Raycaster2D, SpriteProjection};
 pub use rect::Rect;
 pub use spatial_hash::SpatialHash;
 pub use transform::Transform;

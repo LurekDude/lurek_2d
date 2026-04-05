@@ -61,7 +61,7 @@ NavGrid / PathGrid (base cost grid)
   │     ├── Request queue: (id, start, goal)
   │     └── poll() → Option<(id, Vec<Waypoint>)>
   │
-  └── ProvincePath (province_path.rs)
+  └── ProvincePath (graph_path.rs)
         ├── Operates on ProvinceMap adjacency graph
         ├── Centroid distance heuristic for A★
         └── Dijkstra reachability within cost budget
@@ -78,7 +78,8 @@ NavGrid / PathGrid (base cost grid)
 | `hpa.rs` | Hierarchical Pathfinding A★ (HPA★) for fast long-range queries |
 | `nav_grid.rs` | Navigation grid with per-cell traversal costs and diagonal movement modes |
 | `pathgrid.rs` | Weighted grid pathfinding (A*, Dijkstra) with obstacle support |
-| `province_path.rs` | Province-level pathfinding on an adjacency graph using A* and Dijkstra |
+| `graph_path.rs` | Adjacency-graph pathfinding (A★ and Dijkstra) for province maps and sparse neighbor topologies |
+| `influence_map.rs` | Multi-layer spatial float grid for strategic area analysis and influence mapping (moved from `src/ai/`) |
 | `unit_pathfinder.rs` | Unit-aware pathfinder with result caching and convenience methods |
 
 ## Submodules
@@ -136,14 +137,14 @@ Weighted grid pathfinding (A*, Dijkstra) with obstacle support.
 - **`Cell`** (struct): Single cell of the navigation grid. Consult the module-level documentation for the broader usage context and...
 - **`PathGrid`** (struct): A★ navigation grid. Consult the module-level documentation for the broader usage context and preconditions.
 
-### `pathfinding::province_path`
+### `pathfinding::graph_path`
 
-Province-level pathfinding on an adjacency graph using A* and Dijkstra.
+Adjacency-graph pathfinding (A★ and Dijkstra) for province maps and any sparse neighbor topology.
 
-- **`ProvincePath`** (struct): A path through the province adjacency graph.
-- **`ProvinceCostFn`** (struct): Configurable cost function for province pathfinding.  `tag_costs` adds extra cost when crossing an edge with matching...
-- **`find_province_path`** (fn): Find a path between two provinces using A* with centroid distance heuristic.
-- **`province_reachable`** (fn): Find all provinces reachable from `start` within a cost budget using Dijkstra.  Returns a map of `province_id →...
+- **`ProvincePath`** (struct): A path through the adjacency graph.
+- **`ProvinceCostFn`** (struct): Configurable cost function for graph pathfinding.  `tag_costs` adds extra cost when crossing an edge with matching tags.
+- **`find_province_path`** (fn): Find a path between two nodes using A* with centroid distance heuristic.
+- **`province_reachable`** (fn): Find all nodes reachable from `start` within a cost budget using Dijkstra.  Returns a map of `node_id →...
 
 ### `pathfinding::unit_pathfinder`
 
@@ -151,6 +152,14 @@ Unit-aware pathfinder with result caching and convenience methods.
 
 - **`Waypoint`** (struct): A waypoint along a computed path. Consult the module-level documentation for the broader usage context and...
 - **`UnitPathfinder`** (struct): A pathfinder that operates on a shared `NavGrid` with optional result caching.
+
+
+### `pathfinding::influence_map`
+
+Multi-layer spatial float grid for strategic area analysis and influence mapping.
+Moved here from `src/ai/influence_map.rs`; re-exported as `crate::ai::InfluenceMap` for backward compatibility.
+
+- **`InfluenceMap`** (struct): A multi-layer spatial float grid for influence mapping and strategic reasoning.  The grid has fixed dimensions (`width × height`) and named float layers; each layer supports `stamp`, `propagate`, and `decay` operations.
 
 ## Key Types
 
@@ -184,6 +193,10 @@ BFS flow field that stores normalized direction vectors toward a goal.
 
 A pre-computed flow field that stores a direction vector and integrated cost for every cell, guiding any unit toward...
 
+#### `pathfinding::influence_map::InfluenceMap`
+
+A multi-layer spatial float grid for influence mapping and strategic reasoning. Moved from `src/ai/influence_map.rs`.
+
 #### `pathfinding::nav_grid::NavGrid`
 
 A 2D grid of traversal costs used by pathfinding algorithms.  Cells are addressed with 0-based `(x, y)` coordinates in...
@@ -196,13 +209,13 @@ A★ navigation grid. Consult the module-level documentation for the broader usa
 
 A pool of worker threads that process pathfinding requests asynchronously.
 
-#### `pathfinding::province_path::ProvinceCostFn`
+#### `pathfinding::graph_path::ProvinceCostFn`
 
-Configurable cost function for province pathfinding.  `tag_costs` adds extra cost when crossing an edge with matching...
+Configurable cost function for graph pathfinding. `tag_costs` adds extra cost when crossing an edge with matching tags.
 
-#### `pathfinding::province_path::ProvincePath`
+#### `pathfinding::graph_path::ProvincePath`
 
-A path through the province adjacency graph.
+A path through the adjacency graph.
 
 #### `pathfinding::unit_pathfinder::UnitPathfinder`
 
@@ -228,11 +241,11 @@ A completed path result returned by [`PathThreadPool::poll`].
 
 - **`astar()`** `astar::` — Run A★ search on `grid` from `start` to `goal`.
 - **`build_abstract()`** `hpa::` — Build the abstract graph from a `NavGrid`.
-- **`find_province_path()`** `province_path::` — Find a path between two provinces using A* with centroid distance heuristic.
+- **`find_province_path()`** `graph_path::` — Find a path between two nodes using A* with centroid distance heuristic.
 - **`hpa_star()`** `hpa::` — Run HPA★ from `start` to `goal` on the abstract graph, then refine to tiles.
 - **`is_reachable()`** `hpa::` — Check if `goal` is reachable from `start` using the abstract graph.
 - **`line_of_sight()`** `astar::` — Check line-of-sight between two cells using Bresenham's algorithm,
-- **`province_reachable()`** `province_path::` — Find all provinces reachable from `start` within a cost budget using Dijkstra.  Returns a map of `province_id →...
+- **`province_reachable()`** `graph_path::` — Find all nodes reachable from `start` within a cost budget using Dijkstra.
 - **`smooth_path()`** `astar::` — Smooth a path by removing unnecessary waypoints via line-of-sight checks
 
 ## Lua API
@@ -245,8 +258,8 @@ Exposed under `luna.pathfinding.*` by `src/lua_api/pathfinding_api/`.
 |------|-------|
 | `enum` | 1 |
 | `fn` | 8 |
-| `mod` | 9 |
-| `struct` | 14 |
+| `mod` | 11 |
+| `struct` | 15 |
 | `type` | 1 |
-| **Total** | **33** |
+| **Total** | **36** |
 

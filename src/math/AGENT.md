@@ -60,9 +60,8 @@ math/
   │     └── color.rs ── gamma/linear conversion
   │
   ├── Spatial
-  │     ├── Grid ── 2D walkable grid with A*/Dijkstra/BFS
-  │     ├── SpatialHash ── spatial partitioning for broad-phase
-  │     └── Raycaster2D / raycasting.rs ── Wolfenstein-style raycasting
+  │     └── SpatialHash ── spatial partitioning for broad-phase
+  │         (Grid → src/pathfinding/; Raycaster2D → src/raycaster/)
   │
   ├── Tile navigation
   │     └── TileWalker ── grid-based first-person movement (Facing enum)
@@ -70,7 +69,7 @@ math/
   ├── Random
   │     └── RandomGenerator ── seeded PRNG with normal distribution
   │
-  └── (advanced pathfinding moved to src/pathfinding/)
+  └── (Raycaster2D/Segment/RayHit → src/raycaster/; procgen → src/procgen/; Grid → src/pathfinding/; TileWalker → src/tilemap/)
 ```
 
 ## Source Files
@@ -82,19 +81,13 @@ math/
 | `color.rs` | sRGB gamma ↔ linear color space conversion; Color type |
 | `easing.rs` | Standard easing functions for smooth animation and interpolation |
 | `geometry.rs` | 2D geometry utility functions |
-| `grid.rs` | 2D pathfinding grid with A*, Dijkstra, BFS, and flow field generation |
 | `mat3.rs` | Mat3 3×3 matrix for affine transforms |
 | `noise.rs` | 2D Perlin and Simplex noise generators for procedural content |
-| `noise_generator.rs` | Configurable multi-octave noise generator |
 | `polygon.rs` | Polygon utilities: ear-clipping triangulation and convexity testing |
-| `procgen.rs` | Procedural generation utility functions |
 | `random.rs` | Seedable random number generator for reproducible sequences |
-| `raycaster2d.rs` | Wolfenstein-style DDA grid raycaster (math layer) |
-| `raycasting.rs` | 2D raycasting and visibility utility functions |
 | `rect.rs` | Axis-aligned rectangle type |
 | `spatial_hash.rs` | Spatial hash for efficient broad-phase AABB collision queries |
 | `srgb.rs` | sRGB ↔ linear color space utilities |
-| `tile_walker.rs` | Grid-based first-person movement with Facing enum |
 | `transform.rs` | 2D affine transform wrapping Mat3 with chainable methods |
 | `tween.rs` | Value interpolator with easing curves |
 | `vec2.rs` | 2D vector type (x, y: f32) |
@@ -206,19 +199,6 @@ Seedable random number generator for reproducible sequences.
 
 - **`RandomGenerator`** (struct): Seedable random number generator exposed as a Lua object.  Wraps `fastrand::Rng` with engine-compatible API for...
 
-### `math::raycasting`
-
-2D raycasting and visibility utility functions.
-
-- **`Segment`** (struct): A line segment for raycasting. Consult the module-level documentation for the broader usage context and preconditions.
-- **`cast_ray_2d`** (fn): Casts a ray from (ox, oy) in direction (dx, dy) against a list of segments.
-- **`field_of_view`** (fn): Computes a visibility polygon by casting rays at segment endpoints.
-- **`project_column`** (fn): Projects a wall column distance to screen-space drawing parameters.
-- **`distance_shade`** (fn): Distance-based shading. Returns brightness in [0, 1].
-- **`RayHit`** (struct): Result of a single ray cast. Consult the module-level documentation for the broader usage context and preconditions.
-- **`SpriteProjection`** (struct): Sprite projection result. Consult the module-level documentation for the broader usage context and preconditions.
-- **`Raycaster2D`** (struct): 2D grid-based raycaster using DDA traversal.  The grid stores wall types as `u32` values: 0 = empty, >0 = wall....
-
 ### `math::rect`
 
 Rect implementation for the `math` subsystem.
@@ -266,14 +246,6 @@ Vec2 implementation for the `math` subsystem.
 
 A Bezier curve defined by control points.  Uses De Casteljau's algorithm for evaluation. Minimum 2 control points...
 
-#### `math::procgen::CellularOpts`
-
-Options for cellular automata generation.
-
-#### `math::grid::Grid`
-
-2D pathfinding grid with per-cell walkability and movement costs.  Supports A*, Dijkstra, and BFS pathfinding as well...
-
 #### `math::noise::MapGenOptions`
 
 Options for 2D noise map generation. Consult the module-level documentation for the broader usage context and...
@@ -290,21 +262,9 @@ Seeded procedural noise generator. Consult the module-level documentation for th
 
 Seedable random number generator exposed as a Lua object.  Wraps `fastrand::Rng` with engine-compatible API for...
 
-#### `math::raycasting::RayHit`
-
-Result of a single ray cast. Consult the module-level documentation for the broader usage context and preconditions.
-
-#### `math::raycasting::Raycaster2D`
-
-2D grid-based raycaster using DDA traversal.  The grid stores wall types as `u32` values: 0 = empty, >0 = wall....
-
 #### `math::rect::Rect`
 
 An axis-aligned rectangle defined by its top-left corner and dimensions.  Used for AABB collision detection, UI layout,...
-
-#### `math::raycasting::Segment`
-
-A line segment for raycasting. Consult the module-level documentation for the broader usage context and preconditions.
 
 #### `math::spatial_hash::SpatialHash`
 
@@ -313,10 +273,6 @@ Spatial hash for AABB queries. Consult the module-level documentation for the br
 #### `math::spatial_hash::SpatialItem`
 
 Entry in the spatial hash. Consult the module-level documentation for the broader usage context and preconditions.
-
-#### `math::raycasting::SpriteProjection`
-
-Sprite projection result. Consult the module-level documentation for the broader usage context and preconditions.
 
 #### `math::transform::Transform`
 
@@ -333,10 +289,6 @@ A start-to-target value pair for interpolation.
 #### `math::vec2::Vec2`
 
 A 2D floating-point vector used throughout the engine for positions, velocities, and directions.  Implements standard...
-
-#### `math::procgen::VoronoiOpts`
-
-Options for Voronoi diagram generation. Consult the module-level documentation for the broader usage context and...
 
 ### Enums
 
@@ -357,8 +309,6 @@ Noise algorithm kind used by fractal combinators.
 - **`angle_between()`** `geometry::` — Returns the angle in radians from (x1, y1) to (x2, y2).
 - **`apply()`** `easing::` — Looks up an easing function by name and applies it to progress value `t`.  Supported names (case-insensitive):...
 - **`bresenham()`** `geometry::` — Bresenham line rasterization from (x1, y1) to (x2, y2).
-- **`cast_ray_2d()`** `raycasting::` — Casts a ray from (ox, oy) in direction (dx, dy) against a list of segments.
-- **`cellular_automata()`** `procgen::` — Generates a cave/dungeon map using cellular automata.
 - **`circle_contains_point()`** `geometry::` — Returns true if the point (px, py) is inside the circle centered at (cx, cy) with radius r.
 - **`circle_intersects_circle()`** `geometry::` — Returns true if two circles overlap. Consult the module-level documentation for the broader usage context and...
 - **`circle_intersects_line()`** `geometry::` — Line-circle intersection. Returns (intersects, hit1, hit2).
@@ -366,7 +316,6 @@ Noise algorithm kind used by fractal combinators.
 - **`closest_point_on_segment()`** `geometry::` — Returns the closest point on a line segment to a given point.
 - **`convex_hull()`** `geometry::` — Computes the convex hull of a set of 2D points using Andrew's monotone chain algorithm.
 - **`delaunay_triangulate()`** `geometry::` — Delaunay triangulation using the Bowyer-Watson algorithm.
-- **`distance_shade()`** `raycasting::` — Distance-based shading. Returns brightness in [0, 1].
 - **`ease_in_back()`** `easing::` — Back ease-in — pulls back before accelerating past the start.
 - **`ease_in_bounce()`** `easing::` — Bounce ease-in — simulates a bouncing ball launching.
 - **`ease_in_cubic()`** `easing::` — Cubic ease-in — starts slow, accelerates sharply.
@@ -389,8 +338,6 @@ Noise algorithm kind used by fractal combinators.
 - **`ease_out_quart()`** `easing::` — Quartic ease-out — very slow end. Consult the module-level documentation for the broader usage context and...
 - **`ease_out_sine()`** `easing::` — Sinusoidal ease-out — gentle sine-based deceleration.
 - **`fbm()`** `noise::` — Generates fractal Brownian motion noise by layering multiple octaves of Perlin noise.
-- **`field_of_view()`** `raycasting::` — Computes a visibility polygon by casting rays at segment endpoints.
-- **`flood_fill()`** `procgen::` — BFS flood fill on a grid. Consult the module-level documentation for the broader usage context and preconditions.
 - **`gamma_to_linear()`** `srgb::` — Convert a single sRGB gamma-space color component to linear space.  Input and output in `[0.0, 1.0]`. Uses the standard...
 - **`is_convex()`** `polygon::` — Check if a polygon is convex. This accessor incurs no allocation; call it freely in hot paths.  Uses cross-product sign...
 - **`line_intersect()`** `geometry::` — Infinite line intersection. Returns the intersection point if lines are not parallel.
@@ -399,24 +346,20 @@ Noise algorithm kind used by fractal combinators.
 - **`perlin2d()`** `noise::` — Generates 2D Perlin noise at the given coordinates.
 - **`perlin3d()`** `noise::` — Generates 3D Perlin noise at the given coordinates.
 - **`perlin4d()`** `noise::` — Generates 4D Perlin noise at the given coordinates.
-- **`perlin_noise_periodic()`** `procgen::` — Periodic Perlin noise that tiles over period (px, py).
 - **`point_in_polygon()`** `geometry::` — Tests if a point is inside a polygon using the ray casting algorithm.
-- **`poisson_disk()`** `procgen::` — Generates Poisson disk sample points using Bridson's algorithm.
 - **`polygon_area()`** `geometry::` — Computes the signed area of a polygon using the Shoelace formula.
 - **`polygon_centroid()`** `geometry::` — Computes the centroid of a polygon. Consult the module-level documentation for the broader usage context and...
-- **`project_column()`** `raycasting::` — Projects a wall column distance to screen-space drawing parameters.
 - **`segment_intersects_segment()`** `geometry::` — Tests if two line segments intersect. Returns (intersects, intersection_point).
 - **`simplex2d()`** `noise::` — Generates 2D Simplex noise at the given coordinates.
 - **`triangulate()`** `polygon::` — Triangulate a simple polygon using the ear-clipping algorithm.
-- **`voronoi_diagram()`** `procgen::` — Generates a Voronoi diagram. Consult the module-level documentation for the broader usage context and preconditions.
 
 ## Item Summary
 
 | Kind | Count |
 |------|-------|
 | `enum` | 3 |
-| `fn` | 55 |
-| `mod` | 16 |
-| `struct` | 19 |
-| **Total** | **93** |
+| `fn` | 46 |
+| `mod` | 10 |
+| `struct` | 12 |
+| **Total** | **71** |
 

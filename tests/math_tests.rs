@@ -1,5 +1,5 @@
 use luna2d::math::{
-    bezier::BezierCurve, easing, noise, polygon, random::RandomGenerator, srgb,
+    bezier::BezierCurve, color, easing, noise, polygon, random::RandomGenerator,
     transform::Transform, Mat3, Rect, Vec2,
 };
 
@@ -660,8 +660,8 @@ fn polygon_is_convex_concave() {
 fn color_gamma_linear_roundtrip() {
     for i in 0..=10 {
         let gamma = i as f32 / 10.0;
-        let linear = srgb::gamma_to_linear(gamma);
-        let back = srgb::linear_to_gamma(linear);
+        let linear = color::gamma_to_linear(gamma);
+        let back = color::linear_to_gamma(linear);
         assert!(
             (back - gamma).abs() < 1e-4,
             "gamma roundtrip: {gamma} → {linear} → {back}"
@@ -671,7 +671,7 @@ fn color_gamma_linear_roundtrip() {
 
 #[test]
 fn color_gamma_to_linear_known_value() {
-    let linear = srgb::gamma_to_linear(0.5);
+    let linear = color::gamma_to_linear(0.5);
     assert!(
         (linear - 0.214).abs() < 0.01,
         "gammaToLinear(0.5) = {linear}, expected ~0.214"
@@ -680,8 +680,8 @@ fn color_gamma_to_linear_known_value() {
 
 #[test]
 fn color_linear_to_gamma_boundary() {
-    assert!((srgb::linear_to_gamma(0.0)).abs() < 1e-5);
-    assert!((srgb::linear_to_gamma(1.0) - 1.0).abs() < 1e-5);
+    assert!((color::linear_to_gamma(0.0)).abs() < 1e-5);
+    assert!((color::linear_to_gamma(1.0) - 1.0).abs() < 1e-5);
 }
 
 // ── 3D/4D noise tests ─────────────────────────────────────────────────

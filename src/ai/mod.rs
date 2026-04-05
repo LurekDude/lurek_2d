@@ -41,8 +41,8 @@
 //!
 //! ## Dependencies
 //!
-//! - [`pathgrid`] and [`flowfield`] are thin re-exports from `crate::pathfinding`
-//!   (a Tier 2 sibling — re-exported here so `luna.ai.*` has a unified surface).
+//! - `FlowField`, `Cell`, and `PathGrid` are re-exported directly from
+//!   `crate::pathfinding` so `luna.ai.*` has a unified surface.
 //! - All Lua callbacks are stored as `mlua::RegistryKey` references.
 //! - No heap allocation happens per-frame in steady state; vectors are grown at
 //!   agent/behavior creation time.
@@ -59,21 +59,12 @@ pub mod blackboard;
 /// RTS-style ordered command queue supporting enqueue, interrupt (push-front),
 /// replace, and cancel-if-interruptible operations for unit action scheduling.
 pub mod command_queue;
-/// Dijkstra-based flow field for efficient crowd pathfinding — re-exported
-/// from `crate::pathfinding::ai_flow_field`.
-pub mod flowfield;
 /// Finite state machine with named states (enter/update/exit callbacks) and
 /// priority-ordered guarded transitions evaluated each frame.
 pub mod fsm;
 /// Goal-Oriented Action Planning (GOAP) solver using A★ search over boolean
 /// world state to find optimal action sequences toward goals.
 pub mod goap;
-/// Multi-layer spatial float grid for influence mapping — supports stamping,
-/// diffusion propagation, decay, blending, and spatial queries.
-pub mod influence_map;
-/// Weighted grid pathfinding (A★, Dijkstra) with obstacle support — re-exported
-/// from `crate::pathfinding::pathgrid`.
-pub mod pathgrid;
 /// Tabular epsilon-greedy Q-learner for discrete-state reinforcement learning
 /// with Bellman updates, epsilon decay, and JSON serialization.
 pub mod qlearner;
@@ -94,11 +85,11 @@ pub use agent::{Agent, DecisionModel};
 pub use behavior_tree::{BTNode, BTStatus, BehaviorTree, ParallelPolicy};
 pub use blackboard::{Blackboard, BlackboardValue};
 pub use command_queue::{Command, CommandQueue};
-pub use flowfield::FlowField;
+pub use crate::pathfinding::ai_flow_field::FlowField;
 pub use fsm::{StateCallbacks, StateMachine, Transition};
 pub use goap::{GOAPAction, GOAPGoal, GOAPPlanner};
-pub use influence_map::InfluenceMap;
-pub use pathgrid::{Cell, PathGrid};
+pub use crate::pathfinding::InfluenceMap;
+pub use crate::pathfinding::pathgrid::{Cell, PathGrid};
 pub use qlearner::QLearner;
 pub use squad::{FormationType, Squad};
 pub use steering::*;

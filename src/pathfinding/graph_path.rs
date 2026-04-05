@@ -1,7 +1,8 @@
-//! Province-level pathfinding on an adjacency graph using A* and Dijkstra.
+//! Adjacency-graph pathfinding using A* and Dijkstra.
 //!
-//! Operates on abstract province graphs: neighbors, centroids, edge tags.
-//! Does not depend on `ProvinceMap` directly — accepts data via function arguments.
+//! Operates on abstract adjacency graphs: neighbors, centroids, and edge tags.
+//! Suitable for province maps, world-graph navigation, or any topology expressible
+//! as a sparse adjacency relation. Does not depend on grid or tile structures.
 
 use std::cmp::Ordering;
 use std::collections::{BinaryHeap, HashMap, HashSet};

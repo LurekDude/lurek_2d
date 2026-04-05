@@ -1,16 +1,16 @@
 //! Integration tests for Phase 25 math extension modules.
 //!
 //! Covers: NoiseGenerator, Grid, SpatialHash, Raycaster2D, TileWalker,
-//!         Tween, geometry, raycasting, procgen.
+//!         Tween, geometry, procgen. Raycasting types live in luna2d::raycaster.
 
 use luna2d::math::geometry;
 use luna2d::math::noise::{DistType, FractalType, MapGenOptions, NoiseGenerator, NoiseKind};
-use luna2d::math::raycasting::Raycaster2D;
-use luna2d::math::raycasting::{self, Segment};
 use luna2d::math::spatial_hash::SpatialHash;
 use luna2d::math::tween::Tween;
 use luna2d::pathfinding::grid::Grid;
 use luna2d::procgen::{self, CellularOpts, VoronoiOpts};
+use luna2d::raycaster::Raycaster2D;
+use luna2d::raycaster::{cast_ray_2d, distance_shade, field_of_view, project_column, Segment};
 use luna2d::tilemap::tile_walker::{Facing, TileWalker};
 
 // ═════════════════════════════════════════════════════════════════════════
@@ -918,7 +918,7 @@ fn test_cast_ray_2d() {
         }, // vertical wall at x=5
     ];
     // Ray from origin pointing right (+x direction)
-    let hit = raycasting::cast_ray_2d(0.0, 0.0, 1.0, 0.0, 100.0, &segments);
+    let hit = cast_ray_2d(0.0, 0.0, 1.0, 0.0, 100.0, &segments);
     assert!(hit.is_some(), "Should hit vertical wall");
     let (hx, hy, idx) = hit.unwrap();
     assert!((hx - 5.0).abs() < 1e-3, "Hit x should be ~5, got {hx}");
@@ -955,7 +955,7 @@ fn test_field_of_view() {
             y2: -5.0,
         },
     ];
-    let vis = raycasting::field_of_view(0.0, 0.0, &segments, 20.0);
+    let vis = field_of_view(0.0, 0.0, &segments, 20.0);
     // Should return x,y pairs forming a visibility polygon
     assert!(
         vis.len() >= 6,
@@ -971,20 +971,20 @@ fn test_field_of_view() {
 
 #[test]
 fn test_project_column() {
-    let (height, top, bottom) = raycasting::project_column(5.0, std::f32::consts::FRAC_PI_3, 480.0);
+    let (height, top, bottom) = project_column(5.0, std::f32::consts::FRAC_PI_3, 480.0);
     assert!(height > 0.0, "Column height should be positive");
     assert!(top < bottom, "Top should be above bottom");
     assert!(height.is_finite());
 
     // Closer distance → taller column
-    let (h_close, _, _) = raycasting::project_column(2.0, std::f32::consts::FRAC_PI_3, 480.0);
+    let (h_close, _, _) = project_column(2.0, std::f32::consts::FRAC_PI_3, 480.0);
     assert!(h_close > height, "Closer wall should be taller");
 }
 
 #[test]
 fn test_distance_shade() {
-    let shade_near = raycasting::distance_shade(1.0, 20.0);
-    let shade_far = raycasting::distance_shade(18.0, 20.0);
+    let shade_near = distance_shade(1.0, 20.0);
+    let shade_far = distance_shade(18.0, 20.0);
     assert!(shade_near > shade_far, "Near objects should be brighter");
     assert!(
         shade_near >= 0.0 && shade_near <= 1.0,
@@ -995,7 +995,7 @@ fn test_distance_shade() {
         "Shade should be [0,1], got {shade_far}"
     );
 
-    let shade_zero = raycasting::distance_shade(0.0, 20.0);
+    let shade_zero = distance_shade(0.0, 20.0);
     assert!(
         (shade_zero - 1.0).abs() < 1e-4,
         "Distance 0 → full brightness"
