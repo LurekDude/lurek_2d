@@ -1,0 +1,1 @@
+FogState { enabled: false, density: 0.3, color: [0.7, 0.7, 0.8, 1.0] }

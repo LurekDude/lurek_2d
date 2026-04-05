@@ -8,7 +8,11 @@ use luna2d::data::compress::{compress, decompress, CompressFormat};
 use luna2d::data::encode::{decode, encode, EncodeFormat};
 use luna2d::data::hash::{hash, HashAlgorithm};
 use luna2d::data::toml_convert::{encode_toml, parse_toml};
+use luna2d::fx::post::PostFxStack;
+use luna2d::fx::screen::atmosphere::{CloudState, FogState, HeatHazeState, VignetteState};
+use luna2d::fx::screen::{FadeState, FlashState, ShakeState, WeatherState};
 use luna2d::image::ImageData;
+use luna2d::raycaster::Raycaster2D;
 use std::fs;
 use std::path::Path;
 
@@ -239,4 +243,152 @@ types = ["goblin", "dragon", "skeleton"]
     let encoded = encode_toml(&parsed).unwrap();
     let reparsed = parse_toml(&encoded).unwrap();
     assert_eq!(parsed, reparsed);
+}
+
+// ===========================================================================
+// FX screen state defaults
+// ===========================================================================
+
+#[test]
+fn golden_fx_flash_state_default() {
+    let state = FlashState::default();
+    assert_golden_text("fx/flash_state_default.txt", &format!("{:?}", state));
+}
+
+#[test]
+fn golden_fx_shake_state_default() {
+    let state = ShakeState::default();
+    assert_golden_text("fx/shake_state_default.txt", &format!("{:?}", state));
+}
+
+#[test]
+fn golden_fx_fade_state_default() {
+    let state = FadeState::default();
+    assert_golden_text("fx/fade_state_default.txt", &format!("{:?}", state));
+}
+
+#[test]
+fn golden_fx_weather_state_default() {
+    let state = WeatherState::default();
+    let text = format!(
+        "weather_type={:?} intensity={} particle_count={} wind_direction={} wind_speed={}",
+        state.weather_type, state.intensity, state.particles.len(), state.wind_direction, state.wind_speed
+    );
+    assert_golden_text("fx/weather_state_default.txt", &text);
+}
+
+#[test]
+fn golden_fx_cloud_state_default() {
+    let state = CloudState::default();
+    assert_golden_text("fx/cloud_state_default.txt", &format!("{:?}", state));
+}
+
+#[test]
+fn golden_fx_fog_state_default() {
+    let state = FogState::default();
+    assert_golden_text("fx/fog_state_default.txt", &format!("{:?}", state));
+}
+
+#[test]
+fn golden_fx_heat_haze_state_default() {
+    let state = HeatHazeState::default();
+    assert_golden_text("fx/heat_haze_state_default.txt", &format!("{:?}", state));
+}
+
+#[test]
+fn golden_fx_vignette_state_default() {
+    let state = VignetteState::default();
+    assert_golden_text("fx/vignette_state_default.txt", &format!("{:?}", state));
+}
+
+#[test]
+fn golden_fx_postfx_stack_empty() {
+    let stack = PostFxStack::new(320, 240);
+    let text = format!(
+        "effects={} enabled={} width={} height={} capturing={}",
+        stack.effects.len(),
+        stack.enabled.len(),
+        stack.width,
+        stack.height,
+        stack.capturing
+    );
+    assert_golden_text("fx/postfx_stack_empty.txt", &text);
+}
+
+// ===========================================================================
+// Raycaster: deterministic ray cast results
+// ===========================================================================
+
+/// Build a 5×5 grid with a wall ring and an open center.
+///
+/// Layout (W=wall, .=empty):
+///   W W W W W
+///   W . . . W
+///   W . . . W
+///   W . . . W
+///   W W W W W
+fn make_enclosed_5x5() -> Raycaster2D {
+    let mut rc = Raycaster2D::new(5, 5);
+    for x in 0..5 {
+        rc.set_cell(x, 0, 1);
+        rc.set_cell(x, 4, 1);
+    }
+    for y in 0..5 {
+        rc.set_cell(0, y, 1);
+        rc.set_cell(4, y, 1);
+    }
+    rc
+}
+
+#[test]
+fn golden_raycaster_ray_hits_east_wall() {
+    let rc = make_enclosed_5x5();
+    // Origin: centre of inner area (2.5, 2.5), angle 0 = East (+x direction)
+    let hit = rc.cast_ray(2.5, 2.5, 0.0, 20.0).expect("ray must hit east wall");
+    let text = format!(
+        "hit={} cell_value={} side={} distance={:.4} tex_u={:.4} hit_x={:.4} hit_y={:.4}",
+        hit.hit, hit.cell_value, hit.side, hit.distance, hit.tex_u, hit.hit_x, hit.hit_y
+    );
+    assert_golden_text("raycaster/ray_east_wall.txt", &text);
+}
+
+#[test]
+fn golden_raycaster_ray_hits_north_wall() {
+    let rc = make_enclosed_5x5();
+    // Angle PI*1.5 points North (-y direction) in standard grid
+    let angle = -std::f32::consts::FRAC_PI_2;
+    let hit = rc.cast_ray(2.5, 2.5, angle, 20.0).expect("ray must hit north wall");
+    let text = format!(
+        "hit={} cell_value={} side={} distance={:.4} tex_u={:.4} hit_x={:.4} hit_y={:.4}",
+        hit.hit, hit.cell_value, hit.side, hit.distance, hit.tex_u, hit.hit_x, hit.hit_y
+    );
+    assert_golden_text("raycaster/ray_north_wall.txt", &text);
+}
+
+#[test]
+fn golden_raycaster_ray_miss_no_wall() {
+    // Empty 3×3 grid — ray must return None
+    let rc = Raycaster2D::new(3, 3);
+    let hit = rc.cast_ray(1.5, 1.5, 0.0, 0.5);
+    assert!(hit.is_none(), "ray in empty grid must miss");
+    assert_golden_text("raycaster/ray_empty_miss.txt", "hit=false");
+}
+
+#[test]
+fn golden_raycaster_multi_ray_column_distances() {
+    let rc = make_enclosed_5x5();
+    // Cast 5 rays from centre pointing East with slight spread (-2° to +2°)
+    let base_angle = 0.0_f32;
+    let fov_step = std::f32::consts::PI / 180.0 * 1.0; // 1 degree per step
+    let mut rows = Vec::new();
+    for i in 0..5 {
+        let angle = base_angle + (i as f32 - 2.0) * fov_step;
+        let dist = rc
+            .cast_ray(2.5, 2.5, angle, 20.0)
+            .map(|h| format!("{:.4}", h.distance))
+            .unwrap_or_else(|| "miss".to_string());
+        rows.push(dist);
+    }
+    let text = rows.join("\n");
+    assert_golden_text("raycaster/multi_ray_east_5col.txt", &text);
 }
