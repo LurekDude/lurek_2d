@@ -130,6 +130,7 @@ Defaults: `version` = `"1.0.0"`, `priority` = `0`, `enabled` = `true`, `loaded` 
 
 **Public functions:**
 - `new(id: impl Into<String>) -> Self` — Creates a `ModInfo` with sensible defaults.
+- `from_parts(id, name, version, author, description, priority, dependencies) -> Self` — Creates a fully-populated `ModInfo` in one call; used by `luna.modding.register` Lua API binding.
 
 #### `modding::mod_manager::ModManager`
 

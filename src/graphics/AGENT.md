@@ -255,6 +255,9 @@ Per-frame rendering statistics: draw calls, texture switches, canvas switches, s
 
 Custom geometry mesh with per-vertex position, UV, and color data. Supports optional index buffers and optional textures. Three draw modes: triangles, fan, strip.
 
+**Public functions:**
+- `from_vertex_rows(rows: &[[f32; 8]], mode: MeshDrawMode) -> Self` — Creates a `Mesh` from a slice of flat 8-element rows `[x, y, u, v, r, g, b, a]`; convenience constructor used by `luna.graphics.newMesh`.
+
 #### `graphics::mesh::MeshVertex`
 
 A single vertex in a mesh — position (x,y), UV (u,v), and RGBA color (r,g,b,a).
