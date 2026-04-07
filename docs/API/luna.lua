@@ -9,44 +9,47 @@ luna.ai = {}
 ---@class AIWorld
 local AIWorld = {}
 
---- Registers a new agent named `name` in this world and returns its handle.
----@param name string `string`: Unique identifier for the new agent.
----@return number
+--- Registers a new named agent and returns its handle.
+---@param name any
+---@return Agent
 function AIWorld:addAgent(name) end
 
---- Looks up a registered agent by name.
----@param name string `string`: Name of the agent to retrieve.
----@return number
+--- Returns the agent handle for the given name, or nil.
+---@param name any
+---@return Agent?
 function AIWorld:getAgent(name) end
 
---- Returns the number of agents currently registered in this world.
----@return number
+--- Returns the number of registered agents.
+---@return integer
 function AIWorld:getAgentCount() end
 
---- Returns a snapshot of the shared world-level blackboard.
----@return any
+--- Returns a snapshot of the world-level blackboard.
+---@return Blackboard
 function AIWorld:getGlobalBlackboard() end
 
---- Removes and destroys the given agent from this world.
----@param agent any `Agent`: Handle of the agent to remove, obtained from `addAgent`.
+--- Removes an agent by its userdata handle.
+---@param agent any
+---@return nil
 function AIWorld:removeAgent(agent) end
 
---- Advances all agents in the world by `dt` seconds, integrating velocity into position.
----@param dt number `number`: Elapsed seconds since the last frame.
+--- Advances all agents by dt seconds.
+---@param dt any
+---@return nil
 function AIWorld:update(dt) end
 
 ---@class Agent
 local Agent = {}
 
---- Adds a string tag to this agent's tag set (idempotent).
----@param tag string `string`: Tag to add.
+--- Adds a tag to this agent.
+---@param tag any
+---@return nil
 function Agent:addTag(tag) end
 
---- Returns this agent's private blackboard for reading or writing typed data.
----@return any
+--- Returns the agent's local blackboard.
+---@return Blackboard
 function Agent:getBlackboard() end
 
---- Returns the name of the agent's current decision model.
+--- Returns the name of the current decision model.
 ---@return string
 function Agent:getDecisionModel() end
 
@@ -54,562 +57,582 @@ function Agent:getDecisionModel() end
 ---@return number
 function Agent:getMaxForce() end
 
---- Returns the maximum movement speed cap in world units/second.
+--- Returns the maximum speed cap.
 ---@return number
 function Agent:getMaxSpeed() end
 
---- Returns the unique name this agent was registered under.
+--- Returns the agent's registered name.
 ---@return string
 function Agent:getName() end
 
---- Returns the agent's current world-space position.
----@return number
+--- Returns the agent's current position.
 ---@return number
 function Agent:getPosition() end
 
---- Returns the agent's scheduling priority level.
----@return number
+--- Returns the agent's scheduling priority.
+---@return integer
 function Agent:getPriority() end
 
---- Returns the agent's current velocity vector.
----@return number
+--- Returns the agent's current velocity.
 ---@return number
 function Agent:getVelocity() end
 
---- Returns `true` if this agent's tag set contains `tag`.
----@param tag string `string`: Tag to test.
+--- Returns true if the agent has the given tag.
+---@param tag any
 ---@return boolean
 function Agent:hasTag(tag) end
 
---- Removes a string tag from this agent's tag set (no-op if absent).
----@param tag string `string`: Tag to remove.
+--- Removes a tag from this agent.
+---@param tag any
+---@return nil
 function Agent:removeTag(tag) end
 
---- Switches the agent's active decision model at runtime. Valid values: `"fsm"`, `"bt"`, `"utility"`, `"goap"`.
----@param model string `string`: Decision model identifier.
+--- Sets the active decision model.
+---@param model any
+---@return nil
 function Agent:setDecisionModel(model) end
 
---- Sets the maximum steering force that can be applied per frame.
----@param v number `number`: New force cap.
+--- Sets the maximum steering force cap.
+---@param v any
+---@return nil
 function Agent:setMaxForce(v) end
 
---- Sets the maximum movement speed cap in world units/second.
----@param v number `number`: New speed limit (world units/sec).
+--- Sets the maximum speed cap.
+---@param v any
+---@return nil
 function Agent:setMaxSpeed(v) end
 
---- Teleports the agent to world-space coordinates (`x`, `y`).
----@param x number `number`: Horizontal world-space position.
----@param y number `number`: Vertical world-space position.
+--- Sets the agent's world-space position.
+---@param x any
+---@param y any
+---@return nil
 function Agent:setPosition(x, y) end
 
---- Sets the scheduling priority; higher-priority agents are processed first during `update`.
----@param p number `integer`: Priority value, higher = earlier processing.
+--- Sets the scheduling priority (higher = earlier).
+---@param p any
+---@return nil
 function Agent:setPriority(p) end
 
---- Sets the agent's velocity vector in world units per second.
----@param x number `number`: Horizontal component.
----@param y number `number`: Vertical component.
+--- Sets the agent's velocity vector.
+---@param x any
+---@param y any
+---@return nil
 function Agent:setVelocity(x, y) end
 
 ---@class BTNode
 local BTNode = {}
 
---- Adds child to the collection.
----@param child_ud any `userdata`.
+--- Adds a child node (Selector, Sequence, or Parallel only).
+---@param child_ud any
+---@return nil
 function BTNode:addChild(child_ud) end
 
---- Returns the child count.
----@return any
+--- Returns the number of direct children.
+---@return integer
 function BTNode:getChildCount() end
 
---- Returns the count.
----@return any
+--- Returns the repeat count, or 0 if not a Repeater.
+---@return integer
 function BTNode:getCount() end
 
---- Returns the node type.
----@return number
+--- Returns the node type as a string.
+---@return string
 function BTNode:getNodeType() end
 
---- Resets state to initial values.
----@param child_ud any `userdata`.
-function BTNode:reset(child_ud) end
+--- Resets all running-child memos and repeater counters.
+---@return nil
+function BTNode:reset() end
 
---- Sets the child.
----@param child_ud any `userdata`.
+--- Sets the single child of a decorator node.
+---@param child_ud any
+---@return nil
 function BTNode:setChild(child_ud) end
 
---- Sets the count.
----@param n number `integer`.
+--- Sets the repeat count for a Repeater node.
+---@param n any
+---@return nil
 function BTNode:setCount(n) end
 
---- Sets the failure policy.
----@param policy string `string`.
+--- Sets the failure policy for a Parallel node.
+---@param policy any
+---@return nil
 function BTNode:setFailurePolicy(policy) end
 
---- Sets the success policy.
----@param policy string `string`.
+--- Sets the success policy for a Parallel node.
+---@param policy any
+---@return nil
 function BTNode:setSuccessPolicy(policy) end
 
 ---@class BehaviorTree
 local BehaviorTree = {}
 
---- Returns the last status.
----@return any
+--- Returns the status from the last tick.
+---@return string
 function BehaviorTree:getLastStatus() end
 
---- Sets the top-level root node of this behavior tree.
----@param node number `BTNode`: Root `BTNode` returned by one of the node constructors.
-function BehaviorTree:setRoot(node) end
+--- Sets the root node of this behavior tree.
+---@param node_ud any
+---@return nil
+function BehaviorTree:setRoot(node_ud) end
 
 ---@class Blackboard
 local Blackboard = {}
 
---- Removes all entries from this blackboard.
+--- Removes all local entries.
+---@return nil
 function Blackboard:clear() end
 
---- Returns the keys.
----@return number
+--- Returns all local keys as a table.
+---@return table
 function Blackboard:getKeys() end
 
---- Returns the size.
+--- Returns the number of local entries.
 ---@return integer
 function Blackboard:getSize() end
 
---- Returns `true` if a value is stored under `key` in this blackboard.
----@param key string `string`: Key to check.
+--- Returns true if a value exists under the key.
+---@param key any
 ---@return boolean
 function Blackboard:has(key) end
 
---- Deletes the entry at `key` from this blackboard (no-op if absent).
----@param key string `string`: Key to delete.
+--- Removes the entry at key.
+---@param key any
+---@return nil
 function Blackboard:remove(key) end
 
---- Stores a boolean value under `key` on this blackboard.
----@param key string `string`: Key to write.
----@param value boolean `boolean`: Value to store.
+--- Stores a boolean under the given key.
+---@param key any
+---@param value any
+---@return nil
 function Blackboard:setBool(key, value) end
 
---- Stores a floating-point value under `key` on this blackboard.
----@param key string `string`: Key to write.
----@param value number `number`: Value to store.
+--- Stores a number under the given key.
+---@param key any
+---@param value any
+---@return nil
 function Blackboard:setNumber(key, value) end
 
---- Stores a string value under `key` on this blackboard.
----@param key string `string`: Key to write.
----@param value string `string`: Value to store.
+--- Stores a string under the given key.
+---@param key any
+---@param value any
+---@return nil
 function Blackboard:setString(key, value) end
 
 ---@class CommandQueue
 local CommandQueue = {}
 
---- Cancel current on this CommandQueue.
----@return any
+--- Cancels the front command if it is interruptible.
+---@return boolean
 function CommandQueue:cancelCurrent() end
 
 --- Discards all queued commands.
+---@return nil
 function CommandQueue:clear() end
 
---- Returns the count.
+--- Returns the number of queued commands.
 ---@return integer
 function CommandQueue:getCount() end
 
---- Returns the current target.
----@return any
+--- Returns the target coordinates of the front command.
+---@return number
 function CommandQueue:getCurrentTarget() end
 
---- Returns the current type.
----@return number
+--- Returns the kind of the front command, or nil.
+---@return string?
 function CommandQueue:getCurrentType() end
 
---- Returns `true` if there are no commands queued.
+--- Returns true if there are no queued commands.
 ---@return boolean
 function CommandQueue:isEmpty() end
 
 ---@class GOAPPlanner
 local GOAPPlanner = {}
 
---- Returns the action count.
+--- Returns the number of registered actions.
 ---@return integer
 function GOAPPlanner:getActionCount() end
 
---- Returns the goal count.
+--- Returns the number of registered goals.
 ---@return integer
 function GOAPPlanner:getGoalCount() end
 
 ---@class InfluenceMap
 local InfluenceMap = {}
 
---- Adds a named influence layer to this map.
----@param name string `string`: Layer identifier.
+--- Adds a named influence layer.
+---@param name any
+---@return nil
 function InfluenceMap:addLayer(name) end
 
---- Clear all on this InfluenceMap.
----@param layer string `string`.
-function InfluenceMap:clearAll(layer) end
+--- Clears all layers.
+---@return nil
+function InfluenceMap:clearAll() end
 
---- Clear layer on this InfluenceMap.
----@param layer string `string`.
+--- Clears all influence in a layer.
+---@param layer any
+---@return nil
 function InfluenceMap:clearLayer(layer) end
 
---- Decay on this InfluenceMap.
----@param layer string `string`.
----@param factor number `number`.
+--- Multiplies all influences by a decay factor.
+---@param layer any
+---@param factor any
+---@return nil
 function InfluenceMap:decay(layer, factor) end
 
---- Returns the cell size.
----@return any
+--- Returns the cell size in world units.
+---@return number
 function InfluenceMap:getCellSize() end
 
---- Returns the height.
----@return number
+--- Returns the grid height.
+---@return integer
 function InfluenceMap:getHeight() end
 
---- Returns the max position.
----@param layer string `string`.
+--- Returns the world-space position of the maximum value.
+---@param layer any
 ---@return number
 function InfluenceMap:getMaxPosition(layer) end
 
---- Returns the min position.
----@param layer string `string`.
----@param wx number `number`.
----@param wy number `number`.
----@param ww number `number`.
----@param wh number `number`.
----@return any
-function InfluenceMap:getMinPosition(layer, wx, wy, ww, wh) end
-
---- Returns the width.
+--- Returns the world-space position of the minimum value.
+---@param layer any
 ---@return number
+function InfluenceMap:getMinPosition(layer) end
+
+--- Returns the grid width.
+---@return integer
 function InfluenceMap:getWidth() end
 
---- Returns `true` if a layer with `name` exists in this map.
----@param name string `string`: Layer identifier to test.
+--- Returns true if the named layer exists.
+---@param name any
 ---@return boolean
 function InfluenceMap:hasLayer(name) end
 
 ---@class QLearner
 local QLearner = {}
 
---- Returns the action with the highest Q-value for `state`.
----@param state string `string`: State to query.
----@return string
+--- Returns the greedy-best action for the state (1-based).
+---@param state any
+---@return integer
 function QLearner:bestAction(state) end
 
---- Choose action on this QLearner.
----@param state number `integer`.
----@return any
+--- Selects an action using epsilon-greedy policy (1-based).
+---@param state any
+---@return integer
 function QLearner:chooseAction(state) end
 
---- Populates this object from a serialized string.
----@param json string `string`.
+--- Restores the Q-table from a JSON string.
+---@param json any
+---@return nil
 function QLearner:deserialize(json) end
 
---- End episode on this QLearner.
----@return any
+--- Ends the current episode, applying epsilon decay.
+---@return nil
 function QLearner:endEpisode() end
 
---- Returns the action count.
----@param v number `number`.
----@return any
-function QLearner:getActionCount(v) end
+--- Returns the number of discrete actions.
+---@return integer
+function QLearner:getActionCount() end
 
---- Returns the best action.
----@param state number `integer`.
----@param action number `integer`.
----@param reward number `number`.
----@param next_state number `integer`.
----@return any
-function QLearner:getBestAction(state, action, reward, next_state) end
+--- Returns the current discount factor.
+---@return number
+function QLearner:getDiscountFactor() end
 
---- Returns the discount factor.
----@param v number `number`.
----@return any
-function QLearner:getDiscountFactor(v) end
-
---- Returns the episode count.
----@return any
+--- Returns the number of completed episodes.
+---@return integer
 function QLearner:getEpisodeCount() end
 
---- Returns the exploration decay.
+--- Returns the epsilon decay multiplier.
 ---@return number
 function QLearner:getExplorationDecay() end
 
---- Returns the exploration rate.
----@param v number `number`.
+--- Returns the current exploration rate.
 ---@return number
-function QLearner:getExplorationRate(v) end
+function QLearner:getExplorationRate() end
 
---- Returns the learning rate.
----@param v number `number`.
----@return any
-function QLearner:getLearningRate(v) end
+--- Returns the current learning rate.
+---@return number
+function QLearner:getLearningRate() end
 
---- Returns the q value.
----@param state number `integer`.
----@param action number `integer`.
----@return any
+--- Returns the Q-value for a state-action pair (1-based).
+---@param state any
+---@param action any
+---@return number
 function QLearner:getQValue(state, action) end
 
---- Returns the state count.
----@return any
+--- Returns the number of discrete states.
+---@return integer
 function QLearner:getStateCount() end
 
---- Serializes this object to a string representation.
----@param json string `string`.
----@return any
-function QLearner:serialize(json) end
+--- Serializes the Q-table to a JSON string.
+---@return string
+function QLearner:serialize() end
 
---- Sets the discount factor.
----@param v number `number`.
+--- Sets the discount factor gamma.
+---@param v any
+---@return nil
 function QLearner:setDiscountFactor(v) end
 
---- Sets the exploration decay.
----@param v number `number`.
+--- Sets the epsilon decay multiplier.
+---@param v any
+---@return nil
 function QLearner:setExplorationDecay(v) end
 
---- Sets the exploration rate.
----@param v number `number`.
+--- Sets the exploration rate epsilon.
+---@param v any
+---@return nil
 function QLearner:setExplorationRate(v) end
 
---- Sets the learning rate.
----@param v number `number`.
+--- Sets the learning rate alpha.
+---@param v any
+---@return nil
 function QLearner:setLearningRate(v) end
 
 ---@class Squad
 local Squad = {}
 
---- Adds an agent identified by `name` to this squad.
----@param name string `string`: Name of the agent to enlist.
+--- Adds an agent by name to this squad.
+---@param name any
+---@return nil
 function Squad:addMember(name) end
 
---- Returns the blackboard.
----@return any
+--- Returns the squad's shared blackboard.
+---@return Blackboard
 function Squad:getBlackboard() end
 
---- Returns the formation.
----@return any
+--- Returns the current formation type name.
+---@return string
 function Squad:getFormation() end
 
---- Returns the formation spacing.
----@param member_idx number `integer`.
----@param leader_x number `number`.
----@param leader_y number `number`.
----@return any
-function Squad:getFormationSpacing(member_idx, leader_x, leader_y) end
-
---- Returns the leader.
----@param ftype string `string`.
----@param spacing? number `number` optional.
----@return any
-function Squad:getLeader(ftype, spacing) end
-
---- Returns the number of agents currently in this squad.
+--- Returns the formation spacing in world units.
 ---@return number
+function Squad:getFormationSpacing() end
+
+--- Returns the leader name, or nil.
+---@return string?
+function Squad:getLeader() end
+
+--- Returns the number of squad members.
+---@return integer
 function Squad:getMemberCount() end
 
---- Returns the members.
+--- Returns the member names as a table.
 ---@return table
 function Squad:getMembers() end
 
---- Returns the name.
----@param name string `string`.
----@return any
-function Squad:getName(name) end
+--- Returns the squad name.
+---@return string
+function Squad:getName() end
 
---- Removes the agent identified by `name` from this squad.
----@param name string `string`: Name of the agent to remove.
+--- Removes an agent by name from this squad.
+---@param name any
+---@return nil
 function Squad:removeMember(name) end
 
---- Sets the leader.
----@param name string `string`.
+--- Sets the squad leader by name.
+---@param name any
+---@return nil
 function Squad:setLeader(name) end
 
 ---@class StateMachine
 local StateMachine = {}
 
---- Registers a new named state in this FSM.
----@param name string `string`: Unique name for the state.
-function StateMachine:addState(name) end
+--- Registers a named state with optional lifecycle callbacks.
+---@param name any
+---@param opts any
+---@return nil
+function StateMachine:addState(name, opts) end
 
---- Force state on this StateMachine.
----@param name string `string`.
+--- Forces a transition to the named state.
+---@param name any
+---@return nil
 function StateMachine:forceState(name) end
 
---- Returns the current state.
----@param name string `string`.
----@return any
-function StateMachine:getCurrentState(name) end
+--- Returns the current state name, or nil.
+---@return string?
+function StateMachine:getCurrentState() end
 
---- Returns the time in state.
----@return any
+--- Returns seconds spent in the current state.
+---@return number
 function StateMachine:getTimeInState() end
 
 --- Sets the initial state.
----@param name string `string`.
+---@param name any
+---@return nil
 function StateMachine:setInitialState(name) end
 
 ---@class SteeringManager
 local SteeringManager = {}
 
---- Returns the behavior count.
----@param mode string `string`.
+--- Returns the number of active behaviors.
 ---@return integer
-function SteeringManager:getBehaviorCount(mode) end
+function SteeringManager:getBehaviorCount() end
 
---- Returns the combine mode.
+--- Returns the current combination mode.
 ---@return string
 function SteeringManager:getCombineMode() end
 
---- Returns the last steering.
----@return any
+--- Returns the last computed steering force.
+---@return number
 function SteeringManager:getLastSteering() end
 
---- Sets the combine mode.
----@param mode string `string`.
+--- Sets the force combination mode.
+---@param mode any
+---@return nil
 function SteeringManager:setCombineMode(mode) end
 
 ---@class UtilityAI
 local UtilityAI = {}
 
---- Evaluates all conditions and returns a decision.
----@return any
+--- Evaluates all actions and returns the best action name, or nil.
+---@return string?
 function UtilityAI:evaluate() end
 
---- Returns the action count.
+--- Returns the number of registered actions.
 ---@return integer
 function UtilityAI:getActionCount() end
 
---- Returns the last action.
----@return any
+--- Returns the name of the last chosen action, or nil.
+---@return string?
 function UtilityAI:getLastAction() end
 
---- New action.
+--- Creates a BT action leaf with a Lua callback.
 ---@param callback any
----@return any
+---@return BTNode
 function luna.ai.newAction(callback) end
 
---- New behavior tree.
----@return any
+--- Creates a new behavior tree.
+---@return BehaviorTree
 function luna.ai.newBehaviorTree() end
 
---- New blackboard.
----@return any
+--- Creates a new standalone blackboard.
+---@return Blackboard
 function luna.ai.newBlackboard() end
 
---- New command queue.
----@return any
+--- Creates an RTS-style command queue.
+---@return CommandQueue
 function luna.ai.newCommandQueue() end
 
---- New condition.
+--- Creates a BT condition leaf with a Lua predicate.
 ---@param callback any
----@return any
+---@return BTNode
 function luna.ai.newCondition(callback) end
 
---- New goap planner.
----@return any
+--- Creates a new GOAP planning solver.
+---@return GOAPPlanner
 function luna.ai.newGOAPPlanner() end
 
---- New influence map.
+--- Creates a multi-layer influence map grid.
 ---@param w any
 ---@param h any
 ---@param cs any
----@return any
+---@return InfluenceMap
 function luna.ai.newInfluenceMap(w, h, cs) end
 
---- New inverter.
----@return any
+--- Creates a BT inverter decorator.
+---@return BTNode
 function luna.ai.newInverter() end
 
---- New parallel.
+--- Creates a BT parallel node with optional policies.
 ---@param sp? any (optional)
 ---@param fp? any (optional)
----@return any
+---@return BTNode
 function luna.ai.newParallel(sp, fp) end
 
---- New q learner.
+--- Creates a tabular Q-learner.
 ---@param sc any
 ---@param ac any
----@return any
+---@return QLearner
 function luna.ai.newQLearner(sc, ac) end
 
---- New repeater.
+--- Creates a BT repeater decorator.
 ---@param count? any (optional)
----@return any
+---@return BTNode
 function luna.ai.newRepeater(count) end
 
---- New selector.
----@return any
+--- Creates a BT selector node.
+---@return BTNode
 function luna.ai.newSelector() end
 
---- New sequence.
----@return any
+--- Creates a BT sequence node.
+---@return BTNode
 function luna.ai.newSequence() end
 
---- New squad.
+--- Creates a named squad for formation positioning.
 ---@param name any
----@return any
+---@return Squad
 function luna.ai.newSquad(name) end
 
---- New state machine.
----@return any
+--- Creates a new finite state machine.
+---@return StateMachine
 function luna.ai.newStateMachine() end
 
---- New steering manager.
----@return any
+--- Creates a new steering behavior manager.
+---@return SteeringManager
 function luna.ai.newSteeringManager() end
 
---- New succeeder.
----@return any
+--- Creates a BT succeeder decorator.
+---@return BTNode
 function luna.ai.newSucceeder() end
 
---- New utility ai.
----@return any
+--- Creates a new utility AI evaluator.
+---@return UtilityAI
 function luna.ai.newUtilityAI() end
 
---- New world.
----@return any
+--- Creates a new AI world container.
+---@return AIWorld
 function luna.ai.newWorld() end
 
 ---@class luna.animation
 luna.animation = {}
 
---- Lua UserData wrapper for an [`Animation`] controller.
+--- Lua-side wrapper around an [`Animation`] controller.
 ---@class Animation
 local Animation = {}
 
---- Adds a single frame to the frame pool.
+--- Adds a single frame to the frame pool by source rectangle.
 ---@param x any
 ---@param y any
 ---@param w any
 ---@param h any
----@return number
+---@return integer
 function Animation:addFrame(x, y, w, h) end
 
---- Returns the name of the currently playing clip, or `nil`.
----@return string|nil
+--- Returns the name of the currently playing clip, or nil.
+---@return string?
 function Animation:getClip() end
 
---- Returns the total number of named clips.
----@return number
+--- Returns the number of registered clips.
+---@return integer
 function Animation:getClipCount() end
 
+--- Returns the current position within the active clip (0-based).
+---@return integer
+function Animation:getCurrentFrame() end
+
 --- Returns the total number of frames in the frame pool.
----@return number
+---@return integer
 function Animation:getFrameCount() end
 
---- Returns the source quad `{x, y, w, h}` for the current frame, or `nil`.
----@return table|nil
+--- Returns the source quad (x, y, w, h) for the current frame, or nil.
+---@return table?
 function Animation:getQuad() end
 
 --- Returns the playback speed multiplier.
 ---@return number
 function Animation:getSpeed() end
 
---- Returns `true` if a clip is currently playing.
+--- Returns true if the current clip is set to loop.
+---@return boolean
+function Animation:isLooping() end
+
+--- Returns true if a clip is currently playing.
 ---@return boolean
 function Animation:isPlaying() end
 
---- Starts playback of the named clip. Returns `true` if the clip exists.
+--- Pauses playback at the current frame.
+---@return nil
+function Animation:pause() end
+
+--- Starts playback of the named clip.
 ---@param name any
 ---@return boolean
 function Animation:play(name) end
@@ -618,322 +641,361 @@ function Animation:play(name) end
 ---@return table
 function Animation:pollEvents() end
 
+--- Resumes playback from the current frame.
+---@return nil
+function Animation:resume() end
+
+--- Sets the playback position within the current clip.
+---@param index any
+---@return nil
+function Animation:setFrame(index) end
+
 --- Sets the playback speed multiplier.
 ---@param speed any
+---@return nil
 function Animation:setSpeed(speed) end
 
---- Stops playback and clears the current clip.
+--- Stops playback and resets to frame 0.
+---@return nil
 function Animation:stop() end
 
---- Advances the animation by `dt` seconds.
+--- Advances the animation by dt seconds.
 ---@param dt any
+---@return nil
 function Animation:update(dt) end
 
---- Creates a new, empty [`Animation`] controller.
+--- Creates a new, empty Animation controller.
 ---@return Animation
 function luna.animation.new() end
 
 ---@class luna.audio
 luna.audio = {}
 
---- Lua UserData wrapper for an audio bus. Consult the module-level documentation for the broader usage context and preconditions.
+--- Lua-side wrapper for an audio bus resource.
 ---@class Bus
 local Bus = {}
 
---- Returns the name of this audio bus.
----@return any
+--- Returns the bus name.
+---@return string
 function Bus:getName() end
 
---- Returns the pitch multiplier of this bus.
----@return any
+--- Returns the bus pitch multiplier.
+---@return number
 function Bus:getPitch() end
 
---- Returns the current volume scale of this audio mixer bus.
+--- Returns the bus volume.
 ---@return number
 function Bus:getVolume() end
 
---- Returns whether this bus is currently paused.
----@return any
+--- Returns true if this bus is paused.
+---@return boolean
 function Bus:isPaused() end
 
---- Pauses all audio sources that are currently playing through this bus.
+--- Pauses all sources on this bus.
+---@return nil
 function Bus:pause() end
 
---- Resumes all paused sources on this bus.
+--- Resumes all sources on this bus.
+---@return nil
 function Bus:resume() end
 
 --- Sets the pitch multiplier for all sources on this bus.
 ---@param pitch any
+---@return nil
 function Bus:setPitch(pitch) end
 
---- Sets the volume for all sources routed to this bus.
+--- Sets the volume for all sources on this bus.
 ---@param vol any
+---@return nil
 function Bus:setVolume(vol) end
 
---- Lua UserData wrapper for a streaming audio `Decoder`.
+--- Lua-side wrapper for a streaming audio decoder.
 ---@class Decoder
 local Decoder = {}
 
---- Decode the next chunk of audio samples.
+--- Decodes the next chunk of samples, or nil at EOF.
 ---@return SoundData
 function Decoder:decode() end
 
---- Return the bit depth.
----@return any
+--- Returns the bit depth.
+---@return integer
 function Decoder:getBitDepth() end
 
---- Return the number of audio channels.
----@return any
+--- Returns the number of audio channels.
+---@return integer
 function Decoder:getChannelCount() end
 
---- Return the total duration in seconds.
----@return any
+--- Returns the total duration in seconds.
+---@return number
 function Decoder:getDuration() end
 
---- Return the sample rate in Hz.
----@return any
+--- Returns the sample rate in Hz.
+---@return integer
 function Decoder:getSampleRate() end
 
---- Returns whether this decoder supports seeking.
----@return number
+--- Returns true if seeking is supported.
+---@return boolean
 function Decoder:isSeekable() end
 
---- Release the decoder (no-op in the current model).
+--- Releases the decoder (no-op).
+---@return nil
 function Decoder:release() end
 
---- Rewind to the beginning.
+--- Rewinds to the beginning.
+---@return nil
 function Decoder:rewind() end
 
---- Seek to a time offset in seconds.
----@param offset any `f64`.
+--- Seeks to a time offset in seconds.
+---@param offset any
+---@return nil
 function Decoder:seek(offset) end
 
---- Return the current playback position in seconds.
----@return any
+--- Returns the current position in seconds.
+---@return number
 function Decoder:tell() end
 
---- Lua UserData wrapper for the MIDI player.
+--- Lua-side wrapper for the MIDI player.
 ---@class MidiPlayer
 local MidiPlayer = {}
 
---- Returns the audio bus that this MIDI player's output is routed through.
----@return any
+--- Returns the assigned bus, or nil.
+---@return Bus
 function MidiPlayer:getBus() end
 
---- Returns the number of MIDI channels present in the loaded sequence.
----@return number
+--- Returns the number of MIDI channels.
+---@return integer
 function MidiPlayer:getChannelCount() end
 
---- Returns the General MIDI instrument index for the given MIDI channel.
----@param channel number 1-based MIDI channel number (1-16).
----@return number
-function MidiPlayer:getChannelInstrument(channel) end
+--- Returns the GM instrument for a MIDI channel (1-indexed).
+---@param ch any
+---@return integer
+function MidiPlayer:getChannelInstrument(ch) end
 
---- Returns the current volume scale applied to the given MIDI channel.
----@param channel number 1-based MIDI channel number (1-16).
+--- Returns the volume for a MIDI channel (1-indexed).
+---@param ch any
 ---@return number
-function MidiPlayer:getChannelVolume(channel) end
+function MidiPlayer:getChannelVolume(ch) end
 
---- Returns the total duration of the audio source in seconds.
----@return any
+--- Returns the total MIDI duration in seconds.
+---@return number
 function MidiPlayer:getDuration() end
 
---- Returns the file path of the MIDI file currently loaded into the player.
+--- Returns the file path of the loaded MIDI, or nil.
 ---@return string
 function MidiPlayer:getFilePath() end
 
---- Returns the total number of note events in the loaded MIDI sequence.
----@return number
+--- Returns the total note count in the MIDI sequence.
+---@return integer
 function MidiPlayer:getNoteCount() end
 
---- Returns the original tempo written in the MIDI file, in beats per minute.
----@return any
+--- Returns the original MIDI file tempo in BPM.
+---@return number
 function MidiPlayer:getOriginalTempo() end
 
---- Returns the file path of the SoundFont (.sf2) currently loaded into the player.
+--- Returns the SoundFont file path, or nil (stub).
 ---@return string
 function MidiPlayer:getSoundFontPath() end
 
---- Returns the current playback tempo in beats per minute.
+--- Returns the current tempo in BPM.
 ---@return number
 function MidiPlayer:getTempo() end
 
---- Returns the current tempo scale factor applied on top of the original BPM.
+--- Returns the current tempo scale factor.
 ---@return number
 function MidiPlayer:getTempoScale() end
 
---- Returns the ticks-per-beat (PPQ) resolution defined in the MIDI file header.
----@return number
+--- Returns the PPQ resolution from the MIDI header.
+---@return integer
 function MidiPlayer:getTicksPerBeat() end
 
---- Returns the total number of tracks in the loaded MIDI sequence.
----@return number
+--- Returns the number of tracks in the MIDI sequence.
+---@return integer
 function MidiPlayer:getTrackCount() end
 
---- Returns the name string of the given MIDI track from the sequence metadata.
----@param track number 1-based track index.
+--- Returns the name of a MIDI track (1-indexed), or nil.
+---@param idx any
 ---@return string
-function MidiPlayer:getTrackName(track) end
+function MidiPlayer:getTrackName(idx) end
 
---- Returns the current volume of the audio source.
----@return any
+--- Returns the current MIDI volume.
+---@return number
 function MidiPlayer:getVolume() end
 
---- Returns whether the given MIDI channel is currently muted.
----@param channel number 1-based MIDI channel number (1-16).
+--- Returns true if a MIDI channel is muted (1-indexed).
+---@param ch any
 ---@return boolean
-function MidiPlayer:isChannelMuted(channel) end
+function MidiPlayer:isChannelMuted(ch) end
 
---- Returns whether a MIDI file or data string has been successfully loaded.
----@return number
+--- Returns true if a MIDI sequence is loaded.
+---@return boolean
 function MidiPlayer:isLoaded() end
 
---- Returns whether the audio source is set to loop.
----@return any
+--- Returns true if looping is enabled.
+---@return boolean
 function MidiPlayer:isLooping() end
 
---- Returns whether the audio source is currently paused.
----@return any
+--- Returns true if MIDI playback is paused.
+---@return boolean
 function MidiPlayer:isPaused() end
 
---- Returns whether the audio source is currently playing.
----@return any
+--- Returns true if MIDI is currently playing.
+---@return boolean
 function MidiPlayer:isPlaying() end
 
---- Returns whether the given track index is currently muted.
----@param track number 1-based track index.
+--- Returns true if a track is muted (1-indexed).
+---@param idx any
 ---@return boolean
-function MidiPlayer:isTrackMuted(track) end
+function MidiPlayer:isTrackMuted(idx) end
 
---- Loads a MIDI file from the given path and prepares it for playback.
----@param path string File path to the .mid MIDI file.
----@return any
+--- Loads a MIDI file from the given path.
+---@param path any
+---@return boolean
 function MidiPlayer:load(path) end
 
---- Loads MIDI data from a Lua string directly into the player.
----@param data string Raw MIDI bytes as a Lua string.
----@return any
+--- Loads MIDI data from a Lua string.
+---@param data string
+---@return boolean
 function MidiPlayer:loadData(data) end
 
---- Pauses the audio source at its current position.
+--- Pauses MIDI playback.
+---@return nil
 function MidiPlayer:pause() end
 
---- Plays the audio source from the beginning.
+--- Starts MIDI playback.
+---@return nil
 function MidiPlayer:play() end
 
---- Seeks to the given time position (in seconds) in the source.
+--- Seeks to a time position in seconds.
 ---@param secs any
+---@return nil
 function MidiPlayer:seek(secs) end
 
---- Routes the MIDI player's synthesizer output through the given audio bus.
----@param bus string Bus object or bus name string.
-function MidiPlayer:setBus(bus) end
+--- Routes MIDI output through a bus (or nil to clear).
+---@param bus_val any
+---@return nil
+function MidiPlayer:setBus(bus_val) end
 
---- Mutes or unmutes the given MIDI channel for selective playback.
----@param channel number 1-based MIDI channel (1-16).
----@param muted boolean true to silence the channel, false to unmute.
-function MidiPlayer:setChannelMuted(channel, muted) end
+--- Mutes or unmutes a MIDI channel (1-indexed).
+---@param ch any
+---@param muted any
+---@return nil
+function MidiPlayer:setChannelMuted(ch, muted) end
 
---- Sets the volume scale for the specified MIDI channel.
----@param channel number 1-based MIDI channel (1-16).
----@param volume number Volume scale in [0.0, 1.0].
-function MidiPlayer:setChannelVolume(channel, volume) end
+--- Sets volume for a MIDI channel (1-indexed).
+---@param ch any
+---@param vol any
+---@return nil
+function MidiPlayer:setChannelVolume(ch, vol) end
 
---- Enables or disables looping playback for the source.
+--- Enables or disables looping.
 ---@param looping any
+---@return nil
 function MidiPlayer:setLooping(looping) end
 
---- Registers a callback invoked when the MIDI sequence finishes playing.
----@param callback number Function called with no arguments when playback ends.
-function MidiPlayer:setOnEnd(callback) end
+--- Registers a playback-end callback (stub).
+---@param cb any
+---@return nil
+function MidiPlayer:setOnEnd(cb) end
 
---- Registers a callback invoked for each MIDI note-off event during playback.
----@param callback number Function called as callback(channel, note, velocity).
-function MidiPlayer:setOnNoteOff(callback) end
+--- Registers a note-off callback (stub).
+---@param cb any
+---@return nil
+function MidiPlayer:setOnNoteOff(cb) end
 
---- Registers a callback invoked for each MIDI note-on event during playback.
----@param callback number Function called as callback(channel, note, velocity).
-function MidiPlayer:setOnNoteOn(callback) end
+--- Registers a note-on callback (stub).
+---@param cb any
+---@return nil
+function MidiPlayer:setOnNoteOn(cb) end
 
---- Loads a SoundFont (.sf2) file into this player for instrument rendering.
----@param path string File path to the .sf2 SoundFont file.
+--- Loads a SoundFont file into this player (stub).
+---@param path any
+---@return nil
 function MidiPlayer:setSoundFont(path) end
 
---- Sets the playback tempo in beats per minute.
----@param bpm any Tempo in beats per minute (e.g. 120).
+--- Sets playback tempo in BPM.
+---@param bpm any
+---@return nil
 function MidiPlayer:setTempo(bpm) end
 
---- Sets a multiplier applied to the original MIDI tempo during playback.
----@param scale number Tempo scale factor (1.0 = original speed, 2.0 = double speed).
+--- Sets the tempo scale factor (1.0 = original speed).
+---@param scale any
+---@return nil
 function MidiPlayer:setTempoScale(scale) end
 
---- Mutes or unmutes a specific track by index for selective rendering.
----@param track number 1-based track index.
----@param muted boolean true to silence the track, false to enable it.
-function MidiPlayer:setTrackMuted(track, muted) end
+--- Mutes or unmutes a track (1-indexed).
+---@param idx any
+---@param muted any
+---@return nil
+function MidiPlayer:setTrackMuted(idx, muted) end
 
---- Sets the playback volume (0.0 - 1.0) of the source.
+--- Sets MIDI playback volume.
 ---@param vol any
+---@return nil
 function MidiPlayer:setVolume(vol) end
 
---- Solos the given MIDI channel so it is the only one producing sound.
----@param channel number 1-based MIDI channel (1-16).
----@param solo boolean true to solo, false to clear solo.
-function MidiPlayer:soloChannel(channel, solo) end
+--- Solos a MIDI channel (1-indexed).
+---@param ch any
+---@return nil
+function MidiPlayer:soloChannel(ch) end
 
---- Stops playback of the audio source.
+--- Stops MIDI playback.
+---@return nil
 function MidiPlayer:stop() end
 
 --- Returns the current playback position in seconds.
----@return any
+---@return number
 function MidiPlayer:tell() end
 
---- Clears the solo flag on every track so all tracks are audible.
+--- Clears solo on all channels.
+---@return nil
 function MidiPlayer:unsoloAll() end
 
---- Reverts the player to using the built-in default SoundFont for rendering.
+--- Reverts to the built-in default SoundFont (stub).
+---@return nil
 function MidiPlayer:useDefaultSoundFont() end
 
---- Lua UserData wrapper for an audio source resource.
+--- Lua-side wrapper for an audio source resource.
 ---@class Source
 local Source = {}
 
---- Removes any active filter from the audio source.
+--- Removes any active filter from this source.
+---@return nil
 function Source:clearFilter() end
 
---- Creates an independent copy of an audio source.
----@return any
+--- Creates an independent copy of this source.
+---@return Source
 function Source:clone() end
 
---- Fades the audio source in from silence over the given duration.
----@param duration_secs any
-function Source:fadeIn(duration_secs) end
+--- Fades in from silence over the given duration in seconds.
+---@param dur any
+---@return nil
+function Source:fadeIn(dur) end
 
---- Returns the total duration of this audio source in seconds.
+--- Returns the total duration in seconds.
 ---@return number
 function Source:getDuration() end
 
---- Returns the current fade-in duration.
----@return any
+--- Returns the current fade-in duration in seconds.
+---@return number
 function Source:getFadeIn() end
 
---- Returns the current high-pass filter cutoff frequency.
----@return any
+--- Returns the high-pass filter cutoff frequency.
+---@return number
 function Source:getHighpass() end
 
---- Returns the current low-pass filter cutoff frequency.
----@return any
+--- Returns the low-pass filter cutoff frequency.
+---@return number
 function Source:getLowpass() end
 
---- Returns the current stereo panning of the source.
----@return any
+--- Returns the current stereo panning value.
+---@return number
 function Source:getPan() end
 
 --- Returns the current pitch multiplier.
 ---@return number
 function Source:getPitch() end
 
---- Returns the type of this audio source: 'static', 'stream', or 'queue'.
+--- Returns the source type ("static" or "stream").
 ---@return string
 function Source:getType() end
 
@@ -941,479 +1003,564 @@ function Source:getType() end
 ---@return number
 function Source:getVolume() end
 
---- Returns `true` if this source is set to loop.
+--- Returns true if looping is enabled.
 ---@return boolean
 function Source:isLooping() end
 
---- Returns `true` if playback is currently paused.
+--- Returns true if playback is paused.
 ---@return boolean
 function Source:isPaused() end
 
---- Returns `true` if this source is currently playing.
+--- Returns true if currently playing.
 ---@return boolean
 function Source:isPlaying() end
 
---- Returns `true` if playback has stopped (either manually or after the audio ended).
+--- Returns true if playback has stopped.
 ---@return boolean
 function Source:isStopped() end
 
---- Pauses playback. Call `play()` to resume.
+--- Pauses playback at the current position.
+---@return nil
 function Source:pause() end
 
---- Starts or resumes playback from the current seek position.
+--- Starts or resumes playback.
+---@return nil
 function Source:play() end
 
---- Resumes playback of this audio source from its current paused position.
+--- Resumes playback from the paused position.
+---@return nil
 function Source:resume() end
 
---- Seeks playback to `offset` seconds from the start.
----@param offset number `number`: Target position in seconds.
-function Source:seek(offset) end
+--- Seeks to a time position in seconds.
+---@param pos any
+---@return nil
+function Source:seek(pos) end
 
---- Applies a high-pass filter to the audio source.
+--- Applies a high-pass filter at the given cutoff frequency.
 ---@param cutoff_hz any
+---@return nil
 function Source:setHighpass(cutoff_hz) end
 
---- Enables or disables looping. When enabled, the source restarts automatically when it reaches the end.
----@param loop boolean `boolean`: `true` to enable looping.
-function Source:setLooping(loop) end
+--- Enables or disables looping playback.
+---@param looping any
+---@return nil
+function Source:setLooping(looping) end
 
---- Applies a low-pass filter to the audio source.
+--- Applies a low-pass filter at the given cutoff frequency.
 ---@param cutoff_hz any
+---@return nil
 function Source:setLowpass(cutoff_hz) end
 
---- Sets the stereo panning (-1.0 left to 1.0 right) of the source.
+--- Sets stereo panning (-1.0 left to 1.0 right).
 ---@param pan any
+---@return nil
 function Source:setPan(pan) end
 
---- Sets the playback pitch multiplier. `1.0` is normal pitch; `2.0` doubles frequency.
----@param pitch number `number`: Pitch multiplier.
+--- Sets the pitch multiplier (1.0 = normal).
+---@param pitch any
+---@return nil
 function Source:setPitch(pitch) end
 
---- Sets playback volume. `1.0` is full volume; `0.0` is silent.
----@param volume number `number`: Volume multiplier (0–1).
-function Source:setVolume(volume) end
+--- Sets playback volume (0.0 = silent, 1.0 = full).
+---@param vol any
+---@return nil
+function Source:setVolume(vol) end
 
---- Stops playback and resets the seek position to the beginning.
+--- Stops playback and resets seek position.
+---@return nil
 function Source:stop() end
 
 --- Returns the current playback position in seconds.
 ---@return number
 function Source:tell() end
 
+--- Adds a DSP effect to a bus.
 ---@param bus_name any
 ---@param effect_type_str any
 ---@param params? any (optional)
+---@return integer
 function luna.audio.add_effect(bus_name, effect_type_str, params) end
 
---- Removes any active filter from the audio source.
+--- Removes any active filter from a source.
 ---@param id_val any
+---@return nil
 function luna.audio.clearFilter(id_val) end
 
---- Unloads the active SoundFont so the MIDI player falls back to built-in defaults.
+--- Unloads the active SoundFont.
+---@return nil
 function luna.audio.clearMidiSoundFont() end
 
---- Creates an independent copy of an audio source.
+--- Creates an independent copy of a source.
 ---@param id_val any
----@return any
+---@return Source
 function luna.audio.clone(id_val) end
 
+--- Creates a bus by name (functional style).
 ---@param name any
 ---@param parent_name? any (optional)
+---@return nil
 function luna.audio.create_bus(name, parent_name) end
 
---- Fades the audio source in from silence over the given duration.
+--- Fades a source in from silence over the given duration.
 ---@param id_val any
 ---@param dur any
+---@return nil
 function luna.audio.fadeIn(id_val, dur) end
 
---- Returns the number of currently playing audio sources.
----@return any
+--- Returns the number of currently playing sources.
+---@return integer
 function luna.audio.getActiveSourceCount() end
 
---- Returns the current distance attenuation model name.
----@return any
+--- Returns the current distance model name.
+---@return string
 function luna.audio.getDistanceModel() end
 
---- Returns the current global Doppler scale.
----@return any
+--- Returns the current Doppler scale.
+---@return number
 function luna.audio.getDopplerScale() end
 
---- Returns the total duration of the audio source in seconds.
+--- Returns the total duration of a source in seconds.
 ---@param id_val any
----@return any
+---@return number
 function luna.audio.getDuration(id_val) end
 
---- Returns the current fade-in duration.
+--- Returns the fade-in duration of a source.
 ---@param id_val any
----@return any
+---@return number
 function luna.audio.getFadeIn(id_val) end
 
---- Returns the number of free buffer slots remaining in a queueable source.
----@param qsource_id number integer returned by `newQueueableSource`.
----@return number
+--- Returns the free buffer slots in a queueable source.
+---@param qsource_id any
+---@return integer
 function luna.audio.getFreeBufferCount(qsource_id) end
 
---- Returns the current high-pass filter cutoff frequency.
+--- Returns the high-pass filter cutoff of a source.
 ---@param id_val any
----@return any
+---@return number
 function luna.audio.getHighpass(id_val) end
 
---- Returns the 3D listener position.
----@return any
+--- Returns the 3D listener position (x, y, z).
+---@return number
 function luna.audio.getListener() end
 
---- Returns the current 2D listener position (x, y).
----@return any
+--- Returns the 2D listener position (x, y).
+---@return number
 function luna.audio.getListener2D() end
 
---- Returns the current low-pass filter cutoff frequency.
+--- Returns the low-pass filter cutoff of a source.
 ---@param id_val any
----@return any
+---@return number
 function luna.audio.getLowpass(id_val) end
 
---- Returns the current master volume scale (0.0 - 1.0) applied to all audio output.
+--- Returns the global master volume.
 ---@return number
 function luna.audio.getMasterVolume() end
 
---- Returns the maximum number of simultaneous audio sources.
+--- Returns the maximum number of simultaneous sources.
+---@return integer
 function luna.audio.getMaxSources() end
 
---- Returns the current peak level of the audio source.
----@return any
+--- Returns the current peak level (stub).
+---@return number
 function luna.audio.getMeter() end
 
---- Returns the 6-component orientation of an audio source.
+--- Returns the 6-component orientation of a source.
 ---@param id_val any
----@return any
+---@return number
 function luna.audio.getOrientation(id_val) end
 
---- Returns the current stereo panning of the source.
+--- Returns the source stereo panning.
 ---@param id_val any
----@return any
+---@return number
 function luna.audio.getPan(id_val) end
 
---- Returns the current pitch multiplier of the source.
+--- Returns the source pitch multiplier.
 ---@param id_val any
----@return any
+---@return number
 function luna.audio.getPitch(id_val) end
 
---- Returns the name of the currently active audio output device.
+--- Returns the current audio output device name.
 ---@return string
 function luna.audio.getPlaybackDevice() end
 
---- Returns a table containing the names of all available audio output devices.
----@return string
+--- Returns a table of available audio output device names.
+---@return table
 function luna.audio.getPlaybackDevices() end
 
---- Returns the 3D position of an audio source.
+--- Returns the 3D position of a source (x, y, z).
 ---@param id_val any
----@return any
+---@return number
 function luna.audio.getPosition(id_val) end
 
---- Returns the bus name the source is assigned to.
+--- Returns the bus a source is assigned to, or nil.
 ---@param id_val any
----@return any
+---@return Bus
 function luna.audio.getSourceBus(id_val) end
 
---- Returns the number of currently registered audio sources.
----@return any
+--- Returns the total number of registered sources.
+---@return integer
 function luna.audio.getSourceCount() end
 
---- Returns the type string ('static' or 'stream') of the source.
+--- Returns the type string ("static" or "stream") of a source.
 ---@param id_val any
----@return any
+---@return string
 function luna.audio.getSourceType(id_val) end
 
---- Returns the velocity of an audio source.
+--- Returns the velocity of a source (x, y, z).
 ---@param id_val any
----@return any
+---@return number
 function luna.audio.getVelocity(id_val) end
 
---- Returns the current volume of the audio source.
+--- Returns the source volume.
 ---@param id_val any
----@return any
+---@return number
 function luna.audio.getVolume(id_val) end
 
---- Returns whether a SoundFont is currently loaded for the MIDI synthesizer.
----@return number
+--- Returns true if a SoundFont is loaded.
+---@return boolean
 function luna.audio.hasMidiSoundFont() end
 
---- Returns whether the audio source is set to loop.
+--- Returns true if looping is enabled.
 ---@param id_val any
----@return any
+---@return boolean
 function luna.audio.isLooping(id_val) end
 
---- Returns whether the audio source is currently paused.
+--- Returns true if the source is paused.
 ---@param id_val any
----@return any
+---@return boolean
 function luna.audio.isPaused(id_val) end
 
---- Returns whether the audio source is currently playing.
+--- Returns true if the source is playing.
 ---@param id_val any
----@return any
+---@return boolean
 function luna.audio.isPlaying(id_val) end
 
---- Returns whether the audio source is stopped.
+--- Returns true if the source is stopped.
 ---@param id_val any
----@return any
+---@return boolean
 function luna.audio.isStopped(id_val) end
 
 --- Creates a named audio bus for grouping sources.
 ---@param name any
----@return any
+---@return Bus
 function luna.audio.newBus(name) end
 
---- Creates a streaming audio decoder for chunked PCM reading.
----@param source string File path to the audio file.
----@param buffersize? number Optional number of samples per chunk (default 2048).
----@return string
+--- Creates a streaming audio decoder.
+---@param source any
+---@param buffersize? any (optional)
+---@return Decoder
 function luna.audio.newDecoder(source, buffersize) end
 
---- Creates a software MIDI synthesizer player.
+--- Creates a MIDI player, optionally loading a file.
 ---@param path? any (optional)
----@return any
+---@return MidiPlayer
 function luna.audio.newMidiPlayer(path) end
 
---- Creates a queueable audio source that accepts manually-pushed PCM buffers.
----@param sample_rate any `u32`. Sample rate in Hz (e.g. 44100).
----@param bit_depth any `u8`. Bit depth (8 or 16).
----@param channels any `u8`. Channel count (1 = mono, 2 = stereo).
----@param buffer_count number `usize?`. Max queued buffer slots (default 4).
----@return number
+--- Creates a queueable source for manual PCM buffering.
+---@param sample_rate integer
+---@param bit_depth integer
+---@param channels integer
+---@param buffer_count integer
+---@return integer
 function luna.audio.newQueueableSource(sample_rate, bit_depth, channels, buffer_count) end
 
---- Creates a raw PCM audio buffer for building procedurally generated sound.
----@param samples number Total number of PCM samples to allocate.
----@param sampleRate any Sample rate in Hz (e.g. 44100).
----@param bitDepth any Bit depth per sample (8 or 16).
----@param channels number Number of channels (1 = mono, 2 = stereo).
----@return number
-function luna.audio.newSoundData(samples, sampleRate, bitDepth, channels) end
-
---- Loads an audio file and returns a source handle.
+--- Creates a SoundData from a file or as a silent buffer.
 ---@param args any
----@return any
+---@return SoundData
+function luna.audio.newSoundData(args) end
+
+--- Loads an audio file and returns a Source handle.
+---@param args any
+---@return Source
 function luna.audio.newSource(args) end
 
---- Pauses the audio source at its current position.
+--- Pauses playback at the current position.
 ---@param id_val any
+---@return nil
 function luna.audio.pause(id_val) end
 
---- Pauses all currently playing audio sources.
+--- Pauses all currently playing sources.
+---@return nil
 function luna.audio.pauseAll() end
 
---- Plays the audio source from the beginning.
+--- Plays a source, with optional bus routing via options table.
 ---@param id_val any
 ---@param options? any (optional)
+---@return integer
 function luna.audio.play(id_val, options) end
 
---- Plays the audio source in a continuous loop.
+--- Plays the source in a continuous loop.
 ---@param id_val any
+---@return nil
 function luna.audio.playLooping(id_val) end
 
---- Starts playback of a queueable source. PCM output is driven by queued buffers.
----@param qsource_id number integer returned by `newQueueableSource`.
+--- Starts playback of a queueable source.
+---@param qsource_id any
+---@return nil
 function luna.audio.playQueueable(qsource_id) end
 
 --- Pushes a SoundData buffer into a queueable source.
----@param qsource_id number integer returned by `newQueueableSource`.
----@param sounddata SoundData `SoundData` userdata with the PCM samples to enqueue.
-function luna.audio.queueSource(qsource_id, sounddata) end
+---@param qsource_id any
+---@param sd any
+---@return nil
+function luna.audio.queueSource(qsource_id, sd) end
 
---- Releases the audio source and frees its memory.
+--- Releases a source and frees its memory.
 ---@param id_val any
 ---@return boolean
 function luna.audio.release(id_val) end
 
+--- Removes a DSP effect from a bus.
 ---@param bus_name any
 ---@param effect_id any
+---@return boolean
 function luna.audio.remove_effect(bus_name, effect_id) end
 
---- Resumes playback of a paused audio source from its current position.
----@param source number Audio source ID to resume.
-function luna.audio.resume(source) end
+--- Resumes playback from pause.
+---@param id_val any
+---@return nil
+function luna.audio.resume(id_val) end
 
---- Resumes playback on every audio source that is currently paused.
+--- Resumes all paused sources.
+---@return nil
 function luna.audio.resumeAll() end
 
---- Seeks to the given time position (in seconds) in the source.
+--- Seeks to a time position in seconds.
 ---@param id_val any
 ---@param pos any
+---@return nil
 function luna.audio.seek(id_val, pos) end
 
 --- Sets the distance attenuation model.
 ---@param model any
+---@return nil
 function luna.audio.setDistanceModel(model) end
 
---- Sets the global Doppler effect scale (1.0 = default).
+--- Sets the global Doppler effect scale.
 ---@param scale any
+---@return nil
 function luna.audio.setDopplerScale(scale) end
 
---- Applies a high-pass filter to the audio source.
+--- Applies a high-pass filter to a source.
 ---@param id_val any
 ---@param cutoff_hz any
+---@return nil
 function luna.audio.setHighpass(id_val, cutoff_hz) end
 
---- Sets the 3D listener position for spatial audio.
+--- Sets the 3D listener position.
 ---@param x any
 ---@param y any
 ---@param z? any (optional)
+---@return nil
 function luna.audio.setListener(x, y, z) end
 
 --- Sets the 2D listener position for spatial audio.
 ---@param x any
 ---@param y any
+---@return nil
 function luna.audio.setListener2D(x, y) end
 
---- Enables or disables looping playback for the source.
+--- Enables or disables looping.
 ---@param id_val any
 ---@param looping any
+---@return nil
 function luna.audio.setLooping(id_val, looping) end
 
---- Applies a low-pass filter to the audio source.
+--- Applies a low-pass filter to a source.
 ---@param id_val any
 ---@param cutoff_hz any
+---@return nil
 function luna.audio.setLowpass(id_val, cutoff_hz) end
 
---- Sets the global master volume (0.0 - 1.0).
+--- Sets the global master volume.
 ---@param vol any
+---@return nil
 function luna.audio.setMasterVolume(vol) end
 
---- Enables or disables peak metering on the audio source.
+--- Sets the metering scale (stub).
 ---@param scale any
+---@return nil
 function luna.audio.setMeter(scale) end
 
---- Sets the SoundFont (.sf2) file that the MIDI synthesizer uses for instrument samples.
----@param path string File path to the .sf2 SoundFont file.
+--- Sets the global SoundFont for MIDI synthesis.
+---@param path any
+---@return nil
 function luna.audio.setMidiSoundFont(path) end
 
---- Sets the orientation of an audio source.
----@param id_val any
----@param fx any
----@param fy any
----@param fz any
----@param ux any
----@param uy any
----@param uz any
-function luna.audio.setOrientation(id_val, fx, fy, fz, ux, uy, uz) end
+--- Sets the 6-component orientation of a source.
+---@param source Source
+---@param fx number
+---@param fy number
+---@param fz number
+---@param ux number
+---@param uy number
+---@param uz number
+---@return nil
+function luna.audio.setOrientation(source, fx, fy, fz, ux, uy, uz) end
 
---- Sets the stereo panning (-1.0 left to 1.0 right) of the source.
+--- Sets stereo panning (-1.0 left to 1.0 right).
 ---@param id_val any
 ---@param pan any
+---@return nil
 function luna.audio.setPan(id_val, pan) end
 
---- Sets the pitch (playback speed) multiplier of the source.
+--- Sets source pitch multiplier.
 ---@param id_val any
 ---@param pitch any
+---@return nil
 function luna.audio.setPitch(id_val, pitch) end
 
---- Selects the audio output device by name.
----@param name string `string`. Device name to activate.
+--- Selects an audio output device by name.
+---@param name any
+---@return nil
 function luna.audio.setPlaybackDevice(name) end
 
---- Sets the 3D position of an audio source for spatial panning.
+--- Sets the 3D position of a source.
 ---@param id_val any
 ---@param x any
 ---@param y any
 ---@param z? any (optional)
+---@return nil
 function luna.audio.setPosition(id_val, x, y, z) end
 
---- Assigns the source to a named audio bus.
+--- Assigns a source to a bus.
 ---@param id_val any
 ---@param bus_val any
+---@return nil
 function luna.audio.setSourceBus(id_val, bus_val) end
 
---- Sets the velocity of an audio source for Doppler calculation.
+--- Sets the velocity of a source for Doppler.
 ---@param id_val any
 ---@param x any
 ---@param y any
 ---@param z? any (optional)
+---@return nil
 function luna.audio.setVelocity(id_val, x, y, z) end
 
---- Sets the playback volume (0.0 - 1.0) of the source.
+--- Sets source playback volume.
 ---@param id_val any
 ---@param vol any
+---@return nil
 function luna.audio.setVolume(id_val, vol) end
 
+--- Sets a bus volume by name.
 ---@param name any
 ---@param volume any
+---@return nil
 function luna.audio.set_bus_volume(name, volume) end
 
+--- Sets a parameter on a DSP effect.
 ---@param bus_name any
 ---@param effect_id any
 ---@param param_name any
 ---@param value any
+---@return boolean
 function luna.audio.set_effect_param(bus_name, effect_id, param_name, value) end
 
---- Stops playback of the audio source.
+--- Stops playback and resets seek position.
 ---@param id_val any
+---@return nil
 function luna.audio.stop(id_val) end
 
---- Stops all currently playing audio sources.
+--- Stops all currently playing sources.
+---@return nil
 function luna.audio.stopAll() end
 
---- Stops playback and drains all queued buffers in a queueable source.
----@param qsource_id number integer returned by `newQueueableSource`.
+--- Stops a queueable source and drains its buffers.
+---@param qsource_id any
+---@return nil
 function luna.audio.stopQueueable(qsource_id) end
 
 --- Returns the current playback position in seconds.
 ---@param id_val any
----@return any
+---@return number
 function luna.audio.tell(id_val) end
 
 ---@class luna.automation
 luna.automation = {}
 
+--- Returns the name of the active script, or nil if idle.
+---@return string?
 function luna.automation.getCurrentScript() end
 
+--- Returns the index of the next step to be dispatched.
+---@return integer
 function luna.automation.getCurrentStep() end
 
+--- Returns seconds elapsed since playback started.
+---@return number
 function luna.automation.getElapsedTime() end
 
+--- Returns an array of all registered script names.
+---@return table
 function luna.automation.getScripts() end
 
+--- Returns the total number of steps in the active script.
+---@return integer
 function luna.automation.getStepCount() end
 
+--- Returns true if a script with the given name is registered.
 ---@param name any
+---@return boolean
 function luna.automation.hasScript(name) end
 
+--- Returns true if all steps in the active script have been dispatched.
+---@return boolean
 function luna.automation.isComplete() end
 
+--- Returns true if playback is currently paused.
+---@return boolean
 function luna.automation.isPaused() end
 
+--- Returns true if the simulator is actively playing a script.
+---@return boolean
 function luna.automation.isRunning() end
 
+--- Loads a named script from a Lua data table containing a steps array.
 ---@param name any
 ---@param data any
+---@return nil
 function luna.automation.load(name, data) end
 
+--- Pauses playback at the current step position.
+---@return nil
 function luna.automation.pause() end
 
+--- Resumes playback from a paused position.
+---@return nil
 function luna.automation.resume() end
 
+--- Starts playback of the named script from the beginning.
 ---@param name any
+---@return nil
 function luna.automation.start(name) end
 
+--- Stops playback and resets the simulator to idle.
+---@return nil
 function luna.automation.stop() end
 
+--- Removes a loaded script by name, returning true if it existed.
 ---@param name any
+---@return boolean
 function luna.automation.unload(name) end
 
+--- Advances the playback clock by dt seconds, dispatching due steps.
 ---@param dt any
+---@return nil
 function luna.automation.update(dt) end
 
 ---@class luna.camera
 luna.camera = {}
 
---- Lua UserData wrapper for a [`Camera2D`] instance.
+--- Lua-side wrapper around a [`Camera2D`] instance.
 ---@class Camera2D
 local Camera2D = {}
 
---- Clears the follow target (camera stops tracking).
+--- Clears the follow target so the camera stops tracking.
+---@return nil
 function Camera2D:clearTarget() end
 
---- Returns the camera's world-space position as `x, y`.
+--- Returns the camera's world-space position as x, y.
 ---@return number
 function Camera2D:getPosition() end
 
@@ -1421,11 +1568,11 @@ function Camera2D:getPosition() end
 ---@return number
 function Camera2D:getRotation() end
 
---- Returns the current viewport as `x, y, w, h`.
+--- Returns the current viewport as x, y, w, h.
 ---@return number
 function Camera2D:getViewport() end
 
---- Returns the visible world area as `x, y, w, h`.
+--- Returns the visible world area as x, y, w, h.
 ---@return number
 function Camera2D:getVisibleArea() end
 
@@ -1433,17 +1580,20 @@ function Camera2D:getVisibleArea() end
 ---@return number
 function Camera2D:getZoom() end
 
---- Instantly moves the camera to look at `(x, y)`.
+--- Instantly moves the camera to look at the given position.
 ---@param x any
 ---@param y any
+---@return nil
 function Camera2D:lookAt(x, y) end
 
---- Translates the camera by `(dx, dy)` in world space.
+--- Translates the camera by dx, dy in world space.
 ---@param dx any
 ---@param dy any
+---@return nil
 function Camera2D:move(dx, dy) end
 
 --- Removes previously set world-space bounds.
+---@return nil
 function Camera2D:removeBounds() end
 
 --- Sets world-space bounds for camera clamping.
@@ -1451,49 +1601,59 @@ function Camera2D:removeBounds() end
 ---@param y any
 ---@param w any
 ---@param h any
+---@return nil
 function Camera2D:setBounds(x, y, w, h) end
 
---- Sets the dead zone half-extents `(w, h)`. The camera does not move
+--- Sets the dead zone half-extents for camera follow.
 ---@param w any
 ---@param h any
+---@return nil
 function Camera2D:setDeadZone(w, h) end
 
---- Sets the follow smooth interpolation speed (`0.0` = instant snap).
+--- Sets the follow smooth interpolation speed (0.0 = instant snap).
 ---@param speed any
+---@return nil
 function Camera2D:setFollowSmooth(speed) end
 
---- Sets the look-ahead multiplier.
+--- Sets the look-ahead multiplier for follow prediction.
 ---@param mul any
+---@return nil
 function Camera2D:setLookAhead(mul) end
 
 --- Sets the camera's world-space position.
 ---@param x any
 ---@param y any
+---@return nil
 function Camera2D:setPosition(x, y) end
 
 --- Sets the rotation in radians.
 ---@param r any
+---@return nil
 function Camera2D:setRotation(r) end
 
 --- Sets the follow target position.
 ---@param x any
 ---@param y any
+---@return nil
 function Camera2D:setTarget(x, y) end
 
---- Sets the viewport rectangle `(x, y, width, height)` in screen pixels.
+--- Sets the viewport rectangle in screen pixels.
 ---@param x any
 ---@param y any
 ---@param w any
 ---@param h any
+---@return nil
 function Camera2D:setViewport(x, y, w, h) end
 
---- Sets the uniform zoom factor (`1.0` = natural size).
+--- Sets the uniform zoom factor (1.0 = natural size).
 ---@param zoom any
+---@return nil
 function Camera2D:setZoom(zoom) end
 
 --- Starts a screen-shake effect.
 ---@param intensity any
 ---@param duration any
+---@return nil
 function Camera2D:shake(intensity, duration) end
 
 --- Converts world coordinates to screen coordinates.
@@ -1508,11 +1668,12 @@ function Camera2D:toScreen(wx, wy) end
 ---@return number
 function Camera2D:toWorld(sx, sy) end
 
---- Advances the camera simulation by `dt` seconds.
+--- Advances the camera simulation by dt seconds.
 ---@param dt any
+---@return nil
 function Camera2D:update(dt) end
 
---- Creates a new [`Camera2D`] with the given viewport dimensions.
+--- Creates a new Camera2D with the given viewport dimensions.
 ---@param vw any
 ---@param vh any
 ---@return Camera2D
@@ -1521,305 +1682,337 @@ function luna.camera.new(vw, vh) end
 ---@class luna.compute
 luna.compute = {}
 
----@class mlua
-local mlua = {}
+--- Lua-side wrapper around [`NdArray`].
+---@class Array
+local Array = {}
 
---- Abs on this Object.
----@return any
-function mlua:abs() end
+--- Element-wise absolute value.
+---@return Array
+function Array:abs() end
 
---- All on this Object.
----@param axis? number `integer` optional.
----@return any
-function mlua:all(axis) end
-
---- Any on this Object.
----@param axis? number `integer` optional.
----@return any
-function mlua:any(axis) end
-
---- Argmax on this Object.
----@param axis? number `integer` optional.
----@return any
-function mlua:argmax(axis) end
-
---- Argmin on this Object.
----@return any
-function mlua:argmin() end
-
---- Bitwise and on this Object.
----@param other any `userdata`.
-function mlua:bitwiseAnd(other) end
-
---- Bitwise l shift on this Object.
----@param amount number `integer`.
-function mlua:bitwiseLShift(amount) end
-
---- Bitwise not on this Object.
----@param amount number `integer`.
-function mlua:bitwiseNot(amount) end
-
---- Bitwise or on this Object.
----@param other any `userdata`.
-function mlua:bitwiseOr(other) end
-
---- Bitwise r shift on this Object.
----@param amount number `integer`.
-function mlua:bitwiseRShift(amount) end
-
---- Bitwise xor on this Object.
----@param other any `userdata`.
-function mlua:bitwiseXor(other) end
-
---- Clamps the value within the allowed range.
----@param min number `number`.
----@param max number `number`.
-function mlua:clamp(min, max) end
-
---- Returns a deep copy of this object.
----@param val number `number`.
-function mlua:clone(val) end
-
---- Convolve2 d on this Object.
----@param kernel any `userdata`.
-function mlua:convolve2D(kernel) end
-
---- Returns the number of non zero.
----@return number
-function mlua:countNonZero() end
-
---- Dilate on this Object.
----@param radius number `integer`.
-function mlua:dilate(radius) end
-
---- Dot on this Object.
----@param other any `userdata`.
-function mlua:dot(other) end
-
---- Erode on this Object.
----@param row number `integer`.
----@param col number `integer`.
----@param val number `number`.
-function mlua:erode(row, col, val) end
-
---- Fill on this Object.
----@param val number `number`.
-function mlua:fill(val) end
-
---- Returns the current value.
----@param args any `LuaMultiValue`.
----@return any
-function mlua:get(args) end
-
---- Returns the data type.
----@param args any `LuaMultiValue`.
----@return number
-function mlua:getDataType(args) end
-
---- Returns the dimensions.
----@return any
-function mlua:getDimensions() end
-
---- Returns the shape.
----@return any
-function mlua:getShape() end
-
---- Returns the size.
----@return integer
-function mlua:getSize() end
-
---- Returns `true` if on g p u.
----@param args any `LuaMultiValue`.
+--- Returns true if all elements are nonzero.
 ---@return boolean
-function mlua:isOnGPU(args) end
+function Array:all() end
 
---- Matmul on this Object.
----@param other any `userdata`.
-function mlua:matmul(other) end
+--- Returns true if any element is nonzero.
+---@return boolean
+function Array:any() end
 
---- Max on this Object.
----@param axis? number `integer` optional.
----@return any
-function mlua:max(axis) end
+--- Returns the 1-based flat index of the maximum element.
+---@return integer
+function Array:argmax() end
 
---- Mean on this Object.
----@param axis? number `integer` optional.
----@return any
-function mlua:mean(axis) end
+--- Returns the 1-based flat index of the minimum element.
+---@return integer
+function Array:argmin() end
 
---- Min on this Object.
----@param axis? number `integer` optional.
----@return any
-function mlua:min(axis) end
+--- Bitwise AND of two Int32 arrays.
+---@param other any
+---@return Array
+function Array:bitwiseAnd(other) end
 
---- Neg on this Object.
----@param min number `number`.
----@param max number `number`.
-function mlua:neg(min, max) end
+--- Bitwise left shift of an Int32 array.
+---@param amount any
+---@return Array
+function Array:bitwiseLShift(amount) end
 
---- Pow on this Object.
----@param exp number `number`.
-function mlua:pow(exp) end
+--- Bitwise NOT of an Int32 array.
+---@return Array
+function Array:bitwiseNot() end
 
---- Reshape on this Object.
----@param shape number `any`.
-function mlua:reshape(shape) end
+--- Bitwise OR of two Int32 arrays.
+---@param other any
+---@return Array
+function Array:bitwiseOr(other) end
 
---- Sets the value.
----@param args any `LuaMultiValue`.
-function mlua:set(args) end
+--- Bitwise right shift of an Int32 array.
+---@param amount any
+---@return Array
+function Array:bitwiseRShift(amount) end
 
---- Sqrt on this Object.
----@return any
-function mlua:sqrt() end
+--- Bitwise XOR of two Int32 arrays.
+---@param other any
+---@return Array
+function Array:bitwiseXor(other) end
 
---- Sum on this Object.
----@param axis? number `integer` optional.
----@return any
-function mlua:sum(axis) end
+--- Clamps each element to the given range.
+---@param min any
+---@param max any
+---@return Array
+function Array:clamp(min, max) end
 
---- Threshold on this Object.
----@param mask any `userdata`.
----@param other any `userdata`.
-function mlua:threshold(mask, other) end
+--- Returns a deep copy of this array.
+---@return Array
+function Array:clone() end
 
---- To table on this Object.
----@return any
-function mlua:toTable() end
+--- 2D convolution with zero-padding.
+---@param kernel any
+---@return Array
+function Array:convolve2D(kernel) end
 
---- Transpose on this Object.
----@param val number `number`.
-function mlua:transpose(val) end
+--- Returns the count of nonzero elements.
+---@return integer
+function Array:countNonZero() end
 
---- From table.
----@param tbl any
+--- Morphological dilation with a diamond structuring element.
+---@param radius any
+---@return Array
+function Array:dilate(radius) end
+
+--- Dot product of two 1D arrays.
+---@param other any
+---@return number
+function Array:dot(other) end
+
+--- Morphological erosion with a diamond structuring element.
+---@param radius any
+---@return Array
+function Array:erode(radius) end
+
+--- Fills all elements with the given value in-place.
+---@param val any
+---@return nil
+function Array:fill(val) end
+
+--- Returns the element at the given 1-based indices.
+---@param args any
+---@return number
+function Array:get(args) end
+
+--- Returns the element data type name.
+---@return string
+function Array:getDataType() end
+
+--- Returns the number of dimensions.
+---@return integer
+function Array:getDimensions() end
+
+--- Returns the shape as a table of dimension sizes.
+---@return table
+function Array:getShape() end
+
+--- Returns the total number of elements.
+---@return integer
+function Array:getSize() end
+
+--- Returns false (CPU arrays only).
+---@return boolean
+function Array:isOnGPU() end
+
+--- Matrix multiplication of two 2D arrays.
+---@param other any
+---@return Array
+function Array:matmul(other) end
+
+--- Maximum of all elements, or along an axis (1-based).
+---@param axis? any (optional)
+---@return number|Array
+function Array:max(axis) end
+
+--- Mean of all elements, or along an axis (1-based).
+---@param axis? any (optional)
+---@return number|Array
+function Array:mean(axis) end
+
+--- Minimum of all elements, or along an axis (1-based).
+---@param axis? any (optional)
+---@return number|Array
+function Array:min(axis) end
+
+--- Element-wise negation.
+---@return Array
+function Array:neg() end
+
+--- Raises each element to a scalar exponent.
+---@param exp any
+---@return Array
+function Array:pow(exp) end
+
+--- Returns a new array with the given shape and the same data.
+---@param shape any
+---@return Array
+function Array:reshape(shape) end
+
+--- Sets the element at the given 1-based indices to a value.
+---@param args any
+---@return nil
+function Array:set(args) end
+
+--- Element-wise square root.
+---@return Array
+function Array:sqrt() end
+
+--- Sum of all elements, or along an axis (1-based).
+---@param axis? any (optional)
+---@return number|Array
+function Array:sum(axis) end
+
+--- Returns a mask array with 1.0 where elements >= val, else 0.0.
+---@param val any
+---@return Array
+function Array:threshold(val) end
+
+--- Returns all elements as a flat table of numbers.
+---@return table
+function Array:toTable() end
+
+--- Returns the transposed 2D array.
+---@return Array
+function Array:transpose() end
+
+--- Creates an array from a Lua table of numbers with optional shape and dtype.
+---@param data any
 ---@param shape? any (optional)
 ---@param dtype? any (optional)
-function luna.compute.fromTable(tbl, shape, dtype) end
+---@return Array
+function luna.compute.fromTable(data, shape, dtype) end
 
---- New array.
+--- Creates a zero-initialized array with the given shape and optional dtype.
 ---@param shape any
 ---@param dtype? any (optional)
+---@return Array
 function luna.compute.newArray(shape, dtype) end
 
---- Ones.
+--- Creates a one-filled array with the given shape and optional dtype.
 ---@param shape any
 ---@param dtype? any (optional)
+---@return Array
 function luna.compute.ones(shape, dtype) end
 
---- Range.
+--- Creates a 1D array from start to stop with optional step and dtype.
 ---@param start any
 ---@param stop any
 ---@param step? any (optional)
 ---@param dtype? any (optional)
+---@return Array
 function luna.compute.range(start, stop, step, dtype) end
 
---- Zeros.
+--- Creates a zero-filled array with the given shape and optional dtype.
 ---@param shape any
 ---@param dtype? any (optional)
+---@return Array
 function luna.compute.zeros(shape, dtype) end
 
 ---@class luna.data
 luna.data = {}
 
+--- Lua-side wrapper around [`DataView`].
 ---@class DataView
 local DataView = {}
 
+--- Reads a 64-bit float at the given offset.
 ---@param offset any
+---@return number
 function DataView:getDouble(offset) end
 
+--- Reads a 32-bit float at the given offset.
 ---@param offset any
+---@return number
 function DataView:getFloat(offset) end
 
+--- Reads a signed 16-bit integer at the given offset.
 ---@param offset any
+---@return integer
 function DataView:getInt16(offset) end
 
+--- Reads a signed 32-bit integer at the given offset.
 ---@param offset any
+---@return integer
 function DataView:getInt32(offset) end
 
+--- Reads a signed 8-bit integer at the given offset.
 ---@param offset any
+---@return integer
 function DataView:getInt8(offset) end
 
+--- Returns the size of this view in bytes.
+---@return integer
 function DataView:getSize() end
 
+--- Reads an unsigned 16-bit integer at the given offset.
 ---@param offset any
+---@return integer
 function DataView:getUInt16(offset) end
 
+--- Reads an unsigned 32-bit integer at the given offset.
 ---@param offset any
+---@return integer
 function DataView:getUInt32(offset) end
 
+--- Reads an unsigned 8-bit integer at the given offset.
 ---@param offset any
+---@return integer
 function DataView:getUInt8(offset) end
 
---- Compresses data using the given algorithm (''deflate'', ''gzip'', ''lz4'').
+--- Compresses data using the given algorithm (deflate, gzip, lz4).
 ---@param format_str any
 ---@param raw_data any
 ---@param level? any (optional)
----@return any
+---@return string
 function luna.data.compress(format_str, raw_data, level) end
 
---- Decodes encoded text back to binary using the given format (''base64'', ''hex'').
+--- Decodes encoded text back to binary (base64, hex).
 ---@param format_str any
 ---@param encoded any
----@return any
+---@return string
 function luna.data.decode(format_str, encoded) end
 
---- Decompresses data using the given algorithm (''deflate'', ''gzip'', ''lz4'').
+--- Decompresses data using the given algorithm (deflate, gzip, lz4).
 ---@param format_str any
----@param compressed_data any
----@return any
-function luna.data.decompress(format_str, compressed_data) end
+---@param compressed any
+---@return string
+function luna.data.decompress(format_str, compressed) end
 
---- Encodes binary data using the given format (''base64'', ''hex'').
+--- Encodes binary data using the given format (base64, hex).
 ---@param format_str any
 ---@param raw_data any
----@return any
+---@return string
 function luna.data.encode(format_str, raw_data) end
 
 --- Encodes a Lua table as a TOML string.
----@param tbl any
----@return any
-function luna.data.encodeToml(tbl) end
+---@param input any
+---@return string
+function luna.data.encodeToml(input) end
 
 --- Returns the number of bytes the given format and values would occupy.
 ---@param fmt any
 ---@param vals any
----@return any
+---@return integer
 function luna.data.getPackedSize(fmt, vals) end
 
---- Returns the cryptographic hash (md5, sha1, sha256, sha512) of the input.
+--- Returns the cryptographic hash of the input (md5, sha1, sha256, sha512).
 ---@param algo_str any
 ---@param raw_data any
----@return any
+---@return string
 function luna.data.hash(algo_str, raw_data) end
 
---- Creates a new mutable byte buffer of the given size or from a string.
+--- Creates a new mutable byte buffer from a size or string.
 ---@param value any
+---@return ByteData
 function luna.data.newByteData(value) end
 
 --- Creates a read-only windowed view into a byte string.
 ---@param raw any
 ---@param offset? any (optional)
 ---@param size? any (optional)
----@return any
+---@return DataView
 function luna.data.newDataView(raw, offset, size) end
 
---- Packs values into a binary byte string using the LÖVE2D format string.
+--- Packs values into a binary byte string using the format string.
 ---@param fmt any
 ---@param vals any
----@return any
+---@return string
 function luna.data.pack(fmt, vals) end
 
---- Parses a TOML string and returns a Lua table representation.
----@param toml_string any
----@return any
-function luna.data.parseToml(toml_string) end
+--- Parses a TOML string and returns a Lua table.
+---@param input any
+---@return table
+function luna.data.parseToml(input) end
 
 --- Reads values using the Luna2D Binary Pack Format.
 ---@param fmt any
 ---@param raw any
 ---@param offset? any (optional)
----@return any
 function luna.data.read(fmt, raw, offset) end
 
 --- Returns the byte size of a Luna2D Binary Pack Format string.
@@ -1827,2234 +2020,1895 @@ function luna.data.read(fmt, raw, offset) end
 ---@return integer
 function luna.data.size(fmt) end
 
---- Unpacks values from a LÖVE2D-format binary byte string.
+--- Unpacks values from a binary byte string, returning values followed by next offset.
 ---@param fmt any
 ---@param raw any
 ---@param offset? any (optional)
----@return any
 function luna.data.unpack(fmt, raw, offset) end
 
---- Writes values using the Luna2D Binary Pack Format (space-separated type tokens).
+--- Writes values using the Luna2D Binary Pack Format.
 ---@param fmt any
 ---@param vals any
----@return any
+---@return string
 function luna.data.write(fmt, vals) end
 
 ---@class luna.dataframe
 luna.dataframe = {}
 
+--- Lua-side wrapper around a shared [`DataFrame`].
 ---@class DataFrame
 local DataFrame = {}
 
---- Adds row to the collection.
----@param row_tbl? table `table` optional.
----@return any
+--- Adds a row from an optional table of name-value pairs, returns 1-based index.
+---@param row_tbl? any (optional)
+---@return integer
 function DataFrame:addRow(row_tbl) end
 
---- Returns a deep copy of this object.
----@return any
+--- Returns a deep copy of this DataFrame.
+---@return DataFrame
 function DataFrame:clone() end
 
---- Columns on this DataFrame.
+--- Returns a table of column names.
 ---@return table
 function DataFrame:columns() end
 
---- Returns the number of items.
----@param name string `string`.
----@param default? number `any` optional.
----@return number
-function DataFrame:count(name, default) end
+--- Returns the row count (alias for nrows).
+---@return integer
+function DataFrame:count() end
 
---- Returns the number of by.
----@param col number `any`.
----@return number
+--- Counts distinct values in a column, returns a DataFrame with value and count columns.
+---@param col any
+---@return DataFrame
 function DataFrame:countBy(col) end
 
---- Describe on this DataFrame.
----@param col number `any`.
----@return any
-function DataFrame:describe(col) end
+--- Returns descriptive statistics for all numeric columns.
+---@return DataFrame
+function DataFrame:describe() end
 
---- Drop nil on this DataFrame.
----@param n number `integer`.
----@param seed? number `integer` optional.
----@return any
-function DataFrame:dropNil(n, seed) end
+--- Removes rows where the given column is nil, returns a new DataFrame.
+---@param col any
+---@return DataFrame
+function DataFrame:dropNil(col) end
 
---- Fill nil on this DataFrame.
----@param col number `any`.
----@param val number `any`.
+--- Replaces nil values in a column with the given value.
+---@param col any
+---@param val any
+---@return nil
 function DataFrame:fillNil(col, val) end
 
---- Returns the column.
----@param col number `any`.
+--- Returns all values in a column as a table.
+---@param col any
 ---@return table
 function DataFrame:getColumn(col) end
 
---- Returns the row.
----@param row number `integer`.
+--- Returns a row as a table of name-value pairs.
+---@param row any
 ---@return table
 function DataFrame:getRow(row) end
 
---- Returns the value.
----@param row number `integer`.
----@param col number `any`.
----@return any
+--- Returns a single cell value.
+---@param row any
+---@param col any
+---@return LuaValue
 function DataFrame:getValue(row, col) end
 
---- Group by on this DataFrame.
----@param col number `any`.
+--- Groups rows by column value, returns a table of DataFrames keyed by value.
+---@param col any
 ---@return table
 function DataFrame:groupBy(col) end
 
---- Head on this DataFrame.
----@param n? number `integer` optional.
----@return any
+--- Returns the first n rows (default 5).
+---@param n? any (optional)
+---@return DataFrame
 function DataFrame:head(n) end
 
---- Max on this DataFrame.
----@param col number `any`.
+--- Returns the maximum numeric value in a column.
+---@param col any
+---@return number
 function DataFrame:max(col) end
 
---- Mean on this DataFrame.
----@param col number `any`.
+--- Returns the mean of numeric values in a column.
+---@param col any
+---@return number
 function DataFrame:mean(col) end
 
---- Median on this DataFrame.
----@param col number `any`.
+--- Returns the median of numeric values in a column.
+---@param col any
+---@return number
 function DataFrame:median(col) end
 
---- Merge on this DataFrame.
----@param other any `userdata`.
+--- Appends rows from another DataFrame in-place.
+---@param other any
+---@return nil
 function DataFrame:merge(other) end
 
---- Min on this DataFrame.
----@param col number `any`.
+--- Returns the minimum numeric value in a column.
+---@param col any
+---@return number
 function DataFrame:min(col) end
 
---- Ncols on this DataFrame.
----@return any
+--- Returns the number of columns.
+---@return integer
 function DataFrame:ncols() end
 
---- Nrows on this DataFrame.
----@return any
+--- Returns the number of rows.
+---@return integer
 function DataFrame:nrows() end
 
---- Runs a query and returns matching results.
----@param sql_str string `string`.
----@return any
+--- Executes a SQL query against this DataFrame.
+---@param sql_str any
+---@return DataFrame
 function DataFrame:query(sql_str) end
 
---- Removes column from the collection.
----@param col number `any`.
+--- Removes a column by name or index.
+---@param col any
+---@return nil
 function DataFrame:removeColumn(col) end
 
---- Removes row from the collection.
----@param row number `integer`.
+--- Removes a row by 1-based index.
+---@param row any
+---@return nil
 function DataFrame:removeRow(row) end
 
---- Rename on this DataFrame.
----@param col number `any`.
----@param new_name string `string`.
+--- Renames a column.
+---@param col any
+---@param new_name any
+---@return nil
 function DataFrame:rename(col, new_name) end
 
---- Sample on this DataFrame.
----@param n number `integer`.
----@param seed? number `integer` optional.
----@return any
+--- Returns a random sample of n rows.
+---@param n any
+---@param seed? any (optional)
+---@return DataFrame
 function DataFrame:sample(n, seed) end
 
---- Returns filtered rows or items matching the query.
----@param cols any `LuaMultiValue`.
----@return any
+--- Selects a subset of columns, returns a new DataFrame.
+---@param cols any
+---@return DataFrame
 function DataFrame:select(cols) end
 
---- Slice on this DataFrame.
----@param start number `integer`.
----@param end number `integer`.
----@return any
+--- Returns rows from start to end (1-based, inclusive).
+---@param start any
+---@param end any
+---@return DataFrame
 function DataFrame:slice(start, end) end
 
---- Stddev on this DataFrame.
----@param col number `any`.
+--- Returns the population standard deviation of numeric values in a column.
+---@param col any
+---@return number
 function DataFrame:stddev(col) end
 
---- Sum on this DataFrame.
----@param col number `any`.
+--- Returns the sum of numeric values in a column.
+---@param col any
+---@return number
 function DataFrame:sum(col) end
 
---- Tail on this DataFrame.
----@param start number `integer`.
----@param end number `integer`.
----@return any
-function DataFrame:tail(start, end) end
+--- Returns the last n rows (default 5).
+---@param n? any (optional)
+---@return DataFrame
+function DataFrame:tail(n) end
 
---- To binary on this DataFrame.
----@return any
-function DataFrame:toBinary() end
+--- Serializes this DataFrame to a binary LVDF string.
+---@param lua Lua
+---@return string
+function DataFrame:toBinary(lua) end
 
---- To c s v on this DataFrame.
----@return any
+--- Serializes this DataFrame to a CSV string.
+---@return string
 function DataFrame:toCSV() end
 
---- To j s o n on this DataFrame.
----@return any
+--- Serializes this DataFrame to a JSON string.
+---@return string
 function DataFrame:toJSON() end
 
---- To string on this DataFrame.
----@param sql_str string `string`.
----@return any
-function DataFrame:toString(sql_str) end
+--- Returns a formatted string table representation.
+---@return string
+function DataFrame:toString() end
 
---- To table on this DataFrame.
+--- Converts this DataFrame to a Lua table of row tables.
 ---@return table
 function DataFrame:toTable() end
 
---- Unique on this DataFrame.
----@param col number `any`.
+--- Returns unique values in a column as a table.
+---@param col any
 ---@return table
 function DataFrame:unique(col) end
 
---- Variance on this DataFrame.
----@param col number `any`.
+--- Returns the population variance of numeric values in a column.
+---@param col any
+---@return number
 function DataFrame:variance(col) end
 
+--- Lua-side wrapper around a shared [`Database`].
 ---@class Database
 local Database = {}
 
---- Removes all entries.
----@param other any `userdata`.
-function Database:clear(other) end
+--- Removes all tables.
+---@return nil
+function Database:clear() end
 
---- Returns the table.
----@param name string `string`.
----@return table
+--- Returns a copy of a table by name, or nil if not found.
+---@param name any
+---@return DataFrame?
 function Database:getTable(name) end
 
---- Returns `true` if table.
----@param name string `string`.
+--- Returns true if a table with the given name exists.
+---@param name any
 ---@return boolean
 function Database:hasTable(name) end
 
---- List tables on this Database.
+--- Returns a table of all table names.
 ---@return table
 function Database:listTables() end
 
---- Merge on this Database.
----@param other any `userdata`.
+--- Merges all tables from another Database into this one.
+---@param other any
+---@return nil
 function Database:merge(other) end
 
---- Runs a query and returns matching results.
----@param sql_str string `string`.
----@return any
+--- Executes a SQL query against the database tables.
+---@param sql_str any
+---@return DataFrame
 function Database:query(sql_str) end
 
---- Removes table from the collection.
----@param name string `string`.
+--- Removes a table by name.
+---@param name any
+---@return nil
 function Database:removeTable(name) end
 
---- Table count on this Database.
----@return any
+--- Returns the number of tables.
+---@return integer
 function Database:tableCount() end
 
---- To j s o n on this Database.
----@return any
+--- Serializes all tables to a JSON object string.
+---@return string
 function Database:toJSON() end
 
---- From binary.
+--- Deserializes a binary LVDF string into a DataFrame.
 ---@param s any
----@return any
+---@return DataFrame
 function luna.dataframe.fromBinary(s) end
 
---- From csv.
+--- Parses a CSV string into a DataFrame.
 ---@param s any
----@return any
+---@return DataFrame
 function luna.dataframe.fromCSV(s) end
 
---- From json.
+--- Parses a JSON string into a DataFrame.
 ---@param s any
----@return any
+---@return DataFrame
 function luna.dataframe.fromJSON(s) end
 
---- From table.
----@param tbl any
----@return any
-function luna.dataframe.fromTable(tbl) end
+--- Creates a DataFrame from an array of row tables.
+---@param rows any
+---@return DataFrame
+function luna.dataframe.fromTable(rows) end
 
---- New data frame.
----@return any
+--- Creates a new empty DataFrame.
+---@return DataFrame
 function luna.dataframe.newDataFrame() end
 
---- New database.
----@return any
+--- Creates a new empty Database.
+---@return Database
 function luna.dataframe.newDatabase() end
 
---- Random.
+--- Generates a DataFrame with random data from column definitions.
 ---@param defs_tbl any
 ---@param n any
 ---@param seed? any (optional)
----@return any
+---@return DataFrame
 function luna.dataframe.random(defs_tbl, n, seed) end
-
----@class luna.debug
-luna.debug = {}
-
---- Clears all log history.
-function luna.debug.clearLog() end
-
---- Clears all watched paths.
-function luna.debug.clearWatches() end
-
---- Evaluates a Lua string and returns success flag plus results.
----@param code any
----@return any
-function luna.debug.eval(code) end
-
---- Returns the Lua call stack as a table of stack frames.
----@param max_depth? any (optional)
----@return any
-function luna.debug.getCallStack(max_depth) end
-
---- Returns the raw frame time history.
----@return table
-function luna.debug.getFrameHistory() end
-
---- Returns the current frame history buffer size.
----@return boolean
-function luna.debug.getFrameHistorySize() end
-
---- Returns computed frame statistics.
-function luna.debug.getFrameStats() end
-
---- Returns whether console output is enabled.
-function luna.debug.getLogConsole() end
-
---- Returns the current log file path.
----@return table
-function luna.debug.getLogFile() end
-
---- Returns the last `count` log entries (default all).
----@param count? any (optional)
----@return table
-function luna.debug.getLogHistory(count) end
-
---- Returns the current minimum log level.
-function luna.debug.getLogLevel() end
-
---- Returns zone data for a specific frame (0 = most recent).
----@param frame? any (optional)
----@return table
-function luna.debug.getProfileData(frame) end
-
---- Returns the number of retained profile frames.
----@return table
-function luna.debug.getProfileFrameCount() end
-
---- Returns the current watch interval.
-function luna.debug.getWatchInterval() end
-
---- Returns all watched file paths.
----@return table
-function luna.debug.getWatchedPaths() end
-
---- Returns whether the console is considered open.
-function luna.debug.isConsoleOpen() end
-
---- Returns whether the profiler is enabled.
-function luna.debug.isProfilingEnabled() end
-
---- Log at any level with optional source/line info.
----@param level any
----@param message any
-function luna.debug.log(level, message) end
-
---- Opens a console window (no-op on non-Windows).
----@return boolean
-function luna.debug.openConsole() end
-
---- Seals the current frame of profiling data.
-function luna.debug.profileFrame() end
-
---- Ends the most recent timing zone.
----@param name? any (optional)
-function luna.debug.profilePop(name) end
-
---- Starts a named timing zone.
----@param name any
-function luna.debug.profilePush(name) end
-
---- Records a frame time sample.
----@param dt_val any
-function luna.debug.recordFrameTime(dt_val) end
-
---- Clears all profiling state.
-function luna.debug.resetProfile() end
-
---- Scans watched files and returns paths whose modification time changed.
----@return table
-function luna.debug.scan() end
-
---- Sets the maximum frame history buffer size (clamped 10–10000).
----@param size any
-function luna.debug.setFrameHistorySize(size) end
-
---- Toggles stderr console output.
----@param enabled any
-function luna.debug.setLogConsole(enabled) end
-
---- Sets the log file path. Empty string disables file logging.
----@param path any
-function luna.debug.setLogFile(path) end
-
---- Sets the minimum log level to record.
----@param level any
-function luna.debug.setLogLevel(level) end
-
---- Enables or disables the profiler.
----@param enabled any
-function luna.debug.setProfilingEnabled(enabled) end
-
---- Sets the advisory watch interval in seconds.
----@param interval any
-function luna.debug.setWatchInterval(interval) end
-
---- Removes a file from the watch list.
----@param path any
----@return boolean
-function luna.debug.unwatch(path) end
-
---- Registers a file path for modification-time polling.
----@param path any
----@return boolean
-function luna.debug.watch(path) end
-
----@class luna.debugbridge
-luna.debugbridge = {}
-
---- Broadcasts a JSON event to all connected clients.
----@param event any
----@param json_data any
-function luna.debugbridge.broadcast(event, json_data) end
-
---- Captures a print message and broadcasts it to connected clients.
----@param msg any
----@param source? any (optional)
----@param line? any (optional)
-function luna.debugbridge.capturePrint(msg, source, line) end
-
---- Clears the print history.
-function luna.debugbridge.clearPrintHistory() end
-
---- Returns the number of connected TCP clients.
----@return any
-function luna.debugbridge.getClientCount() end
-
---- Returns performance statistics.
----@return table
-function luna.debugbridge.getPerformance() end
-
---- Returns the server port (0 if not running).
----@return any
-function luna.debugbridge.getPort() end
-
---- Returns the print history.
----@param count? any (optional)
----@return table
-function luna.debugbridge.getPrintHistory(count) end
-
---- Returns whether the server is currently running.
----@return any
-function luna.debugbridge.isRunning() end
-
---- Returns whether a screenshot is currently requested.
----@return any
-function luna.debugbridge.isScreenshotRequested() end
-
---- Poll for pending Lua-dependent requests from TCP clients.
----@return any
-function luna.debugbridge.poll() end
-
---- Records a frame time sample.
----@param dt any
-function luna.debugbridge.recordFrame(dt) end
-
---- Flags a screenshot request for the next frame.
----@param scale? any (optional)
-function luna.debugbridge.requestScreenshot(scale) end
-
---- Sets the maximum print history size.
----@param max any
-function luna.debugbridge.setMaxPrintHistory(max) end
-
---- Start the TCP debug server on 127.0.0.1:port.
----@param port? any (optional)
----@return boolean
-function luna.debugbridge.start(port) end
-
---- Stop the TCP debug server and close all connections.
-function luna.debugbridge.stop() end
-
----@class luna.docs
-luna.docs = {}
-
----@class ApiCatalog
-local ApiCatalog = {}
-
---- Entry count on this Object.
----@param module? string `string` optional.
----@return any
-function ApiCatalog:entryCount(module) end
-
---- Returns a filtered subset.
----@param predicate function `function`.
----@return any
-function ApiCatalog:filter(predicate) end
-
---- Returns the entries.
----@param module? string `string` optional.
----@return table
-function ApiCatalog:getEntries(module) end
-
---- Returns the entry.
----@param qualified_name string `string`.
----@return number
-function ApiCatalog:getEntry(qualified_name) end
-
---- Returns the modules.
----@return table
-function ApiCatalog:getModules() end
-
---- Returns the type methods.
----@param qualified_name string `string`.
----@return number
-function ApiCatalog:getTypeMethods(qualified_name) end
-
---- Returns the types.
----@param module_name string `string`.
----@return number
-function ApiCatalog:getTypes(module_name) end
-
---- Merge on this Object.
----@param other any `userdata`.
----@return any
-function ApiCatalog:merge(other) end
-
---- Search on this Object.
----@param query string `string`.
----@return table
-function ApiCatalog:search(query) end
-
---- To j s o n on this Object.
----@return any
-function ApiCatalog:toJSON() end
-
---- To table on this Object.
----@return table
-function ApiCatalog:toTable() end
-
----@class DocEntry
-local DocEntry = {}
-
---- Returns the deprecated.
----@return any
-function DocEntry:getDeprecated() end
-
---- Returns the description.
----@return any
-function DocEntry:getDescription() end
-
---- Returns the example.
----@return number
-function DocEntry:getExample() end
-
---- Returns the kind.
----@return any
-function DocEntry:getKind() end
-
---- Returns the module.
----@return any
-function DocEntry:getModule() end
-
---- Returns the name.
----@return any
-function DocEntry:getName() end
-
---- Returns the parameters.
----@return table
-function DocEntry:getParameters() end
-
---- Returns the qualified name.
----@return any
-function DocEntry:getQualifiedName() end
-
---- Returns the returns.
----@return table
-function DocEntry:getReturns() end
-
---- Returns the score.
----@return any
-function DocEntry:getScore() end
-
---- Returns the since.
----@return any
-function DocEntry:getSince() end
-
---- Returns `true` if description.
----@return boolean
-function DocEntry:hasDescription() end
-
---- Returns `true` if example.
----@return boolean
-function DocEntry:hasExample() end
-
---- Returns `true` if parameters.
----@return boolean
-function DocEntry:hasParameters() end
-
---- Returns `true` if return type.
----@return boolean
-function DocEntry:hasReturnType() end
-
----@class QualityReport
-local QualityReport = {}
-
---- Returns the best.
----@param count? number `integer` optional.
----@return table
-function QualityReport:getBest(count) end
-
---- Returns the by grade.
----@param grade string `string`.
----@return number
-function QualityReport:getByGrade(grade) end
-
---- Returns the grade.
----@return any
-function QualityReport:getGrade() end
-
---- Returns the module scores.
----@param count? number `integer` optional.
----@return table
-function QualityReport:getModuleScores(count) end
-
---- Returns the overall score.
----@return any
-function QualityReport:getOverallScore() end
-
---- Returns the summary.
----@return number
-function QualityReport:getSummary() end
-
---- Returns the worst.
----@param count? number `integer` optional.
----@return table
-function QualityReport:getWorst(count) end
-
---- To j s o n on this Object.
----@return any
-function QualityReport:toJSON() end
-
---- To table on this Object.
----@return table
-function QualityReport:toTable() end
-
----@class ValidationReport
-local ValidationReport = {}
-
---- Returns the incomplete.
----@return table
-function ValidationReport:getIncomplete() end
-
---- Returns the missing.
----@return table
-function ValidationReport:getMissing() end
-
---- Returns the phantom.
----@return table
-function ValidationReport:getPhantom() end
-
---- Returns the summary.
----@return number
-function ValidationReport:getSummary() end
-
---- Incomplete count on this Object.
----@return integer
-function ValidationReport:incompleteCount() end
-
---- Returns `true` if valid.
----@return boolean
-function ValidationReport:isValid() end
-
---- Missing count on this Object.
----@return integer
-function ValidationReport:missingCount() end
-
---- Phantom count on this Object.
----@return integer
-function ValidationReport:phantomCount() end
-
---- To j s o n on this Object.
----@return any
-function ValidationReport:toJSON() end
-
---- To table on this Object.
----@return table
-function ValidationReport:toTable() end
-
---- Compare catalog timestamps against source files.
----@param catalog_ud any
----@param source_dir any
----@return table
-function luna.docs.checkStaleness(catalog_ud, source_dir) end
-
---- Coverage: (documented, total).
----@param catalog_ud? any (optional)
----@return any
-function luna.docs.coverage(catalog_ud) end
-
---- Module-level coverage.
----@param module_name any
----@param catalog_ud? any (optional)
----@return any
-function luna.docs.coverageModule(module_name, catalog_ud) end
-
---- Inject a description for an API entry.
----@param qualified_name any
----@param description any
-function luna.docs.describe(qualified_name, description) end
-
---- Export all three files to a directory.
----@param catalog_ud any
----@param output_dir any
-function luna.docs.exportAll(catalog_ud, output_dir) end
-
---- Export one-line-per-function cheatsheet.
----@param catalog_ud any
----@param path any
-function luna.docs.exportCheatsheet(catalog_ud, path) end
-
---- Export completions JSON for VS Code IntelliSense.
----@param catalog_ud any
----@param path any
-function luna.docs.exportCompletions(catalog_ud, path) end
-
---- Export hover JSON.
----@param catalog_ud any
----@param path any
-function luna.docs.exportHover(catalog_ud, path) end
-
---- Export markdown API reference.
----@param catalog_ud any
----@param path any
-function luna.docs.exportMarkdown(catalog_ud, path) end
-
---- Export signatures JSON.
----@param catalog_ud any
----@param path any
-function luna.docs.exportSignatures(catalog_ud, path) end
-
---- Get the current internal catalog.
-function luna.docs.getCatalog() end
-
---- Load all .toml files in a directory and merge.
----@param directory any
----@return any
-function luna.docs.loadAll(directory) end
-
---- Load a TOML doc file into an ApiCatalog.
----@param path any
----@return any
-function luna.docs.loadToml(path) end
-
---- Calculate quality metrics for a catalog.
----@param catalog_ud? any (optional)
----@return any
-function luna.docs.quality(catalog_ud) end
-
---- Quality for a single module.
----@param module_name any
----@param catalog_ud? any (optional)
----@return any
-function luna.docs.qualityModule(module_name, catalog_ud) end
-
---- Reset the internal catalog.
-function luna.docs.resetCatalog() end
-
---- Scan the luna.* namespace to build an API catalog from live bindings.
----@param opts? any (optional)
----@return any
-function luna.docs.scan(opts) end
-
---- Scan a single module's bindings.
----@param module_name any
----@return any
-function luna.docs.scanModule(module_name) end
-
---- Set parameter info for an entry.
----@param qualified_name any
----@param params any
-function luna.docs.setParamInfo(qualified_name, params) end
-
---- Set return type info for an entry.
----@param qualified_name any
----@param returns any
-function luna.docs.setReturnInfo(qualified_name, returns) end
-
---- Validate catalog completeness against live bindings.
----@param catalog_ud? any (optional)
----@return any
-function luna.docs.validate(catalog_ud) end
-
---- Validate a single module.
----@param module_name any
----@param catalog_ud? any (optional)
----@return any
-function luna.docs.validateModule(module_name, catalog_ud) end
 
 ---@class luna.entity
 luna.entity = {}
 
+--- Lua-side wrapper around a [`Universe`] ECS world.
 ---@class Universe
 local Universe = {}
 
---- Adds system to the collection.
----@param system table `table`.
+--- Adds a system table to the universe.
+---@param system any
+---@return nil
 function Universe:addSystem(system) end
 
---- Attaches a string tag to the entity, enabling fast tag-based group queries.
----@param id number `integer`: Entity ID.
----@param tag string `string`: Tag label to add.
+--- Attaches a string tag to an entity.
+---@param id any
+---@param tag any
+---@return nil
 function Universe:addTag(id, tag) end
 
---- Bitmap tag on this Universe.
----@param id number `integer`.
----@param name string `string`.
+--- Adds a bitmap tag to an entity.
+---@param id any
+---@param name any
+---@return nil
 function Universe:bitmapTag(id, name) end
 
---- Bitmap untag on this Universe.
----@param id number `integer`.
----@param name string `string`.
+--- Removes a bitmap tag from an entity.
+---@param id any
+---@param name any
+---@return nil
 function Universe:bitmapUntag(id, name) end
 
---- Removes all entries.
----@return any
+--- Removes all entities, components, tags, layers, and systems. Blueprints are preserved.
+---@return nil
 function Universe:clear() end
 
---- Define tag on this Universe.
----@param id number `integer`.
----@param name string `string`.
-function Universe:defineTag(id, name) end
+--- Defines a bitmap tag name, returning its bit index.
+---@param name any
+---@return integer
+function Universe:defineTag(name) end
 
---- Draws to the current render target.
----@return any
+--- Calls draw(system, world) on each registered system.
+---@return nil
 function Universe:draw() end
 
---- Emits an event.
----@param args any `LuaMultiValue`.
+--- Calls callback(id, value) for every entity with the named component.
+---@param name any
+---@param callback any
+---@return nil
+function Universe:each(name, callback) end
+
+--- Emits a named event to all systems that implement the handler.
+---@param args any
+---@return nil
 function Universe:emit(args) end
 
---- Returns the current value.
----@param id number `integer`.
----@param name string `string`.
----@return any
+--- Returns the component value for an entity, or nil if missing.
+---@param id any
+---@param name any
+---@return table
 function Universe:get(id, name) end
 
---- Returns the bitmap tag bit.
----@param name string `string`.
----@return any
+--- Returns the bit index for a bitmap tag name, or nil if undefined.
+---@param name any
+---@return integer?
 function Universe:getBitmapTagBit(name) end
 
---- Returns the blueprint components.
----@param name string `string`.
----@return number
+--- Returns a deep copy of a blueprint's component table, or nil.
+---@param name any
+---@return table
 function Universe:getBlueprintComponents(name) end
 
---- Returns an array of packed entity IDs for all direct children.
+--- Returns all direct child entity IDs.
 ---@param parent_id any
 ---@return table
 function Universe:getChildren(parent_id) end
 
---- Returns the components.
----@param id number `integer`.
----@return any
+--- Returns all component names for an entity.
+---@param id any
+---@return table
 function Universe:getComponents(id) end
 
---- Returns the entities.
----@return any
+--- Returns all alive entity IDs.
+---@return table
 function Universe:getEntities() end
 
---- Returns the entities by layer.
----@param layer number `integer`.
----@return number
+--- Returns all alive entities on a specific layer.
+---@param layer any
+---@return table
 function Universe:getEntitiesByLayer(layer) end
 
---- Returns the entities by tag.
----@param id number `integer`.
----@param layer number `integer`.
----@return number
-function Universe:getEntitiesByTag(id, layer) end
+--- Returns all alive entities with the given string tag.
+---@param tag any
+---@return table
+function Universe:getEntitiesByTag(tag) end
 
---- Returns the entities sorted.
----@param name string `string`.
----@return any
-function Universe:getEntitiesSorted(name) end
+--- Returns all alive entities sorted by layer then ID.
+---@return table
+function Universe:getEntitiesSorted() end
 
---- Returns the entity count.
----@param system table `table`.
----@return number
-function Universe:getEntityCount(system) end
+--- Returns the number of alive entities.
+---@return integer
+function Universe:getEntityCount() end
 
---- Returns the layer.
----@param id number `integer`.
----@return number
+--- Returns the layer for an entity, defaulting to zero.
+---@param id any
+---@return integer
 function Universe:getLayer(id) end
 
---- Returns the packed entity ID of the parent, or nil if the entity has no parent.
+--- Returns the parent entity ID, or nil if unparented.
 ---@param child_id any
----@return integer|nil
+---@return integer?
 function Universe:getParent(child_id) end
 
---- Returns the system count.
----@return number
+--- Returns the number of registered systems.
+---@return integer
 function Universe:getSystemCount() end
 
---- Returns the tags.
----@param id number `integer`.
----@return any
+--- Returns all string tags for an entity.
+---@param id any
+---@return table
 function Universe:getTags(id) end
 
---- Returns `true` if the condition is met.
----@param id number `integer`.
----@param name string `string`.
+--- Returns true if the entity has the named component.
+---@param id any
+---@param name any
 ---@return boolean
 function Universe:has(id, name) end
 
---- Returns `true` if bitmap tag.
----@param id number `integer`.
----@param name string `string`.
+--- Returns true if the entity has the given bitmap tag.
+---@param id any
+---@param name any
 ---@return boolean
 function Universe:hasBitmapTag(id, name) end
 
---- Returns `true` if blueprint.
----@param name string `string`.
+--- Returns true if a blueprint with the given name exists.
+---@param name any
 ---@return boolean
 function Universe:hasBlueprint(name) end
 
---- Returns `true` if the entity carries the given tag.
----@param id number `integer`: Entity ID.
----@param tag string `string`: Tag to test.
+--- Returns true if the entity carries the given tag.
+---@param id any
+---@param tag any
 ---@return boolean
 function Universe:hasTag(id, tag) end
 
---- Returns `true` if the entity `id` is currently active in the universe.
----@param id number `integer`: Entity ID to test.
+--- Returns true if the entity ID is currently alive.
+---@param id any
 ---@return boolean
 function Universe:isAlive(id) end
 
---- Destroys the entity with the given `id`, freeing its slot for reuse.
----@param id number `integer`: Entity ID returned by `spawn`.
+--- Destroys the entity with the given ID, freeing its slot for reuse.
+---@param id any
+---@return nil
 function Universe:kill(id) end
 
---- Kills an entity and all its descendants recursively (post-order).
+--- Kills an entity and all its descendants recursively.
 ---@param id any
+---@return nil
 function Universe:killRecursive(id) end
 
---- List blueprints on this Universe.
----@param name string `string`.
-function Universe:listBlueprints(name) end
+--- Returns all defined blueprint names.
+---@return table
+function Universe:listBlueprints() end
 
---- Runs a query and returns matching results.
----@param args any `LuaMultiValue`.
+--- Returns entity IDs that have all listed component names.
+---@param args any
+---@return table
 function Universe:query(args) end
 
---- Query bitmap all on this Universe.
----@param names table `table`.
----@return any
+--- Returns all alive entities with all of the listed bitmap tags.
+---@param names any
+---@return table
 function Universe:queryBitmapAll(names) end
 
---- Query bitmap any on this Universe.
----@param names table `table`.
----@return any
+--- Returns all alive entities with any of the listed bitmap tags.
+---@param names any
+---@return table
 function Universe:queryBitmapAny(names) end
 
---- Query bitmap tag on this Universe.
----@param name string `string`.
----@return any
+--- Returns all alive entities with the given bitmap tag.
+---@param name any
+---@return table
 function Universe:queryBitmapTag(name) end
 
---- Releases the underlying resource handle.
----@param id number `integer`.
----@param tag string `string`.
-function Universe:release(id, tag) end
+--- Releases all universe state, equivalent to clear.
+---@return nil
+function Universe:release() end
 
---- Removes the entry from the collection.
----@param id number `integer`.
----@param name string `string`.
+--- Removes a component from an entity.
+---@param id any
+---@param name any
+---@return nil
 function Universe:remove(id, name) end
 
---- Removes blueprint from the collection.
----@param name string `string`.
+--- Removes a blueprint definition.
+---@param name any
+---@return nil
 function Universe:removeBlueprint(name) end
 
---- Removes system from the collection.
----@param system table `table`.
+--- Removes a system table from the universe.
+---@param system any
+---@return nil
 function Universe:removeSystem(system) end
 
---- Removes a string tag from the entity.
----@param id number `integer`: Entity ID.
----@param tag string `string`: Tag to remove.
+--- Removes a string tag from an entity.
+---@param id any
+---@param tag any
+---@return nil
 function Universe:removeTag(id, tag) end
 
---- Sets the layer.
----@param id number `integer`.
----@param layer number `integer`.
+--- Sets a component value on an entity.
+---@param id any
+---@param name any
+---@param value any
+---@return nil
+function Universe:set(id, name, value) end
+
+--- Sets the layer for an entity.
+---@param id any
+---@param layer any
+---@return nil
 function Universe:setLayer(id, layer) end
 
---- Creates a new entity in this universe and returns its numeric ID.
----@return number
+--- Creates a new entity and returns its packed ID.
+---@return integer
 function Universe:spawn() end
 
---- Advances the simulation by `dt` seconds.
----@param dt number `number`.
+--- Calls update(system, world, dt) on each registered system.
+---@param dt any
+---@return nil
 function Universe:update(dt) end
 
---- New universe.
----@return any
+--- Creates a new empty ECS universe.
+---@return Universe
 function luna.entity.newUniverse() end
 
 ---@class luna.event
 luna.event = {}
 
+--- Lua-side wrapper around a [`Signal`] with registry-stored callbacks.
 ---@class Signal
 local Signal = {}
 
 --- Removes all callbacks for the named event.
 ---@param name any
----@return any
+---@return integer
 function Signal:clear(name) end
 
 --- Removes all callbacks across all events.
----@return any
+---@return integer
 function Signal:clearAll() end
 
---- Emits the named event, calling all registered callbacks in order.
+--- Emits the named event, calling all registered callbacks with extra arguments.
 ---@param args any
+---@return nil
 function Signal:emit(args) end
 
 --- Returns the callback count for the named event.
 ---@param name any
----@return any
+---@return integer
 function Signal:getCount(name) end
 
 --- Returns the total callback count across all events.
----@return any
+---@return integer
 function Signal:getTotalCount() end
 
 --- Removes a subscription by handle ID.
 ---@param handle any
----@return any
+---@return boolean
 function Signal:remove(handle) end
 
 --- Discards all pending events in the queue.
+---@return nil
 function luna.event.clear() end
 
---- Event.
----@return any
+--- Creates a new pub-sub Signal dispatcher.
+---@return Signal
 function luna.event.newSignal() end
 
---- Polls and returns the next event from the queue, or nil if empty.
----@return any
+--- Returns an iterator function that pops events from the queue.
+---@return function
 function luna.event.poll() end
 
---- Syncs OS-level events into the queue. In Luna2D this is a no-op (push model).
+--- Syncs OS-level events into the queue (no-op in Luna2D push model).
+---@return nil
 function luna.event.pump() end
 
 --- Pushes a custom event onto the event queue.
 ---@param args any
+---@return nil
 function luna.event.push(args) end
 
---- Pushes a quit event onto the event queue, requesting the engine to stop.
----@param exitcode? number Optional integer exit code (default 0).
-function luna.event.quit(exitcode) end
+--- Pushes a quit event, requesting the engine to stop.
+---@param code? any (optional)
+---@return nil
+function luna.event.quit(code) end
 
 --- Requests that the engine restart at the beginning of the next frame.
----@return any
+---@return nil
 function luna.event.restart() end
 
 --- Blocks until the next event arrives or the optional timeout elapses.
----@param timeout? number `number?`. Timeout in seconds (optional; omit to wait indefinitely).
----@return any
+---@param timeout? any (optional)
+---@return string?
 function luna.event.wait(timeout) end
 
 ---@class luna.filesystem
 luna.filesystem = {}
 
+--- Lua-side wrapper around a [`FileData`] buffer.
 ---@class FileData
 local FileData = {}
 
 --- Returns the virtual path this data was loaded from.
+---@return string
 function FileData:getFilename() end
 
 --- Returns the file size in bytes.
+---@return integer
 function FileData:getSize() end
 
 --- Returns the file content as a Lua string.
+---@return string
 function FileData:getString() end
 
+--- Lua-side wrapper around a [`FileHandle`] with interior mutability.
 ---@class FileHandle
 local FileHandle = {}
 
 --- Flushes any pending writes and closes the file handle.
----@return string
+---@return nil
 function FileHandle:close() end
 
 --- Flushes all buffered writes to disk without closing the handle.
----@return string
+---@return nil
 function FileHandle:flush() end
 
 --- Returns the access mode the file was opened with.
----@return any
+---@return string
 function FileHandle:getMode() end
 
 --- Returns the size of the open file in bytes.
----@return number
+---@return integer
 function FileHandle:getSize() end
 
 --- Returns whether the read cursor has reached the end of the file.
 ---@return boolean
 function FileHandle:isEOF() end
 
---- Reads a text file and returns its contents as a string.
+--- Reads bytes from the file, returning them as a string.
 ---@param count? any (optional)
----@return any
+---@return string
 function FileHandle:read(count) end
 
---- Reads the next line of text from the file and returns it as a string.
----@return string
+--- Reads the next line from the file without the trailing newline.
+---@return string?
 function FileHandle:readLine() end
 
 --- Seeks the file position to the given byte offset from the start.
----@param offset number Byte position to seek to (0-based).
----@return string
-function FileHandle:seek(offset) end
+---@param pos any
+---@return integer
+function FileHandle:seek(pos) end
 
 --- Returns the current read/write byte offset from the start of the file.
----@return number
+---@return integer
 function FileHandle:tell() end
 
---- Writes a string to a file, creating it if needed.
+--- Writes a string to the file and returns the number of bytes written.
 ---@param data any
----@return any
+---@return integer
 function FileHandle:write(data) end
 
 --- Opens the file in append mode and writes the given string at the end.
----@param path string Relative file path inside the save directory.
----@param data string String to append.
----@return string
+---@param path any
+---@param data any
+---@return nil
 function luna.filesystem.append(path, data) end
 
---- Creates a directory and any missing parent directories.
+--- Creates a directory and any missing parent directories in the save area.
 ---@param path any
+---@return nil
 function luna.filesystem.createDirectory(path) end
 
 --- Returns whether the given file or directory exists.
 ---@param path any
----@return any
+---@return boolean
 function luna.filesystem.exists(path) end
 
 --- Returns a table containing the names of every file and subdirectory in the given path.
----@param path string Directory path to list.
----@return string
+---@param path any
+---@return table
 function luna.filesystem.getDirectoryItems(path) end
 
---- Returns the identity string used to locate the game's sandboxed save directory.
+--- Returns the identity string used to locate the game's save directory.
 ---@return string
 function luna.filesystem.getIdentity() end
 
---- Returns a table of metadata (size, modtime, kind) for a path.
+--- Returns a table of metadata for a path, or nil if the path does not exist.
 ---@param path any
----@return any
+---@return table?
 function luna.filesystem.getInfo(path) end
 
 --- Returns the sandboxed save data directory path.
----@return any
+---@return string
 function luna.filesystem.getSaveDirectory() end
 
---- Returns the absolute path of the directory or archive the game was loaded from.
+--- Returns the absolute path of the directory the game was loaded from.
 ---@return string
 function luna.filesystem.getSource() end
 
 --- Returns the current user's home directory path.
----@return any
+---@return string
 function luna.filesystem.getUserDirectory() end
 
 --- Returns the current working directory path.
+---@return string
 function luna.filesystem.getWorkingDirectory() end
 
 --- Returns whether the given path is a directory.
 ---@param path any
----@return any
+---@return boolean
 function luna.filesystem.isDirectory(path) end
 
 --- Returns whether the given path is a regular file.
 ---@param path any
----@return any
+---@return boolean
 function luna.filesystem.isFile(path) end
 
---- Returns an iterator over lines in a text file.
+--- Returns an iterator function over the lines of a text file.
 ---@param path any
----@return any
+---@return function
 function luna.filesystem.lines(path) end
 
 --- Loads and compiles a Lua file from the VFS, returning it as a callable function.
 ---@param path any
+---@return function
 function luna.filesystem.load(path) end
 
---- Mounts a directory at a virtual path. Returns true on success.
+--- Mounts a directory at a virtual path inside the game filesystem.
 ---@param src any
 ---@param mp any
+---@return boolean
 function luna.filesystem.mount(src, mp) end
 
 --- Loads a file from the VFS into a FileData buffer.
 ---@param path any
+---@return FileData
 function luna.filesystem.newFileData(path) end
 
 --- Opens a file and returns a readable/writable file handle.
 ---@param path any
----@param mode_str any
----@return any
-function luna.filesystem.openFile(path, mode_str) end
+---@param mode any
+---@return FileHandle
+function luna.filesystem.openFile(path, mode) end
 
---- Poll an async load handle. Returns status, data-or-nil.
+--- Polls an async load handle, returning status and optional data.
 ---@param handle_id any
----@return any
+---@return string
 function luna.filesystem.pollAsync(handle_id) end
 
 --- Reads a text file and returns its contents as a string.
 ---@param path any
----@return any
+---@return string
 function luna.filesystem.read(path) end
 
---- Start loading a file in the background. Returns a numeric handle.
+--- Starts loading a file in the background and returns an opaque handle.
 ---@param path any
----@return any
+---@return integer
 function luna.filesystem.readAsync(path) end
 
---- Permanently deletes the file at the given path from the save directory.
----@param path string Relative path to the file to delete.
----@return string
+--- Permanently deletes a file or empty directory from the save directory.
+---@param path any
+---@return nil
 function luna.filesystem.remove(path) end
 
 --- Sets the identity string that names the game's sandboxed save-data directory.
----@param name string Application identity string (e.g. 'mygame').
+---@param name any
+---@return nil
 function luna.filesystem.setIdentity(name) end
 
---- Removes a virtual mount layer.
+--- Removes a virtual mount layer by mountpoint.
 ---@param mp any
+---@return boolean
 function luna.filesystem.unmount(mp) end
 
---- Writes a string to a file, creating it if needed.
+--- Writes a string to a file in the save directory.
 ---@param path any
 ---@param data any
+---@return nil
 function luna.filesystem.write(path, data) end
 
----@class luna.font
-luna.font = {}
+---@class luna.fx
+luna.fx = {}
 
----@class GlyphData
-local GlyphData = {}
+--- Lua-side wrapper around [`ImageEffect`].
+---@class ImageEffect
+local ImageEffect = {}
 
---- Returns the horizontal advance width in pixels.
+--- Appends a post-processing effect to this image effect chain.
+---@param effect any
+---@return nil
+function ImageEffect:addEffect(effect) end
+
+--- Removes all effects from the chain.
+---@return nil
+function ImageEffect:clear() end
+
+--- Returns the number of effects in the chain.
+---@return integer
+function ImageEffect:getEffectCount() end
+
+--- Removes the effect at the given index from the chain.
+---@param idx any
+---@return boolean
+function ImageEffect:removeByIndex(idx) end
+
+--- Removes the first effect matching the given type name.
+---@param name any
+---@return boolean
+function ImageEffect:removeByName(name) end
+
+--- Lua-side wrapper around [`Overlay`].
+---@class Overlay
+local Overlay = {}
+
+--- Resets all overlay subsystems to their default inactive state.
+---@return nil
+function Overlay:clear() end
+
+--- Returns the overlay width and height.
+---@return integer
+function Overlay:getDimensions() end
+
+--- Returns the current flash overlay alpha value.
 ---@return number
-function GlyphData:getAdvance() end
+function Overlay:getFlashAlpha() end
 
---- Returns the horizontal bearing (cursor-to-glyph-edge offset).
+--- Returns the overlay height.
+---@return integer
+function Overlay:getHeight() end
+
+--- Returns the current lightning overlay alpha value.
 ---@return number
-function GlyphData:getBearingX() end
+function Overlay:getLightningAlpha() end
 
---- Returns the vertical bearing (baseline-to-glyph-top offset).
+--- Returns the current shake displacement as x, y.
 ---@return number
-function GlyphData:getBearingY() end
+function Overlay:getShakeOffset() end
 
---- Returns the Unicode code point as an integer.
+--- Returns the overlay width.
+---@return integer
+function Overlay:getWidth() end
+
+--- Returns true if any overlay subsystem is currently active.
+---@return boolean
+function Overlay:isActive() end
+
+--- Resizes the overlay to match new window dimensions.
+---@param w any
+---@param h any
+---@return nil
+function Overlay:resize(w, h) end
+
+--- Triggers a lightning flash effect.
+---@return nil
+function Overlay:triggerLightning() end
+
+--- Advances all overlay subsystems by the given delta time.
+---@param dt any
+---@return nil
+function Overlay:update(dt) end
+
+--- Lua-side wrapper around [`PostFxEffect`].
+---@class PostFxEffect
+local PostFxEffect = {}
+
+--- Returns a named parameter value, or the default if not set.
+---@param name any
+---@param default any
 ---@return number
-function GlyphData:getGlyph() end
+function PostFxEffect:getParameter(name, default) end
 
---- Returns the glyph character as a UTF-8 string.
+--- Returns a list of all parameter names on this effect.
+---@return table
+function PostFxEffect:getParameterNames() end
+
+--- Returns the display name of this effect type.
 ---@return string
-function GlyphData:getGlyphString() end
+function PostFxEffect:getTypeName() end
 
---- Returns the pixel height of the glyph bitmap.
----@return number
-function GlyphData:getHeight() end
+--- Returns true if the named parameter exists on this effect.
+---@param name any
+---@return boolean
+function PostFxEffect:hasParameter(name) end
 
---- Returns the pixel width of the glyph bitmap.
----@return number
-function GlyphData:getWidth() end
+--- Returns true if this is a built-in effect, false if custom.
+---@return boolean
+function PostFxEffect:isBuiltIn() end
 
---- Stub: BMFont rasterization is not yet supported.
----@param image_file any
----@param glyph_hints any
-function luna.font.newBMFontRasterizer(image_file, glyph_hints) end
+--- Returns whether this effect is currently active.
+---@return boolean
+function PostFxEffect:isEnabled() end
 
---- Returns glyph metrics for a given Unicode code point within the font.
----@param font_val any
----@param codepoint any
-function luna.font.newGlyphData(font_val, codepoint) end
+--- Enables or disables this effect.
+---@param enabled any
+---@return nil
+function PostFxEffect:setEnabled(enabled) end
 
---- Loads a TTF/OTF font file and returns a font userdata object.
----@param path any
----@param size? any (optional)
-function luna.font.newRasterizer(path, size) end
+--- Sets a named float parameter on this effect.
+---@param name any
+---@param value any
+---@return nil
+function PostFxEffect:setParameter(name, value) end
 
---- Loads a TTF/OTF font with an optional hinting hint (currently ignored).
----@param path any
----@param size? any (optional)
----@param hinting? any (optional)
-function luna.font.newTrueTypeRasterizer(path, size, hinting) end
+--- Lua-side wrapper around [`PostFxStack`].
+---@class PostFxStack
+local PostFxStack = {}
+
+--- Appends an effect index to the end of the pipeline.
+---@param effect_idx any
+---@return nil
+function PostFxStack:add(effect_idx) end
+
+--- Removes all effects from the pipeline.
+---@return nil
+function PostFxStack:clear() end
+
+--- Returns width and height of the render target.
+---@return integer
+function PostFxStack:getDimensions() end
+
+--- Returns the effect index at the given pipeline position, or nil.
+---@param index any
+---@return integer?
+function PostFxStack:getEffect(index) end
+
+--- Returns the number of effects in the pipeline.
+---@return integer
+function PostFxStack:getEffectCount() end
+
+--- Returns a list of currently enabled effect indices.
+---@return table
+function PostFxStack:getEnabledEffects() end
+
+--- Returns the height of the render target.
+---@return integer
+function PostFxStack:getHeight() end
+
+--- Returns the width of the render target.
+---@return integer
+function PostFxStack:getWidth() end
+
+--- Returns true if the pipeline has no effect slots.
+---@return boolean
+function PostFxStack:isEmpty() end
+
+--- Returns whether the effect at the given index is enabled.
+---@param effect_idx any
+---@return boolean
+function PostFxStack:isEnabled(effect_idx) end
+
+--- Returns the total number of effect slots in the pipeline.
+---@return integer
+function PostFxStack:len() end
+
+--- Removes an effect index from the pipeline.
+---@param effect_idx any
+---@return boolean
+function PostFxStack:remove(effect_idx) end
+
+--- Resizes the render target to the given dimensions.
+---@param w any
+---@param h any
+---@return nil
+function PostFxStack:resize(w, h) end
+
+--- Creates a custom shader post-processing effect.
+---@param shader_id any
+---@return PostFxEffect
+function luna.fx.newCustomEffect(shader_id) end
+
+--- Creates a new built-in post-processing effect by type name.
+---@param type_name any
+---@return PostFxEffect
+function luna.fx.newEffect(type_name) end
+
+--- Creates a new per-image effect chain.
+---@param name any
+---@return ImageEffect
+function luna.fx.newImageEffect(name) end
+
+--- Creates a new screen overlay controller for weather, flash, shake, and fade effects.
+---@param w any
+---@param h any
+---@return Overlay
+function luna.fx.newOverlay(w, h) end
+
+--- Creates a new post-processing pipeline stack.
+---@param w any
+---@param h any
+---@return PostFxStack
+function luna.fx.newStack(w, h) end
 
 ---@class luna.graph
 luna.graph = {}
 
+---@class Edge
+local Edge = {}
+
+--- Adds an item type to the edge allow-list.
+---@param t any
+---@return nil
+function Edge:addAllowedType(t) end
+
+--- Clears the edge allow-list so all item types are permitted.
+---@return nil
+function Edge:clearAllowedTypes() end
+
+--- Returns the edge capacity (-1 = unlimited).
+---@return integer
+function Edge:getCapacity() end
+
+--- Returns the cooldown duration in seconds.
+---@return number
+function Edge:getCooldown() end
+
+--- Returns the source node handle.
+---@return Node
+function Edge:getFrom() end
+
+--- Returns a table of GraphItem handles currently in transit on this edge.
+---@return table
+function Edge:getItemsInTransit() end
+
+--- Returns the speed modifier applied to items in transit.
+---@return number
+function Edge:getSpeedModifier() end
+
+--- Returns items per second this edge can transfer.
+---@return number
+function Edge:getThroughput() end
+
+--- Returns the destination node handle.
+---@return Node
+function Edge:getTo() end
+
+--- Returns the travel time in seconds for items on this edge.
+---@return number
+function Edge:getTravelTime() end
+
+--- Returns the edge type string.
+---@return string
+function Edge:getType() end
+
+--- Returns the pathfinding weight of this edge.
+---@return number
+function Edge:getWeight() end
+
+--- Returns true if the edge is active.
+---@return boolean
+function Edge:isActive() end
+
+--- Returns true if items can travel the edge in either direction.
+---@return boolean
+function Edge:isBidirectional() end
+
+--- Returns true if the given item type is allowed on this edge.
+---@param t any
+---@return boolean
+function Edge:isItemTypeAllowed(t) end
+
+--- Returns true if the edge is currently on cooldown.
+---@return boolean
+function Edge:isOnCooldown() end
+
+--- Removes an item type from the edge allow-list.
+---@param t any
+---@return boolean
+function Edge:removeAllowedType(t) end
+
+--- Sets the active state of this edge.
+---@param a any
+---@return nil
+function Edge:setActive(a) end
+
+--- Sets whether items can travel the edge in either direction.
+---@param b any
+---@return nil
+function Edge:setBidirectional(b) end
+
+--- Sets the edge capacity (-1 = unlimited).
+---@param c any
+---@return nil
+function Edge:setCapacity(c) end
+
+--- Sets the cooldown duration in seconds.
+---@param c any
+---@return nil
+function Edge:setCooldown(c) end
+
+--- Sets the speed modifier applied to items in transit.
+---@param m any
+---@return nil
+function Edge:setSpeedModifier(m) end
+
+--- Sets items per second this edge can transfer.
+---@param t any
+---@return nil
+function Edge:setThroughput(t) end
+
+--- Sets the travel time in seconds for items on this edge.
+---@param t any
+---@return nil
+function Edge:setTravelTime(t) end
+
+--- Sets the edge type string.
+---@param t any
+---@return nil
+function Edge:setType(t) end
+
+--- Sets the pathfinding weight of this edge.
+---@param w any
+---@return nil
+function Edge:setWeight(w) end
+
 ---@class Graph
 local Graph = {}
 
---- Adds edge to the collection.
----@param from_ud any `userdata`.
----@param to_ud any `userdata`.
----@param edge_type? string `string` optional.
----@return any
-function Graph:addEdge(from_ud, to_ud, edge_type) end
-
---- Find path for item on this Graph.
----@param item_ud any `userdata`.
----@param from_ud any `userdata`.
----@param to_ud any `userdata`.
----@return any
-function Graph:findPathForItem(item_ud, from_ud, to_ud) end
-
---- Returns the components.
----@return any
+--- Returns weakly connected components as a table of tables of Node handles.
+---@return table
 function Graph:getComponents() end
 
---- Returns the edge count.
----@param from_ud any `userdata`.
----@param to_ud any `userdata`.
----@return any
-function Graph:getEdgeCount(from_ud, to_ud) end
+--- Returns the number of edges in the graph.
+---@return integer
+function Graph:getEdgeCount() end
 
---- Returns the edges.
----@return any
+--- Returns a table of all Edge handles.
+---@return table
 function Graph:getEdges() end
 
---- Returns the item count.
----@param item_ud any `userdata`.
----@param edge_ud any `userdata`.
----@return any
-function Graph:getItemCount(item_ud, edge_ud) end
+--- Returns the number of items in the graph.
+---@return integer
+function Graph:getItemCount() end
 
---- Returns the items.
----@return any
+--- Returns a table of all GraphItem handles.
+---@return table
 function Graph:getItems() end
 
---- Returns the neighbors.
----@param node_ud any `userdata`.
----@return any
+--- Returns a table of direct neighbor Node handles.
+---@param node_ud any
+---@return table
 function Graph:getNeighbors(node_ud) end
 
---- Returns the node count.
----@param from_ud any `userdata`.
----@param to_ud any `userdata`.
----@param edge_type? string `string` optional.
----@return any
-function Graph:getNodeCount(from_ud, to_ud, edge_type) end
+--- Returns the number of nodes in the graph.
+---@return integer
+function Graph:getNodeCount() end
 
---- Returns the nodes.
----@return any
+--- Returns a table of all Node handles.
+---@return table
 function Graph:getNodes() end
 
---- Returns the stats.
----@return any
+--- Returns a statistics snapshot table.
+---@return table
 function Graph:getStats() end
 
---- Returns `true` if cycle.
+--- Returns true if the graph contains a directed cycle.
 ---@return boolean
 function Graph:hasCycle() end
 
---- Returns `true` if edge.
----@param edge_ud any `userdata`.
+--- Returns true if the edge exists in the graph.
+---@param edge_ud any
 ---@return boolean
 function Graph:hasEdge(edge_ud) end
 
---- Returns `true` if item.
----@param item_ud any `userdata`.
+--- Returns true if the item exists in the graph.
+---@param item_ud any
 ---@return boolean
 function Graph:hasItem(item_ud) end
 
---- Returns `true` if node.
----@param node_ud any `userdata`.
+--- Returns true if the node exists in the graph.
+---@param node_ud any
 ---@return boolean
 function Graph:hasNode(node_ud) end
 
---- Process demand on this Graph.
----@return any
+--- Processes all supply/demand declarations and fires event callbacks.
+---@return nil
 function Graph:processDemand() end
 
---- Removes edge from the collection.
----@param edge_ud any `userdata`.
----@return any
+--- Removes an edge from the graph.
+---@param edge_ud any
+---@return boolean
 function Graph:removeEdge(edge_ud) end
 
---- Removes item from the collection.
----@param item_ud any `userdata`.
----@return any
+--- Removes an item from the graph entirely.
+---@param item_ud any
+---@return boolean
 function Graph:removeItem(item_ud) end
 
---- Removes node from the collection.
----@param node_ud any `userdata`.
----@return any
+--- Removes a node from the graph.
+---@param node_ud any
+---@return boolean
 function Graph:removeNode(node_ud) end
 
---- Advances the simulation by one physics step.
----@return any
+--- Runs one discrete simulation step and fires event callbacks.
+---@return nil
 function Graph:step() end
 
---- Topological sort on this Graph.
----@return any
+--- Returns a topologically sorted table of Node handles, or nil if a cycle exists.
+---@return table?
 function Graph:topologicalSort() end
 
---- Advances the simulation by `dt` seconds.
----@param dt number `number`.
+--- Advances simulation by dt seconds and fires event callbacks.
+---@param dt any
+---@return nil
 function Graph:update(dt) end
-
----@class GraphEdge
-local GraphEdge = {}
-
---- Adds allowed type to the collection.
----@param t string `string`.
-function GraphEdge:addAllowedType(t) end
-
---- Clear allowed types on this Edge.
----@param t string `string`.
-function GraphEdge:clearAllowedTypes(t) end
-
---- Returns the capacity.
----@param c number `integer`.
----@return number
-function GraphEdge:getCapacity(c) end
-
---- Returns the cooldown.
----@param c number `number`.
----@return any
-function GraphEdge:getCooldown(c) end
-
---- Returns the from.
----@return any
-function GraphEdge:getFrom() end
-
---- Returns the items in transit.
----@return any
-function GraphEdge:getItemsInTransit() end
-
---- Returns the speed modifier.
----@param m number `number`.
----@return any
-function GraphEdge:getSpeedModifier(m) end
-
---- Returns the throughput.
----@param t number `number`.
----@return any
-function GraphEdge:getThroughput(t) end
-
---- Returns the to.
----@return any
-function GraphEdge:getTo() end
-
---- Returns the travel time.
----@param t number `number`.
----@return any
-function GraphEdge:getTravelTime(t) end
-
---- Returns the type.
----@param t string `string`.
----@return number
-function GraphEdge:getType(t) end
-
---- Returns the weight.
----@param w number `number`.
----@return any
-function GraphEdge:getWeight(w) end
-
---- Returns `true` if active.
----@param a boolean `boolean`.
----@return boolean
-function GraphEdge:isActive(a) end
-
---- Returns `true` if bidirectional.
----@param b boolean `boolean`.
----@return boolean
-function GraphEdge:isBidirectional(b) end
-
---- Returns `true` if item type allowed.
----@param t string `string`.
----@return boolean
-function GraphEdge:isItemTypeAllowed(t) end
-
---- Returns `true` if on cooldown.
----@param b boolean `boolean`.
----@return boolean
-function GraphEdge:isOnCooldown(b) end
-
---- Removes allowed type from the collection.
----@param t string `string`.
----@return any
-function GraphEdge:removeAllowedType(t) end
-
---- Sets the active.
----@param a boolean `boolean`.
-function GraphEdge:setActive(a) end
-
---- Sets the bidirectional.
----@param b boolean `boolean`.
-function GraphEdge:setBidirectional(b) end
-
---- Sets the capacity.
----@param c number `integer`.
-function GraphEdge:setCapacity(c) end
-
---- Sets the cooldown.
----@param c number `number`.
-function GraphEdge:setCooldown(c) end
-
---- Sets the speed modifier.
----@param m number `number`.
-function GraphEdge:setSpeedModifier(m) end
-
---- Sets the throughput.
----@param t number `number`.
-function GraphEdge:setThroughput(t) end
-
---- Sets the travel time.
----@param t number `number`.
-function GraphEdge:setTravelTime(t) end
-
---- Sets the type.
----@param t string `string`.
-function GraphEdge:setType(t) end
-
---- Sets the weight.
----@param w number `number`.
-function GraphEdge:setWeight(w) end
 
 ---@class GraphItem
 local GraphItem = {}
 
---- Returns the decay time.
----@param t number `number`.
+--- Returns the decay time in seconds (-1 = immortal).
 ---@return number
-function GraphItem:getDecayTime(t) end
+function GraphItem:getDecayTime() end
 
---- Returns the position.
----@return any
+--- Returns the item position: node userdata if at a node, (edge, progress)
+---@return Node|Edge|nil
 function GraphItem:getPosition() end
 
---- Returns the priority.
----@param p number `integer`.
----@return number
-function GraphItem:getPriority(p) end
+--- Returns the item priority.
+---@return integer
+function GraphItem:getPriority() end
 
---- Returns the remaining life.
----@return any
+--- Returns the remaining life in seconds.
+---@return number
 function GraphItem:getRemainingLife() end
 
---- Returns the type.
----@param t string `string`.
----@return number
-function GraphItem:getType(t) end
+--- Returns the item type string.
+---@return string
+function GraphItem:getType() end
 
---- Returns `true` if alive.
+--- Returns true if the item is alive.
 ---@return boolean
 function GraphItem:isAlive() end
 
---- Kill on this GraphItem.
----@return any
+--- Marks the item as dead.
+---@return nil
 function GraphItem:kill() end
 
---- Sets the decay time.
----@param t number `number`.
+--- Sets the decay time in seconds (-1 = immortal).
+---@param t any
+---@return nil
 function GraphItem:setDecayTime(t) end
 
---- Sets the priority.
----@param p number `integer`.
+--- Sets the item priority.
+---@param p any
+---@return nil
 function GraphItem:setPriority(p) end
 
---- Sets the type.
----@param t string `string`.
+--- Sets the item type string.
+---@param t any
+---@return nil
 function GraphItem:setType(t) end
 
----@class GraphNode
-local GraphNode = {}
+---@class Node
+local Node = {}
 
---- Adds tag to the collection.
----@param tag string `string`.
-function GraphNode:addTag(tag) end
+--- Declares a supply of the given item type and quantity at this node.
+---@param item_type any
+---@param quantity any
+---@return nil
+function Node:addSupply(item_type, quantity) end
 
---- Clear all conversions on this Node.
----@return any
-function GraphNode:clearAllConversions() end
+--- Adds a tag to this node.
+---@param tag any
+---@return nil
+function Node:addTag(tag) end
 
---- Clear conversion on this Node.
----@param in_type string `string`.
----@return any
-function GraphNode:clearConversion(in_type) end
+--- Removes all conversion rules from this node.
+---@return nil
+function Node:clearAllConversions() end
 
---- Clear demands on this Node.
----@return any
-function GraphNode:clearDemands() end
+--- Removes the conversion rule for the given input type.
+---@param in_type any
+---@return nil
+function Node:clearConversion(in_type) end
 
---- Clear supplies on this Node.
----@return any
-function GraphNode:clearSupplies() end
+--- Removes all demand declarations from this node.
+---@return nil
+function Node:clearDemands() end
 
---- Clear tags on this Node.
----@return any
-function GraphNode:clearTags() end
+--- Removes all supply declarations from this node.
+---@return nil
+function Node:clearSupplies() end
 
---- Dequeue on this Node.
----@return any
-function GraphNode:dequeue() end
+--- Removes all tags from this node.
+---@return nil
+function Node:clearTags() end
 
---- Enqueue on this Node.
----@param item_ud any `userdata`.
----@return any
-function GraphNode:enqueue(item_ud) end
+--- Pops the next item from the node queue, or nil if empty.
+---@return GraphItem?
+function Node:dequeue() end
 
---- Returns the capacity.
----@param c number `integer`.
----@return number
-function GraphNode:getCapacity(c) end
+--- Pushes an item into the node queue.
+---@param item_ud any
+---@return boolean
+function Node:enqueue(item_ud) end
 
---- Returns the edges.
----@param dir? string `string` optional.
----@return any
-function GraphNode:getEdges(dir) end
-
---- Returns the flow mode.
----@param m string `string`.
----@return string
-function GraphNode:getFlowMode(m) end
-
---- Returns the item count.
----@return any
-function GraphNode:getItemCount() end
-
---- Returns the items.
----@return any
-function GraphNode:getItems() end
-
---- Returns the overflow policy.
----@param p string `string`.
----@return number
-function GraphNode:getOverflowPolicy(p) end
-
---- Returns the process time.
----@param t number `number`.
----@return any
-function GraphNode:getProcessTime(t) end
-
---- Returns the pull filter.
----@param f? string `string` optional.
----@return any
-function GraphNode:getPullFilter(f) end
-
---- Returns the pull rate.
----@param r number `number`.
----@return any
-function GraphNode:getPullRate(r) end
-
---- Returns the push filter.
----@param f? string `string` optional.
----@return any
-function GraphNode:getPushFilter(f) end
-
---- Returns the push rate.
----@param r number `number`.
----@return any
-function GraphNode:getPushRate(r) end
-
---- Returns the queue capacity.
----@param c number `integer`.
----@return number
-function GraphNode:getQueueCapacity(c) end
-
---- Returns the queue size.
+--- Returns the node capacity (-1 = unlimited).
 ---@return integer
-function GraphNode:getQueueSize() end
+function Node:getCapacity() end
 
---- Returns the tags.
----@return any
-function GraphNode:getTags() end
+--- Returns a table of Edge handles connected to this node.
+---@param dir? any (optional)
+---@return table
+function Node:getEdges(dir) end
 
---- Returns the type.
----@param t string `string`.
+--- Returns the flow mode as a string.
+---@return string
+function Node:getFlowMode() end
+
+--- Returns the number of items currently at this node.
+---@return integer
+function Node:getItemCount() end
+
+--- Returns a table of GraphItem handles at this node.
+---@return table
+function Node:getItems() end
+
+--- Returns the overflow policy as a string.
+---@return string
+function Node:getOverflowPolicy() end
+
+--- Returns the processing time in seconds.
 ---@return number
-function GraphNode:getType(t) end
+function Node:getProcessTime() end
 
---- Returns `true` if tag.
----@param tag string `string`.
+--- Returns the pull filter string, or nil if unset.
+---@return string?
+function Node:getPullFilter() end
+
+--- Returns items per second this node pulls.
+---@return number
+function Node:getPullRate() end
+
+--- Returns the push filter string, or nil if unset.
+---@return string?
+function Node:getPushFilter() end
+
+--- Returns items per second this node pushes.
+---@return number
+function Node:getPushRate() end
+
+--- Returns the queue capacity (-1 = unlimited).
+---@return integer
+function Node:getQueueCapacity() end
+
+--- Returns the number of items currently in the queue.
+---@return integer
+function Node:getQueueSize() end
+
+--- Returns a table of tag strings on this node.
+---@return table
+function Node:getTags() end
+
+--- Returns the node type string.
+---@return string
+function Node:getType() end
+
+--- Returns true if this node has the given tag.
+---@param tag any
 ---@return boolean
-function GraphNode:hasTag(tag) end
+function Node:hasTag(tag) end
 
---- Returns `true` if active.
----@param a boolean `boolean`.
+--- Returns true if the node is active.
 ---@return boolean
-function GraphNode:isActive(a) end
+function Node:isActive() end
 
---- Returns `true` if full.
----@param a boolean `boolean`.
+--- Returns true if the node has reached its capacity.
 ---@return boolean
-function GraphNode:isFull(a) end
+function Node:isFull() end
 
---- Returns `true` if queue enabled.
----@param e boolean `boolean`.
+--- Returns true if the node queue is enabled.
 ---@return boolean
-function GraphNode:isQueueEnabled(e) end
+function Node:isQueueEnabled() end
 
---- Removes demand from the collection.
----@param item_type string `string`.
----@return any
-function GraphNode:removeDemand(item_type) end
+--- Removes the demand declaration for the given item type.
+---@param item_type any
+---@return boolean
+function Node:removeDemand(item_type) end
 
---- Removes supply from the collection.
----@param item_type string `string`.
----@return any
-function GraphNode:removeSupply(item_type) end
+--- Removes the supply declaration for the given item type.
+---@param item_type any
+---@return boolean
+function Node:removeSupply(item_type) end
 
---- Removes tag from the collection.
----@param tag string `string`.
----@return any
-function GraphNode:removeTag(tag) end
+--- Removes a tag from this node.
+---@param tag any
+---@return boolean
+function Node:removeTag(tag) end
 
---- Sets the active.
----@param a boolean `boolean`.
-function GraphNode:setActive(a) end
+--- Sets the active state of this node.
+---@param a any
+---@return nil
+function Node:setActive(a) end
 
---- Sets the capacity.
----@param c number `integer`.
-function GraphNode:setCapacity(c) end
+--- Sets the node capacity (-1 = unlimited).
+---@param c any
+---@return nil
+function Node:setCapacity(c) end
 
---- Sets the flow mode.
----@param m string `string`.
-function GraphNode:setFlowMode(m) end
+--- Sets the flow mode from a string.
+---@param m any
+---@return nil
+function Node:setFlowMode(m) end
 
---- Sets the overflow policy.
----@param p string `string`.
-function GraphNode:setOverflowPolicy(p) end
+--- Sets the overflow policy from a string.
+---@param p any
+---@return nil
+function Node:setOverflowPolicy(p) end
 
---- Sets the process time.
----@param t number `number`.
-function GraphNode:setProcessTime(t) end
+--- Sets the processing time in seconds.
+---@param t any
+---@return nil
+function Node:setProcessTime(t) end
 
---- Sets the pull filter.
----@param f? string `string` optional.
-function GraphNode:setPullFilter(f) end
+--- Sets the pull filter string, or nil to clear.
+---@param f? any (optional)
+---@return nil
+function Node:setPullFilter(f) end
 
---- Sets the pull rate.
----@param r number `number`.
-function GraphNode:setPullRate(r) end
+--- Sets items per second this node pulls.
+---@param r any
+---@return nil
+function Node:setPullRate(r) end
 
---- Sets the push filter.
----@param f? string `string` optional.
-function GraphNode:setPushFilter(f) end
+--- Sets the push filter string, or nil to clear.
+---@param f? any (optional)
+---@return nil
+function Node:setPushFilter(f) end
 
---- Sets the push rate.
----@param r number `number`.
-function GraphNode:setPushRate(r) end
+--- Sets items per second this node pushes.
+---@param r any
+---@return nil
+function Node:setPushRate(r) end
 
---- Sets the queue capacity.
----@param c number `integer`.
-function GraphNode:setQueueCapacity(c) end
+--- Sets the queue capacity (-1 = unlimited).
+---@param c any
+---@return nil
+function Node:setQueueCapacity(c) end
 
---- Sets the queue enabled.
----@param e boolean `boolean`.
-function GraphNode:setQueueEnabled(e) end
+--- Enables or disables the node queue.
+---@param e any
+---@return nil
+function Node:setQueueEnabled(e) end
 
---- Sets the type.
----@param t string `string`.
-function GraphNode:setType(t) end
+--- Sets the node type string.
+---@param t any
+---@return nil
+function Node:setType(t) end
 
 --- Creates a new empty directed graph for item flow simulation.
----@return any
+---@return Graph
 function luna.graph.newGraph() end
 
 ---@class luna.graphics
 luna.graphics = {}
 
---- Lua UserData wrapper for an off-screen canvas resource.
+--- Lua-side handle to an off-screen render target stored in SharedState.
 ---@class Canvas
 local Canvas = {}
 
---- Returns the canvas width and height in pixels.
----@return number
----@return number
+--- Returns width and height of this canvas.
+---@return integer
 function Canvas:getDimensions() end
 
---- Returns the canvas height in pixels.
----@return number
+--- Returns the height of this canvas in pixels.
+---@return integer
 function Canvas:getHeight() end
 
---- Returns the canvas width in pixels.
----@return number
+--- Returns the width of this canvas in pixels.
+---@return integer
 function Canvas:getWidth() end
 
---- Lua UserData wrapper for a loaded font resource.
+--- Releases GPU framebuffer memory for this canvas.
+---@return boolean
+function Canvas:release() end
+
+--- Returns the type name of this object.
+---@return string
+function Canvas:type() end
+
+--- Returns the type name of this object.
+---@return string
+function Canvas:typeOf() end
+
+--- Lua-side handle to a loaded font stored in SharedState.
 ---@class Font
 local Font = {}
 
---- Returns the ascent (distance from baseline to the top of the tallest glyph) in pixels.
+--- Returns the ascent of this font in pixels.
 ---@return number
 function Font:getAscent() end
 
---- Returns the descent (distance below the baseline for descenders) in pixels.
+--- Returns the descent of this font in pixels.
 ---@return number
 function Font:getDescent() end
 
---- Returns the line height of this font at its loaded size, in pixels.
+--- Returns the line height of this font.
 ---@return number
 function Font:getHeight() end
 
---- Returns the line height in pixels used when advancing to the next line of text.
+--- Returns the line height multiplier of this font.
 ---@return number
 function Font:getLineHeight() end
 
---- Measures the rendered width of `text` using this font's current size.
----@param text string `string`: The string to measure.
+--- Returns the rendered width of the given text string.
+---@param text any
 ---@return number
 function Font:getWidth(text) end
 
---- Sets the line height multiplier used when laying out multi-line text.
----@param height number Line height factor (1.0 = normal, >1.0 = extra spacing).
+--- Wraps text to the given width and returns the lines.
+---@param text any
+---@param limit any
+---@return table
+function Font:getWrap(text, limit) end
+
+--- Releases this font and frees its atlas memory.
+---@return boolean
+function Font:release() end
+
+--- Sets the line height multiplier for this font.
+---@param height any
+---@return nil
 function Font:setLineHeight(height) end
 
---- Lua UserData wrapper for a loaded texture resource.
+--- Returns the type name of this object.
+---@return string
+function Font:type() end
+
+--- Returns the type name of this object.
+---@return string
+function Font:typeOf() end
+
+--- Lua-side handle to a loaded texture stored in SharedState.
 ---@class Image
 local Image = {}
 
---- Returns image width and height in pixels.
----@return number
----@return number
+--- Returns width and height of this image.
+---@return integer
 function Image:getDimensions() end
 
---- Returns the current min and mag texture filters.
----@return string
----@return string
-function Image:getFilter() end
-
---- Returns the image height in pixels.
----@return number
+--- Returns the height of this image in pixels.
+---@return integer
 function Image:getHeight() end
 
---- Returns the image width in pixels.
----@return number
+--- Returns the width of this image in pixels.
+---@return integer
 function Image:getWidth() end
 
---- Returns the current texture wrap mode for the horizontal and vertical axes.
+--- Releases the GPU texture memory for this image.
+---@return boolean
+function Image:release() end
+
+--- Returns the type name of this object.
 ---@return string
+function Image:type() end
+
+--- Returns the type name of this object.
 ---@return string
-function Image:getWrap() end
+function Image:typeOf() end
 
---- Lua UserData wrapper for a nine-slice (9-patch) image definition.
----@class NineSlice
-local NineSlice = {}
+--- Lua-side handle to a mesh stored in SharedState.
+---@class Mesh
+local Mesh = {}
 
---- Draws to the current render target.
----@param x number `number`.
----@param y number `number`.
----@param w number `number`.
----@param h number `number`.
-function NineSlice:draw(x, y, w, h) end
-
---- Returns the insets.
----@return any
-function NineSlice:getInsets() end
-
---- Returns the texture size.
----@param x number `number`.
----@param y number `number`.
----@param w number `number`.
----@param h number `number`.
+--- Returns vertex data at the given 1-based index.
+---@param index any
 ---@return number
-function NineSlice:getTextureSize(x, y, w, h) end
+function Mesh:getVertex(index) end
 
----@class Shape
-local Shape = {}
+--- Returns the number of vertices in this mesh.
+---@return integer
+function Mesh:getVertexCount() end
 
---- Appends a circle to this shape.
----@param mode any â€” `'fill'` or `'line'`.
----@param x number â€” Centre X in object space.
----@param y number â€” Centre Y in object space.
----@param r number â€” Radius in pixels.
-function Shape:circle(mode, x, y, r) end
+--- Releases this mesh.
+---@return boolean
+function Mesh:release() end
 
---- Clears all commands from this shape and resets color and line-width state.
-function Shape:clear() end
+--- Assigns a texture to this mesh.
+---@param ud? any (optional)
+---@return nil
+function Mesh:setTexture(ud) end
 
---- Returns the number of draw commands currently queued in this shape.
+--- Sets vertex data at the given 1-based index.
+---@param index any
+---@param data any
+---@return nil
+function Mesh:setVertex(index, data) end
+
+--- Returns the type name of this object.
+---@return string
+function Mesh:type() end
+
+--- Returns the type name of this object.
+---@return string
+function Mesh:typeOf() end
+
+--- Lua-side quad viewport into a texture.
+---@class Quad
+local Quad = {}
+
+--- Returns the reference texture dimensions.
 ---@return number
-function Shape:getCommandCount() end
+function Quad:getTextureDimensions() end
 
---- Appends a single line segment to this shape.
----@param x1 number â€” Start X in object space.
----@param y1 number â€” Start Y in object space.
----@param x2 number â€” End X in object space.
----@param y2 number â€” End Y in object space.
-function Shape:line(x1, y1, x2, y2) end
+--- Returns the quad viewport rectangle.
+---@return number
+function Quad:getViewport() end
 
---- Appends a polygon to this shape from a flat vararg vertex list.
----@param mode any â€” `'fill'` or `'line'`.
----@param x1_y1_x2_y2_ number â€” Flat list of vertex coordinates (at least 6 numbers / 3 vertices).
-function Shape:polygon(mode, x1_y1_x2_y2_) end
+--- Sets the quad viewport rectangle.
+---@param x any
+---@param y any
+---@param w any
+---@param h any
+---@return nil
+function Quad:setViewport(x, y, w, h) end
 
---- Appends a polyline to this shape from a flat vararg point list.
----@param x1_y1_x2_y2_ number â€” Flat list of point coordinates (at least 4 numbers / 2 points).
-function Shape:polyline(x1_y1_x2_y2_) end
+--- Returns the type name of this object.
+---@return string
+function Quad:type() end
 
---- Sets the active draw color for subsequent commands in this shape.
----@param r any â€” Red component in [0, 1].
----@param g any â€” Green component in [0, 1].
----@param b any â€” Blue component in [0, 1].
----@param a? any â€” Optional alpha component (default 1.0).
-function Shape:setColor(r, g, b, a) end
+--- Returns the type name of this object.
+---@return string
+function Quad:typeOf() end
 
---- Sets the stroke width for outlined primitives that follow in this shape.
----@param w number â€” Line width in pixels (must be > 0).
-function Shape:setLineWidth(w) end
+--- Lua-side handle to a compiled shader stored in SharedState.
+---@class Shader
+local Shader = {}
 
---- Lua UserData wrapper for a sprite batch resource.
+--- Returns whether this shader has a uniform with the given name.
+---@param name any
+---@return boolean
+function Shader:hasUniform(name) end
+
+--- Releases this shader.
+---@return boolean
+function Shader:release() end
+
+--- Sends a uniform value to this shader.
+---@param name any
+---@param value any
+---@return nil
+function Shader:send(name, value) end
+
+--- Returns the type name of this object.
+---@return string
+function Shader:type() end
+
+--- Returns the type name of this object.
+---@return string
+function Shader:typeOf() end
+
+--- Lua-side handle to a sprite batch stored in SharedState.
 ---@class SpriteBatch
 local SpriteBatch = {}
 
---- Removes all sprites from this batch and resets the sprite count to zero.
+--- Removes all sprites from this batch.
+---@return nil
 function SpriteBatch:clear() end
 
---- Returns the maximum number of sprites this batch was allocated to hold.
----@return number
+--- Returns the maximum capacity of this batch.
+---@return integer
 function SpriteBatch:getBufferSize() end
 
---- Returns the number of sprites currently added to this batch.
----@return number
+--- Returns the number of sprites in this batch.
+---@return integer
 function SpriteBatch:getCount() end
 
---- Applies the given Transform object to the current transform stack.
-function luna.graphics.applyTransform() end
+--- Releases this sprite batch.
+---@return boolean
+function SpriteBatch:release() end
 
---- Draws a filled or outlined arc segment centered at (x, y) with the given radius.
----@param mode string Draw mode: 'fill' or 'line'.
----@param x number Center X coordinate in pixels.
----@param y number Center Y coordinate in pixels.
----@param radius number Arc radius in pixels.
----@param angle1 number Start angle in radians.
----@param angle2 number End angle in radians.
----@param segments? number Optional number of line segments for smoothness.
+--- Returns the type name of this object.
+---@return string
+function SpriteBatch:type() end
+
+--- Returns the type name of this object.
+---@return string
+function SpriteBatch:typeOf() end
+
+--- Applies an affine transform matrix.
+---@param mat any
+function luna.graphics.applyTransform(mat) end
+
+--- Draws an arc.
+---@param mode string
+---@param x number
+---@param y number
+---@param radius number
+---@param angle1 number
+---@param angle2 number
+---@param segments? integer? (optional)
 function luna.graphics.arc(mode, x, y, radius, angle1, angle2, segments) end
 
---- Captures the current frame as an `ImageData` and passes it to `callback`.
----@param callback function â€” `function`. Called with one `ImageData` argument.
----@return any
-function luna.graphics.captureScreenshot(callback) end
+--- Draws a circle.
+---@param mode any
+---@param x any
+---@param y any
+---@param radius any
+function luna.graphics.circle(mode, x, y, radius) end
 
---- Draws a filled or outlined circle centered at (x, y) with the given radius.
----@param mode string Draw mode: 'fill' or 'line'.
----@param x number Center X coordinate in pixels.
----@param y number Center Y coordinate in pixels.
----@param radius number Circle radius in pixels.
----@param segments? number Optional number of line segments (default auto).
-function luna.graphics.circle(mode, x, y, radius, segments) end
-
---- Clears the screen with the current background color.
+--- Clears the draw command queue (resets the screen).
 ---@param r? any (optional)
 ---@param g? any (optional)
 ---@param b? any (optional)
 function luna.graphics.clear(r, g, b) end
 
---- Resets the stencil mode to the default (keep / always / 0).
-function luna.graphics.clearStencil() end
+--- Draws a drawable (Image, Canvas, SpriteBatch, Mesh) at the given position.
+---@param args any
+function luna.graphics.draw(args) end
 
---- Queues draw commands for all live particles.
----@param drawable number â€” `Drawable`. An Image, Canvas, SpriteBatch userdata, or integer image ID.
----@param x number â€” `f32`. Destination X position (default 0).
----@param y number â€” `f32`. Destination Y position (default 0).
----@param r any â€” `f32`. Rotation in radians (default 0).
----@param sx number â€” `f32`. X scale (default 1).
----@param sy number â€” `f32`. Y scale (default 1).
----@param ox number â€” `f32`. X origin offset (default 0).
----@param oy number â€” `f32`. Y origin offset (default 0).
----@return any
-function luna.graphics.draw(drawable, x, y, r, sx, sy, ox, oy) end
+--- Draws a portion of an image defined by a Quad.
+---@param image Image
+---@param quad Quad
+---@param x? number? (optional)
+---@param y? number? (optional)
+---@param r? number? (optional)
+---@param sx? number? (optional)
+---@param sy? number? (optional)
+---@param ox? number? (optional)
+---@param oy? number? (optional)
+function luna.graphics.drawq(image, quad, x, y, r, sx, sy, ox, oy) end
 
---- Draws all sprites in a SpriteBatch using a single efficient GPU draw call.
----@param batch number SpriteBatch ID returned by newSpriteBatch.
----@param x? number Optional X offset in pixels.
----@param y? number Optional Y offset in pixels.
-function luna.graphics.drawBatch(batch, x, y) end
-
---- Draws an off-screen canvas to the current render target.
-function luna.graphics.drawCanvas() end
-
---- Draws any drawable object with a full affine transform.
----@param drawable number â€” `Drawable`. An Image, Canvas, SpriteBatch userdata or integer image ID.
----@param x number â€” `f32`. Destination X position.
----@param y number â€” `f32`. Destination Y position.
----@param r any â€” `f32`. Rotation in radians (default 0).
----@param sx number â€” `f32`. X scale (default 1).
----@param sy number â€” `f32`. Y scale (default sx).
----@param ox number â€” `f32`. X origin offset (default 0).
----@param oy number â€” `f32`. Y origin offset (default 0).
----@return any
-function luna.graphics.drawEx(drawable, x, y, r, sx, sy, ox, oy) end
-
---- Draws the given custom Mesh geometry with the current transform and color.
----@param mesh number Mesh ID returned by newMesh.
----@param x? number Optional X position offset in pixels.
----@param y? number Optional Y position offset in pixels.
-function luna.graphics.drawMesh(mesh, x, y) end
-
---- Draws a nine-slice image stretched to fill the given rectangle.
----@param nineslice number NineSlice UserData returned by newNineSlice.
----@param x number Destination X position.
----@param y number Destination Y position.
----@param w number Destination width.
----@param h number Destination height.
-function luna.graphics.drawNineSlice(nineslice, x, y, w, h) end
-
---- Draws a quad region of an image with an affine transform.
-function luna.graphics.drawQuad() end
-
---- Draws a filled or outlined ellipse centered at (x, y) with given horizontal and vertical radii.
----@param mode string Draw mode: 'fill' or 'line'.
----@param x number Center X coordinate in pixels.
----@param y number Center Y coordinate in pixels.
----@param rx number Horizontal radius in pixels.
----@param ry number Vertical radius in pixels.
----@param segments? any Optional segment count for smoothness.
-function luna.graphics.ellipse(mode, x, y, rx, ry, segments) end
+--- Draws an ellipse.
+---@param mode any
+---@param x any
+---@param y any
+---@param rx any
+---@param ry any
+function luna.graphics.ellipse(mode, x, y, rx, ry) end
 
 --- Returns the current background color.
+---@return number
 function luna.graphics.getBackgroundColor() end
 
---- Returns the name of the currently active blend mode.
+--- Returns the current blend mode as a string.
 ---@return string
 function luna.graphics.getBlendMode() end
 
---- Returns the current world-space camera translate offset (cx, cy).
----@return number
----@return number
-function luna.graphics.getCameraPosition() end
-
---- Returns the current camera rotation angle in radians.
----@return function
-function luna.graphics.getCameraRotation() end
-
---- Returns the current camera zoom (scale) factor applied to the world.
----@return number
-function luna.graphics.getCameraZoom() end
-
---- Returns the ID of the currently active render canvas, or nil.
+--- Returns the current canvas, or nil if drawing to screen.
+---@return Canvas?
 function luna.graphics.getCanvas() end
 
---- Returns the dimensions (w, h) of the current canvas.
----@param id_val any
-function luna.graphics.getCanvasSize(id_val) end
+--- Returns the dimensions of a canvas.
+---@param ud any
+---@return integer
+function luna.graphics.getCanvasSize(ud) end
 
---- Returns the current drawing color (r, g, b, a).
+--- Returns the current drawing color.
+---@return number
 function luna.graphics.getColor() end
 
---- Returns the active color channel write mask.
+--- Returns the current color mask.
+---@return boolean
 function luna.graphics.getColorMask() end
 
 --- Returns the default texture filter mode.
+---@return string
 function luna.graphics.getDefaultFilter() end
 
---- Returns the current depth mode string and write-enable flag.
-function luna.graphics.getDepthMode() end
-
---- Returns the window dimensions (width, height).
+--- Returns window width and height.
+---@return integer
 function luna.graphics.getDimensions() end
 
---- Returns the currently active font ID.
+--- Returns the currently active font, or nil.
+---@return Font?
 function luna.graphics.getFont() end
 
---- Returns the active font's ascent Ă”Ă‡Ă¶ distance in pixels from baseline to the top of capital letters.
----@param id_val any
+--- Returns the ascent of the given font.
+---@param ud any
 ---@return number
-function luna.graphics.getFontAscent(id_val) end
+function luna.graphics.getFontAscent(ud) end
 
---- Returns the active font's descent Ă”Ă‡Ă¶ distance in pixels from the baseline to the bottom of descenders.
----@param id_val any
+--- Returns the descent of the given font.
+---@param ud any
 ---@return number
-function luna.graphics.getFontDescent(id_val) end
+function luna.graphics.getFontDescent(ud) end
 
---- Returns the height of text in the active font.
----@param id_val any
-function luna.graphics.getFontHeight(id_val) end
-
---- Returns the line height in pixels of the currently active font.
----@param id_val any
+--- Returns the line height of the given font.
+---@param ud any
 ---@return number
-function luna.graphics.getFontLineHeight(id_val) end
+function luna.graphics.getFontHeight(ud) end
 
---- Returns the width of text in the active font.
----@param id_val any
+--- Returns the pixel width of text in the given font.
+---@param ud any
 ---@param text any
-function luna.graphics.getFontWidth(id_val, text) end
+---@return number
+function luna.graphics.getFontWidth(ud, text) end
 
---- Returns the wrap mode of the active font.
+--- Returns wrapped lines and the maximum line width.
 ---@param text any
 ---@param limit any
+---@return table
 function luna.graphics.getFontWrap(text, limit) end
 
 --- Returns the window height in pixels.
+---@return integer
 function luna.graphics.getHeight() end
 
---- Returns the current line width in pixels used for 'line' mode drawing.
+--- Returns the current line width.
 ---@return number
 function luna.graphics.getLineWidth() end
 
---- Returns the texture ID currently bound to the given mesh for rendering.
----@param mesh number Mesh ID to query.
+--- Returns the current point size.
 ---@return number
-function luna.graphics.getMeshTexture(mesh) end
-
---- Returns position and UV data for a vertex in a Mesh.
----@param id any
----@param index any
-function luna.graphics.getMeshVertex(id, index) end
-
---- Returns the total number of vertices in a Mesh.
----@param id any
-function luna.graphics.getMeshVertexCount(id) end
-
---- Returns the current point-sprite size.
 function luna.graphics.getPointSize() end
 
---- Returns the active scissor rectangle (x, y, w, h), or nil.
+--- Returns the active scissor rectangle, or nothing.
+---@return number?
 function luna.graphics.getScissor() end
 
---- Returns the currently active Shader ID, or nil.
+--- Returns the active shader, or nil.
+---@return Shader?
 function luna.graphics.getShader() end
 
---- Returns the current depth of the transform stack.
-function luna.graphics.getStackDepth() end
-
---- Returns a table of renderer statistics (draw calls, triangles, etc.).
+--- Returns a table of renderer statistics.
+---@return table
 function luna.graphics.getStats() end
 
---- Returns the current stencil mode as three values: action string, compare string, value.
-function luna.graphics.getStencilMode() end
-
 --- Returns the window width in pixels.
+---@return integer
 function luna.graphics.getWidth() end
 
---- Returns whether the current shader has a uniform with the given name.
----@param id any
----@param name any
-function luna.graphics.hasShaderUniform(id, name) end
-
---- Intersects the current scissor rectangle with the given rectangle.
+--- Intersects the current scissor with a new rectangle.
 ---@param x any
 ---@param y any
 ---@param w any
 ---@param h any
 function luna.graphics.intersectScissor(x, y, w, h) end
 
---- Returns whether wireframe rendering mode is active.
+--- Returns whether wireframe mode is active.
+---@return boolean
 function luna.graphics.isWireframe() end
 
---- Draws a straight line from (x1, y1) to (x2, y2) using the current color.
----@param x1 number Start X in pixels.
----@param y1 number Start Y in pixels.
----@param x2 number End X in pixels.
----@param y2 number End Y in pixels.
-function luna.graphics.line(x1, y1, x2, y2) end
+--- Draws a line between two points.
+---@param args any
+function luna.graphics.line(args) end
 
---- Creates an off-screen render canvas and returns its ID.
+--- Creates an off-screen render canvas.
 ---@param width any
 ---@param height any
+---@return Canvas
 function luna.graphics.newCanvas(width, height) end
 
---- Loads a TTF/OTF font file and returns its ID.
+--- Loads a TTF/OTF font from a file.
 ---@param path any
 ---@param size? any (optional)
+---@return Font
 function luna.graphics.newFont(path, size) end
 
---- Loads an image file and returns its ID.
+--- Loads an image from a file path or creates one from ImageData.
 ---@param arg any
+---@return Image
 function luna.graphics.newImage(arg) end
 
---- Creates a custom Mesh from vertex data and returns its ID.
+--- Creates a custom mesh from vertex data.
 ---@param verts any
 ---@param mode? any (optional)
+---@return Mesh
 function luna.graphics.newMesh(verts, mode) end
 
---- Creates a nine-slice definition from an image and border insets.
----@param image number Image UserData (LuaImage) or numeric image ID.
----@param top number Pixel inset from the top edge.
----@param right number Pixel inset from the right edge.
----@param bottom number Pixel inset from the bottom edge.
----@param left number Pixel inset from the left edge.
----@return any
-function luna.graphics.newNineSlice(image, top, right, bottom, left) end
-
---- Defines a sub-rectangle of a texture (a quad).
+--- Creates a new Quad viewport into a texture.
 ---@param x any
 ---@param y any
 ---@param w any
 ---@param h any
 ---@param sw any
 ---@param sh any
+---@return Quad
 function luna.graphics.newQuad(x, y, w, h, sw, sh) end
 
---- Compiles a custom WGSL shader program and returns its ID.
+--- Compiles a custom WGSL shader and returns its handle.
 ---@param code any
+---@return Shader
 function luna.graphics.newShader(code) end
 
-function luna.graphics.newShape() end
+--- Creates a new sprite batch for the given image.
+---@param ud any
+---@param max? any (optional)
+---@return SpriteBatch
+function luna.graphics.newSpriteBatch(ud, max) end
 
---- Creates a new SpriteBatch for efficiently drawing many sprites sharing one texture.
----@param texture number Texture ID that all sprites in this batch must share.
----@param maxSprites number Maximum number of sprites the batch can hold.
----@return number
-function luna.graphics.newSpriteBatch(texture, maxSprites) end
-
---- Resets the transform to the identity (no translation, rotation, or scale).
+--- Resets the transform to the identity.
 function luna.graphics.origin() end
 
---- Draws a list of (x, y) points using the current point size and color.
----@param ... number Alternating x, y coordinate pairs, or a flat numeric table.
-function luna.graphics.points(...) end
-
---- Draws a filled or outlined polygon from a flat list of (x, y) vertex coordinates.
----@param mode string Draw mode: 'fill' or 'line'.
----@param vertices number Flat table of numbers in (x, y, x, y, ...) order.
-function luna.graphics.polygon(mode, vertices) end
-
---- Draws an open multi-segment polyline.
+--- Draws a list of points.
 ---@param args any
-function luna.graphics.polyline(args) end
+function luna.graphics.points(args) end
 
---- Pops the top transform matrix from the stack.
+--- Draws a polygon from a list of vertices.
+---@param args any
+function luna.graphics.polygon(args) end
+
+--- Pops the transform from the stack.
 function luna.graphics.pop() end
 
---- Draws the given text string at (x, y) using the active font and foreground color.
----@param text string String to draw.
----@param x number Left edge X coordinate in pixels.
----@param y number Top edge Y coordinate in pixels.
----@param angle? number Optional rotation angle in radians.
----@param sx? number Optional scale factors.
----@param sy? number Optional scale factors.
----@param ox? any Optional origin offsets.
----@param oy? any Optional origin offsets.
-function luna.graphics.print(text, x, y, angle, sx, sy, ox, oy) end
+--- Draws text at the given position.
+---@param text any
+---@param x? any (optional)
+---@param y? any (optional)
+---@param scale? any (optional)
+function luna.graphics.print(text, x, y, scale) end
 
 --- Draws word-wrapped text within a given width.
 ---@param text any
@@ -4064,217 +3918,115 @@ function luna.graphics.print(text, x, y, angle, sx, sy, ox, oy) end
 ---@param align? any (optional)
 function luna.graphics.printf(text, x, y, limit, align) end
 
---- Pushes the current transform matrix onto the transform stack.
+--- Pushes the current transform onto the stack.
 function luna.graphics.push() end
 
---- Draws a filled or outlined rectangle at (x, y) with given width and height.
----@param mode string Draw mode: 'fill' or 'line'.
----@param x number Top-left X coordinate in pixels.
----@param y number Top-left Y coordinate in pixels.
----@param width number Rectangle width in pixels.
----@param height number Rectangle height in pixels.
----@param rx? number Optional horizontal corner radius for rounded rectangles.
----@param ry? number Optional vertical corner radius for rounded rectangles.
-function luna.graphics.rectangle(mode, x, y, width, height, rx, ry) end
+--- Draws a rectangle.
+---@param mode string
+---@param x number
+---@param y number
+---@param w number
+---@param h number
+---@param rx? number? (optional)
+---@param ry? number? (optional)
+function luna.graphics.rectangle(mode, x, y, w, h, rx, ry) end
 
---- Releases a GPU resource handle and returns its memory to the pool early.
----@param handle number Resource ID to release (texture, canvas, shader, etc.).
-function luna.graphics.release(handle) end
-
---- Releases the sprite batch resource and frees its GPU instance buffer.
----@param batch number SpriteBatch ID returned by newSpriteBatch.
-function luna.graphics.releaseBatch(batch) end
-
---- Releases the canvas render target and frees its GPU framebuffer memory.
----@param canvas number Canvas ID returned by newCanvas.
-function luna.graphics.releaseCanvas(canvas) end
-
---- Releases the font resource for the given ID and frees its GPU atlas memory.
----@param font number Font ID returned by newFont.
-function luna.graphics.releaseFont(font) end
-
---- Releases the custom mesh resource and frees the GPU vertex buffer.
----@param mesh number Mesh ID returned by newMesh.
-function luna.graphics.releaseMesh(mesh) end
-
---- Releases the compiled shader program and frees its GPU pipeline object.
----@param shader number Shader ID returned by newShader.
-function luna.graphics.releaseShader(shader) end
-
-function luna.graphics.releaseShape() end
-
---- Resets all graphics state to defaults: transform, color (1,1,1,1), shader, and scissor.
-function luna.graphics.reset() end
-
---- Resets the camera transform to identity Ă”Ă‡Ă¶ no translation, rotation, or zoom.
-function luna.graphics.resetCamera() end
-
---- Rotates the current transform by the given angle in radians.
+--- Rotates the coordinate system.
 ---@param angle any
 function luna.graphics.rotate(angle) end
 
---- Queues a PNG export of the actual rendered frame to a file under `save/`.
----@param path string `string`. Relative output path inside `save/`, for example `"save/frame.png"`.
----@return any
+--- Queues a screenshot to be saved after the current frame.
+---@param path any
 function luna.graphics.saveScreenshot(path) end
 
---- Concatenates a scale factor onto the current transform matrix.
----@param sx number Horizontal scale factor.
----@param sy number Vertical scale factor (defaults to sx if omitted).
+--- Scales the coordinate system.
+---@param sx any
+---@param sy? any (optional)
 function luna.graphics.scale(sx, sy) end
 
---- Sends a named uniform variable value to the currently active shader program.
----@param name Shader Uniform variable name as defined in the WGSL shader.
----@param value number Value to send (number, table of numbers, or boolean).
-function luna.graphics.sendShader(name, value) end
+--- Sets the background clear color.
+---@param r any
+---@param g any
+---@param b any
+function luna.graphics.setBackgroundColor(r, g, b) end
 
---- Sets the RGBA color used to clear the framebuffer at the start of each draw frame.
----@param r any Red component in [0, 1].
----@param g any Green component in [0, 1].
----@param b any Blue component in [0, 1].
----@param a? any Optional alpha component (default 1.0).
-function luna.graphics.setBackgroundColor(r, g, b, a) end
-
---- Sets the blend equation used when drawing new pixels over the existing framebuffer.
----@param mode string Blend mode string: 'alpha', 'additive', 'multiply', 'none', etc.
+--- Sets the blend mode for drawing.
+---@param mode any
 function luna.graphics.setBlendMode(mode) end
 
---- Sets the camera transform: position, rotation, and zoom applied to all draw calls.
----@param x number Camera center X in world units.
----@param y number Camera center Y in world units.
----@param angle? number Optional camera rotation angle in radians.
----@param zoom? number Optional zoom scale (1.0 = no zoom).
-function luna.graphics.setCamera(x, y, angle, zoom) end
+--- Sets the active render target to a Canvas, or back to the screen.
+---@param ud? any (optional)
+function luna.graphics.setCanvas(ud) end
 
---- Redirects all drawing to the given canvas (or screen if nil).
----@param args any
-function luna.graphics.setCanvas(args) end
-
---- Sets the current drawing color for all subsequent draw commands.
+--- Sets the current drawing color.
 ---@param r any
 ---@param g any
 ---@param b any
 ---@param a? any (optional)
 function luna.graphics.setColor(r, g, b, a) end
 
---- Sets which RGBA channels are written to the render target for subsequent draw calls.
----@param r boolean Write to the red channel (boolean).
----@param g any Write to the green channel.
----@param b any Write to the blue channel.
----@param a any Write to the alpha channel.
-function luna.graphics.setColorMask(r, g, b, a) end
+--- Sets which RGBA channels are written. Reset with no args.
+---@param args any
+function luna.graphics.setColorMask(args) end
 
---- Sets the default texture filter mode ('linear' or 'nearest').
+--- Sets the default texture filter mode.
 ---@param min any
 ---@param mag any
 ---@param anisotropy? any (optional)
 function luna.graphics.setDefaultFilter(min, mag, anisotropy) end
 
---- Sets the depth test comparison mode and optional write flag.
----@param mode_s any
----@param write? any (optional)
-function luna.graphics.setDepthMode(mode_s, write) end
-
---- Sets the active font for subsequent print calls.
----@param id_val any
-function luna.graphics.setFont(id_val) end
-
---- Sets the line height multiplier for the active font used in multi-line text rendering.
----@param height number Line height factor (1.0 = default spacing).
-function luna.graphics.setFontLineHeight(height) end
+--- Sets the active font for print calls.
+---@param ud any
+function luna.graphics.setFont(ud) end
 
 --- Sets the line width for outline drawing.
 ---@param w any
 function luna.graphics.setLineWidth(w) end
 
---- Sets the vertex topology mode used when drawing a mesh ('triangles', 'fan', 'strip', 'points').
----@param mesh number Mesh ID returned by newMesh.
----@param mode string Topology string: 'triangles', 'fan', 'strip', or 'points'.
-function luna.graphics.setMeshDrawMode(mesh, mode) end
-
---- Binds a texture to the given mesh so it is sampled during rendering.
----@param mesh number Mesh ID returned by newMesh.
----@param texture number Texture ID to bind, or nil to clear.
-function luna.graphics.setMeshTexture(mesh, texture) end
-
---- Updates position and UV data for a single vertex in a Mesh.
----@param id any
----@param index any
----@param data any
-function luna.graphics.setMeshVertex(id, index, data) end
-
---- Sets an index array defining the vertex drawing order for a custom mesh.
----@param mesh number Mesh ID returned by newMesh.
----@param map number Table of 1-based vertex indices specifying the draw order.
-function luna.graphics.setMeshVertexMap(mesh, map) end
-
---- Uploads a new flat vertex array to replace the mesh's current geometry.
----@param mesh number Mesh ID returned by newMesh.
----@param vertices number Table of vertex attribute tables or a flat number array.
-function luna.graphics.setMeshVertices(mesh, vertices) end
-
---- Sets the diameter in pixels used when drawing point primitives.
----@param size number Point diameter in pixels.
+--- Sets the point diameter in pixels.
+---@param size any
 function luna.graphics.setPointSize(size) end
 
---- Restricts drawing to the given rectangle; clears scissor if no args.
-function luna.graphics.setScissor() end
+--- Restricts drawing to a rectangle, or clears scissor if no args.
+---@param args any
+function luna.graphics.setScissor(args) end
 
---- Activates a custom WGSL shader for subsequent draw calls.
----@param id? any (optional)
-function luna.graphics.setShader(id) end
+--- Sets the active shader, or clears it.
+---@param ud? any (optional)
+function luna.graphics.setShader(ud) end
 
---- Sets the persistent stencil mode stored in SharedState.
----@param action_s any
----@param compare_s? any (optional)
+--- Sets the stencil comparison test, or disables stencil testing.
+---@param compare? any (optional)
 ---@param value? any (optional)
-function luna.graphics.setStencilMode(action_s, compare_s, value) end
+function luna.graphics.setStencilTest(compare, value) end
 
---- Configures the stencil test for subsequent draw calls.
-function luna.graphics.setStencilTest() end
-
---- Enables or disables wireframe rendering mode.
+--- Enables or disables wireframe rendering.
 ---@param enabled any
 function luna.graphics.setWireframe(enabled) end
 
---- Applies a shear transform to the current matrix.
+--- Shears the coordinate system.
 ---@param kx any
 ---@param ky any
 function luna.graphics.shear(kx, ky) end
 
---- Appends a new sprite to the batch with the given position and transform properties.
----@param batch number SpriteBatch ID.
----@param x number Sprite X position in pixels.
----@param y number Sprite Y position in pixels.
----@param angle? any Optional rotation in radians.
----@param sx? number Optional scale factors.
----@param sy? number Optional scale factors.
----@param ox? any Optional origin offsets.
----@param oy? any Optional origin offsets.
----@return number
----@return number
-function luna.graphics.spriteBatchAdd(batch, x, y, angle, sx, sy, ox, oy) end
+--- Begins stencil writing with the given action and value.
+---@param action? any (optional)
+---@param value? any (optional)
+function luna.graphics.stencil(action, value) end
 
---- Removes all sprites from the batch, resetting its count to zero.
----@param batch number SpriteBatch ID to clear.
-function luna.graphics.spriteBatchClear(batch) end
-
---- Draws to the stencil buffer using the given Lua draw function.
-function luna.graphics.stencil() end
-
---- Translates (moves) the current transform.
+--- Translates the coordinate system.
 ---@param x any
 ---@param y any
 function luna.graphics.translate(x, y) end
 
---- Draws a filled or outlined triangle with three (x, y) vertex coordinates.
----@param mode string Draw mode: 'fill' or 'line'.
----@param x1 number First vertex.
----@param y1 number First vertex.
----@param x2 number Second vertex.
----@param y2 number Second vertex.
----@param x3 number Third vertex.
----@param y3 number Third vertex.
+--- Draws a triangle.
+---@param mode any
+---@param x1 any
+---@param y1 any
+---@param x2 any
+---@param y2 any
+---@param x3 any
+---@param y3 any
 function luna.graphics.triangle(mode, x1, y1, x2, y2, x3, y3) end
 
 ---@class luna.gui
@@ -4283,1315 +4035,1632 @@ luna.gui = {}
 ---@class Accordion
 local Accordion = {}
 
---- /// Returns a value for addSection (auto-generated).
+--- @return nil
 ---@param title any
 ---@param content_idx? any (optional)
+---@return nil
 function Accordion:addSection(title, content_idx) end
 
---- /// Returns a value for getSectionCount (auto-generated).
+--- @return nil
+---@return nil
 function Accordion:getSectionCount() end
 
---- /// Returns a value for getSectionTitle (auto-generated).
+--- @return nil
 ---@param section_idx any
+---@return nil
 function Accordion:getSectionTitle(section_idx) end
 
---- /// Returns a value for isExclusive (auto-generated).
+--- @return nil
+---@return nil
 function Accordion:isExclusive() end
 
---- /// Returns a value for isSectionExpanded (auto-generated).
+--- @return nil
 ---@param section_idx any
+---@return nil
 function Accordion:isSectionExpanded(section_idx) end
 
---- /// Returns a value for setExclusive (auto-generated).
+--- @return nil
 ---@param v any
+---@return nil
 function Accordion:setExclusive(v) end
 
---- /// Returns a value for toggleSection (auto-generated).
+--- @return nil
 ---@param section_idx any
+---@return nil
 function Accordion:toggleSection(section_idx) end
 
 ---@class Button
 local Button = {}
 
---- /// Returns a value for getText (auto-generated).
+--- @return nil
+---@return nil
 function Button:getText() end
 
---- /// Returns a value for setText (auto-generated).
+--- @return nil
 ---@param text any
+---@return nil
 function Button:setText(text) end
 
 ---@class Checkbox
 local Checkbox = {}
 
---- /// Returns a value for getText (auto-generated).
+--- @return nil
+---@return nil
 function Checkbox:getText() end
 
---- /// Returns a value for isChecked (auto-generated).
+--- @return nil
+---@return nil
 function Checkbox:isChecked() end
 
---- /// Returns a value for setChecked (auto-generated).
+--- @return nil
 ---@param checked any
+---@return nil
 function Checkbox:setChecked(checked) end
 
---- /// Returns a value for setText (auto-generated).
+--- @return nil
 ---@param text any
+---@return nil
 function Checkbox:setText(text) end
 
 ---@class Color_Picker
 local Color_Picker = {}
 
---- /// Returns a value for getColor (auto-generated).
+--- @return nil
+---@return nil
 function Color_Picker:getColor() end
 
---- /// Returns a value for getColorMode (auto-generated).
+--- @return nil
+---@return nil
 function Color_Picker:getColorMode() end
 
---- /// Returns a value for getShowAlpha (auto-generated).
+--- @return nil
+---@return nil
 function Color_Picker:getShowAlpha() end
 
---- /// Returns a value for setColor (auto-generated).
+--- @return nil
 ---@param r any
 ---@param green any
 ---@param b any
 ---@param a? any (optional)
+---@return nil
 function Color_Picker:setColor(r, green, b, a) end
 
---- /// Returns a value for setColorMode (auto-generated).
+--- @return nil
 ---@param mode any
+---@return nil
 function Color_Picker:setColorMode(mode) end
 
---- /// Returns a value for setOnChange (auto-generated).
+--- @return nil
 ---@param f any
+---@return nil
 function Color_Picker:setOnChange(f) end
 
---- /// Returns a value for setShowAlpha (auto-generated).
+--- @return nil
 ---@param v any
+---@return nil
 function Color_Picker:setShowAlpha(v) end
 
 ---@class Combo_Box
 local Combo_Box = {}
 
---- /// Returns a value for addItem (auto-generated).
+--- @return nil
 ---@param text any
+---@return nil
 function Combo_Box:addItem(text) end
 
---- /// Returns a value for clearItems (auto-generated).
+--- @return nil
+---@return nil
 function Combo_Box:clearItems() end
 
---- /// Returns a value for getItem (auto-generated).
+--- @return nil
 ---@param index any
+---@return nil
 function Combo_Box:getItem(index) end
 
---- /// Returns a value for getItemCount (auto-generated).
+--- @return nil
+---@return nil
 function Combo_Box:getItemCount() end
 
---- /// Returns a value for getSelectedIndex (auto-generated).
+--- @return nil
+---@return nil
 function Combo_Box:getSelectedIndex() end
 
---- /// Returns a value for getSelectedItem (auto-generated).
+--- @return nil
+---@return nil
 function Combo_Box:getSelectedItem() end
 
---- /// Returns a value for removeItem (auto-generated).
+--- @return nil
 ---@param index any
+---@return nil
 function Combo_Box:removeItem(index) end
 
---- /// Returns a value for setSelectedIndex (auto-generated).
+--- @return nil
 ---@param index any
+---@return nil
 function Combo_Box:setSelectedIndex(index) end
 
 ---@class Dialog
 local Dialog = {}
 
---- /// Returns a value for addButton (auto-generated).
+--- @return nil
 ---@param text any
 ---@param cb? any (optional)
+---@return nil
 function Dialog:addButton(text, cb) end
 
---- /// Returns a value for close (auto-generated).
+--- @return nil
+---@return nil
 function Dialog:close() end
 
---- /// Returns a value for getContent (auto-generated).
+--- @return nil
+---@return nil
 function Dialog:getContent() end
 
---- /// Returns a value for getTitle (auto-generated).
+--- @return nil
+---@return nil
 function Dialog:getTitle() end
 
---- /// Returns a value for isModal (auto-generated).
+--- @return nil
+---@return nil
 function Dialog:isModal() end
 
---- /// Returns a value for isOpen (auto-generated).
+--- @return nil
+---@return nil
 function Dialog:isOpen() end
 
---- /// Returns a value for open (auto-generated).
+--- @return nil
+---@return nil
 function Dialog:open() end
 
---- /// Returns a value for setContent (auto-generated).
+--- @return nil
 ---@param content_idx? any (optional)
+---@return nil
 function Dialog:setContent(content_idx) end
 
---- /// Returns a value for setModal (auto-generated).
+--- @return nil
 ---@param v any
+---@return nil
 function Dialog:setModal(v) end
 
---- /// Returns a value for setOnClose (auto-generated).
+--- @return nil
 ---@param f any
+---@return nil
 function Dialog:setOnClose(f) end
 
---- /// Returns a value for setTitle (auto-generated).
+--- @return nil
 ---@param title any
+---@return nil
 function Dialog:setTitle(title) end
 
 ---@class Dock_Panel
 local Dock_Panel = {}
 
---- /// Returns a value for dock (auto-generated).
+--- @return nil
 ---@param child_idx any
 ---@param side any
+---@return nil
 function Dock_Panel:dock(child_idx, side) end
 
---- /// Returns a value for getDockedCount (auto-generated).
+--- @return nil
+---@return nil
 function Dock_Panel:getDockedCount() end
 
---- /// Returns a value for getSplitSize (auto-generated).
+--- @return nil
 ---@param side any
+---@return nil
 function Dock_Panel:getSplitSize(side) end
 
---- /// Returns a value for setSplitSize (auto-generated).
+--- @return nil
 ---@param side any
 ---@param size any
+---@return nil
 function Dock_Panel:setSplitSize(side, size) end
 
---- /// Returns a value for undock (auto-generated).
+--- @return nil
 ---@param child_idx any
+---@return nil
 function Dock_Panel:undock(child_idx) end
 
 ---@class Gui_Table
 local Gui_Table = {}
 
---- /// Returns a value for addColumn (auto-generated).
+--- @return nil
 ---@param header any
 ---@param width? any (optional)
+---@return nil
 function Gui_Table:addColumn(header, width) end
 
---- /// Returns a value for addRow (auto-generated).
+--- @return nil
 ---@param cells any
+---@return nil
 function Gui_Table:addRow(cells) end
 
---- /// Returns a value for getCell (auto-generated).
+--- @return nil
 ---@param row any
 ---@param col any
+---@return nil
 function Gui_Table:getCell(row, col) end
 
---- /// Returns a value for getColumnCount (auto-generated).
+--- @return nil
+---@return nil
 function Gui_Table:getColumnCount() end
 
---- /// Returns a value for getRowCount (auto-generated).
+--- @return nil
+---@return nil
 function Gui_Table:getRowCount() end
 
---- /// Returns a value for getSelectedRow (auto-generated).
+--- @return nil
+---@return nil
 function Gui_Table:getSelectedRow() end
 
---- /// Returns a value for isSortable (auto-generated).
+--- @return nil
+---@return nil
 function Gui_Table:isSortable() end
 
---- /// Returns a value for setCell (auto-generated).
+--- @return nil
 ---@param row any
 ---@param col any
 ---@param text any
+---@return nil
 function Gui_Table:setCell(row, col, text) end
 
---- /// Returns a value for setOnSelect (auto-generated).
+--- @return nil
 ---@param f any
+---@return nil
 function Gui_Table:setOnSelect(f) end
 
---- /// Returns a value for setSelectedRow (auto-generated).
+--- @return nil
 ---@param row? any (optional)
+---@return nil
 function Gui_Table:setSelectedRow(row) end
 
---- /// Returns a value for setSortable (auto-generated).
+--- @return nil
 ---@param v any
+---@return nil
 function Gui_Table:setSortable(v) end
 
 ---@class Gui_Window
 local Gui_Window = {}
 
---- /// Returns a value for addChild (auto-generated).
----@param child_idx any
-function Gui_Window:addChild(child_idx) end
-
---- /// Returns a value for getChildren (auto-generated).
-function Gui_Window:getChildren() end
-
---- /// Returns a value for getTitle (auto-generated).
+--- @return nil
+---@return nil
 function Gui_Window:getTitle() end
 
---- /// Returns a value for isCloseable (auto-generated).
+--- @return nil
+---@return nil
 function Gui_Window:isCloseable() end
 
---- /// Returns a value for isDraggable (auto-generated).
+--- @return nil
+---@return nil
 function Gui_Window:isDraggable() end
 
---- /// Returns a value for isResizable (auto-generated).
+--- @return nil
+---@return nil
 function Gui_Window:isResizable() end
 
---- /// Returns a value for removeChild (auto-generated).
----@param child_idx any
-function Gui_Window:removeChild(child_idx) end
-
---- /// Returns a value for setCloseable (auto-generated).
+--- @return nil
 ---@param v any
+---@return nil
 function Gui_Window:setCloseable(v) end
 
---- /// Returns a value for setDraggable (auto-generated).
+--- @return nil
 ---@param v any
+---@return nil
 function Gui_Window:setDraggable(v) end
 
---- /// Returns a value for setOnClose (auto-generated).
+--- @return nil
 ---@param f any
+---@return nil
 function Gui_Window:setOnClose(f) end
 
---- /// Returns a value for setResizable (auto-generated).
+--- @return nil
 ---@param v any
+---@return nil
 function Gui_Window:setResizable(v) end
 
---- /// Returns a value for setTitle (auto-generated).
+--- @return nil
 ---@param title any
+---@return nil
 function Gui_Window:setTitle(title) end
 
 ---@class Image_Widget
 local Image_Widget = {}
 
---- /// Returns a value for addToast (auto-generated).
+--- Queues a toast notification from a table.
 ---@param toast_table any
+---@return nil
 function Image_Widget:addToast(toast_table) end
 
---- /// Returns a value for clearFocus (auto-generated).
+--- Clears keyboard focus.
+---@return nil
 function Image_Widget:clearFocus() end
 
---- /// Returns a value for draw (auto-generated).
-function Image_Widget:draw() end
-
---- /// Returns a value for focusNext (auto-generated).
+--- Moves focus to the next focusable widget.
+---@return nil
 function Image_Widget:focusNext() end
 
---- /// Returns a value for focusPrev (auto-generated).
+--- Moves focus to the previous focusable widget.
+---@return nil
 function Image_Widget:focusPrev() end
 
---- /// Returns a value for getFocus (auto-generated).
+--- Returns the focused widget index or nil.
+---@return number
 function Image_Widget:getFocus() end
 
---- /// Returns a value for getRoot (auto-generated).
+--- Returns the root panel widget table.
+---@return table
 function Image_Widget:getRoot() end
 
---- /// Returns a value for getScaleMode (auto-generated).
+--- @return nil
+---@return nil
 function Image_Widget:getScaleMode() end
 
---- /// Returns a value for getTheme (auto-generated).
+--- Returns whether a theme is set.
+---@return boolean
 function Image_Widget:getTheme() end
 
---- /// Returns a value for getTint (auto-generated).
+--- @return nil
+---@return nil
 function Image_Widget:getTint() end
 
---- /// Returns a value for getToastCount (auto-generated).
+--- Returns the number of active toasts.
+---@return number
 function Image_Widget:getToastCount() end
 
---- /// Returns a value for getWidgetCount (auto-generated).
+--- Returns the total widget count in the context.
+---@return number
 function Image_Widget:getWidgetCount() end
 
---- /// Returns a value for keypressed (auto-generated).
+--- Forwards a key press event to the GUI.
 ---@param key any
+---@return boolean
 function Image_Widget:keypressed(key) end
 
---- /// Returns a value for mousemoved (auto-generated).
+--- Forwards a mouse move event to the GUI.
 ---@param x any
 ---@param y any
----@param dx? any (optional)
----@param dy? any (optional)
-function Image_Widget:mousemoved(x, y, dx, dy) end
+---@return boolean
+function Image_Widget:mousemoved(x, y) end
 
---- /// Returns a value for mousepressed (auto-generated).
+--- Forwards a mouse press event to the GUI.
 ---@param x any
 ---@param y any
 ---@param btn? any (optional)
+---@return boolean
 function Image_Widget:mousepressed(x, y, btn) end
 
---- /// Returns a value for mousereleased (auto-generated).
+--- Forwards a mouse release event to the GUI.
 ---@param x any
 ---@param y any
 ---@param btn? any (optional)
+---@return boolean
 function Image_Widget:mousereleased(x, y, btn) end
 
---- /// Returns a value for newAccordion (auto-generated).
+--- Creates a collapsible accordion widget.
+---@return table
 function Image_Widget:newAccordion() end
 
---- /// Returns a value for newButton (auto-generated).
+--- Creates a button widget.
 ---@param text? any (optional)
+---@return table
 function Image_Widget:newButton(text) end
 
---- /// Returns a value for newCheckbox (auto-generated).
+--- Creates a checkbox widget.
 ---@param text? any (optional)
+---@return table
 function Image_Widget:newCheckbox(text) end
 
---- /// Returns a value for newColorPicker (auto-generated).
+--- Creates a color picker widget.
+---@return table
 function Image_Widget:newColorPicker() end
 
---- /// Returns a value for newComboBox (auto-generated).
+--- Creates a dropdown combo box widget.
+---@return table
 function Image_Widget:newComboBox() end
 
---- /// Returns a value for newDialog (auto-generated).
+--- Creates a modal dialog widget.
 ---@param title? any (optional)
+---@return table
 function Image_Widget:newDialog(title) end
 
---- /// Returns a value for newDockPanel (auto-generated).
+--- Creates a dock panel.
+---@return table
 function Image_Widget:newDockPanel() end
 
---- /// Returns a value for newImageWidget (auto-generated).
+--- Creates an image display widget.
+---@return table
 function Image_Widget:newImageWidget() end
 
---- /// Returns a value for newLabel (auto-generated).
+--- Creates a text label widget.
 ---@param text? any (optional)
+---@return table
 function Image_Widget:newLabel(text) end
 
---- /// Returns a value for newLayout (auto-generated).
+--- Creates a flexbox layout container.
 ---@param direction? any (optional)
+---@return table
 function Image_Widget:newLayout(direction) end
 
---- /// Returns a value for newList (auto-generated).
+--- Creates a selectable list widget.
+---@return table
 function Image_Widget:newList() end
 
---- /// Returns a value for newMenuBar (auto-generated).
+--- Creates a menu bar widget.
+---@return table
 function Image_Widget:newMenuBar() end
 
---- /// Returns a value for newMenuItem (auto-generated).
+--- Creates a menu item widget.
 ---@param text? any (optional)
+---@return table
 function Image_Widget:newMenuItem(text) end
 
---- /// Returns a value for newNinePatch (auto-generated).
+--- Creates a 9-patch slicer widget.
+---@return table
 function Image_Widget:newNinePatch() end
 
---- /// Returns a value for newPanel (auto-generated).
+--- Creates a container panel widget.
+---@return table
 function Image_Widget:newPanel() end
 
---- /// Returns a value for newProgressBar (auto-generated).
+--- Creates a progress bar widget.
 ---@param min? any (optional)
 ---@param max? any (optional)
+---@return table
 function Image_Widget:newProgressBar(min, max) end
 
---- /// Returns a value for newRadioButton (auto-generated).
+--- Creates a grouped radio button widget.
 ---@param text? any (optional)
 ---@param group? any (optional)
+---@return table
 function Image_Widget:newRadioButton(text, group) end
 
---- /// Returns a value for newScrollBar (auto-generated).
+--- Creates a scroll bar widget.
 ---@param vertical? any (optional)
+---@return table
 function Image_Widget:newScrollBar(vertical) end
 
---- /// Returns a value for newScrollPanel (auto-generated).
+--- Creates a scrollable panel widget.
+---@return table
 function Image_Widget:newScrollPanel() end
 
---- /// Returns a value for newSeparator (auto-generated).
+--- Creates a separator line.
 ---@param vertical? any (optional)
+---@return table
 function Image_Widget:newSeparator(vertical) end
 
---- /// Returns a value for newSlider (auto-generated).
+--- Creates a value slider widget.
 ---@param min? any (optional)
 ---@param max? any (optional)
+---@return table
 function Image_Widget:newSlider(min, max) end
 
---- /// Returns a value for newSpacer (auto-generated).
+--- Creates a spacing filler widget.
 ---@param w? any (optional)
 ---@param h? any (optional)
+---@return table
 function Image_Widget:newSpacer(w, h) end
 
---- /// Returns a value for newSplitPanel (auto-generated).
+--- Creates a resizable split panel.
 ---@param orientation? any (optional)
+---@return table
 function Image_Widget:newSplitPanel(orientation) end
 
---- /// Returns a value for newStatusBar (auto-generated).
+--- Creates a status bar widget.
+---@return table
 function Image_Widget:newStatusBar() end
 
---- /// Returns a value for newTabBar (auto-generated).
+--- Creates a tab bar widget.
+---@return table
 function Image_Widget:newTabBar() end
 
---- /// Returns a value for newTable (auto-generated).
+--- Creates a data table widget.
+---@return table
 function Image_Widget:newTable() end
 
---- /// Returns a value for newTextInput (auto-generated).
+--- Creates a text input widget.
+---@return table
 function Image_Widget:newTextInput() end
 
---- /// Returns a value for newTheme (auto-generated).
+--- Creates a new theme instance.
+---@return Theme
 function Image_Widget:newTheme() end
 
---- /// Returns a value for newToast (auto-generated).
+--- Creates a toast notification widget.
 ---@param message? any (optional)
 ---@param duration? any (optional)
+---@return table
 function Image_Widget:newToast(message, duration) end
 
---- /// Returns a value for newToolbar (auto-generated).
+--- Creates a toolbar widget.
 ---@param orientation? any (optional)
+---@return table
 function Image_Widget:newToolbar(orientation) end
 
---- /// Returns a value for newTooltipPanel (auto-generated).
+--- Creates a tooltip panel widget.
 ---@param text? any (optional)
+---@return table
 function Image_Widget:newTooltipPanel(text) end
 
---- /// Returns a value for newTreeView (auto-generated).
+--- Creates a collapsible tree view widget.
+---@return table
 function Image_Widget:newTreeView() end
 
---- /// Returns a value for newWindow (auto-generated).
+--- Creates a draggable window widget.
 ---@param title? any (optional)
+---@return table
 function Image_Widget:newWindow(title) end
 
---- /// Returns a value for setFocus (auto-generated).
+--- Sets keyboard focus to a widget or clears it.
 ---@param widget? any (optional)
+---@return nil
 function Image_Widget:setFocus(widget) end
 
---- /// Returns a value for setScaleMode (auto-generated).
+--- @return nil
 ---@param mode any
+---@return nil
 function Image_Widget:setScaleMode(mode) end
 
---- /// Returns a value for setStyle (auto-generated).
----@param widget_type any
----@param state any
----@param style_table any
-function Image_Widget:setStyle(widget_type, state, style_table) end
+--- Sets the active GUI theme.
+---@param theme_ud any
+---@return nil
+function Image_Widget:setTheme(theme_ud) end
 
---- /// Returns a value for setTheme (auto-generated).
----@param theme_table any
-function Image_Widget:setTheme(theme_table) end
-
---- /// Returns a value for setTint (auto-generated).
+--- @return nil
 ---@param r any
 ---@param green any
 ---@param b any
 ---@param a? any (optional)
+---@return nil
 function Image_Widget:setTint(r, green, b, a) end
 
---- /// Returns a value for textinput (auto-generated).
+--- Forwards text input to the focused text input widget.
 ---@param text any
+---@return boolean
 function Image_Widget:textinput(text) end
 
---- /// Returns a value for update (auto-generated).
+--- Advances toast timers, removes expired toasts, and dispatches pending GUI events.
 ---@param dt any
+---@return nil
 function Image_Widget:update(dt) end
 
---- /// Returns a value for wheelmoved (auto-generated).
+--- Forwards a mouse wheel event to the GUI.
 ---@param x any
 ---@param y any
+---@return boolean
 function Image_Widget:wheelmoved(x, y) end
 
 ---@class Label
 local Label = {}
 
---- /// Returns a value for getText (auto-generated).
+--- @return nil
+---@return nil
 function Label:getText() end
 
---- /// Returns a value for setText (auto-generated).
+--- @return nil
 ---@param text any
+---@return nil
 function Label:setText(text) end
 
 ---@class Layout
 local Layout = {}
 
---- /// Returns a value for getAlign (auto-generated).
+--- @return nil
+---@return nil
 function Layout:getAlign() end
 
---- /// Returns a value for getDirection (auto-generated).
+--- @return nil
+---@return nil
 function Layout:getDirection() end
 
---- /// Returns a value for getJustify (auto-generated).
+--- @return nil
+---@return nil
 function Layout:getJustify() end
 
---- /// Returns a value for getSpacing (auto-generated).
+--- @return nil
+---@return nil
 function Layout:getSpacing() end
 
---- /// Returns a value for getWrap (auto-generated).
+--- @return nil
+---@return nil
 function Layout:getWrap() end
 
---- /// Returns a value for setAlign (auto-generated).
+--- @return nil
 ---@param align any
+---@return nil
 function Layout:setAlign(align) end
 
---- /// Returns a value for setColumns (auto-generated).
+--- @return nil
 ---@param n any
+---@return nil
 function Layout:setColumns(n) end
 
---- /// Returns a value for setDirection (auto-generated).
+--- @return nil
 ---@param dir any
+---@return nil
 function Layout:setDirection(dir) end
 
---- /// Returns a value for setJustify (auto-generated).
+--- @return nil
 ---@param justify any
+---@return nil
 function Layout:setJustify(justify) end
 
---- /// Returns a value for setSpacing (auto-generated).
+--- @return nil
 ---@param spacing any
+---@return nil
 function Layout:setSpacing(spacing) end
 
---- /// Returns a value for setWrap (auto-generated).
+--- @return nil
 ---@param wrap any
+---@return nil
 function Layout:setWrap(wrap) end
 
 ---@class List_Box
 local List_Box = {}
 
---- /// Returns a value for addItem (auto-generated).
+--- @return nil
 ---@param text any
+---@return nil
 function List_Box:addItem(text) end
 
---- /// Returns a value for clearItems (auto-generated).
+--- @return nil
+---@return nil
 function List_Box:clearItems() end
 
---- /// Returns a value for getItem (auto-generated).
+--- @return nil
 ---@param index any
+---@return nil
 function List_Box:getItem(index) end
 
---- /// Returns a value for getItemCount (auto-generated).
+--- @return nil
+---@return nil
 function List_Box:getItemCount() end
 
---- /// Returns a value for getSelectedIndex (auto-generated).
+--- @return nil
+---@return nil
 function List_Box:getSelectedIndex() end
 
---- /// Returns a value for removeItem (auto-generated).
+--- @return nil
 ---@param index any
+---@return nil
 function List_Box:removeItem(index) end
 
---- /// Returns a value for setItemHeight (auto-generated).
+--- @return nil
 ---@param h any
+---@return nil
 function List_Box:setItemHeight(h) end
 
---- /// Returns a value for setSelectedIndex (auto-generated).
+--- @return nil
 ---@param index any
+---@return nil
 function List_Box:setSelectedIndex(index) end
 
 ---@class Menu_Bar
 local Menu_Bar = {}
 
---- /// Returns a value for addMenu (auto-generated).
+--- @return nil
 ---@param menu_idx any
+---@return nil
 function Menu_Bar:addMenu(menu_idx) end
 
---- /// Returns a value for getMenuCount (auto-generated).
+--- @return nil
+---@return nil
 function Menu_Bar:getMenuCount() end
 
---- /// Returns a value for getMenus (auto-generated).
+--- @return nil
+---@return nil
 function Menu_Bar:getMenus() end
 
---- /// Returns a value for removeMenu (auto-generated).
+--- @return nil
 ---@param menu_idx any
+---@return nil
 function Menu_Bar:removeMenu(menu_idx) end
 
 ---@class Menu_Item
 local Menu_Item = {}
 
---- /// Returns a value for addSubItem (auto-generated).
+--- @return nil
 ---@param child_idx any
+---@return nil
 function Menu_Item:addSubItem(child_idx) end
 
---- /// Returns a value for getShortcut (auto-generated).
+--- @return nil
+---@return nil
 function Menu_Item:getShortcut() end
 
---- /// Returns a value for getSubItems (auto-generated).
+--- @return nil
+---@return nil
 function Menu_Item:getSubItems() end
 
---- /// Returns a value for getText (auto-generated).
+--- @return nil
+---@return nil
 function Menu_Item:getText() end
 
---- /// Returns a value for isChecked (auto-generated).
+--- @return nil
+---@return nil
 function Menu_Item:isChecked() end
 
---- /// Returns a value for setChecked (auto-generated).
+--- @return nil
 ---@param v any
+---@return nil
 function Menu_Item:setChecked(v) end
 
---- /// Returns a value for setOnClick (auto-generated).
+--- @return nil
 ---@param f any
+---@return nil
 function Menu_Item:setOnClick(f) end
 
---- /// Returns a value for setShortcut (auto-generated).
+--- @return nil
 ---@param shortcut any
+---@return nil
 function Menu_Item:setShortcut(shortcut) end
 
---- /// Returns a value for setText (auto-generated).
+--- @return nil
 ---@param text any
+---@return nil
 function Menu_Item:setText(text) end
 
 ---@class Nine_Patch
 local Nine_Patch = {}
 
---- /// Returns a value for getImageDimensions (auto-generated).
+--- @return nil
+---@return nil
 function Nine_Patch:getImageDimensions() end
 
---- /// Returns a value for getInsets (auto-generated).
+--- @return nil
+---@return nil
 function Nine_Patch:getInsets() end
 
---- /// Returns a value for getSlices (auto-generated).
+--- @return nil
+---@return nil
 function Nine_Patch:getSlices() end
 
---- /// Returns a value for setImageDimensions (auto-generated).
+--- @return nil
 ---@param w any
 ---@param h any
+---@return nil
 function Nine_Patch:setImageDimensions(w, h) end
 
---- /// Returns a value for setInsets (auto-generated).
+--- @return nil
 ---@param left any
 ---@param top any
 ---@param right any
 ---@param bottom any
+---@return nil
 function Nine_Patch:setInsets(left, top, right, bottom) end
 
 ---@class Panel
 local Panel = {}
 
---- /// Returns a value for getTitle (auto-generated).
+--- @return nil
+---@return nil
 function Panel:getTitle() end
 
---- /// Returns a value for setScrollable (auto-generated).
+--- @return nil
 ---@param scrollable any
+---@return nil
 function Panel:setScrollable(scrollable) end
 
---- /// Returns a value for setTitle (auto-generated).
+--- @return nil
 ---@param title any
+---@return nil
 function Panel:setTitle(title) end
 
 ---@class Progress_Bar
 local Progress_Bar = {}
 
---- /// Returns a value for getMax (auto-generated).
+--- @return nil
+---@return nil
 function Progress_Bar:getMax() end
 
---- /// Returns a value for getMin (auto-generated).
+--- @return nil
+---@return nil
 function Progress_Bar:getMin() end
 
---- /// Returns a value for getProgress (auto-generated).
+--- @return nil
+---@return nil
 function Progress_Bar:getProgress() end
 
---- /// Returns a value for getValue (auto-generated).
+--- @return nil
+---@return nil
 function Progress_Bar:getValue() end
 
---- /// Returns a value for setRange (auto-generated).
+--- @return nil
 ---@param min any
 ---@param max any
+---@return nil
 function Progress_Bar:setRange(min, max) end
 
---- /// Returns a value for setValue (auto-generated).
+--- @return nil
 ---@param v any
+---@return nil
 function Progress_Bar:setValue(v) end
 
 ---@class Radio_Button
 local Radio_Button = {}
 
---- /// Returns a value for getGroup (auto-generated).
+--- @return nil
+---@return nil
 function Radio_Button:getGroup() end
 
---- /// Returns a value for getText (auto-generated).
+--- @return nil
+---@return nil
 function Radio_Button:getText() end
 
---- /// Returns a value for isSelected (auto-generated).
+--- @return nil
+---@return nil
 function Radio_Button:isSelected() end
 
---- /// Returns a value for setGroup (auto-generated).
+--- @return nil
 ---@param group any
+---@return nil
 function Radio_Button:setGroup(group) end
 
---- /// Returns a value for setOnChange (auto-generated).
+--- @return nil
 ---@param f any
+---@return nil
 function Radio_Button:setOnChange(f) end
 
---- /// Returns a value for setSelected (auto-generated).
+--- @return nil
 ---@param v any
+---@return nil
 function Radio_Button:setSelected(v) end
 
---- /// Returns a value for setText (auto-generated).
+--- @return nil
 ---@param text any
+---@return nil
 function Radio_Button:setText(text) end
 
 ---@class Scroll_Bar
 local Scroll_Bar = {}
 
---- /// Returns a value for getContentSize (auto-generated).
+--- @return nil
+---@return nil
 function Scroll_Bar:getContentSize() end
 
---- /// Returns a value for getScrollPosition (auto-generated).
+--- @return nil
+---@return nil
 function Scroll_Bar:getScrollPosition() end
 
---- /// Returns a value for getViewSize (auto-generated).
+--- @return nil
+---@return nil
 function Scroll_Bar:getViewSize() end
 
---- /// Returns a value for isVertical (auto-generated).
+--- @return nil
+---@return nil
 function Scroll_Bar:isVertical() end
 
---- /// Returns a value for setContentSize (auto-generated).
+--- @return nil
 ---@param v any
+---@return nil
 function Scroll_Bar:setContentSize(v) end
 
---- /// Returns a value for setOnChange (auto-generated).
+--- @return nil
 ---@param f any
+---@return nil
 function Scroll_Bar:setOnChange(f) end
 
---- /// Returns a value for setScrollPosition (auto-generated).
+--- @return nil
 ---@param v any
+---@return nil
 function Scroll_Bar:setScrollPosition(v) end
 
---- /// Returns a value for setViewSize (auto-generated).
+--- @return nil
 ---@param v any
+---@return nil
 function Scroll_Bar:setViewSize(v) end
 
 ---@class Scroll_Panel
 local Scroll_Panel = {}
 
---- /// Returns a value for getContentSize (auto-generated).
+--- @return nil
+---@return nil
 function Scroll_Panel:getContentSize() end
 
---- /// Returns a value for getMaxScroll (auto-generated).
+--- @return nil
+---@return nil
 function Scroll_Panel:getMaxScroll() end
 
---- /// Returns a value for getScrollPosition (auto-generated).
+--- @return nil
+---@return nil
 function Scroll_Panel:getScrollPosition() end
 
---- /// Returns a value for getScrollSpeed (auto-generated).
+--- @return nil
+---@return nil
 function Scroll_Panel:getScrollSpeed() end
 
---- /// Returns a value for setContentSize (auto-generated).
+--- @return nil
 ---@param w any
 ---@param h any
+---@return nil
 function Scroll_Panel:setContentSize(w, h) end
 
---- /// Returns a value for setScrollPosition (auto-generated).
+--- @return nil
 ---@param x any
 ---@param y any
+---@return nil
 function Scroll_Panel:setScrollPosition(x, y) end
 
---- /// Returns a value for setScrollSpeed (auto-generated).
+--- @return nil
 ---@param speed any
+---@return nil
 function Scroll_Panel:setScrollSpeed(speed) end
 
 ---@class Separator
 local Separator = {}
 
---- /// Returns a value for getThickness (auto-generated).
+--- @return nil
+---@return nil
 function Separator:getThickness() end
 
---- /// Returns a value for isVertical (auto-generated).
+--- @return nil
+---@return nil
 function Separator:isVertical() end
 
---- /// Returns a value for setThickness (auto-generated).
+--- @return nil
 ---@param thickness any
+---@return nil
 function Separator:setThickness(thickness) end
 
---- /// Returns a value for setVertical (auto-generated).
+--- @return nil
 ---@param v any
+---@return nil
 function Separator:setVertical(v) end
 
 ---@class Slider
 local Slider = {}
 
---- /// Returns a value for getMax (auto-generated).
+--- @return nil
+---@return nil
 function Slider:getMax() end
 
---- /// Returns a value for getMin (auto-generated).
+--- @return nil
+---@return nil
 function Slider:getMin() end
 
---- /// Returns a value for getValue (auto-generated).
+--- @return nil
+---@return nil
 function Slider:getValue() end
 
---- /// Returns a value for setRange (auto-generated).
+--- @return nil
 ---@param min any
 ---@param max any
+---@return nil
 function Slider:setRange(min, max) end
 
---- /// Returns a value for setStep (auto-generated).
+--- @return nil
 ---@param step any
+---@return nil
 function Slider:setStep(step) end
 
---- /// Returns a value for setValue (auto-generated).
+--- @return nil
 ---@param v any
+---@return nil
 function Slider:setValue(v) end
 
 ---@class Split_Panel
 local Split_Panel = {}
 
---- /// Returns a value for getFirstChild (auto-generated).
+--- @return nil
+---@return nil
 function Split_Panel:getFirstChild() end
 
---- /// Returns a value for getMinPanelSize (auto-generated).
+--- @return nil
+---@return nil
 function Split_Panel:getMinPanelSize() end
 
---- /// Returns a value for getOrientation (auto-generated).
+--- @return nil
+---@return nil
 function Split_Panel:getOrientation() end
 
---- /// Returns a value for getSecondChild (auto-generated).
+--- @return nil
+---@return nil
 function Split_Panel:getSecondChild() end
 
---- /// Returns a value for getSplitPosition (auto-generated).
+--- @return nil
+---@return nil
 function Split_Panel:getSplitPosition() end
 
---- /// Returns a value for setFirstChild (auto-generated).
+--- @return nil
 ---@param child_idx any
+---@return nil
 function Split_Panel:setFirstChild(child_idx) end
 
---- /// Returns a value for setMinPanelSize (auto-generated).
+--- @return nil
 ---@param v any
+---@return nil
 function Split_Panel:setMinPanelSize(v) end
 
---- /// Returns a value for setOrientation (auto-generated).
+--- @return nil
 ---@param v any
+---@return nil
 function Split_Panel:setOrientation(v) end
 
---- /// Returns a value for setSecondChild (auto-generated).
+--- @return nil
 ---@param child_idx any
+---@return nil
 function Split_Panel:setSecondChild(child_idx) end
 
---- /// Returns a value for setSplitPosition (auto-generated).
+--- @return nil
 ---@param v any
+---@return nil
 function Split_Panel:setSplitPosition(v) end
 
 ---@class Status_Bar
 local Status_Bar = {}
 
---- /// Returns a value for addSection (auto-generated).
+--- @return nil
 ---@param text any
 ---@param width? any (optional)
+---@return nil
 function Status_Bar:addSection(text, width) end
 
---- /// Returns a value for getSectionCount (auto-generated).
+--- @return nil
+---@return nil
 function Status_Bar:getSectionCount() end
 
---- /// Returns a value for getSectionText (auto-generated).
+--- @return nil
 ---@param section_idx any
+---@return nil
 function Status_Bar:getSectionText(section_idx) end
 
---- /// Returns a value for setSectionCount (auto-generated).
----@param n any
-function Status_Bar:setSectionCount(n) end
-
---- /// Returns a value for setSectionText (auto-generated).
+--- @return nil
 ---@param section_idx any
 ---@param text any
+---@return nil
 function Status_Bar:setSectionText(section_idx, text) end
-
---- /// Returns a value for setSectionWidget (auto-generated).
----@param sidx any
----@param widx any
-function Status_Bar:setSectionWidget(sidx, widx) end
 
 ---@class Tab_Bar
 local Tab_Bar = {}
 
---- /// Returns a value for addTab (auto-generated).
+--- @return nil
 ---@param label any
+---@return nil
 function Tab_Bar:addTab(label) end
 
---- /// Returns a value for getActiveTab (auto-generated).
+--- @return nil
+---@return nil
 function Tab_Bar:getActiveTab() end
 
---- /// Returns a value for getTab (auto-generated).
+--- @return nil
 ---@param index any
+---@return nil
 function Tab_Bar:getTab(index) end
 
---- /// Returns a value for getTabCount (auto-generated).
+--- @return nil
+---@return nil
 function Tab_Bar:getTabCount() end
 
---- /// Returns a value for removeTab (auto-generated).
+--- @return nil
 ---@param index any
+---@return nil
 function Tab_Bar:removeTab(index) end
 
---- /// Returns a value for setActiveTab (auto-generated).
+--- @return nil
 ---@param index any
+---@return nil
 function Tab_Bar:setActiveTab(index) end
 
 ---@class Text_Input
 local Text_Input = {}
 
---- /// Returns a value for getCursorPosition (auto-generated).
+--- @return nil
+---@return nil
 function Text_Input:getCursorPosition() end
 
---- /// Returns a value for getPlaceholder (auto-generated).
+--- @return nil
+---@return nil
 function Text_Input:getPlaceholder() end
 
---- /// Returns a value for getText (auto-generated).
+--- @return nil
+---@return nil
 function Text_Input:getText() end
 
---- /// Returns a value for isFocused (auto-generated).
+--- @return nil
+---@return nil
 function Text_Input:isFocused() end
 
---- /// Returns a value for setMaxLength (auto-generated).
+--- @return nil
 ---@param n any
+---@return nil
 function Text_Input:setMaxLength(n) end
 
---- /// Returns a value for setPlaceholder (auto-generated).
+--- @return nil
 ---@param text any
+---@return nil
 function Text_Input:setPlaceholder(text) end
 
---- /// Returns a value for setText (auto-generated).
+--- @return nil
 ---@param text any
+---@return nil
 function Text_Input:setText(text) end
 
 ---@class Toast
 local Toast = {}
 
---- /// Returns a value for getDuration (auto-generated).
+--- @return nil
+---@return nil
 function Toast:getDuration() end
 
---- /// Returns a value for getMessage (auto-generated).
+--- @return nil
+---@return nil
 function Toast:getMessage() end
 
---- /// Returns a value for getProgress (auto-generated).
+--- @return nil
+---@return nil
 function Toast:getProgress() end
 
---- /// Returns a value for isExpired (auto-generated).
+--- @return nil
+---@return nil
 function Toast:isExpired() end
 
---- /// Returns a value for setDuration (auto-generated).
+--- @return nil
 ---@param d any
+---@return nil
 function Toast:setDuration(d) end
 
---- /// Returns a value for setMessage (auto-generated).
+--- @return nil
 ---@param msg any
+---@return nil
 function Toast:setMessage(msg) end
 
 ---@class Toolbar
 local Toolbar = {}
 
---- /// Returns a value for addButton (auto-generated).
+--- @return nil
 ---@param id any
 ---@param tooltip? any (optional)
+---@return nil
 function Toolbar:addButton(id, tooltip) end
 
---- /// Returns a value for addChild (auto-generated).
----@param child_idx any
-function Toolbar:addChild(child_idx) end
-
---- /// Returns a value for addSeparator (auto-generated).
-function Toolbar:addSeparator() end
-
---- /// Returns a value for addSpacer (auto-generated).
----@param width? any (optional)
-function Toolbar:addSpacer(width) end
-
---- /// Returns a value for getButton (auto-generated).
+--- @return nil
 ---@param id any
+---@return nil
 function Toolbar:getButton(id) end
 
---- /// Returns a value for getChildren (auto-generated).
-function Toolbar:getChildren() end
-
---- /// Returns a value for getOrientation (auto-generated).
+--- @return nil
+---@return nil
 function Toolbar:getOrientation() end
 
---- /// Returns a value for isButtonToggled (auto-generated).
+--- @return nil
 ---@param id any
+---@return nil
 function Toolbar:isButtonToggled(id) end
 
---- /// Returns a value for removeChild (auto-generated).
----@param child_idx any
-function Toolbar:removeChild(child_idx) end
-
---- /// Returns a value for setButtonEnabled (auto-generated).
+--- @return nil
 ---@param id any
 ---@param enabled any
+---@return nil
 function Toolbar:setButtonEnabled(id, enabled) end
 
---- /// Returns a value for setButtonToggled (auto-generated).
+--- @return nil
 ---@param id any
 ---@param toggled any
+---@return nil
 function Toolbar:setButtonToggled(id, toggled) end
 
---- /// Returns a value for setOrientation (auto-generated).
+--- @return nil
 ---@param v any
+---@return nil
 function Toolbar:setOrientation(v) end
 
 ---@class Tooltip_Panel
 local Tooltip_Panel = {}
 
---- /// Returns a value for getDelay (auto-generated).
+--- @return nil
+---@return nil
 function Tooltip_Panel:getDelay() end
 
---- /// Returns a value for getTarget (auto-generated).
+--- @return nil
+---@return nil
 function Tooltip_Panel:getTarget() end
 
---- /// Returns a value for getText (auto-generated).
+--- @return nil
+---@return nil
 function Tooltip_Panel:getText() end
 
---- /// Returns a value for setDelay (auto-generated).
+--- @return nil
 ---@param v any
+---@return nil
 function Tooltip_Panel:setDelay(v) end
 
---- /// Returns a value for setTarget (auto-generated).
+--- @return nil
 ---@param target? any (optional)
+---@return nil
 function Tooltip_Panel:setTarget(target) end
 
---- /// Returns a value for setText (auto-generated).
+--- @return nil
 ---@param text any
+---@return nil
 function Tooltip_Panel:setText(text) end
 
 ---@class Tree_View
 local Tree_View = {}
 
---- /// Returns a value for addNode (auto-generated).
+--- @return nil
 ---@param text any
 ---@param parent_index? any (optional)
+---@return nil
 function Tree_View:addNode(text, parent_index) end
 
---- /// Returns a value for clearNodes (auto-generated).
+--- @return nil
+---@return nil
 function Tree_View:clearNodes() end
 
---- /// Returns a value for collapseAll (auto-generated).
+--- @return nil
+---@return nil
 function Tree_View:collapseAll() end
 
---- /// Returns a value for collapseNode (auto-generated).
+--- @return nil
 ---@param index any
+---@return nil
 function Tree_View:collapseNode(index) end
 
---- /// Returns a value for expandAll (auto-generated).
+--- @return nil
+---@return nil
 function Tree_View:expandAll() end
 
---- /// Returns a value for expandNode (auto-generated).
+--- @return nil
 ---@param index any
+---@return nil
 function Tree_View:expandNode(index) end
 
---- /// Returns a value for getChildNodes (auto-generated).
+--- @return nil
 ---@param index any
+---@return nil
 function Tree_View:getChildNodes(index) end
 
---- /// Returns a value for getNodeCount (auto-generated).
+--- @return nil
+---@return nil
 function Tree_View:getNodeCount() end
 
---- /// Returns a value for getNodeDepth (auto-generated).
+--- @return nil
 ---@param index any
+---@return nil
 function Tree_View:getNodeDepth(index) end
 
---- /// Returns a value for getNodeText (auto-generated).
+--- @return nil
 ---@param index any
+---@return nil
 function Tree_View:getNodeText(index) end
 
---- /// Returns a value for getParentNode (auto-generated).
+--- @return nil
 ---@param index any
+---@return nil
 function Tree_View:getParentNode(index) end
 
---- /// Returns a value for getSelectedNode (auto-generated).
+--- @return nil
+---@return nil
 function Tree_View:getSelectedNode() end
 
---- /// Returns a value for isExpanded (auto-generated).
+--- @return nil
 ---@param index any
+---@return nil
 function Tree_View:isExpanded(index) end
 
---- /// Returns a value for isNodeExpanded (auto-generated).
+--- @return nil
 ---@param index any
+---@return nil
 function Tree_View:isNodeExpanded(index) end
 
---- /// Returns a value for removeNode (auto-generated).
+--- @return nil
 ---@param index any
+---@return nil
 function Tree_View:removeNode(index) end
 
---- /// Returns a value for setNodeIcon (auto-generated).
+--- @return nil
 ---@param index any
 ---@param icon any
+---@return nil
 function Tree_View:setNodeIcon(index, icon) end
 
---- /// Returns a value for setNodeText (auto-generated).
+--- @return nil
 ---@param index any
 ---@param text any
+---@return nil
 function Tree_View:setNodeText(index, text) end
 
---- /// Returns a value for setSelectedNode (auto-generated).
+--- @return nil
 ---@param index any
+---@return nil
 function Tree_View:setSelectedNode(index) end
 
---- /// Returns a value for toggleNode (auto-generated).
+--- @return nil
 ---@param index any
+---@return nil
 function Tree_View:toggleNode(index) end
 
+--- Adds a child widget to this container.
 ---@param child any
+---@return nil
 function luna.gui.addChild(child) end
 
+--- Removes all anchor constraints.
+---@return nil
 function luna.gui.clearAnchor() end
 
+--- Returns whether (x, y) is inside this widget.
 ---@param x any
 ---@param y any
+---@return boolean
 function luna.gui.containsPoint(x, y) end
 
+--- Recursively searches for a widget by id starting from this widget.
 ---@param id any
+---@return table
 function luna.gui.findById(id) end
 
+--- Returns the number of children in this container.
+---@return number
 function luna.gui.getChildCount() end
 
+--- Returns the flex-grow factor.
+---@return number
 function luna.gui.getFlexGrow() end
 
+--- Returns the flex-shrink factor.
+---@return number
 function luna.gui.getFlexShrink() end
 
+--- Returns the widget string identifier.
+---@return string
 function luna.gui.getId() end
 
+--- Returns the widget margin (top, right, bottom, left).
+---@return number
 function luna.gui.getMargin() end
 
+--- Returns the maximum widget size.
+---@return number
 function luna.gui.getMaxSize() end
 
+--- Returns the minimum widget size.
+---@return number
 function luna.gui.getMinSize() end
 
+--- Returns the widget padding (top, right, bottom, left).
+---@return number
 function luna.gui.getPadding() end
 
+--- Returns the widget position.
+---@return number
 function luna.gui.getPosition() end
 
+--- Returns the widget size.
+---@return number
 function luna.gui.getSize() end
 
+--- Returns the widget interaction state name.
+---@return string
 function luna.gui.getState() end
 
+--- Returns the widget tooltip text.
+---@return string
 function luna.gui.getTooltip() end
 
+--- Returns the widget z-order.
+---@return number
 function luna.gui.getZOrder() end
 
+--- Returns whether the widget is enabled.
+---@return boolean
 function luna.gui.isEnabled() end
 
+--- Returns whether the widget is visible.
+---@return boolean
 function luna.gui.isVisible() end
 
+--- Removes a child widget from this container.
 ---@param child any
+---@return nil
 function luna.gui.removeChild(child) end
 
-function luna.gui.setAnchor() end
+--- Sets anchor edges (left, top, right, bottom).
+---@param left number
+---@param top number
+---@param right number
+---@param bottom number
+---@return nil
+function luna.gui.setAnchor(left, top, right, bottom) end
 
+--- Sets center anchor offsets.
 ---@param cx? any (optional)
 ---@param cy? any (optional)
+---@return nil
 function luna.gui.setAnchorCenter(cx, cy) end
 
+--- Sets whether the widget is enabled.
 ---@param v any
+---@return nil
 function luna.gui.setEnabled(v) end
 
+--- Sets the flex-grow factor.
 ---@param grow any
+---@return nil
 function luna.gui.setFlexGrow(grow) end
 
+--- Sets the flex-shrink factor.
 ---@param shrink any
+---@return nil
 function luna.gui.setFlexShrink(shrink) end
 
+--- Sets the widget string identifier.
 ---@param id any
+---@return nil
 function luna.gui.setId(id) end
 
-function luna.gui.setMargin() end
+--- Sets widget margin (CSS-like: top, right?, bottom?, left?).
+---@param top any
+---@param right? any (optional)
+---@param bottom? any (optional)
+---@param left? any (optional)
+---@return nil
+function luna.gui.setMargin(top, right, bottom, left) end
 
+--- Sets the maximum widget size.
 ---@param w any
 ---@param h any
+---@return nil
 function luna.gui.setMaxSize(w, h) end
 
+--- Sets the minimum widget size.
 ---@param w any
 ---@param h any
+---@return nil
 function luna.gui.setMinSize(w, h) end
 
+--- Registers a callback invoked when this widget's value changes.
 ---@param f any
+---@return nil
 function luna.gui.setOnChange(f) end
 
+--- Registers a callback invoked when this widget is clicked.
 ---@param f any
+---@return nil
 function luna.gui.setOnClick(f) end
 
+--- Stores a custom draw callback for later invocation.
 ---@param f any
+---@return nil
 function luna.gui.setOnDraw(f) end
 
-function luna.gui.setPadding() end
+--- Sets widget padding (CSS-like: top, right?, bottom?, left?).
+---@param top any
+---@param right? any (optional)
+---@param bottom? any (optional)
+---@param left? any (optional)
+---@return nil
+function luna.gui.setPadding(top, right, bottom, left) end
 
+--- Sets the widget position.
 ---@param x any
 ---@param y any
+---@return nil
 function luna.gui.setPosition(x, y) end
 
+--- Sets the widget size.
 ---@param w any
 ---@param h any
+---@return nil
 function luna.gui.setSize(w, h) end
 
+--- Sets the widget tooltip text.
 ---@param text any
+---@return nil
 function luna.gui.setTooltip(text) end
 
+--- Sets widget visibility.
 ---@param v any
+---@return nil
 function luna.gui.setVisible(v) end
 
+--- Sets the widget z-order for draw sorting.
 ---@param z any
+---@return nil
 function luna.gui.setZOrder(z) end
 
 ---@class luna.image
 luna.image = {}
 
+--- Lua-side wrapper around [`CompressedImageData`].
 ---@class CompressedImageData
 local CompressedImageData = {}
 
---- Return `(width, height)` of the base mip level.
+--- Returns the width and height of the base mip level.
+---@return integer
 function CompressedImageData:getDimensions() end
 
---- Return the compressed format name string (e.g. `"dxt1"`, `"bc7"`).
+--- Returns the compressed format name string.
+---@return string
 function CompressedImageData:getFormat() end
 
---- Return the height of the base mip level in pixels.
----@return number
+--- Returns the height of the base mip level in pixels.
+---@return integer
 function CompressedImageData:getHeight() end
 
---- Return the number of mipmap levels stored in this compressed image.
+--- Returns the number of mipmap levels stored.
+---@return integer
 function CompressedImageData:getMipmapCount() end
 
---- Return the width of the base mip level in pixels.
----@return number
+--- Returns the width of the base mip level in pixels.
+---@return integer
 function CompressedImageData:getWidth() end
 
+--- Returns true if the file at the given path is a DDS file.
 ---@param filename any
+---@return boolean
 function luna.image.isCompressed(filename) end
 
+--- Loads compressed texture data from a DDS file.
 ---@param filename any
+---@return CompressedImageData
 function luna.image.newCompressedData(filename) end
 
---- Creates a new blank RGBA8 ImageData buffer of the given size.
+--- Creates a new blank ImageData or loads one from a file.
 ---@param args any
+---@return ImageData
 function luna.image.newImageData(args) end
 
 ---@class luna.input
 luna.input = {}
 
+--- Lua-side wrapper around a mouse cursor handle.
 ---@class Cursor
 local Cursor = {}
 
+--- Returns the cursor type as "system" or "custom".
+---@return string
 function Cursor:getType() end
 
+--- Releases the cursor resource (no-op on desktop).
+---@return nil
 function Cursor:release() end
 
 --- Returns the current value (-1 to 1) of a gamepad analog axis.
 ---@param id any
 ---@param axis any
----@return any
+---@return number
 function luna.input.getAxis(id, axis) end
 
 --- Returns the total number of analog axes on the gamepad.
 ---@param id any
----@return any
+---@return integer
 function luna.input.getAxisCount(id) end
 
 --- Returns whether background gamepad events are enabled.
----@return table
+---@return boolean
 function luna.input.getBackgroundEvents() end
 
 --- Returns the total number of buttons on the gamepad.
 ---@param id any
----@return any
+---@return integer
 function luna.input.getButtonCount(id) end
 
 --- Returns the number of connected gamepads.
----@return table
+---@return integer
 function luna.input.getCount() end
 
---- Returns the currently active cursor ID.
----@return any
+--- Returns the name of the currently active system cursor.
+---@return string
 function luna.input.getCursor() end
 
 --- Returns the hardware GUID string of the gamepad.
 ---@param id any
----@return any
+---@return string
 function luna.input.getGUID(id) end
 
---- Returns the stored mapping string for the gamepad with the given GUID, or nil.
+--- Returns the stored mapping string for the given GUID, or nil.
 ---@param guid any
 ---@return string?
 function luna.input.getGamepadMappingString(guid) end
 
---- Returns the direction (string) of a hat switch on the gamepad.
+--- Returns the direction string of a hat switch on the gamepad.
 ---@param id any
 ---@param hat any
----@return any
+---@return string
 function luna.input.getHat(id, hat) end
 
 --- Returns the number of tracked gamepad slots.
----@return table
+---@return integer
 function luna.input.getJoystickCount() end
 
 --- Returns a list of connected gamepad IDs.
@@ -5600,106 +5669,112 @@ function luna.input.getJoysticks() end
 
 --- Returns the key name for the given hardware scancode.
 ---@param scancode any
----@return any
+---@return string?
 function luna.input.getKeyFromScancode(scancode) end
 
 --- Returns the human-readable name of a gamepad.
 ---@param id any
----@return any
+---@return string
 function luna.input.getName(id) end
 
---- Returns the current position (x, y).
----@return any
+--- Returns the current cursor position as (x, y).
+---@return number
 function luna.input.getPosition() end
 
---- Returns the current position (x, y).
+--- Returns the position (x, y) of the touch with the given ID.
 ---@param id any
----@return any
+---@return number
 function luna.input.getPosition(id) end
 
 --- Returns the pressure (0-1) of the touch with the given ID.
 ---@param id any
----@return any
+---@return number
 function luna.input.getPressure(id) end
 
 --- Returns whether relative mouse mode is active.
+---@return boolean
 function luna.input.getRelativeMode() end
 
 --- Returns the hardware scancode for the given key name.
 ---@param key any
----@return any
+---@return string?
 function luna.input.getScancodeFromKey(key) end
 
 --- Returns a system cursor object for the named cursor shape.
 ---@param name any
+---@return Cursor
 function luna.input.getSystemCursor(name) end
 
 --- Returns the number of currently active touch points.
+---@return integer
 function luna.input.getTouchCount() end
 
---- Returns a table of active touch points (id, x, y, pressure).
+--- Returns a table of active touch points with id, x, y, and pressure fields.
 ---@return table
 function luna.input.getTouches() end
 
 --- Returns the mouse scroll wheel delta (dx, dy) since last frame.
----@return any
+---@return number
 function luna.input.getWheelDelta() end
 
 --- Returns the current mouse X position in window coordinates.
----@return any
+---@return number
 function luna.input.getX() end
 
 --- Returns the current mouse Y position in window coordinates.
----@return any
+---@return number
 function luna.input.getY() end
 
 --- Returns whether key-repeat is currently enabled.
+---@return boolean
 function luna.input.hasKeyRepeat() end
 
 --- Returns whether text input mode is currently active.
----@return any
+---@return boolean
 function luna.input.hasTextInput() end
 
 --- Returns whether the gamepad with the given ID is connected.
 ---@param id any
----@return any
+---@return boolean
 function luna.input.isConnected(id) end
 
 --- Returns whether cursor customisation is supported on this platform.
+---@return boolean
 function luna.input.isCursorSupported() end
 
---- Returns whether the given key is currently held down.
+--- Returns true if any of the given keys is currently held down.
 ---@param args any
 ---@return boolean
 function luna.input.isDown(args) end
 
---- Returns whether the given key is currently held down.
+--- Returns whether the given mouse button is currently held down.
 ---@param button any
----@return any
+---@return boolean
 function luna.input.isDown(button) end
 
---- Returns whether the given key is currently held down.
+--- Returns whether the given button on the gamepad is currently held.
 ---@param id any
 ---@param button any
----@return any
+---@return boolean
 function luna.input.isDown(id, button) end
 
 --- Returns whether the joystick at the given slot is a recognized gamepad.
 ---@param id any
----@return any
+---@return boolean
 function luna.input.isGamepad(id) end
 
 --- Returns whether the mouse cursor is locked to the window.
+---@return boolean
 function luna.input.isGrabbed() end
 
---- Returns whether the named modifier key (shift/ctrl/alt/meta/super) is currently held.
+--- Returns whether the named modifier key is currently held.
 ---@param modifier any
 ---@return boolean
 function luna.input.isModifierActive(modifier) end
 
 --- Returns whether the key with the given scancode is held.
 ---@param scancode any
----@return any
+---@return boolean
 function luna.input.isScancodeDown(scancode) end
 
 --- Returns whether the gamepad supports haptic vibration.
@@ -5708,6 +5783,7 @@ function luna.input.isScancodeDown(scancode) end
 function luna.input.isVibrationSupported(id) end
 
 --- Returns whether the mouse cursor is currently visible.
+---@return boolean
 function luna.input.isVisible() end
 
 --- Loads SDL2 GameControllerDB-format mappings from a file.
@@ -5716,1207 +5792,969 @@ function luna.input.isVisible() end
 function luna.input.loadGamepadMappings(path) end
 
 --- Creates a custom mouse cursor from RGBA pixel data.
----@param pixels any
----@param width any
----@param height any
----@param hotx? any (optional)
----@param hoty? any (optional)
+---@param pixels table
+---@param width integer
+---@param height integer
+---@param hotx? integer? (optional)
+---@param hoty? integer? (optional)
+---@return Cursor
 function luna.input.newCursor(pixels, width, height, hotx, hoty) end
 
---- Saves all stored gamepad mappings to a plain-text file, one entry per line.
+--- Saves all stored gamepad mappings to a plain-text file.
 ---@param path any
+---@return nil
 function luna.input.saveGamepadMappings(path) end
 
 --- Enable or disable receiving gamepad events when the window is not focused.
 ---@param enable any
+---@return nil
 function luna.input.setBackgroundEvents(enable) end
 
---- Sets the currently visible mouse cursor to the given hardware cursor handle.
----@param cursor number Cursor ID returned by newCursor or getSystemCursor, or nil to reset.
-function luna.input.setCursor(cursor) end
+--- Sets the active mouse cursor from a Cursor handle, name string, or nil to reset.
+---@param cursor_val any
+---@return nil
+function luna.input.setCursor(cursor_val) end
 
 --- Stores or replaces the SDL2 GameControllerDB mapping string for the given GUID.
 ---@param guid any
 ---@param mapping any
+---@return nil
 function luna.input.setGamepadMapping(guid, mapping) end
 
 --- Locks or unlocks the mouse cursor to the window.
 ---@param grabbed any
+---@return nil
 function luna.input.setGrabbed(grabbed) end
 
 --- Enables or disables key-repeat events.
 ---@param enabled any
+---@return nil
 function luna.input.setKeyRepeat(enabled) end
 
 --- Moves the mouse cursor to the given window-space position.
 ---@param x any
 ---@param y any
+---@return nil
 function luna.input.setPosition(x, y) end
 
 --- Enables or disables raw relative mouse motion mode.
 ---@param relative any
+---@return nil
 function luna.input.setRelativeMode(relative) end
 
 --- Enables or disables Unicode text input mode.
 ---@param enabled any
+---@return nil
 function luna.input.setTextInput(enabled) end
 
---- Triggers haptic rumble with the given left/right motor strengths.
+--- Triggers haptic rumble (currently a no-op stub).
 ---@param args any
 ---@return boolean
 function luna.input.setVibration(args) end
 
---- Shows or hides the operating-system mouse cursor over the game window.
----@param visible number true to show the cursor, false to hide it.
+--- Shows or hides the operating-system mouse cursor.
+---@param visible any
+---@return nil
 function luna.input.setVisible(visible) end
 
 ---@class luna.light
 luna.light = {}
 
---- Lua UserData wrapper for a light resource.
+--- Lua-side handle to a light resource stored in [`LightWorld`].
 ---@class Light
 local Light = {}
 
+--- Returns the custom attenuation coefficients as (constant, linear, quadratic).
+---@return number
 function Light:getAttenuation() end
 
+--- Returns the blend mode as a string.
+---@return string
 function Light:getBlendMode() end
 
+--- Returns the light's tint color as (r, g, b, a).
+---@return number
 function Light:getColor() end
 
+--- Returns the direction angle in radians.
+---@return number
 function Light:getDirection() end
 
+--- Returns the energy scaling factor.
+---@return number
 function Light:getEnergy() end
 
+--- Returns the falloff mode as a string.
+---@return string
 function Light:getFalloff() end
 
+--- Returns the flicker effect speed and strength.
+---@return number
 function Light:getFlicker() end
 
+--- Returns the group identifier.
+---@return integer
 function Light:getGroupId() end
 
+--- Returns the inner cone angle in radians.
+---@return number
 function Light:getInnerAngle() end
 
+--- Returns the brightness multiplier.
+---@return number
 function Light:getIntensity() end
 
+--- Returns the light interaction bitmask.
+---@return integer
 function Light:getLightMask() end
 
+--- Returns the geometric light type as a string.
+---@return string
 function Light:getLightType() end
 
+--- Returns the outer cone angle in radians.
+---@return number
 function Light:getOuterAngle() end
 
+--- Returns the light's world-space position.
+---@return number
 function Light:getPosition() end
 
+--- Returns the light's influence radius.
+---@return number
 function Light:getRadius() end
 
+--- Returns the shadow region color as (r, g, b, a).
+---@return number
 function Light:getShadowColor() end
 
+--- Returns the shadow edge filter as a string.
+---@return string
 function Light:getShadowFilter() end
 
+--- Returns the shadow casting bitmask.
+---@return integer
 function Light:getShadowMask() end
 
+--- Returns the shadow edge smoothing factor.
+---@return number
 function Light:getShadowSmooth() end
 
+--- Returns whether this light is active.
+---@return boolean
 function Light:isEnabled() end
 
+--- Returns whether the flicker effect is active.
+---@return boolean
 function Light:isFlickerEnabled() end
 
+--- Returns whether this light casts shadows.
+---@return boolean
 function Light:isShadowEnabled() end
 
+--- Returns whether this light handle is still valid.
+---@return boolean
 function Light:isValid() end
 
+--- Returns whether this light hints at volumetric scattering.
+---@return boolean
 function Light:isVolumetric() end
 
+--- Removes this light from the world.
+---@return nil
 function Light:remove() end
 
+--- Sets the custom attenuation coefficients (constant, linear, quadratic).
 ---@param c any
 ---@param l any
 ---@param q any
+---@return nil
 function Light:setAttenuation(c, l, q) end
 
+--- Sets the blend mode ('add', 'sub', or 'mix').
 ---@param mode any
+---@return nil
 function Light:setBlendMode(mode) end
 
+--- Sets the light's tint color.
+---@param r any
+---@param g any
+---@param b any
+---@param a? any (optional)
+---@return nil
+function Light:setColor(r, g, b, a) end
+
+--- Sets the direction angle in radians.
 ---@param dir any
+---@return nil
 function Light:setDirection(dir) end
 
+--- Sets whether this light is active.
 ---@param b any
+---@return nil
 function Light:setEnabled(b) end
 
+--- Sets the energy scaling factor.
 ---@param e any
+---@return nil
 function Light:setEnergy(e) end
 
+--- Sets the falloff mode ('linear', 'smooth', or 'constant').
 ---@param mode any
+---@return nil
 function Light:setFalloff(mode) end
 
+--- Sets the flicker effect speed and strength (enables flicker).
 ---@param speed any
 ---@param strength any
+---@return nil
 function Light:setFlicker(speed, strength) end
 
+--- Sets whether the flicker effect is active.
 ---@param b any
+---@return nil
 function Light:setFlickerEnabled(b) end
 
+--- Sets the group identifier for batch operations.
 ---@param id any
+---@return nil
 function Light:setGroupId(id) end
 
+--- Sets the inner cone angle in radians for spot lights.
 ---@param a any
+---@return nil
 function Light:setInnerAngle(a) end
 
+--- Sets the brightness multiplier.
 ---@param i any
+---@return nil
 function Light:setIntensity(i) end
 
+--- Sets the light interaction bitmask.
 ---@param mask any
+---@return nil
 function Light:setLightMask(mask) end
 
+--- Sets the geometric light type ('point', 'directional', or 'spot').
 ---@param t any
+---@return nil
 function Light:setLightType(t) end
 
+--- Sets the outer cone angle in radians for spot lights.
 ---@param a any
+---@return nil
 function Light:setOuterAngle(a) end
 
+--- Sets the light's world-space position.
 ---@param x any
 ---@param y any
+---@return nil
 function Light:setPosition(x, y) end
 
+--- Sets the light's influence radius.
 ---@param r any
+---@return nil
 function Light:setRadius(r) end
 
+--- Sets whether this light casts shadows.
 ---@param b any
+---@return nil
 function Light:setShadowEnabled(b) end
 
+--- Sets the shadow edge filter ('none', 'pcf5', or 'pcf13').
 ---@param filter any
+---@return nil
 function Light:setShadowFilter(filter) end
 
+--- Sets the shadow casting bitmask.
 ---@param mask any
+---@return nil
 function Light:setShadowMask(mask) end
 
+--- Sets the shadow edge smoothing factor.
 ---@param s any
+---@return nil
 function Light:setShadowSmooth(s) end
 
+--- Sets whether this light hints at volumetric scattering.
 ---@param b any
+---@return nil
 function Light:setVolumetric(b) end
 
---- Lua UserData wrapper for an occluder resource.
+--- Lua-side handle to an occluder resource stored in [`LightWorld`].
 ---@class Occluder
 local Occluder = {}
 
+--- Returns the light interaction bitmask.
+---@return integer
 function Occluder:getLightMask() end
 
+--- Returns the shadow opacity.
+---@return number
 function Occluder:getOpacity() end
 
+--- Returns the translation offset as (x, y).
+---@return number
 function Occluder:getPosition() end
 
+--- Returns the polygon vertices as a flat table {x1,y1,x2,y2,...}.
+---@return table
 function Occluder:getVertices() end
 
+--- Returns whether this occluder is active.
+---@return boolean
 function Occluder:isEnabled() end
 
+--- Returns whether this occluder handle is still valid.
+---@return boolean
 function Occluder:isValid() end
 
+--- Removes this occluder from the world.
+---@return nil
 function Occluder:remove() end
 
+--- Sets whether this occluder is active.
 ---@param b any
+---@return nil
 function Occluder:setEnabled(b) end
 
+--- Sets the light interaction bitmask.
 ---@param mask any
+---@return nil
 function Occluder:setLightMask(mask) end
 
+--- Sets the shadow opacity (0.0–1.0).
 ---@param o any
+---@return nil
 function Occluder:setOpacity(o) end
 
+--- Sets the translation offset applied to all vertices.
 ---@param x any
 ---@param y any
+---@return nil
 function Occluder:setPosition(x, y) end
 
+--- Replaces the polygon vertices from a flat table {x1,y1,x2,y2,...}.
 ---@param tbl any
+---@return nil
 function Occluder:setVertices(tbl) end
 
+--- Advances flicker phase for all lights with flicker enabled.
 ---@param dt any
+---@return nil
 function luna.light.advanceFlickers(dt) end
 
+--- Removes all lights and occluders, resets ambient to default.
+---@return nil
 function luna.light.clear() end
 
+--- Returns the global ambient light color as (r, g, b, a).
+---@return number
 function luna.light.getAmbient() end
 
+--- Returns the number of lights in the given group.
 ---@param group_id any
+---@return integer
 function luna.light.getGroupCount(group_id) end
 
+--- Returns the number of lights in the world.
+---@return integer
 function luna.light.getLightCount() end
 
+--- Returns the maximum number of lights processed per frame.
+---@return integer
 function luna.light.getMaxLights() end
 
+--- Returns the number of occluders in the world.
+---@return integer
 function luna.light.getOccluderCount() end
 
+--- Returns whether the lighting system is active.
+---@return boolean
 function luna.light.isEnabled() end
 
+--- Creates a new light at (x, y) with the given radius and optional settings.
 ---@param x any
 ---@param y any
 ---@param radius any
 ---@param opts? any (optional)
+---@return Light
 function luna.light.newLight(x, y, radius, opts) end
 
----@param tbl any
+--- Creates a new shadow occluder from a vertex table and optional settings.
+---@param vtbl any
 ---@param opts? any (optional)
-function luna.light.newOccluder(tbl, opts) end
+---@return Occluder
+function luna.light.newOccluder(vtbl, opts) end
 
+--- Sets the global ambient light color.
 ---@param r any
 ---@param g any
 ---@param b any
 ---@param a? any (optional)
+---@return nil
 function luna.light.setAmbient(r, g, b, a) end
 
+--- Sets whether the lighting system is active.
 ---@param enabled any
+---@return nil
 function luna.light.setEnabled(enabled) end
 
+--- Sets the color for all lights in the given group.
 ---@param group_id any
 ---@param r any
 ---@param g any
 ---@param b any
 ---@param a? any (optional)
+---@return nil
 function luna.light.setGroupColor(group_id, r, g, b, a) end
 
+--- Sets the enabled state for all lights in the given group.
 ---@param group_id any
 ---@param enabled any
+---@return nil
 function luna.light.setGroupEnabled(group_id, enabled) end
 
+--- Sets the intensity for all lights in the given group.
 ---@param group_id any
 ---@param intensity any
+---@return nil
 function luna.light.setGroupIntensity(group_id, intensity) end
 
+--- Sets the maximum number of lights processed per frame (clamped 1–256).
 ---@param n any
+---@return nil
 function luna.light.setMaxLights(n) end
-
----@class luna.localization
-luna.localization = {}
-
---- Returns the available languages.
----@return any
-function luna.localization.getAvailableLanguages() end
-
---- Returns the base.
----@return any
-function luna.localization.getBase() end
-
---- Returns the language.
----@return any
-function luna.localization.getLanguage() end
-
---- Returns true if language.
----@param lang any
----@return any
-function luna.localization.hasLanguage(lang) end
-
---- Load table.
----@param lang any
----@param table any
-function luna.localization.loadTable(lang, table) end
-
---- Off change.
----@param callback any
-function luna.localization.offChange(callback) end
-
---- On change.
----@param callback any
-function luna.localization.onChange(callback) end
-
---- Sets the base.
----@param lang any
-function luna.localization.setBase(lang) end
-
---- Sets the language.
----@param lang any
-function luna.localization.setLanguage(lang) end
-
---- T.
----@param key any
----@param vars? any (optional)
----@return any
-function luna.localization.t(key, vars) end
-
----@class luna.log
-luna.log = {}
-
---- Emit a debug-severity log message from Lua.
----@param message string The message string to log.
-function luna.log.debug(message) end
-
---- Emit an error-severity log message from Lua.
----@param message string The message string to log.
-function luna.log.error(message) end
-
---- Return the name of the currently active minimum log level.
----@return any
-function luna.log.getLevel() end
-
---- Emit an info-severity log message from Lua.
----@param message string The message string to log.
-function luna.log.info(message) end
-
---- Emit a log message from Lua at the specified severity level.
----@param level string Severity level string.
----@param message string The message string to log.
-function luna.log.print(level, message) end
-
---- Set the minimum severity level for runtime log messages.
----@param level any One of `"off"`, `"error"`, `"warn"`, `"info"`, `"debug"`, `"trace"`.
-function luna.log.setLevel(level) end
-
---- Emit a warn-severity log message from Lua.
----@param message string The message string to log.
-function luna.log.warn(message) end
 
 ---@class luna.math
 luna.math = {}
 
+--- Lua-side wrapper around a [`BezierCurve`].
 ---@class BezierCurve
 local BezierCurve = {}
 
---- Evaluates the curve at parameter t in [0, 1] and returns the world point.
----@param t any â€” Curve parameter in the range [0, 1].
----@return number
+--- Evaluates the curve at parameter t, returning (x, y).
+---@param t any
 ---@return number
 function BezierCurve:evaluate(t) end
 
---- Returns the position of the control point at the given index.
----@param i number â€” 1-based index of the control point.
----@return number
----@return number
-function BezierCurve:getControlPoint(i) end
+--- Returns the control point at 1-based index as (x, y), or nil.
+---@param index any
+---@return number?
+function BezierCurve:getControlPoint(index) end
 
---- Returns the total number of control points in the curve.
----@return number
+--- Returns the number of control points.
+---@return integer
 function BezierCurve:getControlPointCount() end
 
---- Returns a new BezierCurve that is the derivative (degree reduced) of this curve.
----@return any
+--- Returns a new BezierCurve representing the first derivative.
+---@return BezierCurve
 function BezierCurve:getDerivative() end
 
---- Removes the control point at the given index from the curve.
----@param i number â€” 1-based index of the control point to remove.
-function BezierCurve:removeControlPoint(i) end
-
---- Subdivides the curve to the given depth and returns the sample points.
----@param depth number â€” Subdivision depth; higher values yield smoother output.
+--- Returns the approximate arc length of the curve.
 ---@return number
----@return number
-function BezierCurve:render(depth) end
+function BezierCurve:length() end
 
---- Shifts every control point by the given (dx, dy) offset in place.
----@param dx number â€” Horizontal offset in pixels.
----@param dy number â€” Vertical offset in pixels.
+--- Removes a control point at 1-based index.
+---@param index any
+---@return boolean
+function BezierCurve:removeControlPoint(index) end
+
+--- Renders the curve as a polyline with the given number of segments.
+---@param segments any
+---@return table
+function BezierCurve:render(segments) end
+
+--- Rotates all control points around a pivot by angle radians.
+---@param angle any
+---@param ox any
+---@param oy any
+---@return nil
+function BezierCurve:rotate(angle, ox, oy) end
+
+--- Scales all control points around a pivot by factor s.
+---@param s any
+---@param ox any
+---@param oy any
+---@return nil
+function BezierCurve:scale(s, ox, oy) end
+
+--- Translates all control points by (dx, dy).
+---@param dx any
+---@param dy any
+---@return nil
 function BezierCurve:translate(dx, dy) end
 
----@class Grid
-local Grid = {}
-
---- Build flow field on this Grid.
----@param gx number â€” `integer`.
----@param gy number â€” `integer`.
-function Grid:buildFlowField(gx, gy) end
-
---- Returns the cost.
----@param x number â€” `integer`.
----@param y number â€” `integer`.
----@return any
-function Grid:getCost(x, y) end
-
---- Returns the dimensions.
----@param x number â€” `integer`.
----@param y number â€” `integer`.
----@param w boolean â€” `boolean`.
----@return any
-function Grid:getDimensions(x, y, w) end
-
---- Returns the height.
----@param x number â€” `integer`.
----@param y number â€” `integer`.
----@param w boolean â€” `boolean`.
----@return number
-function Grid:getHeight(x, y, w) end
-
---- Returns the width.
----@param x number â€” `integer`.
----@param y number â€” `integer`.
----@param w boolean â€” `boolean`.
----@return number
-function Grid:getWidth(x, y, w) end
-
---- Returns `true` if walkable.
----@param x number â€” `integer`.
----@param y number â€” `integer`.
----@return boolean
-function Grid:isWalkable(x, y) end
-
---- Sets the cost.
----@param x number â€” `integer`.
----@param y number â€” `integer`.
----@param cost number â€” `number`.
-function Grid:setCost(x, y, cost) end
-
---- Sets the walkable.
----@param x number â€” `integer`.
----@param y number â€” `integer`.
----@param w boolean â€” `boolean`.
-function Grid:setWalkable(x, y, w) end
-
+--- Lua-side wrapper around a [`NoiseGenerator`].
 ---@class NoiseGenerator
 local NoiseGenerator = {}
 
---- Returns the seed.
----@param args any â€” `LuaMultiValue`.
----@return any
-function NoiseGenerator:getSeed(args) end
+--- Generates a 2D noise map as a flat table (row-major).
+---@param w any
+---@param h any
+---@param opts? any (optional)
+---@return table
+function NoiseGenerator:generateMap(w, h, opts) end
 
---- Perlin noise on this NoiseGenerator.
----@param args any â€” `LuaMultiValue`.
-function NoiseGenerator:perlinNoise(args) end
+--- Returns the current seed.
+---@return integer
+function NoiseGenerator:getSeed() end
 
---- Sets the seed.
----@param seed number â€” `integer`.
+--- Returns 1D Perlin noise at x.
+---@param x any
+---@return number
+function NoiseGenerator:perlin1d(x) end
+
+--- Returns 2D Perlin noise at (x, y).
+---@param x any
+---@param y any
+---@return number
+function NoiseGenerator:perlin2d(x, y) end
+
+--- Returns 3D Perlin noise at (x, y, z).
+---@param x any
+---@param y any
+---@param z any
+---@return number
+function NoiseGenerator:perlin3d(x, y, z) end
+
+--- Returns 4D Perlin noise at (x, y, z, w).
+---@param x any
+---@param y any
+---@param z any
+---@param w any
+---@return number
+function NoiseGenerator:perlin4d(x, y, z, w) end
+
+--- Sets the seed and rebuilds the permutation table.
+---@param seed any
+---@return nil
 function NoiseGenerator:setSeed(seed) end
 
---- Simplex noise on this NoiseGenerator.
----@param args any â€” `LuaMultiValue`.
-function NoiseGenerator:simplexNoise(args) end
+--- Returns 1D Simplex noise at x.
+---@param x any
+---@return number
+function NoiseGenerator:simplex1d(x) end
 
+--- Returns 2D Simplex noise at (x, y).
+---@param x any
+---@param y any
+---@return number
+function NoiseGenerator:simplex2d(x, y) end
+
+--- Returns 3D Simplex noise at (x, y, z).
+---@param x any
+---@param y any
+---@param z any
+---@return number
+function NoiseGenerator:simplex3d(x, y, z) end
+
+--- Applies domain warping, returning offset (x, y).
+---@param x any
+---@param y any
+---@param strength any
+---@return number
+function NoiseGenerator:warpDomain(x, y, strength) end
+
+--- Lua-side wrapper around a [`RandomGenerator`].
 ---@class RandomGenerator
 local RandomGenerator = {}
 
---- Returns the current random seed value.
+--- Returns the seed used to initialise this generator.
+---@return integer
 function RandomGenerator:getSeed() end
 
---- Returns the full PRNG state as a string for later restoration.
+--- Serialises the generator state as a string for later restoration.
+---@return string
 function RandomGenerator:getState() end
 
---- Seeds this random generator with the given integer, resetting its sequence.
----@param seed number â€” Integer seed value. Use 0 to seed from system time.
+--- Returns a uniform random number in [0, 1).
+---@return number
+function RandomGenerator:random() end
+
+--- Returns a uniform random float in [min, max).
+---@param min any
+---@param max any
+---@return number
+function RandomGenerator:randomFloat(min, max) end
+
+--- Returns a uniform random integer in [min, max].
+---@param min any
+---@param max any
+---@return integer
+function RandomGenerator:randomInt(min, max) end
+
+--- Sets the seed, fully resetting the generator state.
+---@param seed any
+---@return nil
 function RandomGenerator:setSeed(seed) end
 
---- Restores the PRNG state from a string returned by getState.
+--- Restores the generator state from a previously serialised string.
 ---@param state any
+---@return nil
 function RandomGenerator:setState(state) end
 
----@class Raycaster2D
-local Raycaster2D = {}
-
---- Returns the cell.
----@param x number â€” `integer`.
----@param y number â€” `integer`.
----@return any
-function Raycaster2D:getCell(x, y) end
-
---- Returns the dimensions.
----@param x number â€” `integer`.
----@param y number â€” `integer`.
----@param val number â€” `integer`.
----@return any
-function Raycaster2D:getDimensions(x, y, val) end
-
---- Returns the height.
----@param x number â€” `integer`.
----@param y number â€” `integer`.
----@param val number â€” `integer`.
----@return number
-function Raycaster2D:getHeight(x, y, val) end
-
---- Returns the width.
----@param x number â€” `integer`.
----@param y number â€” `integer`.
----@param val number â€” `integer`.
----@return number
-function Raycaster2D:getWidth(x, y, val) end
-
---- Returns `true` if blocked.
----@param x number â€” `integer`.
----@param y number â€” `integer`.
----@return boolean
-function Raycaster2D:isBlocked(x, y) end
-
---- Sets the cell.
----@param x number â€” `integer`.
----@param y number â€” `integer`.
----@param val number â€” `integer`.
-function Raycaster2D:setCell(x, y, val) end
-
---- Sets the cells.
----@param data table â€” `table`.
-function Raycaster2D:setCells(data) end
-
+--- Lua-side wrapper around a [`SpatialHash`].
 ---@class SpatialHash
 local SpatialHash = {}
 
---- Removes all entries.
----@param x number â€” `number`.
----@param y number â€” `number`.
----@param w number â€” `number`.
----@param h number â€” `number`.
-function SpatialHash:clear(x, y, w, h) end
+--- Removes all items.
+---@return nil
+function SpatialHash:clear() end
 
 --- Returns the cell size.
----@param id number â€” `any`.
----@param x number â€” `number`.
----@param y number â€” `number`.
----@param w number â€” `number`.
----@param h number â€” `number`.
----@return any
-function SpatialHash:getCellSize(id, x, y, w, h) end
+---@return number
+function SpatialHash:getCellSize() end
 
---- Returns the item count.
----@return any
+--- Returns the number of items in the hash.
+---@return integer
 function SpatialHash:getItemCount() end
 
---- Query circle on this SpatialHash.
----@param cx number â€” `number`.
----@param cy number â€” `number`.
----@param r number â€” `number`.
-function SpatialHash:queryCircle(cx, cy, r) end
+--- Returns IDs of items overlapping the query rectangle.
+---@param x any
+---@param y any
+---@param w any
+---@param h any
+---@return table
+function SpatialHash:queryRect(x, y, w, h) end
 
---- Removes the entry from the collection.
----@param id number â€” `any`.
----@param x number â€” `number`.
----@param y number â€” `number`.
----@param w number â€” `number`.
----@param h number â€” `number`.
-function SpatialHash:remove(id, x, y, w, h) end
+--- Removes an item by its ID.
+---@param id any
+---@return nil
+function SpatialHash:remove(id) end
 
----@class TileWalker
-local TileWalker = {}
-
---- Begin move on this TileWalker.
----@param t number â€” `number`.
-function TileWalker:beginMove(t) end
-
---- Returns `true` if move backward.
----@return boolean
-function TileWalker:canMoveBackward() end
-
---- Returns `true` if move forward.
----@return boolean
-function TileWalker:canMoveForward() end
-
---- Returns `true` if strafe left.
----@return boolean
-function TileWalker:canStrafeLeft() end
-
---- Returns `true` if strafe right.
----@param t number â€” `number`.
----@return boolean
-function TileWalker:canStrafeRight(t) end
-
---- Returns the facing.
----@param facing string â€” `string`.
----@return any
-function TileWalker:getFacing(facing) end
-
---- Returns the facing angle.
----@return number
-function TileWalker:getFacingAngle() end
-
---- Returns the facing direction.
----@return any
-function TileWalker:getFacingDirection() end
-
---- Returns the interpolated angle.
----@param tx number â€” `integer`.
----@param ty number â€” `integer`.
----@return number
-function TileWalker:getInterpolatedAngle(tx, ty) end
-
---- Returns the interpolated position.
----@param t number â€” `number`.
----@return number
-function TileWalker:getInterpolatedPosition(t) end
-
---- Returns the position.
----@param x number â€” `integer`.
----@param y number â€” `integer`.
----@return any
-function TileWalker:getPosition(x, y) end
-
---- Returns the relative facing.
----@param tx number â€” `integer`.
----@param ty number â€” `integer`.
----@return any
-function TileWalker:getRelativeFacing(tx, ty) end
-
---- Move backward on this TileWalker.
----@return any
-function TileWalker:moveBackward() end
-
---- Move forward on this TileWalker.
----@return any
-function TileWalker:moveForward() end
-
---- Sets the facing.
----@param facing string â€” `string`.
-function TileWalker:setFacing(facing) end
-
---- Sets the position.
----@param x number â€” `integer`.
----@param y number â€” `integer`.
-function TileWalker:setPosition(x, y) end
-
---- Strafe left on this TileWalker.
----@return any
-function TileWalker:strafeLeft() end
-
---- Strafe right on this TileWalker.
----@return any
-function TileWalker:strafeRight() end
-
---- Turn around on this TileWalker.
----@param rc_ud any â€” `userdata`.
-function TileWalker:turnAround(rc_ud) end
-
---- Turn left on this TileWalker.
----@return any
-function TileWalker:turnLeft() end
-
---- Turn right on this TileWalker.
----@return any
-function TileWalker:turnRight() end
-
+--- Lua-side wrapper around a [`Transform`].
 ---@class Transform
 local Transform = {}
 
---- Returns an independent deep copy of this transform object.
----@return number
+--- Returns a copy of this transform.
+---@return Transform
 function Transform:clone() end
 
---- Returns the 16 matrix elements of the 4x4 transform in column-major order.
----@return number
+--- Returns the 3x3 matrix as a flat table of 9 numbers (row-major).
+---@return table
 function Transform:getMatrix() end
 
---- Returns a new Transform that is the mathematical inverse of this one.
----@return number
+--- Returns a new Transform that undoes this transform.
+---@return Transform
 function Transform:inverse() end
 
---- Applies the inverse of this transform to the given point.
----@param x number â€” Input X coordinate.
----@param y number â€” Input Y coordinate.
----@return number
+--- Transforms a point from world space back to local space.
+---@param x any
+---@param y any
 ---@return number
 function Transform:inverseTransformPoint(x, y) end
 
---- Resets the internal matrix to the identity (no transform applied).
+--- Resets the transform to identity.
+---@return nil
 function Transform:reset() end
 
---- Applies a rotation by the given angle to the internal matrix.
----@param angle number â€” Rotation angle in radians.
+--- Applies a rotation in radians.
+---@param angle any
+---@return nil
 function Transform:rotate(angle) end
 
---- Applies a scale factor to the transform's internal matrix.
----@param sx number â€” Horizontal scale factor.
----@param sy number â€” Vertical scale factor (defaults to sx if omitted).
+--- Applies non-uniform scaling.
+---@param sx any
+---@param sy? any (optional)
+---@return nil
 function Transform:scale(sx, sy) end
 
---- Applies a shear (skew) transformation to the internal matrix.
----@param kx any â€” Horizontal shear factor.
----@param ky any â€” Vertical shear factor.
+--- Applies shear factors.
+---@param kx any
+---@param ky any
+---@return nil
 function Transform:shear(kx, ky) end
 
---- Transforms a point (x, y) by this matrix and returns the result.
----@param x number â€” Input X coordinate.
----@param y number â€” Input Y coordinate.
----@return number
+--- Transforms a point from local space to world space.
+---@param x any
+---@param y any
 ---@return number
 function Transform:transformPoint(x, y) end
 
---- Applies a translation offset to the internal matrix.
----@param dx number â€” Horizontal offset in pixels.
----@param dy number â€” Vertical offset in pixels.
+--- Applies translation to the transform.
+---@param dx any
+---@param dy any
+---@return nil
 function Transform:translate(dx, dy) end
 
+--- Lua-side wrapper around a [`Tween`].
 ---@class Tween
 local Tween = {}
 
---- Adds value to the collection.
----@param start number â€” `number`.
----@param target number â€” `number`.
+--- Adds a start/target value pair. Returns the 1-based index.
+---@param start any
+---@param target any
+---@return integer
 function Tween:addValue(start, target) end
 
---- Returns the clock.
----@return any
-function Tween:getClock() end
+--- Returns all interpolated values as a table.
+---@return table
+function Tween:getAllValues() end
 
---- Returns the duration.
----@return any
+--- Returns the tween duration in seconds.
+---@return number
 function Tween:getDuration() end
 
---- Returns the value.
----@param index? number â€” `integer` optional.
----@return any
+--- Returns the easing function name.
+---@return string
+function Tween:getEasingName() end
+
+--- Returns the current clock time.
+---@return number
+function Tween:getTime() end
+
+--- Returns the interpolated value at 1-based index.
+---@param index any
+---@return number
 function Tween:getValue(index) end
 
---- Returns the value count.
----@param time number â€” `number`.
----@return any
-function Tween:getValueCount(time) end
+--- Returns the number of values in this tween.
+---@return integer
+function Tween:getValueCount() end
 
---- Returns `true` if complete.
+--- Returns true if the tween has finished.
 ---@return boolean
 function Tween:isComplete() end
 
---- Resets state to initial values.
----@param time number â€” `number`.
-function Tween:reset(time) end
+--- Resets the clock to 0.
+---@return nil
+function Tween:reset() end
 
---- Sets the value.
----@param time number â€” `number`.
-function Tween:set(time) end
+--- Sets the clock to a specific time, clamped to [0, duration].
+---@param t any
+---@return nil
+function Tween:setTime(t) end
 
---- Advances the simulation by `dt` seconds.
----@param dt number â€” `number`.
+--- Advances the clock by dt seconds. Returns true when complete.
+---@param dt any
+---@return boolean
 function Tween:update(dt) end
 
----@class Vec2
-local Vec2 = {}
-
---- Returns a deep copy of this object.
----@param other any â€” `userdata`.
-function Vec2:clone(other) end
-
---- Cross on this Vec2.
----@param other any â€” `userdata`.
-function Vec2:cross(other) end
-
---- Dot on this Vec2.
----@param other any â€” `userdata`.
-function Vec2:dot(other) end
-
---- Returns the current value.
----@param x number â€” `number`.
----@param y number â€” `number`.
----@return any
-function Vec2:get(x, y) end
-
---- Returns the angle.
----@param other any â€” `userdata`.
----@return number
-function Vec2:getAngle(other) end
-
---- Returns the distance.
----@param other any â€” `userdata`.
----@return any
-function Vec2:getDistance(other) end
-
---- Returns the length.
----@param other any â€” `userdata`.
----@return any
-function Vec2:getLength(other) end
-
---- Returns the length squared.
----@param other any â€” `userdata`.
----@return any
-function Vec2:getLengthSquared(other) end
-
---- Returns the normalized.
----@param angle number â€” `number`.
----@return any
-function Vec2:getNormalized(angle) end
-
---- Returns the perpendicular.
----@param other any â€” `userdata`.
----@param t number â€” `number`.
----@return any
-function Vec2:getPerpendicular(other, t) end
-
---- Returns the rotated.
----@param angle number â€” `number`.
----@return any
-function Vec2:getRotated(angle) end
-
---- Returns the x.
----@param x number â€” `number`.
----@return number
-function Vec2:getX(x) end
-
---- Returns the y.
----@param x number â€” `number`.
----@return number
-function Vec2:getY(x) end
-
---- Interpolates between start and target values.
----@param other any â€” `userdata`.
----@param t number â€” `number`.
-function Vec2:lerp(other, t) end
-
---- Sets the value.
----@param x number â€” `number`.
----@param y number â€” `number`.
-function Vec2:set(x, y) end
-
---- Sets the x.
----@param x number â€” `number`.
-function Vec2:setX(x) end
-
---- Sets the y.
----@param y number â€” `number`.
-function Vec2:setY(y) end
-
---- Returns the absolute (non-negative) value of x.
----@param x number â€” Input number.
----@return number
-function luna.math.abs(x) end
-
---- luna.math.angleBetween(x1, y1, x2, y2)
----@param x1 any
----@param y1 any
----@param x2 any
----@param y2 any
-function luna.math.angleBetween(x1, y1, x2, y2) end
-
---- Returns the angle in radians between the positive x-axis and (y, x).
----@param y number â€” Y component.
----@param x number â€” X component.
----@return number
-function luna.math.atan2(y, x) end
-
---- luna.math.bresenham(x1, y1, x2, y2)
----@param x1 any
----@param y1 any
----@param x2 any
----@param y2 any
-function luna.math.bresenham(x1, y1, x2, y2) end
-
---- luna.math.castRay2D(ox, oy, dx, dy, maxDist, segments)
----@param ox any
----@param oy any
----@param dx any
----@param dy any
----@param max_dist any
----@param segs_tbl any
-function luna.math.castRay2D(ox, oy, dx, dy, max_dist, segs_tbl) end
-
---- Returns the smallest integer greater than or equal to x (rounds up).
----@param x number â€” Input number.
----@return number
-function luna.math.ceil(x) end
-
---- luna.math.cellularAutomata(width, height, opts)
----@param w any
----@param h any
----@param opts_tbl? any (optional)
-function luna.math.cellularAutomata(w, h, opts_tbl) end
-
---- luna.math.circleContainsPoint(cx, cy, r, px, py)
----@param cx any
----@param cy any
----@param r any
----@param px any
----@param py any
-function luna.math.circleContainsPoint(cx, cy, r, px, py) end
-
---- luna.math.circleIntersectsCircle(x1, y1, r1, x2, y2, r2)
----@param x1 any
----@param y1 any
----@param r1 any
----@param x2 any
----@param y2 any
----@param r2 any
-function luna.math.circleIntersectsCircle(x1, y1, r1, x2, y2, r2) end
-
---- luna.math.circleIntersectsLine(cx, cy, r, lx1, ly1, lx2, ly2)
----@param cx any
----@param cy any
----@param r any
----@param lx1 any
----@param ly1 any
----@param lx2 any
----@param ly2 any
-function luna.math.circleIntersectsLine(cx, cy, r, lx1, ly1, lx2, ly2) end
-
---- luna.math.circleIntersectsSegment(cx, cy, r, sx1, sy1, sx2, sy2)
----@param cx any
----@param cy any
----@param r any
----@param sx1 any
----@param sy1 any
----@param sx2 any
----@param sy2 any
-function luna.math.circleIntersectsSegment(cx, cy, r, sx1, sy1, sx2, sy2) end
-
---- Clamps a value between min and max.
----@param x any
----@param lo any
----@param hi any
-function luna.math.clamp(x, lo, hi) end
-
---- luna.math.closestPointOnSegment(px, py, x1, y1, x2, y2)
----@param px any
----@param py any
----@param x1 any
----@param y1 any
----@param x2 any
----@param y2 any
-function luna.math.closestPointOnSegment(px, py, x1, y1, x2, y2) end
-
---- Computes and returns the convex hull of a set of 2D points as an ordered vertex list.
----@param points number â€” Table of {x, y} point tables or flat coordinate array.
----@return number
----@return number
-function luna.math.convexHull(points) end
-
---- Returns the cosine of the given angle in radians.
----@param angle number â€” Angle in radians.
----@return any
-function luna.math.cos(angle) end
-
---- luna.math.delaunayTriangulate(points)
----@param tbl any
-function luna.math.delaunayTriangulate(tbl) end
-
---- Returns the Euclidean distance between two points.
----@param x1 any
----@param y1 any
----@param x2 any
----@param y2 any
-function luna.math.distance(x1, y1, x2, y2) end
-
---- luna.math.distanceShade(distance, maxDistance)
----@param distance any
----@param max_dist any
-function luna.math.distanceShade(distance, max_dist) end
-
---- Applies an easing function to t in [0,1].
+--- Applies a named easing function to progress value t.
 ---@param name any
 ---@param t any
-function luna.math.ease(name, t) end
-
---- luna.math.fieldOfView(ox, oy, segments, radius)
----@param ox any
----@param oy any
----@param segs_tbl any
----@param radius any
-function luna.math.fieldOfView(ox, oy, segs_tbl, radius) end
-
---- luna.math.floodFill(data, width, height, sx, sy, threshold, mode)
-function luna.math.floodFill() end
-
---- Returns the largest integer less than or equal to x (rounds down).
----@param x number â€” Input number.
 ---@return number
-function luna.math.floor(x) end
+function luna.math.applyEasing(name, t) end
 
---- Converts a sRGB gamma-encoded channel value to linear light intensity.
----@param c any â€” Gamma-encoded channel value in [0, 1].
----@return any
+--- Returns fractal Brownian motion noise at (x, y).
+---@param x any
+---@param y any
+---@param seed? any (optional)
+---@param octaves? any (optional)
+---@param lac? any (optional)
+---@param gain? any (optional)
+---@return number
+function luna.math.fbm(x, y, seed, octaves, lac, gain) end
+
+--- Converts a gamma-encoded sRGB value to linear space.
+---@param c any
+---@return number
 function luna.math.gammaToLinear(c) end
 
---- Returns the current seed of the engine global random number generator.
----@return number
-function luna.math.getRandomSeed() end
-
---- Returns whether a polygon described by points is convex.
----@param args any
-function luna.math.isConvex(args) end
-
---- Linearly interpolates between a and b by t.
----@param a any
----@param b any
+--- Back ease-in.
 ---@param t any
-function luna.math.lerp(a, b, t) end
+---@return number
+function luna.math.inBack(t) end
 
---- luna.math.lineIntersect(x1, y1, x2, y2, x3, y3, x4, y4)
----@param x1 any
----@param y1 any
----@param x2 any
----@param y2 any
----@param x3 any
----@param y3 any
----@param x4 any
----@param y4 any
-function luna.math.lineIntersect(x1, y1, x2, y2, x3, y3, x4, y4) end
+--- Bounce ease-in.
+---@param t any
+---@return number
+function luna.math.inBounce(t) end
 
---- Converts a linear-light channel value to sRGB gamma-encoded space.
----@param c any â€” Linear-light value in [0, 1].
----@return any
+--- Cubic ease-in.
+---@param t any
+---@return number
+function luna.math.inCubic(t) end
+
+--- Elastic ease-in.
+---@param t any
+---@return number
+function luna.math.inElastic(t) end
+
+--- Exponential ease-in.
+---@param t any
+---@return number
+function luna.math.inExpo(t) end
+
+--- Cubic ease-in-out.
+---@param t any
+---@return number
+function luna.math.inOutCubic(t) end
+
+--- Exponential ease-in-out.
+---@param t any
+---@return number
+function luna.math.inOutExpo(t) end
+
+--- Quadratic ease-in-out.
+---@param t any
+---@return number
+function luna.math.inOutQuad(t) end
+
+--- Quartic ease-in-out.
+---@param t any
+---@return number
+function luna.math.inOutQuart(t) end
+
+--- Sinusoidal ease-in-out.
+---@param t any
+---@return number
+function luna.math.inOutSine(t) end
+
+--- Quadratic ease-in.
+---@param t any
+---@return number
+function luna.math.inQuad(t) end
+
+--- Quartic ease-in.
+---@param t any
+---@return number
+function luna.math.inQuart(t) end
+
+--- Sinusoidal ease-in.
+---@param t any
+---@return number
+function luna.math.inSine(t) end
+
+--- Returns true if the polygon (flat table {x1,y1,...}) is convex.
+---@param pts any
+---@return boolean
+function luna.math.isConvex(pts) end
+
+--- Linear easing (identity).
+---@param t any
+---@return number
+function luna.math.linear(t) end
+
+--- Converts a linear-space value to gamma-encoded sRGB.
+---@param c any
+---@return number
 function luna.math.linearToGamma(c) end
 
---- Returns the largest value from the given list of numbers.
----@param ... any â€” One or more numeric arguments.
----@return number
-function luna.math.max(...) end
+--- Creates a new BezierCurve from a flat table of coordinates {x1,y1, x2,y2, ...}.
+---@param points any
+---@return BezierCurve
+function luna.math.newBezierCurve(points) end
 
---- Returns the smallest value from the given list of numbers.
----@param ... any â€” One or more numeric arguments.
----@return any
-function luna.math.min(...) end
-
---- Creates a new Bezier curve from the given control points.
----@param args any
-function luna.math.newBezierCurve(args) end
-
---- luna.math.newGrid(width, height, defaultCost)
----@param w any
----@param h any
----@param cost? any (optional)
-function luna.math.newGrid(w, h, cost) end
-
---- Creates a reusable Perlin/simplex noise generator with a given seed.
----@param seed number â€” Integer seed for the noise generator.
----@return any
+--- Creates a new seeded noise generator.
+---@param seed? any (optional)
+---@return NoiseGenerator
 function luna.math.newNoiseGenerator(seed) end
 
---- Creates an independent random generator with its own seed.
+--- Creates a new random number generator with an optional seed.
 ---@param seed? any (optional)
+---@return RandomGenerator
 function luna.math.newRandomGenerator(seed) end
 
---- luna.math.newRaycaster2D(width, height)
----@param w any
----@param h any
-function luna.math.newRaycaster2D(w, h) end
+--- Creates a new SpatialHash with the given cell size.
+---@param cell_size any
+---@return SpatialHash
+function luna.math.newSpatialHash(cell_size) end
 
---- Creates a spatial hash grid for fast broad-phase proximity and overlap queries.
----@param cellSize number â€” Width and height of each hash cell in world units.
----@return any
-function luna.math.newSpatialHash(cellSize) end
+--- Creates a new Transform, optionally initialised from full parameters.
+---@param x? number? (optional)
+---@param y? number? (optional)
+---@param angle? number? (optional)
+---@param sx? number? (optional)
+---@param sy? number? (optional)
+---@param ox? number? (optional)
+---@param oy? number? (optional)
+---@param kx? number? (optional)
+---@param ky? number? (optional)
+---@return Transform
+function luna.math.newTransform(x, y, angle, sx, sy, ox, oy, kx, ky) end
 
---- luna.math.newTileWalker(x, y, facing)
----@param x any
----@param y any
----@param facing? any (optional)
-function luna.math.newTileWalker(x, y, facing) end
-
---- Creates a new affine Transform object.
-function luna.math.newTransform() end
-
---- luna.math.newTween(duration, easing)
+--- Creates a new Tween with the given duration and easing name.
 ---@param duration any
----@param easing? any (optional)
-function luna.math.newTween(duration, easing) end
+---@param easing_name? any (optional)
+---@return Tween
+function luna.math.newTween(duration, easing_name) end
 
---- Creates a new 2-component vector object with x and y fields.
----@param x number â€” X component (default 0).
----@param y number â€” Y component (default 0).
----@return any
-function luna.math.newVec2(x, y) end
-
---- Returns a smooth noise value (1D, 2D, or 3D).
----@param x any
----@param y? any (optional)
----@param z? any (optional)
----@param w? any (optional)
-function luna.math.noise(x, y, z, w) end
-
---- Normalizes an angle in radians into the canonical range [-pi, pi].
----@param angle number â€” Angle in radians.
+--- Back ease-out.
+---@param t any
 ---@return number
-function luna.math.normalize(angle) end
+function luna.math.outBack(t) end
 
---- luna.math.perlinNoisePeriodic(x, y, px, py)
+--- Bounce ease-out.
+---@param t any
+---@return number
+function luna.math.outBounce(t) end
+
+--- Cubic ease-out.
+---@param t any
+---@return number
+function luna.math.outCubic(t) end
+
+--- Elastic ease-out.
+---@param t any
+---@return number
+function luna.math.outElastic(t) end
+
+--- Exponential ease-out.
+---@param t any
+---@return number
+function luna.math.outExpo(t) end
+
+--- Quadratic ease-out.
+---@param t any
+---@return number
+function luna.math.outQuad(t) end
+
+--- Quartic ease-out.
+---@param t any
+---@return number
+function luna.math.outQuart(t) end
+
+--- Sinusoidal ease-out.
+---@param t any
+---@return number
+function luna.math.outSine(t) end
+
+--- Returns 2D Perlin noise at (x, y) with the given seed.
 ---@param x any
 ---@param y any
----@param px any
----@param py any
-function luna.math.perlinNoisePeriodic(x, y, px, py) end
-
---- luna.math.pointInPolygon(vertices, px, py)
----@param tbl any
----@param px any
----@param py any
-function luna.math.pointInPolygon(tbl, px, py) end
-
---- luna.math.poissonDisk(width, height, minDist, maxAttempts, seed)
----@param w any
----@param h any
----@param min_dist any
----@param max_attempts? any (optional)
 ---@param seed? any (optional)
-function luna.math.poissonDisk(w, h, min_dist, max_attempts, seed) end
-
---- Returns the signed area of a simple polygon described by its vertex list.
----@param vertices number â€” Table of {x, y} tables or flat coordinate array.
 ---@return number
-function luna.math.polygonArea(vertices) end
+function luna.math.perlin2d(x, y, seed) end
 
---- luna.math.polygonCentroid(vertices)
----@param tbl any
-function luna.math.polygonCentroid(tbl) end
-
---- luna.math.projectColumn(distance, fov, screenHeight)
----@param distance any
----@param fov any
----@param screen_h any
-function luna.math.projectColumn(distance, fov, screen_h) end
-
---- Returns a pseudo-random number. No args: [0,1). One arg max: [1,max]. Two args min,max: [min,max].
----@param min? any (optional)
----@param max? any (optional)
-function luna.math.random(min, max) end
-
---- Returns a normally distributed random number.
----@param stddev? any (optional)
----@param mean? any (optional)
-function luna.math.randomNormal(stddev, mean) end
-
---- luna.math.segmentIntersectsSegment(x1, y1, x2, y2, x3, y3, x4, y4)
----@param x1 any
----@param y1 any
----@param x2 any
----@param y2 any
----@param x3 any
----@param y3 any
----@param x4 any
----@param y4 any
-function luna.math.segmentIntersectsSegment(x1, y1, x2, y2, x3, y3, x4, y4) end
-
---- Seeds the engine global random number generator with the given integer.
----@param seed number â€” Integer seed value; use 0 to seed from system time.
-function luna.math.setRandomSeed(seed) end
-
---- Standalone simplex noise: returns a value in approximately `[-1, 1]` for 1â€“3 coordinates.
----@param x number â€” X coordinate.
----@param y? number â€” Y coordinate (optional, defaults to 0).
----@param z? string â€” Z coordinate (optional; enables 3-D mode).
+--- Returns 3D Perlin noise at (x, y, z) with the given seed.
+---@param x any
+---@param y any
+---@param z any
+---@param seed? any (optional)
 ---@return number
-function luna.math.simplexNoise(x, y, z) end
+function luna.math.perlin3d(x, y, z, seed) end
 
---- Returns the sine of the given angle in radians.
----@param angle number â€” Angle in radians.
----@return any
-function luna.math.sin(angle) end
-
---- Returns the positive square root of x.
----@param x number â€” Non-negative input number.
+--- Returns 2D Simplex noise at (x, y) with the given seed.
+---@param x any
+---@param y any
+---@param seed? any (optional)
 ---@return number
-function luna.math.sqrt(x) end
+function luna.math.simplex2d(x, y, seed) end
 
---- Returns the tangent of the given angle in radians.
----@param angle number â€” Angle in radians.
----@return any
-function luna.math.tan(angle) end
-
---- Triangulates a simple polygon and returns index triples.
----@param args any
-function luna.math.triangulate(args) end
-
---- luna.math.voronoiDiagram(width, height, points, opts)
----@param w any
----@param h any
----@param pts_tbl any
----@param opts_tbl? any (optional)
-function luna.math.voronoiDiagram(w, h, pts_tbl, opts_tbl) end
+--- Triangulates a simple polygon given as a flat table {x1,y1, x2,y2, ...}.
+---@param pts any
+---@return table
+function luna.math.triangulate(pts) end
 
 ---@class luna.minimap
 luna.minimap = {}
 
+--- Lua-side wrapper around a [`Minimap`].
 ---@class Minimap
 local Minimap = {}
 
-function Minimap:addMarker() end
-
---- Adds ping to the collection.
----@return any
-function Minimap:addPing() end
-
---- Clear objects on this Minimap.
----@return any
+--- Removes all tracked objects.
+---@return nil
 function Minimap:clearObjects() end
 
---- Clear viewport rect on this Minimap.
----@return any
+--- Clears the viewport rectangle overlay.
+---@return nil
 function Minimap:clearViewportRect() end
 
---- Returns the center.
----@return any
+--- Returns the center coordinates as x, y.
+---@return number
 function Minimap:getCenter() end
 
 --- Returns the center X coordinate.
@@ -6927,110 +6765,104 @@ function Minimap:getCenterX() end
 ---@return number
 function Minimap:getCenterY() end
 
---- Returns the color mode.
+--- Returns the current color mode as a string.
 ---@return string
 function Minimap:getColorMode() end
 
---- Returns the display height.
----@return number
+--- Returns the display height in pixels.
+---@return integer
 function Minimap:getDisplayHeight() end
 
---- Returns the display size.
----@param w number `integer`.
----@param h number `integer`.
----@return number
-function Minimap:getDisplaySize(w, h) end
+--- Returns the display width and height as two values.
+---@return integer
+function Minimap:getDisplaySize() end
 
---- Returns the display width.
----@return number
+--- Returns the display width in pixels.
+---@return integer
 function Minimap:getDisplayWidth() end
 
---- Returns the fog color.
----@param data table `table`.
----@return any
-function Minimap:getFogColor(data) end
+--- Returns the fog overlay color as r, g, b, a.
+---@return number
+function Minimap:getFogColor() end
 
---- Returns the fog level.
----@param x number `integer`.
----@param y number `integer`.
----@return any
+--- Returns the fog level at a 1-based grid position (0=hidden, 1=explored, 2=visible).
+---@param x any
+---@param y any
+---@return integer
 function Minimap:getFogLevel(x, y) end
 
---- Returns the grid height.
----@return number
+--- Returns the grid height in cells.
+---@return integer
 function Minimap:getGridHeight() end
 
---- Returns the grid size.
----@return number
+--- Returns the grid width and height as two values.
+---@return integer
 function Minimap:getGridSize() end
 
---- Returns the grid width.
----@return number
+--- Returns the grid width in cells.
+---@return integer
 function Minimap:getGridWidth() end
 
---- Returns the marker count.
----@param enabled boolean `boolean`.
----@return any
-function Minimap:getMarkerCount(enabled) end
+--- Returns the number of markers.
+---@return integer
+function Minimap:getMarkerCount() end
 
---- Returns the marker description.
----@param id number `integer`.
----@return any
+--- Returns the description of a marker, or nil.
+---@param id any
+---@return string?
 function Minimap:getMarkerDescription(id) end
 
---- Returns the object count.
----@return any
+--- Returns the number of tracked objects.
+---@return integer
 function Minimap:getObjectCount() end
 
---- Returns the object type count.
----@return number
+--- Returns the number of registered object types.
+---@return integer
 function Minimap:getObjectTypeCount() end
 
---- Returns the owner color.
----@param owner number `integer`.
----@return any
+--- Returns the display color for an owner/faction as r, g, b, a.
+---@param owner any
+---@return number
 function Minimap:getOwnerColor(owner) end
 
---- Returns the ping count.
----@return any
+--- Returns the number of active pings.
+---@return integer
 function Minimap:getPingCount() end
 
---- Returns the terrain.
----@param x number `integer`.
----@param y number `integer`.
----@return any
+--- Returns the terrain type at a 1-based grid position.
+---@param x any
+---@param y any
+---@return integer
 function Minimap:getTerrain(x, y) end
 
---- Returns the terrain color.
----@param terrain_type number `integer`.
----@return any
+--- Returns the display color for a terrain type as r, g, b, a.
+---@param terrain_type any
+---@return number
 function Minimap:getTerrainColor(terrain_type) end
 
---- Get the hover tooltip string for a terrain type ID, or nil if not set.
----@param type_id number `integer`.
----@return string
+--- Returns the hover tooltip string for a terrain type ID, or nil.
+---@param type_id any
+---@return string?
 function Minimap:getTileDescription(type_id) end
 
---- Returns the viewport color.
----@return any
+--- Returns the viewport rectangle color as r, g, b, a.
+---@return number
 function Minimap:getViewportColor() end
 
---- Returns the viewport rect.
----@return any
+--- Returns the viewport rectangle as x, y, w, h or nil if not set.
+---@return number?
 function Minimap:getViewportRect() end
 
---- Returns the zoom.
----@param x number `number`.
----@param y number `number`.
----@return any
-function Minimap:getZoom(x, y) end
+--- Returns the current zoom level.
+---@return number
+function Minimap:getZoom() end
 
---- Returns `true` if marker.
----@param id number `integer`.
+--- Returns whether a marker with the given ID exists.
+---@param id any
 ---@return boolean
 function Minimap:hasMarker(id) end
 
---- Returns `true` if anti alias.
+--- Returns whether anti-aliasing is enabled.
 ---@return boolean
 function Minimap:isAntiAlias() end
 
@@ -7038,2042 +6870,1153 @@ function Minimap:isAntiAlias() end
 ---@return boolean
 function Minimap:isClickable() end
 
---- Returns `true` if fog enabled.
----@param x number `integer`.
----@param y number `integer`.
----@param level number `integer`.
+--- Returns whether fog of war is enabled.
 ---@return boolean
-function Minimap:isFogEnabled(x, y, level) end
+function Minimap:isFogEnabled() end
 
---- Returns `true` if object type visible.
----@param type_idx number `integer`.
+--- Returns whether an object type (1-based index) is visible.
+---@param type_idx any
 ---@return boolean
 function Minimap:isObjectTypeVisible(type_idx) end
 
---- Returns `true` if viewport visible.
----@param r number `number`.
----@param g number `number`.
----@param b number `number`.
----@param a? number `number` optional.
+--- Returns whether the viewport rectangle is visible.
 ---@return boolean
-function Minimap:isViewportVisible(r, g, b, a) end
+function Minimap:isViewportVisible() end
 
---- Removes marker from the collection.
----@param id number `integer`.
----@return any
+--- Removes a marker by ID.
+---@param id any
+---@return boolean
 function Minimap:removeMarker(id) end
 
---- Removes object from the collection.
----@param id number `integer`.
----@return any
+--- Removes a tracked object by ID.
+---@param id any
+---@return boolean
 function Minimap:removeObject(id) end
 
---- Sets the anti alias.
----@param enabled boolean `boolean`.
+--- Sets whether anti-aliasing is enabled.
+---@param enabled any
+---@return nil
 function Minimap:setAntiAlias(enabled) end
 
---- Sets the center.
----@param x number `number`.
----@param y number `number`.
+--- Sets the center of the minimap view in grid coordinates.
+---@param x any
+---@param y any
+---@return nil
 function Minimap:setCenter(x, y) end
 
---- Set whether this minimap responds to click hit-testing.
----@param enabled boolean `boolean`.
+--- Sets whether this minimap responds to click hit-testing.
+---@param enabled any
+---@return nil
 function Minimap:setClickable(enabled) end
 
---- Sets the color mode.
----@param mode string `string`.
+--- Sets the color mode ("terrain" or "political").
+---@param mode any
+---@return nil
 function Minimap:setColorMode(mode) end
 
---- Sets the display size.
----@param w number `integer`.
----@param h number `integer`.
+--- Sets the display size in pixels.
+---@param w any
+---@param h any
+---@return nil
 function Minimap:setDisplaySize(w, h) end
 
---- Sets the fog data.
----@param data table `table`.
+--- Sets the entire fog grid from a flat 1-based table (0=hidden, 1=explored, 2=visible).
+---@param data any
+---@return nil
 function Minimap:setFogData(data) end
 
---- Sets the fog enabled.
----@param enabled boolean `boolean`.
+--- Enables or disables fog of war.
+---@param enabled any
+---@return nil
 function Minimap:setFogEnabled(enabled) end
 
+--- Sets the fog level at a 1-based grid position (0=hidden, 1=explored, 2=visible).
 ---@param x any
 ---@param y any
 ---@param level any
+---@return nil
 function Minimap:setFogLevel(x, y, level) end
 
---- Sets the terrain data from a flat 1-based Lua table of integers (row-major).
----@param data table `table`.
+--- Sets terrain types from a flat 1-based Lua table of integers (row-major).
+---@param data any
+---@return nil
 function Minimap:setTerrainData(data) end
 
---- Sets the viewport visible.
----@param visible boolean `boolean`.
+--- Sets whether the viewport rectangle is visible.
+---@param visible any
+---@return nil
 function Minimap:setViewportVisible(visible) end
 
---- Sets the zoom.
----@param zoom number `number`.
+--- Sets the zoom level (minimum 0.1).
+---@param zoom any
+---@return nil
 function Minimap:setZoom(zoom) end
 
---- Advances the simulation by `dt` seconds.
----@param dt number `number`.
+--- Advances time-based effects by dt seconds (expires pings).
+---@param dt any
+---@return nil
 function Minimap:update(dt) end
 
---- New minimap.
+--- Creates a new grid-based minimap.
 ---@param grid_w any
 ---@param grid_h any
 ---@param display_w? any (optional)
 ---@param display_h? any (optional)
----@return any
+---@return Minimap
 function luna.minimap.newMinimap(grid_w, grid_h, display_w, display_h) end
 
 ---@class luna.modding
 luna.modding = {}
 
----@class mlua
-local mlua = {}
+--- Lua-side wrapper around [`ModInfo`] with per-mod hook and config storage.
+---@class Mod
+local Mod = {}
 
---- Clear load order on this ModManager.
----@return any
-function mlua:clearLoadOrder() end
-
---- Clear reload queue on this ModManager.
----@return any
-function mlua:clearReloadQueue() end
-
---- Returns the all mods.
----@return any
-function mlua:getAllMods() end
-
---- Returns the author.
----@return any
-function mlua:getAuthor() end
-
---- Returns the config.
----@return any
-function mlua:getConfig() end
-
---- Returns the dependencies.
----@return any
-function mlua:getDependencies() end
-
---- Returns the description.
----@return any
-function mlua:getDescription() end
-
---- Returns the hook.
----@param name string `string`.
----@return any
-function mlua:getHook(name) end
-
---- Returns the hook names.
----@return any
-function mlua:getHookNames() end
-
---- Returns the id.
----@return number
-function mlua:getId() end
-
---- Returns the load order.
----@return any
-function mlua:getLoadOrder() end
-
---- Returns the mod count.
----@return any
-function mlua:getModCount() end
-
---- Returns the mod path.
----@param mod_id string `string`.
+--- Returns the author name.
 ---@return string
-function mlua:getModPath(mod_id) end
+function Mod:getAuthor() end
 
---- Returns the name.
----@return any
-function mlua:getName() end
+--- Returns the stored config value, or nil.
+---@return table?
+function Mod:getConfig() end
 
---- Returns the priority.
----@param enabled boolean `boolean`.
----@return number
-function mlua:getPriority(enabled) end
+--- Returns the list of required mod IDs.
+---@return table
+function Mod:getDependencies() end
 
---- Returns the reload queue.
----@return any
-function mlua:getReloadQueue() end
+--- Returns the mod description.
+---@return string
+function Mod:getDescription() end
 
---- Returns the version.
----@return any
-function mlua:getVersion() end
+--- Returns the hook function for the given name, or nil.
+---@param name any
+---@return function?
+function Mod:getHook(name) end
 
---- Returns `true` if circular dependencies.
----@param order_table table `table`.
+--- Returns an array of registered hook names.
+---@return table
+function Mod:getHookNames() end
+
+--- Returns the unique mod identifier.
+---@return string
+function Mod:getId() end
+
+--- Returns the display name.
+---@return string
+function Mod:getName() end
+
+--- Returns the load-order priority.
+---@return integer
+function Mod:getPriority() end
+
+--- Returns the version string.
+---@return string
+function Mod:getVersion() end
+
+--- Returns whether a hook with the given name exists.
+---@param name any
 ---@return boolean
-function mlua:hasCircularDependencies(order_table) end
+function Mod:hasHook(name) end
 
---- Returns `true` if hook.
----@param name string `string`.
+--- Returns whether the mod is enabled.
 ---@return boolean
-function mlua:hasHook(name) end
+function Mod:isEnabled() end
 
---- Returns `true` if mod.
----@param mod_id string `string`.
+--- Returns whether the mod has been loaded.
 ---@return boolean
-function mlua:hasMod(mod_id) end
+function Mod:isLoaded() end
 
---- Returns `true` if enabled.
----@param enabled boolean `boolean`.
+--- Releases all hook and config registry references.
+---@return nil
+function Mod:releaseRefs() end
+
+--- Stores an arbitrary config value for this mod.
+---@param value any
+---@return nil
+function Mod:setConfig(value) end
+
+--- Sets the enabled state.
+---@param enabled any
+---@return nil
+function Mod:setEnabled(enabled) end
+
+--- Lua-side wrapper around [`ModManager`].
+---@class ModManager
+local ModManager = {}
+
+--- Clears the custom load order, reverting to priority-based sorting.
+---@return nil
+function ModManager:clearLoadOrder() end
+
+--- Clears the reload queue without reloading.
+---@return nil
+function ModManager:clearReloadQueue() end
+
+--- Returns an array of info tables for all registered mods.
+---@return table
+function ModManager:getAllMods() end
+
+--- Returns an array of info tables in effective load order.
+---@return table
+function ModManager:getLoadOrder() end
+
+--- Returns the number of registered mods.
+---@return integer
+function ModManager:getModCount() end
+
+--- Returns the filesystem path of a registered mod, or nil.
+---@param mod_id any
+---@return string?
+function ModManager:getModPath(mod_id) end
+
+--- Returns the array of mod IDs pending hot-reload.
+---@return table
+function ModManager:getReloadQueue() end
+
+--- Returns whether any circular dependency cycles exist.
 ---@return boolean
-function mlua:isEnabled(enabled) end
+function ModManager:hasCircularDependencies() end
 
---- Returns `true` if loaded.
----@param name string `string`.
----@param func function `function`.
+--- Returns whether a mod with the given ID is registered.
+---@param mod_id any
 ---@return boolean
-function mlua:isLoaded(name, func) end
+function ModManager:hasMod(mod_id) end
 
---- Mark for reload on this ModManager.
----@param mod_id string `string`.
----@return any
-function mlua:markForReload(mod_id) end
+--- Marks a registered mod for hot-reload.
+---@param mod_id any
+---@return boolean
+function ModManager:markForReload(mod_id) end
 
---- Adds mod to the collection.
----@param ud any `userdata`.
-function mlua:registerMod(ud) end
+--- Registers a mod from its Mod userdata.
+---@param ud any
+---@return nil
+function ModManager:registerMod(ud) end
 
---- Release refs on this Mod.
----@return any
-function mlua:releaseRefs() end
+--- Scans a directory for mods with mod.toml and registers them.
+---@param path any
+---@return table
+function ModManager:scanFolder(path) end
 
---- Scan folder on this ModManager.
----@param path string `string`.
----@return any
-function mlua:scanFolder(path) end
+--- Sets an explicit load order from an array of mod ID strings.
+---@param order_table any
+---@return nil
+function ModManager:setLoadOrder(order_table) end
 
---- Sets the config.
----@param value number `any`.
-function mlua:setConfig(value) end
+--- Removes a mod by ID and returns whether it was found.
+---@param mod_id any
+---@return boolean
+function ModManager:unregisterMod(mod_id) end
 
---- Sets the enabled.
----@param enabled boolean `boolean`.
-function mlua:setEnabled(enabled) end
+--- Returns an array of mod IDs with missing dependencies.
+---@return table
+function ModManager:validateDependencies() end
 
---- Sets the load order.
----@param order_table table `table`.
-function mlua:setLoadOrder(order_table) end
-
---- Removes mod from the collection.
----@param mod_id string `string`.
-function mlua:unregisterMod(mod_id) end
-
---- Validate dependencies on this ModManager.
----@return any
-function mlua:validateDependencies() end
-
---- New mod.
+--- Creates a new Mod from an info table with at least an `id` field.
 ---@param info any
----@return any
+---@return Mod
 function luna.modding.newMod(info) end
 
---- New mod manager.
+--- Creates a new empty ModManager.
+---@return ModManager
 function luna.modding.newModManager() end
 
 ---@class luna.network
 luna.network = {}
 
---- Lua UserData wrapper for a [`NetworkHost`].
+--- Lua-side wrapper around [`NetworkHost`].
 ---@class NetworkHost
 local NetworkHost = {}
 
---- Gracefully disconnects a peer. The disconnect event arrives on the next `service()`.
----@param peer_id_raw any
----@param data? any (optional)
-function NetworkHost:disconnect(peer_id_raw, data) end
+--- Destroys the host, closing the underlying socket.
+---@return nil
+function NetworkHost:destroy() end
 
---- Flushes pending sends immediately.
+--- Gracefully disconnects a peer.
+---@param peer_id any
+---@param data? any (optional)
+---@return nil
+function NetworkHost:disconnect(peer_id, data) end
+
+--- Immediately disconnects a peer without handshake.
+---@param peer_id any
+---@param data? any (optional)
+---@return nil
+function NetworkHost:disconnectNow(peer_id, data) end
+
+--- Flushes all pending sends immediately.
+---@return nil
 function NetworkHost:flush() end
 
---- Returns the local address of this host as `"ip:port"`.
+--- Returns the local bind address as a string.
 ---@return string
 function NetworkHost:getAddress() end
 
---- Polls the network for one event. Returns an event table or `nil`.
----@return table|nil
+--- Returns the bandwidth limits as a table with incoming and outgoing fields.
+---@return table
+function NetworkHost:getBandwidthLimit() end
+
+--- Returns the maximum number of channels per connection.
+---@return integer
+function NetworkHost:getChannelLimit() end
+
+--- Returns the number of currently connected peers.
+---@return integer
+function NetworkHost:getConnectedPeerCount() end
+
+--- Returns a table of connected peer IDs.
+---@return table
+function NetworkHost:getConnectedPeerIds() end
+
+--- Returns the remote address of a peer, or nil if unavailable.
+---@param peer_id any
+---@return string?
+function NetworkHost:getPeerAddress(peer_id) end
+
+--- Returns the maximum number of peer slots.
+---@return integer
+function NetworkHost:getPeerLimit() end
+
+--- Returns the connection state of a peer as a string.
+---@param peer_id any
+---@return string
+function NetworkHost:getPeerState(peer_id) end
+
+--- Returns a statistics table for a peer.
+---@param peer_id any
+---@return table
+function NetworkHost:getPeerStats(peer_id) end
+
+--- Returns the round-trip time estimate for a peer in milliseconds.
+---@param peer_id any
+---@return number
+function NetworkHost:getRoundTripTime(peer_id) end
+
+--- Returns true if the host has been destroyed.
+---@return boolean
+function NetworkHost:isDestroyed() end
+
+--- Sends a ping to a peer to measure round-trip time.
+---@param peer_id any
+---@return nil
+function NetworkHost:ping(peer_id) end
+
+--- Resets a peer connection immediately without notifying the remote side.
+---@param peer_id any
+---@return nil
+function NetworkHost:resetPeer(peer_id) end
+
+--- Polls the network for one event, returning an event table or nil.
+---@return table?
 function NetworkHost:service() end
 
---- Creates a new [`NetworkHost`] bound to the given address.
+--- Sets the channel limit for future connections.
+---@param limit any
+---@return nil
+function NetworkHost:setChannelLimit(limit) end
+
+--- Creates a new network host bound to the given address.
 ---@param opts any
 ---@return NetworkHost
 function luna.network.newHost(opts) end
 
----@class luna.overlay
-luna.overlay = {}
-
----@class Overlay
-local Overlay = {}
-
---- Resets all overlay subsystems to their inactive defaults.
-function Overlay:clear() end
-
---- Placeholder for draw â€” actual rendering handled by the game loop.
-function Overlay:draw() end
-
---- Returns the current ambient tint colour as `(r, g, b, a)`.
----@return number
-function Overlay:getAmbientColor() end
-
---- Returns the current cloud shadow blob count.
----@return number
-function Overlay:getCloudCount() end
-
---- Returns the cloud shadow opacity (0.0â€“1.0).
----@return number
-function Overlay:getCloudOpacity() end
-
---- Returns the cloud shadow blob size scale.
----@return number
-function Overlay:getCloudScale() end
-
---- Returns the cloud shadow scroll speed in pixels per second.
----@return number
-function Overlay:getCloudSpeed() end
-
---- Returns both canvas dimensions as `(width, height)`.
----@return number
-function Overlay:getDimensions() end
-
---- Returns the current film grain noise amplitude (0.0â€“1.0).
----@return number
-function Overlay:getFilmGrainIntensity() end
-
---- Returns the current fog colour as `(r, g, b, a)`.
----@return number
-function Overlay:getFogColor() end
-
---- Returns the current fog density (0.0â€“1.0).
----@return number
-function Overlay:getFogDensity() end
-
---- Returns the heat haze distortion intensity.
----@return number
-function Overlay:getHeatHazeIntensity() end
-
---- Returns the overlay canvas height in pixels.
----@return number
-function Overlay:getHeight() end
-
---- Returns the current lightning flash colour as `(r, g, b, a)`.
----@return number
-function Overlay:getLightningColor() end
-
---- Returns the current camera-shake pixel offset as `(x, y)`.
----@return number
-function Overlay:getShakeOffset() end
-
---- Returns the current time-of-day value (0.0â€“24.0).
----@return number
-function Overlay:getTimeOfDay() end
-
---- Returns the current vignette darkening strength (0.0â€“1.0).
----@return number
-function Overlay:getVignetteStrength() end
-
---- Returns the current weather type as a lowercase string name.
----@return string
-function Overlay:getWeather() end
-
---- Returns the weather particle density (0.0â€“1.0).
----@return number
-function Overlay:getWeatherIntensity() end
-
---- Returns the overlay canvas width in pixels.
----@return number
-function Overlay:getWidth() end
-
---- Returns the wind direction in radians.
----@return number
-function Overlay:getWindDirection() end
-
---- Returns the wind speed in pixels per second.
----@return number
-function Overlay:getWindSpeed() end
-
---- Returns `true` if any overlay subsystem is currently active.
----@return boolean
-function Overlay:isActive() end
-
---- Returns `true` if automatic ambient colour cycling is enabled.
----@return boolean
-function Overlay:isAmbientEnabled() end
-
---- Returns `true` if the cloud shadow overlay is enabled.
----@return boolean
-function Overlay:isCloudShadowsEnabled() end
-
---- Returns `true` while a fade transition is in progress.
----@return boolean
-function Overlay:isFading() end
-
---- Returns `true` if film grain noise is enabled.
----@return boolean
-function Overlay:isFilmGrainEnabled() end
-
---- Returns `true` while a flash is fading out.
----@return boolean
-function Overlay:isFlashing() end
-
---- Returns `true` if the atmospheric fog overlay is enabled.
----@return boolean
-function Overlay:isFogEnabled() end
-
---- Returns `true` if heat haze distortion is enabled.
----@return boolean
-function Overlay:isHeatHazeEnabled() end
-
---- Returns `true` while a camera shake is in progress.
----@return boolean
-function Overlay:isShaking() end
-
---- Returns `true` if the vignette overlay is enabled.
----@return boolean
-function Overlay:isVignetteEnabled() end
-
---- Returns `true` if the weather particle spawner is enabled.
----@return boolean
-function Overlay:isWeatherEnabled() end
-
---- Updates the internal canvas dimensions on window resize.
----@param w any
----@param h any
-function Overlay:resize(w, h) end
-
---- Enables or disables automatic time-of-day ambient colour cycling.
----@param enabled any
-function Overlay:setAmbientEnabled(enabled) end
-
---- Sets the number of cloud shadow blobs rendered each frame.
----@param count any
-function Overlay:setCloudCount(count) end
-
---- Sets the cloud shadow overlay opacity (0.0 = invisible, 1.0 = fully dark).
----@param opacity any
-function Overlay:setCloudOpacity(opacity) end
-
---- Sets the relative size scale of each cloud shadow blob.
----@param scale any
-function Overlay:setCloudScale(scale) end
-
---- Enables or disables the scrolling cloud shadow overlay.
----@param enabled any
-function Overlay:setCloudShadows(enabled) end
-
---- Sets the horizontal scroll speed of cloud shadows in pixels per second.
----@param speed any
-function Overlay:setCloudSpeed(speed) end
-
---- Enables or disables per-frame random film grain noise.
----@param enabled any
-function Overlay:setFilmGrainEnabled(enabled) end
-
---- Sets the film grain noise amplitude (0.0â€“1.0).
----@param intensity any
-function Overlay:setFilmGrainIntensity(intensity) end
-
---- Sets the fog density (0.0 = invisible, 1.0 = fully opaque).
----@param density any
-function Overlay:setFogDensity(density) end
-
---- Enables or disables atmospheric fog.
----@param enabled any
-function Overlay:setFogEnabled(enabled) end
-
---- Enables or disables UV-distortion heat shimmer.
----@param enabled any
-function Overlay:setHeatHazeEnabled(enabled) end
-
---- Sets the heat haze distortion intensity.
----@param intensity any
-function Overlay:setHeatHazeIntensity(intensity) end
-
---- Sets the time-of-day value that drives ambient colour cycling.
----@param hour any
-function Overlay:setTimeOfDay(hour) end
-
---- Enables or disables screen-edge darkening (vignette).
----@param enabled any
-function Overlay:setVignetteEnabled(enabled) end
-
---- Sets the vignette darkening strength (0.0â€“1.0).
----@param strength any
-function Overlay:setVignetteStrength(strength) end
-
---- Sets the active weather type by name.
----@param name any
-function Overlay:setWeather(name) end
-
---- Enables or disables the weather particle spawner.
----@param enabled any
-function Overlay:setWeatherEnabled(enabled) end
-
---- Sets the weather particle density.
----@param intensity any
-function Overlay:setWeatherIntensity(intensity) end
-
---- Sets the wind direction as an angle in radians.
----@param angle any
-function Overlay:setWindDirection(angle) end
-
---- Sets the wind speed in pixels per second.
----@param speed any
-function Overlay:setWindSpeed(speed) end
-
---- Triggers a one-shot lightning flash.
-function Overlay:triggerLightning() end
-
---- Advances all active overlay subsystems by `dt` seconds.
----@param dt any
-function Overlay:update(dt) end
-
----@param width? any (optional)
----@param height? any (optional)
-function luna.overlay.newOverlay(width, height) end
-
 ---@class luna.particle
 luna.particle = {}
 
---- Lua UserData wrapper for a particle system resource.
+--- Lua-side handle to a particle system stored in SharedState.
 ---@class ParticleSystem
 local ParticleSystem = {}
 
---- Returns a deep copy of this object.
----@return any
-function ParticleSystem:clone() end
+--- Returns the number of living particles.
+---@return integer
+function ParticleSystem:count() end
 
---- Emits an event.
----@param count number ÔÇö `integer`.
+--- Emits a burst of the given number of particles.
+---@param count any
+---@return nil
 function ParticleSystem:emit(count) end
 
---- Returns the alphas.
----@return any
-function ParticleSystem:getAlphas() end
-
---- Returns the count.
----@return any
-function ParticleSystem:getCount() end
-
---- Returns the emission shape.
----@return any
-function ParticleSystem:getEmissionShape() end
-
---- Returns the gravity.
----@return number
-function ParticleSystem:getGravity() end
-
---- Returns the position.
----@return any
-function ParticleSystem:getPosition() end
-
---- Returns the relative mode.
----@return string
-function ParticleSystem:getRelativeMode() end
-
---- Returns the particle render shape name.
----@return string
-function ParticleSystem:getShape() end
-
---- Returns `true` if active.
+--- Returns true if the emitter is currently emitting or has live particles.
 ---@return boolean
 function ParticleSystem:isActive() end
 
---- Returns `true` if paused.
+--- Returns true if there are no live particles.
+---@return boolean
+function ParticleSystem:isEmpty() end
+
+--- Returns true if the system has reached max_particles.
+---@return boolean
+function ParticleSystem:isFull() end
+
+--- Returns true if the emitter is paused.
 ---@return boolean
 function ParticleSystem:isPaused() end
 
---- Returns `true` if stopped.
+--- Returns true if the emitter is stopped.
 ---@return boolean
 function ParticleSystem:isStopped() end
 
---- Pauses playback.
----@return any
+--- Moves the emitter to the given world position.
+---@param x any
+---@param y any
+---@return nil
+function ParticleSystem:moveTo(x, y) end
+
+--- Pauses the emitter.
+---@return nil
 function ParticleSystem:pause() end
 
---- Resets state to initial values.
----@return any
+--- Removes the particle system from the engine, freeing its slot.
+---@return nil
+function ParticleSystem:release() end
+
+--- Removes all particles and resets the emitter.
+---@return nil
 function ParticleSystem:reset() end
 
---- Sets the alphas.
----@param args any ÔÇö `LuaMultiValue`.
-function ParticleSystem:setAlphas(args) end
+--- Resumes a paused emitter.
+---@return nil
+function ParticleSystem:resume() end
 
---- Sets the emission rate.
----@param rate number ÔÇö `number`.
-function ParticleSystem:setEmissionRate(rate) end
-
---- Sets the gravity.
----@param gx number ÔÇö `number`.
----@param gy number ÔÇö `number`.
-function ParticleSystem:setGravity(gx, gy) end
-
---- Sets the position.
----@param x number ÔÇö `number`.
----@param y number ÔÇö `number`.
-function ParticleSystem:setPosition(x, y) end
-
---- Sets the relative mode.
----@param mode string ÔÇö `string`.
-function ParticleSystem:setRelativeMode(mode) end
-
---- Sets the particle render shape.
----@param shape_str string `string` — one of `"square"`, `"circle"`, `"triangle"`, `"spark"`, `"diamond"`.
-function ParticleSystem:setShape(shape_str) end
-
---- Begins execution.
----@return any
+--- Starts or restarts particle emission.
+---@return nil
 function ParticleSystem:start() end
 
---- Stops playback.
----@return any
+--- Stops particle emission immediately.
+---@return nil
 function ParticleSystem:stop() end
 
---- Advances the simulation by `dt` seconds.
----@param dt number ÔÇö `number`.
+--- Advances the particle simulation by dt seconds.
+---@param dt any
+---@return nil
 function ParticleSystem:update(dt) end
 
----@param id_val any
-function luna.particle.clone(id_val) end
+--- Lua-side wrapper around a [`Trail`] ribbon effect.
+---@class Trail
+local Trail = {}
 
----@param id_val any
----@param x? any (optional)
----@param y? any (optional)
-function luna.particle.draw(id_val, x, y) end
+--- Removes all trail points.
+---@return nil
+function Trail:clear() end
 
----@param id_val any
----@param count any
-function luna.particle.emit(id_val, count) end
+--- Returns the trail point lifetime in seconds.
+---@return number
+function Trail:getLifetime() end
 
----@param id_val any
-function luna.particle.getAlphas(id_val) end
+--- Returns the number of active trail points.
+---@return integer
+function Trail:getPointCount() end
 
----@param id_val any
-function luna.particle.getBufferSize(id_val) end
+--- Returns the start and end width.
+---@return number
+function Trail:getWidth() end
 
----@param id_val any
-function luna.particle.getColors(id_val) end
-
----@param id_val any
-function luna.particle.getCount(id_val) end
-
----@param id_val any
-function luna.particle.getDirection(id_val) end
-
----@param id_val any
-function luna.particle.getEmissionArea(id_val) end
-
----@param id_val any
-function luna.particle.getEmissionRate(id_val) end
-
----@param id_val any
-function luna.particle.getEmissionShape(id_val) end
-
----@param id_val any
-function luna.particle.getEmitterLifetime(id_val) end
-
----@param id_val any
-function luna.particle.getGravity(id_val) end
-
----@param id_val any
-function luna.particle.getInsertMode(id_val) end
-
----@param id_val any
-function luna.particle.getLinearAcceleration(id_val) end
-
----@param id_val any
-function luna.particle.getLinearDamping(id_val) end
-
----@param id_val any
-function luna.particle.getOffset(id_val) end
-
----@param id_val any
-function luna.particle.getParticleLifetime(id_val) end
-
----@param id_val any
-function luna.particle.getPosition(id_val) end
-
----@param id_val any
-function luna.particle.getRadialAcceleration(id_val) end
-
----@param id_val any
-function luna.particle.getRelativeMode(id_val) end
-
----@param id_val any
-function luna.particle.getRotation(id_val) end
-
----@param id_val any
-function luna.particle.getSizeVariation(id_val) end
-
----@param id_val any
-function luna.particle.getSizes(id_val) end
-
----@param id_val any
-function luna.particle.getSpeed(id_val) end
-
----@param id_val any
-function luna.particle.getSpin(id_val) end
-
----@param id_val any
-function luna.particle.getSpinVariation(id_val) end
-
----@param id_val any
-function luna.particle.getSpread(id_val) end
-
----@param id_val any
-function luna.particle.getTangentialAcceleration(id_val) end
-
----@param id_val any
-function luna.particle.getTexture(id_val) end
-
----@param id_val any
-function luna.particle.hasRelativeRotation(id_val) end
-
----@param id_val any
-function luna.particle.isActive(id_val) end
-
----@param id_val any
-function luna.particle.isEmpty(id_val) end
-
----@param id_val any
-function luna.particle.isFull(id_val) end
-
----@param id_val any
-function luna.particle.isPaused(id_val) end
-
----@param id_val any
-function luna.particle.isStopped(id_val) end
-
----@param id_val any
+--- Appends a new point to the trail head.
 ---@param x any
 ---@param y any
-function luna.particle.moveTo(id_val, x, y) end
+---@return nil
+function Trail:pushPoint(x, y) end
 
+--- Sets how long each trail point persists in seconds.
+---@param lifetime any
+---@return nil
+function Trail:setLifetime(lifetime) end
+
+--- Sets the minimum distance between trail points.
+---@param distance any
+---@return nil
+function Trail:setMinDistance(distance) end
+
+--- Sets the start and end width of the trail ribbon.
+---@param start any
+---@param end? any (optional)
+---@return nil
+function Trail:setWidth(start, end) end
+
+--- Ages trail points and removes expired ones.
+---@param dt any
+---@return nil
+function Trail:update(dt) end
+
+--- Creates a new particle system and stores it in the engine pool.
 ---@param config? any (optional)
+---@return ParticleSystem
 function luna.particle.newSystem(config) end
 
----@param id_val any
-function luna.particle.pause(id_val) end
-
----@param id_val any
-function luna.particle.release(id_val) end
-
----@param id_val any
-function luna.particle.reset(id_val) end
-
----@param args any
-function luna.particle.setAlphas(args) end
-
----@param id_val any
----@param size any
-function luna.particle.setBufferSize(id_val, size) end
-
----@param args any
-function luna.particle.setColors(args) end
-
----@param id_val any
----@param dir any
-function luna.particle.setDirection(id_val, dir) end
-
-function luna.particle.setEmissionArea() end
-
----@param id_val any
----@param rate any
-function luna.particle.setEmissionRate(id_val, rate) end
-
----@param id_val any
----@param shape any
----@param args? any (optional)
-function luna.particle.setEmissionShape(id_val, shape, args) end
-
----@param id_val any
+--- Creates a new trail ribbon effect.
 ---@param lifetime any
-function luna.particle.setEmitterLifetime(id_val, lifetime) end
-
----@param id_val any
----@param gx any
----@param gy any
-function luna.particle.setGravity(id_val, gx, gy) end
-
----@param id_val any
----@param mode any
-function luna.particle.setInsertMode(id_val, mode) end
-
----@param id_val any
----@param xmin any
----@param ymin any
----@param xmax any
----@param ymax any
-function luna.particle.setLinearAcceleration(id_val, xmin, ymin, xmax, ymax) end
-
----@param id_val any
----@param min any
----@param max any
-function luna.particle.setLinearDamping(id_val, min, max) end
-
----@param id_val any
----@param ox any
----@param oy any
-function luna.particle.setOffset(id_val, ox, oy) end
-
----@param id_val any
----@param min any
----@param max any
-function luna.particle.setParticleLifetime(id_val, min, max) end
-
----@param id_val any
----@param x any
----@param y any
-function luna.particle.setPosition(id_val, x, y) end
-
----@param id_val any
----@param quads_table any
-function luna.particle.setQuads(id_val, quads_table) end
-
----@param id_val any
----@param min any
----@param max any
-function luna.particle.setRadialAcceleration(id_val, min, max) end
-
----@param id_val any
----@param mode any
-function luna.particle.setRelativeMode(id_val, mode) end
-
----@param id_val any
----@param enable any
-function luna.particle.setRelativeRotation(id_val, enable) end
-
----@param id_val any
----@param min any
----@param max any
-function luna.particle.setRotation(id_val, min, max) end
-
----@param id_val any
----@param v any
-function luna.particle.setSizeVariation(id_val, v) end
-
----@param args any
-function luna.particle.setSizes(args) end
-
----@param id_val any
----@param min any
----@param max any
-function luna.particle.setSpeed(id_val, min, max) end
-
----@param id_val any
----@param min any
----@param max any
-function luna.particle.setSpin(id_val, min, max) end
-
----@param id_val any
----@param v any
-function luna.particle.setSpinVariation(id_val, v) end
-
----@param id_val any
----@param spread any
-function luna.particle.setSpread(id_val, spread) end
-
----@param id_val any
----@param min any
----@param max any
-function luna.particle.setTangentialAcceleration(id_val, min, max) end
-
----@param id_val any
----@param tex_id any
-function luna.particle.setTexture(id_val, tex_id) end
-
----@param id_val any
-function luna.particle.start(id_val) end
-
----@param id_val any
-function luna.particle.stop(id_val) end
-
----@param id_val any
----@param dt any
-function luna.particle.update(id_val, dt) end
+---@param start_width any
+---@return Trail
+function luna.particle.newTrail(lifetime, start_width) end
 
 ---@class luna.pathfinding
 luna.pathfinding = {}
 
+--- Lua-side wrapper around a PathGrid-based [`AiFlowField`].
+---@class AiFlowField
+local AiFlowField = {}
+
+--- Returns the normalised direction toward the goal (1-based coordinates).
+---@param x any
+---@param y any
+---@return number
+function AiFlowField:getDirection(x, y) end
+
+--- Returns the BFS distance to the goal (1-based coordinates).
+---@param x any
+---@param y any
+---@return number
+function AiFlowField:getDistance(x, y) end
+
+--- Returns the goal cell (1-based coordinates) or nil if unset.
+---@return integer?
+function AiFlowField:getGoal() end
+
+--- Returns the grid height.
+---@return integer
+function AiFlowField:getHeight() end
+
+--- Returns the grid width.
+---@return integer
+function AiFlowField:getWidth() end
+
+--- Returns true if a goal has been set.
+---@return boolean
+function AiFlowField:hasGoal() end
+
+--- Sets the goal cell and triggers BFS recomputation (1-based coordinates).
+---@param x any
+---@param y any
+---@return nil
+function AiFlowField:setGoal(x, y) end
+
+--- Lua-side wrapper around a [`FlowField`].
 ---@class FlowField
 local FlowField = {}
 
---- Returns the cost to target.
----@param x number `integer`.
----@param y number `integer`.
----@return any
-function FlowField:getCostToTarget(x, y) end
-
---- Returns the direction.
----@param x number `integer`.
----@param y number `integer`.
----@return any
-function FlowField:getDirection(x, y) end
-
+--- Returns the integrated cost to the nearest target (1-based coordinates).
 ---@param x any
 ---@param y any
+---@return number
+function FlowField:getCostToTarget(x, y) end
+
+--- Returns the normalised direction vector at a cell (1-based coordinates).
+---@param x any
+---@param y any
+---@return number
 function FlowField:getDirection(x, y) end
 
---- Returns the direction angle.
----@param x number `integer`.
----@param y number `integer`.
+--- Returns the flow direction as an angle in radians (1-based coordinates).
+---@param x any
+---@param y any
 ---@return number
 function FlowField:getDirectionAngle(x, y) end
 
----@param x any
----@param y any
-function FlowField:getDistance(x, y) end
-
-function FlowField:getGoal() end
-
-function FlowField:getHeight() end
-
---- Returns the targets.
+--- Returns the target cells from the most recent computation (1-based coordinates).
 ---@return table
 function FlowField:getTargets() end
 
-function FlowField:getWidth() end
-
-function FlowField:hasGoal() end
-
---- Returns `true` if calculated.
+--- Returns true if the flow field has been computed at least once.
 ---@return boolean
 function FlowField:isCalculated() end
 
----@param x any
----@param y any
-function FlowField:setGoal(x, y) end
-
+--- Lua-side wrapper around a [`NavGrid`] with optional HPA★ abstract graph.
 ---@class NavGrid
 local NavGrid = {}
 
---- Clear dirty on this NavGrid.
----@param mode string `string`.
-function NavGrid:clearDirty(mode) end
+--- Clears all pending dirty rectangles.
+---@return nil
+function NavGrid:clearDirty() end
 
---- Fill on this NavGrid.
----@param cost number `integer`.
+--- Sets every cell to the given cost.
+---@param cost any
+---@return nil
 function NavGrid:fill(cost) end
 
---- Returns the chunk size.
----@return any
+--- Returns the current HPA★ chunk size.
+---@return integer
 function NavGrid:getChunkSize() end
 
---- Returns the cost.
----@param x number `integer`.
----@param y number `integer`.
----@return any
+--- Returns the traversal cost of a cell (1-based coordinates).
+---@param x any
+---@param y any
+---@return integer
 function NavGrid:getCost(x, y) end
 
---- Returns the diagonal mode.
+--- Returns the current diagonal movement mode as a string.
 ---@return string
 function NavGrid:getDiagonalMode() end
 
---- Returns the dimensions.
----@param x number `integer`.
----@param y number `integer`.
----@param cost number `integer`.
----@return any
-function NavGrid:getDimensions(x, y, cost) end
+--- Returns the grid dimensions as width, height.
+---@return integer
+function NavGrid:getDimensions() end
 
---- Returns the height.
----@return number
+--- Returns the grid height in cells.
+---@return integer
 function NavGrid:getHeight() end
 
---- Returns the width.
----@return number
+--- Returns the grid width in cells.
+---@return integer
 function NavGrid:getWidth() end
 
---- Returns `true` if blocked.
----@param x number `integer`.
----@param y number `integer`.
+--- Returns true if the cell is blocked (1-based coordinates).
+---@param x any
+---@param y any
 ---@return boolean
 function NavGrid:isBlocked(x, y) end
 
---- Load from string on this NavGrid.
----@param data string `string`.
+--- Overwrites the grid from a raw byte string (row-major, one byte per cell).
+---@param data any
+---@return nil
 function NavGrid:loadFromString(data) end
 
---- Rebuild abstract on this NavGrid.
----@return any
+--- Rebuilds the HPA★ abstract graph from the current grid state.
+---@return nil
 function NavGrid:rebuildAbstract() end
 
---- Save to string on this NavGrid.
----@param size number `integer`.
-function NavGrid:saveToString(size) end
+--- Exports the cost grid as a byte string (row-major, one byte per cell).
+---@return string
+function NavGrid:saveToString() end
 
---- Sets the chunk size.
----@param size number `integer`.
+--- Sets the HPA★ chunk size.
+---@param size any
+---@return nil
 function NavGrid:setChunkSize(size) end
 
---- Sets the cost.
----@param x number `integer`.
----@param y number `integer`.
----@param cost number `integer`.
-function NavGrid:setCost(x, y, cost) end
-
---- Sets the diagonal mode.
----@param mode string `string`.
-function NavGrid:setDiagonalMode(mode) end
-
---- Sets the dirty.
----@param x number `integer`.
----@param y number `integer`.
----@param w number `integer`.
----@param h number `integer`.
-function NavGrid:setDirty(x, y, w, h) end
-
----@class PathGrid
-local PathGrid = {}
-
-function PathGrid:getCellSize() end
-
----@param x any
----@param y any
-function PathGrid:getCost(x, y) end
-
-function PathGrid:getHeight() end
-
-function PathGrid:getWidth() end
-
----@param x any
----@param y any
-function PathGrid:isWalkable(x, y) end
-
+--- Sets the traversal cost of a cell (1-based coordinates).
 ---@param x any
 ---@param y any
 ---@param cost any
-function PathGrid:setCost(x, y, cost) end
+---@return nil
+function NavGrid:setCost(x, y, cost) end
 
+--- Sets the diagonal movement mode.
+---@param mode any
+---@return nil
+function NavGrid:setDiagonalMode(mode) end
+
+--- Records a dirty rectangle for incremental HPA★ updates (1-based coordinates).
 ---@param x any
 ---@param y any
 ---@param w any
+---@param h any
+---@return nil
+function NavGrid:setDirty(x, y, w, h) end
+
+--- Lua-side wrapper around a [`PathGrid`] (A★ weighted grid with per-cell cost).
+---@class PathGrid
+local PathGrid = {}
+
+--- Returns the world-space size of each cell.
+---@return number
+function PathGrid:getCellSize() end
+
+--- Returns the cost multiplier for a cell (1-based coordinates).
+---@param x any
+---@param y any
+---@return number
+function PathGrid:getCost(x, y) end
+
+--- Returns the grid height in cells.
+---@return integer
+function PathGrid:getHeight() end
+
+--- Returns the grid width in cells.
+---@return integer
+function PathGrid:getWidth() end
+
+--- Returns true if a cell is walkable (1-based coordinates).
+---@param x any
+---@param y any
+---@return boolean
+function PathGrid:isWalkable(x, y) end
+
+--- Sets the cost multiplier for a cell (1-based coordinates).
+---@param x any
+---@param y any
+---@param cost any
+---@return nil
+function PathGrid:setCost(x, y, cost) end
+
+--- Sets the walkability of a cell (1-based coordinates).
+---@param x any
+---@param y any
+---@param w any
+---@return nil
 function PathGrid:setWalkable(x, y, w) end
 
+--- Lua-side wrapper around a [`UnitPathfinder`].
 ---@class UnitPathfinder
 local UnitPathfinder = {}
 
---- Clear cache on this UnitPathfinder.
----@return any
+--- Removes all cached path results.
+---@return nil
 function UnitPathfinder:clearCache() end
 
---- Returns the cache size.
----@param n number `integer`.
----@return any
-function UnitPathfinder:getCacheSize(n) end
+--- Returns the number of entries in the path cache.
+---@return integer
+function UnitPathfinder:getCacheSize() end
 
---- Returns the path cost.
----@param path table `table`.
----@return string
+--- Returns the sum of grid traversal costs along a path.
+---@param path any
+---@return number
 function UnitPathfinder:getPathCost(path) end
 
---- Returns the path length.
----@param path table `table`.
----@return string
+--- Returns the euclidean length of a path table.
+---@param path any
+---@return number
 function UnitPathfinder:getPathLength(path) end
 
---- Returns `true` if cache enabled.
+--- Returns true if path result caching is enabled.
 ---@return boolean
 function UnitPathfinder:isCacheEnabled() end
 
---- Sets the cache enabled.
----@param enabled boolean `boolean`.
+--- Enables or disables path result caching.
+---@param enabled any
+---@return nil
 function UnitPathfinder:setCacheEnabled(enabled) end
 
---- Sets the cache max size.
----@param n number `integer`.
+--- Sets the maximum number of cached path entries.
+---@param n any
+---@return nil
 function UnitPathfinder:setCacheMaxSize(n) end
 
---- Returns the thread count.
----@return any
+--- Returns the background pathfinding thread count (currently always 0).
+---@return integer
 function luna.pathfinding.getThreadCount() end
 
---- New flow field.
+--- Creates a new FlowField backed by a NavGrid.
 ---@param grid_ud any
----@return any
+---@return FlowField
 function luna.pathfinding.newFlowField(grid_ud) end
 
---- New nav grid.
+--- Creates a new NavGrid with all cells walkable.
 ---@param width any
 ---@param height any
----@return any
+---@return NavGrid
 function luna.pathfinding.newNavGrid(width, height) end
 
---- New nav grid from tile map.
----@param tilemap_ud any
----@param layer any
----@param blocked any
----@return any
-function luna.pathfinding.newNavGridFromTileMap(tilemap_ud, layer, blocked) end
-
---- New PathGrid-based BFS flow field.
+--- Creates a new BFS flow field from a PathGrid.
 ---@param grid_ud any
----@return any
+---@return AiFlowField
 function luna.pathfinding.newPathFlowField(grid_ud) end
 
---- Pathfinding on this FlowField.
+--- Creates a new PathGrid with per-cell cost and walkability.
 ---@param w any
 ---@param h any
 ---@param cell_size any
----@return string
+---@return PathGrid
 function luna.pathfinding.newPathGrid(w, h, cell_size) end
 
---- New pathfinder.
+--- Creates a new UnitPathfinder backed by a NavGrid.
 ---@param grid_ud any
----@return any
+---@return UnitPathfinder
 function luna.pathfinding.newPathfinder(grid_ud) end
 
---- Sets the thread count.
+--- Sets the background pathfinding thread count (currently a no-op).
 ---@param count any
+---@return nil
 function luna.pathfinding.setThreadCount(count) end
-
----@class luna.patterns
-luna.patterns = {}
-
----@class CommandStack
-local CommandStack = {}
-
---- Returns `true` if redo.
----@return boolean
-function CommandStack:canRedo() end
-
---- Returns `true` if undo.
----@return boolean
-function CommandStack:canUndo() end
-
---- Clear all on this CommandStack.
----@return any
-function CommandStack:clearAll() end
-
---- Execute on this CommandStack.
----@param name string `string`.
----@param exec_fn function `function`.
----@param undo_fn? function `function` optional.
-function CommandStack:execute(name, exec_fn, undo_fn) end
-
---- Returns the current name.
----@return any
-function CommandStack:getCurrentName() end
-
---- Returns the history size.
----@return number
-function CommandStack:getHistorySize() end
-
---- Redo on this CommandStack.
----@return boolean
-function CommandStack:redo() end
-
---- Undo on this CommandStack.
----@return boolean
-function CommandStack:undo() end
-
----@class EventBus
-local EventBus = {}
-
---- Removes all entries.
----@param event string `string`.
-function EventBus:clear(event) end
-
---- Clear all on this EventBus.
----@return any
-function EventBus:clearAll() end
-
---- Emits an event.
----@param args any `LuaMultiValue`.
-function EventBus:emit(args) end
-
---- Returns the events.
----@return any
-function EventBus:getEvents() end
-
---- Returns the listener count.
----@param event string `string`.
----@return any
-function EventBus:getListenerCount(event) end
-
---- Removes a previously registered event listener.
----@param id number `integer`.
-function EventBus:off(id) end
-
---- Registers an event listener callback.
----@param event string `string`.
----@param callback function `function`.
----@param priority? number `integer` optional.
----@return any
-function EventBus:on(event, callback, priority) end
-
----@class Factory
-local Factory = {}
-
---- Clear all on this Factory.
----@return any
-function Factory:clearAll() end
-
---- Creates a new Factory instance.
----@param args any `LuaMultiValue`.
-function Factory:create(args) end
-
---- Returns the types.
----@return number
-function Factory:getTypes() end
-
---- Returns `true` if the condition is met.
----@param type_name string `string`.
----@return boolean
-function Factory:has(type_name) end
-
---- Adds an entry to the collection.
----@param type_name string `string`.
----@param ctor function `function`.
-function Factory:register(type_name, ctor) end
-
---- Removes the entry from the collection.
----@param type_name string `string`.
-function Factory:remove(type_name) end
-
----@class ObjectPool
-local ObjectPool = {}
-
---- Acquire on this ObjectPool.
----@return any
-function ObjectPool:acquire() end
-
---- Adds an entry to the collection.
----@param value number `any`.
-function ObjectPool:add(value) end
-
---- Clear all on this ObjectPool.
----@return any
-function ObjectPool:clearAll() end
-
---- Returns the active count.
----@return any
-function ObjectPool:getActiveCount() end
-
---- Returns the available count.
----@return integer
-function ObjectPool:getAvailableCount() end
-
---- Returns the total count.
----@return integer
-function ObjectPool:getTotalCount() end
-
---- Releases the underlying resource handle.
----@param value number `any`.
-function ObjectPool:release(value) end
-
----@class ServiceLocator
-local ServiceLocator = {}
-
---- Clear all on this ServiceLocator.
----@return any
-function ServiceLocator:clearAll() end
-
---- Returns the services.
----@return any
-function ServiceLocator:getServices() end
-
---- Returns `true` if the condition is met.
----@param name string `string`.
----@return boolean
-function ServiceLocator:has(name) end
-
---- Locate on this ServiceLocator.
----@param name string `string`.
----@return any
-function ServiceLocator:locate(name) end
-
---- Provide on this ServiceLocator.
----@param name string `string`.
----@param value number `any`.
-function ServiceLocator:provide(name, value) end
-
---- Removes the entry from the collection.
----@param name string `string`.
-function ServiceLocator:remove(name) end
-
----@class SimpleState
-local SimpleState = {}
-
---- Adds state to the collection.
----@param name string `string`.
----@param callbacks? table `table` optional.
-function SimpleState:addState(name, callbacks) end
-
---- Clear all on this SimpleState.
----@return any
-function SimpleState:clearAll() end
-
---- Returns the current.
----@param name string `string`.
----@return any
-function SimpleState:getCurrent(name) end
-
---- Returns the states.
----@return any
-function SimpleState:getStates() end
-
---- Returns `true` if state.
----@param name string `string`.
----@return boolean
-function SimpleState:hasState(name) end
-
---- Transition to on this SimpleState.
----@param name string `string`.
----@return boolean
-function SimpleState:transitionTo(name) end
-
---- Advances the simulation by `dt` seconds.
----@param dt number `number`.
-function SimpleState:update(dt) end
-
---- New command stack.
----@return any
-function luna.patterns.newCommandStack() end
-
---- New event bus.
----@return any
-function luna.patterns.newEventBus() end
-
---- New factory.
----@return any
-function luna.patterns.newFactory() end
-
---- New object pool.
----@return any
-function luna.patterns.newObjectPool() end
-
---- New service locator.
----@return any
-function luna.patterns.newServiceLocator() end
-
---- New simple state.
----@return any
-function luna.patterns.newSimpleState() end
 
 ---@class luna.physics
 luna.physics = {}
 
---- Lua UserData wrapper for a physics body.
+--- Lua-side handle to a physics body accessed through its world.
 ---@class Body
 local Body = {}
 
---- Adds a collision fixture to the body using the given shape definition table.
----@param def number ÔÇö Table describing the fixture: shape, density, friction, restitution.
----@return number
-function Body:addFixture(def) end
+--- Applies an angular impulse.
+---@param impulse any
+---@return nil
+function Body:applyAngularImpulse(impulse) end
 
---- Applies a continuous force (accumulates until the next physics step) to the body's centre of mass.
----@param fx number ÔÇö `number`: Horizontal force component.
----@param fy number ÔÇö `number`: Vertical force component.
+--- Applies a continuous force to the body.
+---@param fx any
+---@param fy any
+---@return nil
 function Body:applyForce(fx, fy) end
 
---- Applies an instantaneous impulse directly to the body's centre of mass.
----@param ix number ÔÇö `number`: Horizontal impulse.
----@param iy number ÔÇö `number`: Vertical impulse.
+--- Applies a linear impulse to the body.
+---@param ix any
+---@param iy any
+---@return nil
 function Body:applyImpulse(ix, iy) end
 
---- Destroys the body and removes it from its parent physics world immediately.
+--- Applies a torque (rotational force).
+---@param torque any
+---@return nil
+function Body:applyTorque(torque) end
+
+--- Removes this body from the world.
+---@return nil
 function Body:destroy() end
 
---- Returns the body's current rotation angle in radians.
+--- Returns the body angle in radians.
 ---@return number
 function Body:getAngle() end
 
---- Returns the type string of the given body.
-function Body:getBodyType() end
-
---- Returns the number of collision fixtures currently attached to the body.
+--- Returns the angular damping coefficient.
 ---@return number
-function Body:getFixtureCount() end
+function Body:getAngularDamping() end
 
---- Returns the total simulated mass of the body in physics units.
+--- Returns the angular velocity in radians/s.
+---@return number
+function Body:getAngularVelocity() end
+
+--- Returns the body friction coefficient.
+---@return number
+function Body:getFriction() end
+
+--- Returns the per-body gravity multiplier.
+---@return number
+function Body:getGravityScale() end
+
+--- Returns the body height.
+---@return number
+function Body:getHeight() end
+
+--- Returns the body's integer ID.
+---@return integer
+function Body:getId() end
+
+--- Returns the collision layer bitmask.
+---@return integer
+function Body:getLayer() end
+
+--- Returns the linear damping coefficient.
+---@return number
+function Body:getLinearDamping() end
+
+--- Returns the collision mask bitmask.
+---@return integer
+function Body:getMask() end
+
+--- Returns the body mass.
 ---@return number
 function Body:getMass() end
 
---- Returns the body's current world-space position.
----@return number
+--- Returns the body position (x, y).
 ---@return number
 function Body:getPosition() end
 
---- Returns the current linear velocity vector of the body.
+--- Returns the body restitution (bounciness).
+---@return number
+function Body:getRestitution() end
+
+--- Returns the body type as a string.
+---@return string
+function Body:getType() end
+
+--- Returns the body velocity (vx, vy).
 ---@return number
 function Body:getVelocity() end
 
---- Sets the body's rotation to `angle` radians (bypasses physics).
----@param angle number ÔÇö `number`: Target angle in radians.
+--- Returns the body width.
+---@return number
+function Body:getWidth() end
+
+--- Returns the body X position.
+---@return number
+function Body:getX() end
+
+--- Returns the body Y position.
+---@return number
+function Body:getY() end
+
+--- Returns whether CCD is enabled.
+---@return boolean
+function Body:isBullet() end
+
+--- Returns whether rotation is locked.
+---@return boolean
+function Body:isFixedRotation() end
+
+--- Returns whether the body can sleep.
+---@return boolean
+function Body:isSleepingAllowed() end
+
+--- Sets the body angle in radians.
+---@param angle any
+---@return nil
 function Body:setAngle(angle) end
 
---- Teleports the body to the given world-space position (bypasses collision detection).
----@param x number ÔÇö `number`: Target X position.
----@param y number ÔÇö `number`: Target Y position.
+--- Sets the angular damping coefficient.
+---@param damping any
+---@return nil
+function Body:setAngularDamping(damping) end
+
+--- Sets the angular velocity.
+---@param omega any
+---@return nil
+function Body:setAngularVelocity(omega) end
+
+--- Enables or disables CCD.
+---@param bullet any
+---@return nil
+function Body:setBullet(bullet) end
+
+--- Locks or unlocks rotation.
+---@param fixed any
+---@return nil
+function Body:setFixedRotation(fixed) end
+
+--- Sets the body friction coefficient.
+---@param friction any
+---@return nil
+function Body:setFriction(friction) end
+
+--- Sets the per-body gravity multiplier.
+---@param scale any
+---@return nil
+function Body:setGravityScale(scale) end
+
+--- Sets the collision layer bitmask.
+---@param layer any
+---@return nil
+function Body:setLayer(layer) end
+
+--- Sets the linear damping coefficient.
+---@param damping any
+---@return nil
+function Body:setLinearDamping(damping) end
+
+--- Sets the collision mask bitmask.
+---@param mask any
+---@return nil
+function Body:setMask(mask) end
+
+--- Sets the body mass.
+---@param mass any
+---@return nil
+function Body:setMass(mass) end
+
+--- Sets the body position.
+---@param x any
+---@param y any
+---@return nil
 function Body:setPosition(x, y) end
 
---- Resizes the body's primary collision shape to the given width and height.
----@param width number ÔÇö New shape width in world units.
----@param height number ÔÇö New shape height in world units.
-function Body:setSize(width, height) end
+--- Sets the body restitution (bounciness).
+---@param restitution any
+---@return nil
+function Body:setRestitution(restitution) end
 
---- Sets the body's linear velocity to the given (vx, vy) world-space vector.
----@param vx number ÔÇö Velocity along the X axis in world units per second.
----@param vy number ÔÇö Velocity along the Y axis in world units per second.
+--- Sets whether the body can sleep.
+---@param allowed any
+---@return nil
+function Body:setSleepingAllowed(allowed) end
+
+--- Sets the body type.
+---@param bt any
+---@return nil
+function Body:setType(bt) end
+
+--- Sets the body velocity.
+---@param vx any
+---@param vy any
+---@return nil
 function Body:setVelocity(vx, vy) end
 
---- Lua UserData wrapper for a standalone physics shape.
----@class Shape
-local Shape = {}
-
---- Destroys the shape. No-op — Lua GC handles cleanup automatically.
-function Shape:destroy() end
-
---- Returns the axis-aligned bounding box of this shape in local coordinates.
----@return number
-function Shape:getBoundingBox() end
-
---- Returns the radius of a circle shape.
----@return number
-function Shape:getRadius() end
-
---- Returns the shape type string: `"circle"`, `"rectangle"`, `"polygon"`, `"edge"`, or `"chain"`.
----@return string
-function Shape:getType() end
-
---- Sets the density for when this shape is attached to a body.
----@param density number `number`. Mass per unit area.
-function Shape:setDensity(density) end
-
---- Sets the friction coefficient for when this shape is attached to a body.
----@param friction number `number`. Surface friction (0 = frictionless, 1 = high friction).
-function Shape:setFriction(friction) end
-
---- Sets the restitution (bounciness) for when this shape is attached to a body.
----@param restitution number `number`. 0 = inelastic, 1 = fully elastic.
-function Shape:setRestitution(restitution) end
-
---- Sets whether this shape acts as a sensor (detects overlaps, no forces).
----@param sensor boolean `boolean`.
-function Shape:setSensor(sensor) end
-
---- Lua UserData wrapper for a physics world.
+--- Lua-side handle wrapping a physics World.
 ---@class World
 local World = {}
 
---- Returns the number of bodies in the world.
+--- Resets the world, removing all bodies and joints.
+---@return nil
+function World:clear() end
+
+--- Removes a body from the world.
+---@param id any
+---@return nil
+function World:destroyBody(id) end
+
+--- Removes a joint from the world.
+---@param jid any
+---@return nil
+function World:destroyJoint(jid) end
+
+--- Returns the number of fixtures on a body.
+---@param body_id any
+---@return integer
+function World:fixtureCount(body_id) end
+
+--- Returns begin-contact events from the last step.
+---@return table
+function World:getBeginContactEvents() end
+
+--- Returns the body ID at a world-space point, or nil.
+---@param x any
+---@param y any
+---@return integer|nil
+function World:getBodyAtPoint(x, y) end
+
+--- Returns contacts involving a specific body.
+---@param body_id any
+---@return table
+function World:getBodyContacts(body_id) end
+
+--- Returns the total number of bodies in the world.
+---@return integer
 function World:getBodyCount() end
 
---- Returns a table of all currently active collision pairs in this physics world.
----@return number
-function World:getCollisions() end
+--- Returns all body IDs in the world.
+---@return table
+function World:getBodyIds() end
 
---- Returns the current world gravity vector.
----@return number
+--- Returns the body type as a string.
+---@param id any
+---@return string
+function World:getBodyType(id) end
+
+--- Returns collision events from the last step.
+---@return table
+function World:getCollisionEvents() end
+
+--- Returns all contact pairs from the narrow phase.
+---@return table
+function World:getContacts() end
+
+--- Returns end-contact events from the last step.
+---@return table
+function World:getEndContactEvents() end
+
+--- Returns the gravity vector (gx, gy).
 ---@return number
 function World:getGravity() end
 
---- Returns whether bodies in this world are allowed to enter a sleep state.
----@param body_id any
+--- Returns the two body IDs connected by a joint.
+---@param jid any
+---@return integer
+function World:getJointBodies(jid) end
+
+--- Returns all joint IDs.
+---@return table
+function World:getJointIds() end
+
+--- Returns the angular limits on a joint.
+---@param jid any
 ---@return number
-function World:isSleepingAllowed(body_id) end
+function World:getJointLimits(jid) end
 
---- Registers collision begin/end callback functions for this physics world.
----@param beginContact number ÔÇö Called with (body1, body2) when two bodies start touching.
----@param endContact number ÔÇö Called with (body1, body2) when they separate.
-function World:setCallbacks(beginContact, endContact) end
+--- Returns the motor speed on a joint's angular axis.
+---@param jid any
+---@return number
+function World:getJointMotorSpeed(jid) end
 
---- Sets world gravity. Default is `(0, 9.81)` (downward).
----@param x number ÔÇö `number`: Horizontal gravity component.
----@param y number ÔÇö `number`: Vertical gravity component.
-function World:setGravity(x, y) end
+--- Returns the type name of a joint.
+---@param jid any
+---@return string
+function World:getJointType(jid) end
 
---- Advances the physics simulation by `dt` seconds, resolving collisions and integrating forces.
----@param dt number ÔÇö `number`: Elapsed simulation time in seconds.
+--- Returns the pixels-per-meter scaling factor.
+---@return number
+function World:getMeter() end
+
+--- Returns the total number of joints.
+---@return integer
+function World:jointCount() end
+
+--- Sets the gravity vector.
+---@param gx any
+---@param gy any
+---@return nil
+function World:setGravity(gx, gy) end
+
+--- Sets the pixels-per-meter scaling factor.
+---@param ppm any
+---@return nil
+function World:setMeter(ppm) end
+
+--- Advances the physics simulation by dt seconds.
+---@param dt any
+---@return nil
 function World:step(dt) end
 
---- Adds a distance joint that maintains a fixed separation between two body anchor points.
----@param world number ÔÇö World ID.
----@param body1 number ÔÇö First body ID.
----@param body2 number ÔÇö Second body ID.
----@param x1 number ÔÇö Anchor on body1 in local coordinates.
----@param y1 number ÔÇö Anchor on body1 in local coordinates.
----@param x2 number ÔÇö Anchor on body2 in local coordinates.
----@param y2 number ÔÇö Anchor on body2 in local coordinates.
+--- Converts a pixel value to physics units.
+---@param px any
 ---@return number
-function luna.physics.addDistanceJoint(world, body1, body2, x1, y1, x2, y2) end
+function World:toPhysics(px) end
 
---- Adds a friction joint that resists relative movement and rotation between two bodies.
----@param world number ÔÇö World ID.
----@param body1 number ÔÇö First body ID.
----@param body2 number ÔÇö Second body ID.
----@param ax number ÔÇö World-space anchor point.
----@param ay number ÔÇö World-space anchor point.
+--- Converts a physics-unit value to pixels.
+---@param m any
 ---@return number
-function luna.physics.addFrictionJoint(world, body1, body2, ax, ay) end
+function World:toPixels(m) end
 
---- Adds a gear joint that couples two revolute or prismatic joints so they move in sync.
----@param world number ÔÇö World ID.
----@param joint1 number ÔÇö First revolute or prismatic joint ID.
----@param joint2 number ÔÇö Second revolute or prismatic joint ID.
----@param ratio number ÔÇö Gear ratio between the two joints.
----@return number
-function luna.physics.addGearJoint(world, joint1, joint2, ratio) end
-
---- Adds a motor joint that drives one body toward a target position relative to another.
----@param world number ÔÇö World ID.
----@param body1 number ÔÇö First body ID (reference).
----@param body2 number ÔÇö Second body ID (driven).
----@return number
-function luna.physics.addMotorJoint(world, body1, body2) end
-
---- Adds a mouse joint that applies a spring force pulling a body toward a target point.
----@param world number ÔÇö World ID.
----@param body number ÔÇö Body ID to control.
----@param x any ÔÇö Initial target position in world coordinates.
----@param y any ÔÇö Initial target position in world coordinates.
----@return number
-function luna.physics.addMouseJoint(world, body, x, y) end
-
---- Adds a prismatic joint that constrains two bodies to slide along a single axis.
----@param world number ÔÇö World ID.
----@param body1 number ÔÇö First body ID.
----@param body2 number ÔÇö Second body ID.
----@param ax number ÔÇö World-space anchor point.
----@param ay number ÔÇö World-space anchor point.
----@param axisX number ÔÇö Slide axis direction (unit vector).
----@param axisY number ÔÇö Slide axis direction (unit vector).
----@return number
-function luna.physics.addPrismaticJoint(world, body1, body2, ax, ay, axisX, axisY) end
-
---- Adds a pulley joint linking two bodies through a rope of fixed total length.
----@param world number ÔÇö World ID.
----@param body1 number ÔÇö First body ID.
----@param body2 number ÔÇö Second body ID.
----@param gx1 number ÔÇö Ground anchor for body1 in world coordinates.
----@param gy1 number ÔÇö Ground anchor for body1 in world coordinates.
----@param gx2 number ÔÇö Ground anchor for body2 in world coordinates.
----@param gy2 number ÔÇö Ground anchor for body2 in world coordinates.
----@param ax1 number ÔÇö Body1 attachment point in local coordinates.
----@param ay1 number ÔÇö Body1 attachment point in local coordinates.
----@param ax2 number ÔÇö Body2 attachment point in local coordinates.
----@param ay2 number ÔÇö Body2 attachment point in local coordinates.
----@param ratio number ÔÇö Pulley ratio (1.0 = symmetric).
----@return number
-function luna.physics.addPulleyJoint(world, body1, body2, gx1, gy1, gx2, gy2, ax1, ay1, ax2, ay2, ratio) end
-
---- Adds a revolute joint that constrains two bodies to rotate around a shared anchor point.
----@param world number ÔÇö World ID.
----@param body1 number ÔÇö First body ID.
----@param body2 number ÔÇö Second body ID.
----@param ax number ÔÇö World-space anchor point to revolve around.
----@param ay number ÔÇö World-space anchor point to revolve around.
----@return number
-function luna.physics.addRevoluteJoint(world, body1, body2, ax, ay) end
-
---- Adds a rope joint that enforces a maximum distance between two body anchor points.
----@param world number ÔÇö World ID.
----@param body1 number ÔÇö First body ID.
----@param body2 number ÔÇö Second body ID.
----@param x1 number ÔÇö Anchor on body1 in local coordinates.
----@param y1 number ÔÇö Anchor on body1 in local coordinates.
----@param x2 number ÔÇö Anchor on body2 in local coordinates.
----@param y2 number ÔÇö Anchor on body2 in local coordinates.
----@param maxLength number ÔÇö Maximum allowed distance in world units.
----@return number
-function luna.physics.addRopeJoint(world, body1, body2, x1, y1, x2, y2, maxLength) end
-
---- Adds a weld joint that rigidly fixes the relative position and angle of two bodies.
----@param world number ÔÇö World ID.
----@param body1 number ÔÇö First body ID.
----@param body2 number ÔÇö Second body ID.
----@param ax number ÔÇö World-space anchor point for the weld.
----@param ay number ÔÇö World-space anchor point for the weld.
----@return number
-function luna.physics.addWeldJoint(world, body1, body2, ax, ay) end
-
---- Adds a wheel joint combining a revolute motor and a prismatic spring for vehicle suspension.
----@param world number ÔÇö World ID.
----@param body1 number ÔÇö Chassis body ID.
----@param body2 number ÔÇö Wheel body ID.
----@param ax number ÔÇö World-space anchor point.
----@param ay number ÔÇö World-space anchor point.
----@param axisX number ÔÇö Suspension axis direction.
----@param axisY number ÔÇö Suspension axis direction.
----@return number
-function luna.physics.addWheelJoint(world, body1, body2, ax, ay, axisX, axisY) end
-
---- Applies an instantaneous angular impulse to the body, changing its spin velocity.
----@param world number ÔÇö World ID.
----@param body number ÔÇö Target body ID.
----@param impulse any ÔÇö Angular impulse magnitude in N┬Ěm┬Ěs.
-function luna.physics.applyAngularImpulse(world, body, impulse) end
-
---- Applies a force vector to a body at its center of mass.
----@param world_id_val any
----@param body_id_val any
----@param fx any
----@param fy any
-function luna.physics.applyForce(world_id_val, body_id_val, fx, fy) end
-
---- Applies a world-space force at a given point on the body, potentially adding torque.
----@param world number ÔÇö World ID.
----@param body number ÔÇö Target body ID.
----@param fx any ÔÇö Force vector in Newtons.
----@param fy any ÔÇö Force vector in Newtons.
----@param px number ÔÇö World-space point of application.
----@param py number ÔÇö World-space point of application.
-function luna.physics.applyForceAtPoint(world, body, fx, fy, px, py) end
-
---- Applies an instantaneous impulse to a body.
----@param world_id_val any
----@param body_id_val any
----@param ix any
----@param iy any
-function luna.physics.applyImpulse(world_id_val, body_id_val, ix, iy) end
-
---- Applies a rotational torque to a body.
----@param world_id_val any
----@param body_id_val any
----@param torque any
-function luna.physics.applyTorque(world_id_val, body_id_val, torque) end
-
---- Attaches a standalone shape to a body as a new collider fixture.
----@param body number `Body` userdata returned by `newBody`.
----@param shape number `Shape` userdata returned by `newCircleShape` etc.
----@return number
-function luna.physics.attachShape(body, shape) end
-
---- Removes a body from the physics world.
----@param world_id_val any
----@param body_id_val any
-function luna.physics.destroyBody(world_id_val, body_id_val) end
-
---- Removes the given joint from the world and frees its resources.
----@param world number ÔÇö World ID that owns the joint.
----@param joint number ÔÇö Joint ID to destroy.
-function luna.physics.destroyJoint(world, joint) end
-
---- Destroys a physics world and frees all associated resources.
----@param world_id_val any
-function luna.physics.destroyWorld(world_id_val) end
-
---- Returns the angular damping coefficient of the body that slows its rotation over time.
----@param world number ÔÇö World ID.
----@param body number ÔÇö Body ID.
----@return number
-function luna.physics.getAngularDamping(world, body) end
-
---- Returns the current angular velocity of the body in radians per second.
----@param world number ÔÇö World ID.
----@param body number ÔÇö Body ID.
----@return number
-function luna.physics.getAngularVelocity(world, body) end
-
---- Returns a table of all body IDs currently registered in the physics world.
----@param world number ÔÇö World ID to query.
----@return number
-function luna.physics.getBodies(world) end
-
---- Returns the body object table for the given body ID within the world.
----@param world number ÔÇö World ID.
----@param body number ÔÇö Body ID to look up.
----@return number
-function luna.physics.getBody(world, body) end
-
---- Returns the current rotation angle (radians) of a physics body.
----@param world_id_val any
----@param body_id_val any
-function luna.physics.getBodyAngle(world_id_val, body_id_val) end
-
---- Returns the first body whose collider contains the given world-space point.
----@param world number World ID or World userdata.
----@param x number World-space X coordinate.
----@param y number World-space Y coordinate.
----@return number
-function luna.physics.getBodyAtPoint(world, x, y) end
-
---- Returns all active contact manifolds where this body touches another body.
----@param world number ÔÇö World ID.
----@param body number ÔÇö Body ID to query.
----@return number
-function luna.physics.getBodyContacts(world, body) end
-
---- Returns the number of bodies in the world.
----@param world_id_val any
-function luna.physics.getBodyCount(world_id_val) end
-
---- Returns the mass of a physics body.
----@param world_id_val any
----@param body_id_val any
-function luna.physics.getBodyMass(world_id_val, body_id_val) end
-
---- Returns the type string of the given body.
----@param world_id_val any
----@param body_id_val any
-function luna.physics.getBodyType(world_id_val, body_id_val) end
-
---- Returns all collision pairs currently overlapping in the physics world.
----@param world number ÔÇö World ID.
----@return number
-function luna.physics.getCollisions(world) end
-
---- Returns a table of all currently active collision contact manifolds in the world.
----@param world number ÔÇö World ID.
----@return number
-function luna.physics.getContacts(world) end
-
---- Returns the global gravity vector (gx, gy).
----@param world_id_val any
-function luna.physics.getGravity(world_id_val) end
-
---- Returns the per-body gravity scale factor applied to the world gravity vector.
----@param world number ÔÇö World ID.
----@param body number ÔÇö Body ID.
----@return number
-function luna.physics.getGravityScale(world, body) end
-
---- Returns the two body IDs connected by the given joint.
----@param world number ÔÇö World ID.
----@param joint number ÔÇö Joint ID to query.
----@return number
-function luna.physics.getJointBodies(world, joint) end
-
---- Returns the total number of joints currently active in the physics world.
----@param world number ÔÇö World ID.
----@return number
-function luna.physics.getJointCount(world) end
-
---- Returns the lower and upper angular or linear limits set on the joint.
----@param world number ÔÇö World ID.
----@param joint number ÔÇö Joint ID.
----@return any
-function luna.physics.getJointLimits(world, joint) end
-
---- Returns the target motor speed of a revolute or prismatic joint.
----@param world number ÔÇö World ID.
----@param joint number ÔÇö Joint ID.
----@return any
-function luna.physics.getJointMotorSpeed(world, joint) end
-
---- Returns a string describing the type of the given joint.
----@param world number ÔÇö World ID.
----@param joint number ÔÇö Joint ID.
+--- Creates a circle shape value.
+---@param r any
 ---@return string
-function luna.physics.getJointType(world, joint) end
+function luna.physics.newCircleShape(r) end
 
---- Returns a table of all joint IDs currently active in the physics world.
----@param world number ÔÇö World ID to query.
----@return number
-function luna.physics.getJoints(world) end
-
---- Returns the linear damping coefficient that gradually slows the body's movement.
----@param world number ÔÇö World ID.
----@param body number ÔÇö Body ID.
----@return number
-function luna.physics.getLinearDamping(world, body) end
-
---- Returns the current pixels-per-meter scale set on the physics world.
----@param world number ÔÇö World ID to query.
----@return number
-function luna.physics.getMeter(world) end
-
---- Returns whether continuous collision detection (CCD) is enabled on the body.
----@param world number ÔÇö World ID.
----@param body number ÔÇö Body ID.
----@return boolean
-function luna.physics.isBullet(world, body) end
-
---- Returns whether the body's rotation is locked and prevented from changing.
----@param world number ÔÇö World ID.
----@param body number ÔÇö Body ID.
----@return number
-function luna.physics.isFixedRotation(world, body) end
-
---- Returns whether the body is allowed to enter a sleep state when inactive.
----@param world number ÔÇö World ID.
----@param body number ÔÇö Body ID.
----@return number
-function luna.physics.isSleepingAllowed(world, body) end
-
---- Creates a rigid body in the given world.
----@param world_id_val any
----@param x any
----@param y any
----@param btype any
-function luna.physics.newBody(world_id_val, x, y, btype) end
-
---- Creates a static chain body from a list of connected edge segments.
----@param world number ÔÇö World ID.
----@param vertices number ÔÇö Flat or nested table of (x, y) chain vertices.
----@param closed? number ÔÇö Optional boolean; true to close the chain into a loop.
----@return number
-function luna.physics.newChainBody(world, vertices, closed) end
-
---- Creates a standalone chain shape from a closed/open flag followed by flat vertex coordinates.
----@param closed boolean `boolean`. True to close the loop.
----@param x1_y1_x2_y2_ number At least 2 vertex pairs (4 numbers).
----@return any
-function luna.physics.newChainShape(closed, x1_y1_x2_y2_) end
-
---- Creates a circle-shaped physics body at the given world position.
----@param world number ÔÇö World ID.
----@param type number ÔÇö Body type: 'static', 'dynamic', or 'kinematic'.
----@param x number ÔÇö Center X in world units.
----@param y number ÔÇö Center Y in world units.
----@param radius number ÔÇö Circle radius in world units.
----@return number
-function luna.physics.newCircleBody(world, type, x, y, radius) end
-
---- Creates a standalone circle shape.
----@param radius number `number`. Circle radius in world units.
----@return any
-function luna.physics.newCircleShape(radius) end
-
---- Creates a single-segment edge body connecting two points in world space.
----@param world number ÔÇö World ID.
----@param x1 number ÔÇö Start point in world units.
----@param y1 number ÔÇö Start point in world units.
----@param x2 number ÔÇö End point in world units.
----@param y2 number ÔÇö End point in world units.
----@return number
-function luna.physics.newEdgeBody(world, x1, y1, x2, y2) end
-
---- Creates a standalone line-segment shape.
----@param x1 number `number`. Start X.
----@param y1 number `number`. Start Y.
----@param x2 number `number`. End X.
----@param y2 number `number`. End Y.
----@return any
+--- Creates an edge shape value.
+---@param x1 any
+---@param y1 any
+---@param x2 any
+---@param y2 any
+---@return string
 function luna.physics.newEdgeShape(x1, y1, x2, y2) end
 
---- Creates a convex polygon body defined by a list of local-space vertices.
----@param world number ÔÇö World ID.
----@param type number ÔÇö Body type: 'static', 'dynamic', or 'kinematic'.
----@param x number ÔÇö World X position for the body's origin.
----@param y number ÔÇö World Y position for the body's origin.
----@param vertices number ÔÇö Flat or nested table of (x, y) polygon vertices in local space.
----@return number
-function luna.physics.newPolygonBody(world, type, x, y, vertices) end
+--- Creates a rectangle shape value.
+---@param w any
+---@param h any
+---@return string
+function luna.physics.newRectangleShape(w, h) end
 
---- Creates a standalone convex polygon shape from flat vertex coordinates.
----@param x1_y1_x2_y2_ number At least 3 vertex pairs (6 numbers).
----@return any
-function luna.physics.newPolygonShape(x1_y1_x2_y2_) end
-
---- Creates a standalone rectangle shape from half-extents.
----@param hx number `number`. Half-width.
----@param hy number `number`. Half-height.
----@return any
-function luna.physics.newRectangleShape(hx, hy) end
-
---- Creates a new regular polygon body.
-function luna.physics.newRegularPolygonBody() end
-
---- Creates a new physics simulation world.
+--- Creates a new physics world with the given gravity vector.
 ---@param gx any
 ---@param gy any
+---@return World
 function luna.physics.newWorld(gx, gy) end
-
---- Returns all bodies whose axis-aligned bounding boxes overlap the given query rectangle.
----@param world number ÔÇö World ID.
----@param x1 number ÔÇö Left edge of the query box in world units.
----@param y1 number ÔÇö Top edge of the query box in world units.
----@param x2 any ÔÇö Right edge in world units.
----@param y2 any ÔÇö Bottom edge in world units.
----@return number
-function luna.physics.queryBoundingBox(world, x1, y1, x2, y2) end
-
---- Casts a ray from the origin in the given direction and returns the first body hit.
----@param world number ÔÇö World ID to cast in.
----@param x1 number ÔÇö Ray origin X in world units.
----@param y1 number ÔÇö Ray origin Y in world units.
----@param x2 number ÔÇö Ray end X in world units.
----@param y2 number ÔÇö Ray end Y in world units.
----@return number
-function luna.physics.raycast(world, x1, y1, x2, y2) end
-
---- Casts a ray and returns every body it intersects, sorted by distance.
----@param world number ÔÇö World ID to cast in.
----@param x1 number ÔÇö Ray origin X in world units.
----@param y1 number ÔÇö Ray origin Y in world units.
----@param x2 number ÔÇö Ray end X in world units.
----@param y2 number ÔÇö Ray end Y in world units.
----@return number
----@return number
-function luna.physics.raycastAll(world, x1, y1, x2, y2) end
-
---- Sets the angular damping coefficient that gradually reduces the body's spin.
----@param world number ÔÇö World ID.
----@param body number ÔÇö Body ID.
----@param damping any ÔÇö Non-negative damping coefficient.
-function luna.physics.setAngularDamping(world, body, damping) end
-
---- Sets the angular velocity of the body to the given value in radians per second.
----@param world number ÔÇö World ID.
----@param body number ÔÇö Body ID.
----@param omega number ÔÇö Angular velocity in radians per second.
-function luna.physics.setAngularVelocity(world, body, omega) end
-
---- Sets the rotation angle (radians) of a physics body.
----@param world_id_val any
----@param body_id_val any
----@param angle any
-function luna.physics.setBodyAngle(world_id_val, body_id_val, angle) end
-
---- Overrides the simulated mass of the body with the given value.
----@param world number ÔÇö World ID.
----@param body number ÔÇö Body ID.
----@param mass number ÔÇö New mass in physics units.
-function luna.physics.setBodyMass(world, body, mass) end
-
---- Sets the position of a physics body.
----@param world_id_val any
----@param body_id_val any
----@param x any
----@param y any
-function luna.physics.setBodyPosition(world_id_val, body_id_val, x, y) end
-
---- Sets the width and height dimensions of the body's collision shape.
----@param world number ÔÇö World ID.
----@param body number ÔÇö Body ID to resize.
----@param width number ÔÇö New shape width in world units.
----@param height number ÔÇö New shape height in world units.
-function luna.physics.setBodySize(world, body, width, height) end
-
---- Sets the body type: 'dynamic', 'static', or 'kinematic'.
----@param world_id_val any
----@param body_id_val any
----@param btype any
-function luna.physics.setBodyType(world_id_val, body_id_val, btype) end
-
---- Sets the linear velocity of a physics body.
----@param world_id_val any
----@param body_id_val any
----@param vx any
----@param vy any
-function luna.physics.setBodyVelocity(world_id_val, body_id_val, vx, vy) end
-
---- Enables continuous collision detection (CCD) on a body to prevent tunneling at high speeds.
----@param world number ÔÇö World ID.
----@param body number ÔÇö Body ID to configure.
----@param enable boolean ÔÇö true to enable CCD, false to disable.
-function luna.physics.setBullet(world, body, enable) end
-
---- Locks or unlocks the body's rotation axis so it cannot spin in the simulation.
----@param world number ÔÇö World ID.
----@param body number ÔÇö Body ID.
----@param fixed boolean ÔÇö true to prevent rotation, false to allow it.
-function luna.physics.setFixedRotation(world, body, fixed) end
-
---- Sets the global gravity vector for the world.
----@param world_id_val any
----@param gx any
----@param gy any
-function luna.physics.setGravity(world_id_val, gx, gy) end
-
---- Sets a per-body multiplier applied to the world gravity vector for this body.
----@param world number ÔÇö World ID.
----@param body number ÔÇö Body ID.
----@param scale number ÔÇö Gravity scale (1.0 = full gravity, 0.0 = weightless).
-function luna.physics.setGravityScale(world, body, scale) end
-
---- Sets the lower and upper angular or linear limits on a constrained joint.
----@param world number ÔÇö World ID.
----@param joint number ÔÇö Joint ID.
----@param lower number ÔÇö Lower limit value (angle in radians or distance).
----@param upper any ÔÇö Upper limit value.
-function luna.physics.setJointLimits(world, joint, lower, upper) end
-
---- Enables or disables the angular/linear limit constraints on a joint.
----@param world number ÔÇö World ID.
----@param joint number ÔÇö Joint ID.
----@param enabled boolean ÔÇö true to enforce limits, false to disable them.
-function luna.physics.setJointLimitsEnabled(world, joint, enabled) end
-
---- Sets the target motor speed for a motorized revolute or prismatic joint.
----@param world number ÔÇö World ID.
----@param joint number ÔÇö Joint ID.
----@param speed any ÔÇö Target speed in rad/s (revolute) or m/s (prismatic).
-function luna.physics.setJointMotorSpeed(world, joint, speed) end
-
---- Sets the linear damping coefficient that gradually slows the body's movement.
----@param world number ÔÇö World ID.
----@param body number ÔÇö Body ID.
----@param damping any ÔÇö Non-negative damping coefficient.
-function luna.physics.setLinearDamping(world, body, damping) end
-
---- Sets the pixels-per-meter ratio used to convert physics world units to screen pixels.
----@param meter number ÔÇö Number of pixels that represent one physics meter.
-function luna.physics.setMeter(meter) end
-
---- Updates the target world-space point that the mouse joint pulls the body toward.
----@param world number ÔÇö World ID.
----@param joint number ÔÇö Mouse joint ID.
----@param x number ÔÇö New target X in world units.
----@param y number ÔÇö New target Y in world units.
-function luna.physics.setMouseJointTarget(world, joint, x, y) end
-
---- Sets whether the body is allowed to enter a sleep state when it comes to rest.
----@param world number ÔÇö World ID.
----@param body number ÔÇö Body ID.
----@param allowed number ÔÇö true to allow sleeping, false to keep the body always awake.
-function luna.physics.setSleepingAllowed(world, body, allowed) end
-
---- Advances the physics simulation by the given timestep in seconds.
----@param world_id_val any
----@param dt any
-function luna.physics.step(world_id_val, dt) end
 
 ---@class luna.pipeline
 luna.pipeline = {}
 
+--- Lua-side wrapper around a [`Pipeline`] DAG with scheduler and Lua callback registry.
 ---@class Pipeline
 local Pipeline = {}
 
 --- Adds a step to the pipeline. Returns self for chaining.
----@param step any `PipelineStep`.
----@return any
-function Pipeline:addStep(step) end
+---@param step_ud any
+---@return Pipeline
+function Pipeline:addStep(step_ud) end
 
 --- Cancels all pending and waiting steps.
+---@return nil
 function Pipeline:cancel() end
 
 --- Clears all steps from the pipeline.
+---@return nil
 function Pipeline:clear() end
 
---- Returns the stored async context table, or nil if not in an async run.
----@return table
+--- Returns the stored async context table, or nil.
+---@return table?
 function Pipeline:getContext() end
 
---- Returns the current error mode as a string (`"abort"` or `"continue"`).
+--- Returns the current error mode as a string.
 ---@return string
 function Pipeline:getErrorMode() end
 
 --- Returns the topological execution order as an array of step names.
----@return string
+---@return table?
 function Pipeline:getExecutionOrder() end
 
 --- Returns the pipeline's name.
 ---@return string
 function Pipeline:getName() end
 
---- Returns parallel execution groups as a nested array. Returns `(nil, error_string)` on cycle.
----@return string
+--- Returns parallel execution groups as a nested array of step name arrays.
+---@return table?
 function Pipeline:getParallelGroups() end
 
---- Returns the current result table built from step states, or nil if nothing has run.
----@return table
+--- Returns the current result table built from step states, or nil.
+---@return table?
 function Pipeline:getResult() end
 
 --- Returns the LuaStep wrapper for the named step, or nil.
----@param name string `String`.
----@return any
+---@param name any
+---@return PipelineStep?
 function Pipeline:getStep(name) end
 
 --- Returns the total number of steps.
----@return any
+---@return integer
 function Pipeline:getStepCount() end
 
 --- Returns a Lua array of all step wrappers in the pipeline.
@@ -9081,372 +8024,198 @@ function Pipeline:getStepCount() end
 function Pipeline:getSteps() end
 
 --- Returns a Lua array of all steps whose tag matches the given string.
----@param tag string `String`.
+---@param tag any
 ---@return table
 function Pipeline:getStepsByTag(tag) end
 
---- Returns `true` if all steps have reached a terminal state.
+--- Returns true if all steps have reached a terminal state.
 ---@return boolean
 function Pipeline:isComplete() end
 
---- Returns `true` if the pipeline is currently running asynchronously.
+--- Returns true if the pipeline is currently running asynchronously.
 ---@return boolean
 function Pipeline:isRunning() end
 
 --- Removes a step from the pipeline by name.
----@param name string `String`.
+---@param name any
+---@return nil
 function Pipeline:removeStep(name) end
 
 --- Resets all step states and clears the async context.
+---@return nil
 function Pipeline:reset() end
 
 --- Executes the pipeline synchronously in topological order.
----@param context table `table?`.
+---@param context? any (optional)
 ---@return table
 function Pipeline:run(context) end
 
---- Starts an async pipeline run. Steps are executed one-per-frame via `update(dt)`.
----@param context table `table?`.
+--- Starts an async pipeline run. Steps are executed one-per-frame via update(dt).
+---@param context? any (optional)
+---@return nil
 function Pipeline:runAsync(context) end
 
---- Sets the pipeline error mode: `"abort"` or `"continue"`.
----@param mode string `String`.
+--- Sets the pipeline error mode: "abort" or "continue".
+---@param mode any
+---@return nil
 function Pipeline:setErrorMode(mode) end
 
 --- Sets the pipeline's name.
----@param name string `String`.
+---@param name any
+---@return nil
 function Pipeline:setName(name) end
 
 --- Sets the callback to invoke when the pipeline completes.
----@param fn function `function | nil`.
-function Pipeline:setOnComplete(fn) end
+---@param cb? any (optional)
+---@return nil
+function Pipeline:setOnComplete(cb) end
 
 --- Sets the callback to invoke each time a step fails.
----@param fn function `function | nil`.
-function Pipeline:setOnStepError(fn) end
+---@param cb? any (optional)
+---@return nil
+function Pipeline:setOnStepError(cb) end
 
 --- Serialises the pipeline definition to a Lua table (no callbacks).
 ---@return table
 function Pipeline:toTable() end
 
---- Advances the async pipeline by one tick. Returns `true` when all steps are done.
----@param dt any `f32`.
+--- Advances the async pipeline by one tick. Returns true when all steps are done.
+---@param dt any
 ---@return boolean
 function Pipeline:update(dt) end
 
---- Validates the pipeline DAG. Returns `(ok, error_array)`.
+--- Validates the pipeline DAG. Returns (ok, error_array).
 ---@return boolean
 function Pipeline:validate() end
 
----@class PipelineStep
-local PipelineStep = {}
+--- Lua-side wrapper around a single [`PipelineStep`], plus Lua callback registry keys.
+---@class Step
+local Step = {}
 
---- Adds a dependency on another step. Returns self for chaining.
----@param dep string `PipelineStep | String`.
----@return any
-function PipelineStep:dependsOn(dep) end
+--- Adds a dependency on another step by name or PipelineStep. Returns self for chaining.
+---@param dep any
+---@return PipelineStep
+function Step:dependsOn(dep) end
 
 --- Returns the number of execution attempts so far.
----@return any
-function PipelineStep:getAttempt() end
+---@return integer
+function Step:getAttempt() end
 
 --- Retrieves a metadata value by key, returning nil if not found.
----@param key string `String`.
----@return string
-function PipelineStep:getData(key) end
+---@param key any
+---@return string?
+function Step:getData(key) end
 
 --- Returns the configured delay in seconds.
----@return any
-function PipelineStep:getDelay() end
+---@return number
+function Step:getDelay() end
 
 --- Returns the list of dependency step names.
 ---@return table
-function PipelineStep:getDependencies() end
+function Step:getDependencies() end
 
 --- Returns the number of declared dependencies.
----@return any
-function PipelineStep:getDependencyCount() end
+---@return integer
+function Step:getDependencyCount() end
 
 --- Returns total seconds spent executing this step.
----@return any
-function PipelineStep:getDuration() end
+---@return number
+function Step:getDuration() end
 
 --- Returns the error message from the last failed attempt, or nil.
----@return string
-function PipelineStep:getError() end
+---@return string?
+function Step:getError() end
 
 --- Returns the unique name of this step.
 ---@return string
-function PipelineStep:getName() end
+function Step:getName() end
 
 --- Returns the configured retry count.
----@return any
-function PipelineStep:getRetryCount() end
+---@return integer
+function Step:getRetryCount() end
 
 --- Returns the current execution status as a string.
 ---@return string
-function PipelineStep:getStatus() end
+function Step:getStatus() end
 
 --- Returns the tag on this step, or nil if unset.
----@return string
-function PipelineStep:getTag() end
+---@return string?
+function Step:getTag() end
 
 --- Returns the timeout stored in metadata, or 0.0 if unset.
----@return any
-function PipelineStep:getTimeout() end
+---@return number
+function Step:getTimeout() end
 
 --- Returns whether this step is marked as optional.
 ---@return boolean
-function PipelineStep:isOptional() end
+function Step:isOptional() end
 
 --- Stores a Lua function as the execute callback for this step.
----@param fn function `function`.
-function PipelineStep:setCallback(fn) end
+---@param cb any
+---@return nil
+function Step:setCallback(cb) end
 
 --- Stores a Lua function (or nil) as the run-condition for this step.
----@param fn function `function | nil`.
-function PipelineStep:setCondition(fn) end
+---@param cond? any (optional)
+---@return nil
+function Step:setCondition(cond) end
 
 --- Stores an arbitrary string value under the given key in step metadata.
----@param key string `String`.
----@param value string `String`.
-function PipelineStep:setData(key, value) end
+---@param key any
+---@param value any
+---@return nil
+function Step:setData(key, value) end
 
---- Sets the delay (in seconds) to wait after dependencies finish.
----@param seconds any `f32`.
-function PipelineStep:setDelay(seconds) end
+--- Sets the delay in seconds to wait after dependencies finish.
+---@param seconds any
+---@return nil
+function Step:setDelay(seconds) end
 
 --- Stores a Lua function (or nil) to call if this step fails.
----@param fn function `function | nil`.
-function PipelineStep:setOnError(fn) end
+---@param cb? any (optional)
+---@return nil
+function Step:setOnError(cb) end
 
 --- Marks whether this step is optional (downstream steps continue on failure).
----@param optional boolean `bool`.
-function PipelineStep:setOptional(optional) end
+---@param optional any
+---@return nil
+function Step:setOptional(optional) end
 
 --- Sets the maximum number of retry attempts on failure.
----@param count any `u32`.
-function PipelineStep:setRetryCount(count) end
+---@param count any
+---@return nil
+function Step:setRetryCount(count) end
 
---- Sets the delay (in seconds) between retry attempts.
----@param seconds any `f32`.
-function PipelineStep:setRetryDelay(seconds) end
+--- Sets the delay in seconds between retry attempts.
+---@param seconds any
+---@return nil
+function Step:setRetryDelay(seconds) end
 
 --- Sets the tag on this step for grouping and filtering.
----@param tag string `String`.
-function PipelineStep:setTag(tag) end
+---@param tag any
+---@return nil
+function Step:setTag(tag) end
 
---- Stores a timeout (in seconds) in the step's metadata.
----@param seconds any `f32`.
-function PipelineStep:setTimeout(seconds) end
+--- Stores a timeout in seconds in the step's metadata.
+---@param seconds any
+---@return nil
+function Step:setTimeout(seconds) end
 
+--- Deserialises a pipeline from a definition table.
 ---@param def any
+---@return Pipeline
 function luna.pipeline.fromTable(def) end
 
+--- Creates a new empty pipeline with the given name (defaults to "pipeline").
 ---@param name? any (optional)
+---@return Pipeline
 function luna.pipeline.newPipeline(name) end
 
+--- Creates a new pipeline step with the given name and optional callback.
 ---@param name any
 ---@param callback? any (optional)
+---@return PipelineStep
 function luna.pipeline.newStep(name, callback) end
-
----@class luna.postfx
-luna.postfx = {}
-
----@class ImageEffect
-local ImageEffect = {}
-
---- Appends a new effect pass by name to the end of this effect chain.
----@param name string â€” `string` â€” Effect type name (e.g. `"blur"`, `"sepia"`).
----@return number
-function ImageEffect:addEffect(name) end
-
---- Removes all effects from this chain.
-function ImageEffect:clearEffects() end
-
---- Returns a deep clone of this `ImageEffect`.
----@return Image
-function ImageEffect:clone() end
-
---- Returns the number of effects in this chain.
----@return number
-function ImageEffect:effectCount() end
-
---- Returns the effect at the given 1-based index or by name, or `nil`.
----@param key string ? `integer | string` ? 1-based index or effect type name.
----@return number
-function ImageEffect:getEffect(key) end
-
---- Removes an effect by 1-based index or by type name.
----@param key string ? `integer | string` ? 1-based index or effect type name.
----@return boolean
-function ImageEffect:removeEffect(key) end
-
---- Serialises this effect chain to a TOML file at the given path.
----@param path string ? `string` ? Destination file path.
----@return any
-function ImageEffect:save(path) end
-
----@class PostFxEffect
-local PostFxEffect = {}
-
---- Returns the string name of this effect's type.
----@return string
-function PostFxEffect:getEffectType() end
-
---- Returns a sorted list of all parameter names currently set on this effect.
----@return string
-function PostFxEffect:getParameterNames() end
-
---- Returns the string name of this effect's type.
----@return string
-function PostFxEffect:getType() end
-
---- Returns `true` if the named parameter exists on this effect.
----@param name string â€” `string` â€” Parameter key to test.
----@return number
-function PostFxEffect:hasParameter(name) end
-
---- Returns `true` if this is a built-in effect (not a custom shader pass).
----@return boolean
-function PostFxEffect:isBuiltIn() end
-
---- Returns `true` if this effect is currently enabled.
----@return boolean
-function PostFxEffect:isEnabled() end
-
---- Sets the colour grading brightness multiplier.
----@param value number â€” `number` â€” Brightness multiplier (default 1.0).
-function PostFxEffect:setBrightness(value) end
-
---- Sets the colour grading contrast.
----@param value number â€” `number` â€” Contrast multiplier (default 1.0).
-function PostFxEffect:setContrast(value) end
-
---- Enables or disables this effect within its parent stack.
----@param enabled boolean â€” `boolean` â€” `true` to activate, `false` to skip.
-function PostFxEffect:setEnabled(enabled) end
-
---- Sets the intensity for bloom or godrays effects.
----@param value number â€” `number` â€” Intensity multiplier (typically 0.0â€“2.0).
-function PostFxEffect:setIntensity(value) end
-
---- Sets the chromatic aberration pixel offset.
----@param value number â€” `number` â€” Pixel offset for channel separation.
-function PostFxEffect:setOffset(value) end
-
---- Sets a named float parameter on the effect.
----@param name string â€” `string` â€” Parameter key.
----@param value number â€” `number` â€” New float value.
-function PostFxEffect:setParameter(name, value) end
-
---- Sets the Gaussian blur radius.
----@param value number â€” `number` â€” Blur radius in pixels.
-function PostFxEffect:setRadius(value) end
-
---- Sets the colour grading saturation.
----@param value number â€” `number` â€” Saturation multiplier (0.0â€“2.0, default 1.0).
-function PostFxEffect:setSaturation(value) end
-
---- Sets the CRT scanline strength.
----@param value number â€” `number` â€” Scanline opacity (0.0â€“1.0).
-function PostFxEffect:setScanlineStrength(value) end
-
---- Sets the vignette or blur strength.
----@param value number â€” `number` â€” Strength factor (0.0â€“1.0).
-function PostFxEffect:setStrength(value) end
-
---- Sets the bloom bright-pass threshold.
----@param value number â€” `number` â€” Threshold luminance (0.0â€“1.0).
-function PostFxEffect:setThreshold(value) end
-
----@class PostFxStack
-local PostFxStack = {}
-
---- Appends a `PostFxEffect` to the end of the stack.
----@param effect number â€” `PostFxEffect` userdata â€” The effect to append.
-function PostFxStack:add(effect) end
-
---- Applies all enabled effects in the stack.
-function PostFxStack:apply() end
-
---- Starts a post-processing capture pass.
-function PostFxStack:beginCapture() end
-
---- Ends a post-processing capture pass.
-function PostFxStack:endCapture() end
-
---- Returns both canvas dimensions as `(width, height)`.
----@return number
-function PostFxStack:getDimensions() end
-
---- Returns the effect at a 1-based position in the chain, or `nil`.
----@param index number â€” `integer` â€” 1-based position in the chain.
----@return number
-function PostFxStack:getEffect(index) end
-
---- Returns the number of effects currently in the chain (enabled and disabled).
----@return number
-function PostFxStack:getEffectCount() end
-
---- Returns a Lua table of all currently enabled effects in application order.
----@return number
-function PostFxStack:getEnabledEffects() end
-
---- Returns the canvas height in pixels.
----@return number
-function PostFxStack:getHeight() end
-
---- Returns the canvas width in pixels.
----@return number
-function PostFxStack:getWidth() end
-
---- Returns `true` while the stack is between `beginCapture` and `endCapture`.
----@return boolean
-function PostFxStack:isCapturing() end
-
---- Returns `true` if the given effect is enabled within this stack.
----@param effect number â€” `PostFxEffect` userdata â€” The effect to query.
----@return boolean
-function PostFxStack:isEffectEnabled(effect) end
-
---- Removes a `PostFxEffect` from the stack chain.
----@param effect number â€” `PostFxEffect` userdata â€” The effect to remove.
----@return boolean
-function PostFxStack:remove(effect) end
-
---- Resizes the internal canvas dimensions.
----@param w number â€” `integer` â€” New canvas width in pixels.
----@param h number â€” `integer` â€” New canvas height in pixels.
-function PostFxStack:resize(w, h) end
-
---- Returns a Lua table listing all valid built-in effect type names.
----@return table<string>
-function luna.postfx.getEffectTypes() end
-
---- Loads a per-image effect chain from a TOML preset file saved by `ImageEffect:save`.
----@param path any
----@return ImageEffect
-function luna.postfx.loadImageEffect(path) end
-
---- Creates a built-in post-processing effect by name.
----@param name any
----@return PostFxEffect
-function luna.postfx.newEffect(name) end
-
---- Creates a per-image effect chain.
----@param args any
----@return ImageEffect
-function luna.postfx.newImageEffect(args) end
-
---- Creates a custom shader pass effect.
----@param shader_id any
----@return PostFxEffect
-function luna.postfx.newPass(shader_id) end
-
----@param w? any (optional)
----@param h? any (optional)
-function luna.postfx.newStack(w, h) end
 
 ---@class luna.procgen
 luna.procgen = {}
@@ -9459,10 +8228,17 @@ luna.procgen = {}
 function luna.procgen.cellularAutomata(w, h, opts) end
 
 --- BFS flood fill on a flat grid of bytes.
+---@param data table
+---@param w integer
+---@param h integer
+---@param sx integer
+---@param sy integer
+---@param threshold? integer? (optional)
+---@param above? boolean? (optional)
 ---@return table
-function luna.procgen.floodFill() end
+function luna.procgen.floodFill(data, w, h, sx, sy, threshold, above) end
 
---- Evaluates a single periodic Perlin noise value at `(x, y)`.
+--- Evaluates periodic Perlin noise at a point.
 ---@param x any
 ---@param y any
 ---@param px any
@@ -9490,1136 +8266,386 @@ function luna.procgen.voronoi(w, h, pts_tbl, opts_tbl) end
 ---@class luna.raycaster
 luna.raycaster = {}
 
---- Lua UserData wrapper for a [`Raycaster2D`] grid.
+--- Lua-side wrapper around a [`Raycaster2D`] grid.
 ---@class Raycaster
 local Raycaster = {}
 
---- Returns the cell value at `(x, y)`.
+--- Returns the cell value at (x, y).
 ---@param x any
 ---@param y any
----@return number
+---@return integer
 function Raycaster:getCell(x, y) end
 
 --- Returns the grid height in cells.
----@return number
+---@return integer
 function Raycaster:height() end
 
---- Returns `true` when the cell at `(x, y)` is a wall (value > 0).
+--- Returns true when the cell at (x, y) is a wall (value > 0).
 ---@param x any
 ---@param y any
 ---@return boolean
 function Raycaster:isBlocked(x, y) end
 
---- Sets the cell value at grid position `(x, y)`.
+--- Sets the cell value at grid position (x, y).
 ---@param x any
 ---@param y any
 ---@param val any
+---@return nil
 function Raycaster:setCell(x, y, val) end
 
---- Replaces all grid cells from a flat Lua table of numbers.
+--- Replaces all grid cells from a flat array of values in row-major order.
 ---@param cells_tbl any
+---@return nil
 function Raycaster:setCells(cells_tbl) end
 
 --- Returns the grid width in cells.
----@return number
+---@return integer
 function Raycaster:width() end
 
---- Creates a new [`Raycaster2D`] grid of the given dimensions.
+--- Returns distance-based brightness in [0, 1].
+---@param distance any
+---@param max_distance any
+---@return number
+function luna.raycaster.distanceShade(distance, max_distance) end
+
+--- Creates a new raycaster grid of the given dimensions.
 ---@param w any
 ---@param h any
 ---@return Raycaster
 function luna.raycaster.new(w, h) end
 
+--- Projects a wall distance to screen-space drawing parameters.
+---@param distance any
+---@param fov any
+---@param screen_height any
+---@return number
+function luna.raycaster.projectColumn(distance, fov, screen_height) end
+
 ---@class luna.savegame
 luna.savegame = {}
 
----@class mlua
-local mlua = {}
+--- Lua-side wrapper around [`SaveManager`] with per-module callback storage.
+---@class SaveManager
+local SaveManager = {}
 
-function mlua:collect() end
+--- Collects data from all registered collectors into a table with metadata.
+---@return table
+function SaveManager:collect() end
 
+--- Deletes a save file for the given slot.
 ---@param slot any
-function mlua:delete(slot) end
+---@return nil
+function SaveManager:delete(slot) end
 
-function mlua:disableAutoSave() end
+--- Disables auto-save.
+---@return nil
+function SaveManager:disableAutoSave() end
 
+--- Returns whether a save file exists for the given slot.
 ---@param slot any
-function mlua:exists(slot) end
+---@return boolean
+function SaveManager:exists(slot) end
 
-function mlua:getSchemaVersion() end
+--- Returns the current schema version.
+---@return integer
+function SaveManager:getSchemaVersion() end
 
+--- Returns metadata for a single slot, or nil if not found.
 ---@param slot any
-function mlua:getSlotInfo(slot) end
+---@return table?
+function SaveManager:getSlotInfo(slot) end
 
-function mlua:getSlots() end
+--- Returns a list of all save slots with metadata.
+---@return table
+function SaveManager:getSlots() end
 
-function mlua:getSummary() end
+--- Returns the current summary string.
+---@return string
+function SaveManager:getSummary() end
 
-function mlua:isDirty() end
+--- Returns whether data has been modified since the last save or load.
+---@return boolean
+function SaveManager:isDirty() end
 
+--- Loads data from a slot file, applies migrations, and restores.
 ---@param slot any
-function mlua:load(slot) end
+---@return boolean
+function SaveManager:load(slot) end
 
-function mlua:markDirty() end
+--- Marks data as modified since the last save or load.
+---@return nil
+function SaveManager:markDirty() end
 
-function mlua:reset() end
+--- Resets all state, removing callbacks and clearing the manager.
+---@return nil
+function SaveManager:reset() end
 
-function mlua:restore() end
+--- Restores data from a table, applying migrations and calling restorers.
+---@param data any
+---@return nil
+function SaveManager:restore(data) end
 
+--- Collects data and writes it to a slot file.
 ---@param slot any
-function mlua:save(slot) end
+---@return nil
+function SaveManager:save(slot) end
 
+--- Sets the current schema version for new saves.
 ---@param version any
-function mlua:setSchemaVersion(version) end
+---@return nil
+function SaveManager:setSchemaVersion(version) end
 
+--- Sets the summary string included in save metadata.
 ---@param summary any
-function mlua:setSummary(summary) end
+---@return nil
+function SaveManager:setSummary(summary) end
 
+--- Removes a named module and its callbacks.
 ---@param name any
-function mlua:unregister(name) end
+---@return nil
+function SaveManager:unregister(name) end
 
+--- Advances the auto-save timer, returning the slot name if a save should trigger.
 ---@param dt any
-function mlua:update(dt) end
+---@return string?
+function SaveManager:update(dt) end
 
+--- Creates a new SaveManager for slot-based save/load operations.
+---@return SaveManager
 function luna.savegame.newSaveManager() end
 
 ---@class luna.scene
 luna.scene = {}
 
+--- Lua-side wrapper around a [`DepthSorter`] with registry-stored callbacks.
 ---@class DepthSorter
 local DepthSorter = {}
 
---- Registers a draw callback at the given depth layer. Higher `depth` values draw in front.
----@param callback number `function`: Draw callback `function()` called when flushing this layer.
----@param depth number `number`: Depth value determining draw order (lower = drawn first).
+--- Registers a draw callback at the given depth layer.
+---@param callback any
+---@param depth any
+---@return nil
 function DepthSorter:add(callback, depth) end
 
---- Registers a table object with a `draw` method at the given depth.
----@param obj number `table`: Object with a `draw()` method. Uses `obj.depth` if no explicit depth is provided.
+--- Registers a table object with a draw method at the given depth.
+---@param obj any
+---@return nil
 function DepthSorter:addObject(obj) end
 
---- Removes all registered callbacks and objects without calling them.
+--- Removes all registered callbacks without calling them.
+---@return nil
 function DepthSorter:clear() end
 
---- Calls all registered draw callbacks and object `draw()` methods in sorted depth order, then clears the list.
+--- Calls all draw callbacks in sorted depth order, then clears.
+---@return nil
 function DepthSorter:flush() end
 
---- Returns the number of callbacks and objects currently registered.
----@return number
+--- Returns the number of registered draw entries.
+---@return integer
 function DepthSorter:getCount() end
 
---- Sorts all registered callbacks and objects by their depth values (ascending).
+--- Sorts all registered callbacks by depth ascending.
+---@return nil
 function DepthSorter:sort() end
 
---- Clears the state.
+--- Clears all scenes from the stack, calling leave on each.
+---@return nil
 function luna.scene.clear() end
 
---- Draw.
+--- Draws all scenes in the stack from bottom to top.
+---@return nil
 function luna.scene.draw() end
 
---- Returns the current.
----@return any
+--- Returns the current top scene table, or nil if the stack is empty.
+---@return table?
 function luna.scene.getCurrent() end
 
---- Returns the data.
+--- Returns a value from the inter-scene data store, or nil if not found.
 ---@param key any
----@return any
+---@return table?
 function luna.scene.getData(key) end
 
---- Returns the registered.
+--- Returns a registered scene table by name, or nil if not found.
 ---@param name any
----@return any
+---@return table?
 function luna.scene.getRegistered(name) end
 
---- Returns the registered names.
----@return any
+--- Returns a list of all registered scene names.
+---@return table
 function luna.scene.getRegisteredNames() end
 
---- Returns the stack size.
----@return any
+--- Returns the number of scenes on the stack.
+---@return integer
 function luna.scene.getStackSize() end
 
---- Returns the transition progress.
----@return any
+--- Returns the transition progress from 0.0 to 1.0.
+---@return number
 function luna.scene.getTransitionProgress() end
 
---- Returns true if data.
+--- Returns true if the given key exists in the data store.
 ---@param key any
----@return any
+---@return boolean
 function luna.scene.hasData(key) end
 
---- Returns true if registered.
+--- Returns true if a scene is registered under the given name.
 ---@param name any
----@return any
+---@return boolean
 function luna.scene.hasRegistered(name) end
 
---- Returns true if empty.
+--- Returns true if the scene stack is empty.
 ---@return boolean
 function luna.scene.isEmpty() end
 
---- Returns true if transitioning.
----@return any
+--- Returns true if a scene transition is currently active.
+---@return boolean
 function luna.scene.isTransitioning() end
 
---- New depth sorter.
----@return any
+--- Creates a new DepthSorter for z-ordered draw batching.
+---@return DepthSorter
 function luna.scene.newDepthSorter() end
 
---- Removes an item.
+--- Pops the top scene from the stack with an optional transition.
 ---@param transition? any (optional)
 ---@param duration? any (optional)
+---@return nil
 function luna.scene.pop(transition, duration) end
 
---- Removes to.
+--- Pops scenes until the named scene is on top, calling leave on each removed.
 ---@param name any
 ---@return boolean
 function luna.scene.popTo(name) end
 
---- Pushes a scene onto the stack.
+--- Pushes a scene table onto the stack with an optional transition.
 ---@param scene table
 ---@param transition? string? (optional)
 ---@param duration? number? (optional)
----@param params? any? (optional)
+---@param params? table? (optional)
+---@return nil
 function luna.scene.push(scene, transition, duration, params) end
 
---- Register scene.
+--- Registers a scene table by name for later retrieval.
 ---@param name any
 ---@param scene any
+---@return nil
 function luna.scene.registerScene(name, scene) end
 
---- Removes data.
+--- Removes a value from the inter-scene data store by key.
 ---@param key any
+---@return nil
 function luna.scene.removeData(key) end
 
---- Sets the data.
+--- Stores a value in the inter-scene data store under the given key.
 ---@param key any
 ---@param value any
+---@return nil
 function luna.scene.setData(key, value) end
 
---- Replaces the top scene with a new one.
+--- Replaces the top scene with a new one, calling leave and enter callbacks.
 ---@param scene table
 ---@param transition? string? (optional)
 ---@param duration? number? (optional)
----@param params? any? (optional)
+---@param params? table? (optional)
+---@return nil
 function luna.scene.switchTo(scene, transition, duration, params) end
 
---- Unregister scene.
+--- Removes a scene from the registry by name.
 ---@param name any
+---@return nil
 function luna.scene.unregisterScene(name) end
 
---- Update.
+--- Updates the top scene and any active transition.
 ---@param dt any
+---@return nil
 function luna.scene.update(dt) end
 
 ---@class luna.serial
 luna.serial = {}
 
---- Parses a CSV string and returns a Lua table (sequence of row tables).
+--- Parses a CSV string and returns a sequence of row tables.
 ---@param s any
 ---@param delim? any (optional)
 ---@param headers? any (optional)
+---@return table
 function luna.serial.fromCsv(s, delim, headers) end
 
 --- Parses a JSON string and returns a Lua table.
 ---@param s any
+---@return table
 function luna.serial.fromJson(s) end
 
 --- Parses a TOML string and returns a Lua table.
 ---@param s any
+---@return table
 function luna.serial.fromToml(s) end
 
---- Serializes a Lua table (sequence of row tables) to a CSV string.
----@param table any
+--- Serializes a sequence of row tables to a CSV string.
+---@param value any
 ---@param delim? any (optional)
 ---@param headers? any (optional)
-function luna.serial.toCsv(table, delim, headers) end
+---@return string
+function luna.serial.toCsv(value, delim, headers) end
 
---- Serializes a Lua table to a JSON string.
----@param table any
+--- Serializes a Lua value to a JSON string.
+---@param value any
 ---@param pretty? any (optional)
-function luna.serial.toJson(table, pretty) end
+---@return string
+function luna.serial.toJson(value, pretty) end
 
 --- Serializes a Lua table to a TOML string.
----@param table any
-function luna.serial.toToml(table) end
+---@param value any
+---@return string
+function luna.serial.toToml(value) end
 
 ---@class luna.spine
 luna.spine = {}
 
---- Lua UserData wrapper for a [`Skeleton`].
+--- Lua-side wrapper around a [`Skeleton`].
 ---@class Skeleton
 local Skeleton = {}
 
---- Adds a root bone (no parent) and returns its index.
+--- Adds a root bone with optional local transform and returns its index.
 ---@param name any
 ---@param opts? any (optional)
----@return number
+---@return integer
 function Skeleton:addBone(name, opts) end
 
 --- Returns the total number of bones.
----@return number
+---@return integer
 function Skeleton:boneCount() end
 
---- Returns the index of the named bone, or `nil` if not found.
+--- Returns the index of the named bone, or nil if not found.
 ---@param name any
----@return number|nil
+---@return integer?
 function Skeleton:findBone(name) end
 
---- Returns the index of the named slot, or `nil` if not found.
+--- Returns the index of the named slot, or nil if not found.
 ---@param name any
----@return number|nil
+---@return integer?
 function Skeleton:findSlot(name) end
 
---- Returns world-space transform of bone at `idx` as a table.
+--- Returns the world-space transform of a bone as a table, or nil if out of range.
 ---@param idx any
----@return table|nil
+---@return table?
 function Skeleton:getBoneWorld(idx) end
 
---- Sets the local position of the root offset (bone 0 world position seed).
+--- Sets the root bone position and propagates world transforms.
 ---@param x any
 ---@param y any
+---@return nil
 function Skeleton:setPosition(x, y) end
 
 --- Returns the total number of slots.
----@return number
+---@return integer
 function Skeleton:slotCount() end
 
---- Propagates all local transforms down the bone hierarchy to compute
+--- Propagates local transforms down the bone hierarchy to compute world positions.
+---@return nil
 function Skeleton:updateWorldTransforms() end
 
---- Creates a new, empty [`Skeleton`] with the given name.
+--- Creates a new empty skeleton with the given name.
 ---@param name any
 ---@return Skeleton
 function luna.spine.newSkeleton(name) end
-
----@class luna.sprite
-luna.sprite = {}
-
----@class Animation
-local Animation = {}
-
---- Adds frame to the collection.
----@param x number `number`.
----@param y number `number`.
----@param w number `number`.
----@param h number `number`.
----@return any
-function Animation:addFrame(x, y, w, h) end
-
---- Returns the clip count.
----@param index number `integer`.
----@return any
-function Animation:getClipCount(index) end
-
---- Returns the current clip.
----@return any
-function Animation:getCurrentClip() end
-
---- Returns the current frame.
----@return any
-function Animation:getCurrentFrame() end
-
---- Returns the current quad.
----@return Quad
-function Animation:getCurrentQuad() end
-
---- Returns the frame count.
----@param index number `integer`.
----@return any
-function Animation:getFrameCount(index) end
-
---- Returns the speed.
----@return any
-function Animation:getSpeed() end
-
---- Returns `true` if looping.
----@param f number `number`.
----@return boolean
-function Animation:isLooping(f) end
-
---- Returns `true` if playing.
----@param f number `number`.
----@return boolean
-function Animation:isPlaying(f) end
-
---- Pauses playback.
----@return any
-function Animation:pause() end
-
---- Starts playback.
----@param name string `string`.
----@return any
-function Animation:play(name) end
-
---- Resumes paused playback.
----@param dt number `number`.
-function Animation:resume(dt) end
-
---- Sets the frame.
----@param index number `integer`.
-function Animation:setFrame(index) end
-
---- Sets the speed.
----@param f number `number`.
-function Animation:setSpeed(f) end
-
---- Stops playback.
----@return any
-function Animation:stop() end
-
---- Advances the simulation by `dt` seconds.
----@param dt number `number`.
-function Animation:update(dt) end
-
----@class Camera2D
-local Camera2D = {}
-
---- Returns the bounds.
----@return any
-function Camera2D:getBounds() end
-
---- Returns the dead zone.
----@return any
-function Camera2D:getDeadZone() end
-
---- Returns the follow smooth.
----@param intensity number `number`.
----@param duration number `number`.
----@return any
-function Camera2D:getFollowSmooth(intensity, duration) end
-
---- Returns the look ahead.
----@param dt number `number`.
----@return any
-function Camera2D:getLookAhead(dt) end
-
---- Returns the position.
----@param z number `number`.
----@return any
-function Camera2D:getPosition(z) end
-
---- Returns the rotation.
----@param x number `number`.
----@param y number `number`.
----@param w number `number`.
----@param h number `number`.
----@return any
-function Camera2D:getRotation(x, y, w, h) end
-
---- Returns the target.
----@return any
-function Camera2D:getTarget() end
-
---- Returns the viewport.
----@param x number `number`.
----@param y number `number`.
----@param w number `number`.
----@param h number `number`.
----@return any
-function Camera2D:getViewport(x, y, w, h) end
-
---- Returns the visible area.
----@param w number `number`.
----@param h number `number`.
----@return any
-function Camera2D:getVisibleArea(w, h) end
-
---- Returns the zoom.
----@param r number `number`.
----@return any
-function Camera2D:getZoom(r) end
-
---- Returns `true` if bounds.
----@param dx number `number`.
----@param dy number `number`.
----@return boolean
-function Camera2D:hasBounds(dx, dy) end
-
---- Look at on this Camera2D.
----@param x number `number`.
----@param y number `number`.
-function Camera2D:lookAt(x, y) end
-
---- Move on this Camera2D.
----@param dx number `number`.
----@param dy number `number`.
-function Camera2D:move(dx, dy) end
-
---- Removes bounds from the collection.
----@param dx number `number`.
----@param dy number `number`.
-function Camera2D:removeBounds(dx, dy) end
-
---- Sets the dead zone.
----@param w number `number`.
----@param h number `number`.
-function Camera2D:setDeadZone(w, h) end
-
---- Sets the follow smooth.
----@param intensity number `number`.
----@param duration number `number`.
-function Camera2D:setFollowSmooth(intensity, duration) end
-
---- Sets the look ahead.
----@param mul number `number`.
-function Camera2D:setLookAhead(mul) end
-
---- Sets the position.
----@param x number `number`.
----@param y number `number`.
-function Camera2D:setPosition(x, y) end
-
---- Sets the rotation.
----@param r number `number`.
-function Camera2D:setRotation(r) end
-
---- Sets the target.
----@param x number `number`.
----@param y number `number`.
-function Camera2D:setTarget(x, y) end
-
---- Sets the zoom.
----@param z number `number`.
-function Camera2D:setZoom(z) end
-
---- Shake on this Camera2D.
----@param intensity number `number`.
----@param duration number `number`.
-function Camera2D:shake(intensity, duration) end
-
---- To screen coords on this Camera2D.
----@param wx number `number`.
----@param wy number `number`.
----@return any
-function Camera2D:toScreenCoords(wx, wy) end
-
---- To world coords on this Camera2D.
----@param sx number `number`.
----@param sy number `number`.
----@return any
-function Camera2D:toWorldCoords(sx, sy) end
-
---- Advances the simulation by `dt` seconds.
----@param dt number `number`.
-function Camera2D:update(dt) end
-
----@class ColumnBatch
-local ColumnBatch = {}
-
---- Returns the column count.
----@return any
-function ColumnBatch:getColumnCount() end
-
---- Returns the depth at.
----@param col number `integer`.
----@return any
-function ColumnBatch:getDepthAt(col) end
-
---- Returns the depth buffer.
----@return table
-function ColumnBatch:getDepthBuffer() end
-
---- Returns the screen height.
----@return number
-function ColumnBatch:getScreenHeight() end
-
---- Returns the screen width.
----@return number
-function ColumnBatch:getScreenWidth() end
-
---- Lua UserData wrapper for DecalSurface (internal — no factory).
----@class DecalSurface
-local DecalSurface = {}
-
---- Returns the dimensions.
----@return any
-function DecalSurface:getDimensions() end
-
---- Returns the height.
----@return number
-function DecalSurface:getHeight() end
-
---- Returns the width.
----@return number
-function DecalSurface:getWidth() end
-
----@class DrawLayer
-local DrawLayer = {}
-
---- Removes all entries.
----@return any
-function DrawLayer:clear() end
-
---- Flushes pending data.
----@return any
-function DrawLayer:flush() end
-
---- Returns the count.
----@return integer
-function DrawLayer:getCount() end
-
---- Queue on this DrawLayer.
----@param z number `number`.
----@param func function `function`.
-function DrawLayer:queue(z, func) end
-
----@class GraphRenderer
-local GraphRenderer = {}
-
---- Auto range on this GraphRenderer.
----@param name string `string`.
----@param pts table `table`.
----@param color? table `table` optional.
-function GraphRenderer:autoRange(name, pts, color) end
-
---- Clear series on this GraphRenderer.
----@param b boolean `boolean`.
-function GraphRenderer:clearSeries(b) end
-
---- Returns the cursor value.
----@return any
-function GraphRenderer:getCursorValue() end
-
---- Returns the range.
----@return any
-function GraphRenderer:getRange() end
-
---- Returns the viewport.
----@param xmin number `number`.
----@param xmax number `number`.
----@param ymin number `number`.
----@param ymax number `number`.
----@return any
-function GraphRenderer:getViewport(xmin, xmax, ymin, ymax) end
-
---- Removes series from the collection.
----@param name string `string`.
-function GraphRenderer:removeSeries(name) end
-
---- Sets the cursor position.
----@param x number `number`.
----@param y number `number`.
-function GraphRenderer:setCursorPosition(x, y) end
-
---- Sets the show axes.
----@param b boolean `boolean`.
-function GraphRenderer:setShowAxes(b) end
-
---- Sets the show grid.
----@param b boolean `boolean`.
-function GraphRenderer:setShowGrid(b) end
-
---- Sets the show labels.
----@param r number `number`.
----@param g number `number`.
----@param b number `number`.
----@param a? number `number` optional.
-function GraphRenderer:setShowLabels(r, g, b, a) end
-
---- Sets the title.
----@param x_label string `string`.
----@param y_label string `string`.
-function GraphRenderer:setTitle(x_label, y_label) end
-
----@class LargeMapRenderer
-local LargeMapRenderer = {}
-
---- Returns the chunk size.
----@param x number `number`.
----@param y number `number`.
----@param zoom number `number`.
----@return any
-function LargeMapRenderer:getChunkSize(x, y, zoom) end
-
---- Returns the map size.
----@param s number `integer`.
----@return any
-function LargeMapRenderer:getMapSize(s) end
-
---- Returns the tile.
----@param x number `integer`.
----@param y number `integer`.
----@return any
-function LargeMapRenderer:getTile(x, y) end
-
---- Returns the tileset columns.
----@return any
-function LargeMapRenderer:getTilesetColumns() end
-
---- Returns the total chunks.
----@param cols number `integer`.
----@return any
-function LargeMapRenderer:getTotalChunks(cols) end
-
---- Returns the visible chunks.
----@param cols number `integer`.
----@return any
-function LargeMapRenderer:getVisibleChunks(cols) end
-
---- Invalidate all on this LargeMapRenderer.
----@return any
-function LargeMapRenderer:invalidateAll() end
-
---- Invalidate chunk on this LargeMapRenderer.
----@param cx number `integer`.
----@param cy number `integer`.
-function LargeMapRenderer:invalidateChunk(cx, cy) end
-
---- Returns `true` if l o d enabled.
----@param levels table `table`.
----@return boolean
-function LargeMapRenderer:isLODEnabled(levels) end
-
---- Sets the camera.
----@param x number `number`.
----@param y number `number`.
----@param zoom number `number`.
-function LargeMapRenderer:setCamera(x, y, zoom) end
-
---- Sets the chunk size.
----@param x number `number`.
----@param y number `number`.
----@param zoom number `number`.
-function LargeMapRenderer:setChunkSize(x, y, zoom) end
-
---- Sets the l o d enabled.
----@param b boolean `boolean`.
-function LargeMapRenderer:setLODEnabled(b) end
-
---- Sets the l o d thresholds.
----@param cx number `integer`.
----@param cy number `integer`.
-function LargeMapRenderer:setLODThresholds(cx, cy) end
-
---- Sets the tile.
----@param x number `integer`.
----@param y number `integer`.
----@param tile_id number `integer`.
-function LargeMapRenderer:setTile(x, y, tile_id) end
-
---- Sets the tileset columns.
----@param cols number `integer`.
-function LargeMapRenderer:setTilesetColumns(cols) end
-
---- Sets the viewport.
----@param w number `number`.
----@param h number `number`.
-function LargeMapRenderer:setViewport(w, h) end
-
----@class Light2D
-local Light2D = {}
-
---- Returns the current light color.
----@return number
-function Light2D:getColor() end
-
---- Returns the intensity.
----@param b boolean `boolean`.
----@return number
-function Light2D:getIntensity(b) end
-
---- Returns the light position in world space.
----@return number
----@return number
-function Light2D:getPosition() end
-
---- Returns the current light radius in world units.
----@return number
-function Light2D:getRadius() end
-
---- Returns `true` if this light is currently enabled.
----@return boolean
-function Light2D:isEnabled() end
-
---- Enables or disables this light. Disabled lights contribute no illumination.
----@param enabled boolean `boolean`: `true` to enable.
-function Light2D:setEnabled(enabled) end
-
---- Sets the intensity.
----@param i number `number`.
-function Light2D:setIntensity(i) end
-
---- Sets the light source position in world space.
----@param x number `number`: World X coordinate.
----@param y number `number`: World Y coordinate.
-function Light2D:setPosition(x, y) end
-
---- Sets the falloff radius of this light. Pixels beyond the radius receive no illumination.
----@param radius number `number`: Radius in world units.
-function Light2D:setRadius(radius) end
-
---- Lua UserData wrapper for PaletteLUT (internal — no factory).
----@class PaletteLUT
-local PaletteLUT = {}
-
---- Removes all entries.
----@return any
-function PaletteLUT:clear() end
-
---- Returns the color count.
----@return any
-function PaletteLUT:getColorCount() end
-
---- Returns the from color.
----@param index number `integer`.
----@return any
-function PaletteLUT:getFromColor(index) end
-
---- Returns the to color.
----@param index number `integer`.
----@return any
-function PaletteLUT:getToColor(index) end
-
----@class PolygonMap
-local PolygonMap = {}
-
---- Removes all entries.
----@return any
-function PolygonMap:clear() end
-
---- Clear highlight on this PolygonMap.
----@return any
-function PolygonMap:clearHighlight() end
-
---- Returns the bounding box.
----@return number
-function PolygonMap:getBoundingBox() end
-
---- Returns the region at.
----@param x number `number`.
----@param y number `number`.
----@return any
-function PolygonMap:getRegionAt(x, y) end
-
---- Returns the region center.
----@param name string `string`.
----@return any
-function PolygonMap:getRegionCenter(name) end
-
---- Returns the region color.
----@param name string `string`.
----@return any
-function PolygonMap:getRegionColor(name) end
-
---- Returns the region names.
----@return table
-function PolygonMap:getRegionNames() end
-
---- Returns the region vertices.
----@param name string `string`.
----@return any
-function PolygonMap:getRegionVertices(name) end
-
---- Highlight on this PolygonMap.
----@param name string `string`.
-function PolygonMap:highlight(name) end
-
---- Removes region from the collection.
----@param name string `string`.
----@param r number `number`.
----@param g number `number`.
----@param b number `number`.
----@param a? number `number` optional.
-function PolygonMap:removeRegion(name, r, g, b, a) end
-
---- Sets the outline width.
----@param r number `number`.
----@param g number `number`.
----@param b number `number`.
----@param a? number `number` optional.
-function PolygonMap:setOutlineWidth(r, g, b, a) end
-
----@class SpriteSheet
-local SpriteSheet = {}
-
---- Returns the column.
----@param start number `integer`.
----@param count number `integer`.
----@return any
-function SpriteSheet:getColumn(start, count) end
-
---- Returns the direction frames.
----@param direction number `integer`.
----@return any
-function SpriteSheet:getDirectionFrames(direction) end
-
---- Returns the frame.
----@param index number `integer`.
----@return any
-function SpriteSheet:getFrame(index) end
-
---- Returns the total number of frames in this sprite sheet.
----@return number
-function SpriteSheet:getFrameCount() end
-
---- Returns the frame size.
----@param row number `integer`.
----@return any
-function SpriteSheet:getFrameSize(row) end
-
---- Returns the grid size.
----@param row number `integer`.
----@return number
-function SpriteSheet:getGridSize(row) end
-
---- Returns the group.
----@param name string `string`.
----@return any
-function SpriteSheet:getGroup(name) end
-
---- Returns the group names.
----@return table
-function SpriteSheet:getGroupNames() end
-
---- Returns the range.
----@param start number `integer`.
----@param count number `integer`.
----@return any
-function SpriteSheet:getRange(start, count) end
-
---- Returns the row.
----@param row number `integer`.
----@return any
-function SpriteSheet:getRow(row) end
-
----@class TextureAtlas
-local TextureAtlas = {}
-
---- Removes all entries.
----@return any
-function TextureAtlas:clear() end
-
---- Returns the dimensions.
----@return any
-function TextureAtlas:getDimensions() end
-
---- Returns the pixel bounds of the named region.
----@param name string `string`: Region name.
----@return number
-function TextureAtlas:getRegion(name) end
-
---- Returns the region count.
----@return any
-function TextureAtlas:getRegionCount() end
-
---- Returns the regions.
----@return table
-function TextureAtlas:getRegions() end
-
---- Pack on this TextureAtlas.
----@param name string `string`.
----@param w number `integer`.
----@param h number `integer`.
----@return any
-function TextureAtlas:pack(name, w, h) end
-
---- Lua UserData wrapper for Trail (internal — no factory).
----@class Trail
-local Trail = {}
-
---- Removes all entries.
----@return any
-function Trail:clear() end
-
---- Returns the lifetime.
----@param d number `number`.
----@return any
-function Trail:getLifetime(d) end
-
---- Returns the point count.
----@return number
-function Trail:getPointCount() end
-
---- Returns the width.
----@param r number `number`.
----@param g number `number`.
----@param b number `number`.
----@param a? number `number` optional.
----@return number
-function Trail:getWidth(r, g, b, a) end
-
---- Adds point to the collection.
----@param x number `number`.
----@param y number `number`.
-function Trail:pushPoint(x, y) end
-
---- Sets the lifetime.
----@param lt number `number`.
-function Trail:setLifetime(lt) end
-
---- Sets the min distance.
----@param d number `number`.
-function Trail:setMinDistance(d) end
-
---- Sets the width.
----@param start number `number`.
----@param end? number `number` optional.
-function Trail:setWidth(start, end) end
-
---- Advances the simulation by `dt` seconds.
----@param start number `number`.
----@param end? number `number` optional.
-function Trail:update(start, end) end
-
----@class Viewport
-local Viewport = {}
-
---- Returns the game dimensions.
----@param mode string `string`.
----@return any
-function Viewport:getGameDimensions(mode) end
-
---- Returns the current viewport scroll offset.
----@return number
----@return number
-function Viewport:getOffset() end
-
---- Returns the current content scale factor.
----@return number
-function Viewport:getScale() end
-
---- Returns the scale mode.
----@param mode string `string`.
----@return string
-function Viewport:getScaleMode(mode) end
-
---- Resize on this Viewport.
----@param w number `number`.
----@param h number `number`.
-function Viewport:resize(w, h) end
-
---- Sets the scale mode.
----@param sx number `number`.
----@param sy number `number`.
-function Viewport:setScaleMode(sx, sy) end
-
---- To game on this Viewport.
----@param sx number `number`.
----@param sy number `number`.
----@return any
-function Viewport:toGame(sx, sy) end
-
---- Converts world-space coordinates to screen-space pixel coordinates.
----@param wx number `number`: World X.
----@param wy number `number`: World Y.
----@return number
----@return number
-function Viewport:toScreen(wx, wy) end
-
----@class ViewportScale
-local ViewportScale = {}
-
---- Returns the game dimensions.
----@return any
-function ViewportScale:getGameDimensions() end
-
---- Returns the mode.
----@param sx number `number`.
----@param sy number `number`.
----@return string
-function ViewportScale:getMode(sx, sy) end
-
---- Returns the offset.
----@return any
-function ViewportScale:getOffset() end
-
---- Returns the scale.
----@param sx number `number`.
----@param sy number `number`.
----@return number
-function ViewportScale:getScale(sx, sy) end
-
---- Returns the scaled dimensions.
----@return number
-function ViewportScale:getScaledDimensions() end
-
---- Resize on this ViewportScale.
----@param w number `number`.
----@param h number `number`.
-function ViewportScale:resize(w, h) end
-
---- To game coords on this ViewportScale.
----@param sx number `number`.
----@param sy number `number`.
----@return any
-function ViewportScale:toGameCoords(sx, sy) end
-
---- To screen coords on this ViewportScale.
----@param gx number `number`.
----@param gy number `number`.
----@return any
-function ViewportScale:toScreenCoords(gx, gy) end
-
---- New animation.
----@return any
-function luna.sprite.newAnimation() end
-
---- New camera2d.
----@param w? any (optional)
----@param h? any (optional)
----@return any
-function luna.sprite.newCamera2D(w, h) end
-
---- New column batch.
----@param col_count any
----@param screen_w any
----@param screen_h any
----@return any
-function luna.sprite.newColumnBatch(col_count, screen_w, screen_h) end
-
---- New draw layer.
----@return any
-function luna.sprite.newDrawLayer() end
-
---- New graph renderer.
----@return any
-function luna.sprite.newGraphRenderer() end
-
---- New large map renderer.
----@param tile_w any
----@param tile_h any
----@return any
-function luna.sprite.newLargeMapRenderer(tile_w, tile_h) end
-
---- New light2d.
----@param x any
----@param y any
----@param radius any
----@return any
-function luna.sprite.newLight2D(x, y, radius) end
-
---- New polygon map.
----@return any
-function luna.sprite.newPolygonMap() end
-
---- New sprite sheet.
----@param tex_w any
----@param tex_h any
----@param frame_w any
----@param frame_h any
----@return any
-function luna.sprite.newSpriteSheet(tex_w, tex_h, frame_w, frame_h) end
-
---- New texture atlas.
----@param w any
----@param h any
----@param padding? any (optional)
----@return any
-function luna.sprite.newTextureAtlas(w, h, padding) end
-
---- New viewport.
----@param w any
----@param h any
----@param mode? any (optional)
----@return any
-function luna.sprite.newViewport(w, h, mode) end
-
---- New viewport scale.
----@param w any
----@param h any
----@param mode? any (optional)
----@return any
-function luna.sprite.newViewportScale(w, h, mode) end
 
 ---@class luna.system
 luna.system = {}
@@ -10633,7 +8659,7 @@ function luna.system.getArch() end
 function luna.system.getArgs() end
 
 --- Returns the output table from the most recently completed runBatch call.
----@param handle number Batch handle returned by runBatch.
+---@param handle number ÔÇö Batch handle returned by runBatch.
 ---@return string
 function luna.system.getBatchResults(handle) end
 
@@ -10645,7 +8671,7 @@ function luna.system.getClipboardText() end
 function luna.system.getDebugOverlay() end
 
 --- Returns the value of the named OS environment variable, or nil if not set.
----@param name number Environment variable name (case-sensitive on Linux/macOS).
+---@param name number ÔÇö Environment variable name (case-sensitive on Linux/macOS).
 ---@return string
 function luna.system.getEnv(name) end
 
@@ -10696,12 +8722,12 @@ function luna.system.log(level, message) end
 function luna.system.openURL(url) end
 
 --- Parses a command-line argument string and returns a structured key/value table.
----@param args string Argument string or table (e.g. '--flag=value --bool').
+---@param args string ÔÇö Argument string or table (e.g. '--flag=value --bool').
 ---@return boolean
 function luna.system.parseArgs(args) end
 
 --- Runs a list of shell commands in parallel and returns immediately without blocking.
----@param commands string Table of command strings to execute concurrently.
+---@param commands string ÔÇö Table of command strings to execute concurrently.
 ---@return number
 function luna.system.runBatch(commands) end
 
@@ -10714,7 +8740,7 @@ function luna.system.setClipboardText(text) end
 function luna.system.setDebugOverlay(enabled) end
 
 --- Sets the minimum severity level for runtime log messages.
----@param level any One of 'debug', 'info', 'warn', or 'error'.
+---@param level any ÔÇö One of 'debug', 'info', 'warn', or 'error'.
 function luna.system.setLogLevel(level) end
 
 ---@class luna.terminal
@@ -10723,1068 +8749,1163 @@ luna.terminal = {}
 ---@class Terminal
 local Terminal = {}
 
+--- Attaches a widget to this terminal.
 ---@param widget_ud any
+---@return nil
 function Terminal:addWidget(widget_ud) end
 
+--- Clears all cells to defaults.
+---@return nil
 function Terminal:clear() end
 
+--- Detaches all widgets from this terminal.
+---@return nil
 function Terminal:clearWidgets() end
 
+--- Renders the terminal grid and widgets as draw commands.
 ---@param x? any (optional)
 ---@param y? any (optional)
+---@return nil
 function Terminal:draw(x, y) end
 
+--- Returns the cell data at 1-based coordinates.
 ---@param col any
 ---@param row any
+---@return integer
 function Terminal:get(col, row) end
 
+--- Returns the default cell size in pixels.
+---@return number
 function Terminal:getCellSize() end
 
+--- Returns the terminal grid dimensions.
+---@return integer
 function Terminal:getDimensions() end
 
+--- Returns the currently focused widget, or nil.
+---@return Widget?
 function Terminal:getFocused() end
 
+--- Returns the number of attached widgets.
+---@return integer
 function Terminal:getWidgetCount() end
 
+--- Routes a key press to the focused widget and fires callbacks.
 ---@param key any
+---@return boolean
 function Terminal:keypressed(key) end
 
+--- Detaches a widget from this terminal.
 ---@param widget_ud any
+---@return nil
 function Terminal:removeWidget(widget_ud) end
 
+--- Sets a cell at 1-based coordinates with character FG and BG colours.
 ---@param args any
+---@return nil
 function Terminal:set(args) end
 
+--- Sets the focused widget, or clears focus if nil is passed.
 ---@param value any
+---@return nil
 function Terminal:setFocus(value) end
 
+--- Routes text input to the focused widget and fires callbacks.
 ---@param text any
+---@return boolean
 function Terminal:textinput(text) end
 
 ---@class Widget
 local Widget = {}
 
+--- Adds a child widget to a panel widget.
 ---@param child_ud any
+---@return nil
 function Widget:addChild(child_ud) end
 
+--- Adds an item to a list widget.
 ---@param item any
+---@return nil
 function Widget:addItem(item) end
 
+--- Removes all children from a panel widget.
+---@return nil
 function Widget:clearChildren() end
 
+--- Removes all items from a list widget.
+---@return nil
 function Widget:clearItems() end
 
+--- Returns a child widget from a panel by 1-based index, or nil.
 ---@param index any
+---@return Widget?
 function Widget:getChild(index) end
 
+--- Returns the number of children in a panel widget.
+---@return integer
 function Widget:getChildCount() end
 
+--- Returns the colour of a label or border widget.
+---@return number
 function Widget:getColor() end
 
+--- Returns a list item by 1-based index.
 ---@param index any
+---@return string
 function Widget:getItem(index) end
 
+--- Returns the number of items in a list widget.
+---@return integer
 function Widget:getItemCount() end
 
+--- Returns the maximum character length of a text box widget.
+---@return integer
 function Widget:getMaxLength() end
 
+--- Returns the widget position as 1-based coordinates.
+---@return integer
 function Widget:getPosition() end
 
+--- Returns the selected item index (1-based) in a list widget, or nil.
+---@return integer?
 function Widget:getSelected() end
 
+--- Returns the widget size in cells.
+---@return integer
 function Widget:getSize() end
 
+--- Returns the border style name of a border widget.
+---@return string
 function Widget:getStyle() end
 
+--- Returns the free-form identification tag.
+---@return string
 function Widget:getTag() end
 
+--- Returns the text content of a label, button, or text box widget.
+---@return string
 function Widget:getText() end
 
+--- Returns the title of a border widget.
+---@return string
 function Widget:getTitle() end
 
+--- Returns whether the widget accepts input.
+---@return boolean
 function Widget:isEnabled() end
 
+--- Returns whether the widget is visible.
+---@return boolean
 function Widget:isVisible() end
 
+--- Removes a child widget from a panel widget.
 ---@param child_ud any
+---@return nil
 function Widget:removeChild(child_ud) end
 
+--- Removes an item from a list widget by 1-based index.
 ---@param index any
+---@return nil
 function Widget:removeItem(index) end
 
+--- Sets whether the widget accepts input.
 ---@param enabled any
+---@return nil
 function Widget:setEnabled(enabled) end
 
+--- Sets the maximum character length of a text box widget.
 ---@param max_length any
+---@return nil
 function Widget:setMaxLength(max_length) end
 
+--- Registers a text change callback for a text box widget.
 ---@param callback? any (optional)
+---@return nil
 function Widget:setOnChange(callback) end
 
+--- Registers a click callback for a button widget.
 ---@param callback? any (optional)
+---@return nil
 function Widget:setOnClick(callback) end
 
+--- Registers a selection change callback for a list widget.
 ---@param callback? any (optional)
+---@return nil
 function Widget:setOnSelect(callback) end
 
+--- Sets the widget position from 1-based coordinates.
 ---@param col any
 ---@param row any
+---@return nil
 function Widget:setPosition(col, row) end
 
+--- Sets the selected item in a list widget by 1-based index.
 ---@param index? any (optional)
+---@return nil
 function Widget:setSelected(index) end
 
+--- Sets the widget size in cells.
 ---@param width any
 ---@param height any
+---@return nil
 function Widget:setSize(width, height) end
 
+--- Sets the border style of a border widget.
 ---@param style_name any
+---@return nil
 function Widget:setStyle(style_name) end
 
+--- Sets the free-form identification tag.
 ---@param tag any
+---@return nil
 function Widget:setTag(tag) end
 
+--- Sets the text content of a label, button, or text box widget.
 ---@param text any
+---@return nil
 function Widget:setText(text) end
 
+--- Sets the title of a border widget.
 ---@param title any
+---@return nil
 function Widget:setTitle(title) end
 
+--- Sets the widget visibility.
 ---@param visible any
+---@return nil
 function Widget:setVisible(visible) end
 
+--- Creates a new decorative border widget at 1-based coordinates.
 ---@param col any
 ---@param row any
 ---@param width any
 ---@param height any
+---@return Widget
 function luna.terminal.newBorder(col, row, width, height) end
 
-function luna.terminal.newButton() end
+--- Creates a new button widget at 1-based coordinates.
+---@param col integer
+---@param row integer
+---@param width integer
+---@param height? integer? (optional)
+---@param text? string? (optional)
+---@return Widget
+function luna.terminal.newButton(col, row, width, height, text) end
 
+--- Creates a new label widget at 1-based coordinates.
 ---@param col any
 ---@param row any
 ---@param text? any (optional)
+---@return Widget
 function luna.terminal.newLabel(col, row, text) end
 
+--- Creates a new scrollable list widget at 1-based coordinates.
 ---@param col any
 ---@param row any
 ---@param width any
 ---@param height any
+---@return Widget
 function luna.terminal.newList(col, row, width, height) end
 
+--- Creates a new container panel widget at 1-based coordinates.
 ---@param col any
 ---@param row any
 ---@param width? any (optional)
 ---@param height? any (optional)
+---@return Widget
 function luna.terminal.newPanel(col, row, width, height) end
 
+--- Creates a new terminal grid with the given dimensions.
 ---@param cols? any (optional)
 ---@param rows? any (optional)
+---@return Terminal
 function luna.terminal.newTerminal(cols, rows) end
 
+--- Creates a new single-line text box widget at 1-based coordinates.
 ---@param col any
 ---@param row any
 ---@param width any
+---@return Widget
 function luna.terminal.newTextBox(col, row, width) end
 
 ---@class luna.thread
 luna.thread = {}
 
----@class Thread
-local Thread = {}
+--- Lua-side wrapper around a background [`LuaThread`].
+---@class ThreadHandle
+local ThreadHandle = {}
 
---- Returns the error message if the thread terminated with a Lua error, or `nil` if it completed normally.
----@return string
-function Thread:getError() end
+--- Returns the error message if the thread failed, or nil.
+---@return string?
+function ThreadHandle:getError() end
 
---- Returns `true` if the thread is currently executing.
+--- Returns whether the thread is currently executing.
 ---@return boolean
-function Thread:isRunning() end
+function ThreadHandle:isRunning() end
 
---- Launches the background thread, passing optional arguments to the Lua script via `...`.
----@param ... number `any`: Optional arguments forwarded to the thread script as Lua values.
-function Thread:start(...) end
+--- Launches the background thread, passing optional arguments via varargs.
+---@param args any
+---@return nil
+function ThreadHandle:start(args) end
 
---- Blocks the calling coroutine until this thread finishes execution.
-function Thread:wait() end
+--- Returns the type name of this object.
+---@return string
+function ThreadHandle:type() end
 
---- Get or create a named global channel (singleton, shared across threads).
+--- Returns whether this object is of the given type.
 ---@param name any
----@return any
+---@return boolean
+function ThreadHandle:typeOf(name) end
+
+--- Blocks the calling thread until the background thread finishes.
+---@return nil
+function ThreadHandle:wait() end
+
+--- Gets or creates a named global channel shared across threads.
+---@param name any
+---@return Channel
 function luna.thread.getChannel(name) end
 
---- Create an unnamed thread-safe channel for inter-thread communication.
----@return any
+--- Creates an unnamed thread-safe channel for inter-thread communication.
+---@return Channel
 function luna.thread.newChannel() end
 
---- Create a new background thread from a Lua code string.
+--- Creates a new background thread from a Lua code string.
 ---@param code any
----@return any
+---@return Thread
 function luna.thread.newThread(code) end
 
 ---@class luna.tilemap
 luna.tilemap = {}
 
+--- Lua-side wrapper around an [`AutoTileSheet`].
 ---@class AutoTileSheet
 local AutoTileSheet = {}
 
---- luna.tilemap.AutoTileSheet:getBitmaskForTile(index)
----@param index any
-function AutoTileSheet:getBitmaskForTile(index) end
+--- Returns the bitmask value associated with a tile index.
+---@param idx any
+---@return integer
+function AutoTileSheet:getBitmaskForTile(idx) end
 
---- luna.tilemap.AutoTileSheet:getComposite48GridQuad(index) -> {x,y,width,height}
----@param index any
-function AutoTileSheet:getComposite48GridQuad(index) end
-
---- luna.tilemap.AutoTileSheet:getGridQuad(index, cols) -> {x,y,width,height}
----@param index any
----@param cols any
-function AutoTileSheet:getGridQuad(index, cols) end
-
---- luna.tilemap.AutoTileSheet:getLayout()
+--- Returns the layout variant as a string.
+---@return string
 function AutoTileSheet:getLayout() end
 
---- luna.tilemap.AutoTileSheet:getQuad(index)
----@param index any
-function AutoTileSheet:getQuad(index) end
+--- Returns the atlas region rectangle for the tile at the given index.
+---@param idx any
+---@return number
+function AutoTileSheet:getQuad(idx) end
 
---- luna.tilemap.AutoTileSheet:getQuarterDstRects(x, y) -> {[1],...[4]}
----@param x any
----@param y any
-function AutoTileSheet:getQuarterDstRects(x, y) end
-
---- luna.tilemap.AutoTileSheet:getQuarterRects(bitmask) -> {[1]={x,y,w,h},...[4]=...}
----@param bitmask any
-function AutoTileSheet:getQuarterRects(bitmask) end
-
---- luna.tilemap.AutoTileSheet:getTileCount()
+--- Returns the number of tiles in this sheet.
+---@return integer
 function AutoTileSheet:getTileCount() end
 
---- luna.tilemap.AutoTileSheet:getTileForBitmask(bitmask)
+--- Returns the tile index for a given bitmask, or nil.
 ---@param bitmask any
+---@return integer?
 function AutoTileSheet:getTileForBitmask(bitmask) end
 
---- luna.tilemap.AutoTileSheet:getTileHeight()
+--- Returns the tile height in pixels.
+---@return integer
 function AutoTileSheet:getTileHeight() end
 
---- luna.tilemap.AutoTileSheet:getTileWidth()
+--- Returns the tile width in pixels.
+---@return integer
 function AutoTileSheet:getTileWidth() end
 
+--- Lua-side wrapper around a [`ChunkMap`].
 ---@class ChunkMap
 local ChunkMap = {}
 
---- luna.tilemap.ChunkMap:chunkTileRange(cx, cy) -> x0,y0,x1,y1
+--- Returns the tile coordinate range for chunk (cx, cy) as (x0, y0, x1, y1).
 ---@param cx any
 ---@param cy any
+---@return integer
 function ChunkMap:chunkTileRange(cx, cy) end
 
---- luna.tilemap.ChunkMap:clearTile(x, y)
+--- Clears the tile at (x, y) by setting its GID to 0.
 ---@param x any
 ---@param y any
+---@return nil
 function ChunkMap:clearTile(x, y) end
 
---- luna.tilemap.ChunkMap:getChunkSize()
+--- Returns the chunk size (tiles per side).
+---@return integer
 function ChunkMap:getChunkSize() end
 
---- luna.tilemap.ChunkMap:getLoadedChunks() -> [{cx,cy}, ...]
+--- Returns a table of all currently loaded chunk coordinates as {{cx, cy}, ...}.
+---@return table
 function ChunkMap:getLoadedChunks() end
 
---- luna.tilemap.ChunkMap:getTile(x, y) -- 0-based tile coords
+--- Returns the GID at tile coordinate (x, y).
 ---@param x any
 ---@param y any
+---@return integer
 function ChunkMap:getTile(x, y) end
 
---- luna.tilemap.ChunkMap:loadChunk(cx, cy)
+--- Pre-allocates the chunk at chunk coordinates (cx, cy).
 ---@param cx any
 ---@param cy any
+---@return nil
 function ChunkMap:loadChunk(cx, cy) end
 
---- luna.tilemap.ChunkMap:setTile(x, y, gid) -- 0-based tile coords
+--- Sets the GID at tile coordinate (x, y).
 ---@param x any
 ---@param y any
 ---@param gid any
+---@return nil
 function ChunkMap:setTile(x, y, gid) end
 
---- luna.tilemap.ChunkMap:unloadChunk(cx, cy)
+--- Removes the chunk at chunk coordinates (cx, cy) from memory.
 ---@param cx any
 ---@param cy any
+---@return nil
 function ChunkMap:unloadChunk(cx, cy) end
 
+--- Lua-side wrapper around an [`IsoMap`].
 ---@class IsoMap
 local IsoMap = {}
 
---- Adds an elevation level layer to the isometric map for multi-height rendering.
----@param level number ÔÇö Level definition table or level index integer.
-function IsoMap:addLevel(level) end
+--- Appends a new empty Z-level and returns its 1-based index.
+---@return integer
+function IsoMap:addLevel() end
 
---- Returns the height of the isometric map in tile rows.
----@return number
+--- Fills every cell in level z with gid for the given part (1-based z; 0-based part).
+---@param z any
+---@param part any
+---@param gid any
+---@return nil
+function IsoMap:fillLevel(z, part, gid) end
+
+--- Returns the map height in tiles.
+---@return integer
 function IsoMap:getHeight() end
 
---- luna.tilemap.IsoMap:getLevelCount()
+--- Returns the number of Z-levels currently in the map.
+---@return integer
 function IsoMap:getLevelCount() end
 
---- luna.tilemap.IsoMap:getLevelHeight()
+--- Returns the vertical pixel offset between consecutive Z-levels.
+---@return integer
 function IsoMap:getLevelHeight() end
 
---- luna.tilemap.IsoMap:getTileHeight()
+--- Returns the tile footprint height in pixels.
+---@return integer
 function IsoMap:getTileHeight() end
 
---- Returns the width in pixels of a single isometric tile.
----@return number
+--- Returns the tile footprint width in pixels.
+---@return integer
 function IsoMap:getTileWidth() end
 
---- Returns the width of the isometric map in tile columns.
----@return number
+--- Returns the map width in tiles.
+---@return integer
 function IsoMap:getWidth() end
 
---- luna.tilemap.IsoMap:isLevelVisible(levelIdx)
----@param idx any
-function IsoMap:isLevelVisible(idx) end
+--- Returns the visibility of a level (1-based z).
+---@param z any
+---@return boolean
+function IsoMap:isLevelVisible(z) end
 
---- luna.tilemap.IsoMap:screenToTile(sx, sy)
+--- Converts screen pixel coordinates to isometric tile coordinates at Z-level 0.
 ---@param sx any
 ---@param sy any
+---@return number
 function IsoMap:screenToTile(sx, sy) end
 
---- luna.tilemap.IsoMap:setOrigin(x, y)
+--- Sets the screen pixel origin.
 ---@param x any
 ---@param y any
+---@return nil
 function IsoMap:setOrigin(x, y) end
 
---- luna.tilemap.IsoMap:tileToScreen(tx, ty, tz)
+--- Projects isometric tile coordinates (tx, ty, tz) to screen pixels.
 ---@param tx any
 ---@param ty any
 ---@param tz any
+---@return number
 function IsoMap:tileToScreen(tx, ty, tz) end
 
+--- Lua-side wrapper around a [`MapBlock`].
 ---@class MapBlock
 local MapBlock = {}
 
---- luna.tilemap.MapBlock:getDimensions()
+--- Returns the block dimensions as (width, height) in tiles.
+---@return integer
 function MapBlock:getDimensions() end
 
---- Returns the height of this map block section in tile coordinates.
----@return number
+--- Returns the block height in tiles.
+---@return integer
 function MapBlock:getHeight() end
 
---- luna.tilemap.MapBlock:getHeightInSegments()
+--- Returns the number of segments along the height.
+---@return integer
 function MapBlock:getHeightInSegments() end
 
---- luna.tilemap.MapBlock:getLayerCount()
+--- Returns the number of layers in this block.
+---@return integer
 function MapBlock:getLayerCount() end
 
---- Returns the name string assigned to this map block in the tile editor.
+--- Returns the name of this block.
 ---@return string
 function MapBlock:getName() end
 
---- luna.tilemap.MapBlock:getSegmentCount(edge)
----@param edge_str any
-function MapBlock:getSegmentCount(edge_str) end
-
---- luna.tilemap.MapBlock:getSegmentSize()
+--- Returns the segment size in tiles.
+---@return integer
 function MapBlock:getSegmentSize() end
 
---- luna.tilemap.MapBlock:getSide(edge, segment)
+--- Returns the side connection ID for a segment on a given edge.
 ---@param edge_str any
 ---@param segment any
+---@return integer
 function MapBlock:getSide(edge_str, segment) end
 
---- luna.tilemap.MapBlock:getTile(layer, x, y)
+--- Returns the GID of the tile at (x, y) on the given layer (1-based).
 ---@param layer any
 ---@param x any
 ---@param y any
+---@return integer
 function MapBlock:getTile(layer, x, y) end
 
---- Returns the numeric weight used by procedural generators when placing this block.
+--- Returns the placement weight.
 ---@return number
 function MapBlock:getWeight() end
 
---- Returns the width of this map block section in tile coordinates.
----@return number
+--- Returns the block width in tiles.
+---@return integer
 function MapBlock:getWidth() end
 
---- luna.tilemap.MapBlock:getWidthInSegments()
+--- Returns the number of segments along the width.
+---@return integer
 function MapBlock:getWidthInSegments() end
 
---- luna.tilemap.MapBlock:setName(name)
+--- Sets the human-readable name of this block.
 ---@param name any
+---@return nil
 function MapBlock:setName(name) end
 
---- luna.tilemap.MapBlock:setWeight(weight)
+--- Sets the placement weight.
 ---@param weight any
+---@return nil
 function MapBlock:setWeight(weight) end
 
----@class MapGen
-local MapGen = {}
-
---- Removes all zone definitions from this map generator's zone list.
-function MapGen:clearZones() end
-
---- luna.tilemap.MapGen:getGridDimensions()
-function MapGen:getGridDimensions() end
-
---- luna.tilemap.MapGen:getGridHeight()
-function MapGen:getGridHeight() end
-
---- Returns the width of the generation grid in block-sized units.
----@return number
-function MapGen:getGridWidth() end
-
---- Returns the layer stacking mode used by this generator.
----@return string
-function MapGen:getLayerMode() end
-
---- luna.tilemap.MapGen:getOrientation()
-function MapGen:getOrientation() end
-
---- luna.tilemap.MapGen:getPlacementCount()
-function MapGen:getPlacementCount() end
-
---- luna.tilemap.MapGen:getSegmentSize()
-function MapGen:getSegmentSize() end
-
---- luna.tilemap.MapGen:getTilePixelHeight()
-function MapGen:getTilePixelHeight() end
-
---- luna.tilemap.MapGen:getTilePixelWidth()
-function MapGen:getTilePixelWidth() end
-
---- Returns the zone definition table at the given 1-based index.
----@param index number ÔÇö 1-based index into the zone list.
----@return table
-function MapGen:getZone(index) end
-
---- Returns the total number of zone definitions registered in this generator.
----@return number
-function MapGen:getZoneCount() end
-
---- luna.tilemap.MapGen:setLayerMode(mode)
----@param mode any
-function MapGen:setLayerMode(mode) end
-
---- luna.tilemap.MapGen:setOrientation(orientation)
----@param orientation any
-function MapGen:setOrientation(orientation) end
-
---- luna.tilemap.MapGen:setTileSize(w, h)
----@param w any
----@param h any
-function MapGen:setTileSize(w, h) end
-
+--- Lua-side wrapper around a [`MapGroup`].
 ---@class MapGroup
 local MapGroup = {}
 
---- luna.tilemap.MapGroup:addBlock(block)
+--- Adds a block to this group.
 ---@param block_ud any
+---@return nil
 function MapGroup:addBlock(block_ud) end
 
---- luna.tilemap.MapGroup:addScript(script)
----@param script_ud any
-function MapGroup:addScript(script_ud) end
-
---- luna.tilemap.MapGroup:getBlock(index)
----@param index any
-function MapGroup:getBlock(index) end
-
---- luna.tilemap.MapGroup:getBlockCount()
+--- Returns the number of blocks in this group.
+---@return integer
 function MapGroup:getBlockCount() end
 
---- Returns the display name string of this map group layer.
+--- Returns the name of this group.
 ---@return string
 function MapGroup:getName() end
 
---- luna.tilemap.MapGroup:getScript(index)
----@param index any
-function MapGroup:getScript(index) end
+--- Removes a block by 1-based index.
+---@param idx any
+---@return nil
+function MapGroup:removeBlock(idx) end
 
---- luna.tilemap.MapGroup:getScriptCount()
-function MapGroup:getScriptCount() end
-
---- luna.tilemap.MapGroup:removeBlock(index)
----@param index any
-function MapGroup:removeBlock(index) end
-
---- luna.tilemap.MapGroup:setName(name)
----@param name any
-function MapGroup:setName(name) end
-
----@class MapScript
-local MapScript = {}
-
---- luna.tilemap.MapScript:addStep(stepTable)
----@param step_table any
-function MapScript:addStep(step_table) end
-
---- luna.tilemap.MapScript:clearSteps()
-function MapScript:clearSteps() end
-
---- Returns the identifier name assigned to this map script component.
----@return string
-function MapScript:getName() end
-
---- luna.tilemap.MapScript:getStep(index)
----@param index any
-function MapScript:getStep(index) end
-
---- luna.tilemap.MapScript:getStepCount()
-function MapScript:getStepCount() end
-
---- luna.tilemap.MapScript:removeStep(index)
----@param index any
-function MapScript:removeStep(index) end
-
---- luna.tilemap.MapScript:setName(name)
----@param name any
-function MapScript:setName(name) end
-
+--- Lua-side wrapper around a [`TileMap`].
 ---@class TileMap
 local TileMap = {}
 
---- luna.tilemap.TileMap:addTileSet(tileset)
+--- Adds a new empty layer and returns its 1-based index.
+---@param name any
+---@param w any
+---@param h any
+---@return integer
+function TileMap:addLayer(name, w, h) end
+
+--- Adds a tileset to this map.
 ---@param ts_ud any
+---@return nil
 function TileMap:addTileSet(ts_ud) end
 
---- luna.tilemap.TileMap:clearTile(layerIdx, x, y)
----@param layer any
----@param x any
----@param y any
-function TileMap:clearTile(layer, x, y) end
-
---- luna.tilemap.TileMap:drawLayer(layerIdx)
----@param idx any
-function TileMap:drawLayer(idx) end
-
---- luna.tilemap.TileMap:fill(layerIdx, gid)
+--- Fills an entire layer with the given GID (1-based layer).
 ---@param layer any
 ---@param gid any
+---@return nil
 function TileMap:fill(layer, gid) end
 
---- luna.tilemap.TileMap:getChunkSize()
+--- Returns the chunk size used for spatial partitioning.
+---@return integer
 function TileMap:getChunkSize() end
 
---- luna.tilemap.TileMap:getLayerColor(layerIdx)
+--- Returns the RGBA tint color of a layer.
 ---@param idx any
+---@return number
 function TileMap:getLayerColor(idx) end
 
---- luna.tilemap.TileMap:getLayerCount()
+--- Returns the number of layers.
+---@return integer
 function TileMap:getLayerCount() end
 
---- luna.tilemap.TileMap:getLayerName(layerIdx)
+--- Returns the name of a layer by 1-based index.
 ---@param idx any
+---@return string?
 function TileMap:getLayerName(idx) end
 
---- luna.tilemap.TileMap:getLayerOffset(layerIdx)
+--- Returns the pixel offset of a layer.
 ---@param idx any
+---@return number
 function TileMap:getLayerOffset(idx) end
 
---- luna.tilemap.TileMap:getLayerParallax(layerIdx)
+--- Returns the parallax factor of a layer.
 ---@param idx any
+---@return number
 function TileMap:getLayerParallax(idx) end
 
---- luna.tilemap.TileMap:getLayerVisible(layerIdx)
+--- Returns layer visibility.
 ---@param idx any
+---@return boolean
 function TileMap:getLayerVisible(idx) end
 
---- luna.tilemap.TileMap:getOrientation() -> "topdown"|"sideview"
+--- Returns the map orientation as a string ("topdown" or "sideview").
+---@return string
 function TileMap:getOrientation() end
 
---- luna.tilemap.TileMap:getTile(layerIdx, x, y)
+--- Returns the GID at (x, y) on the given layer (1-based).
 ---@param layer any
 ---@param x any
 ---@param y any
+---@return integer
 function TileMap:getTile(layer, x, y) end
 
---- luna.tilemap.TileMap:getTileDimensions()
+--- Returns tile dimensions as (width, height).
+---@return integer
 function TileMap:getTileDimensions() end
 
---- Returns the height of a single tile in pixels.
----@return number
+--- Returns the tile height in pixels.
+---@return integer
 function TileMap:getTileHeight() end
 
---- luna.tilemap.TileMap:getTileSet(index)
----@param index any
-function TileMap:getTileSet(index) end
-
---- luna.tilemap.TileMap:getTileSetCount()
+--- Returns the number of tilesets attached to this map.
+---@return integer
 function TileMap:getTileSetCount() end
 
---- Returns the width of a single tile in pixels.
----@return number
+--- Returns the tile width in pixels.
+---@return integer
 function TileMap:getTileWidth() end
 
---- Returns the visible tile range as x, y, width, height in tile coordinates.
----@return number
+--- Returns the viewport as (x, y, w, h) or nil if not set.
 ---@return number
 function TileMap:getViewport() end
 
---- luna.tilemap.TileMap:isSolid(layerIdx, tx, ty)
+--- Returns true if the tile at (x, y) on layer is solid (1-based).
 ---@param layer any
+---@param x any
+---@param y any
+---@return boolean
+function TileMap:isSolid(layer, x, y) end
+
+--- Sets the map orientation from a string ("topdown" or "sideview").
+---@param orientation any
+---@return nil
+function TileMap:setOrientation(orientation) end
+
+--- Converts tile coordinates to world pixel coordinates (1-based input).
 ---@param tx any
 ---@param ty any
-function TileMap:isSolid(layer, tx, ty) end
-
---- luna.tilemap.TileMap:setOrientation(mode)
----@param mode any
-function TileMap:setOrientation(mode) end
-
---- luna.tilemap.TileMap:tileToWorld(tx, ty)
----@param tx any
----@param ty any
+---@return number
 function TileMap:tileToWorld(tx, ty) end
 
---- Advances the map's animation timers and any attached script callbacks.
----@param dt any ÔÇö Delta time in seconds since the last update.
+--- Advances tile animation timers by dt seconds.
+---@param dt any
+---@return nil
 function TileMap:update(dt) end
 
---- luna.tilemap.TileMap:worldToTile(wx, wy)
+--- Converts world pixel coordinates to tile coordinates.
 ---@param wx any
 ---@param wy any
+---@return integer
 function TileMap:worldToTile(wx, wy) end
 
+--- Lua-side wrapper around a [`TileSet`].
 ---@class TileSet
 local TileSet = {}
 
---- luna.tilemap.TileSet:getAnimation(tileId)
+--- Returns the animation frames for a local tile ID as a table, or nil.
 ---@param tile_id any
+---@return table?
 function TileSet:getAnimation(tile_id) end
 
---- Returns the number of tile columns in this tileset's source image.
----@return number
+--- Returns the number of tile columns in the atlas texture.
+---@return integer
 function TileSet:getColumns() end
 
---- Returns the global tile ID (GID) assigned to the first tile in this tileset.
----@return number
+--- Returns the first global ID assigned to this tileset.
+---@return integer
 function TileSet:getFirstGid() end
 
---- Returns the pixel margin around the outside edge of the tileset image.
----@return number
+--- Returns the margin in pixels around the edges of the atlas.
+---@return integer
 function TileSet:getMargin() end
 
---- luna.tilemap.TileSet:getQuad(tileId)
+--- Computes the atlas source rectangle for a 0-based local tile ID.
 ---@param tile_id any
+---@return number
 function TileSet:getQuad(tile_id) end
 
---- Returns the pixel gap between adjacent tiles in the tileset source image.
----@return number
+--- Returns the spacing in pixels between tiles in the atlas.
+---@return integer
 function TileSet:getSpacing() end
 
---- luna.tilemap.TileSet:getTileCount()
+--- Returns the total number of tiles in this tileset.
+---@return integer
 function TileSet:getTileCount() end
 
---- luna.tilemap.TileSet:getTileDimensions()
+--- Returns the tile dimensions as (width, height).
+---@return integer
 function TileSet:getTileDimensions() end
 
---- luna.tilemap.TileSet:getTileHeight()
+--- Returns the height of a single tile in pixels.
+---@return integer
 function TileSet:getTileHeight() end
 
---- luna.tilemap.TileSet:getTileWidth()
+--- Returns the width of a single tile in pixels.
+---@return integer
 function TileSet:getTileWidth() end
 
---- luna.tilemap.TileSet:isSolid(tileId)
+--- Returns whether a local tile ID is solid.
 ---@param tile_id any
+---@return boolean
 function TileSet:isSolid(tile_id) end
 
---- luna.tilemap.TileSet:setSolid(tileId, solid)
+--- Sets the animation frames for a local tile ID from a table of {tileId, durationMs}.
+---@param tile_id any
+---@param frames any
+---@return nil
+function TileSet:setAnimation(tile_id, frames) end
+
+--- Sets whether a local tile ID is solid for collision purposes.
 ---@param tile_id any
 ---@param solid any
+---@return nil
 function TileSet:setSolid(tile_id, solid) end
 
---- luna.tilemap.fromScreenHex(sx, sy, size)
+--- Converts screen position back to axial hex coordinates (pointy-top layout).
 ---@param sx any
 ---@param sy any
 ---@param size any
+---@return integer
 function luna.tilemap.fromScreenHex(sx, sy, size) end
 
---- luna.tilemap.fromScreenIso(sx, sy, tileW, tileH)
+--- Converts screen position back to tile coordinates for diamond isometric projection.
 ---@param sx any
 ---@param sy any
----@param tile_w any
----@param tile_h any
-function luna.tilemap.fromScreenIso(sx, sy, tile_w, tile_h) end
-
---- Returns all hex cell coordinates within a given radius of center (q, r).
----@param q any ÔÇö Center q coordinate.
----@param r any ÔÇö Center r coordinate.
----@param radius number ÔÇö Radius in hex steps (1 = immediate ring, 2 = two rings, etc.).
+---@param tw any
+---@param th any
 ---@return number
+function luna.tilemap.fromScreenIso(sx, sy, tw, th) end
+
+--- Returns all hex cells within radius distance (filled hex circle) as a table.
+---@param q any
+---@param r any
+---@param radius any
+---@return table
 function luna.tilemap.hexArea(q, r, radius) end
 
---- luna.tilemap.hexDistance(q1, r1, q2, r2)
+--- Returns the hex distance between two axial coordinates.
 ---@param q1 any
 ---@param r1 any
 ---@param q2 any
 ---@param r2 any
+---@return integer
 function luna.tilemap.hexDistance(q1, r1, q2, r2) end
 
---- luna.tilemap.hexLine(q1, r1, q2, r2)
+--- Returns all hex cells along a line between two axial coordinates as a table.
 ---@param q1 any
 ---@param r1 any
 ---@param q2 any
 ---@param r2 any
+---@return table
 function luna.tilemap.hexLine(q1, r1, q2, r2) end
 
---- Returns the six hex grid coordinates adjacent to the cell at (q, r).
----@param q number ÔÇö Integer q (column) coordinate of the center cell.
----@param r number ÔÇö Integer r (row) coordinate of the center cell.
----@return number
+--- Returns the six axial neighbor coordinates as a table of {q, r} pairs.
+---@param q any
+---@param r any
+---@return table
 function luna.tilemap.hexNeighbors(q, r) end
 
---- luna.tilemap.hexReflect(q, r, centerQ, centerR, axis)
+--- Reflects hex coordinates across an axis through the center.
 ---@param q any
 ---@param r any
 ---@param center_q any
 ---@param center_r any
 ---@param axis any
+---@return integer
 function luna.tilemap.hexReflect(q, r, center_q, center_r, axis) end
 
---- Returns all hex cell coordinates forming the ring at exactly the given radius from (q, r).
----@param q any ÔÇö Center q coordinate.
----@param r any ÔÇö Center r coordinate.
----@param radius number ÔÇö Ring distance in hex steps.
+--- Returns all cells at exactly radius distance from (q, r) as a table.
+---@param q any
+---@param r any
+---@param radius any
 ---@return table
 function luna.tilemap.hexRing(q, r, radius) end
 
---- luna.tilemap.hexRotate(q, r, centerQ, centerR, steps)
+--- Rotates hex coordinates around a center by steps x 60 degrees clockwise.
 ---@param q any
 ---@param r any
 ---@param center_q any
 ---@param center_r any
 ---@param steps any
+---@return integer
 function luna.tilemap.hexRotate(q, r, center_q, center_r, steps) end
 
---- Rounds fractional hex coordinates (q, r) to the nearest integer hex cell center.
----@param q any ÔÇö Fractional q (column) coordinate.
----@param r any ÔÇö Fractional r (row) coordinate.
----@return number
+--- Rounds fractional axial coordinates to the nearest hex cell.
+---@param q any
+---@param r any
+---@return integer
 function luna.tilemap.hexRound(q, r) end
 
---- luna.tilemap.hexSpiral(q, r, radius)
+--- Returns all hex cells from center outward to radius, ring by ring, as a table.
 ---@param q any
 ---@param r any
 ---@param radius any
+---@return table
 function luna.tilemap.hexSpiral(q, r, radius) end
 
---- luna.tilemap.isoDirectionFromAngle(angle)
+--- Snaps an angle (in radians) to the nearest isometric direction (1-4).
 ---@param angle any
+---@return integer
 function luna.tilemap.isoDirectionFromAngle(angle) end
 
---- luna.tilemap.isoDirectionName(direction)
+--- Returns the name of an isometric direction (1-4).
 ---@param direction any
+---@return string
 function luna.tilemap.isoDirectionName(direction) end
 
---- luna.tilemap.isoRotate(direction, steps)
+--- Rotates an isometric direction (1-4) clockwise by steps.
 ---@param direction any
 ---@param steps any
+---@return integer
 function luna.tilemap.isoRotate(direction, steps) end
 
---- luna.tilemap.loadTMX(xmlString) -> table with TmxMap fields, or nil+err
----@param xml any
-function luna.tilemap.loadTMX(xml) end
-
---- luna.tilemap.newAutoTileSheet(tileW, tileH, layout)
+--- Creates a new AutoTileSheet with the given tile dimensions and layout.
 ---@param tile_w any
 ---@param tile_h any
----@param layout_str any
+---@param layout_str? any (optional)
+---@return AutoTileSheet
 function luna.tilemap.newAutoTileSheet(tile_w, tile_h, layout_str) end
 
---- luna.tilemap.newChunkMap(chunkSize) -> ChunkMap
+--- Creates a new ChunkMap with the given chunk size.
 ---@param chunk_size? any (optional)
+---@return ChunkMap
 function luna.tilemap.newChunkMap(chunk_size) end
 
---- luna.tilemap.newIsoMap(width, height, tileW, tileH, levelHeight)
+--- Creates a new IsoMap with no levels.
 ---@param width any
 ---@param height any
 ---@param tile_w any
 ---@param tile_h any
 ---@param level_height any
+---@return IsoMap
 function luna.tilemap.newIsoMap(width, height, tile_w, tile_h, level_height) end
 
---- luna.tilemap.newMapBlock(width, height, layers, segmentSize)
+--- Creates a new MapBlock with the given dimensions.
 ---@param width any
 ---@param height any
----@param layers any
----@param segment_size any
+---@param layers? any (optional)
+---@param segment_size? any (optional)
+---@return MapBlock
 function luna.tilemap.newMapBlock(width, height, layers, segment_size) end
 
---- luna.tilemap.newMapGen(group, sizeOrW, hOrSegSize, segSize)
-function luna.tilemap.newMapGen() end
-
---- Creates a named group layer for organizing child layers inside a tile map.
----@param name number ÔÇö Display name for the group layer.
----@return number
+--- Creates a new empty MapGroup with the given name.
+---@param name any
+---@return MapGroup
 function luna.tilemap.newMapGroup(name) end
 
---- Creates a script object attached to a tile map layer for custom logic.
----@param name number ÔÇö Identifier name for the script component.
----@return any
-function luna.tilemap.newMapScript(name) end
-
---- luna.tilemap.newTileMap(tileW, tileH, chunkSize)
----@param tile_w any
----@param tile_h any
+--- Creates a new TileMap with the given tile size and chunk size.
+---@param tile_width any
+---@param tile_height any
 ---@param chunk_size? any (optional)
-function luna.tilemap.newTileMap(tile_w, tile_h, chunk_size) end
+---@return TileMap
+function luna.tilemap.newTileMap(tile_width, tile_height, chunk_size) end
 
---- luna.tilemap.newTileSet(firstGid, tileCount, columns, tileW, tileH, spacing, margin)
-function luna.tilemap.newTileSet() end
+--- Creates a new TileSet with the given atlas layout parameters.
+---@param firstGid integer
+---@param tileCount integer
+---@param columns integer
+---@param tileWidth integer
+---@param tileHeight integer
+---@param spacing? integer? (optional)
+---@param margin? integer? (optional)
+---@return TileSet
+function luna.tilemap.newTileSet(firstGid, tileCount, columns, tileWidth, tileHeight, spacing, margin) end
 
---- luna.tilemap.toScreenHex(q, r, size)
+--- Converts axial hex coordinates to screen position (pointy-top layout).
 ---@param q any
 ---@param r any
 ---@param size any
+---@return number
 function luna.tilemap.toScreenHex(q, r, size) end
 
---- luna.tilemap.toScreenIso(tx, ty, tileW, tileH)
+--- Converts tile coordinates to screen position using diamond isometric projection.
 ---@param tx any
 ---@param ty any
----@param tile_w any
----@param tile_h any
-function luna.tilemap.toScreenIso(tx, ty, tile_w, tile_h) end
+---@param tw any
+---@param th any
+---@return number
+function luna.tilemap.toScreenIso(tx, ty, tw, th) end
 
 ---@class luna.timer
 luna.timer = {}
 
----@class mlua
-local mlua = {}
+--- Lua-side wrapper around a [`Scheduler`] with per-event callback storage.
+---@class Scheduler
+local Scheduler = {}
 
---- Calls a Lua function after the given delay in seconds.
+--- Schedules a callback to fire once after a delay.
 ---@param delay any
 ---@param func any
----@return any
-function mlua:after(delay, func) end
+---@return integer
+function Scheduler:after(delay, func) end
 
---- Cancels a scheduled timer callback.
----@param id any
----@return any
-function mlua:cancel(id) end
-
---- Cancels and removes every pending timer entry from this scheduler.
----@return any
-function mlua:cancelAll() end
-
---- Cancels a specific named timer that was scheduled on this scheduler.
----@param name string Name string used when the timer was created.
----@return boolean
-function mlua:cancelNamed(name) end
-
---- Returns the number of active timer entries currently in the scheduler.
----@return number
-function mlua:getCount() end
-
---- Returns the repeat interval of the given timer entry in seconds.
----@param id number Timer ID returned when the timer was created.
----@return number
-function mlua:getInterval(id) end
-
---- Returns the time remaining before the next invocation of the given timer.
----@param id number Timer ID returned when the timer was created.
----@return any
-function mlua:getRemaining(id) end
-
---- Returns how many times the given timer has fired since it was created.
----@param id number Timer ID.
----@return number
-function mlua:getRepeatCount(id) end
-
---- Returns the current time-scale factor applied to all timers in this scheduler.
----@return number
-function mlua:getTimeScale() end
-
---- Returns whether the scheduler has no active timer entries.
----@return number
-function mlua:isEmpty() end
-
---- Returns whether the scheduler is currently paused and not advancing timers.
+--- Cancels a scheduled event by its numeric ID.
 ---@param id any
 ---@return boolean
-function mlua:isPaused(id) end
+function Scheduler:cancel(id) end
 
---- Pauses the scheduler so no pending callbacks fire until resumed.
+--- Cancels all scheduled events and returns the count removed.
+---@return integer
+function Scheduler:cancelAll() end
+
+--- Cancels a scheduled event by its string name.
+---@param name any
+---@return boolean
+function Scheduler:cancelNamed(name) end
+
+--- Returns the number of active scheduled events.
+---@return integer
+function Scheduler:getCount() end
+
+--- Returns the base interval in seconds for an event, or nil.
 ---@param id any
----@return any
-function mlua:pause(id) end
+---@return number?
+function Scheduler:getInterval(id) end
 
---- Resets the elapsed time of the given timer so it fires again after its full interval.
----@param id number Timer ID to reset.
----@return any
-function mlua:resetEvent(id) end
-
---- Resumes a paused scheduler, allowing its callbacks to fire again.
+--- Returns the seconds remaining until the next fire for an event, or nil.
 ---@param id any
----@return any
-function mlua:resume(id) end
+---@return number?
+function Scheduler:getRemaining(id) end
 
---- Changes the repeat interval of an existing timer without recreating it.
----@param id number Timer ID.
----@param interval number New interval in seconds.
----@return any
-function mlua:setInterval(id, interval) end
+--- Returns the repeat count remaining for an event, or nil.
+---@param id any
+---@return integer?
+function Scheduler:getRepeatCount(id) end
 
---- Sets a time-scale factor that speeds up or slows down all timers in the scheduler.
----@param scale any Time multiplier (1.0 = real time, 2.0 = double speed).
-function mlua:setTimeScale(scale) end
+--- Returns the current time-scale multiplier.
+---@return number
+function Scheduler:getTimeScale() end
 
---- Advances all pending timers by dt seconds.
+--- Returns whether the scheduler has no active events.
+---@return boolean
+function Scheduler:isEmpty() end
+
+--- Returns whether the given event is currently paused.
+---@param id any
+---@return boolean
+function Scheduler:isPaused(id) end
+
+--- Pauses a scheduled event by its ID.
+---@param id any
+---@return boolean
+function Scheduler:pause(id) end
+
+--- Resets an event's remaining time back to its original interval.
+---@param id any
+---@return boolean
+function Scheduler:resetEvent(id) end
+
+--- Resumes a paused event by its ID.
+---@param id any
+---@return boolean
+function Scheduler:resume(id) end
+
+--- Changes the repeat interval of an existing event.
+---@param id any
+---@param interval any
+---@return boolean
+function Scheduler:setInterval(id, interval) end
+
+--- Sets a global time-scale multiplier for this scheduler.
+---@param scale any
+---@return nil
+function Scheduler:setTimeScale(scale) end
+
+--- Advances all timers by dt seconds, firing due callbacks.
 ---@param dt any
----@return any
-function mlua:update(dt) end
+---@return integer
+function Scheduler:update(dt) end
 
 --- Returns the rolling-average frame delta time in seconds.
----@return any
+---@return number
 function luna.timer.getAverageDelta() end
 
---- Returns the delta time (seconds) for the current frame.
----@return any
+--- Returns the delta time in seconds for the current frame.
+---@return number
 function luna.timer.getDelta() end
 
---- Returns the measured frames-per-second for the current frame.
----@return any
+--- Returns the current frames-per-second measurement.
+---@return number
 function luna.timer.getFPS() end
 
---- Returns the high-resolution monotonic timer value in microseconds.
+--- Returns the high-resolution elapsed time since engine start in seconds.
 ---@return number
 function luna.timer.getMicroTime() end
 
---- Returns the total elapsed time in seconds since engine start.
----@return any
+--- Returns the total elapsed time since engine start in seconds.
+---@return number
 function luna.timer.getTime() end
 
---- Creates an independent timer scheduler for managing a set of callbacks.
----@return number
+--- Creates a new independent Scheduler for managing timed callbacks.
+---@return Scheduler
 function luna.timer.newScheduler() end
 
 --- Suspends execution for the given number of seconds.
 ---@param seconds any
+---@return nil
 function luna.timer.sleep(seconds) end
 
---- Advances the timer by one step (called automatically each frame).
----@return any
+--- Advances the timer by one frame, returning the delta time.
+---@return number
 function luna.timer.step() end
 
 ---@class luna.window
 luna.window = {}
 
---- Requests the application to close the window.
+--- Requests the window to close.
+---@return nil
 function luna.window.close() end
 
 --- Requests the window manager to bring the window to the foreground.
+---@return nil
 function luna.window.focus() end
 
 --- Converts physical pixels to device-independent coordinates.
 ---@param value any
----@return any
+---@return number
 function luna.window.fromPixels(value) end
 
 --- Returns the DPI scaling factor for the window.
----@return any
+---@return number
 function luna.window.getDPIScale() end
 
---- Returns the desktop resolution (width, height) for the given display.
----@return any
+--- Returns the desktop resolution as width, height.
+---@return integer
 function luna.window.getDesktopDimensions() end
 
---- Returns the window dimensions (width, height).
----@return any
+--- Returns the window dimensions as width, height.
+---@return integer
 function luna.window.getDimensions() end
 
 --- Returns the number of connected displays.
----@return any
+---@return integer
 function luna.window.getDisplayCount() end
 
---- Returns the name of the given display.
+--- Returns the name of the current display.
 ---@param display? any (optional)
----@return any
+---@return string
 function luna.window.getDisplayName(display) end
 
---- Returns the current display orientation as a string.
+--- Returns the current display orientation.
 ---@return string
 function luna.window.getDisplayOrientation() end
 
---- Returns the current fullscreen type string, or nil if windowed.
----@return any
+--- Returns the fullscreen state and type string.
+---@return boolean
 function luna.window.getFullscreen() end
 
 --- Returns all available fullscreen video modes.
----@return any
+---@return table
 function luna.window.getFullscreenModes() end
 
---- Returns the game's logical height in virtual pixels.
+--- Returns the logical game height in virtual pixels.
 ---@return number
 function luna.window.getGameHeight() end
 
---- Returns the game's logical width in virtual pixels.
+--- Returns the logical game width in virtual pixels.
 ---@return number
 function luna.window.getGameWidth() end
 
 --- Returns the window height in pixels.
----@return any
+---@return integer
 function luna.window.getHeight() end
 
---- Returns the current window mode settings as a table.
----@return any
+--- Returns the window dimensions and mode flags as width, height, flags.
+---@return integer
 function luna.window.getMode() end
 
---- Returns the display's native DPI scale factor.
+--- Returns the native DPI scale factor.
 ---@return number
 function luna.window.getNativeDPIScale() end
 
---- Returns the window dimensions in physical pixels (for HiDPI).
----@return any
+--- Returns the window dimensions in physical pixels.
+---@return integer
 function luna.window.getPixelDimensions() end
 
---- Returns the window position (x, y) on the desktop.
----@return any
+--- Returns the window position as x, y in screen coordinates.
+---@return integer
 function luna.window.getPosition() end
 
---- Returns the safe display area in logical pixels as `x, y, w, h`.
+--- Returns the safe display area as x, y, w, h.
 ---@return number
 function luna.window.getSafeArea() end
 
---- Returns the current viewport scale and offset information as a table.
----@return number
+--- Returns viewport scale and offset information as a table.
+---@return table
 function luna.window.getScaleInfo() end
 
 --- Returns the current viewport scale mode string.
 ---@return string
 function luna.window.getScaleMode() end
 
---- Returns the operating-system color theme preference.
+--- Returns the OS color theme preference.
 ---@return string
 function luna.window.getSystemTheme() end
 
---- Returns the current text displayed in the operating-system window title bar.
+--- Returns the current window title.
 ---@return string
 function luna.window.getTitle() end
 
---- Returns the current VSync mode value.
+--- Returns the current VSync mode integer.
+---@return integer
 function luna.window.getVSync() end
 
 --- Returns the window width in pixels.
----@return any
+---@return integer
 function luna.window.getWidth() end
 
---- Returns whether the window has keyboard input focus.
+--- Returns whether the window has keyboard focus.
+---@return boolean
 function luna.window.hasFocus() end
 
 --- Returns whether the mouse cursor is inside the window.
+---@return boolean
 function luna.window.hasMouseFocus() end
 
---- Returns whether the window is currently in fullscreen mode.
+--- Returns whether the window is in fullscreen mode.
 ---@return boolean
 function luna.window.isFullscreen() end
 
---- Returns whether high-DPI rendering is allowed for this window.
+--- Returns whether high-DPI rendering is allowed.
 ---@return boolean
 function luna.window.isHighDPIAllowed() end
 
 --- Returns whether the window is maximized.
+---@return boolean
 function luna.window.isMaximized() end
 
 --- Returns whether the window is minimized.
+---@return boolean
 function luna.window.isMinimized() end
 
---- Returns whether the window has been created and is not yet closed.
+--- Returns whether the window is open.
 ---@return boolean
 function luna.window.isOpen() end
 
@@ -11792,58 +9913,74 @@ function luna.window.isOpen() end
 ---@return boolean
 function luna.window.isResizable() end
 
---- Returns whether the window is currently visible.
+--- Returns whether the window is visible.
+---@return boolean
 function luna.window.isVisible() end
 
---- Maximizes the window so it fills all available desktop space.
+--- Maximizes the window to fill the desktop.
+---@return nil
 function luna.window.maximize() end
 
---- Minimizes the window to the OS taskbar or dock.
+--- Minimizes the window to the taskbar.
+---@return nil
 function luna.window.minimize() end
 
 --- Flashes the window in the taskbar to request user attention.
+---@return nil
 function luna.window.requestAttention() end
 
---- Restores the window from maximized or minimized state.
+--- Restores the window from minimized or maximized state.
+---@return nil
 function luna.window.restore() end
 
 --- Enables or disables fullscreen mode.
 ---@param enabled any
 ---@param fstype? any (optional)
+---@return nil
 function luna.window.setFullscreen(enabled, fstype) end
 
---- Sets the window icon from a pixel buffer.
+--- Sets the window icon from a file path.
 ---@param path any
+---@return nil
 function luna.window.setIcon(path) end
 
---- Resizes the window and optionally changes fullscreen mode.
+--- Resizes the window and optionally changes fullscreen and vsync.
 ---@param w any
 ---@param h any
 ---@param flags? any (optional)
+---@return nil
 function luna.window.setMode(w, h, flags) end
 
---- Moves the window to the given desktop position.
+--- Moves the window to the given screen position.
 ---@param x any
 ---@param y any
+---@return nil
 function luna.window.setPosition(x, y) end
 
 --- Sets the viewport scale mode.
----@param mode string Scale mode: `"none"`, `"letterbox"`, `"stretch"`, or `"pixel"`.
+---@param mode any
+---@return nil
 function luna.window.setScaleMode(mode) end
 
---- Sets the text displayed in the window's title bar.
----@param title string New title string to display.
+--- Sets the window title bar text.
+---@param title any
+---@return nil
 function luna.window.setTitle(title) end
 
---- Enables or disables vertical synchronization.
+--- Sets the VSync mode (1=on, 0=off, -1=adaptive).
 ---@param mode any
+---@return nil
 function luna.window.setVSync(mode) end
 
---- Shows a platform native message box dialog.
+--- Shows a platform-native message box dialog.
+---@param title string
+---@param message string
+---@param boxType? string? (optional)
+---@param btnType? string? (optional)
 ---@return string
-function luna.window.showMessageBox() end
+function luna.window.showMessageBox(title, message, boxType, btnType) end
 
 --- Converts a device-independent coordinate to physical pixels.
 ---@param value any
----@return any
+---@return number
 function luna.window.toPixels(value) end

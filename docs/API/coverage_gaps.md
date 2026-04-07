@@ -10,7 +10,7 @@ This report identifies three categories of coverage issues:
 
 ---
 
-## 1. Rust→Lua Gaps (168 items)
+## 1. Rust→Lua Gaps (192 items)
 
 These public Rust functions are **not exposed** to the `luna.*` Lua API.
 This may be intentional (engine internals) or an oversight.
@@ -24,8 +24,6 @@ This may be intentional (engine internals) or an oversight.
 ### `compute::ops`
 
 - `add_scalar` — Add a scalar to every element. The insertion is O(1) amortis `src/compute/ops.rs:114`
-- `argmax` — Return the flat index of the maximum element (0-based).  # P `src/compute/ops.rs:606`
-- `argmin` — Return the flat index of the minimum element (0-based).  # P `src/compute/ops.rs:586`
 - `bitwise_and` — Bitwise AND of two Int32 arrays. Consult the module-level do `src/compute/ops.rs:972`
 - `bitwise_lshift` — Bitwise left shift of an Int32 array by `amount` bits.  # Pa `src/compute/ops.rs:1045`
 - `bitwise_not` — Bitwise NOT of an Int32 array. Consult the module-level docu `src/compute/ops.rs:1028`
@@ -47,13 +45,10 @@ This may be intentional (engine internals) or an oversight.
 - `mean_axis` — Mean along a given axis. Consult the module-level documentat `src/compute/ops.rs:796`
 - `min_axis` — Minimum along a given axis. Consult the module-level documen `src/compute/ops.rs:814`
 - `min_val` — Minimum value across all elements. Consult the module-level  `src/compute/ops.rs:688`
-- `mul` — Element-wise multiplication of two arrays (same shape and dt `src/compute/ops.rs:150`
 - `mul_scalar` — Multiply every element by a scalar. Consult the module-level `src/compute/ops.rs:162`
-- `neg` — Element-wise negation. Consult the module-level documentatio `src/compute/ops.rs:235`
 - `neq` — Element-wise not-equal comparison of two arrays. Returns Flo `src/compute/ops.rs:311`
 - `neq_scalar` — Element-wise not-equal comparison against a scalar. Returns  `src/compute/ops.rs:333`
 - `pow_scalar` — Raise every element to a scalar exponent.  # Parameters - `a `src/compute/ops.rs:198`
-- `reshape` — Reshape an array to a new shape with the same total element  `src/compute/ops.rs:892`
 - `sub_scalar` — Subtract a scalar from every element. Consult the module-lev `src/compute/ops.rs:138`
 - `sum_axis` — Sum along a given axis, producing an array with that axis re `src/compute/ops.rs:764`
 - `transpose_2d` — Transpose a 2D array (swap rows and columns).  # Parameters  `src/compute/ops.rs:918`
@@ -61,17 +56,13 @@ This may be intentional (engine internals) or an oversight.
 
 ### `compute::spatial`
 
-- `convolve2d` — 2D convolution with zero-padding (same-size output).  # Para `src/compute/spatial.rs:25`
-- `dilate` — Morphological dilation with a Manhattan-diamond structuring  `src/compute/spatial.rs:81`
-- `erode` — Morphological erosion with a Manhattan-diamond structuring e `src/compute/spatial.rs:128`
-- `flood_fill` — Flood fill using BFS with 4-connectivity.  # Parameters - `a `src/compute/spatial.rs:180`
-- `get_region` — Extract a rectangular sub-region from a 2D array.  # Paramet `src/compute/spatial.rs:238`
-- `matmul` — Matrix multiplication of two 2D arrays: (m,k) × (k,n) → (m,n `src/compute/spatial.rs:322`
-- `set_region` — Copy a source 2D array into a target 2D array at position `( `src/compute/spatial.rs:282`
+- `flood_fill` — Flood fill using BFS with 4-connectivity.  # Parameters - `a `src/compute/spatial.rs:188`
+- `get_region` — Extract a rectangular sub-region from a 2D array.  # Paramet `src/compute/spatial.rs:246`
+- `set_region` — Copy a source 2D array into a target 2D array at position `( `src/compute/spatial.rs:290`
 
 ### `data::bin_pack`
 
-- `measure_size` — Compute the total byte size that `write` would produce for t `src/data/bin_pack.rs:365`
+- `measure_size` — Compute the total byte size that `write` would produce for t `src/data/bin_pack.rs:437`
 
 ### `data::pack`
 
@@ -100,11 +91,16 @@ This may be intentional (engine internals) or an oversight.
 
 ### `engine::messages`
 
+- `catalog` — Returns a reference to the global [`MessageCatalog`], or `No `src/engine/messages.rs:136`
 - `get_message` — Resolve a stable message ID to its human-readable text.  Ret `src/engine/messages.rs:118`
 
 ### `entity::universe`
 
-- `deep_copy_table` — Deep-copies a Lua table recursively. Consult the module-leve `src/entity/universe.rs:1170`
+- `deep_copy_table` — Deep-copies a Lua table recursively. Consult the module-leve `src/entity/universe.rs:1179`
+
+### `event`
+
+- `event_to_lua_multi` — Converts an [`Event`] into a Lua multi-value (name followed  `src/event/mod.rs:211`
 
 ### `input::gamepad`
 
@@ -113,10 +109,10 @@ This may be intentional (engine internals) or an oversight.
 
 ### `input::keyboard`
 
-- `get_key_from_scancode` — Resolves a physical scancode string to the closest logical L `src/input/keyboard.rs:315`
-- `get_scancode_from_key` — Resolves a logical Luna key name to the closest physical sca `src/input/keyboard.rs:283`
-- `winit_key_to_string` — Converts a `winit 0.30` logical `Key` to the lowercase strin `src/input/keyboard.rs:349`
-- `winit_scancode_to_string` — Converts a `winit 0.30` physical `KeyCode` to a engine-compa `src/input/keyboard.rs:400`
+- `get_key_from_scancode` — Resolves a physical scancode string to the closest logical L `src/input/keyboard.rs:326`
+- `get_scancode_from_key` — Resolves a logical Luna key name to the closest physical sca `src/input/keyboard.rs:294`
+- `winit_key_to_string` — Converts a `winit 0.30` logical `Key` to the lowercase strin `src/input/keyboard.rs:360`
+- `winit_scancode_to_string` — Converts a `winit 0.30` physical `KeyCode` to a engine-compa `src/input/keyboard.rs:411`
 
 ### `input::mouse`
 
@@ -154,6 +150,7 @@ This may be intentional (engine internals) or an oversight.
 ### `math::geometry`
 
 - `angle_between` — Returns the angle in radians from (x1, y1) to (x2, y2).  # P `src/math/geometry.rs:23`
+- `bresenham` — Bresenham line rasterization from (x1, y1) to (x2, y2).  # P `src/math/geometry.rs:396`
 - `circle_contains_point` — Returns true if the point (px, py) is inside the circle cent `src/math/geometry.rs:38`
 - `circle_intersects_circle` — Returns true if two circles overlap. Consult the module-leve `src/math/geometry.rs:56`
 - `circle_intersects_line` — Line-circle intersection. Returns (intersects, hit1, hit2).  `src/math/geometry.rs:79`
@@ -167,15 +164,10 @@ This may be intentional (engine internals) or an oversight.
 - `polygon_centroid` — Computes the centroid of a polygon. Consult the module-level `src/math/geometry.rs:213`
 - `segment_intersects_segment` — Tests if two line segments intersect. Returns (intersects, i `src/math/geometry.rs:262`
 
-### `math::noise::functions`
+### `math::noise_functions`
 
-- `fbm` — Generates fractal Brownian motion noise by layering multiple `src/math/noise/functions.rs:115`
-- `perlin2d` — Generates 2D Perlin noise at the given coordinates.  # Param `src/math/noise/functions.rs:18`
-- `perlin3d` — Generates 3D Perlin noise at the given coordinates.  # Param `src/math/noise/functions.rs:279`
-- `perlin4d` — Generates 4D Perlin noise at the given coordinates.  # Param `src/math/noise/functions.rs:331`
-- `simplex2d` — Generates 2D Simplex noise at the given coordinates.  # Para `src/math/noise/functions.rs:46`
-- `simplex_noise_2d` — Returns 2D simplex noise for the given coordinates using see `src/math/noise/functions.rs:84`
-- `simplex_noise_3d` — Returns 3D simplex noise for the given coordinates using see `src/math/noise/functions.rs:99`
+- `simplex_noise_2d` — Returns 2D simplex noise for the given coordinates using see `src/math/noise_functions.rs:84`
+- `simplex_noise_3d` — Returns 3D simplex noise for the given coordinates using see `src/math/noise_functions.rs:99`
 
 ### `math::polygon`
 
@@ -191,14 +183,15 @@ This may be intentional (engine internals) or an oversight.
 - `interpolate_alphas` — Interpolate a multi-stop alpha array at normalised time `t`  `src/particle/math.rs:95`
 - `interpolate_colors` — Interpolate a multi-stop color array at normalised time `t`  `src/particle/math.rs:62`
 - `interpolate_sizes` — Interpolate a multi-stop size array at normalised time `t` ( `src/particle/math.rs:33`
+- `lerp` — Linearly interpolate between `a` and `b` by factor `t`.  # P `src/particle/math.rs:12`
 - `rand_normal` — Approximate a standard-normal random value using Box-Muller  `src/particle/math.rs:129`
 - `rand_range` — Sample a uniform random value in `[min, max]`.  # Parameters `src/particle/math.rs:118`
 
 ### `pathfinding::astar`
 
 - `astar` — Run A★ search on `grid` from `start` to `goal`.  # Parameter `src/pathfinding/astar.rs:82`
-- `line_of_sight` — Check line-of-sight between two cells using Bresenham's algo `src/pathfinding/astar.rs:292`
-- `smooth_path` — Smooth a path by removing unnecessary waypoints via line-of- `src/pathfinding/astar.rs:334`
+- `line_of_sight` — Check line-of-sight between two cells using Bresenham's algo `src/pathfinding/astar.rs:300`
+- `smooth_path` — Smooth a path by removing unnecessary waypoints via line-of- `src/pathfinding/astar.rs:342`
 
 ### `pathfinding::graph_path`
 
@@ -213,7 +206,7 @@ This may be intentional (engine internals) or an oversight.
 
 ### `procgen::cellular`
 
-- `cellular_automata` — Generates a cave/dungeon map using cellular automata.  # Par `src/procgen/cellular.rs:55`
+- `cellular_automata` — Generates a cave/dungeon map using cellular automata.  # Par `src/procgen/cellular.rs:75`
 
 ### `procgen::flood_fill`
 
@@ -229,7 +222,7 @@ This may be intentional (engine internals) or an oversight.
 
 ### `procgen::voronoi`
 
-- `voronoi_diagram` — Generates a Voronoi diagram. Consult the module-level docume `src/procgen/voronoi.rs:51`
+- `voronoi_diagram` — Generates a Voronoi diagram. Consult the module-level docume `src/procgen/voronoi.rs:69`
 
 ### `raycaster::lighting`
 
@@ -256,8 +249,8 @@ This may be intentional (engine internals) or an oversight.
 
 ### `savegame`
 
-- `serialize_table` — Serialize a simple Lua-compatible value hierarchy into a `re `src/savegame/mod.rs:148`
-- `serialize_value` — Serialize a single value. `src/savegame/mod.rs:173`
+- `serialize_table` — Serialize a simple Lua-compatible value hierarchy into a `re `src/savegame/mod.rs:250`
+- `serialize_value` — Serialize a single value.  # Parameters - `value` — `&SaveVa `src/savegame/mod.rs:282`
 
 ### `savegame::save_data`
 
@@ -274,6 +267,11 @@ This may be intentional (engine internals) or an oversight.
 - `from_json` — Parse a JSON string into a `SerialValue`.  # Parameters - `s `src/serial/json.rs:18`
 - `to_json` — Serialize a `SerialValue` to a JSON string.  # Parameters -  `src/serial/json.rs:32`
 
+### `serial::lua_table`
+
+- `from_lua` — Converts a Lua value tree into a `SerialValue` tree.  # Para `src/serial/lua_table.rs:78`
+- `to_lua` — Converts a `SerialValue` tree into a Lua value tree.  # Para `src/serial/lua_table.rs:47`
+
 ### `serial::toml`
 
 - `from_toml` — Parse a TOML string into a `SerialValue`.  # Parameters - `s `src/serial/toml.rs:16`
@@ -286,8 +284,8 @@ This may be intentional (engine internals) or an oversight.
 
 ### `thread::channel`
 
-- `channel_value_to_lua` — Convert a `ChannelValue` back into a Lua value.  # Parameter `src/thread/channel.rs:299`
-- `lua_to_channel_value` — Convert a Lua value into a `ChannelValue` for cross-thread t `src/thread/channel.rs:278`
+- `channel_value_to_lua` — Convert a `ChannelValue` back into a Lua value.  # Parameter `src/thread/channel.rs:298`
+- `lua_to_channel_value` — Convert a Lua value into a `ChannelValue` for cross-thread t `src/thread/channel.rs:277`
 
 ### `tilemap::coords`
 
@@ -312,6 +310,44 @@ This may be intentional (engine internals) or an oversight.
 
 - `load_tmx` — Parses a TMX file given its XML content as a string.  # Para `src/tilemap/tmx.rs:291`
 
+### `window::management`
+
+- `from_dpi_pixels` — Converts a physical pixel value to device-independent coordi `src/window/management.rs:280`
+- `get_dpi_scale` — Returns the DPI scale factor of the display the window is on `src/window/management.rs:94`
+- `get_fullscreen` — Returns the fullscreen state and type as a `(bool, &str)` pa `src/window/management.rs:232`
+- `get_fullscreen_type_str` — Returns the fullscreen type as a lowercase string.  # Parame `src/window/management.rs:218`
+- `get_mode` — Returns the current window mode settings.  # Parameters - `w `src/window/management.rs:338`
+- `get_pixel_dimensions` — Returns the window dimensions in physical pixels (logical si `src/window/management.rs:297`
+- `get_position` — Returns the current window position in screen coordinates as `src/window/management.rs:105`
+- `get_vsync` — Returns the current VSync mode integer.  # Parameters - `ws` `src/window/management.rs:81`
+- `has_focus` — Returns whether the window currently has keyboard focus.  #  `src/window/management.rs:172`
+- `has_mouse_focus` — Returns whether the mouse cursor is inside the window.  # Pa `src/window/management.rs:254`
+- `is_fullscreen` — Returns whether the window is currently in fullscreen mode.  `src/window/management.rs:59`
+- `is_maximized` — Returns whether the window is currently maximized.  # Parame `src/window/management.rs:161`
+- `is_minimized` — Returns whether the window is currently minimized.  # Parame `src/window/management.rs:150`
+- `is_visible` — Returns whether the window is currently visible.  # Paramete `src/window/management.rs:243`
+- `request_attention` — Schedules a user-attention request (taskbar flash on Windows `src/window/management.rs:180`
+- `set_fullscreen` — Schedules a fullscreen mode change.  `flag` = `true` to ente `src/window/management.rs:43`
+- `set_icon` — Schedules a window icon change from the given file path.  #  `src/window/management.rs:197`
+- `set_mode` — Schedules a combined window mode change (size + optional ful `src/window/management.rs:314`
+- `set_position` — Schedules a window position change to `(x, y)` in screen coo `src/window/management.rs:115`
+- `set_size` — Schedules a window resize to `(w, h)` logical pixels.  # Par `src/window/management.rs:207`
+- `set_title` — Schedules a window title change for the next frame.  # Param `src/window/management.rs:30`
+- `set_vsync` — Schedules a VSync mode change.  `1` = Fifo (vsync on), `0` = `src/window/management.rs:70`
+- `show_message_box` — Shows a platform-native message box dialog.  `box_type`: `"i `src/window/management.rs:361`
+- `to_dpi_pixels` — Converts a device-independent value to physical pixels using `src/window/management.rs:266`
+
+### `window::viewport`
+
+- `from_pixels` — Converts window pixel coordinates `(x, y)` back to game-spac `src/window/viewport.rs:87`
+- `get_height` — Returns the logical game height in virtual pixels.  # Parame `src/window/viewport.rs:28`
+- `get_scale_info` — Returns the current viewport scale and offset information.   `src/window/viewport.rs:132`
+- `get_scale_mode` — Returns the current viewport scale mode string.  One of `"no `src/window/viewport.rs:41`
+- `get_width` — Returns the logical game width in virtual pixels.  # Paramet `src/window/viewport.rs:17`
+- `set_scale_mode` — Schedules a viewport scale mode change.  Accepted values: `" `src/window/viewport.rs:52`
+- `set_scale_mode_validated` — Validates and schedules a viewport scale mode change.  Retur `src/window/viewport.rs:154`
+- `to_pixels` — Converts game-space coordinates `(x, y)` to window pixel coo `src/window/viewport.rs:68`
+
 ---
 
 ## 2. Rust Docstring Issues (0 items)
@@ -323,360 +359,37 @@ These appear as `// (undocumented)` in `docs/API/rust-api.md`.
 
 ---
 
-## 3. Lua Docstring Issues (848 items)
+## 3. Lua Docstring Issues (267 items)
 
 Lua API items with missing or very short descriptions (< 15 chars).
 These appear without documentation in `docs/API/lua-api.md` and IntelliSense.
 
 ### `ai`
 
-- `method` **`AIWorld:AIWorld:getAgentCount`** — *"@return any"* (too short)
-- `method` **`AIWorld:AIWorld:getGlobalBlackboard`** — *"@return any"* (too short)
-- `method` **`Agent:Agent:getBlackboard`** — *"@return any"* (too short)
-- `method` **`Agent:Agent:getDecisionModel`** — *"@return any"* (too short)
-- `method` **`Agent:Agent:getMaxForce`** — *"@return any"* (too short)
-- `method` **`Agent:Agent:getMaxSpeed`** — *"@return any"* (too short)
-- `method` **`Agent:Agent:getName`** — *"@return any"* (too short)
-- `method` **`Agent:Agent:getPosition`** — *"@return any"* (too short)
-- `method` **`Agent:Agent:getPriority`** — *"@return any"* (too short)
-- `method` **`Agent:Agent:getVelocity`** — *"@return any"* (too short)
-- `method` **`BTNode:BTNode:getChildCount`** — *"@return any"* (too short)
-- `method` **`BTNode:BTNode:getCount`** — *"@return any"* (too short)
-- `method` **`BTNode:BTNode:getNodeType`** — *"@return string"* (too short)
-- `method` **`BehaviorTree:BehaviorTree:getLastStatus`** — *"@return any"* (too short)
-- `method` **`Blackboard:Blackboard:getKeys`** — *"@return table"* (too short)
-- `method` **`CommandQueue:CommandQueue:getCurrentTarget`** — *"@return any"* (too short)
-- `method` **`CommandQueue:CommandQueue:getCurrentType`** — *"@return any"* (too short)
-- `method` **`InfluenceMap:InfluenceMap:getCellSize`** — *"@return any"* (too short)
-- `method` **`InfluenceMap:InfluenceMap:getHeight`** — *"@return any"* (too short)
-- `method` **`InfluenceMap:InfluenceMap:getWidth`** — *"@return any"* (too short)
-- `method` **`QLearner:QLearner:getActionCount`** — *"@return any"* (too short)
-- `method` **`QLearner:QLearner:getDiscountFactor`** — *"@return any"* (too short)
-- `method` **`QLearner:QLearner:getEpisodeCount`** — *"@return any"* (too short)
-- `method` **`QLearner:QLearner:getExplorationDecay`** — *"@return any"* (too short)
-- `method` **`QLearner:QLearner:getExplorationRate`** — *"@return any"* (too short)
-- `method` **`QLearner:QLearner:getLearningRate`** — *"@return any"* (too short)
-- `method` **`QLearner:QLearner:getStateCount`** — *"@return any"* (too short)
-- `method` **`Squad:Squad:getBlackboard`** — *"@return any"* (too short)
-- `method` **`Squad:Squad:getFormation`** — *"@return any"* (too short)
-- `method` **`Squad:Squad:getFormationSpacing`** — *"@return any"* (too short)
-- `method` **`Squad:Squad:getLeader`** — *"@return any"* (too short)
-- `method` **`Squad:Squad:getMembers`** — *"@return table"* (too short)
-- `method` **`Squad:Squad:getName`** — *"@return any"* (too short)
-- `method` **`StateMachine:StateMachine:getCurrentState`** — *"@return any"* (too short)
-- `method` **`StateMachine:StateMachine:getTimeInState`** — *"@return any"* (too short)
-- `method` **`SteeringManager:SteeringManager:getCombineMode`** — *"@return any"* (too short)
-- `method` **`SteeringManager:SteeringManager:getLastSteering`** — *"@return any"* (too short)
-- `method` **`UtilityAI:UtilityAI:getLastAction`** — *"@return any"* (too short)
-
-### `animation`
-
-- `method` **`Animation:Animation:getClipCount`** — *"@return number"* (too short)
-- `method` **`Animation:Animation:getFrameCount`** — *"@return number"* (too short)
-- `method` **`Animation:Animation:getSpeed`** — *"@return number"* (too short)
-- `method` **`Animation:Animation:stop`** — *(no description)*
-
-### `audio`
-
-- `function` **`luna.audio.luna.audio.getActiveSourceCount`** — *"@return any"* (too short)
-- `function` **`luna.audio.luna.audio.getDistanceModel`** — *"@return any"* (too short)
-- `function` **`luna.audio.luna.audio.getDopplerScale`** — *"@return any"* (too short)
-- `function` **`luna.audio.luna.audio.getFreeBufferCount`** — *"# Parameters"* (too short)
-- `function` **`luna.audio.luna.audio.getListener`** — *"@return any"* (too short)
-- `function` **`luna.audio.luna.audio.getListener2D`** — *"@return any"* (too short)
-- `function` **`luna.audio.luna.audio.getMasterVolume`** — *"# Returns"* (too short)
-- `function` **`luna.audio.luna.audio.getMaxSources`** — *(no description)*
-- `function` **`luna.audio.luna.audio.getMeter`** — *"@return any"* (too short)
-- `function` **`luna.audio.luna.audio.getPlaybackDevice`** — *"# Returns"* (too short)
-- `function` **`luna.audio.luna.audio.getPlaybackDevices`** — *"# Returns"* (too short)
-- `function` **`luna.audio.luna.audio.getSourceCount`** — *"@return any"* (too short)
-- `function` **`luna.audio.luna.audio.hasMidiSoundFont`** — *"# Returns"* (too short)
-- `function` **`luna.audio.luna.audio.pauseAll`** — *(no description)*
-- `function` **`luna.audio.luna.audio.setMidiSoundFont`** — *"# Parameters"* (too short)
-- `function` **`luna.audio.luna.audio.set_bus_volume`** — *(no description)*
-- `function` **`luna.audio.luna.audio.set_effect_param`** — *(no description)*
-- `function` **`luna.audio.luna.audio.stopAll`** — *(no description)*
-- `function` **`luna.audio.luna.audio.stopQueueable`** — *"# Parameters"* (too short)
-- `method` **`Bus:Bus:getName`** — *"@return any"* (too short)
-- `method` **`Bus:Bus:getPitch`** — *"@return any"* (too short)
-- `method` **`Bus:Bus:getVolume`** — *"@return any"* (too short)
-- `method` **`Bus:Bus:isPaused`** — *"@return any"* (too short)
-- `method` **`Bus:Bus:pause`** — *(no description)*
-- `method` **`Decoder:Decoder:isSeekable`** — *"# Returns"* (too short)
-- `method` **`MidiPlayer:MidiPlayer:getBus`** — *"@return any"* (too short)
-- `method` **`MidiPlayer:MidiPlayer:getChannelCount`** — *"@return any"* (too short)
-- `method` **`MidiPlayer:MidiPlayer:getDuration`** — *"@return any"* (too short)
-- `method` **`MidiPlayer:MidiPlayer:getFilePath`** — *"@return any"* (too short)
-- `method` **`MidiPlayer:MidiPlayer:getNoteCount`** — *"@return any"* (too short)
-- `method` **`MidiPlayer:MidiPlayer:getOriginalTempo`** — *"@return any"* (too short)
-- `method` **`MidiPlayer:MidiPlayer:getSoundFontPath`** — *"@return any"* (too short)
-- `method` **`MidiPlayer:MidiPlayer:getTempo`** — *"@return any"* (too short)
-- `method` **`MidiPlayer:MidiPlayer:getTempoScale`** — *"@return any"* (too short)
-- `method` **`MidiPlayer:MidiPlayer:getTicksPerBeat`** — *"@return any"* (too short)
-- `method` **`MidiPlayer:MidiPlayer:getTrackCount`** — *"@return any"* (too short)
-- `method` **`MidiPlayer:MidiPlayer:getVolume`** — *"@return any"* (too short)
-- `method` **`MidiPlayer:MidiPlayer:isLoaded`** — *"@return any"* (too short)
-- `method` **`MidiPlayer:MidiPlayer:isLooping`** — *"@return any"* (too short)
-- `method` **`MidiPlayer:MidiPlayer:isPaused`** — *"@return any"* (too short)
-- `method` **`MidiPlayer:MidiPlayer:isPlaying`** — *"@return any"* (too short)
-- `method` **`MidiPlayer:MidiPlayer:pause`** — *(no description)*
-- `method` **`MidiPlayer:MidiPlayer:stop`** — *(no description)*
-- `method` **`MidiPlayer:MidiPlayer:tell`** — *"@return any"* (too short)
-- `method` **`MidiPlayer:MidiPlayer:unsoloAll`** — *(no description)*
-- `method` **`Source:Source:getDuration`** — *"@return any"* (too short)
-- `method` **`Source:Source:getFadeIn`** — *"@return any"* (too short)
-- `method` **`Source:Source:getHighpass`** — *"@return any"* (too short)
-- `method` **`Source:Source:getLowpass`** — *"@return any"* (too short)
-- `method` **`Source:Source:getPan`** — *"@return any"* (too short)
-- `method` **`Source:Source:getPitch`** — *"@return any"* (too short)
-- `method` **`Source:Source:getType`** — *"@return any"* (too short)
-- `method` **`Source:Source:getVolume`** — *"@return any"* (too short)
-- `method` **`Source:Source:isLooping`** — *"@return any"* (too short)
-- `method` **`Source:Source:isPaused`** — *"@return any"* (too short)
-- `method` **`Source:Source:isPlaying`** — *"@return any"* (too short)
-- `method` **`Source:Source:isStopped`** — *"@return any"* (too short)
-- `method` **`Source:Source:pause`** — *(no description)*
-- `method` **`Source:Source:stop`** — *(no description)*
-- `method` **`Source:Source:tell`** — *"@return any"* (too short)
-
-### `automation`
-
-- `function` **`luna.automation.luna.automation.getCurrentScript`** — *(no description)*
-- `function` **`luna.automation.luna.automation.getCurrentStep`** — *(no description)*
-- `function` **`luna.automation.luna.automation.getElapsedTime`** — *(no description)*
-- `function` **`luna.automation.luna.automation.getScripts`** — *(no description)*
-- `function` **`luna.automation.luna.automation.getStepCount`** — *(no description)*
-- `function` **`luna.automation.luna.automation.hasScript`** — *(no description)*
-- `function` **`luna.automation.luna.automation.isComplete`** — *(no description)*
-- `function` **`luna.automation.luna.automation.isPaused`** — *(no description)*
-- `function` **`luna.automation.luna.automation.pause`** — *(no description)*
-- `function` **`luna.automation.luna.automation.stop`** — *(no description)*
-
-### `camera`
-
-- `method` **`Camera2D:Camera2D:clearTarget`** — *(no description)*
-- `method` **`Camera2D:Camera2D:getRotation`** — *"@return number"* (too short)
-- `method` **`Camera2D:Camera2D:getZoom`** — *"@return number"* (too short)
-
-### `dataframe`
-
-- `method` **`DataFrame:DataFrame:clone`** — *"@return any"* (too short)
-
-### `debug`
-
-- `function` **`luna.debug.luna.debug.clearLog`** — *(no description)*
-- `function` **`luna.debug.luna.debug.clearWatches`** — *(no description)*
-- `function` **`luna.debug.luna.debug.getFrameHistory`** — *"@return table"* (too short)
-- `function` **`luna.debug.luna.debug.getFrameStats`** — *(no description)*
-- `function` **`luna.debug.luna.debug.getLogConsole`** — *(no description)*
-- `function` **`luna.debug.luna.debug.getLogFile`** — *"@return table"* (too short)
-- `function` **`luna.debug.luna.debug.getLogLevel`** — *(no description)*
-- `function` **`luna.debug.luna.debug.getProfileFrameCount`** — *"@return table"* (too short)
-- `function` **`luna.debug.luna.debug.getWatchInterval`** — *(no description)*
-- `function` **`luna.debug.luna.debug.getWatchedPaths`** — *"@return table"* (too short)
-- `function` **`luna.debug.luna.debug.isConsoleOpen`** — *(no description)*
-- `function` **`luna.debug.luna.debug.isProfilingEnabled`** — *(no description)*
-- `function` **`luna.debug.luna.debug.resetProfile`** — *(no description)*
-
-### `debugbridge`
-
-- `function` **`luna.debugbridge.luna.debugbridge.clearPrintHistory`** — *(no description)*
-- `function` **`luna.debugbridge.luna.debugbridge.getClientCount`** — *"@return any"* (too short)
-- `function` **`luna.debugbridge.luna.debugbridge.getPerformance`** — *"@return table"* (too short)
-- `function` **`luna.debugbridge.luna.debugbridge.getPort`** — *"@return any"* (too short)
-- `function` **`luna.debugbridge.luna.debugbridge.isRunning`** — *"@return any"* (too short)
-- `function` **`luna.debugbridge.luna.debugbridge.isScreenshotRequested`** — *"@return any"* (too short)
-
-### `docs`
-
-- `class` **`luna.docs.ApiCatalog`** — *(no description)*
-- `class` **`luna.docs.DocEntry`** — *(no description)*
-- `class` **`luna.docs.QualityReport`** — *(no description)*
-- `class` **`luna.docs.ValidationReport`** — *(no description)*
-- `method` **`ApiCatalog:ApiCatalog:getModules`** — *"@return table"* (too short)
-- `method` **`DocEntry:DocEntry:getDeprecated`** — *"@return any"* (too short)
-- `method` **`DocEntry:DocEntry:getDescription`** — *"@return any"* (too short)
-- `method` **`DocEntry:DocEntry:getExample`** — *"@return any"* (too short)
-- `method` **`DocEntry:DocEntry:getKind`** — *"@return any"* (too short)
-- `method` **`DocEntry:DocEntry:getModule`** — *"@return any"* (too short)
-- `method` **`DocEntry:DocEntry:getName`** — *"@return any"* (too short)
-- `method` **`DocEntry:DocEntry:getParameters`** — *"@return table"* (too short)
-- `method` **`DocEntry:DocEntry:getQualifiedName`** — *"@return any"* (too short)
-- `method` **`DocEntry:DocEntry:getReturns`** — *"@return table"* (too short)
-- `method` **`DocEntry:DocEntry:getScore`** — *"@return any"* (too short)
-- `method` **`DocEntry:DocEntry:getSince`** — *"@return any"* (too short)
-- `method` **`QualityReport:QualityReport:getGrade`** — *"@return any"* (too short)
-- `method` **`QualityReport:QualityReport:getModuleScores`** — *"@return table"* (too short)
-- `method` **`QualityReport:QualityReport:getOverallScore`** — *"@return any"* (too short)
-- `method` **`QualityReport:QualityReport:getSummary`** — *"@return any"* (too short)
-- `method` **`ValidationReport:ValidationReport:getIncomplete`** — *"@return table"* (too short)
-- `method` **`ValidationReport:ValidationReport:getMissing`** — *"@return table"* (too short)
-- `method` **`ValidationReport:ValidationReport:getPhantom`** — *"@return table"* (too short)
-- `method` **`ValidationReport:ValidationReport:getSummary`** — *"@return any"* (too short)
-
-### `entity`
-
-- `method` **`Universe:Universe:draw`** — *"# Returns"* (too short)
-- `method` **`Universe:Universe:getEntities`** — *"@return any"* (too short)
-- `method` **`Universe:Universe:getEntitiesSorted`** — *"@return any"* (too short)
-- `method` **`Universe:Universe:getEntityCount`** — *"@return any"* (too short)
-- `method` **`Universe:Universe:getSystemCount`** — *"# Returns"* (too short)
-
-### `event`
-
-- `method` **`Signal:Signal:getTotalCount`** — *"@return any"* (too short)
-
-### `filesystem`
-
-- `function` **`luna.filesystem.luna.filesystem.getDirectoryItems`** — *"# Parameters"* (too short)
-- `function` **`luna.filesystem.luna.filesystem.getIdentity`** — *"# Returns"* (too short)
-- `function` **`luna.filesystem.luna.filesystem.getSaveDirectory`** — *"@return any"* (too short)
-- `function` **`luna.filesystem.luna.filesystem.getSource`** — *"# Returns"* (too short)
-- `function` **`luna.filesystem.luna.filesystem.getUserDirectory`** — *"@return any"* (too short)
-- `function` **`luna.filesystem.luna.filesystem.getWorkingDirectory`** — *(no description)*
-- `function` **`luna.filesystem.luna.filesystem.setIdentity`** — *"# Parameters"* (too short)
-- `method` **`FileData:FileData:getFilename`** — *(no description)*
-- `method` **`FileData:FileData:getSize`** — *(no description)*
-- `method` **`FileData:FileData:getString`** — *(no description)*
-- `method` **`FileHandle:FileHandle:getMode`** — *"@return any"* (too short)
-- `method` **`FileHandle:FileHandle:getSize`** — *"@return any"* (too short)
-- `method` **`FileHandle:FileHandle:isEOF`** — *"# Returns"* (too short)
-- `method` **`FileHandle:FileHandle:tell`** — *"@return any"* (too short)
-
-### `font`
-
-- `class` **`luna.font.GlyphData`** — *(no description)*
-- `method` **`GlyphData:GlyphData:getAdvance`** — *"# Returns"* (too short)
-- `method` **`GlyphData:GlyphData:getBearingX`** — *"# Returns"* (too short)
-- `method` **`GlyphData:GlyphData:getBearingY`** — *"# Returns"* (too short)
-- `method` **`GlyphData:GlyphData:getGlyph`** — *"# Returns"* (too short)
-- `method` **`GlyphData:GlyphData:getGlyphString`** — *"# Returns"* (too short)
-- `method` **`GlyphData:GlyphData:getHeight`** — *"# Returns"* (too short)
-- `method` **`GlyphData:GlyphData:getWidth`** — *"# Returns"* (too short)
+- `class` **`luna.ai.AIWorld`** — *(no description)*
+- `class` **`luna.ai.Agent`** — *(no description)*
+- `class` **`luna.ai.BTNode`** — *(no description)*
+- `class` **`luna.ai.BehaviorTree`** — *(no description)*
+- `class` **`luna.ai.Blackboard`** — *(no description)*
+- `class` **`luna.ai.CommandQueue`** — *(no description)*
+- `class` **`luna.ai.GOAPPlanner`** — *(no description)*
+- `class` **`luna.ai.InfluenceMap`** — *(no description)*
+- `class` **`luna.ai.QLearner`** — *(no description)*
+- `class` **`luna.ai.Squad`** — *(no description)*
+- `class` **`luna.ai.StateMachine`** — *(no description)*
+- `class` **`luna.ai.SteeringManager`** — *(no description)*
+- `class` **`luna.ai.UtilityAI`** — *(no description)*
 
 ### `graph`
 
-- `class` **`luna.graph.GraphEdge`** — *(no description)*
-- `class` **`luna.graph.GraphNode`** — *(no description)*
-- `method` **`Graph:Graph:getComponents`** — *"@return any"* (too short)
-- `method` **`Graph:Graph:getEdgeCount`** — *"@return any"* (too short)
-- `method` **`Graph:Graph:getEdges`** — *"@return any"* (too short)
-- `method` **`Graph:Graph:getItemCount`** — *"@return any"* (too short)
-- `method` **`Graph:Graph:getItems`** — *"@return any"* (too short)
-- `method` **`Graph:Graph:getNodeCount`** — *"@return any"* (too short)
-- `method` **`Graph:Graph:getNodes`** — *"@return any"* (too short)
-- `method` **`Graph:Graph:getStats`** — *"@return any"* (too short)
-- `method` **`Graph:Graph:hasCycle`** — *"@return any"* (too short)
-- `method` **`GraphEdge:GraphEdge:getCapacity`** — *"@return any"* (too short)
-- `method` **`GraphEdge:GraphEdge:getCooldown`** — *"@return any"* (too short)
-- `method` **`GraphEdge:GraphEdge:getFrom`** — *"@return any"* (too short)
-- `method` **`GraphEdge:GraphEdge:getItemsInTransit`** — *"@return any"* (too short)
-- `method` **`GraphEdge:GraphEdge:getSpeedModifier`** — *"@return any"* (too short)
-- `method` **`GraphEdge:GraphEdge:getThroughput`** — *"@return any"* (too short)
-- `method` **`GraphEdge:GraphEdge:getTo`** — *"@return any"* (too short)
-- `method` **`GraphEdge:GraphEdge:getTravelTime`** — *"@return any"* (too short)
-- `method` **`GraphEdge:GraphEdge:getType`** — *"@return any"* (too short)
-- `method` **`GraphEdge:GraphEdge:getWeight`** — *"@return any"* (too short)
-- `method` **`GraphEdge:GraphEdge:isActive`** — *"@return any"* (too short)
-- `method` **`GraphEdge:GraphEdge:isBidirectional`** — *"@return any"* (too short)
-- `method` **`GraphEdge:GraphEdge:isOnCooldown`** — *"@return any"* (too short)
-- `method` **`GraphItem:GraphItem:getDecayTime`** — *"@return any"* (too short)
-- `method` **`GraphItem:GraphItem:getPosition`** — *"@return any"* (too short)
-- `method` **`GraphItem:GraphItem:getPriority`** — *"@return any"* (too short)
-- `method` **`GraphItem:GraphItem:getRemainingLife`** — *"@return any"* (too short)
-- `method` **`GraphItem:GraphItem:getType`** — *"@return any"* (too short)
-- `method` **`GraphItem:GraphItem:isAlive`** — *"@return any"* (too short)
-- `method` **`GraphNode:GraphNode:getCapacity`** — *"@return any"* (too short)
-- `method` **`GraphNode:GraphNode:getFlowMode`** — *"@return any"* (too short)
-- `method` **`GraphNode:GraphNode:getItemCount`** — *"@return any"* (too short)
-- `method` **`GraphNode:GraphNode:getItems`** — *"@return any"* (too short)
-- `method` **`GraphNode:GraphNode:getOverflowPolicy`** — *"@return any"* (too short)
-- `method` **`GraphNode:GraphNode:getProcessTime`** — *"@return any"* (too short)
-- `method` **`GraphNode:GraphNode:getPullFilter`** — *"@return any"* (too short)
-- `method` **`GraphNode:GraphNode:getPullRate`** — *"@return any"* (too short)
-- `method` **`GraphNode:GraphNode:getPushFilter`** — *"@return any"* (too short)
-- `method` **`GraphNode:GraphNode:getPushRate`** — *"@return any"* (too short)
-- `method` **`GraphNode:GraphNode:getQueueCapacity`** — *"@return any"* (too short)
-- `method` **`GraphNode:GraphNode:getTags`** — *"@return any"* (too short)
-- `method` **`GraphNode:GraphNode:getType`** — *"@return any"* (too short)
-- `method` **`GraphNode:GraphNode:isActive`** — *"@return any"* (too short)
-- `method` **`GraphNode:GraphNode:isQueueEnabled`** — *"@return any"* (too short)
+- `class` **`luna.graph.Edge`** — *(no description)*
+- `class` **`luna.graph.Graph`** — *(no description)*
+- `class` **`luna.graph.GraphItem`** — *(no description)*
+- `class` **`luna.graph.Node`** — *(no description)*
 
 ### `graphics`
 
-- `class` **`luna.graphics.Shape`** — *(no description)*
-- `function` **`luna.graphics.luna.graphics.arc`** — *"# Parameters"* (too short)
-- `function` **`luna.graphics.luna.graphics.circle`** — *"# Parameters"* (too short)
-- `function` **`luna.graphics.luna.graphics.drawBatch`** — *"# Parameters"* (too short)
-- `function` **`luna.graphics.luna.graphics.drawCanvas`** — *(no description)*
-- `function` **`luna.graphics.luna.graphics.drawMesh`** — *"# Parameters"* (too short)
-- `function` **`luna.graphics.luna.graphics.drawNineSlice`** — *"# Parameters"* (too short)
-- `function` **`luna.graphics.luna.graphics.ellipse`** — *"# Parameters"* (too short)
-- `function` **`luna.graphics.luna.graphics.getBlendMode`** — *"# Returns"* (too short)
-- `function` **`luna.graphics.luna.graphics.getCameraPosition`** — *"# Returns"* (too short)
-- `function` **`luna.graphics.luna.graphics.getCameraRotation`** — *"# Returns"* (too short)
-- `function` **`luna.graphics.luna.graphics.getCameraZoom`** — *"# Returns"* (too short)
-- `function` **`luna.graphics.luna.graphics.getCanvas`** — *(no description)*
-- `function` **`luna.graphics.luna.graphics.getCanvasSize`** — *(no description)*
-- `function` **`luna.graphics.luna.graphics.getColorMask`** — *(no description)*
-- `function` **`luna.graphics.luna.graphics.getDefaultFilter`** — *(no description)*
-- `function` **`luna.graphics.luna.graphics.getDepthMode`** — *(no description)*
-- `function` **`luna.graphics.luna.graphics.getFontAscent`** — *"# Returns"* (too short)
-- `function` **`luna.graphics.luna.graphics.getFontDescent`** — *"# Returns"* (too short)
-- `function` **`luna.graphics.luna.graphics.getFontLineHeight`** — *"# Returns"* (too short)
-- `function` **`luna.graphics.luna.graphics.getFontWrap`** — *(no description)*
-- `function` **`luna.graphics.luna.graphics.getLineWidth`** — *"# Returns"* (too short)
-- `function` **`luna.graphics.luna.graphics.getMeshTexture`** — *"# Parameters"* (too short)
-- `function` **`luna.graphics.luna.graphics.getMeshVertex`** — *(no description)*
-- `function` **`luna.graphics.luna.graphics.getMeshVertexCount`** — *(no description)*
-- `function` **`luna.graphics.luna.graphics.getPointSize`** — *(no description)*
-- `function` **`luna.graphics.luna.graphics.getScissor`** — *(no description)*
-- `function` **`luna.graphics.luna.graphics.getShader`** — *(no description)*
-- `function` **`luna.graphics.luna.graphics.getStackDepth`** — *(no description)*
-- `function` **`luna.graphics.luna.graphics.getStats`** — *(no description)*
-- `function` **`luna.graphics.luna.graphics.getStencilMode`** — *(no description)*
-- `function` **`luna.graphics.luna.graphics.hasShaderUniform`** — *(no description)*
-- `function` **`luna.graphics.luna.graphics.isWireframe`** — *(no description)*
-- `function` **`luna.graphics.luna.graphics.line`** — *"# Parameters"* (too short)
-- `function` **`luna.graphics.luna.graphics.points`** — *"# Parameters"* (too short)
-- `function` **`luna.graphics.luna.graphics.polygon`** — *"# Parameters"* (too short)
-- `function` **`luna.graphics.luna.graphics.print`** — *"# Parameters"* (too short)
-- `function` **`luna.graphics.luna.graphics.printf`** — *(no description)*
-- `function` **`luna.graphics.luna.graphics.rectangle`** — *"# Parameters"* (too short)
-- `function` **`luna.graphics.luna.graphics.setBackgroundColor`** — *"# Parameters"* (too short)
-- `function` **`luna.graphics.luna.graphics.setBlendMode`** — *"# Parameters"* (too short)
-- `function` **`luna.graphics.luna.graphics.setCamera`** — *"# Parameters"* (too short)
-- `function` **`luna.graphics.luna.graphics.setColorMask`** — *"# Parameters"* (too short)
-- `function` **`luna.graphics.luna.graphics.setDefaultFilter`** — *(no description)*
-- `function` **`luna.graphics.luna.graphics.setFontLineHeight`** — *"# Parameters"* (too short)
-- `function` **`luna.graphics.luna.graphics.setMeshDrawMode`** — *"# Parameters"* (too short)
-- `function` **`luna.graphics.luna.graphics.setMeshVertexMap`** — *"# Parameters"* (too short)
-- `function` **`luna.graphics.luna.graphics.setPointSize`** — *"# Parameters"* (too short)
-- `function` **`luna.graphics.luna.graphics.stencil`** — *(no description)*
-- `function` **`luna.graphics.luna.graphics.triangle`** — *"# Parameters"* (too short)
-- `method` **`Canvas:Canvas:getDimensions`** — *"# Returns"* (too short)
-- `method` **`Canvas:Canvas:getHeight`** — *"# Returns"* (too short)
-- `method` **`Canvas:Canvas:getWidth`** — *"# Returns"* (too short)
-- `method` **`Font:Font:getAscent`** — *"# Returns"* (too short)
-- `method` **`Font:Font:getDescent`** — *"# Returns"* (too short)
-- `method` **`Font:Font:getHeight`** — *"# Returns"* (too short)
-- `method` **`Font:Font:getLineHeight`** — *"# Returns"* (too short)
-- `method` **`Font:Font:setLineHeight`** — *"# Parameters"* (too short)
-- `method` **`Image:Image:getDimensions`** — *"# Returns"* (too short)
-- `method` **`Image:Image:getFilter`** — *"# Returns"* (too short)
-- `method` **`Image:Image:getHeight`** — *"# Returns"* (too short)
-- `method` **`Image:Image:getWidth`** — *"# Returns"* (too short)
-- `method` **`Image:Image:getWrap`** — *"# Returns"* (too short)
-- `method` **`NineSlice:NineSlice:draw`** — *"# Parameters"* (too short)
-- `method` **`NineSlice:NineSlice:getInsets`** — *"# Returns"* (too short)
-- `method` **`NineSlice:NineSlice:getTextureSize`** — *"# Parameters"* (too short)
-- `method` **`Shape:Shape:clear`** — *(no description)*
-- `method` **`Shape:Shape:getCommandCount`** — *"# Returns"* (too short)
-- `method` **`Shape:Shape:setColor`** — *"# Parameters"* (too short)
-- `method` **`Shape:Shape:setLineWidth`** — *"# Parameters"* (too short)
-- `method` **`SpriteBatch:SpriteBatch:getBufferSize`** — *"# Returns"* (too short)
-- `method` **`SpriteBatch:SpriteBatch:getCount`** — *"# Returns"* (too short)
-- `module` **`luna.graphics`** — *(no description)*
+- `function` **`luna.graphics.luna.graphics.arc`** — *"Draws an arc."* (too short)
 
 ### `gui`
 
@@ -711,593 +424,230 @@ These appear without documentation in `docs/API/lua-api.md` and IntelliSense.
 - `class` **`luna.gui.Toolbar`** — *(no description)*
 - `class` **`luna.gui.Tooltip_Panel`** — *(no description)*
 - `class` **`luna.gui.Tree_View`** — *(no description)*
-
-### `image`
-
-- `function` **`luna.image.luna.image.isCompressed`** — *(no description)*
-
-### `input`
-
-- `function` **`luna.input.luna.input.getBackgroundEvents`** — *"@return table"* (too short)
-- `function` **`luna.input.luna.input.getCount`** — *"@return table"* (too short)
-- `function` **`luna.input.luna.input.getCursor`** — *"@return any"* (too short)
-- `function` **`luna.input.luna.input.getJoystickCount`** — *"@return table"* (too short)
-- `function` **`luna.input.luna.input.getJoysticks`** — *"@return table"* (too short)
-- `function` **`luna.input.luna.input.getPosition`** — *"@return any"* (too short)
-- `function` **`luna.input.luna.input.getRelativeMode`** — *(no description)*
-- `function` **`luna.input.luna.input.getSystemCursor`** — *(no description)*
-- `function` **`luna.input.luna.input.getTouchCount`** — *(no description)*
-- `function` **`luna.input.luna.input.getTouches`** — *"@return table"* (too short)
-- `function` **`luna.input.luna.input.getWheelDelta`** — *"@return any"* (too short)
-- `function` **`luna.input.luna.input.getX`** — *"@return any"* (too short)
-- `function` **`luna.input.luna.input.getY`** — *"@return any"* (too short)
-- `function` **`luna.input.luna.input.hasKeyRepeat`** — *(no description)*
-- `function` **`luna.input.luna.input.hasTextInput`** — *"@return any"* (too short)
-- `function` **`luna.input.luna.input.isCursorSupported`** — *(no description)*
-- `function` **`luna.input.luna.input.isGrabbed`** — *(no description)*
-- `function` **`luna.input.luna.input.isVisible`** — *(no description)*
-- `function` **`luna.input.luna.input.setCursor`** — *"# Parameters"* (too short)
-- `method` **`Cursor:Cursor:getType`** — *(no description)*
-
-### `light`
-
-- `method` **`Light:Light:getAttenuation`** — *(no description)*
-- `method` **`Light:Light:getBlendMode`** — *(no description)*
-- `method` **`Light:Light:getColor`** — *(no description)*
-- `method` **`Light:Light:getDirection`** — *(no description)*
-- `method` **`Light:Light:getEnergy`** — *(no description)*
-- `method` **`Light:Light:getFalloff`** — *(no description)*
-- `method` **`Light:Light:getFlicker`** — *(no description)*
-- `method` **`Light:Light:getGroupId`** — *(no description)*
-- `method` **`Light:Light:getInnerAngle`** — *(no description)*
-- `method` **`Light:Light:getIntensity`** — *(no description)*
-- `method` **`Light:Light:getLightMask`** — *(no description)*
-- `method` **`Light:Light:getLightType`** — *(no description)*
-- `method` **`Light:Light:getOuterAngle`** — *(no description)*
-- `method` **`Light:Light:getPosition`** — *(no description)*
-- `method` **`Light:Light:getRadius`** — *(no description)*
-- `method` **`Light:Light:getShadowColor`** — *(no description)*
-- `method` **`Light:Light:getShadowFilter`** — *(no description)*
-- `method` **`Light:Light:getShadowMask`** — *(no description)*
-- `method` **`Light:Light:getShadowSmooth`** — *(no description)*
-- `method` **`Light:Light:isEnabled`** — *(no description)*
-- `method` **`Light:Light:isFlickerEnabled`** — *(no description)*
-- `method` **`Light:Light:isShadowEnabled`** — *(no description)*
-- `method` **`Light:Light:isValid`** — *(no description)*
-- `method` **`Light:Light:isVolumetric`** — *(no description)*
-- `method` **`Light:Light:setAttenuation`** — *(no description)*
-- `method` **`Light:Light:setBlendMode`** — *(no description)*
-- `method` **`Light:Light:setDirection`** — *(no description)*
-- `method` **`Light:Light:setEnabled`** — *(no description)*
-- `method` **`Light:Light:setEnergy`** — *(no description)*
-- `method` **`Light:Light:setFalloff`** — *(no description)*
-- `method` **`Light:Light:setFlicker`** — *(no description)*
-- `method` **`Light:Light:setFlickerEnabled`** — *(no description)*
-- `method` **`Light:Light:setGroupId`** — *(no description)*
-- `method` **`Light:Light:setInnerAngle`** — *(no description)*
-- `method` **`Light:Light:setIntensity`** — *(no description)*
-- `method` **`Light:Light:setLightMask`** — *(no description)*
-- `method` **`Light:Light:setOuterAngle`** — *(no description)*
-- `method` **`Light:Light:setPosition`** — *(no description)*
-- `method` **`Light:Light:setRadius`** — *(no description)*
-- `method` **`Light:Light:setShadowEnabled`** — *(no description)*
-- `method` **`Light:Light:setShadowFilter`** — *(no description)*
-- `method` **`Light:Light:setShadowMask`** — *(no description)*
-- `method` **`Light:Light:setShadowSmooth`** — *(no description)*
-- `method` **`Light:Light:setVolumetric`** — *(no description)*
-- `method` **`Occluder:Occluder:getLightMask`** — *(no description)*
-- `method` **`Occluder:Occluder:getOpacity`** — *(no description)*
-- `method` **`Occluder:Occluder:getPosition`** — *(no description)*
-- `method` **`Occluder:Occluder:getVertices`** — *(no description)*
-- `method` **`Occluder:Occluder:isEnabled`** — *(no description)*
-- `method` **`Occluder:Occluder:isValid`** — *(no description)*
-- `method` **`Occluder:Occluder:setEnabled`** — *(no description)*
-- `method` **`Occluder:Occluder:setLightMask`** — *(no description)*
-- `method` **`Occluder:Occluder:setOpacity`** — *(no description)*
-- `method` **`Occluder:Occluder:setPosition`** — *(no description)*
-- `method` **`Occluder:Occluder:setVertices`** — *(no description)*
-
-### `localization`
-
-- `function` **`luna.localization.luna.localization.getAvailableLanguages`** — *"@return any"* (too short)
-- `function` **`luna.localization.luna.localization.getBase`** — *"@return any"* (too short)
-- `function` **`luna.localization.luna.localization.getLanguage`** — *"@return any"* (too short)
+- `method` **`Accordion:Accordion:addSection`** — *"@return nil"* (too short)
+- `method` **`Accordion:Accordion:getSectionCount`** — *"@return nil"* (too short)
+- `method` **`Accordion:Accordion:getSectionTitle`** — *"@return nil"* (too short)
+- `method` **`Accordion:Accordion:isExclusive`** — *"@return nil"* (too short)
+- `method` **`Accordion:Accordion:isSectionExpanded`** — *"@return nil"* (too short)
+- `method` **`Accordion:Accordion:setExclusive`** — *"@return nil"* (too short)
+- `method` **`Accordion:Accordion:toggleSection`** — *"@return nil"* (too short)
+- `method` **`Button:Button:getText`** — *"@return nil"* (too short)
+- `method` **`Button:Button:setText`** — *"@return nil"* (too short)
+- `method` **`Checkbox:Checkbox:getText`** — *"@return nil"* (too short)
+- `method` **`Checkbox:Checkbox:isChecked`** — *"@return nil"* (too short)
+- `method` **`Checkbox:Checkbox:setChecked`** — *"@return nil"* (too short)
+- `method` **`Checkbox:Checkbox:setText`** — *"@return nil"* (too short)
+- `method` **`Color_Picker:Color_Picker:getColor`** — *"@return nil"* (too short)
+- `method` **`Color_Picker:Color_Picker:getColorMode`** — *"@return nil"* (too short)
+- `method` **`Color_Picker:Color_Picker:getShowAlpha`** — *"@return nil"* (too short)
+- `method` **`Color_Picker:Color_Picker:setColor`** — *"@return nil"* (too short)
+- `method` **`Color_Picker:Color_Picker:setColorMode`** — *"@return nil"* (too short)
+- `method` **`Color_Picker:Color_Picker:setOnChange`** — *"@return nil"* (too short)
+- `method` **`Color_Picker:Color_Picker:setShowAlpha`** — *"@return nil"* (too short)
+- `method` **`Combo_Box:Combo_Box:addItem`** — *"@return nil"* (too short)
+- `method` **`Combo_Box:Combo_Box:clearItems`** — *"@return nil"* (too short)
+- `method` **`Combo_Box:Combo_Box:getItem`** — *"@return nil"* (too short)
+- `method` **`Combo_Box:Combo_Box:getItemCount`** — *"@return nil"* (too short)
+- `method` **`Combo_Box:Combo_Box:getSelectedIndex`** — *"@return nil"* (too short)
+- `method` **`Combo_Box:Combo_Box:getSelectedItem`** — *"@return nil"* (too short)
+- `method` **`Combo_Box:Combo_Box:removeItem`** — *"@return nil"* (too short)
+- `method` **`Combo_Box:Combo_Box:setSelectedIndex`** — *"@return nil"* (too short)
+- `method` **`Dialog:Dialog:addButton`** — *"@return nil"* (too short)
+- `method` **`Dialog:Dialog:close`** — *"@return nil"* (too short)
+- `method` **`Dialog:Dialog:getContent`** — *"@return nil"* (too short)
+- `method` **`Dialog:Dialog:getTitle`** — *"@return nil"* (too short)
+- `method` **`Dialog:Dialog:isModal`** — *"@return nil"* (too short)
+- `method` **`Dialog:Dialog:isOpen`** — *"@return nil"* (too short)
+- `method` **`Dialog:Dialog:open`** — *"@return nil"* (too short)
+- `method` **`Dialog:Dialog:setContent`** — *"@return nil"* (too short)
+- `method` **`Dialog:Dialog:setModal`** — *"@return nil"* (too short)
+- `method` **`Dialog:Dialog:setOnClose`** — *"@return nil"* (too short)
+- `method` **`Dialog:Dialog:setTitle`** — *"@return nil"* (too short)
+- `method` **`Dock_Panel:Dock_Panel:dock`** — *"@return nil"* (too short)
+- `method` **`Dock_Panel:Dock_Panel:getDockedCount`** — *"@return nil"* (too short)
+- `method` **`Dock_Panel:Dock_Panel:getSplitSize`** — *"@return nil"* (too short)
+- `method` **`Dock_Panel:Dock_Panel:setSplitSize`** — *"@return nil"* (too short)
+- `method` **`Dock_Panel:Dock_Panel:undock`** — *"@return nil"* (too short)
+- `method` **`Gui_Table:Gui_Table:addColumn`** — *"@return nil"* (too short)
+- `method` **`Gui_Table:Gui_Table:addRow`** — *"@return nil"* (too short)
+- `method` **`Gui_Table:Gui_Table:getCell`** — *"@return nil"* (too short)
+- `method` **`Gui_Table:Gui_Table:getColumnCount`** — *"@return nil"* (too short)
+- `method` **`Gui_Table:Gui_Table:getRowCount`** — *"@return nil"* (too short)
+- `method` **`Gui_Table:Gui_Table:getSelectedRow`** — *"@return nil"* (too short)
+- `method` **`Gui_Table:Gui_Table:isSortable`** — *"@return nil"* (too short)
+- `method` **`Gui_Table:Gui_Table:setCell`** — *"@return nil"* (too short)
+- `method` **`Gui_Table:Gui_Table:setOnSelect`** — *"@return nil"* (too short)
+- `method` **`Gui_Table:Gui_Table:setSelectedRow`** — *"@return nil"* (too short)
+- `method` **`Gui_Table:Gui_Table:setSortable`** — *"@return nil"* (too short)
+- `method` **`Gui_Window:Gui_Window:getTitle`** — *"@return nil"* (too short)
+- `method` **`Gui_Window:Gui_Window:isCloseable`** — *"@return nil"* (too short)
+- `method` **`Gui_Window:Gui_Window:isDraggable`** — *"@return nil"* (too short)
+- `method` **`Gui_Window:Gui_Window:isResizable`** — *"@return nil"* (too short)
+- `method` **`Gui_Window:Gui_Window:setCloseable`** — *"@return nil"* (too short)
+- `method` **`Gui_Window:Gui_Window:setDraggable`** — *"@return nil"* (too short)
+- `method` **`Gui_Window:Gui_Window:setOnClose`** — *"@return nil"* (too short)
+- `method` **`Gui_Window:Gui_Window:setResizable`** — *"@return nil"* (too short)
+- `method` **`Gui_Window:Gui_Window:setTitle`** — *"@return nil"* (too short)
+- `method` **`Image_Widget:Image_Widget:getScaleMode`** — *"@return nil"* (too short)
+- `method` **`Image_Widget:Image_Widget:getTint`** — *"@return nil"* (too short)
+- `method` **`Image_Widget:Image_Widget:setScaleMode`** — *"@return nil"* (too short)
+- `method` **`Image_Widget:Image_Widget:setTint`** — *"@return nil"* (too short)
+- `method` **`Label:Label:getText`** — *"@return nil"* (too short)
+- `method` **`Label:Label:setText`** — *"@return nil"* (too short)
+- `method` **`Layout:Layout:getAlign`** — *"@return nil"* (too short)
+- `method` **`Layout:Layout:getDirection`** — *"@return nil"* (too short)
+- `method` **`Layout:Layout:getJustify`** — *"@return nil"* (too short)
+- `method` **`Layout:Layout:getSpacing`** — *"@return nil"* (too short)
+- `method` **`Layout:Layout:getWrap`** — *"@return nil"* (too short)
+- `method` **`Layout:Layout:setAlign`** — *"@return nil"* (too short)
+- `method` **`Layout:Layout:setColumns`** — *"@return nil"* (too short)
+- `method` **`Layout:Layout:setDirection`** — *"@return nil"* (too short)
+- `method` **`Layout:Layout:setJustify`** — *"@return nil"* (too short)
+- `method` **`Layout:Layout:setSpacing`** — *"@return nil"* (too short)
+- `method` **`Layout:Layout:setWrap`** — *"@return nil"* (too short)
+- `method` **`List_Box:List_Box:addItem`** — *"@return nil"* (too short)
+- `method` **`List_Box:List_Box:clearItems`** — *"@return nil"* (too short)
+- `method` **`List_Box:List_Box:getItem`** — *"@return nil"* (too short)
+- `method` **`List_Box:List_Box:getItemCount`** — *"@return nil"* (too short)
+- `method` **`List_Box:List_Box:getSelectedIndex`** — *"@return nil"* (too short)
+- `method` **`List_Box:List_Box:removeItem`** — *"@return nil"* (too short)
+- `method` **`List_Box:List_Box:setItemHeight`** — *"@return nil"* (too short)
+- `method` **`List_Box:List_Box:setSelectedIndex`** — *"@return nil"* (too short)
+- `method` **`Menu_Bar:Menu_Bar:addMenu`** — *"@return nil"* (too short)
+- `method` **`Menu_Bar:Menu_Bar:getMenuCount`** — *"@return nil"* (too short)
+- `method` **`Menu_Bar:Menu_Bar:getMenus`** — *"@return nil"* (too short)
+- `method` **`Menu_Bar:Menu_Bar:removeMenu`** — *"@return nil"* (too short)
+- `method` **`Menu_Item:Menu_Item:addSubItem`** — *"@return nil"* (too short)
+- `method` **`Menu_Item:Menu_Item:getShortcut`** — *"@return nil"* (too short)
+- `method` **`Menu_Item:Menu_Item:getSubItems`** — *"@return nil"* (too short)
+- `method` **`Menu_Item:Menu_Item:getText`** — *"@return nil"* (too short)
+- `method` **`Menu_Item:Menu_Item:isChecked`** — *"@return nil"* (too short)
+- `method` **`Menu_Item:Menu_Item:setChecked`** — *"@return nil"* (too short)
+- `method` **`Menu_Item:Menu_Item:setOnClick`** — *"@return nil"* (too short)
+- `method` **`Menu_Item:Menu_Item:setShortcut`** — *"@return nil"* (too short)
+- `method` **`Menu_Item:Menu_Item:setText`** — *"@return nil"* (too short)
+- `method` **`Nine_Patch:Nine_Patch:getImageDimensions`** — *"@return nil"* (too short)
+- `method` **`Nine_Patch:Nine_Patch:getInsets`** — *"@return nil"* (too short)
+- `method` **`Nine_Patch:Nine_Patch:getSlices`** — *"@return nil"* (too short)
+- `method` **`Nine_Patch:Nine_Patch:setImageDimensions`** — *"@return nil"* (too short)
+- `method` **`Nine_Patch:Nine_Patch:setInsets`** — *"@return nil"* (too short)
+- `method` **`Panel:Panel:getTitle`** — *"@return nil"* (too short)
+- `method` **`Panel:Panel:setScrollable`** — *"@return nil"* (too short)
+- `method` **`Panel:Panel:setTitle`** — *"@return nil"* (too short)
+- `method` **`Progress_Bar:Progress_Bar:getMax`** — *"@return nil"* (too short)
+- `method` **`Progress_Bar:Progress_Bar:getMin`** — *"@return nil"* (too short)
+- `method` **`Progress_Bar:Progress_Bar:getProgress`** — *"@return nil"* (too short)
+- `method` **`Progress_Bar:Progress_Bar:getValue`** — *"@return nil"* (too short)
+- `method` **`Progress_Bar:Progress_Bar:setRange`** — *"@return nil"* (too short)
+- `method` **`Progress_Bar:Progress_Bar:setValue`** — *"@return nil"* (too short)
+- `method` **`Radio_Button:Radio_Button:getGroup`** — *"@return nil"* (too short)
+- `method` **`Radio_Button:Radio_Button:getText`** — *"@return nil"* (too short)
+- `method` **`Radio_Button:Radio_Button:isSelected`** — *"@return nil"* (too short)
+- `method` **`Radio_Button:Radio_Button:setGroup`** — *"@return nil"* (too short)
+- `method` **`Radio_Button:Radio_Button:setOnChange`** — *"@return nil"* (too short)
+- `method` **`Radio_Button:Radio_Button:setSelected`** — *"@return nil"* (too short)
+- `method` **`Radio_Button:Radio_Button:setText`** — *"@return nil"* (too short)
+- `method` **`Scroll_Bar:Scroll_Bar:getContentSize`** — *"@return nil"* (too short)
+- `method` **`Scroll_Bar:Scroll_Bar:getScrollPosition`** — *"@return nil"* (too short)
+- `method` **`Scroll_Bar:Scroll_Bar:getViewSize`** — *"@return nil"* (too short)
+- `method` **`Scroll_Bar:Scroll_Bar:isVertical`** — *"@return nil"* (too short)
+- `method` **`Scroll_Bar:Scroll_Bar:setContentSize`** — *"@return nil"* (too short)
+- `method` **`Scroll_Bar:Scroll_Bar:setOnChange`** — *"@return nil"* (too short)
+- `method` **`Scroll_Bar:Scroll_Bar:setScrollPosition`** — *"@return nil"* (too short)
+- `method` **`Scroll_Bar:Scroll_Bar:setViewSize`** — *"@return nil"* (too short)
+- `method` **`Scroll_Panel:Scroll_Panel:getContentSize`** — *"@return nil"* (too short)
+- `method` **`Scroll_Panel:Scroll_Panel:getMaxScroll`** — *"@return nil"* (too short)
+- `method` **`Scroll_Panel:Scroll_Panel:getScrollPosition`** — *"@return nil"* (too short)
+- `method` **`Scroll_Panel:Scroll_Panel:getScrollSpeed`** — *"@return nil"* (too short)
+- `method` **`Scroll_Panel:Scroll_Panel:setContentSize`** — *"@return nil"* (too short)
+- `method` **`Scroll_Panel:Scroll_Panel:setScrollPosition`** — *"@return nil"* (too short)
+- `method` **`Scroll_Panel:Scroll_Panel:setScrollSpeed`** — *"@return nil"* (too short)
+- `method` **`Separator:Separator:getThickness`** — *"@return nil"* (too short)
+- `method` **`Separator:Separator:isVertical`** — *"@return nil"* (too short)
+- `method` **`Separator:Separator:setThickness`** — *"@return nil"* (too short)
+- `method` **`Separator:Separator:setVertical`** — *"@return nil"* (too short)
+- `method` **`Slider:Slider:getMax`** — *"@return nil"* (too short)
+- `method` **`Slider:Slider:getMin`** — *"@return nil"* (too short)
+- `method` **`Slider:Slider:getValue`** — *"@return nil"* (too short)
+- `method` **`Slider:Slider:setRange`** — *"@return nil"* (too short)
+- `method` **`Slider:Slider:setStep`** — *"@return nil"* (too short)
+- `method` **`Slider:Slider:setValue`** — *"@return nil"* (too short)
+- `method` **`Split_Panel:Split_Panel:getFirstChild`** — *"@return nil"* (too short)
+- `method` **`Split_Panel:Split_Panel:getMinPanelSize`** — *"@return nil"* (too short)
+- `method` **`Split_Panel:Split_Panel:getOrientation`** — *"@return nil"* (too short)
+- `method` **`Split_Panel:Split_Panel:getSecondChild`** — *"@return nil"* (too short)
+- `method` **`Split_Panel:Split_Panel:getSplitPosition`** — *"@return nil"* (too short)
+- `method` **`Split_Panel:Split_Panel:setFirstChild`** — *"@return nil"* (too short)
+- `method` **`Split_Panel:Split_Panel:setMinPanelSize`** — *"@return nil"* (too short)
+- `method` **`Split_Panel:Split_Panel:setOrientation`** — *"@return nil"* (too short)
+- `method` **`Split_Panel:Split_Panel:setSecondChild`** — *"@return nil"* (too short)
+- `method` **`Split_Panel:Split_Panel:setSplitPosition`** — *"@return nil"* (too short)
+- `method` **`Status_Bar:Status_Bar:addSection`** — *"@return nil"* (too short)
+- `method` **`Status_Bar:Status_Bar:getSectionCount`** — *"@return nil"* (too short)
+- `method` **`Status_Bar:Status_Bar:getSectionText`** — *"@return nil"* (too short)
+- `method` **`Status_Bar:Status_Bar:setSectionText`** — *"@return nil"* (too short)
+- `method` **`Tab_Bar:Tab_Bar:addTab`** — *"@return nil"* (too short)
+- `method` **`Tab_Bar:Tab_Bar:getActiveTab`** — *"@return nil"* (too short)
+- `method` **`Tab_Bar:Tab_Bar:getTab`** — *"@return nil"* (too short)
+- `method` **`Tab_Bar:Tab_Bar:getTabCount`** — *"@return nil"* (too short)
+- `method` **`Tab_Bar:Tab_Bar:removeTab`** — *"@return nil"* (too short)
+- `method` **`Tab_Bar:Tab_Bar:setActiveTab`** — *"@return nil"* (too short)
+- `method` **`Text_Input:Text_Input:getCursorPosition`** — *"@return nil"* (too short)
+- `method` **`Text_Input:Text_Input:getPlaceholder`** — *"@return nil"* (too short)
+- `method` **`Text_Input:Text_Input:getText`** — *"@return nil"* (too short)
+- `method` **`Text_Input:Text_Input:isFocused`** — *"@return nil"* (too short)
+- `method` **`Text_Input:Text_Input:setMaxLength`** — *"@return nil"* (too short)
+- `method` **`Text_Input:Text_Input:setPlaceholder`** — *"@return nil"* (too short)
+- `method` **`Text_Input:Text_Input:setText`** — *"@return nil"* (too short)
+- `method` **`Toast:Toast:getDuration`** — *"@return nil"* (too short)
+- `method` **`Toast:Toast:getMessage`** — *"@return nil"* (too short)
+- `method` **`Toast:Toast:getProgress`** — *"@return nil"* (too short)
+- `method` **`Toast:Toast:isExpired`** — *"@return nil"* (too short)
+- `method` **`Toast:Toast:setDuration`** — *"@return nil"* (too short)
+- `method` **`Toast:Toast:setMessage`** — *"@return nil"* (too short)
+- `method` **`Toolbar:Toolbar:addButton`** — *"@return nil"* (too short)
+- `method` **`Toolbar:Toolbar:getButton`** — *"@return nil"* (too short)
+- `method` **`Toolbar:Toolbar:getOrientation`** — *"@return nil"* (too short)
+- `method` **`Toolbar:Toolbar:isButtonToggled`** — *"@return nil"* (too short)
+- `method` **`Toolbar:Toolbar:setButtonEnabled`** — *"@return nil"* (too short)
+- `method` **`Toolbar:Toolbar:setButtonToggled`** — *"@return nil"* (too short)
+- `method` **`Toolbar:Toolbar:setOrientation`** — *"@return nil"* (too short)
+- `method` **`Tooltip_Panel:Tooltip_Panel:getDelay`** — *"@return nil"* (too short)
+- `method` **`Tooltip_Panel:Tooltip_Panel:getTarget`** — *"@return nil"* (too short)
+- `method` **`Tooltip_Panel:Tooltip_Panel:getText`** — *"@return nil"* (too short)
+- `method` **`Tooltip_Panel:Tooltip_Panel:setDelay`** — *"@return nil"* (too short)
+- `method` **`Tooltip_Panel:Tooltip_Panel:setTarget`** — *"@return nil"* (too short)
+- `method` **`Tooltip_Panel:Tooltip_Panel:setText`** — *"@return nil"* (too short)
+- `method` **`Tree_View:Tree_View:addNode`** — *"@return nil"* (too short)
+- `method` **`Tree_View:Tree_View:clearNodes`** — *"@return nil"* (too short)
+- `method` **`Tree_View:Tree_View:collapseAll`** — *"@return nil"* (too short)
+- `method` **`Tree_View:Tree_View:collapseNode`** — *"@return nil"* (too short)
+- `method` **`Tree_View:Tree_View:expandAll`** — *"@return nil"* (too short)
+- `method` **`Tree_View:Tree_View:expandNode`** — *"@return nil"* (too short)
+- `method` **`Tree_View:Tree_View:getChildNodes`** — *"@return nil"* (too short)
+- `method` **`Tree_View:Tree_View:getNodeCount`** — *"@return nil"* (too short)
+- `method` **`Tree_View:Tree_View:getNodeDepth`** — *"@return nil"* (too short)
+- `method` **`Tree_View:Tree_View:getNodeText`** — *"@return nil"* (too short)
+- `method` **`Tree_View:Tree_View:getParentNode`** — *"@return nil"* (too short)
+- `method` **`Tree_View:Tree_View:getSelectedNode`** — *"@return nil"* (too short)
+- `method` **`Tree_View:Tree_View:isExpanded`** — *"@return nil"* (too short)
+- `method` **`Tree_View:Tree_View:isNodeExpanded`** — *"@return nil"* (too short)
+- `method` **`Tree_View:Tree_View:removeNode`** — *"@return nil"* (too short)
+- `method` **`Tree_View:Tree_View:setNodeIcon`** — *"@return nil"* (too short)
+- `method` **`Tree_View:Tree_View:setNodeText`** — *"@return nil"* (too short)
+- `method` **`Tree_View:Tree_View:setSelectedNode`** — *"@return nil"* (too short)
+- `method` **`Tree_View:Tree_View:toggleNode`** — *"@return nil"* (too short)
 
 ### `math`
 
-- `function` **`luna.math.luna.math.abs`** — *"# Parameters"* (too short)
-- `function` **`luna.math.luna.math.atan2`** — *"# Parameters"* (too short)
-- `function` **`luna.math.luna.math.ceil`** — *"# Parameters"* (too short)
-- `function` **`luna.math.luna.math.cos`** — *"# Parameters"* (too short)
-- `function` **`luna.math.luna.math.distance`** — *(no description)*
-- `function` **`luna.math.luna.math.floor`** — *"# Parameters"* (too short)
-- `function` **`luna.math.luna.math.getRandomSeed`** — *"# Returns"* (too short)
-- `function` **`luna.math.luna.math.isConvex`** — *(no description)*
-- `function` **`luna.math.luna.math.max`** — *"# Parameters"* (too short)
-- `function` **`luna.math.luna.math.min`** — *"# Parameters"* (too short)
-- `function` **`luna.math.luna.math.noise`** — *(no description)*
-- `function` **`luna.math.luna.math.polygonArea`** — *"# Parameters"* (too short)
-- `function` **`luna.math.luna.math.random`** — *(no description)*
-- `function` **`luna.math.luna.math.randomNormal`** — *(no description)*
-- `function` **`luna.math.luna.math.sin`** — *"# Parameters"* (too short)
-- `function` **`luna.math.luna.math.sqrt`** — *"# Parameters"* (too short)
-- `function` **`luna.math.luna.math.tan`** — *"# Parameters"* (too short)
-- `method` **`BezierCurve:BezierCurve:getControlPoint`** — *"# Parameters"* (too short)
-- `method` **`BezierCurve:BezierCurve:getControlPointCount`** — *"# Returns"* (too short)
-- `method` **`BezierCurve:BezierCurve:getDerivative`** — *"# Returns"* (too short)
-- `method` **`Grid:Grid:getCost`** — *"# Parameters"* (too short)
-- `method` **`Grid:Grid:getDimensions`** — *"# Parameters"* (too short)
-- `method` **`Grid:Grid:getHeight`** — *"# Parameters"* (too short)
-- `method` **`Grid:Grid:getWidth`** — *"# Parameters"* (too short)
-- `method` **`Grid:Grid:isWalkable`** — *"# Parameters"* (too short)
-- `method` **`Grid:Grid:setWalkable`** — *"# Parameters"* (too short)
-- `method` **`NoiseGenerator:NoiseGenerator:getSeed`** — *"# Parameters"* (too short)
-- `method` **`RandomGenerator:RandomGenerator:getSeed`** — *(no description)*
-- `method` **`RandomGenerator:RandomGenerator:getState`** — *(no description)*
-- `method` **`Raycaster2D:Raycaster2D:getCell`** — *"# Parameters"* (too short)
-- `method` **`Raycaster2D:Raycaster2D:getDimensions`** — *"# Parameters"* (too short)
-- `method` **`Raycaster2D:Raycaster2D:getHeight`** — *"# Parameters"* (too short)
-- `method` **`Raycaster2D:Raycaster2D:getWidth`** — *"# Parameters"* (too short)
-- `method` **`Raycaster2D:Raycaster2D:isBlocked`** — *"# Parameters"* (too short)
-- `method` **`Raycaster2D:Raycaster2D:setCells`** — *"# Parameters"* (too short)
-- `method` **`SpatialHash:SpatialHash:getCellSize`** — *"# Parameters"* (too short)
-- `method` **`SpatialHash:SpatialHash:getItemCount`** — *"# Returns"* (too short)
-- `method` **`TileWalker:TileWalker:canMoveBackward`** — *"# Returns"* (too short)
-- `method` **`TileWalker:TileWalker:canMoveForward`** — *"# Returns"* (too short)
-- `method` **`TileWalker:TileWalker:canStrafeLeft`** — *"# Returns"* (too short)
-- `method` **`TileWalker:TileWalker:canStrafeRight`** — *"# Parameters"* (too short)
-- `method` **`TileWalker:TileWalker:getFacing`** — *"# Parameters"* (too short)
-- `method` **`TileWalker:TileWalker:getFacingAngle`** — *"# Returns"* (too short)
-- `method` **`TileWalker:TileWalker:getFacingDirection`** — *"# Returns"* (too short)
-- `method` **`TileWalker:TileWalker:getInterpolatedAngle`** — *"# Parameters"* (too short)
-- `method` **`TileWalker:TileWalker:getInterpolatedPosition`** — *"# Parameters"* (too short)
-- `method` **`TileWalker:TileWalker:getPosition`** — *"# Parameters"* (too short)
-- `method` **`TileWalker:TileWalker:getRelativeFacing`** — *"# Parameters"* (too short)
-- `method` **`TileWalker:TileWalker:setFacing`** — *"# Parameters"* (too short)
-- `method` **`TileWalker:TileWalker:setPosition`** — *"# Parameters"* (too short)
-- `method` **`Transform:Transform:clone`** — *"# Returns"* (too short)
-- `method` **`Transform:Transform:getMatrix`** — *"# Returns"* (too short)
-- `method` **`Transform:Transform:inverse`** — *"# Returns"* (too short)
-- `method` **`Tween:Tween:getClock`** — *"# Returns"* (too short)
-- `method` **`Tween:Tween:getDuration`** — *"# Returns"* (too short)
-- `method` **`Tween:Tween:getValue`** — *"# Parameters"* (too short)
-- `method` **`Tween:Tween:getValueCount`** — *"# Parameters"* (too short)
-- `method` **`Tween:Tween:isComplete`** — *"# Returns"* (too short)
-- `method` **`Tween:Tween:set`** — *"# Parameters"* (too short)
-- `method` **`Vec2:Vec2:clone`** — *"# Parameters"* (too short)
-- `method` **`Vec2:Vec2:get`** — *"# Parameters"* (too short)
-- `method` **`Vec2:Vec2:getAngle`** — *"# Parameters"* (too short)
-- `method` **`Vec2:Vec2:getDistance`** — *"# Parameters"* (too short)
-- `method` **`Vec2:Vec2:getLength`** — *"# Parameters"* (too short)
-- `method` **`Vec2:Vec2:getLengthSquared`** — *"# Parameters"* (too short)
-- `method` **`Vec2:Vec2:getNormalized`** — *"# Parameters"* (too short)
-- `method` **`Vec2:Vec2:getPerpendicular`** — *"# Parameters"* (too short)
-- `method` **`Vec2:Vec2:getRotated`** — *"# Parameters"* (too short)
-- `method` **`Vec2:Vec2:getX`** — *"# Parameters"* (too short)
-- `method` **`Vec2:Vec2:getY`** — *"# Parameters"* (too short)
-- `method` **`Vec2:Vec2:set`** — *"# Parameters"* (too short)
-- `module` **`luna.math`** — *(no description)*
-
-### `minimap`
-
-- `method` **`Minimap:Minimap:getCenter`** — *"@return any"* (too short)
-- `method` **`Minimap:Minimap:getCenterX`** — *"@return number"* (too short)
-- `method` **`Minimap:Minimap:getCenterY`** — *"@return number"* (too short)
-- `method` **`Minimap:Minimap:getColorMode`** — *"@return any"* (too short)
-- `method` **`Minimap:Minimap:getDisplayHeight`** — *"@return any"* (too short)
-- `method` **`Minimap:Minimap:getDisplaySize`** — *"@return any"* (too short)
-- `method` **`Minimap:Minimap:getDisplayWidth`** — *"@return any"* (too short)
-- `method` **`Minimap:Minimap:getFogColor`** — *"@return any"* (too short)
-- `method` **`Minimap:Minimap:getGridHeight`** — *"@return any"* (too short)
-- `method` **`Minimap:Minimap:getGridSize`** — *"@return any"* (too short)
-- `method` **`Minimap:Minimap:getGridWidth`** — *"@return any"* (too short)
-- `method` **`Minimap:Minimap:getMarkerCount`** — *"@return any"* (too short)
-- `method` **`Minimap:Minimap:getObjectCount`** — *"@return any"* (too short)
-- `method` **`Minimap:Minimap:getObjectTypeCount`** — *"@return any"* (too short)
-- `method` **`Minimap:Minimap:getPingCount`** — *"@return any"* (too short)
-- `method` **`Minimap:Minimap:getViewportColor`** — *"@return any"* (too short)
-- `method` **`Minimap:Minimap:getViewportRect`** — *"@return any"* (too short)
-- `method` **`Minimap:Minimap:getZoom`** — *"@return any"* (too short)
-- `method` **`Minimap:Minimap:isAntiAlias`** — *"@return any"* (too short)
-- `method` **`Minimap:Minimap:isFogEnabled`** — *"@return any"* (too short)
-- `method` **`Minimap:Minimap:isViewportVisible`** — *"@return any"* (too short)
-- `method` **`Minimap:Minimap:setFogLevel`** — *(no description)*
-
-### `network`
-
-- `method` **`NetworkHost:NetworkHost:getAddress`** — *"@return string"* (too short)
-
-### `overlay`
-
-- `method` **`Overlay:Overlay:getCloudCount`** — *"@return number"* (too short)
-- `method` **`Overlay:Overlay:getCloudOpacity`** — *"@return number"* (too short)
-- `method` **`Overlay:Overlay:getCloudScale`** — *"@return number"* (too short)
-- `method` **`Overlay:Overlay:getCloudSpeed`** — *"@return number"* (too short)
-- `method` **`Overlay:Overlay:getFilmGrainIntensity`** — *"@return number"* (too short)
-- `method` **`Overlay:Overlay:getFogDensity`** — *"@return number"* (too short)
-- `method` **`Overlay:Overlay:getHeatHazeIntensity`** — *"@return number"* (too short)
-- `method` **`Overlay:Overlay:getTimeOfDay`** — *"@return number"* (too short)
-- `method` **`Overlay:Overlay:getVignetteStrength`** — *"@return number"* (too short)
-- `method` **`Overlay:Overlay:getWeather`** — *"@return string"* (too short)
-- `method` **`Overlay:Overlay:getWeatherIntensity`** — *"@return number"* (too short)
-- `method` **`Overlay:Overlay:getWindDirection`** — *"@return number"* (too short)
-- `method` **`Overlay:Overlay:getWindSpeed`** — *"@return number"* (too short)
-
-### `particle`
-
-- `method` **`ParticleSystem:ParticleSystem:clone`** — *"# Returns"* (too short)
-- `method` **`ParticleSystem:ParticleSystem:emit`** — *"# Parameters"* (too short)
-- `method` **`ParticleSystem:ParticleSystem:getAlphas`** — *"# Returns"* (too short)
-- `method` **`ParticleSystem:ParticleSystem:getCount`** — *"# Returns"* (too short)
-- `method` **`ParticleSystem:ParticleSystem:getEmissionShape`** — *"# Returns"* (too short)
-- `method` **`ParticleSystem:ParticleSystem:getGravity`** — *"# Returns"* (too short)
-- `method` **`ParticleSystem:ParticleSystem:getPosition`** — *"# Returns"* (too short)
-- `method` **`ParticleSystem:ParticleSystem:getRelativeMode`** — *"# Returns"* (too short)
-- `method` **`ParticleSystem:ParticleSystem:getShape`** — *"# Returns"* (too short)
-- `method` **`ParticleSystem:ParticleSystem:isActive`** — *"# Returns"* (too short)
-- `method` **`ParticleSystem:ParticleSystem:isPaused`** — *"# Returns"* (too short)
-- `method` **`ParticleSystem:ParticleSystem:isStopped`** — *"# Returns"* (too short)
-- `method` **`ParticleSystem:ParticleSystem:pause`** — *"# Returns"* (too short)
-- `method` **`ParticleSystem:ParticleSystem:setAlphas`** — *"# Parameters"* (too short)
-- `method` **`ParticleSystem:ParticleSystem:setEmissionRate`** — *"# Parameters"* (too short)
-- `method` **`ParticleSystem:ParticleSystem:setGravity`** — *"# Parameters"* (too short)
-- `method` **`ParticleSystem:ParticleSystem:setPosition`** — *"# Parameters"* (too short)
-- `method` **`ParticleSystem:ParticleSystem:setRelativeMode`** — *"# Parameters"* (too short)
-- `method` **`ParticleSystem:ParticleSystem:setShape`** — *"# Parameters"* (too short)
-- `method` **`ParticleSystem:ParticleSystem:stop`** — *"# Returns"* (too short)
-
-### `pathfinding`
-
-- `function` **`luna.pathfinding.luna.pathfinding.getThreadCount`** — *"@return any"* (too short)
-- `method` **`FlowField:FlowField:getTargets`** — *"@return table"* (too short)
-- `method` **`FlowField:FlowField:isCalculated`** — *"@return any"* (too short)
-- `method` **`NavGrid:NavGrid:getChunkSize`** — *"@return any"* (too short)
-- `method` **`NavGrid:NavGrid:getDiagonalMode`** — *"@return string"* (too short)
-- `method` **`NavGrid:NavGrid:getDimensions`** — *"@return any"* (too short)
-- `method` **`NavGrid:NavGrid:getHeight`** — *"@return any"* (too short)
-- `method` **`NavGrid:NavGrid:getWidth`** — *"@return any"* (too short)
-- `method` **`PathGrid:PathGrid:getCellSize`** — *(no description)*
-- `method` **`PathGrid:PathGrid:getCost`** — *(no description)*
-- `method` **`PathGrid:PathGrid:getHeight`** — *(no description)*
-- `method` **`PathGrid:PathGrid:getWidth`** — *(no description)*
-- `method` **`PathGrid:PathGrid:isWalkable`** — *(no description)*
-- `method` **`UnitPathfinder:UnitPathfinder:getCacheSize`** — *"@return any"* (too short)
-- `method` **`UnitPathfinder:UnitPathfinder:isCacheEnabled`** — *"@return any"* (too short)
-
-### `patterns`
-
-- `method` **`CommandStack:CommandStack:getCurrentName`** — *"# Returns"* (too short)
-- `method` **`EventBus:EventBus:getEvents`** — *"@return any"* (too short)
-- `method` **`Factory:Factory:getTypes`** — *"@return any"* (too short)
-- `method` **`ObjectPool:ObjectPool:getActiveCount`** — *"@return any"* (too short)
-- `method` **`ServiceLocator:ServiceLocator:getServices`** — *"@return any"* (too short)
-- `method` **`SimpleState:SimpleState:getCurrent`** — *"@return any"* (too short)
-- `method` **`SimpleState:SimpleState:getStates`** — *"@return any"* (too short)
-
-### `physics`
-
-- `function` **`luna.physics.luna.physics.getAngularDamping`** — *"# Parameters"* (too short)
-- `function` **`luna.physics.luna.physics.getAngularVelocity`** — *"# Parameters"* (too short)
-- `function` **`luna.physics.luna.physics.getBodies`** — *"# Parameters"* (too short)
-- `function` **`luna.physics.luna.physics.getBody`** — *"# Parameters"* (too short)
-- `function` **`luna.physics.luna.physics.getBodyAngle`** — *(no description)*
-- `function` **`luna.physics.luna.physics.getBodyAtPoint`** — *"# Parameters"* (too short)
-- `function` **`luna.physics.luna.physics.getBodyContacts`** — *"# Parameters"* (too short)
-- `function` **`luna.physics.luna.physics.getBodyCount`** — *(no description)*
-- `function` **`luna.physics.luna.physics.getBodyMass`** — *(no description)*
-- `function` **`luna.physics.luna.physics.getBodyType`** — *(no description)*
-- `function` **`luna.physics.luna.physics.getCollisions`** — *"# Parameters"* (too short)
-- `function` **`luna.physics.luna.physics.getContacts`** — *"# Parameters"* (too short)
-- `function` **`luna.physics.luna.physics.getGravity`** — *(no description)*
-- `function` **`luna.physics.luna.physics.getGravityScale`** — *"# Parameters"* (too short)
-- `function` **`luna.physics.luna.physics.getJointBodies`** — *"# Parameters"* (too short)
-- `function` **`luna.physics.luna.physics.getJointCount`** — *"# Parameters"* (too short)
-- `function` **`luna.physics.luna.physics.getJointLimits`** — *"# Parameters"* (too short)
-- `function` **`luna.physics.luna.physics.getJointMotorSpeed`** — *"# Parameters"* (too short)
-- `function` **`luna.physics.luna.physics.getJointType`** — *"# Parameters"* (too short)
-- `function` **`luna.physics.luna.physics.getJoints`** — *"# Parameters"* (too short)
-- `function` **`luna.physics.luna.physics.getLinearDamping`** — *"# Parameters"* (too short)
-- `function` **`luna.physics.luna.physics.getMeter`** — *"# Parameters"* (too short)
-- `function` **`luna.physics.luna.physics.isBullet`** — *"# Parameters"* (too short)
-- `function` **`luna.physics.luna.physics.isFixedRotation`** — *"# Parameters"* (too short)
-- `function` **`luna.physics.luna.physics.isSleepingAllowed`** — *"# Parameters"* (too short)
-- `function` **`luna.physics.luna.physics.queryBoundingBox`** — *"# Parameters"* (too short)
-- `function` **`luna.physics.luna.physics.setAngularDamping`** — *"# Parameters"* (too short)
-- `function` **`luna.physics.luna.physics.setAngularVelocity`** — *"# Parameters"* (too short)
-- `function` **`luna.physics.luna.physics.setBodyAngle`** — *(no description)*
-- `function` **`luna.physics.luna.physics.setBodyPosition`** — *(no description)*
-- `function` **`luna.physics.luna.physics.setBodySize`** — *"# Parameters"* (too short)
-- `function` **`luna.physics.luna.physics.setBodyType`** — *(no description)*
-- `function` **`luna.physics.luna.physics.setBodyVelocity`** — *(no description)*
-- `function` **`luna.physics.luna.physics.setGravity`** — *(no description)*
-- `function` **`luna.physics.luna.physics.setGravityScale`** — *"# Parameters"* (too short)
-- `function` **`luna.physics.luna.physics.setJointLimits`** — *"# Parameters"* (too short)
-- `function` **`luna.physics.luna.physics.setJointMotorSpeed`** — *"# Parameters"* (too short)
-- `function` **`luna.physics.luna.physics.setLinearDamping`** — *"# Parameters"* (too short)
-- `function` **`luna.physics.luna.physics.setMeter`** — *"# Parameters"* (too short)
-- `function` **`luna.physics.luna.physics.setSleepingAllowed`** — *"# Parameters"* (too short)
-- `method` **`Body:Body:getAngle`** — *"# Returns"* (too short)
-- `method` **`Body:Body:getBodyType`** — *(no description)*
-- `method` **`Body:Body:getFixtureCount`** — *"# Returns"* (too short)
-- `method` **`Body:Body:getMass`** — *"# Returns"* (too short)
-- `method` **`Body:Body:getPosition`** — *"# Returns"* (too short)
-- `method` **`Body:Body:getVelocity`** — *"# Returns"* (too short)
-- `method` **`Body:Body:setAngle`** — *"# Parameters"* (too short)
-- `method` **`Body:Body:setVelocity`** — *"# Parameters"* (too short)
-- `method` **`Shape:Shape:getBoundingBox`** — *"# Returns"* (too short)
-- `method` **`Shape:Shape:getRadius`** — *"# Returns"* (too short)
-- `method` **`Shape:Shape:getType`** — *"# Returns"* (too short)
-- `method` **`Shape:Shape:setDensity`** — *"# Parameters"* (too short)
-- `method` **`Shape:Shape:setFriction`** — *"# Parameters"* (too short)
-- `method` **`Shape:Shape:setRestitution`** — *"# Parameters"* (too short)
-- `method` **`Shape:Shape:setSensor`** — *"# Parameters"* (too short)
-- `method` **`World:World:getBodyCount`** — *(no description)*
-- `method` **`World:World:getCollisions`** — *"# Returns"* (too short)
-- `method` **`World:World:getGravity`** — *"# Returns"* (too short)
-- `method` **`World:World:isSleepingAllowed`** — *"# Returns"* (too short)
-- `method` **`World:World:setGravity`** — *"# Parameters"* (too short)
-
-### `pipeline`
-
-- `class` **`luna.pipeline.PipelineStep`** — *(no description)*
-- `function` **`luna.pipeline.luna.pipeline.fromTable`** — *(no description)*
-- `method` **`Pipeline:Pipeline:clear`** — *(no description)*
-- `method` **`Pipeline:Pipeline:getContext`** — *"# Returns"* (too short)
-- `method` **`Pipeline:Pipeline:getErrorMode`** — *"# Returns"* (too short)
-- `method` **`Pipeline:Pipeline:getExecutionOrder`** — *"# Returns"* (too short)
-- `method` **`Pipeline:Pipeline:getName`** — *"# Returns"* (too short)
-- `method` **`Pipeline:Pipeline:getParallelGroups`** — *"# Returns"* (too short)
-- `method` **`Pipeline:Pipeline:getResult`** — *"# Returns"* (too short)
-- `method` **`Pipeline:Pipeline:getStep`** — *"# Parameters"* (too short)
-- `method` **`Pipeline:Pipeline:getStepCount`** — *"# Returns"* (too short)
-- `method` **`Pipeline:Pipeline:getSteps`** — *"# Returns"* (too short)
-- `method` **`Pipeline:Pipeline:getStepsByTag`** — *"# Parameters"* (too short)
-- `method` **`Pipeline:Pipeline:isComplete`** — *"# Returns"* (too short)
-- `method` **`Pipeline:Pipeline:isRunning`** — *"# Returns"* (too short)
-- `method` **`Pipeline:Pipeline:setErrorMode`** — *"# Parameters"* (too short)
-- `method` **`Pipeline:Pipeline:setName`** — *"# Parameters"* (too short)
-- `method` **`Pipeline:Pipeline:setOnComplete`** — *"# Parameters"* (too short)
-- `method` **`Pipeline:Pipeline:setOnStepError`** — *"# Parameters"* (too short)
-- `method` **`PipelineStep:PipelineStep:getAttempt`** — *"# Returns"* (too short)
-- `method` **`PipelineStep:PipelineStep:getDelay`** — *"# Returns"* (too short)
-- `method` **`PipelineStep:PipelineStep:getDependencies`** — *"# Returns"* (too short)
-- `method` **`PipelineStep:PipelineStep:getDependencyCount`** — *"# Returns"* (too short)
-- `method` **`PipelineStep:PipelineStep:getDuration`** — *"# Returns"* (too short)
-- `method` **`PipelineStep:PipelineStep:getError`** — *"# Returns"* (too short)
-- `method` **`PipelineStep:PipelineStep:getName`** — *"# Returns"* (too short)
-- `method` **`PipelineStep:PipelineStep:getRetryCount`** — *"# Returns"* (too short)
-- `method` **`PipelineStep:PipelineStep:getStatus`** — *"# Returns"* (too short)
-- `method` **`PipelineStep:PipelineStep:getTag`** — *"# Returns"* (too short)
-- `method` **`PipelineStep:PipelineStep:getTimeout`** — *"# Returns"* (too short)
-- `method` **`PipelineStep:PipelineStep:isOptional`** — *"# Returns"* (too short)
-- `method` **`PipelineStep:PipelineStep:setDelay`** — *"# Parameters"* (too short)
-- `method` **`PipelineStep:PipelineStep:setRetryCount`** — *"# Parameters"* (too short)
-- `method` **`PipelineStep:PipelineStep:setRetryDelay`** — *"# Parameters"* (too short)
-- `method` **`PipelineStep:PipelineStep:setTag`** — *"# Parameters"* (too short)
-
-### `postfx`
-
-- `method` **`ImageEffect:ImageEffect:effectCount`** — *"# Returns"* (too short)
-- `method` **`PostFxEffect:PostFxEffect:isBuiltIn`** — *"# Returns"* (too short)
-- `method` **`PostFxStack:PostFxStack:getDimensions`** — *"# Returns"* (too short)
-- `method` **`PostFxStack:PostFxStack:getHeight`** — *"# Returns"* (too short)
-- `method` **`PostFxStack:PostFxStack:getWidth`** — *"# Returns"* (too short)
-
-### `raycaster`
-
-- `method` **`Raycaster:Raycaster:height`** — *"@return number"* (too short)
-- `method` **`Raycaster:Raycaster:width`** — *"@return number"* (too short)
-
-### `savegame`
-
-- `function` **`luna.savegame.luna.savegame.newSaveManager`** — *(no description)*
-- `module` **`luna.savegame`** — *(no description)*
-
-### `scene`
-
-- `function` **`luna.scene.luna.scene.clear`** — *(no description)*
-- `function` **`luna.scene.luna.scene.draw`** — *(no description)*
-- `function` **`luna.scene.luna.scene.getCurrent`** — *"@return any"* (too short)
-- `function` **`luna.scene.luna.scene.getRegisteredNames`** — *"@return any"* (too short)
-- `function` **`luna.scene.luna.scene.getStackSize`** — *"@return any"* (too short)
-- `function` **`luna.scene.luna.scene.getTransitionProgress`** — *"@return any"* (too short)
-- `function` **`luna.scene.luna.scene.isTransitioning`** — *"@return any"* (too short)
-- `method` **`DepthSorter:DepthSorter:getCount`** — *"@return any"* (too short)
-
-### `spine`
-
-- `method` **`Skeleton:Skeleton:boneCount`** — *"@return number"* (too short)
-- `method` **`Skeleton:Skeleton:slotCount`** — *"@return number"* (too short)
-
-### `sprite`
-
-- `method` **`Animation:Animation:getClipCount`** — *"@return any"* (too short)
-- `method` **`Animation:Animation:getCurrentClip`** — *"@return any"* (too short)
-- `method` **`Animation:Animation:getCurrentFrame`** — *"@return any"* (too short)
-- `method` **`Animation:Animation:getCurrentQuad`** — *"@return any"* (too short)
-- `method` **`Animation:Animation:getFrameCount`** — *"@return any"* (too short)
-- `method` **`Animation:Animation:getSpeed`** — *"@return any"* (too short)
-- `method` **`Animation:Animation:isLooping`** — *"@return any"* (too short)
-- `method` **`Animation:Animation:isPlaying`** — *"@return any"* (too short)
-- `method` **`Animation:Animation:pause`** — *"# Returns"* (too short)
-- `method` **`Animation:Animation:stop`** — *"# Returns"* (too short)
-- `method` **`Camera2D:Camera2D:getBounds`** — *"@return any"* (too short)
-- `method` **`Camera2D:Camera2D:getDeadZone`** — *"@return any"* (too short)
-- `method` **`Camera2D:Camera2D:getFollowSmooth`** — *"@return any"* (too short)
-- `method` **`Camera2D:Camera2D:getLookAhead`** — *"@return any"* (too short)
-- `method` **`Camera2D:Camera2D:getPosition`** — *"@return any"* (too short)
-- `method` **`Camera2D:Camera2D:getRotation`** — *"@return any"* (too short)
-- `method` **`Camera2D:Camera2D:getTarget`** — *"@return any"* (too short)
-- `method` **`Camera2D:Camera2D:getViewport`** — *"@return any"* (too short)
-- `method` **`Camera2D:Camera2D:getVisibleArea`** — *"@return any"* (too short)
-- `method` **`Camera2D:Camera2D:getZoom`** — *"@return any"* (too short)
-- `method` **`Camera2D:Camera2D:hasBounds`** — *"@return any"* (too short)
-- `method` **`ColumnBatch:ColumnBatch:getColumnCount`** — *"@return any"* (too short)
-- `method` **`ColumnBatch:ColumnBatch:getDepthBuffer`** — *"@return table"* (too short)
-- `method` **`ColumnBatch:ColumnBatch:getScreenHeight`** — *"@return any"* (too short)
-- `method` **`ColumnBatch:ColumnBatch:getScreenWidth`** — *"@return any"* (too short)
-- `method` **`DecalSurface:DecalSurface:getDimensions`** — *"@return any"* (too short)
-- `method` **`DecalSurface:DecalSurface:getHeight`** — *"@return any"* (too short)
-- `method` **`DecalSurface:DecalSurface:getWidth`** — *"@return any"* (too short)
-- `method` **`GraphRenderer:GraphRenderer:getCursorValue`** — *"@return any"* (too short)
-- `method` **`GraphRenderer:GraphRenderer:getRange`** — *"@return any"* (too short)
-- `method` **`GraphRenderer:GraphRenderer:getViewport`** — *"@return any"* (too short)
-- `method` **`LargeMapRenderer:LargeMapRenderer:getChunkSize`** — *"@return any"* (too short)
-- `method` **`LargeMapRenderer:LargeMapRenderer:getMapSize`** — *"@return any"* (too short)
-- `method` **`LargeMapRenderer:LargeMapRenderer:getTilesetColumns`** — *"@return any"* (too short)
-- `method` **`LargeMapRenderer:LargeMapRenderer:getTotalChunks`** — *"@return any"* (too short)
-- `method` **`LargeMapRenderer:LargeMapRenderer:getVisibleChunks`** — *"@return any"* (too short)
-- `method` **`LargeMapRenderer:LargeMapRenderer:isLODEnabled`** — *"@return any"* (too short)
-- `method` **`Light2D:Light2D:getColor`** — *"@return any"* (too short)
-- `method` **`Light2D:Light2D:getIntensity`** — *"@return any"* (too short)
-- `method` **`Light2D:Light2D:getPosition`** — *"@return any"* (too short)
-- `method` **`Light2D:Light2D:getRadius`** — *"@return any"* (too short)
-- `method` **`Light2D:Light2D:isEnabled`** — *"@return any"* (too short)
-- `method` **`PaletteLUT:PaletteLUT:getColorCount`** — *"@return any"* (too short)
-- `method` **`PolygonMap:PolygonMap:getBoundingBox`** — *"@return any"* (too short)
-- `method` **`PolygonMap:PolygonMap:getRegionNames`** — *"@return table"* (too short)
-- `method` **`SpriteSheet:SpriteSheet:getFrameCount`** — *"@return any"* (too short)
-- `method` **`SpriteSheet:SpriteSheet:getFrameSize`** — *"@return any"* (too short)
-- `method` **`SpriteSheet:SpriteSheet:getGridSize`** — *"@return any"* (too short)
-- `method` **`SpriteSheet:SpriteSheet:getGroupNames`** — *"@return table"* (too short)
-- `method` **`TextureAtlas:TextureAtlas:getDimensions`** — *"@return any"* (too short)
-- `method` **`TextureAtlas:TextureAtlas:getRegionCount`** — *"@return any"* (too short)
-- `method` **`TextureAtlas:TextureAtlas:getRegions`** — *"@return table"* (too short)
-- `method` **`Trail:Trail:getLifetime`** — *"@return any"* (too short)
-- `method` **`Trail:Trail:getPointCount`** — *"@return any"* (too short)
-- `method` **`Trail:Trail:getWidth`** — *"@return any"* (too short)
-- `method` **`Viewport:Viewport:getGameDimensions`** — *"@return any"* (too short)
-- `method` **`Viewport:Viewport:getOffset`** — *"@return any"* (too short)
-- `method` **`Viewport:Viewport:getScale`** — *"@return any"* (too short)
-- `method` **`Viewport:Viewport:getScaleMode`** — *"@return any"* (too short)
-- `method` **`ViewportScale:ViewportScale:getGameDimensions`** — *"@return any"* (too short)
-- `method` **`ViewportScale:ViewportScale:getMode`** — *"@return any"* (too short)
-- `method` **`ViewportScale:ViewportScale:getOffset`** — *"@return any"* (too short)
-- `method` **`ViewportScale:ViewportScale:getScale`** — *"@return any"* (too short)
-- `method` **`ViewportScale:ViewportScale:getScaledDimensions`** — *"@return any"* (too short)
-
-### `system`
-
-- `function` **`luna.system.luna.system.getArch`** — *"@return any"* (too short)
-- `function` **`luna.system.luna.system.getArgs`** — *"@return table"* (too short)
-- `function` **`luna.system.luna.system.getClipboardText`** — *"@return any"* (too short)
-- `function` **`luna.system.luna.system.getDebugOverlay`** — *(no description)*
-- `function` **`luna.system.luna.system.getInfo`** — *"@return any"* (too short)
-- `function` **`luna.system.luna.system.getLastError`** — *"@return any"* (too short)
-- `function` **`luna.system.luna.system.getLogLevel`** — *"# Returns"* (too short)
-- `function` **`luna.system.luna.system.getMemorySize`** — *"@return any"* (too short)
-- `function` **`luna.system.luna.system.getOS`** — *"@return any"* (too short)
-- `function` **`luna.system.luna.system.getPowerInfo`** — *"@return any"* (too short)
-- `function` **`luna.system.luna.system.getPreferredLocales`** — *"@return any"* (too short)
-- `function` **`luna.system.luna.system.getProcessorCount`** — *"@return any"* (too short)
-- `function` **`luna.system.luna.system.getVersion`** — *"@return any"* (too short)
-- `function` **`luna.system.luna.system.setLogLevel`** — *"# Parameters"* (too short)
+- `function` **`luna.math.luna.math.inBack`** — *"Back ease-in."* (too short)
+- `function` **`luna.math.luna.math.inCubic`** — *"Cubic ease-in."* (too short)
+- `function` **`luna.math.luna.math.outBack`** — *"Back ease-out."* (too short)
 
 ### `terminal`
 
-- `method` **`Terminal:Terminal:clear`** — *(no description)*
-- `method` **`Terminal:Terminal:clearWidgets`** — *(no description)*
-- `method` **`Terminal:Terminal:draw`** — *(no description)*
-- `method` **`Terminal:Terminal:get`** — *(no description)*
-- `method` **`Terminal:Terminal:getCellSize`** — *(no description)*
-- `method` **`Terminal:Terminal:getDimensions`** — *(no description)*
-- `method` **`Terminal:Terminal:getFocused`** — *(no description)*
-- `method` **`Terminal:Terminal:getWidgetCount`** — *(no description)*
-- `method` **`Terminal:Terminal:set`** — *(no description)*
-- `method` **`Terminal:Terminal:setFocus`** — *(no description)*
-- `method` **`Widget:Widget:clearChildren`** — *(no description)*
-- `method` **`Widget:Widget:clearItems`** — *(no description)*
-- `method` **`Widget:Widget:getChild`** — *(no description)*
-- `method` **`Widget:Widget:getChildCount`** — *(no description)*
-- `method` **`Widget:Widget:getColor`** — *(no description)*
-- `method` **`Widget:Widget:getItem`** — *(no description)*
-- `method` **`Widget:Widget:getItemCount`** — *(no description)*
-- `method` **`Widget:Widget:getMaxLength`** — *(no description)*
-- `method` **`Widget:Widget:getPosition`** — *(no description)*
-- `method` **`Widget:Widget:getSelected`** — *(no description)*
-- `method` **`Widget:Widget:getSize`** — *(no description)*
-- `method` **`Widget:Widget:getStyle`** — *(no description)*
-- `method` **`Widget:Widget:getTag`** — *(no description)*
-- `method` **`Widget:Widget:getText`** — *(no description)*
-- `method` **`Widget:Widget:getTitle`** — *(no description)*
-- `method` **`Widget:Widget:isEnabled`** — *(no description)*
-- `method` **`Widget:Widget:isVisible`** — *(no description)*
-- `method` **`Widget:Widget:setEnabled`** — *(no description)*
-- `method` **`Widget:Widget:setMaxLength`** — *(no description)*
-- `method` **`Widget:Widget:setOnChange`** — *(no description)*
-- `method` **`Widget:Widget:setOnClick`** — *(no description)*
-- `method` **`Widget:Widget:setOnSelect`** — *(no description)*
-- `method` **`Widget:Widget:setPosition`** — *(no description)*
-- `method` **`Widget:Widget:setSelected`** — *(no description)*
-- `method` **`Widget:Widget:setStyle`** — *(no description)*
-- `method` **`Widget:Widget:setTitle`** — *(no description)*
-- `method` **`Widget:Widget:setVisible`** — *(no description)*
-
-### `thread`
-
-- `class` **`luna.thread.Thread`** — *(no description)*
-- `method` **`Thread:Thread:getError`** — *"@return any"* (too short)
-- `method` **`Thread:Thread:isRunning`** — *"@return any"* (too short)
-
-### `tilemap`
-
-- `function` **`luna.tilemap.luna.tilemap.hexArea`** — *"# Parameters"* (too short)
-- `function` **`luna.tilemap.luna.tilemap.hexNeighbors`** — *"# Parameters"* (too short)
-- `function` **`luna.tilemap.luna.tilemap.hexRing`** — *"# Parameters"* (too short)
-- `method` **`IsoMap:IsoMap:getHeight`** — *"# Returns"* (too short)
-- `method` **`IsoMap:IsoMap:getTileWidth`** — *"# Returns"* (too short)
-- `method` **`IsoMap:IsoMap:getWidth`** — *"# Returns"* (too short)
-- `method` **`MapBlock:MapBlock:getHeight`** — *"# Returns"* (too short)
-- `method` **`MapBlock:MapBlock:getName`** — *"# Returns"* (too short)
-- `method` **`MapBlock:MapBlock:getWeight`** — *"# Returns"* (too short)
-- `method` **`MapBlock:MapBlock:getWidth`** — *"# Returns"* (too short)
-- `method` **`MapGen:MapGen:getGridWidth`** — *"# Returns"* (too short)
-- `method` **`MapGen:MapGen:getLayerMode`** — *"# Returns"* (too short)
-- `method` **`MapGen:MapGen:getZone`** — *"# Parameters"* (too short)
-- `method` **`MapGen:MapGen:getZoneCount`** — *"# Returns"* (too short)
-- `method` **`MapGroup:MapGroup:getName`** — *"# Returns"* (too short)
-- `method` **`MapScript:MapScript:getName`** — *"# Returns"* (too short)
-- `method` **`TileMap:TileMap:getTileHeight`** — *"# Returns"* (too short)
-- `method` **`TileMap:TileMap:getTileWidth`** — *"# Returns"* (too short)
-- `method` **`TileMap:TileMap:getViewport`** — *"# Returns"* (too short)
-- `method` **`TileSet:TileSet:getColumns`** — *"# Returns"* (too short)
-- `method` **`TileSet:TileSet:getFirstGid`** — *"# Returns"* (too short)
-- `method` **`TileSet:TileSet:getMargin`** — *"# Returns"* (too short)
-- `method` **`TileSet:TileSet:getSpacing`** — *"# Returns"* (too short)
-
-### `timer`
-
-- `function` **`luna.timer.luna.timer.getAverageDelta`** — *"@return any"* (too short)
-- `function` **`luna.timer.luna.timer.getDelta`** — *"@return any"* (too short)
-- `function` **`luna.timer.luna.timer.getFPS`** — *"@return any"* (too short)
-- `function` **`luna.timer.luna.timer.getMicroTime`** — *"# Returns"* (too short)
-- `function` **`luna.timer.luna.timer.getTime`** — *"@return any"* (too short)
-
-### `window`
-
-- `function` **`luna.window.luna.window.getDPIScale`** — *"@return any"* (too short)
-- `function` **`luna.window.luna.window.getDesktopDimensions`** — *"@return any"* (too short)
-- `function` **`luna.window.luna.window.getDimensions`** — *"@return any"* (too short)
-- `function` **`luna.window.luna.window.getDisplayCount`** — *"@return any"* (too short)
-- `function` **`luna.window.luna.window.getFullscreen`** — *"@return any"* (too short)
-- `function` **`luna.window.luna.window.getFullscreenModes`** — *"@return any"* (too short)
-- `function` **`luna.window.luna.window.getGameHeight`** — *"# Returns"* (too short)
-- `function` **`luna.window.luna.window.getGameWidth`** — *"# Returns"* (too short)
-- `function` **`luna.window.luna.window.getHeight`** — *"@return any"* (too short)
-- `function` **`luna.window.luna.window.getMode`** — *"@return any"* (too short)
-- `function` **`luna.window.luna.window.getPixelDimensions`** — *"@return any"* (too short)
-- `function` **`luna.window.luna.window.getPosition`** — *"@return any"* (too short)
-- `function` **`luna.window.luna.window.getTitle`** — *"# Returns"* (too short)
-- `function` **`luna.window.luna.window.getVSync`** — *(no description)*
-- `function` **`luna.window.luna.window.getWidth`** — *"@return any"* (too short)
-- `function` **`luna.window.luna.window.hasFocus`** — *(no description)*
-- `function` **`luna.window.luna.window.hasMouseFocus`** — *(no description)*
-- `function` **`luna.window.luna.window.isFullscreen`** — *"# Returns"* (too short)
-- `function` **`luna.window.luna.window.isMaximized`** — *(no description)*
-- `function` **`luna.window.luna.window.isMinimized`** — *(no description)*
-- `function` **`luna.window.luna.window.isResizable`** — *"# Returns"* (too short)
-- `function` **`luna.window.luna.window.isVisible`** — *(no description)*
-- `function` **`luna.window.luna.window.setTitle`** — *"# Parameters"* (too short)
+- `class` **`luna.terminal.Terminal`** — *(no description)*
+- `class` **`luna.terminal.Widget`** — *(no description)*
 
 ---
 

@@ -187,11 +187,17 @@ impl Skeleton {
     }
 
     /// Returns the number of bones in this skeleton.
+    ///
+    /// # Returns
+    /// `usize`.
     pub fn bone_count(&self) -> usize {
         self.bones.len()
     }
 
     /// Returns the number of slots in this skeleton.
+    ///
+    /// # Returns
+    /// `usize`.
     pub fn slot_count(&self) -> usize {
         self.slots.len()
     }
