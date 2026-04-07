@@ -46,9 +46,23 @@ _PUB_ITEM_RE = re.compile(
     r"\s+([A-Za-z_][A-Za-z0-9_]*)"
 )
 
-# Matches luna.* function registrations in Lua API source
+# Matches luna.* function registrations in Lua API source.
+# _LUA_SET_RE matches luna.set("name", ...) — catches functions AND module mounts.
+# _LUA_SET2_RE matches only the well-known API table variables used in register()
+#   functions (tbl, graphics, keyboard, mouse, gamepad, touch, overlay_tbl, system).
+#   This avoids false positives from local return-table builders like t.set("x", ...)
+#   or stats.set("drawcalls", ...) inside method closures.
 _LUA_SET_RE = re.compile(r'luna\.set\s*\(\s*"([A-Za-z_][A-Za-z0-9_]*)"\s*,')
-_LUA_SET2_RE = re.compile(r'\.set\s*\(\s*"([A-Za-z_][A-Za-z0-9_]*)"\s*,')
+_LUA_SET2_RE = re.compile(
+    r'\b(?:tbl|graphics|keyboard|mouse|gamepad|touch|overlay_tbl|system)'
+    r'\.set\s*\(\s*"([A-Za-z_][A-Za-z0-9_]*)"\s*,'
+)
+# Matches module-mount lines like `luna.set("timer", tbl)?;` — these are namespace
+# mounts, not individual function registrations, and need no per-function doc.
+_LUA_MOUNT_RE = re.compile(
+    r'luna\.set\s*\(\s*"[^"]+"\s*,\s*'
+    r'(?:tbl|graphics|keyboard|mouse|gamepad|touch|overlay_tbl|system)\s*\)'
+)
 
 
 # ──────────────────────────────────────────────────────────────────────────────
@@ -132,6 +146,30 @@ def _collect_lua_items(src_dir: Path) -> list[dict]:
             if not m:
                 continue
             fn_name = m.group(1)
+
+            # Skip module-mount lines: luna.set("module", tbl_var) — these are
+            # namespace mounts, not individual API functions; they carry no
+            # per-function doc obligation.
+            if _LUA_MOUNT_RE.search(stripped):
+                continue
+
+            # Skip local-scope table builders: if `let tbl = lua.create_table()`
+            # appears within the preceding 8 lines AND there is no `//` comment
+            # in the preceding 4 lines, then `tbl` is a temporary return-value
+            # table (e.g. inside a method closure or a helper function), not the
+            # register() API table.  Real API registrations always have a
+            # `// -- funcName --` section header or `///` doc comment before them.
+            has_nearby_create = any(
+                "let tbl = lua.create_table()" in lines[k]
+                for k in range(max(i - 8, 0), i)
+            )
+            has_nearby_comment = any(
+                lines[k].strip().startswith("/// ")
+                or lines[k].strip().startswith("// -- ")
+                for k in range(max(i - 4, 0), i)
+            )
+            if has_nearby_create and not has_nearby_comment:
+                continue
 
             # Look backwards for a // comment describing the function
             has_doc = False
@@ -255,7 +293,7 @@ def main() -> None:  # noqa: C901
     print("-" * 60)
     _print_summary("Total", all_stats)
     print("=" * 60)
-    print(f"Metadata written → {out_path.relative_to(WORKSPACE_ROOT)}")
+    print(f"Metadata written -> {out_path.relative_to(WORKSPACE_ROOT)}")
     if missing_items:
         print(f"Run with --report-missing to list {len(missing_items)} uncovered item(s).")
 

@@ -104,8 +104,8 @@ def collect_rust_public_fns(src_dir: Path, module_filter: str = None) -> List[di
 
 def collect_lua_api_fns(module_filter: str = None) -> List[dict]:
     """Collect all Lua API functions from gen_lua_api.py JSON data."""
-    # Import and use gen_lua_api directly
-    sys.path.insert(0, str(WORKSPACE_ROOT / "tools"))
+    # Import and use gen_lua_api directly (lives in tools/docs/)
+    sys.path.insert(0, str(WORKSPACE_ROOT / "tools" / "docs"))
     import gen_lua_api
 
     all_fns = gen_lua_api.collect_all_functions(WORKSPACE_ROOT / "src" / "lua_api")
