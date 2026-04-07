@@ -17,26 +17,19 @@ fn mod_info_from_table(tbl: &LuaTable) -> LuaResult<ModInfo> {
     let id: String = tbl
         .get::<_, String>("id")
         .map_err(|_| LuaError::RuntimeError("newMod requires 'id' field".into()))?;
-    let mut info = ModInfo::new(id);
-    if let Ok(v) = tbl.get::<_, String>("name") {
-        info.name = v;
-    }
-    if let Ok(v) = tbl.get::<_, String>("version") {
-        info.version = v;
-    }
-    if let Ok(v) = tbl.get::<_, String>("author") {
-        info.author = v;
-    }
-    if let Ok(v) = tbl.get::<_, String>("description") {
-        info.description = v;
-    }
-    if let Ok(v) = tbl.get::<_, i32>("priority") {
-        info.priority = v;
-    }
-    if let Ok(deps) = tbl.get::<_, LuaTable>("dependencies") {
-        info.dependencies = deps.sequence_values::<String>().flatten().collect();
-    }
-    Ok(info)
+    let dependencies = tbl
+        .get::<_, LuaTable>("dependencies")
+        .map(|deps| deps.sequence_values::<String>().flatten().collect())
+        .unwrap_or_default();
+    Ok(ModInfo::from_parts(
+        id,
+        tbl.get::<_, String>("name").ok(),
+        tbl.get::<_, String>("version").ok(),
+        tbl.get::<_, String>("author").ok(),
+        tbl.get::<_, String>("description").ok(),
+        tbl.get::<_, i32>("priority").ok(),
+        dependencies,
+    ))
 }
 
 /// Writes a [`ModInfo`] to a Lua table.

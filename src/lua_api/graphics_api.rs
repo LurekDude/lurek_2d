@@ -1877,21 +1877,23 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
                 Some("strip") => MeshDrawMode::Strip,
                 _ => MeshDrawMode::Triangles,
             };
-            let mut vertices = Vec::new();
-            for vert in verts.sequence_values::<LuaTable>() {
-                let v = vert?;
-                vertices.push(MeshVertex {
-                    x: v.get(1).unwrap_or(0.0),
-                    y: v.get(2).unwrap_or(0.0),
-                    u: v.get(3).unwrap_or(0.0),
-                    v: v.get(4).unwrap_or(0.0),
-                    r: v.get(5).unwrap_or(1.0),
-                    g: v.get(6).unwrap_or(1.0),
-                    b: v.get(7).unwrap_or(1.0),
-                    a: v.get(8).unwrap_or(1.0),
-                });
-            }
-            let mesh = Mesh::from_vertices(vertices, draw_mode);
+            let rows: Vec<[f32; 8]> = verts
+                .sequence_values::<LuaTable>()
+                .map(|vert| {
+                    let v = vert?;
+                    Ok([
+                        v.get(1).unwrap_or(0.0),
+                        v.get(2).unwrap_or(0.0),
+                        v.get(3).unwrap_or(0.0),
+                        v.get(4).unwrap_or(0.0),
+                        v.get(5).unwrap_or(1.0),
+                        v.get(6).unwrap_or(1.0),
+                        v.get(7).unwrap_or(1.0),
+                        v.get(8).unwrap_or(1.0),
+                    ])
+                })
+                .collect::<LuaResult<_>>()?;
+            let mesh = Mesh::from_vertex_rows(&rows, draw_mode);
             let mut st = s.borrow_mut();
             let mesh_clone = mesh.clone();
             let key = st.meshes.insert(mesh);

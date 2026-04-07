@@ -76,6 +76,48 @@ impl ModInfo {
             path: None,
         }
     }
+
+    /// Creates a `ModInfo` from its constituent parts, applying optional overrides over the defaults from [`ModInfo::new`].
+    ///
+    /// # Parameters
+    /// - `id` — `String`.
+    /// - `name` — `Option<String>`.
+    /// - `version` — `Option<String>`.
+    /// - `author` — `Option<String>`.
+    /// - `description` — `Option<String>`.
+    /// - `priority` — `Option<i32>`.
+    /// - `dependencies` — `Vec<String>`.
+    ///
+    /// # Returns
+    /// `Self`.
+    pub fn from_parts(
+        id: String,
+        name: Option<String>,
+        version: Option<String>,
+        author: Option<String>,
+        description: Option<String>,
+        priority: Option<i32>,
+        dependencies: Vec<String>,
+    ) -> Self {
+        let mut info = Self::new(id);
+        if let Some(n) = name {
+            info.name = n;
+        }
+        if let Some(v) = version {
+            info.version = v;
+        }
+        if let Some(a) = author {
+            info.author = a;
+        }
+        if let Some(d) = description {
+            info.description = d;
+        }
+        if let Some(p) = priority {
+            info.priority = p;
+        }
+        info.dependencies = dependencies;
+        info
+    }
 }
 
 /// Centralized registry for managing mods, resolving load order,

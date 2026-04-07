@@ -133,6 +133,31 @@ impl Mesh {
         }
     }
 
+    /// Creates a mesh from raw per-vertex float rows (x, y, u, v, r, g, b, a).
+    ///
+    /// # Parameters
+    /// - `rows` — `&[[f32; 8]]`.
+    /// - `mode` — `MeshDrawMode`.
+    ///
+    /// # Returns
+    /// `Self`.
+    pub fn from_vertex_rows(rows: &[[f32; 8]], mode: MeshDrawMode) -> Self {
+        let vertices: Vec<MeshVertex> = rows
+            .iter()
+            .map(|r| MeshVertex {
+                x: r[0],
+                y: r[1],
+                u: r[2],
+                v: r[3],
+                r: r[4],
+                g: r[5],
+                b: r[6],
+                a: r[7],
+            })
+            .collect();
+        Self::from_vertices(vertices, mode)
+    }
+
     /// Sets a single vertex at the given index.
     ///
     /// # Parameters
