@@ -1,4 +1,4 @@
-﻿# raycaster — Feature Analysis
+# raycaster — Feature Analysis
 
 **Tier**: 2 (Extension)
 **Spec**: `specs/raycaster.md`
@@ -6,7 +6,7 @@
 
 ## Purpose
 
-DDA-based 2D grid raycaster for retro FPS and dungeon crawlers. Produces RayHit results (distance, texture coord, hit position, side) that Lua scripts render as screen columns via `luna.render` fill/quad calls. Satisfies A-03 (2D graphics only) — pseudo-3D via 2D draw calls.
+DDA-based 2D grid raycaster for retro FPS and dungeon crawlers. Produces RayHit results (distance, texture coord, hit position, side) that Lua scripts render as screen columns via `luna.gfx` fill/quad calls. Satisfies A-03 (2D graphics only) — pseudo-3D via 2D draw calls.
 
 ## Current Feature Summary
 

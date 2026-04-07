@@ -1,4 +1,4 @@
-﻿# Extension Testing Strategy
+# Extension Testing Strategy
 
 ## Current State
 
@@ -34,7 +34,7 @@ import { CompletionProvider } from '../../src/providers/completion';
 import { MockDocument, MockPosition } from '../mocks/vscode';
 
 describe('CompletionProvider', () => {
-  it('completes luna.render.* methods', () => { ... });
+  it('completes luna.gfx.* methods', () => { ... });
   it('completes builtins after luna.', () => { ... });
   it('does not complete outside luna namespace', () => { ... });
   it('includes parameter snippets', () => { ... });

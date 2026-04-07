@@ -1,4 +1,4 @@
-﻿-- System Infiltration / Gadget Puzzle Demo
+-- System Infiltration / Gadget Puzzle Demo
 -- Navigate rooms, avoid cameras, use gadgets, hack terminals, steal data
 
 local function clamp(v, mn, mx) return math.max(mn, math.min(mx, v)) end
@@ -100,8 +100,8 @@ local function startHack(doorR, doorC)
     gameState = "hacking"
 end
 
-function luna.load()
-    luna.render.setBackgroundColor(0.05, 0.05, 0.1)
+function luna.init()
+    luna.gfx.setBackgroundColor(0.05, 0.05, 0.1)
     initMap()
     player.x = 1.5 * TILE
     player.y = 13.5 * TILE
@@ -113,7 +113,7 @@ function luna.load()
     addCamera(18.5 * TILE, 11.5 * TILE, 3.14, 1.5, 0.9)
 end
 
-function luna.update(dt)
+function luna.process(dt)
     if gameState == "won" or gameState == "caught" then return end
 
     missionTimer = missionTimer - dt
@@ -296,115 +296,115 @@ function luna.keypressed(key)
     end
 end
 
-function luna.draw()
+function luna.render()
     -- Draw map
     for r = 1, ROWS do
         for c = 1, COLS do
             local x, y = (c - 1) * TILE, (r - 1) * TILE
             local v = map[r][c]
             if v == 0 then
-                luna.render.setColor(0.12, 0.12, 0.18, 1)
-                luna.render.rectangle("fill", x, y, TILE, TILE)
+                luna.gfx.setColor(0.12, 0.12, 0.18, 1)
+                luna.gfx.rectangle("fill", x, y, TILE, TILE)
             elseif v == 1 then
-                luna.render.setColor(0.2, 0.2, 0.25, 1)
-                luna.render.rectangle("fill", x, y, TILE, TILE)
+                luna.gfx.setColor(0.2, 0.2, 0.25, 1)
+                luna.gfx.rectangle("fill", x, y, TILE, TILE)
             elseif v >= 2 and v <= 4 then
                 local clr = DOOR_COLORS[v]
-                luna.render.setColor(clr[1], clr[2], clr[3], 1)
-                luna.render.rectangle("fill", x, y, TILE, TILE)
-                luna.render.setColor(1, 1, 1, 0.7)
-                luna.render.print(DOOR_NAMES[v], x + 2, y + 12, 0.5)
+                luna.gfx.setColor(clr[1], clr[2], clr[3], 1)
+                luna.gfx.rectangle("fill", x, y, TILE, TILE)
+                luna.gfx.setColor(1, 1, 1, 0.7)
+                luna.gfx.print(DOOR_NAMES[v], x + 2, y + 12, 0.5)
             elseif v == 5 then
-                luna.render.setColor(0.2, 0.2, 0.25, 1)
-                luna.render.rectangle("fill", x, y, TILE, TILE)
-                luna.render.setColor(0, 0.8, 0, 1)
-                luna.render.print(">_", x + 8, y + 10, 1)
+                luna.gfx.setColor(0.2, 0.2, 0.25, 1)
+                luna.gfx.rectangle("fill", x, y, TILE, TILE)
+                luna.gfx.setColor(0, 0.8, 0, 1)
+                luna.gfx.print(">_", x + 8, y + 10, 1)
             elseif v == 6 then
-                luna.render.setColor(0.6, 0.5, 0.1, 1)
-                luna.render.rectangle("fill", x, y, TILE, TILE)
-                luna.render.setColor(1, 1, 1, 1)
-                luna.render.print("VAULT", x + 2, y + 12, 0.5)
+                luna.gfx.setColor(0.6, 0.5, 0.1, 1)
+                luna.gfx.rectangle("fill", x, y, TILE, TILE)
+                luna.gfx.setColor(1, 1, 1, 1)
+                luna.gfx.print("VAULT", x + 2, y + 12, 0.5)
             elseif v == 7 then
-                luna.render.setColor(0.1, 0.5, 0.1, 1)
-                luna.render.rectangle("fill", x, y, TILE, TILE)
-                luna.render.setColor(1, 1, 1, 1)
-                luna.render.print("EXIT", x + 4, y + 12, 0.55)
+                luna.gfx.setColor(0.1, 0.5, 0.1, 1)
+                luna.gfx.rectangle("fill", x, y, TILE, TILE)
+                luna.gfx.setColor(1, 1, 1, 1)
+                luna.gfx.print("EXIT", x + 4, y + 12, 0.55)
             end
         end
     end
 
     -- Grid lines
-    luna.render.setColor(0.15, 0.15, 0.2, 0.5)
+    luna.gfx.setColor(0.15, 0.15, 0.2, 0.5)
     for r = 0, ROWS do
-        luna.render.line(0, r * TILE, COLS * TILE, r * TILE)
+        luna.gfx.line(0, r * TILE, COLS * TILE, r * TILE)
     end
     for c = 0, COLS do
-        luna.render.line(c * TILE, 0, c * TILE, ROWS * TILE)
+        luna.gfx.line(c * TILE, 0, c * TILE, ROWS * TILE)
     end
 
     -- Cameras
     for i, cam in ipairs(cameras) do
         local disabled = isCamDisabled(i)
         if disabled then
-            luna.render.setColor(0.3, 0.3, 0.3, 0.5)
+            luna.gfx.setColor(0.3, 0.3, 0.3, 0.5)
         else
-            luna.render.setColor(1, 0, 0, 0.2)
+            luna.gfx.setColor(1, 0, 0, 0.2)
             -- Vision cone
             local cx1 = cam.x + math.cos(cam.angle - cam.coneWidth) * cam.range
             local cy1 = cam.y + math.sin(cam.angle - cam.coneWidth) * cam.range
             local cx2 = cam.x + math.cos(cam.angle + cam.coneWidth) * cam.range
             local cy2 = cam.y + math.sin(cam.angle + cam.coneWidth) * cam.range
-            luna.render.polygon("fill", {cam.x, cam.y, cx1, cy1, cx2, cy2})
+            luna.gfx.polygon("fill", {cam.x, cam.y, cx1, cy1, cx2, cy2})
         end
-        luna.render.setColor(disabled and 0.4 or 1, 0, 0, 1)
-        luna.render.circle("fill", cam.x, cam.y, 6)
+        luna.gfx.setColor(disabled and 0.4 or 1, 0, 0, 1)
+        luna.gfx.circle("fill", cam.x, cam.y, 6)
     end
 
     -- Player
-    luna.render.setColor(0, 0.8, 1, 1)
-    luna.render.circle("fill", player.x, player.y, 10)
-    luna.render.setColor(0, 0.5, 0.8, 1)
-    luna.render.circle("line", player.x, player.y, 12)
+    luna.gfx.setColor(0, 0.8, 1, 1)
+    luna.gfx.circle("fill", player.x, player.y, 10)
+    luna.gfx.setColor(0, 0.5, 0.8, 1)
+    luna.gfx.circle("line", player.x, player.y, 12)
 
     -- HUD
-    luna.render.setColor(0, 0, 0, 0.8)
-    luna.render.rectangle("fill", 0, 0, W, 35)
+    luna.gfx.setColor(0, 0, 0, 0.8)
+    luna.gfx.rectangle("fill", 0, 0, W, 35)
     -- Alert bar
-    luna.render.setColor(0.3, 0.3, 0.3, 1)
-    luna.render.rectangle("fill", 10, 5, 150, 12)
+    luna.gfx.setColor(0.3, 0.3, 0.3, 1)
+    luna.gfx.rectangle("fill", 10, 5, 150, 12)
     local alertPct = alertLevel / maxAlert
     local ar = lerp(0.2, 1, alertPct)
-    luna.render.setColor(ar, 0.1, 0.1, 1)
-    luna.render.rectangle("fill", 10, 5, alertPct * 150, 12)
-    luna.render.setColor(1, 1, 1, 1)
-    luna.render.print("Alert", 165, 3, 0.75)
+    luna.gfx.setColor(ar, 0.1, 0.1, 1)
+    luna.gfx.rectangle("fill", 10, 5, alertPct * 150, 12)
+    luna.gfx.setColor(1, 1, 1, 1)
+    luna.gfx.print("Alert", 165, 3, 0.75)
     -- Timer
     local mins = math.floor(missionTimer / 60)
     local secs = math.floor(missionTimer % 60)
     local timeStr = mins .. ":" .. (secs < 10 and "0" or "") .. secs
-    luna.render.setColor(missionTimer < 30 and 1 or 0.8, missionTimer < 30 and 0.3 or 0.8, missionTimer < 30 and 0.3 or 0.8, 1)
-    luna.render.print("Time: " .. timeStr, 220, 5, 0.9)
+    luna.gfx.setColor(missionTimer < 30 and 1 or 0.8, missionTimer < 30 and 0.3 or 0.8, missionTimer < 30 and 0.3 or 0.8, 1)
+    luna.gfx.print("Time: " .. timeStr, 220, 5, 0.9)
     -- Gadgets
-    luna.render.setColor(0.7, 0.7, 0.7, 1)
-    luna.render.print("Keycards:" .. gadgets.keycard .. " EMP(Q):" .. gadgets.emp .. " Picks:" .. gadgets.lockpick, 350, 5, 0.75)
+    luna.gfx.setColor(0.7, 0.7, 0.7, 1)
+    luna.gfx.print("Keycards:" .. gadgets.keycard .. " EMP(Q):" .. gadgets.emp .. " Picks:" .. gadgets.lockpick, 350, 5, 0.75)
     -- Data
-    luna.render.setColor(hasData and 0 or 0.5, hasData and 1 or 0.5, hasData and 0 or 0.5, 1)
-    luna.render.print(hasData and "DATA ACQUIRED" or "No Data", 650, 5, 0.8)
+    luna.gfx.setColor(hasData and 0 or 0.5, hasData and 1 or 0.5, hasData and 0 or 0.5, 1)
+    luna.gfx.print(hasData and "DATA ACQUIRED" or "No Data", 650, 5, 0.8)
 
     -- Bottom HUD
-    luna.render.setColor(0, 0, 0, 0.7)
-    luna.render.rectangle("fill", 0, H - 25, W, 25)
-    luna.render.setColor(0.6, 0.6, 0.6, 1)
-    luna.render.print("WASD move | E interact with doors/terminals | Q EMP | Get to vault, steal data, reach exit", 10, H - 22, 0.7)
+    luna.gfx.setColor(0, 0, 0, 0.7)
+    luna.gfx.rectangle("fill", 0, H - 25, W, 25)
+    luna.gfx.setColor(0.6, 0.6, 0.6, 1)
+    luna.gfx.print("WASD move | E interact with doors/terminals | Q EMP | Get to vault, steal data, reach exit", 10, H - 22, 0.7)
 
     -- Hack overlay
     if gameState == "hacking" and hackState then
-        luna.render.setColor(0, 0, 0, 0.9)
-        luna.render.rectangle("fill", W / 2 - 200, H / 2 - 120, 400, 240)
-        luna.render.setColor(0, 1, 0, 1)
-        luna.render.print("HACK TERMINAL", W / 2 - 70, H / 2 - 110, 1)
-        luna.render.print("Match wires: press 1-4 in correct order", W / 2 - 150, H / 2 - 85, 0.75)
-        luna.render.print("Time: " .. math.floor(hackState.timer) .. "s | Q to cancel", W / 2 - 100, H / 2 - 65, 0.7)
+        luna.gfx.setColor(0, 0, 0, 0.9)
+        luna.gfx.rectangle("fill", W / 2 - 200, H / 2 - 120, 400, 240)
+        luna.gfx.setColor(0, 1, 0, 1)
+        luna.gfx.print("HACK TERMINAL", W / 2 - 70, H / 2 - 110, 1)
+        luna.gfx.print("Match wires: press 1-4 in correct order", W / 2 - 150, H / 2 - 85, 0.75)
+        luna.gfx.print("Time: " .. math.floor(hackState.timer) .. "s | Q to cancel", W / 2 - 100, H / 2 - 65, 0.7)
 
         local wireColors = {{1, 0, 0}, {0, 1, 0}, {0, 0.5, 1}, {1, 1, 0}}
         for i = 1, 4 do
@@ -413,44 +413,44 @@ function luna.draw()
             local wy = H / 2 - 30 + (i - 1) * 40
             -- Left side (source)
             local c = wireColors[wire.id]
-            luna.render.setColor(c[1], c[2], c[3], 1)
-            luna.render.circle("fill", wx, wy, 10)
-            luna.render.print("Wire " .. wire.id, wx + 15, wy - 7, 0.7)
+            luna.gfx.setColor(c[1], c[2], c[3], 1)
+            luna.gfx.circle("fill", wx, wy, 10)
+            luna.gfx.print("Wire " .. wire.id, wx + 15, wy - 7, 0.7)
             -- Right side (target)
             local tc = wireColors[wire.target]
-            luna.render.setColor(tc[1], tc[2], tc[3], 1)
-            luna.render.circle("fill", wx + 280, wy, 10)
-            luna.render.print("Port " .. wire.target, wx + 220, wy - 7, 0.7)
+            luna.gfx.setColor(tc[1], tc[2], tc[3], 1)
+            luna.gfx.circle("fill", wx + 280, wy, 10)
+            luna.gfx.print("Port " .. wire.target, wx + 220, wy - 7, 0.7)
 
             if wire.connected then
-                luna.render.setColor(0, 1, 0, 0.8)
-                luna.render.line(wx + 10, wy, wx + 270, wy)
+                luna.gfx.setColor(0, 1, 0, 0.8)
+                luna.gfx.line(wx + 10, wy, wx + 270, wy)
             end
             if i == hackState.nextWire then
-                luna.render.setColor(1, 1, 1, 0.5 + math.sin(luna.time.getTime() * 6) * 0.5)
-                luna.render.circle("line", wx, wy, 14)
+                luna.gfx.setColor(1, 1, 1, 0.5 + math.sin(luna.time.getTime() * 6) * 0.5)
+                luna.gfx.circle("line", wx, wy, 14)
             end
         end
     end
 
     -- Message
     if msgTimer > 0 then
-        luna.render.setColor(0, 1, 0.5, clamp(msgTimer, 0, 1))
-        luna.render.print(message, W / 2 - 120, H / 2 + 80, 1)
+        luna.gfx.setColor(0, 1, 0.5, clamp(msgTimer, 0, 1))
+        luna.gfx.print(message, W / 2 - 120, H / 2 + 80, 1)
     end
 
     -- Game over / win
     if gameState == "caught" then
-        luna.render.setColor(0.5, 0, 0, 0.85)
-        luna.render.rectangle("fill", 0, 0, W, H)
-        luna.render.setColor(1, 1, 1, 1)
-        luna.render.print("MISSION FAILED", W / 2 - 100, H / 2 - 20, 1.5)
-        luna.render.print("Press R to retry", W / 2 - 60, H / 2 + 20, 0.9)
+        luna.gfx.setColor(0.5, 0, 0, 0.85)
+        luna.gfx.rectangle("fill", 0, 0, W, H)
+        luna.gfx.setColor(1, 1, 1, 1)
+        luna.gfx.print("MISSION FAILED", W / 2 - 100, H / 2 - 20, 1.5)
+        luna.gfx.print("Press R to retry", W / 2 - 60, H / 2 + 20, 0.9)
     elseif gameState == "won" then
-        luna.render.setColor(0, 0.2, 0.1, 0.85)
-        luna.render.rectangle("fill", 0, 0, W, H)
-        luna.render.setColor(0, 1, 0.5, 1)
-        luna.render.print("MISSION COMPLETE", W / 2 - 110, H / 2 - 20, 1.5)
-        luna.render.print("Press R to replay", W / 2 - 65, H / 2 + 20, 0.9)
+        luna.gfx.setColor(0, 0.2, 0.1, 0.85)
+        luna.gfx.rectangle("fill", 0, 0, W, H)
+        luna.gfx.setColor(0, 1, 0.5, 1)
+        luna.gfx.print("MISSION COMPLETE", W / 2 - 110, H / 2 - 20, 1.5)
+        luna.gfx.print("Press R to replay", W / 2 - 65, H / 2 + 20, 0.9)
     end
 end

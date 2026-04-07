@@ -218,7 +218,7 @@ All save operations are methods on the `SaveManager` UserData object.
 
 local sm
 
-function luna.load()
+function luna.init()
     sm = luna.savegame.newSaveManager()
     sm:setSchemaVersion(2)
 
@@ -261,7 +261,7 @@ function luna.load()
     end
 end
 
-function luna.update(dt)
+function luna.process(dt)
     -- Advance auto-save timer (fires only when dirty)
     local slot = sm:update(dt)
     if slot then

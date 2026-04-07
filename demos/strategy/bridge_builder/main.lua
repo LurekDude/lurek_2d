@@ -1,4 +1,4 @@
-﻿-- Bridge Builder — Place nodes and beams, then test with physics
+-- Bridge Builder — Place nodes and beams, then test with physics
 
 local function clamp(v, mn, mx) return math.max(mn, math.min(mx, v)) end
 local function lerp(a, b, t) return a + (b - a) * t end
@@ -65,9 +65,9 @@ local function reset_build()
     nodes[4] = { x = RIGHT_EDGE, y = GAP_Y - 50, anchored = true }
 end
 
-function luna.load()
+function luna.init()
     luna.window.setTitle("Bridge Builder")
-    luna.render.setBackgroundColor(0.4, 0.7, 0.95)
+    luna.gfx.setBackgroundColor(0.4, 0.7, 0.95)
     reset_build()
 end
 
@@ -110,7 +110,7 @@ local function get_bridge_y_at(vx)
     return best_y
 end
 
-function luna.update(dt)
+function luna.process(dt)
     if mode ~= "test" then return end
     test_timer = test_timer + dt
 
@@ -184,79 +184,79 @@ local function stress_color(stress, max_s)
     end
 end
 
-function luna.draw()
+function luna.render()
     -- water
-    luna.render.setColor(0.15, 0.3, 0.6, 1)
-    luna.render.rectangle("fill", 0, H - 80, W, 80)
+    luna.gfx.setColor(0.15, 0.3, 0.6, 1)
+    luna.gfx.rectangle("fill", 0, H - 80, W, 80)
 
     -- cliffs
-    luna.render.setColor(0.35, 0.25, 0.15, 1)
-    luna.render.rectangle("fill", 0, GAP_Y, LEFT_EDGE, H - GAP_Y)
-    luna.render.rectangle("fill", RIGHT_EDGE, GAP_Y, W - RIGHT_EDGE, H - GAP_Y)
+    luna.gfx.setColor(0.35, 0.25, 0.15, 1)
+    luna.gfx.rectangle("fill", 0, GAP_Y, LEFT_EDGE, H - GAP_Y)
+    luna.gfx.rectangle("fill", RIGHT_EDGE, GAP_Y, W - RIGHT_EDGE, H - GAP_Y)
     -- grass
-    luna.render.setColor(0.2, 0.6, 0.2, 1)
-    luna.render.rectangle("fill", 0, GAP_Y - 8, LEFT_EDGE, 8)
-    luna.render.rectangle("fill", RIGHT_EDGE, GAP_Y - 8, W - RIGHT_EDGE, 8)
+    luna.gfx.setColor(0.2, 0.6, 0.2, 1)
+    luna.gfx.rectangle("fill", 0, GAP_Y - 8, LEFT_EDGE, 8)
+    luna.gfx.rectangle("fill", RIGHT_EDGE, GAP_Y - 8, W - RIGHT_EDGE, 8)
 
     -- beams
     for _, beam in ipairs(beams) do
         local n1 = nodes[beam.a]
         local n2 = nodes[beam.b]
         if beam.broken then
-            luna.render.setColor(0.3, 0.3, 0.3, 0.4)
+            luna.gfx.setColor(0.3, 0.3, 0.3, 0.4)
         elseif mode == "test" or mode == "result" then
             local mat = MAT[beam.mat]
             local cr, cg, cb = stress_color(beam.stress, mat.max_stress)
-            luna.render.setColor(cr, cg, cb, 1)
+            luna.gfx.setColor(cr, cg, cb, 1)
         else
             local mat = MAT[beam.mat]
-            luna.render.setColor(mat.r, mat.g, mat.b, 1)
+            luna.gfx.setColor(mat.r, mat.g, mat.b, 1)
         end
-        luna.render.setLineWidth(beam.mat == 2 and 4 or 3)
-        luna.render.line(n1.x, n1.y, n2.x, n2.y)
+        luna.gfx.setLineWidth(beam.mat == 2 and 4 or 3)
+        luna.gfx.line(n1.x, n1.y, n2.x, n2.y)
     end
-    luna.render.setLineWidth(1)
+    luna.gfx.setLineWidth(1)
 
     -- nodes
     for i, n in ipairs(nodes) do
         if n.anchored then
-            luna.render.setColor(0.7, 0.7, 0.7, 1)
+            luna.gfx.setColor(0.7, 0.7, 0.7, 1)
         elseif i == selected_node then
-            luna.render.setColor(1, 1, 0, 1)
+            luna.gfx.setColor(1, 1, 0, 1)
         else
-            luna.render.setColor(1, 1, 1, 1)
+            luna.gfx.setColor(1, 1, 1, 1)
         end
-        luna.render.circle("fill", n.x, n.y, 6)
+        luna.gfx.circle("fill", n.x, n.y, 6)
     end
 
     -- vehicle
     if vehicle and (mode == "test" or mode == "result") then
-        luna.render.setColor(0.8, 0.2, 0.2, 1)
-        luna.render.rectangle("fill", vehicle.x, vehicle.y, vehicle.w, vehicle.h)
+        luna.gfx.setColor(0.8, 0.2, 0.2, 1)
+        luna.gfx.rectangle("fill", vehicle.x, vehicle.y, vehicle.w, vehicle.h)
         -- wheels
-        luna.render.setColor(0.2, 0.2, 0.2, 1)
-        luna.render.circle("fill", vehicle.x + 8, vehicle.y + vehicle.h, 6)
-        luna.render.circle("fill", vehicle.x + vehicle.w - 8, vehicle.y + vehicle.h, 6)
+        luna.gfx.setColor(0.2, 0.2, 0.2, 1)
+        luna.gfx.circle("fill", vehicle.x + 8, vehicle.y + vehicle.h, 6)
+        luna.gfx.circle("fill", vehicle.x + vehicle.w - 8, vehicle.y + vehicle.h, 6)
     end
 
     -- HUD
-    luna.render.setColor(0, 0, 0, 0.6)
-    luna.render.rectangle("fill", 0, 0, W, 40)
-    luna.render.setColor(1, 1, 1, 1)
+    luna.gfx.setColor(0, 0, 0, 0.6)
+    luna.gfx.rectangle("fill", 0, 0, W, 40)
+    luna.gfx.setColor(1, 1, 1, 1)
     local mat = MAT[material]
-    luna.render.print("Material: " .. mat.name .. " ($" .. mat.cost .. ")  |  Budget: $" .. budget, 10, 10, 1)
-    luna.render.print("1/2=Material  T=Test  R=Reset", W - 280, 10, 0.9)
+    luna.gfx.print("Material: " .. mat.name .. " ($" .. mat.cost .. ")  |  Budget: $" .. budget, 10, 10, 1)
+    luna.gfx.print("1/2=Material  T=Test  R=Reset", W - 280, 10, 0.9)
 
     if mode == "build" then
-        luna.render.setColor(0.8, 0.8, 0.2, 0.7)
-        luna.render.print("Click to place nodes. Click two nodes to connect. T to test.", 10, H - 25, 0.9)
+        luna.gfx.setColor(0.8, 0.8, 0.2, 0.7)
+        luna.gfx.print("Click to place nodes. Click two nodes to connect. T to test.", 10, H - 25, 0.9)
     end
 
     if result_text then
-        luna.render.setColor(0, 0, 0, 0.7)
-        luna.render.rectangle("fill", W / 2 - 200, H / 2 - 30, 400, 60)
-        luna.render.setColor(1, 1, 1, 1)
-        luna.render.print(result_text, W / 2 - 180, H / 2 - 15, 0.9)
+        luna.gfx.setColor(0, 0, 0, 0.7)
+        luna.gfx.rectangle("fill", W / 2 - 200, H / 2 - 30, 400, 60)
+        luna.gfx.setColor(1, 1, 1, 1)
+        luna.gfx.print(result_text, W / 2 - 180, H / 2 - 15, 0.9)
     end
 end
 

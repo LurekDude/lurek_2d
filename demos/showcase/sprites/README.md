@@ -1,4 +1,4 @@
-﻿# Sprites / Movement Demo
+# Sprites / Movement Demo
 
 Moves a coloured rectangle around the screen with keyboard input. Demonstrates real-time position updates, boundary clamping, and mouse-click spawning.
 
@@ -6,10 +6,10 @@ Moves a coloured rectangle around the screen with keyboard input. Demonstrates r
 
 - `luna.keyboard.isDown()` — polling multiple keys each frame
 - `luna.mouse.getPosition()` / `luna.mouse.isDown()` — mouse input
-- `luna.render.rectangle()` with fill and outline modes
+- `luna.gfx.rectangle()` with fill and outline modes
 - Delta-time movement: `pos = pos + speed * dt`
 - Boundary clamping to keep entities on screen
-- `luna.render.getWidth()` / `getHeight()` — window size query
+- `luna.gfx.getWidth()` / `getHeight()` — window size query
 
 ## How to Run
 

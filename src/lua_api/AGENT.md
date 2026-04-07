@@ -1,4 +1,4 @@
-﻿# `lua_api` — Agent Reference
+# `lua_api` — Agent Reference
 
 | Property | Value |
 |----------|-------|
@@ -23,7 +23,7 @@ translation layer — business logic stays in the domain modules below.
 |------|---------|
 | `mod.rs` | VM creation, StdLib selection, global nulling, module registration |
 | `userdata.rs` | `LunaType` trait, shared UserData patterns |
-| `graphics_api/` | `luna.render.*` — drawing, images, fonts, canvases, shaders |
+| `graphics_api/` | `luna.gfx.*` — drawing, images, fonts, canvases, shaders |
 | `audio_api.rs` | `luna.audio.*` — sources, playback, volume, buses |
 | `input_api.rs` | `luna.input.*`, `luna.keyboard.*`, `luna.mouse.*`, `luna.gamepad.*`, `luna.touch.*` |
 | `timer_api.rs` | `luna.time.*` — delta time, FPS, sleep (Gold standard for docstring format) |

@@ -1,8 +1,8 @@
-﻿-- Module availability guard (added by fix_nil_module_demos.py)
+-- Module availability guard (added by fix_nil_module_demos.py)
 if not luna.postfx then
-    function luna.load()
-        luna.render.setBackgroundColor(0.08, 0.08, 0.12)
-        luna.render.print("luna.postfx is not available - use luna.postfx instead", 180, 270)
+    function luna.init()
+        luna.gfx.setBackgroundColor(0.08, 0.08, 0.12)
+        luna.gfx.print("luna.postfx is not available - use luna.postfx instead", 180, 270)
     end
     return
 end
@@ -21,9 +21,9 @@ local effect_names = {
 }
 local active = {}  -- tracks which effects are active in the stack
 
-function luna.load()
+function luna.init()
     luna.window.setTitle("PostFX Demo - Luna2D")
-    luna.render.setBackgroundColor(0.05, 0.05, 0.1)
+    luna.gfx.setBackgroundColor(0.05, 0.05, 0.1)
 
     -- Create a stack at window resolution
     stack = luna.postfx.newStack(800, 600)
@@ -39,45 +39,45 @@ function luna.load()
     active[1] = true
 end
 
-function luna.update(dt)
+function luna.process(dt)
     -- Nothing to update — all interaction is via keypressed
 end
 
-function luna.draw()
+function luna.render()
     -- Capture the scene into the PostFX stack so effects are applied
     stack:beginCapture()
 
     -- Draw a colourful scene to show effects on
     -- Background shapes
-    luna.render.setColor(0.2, 0.1, 0.4)
-    luna.render.rectangle("fill", 0, 0, 800, 600)
+    luna.gfx.setColor(0.2, 0.1, 0.4)
+    luna.gfx.rectangle("fill", 0, 0, 800, 600)
 
     -- Bright circles (good for bloom)
-    luna.render.setColor(1.0, 0.8, 0.2)
-    luna.render.circle("fill", 200, 200, 60)
+    luna.gfx.setColor(1.0, 0.8, 0.2)
+    luna.gfx.circle("fill", 200, 200, 60)
 
-    luna.render.setColor(0.2, 0.8, 1.0)
-    luna.render.circle("fill", 500, 300, 80)
+    luna.gfx.setColor(0.2, 0.8, 1.0)
+    luna.gfx.circle("fill", 500, 300, 80)
 
-    luna.render.setColor(1.0, 0.3, 0.5)
-    luna.render.circle("fill", 350, 450, 50)
+    luna.gfx.setColor(1.0, 0.3, 0.5)
+    luna.gfx.circle("fill", 350, 450, 50)
 
     -- Grid lines (good for CRT / chromatic aberration)
-    luna.render.setColor(0.3, 0.3, 0.5)
+    luna.gfx.setColor(0.3, 0.3, 0.5)
     for x = 0, 800, 50 do
-        luna.render.line(x, 0, x, 600)
+        luna.gfx.line(x, 0, x, 600)
     end
     for y = 0, 600, 50 do
-        luna.render.line(0, y, 800, y)
+        luna.gfx.line(0, y, 800, y)
     end
 
     -- Bright star pattern (good for godrays)
-    luna.render.setColor(1.0, 1.0, 0.9)
+    luna.gfx.setColor(1.0, 1.0, 0.9)
     for angle = 0, 360, 30 do
         local rad = math.rad(angle)
         local cx, cy = 400, 300
         local len = 100
-        luna.render.line(cx, cy, cx + math.cos(rad) * len, cy + math.sin(rad) * len)
+        luna.gfx.line(cx, cy, cx + math.cos(rad) * len, cy + math.sin(rad) * len)
     end
 
     -- HUD — drawn after apply() so it renders on top of the post-processed scene
@@ -85,24 +85,24 @@ function luna.draw()
     stack:apply()
 
     -- HUD — show effect info
-    luna.render.setColor(1, 1, 1)
-    luna.render.print("PostFX Demo", 10, 10, 2)
+    luna.gfx.setColor(1, 1, 1)
+    luna.gfx.print("PostFX Demo", 10, 10, 2)
 
     local fps = math.floor(luna.time.getFPS())
-    luna.render.print("FPS: " .. tostring(fps), 700, 10, 1.5)
+    luna.gfx.print("FPS: " .. tostring(fps), 700, 10, 1.5)
 
     -- Show effect list
     local y = 50
     for i, name in ipairs(effect_names) do
         if i == current_effect then
-            luna.render.setColor(1, 1, 0)
-            luna.render.print("> ", 10, y, 1.5)
+            luna.gfx.setColor(1, 1, 0)
+            luna.gfx.print("> ", 10, y, 1.5)
         else
-            luna.render.setColor(0.6, 0.6, 0.6)
+            luna.gfx.setColor(0.6, 0.6, 0.6)
         end
 
         local status = active[i] and "[ON]" or "[off]"
-        luna.render.print(name .. " " .. status, 30, y, 1.5)
+        luna.gfx.print(name .. " " .. status, 30, y, 1.5)
 
         -- Show key parameters for the current effect
         if i == current_effect then
@@ -113,8 +113,8 @@ function luna.draw()
                 param_str = param_str .. pname .. "=" .. string.format("%.2f", val) .. " "
             end
             if #param_str > 0 then
-                luna.render.setColor(0.5, 0.8, 1.0)
-                luna.render.print("  " .. param_str, 30, y + 18, 1)
+                luna.gfx.setColor(0.5, 0.8, 1.0)
+                luna.gfx.print("  " .. param_str, 30, y + 18, 1)
             end
         end
 
@@ -122,12 +122,12 @@ function luna.draw()
     end
 
     -- Controls
-    luna.render.setColor(0.7, 0.7, 0.7)
-    luna.render.print("Controls:", 500, 50, 1.5)
-    luna.render.print("Up/Down = select effect", 500, 75, 1)
-    luna.render.print("Space = toggle effect on/off", 500, 95, 1)
-    luna.render.print("Left/Right = adjust first parameter", 500, 115, 1)
-    luna.render.print("Stack effects: " .. stack:getEffectCount(), 500, 140, 1.2)
+    luna.gfx.setColor(0.7, 0.7, 0.7)
+    luna.gfx.print("Controls:", 500, 50, 1.5)
+    luna.gfx.print("Up/Down = select effect", 500, 75, 1)
+    luna.gfx.print("Space = toggle effect on/off", 500, 95, 1)
+    luna.gfx.print("Left/Right = adjust first parameter", 500, 115, 1)
+    luna.gfx.print("Stack effects: " .. stack:getEffectCount(), 500, 140, 1.2)
 end
 
 function luna.keypressed(key)

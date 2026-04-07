@@ -1,4 +1,4 @@
-﻿-- examples/camera.lua
+-- examples/camera.lua
 -- luna.camera — Camera2D: viewport, position, zoom, follow, shake, coordinate transforms.
 -- All luna.camera API methods demonstrated with code and comments.
 
@@ -98,7 +98,7 @@ local sx, sy = cam:toScreen(wx2, wy2)  -- round-trip
 -- ── Typical Usage Pattern ─────────────────────────────────────────────────────
 
 --[[
-function luna.load()
+function luna.init()
     camera = luna.camera.new(800, 600)
     camera:setBounds(0, 0, 3200, 1800)
     camera:setFollowSmooth(6.0)
@@ -106,7 +106,7 @@ function luna.load()
     player = { x = 400, y = 300 }
 end
 
-function luna.update(dt)
+function luna.process(dt)
     -- Move player with arrow keys
     local spd = 150 * dt
     if luna.keyboard.isDown("right") then player.x = player.x + spd end
@@ -125,9 +125,9 @@ function luna.keypressed(key)
     end
 end
 
-function luna.draw()
-    -- luna.render.setCamera(camera) would apply the transform for all draws
-    -- (actual graphics-integration call depends on luna.render API)
-    luna.render.drawCircle("fill", player.x, player.y, 16)
+function luna.render()
+    -- luna.gfx.setCamera(camera) would apply the transform for all draws
+    -- (actual graphics-integration call depends on luna.gfx API)
+    luna.gfx.drawCircle("fill", player.x, player.y, 16)
 end
 ]]

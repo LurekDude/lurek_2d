@@ -1,4 +1,4 @@
-﻿-- Donkey Kong — Classic Arcade (Luna2D demo)
+-- Donkey Kong — Classic Arcade (Luna2D demo)
 -- Climb ladders and jump over barrels to rescue Pauline at the top.
 -- WASD or Arrow keys to move, Space to jump.
 
@@ -88,15 +88,15 @@ end
 
 -- ── Load ─────────────────────────────────────────────────────────────────
 
-function luna.load()
-    luna.render.setBackgroundColor(0.05, 0.05, 0.1)
+function luna.init()
+    luna.gfx.setBackgroundColor(0.05, 0.05, 0.1)
     score = 0; lives = 3; level = 1
     reset()
 end
 
 -- ── Update ───────────────────────────────────────────────────────────────
 
-function luna.update(dt)
+function luna.process(dt)
     if game_state ~= "playing" then
         if game_state == "win" then
             win_flash = win_flash + dt
@@ -239,9 +239,9 @@ end
 
 -- ── Draw ─────────────────────────────────────────────────────────────────
 
-function luna.draw()
+function luna.render()
     -- Platforms
-    luna.render.setColor(0.5, 0.35, 0.2)
+    luna.gfx.setColor(0.5, 0.35, 0.2)
     for _, p in ipairs(PLATFORMS) do
         local y1 = platform_y_at(p, p.x1)
         local y2 = platform_y_at(p, p.x2)
@@ -253,44 +253,44 @@ function luna.draw()
             local lx = p.x1 + t1 * (p.x2 - p.x1)
             local ly = y1 + t1 * (y2 - y1)
             local rw = (p.x2 - p.x1) / steps
-            luna.render.rectangle("fill", lx, ly, rw + 1, FLOOR_H)
+            luna.gfx.rectangle("fill", lx, ly, rw + 1, FLOOR_H)
         end
     end
 
     -- Ladders
-    luna.render.setColor(0.8, 0.65, 0.2)
+    luna.gfx.setColor(0.8, 0.65, 0.2)
     for _, lad in ipairs(LADDERS) do
-        luna.render.rectangle("fill", lad.x - 3, lad.y_top, 6, lad.y_bot - lad.y_top)
+        luna.gfx.rectangle("fill", lad.x - 3, lad.y_top, 6, lad.y_bot - lad.y_top)
         -- Rungs
         local num_rungs = math.floor((lad.y_bot - lad.y_top) / 20)
         for r = 0, num_rungs do
             local ry = lad.y_top + r * 20
-            luna.render.rectangle("fill", lad.x - 12, ry, 24, 4)
+            luna.gfx.rectangle("fill", lad.x - 12, ry, 24, 4)
         end
     end
 
     -- Pauline (goal) at top
-    luna.render.setColor(1, 0.6, 0.6)
-    luna.render.rectangle("fill", W - 200, H - 440 - 40, 20, 40)
-    luna.render.circle("fill", W - 190, H - 440 - 48, 12)
-    luna.render.setColor(1, 1, 1)
-    luna.render.print("PAULINE!", W - 230, H - 440 - 60, 1.4)
+    luna.gfx.setColor(1, 0.6, 0.6)
+    luna.gfx.rectangle("fill", W - 200, H - 440 - 40, 20, 40)
+    luna.gfx.circle("fill", W - 190, H - 440 - 48, 12)
+    luna.gfx.setColor(1, 1, 1)
+    luna.gfx.print("PAULINE!", W - 230, H - 440 - 60, 1.4)
 
     -- Donkey Kong at top
-    luna.render.setColor(0.45, 0.25, 0.1)
-    luna.render.rectangle("fill", W - 300, H - 440 - 50, 50, 50)
-    luna.render.circle("fill", W - 275, H - 440 - 60, 18)
+    luna.gfx.setColor(0.45, 0.25, 0.1)
+    luna.gfx.rectangle("fill", W - 300, H - 440 - 50, 50, 50)
+    luna.gfx.circle("fill", W - 275, H - 440 - 60, 18)
     -- DK arms
-    luna.render.rectangle("fill", W - 330, H - 440 - 40, 30, 14)
-    luna.render.rectangle("fill", W - 250, H - 440 - 40, 30, 14)
+    luna.gfx.rectangle("fill", W - 330, H - 440 - 40, 30, 14)
+    luna.gfx.rectangle("fill", W - 250, H - 440 - 40, 30, 14)
 
     -- Barrels
     for _, b in ipairs(barrels) do
         local roll = math.sin(b.roll_anim) * 5
-        luna.render.setColor(0.6, 0.35, 0.1)
-        luna.render.circle("fill", b.x + b.w/2, b.y + b.h/2, b.w/2)
-        luna.render.setColor(0.8, 0.55, 0.2)
-        luna.render.line(
+        luna.gfx.setColor(0.6, 0.35, 0.1)
+        luna.gfx.circle("fill", b.x + b.w/2, b.y + b.h/2, b.w/2)
+        luna.gfx.setColor(0.8, 0.55, 0.2)
+        luna.gfx.line(
             b.x + b.w/2 + math.cos(b.roll_anim) * b.w/2 * 0.7,
             b.y + b.h/2 + math.sin(b.roll_anim) * b.h/2 * 0.7,
             b.x + b.w/2 - math.cos(b.roll_anim) * b.w/2 * 0.7,
@@ -299,42 +299,42 @@ function luna.draw()
     end
 
     -- Player
-    luna.render.setColor(0.9, 0.2, 0.2)
-    luna.render.rectangle("fill", player.x, player.y + player.h * 0.4, player.w, player.h * 0.6)
-    luna.render.setColor(0.9, 0.7, 0.4)
-    luna.render.circle("fill", player.x + player.w/2, player.y + 12, 12)
+    luna.gfx.setColor(0.9, 0.2, 0.2)
+    luna.gfx.rectangle("fill", player.x, player.y + player.h * 0.4, player.w, player.h * 0.6)
+    luna.gfx.setColor(0.9, 0.7, 0.4)
+    luna.gfx.circle("fill", player.x + player.w/2, player.y + 12, 12)
     -- Hat
-    luna.render.setColor(0.6, 0.15, 0.1)
-    luna.render.rectangle("fill", player.x + 2, player.y, player.w - 4, 10)
-    luna.render.rectangle("fill", player.x - 2, player.y + 6, player.w + 4, 5)
+    luna.gfx.setColor(0.6, 0.15, 0.1)
+    luna.gfx.rectangle("fill", player.x + 2, player.y, player.w - 4, 10)
+    luna.gfx.rectangle("fill", player.x - 2, player.y + 6, player.w + 4, 5)
 
     -- HUD
-    luna.render.setColor(1, 1, 0)
-    luna.render.print("DONKEY KONG", 10, 8, 2)
-    luna.render.setColor(1, 1, 1)
-    luna.render.print("Score: " .. score, 10, 30, 1.5)
-    luna.render.setColor(1, 0.3, 0.3)
-    luna.render.print("Lives: " .. lives, W/2 - 50, 8, 1.5)
-    luna.render.setColor(0.6, 0.8, 1)
-    luna.render.print("Level " .. level, W - 90, 8, 1.5)
+    luna.gfx.setColor(1, 1, 0)
+    luna.gfx.print("DONKEY KONG", 10, 8, 2)
+    luna.gfx.setColor(1, 1, 1)
+    luna.gfx.print("Score: " .. score, 10, 30, 1.5)
+    luna.gfx.setColor(1, 0.3, 0.3)
+    luna.gfx.print("Lives: " .. lives, W/2 - 50, 8, 1.5)
+    luna.gfx.setColor(0.6, 0.8, 1)
+    luna.gfx.print("Level " .. level, W - 90, 8, 1.5)
 
     -- Win overlay
     if game_state == "win" then
-        luna.render.setColor(0, 0, 0, 0.5)
-        luna.render.rectangle("fill", 0, 0, W, H)
-        luna.render.setColor(1, 1, 0, math.abs(math.sin(win_flash * 4)))
-        luna.render.print("YOU SAVED PAULINE!", W/2 - 140, H/2 - 20, 3)
+        luna.gfx.setColor(0, 0, 0, 0.5)
+        luna.gfx.rectangle("fill", 0, 0, W, H)
+        luna.gfx.setColor(1, 1, 0, math.abs(math.sin(win_flash * 4)))
+        luna.gfx.print("YOU SAVED PAULINE!", W/2 - 140, H/2 - 20, 3)
     end
     -- Game over overlay
     if game_state == "gameover" then
-        luna.render.setColor(0, 0, 0, 0.7)
-        luna.render.rectangle("fill", 0, 0, W, H)
-        luna.render.setColor(1, 0.2, 0.2)
-        luna.render.print("GAME OVER", W/2 - 80, H/2 - 25, 3)
-        luna.render.setColor(1, 1, 1)
-        luna.render.print("Score: " .. score, W/2 - 50, H/2 + 15, 2)
-        luna.render.setColor(0.6, 0.6, 0.6)
-        luna.render.print("Press R to restart", W/2 - 100, H/2 + 48, 2)
+        luna.gfx.setColor(0, 0, 0, 0.7)
+        luna.gfx.rectangle("fill", 0, 0, W, H)
+        luna.gfx.setColor(1, 0.2, 0.2)
+        luna.gfx.print("GAME OVER", W/2 - 80, H/2 - 25, 3)
+        luna.gfx.setColor(1, 1, 1)
+        luna.gfx.print("Score: " .. score, W/2 - 50, H/2 + 15, 2)
+        luna.gfx.setColor(0.6, 0.6, 0.6)
+        luna.gfx.print("Press R to restart", W/2 - 100, H/2 + 48, 2)
     end
 end
 

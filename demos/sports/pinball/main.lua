@@ -1,4 +1,4 @@
-﻿-- Pinball -- Physics-based pinball table
+-- Pinball -- Physics-based pinball table
 -- Left/Right arrows or Z/slash for flippers, Space to launch
 
 local function clamp(v, mn, mx) return math.max(mn, math.min(mx, v)) end
@@ -42,9 +42,9 @@ local function reset_ball()
     launch_power = 0
 end
 
-function luna.load()
+function luna.init()
     luna.window.setTitle("Pinball")
-    luna.render.setBackgroundColor(0.05, 0.06, 0.1)
+    luna.gfx.setBackgroundColor(0.05, 0.06, 0.1)
 
     world = luna.physics.newWorld(0, 300)
     walls = {}
@@ -89,7 +89,7 @@ function luna.load()
     reset_ball()
 end
 
-function luna.update(dt)
+function luna.process(dt)
     if state == "dead" then return end
 
     -- launch power
@@ -168,96 +168,96 @@ function luna.update(dt)
     end
 end
 
-function luna.draw()
+function luna.render()
     -- walls
-    luna.render.setColor(0.4, 0.45, 0.6, 1)
-    luna.render.setLineWidth(3)
+    luna.gfx.setColor(0.4, 0.45, 0.6, 1)
+    luna.gfx.setLineWidth(3)
     for _, w in ipairs(walls) do
-        luna.render.line(w.x1, w.y1, w.x2, w.y2)
+        luna.gfx.line(w.x1, w.y1, w.x2, w.y2)
     end
-    luna.render.setLineWidth(1)
+    luna.gfx.setLineWidth(1)
 
     -- bumpers
     for _, bump in ipairs(bumpers) do
         if bump.flash > 0 then
-            luna.render.setColor(1, 0.9, 0.3, 1)
+            luna.gfx.setColor(1, 0.9, 0.3, 1)
         else
-            luna.render.setColor(0.8, 0.3, 0.3, 1)
+            luna.gfx.setColor(0.8, 0.3, 0.3, 1)
         end
-        luna.render.circle("fill", bump.x, bump.y, bump.r)
-        luna.render.setColor(1, 1, 1, 0.3)
-        luna.render.circle("line", bump.x, bump.y, bump.r)
+        luna.gfx.circle("fill", bump.x, bump.y, bump.r)
+        luna.gfx.setColor(1, 1, 1, 0.3)
+        luna.gfx.circle("line", bump.x, bump.y, bump.r)
     end
 
     -- targets
     for _, tgt in ipairs(targets) do
         if tgt.hit then
-            luna.render.setColor(0.3, 0.3, 0.3, 0.5)
+            luna.gfx.setColor(0.3, 0.3, 0.3, 0.5)
         elseif tgt.flash > 0 then
-            luna.render.setColor(1, 1, 0.2, 1)
+            luna.gfx.setColor(1, 1, 0.2, 1)
         else
-            luna.render.setColor(0.2, 0.8, 0.4, 1)
+            luna.gfx.setColor(0.2, 0.8, 0.4, 1)
         end
-        luna.render.rectangle("fill", tgt.x - 10, tgt.y - 4, 20, 8)
+        luna.gfx.rectangle("fill", tgt.x - 10, tgt.y - 4, 20, 8)
     end
 
     -- flippers
     local left_active = luna.keyboard.isDown("left") or luna.keyboard.isDown("z")
     local right_active = luna.keyboard.isDown("right") or luna.keyboard.isDown("/")
 
-    luna.render.setColor(0.6, 0.7, 0.9, 1)
+    luna.gfx.setColor(0.6, 0.7, 0.9, 1)
     -- left flipper
     local la = left_active and -0.4 or 0.3
     local lx1 = flippers.left.x - 10
     local lx2 = flippers.left.x + FLIPPER_LEN / 2
     local ly = flippers.left.y + la * 20
-    luna.render.line(lx1, flippers.left.y, lx2, ly)
-    luna.render.circle("fill", lx1, flippers.left.y, 6)
-    luna.render.circle("fill", lx2, ly, 5)
+    luna.gfx.line(lx1, flippers.left.y, lx2, ly)
+    luna.gfx.circle("fill", lx1, flippers.left.y, 6)
+    luna.gfx.circle("fill", lx2, ly, 5)
 
     -- right flipper
     local ra = right_active and -0.4 or 0.3
     local rx1 = flippers.right.x + 10
     local rx2 = flippers.right.x - FLIPPER_LEN / 2
     local ry = flippers.right.y + ra * 20
-    luna.render.line(rx1, flippers.right.y, rx2, ry)
-    luna.render.circle("fill", rx1, flippers.right.y, 6)
-    luna.render.circle("fill", rx2, ry, 5)
+    luna.gfx.line(rx1, flippers.right.y, rx2, ry)
+    luna.gfx.circle("fill", rx1, flippers.right.y, 6)
+    luna.gfx.circle("fill", rx2, ry, 5)
 
     -- ball
     if state ~= "dead" then
         local bx, by = ball_body:getPosition()
-        luna.render.setColor(0.9, 0.9, 0.95, 1)
-        luna.render.circle("fill", bx, by, ball_r)
-        luna.render.setColor(1, 1, 1, 0.4)
-        luna.render.circle("fill", bx - 2, by - 2, 3)
+        luna.gfx.setColor(0.9, 0.9, 0.95, 1)
+        luna.gfx.circle("fill", bx, by, ball_r)
+        luna.gfx.setColor(1, 1, 1, 0.4)
+        luna.gfx.circle("fill", bx - 2, by - 2, 3)
     end
 
     -- launcher power bar
     if state == "launch" then
-        luna.render.setColor(0.2, 0.2, 0.2, 0.8)
-        luna.render.rectangle("fill", W - 28, H - 200, 16, 150)
-        luna.render.setColor(1, 0.4, 0.1, 1)
+        luna.gfx.setColor(0.2, 0.2, 0.2, 0.8)
+        luna.gfx.rectangle("fill", W - 28, H - 200, 16, 150)
+        luna.gfx.setColor(1, 0.4, 0.1, 1)
         local barH = (launch_power / 600) * 150
-        luna.render.rectangle("fill", W - 28, H - 200 + 150 - barH, 16, barH)
-        luna.render.setColor(1, 1, 1, 0.7)
-        luna.render.print("SPACE", W - 32, H - 215, 0.6)
+        luna.gfx.rectangle("fill", W - 28, H - 200 + 150 - barH, 16, barH)
+        luna.gfx.setColor(1, 1, 1, 0.7)
+        luna.gfx.print("SPACE", W - 32, H - 215, 0.6)
     end
 
     -- HUD
-    luna.render.setColor(1, 1, 1, 1)
-    luna.render.print("SCORE: " .. score, 20, 20, 1.3)
-    luna.render.print("BALLS: " .. balls_left, 20, 50)
-    luna.render.print("FPS: " .. luna.time.getFPS(), 20, 70, 0.8)
+    luna.gfx.setColor(1, 1, 1, 1)
+    luna.gfx.print("SCORE: " .. score, 20, 20, 1.3)
+    luna.gfx.print("BALLS: " .. balls_left, 20, 50)
+    luna.gfx.print("FPS: " .. luna.time.getFPS(), 20, 70, 0.8)
 
     -- game over
     if state == "dead" then
-        luna.render.setColor(0, 0, 0, 0.75)
-        luna.render.rectangle("fill", 0, 0, W, H)
-        luna.render.setColor(1, 0.3, 0.3, 1)
-        luna.render.print("GAME OVER", 130, 280, 3)
-        luna.render.setColor(1, 1, 1, 1)
-        luna.render.print("Final Score: " .. score, 180, 350, 1.5)
+        luna.gfx.setColor(0, 0, 0, 0.75)
+        luna.gfx.rectangle("fill", 0, 0, W, H)
+        luna.gfx.setColor(1, 0.3, 0.3, 1)
+        luna.gfx.print("GAME OVER", 130, 280, 3)
+        luna.gfx.setColor(1, 1, 1, 1)
+        luna.gfx.print("Final Score: " .. score, 180, 350, 1.5)
     end
 end
 

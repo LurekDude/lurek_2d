@@ -298,7 +298,7 @@ end)
 
 -- update(dt)  — advance all items, check conversions, fire events
 --[[
-function luna.update(dt)
+function luna.process(dt)
     graph:update(dt)
 end
 ]]

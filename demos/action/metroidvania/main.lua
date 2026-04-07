@@ -1,4 +1,4 @@
-﻿-- Metroidvania Exploration Demo
+-- Metroidvania Exploration Demo
 -- Side-scrolling platformer with multiple rooms, abilities, and enemies
 -- Controls: WASD/Arrows to move, Space to jump, Shift to dash (when unlocked)
 -- Collect items to unlock abilities. Explore all rooms!
@@ -115,15 +115,15 @@ local function isSolid(rx, ry, px, py, pw, ph)
     return false
 end
 
-function luna.load()
+function luna.init()
     luna.window.setTitle("Metroidvania Exploration")
-    luna.render.setBackgroundColor(0.08, 0.06, 0.12)
+    luna.gfx.setBackgroundColor(0.08, 0.06, 0.12)
     camera = luna.camera.new(800, 600)
     camera:setZoom(2.5)
     loadRoom(0, 0)
 end
 
-function luna.update(dt)
+function luna.process(dt)
     if gameOver then return end
     player.invincible = clamp(player.invincible - dt, 0, 9)
     -- Movement
@@ -185,15 +185,15 @@ end
 local function camera_apply()
     local x, y = camera:getPosition()
     local z    = camera:getZoom()
-    luna.render.push()
-    luna.render.scale(z, z)
-    luna.render.translate(-x, -y)
+    luna.gfx.push()
+    luna.gfx.scale(z, z)
+    luna.gfx.translate(-x, -y)
 end
 local function camera_reset()
-    luna.render.pop()
+    luna.gfx.pop()
 end
 
-function luna.draw()
+function luna.render()
     camera:setPosition(player.x - 120, player.y - 80)
     camera_apply()
     -- Draw room tiles
@@ -203,11 +203,11 @@ function luna.draw()
             for col = 1, #rd.tiles[row] do
                 local v = rd.tiles[row][col]
                 local tx, ty = (col - 1) * tileSize, (row - 1) * tileSize
-                if v == 1 then luna.render.setColor(0.3, 0.25, 0.4); luna.render.rectangle("fill", tx, ty, tileSize, tileSize)
-                elseif v == 2 then luna.render.setColor(0.4, 0.5, 0.3); luna.render.rectangle("fill", tx, ty, tileSize, 4)
+                if v == 1 then luna.gfx.setColor(0.3, 0.25, 0.4); luna.gfx.rectangle("fill", tx, ty, tileSize, tileSize)
+                elseif v == 2 then luna.gfx.setColor(0.4, 0.5, 0.3); luna.gfx.rectangle("fill", tx, ty, tileSize, 4)
                 elseif v == 3 then
-                    if player.hasDash then luna.render.setColor(0.2, 0.2, 0.2, 0.3) else luna.render.setColor(0.8, 0.2, 0.2) end
-                    luna.render.rectangle("fill", tx, ty, tileSize, tileSize)
+                    if player.hasDash then luna.gfx.setColor(0.2, 0.2, 0.2, 0.3) else luna.gfx.setColor(0.8, 0.2, 0.2) end
+                    luna.gfx.rectangle("fill", tx, ty, tileSize, tileSize)
                 end
             end
         end
@@ -215,47 +215,47 @@ function luna.draw()
     -- Items
     for _, it in ipairs(items) do
         if it.alive then
-            if it.kind == "dash" then luna.render.setColor(0.2, 0.8, 1) else luna.render.setColor(0, 1, 0.4) end
-            luna.render.rectangle("fill", it.x + 2, it.y + 2, it.w, it.h)
+            if it.kind == "dash" then luna.gfx.setColor(0.2, 0.8, 1) else luna.gfx.setColor(0, 1, 0.4) end
+            luna.gfx.rectangle("fill", it.x + 2, it.y + 2, it.w, it.h)
         end
     end
     -- Enemies
     for _, e in ipairs(enemies) do
-        if e.alive then luna.render.setColor(0.9, 0.2, 0.2); luna.render.rectangle("fill", e.x, e.y, e.w, e.h) end
+        if e.alive then luna.gfx.setColor(0.9, 0.2, 0.2); luna.gfx.rectangle("fill", e.x, e.y, e.w, e.h) end
     end
     -- Player
     local blink = player.invincible > 0 and math.sin(luna.time.getTime() * 20) > 0
     if not blink then
-        if player.dashing then luna.render.setColor(0.5, 0.8, 1) else luna.render.setColor(0.3, 0.9, 0.4) end
-        luna.render.rectangle("fill", player.x, player.y, player.w, player.h)
+        if player.dashing then luna.gfx.setColor(0.5, 0.8, 1) else luna.gfx.setColor(0.3, 0.9, 0.4) end
+        luna.gfx.rectangle("fill", player.x, player.y, player.w, player.h)
         -- Eyes
-        luna.render.setColor(1, 1, 1)
+        luna.gfx.setColor(1, 1, 1)
         local ex = player.facing > 0 and player.x + 9 or player.x + 3
-        luna.render.rectangle("fill", ex, player.y + 5, 4, 4)
+        luna.gfx.rectangle("fill", ex, player.y + 5, 4, 4)
     end
     camera_reset()
     -- HUD
-    luna.render.setColor(1, 1, 1)
-    luna.render.print("HP: " .. player.hp .. "/" .. player.maxHp, 10, 10)
-    luna.render.print("Room: " .. currentRoom.x .. "," .. currentRoom.y, 10, 26)
-    luna.render.print("Score: " .. score, 10, 42)
-    if player.hasDash then luna.render.setColor(0.2, 0.8, 1); luna.render.print("[DASH]", 10, 58) end
+    luna.gfx.setColor(1, 1, 1)
+    luna.gfx.print("HP: " .. player.hp .. "/" .. player.maxHp, 10, 10)
+    luna.gfx.print("Room: " .. currentRoom.x .. "," .. currentRoom.y, 10, 26)
+    luna.gfx.print("Score: " .. score, 10, 42)
+    if player.hasDash then luna.gfx.setColor(0.2, 0.8, 1); luna.gfx.print("[DASH]", 10, 58) end
     -- Minimap
-    luna.render.setColor(0, 0, 0, 0.6)
-    luna.render.rectangle("fill", 700, 10, 80, 80)
+    luna.gfx.setColor(0, 0, 0, 0.6)
+    luna.gfx.rectangle("fill", 700, 10, 80, 80)
     for key, _ in pairs(visited) do
         local parts = {}; for p in key:gmatch("[^,]+") do parts[#parts + 1] = tonumber(p) end
         local mx = 740 + parts[1] * 18
         local my = 50 + parts[2] * 18
-        if parts[1] == currentRoom.x and parts[2] == currentRoom.y then luna.render.setColor(0.3, 0.9, 0.4)
-        else luna.render.setColor(0.5, 0.5, 0.6) end
-        luna.render.rectangle("fill", mx, my, 14, 14)
+        if parts[1] == currentRoom.x and parts[2] == currentRoom.y then luna.gfx.setColor(0.3, 0.9, 0.4)
+        else luna.gfx.setColor(0.5, 0.5, 0.6) end
+        luna.gfx.rectangle("fill", mx, my, 14, 14)
     end
     if gameOver then
-        luna.render.setColor(0, 0, 0, 0.7); luna.render.rectangle("fill", 0, 0, 800, 600)
-        luna.render.setColor(1, 0.2, 0.2); luna.render.print("GAME OVER - Press R to restart", 260, 280, 1.5)
+        luna.gfx.setColor(0, 0, 0, 0.7); luna.gfx.rectangle("fill", 0, 0, 800, 600)
+        luna.gfx.setColor(1, 0.2, 0.2); luna.gfx.print("GAME OVER - Press R to restart", 260, 280, 1.5)
     end
-    luna.render.setColor(0.5, 0.5, 0.5); luna.render.print("FPS: " .. luna.time.getFPS(), 700, 580)
+    luna.gfx.setColor(0.5, 0.5, 0.5); luna.gfx.print("FPS: " .. luna.time.getFPS(), 700, 580)
 end
 
 function luna.keypressed(key)

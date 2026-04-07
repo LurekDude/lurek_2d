@@ -1,4 +1,4 @@
-﻿# GPU Rendering Pipeline — Performance & Threading
+# GPU Rendering Pipeline — Performance & Threading
 
 ## Current Architecture
 
@@ -138,13 +138,13 @@ Add a cached draw mode where tessellated geometry is stored and reused:
 
 ```lua
 -- Lua API concept
-local bg = luna.render.newGeometryCache()
+local bg = luna.gfx.newGeometryCache()
 bg:begin()
-  luna.render.rectangle("fill", 0, 0, 800, 600)
-  luna.render.draw(background_img, 0, 0)
+  luna.gfx.rectangle("fill", 0, 0, 800, 600)
+  luna.gfx.draw(background_img, 0, 0)
 bg:finish()
 
-function luna.draw()
+function luna.render()
   bg:draw()  -- Reuses cached vertices, zero tessellation
   -- ... dynamic stuff below
 end

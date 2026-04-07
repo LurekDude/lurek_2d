@@ -1,4 +1,4 @@
-﻿-- Trajectory Sports (Golf / Artillery)
+-- Trajectory Sports (Golf / Artillery)
 -- Aim with mouse, hold Space to charge power, release to shoot.
 -- 3 holes of increasing difficulty with wind.
 
@@ -75,7 +75,7 @@ local function new_hole(hole_num)
     skid_trails = {}
 end
 
-function luna.load()
+function luna.init()
     state.current_hole = 1
     state.total_holes = 3
     state.strokes = 0
@@ -87,7 +87,7 @@ function luna.load()
     new_hole(1)
 end
 
-function luna.update(dt)
+function luna.process(dt)
     if state.game_over then return end
 
     if state.hole_complete then
@@ -179,102 +179,102 @@ function luna.keyreleased(key)
     end
 end
 
-function luna.draw()
-    luna.render.setBackgroundColor(0.15, 0.2, 0.35)
+function luna.render()
+    luna.gfx.setBackgroundColor(0.15, 0.2, 0.35)
 
     -- sky gradient bands
     for i = 0, 5 do
         local t = i / 5
-        luna.render.setColor(0.15 + t * 0.1, 0.2 + t * 0.15, 0.35 + t * 0.15, 1)
-        luna.render.rectangle("fill", 0, i * 60, W, 60)
+        luna.gfx.setColor(0.15 + t * 0.1, 0.2 + t * 0.15, 0.35 + t * 0.15, 1)
+        luna.gfx.rectangle("fill", 0, i * 60, W, 60)
     end
 
     -- terrain fill
-    luna.render.setColor(0.2, 0.5, 0.2, 1)
+    luna.gfx.setColor(0.2, 0.5, 0.2, 1)
     for i = 1, #terrain - 1 do
         local a, b = terrain[i], terrain[i + 1]
-        luna.render.polygon("fill", { a.x, a.y, b.x, b.y, b.x, H, a.x, H })
+        luna.gfx.polygon("fill", { a.x, a.y, b.x, b.y, b.x, H, a.x, H })
     end
 
     -- terrain outline
-    luna.render.setColor(0.3, 0.65, 0.3, 1)
-    luna.render.setLineWidth(2)
+    luna.gfx.setColor(0.3, 0.65, 0.3, 1)
+    luna.gfx.setLineWidth(2)
     for i = 1, #terrain - 1 do
-        luna.render.line(terrain[i].x, terrain[i].y, terrain[i + 1].x, terrain[i + 1].y)
+        luna.gfx.line(terrain[i].x, terrain[i].y, terrain[i + 1].x, terrain[i + 1].y)
     end
 
     -- hole/target
     local hole = holes[state.current_hole]
     if hole then
-        luna.render.setColor(0.1, 0.1, 0.1, 1)
-        luna.render.circle("fill", hole.x, hole.y, hole.radius)
-        luna.render.setColor(1, 0.8, 0, 1)
-        luna.render.circle("line", hole.x, hole.y, hole.radius)
+        luna.gfx.setColor(0.1, 0.1, 0.1, 1)
+        luna.gfx.circle("fill", hole.x, hole.y, hole.radius)
+        luna.gfx.setColor(1, 0.8, 0, 1)
+        luna.gfx.circle("line", hole.x, hole.y, hole.radius)
         -- flag
-        luna.render.setColor(1, 0.2, 0.2, 1)
-        luna.render.line(hole.x, hole.y - 30, hole.x, hole.y)
-        luna.render.polygon("fill", { hole.x, hole.y - 30, hole.x + 15, hole.y - 22, hole.x, hole.y - 14 })
+        luna.gfx.setColor(1, 0.2, 0.2, 1)
+        luna.gfx.line(hole.x, hole.y - 30, hole.x, hole.y)
+        luna.gfx.polygon("fill", { hole.x, hole.y - 30, hole.x + 15, hole.y - 22, hole.x, hole.y - 14 })
     end
 
     -- skid marks
-    luna.render.setColor(0.15, 0.35, 0.15, 0.6)
+    luna.gfx.setColor(0.15, 0.35, 0.15, 0.6)
     for _, s in ipairs(skid_trails) do
-        luna.render.circle("fill", s.x, s.y, 2)
+        luna.gfx.circle("fill", s.x, s.y, 2)
     end
 
     -- ball
     if not state.hole_complete then
-        luna.render.setColor(1, 1, 1, 1)
-        luna.render.circle("fill", ball.x, ball.y, ball.radius)
-        luna.render.setColor(0.8, 0.8, 0.8, 1)
-        luna.render.circle("line", ball.x, ball.y, ball.radius)
+        luna.gfx.setColor(1, 1, 1, 1)
+        luna.gfx.circle("fill", ball.x, ball.y, ball.radius)
+        luna.gfx.setColor(0.8, 0.8, 0.8, 1)
+        luna.gfx.circle("line", ball.x, ball.y, ball.radius)
     end
 
     -- aim line
     if not ball.moving and not state.hole_complete and not state.game_over then
         local mx, my = luna.mouse.getPosition()
-        luna.render.setColor(1, 1, 1, 0.4)
-        luna.render.setLineWidth(1)
-        luna.render.line(ball.x, ball.y, mx, my)
+        luna.gfx.setColor(1, 1, 1, 0.4)
+        luna.gfx.setLineWidth(1)
+        luna.gfx.line(ball.x, ball.y, mx, my)
     end
 
     -- power bar
-    luna.render.setColor(0.2, 0.2, 0.2, 0.8)
-    luna.render.rectangle("fill", 20, 20, 160, 20)
+    luna.gfx.setColor(0.2, 0.2, 0.2, 0.8)
+    luna.gfx.rectangle("fill", 20, 20, 160, 20)
     local pf = state.power / 500
     local pr = clamp(pf * 2, 0, 1)
     local pg = clamp(2 - pf * 2, 0, 1)
-    luna.render.setColor(pr, pg, 0, 1)
-    luna.render.rectangle("fill", 22, 22, 156 * pf, 16)
-    luna.render.setColor(1, 1, 1, 1)
-    luna.render.print("Power", 70, 22)
+    luna.gfx.setColor(pr, pg, 0, 1)
+    luna.gfx.rectangle("fill", 22, 22, 156 * pf, 16)
+    luna.gfx.setColor(1, 1, 1, 1)
+    luna.gfx.print("Power", 70, 22)
 
     -- wind arrow
     local wind_str = "Wind: "
     if state.wind > 0 then wind_str = wind_str .. ">>>" else wind_str = wind_str .. "<<<" end
-    luna.render.setColor(0.7, 0.9, 1, 1)
-    luna.render.print(wind_str .. " " .. math.floor(math.abs(state.wind)), 20, 50)
+    luna.gfx.setColor(0.7, 0.9, 1, 1)
+    luna.gfx.print(wind_str .. " " .. math.floor(math.abs(state.wind)), 20, 50)
 
     -- HUD
-    luna.render.setColor(1, 1, 1, 1)
-    luna.render.print("Hole: " .. state.current_hole .. "/" .. state.total_holes, 20, 75)
-    luna.render.print("Strokes: " .. state.hole_strokes, 20, 95)
-    luna.render.print("Total: " .. state.strokes, 20, 115)
+    luna.gfx.setColor(1, 1, 1, 1)
+    luna.gfx.print("Hole: " .. state.current_hole .. "/" .. state.total_holes, 20, 75)
+    luna.gfx.print("Strokes: " .. state.hole_strokes, 20, 95)
+    luna.gfx.print("Total: " .. state.strokes, 20, 115)
 
     -- distance to hole
     if hole and not state.hole_complete then
         local dist = math.floor(math.abs(ball.x - hole.x))
-        luna.render.print("Distance: " .. dist .. "px", 20, 135)
+        luna.gfx.print("Distance: " .. dist .. "px", 20, 135)
     end
 
     -- message
     if state.message ~= "" and (state.hole_complete or state.game_over) then
-        luna.render.setColor(1, 1, 0.3, 1)
-        luna.render.print(state.message, W / 2 - 100, H / 2 - 20, 1.5)
+        luna.gfx.setColor(1, 1, 0.3, 1)
+        luna.gfx.print(state.message, W / 2 - 100, H / 2 - 20, 1.5)
     end
 
     -- controls
-    luna.render.setColor(0.6, 0.6, 0.6, 0.6)
-    luna.render.print("Aim: Mouse | Power: Hold Space | R: Restart", 200, H - 25)
-    luna.render.print("FPS: " .. luna.time.getFPS(), W - 80, 10)
+    luna.gfx.setColor(0.6, 0.6, 0.6, 0.6)
+    luna.gfx.print("Aim: Mouse | Power: Hold Space | R: Restart", 200, H - 25)
+    luna.gfx.print("FPS: " .. luna.time.getFPS(), W - 80, 10)
 end

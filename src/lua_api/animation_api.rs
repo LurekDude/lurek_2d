@@ -1,4 +1,4 @@
-﻿//! `luna.tween` — Sprite animation: frame pools, named clips, speed control, and playback events.
+//! `luna.tween` — Sprite animation: frame pools, named clips, speed control, and playback events.
 
 use super::SharedState;
 use mlua::prelude::*;
@@ -268,6 +268,6 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
         })?,
     )?;
 
-    luna.set("tween", tbl)?;
+    luna.set("animation", tbl)?;
     Ok(())
 }

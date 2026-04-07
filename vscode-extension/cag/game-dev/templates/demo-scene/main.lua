@@ -1,4 +1,4 @@
-﻿local scenes = {
+local scenes = {
     require("scenes.01_sprites"),
     require("scenes.02_shapes"),
     require("scenes.03_particles"),
@@ -6,25 +6,25 @@
 
 local current = 1
 
-function luna.load()
+function luna.init()
     for _, s in ipairs(scenes) do
         if s.load then s.load() end
     end
 end
 
-function luna.update(dt)
+function luna.process(dt)
     local s = scenes[current]
     if s and s.update then s.update(dt) end
 end
 
-function luna.draw()
-    luna.render.clear(0.08, 0.08, 0.12)
+function luna.render()
+    luna.gfx.clear(0.08, 0.08, 0.12)
     local s = scenes[current]
     if s and s.draw then s.draw() end
     -- Scene indicator
-    luna.render.setColor(0.6, 0.6, 0.6, 1)
-    luna.render.print("Scene " .. current .. "/" .. #scenes .. " — Press 1-" .. #scenes .. " to switch", 10, 580)
-    luna.render.setColor(1, 1, 1, 1)
+    luna.gfx.setColor(0.6, 0.6, 0.6, 1)
+    luna.gfx.print("Scene " .. current .. "/" .. #scenes .. " — Press 1-" .. #scenes .. " to switch", 10, 580)
+    luna.gfx.setColor(1, 1, 1, 1)
 end
 
 function luna.keypressed(key)

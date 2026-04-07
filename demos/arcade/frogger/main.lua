@@ -1,4 +1,4 @@
-﻿-- Frogger — Classic Arcade (Luna2D demo)
+-- Frogger — Classic Arcade (Luna2D demo)
 -- Guide the frog across a busy road and floating river logs to reach the lily pads.
 -- WASD or Arrow keys to hop. One hit = one life lost.
 
@@ -72,15 +72,15 @@ end
 
 -- ── Load ─────────────────────────────────────────────────────────────────
 
-function luna.load()
-    luna.render.setBackgroundColor(0.05, 0.1, 0.05)
+function luna.init()
+    luna.gfx.setBackgroundColor(0.05, 0.1, 0.05)
     score = 0; lives = NUM_LIVES; level = 1
     init()
 end
 
 -- ── Update ───────────────────────────────────────────────────────────────
 
-function luna.update(dt)
+function luna.process(dt)
     if game_state ~= "playing" then return end
     hop_cd = math.max(0, hop_cd - dt)
 
@@ -178,27 +178,27 @@ end
 
 -- ── Draw ─────────────────────────────────────────────────────────────────
 
-function luna.draw()
+function luna.render()
     -- Draw lane backgrounds
     for _, lane in ipairs(LANES) do
         local ly = lane.row * CELL
         if lane.type == "safe" then
-            luna.render.setColor(0.15, 0.3, 0.1)
+            luna.gfx.setColor(0.15, 0.3, 0.1)
         elseif lane.type == "road" then
-            luna.render.setColor(0.2, 0.2, 0.2)
+            luna.gfx.setColor(0.2, 0.2, 0.2)
         else -- water
-            luna.render.setColor(0.05, 0.15, 0.45)
+            luna.gfx.setColor(0.05, 0.15, 0.45)
         end
-        luna.render.rectangle("fill", 0, ly, W, CELL)
+        luna.gfx.rectangle("fill", 0, ly, W, CELL)
     end
 
     -- Lane dividers (road)
-    luna.render.setColor(0.5, 0.5, 0.1, 0.4)
+    luna.gfx.setColor(0.5, 0.5, 0.1, 0.4)
     for _, lane in ipairs(LANES) do
         if lane.type == "road" then
             local ly = lane.row * CELL + CELL/2
             for x = 0, W, 30 do
-                luna.render.rectangle("fill", x, ly - 2, 16, 4)
+                luna.gfx.rectangle("fill", x, ly - 2, 16, 4)
             end
         end
     end
@@ -209,11 +209,11 @@ function luna.draw()
         local hx = (i - 1) * slot_w + slot_w/2 - 20
         local hy = 4
         if homes[i] then
-            luna.render.setColor(0.1, 0.8, 0.2)
+            luna.gfx.setColor(0.1, 0.8, 0.2)
         else
-            luna.render.setColor(0.1, 0.4, 0.15)
+            luna.gfx.setColor(0.1, 0.4, 0.15)
         end
-        luna.render.circle("fill", (i - 1) * slot_w + slot_w/2, CELL/2, 20)
+        luna.gfx.circle("fill", (i - 1) * slot_w + slot_w/2, CELL/2, 20)
     end
 
     -- Lane objects (cars / logs)
@@ -223,13 +223,13 @@ function luna.draw()
             if objs then
                 for _, obj in ipairs(objs) do
                     local ly = lane.row * CELL + 4
-                    luna.render.setColor(lane.color[1], lane.color[2], lane.color[3])
-                    luna.render.rectangle("fill", obj.x, ly, obj.w, CELL - 8)
+                    luna.gfx.setColor(lane.color[1], lane.color[2], lane.color[3])
+                    luna.gfx.rectangle("fill", obj.x, ly, obj.w, CELL - 8)
                     -- Highlight
                     if lane.type == "road" then
-                        luna.render.setColor(1, 1, 0.5, 0.4)
-                        luna.render.circle("fill", obj.x + 12, ly + 8, 6)
-                        luna.render.circle("fill", obj.x + obj.w - 12, ly + 8, 6)
+                        luna.gfx.setColor(1, 1, 0.5, 0.4)
+                        luna.gfx.circle("fill", obj.x + 12, ly + 8, 6)
+                        luna.gfx.circle("fill", obj.x + obj.w - 12, ly + 8, 6)
                     end
                 end
             end
@@ -241,34 +241,34 @@ function luna.draw()
     local fy = frog.y + 2
     local fw = frog.w - 4
     local fh = frog.h - 4
-    luna.render.setColor(0.2, 0.8, 0.2)
-    luna.render.rectangle("fill", fx + fw/4, fy, fw/2, fh)
-    luna.render.rectangle("fill", fx, fy + fh/3, fw, fh/3)
+    luna.gfx.setColor(0.2, 0.8, 0.2)
+    luna.gfx.rectangle("fill", fx + fw/4, fy, fw/2, fh)
+    luna.gfx.rectangle("fill", fx, fy + fh/3, fw, fh/3)
     -- Eyes
-    luna.render.setColor(1, 1, 0)
-    luna.render.circle("fill", fx + fw/4, fy + 5, 4)
-    luna.render.circle("fill", fx + fw*3/4, fy + 5, 4)
+    luna.gfx.setColor(1, 1, 0)
+    luna.gfx.circle("fill", fx + fw/4, fy + 5, 4)
+    luna.gfx.circle("fill", fx + fw*3/4, fy + 5, 4)
 
     -- HUD
-    luna.render.setColor(1, 1, 1)
-    luna.render.print("Score: " .. score, 8, H - 20, 1.5)
-    luna.render.setColor(1, 0.4, 0.4)
+    luna.gfx.setColor(1, 1, 1)
+    luna.gfx.print("Score: " .. score, 8, H - 20, 1.5)
+    luna.gfx.setColor(1, 0.4, 0.4)
     local life_str = ""
     for i = 1, lives do life_str = life_str .. "🐸" end
-    luna.render.print("Lives: " .. lives, W/2 - 50, H - 20, 1.5)
-    luna.render.setColor(0.5, 0.8, 0.5)
-    luna.render.print("Level " .. level, W - 90, H - 20, 1.5)
+    luna.gfx.print("Lives: " .. lives, W/2 - 50, H - 20, 1.5)
+    luna.gfx.setColor(0.5, 0.8, 0.5)
+    luna.gfx.print("Level " .. level, W - 90, H - 20, 1.5)
 
     -- Overlay
     if game_state == "gameover" then
-        luna.render.setColor(0, 0, 0, 0.7)
-        luna.render.rectangle("fill", 0, 0, W, H)
-        luna.render.setColor(1, 0.3, 0.3)
-        luna.render.print("GAME OVER", W/2 - 80, H/2 - 25, 3)
-        luna.render.setColor(1, 1, 1)
-        luna.render.print("Score: " .. score, W/2 - 50, H/2 + 15, 2)
-        luna.render.setColor(0.6, 0.6, 0.6)
-        luna.render.print("Press R to restart", W/2 - 100, H/2 + 48, 2)
+        luna.gfx.setColor(0, 0, 0, 0.7)
+        luna.gfx.rectangle("fill", 0, 0, W, H)
+        luna.gfx.setColor(1, 0.3, 0.3)
+        luna.gfx.print("GAME OVER", W/2 - 80, H/2 - 25, 3)
+        luna.gfx.setColor(1, 1, 1)
+        luna.gfx.print("Score: " .. score, W/2 - 50, H/2 + 15, 2)
+        luna.gfx.setColor(0.6, 0.6, 0.6)
+        luna.gfx.print("Press R to restart", W/2 - 100, H/2 + 48, 2)
     end
 end
 

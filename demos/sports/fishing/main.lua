@@ -1,4 +1,4 @@
-﻿-- Marine / Fishing Simulation Demo
+-- Marine / Fishing Simulation Demo
 -- Cast line, catch fish with tension mini-game, sell at end of day
 
 local function clamp(v, mn, mx) return math.max(mn, math.min(mx, v)) end
@@ -78,12 +78,12 @@ local function spawnFish()
     })
 end
 
-function luna.load()
-    luna.render.setBackgroundColor(0.4, 0.7, 1)
+function luna.init()
+    luna.gfx.setBackgroundColor(0.4, 0.7, 1)
     for _ = 1, MAX_FISH do spawnFish() end
 end
 
-function luna.update(dt)
+function luna.process(dt)
     waveOffset = waveOffset + dt * 2
 
     if msgTimer > 0 then msgTimer = msgTimer - dt end
@@ -258,64 +258,64 @@ function luna.keypressed(key)
     if key == "3" then currentBait = 3 end
 end
 
-function luna.draw()
+function luna.render()
     -- Sky gradient (simple bands)
-    luna.render.setColor(0.3, 0.55, 0.9, 1)
-    luna.render.rectangle("fill", 0, 0, W, WATER_Y / 2)
-    luna.render.setColor(0.5, 0.7, 1, 1)
-    luna.render.rectangle("fill", 0, WATER_Y / 2, W, WATER_Y / 2)
+    luna.gfx.setColor(0.3, 0.55, 0.9, 1)
+    luna.gfx.rectangle("fill", 0, 0, W, WATER_Y / 2)
+    luna.gfx.setColor(0.5, 0.7, 1, 1)
+    luna.gfx.rectangle("fill", 0, WATER_Y / 2, W, WATER_Y / 2)
 
     -- Sun
-    luna.render.setColor(1, 0.9, 0.3, 1)
-    luna.render.circle("fill", 650, 60, 35)
+    luna.gfx.setColor(1, 0.9, 0.3, 1)
+    luna.gfx.circle("fill", 650, 60, 35)
 
     -- Dock
-    luna.render.setColor(0.5, 0.35, 0.15, 1)
-    luna.render.rectangle("fill", playerX - 60, DOCK_Y, 120, 15)
-    luna.render.rectangle("fill", playerX - 40, DOCK_Y + 15, 8, 30)
-    luna.render.rectangle("fill", playerX + 32, DOCK_Y + 15, 8, 30)
+    luna.gfx.setColor(0.5, 0.35, 0.15, 1)
+    luna.gfx.rectangle("fill", playerX - 60, DOCK_Y, 120, 15)
+    luna.gfx.rectangle("fill", playerX - 40, DOCK_Y + 15, 8, 30)
+    luna.gfx.rectangle("fill", playerX + 32, DOCK_Y + 15, 8, 30)
 
     -- Player (stick figure on dock)
-    luna.render.setColor(0.9, 0.8, 0.6, 1)
-    luna.render.circle("fill", playerX, DOCK_Y - 20, 10)
-    luna.render.setColor(0.2, 0.3, 0.6, 1)
-    luna.render.rectangle("fill", playerX - 6, DOCK_Y - 10, 12, 20)
+    luna.gfx.setColor(0.9, 0.8, 0.6, 1)
+    luna.gfx.circle("fill", playerX, DOCK_Y - 20, 10)
+    luna.gfx.setColor(0.2, 0.3, 0.6, 1)
+    luna.gfx.rectangle("fill", playerX - 6, DOCK_Y - 10, 12, 20)
 
     -- Rod
-    luna.render.setColor(0.5, 0.3, 0.1, 1)
-    luna.render.setLineWidth(2)
-    luna.render.line(playerX + 5, DOCK_Y - 15, playerX + 30, DOCK_Y - 45)
+    luna.gfx.setColor(0.5, 0.3, 0.1, 1)
+    luna.gfx.setLineWidth(2)
+    luna.gfx.line(playerX + 5, DOCK_Y - 15, playerX + 30, DOCK_Y - 45)
 
     -- Fishing line
     if lineOut then
-        luna.render.setColor(0.8, 0.8, 0.8, 0.7)
-        luna.render.setLineWidth(1)
-        luna.render.line(playerX + 30, DOCK_Y - 45, lineX, lineY)
+        luna.gfx.setColor(0.8, 0.8, 0.8, 0.7)
+        luna.gfx.setLineWidth(1)
+        luna.gfx.line(playerX + 30, DOCK_Y - 45, lineX, lineY)
         -- Bobber
-        luna.render.setColor(1, 0.2, 0, 1)
-        luna.render.circle("fill", lineX, WATER_Y + math.sin(waveOffset + lineX * 0.1) * 3, 4)
+        luna.gfx.setColor(1, 0.2, 0, 1)
+        luna.gfx.circle("fill", lineX, WATER_Y + math.sin(waveOffset + lineX * 0.1) * 3, 4)
     end
 
     -- Water surface with waves
-    luna.render.setColor(0.1, 0.3, 0.7, 0.9)
-    luna.render.rectangle("fill", 0, WATER_Y, W, H - WATER_Y)
+    luna.gfx.setColor(0.1, 0.3, 0.7, 0.9)
+    luna.gfx.rectangle("fill", 0, WATER_Y, W, H - WATER_Y)
     -- Wave lines
-    luna.render.setColor(0.2, 0.4, 0.8, 0.4)
-    luna.render.setLineWidth(1)
+    luna.gfx.setColor(0.2, 0.4, 0.8, 0.4)
+    luna.gfx.setLineWidth(1)
     for wy = WATER_Y, WATER_Y + 30, 8 do
         for wx = 0, W - 20, 20 do
             local yo = math.sin(waveOffset + wx * 0.08 + wy * 0.2) * 3
-            luna.render.line(wx, wy + yo, wx + 15, wy + yo + 1)
+            luna.gfx.line(wx, wy + yo, wx + 15, wy + yo + 1)
         end
     end
 
     -- Depth markers
-    luna.render.setColor(0.5, 0.6, 0.8, 0.3)
+    luna.gfx.setColor(0.5, 0.6, 0.8, 0.3)
     for d = 50, maxDepth, 50 do
         local dy = WATER_Y + d
         if dy < H then
-            luna.render.line(0, dy, W, dy)
-            luna.render.print(d .. "m", 5, dy - 12, 0.6)
+            luna.gfx.line(0, dy, W, dy)
+            luna.gfx.print(d .. "m", 5, dy - 12, 0.6)
         end
     end
 
@@ -324,17 +324,17 @@ function luna.draw()
         if f.y < H + 20 then
             local c = f.type.color
             local depth_fade = clamp(1 - (f.y - WATER_Y) / (maxDepth * 1.2), 0.2, 1)
-            luna.render.setColor(c[1] * depth_fade, c[2] * depth_fade, c[3] * depth_fade, 0.8)
+            luna.gfx.setColor(c[1] * depth_fade, c[2] * depth_fade, c[3] * depth_fade, 0.8)
             -- Fish body (triangle-ish)
             local dir = f.vx >= 0 and 1 or -1
             local s = f.size
-            luna.render.polygon("fill", {
+            luna.gfx.polygon("fill", {
                 f.x + dir * s, f.y,
                 f.x - dir * s, f.y - s * 0.5,
                 f.x - dir * s, f.y + s * 0.5,
             })
             -- Tail
-            luna.render.polygon("fill", {
+            luna.gfx.polygon("fill", {
                 f.x - dir * s, f.y,
                 f.x - dir * (s + 4), f.y - s * 0.4,
                 f.x - dir * (s + 4), f.y + s * 0.4,
@@ -344,85 +344,85 @@ function luna.draw()
 
     -- Cast power bar
     if casting then
-        luna.render.setColor(0, 0, 0, 0.7)
-        luna.render.rectangle("fill", playerX - 25, DOCK_Y - 70, 50, 10)
-        luna.render.setColor(1, 1 - castPower / 100, 0, 1)
-        luna.render.rectangle("fill", playerX - 25, DOCK_Y - 70, castPower / 2, 10)
+        luna.gfx.setColor(0, 0, 0, 0.7)
+        luna.gfx.rectangle("fill", playerX - 25, DOCK_Y - 70, 50, 10)
+        luna.gfx.setColor(1, 1 - castPower / 100, 0, 1)
+        luna.gfx.rectangle("fill", playerX - 25, DOCK_Y - 70, castPower / 2, 10)
     end
 
     -- Tension meter (when hooked)
     if state == "hooked" then
-        luna.render.setColor(0, 0, 0, 0.8)
-        luna.render.rectangle("fill", W / 2 - 110, 50, 220, 70)
-        luna.render.setColor(1, 1, 1, 1)
-        luna.render.print("TENSION", W / 2 - 30, 55, 0.9)
+        luna.gfx.setColor(0, 0, 0, 0.8)
+        luna.gfx.rectangle("fill", W / 2 - 110, 50, 220, 70)
+        luna.gfx.setColor(1, 1, 1, 1)
+        luna.gfx.print("TENSION", W / 2 - 30, 55, 0.9)
 
         -- Tension bar
-        luna.render.setColor(0.3, 0.3, 0.3, 1)
-        luna.render.rectangle("fill", W / 2 - 95, 75, 190, 16)
+        luna.gfx.setColor(0.3, 0.3, 0.3, 1)
+        luna.gfx.rectangle("fill", W / 2 - 95, 75, 190, 16)
         -- Sweet spot zone
-        luna.render.setColor(0, 0.6, 0, 0.4)
+        luna.gfx.setColor(0, 0.6, 0, 0.4)
         local zoneX = W / 2 - 95 + tensionMin / 100 * 190
         local zoneW = (tensionMax - tensionMin) / 100 * 190
-        luna.render.rectangle("fill", zoneX, 75, zoneW, 16)
+        luna.gfx.rectangle("fill", zoneX, 75, zoneW, 16)
         -- Current tension
         local tColor = (tension > tensionMax or tension < tensionMin) and {1, 0, 0} or {0, 1, 0}
-        luna.render.setColor(tColor[1], tColor[2], tColor[3], 1)
+        luna.gfx.setColor(tColor[1], tColor[2], tColor[3], 1)
         local tx = W / 2 - 95 + tension / 100 * 190
-        luna.render.rectangle("fill", tx - 3, 73, 6, 20)
+        luna.gfx.rectangle("fill", tx - 3, 73, 6, 20)
 
         -- Reel progress
-        luna.render.setColor(0.3, 0.3, 0.3, 1)
-        luna.render.rectangle("fill", W / 2 - 95, 97, 190, 10)
-        luna.render.setColor(0, 0.7, 1, 1)
-        luna.render.rectangle("fill", W / 2 - 95, 97, reelProgress / 100 * 190, 10)
-        luna.render.setColor(1, 1, 1, 0.7)
-        luna.render.print("Up/Down keys", W / 2 - 45, 110, 0.6)
+        luna.gfx.setColor(0.3, 0.3, 0.3, 1)
+        luna.gfx.rectangle("fill", W / 2 - 95, 97, 190, 10)
+        luna.gfx.setColor(0, 0.7, 1, 1)
+        luna.gfx.rectangle("fill", W / 2 - 95, 97, reelProgress / 100 * 190, 10)
+        luna.gfx.setColor(1, 1, 1, 0.7)
+        luna.gfx.print("Up/Down keys", W / 2 - 45, 110, 0.6)
     end
 
     -- HUD
-    luna.render.setColor(0, 0, 0, 0.75)
-    luna.render.rectangle("fill", 0, 0, W, 40)
-    luna.render.setColor(1, 1, 1, 1)
-    luna.render.print("Day " .. day, 10, 5, 1)
+    luna.gfx.setColor(0, 0, 0, 0.75)
+    luna.gfx.rectangle("fill", 0, 0, W, 40)
+    luna.gfx.setColor(1, 1, 1, 1)
+    luna.gfx.print("Day " .. day, 10, 5, 1)
     local mins = math.floor(dayTimer / 60)
     local secs = math.floor(dayTimer % 60)
-    luna.render.print("Time: " .. mins .. ":" .. (secs < 10 and "0" or "") .. secs, 80, 8, 0.8)
-    luna.render.print("Money: $" .. money, 200, 8, 0.8)
+    luna.gfx.print("Time: " .. mins .. ":" .. (secs < 10 and "0" or "") .. secs, 80, 8, 0.8)
+    luna.gfx.print("Money: $" .. money, 200, 8, 0.8)
 
     -- Bait selector
     for i, b in ipairs(BAITS) do
         local sel = i == currentBait
-        luna.render.setColor(b.color[1], b.color[2], b.color[3], sel and 1 or 0.4)
-        luna.render.rectangle("fill", 320 + (i - 1) * 80, 5, 70, 20)
-        luna.render.setColor(1, 1, 1, sel and 1 or 0.5)
-        luna.render.print(i .. ":" .. b.name, 325 + (i - 1) * 80, 8, 0.7)
+        luna.gfx.setColor(b.color[1], b.color[2], b.color[3], sel and 1 or 0.4)
+        luna.gfx.rectangle("fill", 320 + (i - 1) * 80, 5, 70, 20)
+        luna.gfx.setColor(1, 1, 1, sel and 1 or 0.5)
+        luna.gfx.print(i .. ":" .. b.name, 325 + (i - 1) * 80, 8, 0.7)
     end
 
     -- Catch log
-    luna.render.setColor(0.6, 0.6, 0.6, 1)
-    luna.render.print("Catches: " .. #catches, 600, 8, 0.75)
+    luna.gfx.setColor(0.6, 0.6, 0.6, 1)
+    luna.gfx.print("Catches: " .. #catches, 600, 8, 0.75)
     if #catches > 0 then
         local logY = 45
-        luna.render.setColor(0, 0, 0, 0.5)
+        luna.gfx.setColor(0, 0, 0, 0.5)
         local logH = clamp(#catches, 1, 8) * 14 + 5
-        luna.render.rectangle("fill", W - 160, logY, 155, logH)
+        luna.gfx.rectangle("fill", W - 160, logY, 155, logH)
         for i = clamp(#catches - 7, 1, #catches), #catches do
             local c = catches[i]
-            luna.render.setColor(0.8, 0.9, 1, 1)
-            luna.render.print(c.name .. " (" .. c.size .. ") $" .. c.value, W - 155, logY + (i - clamp(#catches - 7, 1, #catches)) * 14, 0.6)
+            luna.gfx.setColor(0.8, 0.9, 1, 1)
+            luna.gfx.print(c.name .. " (" .. c.size .. ") $" .. c.value, W - 155, logY + (i - clamp(#catches - 7, 1, #catches)) * 14, 0.6)
         end
     end
 
     -- Bottom controls
-    luna.render.setColor(0, 0, 0, 0.6)
-    luna.render.rectangle("fill", 0, H - 22, W, 22)
-    luna.render.setColor(0.7, 0.7, 0.7, 1)
-    luna.render.print("A/D move | Space hold+release to cast | Up/Down reel tension | 1/2/3 bait", 10, H - 19, 0.7)
+    luna.gfx.setColor(0, 0, 0, 0.6)
+    luna.gfx.rectangle("fill", 0, H - 22, W, 22)
+    luna.gfx.setColor(0.7, 0.7, 0.7, 1)
+    luna.gfx.print("A/D move | Space hold+release to cast | Up/Down reel tension | 1/2/3 bait", 10, H - 19, 0.7)
 
     -- Message
     if msgTimer > 0 then
-        luna.render.setColor(1, 1, 0.5, clamp(msgTimer, 0, 1))
-        luna.render.print(message, W / 2 - 80, H / 2 - 50, 1.1)
+        luna.gfx.setColor(1, 1, 0.5, clamp(msgTimer, 0, 1))
+        luna.gfx.print(message, W / 2 - 80, H / 2 - 50, 1.1)
     end
 end

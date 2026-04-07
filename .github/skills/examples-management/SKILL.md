@@ -1,4 +1,4 @@
-﻿---
+---
 name: examples-management
 description: "Load this skill when adding, modifying, or reviewing content in the examples/ or demos/ directories: game example scripts, demo folder structure, conf.lua, or README files. Use for ensuring examples are self-contained, well-commented, and demonstrate one API concept. Skip it for engine Rust code, tests, documentation under docs/, or CAG work."
 ---
@@ -37,7 +37,7 @@ description: "Load this skill when adding, modifying, or reviewing content in th
 ```
 examples/
 ├── physics.lua        — luna.physics.* API example
-├── graphics.lua       — luna.render.* example
+├── graphics.lua       — luna.gfx.* example
 ├── timer.lua          — luna.time.* example
 ├── audio.lua          — luna.audio.* example
 └── ...                — one .lua per API namespace
@@ -51,20 +51,20 @@ examples/
 -- Run with: cargo run -- examples/timer
 
 -- ── load ──────────────────────────────────────────────────────
-function luna.load()
+function luna.init()
     elapsed = 0
-    font = luna.render.getDefaultFont()
+    font = luna.gfx.getDefaultFont()
 end
 
 -- ── update ────────────────────────────────────────────────────
-function luna.update(dt)
+function luna.process(dt)
     elapsed = elapsed + dt
 end
 
 -- ── draw ──────────────────────────────────────────────────────
-function luna.draw()
-    luna.render.print("FPS: " .. luna.time.getFPS(), 10, 10)
-    luna.render.print("Elapsed: " .. string.format("%.2f", elapsed), 10, 30)
+function luna.render()
+    luna.gfx.print("FPS: " .. luna.time.getFPS(), 10, 10)
+    luna.gfx.print("Elapsed: " .. string.format("%.2f", elapsed), 10, 30)
 end
 ```
 
@@ -145,7 +145,7 @@ If an example supports a `--smoke` flag, it calls `luna.quit()` after one frame 
 Add smoke test support to a new example:
 
 ```lua
-function luna.load()
+function luna.init()
     local args = luna.platform.getArgs()
     if args["--smoke"] then
         luna.signal.quit()
@@ -203,24 +203,24 @@ Color component values must be in `[0.0, 1.0]` range — **never** `[0, 255]`:
 
 ```lua
 -- CORRECT
-luna.render.setColor(1.0, 0.0, 0.0, 1.0)    -- red, full opacity
-luna.render.setColor(0.5, 0.5, 0.5, 1.0)    -- mid-gray
+luna.gfx.setColor(1.0, 0.0, 0.0, 1.0)    -- red, full opacity
+luna.gfx.setColor(0.5, 0.5, 0.5, 1.0)    -- mid-gray
 
 -- WRONG
-luna.render.setColor(255, 0, 0, 255)         -- byte range, not float
+luna.gfx.setColor(255, 0, 0, 255)         -- byte range, not float
 ```
 
 ### Rectangle Draw Mode
 
-`luna.render.rectangle()` takes a string mode as its first arg — not a boolean:
+`luna.gfx.rectangle()` takes a string mode as its first arg — not a boolean:
 
 ```lua
 -- CORRECT
-luna.render.rectangle("fill", x, y, w, h)
-luna.render.rectangle("line", x, y, w, h)
+luna.gfx.rectangle("fill", x, y, w, h)
+luna.gfx.rectangle("line", x, y, w, h)
 
 -- WRONG
-luna.render.rectangle(true, x, y, w, h)   -- boolean does not work
+luna.gfx.rectangle(true, x, y, w, h)   -- boolean does not work
 ```
 
 ### Physics Body Types

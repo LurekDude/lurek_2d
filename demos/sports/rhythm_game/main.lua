@@ -1,4 +1,4 @@
-﻿-- Rhythm Game Demo — 4-lane note highway with timing windows
+-- Rhythm Game Demo — 4-lane note highway with timing windows
 -- Keys: D, F, J, K to hit notes | Space to start/restart | Escape to quit
 
 local function clamp(v, mn, mx) return math.max(mn, math.min(mx, v)) end
@@ -75,9 +75,9 @@ local function addFeedback(x, text, r, g, b)
     table.insert(feedbacks, { x = x, y = hitY - 40, text = text, alpha = 1.5, r = r, g = g, b = b })
 end
 
-function luna.load()
+function luna.init()
     luna.window.setTitle("Rhythm Game")
-    luna.render.setBackgroundColor(0.08, 0.08, 0.12)
+    luna.gfx.setBackgroundColor(0.08, 0.08, 0.12)
     local screenW = 800
     local totalWidth = #lanes * laneWidth
     local startX = (screenW - totalWidth) / 2
@@ -87,7 +87,7 @@ function luna.load()
     hitY = 520
 end
 
-function luna.update(dt)
+function luna.process(dt)
     if not started then return end
     gameTime = gameTime + dt
 
@@ -182,26 +182,26 @@ local function tryHit(laneIdx)
     end
 end
 
-function luna.draw()
+function luna.render()
     -- draw lanes
     for i, lane in ipairs(lanes) do
-        luna.render.setColor(0.15, 0.15, 0.2, 1)
-        luna.render.rectangle("fill", lane.x, 0, laneWidth, 600)
-        luna.render.setColor(0.25, 0.25, 0.35, 1)
-        luna.render.rectangle("line", lane.x, 0, laneWidth, 600)
+        luna.gfx.setColor(0.15, 0.15, 0.2, 1)
+        luna.gfx.rectangle("fill", lane.x, 0, laneWidth, 600)
+        luna.gfx.setColor(0.25, 0.25, 0.35, 1)
+        luna.gfx.rectangle("line", lane.x, 0, laneWidth, 600)
     end
 
     -- hit zone
-    luna.render.setColor(1, 1, 1, 0.3)
+    luna.gfx.setColor(1, 1, 1, 0.3)
     for _, lane in ipairs(lanes) do
-        luna.render.rectangle("fill", lane.x, hitY - 10, laneWidth, noteHeight + 20)
+        luna.gfx.rectangle("fill", lane.x, hitY - 10, laneWidth, noteHeight + 20)
     end
 
     -- draw flashes
     for _, fl in ipairs(flashes) do
         local a = clamp(fl.alpha, 0, 1)
-        luna.render.setColor(fl.r, fl.g, fl.b, a * 0.5)
-        luna.render.rectangle("fill", lanes[fl.lane].x, 0, laneWidth, 600)
+        luna.gfx.setColor(fl.r, fl.g, fl.b, a * 0.5)
+        luna.gfx.rectangle("fill", lanes[fl.lane].x, 0, laneWidth, 600)
     end
 
     -- draw notes
@@ -209,52 +209,52 @@ function luna.draw()
         if not n.hit then
             local c = lanes[n.lane].color
             if n.missed then
-                luna.render.setColor(0.3, 0.3, 0.3, 0.5)
+                luna.gfx.setColor(0.3, 0.3, 0.3, 0.5)
             else
-                luna.render.setColor(c[1], c[2], c[3], 1)
+                luna.gfx.setColor(c[1], c[2], c[3], 1)
             end
-            luna.render.rectangle("fill", lanes[n.lane].x + 4, n.y, laneWidth - 8, noteHeight)
+            luna.gfx.rectangle("fill", lanes[n.lane].x + 4, n.y, laneWidth - 8, noteHeight)
         end
     end
 
     -- key labels
-    luna.render.setColor(1, 1, 1, 0.8)
+    luna.gfx.setColor(1, 1, 1, 0.8)
     for i, lane in ipairs(lanes) do
-        luna.render.print(string.upper(lane.key), lane.x + laneWidth / 2 - 6, hitY + 30)
+        luna.gfx.print(string.upper(lane.key), lane.x + laneWidth / 2 - 6, hitY + 30)
     end
 
     -- feedbacks
     for _, fb in ipairs(feedbacks) do
         local a = clamp(fb.alpha, 0, 1)
-        luna.render.setColor(fb.r, fb.g, fb.b, a)
-        luna.render.print(fb.text, fb.x - 20, fb.y)
+        luna.gfx.setColor(fb.r, fb.g, fb.b, a)
+        luna.gfx.print(fb.text, fb.x - 20, fb.y)
     end
 
     -- HUD
-    luna.render.setColor(1, 1, 1, 1)
-    luna.render.print("SCORE: " .. score, 10, 10)
-    luna.render.print("COMBO: " .. combo, 10, 30)
+    luna.gfx.setColor(1, 1, 1, 1)
+    luna.gfx.print("SCORE: " .. score, 10, 10)
+    luna.gfx.print("COMBO: " .. combo, 10, 30)
     local mult = clamp(math.floor(combo / 10) + 1, 1, 4)
-    luna.render.print("x" .. mult, 10, 50)
-    luna.render.print("BPM: " .. bpm, 680, 10)
+    luna.gfx.print("x" .. mult, 10, 50)
+    luna.gfx.print("BPM: " .. bpm, 680, 10)
     local accuracy = 0
     if totalNotes > 0 then
         accuracy = math.floor((hitNotes / totalNotes) * 100)
     end
-    luna.render.print("ACC: " .. accuracy .. "%", 680, 30)
-    luna.render.print("FPS: " .. luna.time.getFPS(), 680, 50)
+    luna.gfx.print("ACC: " .. accuracy .. "%", 680, 30)
+    luna.gfx.print("FPS: " .. luna.time.getFPS(), 680, 50)
 
     if not started then
-        luna.render.setColor(0, 0, 0, 0.7)
-        luna.render.rectangle("fill", 200, 220, 400, 180)
-        luna.render.setColor(1, 1, 1, 1)
+        luna.gfx.setColor(0, 0, 0, 0.7)
+        luna.gfx.rectangle("fill", 200, 220, 400, 180)
+        luna.gfx.setColor(1, 1, 1, 1)
         if gameTime > 0 then
-            luna.render.print("SONG COMPLETE!", 310, 240, 1.5)
-            luna.render.print("Score: " .. score, 320, 280)
-            luna.render.print("Perfect: " .. perfectHits .. "  Good: " .. goodHits .. "  Miss: " .. misses, 260, 310)
-            luna.render.print("Max Combo: " .. maxCombo, 320, 340)
+            luna.gfx.print("SONG COMPLETE!", 310, 240, 1.5)
+            luna.gfx.print("Score: " .. score, 320, 280)
+            luna.gfx.print("Perfect: " .. perfectHits .. "  Good: " .. goodHits .. "  Miss: " .. misses, 260, 310)
+            luna.gfx.print("Max Combo: " .. maxCombo, 320, 340)
         end
-        luna.render.print("[SPACE] to " .. (gameTime > 0 and "restart" or "start"), 310, 370)
+        luna.gfx.print("[SPACE] to " .. (gameTime > 0 and "restart" or "start"), 310, 370)
     end
 end
 

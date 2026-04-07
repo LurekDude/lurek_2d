@@ -1,4 +1,4 @@
-﻿//! `luna.render` — 2D drawing, images, fonts, canvases, meshes, shaders and sprite batches.
+//! `luna.gfx` — 2D drawing, images, fonts, canvases, meshes, shaders and sprite batches.
 
 use super::SharedState;
 use mlua::prelude::*;
@@ -732,7 +732,7 @@ fn parse_draw_mode(mode: &str) -> DrawMode {
 // Registration
 // ===============================================================================
 
-/// Registers the `luna.render` namespace on the given Lua table.
+/// Registers the `luna.gfx` namespace on the given Lua table.
 ///
 /// # Parameters
 /// - `lua` — `&Lua`. The Lua VM.
@@ -1132,7 +1132,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
                         drop(img);
                         if !st.textures.contains_key(key) {
                             return Err(LuaError::RuntimeError(
-                                "luna.render.draw: image handle is not valid".into(),
+                                "luna.gfx.draw: image handle is not valid".into(),
                             ));
                         }
                         if has_transform {
@@ -1162,7 +1162,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
                         drop(canvas);
                         if !st.canvases.contains_key(key) {
                             return Err(LuaError::RuntimeError(
-                                "luna.render.draw: canvas handle is not valid".into(),
+                                "luna.gfx.draw: canvas handle is not valid".into(),
                             ));
                         }
                         st.draw_commands.push(DrawCommand::DrawCanvas {
@@ -1182,7 +1182,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
                         drop(batch);
                         if !st.sprite_batches.contains_key(key) {
                             return Err(LuaError::RuntimeError(
-                                "luna.render.draw: sprite batch handle is not valid".into(),
+                                "luna.gfx.draw: sprite batch handle is not valid".into(),
                             ));
                         }
                         st.draw_commands
@@ -1194,7 +1194,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
                         drop(mesh);
                         if !st.meshes.contains_key(key) {
                             return Err(LuaError::RuntimeError(
-                                "luna.render.draw: mesh handle is not valid".into(),
+                                "luna.gfx.draw: mesh handle is not valid".into(),
                             ));
                         }
                         st.draw_commands.push(DrawCommand::DrawMesh {
@@ -1210,14 +1210,14 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
                         return Ok(());
                     }
                     Err(LuaError::RuntimeError(
-                        "luna.render.draw: expected Image, Canvas, SpriteBatch, or Mesh".into(),
+                        "luna.gfx.draw: expected Image, Canvas, SpriteBatch, or Mesh".into(),
                     ))
                 }
                 LuaValue::Nil => Err(LuaError::RuntimeError(
-                    "luna.render.draw: drawable cannot be nil".into(),
+                    "luna.gfx.draw: drawable cannot be nil".into(),
                 )),
                 _ => Err(LuaError::RuntimeError(
-                    "luna.render.draw: unsupported drawable type".into(),
+                    "luna.gfx.draw: unsupported drawable type".into(),
                 )),
             }
         })?,
@@ -1496,12 +1496,12 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
             let full_path = st.game_dir.join(&path);
             let data = std::fs::read(&full_path).map_err(|e| {
                 LuaError::RuntimeError(format!(
-                    "luna.render.newFont: failed to read '{}': {}",
+                    "luna.gfx.newFont: failed to read '{}': {}",
                     path, e
                 ))
             })?;
             let font = Font::from_bytes(&data, size)
-                .map_err(|e| LuaError::RuntimeError(format!("luna.render.newFont: {}", e)))?;
+                .map_err(|e| LuaError::RuntimeError(format!("luna.gfx.newFont: {}", e)))?;
             let key = st.fonts.insert(font);
             Ok(LuaFont {
                 state: s.clone(),
@@ -1523,7 +1523,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
             let mut st = s.borrow_mut();
             if !st.fonts.contains_key(key) {
                 return Err(LuaError::RuntimeError(
-                    "luna.render.setFont: font handle is not valid or was released".into(),
+                    "luna.gfx.setFont: font handle is not valid or was released".into(),
                 ));
             }
             st.active_font = Some(key);
@@ -1564,7 +1564,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
             let mut st = s.borrow_mut();
             let f = st.fonts.get_mut(key).ok_or_else(|| {
                 LuaError::RuntimeError(
-                    "luna.render.getFontWidth: font handle is not valid".into(),
+                    "luna.gfx.getFontWidth: font handle is not valid".into(),
                 )
             })?;
             Ok(f.text_width(&text))
@@ -1585,7 +1585,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
             let st = s.borrow();
             let f = st.fonts.get(key).ok_or_else(|| {
                 LuaError::RuntimeError(
-                    "luna.render.getFontHeight: font handle is not valid".into(),
+                    "luna.gfx.getFontHeight: font handle is not valid".into(),
                 )
             })?;
             Ok(f.line_height())
@@ -1606,7 +1606,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
             let st = s.borrow();
             let f = st.fonts.get(key).ok_or_else(|| {
                 LuaError::RuntimeError(
-                    "luna.render.getFontAscent: font handle is not valid".into(),
+                    "luna.gfx.getFontAscent: font handle is not valid".into(),
                 )
             })?;
             Ok(f.ascent())
@@ -1627,7 +1627,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
             let st = s.borrow();
             let f = st.fonts.get(key).ok_or_else(|| {
                 LuaError::RuntimeError(
-                    "luna.render.getFontDescent: font handle is not valid".into(),
+                    "luna.gfx.getFontDescent: font handle is not valid".into(),
                 )
             })?;
             Ok(f.descent())
@@ -1677,7 +1677,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
         lua.create_function(move |_, arg: LuaValue| match arg {
             LuaValue::String(path_str) => {
                 let path = path_str.to_str().map_err(|e| {
-                    LuaError::RuntimeError(format!("luna.render.newImage: invalid path: {}", e))
+                    LuaError::RuntimeError(format!("luna.gfx.newImage: invalid path: {}", e))
                 })?;
                 let mut st = s.borrow_mut();
                 let full_path = st.game_dir.join(path);
@@ -1690,7 +1690,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
                         })
                     }
                     Err(e) => Err(LuaError::RuntimeError(format!(
-                        "luna.render.newImage: failed to load '{}': {}",
+                        "luna.gfx.newImage: failed to load '{}': {}",
                         path, e
                     ))),
                 }
@@ -1709,13 +1709,13 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
                         })
                     }
                     Err(e) => Err(LuaError::RuntimeError(format!(
-                        "luna.render.newImage: failed to create from ImageData: {}",
+                        "luna.gfx.newImage: failed to create from ImageData: {}",
                         e
                     ))),
                 }
             }
             _ => Err(LuaError::RuntimeError(
-                "luna.render.newImage: expected a file path string or ImageData".into(),
+                "luna.gfx.newImage: expected a file path string or ImageData".into(),
             )),
         })?,
     )?;
@@ -1733,7 +1733,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
         lua.create_function(move |_, (width, height): (u32, u32)| {
             if width == 0 || height == 0 {
                 return Err(LuaError::RuntimeError(
-                    "luna.render.newCanvas: width and height must be greater than zero".into(),
+                    "luna.gfx.newCanvas: width and height must be greater than zero".into(),
                 ));
             }
             let mut st = s.borrow_mut();
@@ -1765,7 +1765,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
                     drop(c);
                     if !st.canvases.contains_key(key) {
                         return Err(LuaError::RuntimeError(
-                            "luna.render.setCanvas: canvas handle is not valid".into(),
+                            "luna.gfx.setCanvas: canvas handle is not valid".into(),
                         ));
                     }
                     st.active_canvas = Some(key);
@@ -1812,7 +1812,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
             let st = s.borrow();
             let c = st.canvases.get(key).ok_or_else(|| {
                 LuaError::RuntimeError(
-                    "luna.render.getCanvasSize: canvas handle is not valid".into(),
+                    "luna.gfx.getCanvasSize: canvas handle is not valid".into(),
                 )
             })?;
             Ok((c.width, c.height))
@@ -1837,7 +1837,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
             let mut st = s.borrow_mut();
             if !st.textures.contains_key(img_key) {
                 return Err(LuaError::RuntimeError(
-                    "luna.render.newSpriteBatch: image handle is not valid".into(),
+                    "luna.gfx.newSpriteBatch: image handle is not valid".into(),
                 ));
             }
             let batch = SpriteBatch::new(img_key, max_entries);
@@ -1907,7 +1907,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
         "newShader",
         lua.create_function(move |_, code: String| {
             let shader = Shader::new(code).map_err(|err| {
-                LuaError::RuntimeError(format!("luna.render.newShader: {}", err))
+                LuaError::RuntimeError(format!("luna.gfx.newShader: {}", err))
             })?;
             let key = s.borrow_mut().shaders.insert(shader);
             Ok(LuaShader {
@@ -1932,7 +1932,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
                     drop(sh);
                     if !st.shaders.contains_key(key) {
                         return Err(LuaError::RuntimeError(
-                            "luna.render.setShader: shader handle is not valid".into(),
+                            "luna.gfx.setShader: shader handle is not valid".into(),
                         ));
                     }
                     st.active_shader = Some(key);
@@ -2411,6 +2411,6 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
         })?,
     )?;
 
-    luna.set("render", graphics)?;
+    luna.set("gfx", graphics)?;
     Ok(())
 }

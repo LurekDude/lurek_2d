@@ -1,4 +1,4 @@
-﻿# Luna2D — Engine Architecture
+# Luna2D — Engine Architecture
 
 > **Source of truth** for the runtime module structure, rendering pipeline, and internal subsystem design.
 > Companion documents: [philosophy.md](philosophy.md) (principles + design assumptions) · [test-framework.md](test-framework.md) (test architecture).
@@ -183,7 +183,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
 
 | Namespace | API File | Scope |
 |---|---|---|
-| `luna.render` | `graphics_api.rs` | Drawing, images, fonts, canvases, meshes, shaders, sprite batches |
+| `luna.gfx` | `graphics_api.rs` | Drawing, images, fonts, canvases, meshes, shaders, sprite batches |
 | `luna.audio` | `audio_api.rs` | Sound loading, playback, volume, pitch, panning, buses |
 | `luna.keyboard` | `input_api.rs` | Key state, scancodes, text input |
 | `luna.mouse` | `input_api.rs` | Position, buttons, cursor, scroll, grab |
@@ -469,14 +469,14 @@ Compile-time type safety: a `TextureKey` cannot be passed where a `FontKey` is e
 ### Resource Lifecycle
 
 ```
-Lua: local img = luna.render.newImage("player.png")
+Lua: local img = luna.gfx.newImage("player.png")
   │
   ▼
 Rust: load pixels → insert into textures SlotMap → upload to GPU
       → return LuaImage(TextureKey) as UserData to Lua
   │
   ▼
-Lua: luna.render.draw(img, 100, 200)
+Lua: luna.gfx.draw(img, 100, 200)
   │
   ▼
 Rust: push DrawImage { texture_key, ... } into draw_commands
@@ -570,7 +570,7 @@ Affine transforms managed via a push/pop stack. Each entry stores translation, r
 All major resource types are exposed to Lua as `mlua::UserData` objects, providing an object-oriented API:
 
 ```lua
-local img = luna.render.newImage("player.png")
+local img = luna.gfx.newImage("player.png")
 img:getWidth()
 img:getHeight()
 img:release()
@@ -619,7 +619,7 @@ This provides `type()`, `typeOf()`, and `__tostring` metamethods automatically.
 
 ### Drawable Protocol
 
-Types that implement the Drawable protocol can be passed to `luna.render.draw()`:
+Types that implement the Drawable protocol can be passed to `luna.gfx.draw()`:
 Image, Canvas, SpriteBatch, Mesh, ParticleSystem.
 
 ---
@@ -724,7 +724,7 @@ pub struct ParticleSystem {
 
 ### luna.img — CPU Pixel Manipulation
 
-`ImageData`: RGBA8 pixel buffer with `getPixel`, `setPixel`, `mapPixel`, `paste`, `encode("png")`. Can be uploaded to GPU: `luna.render.newImage(imageData)`.
+`ImageData`: RGBA8 pixel buffer with `getPixel`, `setPixel`, `mapPixel`, `paste`, `encode("png")`. Can be uploaded to GPU: `luna.gfx.newImage(imageData)`.
 
 ### luna.sound — Decoded Audio Samples
 

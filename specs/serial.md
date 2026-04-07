@@ -1,4 +1,4 @@
-﻿# `serial` — Agent Reference
+# `serial` — Agent Reference
 
 | Property         | Value                                                |
 |------------------|------------------------------------------------------|
@@ -135,7 +135,7 @@ Exposed under `luna.codec.*` by `src/lua_api/serial_api.rs`. The API provides si
 
 ```lua
 -- JSON round-trip
-function luna.load()
+function luna.init()
     local data = { name = "Luna2D", version = 4, features = { "physics", "audio" } }
 
     -- Serialize to JSON (pretty-printed)
@@ -152,7 +152,7 @@ end
 
 ```lua
 -- TOML config parsing
-function luna.load()
+function luna.init()
     local toml_str = luna.fs.read("settings.toml")
     local cfg = luna.codec.fromToml(toml_str)
     print(cfg.window.title)
@@ -167,7 +167,7 @@ end
 
 ```lua
 -- CSV data loading
-function luna.load()
+function luna.init()
     local csv_text = "name,score\nalice,100\nbob,85\n"
     local rows = luna.codec.fromCsv(csv_text)
     for i, row in ipairs(rows) do
@@ -216,12 +216,12 @@ Note: counts reflect the active (compiled) surface only. The disabled `yaml.rs` 
 
 ```lua
 -- Example: Basic serial usage
-function luna.load()
+function luna.init()
     -- TODO: replace with real serial setup
     local obj = luna.codec.serial()
 end
 
-function luna.update(dt)
+function luna.process(dt)
     -- TODO: update logic
 end
 ```

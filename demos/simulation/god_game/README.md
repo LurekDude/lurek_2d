@@ -1,15 +1,15 @@
-﻿# God Game
+# God Game
 
 An ecosystem god-game where you watch over tribes, predators, and prey on a procedurally generated tile world. Faith accumulates when tribes worship at temples you place, and you spend faith on miracles — rain, lightning, healing, and food drops — to steer the simulation. A day/night cycle affects tribe movement speed and a storm system provides dramatic weather events.
 
 ## What It Demonstrates
 
-- `luna.render.rectangle()` — tile world rendering with terrain-color lookup table
+- `luna.gfx.rectangle()` — tile world rendering with terrain-color lookup table
 - `luna.mouse.getPosition()` / `luna.mousepressed()` — miracle targeting and temple placement
 - `luna.keyboard.wasPressed()` — miracle selection cycling
-- `luna.render.setColor()` — day/night ambient blending and entity coloring
-- `luna.render.print()` — faith counter, day count, and population HUD
-- `luna.render.setBackgroundColor()` — base sky color
+- `luna.gfx.setColor()` — day/night ambient blending and entity coloring
+- `luna.gfx.print()` — faith counter, day count, and population HUD
+- `luna.gfx.setBackgroundColor()` — base sky color
 - Entity AI — tribe hunger/HP state machine, predator hunt-nearest logic, prey reproduce/wander
 - Day/night cycle — 30-second oscillation gate that modifies entity movement speeds
 

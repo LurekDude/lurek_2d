@@ -1,17 +1,17 @@
-﻿# Card Game
+# Card Game
 
 A collectible card game (CCG) demo featuring turn-based combat between you and an AI opponent. Each turn your mana pool grows, letting you play increasingly powerful cards from your hand. Defeat the enemy by reducing their HP to zero before they do the same to you.
 
 ## What It Demonstrates
 
-- `luna.render.rectangle()` — card rendering with fill and outline passes
-- `luna.render.circle()` — mana cost badges drawn on each card
-- `luna.render.print()` — multi-field HUD text: HP, mana, shield, log lines
-- `luna.render.setColor()` — per-card tint, hover highlight, and status-bar colouring
+- `luna.gfx.rectangle()` — card rendering with fill and outline passes
+- `luna.gfx.circle()` — mana cost badges drawn on each card
+- `luna.gfx.print()` — multi-field HUD text: HP, mana, shield, log lines
+- `luna.gfx.setColor()` — per-card tint, hover highlight, and status-bar colouring
 - `luna.mouse.getPosition()` — hover detection and click-to-play input
 - `luna.mouse.isPressed()` — single-frame click detection for card selection
 - `luna.keyboard.isPressed()` — End Turn (Enter) and Quit (Escape) hotkeys
-- `luna.render.setBackgroundColor()` — dark purple arena atmosphere
+- `luna.gfx.setBackgroundColor()` — dark purple arena atmosphere
 
 ## How to Run
 

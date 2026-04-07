@@ -1,4 +1,4 @@
-﻿//! `ImageEffect` â€” an ordered chain of `PostFxEffect` passes for per-image draw calls.
+//! `ImageEffect` â€” an ordered chain of `PostFxEffect` passes for per-image draw calls.
 //!
 //! [`ImageEffect`] groups one or more [`PostFxEffect`] entries and converts them
 //! to lightweight [`crate::graphics::ShaderPassDescriptor`] values via
@@ -15,7 +15,7 @@ use crate::log_msg;
 
 /// An ordered shader-effect chain to apply when drawing a single image.
 ///
-/// Can be attached to a `luna.render.draw` call via the options-table
+/// Can be attached to a `luna.gfx.draw` call via the options-table
 /// overload (`effect` key). Effects are applied in insertion order through
 /// each enabled pass. `to_passes` converts the chain to the lightweight
 /// Tier-1 type embedded into `DrawCommand` variants.

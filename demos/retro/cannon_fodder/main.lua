@@ -1,4 +1,4 @@
-﻿-- Cannon Fodder — Amiga 500 Classic (Luna2D demo)
+-- Cannon Fodder — Amiga 500 Classic (Luna2D demo)
 -- Point-and-click squad-based top-down shooter inspired by Sensible Software's 1993 title.
 -- Lead your three soldiers through the jungle, eliminate all enemies, and reach the flag.
 
@@ -67,15 +67,15 @@ end
 
 -- ── Load ─────────────────────────────────────────────────────────────────
 
-function luna.load()
-    luna.render.setBackgroundColor(0.15, 0.32, 0.1)
+function luna.init()
+    luna.gfx.setBackgroundColor(0.15, 0.32, 0.1)
     score = 0; mission = 1
     build_mission(mission)
 end
 
 -- ── Update ───────────────────────────────────────────────────────────────
 
-function luna.update(dt)
+function luna.process(dt)
     if game_state ~= "playing" then return end
     anim = anim + dt
 
@@ -208,42 +208,42 @@ end
 
 -- ── Draw ─────────────────────────────────────────────────────────────────
 
-function luna.draw()
+function luna.render()
     -- Ground
-    luna.render.setColor(0.15, 0.32, 0.1)
-    luna.render.rectangle("fill", 0, 0, W, H)
+    luna.gfx.setColor(0.15, 0.32, 0.1)
+    luna.gfx.rectangle("fill", 0, 0, W, H)
 
     -- Path / sand track
-    luna.render.setColor(0.55, 0.48, 0.3, 0.5)
-    luna.render.rectangle("fill", W/2 - 30, 0, 60, H)
+    luna.gfx.setColor(0.55, 0.48, 0.3, 0.5)
+    luna.gfx.rectangle("fill", W/2 - 30, 0, 60, H)
 
     -- Trees
     for _, t in ipairs(trees) do
-        luna.render.setColor(0.08, 0.22, 0.06)
-        luna.render.circle("fill", t.x, t.y, t.r)
-        luna.render.setColor(0.12, 0.30, 0.10)
-        luna.render.circle("fill", t.x - 4, t.y - 4, t.r * 0.7)
+        luna.gfx.setColor(0.08, 0.22, 0.06)
+        luna.gfx.circle("fill", t.x, t.y, t.r)
+        luna.gfx.setColor(0.12, 0.30, 0.10)
+        luna.gfx.circle("fill", t.x - 4, t.y - 4, t.r * 0.7)
     end
 
     -- Flag (objective)
     local all_dead = true
     for _, e in ipairs(enemies) do if e.alive then all_dead = false; break end end
     if all_dead then
-        luna.render.setColor(0.9, 0.1, 0.1)
-        luna.render.rectangle("fill", flag.x, flag.y, flag.w, flag.h)
-        luna.render.setColor(1, 1, 1)
-        luna.render.print("FLAG", flag.x + 1, flag.y + 5, 1.1)
+        luna.gfx.setColor(0.9, 0.1, 0.1)
+        luna.gfx.rectangle("fill", flag.x, flag.y, flag.w, flag.h)
+        luna.gfx.setColor(1, 1, 1)
+        luna.gfx.print("FLAG", flag.x + 1, flag.y + 5, 1.1)
     end
 
     -- Enemies
     for _, e in ipairs(enemies) do
         if e.alive then
-            luna.render.setColor(0.6, 0.4, 0.15)
-            luna.render.rectangle("fill", e.x, e.y, 18, 20)
-            luna.render.setColor(0.7, 0.55, 0.35)
-            luna.render.circle("fill", e.x + 9, e.y + 6, 7)
-            luna.render.setColor(0.5, 0.35, 0.1)
-            luna.render.rectangle("fill", e.x - 1, e.y, 20, 6)
+            luna.gfx.setColor(0.6, 0.4, 0.15)
+            luna.gfx.rectangle("fill", e.x, e.y, 18, 20)
+            luna.gfx.setColor(0.7, 0.55, 0.35)
+            luna.gfx.circle("fill", e.x + 9, e.y + 6, 7)
+            luna.gfx.setColor(0.5, 0.35, 0.1)
+            luna.gfx.rectangle("fill", e.x - 1, e.y, 20, 6)
         end
     end
 
@@ -251,58 +251,58 @@ function luna.draw()
     for i, s in ipairs(squad) do
         if s.alive then
             local pulsing = i == 1 and (0.8 + 0.2 * math.sin(anim * 5)) or 1
-            luna.render.setColor(0.3 * pulsing, 0.6 * pulsing, 0.3 * pulsing)
-            luna.render.rectangle("fill", s.x, s.y, 16, 18)
-            luna.render.setColor(0.85, 0.7, 0.5)
-            luna.render.circle("fill", s.x + 8, s.y + 6, 7)
-            luna.render.setColor(0.3, 0.55, 0.3)
-            luna.render.rectangle("fill", s.x - 1, s.y, 18, 6)
+            luna.gfx.setColor(0.3 * pulsing, 0.6 * pulsing, 0.3 * pulsing)
+            luna.gfx.rectangle("fill", s.x, s.y, 16, 18)
+            luna.gfx.setColor(0.85, 0.7, 0.5)
+            luna.gfx.circle("fill", s.x + 8, s.y + 6, 7)
+            luna.gfx.setColor(0.3, 0.55, 0.3)
+            luna.gfx.rectangle("fill", s.x - 1, s.y, 18, 6)
         end
     end
 
     -- Bullets
-    luna.render.setColor(1, 0.9, 0.3)
+    luna.gfx.setColor(1, 0.9, 0.3)
     for _, b in ipairs(bullets) do
-        if not b.enemy then luna.render.rectangle("fill", b.x - 2, b.y - 2, 5, 5) end
+        if not b.enemy then luna.gfx.rectangle("fill", b.x - 2, b.y - 2, 5, 5) end
     end
-    luna.render.setColor(1, 0.3, 0.1)
+    luna.gfx.setColor(1, 0.3, 0.1)
     for _, b in ipairs(bullets) do
-        if b.enemy then luna.render.rectangle("fill", b.x - 2, b.y - 2, 5, 5) end
+        if b.enemy then luna.gfx.rectangle("fill", b.x - 2, b.y - 2, 5, 5) end
     end
 
     -- Target cursor
-    luna.render.setColor(1, 1, 0, 0.6)
-    luna.render.circle("line", mouse_target.x, mouse_target.y, 10)
-    luna.render.line(mouse_target.x - 14, mouse_target.y, mouse_target.x + 14, mouse_target.y)
-    luna.render.line(mouse_target.x, mouse_target.y - 14, mouse_target.x, mouse_target.y + 14)
+    luna.gfx.setColor(1, 1, 0, 0.6)
+    luna.gfx.circle("line", mouse_target.x, mouse_target.y, 10)
+    luna.gfx.line(mouse_target.x - 14, mouse_target.y, mouse_target.x + 14, mouse_target.y)
+    luna.gfx.line(mouse_target.x, mouse_target.y - 14, mouse_target.x, mouse_target.y + 14)
 
     -- HUD
-    luna.render.setColor(0, 0, 0, 0.65)
-    luna.render.rectangle("fill", 0, 0, W, 30)
-    luna.render.setColor(0.6, 1, 0.3)
-    luna.render.print("CANNON FODDER", 8, 4, 1.8)
-    luna.render.setColor(1, 1, 1)
-    luna.render.print("Mission " .. mission .. "/5", W/2 - 50, 4, 1.7)
-    luna.render.setColor(1, 0.8, 0.2)
-    luna.render.print("Score: " .. score, W - 130, 4, 1.6)
+    luna.gfx.setColor(0, 0, 0, 0.65)
+    luna.gfx.rectangle("fill", 0, 0, W, 30)
+    luna.gfx.setColor(0.6, 1, 0.3)
+    luna.gfx.print("CANNON FODDER", 8, 4, 1.8)
+    luna.gfx.setColor(1, 1, 1)
+    luna.gfx.print("Mission " .. mission .. "/5", W/2 - 50, 4, 1.7)
+    luna.gfx.setColor(1, 0.8, 0.2)
+    luna.gfx.print("Score: " .. score, W - 130, 4, 1.6)
 
     -- Controls hint
-    luna.render.setColor(0.6, 0.8, 0.6, 0.7)
-    luna.render.print("[WASD] Move squad  [Arrows] Pan view  Squad auto-fires!", 8, H - 20, 1.3)
+    luna.gfx.setColor(0.6, 0.8, 0.6, 0.7)
+    luna.gfx.print("[WASD] Move squad  [Arrows] Pan view  Squad auto-fires!", 8, H - 20, 1.3)
 
     -- Overlay
     local ov_text, ov_col = nil, nil
     if game_state == "gameover" then ov_text = "ALL MEN LOST"; ov_col = {1,0.2,0.2}
     elseif game_state == "win"  then ov_text = "MISSION ACCOMPLISHED"; ov_col = {0.3,1,0.5} end
     if ov_text then
-        luna.render.setColor(0, 0, 0, 0.75)
-        luna.render.rectangle("fill", 0, 0, W, H)
-        luna.render.setColor(ov_col[1], ov_col[2], ov_col[3])
-        luna.render.print(ov_text, W/2 - #ov_text * 9, H/2 - 25, 3)
-        luna.render.setColor(1, 1, 1)
-        luna.render.print("Score: " .. score, W/2 - 50, H/2 + 20, 2)
-        luna.render.setColor(0.6, 0.6, 0.6)
-        luna.render.print("Press R to restart", W/2 - 100, H/2 + 55, 2)
+        luna.gfx.setColor(0, 0, 0, 0.75)
+        luna.gfx.rectangle("fill", 0, 0, W, H)
+        luna.gfx.setColor(ov_col[1], ov_col[2], ov_col[3])
+        luna.gfx.print(ov_text, W/2 - #ov_text * 9, H/2 - 25, 3)
+        luna.gfx.setColor(1, 1, 1)
+        luna.gfx.print("Score: " .. score, W/2 - 50, H/2 + 20, 2)
+        luna.gfx.setColor(0.6, 0.6, 0.6)
+        luna.gfx.print("Press R to restart", W/2 - 100, H/2 + 55, 2)
     end
 end
 

@@ -1,11 +1,11 @@
-﻿# Tennis Classic
+# Tennis Classic
 
 A top-down tennis game with serve mechanics, topspin, and full tennis scoring.
 First to 6 games wins the set.
 
 ## What It Demonstrates
 
-- `luna.render.rectangle()` / `luna.render.circle()` — court, players, ball
+- `luna.gfx.rectangle()` / `luna.gfx.circle()` — court, players, ball
 - `luna.input.isKeyDown()` — smooth player movement in four directions
 - `luna.keypressed()` — serving
 - Tennis scoring (0/15/30/40/Deuce/Adv)

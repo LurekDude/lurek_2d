@@ -1,4 +1,4 @@
-﻿-- Galaga — Classic Arcade (Luna2D demo)
+-- Galaga — Classic Arcade (Luna2D demo)
 -- Destroy the insect fleet as they swoop down in diving attack patterns.
 -- Left/Right to move, Space to shoot. Each cleared wave increases speed.
 
@@ -62,14 +62,14 @@ end
 
 -- ── Load ─────────────────────────────────────────────────────────────────
 
-function luna.load()
-    luna.render.setBackgroundColor(0, 0, 0.05)
+function luna.init()
+    luna.gfx.setBackgroundColor(0, 0, 0.05)
     reset()
 end
 
 -- ── Update ───────────────────────────────────────────────────────────────
 
-function luna.update(dt)
+function luna.process(dt)
     if game_state ~= "playing" then return end
     anim_timer = anim_timer + dt
     shoot_cd = math.max(0, shoot_cd - dt)
@@ -190,40 +190,40 @@ end
 
 -- ── Draw ─────────────────────────────────────────────────────────────────
 
-function luna.draw()
+function luna.render()
     -- Stars
     math.randomseed(99)
     for i = 1, 100 do
         local blink = (math.sin(anim_timer * 3 + i) + 1) / 2
-        luna.render.setColor(blink, blink, blink, 0.5)
-        luna.render.circle("fill", math.random(W), math.random(H), 1)
+        luna.gfx.setColor(blink, blink, blink, 0.5)
+        luna.gfx.circle("fill", math.random(W), math.random(H), 1)
     end
     math.randomseed(os.time())
 
     -- HUD
-    luna.render.setColor(1, 1, 1)
-    luna.render.print("GALAGA", W/2 - 35, 5, 2)
-    luna.render.setColor(0.8, 0.9, 1)
-    luna.render.print("Score: " .. score, 8, 8, 1.5)
-    luna.render.setColor(1, 0.4, 0.4)
-    luna.render.print("Lives: " .. lives, W - 100, 8, 1.5)
-    luna.render.setColor(0.6, 0.6, 0.8)
-    luna.render.print("Wave " .. wave, W - 80, H - 20, 1.5)
+    luna.gfx.setColor(1, 1, 1)
+    luna.gfx.print("GALAGA", W/2 - 35, 5, 2)
+    luna.gfx.setColor(0.8, 0.9, 1)
+    luna.gfx.print("Score: " .. score, 8, 8, 1.5)
+    luna.gfx.setColor(1, 0.4, 0.4)
+    luna.gfx.print("Lives: " .. lives, W - 100, 8, 1.5)
+    luna.gfx.setColor(0.6, 0.6, 0.8)
+    luna.gfx.print("Wave " .. wave, W - 80, H - 20, 1.5)
 
     -- Player ship
-    luna.render.setColor(0.4, 0.8, 1.0)
+    luna.gfx.setColor(0.4, 0.8, 1.0)
     -- Fuselage
-    luna.render.rectangle("fill", player.x + 10, player.y, 12, player.h)
+    luna.gfx.rectangle("fill", player.x + 10, player.y, 12, player.h)
     -- Wings
-    luna.render.rectangle("fill", player.x, player.y + 10, player.w, 10)
+    luna.gfx.rectangle("fill", player.x, player.y + 10, player.w, 10)
     -- Cockpit
-    luna.render.setColor(0.8, 1.0, 1.0)
-    luna.render.circle("fill", player.x + player.w/2, player.y + 6, 5)
+    luna.gfx.setColor(0.8, 1.0, 1.0)
+    luna.gfx.circle("fill", player.x + player.w/2, player.y + 6, 5)
 
     -- Enemy bullets
-    luna.render.setColor(1, 0.5, 0.1)
+    luna.gfx.setColor(1, 0.5, 0.1)
     for _, eb in ipairs(enemy_bullets) do
-        luna.render.rectangle("fill", eb.x, eb.y, eb.w, eb.h)
+        luna.gfx.rectangle("fill", eb.x, eb.y, eb.w, eb.h)
     end
 
     -- Enemies
@@ -231,37 +231,37 @@ function luna.draw()
         if e.alive then
             local pulsate = 0.7 + math.sin(anim_timer * 4 + e.home_x) * 0.3
             if e.row == 1 then
-                luna.render.setColor(0.9 * pulsate, 0.2, 0.8 * pulsate)
+                luna.gfx.setColor(0.9 * pulsate, 0.2, 0.8 * pulsate)
             elseif e.row == 2 then
-                luna.render.setColor(0.1, 0.8 * pulsate, 0.9 * pulsate)
+                luna.gfx.setColor(0.1, 0.8 * pulsate, 0.9 * pulsate)
             else
-                luna.render.setColor(0.8 * pulsate, 0.8 * pulsate, 0.1)
+                luna.gfx.setColor(0.8 * pulsate, 0.8 * pulsate, 0.1)
             end
             -- Wing/body shape
-            luna.render.rectangle("fill", e.x + 4, e.y + 6, ENEMY_W - 8, ENEMY_H - 12)
-            luna.render.rectangle("fill", e.x, e.y + 14, ENEMY_W, 10)
+            luna.gfx.rectangle("fill", e.x + 4, e.y + 6, ENEMY_W - 8, ENEMY_H - 12)
+            luna.gfx.rectangle("fill", e.x, e.y + 14, ENEMY_W, 10)
             -- Antennae
-            luna.render.line(e.x + ENEMY_W/2 - 6, e.y + 6, e.x + ENEMY_W/2 - 12, e.y)
-            luna.render.line(e.x + ENEMY_W/2 + 6, e.y + 6, e.x + ENEMY_W/2 + 12, e.y)
+            luna.gfx.line(e.x + ENEMY_W/2 - 6, e.y + 6, e.x + ENEMY_W/2 - 12, e.y)
+            luna.gfx.line(e.x + ENEMY_W/2 + 6, e.y + 6, e.x + ENEMY_W/2 + 12, e.y)
         end
     end
 
     -- Player bullets
-    luna.render.setColor(0.9, 1, 0.5)
+    luna.gfx.setColor(0.9, 1, 0.5)
     for _, b in ipairs(bullets) do
-        luna.render.rectangle("fill", b.x, b.y, 4, 14)
+        luna.gfx.rectangle("fill", b.x, b.y, 4, 14)
     end
 
     -- Overlay
     if game_state == "gameover" then
-        luna.render.setColor(0, 0, 0, 0.7)
-        luna.render.rectangle("fill", 0, 0, W, H)
-        luna.render.setColor(1, 0.2, 0.2)
-        luna.render.print("GAME OVER", W/2 - 80, H/2 - 30, 3)
-        luna.render.setColor(1, 1, 1)
-        luna.render.print("Score: " .. score, W/2 - 50, H/2 + 10, 2)
-        luna.render.setColor(0.6, 0.6, 0.6)
-        luna.render.print("Press R to restart", W/2 - 100, H/2 + 45, 2)
+        luna.gfx.setColor(0, 0, 0, 0.7)
+        luna.gfx.rectangle("fill", 0, 0, W, H)
+        luna.gfx.setColor(1, 0.2, 0.2)
+        luna.gfx.print("GAME OVER", W/2 - 80, H/2 - 30, 3)
+        luna.gfx.setColor(1, 1, 1)
+        luna.gfx.print("Score: " .. score, W/2 - 50, H/2 + 10, 2)
+        luna.gfx.setColor(0.6, 0.6, 0.6)
+        luna.gfx.print("Press R to restart", W/2 - 100, H/2 + 45, 2)
     end
 end
 

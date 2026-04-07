@@ -1,16 +1,16 @@
-﻿# Colony Sim
+# Colony Sim
 
 A top-down colony builder where you place farms, beds, and recreation halls to keep your colonists fed, rested, and happy. Colonists evaluate their lowest need every tick and autonomously walk to the relevant building, while a rolling day/night cycle forces them to sleep before exhaustion sets in.
 
 ## What It Demonstrates
 
-- `luna.render.rectangle()` — tile grid, building footprints, and stat bar rendering
-- `luna.render.setColor()` — per-colonist colour coding by current state
-- `luna.render.print()` — HUD overlays showing food, materials, day count, and colonist stats
+- `luna.gfx.rectangle()` — tile grid, building footprints, and stat bar rendering
+- `luna.gfx.setColor()` — per-colonist colour coding by current state
+- `luna.gfx.print()` — HUD overlays showing food, materials, day count, and colonist stats
 - `luna.mouse.getPosition()` — placement cursor tracking across the tile grid
 - `luna.mouse.isPressed()` — left-click place / right-click assign workflow
 - `luna.keyboard.isPressed()` — number keys to switch placement type
-- `luna.render.setBackgroundColor()` — earthy dark-green world background
+- `luna.gfx.setBackgroundColor()` — earthy dark-green world background
 - `luna.window.setTitle()` — runtime window title update on load
 
 ## How to Run

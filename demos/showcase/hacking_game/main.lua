@@ -1,4 +1,4 @@
-﻿-- Hacking Game — Luna2D Demo
+-- Hacking Game — Luna2D Demo
 -- Terminal-based hacking: crack passwords, explore filesystems, download targets
 
 local function clamp(v, mn, mx) return math.max(mn, math.min(mx, v)) end
@@ -60,7 +60,7 @@ local function init_servers()
     }
 end
 
-function luna.load()
+function luna.init()
     lines = {}
     input_buf = ""
     cursor_blink = 0
@@ -170,7 +170,7 @@ local function exec_command(cmd)
     end
 end
 
-function luna.update(dt)
+function luna.process(dt)
     cursor_blink = cursor_blink + dt
     if game_over or game_won then return end
 
@@ -229,15 +229,15 @@ function luna.mousepressed(mx, my, btn)
     end
 end
 
-function luna.draw()
-    luna.render.setBackgroundColor(0, 0.02, 0)
+function luna.render()
+    luna.gfx.setBackgroundColor(0, 0.02, 0)
 
     if crack_active then
-        luna.render.setColor(0,0.15,0,1)
-        luna.render.rectangle("fill", 0, 0, 800, 600)
-        luna.render.setColor(0,1,0,1)
-        luna.render.print("=== PASSWORD CRACK ===  Time: " .. math.floor(crack_timer), 20, 20, 1.2)
-        luna.render.print("Find: " .. crack_target, 20, 50, 1)
+        luna.gfx.setColor(0,0.15,0,1)
+        luna.gfx.rectangle("fill", 0, 0, 800, 600)
+        luna.gfx.setColor(0,1,0,1)
+        luna.gfx.print("=== PASSWORD CRACK ===  Time: " .. math.floor(crack_timer), 20, 20, 1.2)
+        luna.gfx.print("Find: " .. crack_target, 20, 50, 1)
         local start_y = 100
         local vis = math.floor((500) / LINE_H)
         local offset = math.floor(crack_scroll) % #crack_words
@@ -247,11 +247,11 @@ function luna.draw()
             local w = crack_words[idx]
             local y = start_y + i * LINE_H
             if w == crack_target then
-                luna.render.setColor(0,1,0.5,1)
+                luna.gfx.setColor(0,1,0.5,1)
             else
-                luna.render.setColor(0,0.7,0,0.8)
+                luna.gfx.setColor(0,0.7,0,0.8)
             end
-            luna.render.print(hex .. "  " .. w, 60, y, 1)
+            luna.gfx.print(hex .. "  " .. w, 60, y, 1)
         end
         return
     end
@@ -260,36 +260,36 @@ function luna.draw()
     local start = clamp(#lines - MAX_LINES + 1, 1, #lines)
     for i = start, #lines do
         local y = (i - start) * LINE_H + 10
-        luna.render.setColor(0, 1, 0, 1)
-        luna.render.print(lines[i], 10, y, 0.9)
+        luna.gfx.setColor(0, 1, 0, 1)
+        luna.gfx.print(lines[i], 10, y, 0.9)
     end
 
     -- input line
     local iy = clamp(#lines - start + 1, 0, MAX_LINES) * LINE_H + 10
-    luna.render.setColor(0, 1, 0, 1)
+    luna.gfx.setColor(0, 1, 0, 1)
     local caret = ""
     if math.floor(cursor_blink * 2) % 2 == 0 then caret = "_" end
-    luna.render.print(PROMPT .. input_buf .. caret, 10, iy, 0.9)
+    luna.gfx.print(PROMPT .. input_buf .. caret, 10, iy, 0.9)
 
     -- trace bar
     if current_server > 0 then
         local pct = clamp(trace_timer / trace_max, 0, 1)
-        luna.render.setColor(0.2, 0.2, 0.2, 1)
-        luna.render.rectangle("fill", 600, 5, 190, 12)
-        luna.render.setColor(1 - pct, pct, 0, 1)
-        luna.render.rectangle("fill", 600, 5, 190 * pct, 12)
-        luna.render.setColor(0,1,0,0.7)
-        luna.render.print("TRACE: " .. math.floor(trace_timer) .. "s", 605, 3, 0.7)
+        luna.gfx.setColor(0.2, 0.2, 0.2, 1)
+        luna.gfx.rectangle("fill", 600, 5, 190, 12)
+        luna.gfx.setColor(1 - pct, pct, 0, 1)
+        luna.gfx.rectangle("fill", 600, 5, 190 * pct, 12)
+        luna.gfx.setColor(0,1,0,0.7)
+        luna.gfx.print("TRACE: " .. math.floor(trace_timer) .. "s", 605, 3, 0.7)
     end
 
     if game_over then
-        luna.render.setColor(1,0,0,1)
-        luna.render.print("CONNECTION TRACED — GAME OVER", 200, 280, 1.3)
-        luna.render.print("Score: " .. score .. "  [R]estart  [ESC]Quit", 240, 320, 1)
+        luna.gfx.setColor(1,0,0,1)
+        luna.gfx.print("CONNECTION TRACED — GAME OVER", 200, 280, 1.3)
+        luna.gfx.print("Score: " .. score .. "  [R]estart  [ESC]Quit", 240, 320, 1)
     end
     if game_won then
-        luna.render.setColor(0,1,0.5,1)
-        luna.render.print("ALL TARGETS DOWNLOADED — MISSION COMPLETE", 140, 280, 1.2)
-        luna.render.print("Score: " .. score .. "  [R]estart  [ESC]Quit", 240, 320, 1)
+        luna.gfx.setColor(0,1,0.5,1)
+        luna.gfx.print("ALL TARGETS DOWNLOADED — MISSION COMPLETE", 140, 280, 1.2)
+        luna.gfx.print("Score: " .. score .. "  [R]estart  [ESC]Quit", 240, 320, 1)
     end
 end

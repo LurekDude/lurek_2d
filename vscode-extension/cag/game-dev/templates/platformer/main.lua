@@ -1,20 +1,20 @@
-﻿local Player = require("entities.player")
+local Player = require("entities.player")
 local Camera = require("lib.camera")
 
 local player, camera
 
-function luna.load()
+function luna.init()
     player = Player.new(100, 300)
     camera = Camera.new()
 end
 
-function luna.update(dt)
+function luna.process(dt)
     player:update(dt)
     camera:follow(player, dt)
 end
 
-function luna.draw()
-    luna.render.clear(0.2, 0.6, 0.9)
+function luna.render()
+    luna.gfx.clear(0.2, 0.6, 0.9)
     camera:apply()
     player:draw()
     camera:reset()

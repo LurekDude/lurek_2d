@@ -1,4 +1,4 @@
-﻿# MCP Server Analysis
+# MCP Server Analysis
 
 ## Current State
 
@@ -174,7 +174,7 @@ Test plan:
   "description": "Get Luna2D API documentation for a specific function or namespace",
   "hints": ["Use when user asks about luna.* API", "Returns complete parameter info"],
   "examples": [
-    { "input": { "query": "luna.render.circle" }, "output": "..." }
+    { "input": { "query": "luna.gfx.circle" }, "output": "..." }
   ],
   "category": "documentation"
 }

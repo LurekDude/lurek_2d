@@ -1,13 +1,13 @@
-﻿# Hacking Game
+# Hacking Game
 
 A terminal-based hacking game where you breach three networked servers, navigate their file systems, and download classified target files before a trace timer expires. Each server requires cracking its password through a click-the-word mini-game. Routing traffic through proxy chains slows the trace counter, giving more time to explore.
 
 ## What It Demonstrates
 
 - `luna.keyboard.wasPressed()` — character-by-character terminal input capture
-- `luna.render.print()` — scrolling terminal output and blinking cursor rendering
-- `luna.render.rectangle()` — password-crack word grid and trace-bar HUD
-- `luna.render.setColor()` — colour-coded output lines (green success, red alert, white normal)
+- `luna.gfx.print()` — scrolling terminal output and blinking cursor rendering
+- `luna.gfx.rectangle()` — password-crack word grid and trace-bar HUD
+- `luna.gfx.setColor()` — colour-coded output lines (green success, red alert, white normal)
 - `luna.mousepressed()` — clicking words in the crack mini-game to match the target password
 - `luna.time.getTime()` — cursor blink animation
 - In-memory virtual filesystem — `make_fs()` builds a directory-tree table parsed by `ls`, `cd`, and `cat`

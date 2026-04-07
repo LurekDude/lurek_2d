@@ -1,4 +1,4 @@
-﻿-- Logic / Programming Puzzle — Program a robot to reach the flag
+-- Logic / Programming Puzzle — Program a robot to reach the flag
 
 local function lerp(a, b, t) return a + (b - a) * t end
 
@@ -98,9 +98,9 @@ local function load_level(n)
     loop_count = 0
 end
 
-function luna.load()
+function luna.init()
     luna.window.setTitle("Logic Puzzle")
-    luna.render.setBackgroundColor(0.1, 0.1, 0.15)
+    luna.gfx.setBackgroundColor(0.1, 0.1, 0.15)
     build_levels()
     load_level(1)
 end
@@ -156,7 +156,7 @@ local function execute_step()
     end
 end
 
-function luna.update(dt)
+function luna.process(dt)
     if not executing then return end
     exec_timer = exec_timer + dt
     if exec_timer >= EXEC_SPEED then
@@ -177,24 +177,24 @@ local function draw_grid()
             local x = GRID_X + (c - 1) * TILE
             local y = GRID_Y + (r - 1) * TILE
             if grid[r][c] == 1 then
-                luna.render.setColor(0.3, 0.3, 0.35, 1)
-                luna.render.rectangle("fill", x, y, TILE, TILE)
+                luna.gfx.setColor(0.3, 0.3, 0.35, 1)
+                luna.gfx.rectangle("fill", x, y, TILE, TILE)
             else
-                luna.render.setColor(0.18, 0.18, 0.22, 1)
-                luna.render.rectangle("fill", x, y, TILE, TILE)
+                luna.gfx.setColor(0.18, 0.18, 0.22, 1)
+                luna.gfx.rectangle("fill", x, y, TILE, TILE)
             end
-            luna.render.setColor(0.25, 0.25, 0.3, 1)
-            luna.render.rectangle("line", x, y, TILE, TILE)
+            luna.gfx.setColor(0.25, 0.25, 0.3, 1)
+            luna.gfx.rectangle("line", x, y, TILE, TILE)
         end
     end
 
     -- flag
     local fx = GRID_X + (goal.col - 1) * TILE + TILE / 2
     local fy = GRID_Y + (goal.row - 1) * TILE + TILE / 2
-    luna.render.setColor(1, 0.85, 0.1, 1)
-    luna.render.circle("fill", fx, fy, 10)
-    luna.render.setColor(0, 0, 0, 1)
-    luna.render.print("F", fx - 4, fy - 7, 0.9)
+    luna.gfx.setColor(1, 0.85, 0.1, 1)
+    luna.gfx.circle("fill", fx, fy, 10)
+    luna.gfx.setColor(0, 0, 0, 1)
+    luna.gfx.print("F", fx - 4, fy - 7, 0.9)
 end
 
 local function draw_robot()
@@ -210,87 +210,87 @@ local function draw_robot()
     end
 
     -- body
-    luna.render.setColor(0.2, 0.8, 0.9, 1)
-    luna.render.circle("fill", rx, ry, 14)
+    luna.gfx.setColor(0.2, 0.8, 0.9, 1)
+    luna.gfx.circle("fill", rx, ry, 14)
 
     -- direction indicator
     local d = DIR[robot.dir]
-    luna.render.setColor(1, 1, 1, 1)
-    luna.render.circle("fill", rx + d[1] * 10, ry + d[2] * 10, 4)
+    luna.gfx.setColor(1, 1, 1, 1)
+    luna.gfx.circle("fill", rx + d[1] * 10, ry + d[2] * 10, 4)
 end
 
 local PANEL_X = 480
 local PANEL_W = 300
 
 local function draw_command_panel()
-    luna.render.setColor(0.12, 0.12, 0.18, 1)
-    luna.render.rectangle("fill", PANEL_X, 50, PANEL_W, H - 100)
-    luna.render.setColor(0.3, 0.3, 0.4, 1)
-    luna.render.rectangle("line", PANEL_X, 50, PANEL_W, H - 100)
+    luna.gfx.setColor(0.12, 0.12, 0.18, 1)
+    luna.gfx.rectangle("fill", PANEL_X, 50, PANEL_W, H - 100)
+    luna.gfx.setColor(0.3, 0.3, 0.4, 1)
+    luna.gfx.rectangle("line", PANEL_X, 50, PANEL_W, H - 100)
 
-    luna.render.setColor(1, 1, 1, 1)
-    luna.render.print("COMMANDS", PANEL_X + 10, 58, 1.1)
+    luna.gfx.setColor(1, 1, 1, 1)
+    luna.gfx.print("COMMANDS", PANEL_X + 10, 58, 1.1)
 
     -- command buttons
     for i, cmd in ipairs(CMD_LIST) do
         local bx = PANEL_X + 10 + (i - 1) * 70
         local by = 90
         local c = CMD_COLORS[cmd]
-        luna.render.setColor(c[1], c[2], c[3], 0.8)
-        luna.render.rectangle("fill", bx, by, 62, 28)
-        luna.render.setColor(1, 1, 1, 1)
-        luna.render.print(cmd, bx + 5, by + 5, 0.85)
+        luna.gfx.setColor(c[1], c[2], c[3], 0.8)
+        luna.gfx.rectangle("fill", bx, by, 62, 28)
+        luna.gfx.setColor(1, 1, 1, 1)
+        luna.gfx.print(cmd, bx + 5, by + 5, 0.85)
     end
 
     -- program list
-    luna.render.setColor(1, 1, 1, 1)
-    luna.render.print("PROGRAM (" .. #program .. "/" .. MAX_PROGRAM .. ")", PANEL_X + 10, 135, 1)
+    luna.gfx.setColor(1, 1, 1, 1)
+    luna.gfx.print("PROGRAM (" .. #program .. "/" .. MAX_PROGRAM .. ")", PANEL_X + 10, 135, 1)
 
     for i, cmd in ipairs(program) do
         local py = 160 + (i - 1) * 28
         local c = CMD_COLORS[cmd]
         -- highlight current execution
         if executing and i == exec_index then
-            luna.render.setColor(1, 1, 0, 0.3)
-            luna.render.rectangle("fill", PANEL_X + 8, py - 2, PANEL_W - 16, 26)
+            luna.gfx.setColor(1, 1, 0, 0.3)
+            luna.gfx.rectangle("fill", PANEL_X + 8, py - 2, PANEL_W - 16, 26)
         end
-        luna.render.setColor(c[1], c[2], c[3], 1)
-        luna.render.rectangle("fill", PANEL_X + 12, py, 18, 18)
-        luna.render.setColor(1, 1, 1, 1)
+        luna.gfx.setColor(c[1], c[2], c[3], 1)
+        luna.gfx.rectangle("fill", PANEL_X + 12, py, 18, 18)
+        luna.gfx.setColor(1, 1, 1, 1)
         local pointer = (executing and i == exec_index) and " >> " or ("  " .. i .. ". ")
-        luna.render.print(pointer .. cmd, PANEL_X + 35, py, 0.9)
+        luna.gfx.print(pointer .. cmd, PANEL_X + 35, py, 0.9)
     end
 
     -- controls
-    luna.render.setColor(0.6, 0.6, 0.6, 0.8)
-    luna.render.print("ENTER = Run", PANEL_X + 10, H - 90, 0.85)
-    luna.render.print("C = Clear   R = Reset", PANEL_X + 10, H - 70, 0.85)
+    luna.gfx.setColor(0.6, 0.6, 0.6, 0.8)
+    luna.gfx.print("ENTER = Run", PANEL_X + 10, H - 90, 0.85)
+    luna.gfx.print("C = Clear   R = Reset", PANEL_X + 10, H - 70, 0.85)
 end
 
-function luna.draw()
+function luna.render()
     if all_done then
-        luna.render.setColor(1, 1, 0.5, 1)
-        luna.render.print("ALL LEVELS COMPLETE!", W / 2 - 100, H / 2 - 20, 1.5)
-        luna.render.setColor(0.7, 0.7, 0.7, 1)
-        luna.render.print("Press R to restart", W / 2 - 60, H / 2 + 20, 1)
+        luna.gfx.setColor(1, 1, 0.5, 1)
+        luna.gfx.print("ALL LEVELS COMPLETE!", W / 2 - 100, H / 2 - 20, 1.5)
+        luna.gfx.setColor(0.7, 0.7, 0.7, 1)
+        luna.gfx.print("Press R to restart", W / 2 - 60, H / 2 + 20, 1)
         return
     end
 
     -- level name
-    luna.render.setColor(1, 1, 1, 1)
-    luna.render.print(levels[current_level].name, 10, 10, 1.2)
+    luna.gfx.setColor(1, 1, 1, 1)
+    luna.gfx.print(levels[current_level].name, 10, 10, 1.2)
 
     draw_grid()
     draw_robot()
     draw_command_panel()
 
     if level_complete then
-        luna.render.setColor(0, 0, 0, 0.6)
-        luna.render.rectangle("fill", W / 2 - 150, H / 2 - 30, 300, 60)
-        luna.render.setColor(0.2, 1, 0.3, 1)
-        luna.render.print("LEVEL COMPLETE!", W / 2 - 70, H / 2 - 20, 1.4)
-        luna.render.setColor(1, 1, 1, 1)
-        luna.render.print("Press N for next level", W / 2 - 65, H / 2 + 10, 0.9)
+        luna.gfx.setColor(0, 0, 0, 0.6)
+        luna.gfx.rectangle("fill", W / 2 - 150, H / 2 - 30, 300, 60)
+        luna.gfx.setColor(0.2, 1, 0.3, 1)
+        luna.gfx.print("LEVEL COMPLETE!", W / 2 - 70, H / 2 - 20, 1.4)
+        luna.gfx.setColor(1, 1, 1, 1)
+        luna.gfx.print("Press N for next level", W / 2 - 65, H / 2 + 10, 0.9)
     end
 end
 

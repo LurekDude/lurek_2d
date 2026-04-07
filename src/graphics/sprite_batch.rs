@@ -1,4 +1,4 @@
-﻿//! Sprite batching for efficient rendering of many sprites sharing one texture.
+//! Sprite batching for efficient rendering of many sprites sharing one texture.
 //!
 //! This module is part of Luna2D's `graphics` subsystem and provides the implementation
 //! details for sprite batch-related operations and data management.
@@ -12,7 +12,7 @@ use crate::engine::resource_keys::TextureKey;
 
 /// A batch of sprites sharing a single texture, drawn in one GPU call.
 ///
-/// Created via `luna.render.newSpriteBatch(image_id, max_sprites?)`.
+/// Created via `luna.gfx.newSpriteBatch(image_id, max_sprites?)`.
 /// Use `add()` to queue sprites and the engine draws them all at once.
 ///
 /// # Fields

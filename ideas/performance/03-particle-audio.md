@@ -224,7 +224,7 @@ Instead of decoding on first play, decode all audio files during
 `luna.load()` using multiple threads:
 
 ```lua
-function luna.load()
+function luna.init()
   -- These all decode in parallel on background threads
   local futures = {
     luna.audio.preloadAsync("sfx/hit.wav"),

@@ -1,4 +1,4 @@
-﻿-- Railroad / Transport Logistics Demo
+-- Railroad / Transport Logistics Demo
 -- Place tracks, route trains between stations, earn revenue from deliveries
 
 local TILE = 32
@@ -106,8 +106,8 @@ local function spawnTrain(stationIdx)
     end
 end
 
-function luna.load()
-    luna.render.setBackgroundColor(0.15, 0.2, 0.15)
+function luna.init()
+    luna.gfx.setBackgroundColor(0.15, 0.2, 0.15)
     initGrid()
     addStation(3, 4, "Lumber", "wood", "food")
     addStation(22, 4, "Forge", "iron", "wood")
@@ -122,7 +122,7 @@ function luna.load()
     revenueHistory = {0}
 end
 
-function luna.update(dt)
+function luna.process(dt)
     -- Day cycle
     dayTimer = dayTimer + dt
     if dayTimer >= DAY_LENGTH then
@@ -228,34 +228,34 @@ end
 local function drawTrack(col, row, t)
     local x, y = (col - 1) * TILE, (row - 1) * TILE
     local cx, cy = x + TILE / 2, y + TILE / 2
-    luna.render.setColor(0.6, 0.6, 0.5, 1)
-    luna.render.setLineWidth(3)
+    luna.gfx.setColor(0.6, 0.6, 0.5, 1)
+    luna.gfx.setLineWidth(3)
     if t == 1 then
-        luna.render.line(x, cy, x + TILE, cy)
+        luna.gfx.line(x, cy, x + TILE, cy)
     elseif t == 2 then
-        luna.render.line(cx, y, cx, y + TILE)
+        luna.gfx.line(cx, y, cx, y + TILE)
     elseif t == 3 then
-        luna.render.line(cx, cy, x + TILE, cy)
-        luna.render.line(cx, cy, cx, y)
+        luna.gfx.line(cx, cy, x + TILE, cy)
+        luna.gfx.line(cx, cy, cx, y)
     elseif t == 4 then
-        luna.render.line(cx, cy, x + TILE, cy)
-        luna.render.line(cx, cy, cx, y + TILE)
+        luna.gfx.line(cx, cy, x + TILE, cy)
+        luna.gfx.line(cx, cy, cx, y + TILE)
     elseif t == 5 then
-        luna.render.line(cx, cy, x, cy)
-        luna.render.line(cx, cy, cx, y + TILE)
+        luna.gfx.line(cx, cy, x, cy)
+        luna.gfx.line(cx, cy, cx, y + TILE)
     elseif t == 6 then
-        luna.render.line(cx, cy, x, cy)
-        luna.render.line(cx, cy, cx, y)
+        luna.gfx.line(cx, cy, x, cy)
+        luna.gfx.line(cx, cy, cx, y)
     end
-    luna.render.setLineWidth(1)
+    luna.gfx.setLineWidth(1)
 end
 
-function luna.draw()
+function luna.render()
     -- Grid
-    luna.render.setColor(0.2, 0.25, 0.2, 1)
+    luna.gfx.setColor(0.2, 0.25, 0.2, 1)
     for r = 1, ROWS do
         for c = 1, COLS do
-            luna.render.rectangle("line", (c - 1) * TILE, (r - 1) * TILE, TILE, TILE)
+            luna.gfx.rectangle("line", (c - 1) * TILE, (r - 1) * TILE, TILE, TILE)
         end
     end
 
@@ -270,32 +270,32 @@ function luna.draw()
     for _, st in ipairs(stations) do
         local x, y = (st.col - 1) * TILE, (st.row - 1) * TILE
         local clr = CARGO_COLORS[st.produces]
-        luna.render.setColor(clr[1], clr[2], clr[3], 1)
-        luna.render.rectangle("fill", x + 2, y + 2, TILE - 4, TILE - 4)
-        luna.render.setColor(1, 1, 1, 1)
-        luna.render.print(st.name, x, y - 14, 0.8)
-        luna.render.print("Stock:" .. st.stock, x, y + TILE + 2, 0.7)
+        luna.gfx.setColor(clr[1], clr[2], clr[3], 1)
+        luna.gfx.rectangle("fill", x + 2, y + 2, TILE - 4, TILE - 4)
+        luna.gfx.setColor(1, 1, 1, 1)
+        luna.gfx.print(st.name, x, y - 14, 0.8)
+        luna.gfx.print("Stock:" .. st.stock, x, y + TILE + 2, 0.7)
     end
 
     -- Trains
     for _, tr in ipairs(trains) do
         local clr = CARGO_COLORS[tr.cargo] or {1, 1, 0}
-        luna.render.setColor(clr[1], clr[2], clr[3], 1)
-        luna.render.rectangle("fill", tr.px - 8, tr.py - 8, 16, 16)
-        luna.render.setColor(0, 0, 0, 1)
-        luna.render.rectangle("line", tr.px - 8, tr.py - 8, 16, 16)
+        luna.gfx.setColor(clr[1], clr[2], clr[3], 1)
+        luna.gfx.rectangle("fill", tr.px - 8, tr.py - 8, 16, 16)
+        luna.gfx.setColor(0, 0, 0, 1)
+        luna.gfx.rectangle("line", tr.px - 8, tr.py - 8, 16, 16)
     end
 
     -- HUD
-    luna.render.setColor(0, 0, 0, 0.7)
-    luna.render.rectangle("fill", 0, H - 60, W, 60)
-    luna.render.setColor(1, 1, 1, 1)
-    luna.render.print("Day " .. day .. "  Revenue: $" .. revenue .. "  Track: " .. TRACK_NAMES[selectedTrack] .. " (1-6/Tab)", 10, H - 55, 1)
-    luna.render.print("Left-click: place track | Right-click: cycle/remove | Trains auto-spawn from stations", 10, H - 35, 0.8)
+    luna.gfx.setColor(0, 0, 0, 0.7)
+    luna.gfx.rectangle("fill", 0, H - 60, W, 60)
+    luna.gfx.setColor(1, 1, 1, 1)
+    luna.gfx.print("Day " .. day .. "  Revenue: $" .. revenue .. "  Track: " .. TRACK_NAMES[selectedTrack] .. " (1-6/Tab)", 10, H - 55, 1)
+    luna.gfx.print("Left-click: place track | Right-click: cycle/remove | Trains auto-spawn from stations", 10, H - 35, 0.8)
 
     -- Revenue mini-graph
     if #revenueHistory > 1 then
-        luna.render.setColor(0.2, 0.8, 0.2, 1)
+        luna.gfx.setColor(0.2, 0.8, 0.2, 1)
         local gx, gy, gw, gh = W - 160, H - 55, 150, 45
         local maxR = 1
         for _, v in ipairs(revenueHistory) do if v > maxR then maxR = v end end
@@ -304,14 +304,14 @@ function luna.draw()
             local x2 = gx + (i - 1) / (#revenueHistory - 1) * gw
             local y1 = gy + gh - (revenueHistory[i - 1] / maxR) * gh
             local y2 = gy + gh - (revenueHistory[i] / maxR) * gh
-            luna.render.line(x1, y1, x2, y2)
+            luna.gfx.line(x1, y1, x2, y2)
         end
     end
 
     -- Message
     if msgTimer > 0 then
-        luna.render.setColor(0, 1, 0.5, msgTimer / 2)
-        luna.render.print(message, W / 2 - 100, 20, 1)
+        luna.gfx.setColor(0, 1, 0.5, msgTimer / 2)
+        luna.gfx.print(message, W / 2 - 100, 20, 1)
     end
 
     -- Mouse hover preview
@@ -319,7 +319,7 @@ function luna.draw()
     local hc = math.floor(mx / TILE) + 1
     local hr = math.floor(my / TILE) + 1
     if hc >= 1 and hc <= COLS and hr >= 1 and hr <= ROWS and grid[hr] and grid[hr][hc] == 0 then
-        luna.render.setColor(1, 1, 0, 0.3)
-        luna.render.rectangle("fill", (hc - 1) * TILE, (hr - 1) * TILE, TILE, TILE)
+        luna.gfx.setColor(1, 1, 0, 0.3)
+        luna.gfx.rectangle("fill", (hc - 1) * TILE, (hr - 1) * TILE, TILE, TILE)
     end
 end

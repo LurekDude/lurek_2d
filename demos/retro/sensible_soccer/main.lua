@@ -1,4 +1,4 @@
-﻿-- Sensible Soccer — Amiga 500 Classic (Luna2D demo)
+-- Sensible Soccer — Amiga 500 Classic (Luna2D demo)
 -- Fast-paced top-down football inspired by Sensible Software's 1992 Amiga classic.
 -- Score more goals than the CPU in 3 minutes to win.
 
@@ -98,14 +98,14 @@ end
 
 -- ── Load ─────────────────────────────────────────────────────────────────
 
-function luna.load()
-    luna.render.setBackgroundColor(0.2, 0.55, 0.15)
+function luna.init()
+    luna.gfx.setBackgroundColor(0.2, 0.55, 0.15)
     reset()
 end
 
 -- ── Update ───────────────────────────────────────────────────────────────
 
-function luna.update(dt)
+function luna.process(dt)
     if game_state ~= "playing" then return end
     anim = anim + dt
     time_left = time_left - dt
@@ -202,97 +202,97 @@ end
 
 -- ── Draw ─────────────────────────────────────────────────────────────────
 
-function luna.draw()
+function luna.render()
     -- Pitch
-    luna.render.setColor(0.16, 0.52, 0.12)
-    luna.render.rectangle("fill", PX, PY, PW, PH)
+    luna.gfx.setColor(0.16, 0.52, 0.12)
+    luna.gfx.rectangle("fill", PX, PY, PW, PH)
     -- Striped grass
     for i = 0, 9 do
         if i % 2 == 0 then
-            luna.render.setColor(0.2, 0.56, 0.15, 0.4)
-            luna.render.rectangle("fill", PX + i * (PW/10), PY, PW/10, PH)
+            luna.gfx.setColor(0.2, 0.56, 0.15, 0.4)
+            luna.gfx.rectangle("fill", PX + i * (PW/10), PY, PW/10, PH)
         end
     end
     -- Lines
-    luna.render.setColor(1, 1, 1, 0.8)
-    luna.render.rectangle("line", PX, PY, PW, PH)
-    luna.render.line(PX + PW/2, PY, PX + PW/2, PY + PH)
-    luna.render.circle("line", PX + PW/2, PY + PH/2, 50)
+    luna.gfx.setColor(1, 1, 1, 0.8)
+    luna.gfx.rectangle("line", PX, PY, PW, PH)
+    luna.gfx.line(PX + PW/2, PY, PX + PW/2, PY + PH)
+    luna.gfx.circle("line", PX + PW/2, PY + PH/2, 50)
     -- Goals
-    luna.render.setColor(1, 1, 1)
-    luna.render.rectangle("line", PX - GOAL_W, PY + PH/2 - GOAL_H/2, GOAL_W, GOAL_H)
-    luna.render.rectangle("line", PX + PW, PY + PH/2 - GOAL_H/2, GOAL_W, GOAL_H)
+    luna.gfx.setColor(1, 1, 1)
+    luna.gfx.rectangle("line", PX - GOAL_W, PY + PH/2 - GOAL_H/2, GOAL_W, GOAL_H)
+    luna.gfx.rectangle("line", PX + PW, PY + PH/2 - GOAL_H/2, GOAL_W, GOAL_H)
     -- Penalty areas
-    luna.render.rectangle("line", PX, PY + PH/2 - 90, 70, 180)
-    luna.render.rectangle("line", PX + PW - 70, PY + PH/2 - 90, 70, 180)
+    luna.gfx.rectangle("line", PX, PY + PH/2 - 90, 70, 180)
+    luna.gfx.rectangle("line", PX + PW - 70, PY + PH/2 - 90, 70, 180)
 
     -- CPU team (red)
     for i, cp in ipairs(cpu) do
-        luna.render.setColor(0.85, 0.15, 0.15)
-        luna.render.circle("fill", cp.x, cp.y, 9)
-        luna.render.setColor(0, 0, 0)
-        luna.render.print(tostring(i), cp.x - 4, cp.y - 6, 1.1)
+        luna.gfx.setColor(0.85, 0.15, 0.15)
+        luna.gfx.circle("fill", cp.x, cp.y, 9)
+        luna.gfx.setColor(0, 0, 0)
+        luna.gfx.print(tostring(i), cp.x - 4, cp.y - 6, 1.1)
     end
 
     -- Player team (blue)
     for i, p in ipairs(team) do
         local sel = i == controlled
-        luna.render.setColor(sel and 0.9 or 0.2, sel and 0.9 or 0.4, sel and 0.2 or 0.9)
-        luna.render.circle("fill", p.x, p.y, 9)
+        luna.gfx.setColor(sel and 0.9 or 0.2, sel and 0.9 or 0.4, sel and 0.2 or 0.9)
+        luna.gfx.circle("fill", p.x, p.y, 9)
         if sel then
-            luna.render.setColor(1, 1, 0)
-            luna.render.circle("line", p.x, p.y, 12)
+            luna.gfx.setColor(1, 1, 0)
+            luna.gfx.circle("line", p.x, p.y, 12)
         end
-        luna.render.setColor(0, 0, 0)
-        luna.render.print(tostring(i), p.x - 4, p.y - 6, 1.1)
+        luna.gfx.setColor(0, 0, 0)
+        luna.gfx.print(tostring(i), p.x - 4, p.y - 6, 1.1)
     end
 
     -- Ball
     local bs = 0.6 + 0.4 * math.sin(anim * 10)
-    luna.render.setColor(1, 1, 1)
-    luna.render.circle("fill", ball.x, ball.y, 7)
-    luna.render.setColor(0, 0, 0)
-    luna.render.circle("line", ball.x, ball.y, 7)
+    luna.gfx.setColor(1, 1, 1)
+    luna.gfx.circle("fill", ball.x, ball.y, 7)
+    luna.gfx.setColor(0, 0, 0)
+    luna.gfx.circle("line", ball.x, ball.y, 7)
     -- Spinning pattern
-    luna.render.setColor(0.2, 0.2, 0.2)
-    luna.render.rectangle("fill", ball.x - 2, ball.y - 2, 4, 4)
+    luna.gfx.setColor(0.2, 0.2, 0.2)
+    luna.gfx.rectangle("fill", ball.x - 2, ball.y - 2, 4, 4)
 
     -- HUD
-    luna.render.setColor(0, 0, 0, 0.7)
-    luna.render.rectangle("fill", 0, 0, W, 42)
-    luna.render.setColor(0.4, 0.6, 1)
-    luna.render.print("YOU", 20, 5, 2)
-    luna.render.setColor(1, 1, 1)
-    luna.render.print(scores.player .. " — " .. scores.cpu, W/2 - 30, 5, 2.5)
-    luna.render.setColor(1, 0.4, 0.4)
-    luna.render.print("CPU", W - 70, 5, 2)
+    luna.gfx.setColor(0, 0, 0, 0.7)
+    luna.gfx.rectangle("fill", 0, 0, W, 42)
+    luna.gfx.setColor(0.4, 0.6, 1)
+    luna.gfx.print("YOU", 20, 5, 2)
+    luna.gfx.setColor(1, 1, 1)
+    luna.gfx.print(scores.player .. " — " .. scores.cpu, W/2 - 30, 5, 2.5)
+    luna.gfx.setColor(1, 0.4, 0.4)
+    luna.gfx.print("CPU", W - 70, 5, 2)
     local mins = math.floor(time_left / 60)
     local secs = math.floor(time_left % 60)
-    luna.render.setColor(1, 0.9, 0.3)
-    luna.render.print(string.format("%d:%02d", mins, secs), W/2 - 20, H - 25, 1.8)
+    luna.gfx.setColor(1, 0.9, 0.3)
+    luna.gfx.print(string.format("%d:%02d", mins, secs), W/2 - 20, H - 25, 1.8)
 
-    luna.render.setColor(0.6, 0.8, 0.6, 0.6)
-    luna.render.print("[WASD/Arrows] Move  [Space] Kick  [Tab] Switch player", 10, H - 20, 1.3)
+    luna.gfx.setColor(0.6, 0.8, 0.6, 0.6)
+    luna.gfx.print("[WASD/Arrows] Move  [Space] Kick  [Tab] Switch player", 10, H - 20, 1.3)
 
     -- Kickoff flash
     if kickoff_timer > 0 then
-        luna.render.setColor(1, 1, 0.3, kickoff_timer)
-        luna.render.print("GOAL!", W/2 - 35, H/2 - 15, 4)
+        luna.gfx.setColor(1, 1, 0.3, kickoff_timer)
+        luna.gfx.print("GOAL!", W/2 - 35, H/2 - 15, 4)
     end
 
     if game_state == "gameover" then
-        luna.render.setColor(0, 0, 0, 0.75)
-        luna.render.rectangle("fill", 0, 0, W, H)
+        luna.gfx.setColor(0, 0, 0, 0.75)
+        luna.gfx.rectangle("fill", 0, 0, W, H)
         local msg = scores.player > scores.cpu and "YOU WIN!" or
                     scores.player < scores.cpu and "CPU WINS" or "DRAW!"
         local col = scores.player > scores.cpu and {0.3,1,0.4} or
                     scores.player < scores.cpu and {1,0.3,0.3} or {1,1,0.4}
-        luna.render.setColor(col[1], col[2], col[3])
-        luna.render.print(msg, W/2 - #msg * 14, H/2 - 25, 4)
-        luna.render.setColor(1, 1, 1)
-        luna.render.print(scores.player .. " — " .. scores.cpu, W/2 - 30, H/2 + 20, 3)
-        luna.render.setColor(0.6, 0.6, 0.6)
-        luna.render.print("Press R to restart", W/2 - 100, H/2 + 65, 2)
+        luna.gfx.setColor(col[1], col[2], col[3])
+        luna.gfx.print(msg, W/2 - #msg * 14, H/2 - 25, 4)
+        luna.gfx.setColor(1, 1, 1)
+        luna.gfx.print(scores.player .. " — " .. scores.cpu, W/2 - 30, H/2 + 20, 3)
+        luna.gfx.setColor(0.6, 0.6, 0.6)
+        luna.gfx.print("Press R to restart", W/2 - 100, H/2 + 65, 2)
     end
 end
 

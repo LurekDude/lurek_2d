@@ -1,4 +1,4 @@
-﻿-- examples/window.lua
+-- examples/window.lua
 -- Luna2D luna.window API Reference
 -- This file is documentation code, not a runnable game.
 -- Every luna.window function is demonstrated with inline comments.
@@ -100,8 +100,8 @@ luna.window.setDisplaySleepEnabled(false)  -- keep display on
 -- Window Icon
 -- ─────────────────────────────────────────────────────────────────────────────
 
--- Set the window's taskbar / titlebar icon (load with luna.render.newImage)
--- local icon_img = luna.render.newImage("icon.png")
+-- Set the window's taskbar / titlebar icon (load with luna.gfx.newImage)
+-- local icon_img = luna.gfx.newImage("icon.png")
 -- luna.window.setIcon(icon_img)
 
 -- ─────────────────────────────────────────────────────────────────────────────
@@ -141,7 +141,7 @@ function luna.visible(isVisible)
     end
 end
 
-function luna.quit()
+function luna.exit()
     -- Called when the OS requests the window to close (Alt+F4, ⌘Q, etc.).
     -- Return true to cancel the close (e.g., show a save dialog first).
     -- Return nil / false to allow the close (default behaviour).

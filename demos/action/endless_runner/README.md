@@ -1,15 +1,15 @@
-﻿# Endless Runner
+# Endless Runner
 
 A side-scrolling infinite runner where your character auto-moves right through an obstacle course. Jump over tall barriers, slide under low beams, and collect coins for bonus points as the world continuously speeds up. The run ends the moment you collide with any obstacle.
 
 ## What It Demonstrates
 
-- `luna.render.rectangle()` — ground, obstacle, and player body rendering
-- `luna.render.circle()` — coin pickups with radius-based collection detection
-- `luna.render.setColor()` — parallax layer tinting and death-flash effect
-- `luna.render.print()` — live score, high score, and game-over overlay text
+- `luna.gfx.rectangle()` — ground, obstacle, and player body rendering
+- `luna.gfx.circle()` — coin pickups with radius-based collection detection
+- `luna.gfx.setColor()` — parallax layer tinting and death-flash effect
+- `luna.gfx.print()` — live score, high score, and game-over overlay text
 - `luna.keyboard.isDown()` — held Space for jump, held Down for slide
-- `luna.render.setBackgroundColor()` — night-sky dark blue atmosphere
+- `luna.gfx.setBackgroundColor()` — night-sky dark blue atmosphere
 
 ## How to Run
 

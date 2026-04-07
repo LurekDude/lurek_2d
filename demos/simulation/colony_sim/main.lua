@@ -1,4 +1,4 @@
-﻿-- Colony Simulation — Top-down colony builder with colonist AI
+-- Colony Simulation — Top-down colony builder with colonist AI
 -- Click to place buildings (1=Farm, 2=Bed, 3=Rec), right-click to assign colonist
 
 local function clamp(v, mn, mx) return math.max(mn, math.min(mx, v)) end
@@ -51,9 +51,9 @@ local function new_colonist(x, y)
     }
 end
 
-function luna.load()
+function luna.init()
     luna.window.setTitle("Colony Sim")
-    luna.render.setBackgroundColor(0.12, 0.15, 0.1)
+    luna.gfx.setBackgroundColor(0.12, 0.15, 0.1)
 
     colonists = {}
     buildings = {}
@@ -97,7 +97,7 @@ local function is_night()
     return norm > 0.7
 end
 
-function luna.update(dt)
+function luna.process(dt)
     -- day cycle
     day_time = day_time + dt
     if day_time >= day_length then
@@ -214,7 +214,7 @@ function luna.update(dt)
     end
 end
 
-function luna.draw()
+function luna.render()
     -- day/night tint
     local night_alpha = 0
     local norm = day_time / day_length
@@ -223,26 +223,26 @@ function luna.draw()
     end
 
     -- grid
-    luna.render.setColor(0.18, 0.2, 0.15, 0.3)
+    luna.gfx.setColor(0.18, 0.2, 0.15, 0.3)
     for r = 0, ROWS do
-        luna.render.line(0, r * TILE, COLS * TILE, r * TILE)
+        luna.gfx.line(0, r * TILE, COLS * TILE, r * TILE)
     end
     for c = 0, COLS do
-        luna.render.line(c * TILE, 0, c * TILE, ROWS * TILE)
+        luna.gfx.line(c * TILE, 0, c * TILE, ROWS * TILE)
     end
 
     -- buildings
     for _, b in ipairs(buildings) do
         local col = BUILD_COLORS[b.type]
-        luna.render.setColor(col[1], col[2], col[3], 0.8)
-        luna.render.rectangle("fill", (b.x - 0.5) * TILE, (b.y - 0.5) * TILE, TILE, TILE)
-        luna.render.setColor(1, 1, 1, 0.4)
-        luna.render.rectangle("line", (b.x - 0.5) * TILE, (b.y - 0.5) * TILE, TILE, TILE)
+        luna.gfx.setColor(col[1], col[2], col[3], 0.8)
+        luna.gfx.rectangle("fill", (b.x - 0.5) * TILE, (b.y - 0.5) * TILE, TILE, TILE)
+        luna.gfx.setColor(1, 1, 1, 0.4)
+        luna.gfx.rectangle("line", (b.x - 0.5) * TILE, (b.y - 0.5) * TILE, TILE, TILE)
 
         -- label
-        luna.render.setColor(1, 1, 1, 0.6)
+        luna.gfx.setColor(1, 1, 1, 0.6)
         local tag = ({ "F", "B", "R" })[b.type]
-        luna.render.print(tag, (b.x - 0.3) * TILE, (b.y - 0.35) * TILE, 0.7)
+        luna.gfx.print(tag, (b.x - 0.3) * TILE, (b.y - 0.35) * TILE, 0.7)
     end
 
     -- colonists
@@ -252,21 +252,21 @@ function luna.draw()
         if c.state == "working" then cr, cg, cb = 0.2, 0.9, 0.3 end
         if c.hunger < 20 or c.energy < 15 then cr, cg, cb = 1, 0.3, 0.2 end
 
-        luna.render.setColor(cr, cg, cb, 1)
-        luna.render.circle("fill", c.x * TILE, c.y * TILE, 5)
+        luna.gfx.setColor(cr, cg, cb, 1)
+        luna.gfx.circle("fill", c.x * TILE, c.y * TILE, 5)
 
         -- need indicators (tiny bars)
         local bx = c.x * TILE - 6
         local by = c.y * TILE - 10
         -- hunger (red)
-        luna.render.setColor(0.8, 0.2, 0.2, 0.7)
-        luna.render.rectangle("fill", bx, by, 12 * (c.hunger / 100), 2)
+        luna.gfx.setColor(0.8, 0.2, 0.2, 0.7)
+        luna.gfx.rectangle("fill", bx, by, 12 * (c.hunger / 100), 2)
         -- energy (blue)
-        luna.render.setColor(0.2, 0.4, 0.9, 0.7)
-        luna.render.rectangle("fill", bx, by + 3, 12 * (c.energy / 100), 2)
+        luna.gfx.setColor(0.2, 0.4, 0.9, 0.7)
+        luna.gfx.rectangle("fill", bx, by + 3, 12 * (c.energy / 100), 2)
         -- happiness (yellow)
-        luna.render.setColor(0.9, 0.8, 0.2, 0.7)
-        luna.render.rectangle("fill", bx, by + 6, 12 * (c.happiness / 100), 2)
+        luna.gfx.setColor(0.9, 0.8, 0.2, 0.7)
+        luna.gfx.rectangle("fill", bx, by + 6, 12 * (c.happiness / 100), 2)
     end
 
     -- placement ghost
@@ -275,24 +275,24 @@ function luna.draw()
     local gr = math.floor(my / TILE) + 0.5
     if gr <= ROWS then
         local col = BUILD_COLORS[place_type]
-        luna.render.setColor(col[1], col[2], col[3], 0.3)
-        luna.render.rectangle("fill", (gc - 0.5) * TILE, (gr - 0.5) * TILE, TILE, TILE)
+        luna.gfx.setColor(col[1], col[2], col[3], 0.3)
+        luna.gfx.rectangle("fill", (gc - 0.5) * TILE, (gr - 0.5) * TILE, TILE, TILE)
     end
 
     -- night overlay
     if night_alpha > 0 then
-        luna.render.setColor(0.02, 0.02, 0.08, night_alpha)
-        luna.render.rectangle("fill", 0, 0, W, H)
+        luna.gfx.setColor(0.02, 0.02, 0.08, night_alpha)
+        luna.gfx.rectangle("fill", 0, 0, W, H)
     end
 
     -- HUD background
     local hud_y = ROWS * TILE
-    luna.render.setColor(0.1, 0.1, 0.12, 0.9)
-    luna.render.rectangle("fill", 0, hud_y, W, H - hud_y)
+    luna.gfx.setColor(0.1, 0.1, 0.12, 0.9)
+    luna.gfx.rectangle("fill", 0, hud_y, W, H - hud_y)
 
-    luna.render.setColor(1, 1, 1, 1)
+    luna.gfx.setColor(1, 1, 1, 1)
     local time_str = is_night() and "Night" or "Day"
-    luna.render.print(string.format("Day %d (%s)  |  Food: %d  Materials: %d  Colonists: %d  |  Placing: %s (1/2/3 to switch)",
+    luna.gfx.print(string.format("Day %d (%s)  |  Food: %d  Materials: %d  Colonists: %d  |  Placing: %s (1/2/3 to switch)",
         day_count, time_str, food_store, materials, #colonists, BUILD_NAMES[place_type]),
         10, hud_y + 6, 0.8)
 
@@ -304,11 +304,11 @@ function luna.draw()
                 math.floor(c.hunger), math.floor(c.energy), math.floor(c.happiness))
         end
     end
-    luna.render.setColor(0.8, 0.8, 0.8, 0.7)
-    luna.render.print(detail, 10, hud_y + 24, 0.65)
+    luna.gfx.setColor(0.8, 0.8, 0.8, 0.7)
+    luna.gfx.print(detail, 10, hud_y + 24, 0.65)
 
-    luna.render.setColor(1, 1, 1, 0.4)
-    luna.render.print("FPS: " .. luna.time.getFPS(), W - 70, hud_y + 6, 0.7)
+    luna.gfx.setColor(1, 1, 1, 0.4)
+    luna.gfx.print("FPS: " .. luna.time.getFPS(), W - 70, hud_y + 6, 0.7)
 end
 
 function luna.mousepressed(x, y, button)

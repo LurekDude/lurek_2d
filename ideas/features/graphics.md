@@ -1,4 +1,4 @@
-﻿# graphics — Feature Analysis
+# graphics — Feature Analysis
 
 **Tier**: 1 (Core)
 **Spec**: `specs/graphics.md`
@@ -46,10 +46,10 @@
 
 ## Suggestions
 
-1. **Add TextureAtlas JSON/XML import**: `luna.render.newAtlasFromFile(image, json_path)` — parse TexturePacker/Aseprite format. Critical for production art pipelines.
-2. **Add render layers**: `luna.render.setLayer(name_or_index)` — assign draw calls to layers, each with independent sort and visibility. Many 2D games need "background", "entities", "UI" layers.
-3. **Add gradient primitives**: `luna.render.drawGradientRect(x, y, w, h, color1, color2, direction)` — simple but high impact for visual polish.
-4. **Add rich text**: `luna.render.drawRichText(markup, x, y)` — parse `[color=#ff0000]red text[/color]` or similar markup. Bevy and Solar2D both have this.
+1. **Add TextureAtlas JSON/XML import**: `luna.gfx.newAtlasFromFile(image, json_path)` — parse TexturePacker/Aseprite format. Critical for production art pipelines.
+2. **Add render layers**: `luna.gfx.setLayer(name_or_index)` — assign draw calls to layers, each with independent sort and visibility. Many 2D games need "background", "entities", "UI" layers.
+3. **Add gradient primitives**: `luna.gfx.drawGradientRect(x, y, w, h, color1, color2, direction)` — simple but high impact for visual polish.
+4. **Add rich text**: `luna.gfx.drawRichText(markup, x, y)` — parse `[color=#ff0000]red text[/color]` or similar markup. Bevy and Solar2D both have this.
 5. **Split the module**: The 18-file, 66-function surface is large enough to warrant sub-modules. Even just extracting `text` and `sprite` would reduce cognitive load.
 
 ## Competitor Comparison

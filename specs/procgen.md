@@ -1,4 +1,4 @@
-﻿# `procgen` — Agent Reference
+# `procgen` — Agent Reference
 
 | Property       | Value                                                |
 |----------------|------------------------------------------------------|
@@ -166,7 +166,7 @@ All functions are registered under `luna.procgen.*` by `src/lua_api/procgen_api.
 ## Lua Examples
 
 ```lua
-function luna.load()
+function luna.init()
     -- Generate a 40x30 cave map with cellular automata
     local cave = luna.procgen.cellularAutomata(40, 30, {
         fill = 0.45,
@@ -196,14 +196,14 @@ function luna.load()
     -- regions[i] is 1, 2, or 3 (1-based seed index)
 end
 
-function luna.draw()
+function luna.render()
     -- Use periodic noise for a scrolling background
     for x = 0, 199 do
         for y = 0, 149 do
             local n = luna.procgen.perlinNoise(x * 0.05, y * 0.05, 10.0, 7.5)
             local brightness = (n + 1) * 0.5  -- map [-1,1] to [0,1]
-            luna.render.setColor(brightness, brightness, brightness)
-            luna.render.points(x, y)
+            luna.gfx.setColor(brightness, brightness, brightness)
+            luna.gfx.points(x, y)
         end
     end
 end

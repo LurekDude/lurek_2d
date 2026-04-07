@@ -1,4 +1,4 @@
-﻿-- Platform Fighter — Smash Bros style 2-player arena
+-- Platform Fighter — Smash Bros style 2-player arena
 -- Player 1: WASD + F(punch) + G(smash)  |  Player 2: Arrows + K(punch) + L(smash)
 
 local function clamp(v, mn, mx) return math.max(mn, math.min(mx, v)) end
@@ -39,9 +39,9 @@ local function reset_match()
     winner = 0
 end
 
-function luna.load()
+function luna.init()
     luna.window.setTitle("Platform Fighter")
-    luna.render.setBackgroundColor(0.12, 0.1, 0.18)
+    luna.gfx.setBackgroundColor(0.12, 0.1, 0.18)
     reset_match()
 end
 
@@ -133,7 +133,7 @@ local function update_player(p, dt)
     end
 end
 
-function luna.update(dt)
+function luna.process(dt)
     if match_over then return end
     update_player(p1, dt)
     update_player(p2, dt)
@@ -146,54 +146,54 @@ end
 local function draw_player(p, label)
     if p.stocks <= 0 then return end
     local alpha = (p.invuln > 0 and math.sin(luna.time.getTime() * 20) > 0) and 0.3 or 1.0
-    luna.render.setColor(p.cr, p.cg, p.cb, alpha)
-    luna.render.rectangle("fill", p.x, p.y, p.w, p.h)
+    luna.gfx.setColor(p.cr, p.cg, p.cb, alpha)
+    luna.gfx.rectangle("fill", p.x, p.y, p.w, p.h)
     -- eyes
-    luna.render.setColor(1, 1, 1, alpha)
+    luna.gfx.setColor(1, 1, 1, alpha)
     local ex = (p.dir == 1) and (p.x + 18) or (p.x + 6)
-    luna.render.rectangle("fill", ex, p.y + 10, 6, 6)
+    luna.gfx.rectangle("fill", ex, p.y + 10, 6, 6)
     -- attack flash
     if p.attacking then
-        luna.render.setColor(1, 1, 0, 0.6)
+        luna.gfx.setColor(1, 1, 0, 0.6)
         local reach = (p.atk_type == "smash") and 50 or 35
         local ax = (p.dir == 1) and (p.x + p.w) or (p.x - reach)
-        luna.render.rectangle("fill", ax, p.y + 5, reach, p.h - 10)
+        luna.gfx.rectangle("fill", ax, p.y + 5, reach, p.h - 10)
     end
 end
 
 local function draw_hud(p, x_base, label)
-    luna.render.setColor(p.cr, p.cg, p.cb, 1)
-    luna.render.print(label, x_base, 10, 1.2)
-    luna.render.setColor(1, 1, 1, 1)
-    luna.render.print(tostring(math.floor(p.damage)) .. "%", x_base, 35, 1.8)
+    luna.gfx.setColor(p.cr, p.cg, p.cb, 1)
+    luna.gfx.print(label, x_base, 10, 1.2)
+    luna.gfx.setColor(1, 1, 1, 1)
+    luna.gfx.print(tostring(math.floor(p.damage)) .. "%", x_base, 35, 1.8)
     for i = 1, 3 do
         if i <= p.stocks then
-            luna.render.setColor(p.cr, p.cg, p.cb, 1)
-            luna.render.circle("fill", x_base + (i - 1) * 20 + 8, 75, 7)
+            luna.gfx.setColor(p.cr, p.cg, p.cb, 1)
+            luna.gfx.circle("fill", x_base + (i - 1) * 20 + 8, 75, 7)
         else
-            luna.render.setColor(0.3, 0.3, 0.3, 1)
-            luna.render.circle("line", x_base + (i - 1) * 20 + 8, 75, 7)
+            luna.gfx.setColor(0.3, 0.3, 0.3, 1)
+            luna.gfx.circle("line", x_base + (i - 1) * 20 + 8, 75, 7)
         end
     end
 end
 
-function luna.draw()
+function luna.render()
     -- ground
-    luna.render.setColor(0.25, 0.22, 0.3, 1)
-    luna.render.rectangle("fill", 0, GROUND_Y, W, H - GROUND_Y)
+    luna.gfx.setColor(0.25, 0.22, 0.3, 1)
+    luna.gfx.rectangle("fill", 0, GROUND_Y, W, H - GROUND_Y)
     -- platforms
-    luna.render.setColor(0.35, 0.3, 0.45, 1)
+    luna.gfx.setColor(0.35, 0.3, 0.45, 1)
     for _, plat in ipairs(platforms) do
-        luna.render.rectangle("fill", plat.x, plat.y, plat.w, plat.h)
+        luna.gfx.rectangle("fill", plat.x, plat.y, plat.w, plat.h)
     end
     draw_player(p1, "P1")
     draw_player(p2, "P2")
     draw_hud(p1, 30, "P1")
     draw_hud(p2, W - 120, "P2")
     if match_over then
-        luna.render.setColor(1, 1, 1, 1)
-        luna.render.print("PLAYER " .. winner .. " WINS!", W / 2 - 80, H / 2 - 20, 2)
-        luna.render.print("Press R to rematch", W / 2 - 70, H / 2 + 20, 1)
+        luna.gfx.setColor(1, 1, 1, 1)
+        luna.gfx.print("PLAYER " .. winner .. " WINS!", W / 2 - 80, H / 2 - 20, 2)
+        luna.gfx.print("Press R to rematch", W / 2 - 70, H / 2 + 20, 1)
     end
 end
 

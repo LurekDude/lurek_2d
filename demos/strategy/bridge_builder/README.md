@@ -1,4 +1,4 @@
-﻿# Bridge Builder Demo
+# Bridge Builder Demo
 
 A structural engineering puzzle. Place connection nodes across a gap, link them with Wood or Steel beams within a budget, then test with a vehicle that crosses the bridge. Beams turn red under stress and can break.
 
@@ -10,7 +10,7 @@ A structural engineering puzzle. Place connection nodes across a gap, link them 
 - Stress simulation: per-beam stress computed from deflection and load, visualised as colour lerp from white → red
 - `luna.mouse.getPosition()` and `luna.mousepressed` for node snapping and beam creation
 - Combo detection: click node → click second node → beam auto-placed with duplicate guard
-- `luna.render.line()` for beam drawing with stress-driven colour tinting
+- `luna.gfx.line()` for beam drawing with stress-driven colour tinting
 
 ## How to Run
 

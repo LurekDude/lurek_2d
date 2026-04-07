@@ -1,9 +1,10 @@
-﻿//! Engine and window configuration loaded from `conf.lua`.
+//! Engine and window configuration loaded from `conf.lua`.
 //!
 //! When the engine starts it looks for a `conf.lua` file in the game directory.
-//! If found, it is executed in a minimal Lua VM and the result is read into a [`Config`]
-//! struct.  Missing fields fall back to built-in defaults so authors only need to specify
-//! the settings they actually want to change.
+//! If found, it is evaluated in a minimal Lua VM.  The file must return a Lua table
+//! whose structure mirrors the [`Config`] struct.  Missing fields fall back to
+//! built-in defaults so authors only need to specify the settings they actually want
+//! to change.
 //!
 //! # Structure
 //!
@@ -22,20 +23,20 @@
 //! # Example `conf.lua`
 //!
 //! ```lua
-//! function luna.conf(t)
-//!     t.window.title   = "My Game"
-//!     t.window.width   = 1280
-//!     t.window.height  = 720
-//!     t.window.vsync   = true
+//! return {
+//!     window = {
+//!         title  = "My Game",
+//!         width  = 1280,
+//!         height = 720,
+//!         vsync  = true,
+//!     },
 //!     -- GPU backend: "auto" | "dx12" | "vulkan" | "metal"
-//!     t.graphics.backend          = "auto"
-//!     -- Power preference: "high" | "low" | "none"
-//!     t.graphics.power_preference = "high"
-//! end
+//!     graphics = { backend = "auto", power_preference = "high" },
+//! }
 //! ```
 
 use crate::engine::log_messages::{
-    L050_MODULE_DEP_DISABLED, L051_CONF_READ_ERR, L052_CONF_PARSE_ERR, L053_CONF_CALLBACK_ERR,
+    L050_MODULE_DEP_DISABLED, L051_CONF_READ_ERR, L052_CONF_PARSE_ERR,
 };
 #[allow(unused_imports)]
 use crate::log_msg;
@@ -147,7 +148,7 @@ pub struct WindowConfig {
 /// # Fields
 /// - `audio` — rodio audio subsystem (`luna.audio`).
 /// - `physics` — rapier2d physics world (`luna.physics`).
-/// - `graphics` — GPU render pipeline (`luna.render`, `luna.font`, `luna.sprite`).
+/// - `graphics` — GPU render pipeline (`luna.gfx`, `luna.font`, `luna.sprite`).
 /// - `input` — keyboard / mouse / gamepad input (`luna.input`).
 /// - `timer` — frame timer and scheduled callbacks (`luna.time`).
 /// - `filesystem` — sandboxed game filesystem (`luna.fs`).
@@ -339,13 +340,11 @@ impl Config {
     /// Loads engine configuration from `conf.lua` in the game directory.
     ///
     /// If `conf.lua` is absent or contains errors, returns `Config::default()` silently.
-    /// The expected Lua pattern is:
+    /// The expected format is a Lua file that returns a configuration table:
     /// ```lua
-    /// function luna.conf(t)
-    ///     t.window.title = "My Game"
-    ///     t.window.width = 1280
-    ///     t.window.height = 720
-    /// end
+    /// return {
+    ///     window = { title = "My Game", width = 1280, height = 720 },
+    /// }
     /// ```
     ///
     /// # Parameters
@@ -356,22 +355,12 @@ impl Config {
     /// `conf.lua` had errors; the returned `Config` still holds usable defaults.
     pub fn load_from_conf_lua(game_dir: &Path) -> (Self, Option<String>) {
         let conf_path = game_dir.join("conf.lua");
-        let mut config = Config::default();
+        let config = Config::default();
 
         if !conf_path.exists() {
             return (config, None);
         }
 
-        let lua = Lua::new();
-        let luna = match lua.create_table() {
-            Ok(t) => t,
-            Err(e) => return (config, Some(format!("Failed to create Lua table: {}", e))),
-        };
-        if let Err(e) = lua.globals().set("luna", &luna) {
-            return (config, Some(format!("Failed to set luna global: {}", e)));
-        }
-
-        // Load and execute conf.lua
         let code = match std::fs::read_to_string(&conf_path) {
             Ok(c) => c,
             Err(e) => {
@@ -380,137 +369,20 @@ impl Config {
             }
         };
 
-        if let Err(e) = lua.load(&code).set_name("conf.lua").exec() {
-            log_msg!(warn, L052_CONF_PARSE_ERR, "{}", e);
-            return (config, Some(format!("Error in conf.lua: {}", e)));
-        }
-
-        // Call luna.conf(t) if defined
-        if let Ok(conf_fn) = luna.get::<_, LuaFunction>("conf") {
-            let t = Self::create_config_table(&lua, &config);
-            if let Err(e) = conf_fn.call::<_, ()>(t.clone()) {
-                log_msg!(warn, L053_CONF_CALLBACK_ERR, "{}", e);
-                return (config, Some(format!("Error calling luna.conf(): {}", e)));
+        let lua = Lua::new();
+        let eval_result = lua.load(&code).set_name("conf.lua").eval::<LuaValue>();
+        let config = match eval_result {
+            Ok(LuaValue::Table(t)) => Self::read_config_table(&t, config),
+            Ok(_) => {
+                // conf.lua did not return a table — no config to merge
+                config
             }
-            config = Self::read_config_table(&t, config);
-        }
-
+            Err(e) => {
+                log_msg!(warn, L052_CONF_PARSE_ERR, "{}", e);
+                return (config, Some(format!("Error in conf.lua: {}", e)));
+            }
+        };
         (config, None)
-    }
-
-    fn create_config_table<'a>(lua: &'a Lua, config: &Config) -> LuaTable<'a> {
-        let t = lua.create_table().unwrap();
-
-        let window = lua.create_table().unwrap();
-        window.set("title", config.window.title.as_str()).unwrap();
-        window.set("width", config.window.width).unwrap();
-        window.set("height", config.window.height).unwrap();
-        window.set("vsync", config.window.vsync).unwrap();
-        window.set("fullscreen", config.window.fullscreen).unwrap();
-        window.set("resizable", config.window.resizable).unwrap();
-        window
-            .set("minwidth", config.window.min_width.unwrap_or(0))
-            .unwrap();
-        window
-            .set("minheight", config.window.min_height.unwrap_or(0))
-            .unwrap();
-        window.set("borderless", config.window.borderless).unwrap();
-        window
-            .set("icon", config.window.icon.as_deref().unwrap_or(""))
-            .unwrap();
-        window
-            .set("displayindex", config.window.display_index)
-            .unwrap();
-        window
-            .set("scalemode", config.window.scale_mode.as_str())
-            .unwrap();
-        window
-            .set("gamewidth", config.window.game_width.unwrap_or(0))
-            .unwrap();
-        window
-            .set("gameheight", config.window.game_height.unwrap_or(0))
-            .unwrap();
-        window.set("maximized", config.window.maximized).unwrap();
-        t.set("window", window).unwrap();
-
-        let graphics = lua.create_table().unwrap();
-        graphics
-            .set("backend", config.graphics.backend.as_str())
-            .unwrap();
-        graphics
-            .set(
-                "power_preference",
-                config.graphics.power_preference.as_str(),
-            )
-            .unwrap();
-        t.set("graphics", graphics).unwrap();
-
-        let modules = lua.create_table().unwrap();
-        modules.set("audio", config.modules.audio).unwrap();
-        modules.set("physics", config.modules.physics).unwrap();
-        modules.set("graphics", config.modules.graphics).unwrap();
-        modules.set("input", config.modules.input).unwrap();
-        modules.set("timer", config.modules.timer).unwrap();
-        modules
-            .set("filesystem", config.modules.filesystem)
-            .unwrap();
-        modules.set("window", config.modules.window).unwrap();
-        modules.set("particle", config.modules.particle).unwrap();
-        modules.set("image", config.modules.image).unwrap();
-        modules.set("gui", config.modules.gui).unwrap();
-        modules.set("overlay", config.modules.overlay).unwrap();
-        modules.set("tilemap", config.modules.tilemap).unwrap();
-        modules.set("scene", config.modules.scene).unwrap();
-        modules.set("savegame", config.modules.savegame).unwrap();
-        modules.set("entity", config.modules.entity).unwrap();
-        modules.set("ai", config.modules.ai).unwrap();
-        modules
-            .set("pathfinding", config.modules.pathfinding)
-            .unwrap();
-        modules.set("thread", config.modules.thread).unwrap();
-        modules.set("graph", config.modules.graph).unwrap();
-        modules.set("data", config.modules.data).unwrap();
-        modules.set("compute", config.modules.compute).unwrap();
-        modules.set("minimap", config.modules.minimap).unwrap();
-        modules.set("modding", config.modules.modding).unwrap();
-        modules.set("pipeline", config.modules.pipeline).unwrap();
-        modules.set("system", config.modules.system).unwrap();
-        modules
-            .set("localization", config.modules.localization)
-            .unwrap();
-        modules.set("debug", config.modules.debug).unwrap();
-        modules.set("animation", config.modules.animation).unwrap();
-        modules.set("camera", config.modules.camera).unwrap();
-        modules.set("network", config.modules.network).unwrap();
-        modules.set("procgen", config.modules.procgen).unwrap();
-        modules.set("raycaster", config.modules.raycaster).unwrap();
-        modules.set("spine", config.modules.spine).unwrap();
-        modules.set("terminal", config.modules.terminal).unwrap();
-        t.set("modules", modules).unwrap();
-
-        let perf = lua.create_table().unwrap();
-        perf.set("target_fps", config.performance.target_fps)
-            .unwrap();
-        t.set("performance", perf).unwrap();
-
-        if let Some(ref identity) = config.identity {
-            t.set("identity", identity.as_str()).unwrap();
-        }
-        if let Some(ref version) = config.version {
-            t.set("version", version.as_str()).unwrap();
-        }
-
-        let log_tbl = lua.create_table().unwrap();
-        log_tbl
-            .set("file", config.log_file.as_deref().unwrap_or(""))
-            .unwrap();
-        log_tbl.set("append", config.log_append).unwrap();
-        log_tbl
-            .set("level", config.log_level.as_deref().unwrap_or(""))
-            .unwrap();
-        t.set("log", log_tbl).unwrap();
-
-        t
     }
 
     fn read_config_table(t: &LuaTable, default: Config) -> Config {

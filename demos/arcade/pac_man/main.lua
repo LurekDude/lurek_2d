@@ -1,4 +1,4 @@
-﻿-- Pac-Man — Classic Arcade (Luna2D demo)
+-- Pac-Man — Classic Arcade (Luna2D demo)
 -- Navigate the maze, eat all dots, avoid the 4 ghosts.
 -- Power pellets let you eat ghosts for 8 seconds.
 
@@ -121,8 +121,8 @@ end
 
 -- ── Load ─────────────────────────────────────────────────────────────────
 
-function luna.load()
-    luna.render.setBackgroundColor(0, 0, 0)
+function luna.init()
+    luna.gfx.setBackgroundColor(0, 0, 0)
     build_map()
     pac = { x = 10*CELL, y = 15*CELL, dx = 0, dy = 0, next_dx = 1, next_dy = 0, speed = 130 }
     ghosts = {}
@@ -134,7 +134,7 @@ end
 
 -- ── Update ───────────────────────────────────────────────────────────────
 
-function luna.update(dt)
+function luna.process(dt)
     if game_state ~= "playing" then
         if game_state == "dead" then
             dead_timer = dead_timer - dt
@@ -202,14 +202,14 @@ end
 
 -- ── Draw ─────────────────────────────────────────────────────────────────
 
-function luna.draw()
+function luna.render()
     -- Header bar
-    luna.render.setColor(0, 0, 0.3)
-    luna.render.rectangle("fill", 0, 0, W, 30)
-    luna.render.setColor(1, 1, 0)
-    luna.render.print("Score: " .. score, 4, 6, 1.5)
-    luna.render.setColor(1, 0.3, 0.3)
-    luna.render.print("Lives: " .. lives, W - 90, 6, 1.5)
+    luna.gfx.setColor(0, 0, 0.3)
+    luna.gfx.rectangle("fill", 0, 0, W, 30)
+    luna.gfx.setColor(1, 1, 0)
+    luna.gfx.print("Score: " .. score, 4, 6, 1.5)
+    luna.gfx.setColor(1, 0.3, 0.3)
+    luna.gfx.print("Lives: " .. lives, W - 90, 6, 1.5)
 
     -- Map
     for y = 1, ROWS do
@@ -218,57 +218,57 @@ function luna.draw()
             local px = (x-1)*CELL
             local py = (y-1)*CELL + 30
             if c == 1 then
-                luna.render.setColor(0.1, 0.2, 0.8)
-                luna.render.rectangle("fill", px+1, py+1, CELL-2, CELL-2)
+                luna.gfx.setColor(0.1, 0.2, 0.8)
+                luna.gfx.rectangle("fill", px+1, py+1, CELL-2, CELL-2)
             elseif c == 0 then
-                luna.render.setColor(1, 0.9, 0.6)
-                luna.render.circle("fill", px + CELL/2, py + CELL/2, 2)
+                luna.gfx.setColor(1, 0.9, 0.6)
+                luna.gfx.circle("fill", px + CELL/2, py + CELL/2, 2)
             elseif c == 2 then
-                luna.render.setColor(1, 1, 0)
-                luna.render.circle("fill", px + CELL/2, py + CELL/2, 5)
+                luna.gfx.setColor(1, 1, 0)
+                luna.gfx.circle("fill", px + CELL/2, py + CELL/2, 5)
             end
         end
     end
 
     -- Pac-Man
     local pac_color = (game_state == "dead") and {1,0,0} or {1,1,0}
-    luna.render.setColor(pac_color[1], pac_color[2], pac_color[3])
-    luna.render.circle("fill", pac.x + CELL/2, pac.y + CELL/2 + 30, CELL/2 - 1)
+    luna.gfx.setColor(pac_color[1], pac_color[2], pac_color[3])
+    luna.gfx.circle("fill", pac.x + CELL/2, pac.y + CELL/2 + 30, CELL/2 - 1)
 
     -- Ghosts
     for i, g in ipairs(ghosts) do
         if power_timer > 0 then
-            luna.render.setColor(0.1, 0.1, 0.8)
+            luna.gfx.setColor(0.1, 0.1, 0.8)
         else
             local c = GHOST_COLORS[i]
-            luna.render.setColor(c[1], c[2], c[3])
+            luna.gfx.setColor(c[1], c[2], c[3])
         end
         local gx = g.x + CELL/2
         local gy = g.y + CELL/2 + 30
-        luna.render.circle("fill", gx, gy - 2, CELL/2 - 1)
-        luna.render.rectangle("fill", g.x + 1, gy - 2, CELL - 2, CELL/2)
+        luna.gfx.circle("fill", gx, gy - 2, CELL/2 - 1)
+        luna.gfx.rectangle("fill", g.x + 1, gy - 2, CELL - 2, CELL/2)
     end
 
     -- Overlays
     if game_state == "win" then
-        luna.render.setColor(0, 0, 0, 0.65)
-        luna.render.rectangle("fill", 0, 0, W, H)
-        luna.render.setColor(1, 1, 0)
-        luna.render.print("LEVEL CLEAR!", W/2 - 90, H/2 - 20, 3)
-        luna.render.setColor(0.7, 0.7, 0.7)
-        luna.render.print("Press R to restart", W/2 - 100, H/2 + 20, 2)
+        luna.gfx.setColor(0, 0, 0, 0.65)
+        luna.gfx.rectangle("fill", 0, 0, W, H)
+        luna.gfx.setColor(1, 1, 0)
+        luna.gfx.print("LEVEL CLEAR!", W/2 - 90, H/2 - 20, 3)
+        luna.gfx.setColor(0.7, 0.7, 0.7)
+        luna.gfx.print("Press R to restart", W/2 - 100, H/2 + 20, 2)
     elseif game_state == "gameover" then
-        luna.render.setColor(0, 0, 0, 0.65)
-        luna.render.rectangle("fill", 0, 0, W, H)
-        luna.render.setColor(1, 0.2, 0.2)
-        luna.render.print("GAME OVER", W/2 - 80, H/2 - 20, 3)
-        luna.render.setColor(0.7, 0.7, 0.7)
-        luna.render.print("Press R to restart", W/2 - 100, H/2 + 20, 2)
+        luna.gfx.setColor(0, 0, 0, 0.65)
+        luna.gfx.rectangle("fill", 0, 0, W, H)
+        luna.gfx.setColor(1, 0.2, 0.2)
+        luna.gfx.print("GAME OVER", W/2 - 80, H/2 - 20, 3)
+        luna.gfx.setColor(0.7, 0.7, 0.7)
+        luna.gfx.print("Press R to restart", W/2 - 100, H/2 + 20, 2)
     end
 
     if power_timer > 0 then
-        luna.render.setColor(0.5, 0.5, 1)
-        luna.render.print("POWER! " .. string.format("%.1f", power_timer), W/2 - 50, H - 20, 1.5)
+        luna.gfx.setColor(0.5, 0.5, 1)
+        luna.gfx.print("POWER! " .. string.format("%.1f", power_timer), W/2 - 50, H - 20, 1.5)
     end
 end
 

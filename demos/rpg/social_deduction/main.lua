@@ -1,4 +1,4 @@
-﻿-- Social Deduction — Among Us style with AI players
+-- Social Deduction — Among Us style with AI players
 -- Complete tasks or vote out the traitor to win
 
 local function clamp(v, mn, mx) return math.max(mn, math.min(mx, v)) end
@@ -69,9 +69,9 @@ local function init_game()
     end
 end
 
-function luna.load()
+function luna.init()
     luna.window.setTitle("Social Deduction")
-    luna.render.setBackgroundColor(0.08, 0.08, 0.12)
+    luna.gfx.setBackgroundColor(0.08, 0.08, 0.12)
     init_game()
 end
 
@@ -143,7 +143,7 @@ local function update_ai(p, i, dt)
     p.y = clamp(p.y, 10, H - 10)
 end
 
-function luna.update(dt)
+function luna.process(dt)
     if game_over then return end
     msg_timer = msg_timer - dt
     if msg_timer < 0 then message = nil end
@@ -226,14 +226,14 @@ local function draw_task_phase()
         if not t.done then
             local visible = dist(me, t) < VISION_RADIUS
             if visible then
-                luna.render.setColor(1, 1, 0.3, 0.8)
-                luna.render.rectangle("fill", t.x - 10, t.y - 10, 20, 20)
-                luna.render.setColor(0, 0, 0, 1)
-                luna.render.print("!", t.x - 3, t.y - 8, 1)
+                luna.gfx.setColor(1, 1, 0.3, 0.8)
+                luna.gfx.rectangle("fill", t.x - 10, t.y - 10, 20, 20)
+                luna.gfx.setColor(0, 0, 0, 1)
+                luna.gfx.print("!", t.x - 3, t.y - 8, 1)
             end
         else
-            luna.render.setColor(0.2, 0.5, 0.2, 0.5)
-            luna.render.rectangle("line", t.x - 10, t.y - 10, 20, 20)
+            luna.gfx.setColor(0.2, 0.5, 0.2, 0.5)
+            luna.gfx.rectangle("line", t.x - 10, t.y - 10, 20, 20)
         end
     end
 
@@ -244,73 +244,73 @@ local function draw_task_phase()
             local visible = (i == player_id) or (dist(me, p) < VISION_RADIUS)
             if visible then
                 local c = COLORS[i]
-                luna.render.setColor(c[1], c[2], c[3], 1)
-                luna.render.circle("fill", p.x, p.y, 14)
-                luna.render.setColor(1, 1, 1, 0.9)
-                luna.render.print(NAMES[i], p.x - 10, p.y - 28, 0.7)
+                luna.gfx.setColor(c[1], c[2], c[3], 1)
+                luna.gfx.circle("fill", p.x, p.y, 14)
+                luna.gfx.setColor(1, 1, 1, 0.9)
+                luna.gfx.print(NAMES[i], p.x - 10, p.y - 28, 0.7)
             end
         end
     end
 
     -- vision circle
-    luna.render.setColor(1, 1, 1, 0.08)
-    luna.render.circle("line", me.x, me.y, VISION_RADIUS)
+    luna.gfx.setColor(1, 1, 1, 0.08)
+    luna.gfx.circle("line", me.x, me.y, VISION_RADIUS)
 
     -- HUD
-    luna.render.setColor(0.2, 0.2, 0.3, 0.8)
-    luna.render.rectangle("fill", 0, 0, W, 36)
-    luna.render.setColor(1, 1, 1, 1)
-    luna.render.print("Tasks: " .. progress .. "/" .. TASK_COUNT, 10, 8, 1)
+    luna.gfx.setColor(0.2, 0.2, 0.3, 0.8)
+    luna.gfx.rectangle("fill", 0, 0, W, 36)
+    luna.gfx.setColor(1, 1, 1, 1)
+    luna.gfx.print("Tasks: " .. progress .. "/" .. TASK_COUNT, 10, 8, 1)
     -- progress bar
-    luna.render.setColor(0.3, 0.3, 0.3, 1)
-    luna.render.rectangle("fill", 200, 10, 200, 16)
-    luna.render.setColor(0.2, 0.9, 0.3, 1)
-    luna.render.rectangle("fill", 200, 10, 200 * (progress / TASK_COUNT), 16)
+    luna.gfx.setColor(0.3, 0.3, 0.3, 1)
+    luna.gfx.rectangle("fill", 200, 10, 200, 16)
+    luna.gfx.setColor(0.2, 0.9, 0.3, 1)
+    luna.gfx.rectangle("fill", 200, 10, 200 * (progress / TASK_COUNT), 16)
 
-    luna.render.setColor(1, 1, 1, 1)
+    luna.gfx.setColor(1, 1, 1, 1)
     local role = (player_id == traitor_id) and "TRAITOR" or "CREW"
-    luna.render.print("Role: " .. role, 500, 8, 1)
-    luna.render.print("M=Meeting  WASD=Move", 10, H - 22, 0.8)
+    luna.gfx.print("Role: " .. role, 500, 8, 1)
+    luna.gfx.print("M=Meeting  WASD=Move", 10, H - 22, 0.8)
     if player_id == traitor_id then
-        luna.render.setColor(1, 0.3, 0.3, 1)
-        luna.render.print("S=Sabotage", 680, 8, 1)
+        luna.gfx.setColor(1, 0.3, 0.3, 1)
+        luna.gfx.print("S=Sabotage", 680, 8, 1)
     end
 end
 
 local function draw_meeting()
-    luna.render.setColor(0.15, 0.15, 0.25, 1)
-    luna.render.rectangle("fill", 50, 50, W - 100, H - 100)
-    luna.render.setColor(1, 1, 1, 1)
-    luna.render.print("EMERGENCY MEETING", W / 2 - 90, 70, 1.5)
-    luna.render.print("Time: " .. math.floor(meeting_timer), W / 2 - 20, 100, 1)
-    luna.render.print("Click a name to vote", W / 2 - 65, 120, 0.9)
+    luna.gfx.setColor(0.15, 0.15, 0.25, 1)
+    luna.gfx.rectangle("fill", 50, 50, W - 100, H - 100)
+    luna.gfx.setColor(1, 1, 1, 1)
+    luna.gfx.print("EMERGENCY MEETING", W / 2 - 90, 70, 1.5)
+    luna.gfx.print("Time: " .. math.floor(meeting_timer), W / 2 - 20, 100, 1)
+    luna.gfx.print("Click a name to vote", W / 2 - 65, 120, 0.9)
 
     local y = 160
     for i = 1, 6 do
         local p = players[i]
         local c = COLORS[i]
         if p.alive then
-            luna.render.setColor(c[1], c[2], c[3], 1)
-            luna.render.circle("fill", 120, y + 10, 12)
-            luna.render.setColor(1, 1, 1, 1)
-            luna.render.print(NAMES[i], 145, y, 1.2)
+            luna.gfx.setColor(c[1], c[2], c[3], 1)
+            luna.gfx.circle("fill", 120, y + 10, 12)
+            luna.gfx.setColor(1, 1, 1, 1)
+            luna.gfx.print(NAMES[i], 145, y, 1.2)
             if meeting_votes[player_id] == i then
-                luna.render.setColor(1, 1, 0, 1)
-                luna.render.print(" <-- YOUR VOTE", 260, y, 1)
+                luna.gfx.setColor(1, 1, 0, 1)
+                luna.gfx.print(" <-- YOUR VOTE", 260, y, 1)
             end
         else
-            luna.render.setColor(0.4, 0.4, 0.4, 1)
-            luna.render.print(NAMES[i] .. " (eliminated)", 145, y, 1)
+            luna.gfx.setColor(0.4, 0.4, 0.4, 1)
+            luna.gfx.print(NAMES[i] .. " (eliminated)", 145, y, 1)
         end
         y = y + 45
     end
 end
 
-function luna.draw()
+function luna.render()
     if game_over then
-        luna.render.setColor(1, 1, 1, 1)
-        luna.render.print(game_result, W / 2 - 140, H / 2 - 20, 1.3)
-        luna.render.print("Press R to restart", W / 2 - 60, H / 2 + 20, 1)
+        luna.gfx.setColor(1, 1, 1, 1)
+        luna.gfx.print(game_result, W / 2 - 140, H / 2 - 20, 1.3)
+        luna.gfx.print("Press R to restart", W / 2 - 60, H / 2 + 20, 1)
         return
     end
     if phase == "task" then
@@ -319,8 +319,8 @@ function luna.draw()
         draw_meeting()
     end
     if message and msg_timer > 0 then
-        luna.render.setColor(1, 1, 0.5, clamp(msg_timer, 0, 1))
-        luna.render.print(message, W / 2 - 120, H / 2, 1)
+        luna.gfx.setColor(1, 1, 0.5, clamp(msg_timer, 0, 1))
+        luna.gfx.print(message, W / 2 - 120, H / 2, 1)
     end
 end
 

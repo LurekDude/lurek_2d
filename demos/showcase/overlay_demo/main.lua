@@ -1,4 +1,4 @@
-﻿-- examples/overlay_demo/main.lua
+-- examples/overlay_demo/main.lua
 -- Demonstrates luna.overlay for composable screen effects.
 -- Press F to flash, S to shake, L for lightning, D to fade, C to clear.
 -- Press 1-8 to cycle weather types, V to toggle vignette, G to toggle fog.
@@ -8,7 +8,7 @@ local time_speed = 1.0  -- hours per second for time-of-day cycling
 local weather_types = {"none", "rain", "snow", "hail", "dust", "leaves", "ash", "pollen"}
 local current_weather = 2  -- start with rain
 
-function luna.load()
+function luna.init()
     overlay = luna.overlay.newOverlay(800, 600)
 
     -- Enable a moody rainy-night scene
@@ -38,7 +38,7 @@ function luna.load()
     overlay:setCloudOpacity(0.2)
 end
 
-function luna.update(dt)
+function luna.process(dt)
     -- Advance time of day
     local tod = overlay:getTimeOfDay() + time_speed * dt
     if tod >= 24.0 then tod = tod - 24.0 end
@@ -48,56 +48,56 @@ function luna.update(dt)
     overlay:update(dt)
 end
 
-function luna.draw()
+function luna.render()
     -- Background gradient (simulated with two rectangles)
     local r, g, b = overlay:getAmbientColor()
-    luna.render.setColor(r * 0.3, g * 0.3, b * 0.3, 1)
-    luna.render.rectangle("fill", 0, 0, 800, 300)
-    luna.render.setColor(r * 0.15, g * 0.15, b * 0.15, 1)
-    luna.render.rectangle("fill", 0, 300, 800, 300)
+    luna.gfx.setColor(r * 0.3, g * 0.3, b * 0.3, 1)
+    luna.gfx.rectangle("fill", 0, 0, 800, 300)
+    luna.gfx.setColor(r * 0.15, g * 0.15, b * 0.15, 1)
+    luna.gfx.rectangle("fill", 0, 300, 800, 300)
 
     -- Ground
-    luna.render.setColor(0.15, 0.2, 0.1, 1)
-    luna.render.rectangle("fill", 0, 450, 800, 150)
+    luna.gfx.setColor(0.15, 0.2, 0.1, 1)
+    luna.gfx.rectangle("fill", 0, 450, 800, 150)
 
     -- HUD
-    luna.render.setColor(1, 1, 1, 1)
-    luna.render.print("Overlay Demo — Screen Effects", 20, 20)
-    luna.render.print(string.format("Time: %.1fh  Weather: %s  Active: %s",
+    luna.gfx.setColor(1, 1, 1, 1)
+    luna.gfx.print("Overlay Demo — Screen Effects", 20, 20)
+    luna.gfx.print(string.format("Time: %.1fh  Weather: %s  Active: %s",
         overlay:getTimeOfDay(),
         overlay:getWeather(),
         tostring(overlay:isActive())), 20, 45)
-    luna.render.print("F=Flash  S=Shake  L=Lightning  D=Fade  C=Clear", 20, 70)
-    luna.render.print("1-8=Weather  V=Vignette  G=Fog  H=HeatHaze  N=FilmGrain", 20, 95)
-    luna.render.print(string.format("+/- = Time speed (%.1fx)", time_speed), 20, 120)
+    luna.gfx.print("F=Flash  S=Shake  L=Lightning  D=Fade  C=Clear", 20, 70)
+    luna.gfx.print("1-8=Weather  V=Vignette  G=Fog  H=HeatHaze  N=FilmGrain", 20, 95)
+    luna.gfx.print(string.format("+/- = Time speed (%.1fx)", time_speed), 20, 120)
 
     -- Show active effect indicators
     local y = 150
     if overlay:isFlashing() then
-        luna.render.setColor(1, 1, 0, 1)
-        luna.render.print("[FLASH]", 20, y)
+        luna.gfx.setColor(1, 1, 0, 1)
+        luna.gfx.print("[FLASH]", 20, y)
         y = y + 20
     end
     if overlay:isShaking() then
         local ox, oy = overlay:getShakeOffset()
-        luna.render.setColor(1, 0.5, 0, 1)
-        luna.render.print(string.format("[SHAKE] offset: %.1f, %.1f", ox, oy), 20, y)
+        luna.gfx.setColor(1, 0.5, 0, 1)
+        luna.gfx.print(string.format("[SHAKE] offset: %.1f, %.1f", ox, oy), 20, y)
         y = y + 20
     end
     if overlay:isFading() then
-        luna.render.setColor(0.5, 0.5, 1, 1)
-        luna.render.print("[FADING]", 20, y)
+        luna.gfx.setColor(0.5, 0.5, 1, 1)
+        luna.gfx.print("[FADING]", 20, y)
         y = y + 20
     end
     if overlay:isFogEnabled() then
         local density = overlay:getFogDensity()
-        luna.render.setColor(0.7, 0.7, 0.8, 1)
-        luna.render.print(string.format("[FOG] density: %.2f", density), 20, y)
+        luna.gfx.setColor(0.7, 0.7, 0.8, 1)
+        luna.gfx.print(string.format("[FOG] density: %.2f", density), 20, y)
         y = y + 20
     end
     if overlay:isVignetteEnabled() then
-        luna.render.setColor(0.6, 0.4, 0.6, 1)
-        luna.render.print(string.format("[VIGNETTE] strength: %.2f", overlay:getVignetteStrength()), 20, y)
+        luna.gfx.setColor(0.6, 0.4, 0.6, 1)
+        luna.gfx.print(string.format("[VIGNETTE] strength: %.2f", overlay:getVignetteStrength()), 20, y)
         y = y + 20
     end
 

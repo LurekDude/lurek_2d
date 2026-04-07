@@ -1,4 +1,4 @@
-﻿# Tilemap World
+# Tilemap World
 
 Load tilemaps, render layers, tile-based collision, auto-tiling, camera bounds, and trigger zones.
 
@@ -42,7 +42,7 @@ local function load_map(path)
     for _, layer in ipairs(data.layers) do
         map.layers[layer.name] = layer.data
     end
-    map.tileset = luna.render.newImage("tileset.png")
+    map.tileset = luna.gfx.newImage("tileset.png")
 end
 ```
 
@@ -54,7 +54,7 @@ local function get_tile_quad(tile_id, tileset_w)
     local cols = math.floor(tileset_w / ts)
     local col = (tile_id - 1) % cols
     local row = math.floor((tile_id - 1) / cols)
-    return luna.render.newQuad(col * ts, row * ts, ts, ts, tileset_w, tileset_w)
+    return luna.gfx.newQuad(col * ts, row * ts, ts, ts, tileset_w, tileset_w)
 end
 ```
 
@@ -77,7 +77,7 @@ local function draw_layer(layer_name, cam_x, cam_y, screen_w, screen_h)
             local tile_id = data[idx]
             if tile_id and tile_id > 0 then
                 local quad = get_tile_quad(tile_id, 256)
-                luna.render.draw(map.tileset, quad, col * ts, row * ts)
+                luna.gfx.draw(map.tileset, quad, col * ts, row * ts)
             end
         end
     end

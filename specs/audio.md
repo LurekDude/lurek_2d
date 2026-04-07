@@ -328,7 +328,7 @@ Exposed under `luna.audio.*` by `src/lua_api/audio_api.rs`. The API surface incl
 
 ```lua
 -- Basic audio playback with bus routing
-function luna.load()
+function luna.init()
     -- Create audio buses
     music_bus = luna.audio.newBus("music")
     sfx_bus = luna.audio.newBus("sfx")
@@ -364,7 +364,7 @@ end
 
 ```lua
 -- DSP effects on a bus
-function luna.load()
+function luna.init()
     local bus = luna.audio.newBus("fx")
     local id = luna.audio.add_effect("fx", "lowpass", { value = 2000 })
     luna.audio.set_effect_param("fx", id, "cutoff", 1500)
@@ -373,14 +373,14 @@ end
 
 ```lua
 -- Spatial audio with 2D listener
-function luna.load()
+function luna.init()
     luna.audio.setListener2D(400, 300)
     local src = luna.audio.newSource("footsteps.ogg", "static")
     luna.audio.setPosition(src, 200, 300, 0)
     src:play()
 end
 
-function luna.update(dt)
+function luna.process(dt)
     -- Move listener with player position
     local px, py = player.x, player.y
     luna.audio.setListener2D(px, py)
@@ -389,7 +389,7 @@ end
 
 ```lua
 -- Procedural audio with SoundData
-function luna.load()
+function luna.init()
     local sd = luna.audio.newSoundData(44100, 44100, 1)  -- 1 second mono
     for i = 0, sd:getSampleCount() - 1 do
         local t = i / sd:getSampleRate()

@@ -1,4 +1,4 @@
-﻿# `gui` — Agent Reference
+# `gui` — Agent Reference
 
 | Property | Value |
 |----------|-------|
@@ -42,7 +42,7 @@ scripts full control over which GUI instance is active. `GuiContext` manages foc
 mouse/keyboard hit-testing against widget bounds.
 
 **Scope boundary**: The `gui` module holds layout and state as CPU data only. Actual rendering
-is done via `luna.render` draw calls issued by `lua_api/gui_api.rs`. No GPU resources live here.
+is done via `luna.gfx` draw calls issued by `lua_api/gui_api.rs`. No GPU resources live here.
 
 ## Architecture
 
@@ -66,7 +66,7 @@ luna.ui.newButton("OK")  →    GuiContext.add_button() → pool[idx]   → crea
 btn:setPosition(10, 20)   →    pool[idx].base.x/y = 10/20           → borrow_mut GuiContext
 luna.ui.mousepressed(…)  →    GuiContext.mouse_pressed() → hit test → returns bool (consumed)
 luna.ui.update(dt)       →    GuiContext.update(dt) → expire toasts
-                                                                      → luna.render.* draws
+                                                                      → luna.gfx.* draws
 ```
 
 ## Source Files
@@ -511,7 +511,7 @@ function luna.keypressed(key)
     luna.ui.keypressed(key)
 end
 
-function luna.update(dt)
+function luna.process(dt)
     luna.ui.update(dt)
 end
 ```
@@ -537,7 +537,7 @@ end
 
 ## Notes
 
-- **No GPU dependency**: The gui module is pure CPU data. Rendering is delegated to `luna.render` calls in `gui_api.rs`.
+- **No GPU dependency**: The gui module is pure CPU data. Rendering is delegated to `luna.gfx` calls in `gui_api.rs`.
 - **Flat pool indexing**: All widgets are stored in a single `Vec<WidgetKind>` and referenced by `usize` index. Index 0 is always the root panel. This avoids lifetime complexity but means widget indices are invalidated if widgets are removed (currently removal is not supported — widgets are added only).
 - **Input forwarding pattern**: Unlike auto-dispatched input, GUI input must be explicitly forwarded from `luna.mousepressed`/`luna.keypressed` callbacks. This lets scripts control which GUI instance receives events — useful for multiple GUI panels, pause menus, etc.
 - **1-based Lua indices**: List/combo/tab/tree methods use 1-based indices on the Lua side, converting to 0-based internally.

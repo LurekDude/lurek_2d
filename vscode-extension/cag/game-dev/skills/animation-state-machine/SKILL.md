@@ -1,4 +1,4 @@
-﻿# Animation State Machine
+# Animation State Machine
 
 State-driven sprite animation with transition conditions, priority, and frame events.
 
@@ -77,11 +77,11 @@ end
 ## Drawing
 
 ```lua
-function luna.draw()
+function luna.render()
     local def = anims[anim.state]
     local quad_index = def.frames[anim.frame]
-    -- Use luna.render.draw with quad from sprite sheet
-    luna.render.draw(spritesheet, quads[quad_index], player.x, player.y)
+    -- Use luna.gfx.draw with quad from sprite sheet
+    luna.gfx.draw(spritesheet, quads[quad_index], player.x, player.y)
 end
 ```
 

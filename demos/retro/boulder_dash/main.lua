@@ -1,4 +1,4 @@
-﻿-- Boulder Dash — C-64 Classic (Luna2D demo)
+-- Boulder Dash — C-64 Classic (Luna2D demo)
 -- Dig through caves, collect diamonds, and escape before time runs out.
 -- Avoid boulders that fall if their support is dug away.
 
@@ -77,8 +77,8 @@ end
 
 -- ── Load ─────────────────────────────────────────────────────────────────
 
-function luna.load()
-    luna.render.setBackgroundColor(0.04, 0.03, 0.01)
+function luna.init()
+    luna.gfx.setBackgroundColor(0.04, 0.03, 0.01)
     score = 0; lives = 3; level = 1
     gen_level()
 end
@@ -87,7 +87,7 @@ end
 
 local move_cd = 0
 
-function luna.update(dt)
+function luna.process(dt)
     if game_state ~= "playing" then return end
     time_left = time_left - dt
     if time_left <= 0 then
@@ -161,19 +161,19 @@ end
 
 local function cell_px(cx, cy) return cx * CELL, cy * CELL + 40 end
 
-function luna.draw()
+function luna.render()
     -- HUD
-    luna.render.setColor(0, 0, 0)
-    luna.render.rectangle("fill", 0, 0, W, 40)
-    luna.render.setColor(0.9, 0.7, 0.2)
-    luna.render.print("BOULDER DASH", 8, 6, 1.6)
-    luna.render.setColor(0.3, 0.8, 1)
-    luna.render.print("Dia: " .. diamonds_got .. "/" .. diamonds_needed, W/2 - 60, 8, 1.5)
-    luna.render.setColor(1, 0.4, 0.4)
+    luna.gfx.setColor(0, 0, 0)
+    luna.gfx.rectangle("fill", 0, 0, W, 40)
+    luna.gfx.setColor(0.9, 0.7, 0.2)
+    luna.gfx.print("BOULDER DASH", 8, 6, 1.6)
+    luna.gfx.setColor(0.3, 0.8, 1)
+    luna.gfx.print("Dia: " .. diamonds_got .. "/" .. diamonds_needed, W/2 - 60, 8, 1.5)
+    luna.gfx.setColor(1, 0.4, 0.4)
     local tsec = math.max(0, math.floor(time_left))
-    luna.render.print("Time: " .. tsec, W - 120, 8, 1.5)
-    luna.render.setColor(0.7, 0.9, 0.7)
-    luna.render.print("Score: " .. score, W/2 + 80, 8, 1.5)
+    luna.gfx.print("Time: " .. tsec, W - 120, 8, 1.5)
+    luna.gfx.setColor(0.7, 0.9, 0.7)
+    luna.gfx.print("Score: " .. score, W/2 + 80, 8, 1.5)
 
     -- Map cells
     for y = 0, MAP_H - 1 do
@@ -182,20 +182,20 @@ function luna.draw()
             if c ~= EMPTY then
                 local col = COLORS[c] or {1, 0, 1}
                 local px, py = cell_px(x, y)
-                luna.render.setColor(col[1], col[2], col[3])
+                luna.gfx.setColor(col[1], col[2], col[3])
                 if c == BOULDER then
-                    luna.render.circle("fill", px + CELL/2, py + CELL/2, CELL/2 - 1)
+                    luna.gfx.circle("fill", px + CELL/2, py + CELL/2, CELL/2 - 1)
                 elseif c == DIAMOND then
                     -- Diamond shape
-                    luna.render.circle("fill", px + CELL/2, py + CELL/2, CELL/2 - 2)
-                    luna.render.setColor(0.7, 1, 1)
-                    luna.render.circle("fill", px + CELL/2 - 2, py + CELL/2 - 2, 3)
+                    luna.gfx.circle("fill", px + CELL/2, py + CELL/2, CELL/2 - 2)
+                    luna.gfx.setColor(0.7, 1, 1)
+                    luna.gfx.circle("fill", px + CELL/2 - 2, py + CELL/2 - 2, 3)
                 elseif c == EXIT then
                     local open = diamonds_got >= diamonds_needed
-                    luna.render.setColor(open and 0.1 or 0.5, open and 0.9 or 0.5, open and 0.3 or 0.5)
-                    luna.render.rectangle("fill", px + 2, py + 2, CELL - 4, CELL - 4)
+                    luna.gfx.setColor(open and 0.1 or 0.5, open and 0.9 or 0.5, open and 0.3 or 0.5)
+                    luna.gfx.rectangle("fill", px + 2, py + 2, CELL - 4, CELL - 4)
                 else
-                    luna.render.rectangle("fill", px + 1, py + 1, CELL - 2, CELL - 2)
+                    luna.gfx.rectangle("fill", px + 1, py + 1, CELL - 2, CELL - 2)
                 end
             end
         end
@@ -203,22 +203,22 @@ function luna.draw()
 
     -- Player
     local px, py = cell_px(player_x, player_y)
-    luna.render.setColor(1, 0.9, 0.3)
-    luna.render.circle("fill", px + CELL/2, py + CELL/2, CELL/2 - 1)
-    luna.render.setColor(0.2, 0.1, 0)
-    luna.render.circle("fill", px + CELL/2 - 3, py + CELL/2 - 2, 2)
-    luna.render.circle("fill", px + CELL/2 + 3, py + CELL/2 - 2, 2)
+    luna.gfx.setColor(1, 0.9, 0.3)
+    luna.gfx.circle("fill", px + CELL/2, py + CELL/2, CELL/2 - 1)
+    luna.gfx.setColor(0.2, 0.1, 0)
+    luna.gfx.circle("fill", px + CELL/2 - 3, py + CELL/2 - 2, 2)
+    luna.gfx.circle("fill", px + CELL/2 + 3, py + CELL/2 - 2, 2)
 
     -- Game-over overlay
     if game_state == "gameover" then
-        luna.render.setColor(0, 0, 0, 0.75)
-        luna.render.rectangle("fill", 0, 0, W, H)
-        luna.render.setColor(1, 0.3, 0.1)
-        luna.render.print("GAME OVER", W/2 - 80, H/2 - 25, 3)
-        luna.render.setColor(1, 1, 1)
-        luna.render.print("Score: " .. score, W/2 - 55, H/2 + 15, 2)
-        luna.render.setColor(0.6, 0.6, 0.6)
-        luna.render.print("Press R to restart", W/2 - 100, H/2 + 48, 2)
+        luna.gfx.setColor(0, 0, 0, 0.75)
+        luna.gfx.rectangle("fill", 0, 0, W, H)
+        luna.gfx.setColor(1, 0.3, 0.1)
+        luna.gfx.print("GAME OVER", W/2 - 80, H/2 - 25, 3)
+        luna.gfx.setColor(1, 1, 1)
+        luna.gfx.print("Score: " .. score, W/2 - 55, H/2 + 15, 2)
+        luna.gfx.setColor(0.6, 0.6, 0.6)
+        luna.gfx.print("Press R to restart", W/2 - 100, H/2 + 48, 2)
     end
 end
 

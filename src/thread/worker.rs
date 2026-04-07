@@ -1,4 +1,4 @@
-﻿//! Background Lua thread with independent VM.
+//! Background Lua thread with independent VM.
 //!
 //! Each `LuaThread` spawns an OS thread running its own `mlua::Lua` instance.
 //! Communication with the main thread happens exclusively through `Channel`
@@ -161,7 +161,7 @@ impl LuaThread {
 /// - `luna.thread.getChannel(name)` — access to named channels
 /// - `arg` — table of arguments passed to `thread:start(...)`
 ///
-/// Worker threads do NOT get: `luna.render`, `luna.audio`, `luna.window`,
+/// Worker threads do NOT get: `luna.gfx`, `luna.audio`, `luna.window`,
 /// `luna.input`, `luna.physics`, `luna.particles`, or any module that
 /// touches `SharedState`.
 fn register_thread_safe_modules(

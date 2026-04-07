@@ -1,4 +1,4 @@
-﻿-- 2D Souls-like Precision Combat
+-- 2D Souls-like Precision Combat
 -- WASD move, J=light attack, K=heavy attack, L=dodge, Space=block
 
 local W, H = 800, 600
@@ -22,9 +22,9 @@ local function spawn_hit_particles(x, y, r, g, b)
     end
 end
 
-function luna.load()
+function luna.init()
     luna.window.setTitle("Soulslike Combat")
-    luna.render.setBackgroundColor(0.08, 0.06, 0.1)
+    luna.gfx.setBackgroundColor(0.08, 0.06, 0.1)
 
     local ground = H - 100
     player = {
@@ -102,7 +102,7 @@ local function boss_try_hit_player()
     end
 end
 
-function luna.update(dt)
+function luna.process(dt)
     if state ~= "play" then return end
 
     -- particles
@@ -216,15 +216,15 @@ function luna.update(dt)
 end
 
 local function draw_bar(x, y, w, h, val, max, r, g, b)
-    luna.render.setColor(0.15, 0.15, 0.15, 0.9)
-    luna.render.rectangle("fill", x, y, w, h)
-    luna.render.setColor(r, g, b, 1)
-    luna.render.rectangle("fill", x, y, w * clamp(val / max, 0, 1), h)
-    luna.render.setColor(1, 1, 1, 0.3)
-    luna.render.rectangle("line", x, y, w, h)
+    luna.gfx.setColor(0.15, 0.15, 0.15, 0.9)
+    luna.gfx.rectangle("fill", x, y, w, h)
+    luna.gfx.setColor(r, g, b, 1)
+    luna.gfx.rectangle("fill", x, y, w * clamp(val / max, 0, 1), h)
+    luna.gfx.setColor(1, 1, 1, 0.3)
+    luna.gfx.rectangle("line", x, y, w, h)
 end
 
-function luna.draw()
+function luna.render()
     local sx, sy = 0, 0
     if shake.timer > 0 then
         sx = (math.random() - 0.5) * shake.intensity * 2
@@ -233,21 +233,21 @@ function luna.draw()
 
     -- ground
     local ground = player.y
-    luna.render.setColor(0.15, 0.12, 0.18, 1)
-    luna.render.rectangle("fill", sx, ground + sy, W, H - ground)
-    luna.render.setColor(0.3, 0.25, 0.35, 1)
-    luna.render.line(0 + sx, ground + sy, W + sx, ground + sy)
+    luna.gfx.setColor(0.15, 0.12, 0.18, 1)
+    luna.gfx.rectangle("fill", sx, ground + sy, W, H - ground)
+    luna.gfx.setColor(0.3, 0.25, 0.35, 1)
+    luna.gfx.line(0 + sx, ground + sy, W + sx, ground + sy)
 
     -- arena pillars
-    luna.render.setColor(0.2, 0.18, 0.25, 0.6)
-    luna.render.rectangle("fill", 60 + sx, ground - 120 + sy, 16, 120)
-    luna.render.rectangle("fill", W - 76 + sx, ground - 120 + sy, 16, 120)
+    luna.gfx.setColor(0.2, 0.18, 0.25, 0.6)
+    luna.gfx.rectangle("fill", 60 + sx, ground - 120 + sy, 16, 120)
+    luna.gfx.rectangle("fill", W - 76 + sx, ground - 120 + sy, 16, 120)
 
     -- particles
     for _, p in ipairs(particles) do
         local a = clamp(p.life / 0.3, 0, 1)
-        luna.render.setColor(p.r, p.g, p.b, a)
-        luna.render.circle("fill", p.x + sx, p.y + sy, 3)
+        luna.gfx.setColor(p.r, p.g, p.b, a)
+        luna.gfx.circle("fill", p.x + sx, p.y + sy, 3)
     end
 
     -- boss
@@ -255,64 +255,64 @@ function luna.draw()
     if boss.hurt_flash > 0 then br, bg, bb = 1, 1, 1 end
     if boss.tele_flash > 0.3 then br, bg, bb = 1, 0.5, 0.1 end
     if boss.state == "recovery" then br, bg, bb = 0.4, 0.15, 0.15 end
-    luna.render.setColor(br, bg, bb, 1)
-    luna.render.rectangle("fill", boss.x - boss.w / 2 + sx, boss.y - boss.h + sy, boss.w, boss.h)
+    luna.gfx.setColor(br, bg, bb, 1)
+    luna.gfx.rectangle("fill", boss.x - boss.w / 2 + sx, boss.y - boss.h + sy, boss.w, boss.h)
     -- boss eyes
-    luna.render.setColor(1, 0.3, 0.1, 1)
+    luna.gfx.setColor(1, 0.3, 0.1, 1)
     local eye_x = boss.x + boss.facing * 8
-    luna.render.circle("fill", eye_x + sx, boss.y - boss.h + 16 + sy, 4)
+    luna.gfx.circle("fill", eye_x + sx, boss.y - boss.h + 16 + sy, 4)
 
     -- player
     local pr, pg, pb = 0.3, 0.6, 0.9
     if player.hurt_flash > 0 then pr, pg, pb = 1, 0.3, 0.3 end
     if player.iframe then pr, pg, pb = 0.7, 0.7, 1 end
     if player.blocking then pr, pg, pb = 0.4, 0.8, 0.4 end
-    luna.render.setColor(pr, pg, pb, player.iframe and 0.5 or 1)
-    luna.render.rectangle("fill", player.x - player.w / 2 + sx, player.y - player.h + sy, player.w, player.h)
+    luna.gfx.setColor(pr, pg, pb, player.iframe and 0.5 or 1)
+    luna.gfx.rectangle("fill", player.x - player.w / 2 + sx, player.y - player.h + sy, player.w, player.h)
 
     -- attack slash visual
     if player.attacking and player.atk_timer < player.atk_dur * 0.7 then
         local range = player.atk_type == "light" and player.light_range or player.heavy_range
         local alpha = 1 - player.atk_timer / player.atk_dur
-        luna.render.setColor(1, 0.9, 0.5, alpha * 0.6)
+        luna.gfx.setColor(1, 0.9, 0.5, alpha * 0.6)
         local ax = player.x + player.facing * range / 2
-        luna.render.rectangle("fill", ax - range / 2 + sx, player.y - player.h + 10 + sy, range, 30)
+        luna.gfx.rectangle("fill", ax - range / 2 + sx, player.y - player.h + 10 + sy, range, 30)
     end
 
     -- HUD — player bars
     draw_bar(20, 20, 200, 16, player.hp, player.max_hp, 0.8, 0.2, 0.2)
-    luna.render.setColor(1, 1, 1, 1)
-    luna.render.print("HP", 24, 21, 0.8)
+    luna.gfx.setColor(1, 1, 1, 1)
+    luna.gfx.print("HP", 24, 21, 0.8)
 
     draw_bar(20, 42, 200, 12, player.stamina, player.max_stamina, 0.2, 0.7, 0.3)
-    luna.render.setColor(1, 1, 1, 1)
-    luna.render.print("ST", 24, 42, 0.7)
+    luna.gfx.setColor(1, 1, 1, 1)
+    luna.gfx.print("ST", 24, 42, 0.7)
 
     -- HUD — boss bar
     draw_bar(W / 2 - 150, H - 50, 300, 20, boss.hp, boss.max_hp, 0.7, 0.15, 0.15)
-    luna.render.setColor(1, 1, 1, 1)
+    luna.gfx.setColor(1, 1, 1, 1)
     local boss_name = boss.phase == 2 and "WARDEN (Enraged)" or "WARDEN"
-    luna.render.print(boss_name, W / 2 - 60, H - 48, 0.9)
+    luna.gfx.print(boss_name, W / 2 - 60, H - 48, 0.9)
 
     -- controls hint
-    luna.render.setColor(1, 1, 1, 0.4)
-    luna.render.print("A/D: Move  J: Light  K: Heavy  L: Dodge  Space: Block", 150, H - 20, 0.7)
+    luna.gfx.setColor(1, 1, 1, 0.4)
+    luna.gfx.print("A/D: Move  J: Light  K: Heavy  L: Dodge  Space: Block", 150, H - 20, 0.7)
 
     -- death / victory overlay
     if state == "dead" then
-        luna.render.setColor(0, 0, 0, 0.8)
-        luna.render.rectangle("fill", 0, 0, W, H)
-        luna.render.setColor(0.8, 0.1, 0.1, 1)
-        luna.render.print("YOU DIED", W / 2 - 120, H / 2 - 40, 3)
-        luna.render.setColor(1, 1, 1, 0.8)
-        luna.render.print("Press R to retry", W / 2 - 60, H / 2 + 30)
+        luna.gfx.setColor(0, 0, 0, 0.8)
+        luna.gfx.rectangle("fill", 0, 0, W, H)
+        luna.gfx.setColor(0.8, 0.1, 0.1, 1)
+        luna.gfx.print("YOU DIED", W / 2 - 120, H / 2 - 40, 3)
+        luna.gfx.setColor(1, 1, 1, 0.8)
+        luna.gfx.print("Press R to retry", W / 2 - 60, H / 2 + 30)
     elseif state == "victory" then
-        luna.render.setColor(0, 0, 0, 0.6)
-        luna.render.rectangle("fill", 0, 0, W, H)
-        luna.render.setColor(1, 0.85, 0.2, 1)
-        luna.render.print("WARDEN DEFEATED", W / 2 - 160, H / 2 - 40, 2.5)
-        luna.render.setColor(1, 1, 1, 0.8)
-        luna.render.print("Press R to play again", W / 2 - 70, H / 2 + 30)
+        luna.gfx.setColor(0, 0, 0, 0.6)
+        luna.gfx.rectangle("fill", 0, 0, W, H)
+        luna.gfx.setColor(1, 0.85, 0.2, 1)
+        luna.gfx.print("WARDEN DEFEATED", W / 2 - 160, H / 2 - 40, 2.5)
+        luna.gfx.setColor(1, 1, 1, 0.8)
+        luna.gfx.print("Press R to play again", W / 2 - 70, H / 2 + 30)
     end
 end
 

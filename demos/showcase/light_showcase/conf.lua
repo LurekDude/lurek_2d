@@ -1,5 +1,7 @@
-function luna.conf(t)
-    t.window.title  = "Luna2D — Light Showcase"
-    t.window.width  = 1024
-    t.window.height = 768
-end
+return {
+    window = {
+        title = "Luna2D — Light Showcase",
+        width = 1024,
+        height = 768,
+    },
+}

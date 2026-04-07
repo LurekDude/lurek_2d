@@ -1,4 +1,4 @@
-﻿# `image` — Agent Reference
+# `image` — Agent Reference
 
 | Property       | Value                                                |
 |----------------|------------------------------------------------------|
@@ -12,7 +12,7 @@
 
 ## Summary
 
-The `image` module provides CPU-side pixel-level access to RGBA image data. It is the raw pixel layer that sits beneath the GPU texture pipeline — `ImageData` is never on the GPU until explicitly uploaded via the graphics API (`luna.render.newImage(imgdata)`). The module covers three distinct concerns: uncompressed RGBA pixel buffers (`ImageData`), GPU-compressed DDS texture containers (`CompressedImageData`), and colour palette lookup tables for shader-based palette swapping (`PaletteLUT`).
+The `image` module provides CPU-side pixel-level access to RGBA image data. It is the raw pixel layer that sits beneath the GPU texture pipeline — `ImageData` is never on the GPU until explicitly uploaded via the graphics API (`luna.gfx.newImage(imgdata)`). The module covers three distinct concerns: uncompressed RGBA pixel buffers (`ImageData`), GPU-compressed DDS texture containers (`CompressedImageData`), and colour palette lookup tables for shader-based palette swapping (`PaletteLUT`).
 
 `ImageData` supports loading PNG/JPEG files from disk via the `image` crate, creating blank buffers, constructing from raw bytes, per-pixel read/write (`get_pixel` / `set_pixel`), bulk transforms (`map_pixel`, `paste`), PNG encoding, and raw byte extraction. Because it is pure `Vec<u8>` arithmetic with no GPU state, operations can be called freely during `luna.load()` or inside background thread workers.
 
@@ -172,7 +172,7 @@ Exposed under `luna.img.*` by `src/lua_api/image_api.rs`. The Lua wrapper also d
 ## Lua Examples
 
 ```lua
-function luna.load()
+function luna.init()
     -- Create a CPU-side pixel buffer and fill with a gradient
     imgdata = luna.img.newImageData(64, 64)
     for y = 0, 63 do
@@ -182,22 +182,22 @@ function luna.load()
     end
 
     -- Upload to GPU for rendering
-    tex = luna.render.newImage(imgdata)
+    tex = luna.gfx.newImage(imgdata)
 end
 
-function luna.draw()
-    luna.render.draw(tex, 100, 100)
+function luna.render()
+    luna.gfx.draw(tex, 100, 100)
 end
 ```
 
 ```lua
 -- Load an image file, invert its colours, and upload the result
-function luna.load()
+function luna.init()
     local src = luna.img.newImageData("sprites/player.png")
     src:mapPixel(function(x, y, r, g, b, a)
         return 255 - r, 255 - g, 255 - b, a
     end)
-    inverted = luna.render.newImage(src)
+    inverted = luna.gfx.newImage(src)
 end
 ```
 
@@ -233,7 +233,7 @@ end
 
 ## Notes
 
-- `ImageData` is a CPU-side RGBA8 buffer; it has no GPU resources until `luna.render.newImage(imgdata)` is called.
+- `ImageData` is a CPU-side RGBA8 buffer; it has no GPU resources until `luna.gfx.newImage(imgdata)` is called.
 - `ImageData` implements `mlua::UserData` directly in `image_data.rs`, exposing Lua methods alongside the Rust API.
 - `mapPixel(fn)` calls the Lua function for every pixel — avoid for large images due to Lua→Rust boundary overhead per pixel.
 - PNG encoding via `encode("png")` is blocking and allocates; offload to a thread worker for non-blocking export of large images.

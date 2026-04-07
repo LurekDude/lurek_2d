@@ -1,15 +1,15 @@
-﻿# Nine-Slice Demo
+# Nine-Slice Demo
 
-Demonstrates `luna.render.newNineSlice()` for building scalable UI panels and buttons that preserve corner detail while stretching edges and the centre.
+Demonstrates `luna.gfx.newNineSlice()` for building scalable UI panels and buttons that preserve corner detail while stretching edges and the centre.
 
 ## What It Demonstrates
 
-- `luna.render.newNineSlice()` — create a 9-patch descriptor
-- `luna.render.drawNineSlice()` — render at arbitrary size
+- `luna.gfx.newNineSlice()` — create a 9-patch descriptor
+- `luna.gfx.drawNineSlice()` — render at arbitrary size
 - Corner slice preservation when scaling
 - Runtime resize: adjusting panel dimensions with arrow keys
 - Building dialog boxes and button frames from a single slice definition
-- `luna.render.setColor()` for tinting nine-slice instances
+- `luna.gfx.setColor()` for tinting nine-slice instances
 
 ## How to Run
 

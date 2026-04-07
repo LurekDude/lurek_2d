@@ -1,16 +1,16 @@
-﻿local Class  = require("lib.class")
+local Class  = require("lib.class")
 local Events = require("lib.events")
 
-function luna.load()
+function luna.init()
     Events.emit("game:start")
 end
 
-function luna.update(dt)
+function luna.process(dt)
     Events.emit("game:update", dt)
 end
 
-function luna.draw()
-    luna.render.clear(0.1, 0.1, 0.15)
+function luna.render()
+    luna.gfx.clear(0.1, 0.1, 0.15)
     Events.emit("game:draw")
 end
 

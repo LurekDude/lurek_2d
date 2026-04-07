@@ -1,4 +1,4 @@
-﻿# `fx` — Agent Reference
+# `fx` — Agent Reference
 
 | Property       | Value                                               |
 |----------------|-----------------------------------------------------|
@@ -315,7 +315,7 @@ local stack = luna.postfx.newStack(800, 600)
 stack:add(0)  -- bloom at index 0
 stack:add(1)  -- crt at index 1
 
-function luna.draw()
+function luna.render()
     -- stack:beginCapture()
     -- ... draw scene ...
     -- stack:endCapture()
@@ -327,7 +327,7 @@ end
 -- Screen overlay: weather + flash + shake
 local overlay = luna.postfx.newOverlay(800, 600)
 
-function luna.update(dt)
+function luna.process(dt)
     overlay:update(dt)
 
     -- Trigger a white flash on spacebar
@@ -341,18 +341,18 @@ function luna.update(dt)
     end
 end
 
-function luna.draw()
+function luna.render()
     -- Apply shake offset to camera
     local sx, sy = overlay:getShakeOffset()
-    luna.render.translate(sx, sy)
+    luna.gfx.translate(sx, sy)
 
     -- ... draw scene ...
 
     -- Draw flash overlay
     local flashAlpha = overlay:getFlashAlpha()
     if flashAlpha > 0 then
-        luna.render.setColor(1, 1, 1, flashAlpha)
-        luna.render.rectangle("fill", 0, 0, 800, 600)
+        luna.gfx.setColor(1, 1, 1, flashAlpha)
+        luna.gfx.rectangle("fill", 0, 0, 800, 600)
     end
 end
 ```

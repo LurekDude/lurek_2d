@@ -1,4 +1,4 @@
-﻿-- Courtroom Drama / Debate Simulation
+-- Courtroom Drama / Debate Simulation
 -- Present evidence, cross-examine witnesses, win cases!
 
 local function clamp(v, mn, mx) return math.max(mn, math.min(mx, v)) end
@@ -20,7 +20,7 @@ local result_msg = ""
 local cases = {}
 local evidence_collected = {}
 
-function luna.load()
+function luna.init()
     cases = {
         {
             title = "The Missing Diamond",
@@ -138,7 +138,7 @@ local function advance_testimony()
     end
 end
 
-function luna.update(dt)
+function luna.process(dt)
     if flash_timer > 0 then flash_timer = flash_timer - dt end
     if state == "testimony" then
         local t = current_testimony()
@@ -244,66 +244,66 @@ function luna.keypressed(key)
 end
 
 local function draw_bar(label, x, y, w, h, value, max, r, g, b)
-    luna.render.setColor(0.2, 0.2, 0.2, 1)
-    luna.render.rectangle("fill", x, y, w, h)
+    luna.gfx.setColor(0.2, 0.2, 0.2, 1)
+    luna.gfx.rectangle("fill", x, y, w, h)
     local pct = clamp(value / max, 0, 1)
-    luna.render.setColor(r, g, b, 1)
-    luna.render.rectangle("fill", x, y, w * pct, h)
-    luna.render.setColor(1, 1, 1, 1)
-    luna.render.print(label .. ": " .. math.floor(value) .. "/" .. max, x, y - 16, 0.7)
+    luna.gfx.setColor(r, g, b, 1)
+    luna.gfx.rectangle("fill", x, y, w * pct, h)
+    luna.gfx.setColor(1, 1, 1, 1)
+    luna.gfx.print(label .. ": " .. math.floor(value) .. "/" .. max, x, y - 16, 0.7)
 end
 
-function luna.draw()
-    luna.render.setBackgroundColor(0.08, 0.06, 0.12)
+function luna.render()
+    luna.gfx.setBackgroundColor(0.08, 0.06, 0.12)
 
     if state == "title" then
-        luna.render.setColor(1, 0.85, 0.3, 1)
-        luna.render.print("COURTROOM DRAMA", 200, 120, 2)
-        luna.render.setColor(0.8, 0.8, 0.8, 1)
-        luna.render.print("Present evidence. Cross-examine witnesses.", 200, 200, 1)
-        luna.render.print("Win 3 cases to become a legendary attorney!", 200, 230, 1)
-        luna.render.setColor(0.6, 1, 0.6, 1)
-        luna.render.print("Press ENTER to begin", 260, 320, 1.2)
+        luna.gfx.setColor(1, 0.85, 0.3, 1)
+        luna.gfx.print("COURTROOM DRAMA", 200, 120, 2)
+        luna.gfx.setColor(0.8, 0.8, 0.8, 1)
+        luna.gfx.print("Present evidence. Cross-examine witnesses.", 200, 200, 1)
+        luna.gfx.print("Win 3 cases to become a legendary attorney!", 200, 230, 1)
+        luna.gfx.setColor(0.6, 1, 0.6, 1)
+        luna.gfx.print("Press ENTER to begin", 260, 320, 1.2)
         return
     end
 
     local c = cases[current_case]
 
     if state == "case_intro" then
-        luna.render.setColor(1, 0.8, 0.3, 1)
-        luna.render.print("Case " .. current_case .. ": " .. c.title, 150, 100, 1.5)
-        luna.render.setColor(0.9, 0.9, 0.9, 1)
-        luna.render.print(c.intro, 150, 180, 1)
-        luna.render.setColor(0.8, 0.8, 0.6, 1)
-        luna.render.print("Witness: " .. c.witness, 150, 260, 1)
-        luna.render.setColor(0.5, 1, 0.5, 1)
-        luna.render.print("Press ENTER to start cross-examination", 150, 340, 1)
+        luna.gfx.setColor(1, 0.8, 0.3, 1)
+        luna.gfx.print("Case " .. current_case .. ": " .. c.title, 150, 100, 1.5)
+        luna.gfx.setColor(0.9, 0.9, 0.9, 1)
+        luna.gfx.print(c.intro, 150, 180, 1)
+        luna.gfx.setColor(0.8, 0.8, 0.6, 1)
+        luna.gfx.print("Witness: " .. c.witness, 150, 260, 1)
+        luna.gfx.setColor(0.5, 1, 0.5, 1)
+        luna.gfx.print("Press ENTER to start cross-examination", 150, 340, 1)
         return
     end
 
     if state == "result" then
-        luna.render.setColor(1, 1, 0.5, 1)
-        luna.render.print("VERDICT", 300, 100, 2)
-        luna.render.setColor(0.9, 0.9, 0.9, 1)
-        luna.render.print(result_msg, 150, 200, 1.2)
-        luna.render.print("Score: " .. score .. " / " .. #cases, 150, 260, 1)
-        luna.render.setColor(0.5, 1, 0.5, 1)
-        luna.render.print("Press ENTER to continue", 220, 340, 1)
+        luna.gfx.setColor(1, 1, 0.5, 1)
+        luna.gfx.print("VERDICT", 300, 100, 2)
+        luna.gfx.setColor(0.9, 0.9, 0.9, 1)
+        luna.gfx.print(result_msg, 150, 200, 1.2)
+        luna.gfx.print("Score: " .. score .. " / " .. #cases, 150, 260, 1)
+        luna.gfx.setColor(0.5, 1, 0.5, 1)
+        luna.gfx.print("Press ENTER to continue", 220, 340, 1)
         return
     end
 
     -- Courtroom scene
     -- Judge bench
-    luna.render.setColor(0.35, 0.2, 0.1, 1)
-    luna.render.rectangle("fill", 250, 20, 300, 50)
-    luna.render.setColor(1, 0.9, 0.7, 1)
-    luna.render.print("JUDGE", 370, 30, 1)
+    luna.gfx.setColor(0.35, 0.2, 0.1, 1)
+    luna.gfx.rectangle("fill", 250, 20, 300, 50)
+    luna.gfx.setColor(1, 0.9, 0.7, 1)
+    luna.gfx.print("JUDGE", 370, 30, 1)
 
     -- Witness stand
-    luna.render.setColor(0.3, 0.25, 0.15, 1)
-    luna.render.rectangle("fill", 550, 90, 120, 40)
-    luna.render.setColor(0.9, 0.8, 0.6, 1)
-    luna.render.print(c.witness, 560, 100, 0.7)
+    luna.gfx.setColor(0.3, 0.25, 0.15, 1)
+    luna.gfx.rectangle("fill", 550, 90, 120, 40)
+    luna.gfx.setColor(0.9, 0.8, 0.6, 1)
+    luna.gfx.print(c.witness, 560, 100, 0.7)
 
     -- Bars
     draw_bar("Credibility", 20, 30, 180, 14, credibility, 100, 0.2, 0.7, 1)
@@ -313,72 +313,72 @@ function luna.draw()
     if state == "testimony" then
         local t = current_testimony()
         if t then
-            luna.render.setColor(0.15, 0.12, 0.2, 1)
-            luna.render.rectangle("fill", 30, 150, 540, 80)
-            luna.render.setColor(0.25, 0.2, 0.3, 1)
-            luna.render.rectangle("line", 30, 150, 540, 80)
-            luna.render.setColor(1, 0.9, 0.7, 1)
-            luna.render.print(c.witness .. " (" .. testimony_idx .. "/" .. #c.testimony .. "):", 40, 155, 0.8)
+            luna.gfx.setColor(0.15, 0.12, 0.2, 1)
+            luna.gfx.rectangle("fill", 30, 150, 540, 80)
+            luna.gfx.setColor(0.25, 0.2, 0.3, 1)
+            luna.gfx.rectangle("line", 30, 150, 540, 80)
+            luna.gfx.setColor(1, 0.9, 0.7, 1)
+            luna.gfx.print(c.witness .. " (" .. testimony_idx .. "/" .. #c.testimony .. "):", 40, 155, 0.8)
             local visible = string.sub(t.text, 1, math.floor(text_progress))
-            luna.render.setColor(1, 1, 1, 1)
-            luna.render.print('"' .. visible .. '"', 40, 180, 0.9)
+            luna.gfx.setColor(1, 1, 1, 1)
+            luna.gfx.print('"' .. visible .. '"', 40, 180, 0.9)
         end
     end
 
     -- Evidence panel
     if show_evidence_panel and state == "testimony" then
-        luna.render.setColor(0.1, 0.1, 0.18, 0.95)
-        luna.render.rectangle("fill", 20, 250, 300, 150)
-        luna.render.setColor(0.4, 0.4, 0.6, 1)
-        luna.render.rectangle("line", 20, 250, 300, 150)
-        luna.render.setColor(1, 0.85, 0.4, 1)
-        luna.render.print("Evidence (Up/Down, Enter to present):", 30, 255, 0.75)
+        luna.gfx.setColor(0.1, 0.1, 0.18, 0.95)
+        luna.gfx.rectangle("fill", 20, 250, 300, 150)
+        luna.gfx.setColor(0.4, 0.4, 0.6, 1)
+        luna.gfx.rectangle("line", 20, 250, 300, 150)
+        luna.gfx.setColor(1, 0.85, 0.4, 1)
+        luna.gfx.print("Evidence (Up/Down, Enter to present):", 30, 255, 0.75)
         for i, ev in ipairs(c.evidence) do
             local ey = 275 + (i - 1) * 28
             if i == selected_evidence then
-                luna.render.setColor(0.3, 0.3, 0.5, 1)
-                luna.render.rectangle("fill", 25, ey - 2, 290, 24)
-                luna.render.setColor(1, 1, 0.6, 1)
+                luna.gfx.setColor(0.3, 0.3, 0.5, 1)
+                luna.gfx.rectangle("fill", 25, ey - 2, 290, 24)
+                luna.gfx.setColor(1, 1, 0.6, 1)
             else
-                luna.render.setColor(0.7, 0.7, 0.7, 1)
+                luna.gfx.setColor(0.7, 0.7, 0.7, 1)
             end
-            luna.render.print(i .. ". " .. ev.name .. " — " .. ev.desc, 35, ey, 0.65)
+            luna.gfx.print(i .. ". " .. ev.name .. " — " .. ev.desc, 35, ey, 0.65)
         end
     end
 
     -- Question menu
     if state == "question" then
-        luna.render.setColor(0.1, 0.1, 0.18, 0.95)
-        luna.render.rectangle("fill", 20, 250, 500, 130)
-        luna.render.setColor(1, 0.85, 0.4, 1)
-        luna.render.print("Cross-examine (Up/Down, Enter):", 30, 255, 0.8)
+        luna.gfx.setColor(0.1, 0.1, 0.18, 0.95)
+        luna.gfx.rectangle("fill", 20, 250, 500, 130)
+        luna.gfx.setColor(1, 0.85, 0.4, 1)
+        luna.gfx.print("Cross-examine (Up/Down, Enter):", 30, 255, 0.8)
         for i, q in ipairs(c.questions) do
             local qy = 280 + (i - 1) * 30
             if i == selected_question then
-                luna.render.setColor(0.3, 0.3, 0.5, 1)
-                luna.render.rectangle("fill", 25, qy - 2, 490, 26)
-                luna.render.setColor(1, 1, 0.6, 1)
+                luna.gfx.setColor(0.3, 0.3, 0.5, 1)
+                luna.gfx.rectangle("fill", 25, qy - 2, 490, 26)
+                luna.gfx.setColor(1, 1, 0.6, 1)
             else
-                luna.render.setColor(0.8, 0.8, 0.8, 1)
+                luna.gfx.setColor(0.8, 0.8, 0.8, 1)
             end
-            luna.render.print(q.text, 35, qy, 0.8)
+            luna.gfx.print(q.text, 35, qy, 0.8)
         end
     end
 
     -- Controls
-    luna.render.setColor(0.5, 0.5, 0.5, 1)
-    luna.render.print("E=evidence | P=press | Q=question | Enter=next | Esc=quit", 30, 450, 0.65)
-    luna.render.print("Case " .. current_case .. "/" .. #cases .. "  |  Testimony " .. testimony_idx .. "/" .. #c.testimony, 30, 435, 0.65)
+    luna.gfx.setColor(0.5, 0.5, 0.5, 1)
+    luna.gfx.print("E=evidence | P=press | Q=question | Enter=next | Esc=quit", 30, 450, 0.65)
+    luna.gfx.print("Case " .. current_case .. "/" .. #cases .. "  |  Testimony " .. testimony_idx .. "/" .. #c.testimony, 30, 435, 0.65)
 
     -- Flash
     if flash_timer > 0 then
         local a = clamp(flash_timer, 0, 1)
-        luna.render.setColor(0, 0, 0, 0.7 * a)
-        luna.render.rectangle("fill", 50, 400, 700, 35)
-        luna.render.setColor(flash_color[1], flash_color[2], flash_color[3], a)
-        luna.render.print(flash_text, 60, 405, 0.85)
+        luna.gfx.setColor(0, 0, 0, 0.7 * a)
+        luna.gfx.rectangle("fill", 50, 400, 700, 35)
+        luna.gfx.setColor(flash_color[1], flash_color[2], flash_color[3], a)
+        luna.gfx.print(flash_text, 60, 405, 0.85)
     end
 
-    luna.render.setColor(0.5, 0.5, 0.5, 1)
-    luna.render.print("FPS: " .. luna.time.getFPS(), 700, 5, 0.6)
+    luna.gfx.setColor(0.5, 0.5, 0.5, 1)
+    luna.gfx.print("FPS: " .. luna.time.getFPS(), 700, 5, 0.6)
 end

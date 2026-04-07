@@ -1,4 +1,4 @@
-﻿# `particle` — Agent Reference
+# `particle` — Agent Reference
 
 | Property       | Value                                                |
 |----------------|------------------------------------------------------|
@@ -300,7 +300,7 @@ The config table passed to `newSystem()` supports these camelCase keys (all opti
 
 ```lua
 -- Fire emitter with gravity and alpha fade
-function luna.load()
+function luna.init()
     fire = luna.particles.newSystem({
         maxParticles = 500,
         emissionRate = 80,
@@ -321,25 +321,25 @@ function luna.load()
     })
 end
 
-function luna.update(dt)
+function luna.process(dt)
     fire:update(dt)
     fire:moveTo(400, 500)
 end
 
-function luna.draw()
-    luna.render.draw(fire, 0, 0)
+function luna.render()
+    luna.gfx.draw(fire, 0, 0)
 end
 ```
 
 ```lua
 -- Trail ribbon following the mouse
-function luna.load()
+function luna.init()
     ribbon = luna.particles.newTrail(0.8, 12)
     ribbon:setHeadColor(0.2, 0.6, 1.0, 1.0)
     ribbon:setTailColor(0.2, 0.6, 1.0, 0.0)
 end
 
-function luna.update(dt)
+function luna.process(dt)
     local mx, my = luna.mouse.getPosition()
     ribbon:pushPoint(mx, my)
     ribbon:update(dt)

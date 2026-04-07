@@ -21,9 +21,9 @@ description: "Create a new self-contained Lua example game in examples/. Use whe
 2. Create directory `examples/<EXAMPLE_NAME>/`
 3. Write `examples/<EXAMPLE_NAME>/main.lua` with:
    - `local` variables for all state
-   - `function luna.load()` — initialization
-   - `function luna.update(dt)` — frame logic
-   - `function luna.draw()` — rendering only
+   - `function luna.init()` — initialization
+   - `function luna.process(dt)` — frame logic
+   - `function luna.render()` — rendering only
    - Optionally: `luna.keypressed`, `luna.mousepressed` callbacks
 4. Check all API calls against `docs/API/lua_api_reference_generated.md`:
    - Colors: `[0.0, 1.0]` float range

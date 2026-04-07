@@ -1,8 +1,8 @@
-﻿-- Module availability guard (added by fix_nil_module_demos.py)
+-- Module availability guard (added by fix_nil_module_demos.py)
 if not luna.devtools then
-    function luna.load()
-        luna.render.setBackgroundColor(0.08, 0.08, 0.12)
-        luna.render.print("luna.devtools is not available in this build", 180, 270)
+    function luna.init()
+        luna.gfx.setBackgroundColor(0.08, 0.08, 0.12)
+        luna.gfx.print("luna.devtools is not available in this build", 180, 270)
     end
     return
 end
@@ -13,7 +13,7 @@ end
 local dt = luna.devtools
 local frame_count = 0
 
-function luna.load()
+function luna.init()
     -- Configure logger
     dt.setLogLevel("debug")
     dt.setLogConsole(false)  -- suppress stderr in demo
@@ -28,10 +28,10 @@ function luna.load()
     -- Frame stats
     dt.setFrameHistorySize(120)
 
-    luna.render.setBackgroundColor(0.1, 0.1, 0.15)
+    luna.gfx.setBackgroundColor(0.1, 0.1, 0.15)
 end
 
-function luna.update(delta)
+function luna.process(delta)
     frame_count = frame_count + 1
 
     -- Profile the update phase
@@ -60,39 +60,39 @@ function luna.update(delta)
     end
 end
 
-function luna.draw()
+function luna.render()
     local y = 20
 
-    luna.render.setColor(1, 1, 0.6)
-    luna.render.print("Devtools Demo", 20, y)
+    luna.gfx.setColor(1, 1, 0.6)
+    luna.gfx.print("Devtools Demo", 20, y)
     y = y + 30
 
     -- Frame stats
     local stats = dt.getFrameStats()
-    luna.render.setColor(0.7, 1, 0.7)
-    luna.render.print(string.format("FPS: %.1f  |  dt: %.3fms", stats.fps or 0, (stats.avg or 0) * 1000), 20, y)
+    luna.gfx.setColor(0.7, 1, 0.7)
+    luna.gfx.print(string.format("FPS: %.1f  |  dt: %.3fms", stats.fps or 0, (stats.avg or 0) * 1000), 20, y)
     y = y + 20
-    luna.render.print(string.format("p50: %.3fms  p95: %.3fms  p99: %.3fms", (stats.p50 or 0) * 1000, (stats.p95 or 0) * 1000, (stats.p99 or 0) * 1000), 20, y)
+    luna.gfx.print(string.format("p50: %.3fms  p95: %.3fms  p99: %.3fms", (stats.p50 or 0) * 1000, (stats.p95 or 0) * 1000, (stats.p99 or 0) * 1000), 20, y)
     y = y + 30
 
     -- Profile data (most recent frame)
-    luna.render.setColor(0.7, 0.8, 1)
-    luna.render.print("Profile (last frame):", 20, y)
+    luna.gfx.setColor(0.7, 0.8, 1)
+    luna.gfx.print("Profile (last frame):", 20, y)
     y = y + 20
 
     local zones = dt.getProfileData()
     if zones then
         for i = 1, #zones do
             local z = zones[i]
-            luna.render.setColor(0.9, 0.9, 0.9)
-            luna.render.print(string.format("  %s: %.3fms (self: %.3fms)", z.name, z.time * 1000, z.selfTime * 1000), 20, y)
+            luna.gfx.setColor(0.9, 0.9, 0.9)
+            luna.gfx.print(string.format("  %s: %.3fms (self: %.3fms)", z.name, z.time * 1000, z.selfTime * 1000), 20, y)
             y = y + 18
             -- Children
             if z.children then
                 for j = 1, #z.children do
                     local c = z.children[j]
-                    luna.render.setColor(0.7, 0.7, 0.7)
-                    luna.render.print(string.format("    %s: %.3fms", c.name, c.time * 1000), 20, y)
+                    luna.gfx.setColor(0.7, 0.7, 0.7)
+                    luna.gfx.print(string.format("    %s: %.3fms", c.name, c.time * 1000), 20, y)
                     y = y + 18
                 end
             end
@@ -101,27 +101,27 @@ function luna.draw()
     y = y + 10
 
     -- Log history (last 5)
-    luna.render.setColor(1, 0.8, 0.6)
-    luna.render.print("Recent logs:", 20, y)
+    luna.gfx.setColor(1, 0.8, 0.6)
+    luna.gfx.print("Recent logs:", 20, y)
     y = y + 20
 
     local history = dt.getLogHistory(5)
     for i = 1, #history do
         local entry = history[i]
-        luna.render.setColor(0.8, 0.8, 0.8)
-        luna.render.print(string.format("[%s] %s", entry.level, entry.message), 30, y)
+        luna.gfx.setColor(0.8, 0.8, 0.8)
+        luna.gfx.print(string.format("[%s] %s", entry.level, entry.message), 30, y)
         y = y + 16
     end
     y = y + 20
 
     -- Eval demo
-    luna.render.setColor(0.6, 1, 0.9)
+    luna.gfx.setColor(0.6, 1, 0.9)
     local ok, result = dt.eval("return 2 + 2")
-    luna.render.print(string.format("eval('return 2+2') = %s (ok=%s)", tostring(result), tostring(ok)), 20, y)
+    luna.gfx.print(string.format("eval('return 2+2') = %s (ok=%s)", tostring(result), tostring(ok)), 20, y)
     y = y + 20
 
-    luna.render.setColor(0.5, 0.5, 0.5)
-    luna.render.print("Press ESC to quit", 20, y)
+    luna.gfx.setColor(0.5, 0.5, 0.5)
+    luna.gfx.print("Press ESC to quit", 20, y)
 end
 
 function luna.keypressed(key)

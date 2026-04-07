@@ -1,4 +1,4 @@
-﻿-- examples/event.lua
+-- examples/event.lua
 -- Luna2D luna.signal API Reference
 -- This file is documentation code, not a runnable game.
 -- Covers the Signal event bus and the engine event queue.
@@ -91,7 +91,7 @@ if name then
 end
 
 -- Process all queued events in a loop (typical main loop pattern):
-function luna.update(dt)
+function luna.process(dt)
     local ev, v1, v2, v3
     local safety = 0
     repeat

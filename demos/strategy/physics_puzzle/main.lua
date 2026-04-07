@@ -1,4 +1,4 @@
-﻿-- Physics Puzzle Demo -- drop shapes to guide a ball to the goal
+-- Physics Puzzle Demo -- drop shapes to guide a ball to the goal
 -- Click to place shapes | 1/2: toggle circle/rect | R: reset | Escape: quit
 
 local world = nil
@@ -61,9 +61,9 @@ local function loadLevel(idx)
     messageTimer = 3
 end
 
-function luna.load()
+function luna.init()
     luna.window.setTitle("Physics Puzzle")
-    luna.render.setBackgroundColor(0.12, 0.12, 0.18)
+    luna.gfx.setBackgroundColor(0.12, 0.12, 0.18)
     loadLevel(1)
 end
 
@@ -90,7 +90,7 @@ local function placePiece(mx, my)
     table.insert(placedPieces, piece)
 end
 
-function luna.update(dt)
+function luna.process(dt)
     if won then return end
 
     world:step(dt)
@@ -116,75 +116,75 @@ function luna.update(dt)
     end
 end
 
-function luna.draw()
+function luna.render()
     -- goal zone
-    luna.render.setColor(0.2, 0.8, 0.2, 0.4)
-    luna.render.rectangle("fill", goal.x, goal.y, goal.w, goal.h)
-    luna.render.setColor(0.2, 1, 0.2, 1)
-    luna.render.rectangle("line", goal.x, goal.y, goal.w, goal.h)
-    luna.render.print("GOAL", goal.x + 14, goal.y + 12)
+    luna.gfx.setColor(0.2, 0.8, 0.2, 0.4)
+    luna.gfx.rectangle("fill", goal.x, goal.y, goal.w, goal.h)
+    luna.gfx.setColor(0.2, 1, 0.2, 1)
+    luna.gfx.rectangle("line", goal.x, goal.y, goal.w, goal.h)
+    luna.gfx.print("GOAL", goal.x + 14, goal.y + 12)
 
     -- static platforms
     for _, s in ipairs(staticBodies) do
-        luna.render.setColor(0.5, 0.45, 0.4, 1)
-        luna.render.rectangle("fill", s.x, s.y, s.w, s.h)
+        luna.gfx.setColor(0.5, 0.45, 0.4, 1)
+        luna.gfx.rectangle("fill", s.x, s.y, s.w, s.h)
     end
 
     -- placed pieces
     for _, p in ipairs(placedPieces) do
-        luna.render.setColor(0.3, 0.5, 0.8, 0.9)
+        luna.gfx.setColor(0.3, 0.5, 0.8, 0.9)
         if p.mode == "circle" then
-            luna.render.circle("fill", p.x, p.y, p.r)
-            luna.render.setColor(0.4, 0.6, 1, 1)
-            luna.render.circle("line", p.x, p.y, p.r)
+            luna.gfx.circle("fill", p.x, p.y, p.r)
+            luna.gfx.setColor(0.4, 0.6, 1, 1)
+            luna.gfx.circle("line", p.x, p.y, p.r)
         else
-            luna.render.rectangle("fill", p.x - p.w / 2, p.y - p.h / 2, p.w, p.h)
-            luna.render.setColor(0.4, 0.6, 1, 1)
-            luna.render.rectangle("line", p.x - p.w / 2, p.y - p.h / 2, p.w, p.h)
+            luna.gfx.rectangle("fill", p.x - p.w / 2, p.y - p.h / 2, p.w, p.h)
+            luna.gfx.setColor(0.4, 0.6, 1, 1)
+            luna.gfx.rectangle("line", p.x - p.w / 2, p.y - p.h / 2, p.w, p.h)
         end
     end
 
     -- ball
     local bx, by = ballBody:getPosition()
-    luna.render.setColor(1, 0.4, 0.2, 1)
-    luna.render.circle("fill", bx, by, 12)
-    luna.render.setColor(1, 0.6, 0.3, 1)
-    luna.render.circle("line", bx, by, 12)
+    luna.gfx.setColor(1, 0.4, 0.2, 1)
+    luna.gfx.circle("fill", bx, by, 12)
+    luna.gfx.setColor(1, 0.6, 0.3, 1)
+    luna.gfx.circle("line", bx, by, 12)
 
     -- cursor preview
     if not won then
         local mx, my = luna.mouse.getPosition()
-        luna.render.setColor(0.3, 0.5, 0.8, 0.3)
+        luna.gfx.setColor(0.3, 0.5, 0.8, 0.3)
         if placeMode == "circle" then
-            luna.render.circle("line", mx, my, placeRadius)
+            luna.gfx.circle("line", mx, my, placeRadius)
         else
-            luna.render.rectangle("line", mx - placeW / 2, my - placeH / 2, placeW, placeH)
+            luna.gfx.rectangle("line", mx - placeW / 2, my - placeH / 2, placeW, placeH)
         end
     end
 
     -- HUD
-    luna.render.setColor(1, 1, 1, 1)
-    luna.render.print("Level: " .. level, 10, 10)
-    luna.render.print("Pieces: " .. (maxPieces - #placedPieces) .. "/" .. maxPieces, 10, 30)
-    luna.render.print("Mode: " .. placeMode .. "  [1] Circle  [2] Rect", 10, 50)
-    luna.render.print("Click to place | R: Reset | N: Next level", 10, 575)
+    luna.gfx.setColor(1, 1, 1, 1)
+    luna.gfx.print("Level: " .. level, 10, 10)
+    luna.gfx.print("Pieces: " .. (maxPieces - #placedPieces) .. "/" .. maxPieces, 10, 30)
+    luna.gfx.print("Mode: " .. placeMode .. "  [1] Circle  [2] Rect", 10, 50)
+    luna.gfx.print("Click to place | R: Reset | N: Next level", 10, 575)
 
     -- message
     if messageTimer > 0 then
-        luna.render.setColor(0, 0, 0, 0.6)
-        luna.render.rectangle("fill", 200, 270, 400, 40)
-        luna.render.setColor(1, 1, 0.5, 1)
-        luna.render.print(message, 220, 280)
+        luna.gfx.setColor(0, 0, 0, 0.6)
+        luna.gfx.rectangle("fill", 200, 270, 400, 40)
+        luna.gfx.setColor(1, 1, 0.5, 1)
+        luna.gfx.print(message, 220, 280)
     end
 
     -- won overlay
     if won then
-        luna.render.setColor(0, 0, 0, 0.5)
-        luna.render.rectangle("fill", 250, 240, 300, 80)
-        luna.render.setColor(0.2, 1, 0.4, 1)
-        luna.render.print("LEVEL COMPLETE!", 310, 255, 1.3)
-        luna.render.setColor(1, 1, 1, 1)
-        luna.render.print("Press N for next level", 315, 290)
+        luna.gfx.setColor(0, 0, 0, 0.5)
+        luna.gfx.rectangle("fill", 250, 240, 300, 80)
+        luna.gfx.setColor(0.2, 1, 0.4, 1)
+        luna.gfx.print("LEVEL COMPLETE!", 310, 255, 1.3)
+        luna.gfx.setColor(1, 1, 1, 1)
+        luna.gfx.print("Press N for next level", 315, 290)
     end
 end
 

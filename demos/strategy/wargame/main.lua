@@ -1,4 +1,4 @@
-﻿-- Wargame — Tactical Tabletop with Two Armies
+-- Wargame — Tactical Tabletop with Two Armies
 -- Turn-based combat on a grid with terrain, morale, and command points
 
 local GRID = 40
@@ -207,7 +207,7 @@ local function endTurn()
     end
 end
 
-function luna.load()
+function luna.init()
     -- Generate terrain
     for y = 1, MAP_H do
         terrain[y] = {}
@@ -239,7 +239,7 @@ function luna.load()
     addUnit("red", "infantry", MAP_W - 1, 12)
 end
 
-function luna.update(dt)
+function luna.process(dt)
     if messageTimer > 0 then messageTimer = messageTimer - dt end
 end
 
@@ -320,8 +320,8 @@ function luna.mousepressed(mx, my, btn)
     end
 end
 
-function luna.draw()
-    luna.render.setBackgroundColor(0.12, 0.14, 0.1)
+function luna.render()
+    luna.gfx.setBackgroundColor(0.12, 0.14, 0.1)
 
     -- Grid and terrain
     for y = 1, MAP_H do
@@ -330,33 +330,33 @@ function luna.draw()
             local py = OY + (y - 1) * GRID
             local t = terrain[y][x]
             if t == 0 then
-                luna.render.setColor(0.25, 0.3, 0.2, 1)
+                luna.gfx.setColor(0.25, 0.3, 0.2, 1)
             elseif t == 1 then
-                luna.render.setColor(0.15, 0.35, 0.15, 1)
+                luna.gfx.setColor(0.15, 0.35, 0.15, 1)
             elseif t == 2 then
-                luna.render.setColor(0.35, 0.3, 0.2, 1)
+                luna.gfx.setColor(0.35, 0.3, 0.2, 1)
             end
-            luna.render.rectangle("fill", px, py, GRID - 1, GRID - 1)
+            luna.gfx.rectangle("fill", px, py, GRID - 1, GRID - 1)
             if t == 1 then
-                luna.render.setColor(0.1, 0.5, 0.1, 0.5)
-                luna.render.print("F", px + 14, py + 12)
+                luna.gfx.setColor(0.1, 0.5, 0.1, 0.5)
+                luna.gfx.print("F", px + 14, py + 12)
             elseif t == 2 then
-                luna.render.setColor(0.6, 0.5, 0.3, 0.5)
-                luna.render.print("H", px + 14, py + 12)
+                luna.gfx.setColor(0.6, 0.5, 0.3, 0.5)
+                luna.gfx.print("H", px + 14, py + 12)
             end
         end
     end
 
     -- Move range highlight
-    luna.render.setColor(0.3, 0.6, 1, 0.3)
+    luna.gfx.setColor(0.3, 0.6, 1, 0.3)
     for _, m in ipairs(moveRange) do
-        luna.render.rectangle("fill", OX + (m[1]-1)*GRID, OY + (m[2]-1)*GRID, GRID-1, GRID-1)
+        luna.gfx.rectangle("fill", OX + (m[1]-1)*GRID, OY + (m[2]-1)*GRID, GRID-1, GRID-1)
     end
 
     -- Attack target highlight
     for _, t in ipairs(attackTargets) do
-        luna.render.setColor(1, 0.3, 0.3, 0.4)
-        luna.render.rectangle("fill", OX + (t.gx-1)*GRID, OY + (t.gy-1)*GRID, GRID-1, GRID-1)
+        luna.gfx.setColor(1, 0.3, 0.3, 0.4)
+        luna.gfx.rectangle("fill", OX + (t.gx-1)*GRID, OY + (t.gy-1)*GRID, GRID-1, GRID-1)
     end
 
     -- Units
@@ -366,62 +366,62 @@ function luna.draw()
             local py = OY + (u.gy - 1) * GRID
             -- Team color
             if u.team == "blue" then
-                luna.render.setColor(0.2, 0.4, 0.9, 1)
+                luna.gfx.setColor(0.2, 0.4, 0.9, 1)
             else
-                luna.render.setColor(0.9, 0.25, 0.2, 1)
+                luna.gfx.setColor(0.9, 0.25, 0.2, 1)
             end
-            luna.render.circle("fill", px + GRID/2, py + GRID/2, GRID/2 - 4)
+            luna.gfx.circle("fill", px + GRID/2, py + GRID/2, GRID/2 - 4)
 
             -- Selected indicator
             if i == selected then
-                luna.render.setColor(1, 1, 0, 1)
-                luna.render.setLineWidth(2)
-                luna.render.circle("line", px + GRID/2, py + GRID/2, GRID/2 - 2)
-                luna.render.setLineWidth(1)
+                luna.gfx.setColor(1, 1, 0, 1)
+                luna.gfx.setLineWidth(2)
+                luna.gfx.circle("line", px + GRID/2, py + GRID/2, GRID/2 - 2)
+                luna.gfx.setLineWidth(1)
             end
 
             -- Icon
-            luna.render.setColor(1, 1, 1, 1)
-            luna.render.print(u.icon, px + GRID/2 - 4, py + GRID/2 - 6)
+            luna.gfx.setColor(1, 1, 1, 1)
+            luna.gfx.print(u.icon, px + GRID/2 - 4, py + GRID/2 - 6)
 
             -- HP bar
-            luna.render.setColor(0.2, 0.2, 0.2, 1)
-            luna.render.rectangle("fill", px + 4, py + GRID - 8, GRID - 8, 4)
-            luna.render.setColor(0.2, 0.9, 0.2, 1)
-            luna.render.rectangle("fill", px + 4, py + GRID - 8, (GRID - 8) * (u.hp / u.maxHp), 4)
+            luna.gfx.setColor(0.2, 0.2, 0.2, 1)
+            luna.gfx.rectangle("fill", px + 4, py + GRID - 8, GRID - 8, 4)
+            luna.gfx.setColor(0.2, 0.9, 0.2, 1)
+            luna.gfx.rectangle("fill", px + 4, py + GRID - 8, (GRID - 8) * (u.hp / u.maxHp), 4)
         end
     end
 
     -- HUD
-    luna.render.setColor(0, 0, 0, 0.85)
-    luna.render.rectangle("fill", 0, 0, 800, 46)
+    luna.gfx.setColor(0, 0, 0, 0.85)
+    luna.gfx.rectangle("fill", 0, 0, 800, 46)
 
     local turnColor = turn == "blue" and {0.4, 0.6, 1} or {1, 0.4, 0.3}
-    luna.render.setColor(turnColor[1], turnColor[2], turnColor[3], 1)
-    luna.render.print(turn:upper() .. " TURN", 10, 5, 1.2)
+    luna.gfx.setColor(turnColor[1], turnColor[2], turnColor[3], 1)
+    luna.gfx.print(turn:upper() .. " TURN", 10, 5, 1.2)
 
-    luna.render.setColor(1, 1, 1, 1)
-    luna.render.print("CP: " .. cp .. "/" .. MAX_CP, 150, 8)
-    luna.render.print("Blue: " .. morale("blue") .. " units", 280, 8)
-    luna.render.print("Red: " .. morale("red") .. " units", 420, 8)
-    luna.render.print("[Space] End Turn  [Esc] Deselect", 10, 28)
-    luna.render.print("LClick=Move  RClick=Attack", 400, 28)
+    luna.gfx.setColor(1, 1, 1, 1)
+    luna.gfx.print("CP: " .. cp .. "/" .. MAX_CP, 150, 8)
+    luna.gfx.print("Blue: " .. morale("blue") .. " units", 280, 8)
+    luna.gfx.print("Red: " .. morale("red") .. " units", 420, 8)
+    luna.gfx.print("[Space] End Turn  [Esc] Deselect", 10, 28)
+    luna.gfx.print("LClick=Move  RClick=Attack", 400, 28)
 
     -- Combat log
-    luna.render.setColor(0, 0, 0, 0.7)
-    luna.render.rectangle("fill", 0, 530, 800, 70)
-    luna.render.setColor(0.8, 0.8, 0.6, 1)
+    luna.gfx.setColor(0, 0, 0, 0.7)
+    luna.gfx.rectangle("fill", 0, 530, 800, 70)
+    luna.gfx.setColor(0.8, 0.8, 0.6, 1)
     for i, log in ipairs(combatLog) do
-        luna.render.print(log, 10, 530 + (i - 1) * 13)
+        luna.gfx.print(log, 10, 530 + (i - 1) * 13)
     end
 
     -- Game over
     if gameOver then
-        luna.render.setColor(0, 0, 0, 0.75)
-        luna.render.rectangle("fill", 200, 220, 400, 100)
-        luna.render.setColor(1, 1, 0.3, 1)
-        luna.render.print(winner .. " WINS!", 330, 240, 1.8)
-        luna.render.setColor(1, 1, 1, 1)
-        luna.render.print("Press R to restart", 330, 290)
+        luna.gfx.setColor(0, 0, 0, 0.75)
+        luna.gfx.rectangle("fill", 200, 220, 400, 100)
+        luna.gfx.setColor(1, 1, 0.3, 1)
+        luna.gfx.print(winner .. " WINS!", 330, 240, 1.8)
+        luna.gfx.setColor(1, 1, 1, 1)
+        luna.gfx.print("Press R to restart", 330, 290)
     end
 end

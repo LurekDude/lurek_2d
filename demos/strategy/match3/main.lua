@@ -1,4 +1,4 @@
-﻿-- Match-3 Puzzle: Swap adjacent gems, match 3+, cascade combos
+-- Match-3 Puzzle: Swap adjacent gems, match 3+, cascade combos
 -- Click two adjacent gems to swap, score points, special gems
 
 local function lerp(a, b, t) return a + (b - a) * t end
@@ -230,11 +230,11 @@ local function has_valid_moves()
     return false
 end
 
-function luna.load()
+function luna.init()
     init_grid()
 end
 
-function luna.update(dt)
+function luna.process(dt)
     -- Animate gem positions
     local all_settled = true
     for r = 1, GRID_SIZE do
@@ -343,22 +343,22 @@ function luna.keypressed(key)
     if key == "escape" then luna.signal.quit() end
 end
 
-function luna.draw()
-    luna.render.setBackgroundColor(0.12, 0.1, 0.18)
+function luna.render()
+    luna.gfx.setBackgroundColor(0.12, 0.1, 0.18)
 
     -- Title and score
-    luna.render.setColor(1, 1, 1, 1)
-    luna.render.print("MATCH-3", GRID_X, 10, 2)
-    luna.render.print("Score: " .. score, GRID_X + 250, 15, 1.5)
-    luna.render.print("Moves: " .. moves, GRID_X + 250, 38)
+    luna.gfx.setColor(1, 1, 1, 1)
+    luna.gfx.print("MATCH-3", GRID_X, 10, 2)
+    luna.gfx.print("Score: " .. score, GRID_X + 250, 15, 1.5)
+    luna.gfx.print("Moves: " .. moves, GRID_X + 250, 38)
     if combo > 1 then
-        luna.render.setColor(1, 0.8, 0.1, 1)
-        luna.render.print("COMBO x" .. combo, GRID_X + 420, 15, 1.5)
+        luna.gfx.setColor(1, 0.8, 0.1, 1)
+        luna.gfx.print("COMBO x" .. combo, GRID_X + 420, 15, 1.5)
     end
 
     -- Grid background
-    luna.render.setColor(0.18, 0.16, 0.22, 1)
-    luna.render.rectangle("fill", GRID_X - 4, GRID_Y - 4, GRID_SIZE * CELL + 8, GRID_SIZE * CELL + 8)
+    luna.gfx.setColor(0.18, 0.16, 0.22, 1)
+    luna.gfx.rectangle("fill", GRID_X - 4, GRID_Y - 4, GRID_SIZE * CELL + 8, GRID_SIZE * CELL + 8)
 
     -- Gems
     for r = 1, GRID_SIZE do
@@ -370,27 +370,27 @@ function luna.draw()
                 local pad = 3
 
                 -- Cell background
-                luna.render.setColor(0.14, 0.12, 0.18, 1)
-                luna.render.rectangle("fill", x, y, CELL, CELL)
+                luna.gfx.setColor(0.14, 0.12, 0.18, 1)
+                luna.gfx.rectangle("fill", x, y, CELL, CELL)
 
                 -- Gem
                 local clr = gem_colors[g.color]
-                luna.render.setColor(clr[1], clr[2], clr[3], 1)
-                luna.render.circle("fill", x + CELL / 2, y + CELL / 2, CELL / 2 - pad)
+                luna.gfx.setColor(clr[1], clr[2], clr[3], 1)
+                luna.gfx.circle("fill", x + CELL / 2, y + CELL / 2, CELL / 2 - pad)
 
                 -- Highlight for specials
                 if g.special == "bomb" then
-                    luna.render.setColor(1, 1, 1, 0.5)
-                    luna.render.circle("fill", x + CELL / 2, y + CELL / 2, 8)
+                    luna.gfx.setColor(1, 1, 1, 0.5)
+                    luna.gfx.circle("fill", x + CELL / 2, y + CELL / 2, 8)
                 elseif g.special == "wiper" then
-                    luna.render.setColor(1, 1, 1, 0.4)
-                    luna.render.circle("line", x + CELL / 2, y + CELL / 2, CELL / 2 - pad - 3)
-                    luna.render.circle("line", x + CELL / 2, y + CELL / 2, CELL / 2 - pad - 6)
+                    luna.gfx.setColor(1, 1, 1, 0.4)
+                    luna.gfx.circle("line", x + CELL / 2, y + CELL / 2, CELL / 2 - pad - 3)
+                    luna.gfx.circle("line", x + CELL / 2, y + CELL / 2, CELL / 2 - pad - 6)
                 end
 
                 -- Shine
-                luna.render.setColor(1, 1, 1, 0.15)
-                luna.render.circle("fill", x + CELL / 2 - 6, y + CELL / 2 - 8, 6)
+                luna.gfx.setColor(1, 1, 1, 0.15)
+                luna.gfx.circle("fill", x + CELL / 2 - 6, y + CELL / 2 - 8, 6)
             end
         end
     end
@@ -399,14 +399,14 @@ function luna.draw()
     if selected then
         local sx = GRID_X + (selected.c - 1) * CELL
         local sy = GRID_Y + (selected.r - 1) * CELL
-        luna.render.setColor(1, 1, 1, 0.5)
-        luna.render.setLineWidth(3)
-        luna.render.rectangle("line", sx, sy, CELL, CELL)
-        luna.render.setLineWidth(1)
+        luna.gfx.setColor(1, 1, 1, 0.5)
+        luna.gfx.setLineWidth(3)
+        luna.gfx.rectangle("line", sx, sy, CELL, CELL)
+        luna.gfx.setLineWidth(1)
     end
 
     -- Controls
-    luna.render.setColor(0.5, 0.5, 0.5, 1)
-    luna.render.print("Click gems to swap | R: restart | ESC: quit", GRID_X, SCREEN_H - 28)
-    luna.render.print("FPS: " .. luna.time.getFPS(), SCREEN_W - 90, 10)
+    luna.gfx.setColor(0.5, 0.5, 0.5, 1)
+    luna.gfx.print("Click gems to swap | R: restart | ESC: quit", GRID_X, SCREEN_H - 28)
+    luna.gfx.print("FPS: " .. luna.time.getFPS(), SCREEN_W - 90, 10)
 end

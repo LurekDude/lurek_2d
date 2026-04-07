@@ -1,8 +1,8 @@
-﻿# Luna2D API Examples
+# Luna2D API Examples
 
 Each file in this folder is a **Lua API reference** for one engine module.
 These files document every public `luna.*` function with realistic usage patterns.
-They are not runnable games — they are meant to be read, searched, and copy-pasted from.
+They are not runnable games � they are meant to be read, searched, and copy-pasted from.
 
 ## How to use
 
@@ -15,11 +15,11 @@ They are not runnable games — they are meant to be read, searched, and copy-pa
 | File | API | Description |
 |------|-----|-------------|
 | [ai.lua](ai.lua) | `luna.ai` | Finite-state machines, behaviour trees, GOAP planners, and steering behaviours |
-| [animation.lua](animation.lua) | `luna.tween` | Sprite animation clips, frame pools, playback control, and frame-level events |
+| [animation.lua](animation.lua) | `luna.animation` | Sprite animation clips, frame pools, playback control, and frame-level events |
 | [audio.lua](audio.lua) | `luna.audio` | Sound sources, streaming music, volume/pitch/pan, buses, and audio effects |
 | [automation.lua](automation.lua) | `luna.automation` | Replaying and recording input sequences for automated testing or cutscenes |
 | [camera.lua](camera.lua) | `luna.camera` | 2D cameras with pan, zoom, rotation, viewport scaling, and screen-to-world transforms |
-| [compute.lua](compute.lua) | `luna.gpu` | Dense numerical arrays (NdArray) and CPU-side numerical processing |
+| [compute.lua](compute.lua) | `luna.compute` | Dense numerical arrays (NdArray) and CPU-side numerical processing |
 | [data.lua](data.lua) | `luna.data` | ByteData buffers, compression (deflate/gzip/lz4/zlib), hashing (MD5/SHA), and base64/hex encoding |
 | [dataframe.lua](dataframe.lua) | `luna.dataframe` | Column-major tabular data, filtering, sorting, joins, aggregation, and an SQL-capable Database |
 | [entity.lua](entity.lua) | `luna.entity` | Lightweight entity component helpers and entity management |
@@ -27,7 +27,7 @@ They are not runnable games — they are meant to be read, searched, and copy-pa
 | [filesystem.lua](filesystem.lua) | `luna.fs` | Sandboxed game filesystem, virtual mount points, ZIP archives, and FileHandle I/O |
 | [fx.lua](fx.lua) | `luna.postfx` | Post-processing effects: blur, bloom, color grading, and custom effect chains |
 | [graph.lua](graph.lua) | `luna.graph` | Directed graphs, edge/node operations, flow simulation, and graph algorithms |
-| [graphics.lua](graphics.lua) | `luna.render` | 2D drawing, images, fonts, canvases, meshes, sprite batches, shaders, transforms, and stencils |
+| [graphics.lua](graphics.lua) | `luna.gfx` | 2D drawing, images, fonts, canvases, meshes, sprite batches, shaders, transforms, and stencils |
 | [gui.lua](gui.lua) | `luna.ui` | Retained-mode widget UI: buttons, sliders, text inputs, panels, layouts, and theming |
 | [image.lua](image.lua) | `luna.img` | CPU-side pixel buffers, per-pixel manipulation, and PNG/BMP encoding |
 | [input.lua](input.lua) | `luna.input` | Keyboard, mouse, gamepad, and touch state queries |
@@ -56,6 +56,6 @@ They are not runnable games — they are meant to be read, searched, and copy-pa
 
 - All indices are **1-based** (Lua convention).
 - All angles are in **radians**.
-- All colour channels are **float 0.0–1.0**.
+- All colour channels are **float 0.0�1.0**.
 - Functions shown as `func(x, y?, z?)` have optional parameters marked `?`.
-- `→` separates parameters from return values in comments.
+- `�` separates parameters from return values in comments.

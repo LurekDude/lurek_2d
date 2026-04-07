@@ -1,14 +1,14 @@
-﻿# `compute` — Agent Reference
+# `compute` � Agent Reference
 
 | Property       | Value                                                |
 |----------------|------------------------------------------------------|
-| **Tier**       | Tier 1 — Core Engine Subsystems                      |
-| **Status**     | Implemented — Full                                   |
-| **Lua API**    | `luna.gpu`                                       |
+| **Tier**       | Tier 1 � Core Engine Subsystems                      |
+| **Status**     | Implemented � Full                                   |
+| **Lua API**    | `luna.compute`                                       |
 | **Source**      | `src/compute/`                                       |
 | **Rust Tests** | `tests/rust/unit/compute_tests.rs`                   |
 | **Lua Tests**  | `tests/lua/unit/test_compute.lua`                    |
-| **Architecture** | —                                                  |
+| **Architecture** | �                                                  |
 
 ## Summary
 
@@ -22,7 +22,7 @@ The module is split into three submodules: `array` (core container and construct
 `ops` (50+ element-wise arithmetic, comparison, reduction, masking, shape manipulation,
 and bitwise operations), and `spatial` (2D convolution, morphological operations,
 flood fill, region extraction, matrix multiplication, and dot product). All operations
-are CPU-side — there is no GPU compute shader path. The CPU path operates on contiguous
+are CPU-side � there is no GPU compute shader path. The CPU path operates on contiguous
 `Vec<u8>` storage so that Rust-level loops can benefit from SIMD auto-vectorisation
 without requiring any `unsafe` code or explicit intrinsic calls.
 
@@ -32,43 +32,43 @@ networks, heat diffusion) at scales that would drop below target frame rate if p
 sequentially in Lua, and offline data preprocessing during level loading. The module
 enforces a hard cap of 268,435,456 elements per array to prevent unbounded allocations.
 
-The compute module is intentionally NOT a general-purpose tensor library — it does not
+The compute module is intentionally NOT a general-purpose tensor library � it does not
 provide broadcasting, automatic differentiation, or GPU dispatch. For named-column
 tabular data, use the `dataframe` module instead.
 
 ## Architecture
 
 ```
-luna.gpu (Lua API)
-  │
-  ▼
+luna.compute (Lua API)
+  -
+  �
 LuaArray (UserData wrapper)
-  │
-  ▼
-NdArray (core container — src/compute/array.rs)
-  ├── shape: Vec<usize>      (1D / 2D / 3D, max 268M elements)
-  ├── strides: Vec<usize>    (row-major, computed from shape)
-  ├── dtype: DataType         (Float32 | Float64 | Int32)
-  └── data: Vec<u8>          (contiguous byte buffer)
-        │
-        ├── ops.rs ── 50+ pure functions ──────────────────────
-        │     ├── Arithmetic ── add, sub, mul, div, pow, neg, abs, sqrt
-        │     ├── Scalar ops ── add_scalar, sub_scalar, mul_scalar, etc.
-        │     ├── Comparison ── eq, neq, gt, lt, gte, lte (→ Float32 0|1)
-        │     ├── Masking ── threshold, where_mask, count_nonzero
-        │     ├── Predicates ── any, all, argmin, argmax
-        │     ├── Reductions ── sum, mean, min_val, max_val (global)
-        │     ├── Axis reductions ── sum_axis, mean_axis, min_axis, max_axis
-        │     ├── Shape ── reshape, transpose_2d, fill, clone_array
-        │     └── Bitwise ── and, or, xor, not, lshift, rshift (Int32 only)
-        │
-        └── spatial.rs ── spatial / linear algebra ────────────
-              ├── convolve2d ── 2D convolution with zero-padding
-              ├── dilate / erode ── morphological ops (Manhattan diamond)
-              ├── flood_fill ── BFS 4-connectivity region fill
-              ├── get_region / set_region ── rectangular sub-array access
-              ├── matmul ── matrix multiplication (m,k)×(k,n)→(m,n)
-              └── dot ── vector dot product
+  -
+  �
+NdArray (core container � src/compute/array.rs)
+  +�� shape: Vec<usize>      (1D / 2D / 3D, max 268M elements)
+  +�� strides: Vec<usize>    (row-major, computed from shape)
+  +�� dtype: DataType         (Float32 | Float64 | Int32)
+  L�� data: Vec<u8>          (contiguous byte buffer)
+        -
+        +�� ops.rs �� 50+ pure functions ����������������������
+        -     +�� Arithmetic �� add, sub, mul, div, pow, neg, abs, sqrt
+        -     +�� Scalar ops �� add_scalar, sub_scalar, mul_scalar, etc.
+        -     +�� Comparison �� eq, neq, gt, lt, gte, lte (� Float32 0|1)
+        -     +�� Masking �� threshold, where_mask, count_nonzero
+        -     +�� Predicates �� any, all, argmin, argmax
+        -     +�� Reductions �� sum, mean, min_val, max_val (global)
+        -     +�� Axis reductions �� sum_axis, mean_axis, min_axis, max_axis
+        -     +�� Shape �� reshape, transpose_2d, fill, clone_array
+        -     L�� Bitwise �� and, or, xor, not, lshift, rshift (Int32 only)
+        -
+        L�� spatial.rs �� spatial / linear algebra ������������
+              +�� convolve2d �� 2D convolution with zero-padding
+              +�� dilate / erode �� morphological ops (Manhattan diamond)
+              +�� flood_fill �� BFS 4-connectivity region fill
+              +�� get_region / set_region �� rectangular sub-array access
+              +�� matmul �� matrix multiplication (m,k)�(k,n)�(m,n)
+              L�� dot �� vector dot product
 ```
 
 ## Source Files
@@ -90,8 +90,8 @@ Core NdArray container and DataType enum. Provides constructors (`new`, `zeros`,
 `size`, `ndim`, `strides`), raw data access (`data`, `data_mut`), and utilities
 (`flat_index`, `compute_strides`, `to_f64_vec`, `display_string`).
 
-- **`NdArray`** (struct): Dense N-dimensional numerical array with row-major strides. Stores data as a contiguous `Vec<u8>` byte buffer. Shapes limited to 1–3 dimensions, max 268M elements.
-- **`DataType`** (enum): Element data type — `Float32` (4 bytes), `Float64` (8 bytes), `Int32` (4 bytes). Parsed from strings `"float32"` / `"float64"` / `"int32"`.
+- **`NdArray`** (struct): Dense N-dimensional numerical array with row-major strides. Stores data as a contiguous `Vec<u8>` byte buffer. Shapes limited to 1�3 dimensions, max 268M elements.
+- **`DataType`** (enum): Element data type � `Float32` (4 bytes), `Float64` (8 bytes), `Int32` (4 bytes). Parsed from strings `"float32"` / `"float64"` / `"int32"`.
 
 ### `compute::ops`
 
@@ -131,7 +131,7 @@ arrays except `dot` which requires 1D.
 - **`flood_fill`** (fn): BFS flood fill with 4-connectivity from a seed cell.
 - **`get_region`** (fn): Extract a rectangular sub-region from a 2D array.
 - **`set_region`** (fn): Copy a source 2D array into a target at a given position (in-place).
-- **`matmul`** (fn): Matrix multiplication (m,k)×(k,n)→(m,n) using naive triple loop.
+- **`matmul`** (fn): Matrix multiplication (m,k)�(k,n)�(m,n) using naive triple loop.
 - **`dot`** (fn): Dot product of two 1D arrays.
 
 ## Key Types
@@ -152,15 +152,15 @@ Metadata: `shape`, `dtype`, `size`, `ndim`, `strides`. Element access: `get_f64`
 #### `compute::array::DataType`
 
 Element data type for an NdArray. Three variants:
-- `Float32` — 32-bit IEEE 754 floating point (4 bytes per element)
-- `Float64` — 64-bit IEEE 754 floating point (8 bytes per element)
-- `Int32` — 32-bit signed integer (4 bytes per element)
+- `Float32` � 32-bit IEEE 754 floating point (4 bytes per element)
+- `Float64` � 64-bit IEEE 754 floating point (8 bytes per element)
+- `Int32` � 32-bit signed integer (4 bytes per element)
 
 Methods: `parse(s)` parses `"float32"` / `"float64"` / `"int32"`, `byte_size()` returns bytes per element, `name()` returns the string name.
 
 ## Lua API
 
-Exposed under `luna.gpu.*` by `src/lua_api/compute_api.rs`. The API provides
+Exposed under `luna.compute.*` by `src/lua_api/compute_api.rs`. The API provides
 five module-level constructor functions and a `LuaArray` UserData type with 52 methods.
 All indices in the Lua API are 1-based. The default dtype is `"float32"`.
 
@@ -168,11 +168,11 @@ All indices in the Lua API are 1-based. The default dtype is `"float32"`.
 
 | Function | Description |
 |----------|-------------|
-| `luna.gpu.newArray(shape, dtype?)` | Create a zero-initialized array |
-| `luna.gpu.zeros(shape, dtype?)` | Create a zero-filled array |
-| `luna.gpu.ones(shape, dtype?)` | Create a one-filled array |
-| `luna.gpu.range(start, stop, step?, dtype?)` | Create a 1D array from start to stop |
-| `luna.gpu.fromTable(data, shape?, dtype?)` | Create an array from a Lua table |
+| `luna.compute.newArray(shape, dtype?)` | Create a zero-initialized array |
+| `luna.compute.zeros(shape, dtype?)` | Create a zero-filled array |
+| `luna.compute.ones(shape, dtype?)` | Create a one-filled array |
+| `luna.compute.range(start, stop, step?, dtype?)` | Create a 1D array from start to stop |
+| `luna.compute.fromTable(data, shape?, dtype?)` | Create an array from a Lua table |
 
 ### Array methods
 
@@ -199,7 +199,7 @@ All indices in the Lua API are 1-based. The default dtype is `"float32"`.
 | `arr:abs()` | Element-wise absolute value |
 | `arr:neg()` | Element-wise negation |
 | `arr:clamp(min, max)` | Clamp elements to range |
-| `arr:eq(other)` | Equality comparison (→ 0/1 array) |
+| `arr:eq(other)` | Equality comparison (� 0/1 array) |
 | `arr:neq(other)` | Not-equal comparison |
 | `arr:gt(other)` | Greater-than comparison |
 | `arr:lt(other)` | Less-than comparison |
@@ -234,9 +234,9 @@ All indices in the Lua API are 1-based. The default dtype is `"float32"`.
 ## Lua Examples
 
 ```lua
-function luna.load()
-    -- Create a 10×10 heightmap filled with zeros
-    heightmap = luna.gpu.zeros({10, 10}, "float32")
+function luna.init()
+    -- Create a 10�10 heightmap filled with zeros
+    heightmap = luna.compute.zeros({10, 10}, "float32")
 
     -- Fill with some procedural values
     for r = 1, 10 do
@@ -246,7 +246,7 @@ function luna.load()
     end
 
     -- Apply a blur kernel via 2D convolution
-    local kernel = luna.gpu.fromTable(
+    local kernel = luna.compute.fromTable(
         {1/9, 1/9, 1/9, 1/9, 1/9, 1/9, 1/9, 1/9, 1/9},
         {3, 3}
     )
@@ -260,21 +260,21 @@ function luna.load()
     -- Threshold into a binary mask
     mask = blurred:threshold(0.5)
 
-    -- Extract a 3×3 sub-region starting at row 2, col 2
+    -- Extract a 3�3 sub-region starting at row 2, col 2
     local region = blurred:getRegion(2, 2, 3, 3)
 end
 ```
 
 ```lua
 -- Matrix multiplication example
-function luna.load()
-    local a = luna.gpu.fromTable({1, 2, 3, 4, 5, 6}, {2, 3})
-    local b = luna.gpu.fromTable({7, 8, 9, 10, 11, 12}, {3, 2})
-    local c = a:matmul(b)  -- result is 2×2
+function luna.init()
+    local a = luna.compute.fromTable({1, 2, 3, 4, 5, 6}, {2, 3})
+    local b = luna.compute.fromTable({7, 8, 9, 10, 11, 12}, {3, 2})
+    local c = a:matmul(b)  -- result is 2�2
 
     -- Dot product of 1D arrays
-    local v1 = luna.gpu.fromTable({1, 0, 0})
-    local v2 = luna.gpu.fromTable({0, 1, 0})
+    local v1 = luna.compute.fromTable({1, 0, 0})
+    local v2 = luna.compute.fromTable({0, 1, 0})
     local dp = v1:dot(v2)  -- 0.0
 end
 ```
@@ -295,7 +295,7 @@ end
 | `engine`    | Imports from | Uses `log_messages` constants for allocation warnings    |
 | `math`      | Peer         | Both are Tier 1 leaf-like modules; `compute` does not import `math` |
 | `dataframe` | Related      | `dataframe` stores named-column tabular data; `compute` stores raw N-dimensional numeric arrays |
-| `lua_api`   | Imported by  | `src/lua_api/compute_api.rs` registers `luna.gpu.*`  |
+| `lua_api`   | Imported by  | `src/lua_api/compute_api.rs` registers `luna.compute.*`  |
 
 **Similar modules**: `dataframe` provides named-column tabular data (think spreadsheet rows);
 `compute` provides raw numerical arrays (think NumPy ndarrays). Use `compute` for spatial
@@ -310,9 +310,9 @@ column types.
 - Bitwise operations (`bitwiseAnd`, `bitwiseOr`, etc.) require `Int32` dtype and return an error for float arrays.
 - The Lua API uses **1-based indices** (converted to 0-based internally). The Rust API uses 0-based indices throughout.
 - Maximum element count is 268,435,456 (256M). Arrays exceeding this limit produce an error at construction time.
-- Shape is constrained to 1D, 2D, or 3D — higher-dimensional arrays are not supported.
-- `matmul` uses a naive O(n³) triple loop. For very large matrices this will be slow; it is intended for moderate-size game data, not HPC workloads.
+- Shape is constrained to 1D, 2D, or 3D � higher-dimensional arrays are not supported.
+- `matmul` uses a naive O(n3) triple loop. For very large matrices this will be slow; it is intended for moderate-size game data, not HPC workloads.
 - `convolve2d` uses zero-padding and produces same-size output. Kernel center is at `(kRows/2, kCols/2)`.
-- The `dispatch_arith!` macro in `compute_api.rs` unifies Array-vs-scalar overloading for arithmetic and comparison methods — a single Lua method accepts either an Array or a number.
+- The `dispatch_arith!` macro in `compute_api.rs` unifies Array-vs-scalar overloading for arithmetic and comparison methods � a single Lua method accepts either an Array or a number.
 - There is no GPU compute path. All operations run on the CPU. The `isOnGPU()` method always returns `false`.
 - Large arrays (>10M elements) may cause GC pressure in Lua when converting via `toTable()`; prefer Rust-side batch operations.

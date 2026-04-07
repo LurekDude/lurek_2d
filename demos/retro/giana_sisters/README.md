@@ -1,11 +1,11 @@
-﻿# The Great Giana Sisters
+# The Great Giana Sisters
 
 A side-scrolling platformer inspired by the notorious 1987 C-64 game that briefly
 rivalled Super Mario Bros. Collect gems, stomp enemies, and reach the exit.
 
 ## What It Demonstrates
 
-- `luna.render.rectangle()` / `luna.render.circle()` — tiles, player, enemies, gems
+- `luna.gfx.rectangle()` / `luna.gfx.circle()` — tiles, player, enemies, gems
 - `luna.input.isKeyDown()` — smooth horizontal movement
 - `luna.keypressed()` — jumping
 - Tile-based collision detection with full AABB resolution

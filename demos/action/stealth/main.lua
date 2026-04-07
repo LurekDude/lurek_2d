@@ -1,4 +1,4 @@
-﻿-- Stealth Action Demo — top-down sneaking with guard vision cones
+-- Stealth Action Demo — top-down sneaking with guard vision cones
 -- WASD to move, LShift to crouch, Escape to quit
 
 local function clamp(v, mn, mx) return math.max(mn, math.min(mx, v)) end
@@ -62,9 +62,9 @@ local function canSee(guard, tx, ty)
     return true
 end
 
-function luna.load()
+function luna.init()
     luna.window.setTitle("Stealth Action")
-    luna.render.setBackgroundColor(0.1, 0.12, 0.1)
+    luna.gfx.setBackgroundColor(0.1, 0.12, 0.1)
 
     -- walls
     walls = {
@@ -106,7 +106,7 @@ local function resetLevel()
     noiseRipples = {}
 end
 
-function luna.update(dt)
+function luna.process(dt)
     if player.caught or player.won then return end
 
     -- player movement
@@ -212,27 +212,27 @@ function luna.update(dt)
     end
 end
 
-function luna.draw()
+function luna.render()
     -- hide spots
     for _, hs in ipairs(hideSpots) do
-        luna.render.setColor(0.05, 0.08, 0.05, 1)
-        luna.render.rectangle("fill", hs.x, hs.y, hs.w, hs.h)
-        luna.render.setColor(0.2, 0.3, 0.2, 1)
-        luna.render.rectangle("line", hs.x, hs.y, hs.w, hs.h)
+        luna.gfx.setColor(0.05, 0.08, 0.05, 1)
+        luna.gfx.rectangle("fill", hs.x, hs.y, hs.w, hs.h)
+        luna.gfx.setColor(0.2, 0.3, 0.2, 1)
+        luna.gfx.rectangle("line", hs.x, hs.y, hs.w, hs.h)
     end
 
     -- walls
     for _, w in ipairs(walls) do
-        luna.render.setColor(0.35, 0.3, 0.25, 1)
-        luna.render.rectangle("fill", w.x, w.y, w.w, w.h)
+        luna.gfx.setColor(0.35, 0.3, 0.25, 1)
+        luna.gfx.rectangle("fill", w.x, w.y, w.w, w.h)
     end
 
     -- exit zone
-    luna.render.setColor(0.2, 0.8, 0.2, 0.5)
-    luna.render.rectangle("fill", exitZone.x, exitZone.y, exitZone.w, exitZone.h)
-    luna.render.setColor(0.2, 1, 0.2, 1)
-    luna.render.rectangle("line", exitZone.x, exitZone.y, exitZone.w, exitZone.h)
-    luna.render.print("EXIT", exitZone.x + 8, exitZone.y + 20)
+    luna.gfx.setColor(0.2, 0.8, 0.2, 0.5)
+    luna.gfx.rectangle("fill", exitZone.x, exitZone.y, exitZone.w, exitZone.h)
+    luna.gfx.setColor(0.2, 1, 0.2, 1)
+    luna.gfx.rectangle("line", exitZone.x, exitZone.y, exitZone.w, exitZone.h)
+    luna.gfx.print("EXIT", exitZone.x + 8, exitZone.y + 20)
 
     -- guard vision cones
     for _, g in ipairs(guards) do
@@ -242,7 +242,7 @@ function luna.draw()
         local a = 0.12
         if g.state == "chase" then r, gr, b, a = 1, 0, 0, 0.2
         elseif g.suspicion > 0.5 then r, gr, b, a = 1, 0.5, 0, 0.15 end
-        luna.render.setColor(r, gr, b, a)
+        luna.gfx.setColor(r, gr, b, a)
         for i = 0, segments - 1 do
             local a1 = g.angle - g.fov + step * i
             local a2 = g.angle - g.fov + step * (i + 1)
@@ -251,63 +251,63 @@ function luna.draw()
                 g.x + math.cos(a1) * g.viewDist, g.y + math.sin(a1) * g.viewDist,
                 g.x + math.cos(a2) * g.viewDist, g.y + math.sin(a2) * g.viewDist,
             }
-            luna.render.polygon("fill", verts)
+            luna.gfx.polygon("fill", verts)
         end
     end
 
     -- noise ripples
     for _, nr in ipairs(noiseRipples) do
-        luna.render.setColor(1, 1, 0.5, nr.alpha * 0.3)
-        luna.render.circle("line", nr.x, nr.y, nr.r)
+        luna.gfx.setColor(1, 1, 0.5, nr.alpha * 0.3)
+        luna.gfx.circle("line", nr.x, nr.y, nr.r)
     end
 
     -- guards
     for _, g in ipairs(guards) do
         if g.state == "chase" then
-            luna.render.setColor(1, 0.1, 0.1, 1)
+            luna.gfx.setColor(1, 0.1, 0.1, 1)
         elseif g.suspicion > 0.5 then
-            luna.render.setColor(1, 0.6, 0.1, 1)
+            luna.gfx.setColor(1, 0.6, 0.1, 1)
         else
-            luna.render.setColor(0.8, 0.8, 0.2, 1)
+            luna.gfx.setColor(0.8, 0.8, 0.2, 1)
         end
-        luna.render.circle("fill", g.x, g.y, 10)
+        luna.gfx.circle("fill", g.x, g.y, 10)
         -- direction indicator
-        luna.render.setColor(1, 1, 1, 0.8)
-        luna.render.line(g.x, g.y, g.x + math.cos(g.angle) * 14, g.y + math.sin(g.angle) * 14)
+        luna.gfx.setColor(1, 1, 1, 0.8)
+        luna.gfx.line(g.x, g.y, g.x + math.cos(g.angle) * 14, g.y + math.sin(g.angle) * 14)
     end
 
     -- player
     local pa = player.hidden and 0.4 or 1
     local pr = player.crouching and 5 or player.r
-    luna.render.setColor(0.2, 0.6, 1, pa)
-    luna.render.circle("fill", player.x, player.y, pr)
+    luna.gfx.setColor(0.2, 0.6, 1, pa)
+    luna.gfx.circle("fill", player.x, player.y, pr)
     if player.crouching then
-        luna.render.setColor(0.4, 0.8, 1, 0.3)
-        luna.render.circle("line", player.x, player.y, 12)
+        luna.gfx.setColor(0.4, 0.8, 1, 0.3)
+        luna.gfx.circle("line", player.x, player.y, 12)
     end
 
     -- HUD
-    luna.render.setColor(1, 1, 1, 1)
-    luna.render.print(player.crouching and "CROUCHING" or "STANDING", 10, 10)
+    luna.gfx.setColor(1, 1, 1, 1)
+    luna.gfx.print(player.crouching and "CROUCHING" or "STANDING", 10, 10)
     if player.hidden then
-        luna.render.setColor(0.3, 1, 0.3, 1)
-        luna.render.print("HIDDEN", 10, 30)
+        luna.gfx.setColor(0.3, 1, 0.3, 1)
+        luna.gfx.print("HIDDEN", 10, 30)
     end
-    luna.render.setColor(1, 1, 1, 0.5)
-    luna.render.print("WASD: Move  |  LShift: Crouch  |  R: Reset", 10, 575)
+    luna.gfx.setColor(1, 1, 1, 0.5)
+    luna.gfx.print("WASD: Move  |  LShift: Crouch  |  R: Reset", 10, 575)
 
     -- game over / win
     if player.caught then
-        luna.render.setColor(0, 0, 0, 0.7)
-        luna.render.rectangle("fill", 250, 250, 300, 80)
-        luna.render.setColor(1, 0.2, 0.2, 1)
-        luna.render.print("CAUGHT! Press R to retry", 290, 280, 1.2)
+        luna.gfx.setColor(0, 0, 0, 0.7)
+        luna.gfx.rectangle("fill", 250, 250, 300, 80)
+        luna.gfx.setColor(1, 0.2, 0.2, 1)
+        luna.gfx.print("CAUGHT! Press R to retry", 290, 280, 1.2)
     end
     if player.won then
-        luna.render.setColor(0, 0, 0, 0.7)
-        luna.render.rectangle("fill", 250, 250, 300, 80)
-        luna.render.setColor(0.2, 1, 0.2, 1)
-        luna.render.print("ESCAPED! Press R to replay", 285, 280, 1.2)
+        luna.gfx.setColor(0, 0, 0, 0.7)
+        luna.gfx.rectangle("fill", 250, 250, 300, 80)
+        luna.gfx.setColor(0.2, 1, 0.2, 1)
+        luna.gfx.print("ESCAPED! Press R to replay", 285, 280, 1.2)
     end
 end
 

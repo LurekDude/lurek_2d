@@ -1,15 +1,15 @@
-﻿# Courtroom
+# Courtroom
 
 A courtroom drama simulation inspired by Ace Attorney. Work through three cases — missing diamond, poisoned cake, and forged painting — by listening to witness testimony, presenting evidence at the right moment, and pressing witnesses for contradictions to fill the jury bar and secure a guilty verdict.
 
 ## What It Demonstrates
 
-- `luna.render.rectangle()` — witness stand, evidence panel, jury progress bar
-- `luna.render.print()` — animated typewriter-style testimony text rendering
-- `luna.render.setColor()` — flash banners for successful objections and contradiction reveals
+- `luna.gfx.rectangle()` — witness stand, evidence panel, jury progress bar
+- `luna.gfx.print()` — animated typewriter-style testimony text rendering
+- `luna.gfx.setColor()` — flash banners for successful objections and contradiction reveals
 - `luna.keyboard.isPressed()` — state-machine navigation across title, intro, testimony, and verdict screens
 - `luna.signal.quit()` — clean exit triggered from the title screen
-- `luna.render.setBackgroundColor()` — courtroom backdrop theming per state
+- `luna.gfx.setBackgroundColor()` — courtroom backdrop theming per state
 
 ## How to Run
 

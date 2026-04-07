@@ -1,4 +1,4 @@
-﻿-- Signal Demo — Luna2D example
+-- Signal Demo — Luna2D example
 -- Demonstrates the pub-sub Signal system for decoupled event handling.
 
 local events = luna.signal.newSignal()
@@ -30,7 +30,7 @@ events:register("hit", function(target)
     events:emit("score", 10)
 end)
 
-function luna.load()
+function luna.init()
     luna.window.setTitle("Signal Demo")
 
     -- Simulate some game events
@@ -40,23 +40,23 @@ function luna.load()
     events:emit("score", 50)
 end
 
-function luna.update(dt)
+function luna.process(dt)
     -- Keep log from growing too large
     while #log > 20 do
         table.remove(log, 1)
     end
 end
 
-function luna.draw()
-    luna.render.setColor(1, 1, 1)
-    luna.render.print("Signal Demo — Press SPACE for hit, R to reset", 20, 20)
-    luna.render.print("Score: " .. score, 20, 50)
-    luna.render.print("Combo: " .. combo, 20, 70)
-    luna.render.print("Listeners: " .. events:getTotalCount(), 20, 90)
+function luna.render()
+    luna.gfx.setColor(1, 1, 1)
+    luna.gfx.print("Signal Demo — Press SPACE for hit, R to reset", 20, 20)
+    luna.gfx.print("Score: " .. score, 20, 50)
+    luna.gfx.print("Combo: " .. combo, 20, 70)
+    luna.gfx.print("Listeners: " .. events:getTotalCount(), 20, 90)
 
-    luna.render.setColor(0.7, 0.9, 0.7)
+    luna.gfx.setColor(0.7, 0.9, 0.7)
     for i, msg in ipairs(log) do
-        luna.render.print(msg, 30, 110 + (i - 1) * 18)
+        luna.gfx.print(msg, 30, 110 + (i - 1) * 18)
     end
 end
 

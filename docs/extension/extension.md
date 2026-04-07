@@ -1,4 +1,4 @@
-﻿# Luna2D VS Code Extension — Technical Specification
+# Luna2D VS Code Extension — Technical Specification
 
 > **Version**: 0.8.2
 > **Engine**: Luna2D (LuaJIT, Rust)
@@ -312,14 +312,14 @@ interface CompletionItem {
   label: string        // e.g., "newImage"
   kind: string         // "function" | "method" | "enum" | "value" | "class"
   module: string       // e.g., "graphics"
-  detail: string       // e.g., "luna.render.newImage(filename)"
+  detail: string       // e.g., "luna.gfx.newImage(filename)"
   insertText: string   // snippet: "newImage(${1:filename})"
   documentation?: string
   parent?: string      // for methods: the type name (e.g., "Image")
 }
 
 interface SignatureItem {
-  label: string        // e.g., "luna.render.newImage"
+  label: string        // e.g., "luna.gfx.newImage"
   module: string
   parameters: string[] // ["filename: string", "settings?: table"]
   documentation?: string
@@ -397,7 +397,7 @@ All providers register for `{ language: "lua", scheme: "file" }`.
 
 | Context | Trigger | Example | What it returns |
 |---------|---------|---------|-----------------|
-| Module functions | `luna.render.` | typing after `luna.render.` | All functions in `graphics` module |
+| Module functions | `luna.gfx.` | typing after `luna.gfx.` | All functions in `graphics` module |
 | Type methods | `image:` | typing after a variable with `:` | All methods for the type |
 | Module names | `luna.` | typing after `luna.` | All module names |
 
@@ -424,7 +424,7 @@ Looks up the matched symbol in `apiData.getHoverDoc(key)` and returns a `Markdow
 
 **Trigger characters**: `(`, `,`
 
-Matches function calls like `luna.render.newImage(` and counts commas to determine the active parameter index. Returns `vscode.SignatureHelp` with parameter info from `apiData.getSignature()`.
+Matches function calls like `luna.gfx.newImage(` and counts commas to determine the active parameter index. Returns `vscode.SignatureHelp` with parameter info from `apiData.getSignature()`.
 
 ### 5.4 Diagnostics Provider
 
@@ -439,7 +439,7 @@ Matches function calls like `luna.render.newImage(` and counts commas to determi
 | `math.random` usage | Hint | → "Prefer luna.math.random() for thread safety" |
 | Missing `luna.signal.pump()` | Warning | Custom `luna.run()` without pump → "window will freeze" |
 | Unused `require()` | Hint | `local x = require("y")` where `x` is never used |
-| Wrong callback signature | Warning | `function luna.update()` without `dt` parameter |
+| Wrong callback signature | Warning | `function luna.process()` without `dt` parameter |
 | Asset path validation | Warning | `newImage("missing.png")` when file doesn't exist |
 
 **Toggle settings**: Each check has a `luna2d.diagnostics.*` boolean setting.
@@ -448,7 +448,7 @@ Matches function calls like `luna.render.newImage(` and counts commas to determi
 
 Parses Lua source with regex patterns to find:
 - Function declarations: `function name()`, `local function name()`
-- Engine callbacks: `function luna.update(dt)` → `SymbolKind.Event`
+- Engine callbacks: `function luna.process(dt)` → `SymbolKind.Event`
 - Variable-assigned functions: `local name = function()`
 - Table declarations: `local MyTable = {}`
 
@@ -463,9 +463,9 @@ Detects Luna2D color API calls (`setColor`, `setBackgroundColor`, `clear`) with 
 ### 5.7 Asset Path Provider
 
 Auto-completes file paths inside string arguments of asset loading functions:
-- `luna.render.newImage("` → suggests `.png`, `.jpg` files
+- `luna.gfx.newImage("` → suggests `.png`, `.jpg` files
 - `luna.audio.newSource("` → suggests `.ogg`, `.mp3`, `.wav` files
-- `luna.render.newFont("` → suggests `.ttf`, `.otf` files
+- `luna.gfx.newFont("` → suggests `.ttf`, `.otf` files
 
 Scans the workspace filesystem filtered by appropriate extensions.
 
@@ -483,7 +483,7 @@ Workspace-wide search for symbol references using regex patterns across all `.lu
 
 Shows inline parameter name hints at call sites for Luna2D API functions:
 ```lua
-luna.render.setColor(1, 0, 0, 1)
+luna.gfx.setColor(1, 0, 0, 1)
 --                     ^r ^g ^b ^a   ← inlay hints
 ```
 
@@ -999,10 +999,10 @@ export class a similar game engineDebugBridge {
 
 | Pattern | Luna2D (Lua) | a similar JS game engine (JS/TS) |
 |---------|-------------|-------------------|
-| Trigger | `luna.render.` | `this.add.`, `this.physics.`, `a similar game engine.` |
+| Trigger | `luna.gfx.` | `this.add.`, `this.physics.`, `a similar game engine.` |
 | Module prefix regex | `/luna\.(\w+)\.$/` | `/this\.(\w+)\.$/` or `/a similar game engine\.(\w+)\.$/` |
 | Type methods | `Image:getWidth()` | `this.sprite.setScale()` |
-| Enum values | `luna.render.FilterMode` | `a similar game engine.BlendModes`, `a similar game engine.Physics.Arcade` |
+| Enum values | `luna.gfx.FilterMode` | `a similar game engine.BlendModes`, `a similar game engine.Physics.Arcade` |
 
 ```typescript
 // a similar JS game engine completion provider

@@ -1,4 +1,4 @@
-﻿-- Tetris — Classic Arcade (Luna2D demo)
+-- Tetris — Classic Arcade (Luna2D demo)
 -- Rotate and place falling tetrominoes, clear lines to score points.
 -- Arrow keys to move/rotate, Down to soft-drop, Space to hard-drop.
 
@@ -100,8 +100,8 @@ end
 
 -- ── Load ─────────────────────────────────────────────────────────────────
 
-function luna.load()
-    luna.render.setBackgroundColor(0.05, 0.05, 0.1)
+function luna.init()
+    luna.gfx.setBackgroundColor(0.05, 0.05, 0.1)
     new_board()
     score = 0; lines_cleared = 0; level = 1
     drop_interval = 0.5
@@ -115,7 +115,7 @@ end
 local move_repeat_timer = 0
 local move_dir = 0
 
-function luna.update(dt)
+function luna.process(dt)
     if game_over then return end
 
     -- Soft drop
@@ -142,22 +142,22 @@ end
 local function draw_cell(x, y, color, alpha)
     local px = BOARD_X + x * CELL
     local py = BOARD_Y + y * CELL
-    luna.render.setColor(color[1], color[2], color[3], alpha or 1)
-    luna.render.rectangle("fill", px+1, py+1, CELL-2, CELL-2)
-    luna.render.setColor(color[1]*1.4, color[2]*1.4, color[3]*1.4, alpha or 1)
-    luna.render.rectangle("line", px+1, py+1, CELL-2, CELL-2)
+    luna.gfx.setColor(color[1], color[2], color[3], alpha or 1)
+    luna.gfx.rectangle("fill", px+1, py+1, CELL-2, CELL-2)
+    luna.gfx.setColor(color[1]*1.4, color[2]*1.4, color[3]*1.4, alpha or 1)
+    luna.gfx.rectangle("line", px+1, py+1, CELL-2, CELL-2)
 end
 
-function luna.draw()
+function luna.render()
     -- Board border
-    luna.render.setColor(0.3, 0.3, 0.5)
-    luna.render.rectangle("line", BOARD_X - 1, BOARD_Y - 1, COLS * CELL + 2, ROWS * CELL + 2)
+    luna.gfx.setColor(0.3, 0.3, 0.5)
+    luna.gfx.rectangle("line", BOARD_X - 1, BOARD_Y - 1, COLS * CELL + 2, ROWS * CELL + 2)
 
     -- Grid ghost
-    luna.render.setColor(0.12, 0.12, 0.18)
+    luna.gfx.setColor(0.12, 0.12, 0.18)
     for y = 0, ROWS - 1 do
         for x = 0, COLS - 1 do
-            luna.render.rectangle("line", BOARD_X + x*CELL + 1, BOARD_Y + y*CELL + 1, CELL - 2, CELL - 2)
+            luna.gfx.rectangle("line", BOARD_X + x*CELL + 1, BOARD_Y + y*CELL + 1, CELL - 2, CELL - 2)
         end
     end
 
@@ -188,20 +188,20 @@ function luna.draw()
 
     -- Sidebar info
     local sx = BOARD_X + COLS * CELL + 20
-    luna.render.setColor(0.7, 0.7, 0.9)
-    luna.render.print("SCORE",  sx, BOARD_Y + 10, 1.5)
-    luna.render.setColor(1, 1, 1)
-    luna.render.print(tostring(score), sx, BOARD_Y + 28, 1.8)
-    luna.render.setColor(0.7, 0.7, 0.9)
-    luna.render.print("LEVEL", sx, BOARD_Y + 65, 1.5)
-    luna.render.setColor(1, 1, 1)
-    luna.render.print(tostring(level), sx, BOARD_Y + 82, 2)
-    luna.render.setColor(0.7, 0.7, 0.9)
-    luna.render.print("LINES", sx, BOARD_Y + 115, 1.5)
-    luna.render.setColor(1, 1, 1)
-    luna.render.print(tostring(lines_cleared), sx, BOARD_Y + 132, 2)
-    luna.render.setColor(0.7, 0.7, 0.9)
-    luna.render.print("NEXT",  sx, BOARD_Y + 165, 1.5)
+    luna.gfx.setColor(0.7, 0.7, 0.9)
+    luna.gfx.print("SCORE",  sx, BOARD_Y + 10, 1.5)
+    luna.gfx.setColor(1, 1, 1)
+    luna.gfx.print(tostring(score), sx, BOARD_Y + 28, 1.8)
+    luna.gfx.setColor(0.7, 0.7, 0.9)
+    luna.gfx.print("LEVEL", sx, BOARD_Y + 65, 1.5)
+    luna.gfx.setColor(1, 1, 1)
+    luna.gfx.print(tostring(level), sx, BOARD_Y + 82, 2)
+    luna.gfx.setColor(0.7, 0.7, 0.9)
+    luna.gfx.print("LINES", sx, BOARD_Y + 115, 1.5)
+    luna.gfx.setColor(1, 1, 1)
+    luna.gfx.print(tostring(lines_cleared), sx, BOARD_Y + 132, 2)
+    luna.gfx.setColor(0.7, 0.7, 0.9)
+    luna.gfx.print("NEXT",  sx, BOARD_Y + 165, 1.5)
     if next_piece then
         for _, c in ipairs(next_piece.cells) do
             draw_cell(-1 + c[1] + math.floor((COLS + 12.5) / CELL), c[2] + 11, next_piece.color)
@@ -209,28 +209,28 @@ function luna.draw()
         for _, c in ipairs(next_piece.cells) do
             local px2 = sx + c[1] * CELL
             local py2 = BOARD_Y + 180 + c[2] * CELL
-            luna.render.setColor(next_piece.color[1], next_piece.color[2], next_piece.color[3])
-            luna.render.rectangle("fill", px2+1, py2+1, CELL-2, CELL-2)
+            luna.gfx.setColor(next_piece.color[1], next_piece.color[2], next_piece.color[3])
+            luna.gfx.rectangle("fill", px2+1, py2+1, CELL-2, CELL-2)
         end
     end
 
     -- Controls
-    luna.render.setColor(0.4, 0.4, 0.5)
-    luna.render.print("←→  Move",   sx, H - 110, 1.2)
-    luna.render.print("↑   Rotate", sx, H - 95,  1.2)
-    luna.render.print("↓   Soft",   sx, H - 80,  1.2)
-    luna.render.print("SPC Hard",   sx, H - 65,  1.2)
-    luna.render.print("ESC Quit",   sx, H - 50,  1.2)
+    luna.gfx.setColor(0.4, 0.4, 0.5)
+    luna.gfx.print("←→  Move",   sx, H - 110, 1.2)
+    luna.gfx.print("↑   Rotate", sx, H - 95,  1.2)
+    luna.gfx.print("↓   Soft",   sx, H - 80,  1.2)
+    luna.gfx.print("SPC Hard",   sx, H - 65,  1.2)
+    luna.gfx.print("ESC Quit",   sx, H - 50,  1.2)
 
     -- Game over overlay
     if game_over then
-        luna.render.setColor(0, 0, 0, 0.7)
-        luna.render.rectangle("fill", 0, 0, W, H)
-        luna.render.setColor(1, 0.2, 0.2)
-        luna.render.print("GAME OVER", W/2 - 80, H/2 - 20, 3)
-        luna.render.setColor(0.7, 0.7, 0.7)
-        luna.render.print("Score: " .. score, W/2 - 50, H/2 + 20, 2)
-        luna.render.print("Press R to restart", W/2 - 100, H/2 + 50, 2)
+        luna.gfx.setColor(0, 0, 0, 0.7)
+        luna.gfx.rectangle("fill", 0, 0, W, H)
+        luna.gfx.setColor(1, 0.2, 0.2)
+        luna.gfx.print("GAME OVER", W/2 - 80, H/2 - 20, 3)
+        luna.gfx.setColor(0.7, 0.7, 0.7)
+        luna.gfx.print("Score: " .. score, W/2 - 50, H/2 + 20, 2)
+        luna.gfx.print("Press R to restart", W/2 - 100, H/2 + 50, 2)
     end
 end
 

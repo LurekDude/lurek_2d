@@ -1,4 +1,4 @@
-﻿# `ai` — Agent Reference
+# `ai` — Agent Reference
 
 | Property       | Value                                                |
 |----------------|------------------------------------------------------|
@@ -510,7 +510,7 @@ The full Lua-facing surface is registered in `src/lua_api/ai_api.rs` under the `
 ### FSM-based NPC patrol with steering
 
 ```lua
-function luna.load()
+function luna.init()
     world = luna.ai.newWorld()
     local agent = world:addAgent("guard")
     agent:setPosition(100, 200)
@@ -536,7 +536,7 @@ function luna.load()
     steering:addSeek(400, 300, 1.0)
 end
 
-function luna.update(dt)
+function luna.process(dt)
     world:update(dt)
 end
 ```

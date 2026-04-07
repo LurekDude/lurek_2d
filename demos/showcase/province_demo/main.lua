@@ -1,8 +1,8 @@
-﻿-- Module availability guard (added by fix_nil_module_demos.py)
+-- Module availability guard (added by fix_nil_module_demos.py)
 if not luna.province then
-    function luna.load()
-        luna.render.setBackgroundColor(0.08, 0.08, 0.12)
-        luna.render.print("luna.province is not available in this build", 180, 270)
+    function luna.init()
+        luna.gfx.setBackgroundColor(0.08, 0.08, 0.12)
+        luna.gfx.print("luna.province is not available in this build", 180, 270)
     end
     return
 end
@@ -27,7 +27,7 @@ local terrain_colors = {
     desert   = { 0.9, 0.8, 0.5, 1.0 },
 }
 
-function luna.load()
+function luna.init()
     -- Generate a random province world (shapes only -- no terrain assigned)
     map = luna.province.generate({
         width = 200,
@@ -74,76 +74,76 @@ function luna.load()
     end
 end
 
-function luna.update(dt)
+function luna.process(dt)
     -- nothing dynamic in this demo
 end
 
-function luna.draw()
+function luna.render()
     if not map then return end
 
     local w = map:getWidth()
     local h = map:getHeight()
-    local sw = luna.render.getWidth()
-    local sh = luna.render.getHeight()
+    local sw = luna.gfx.getWidth()
+    local sh = luna.gfx.getHeight()
 
     -- Scale the province map to fill the window
     local sx = sw / w
     local sy = sh / h
     local scale = math.min(sx, sy)
 
-    luna.render.push()
-    luna.render.scale(scale, scale)
+    luna.gfx.push()
+    luna.gfx.scale(scale, scale)
 
     -- Draw province colour buffer
     local ids = map:getProvinceIds()
     for _, pid in ipairs(ids) do
         local r, g, b = map:getProvinceColor(pid)
-        luna.render.setColor(r / 255, g / 255, b / 255)
+        luna.gfx.setColor(r / 255, g / 255, b / 255)
 
         -- Approximate: draw a small rect at centroid (real rendering would
         -- use the full pixel buffer, but this gives a visual indication)
         local cx, cy = map:getCentroid(pid)
         local area = map:getArea(pid)
         local side = math.sqrt(area)
-        luna.render.rectangle("fill", cx - side / 2, cy - side / 2, side, side)
+        luna.gfx.rectangle("fill", cx - side / 2, cy - side / 2, side, side)
     end
 
     -- Highlight selected province
     if selected then
-        luna.render.setColor(1, 1, 0, 0.5)
+        luna.gfx.setColor(1, 1, 0, 0.5)
         local cx, cy = map:getCentroid(selected)
-        luna.render.circle("fill", cx, cy, 5)
+        luna.gfx.circle("fill", cx, cy, 5)
     end
 
     -- Draw path
     if path_ids then
-        luna.render.setColor(0, 1, 0)
+        luna.gfx.setColor(0, 1, 0)
         for i = 1, #path_ids - 1 do
             local ax, ay = map:getCentroid(path_ids[i])
             local bx, by = map:getCentroid(path_ids[i + 1])
-            luna.render.line(ax, ay, bx, by)
+            luna.gfx.line(ax, ay, bx, by)
         end
     end
 
-    luna.render.pop()
+    luna.gfx.pop()
 
     -- HUD
-    luna.render.setColor(1, 1, 1)
-    luna.render.print("Province Demo -- click to select, right-click to path", 10, 10)
-    luna.render.print("Mode: " .. mode_names[mode_idx] .. "  [M] to cycle", 10, 30)
-    luna.render.print("Provinces: " .. map:getProvinceCount(), 10, 50)
+    luna.gfx.setColor(1, 1, 1)
+    luna.gfx.print("Province Demo -- click to select, right-click to path", 10, 10)
+    luna.gfx.print("Mode: " .. mode_names[mode_idx] .. "  [M] to cycle", 10, 30)
+    luna.gfx.print("Provinces: " .. map:getProvinceCount(), 10, 50)
     if selected then
         local terrain = data:getProperty(selected, "terrain") or "unknown"
         local owner = data:getProperty(selected, "owner") or 0
-        luna.render.print("Selected: " .. selected .. "  terrain=" .. tostring(terrain) .. "  owner=" .. tostring(owner), 10, 70)
+        luna.gfx.print("Selected: " .. selected .. "  terrain=" .. tostring(terrain) .. "  owner=" .. tostring(owner), 10, 70)
     end
 end
 
 function luna.mousepressed(x, y, button)
     if not map then return end
 
-    local sw = luna.render.getWidth()
-    local sh = luna.render.getHeight()
+    local sw = luna.gfx.getWidth()
+    local sh = luna.gfx.getHeight()
     local w = map:getWidth()
     local h = map:getHeight()
     local scale = math.min(sw / w, sh / h)

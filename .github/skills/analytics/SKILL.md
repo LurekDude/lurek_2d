@@ -1,4 +1,4 @@
-﻿---
+---
 name: analytics
 description: "Load this skill when collecting, parsing, or acting on diagnostic data from Luna2D log files, performance counters, telemetry events, or game session records: structuring game events for analysis, extracting performance metrics from RUST_LOG output, finding crash patterns, using data to drive game balance or design decisions, or building an in-game telemetry pipeline. Use for: log parsing, session event recording, crash frequency analysis, performance histogram analysis, data-driven game balance. Skip it for live runtime debugging (use dev-debugging skill) or setting up log output (use logging skill)."
 ---
@@ -166,7 +166,7 @@ T.event("boss_killed",   { boss = name, hp_remaining = boss.hp, time = elapsed }
 ```lua
 local _frameTimes = {}
 
-function luna.update(dt)
+function luna.process(dt)
     _frameTimes[#_frameTimes+1] = dt * 1000  -- ms
     if #_frameTimes >= 600 then              -- every 10s at 60fps
         local avg = 0

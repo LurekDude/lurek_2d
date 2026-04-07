@@ -1,14 +1,14 @@
-﻿# Donkey Kong
+# Donkey Kong
 
 Climb ladders and leap over rolling barrels to rescue Pauline at the top.
 Based on Nintendo's 1981 arcade classic.
 
 ## What It Demonstrates
 
-- `luna.render.rectangle()` / `luna.render.circle()` — platforms, barrels, characters
+- `luna.gfx.rectangle()` / `luna.gfx.circle()` — platforms, barrels, characters
 - `luna.input.isKeyDown()` — walk and climb
 - `luna.keypressed()` — jumping
-- `luna.render.print()` — score, lives, level HUD
+- `luna.gfx.print()` — score, lives, level HUD
 - Sloped platform physics with ladder entry/exit detection
 
 ## Controls

@@ -1,4 +1,4 @@
-﻿-- examples/scene.lua
+-- examples/scene.lua
 -- luna.scene — Scene stack, transitions, registry, data store, depth-sorted rendering.
 -- All luna.scene API methods demonstrated with code and comments.
 
@@ -47,7 +47,7 @@ function MenuScene:update(dt)
 end
 
 function MenuScene:draw()
-    luna.render.print("Press Enter to start", 100, 100)
+    luna.gfx.print("Press Enter to start", 100, 100)
 end
 
 local GameScene = {}
@@ -68,7 +68,7 @@ function GameScene:update(dt)
 end
 
 function GameScene:draw()
-    luna.render.print("Score: " .. self.score, 100, 100)
+    luna.gfx.print("Score: " .. self.score, 100, 100)
 end
 
 -- ── Stack Operations ──────────────────────────────────────────────────────────
@@ -160,11 +160,11 @@ local sorter = luna.scene.newDepthSorter()
 
 -- add(fn, depth) — register a plain draw function at the given depth
 sorter:add(function()
-    luna.render.drawRect("fill", 100, 100, 32, 32)  -- background layer
+    luna.gfx.drawRect("fill", 100, 100, 32, 32)  -- background layer
 end, -10)
 
 sorter:add(function()
-    luna.render.drawRect("fill", 200, 200, 32, 32)  -- foreground layer
+    luna.gfx.drawRect("fill", 200, 200, 32, 32)  -- foreground layer
 end, 10)
 
 -- addObject(obj) — register a table with a `drawSorted` method at obj.depth
@@ -172,7 +172,7 @@ local tree = {
     depth = 5,
     x = 300, y = 200,
     drawSorted = function(self)
-        luna.render.print("Tree", self.x, self.y)
+        luna.gfx.print("Tree", self.x, self.y)
     end
 }
 sorter:addObject(tree)
@@ -197,15 +197,15 @@ sorter:clear()
 -- ── Typical Usage in main.lua ─────────────────────────────────────────────────
 
 --[[
-function luna.load()
+function luna.init()
     luna.scene.push(MenuScene.new())
 end
 
-function luna.update(dt)
+function luna.process(dt)
     luna.scene.update(dt)
 end
 
-function luna.draw()
+function luna.render()
     luna.scene.draw()
 end
 ]]

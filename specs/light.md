@@ -1,4 +1,4 @@
-﻿# `light` — Agent Reference
+# `light` — Agent Reference
 
 | Property       | Value                                                |
 |----------------|------------------------------------------------------|
@@ -214,7 +214,7 @@ Exposed under `luna.light.*` by `src/lua_api/light_api.rs`. The API provides two
 -- Basic point light with flicker and an occluder casting shadows
 local torch, wall
 
-function luna.load()
+function luna.init()
     -- Create a warm torch light with flicker
     torch = luna.light.newLight(400, 300, 200, {
         color = {1.0, 0.8, 0.4},
@@ -237,7 +237,7 @@ function luna.load()
     luna.light.setAmbient(0.05, 0.05, 0.1)
 end
 
-function luna.update(dt)
+function luna.process(dt)
     -- Move the torch to follow the mouse
     local mx, my = luna.mouse.getPosition()
     torch:setPosition(mx, my)
@@ -246,15 +246,15 @@ function luna.update(dt)
     luna.light.advanceFlickers(dt)
 end
 
-function luna.draw()
+function luna.render()
     -- Draw your scene; the lighting system composites automatically
-    luna.render.print("Move the mouse to move the torch", 10, 10)
+    luna.gfx.print("Move the mouse to move the torch", 10, 10)
 end
 ```
 
 ```lua
 -- Spot light with group management
-function luna.load()
+function luna.init()
     -- Create three spot lights in group 1
     for i = 1, 3 do
         luna.light.newLight(200 * i, 300, 150, {

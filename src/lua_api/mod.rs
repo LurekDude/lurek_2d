@@ -1,4 +1,4 @@
-﻿//! Lua API binding bridge for the Luna2D engine.
+//! Lua API binding bridge for the Luna2D engine.
 //!
 //! This is the integration layer that registers all `luna.*` API sub-modules
 //! on top of the types defined in `engine`. `SharedState`, `WindowState`,
@@ -124,7 +124,7 @@ pub mod math_api;
 /// Registers the `luna.physics.*` rigid-body physics API.
 pub mod physics_api;
 
-/// Registers the `luna.render.*` rendering and drawing API.
+/// Registers the `luna.gfx.*` rendering and drawing API.
 pub mod graphics_api;
 
 /// Exposes low-level system queries (processor count, memory size, URL opening, locale, power).
@@ -314,7 +314,7 @@ pub fn create_lua_vm(state: Rc<RefCell<SharedState>>, modules: &ModulesConfig) -
         physics_api::register(&lua, &luna, state.clone())?;
     }
 
-    // graphics: luna.render
+    // graphics: luna.gfx
     if modules.graphics {
         graphics_api::register(&lua, &luna, state.clone())?;
     }

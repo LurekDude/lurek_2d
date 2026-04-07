@@ -146,13 +146,13 @@ impl LuaUserData for LuaSignal {
 pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> LuaResult<()> {
     let tbl = lua.create_table()?;
 
-    // -- quit --
-    /// Pushes a quit event, requesting the engine to stop.
+    // -- exit --
+    /// Pushes an exit event, requesting the engine to stop.
     /// @param code : integer?
     /// @return nil
     let s = state.clone();
     tbl.set(
-        "quit",
+        "exit",
         lua.create_function(move |_, code: Option<i32>| {
             let mut st = s.borrow_mut();
             st.quit_requested = true;

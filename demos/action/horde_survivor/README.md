@@ -1,14 +1,14 @@
-﻿# Horde Survivor
+# Horde Survivor
 
 A Vampire Survivors–style bullet heaven where orbiting projectiles automatically destroy waves of enemies that grow faster and more numerous over time. Killing enemies drops XP gems; collecting enough triggers a level-up screen with three random upgrade choices. A large scrolling arena means enemies can spawn off-screen from any four edges.
 
 ## What It Demonstrates
 
 - `luna.keyboard.isDown()` — eight-directional player movement with normalised diagonal speed
-- `luna.render.circle()` — player, enemies, projectiles, XP gems, and death particles
-- `luna.render.rectangle()` — health bar, XP bar, and upgrade-choice panels
-- `luna.render.print()` — score, kill counter, timer, and upgrade option labels
-- `luna.render.setBackgroundColor()` — dark space-themed background
+- `luna.gfx.circle()` — player, enemies, projectiles, XP gems, and death particles
+- `luna.gfx.rectangle()` — health bar, XP bar, and upgrade-choice panels
+- `luna.gfx.print()` — score, kill counter, timer, and upgrade option labels
+- `luna.gfx.setBackgroundColor()` — dark space-themed background
 - Camera follow — world-space entities are offset by `cam.x / cam.y` each draw frame
 - Orbiting weapon system — projectile positions calculated from `player.angle` each update tick
 - Upgrade system — stat table driven by a random pool draw, applied immediately to player stats

@@ -1,4 +1,4 @@
-﻿---
+---
 name: dev-debugging
 description: "Load this skill when diagnosing runtime bugs, crashes, or unexpected behavior in Luna2D. It owns diagnostic techniques, error tracing, and root cause analysis patterns. Skip it for feature implementation or test writing."
 ---
@@ -112,7 +112,7 @@ end
 ```lua
 -- Wrap risky code in pcall to handle errors without crashing
 local ok, err = pcall(function()
-    luna.render.newImage("missing.png")
+    luna.gfx.newImage("missing.png")
 end)
 if not ok then
     print("Failed to load image: " .. tostring(err))

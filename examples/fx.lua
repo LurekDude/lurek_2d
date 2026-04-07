@@ -1,4 +1,4 @@
-﻿-- examples/fx.lua
+-- examples/fx.lua
 -- luna.postfx — Post-processing effects: stacking, per-image chains, screen overlays.
 -- All luna.postfx API methods demonstrated with code and comments.
 
@@ -16,8 +16,8 @@ local grain  = luna.postfx.newEffect("grain")
 local sepia  = luna.postfx.newEffect("sepia")
 
 -- newCustomEffect(shader_id) → PostFxEffect  — custom WGSL shader effect
--- shader_id is the id returned by luna.render.newShader(...)
--- local my_shader = luna.render.newShader(nil, frag_src)
+-- shader_id is the id returned by luna.gfx.newShader(...)
+-- local my_shader = luna.gfx.newShader(nil, frag_src)
 -- local custom_fx = luna.postfx.newCustomEffect(my_shader:getId())
 
 -- ── Configuring Effects ───────────────────────────────────────────────────────
@@ -167,11 +167,11 @@ overlay:resize(1280, 720)
 --[[
 local fx_overlay, shake_x, shake_y
 
-function luna.load()
+function luna.init()
     fx_overlay = luna.postfx.newOverlay(luna.window.getWidth(), luna.window.getHeight())
 end
 
-function luna.update(dt)
+function luna.process(dt)
     -- react to hit
     if player_was_hit then
         fx_overlay:triggerFlash(1, 0, 0, 0.6, 0.12)
@@ -181,17 +181,17 @@ function luna.update(dt)
     shake_x, shake_y = fx_overlay:getShakeOffset()
 end
 
-function luna.draw()
-    luna.render.push()
-    luna.render.translate(shake_x, shake_y)
+function luna.render()
+    luna.gfx.push()
+    luna.gfx.translate(shake_x, shake_y)
     -- ... draw world ...
-    luna.render.pop()
+    luna.gfx.pop()
 
     -- draw flash overlay on top
     if fx_overlay:getFlashAlpha() > 0 then
-        luna.render.setColor(1, 0, 0, fx_overlay:getFlashAlpha())
-        luna.render.rectangle("fill", 0, 0, luna.window.getWidth(), luna.window.getHeight())
-        luna.render.setColor(1, 1, 1, 1)
+        luna.gfx.setColor(1, 0, 0, fx_overlay:getFlashAlpha())
+        luna.gfx.rectangle("fill", 0, 0, luna.window.getWidth(), luna.window.getHeight())
+        luna.gfx.setColor(1, 1, 1, 1)
     end
 end
 ]]

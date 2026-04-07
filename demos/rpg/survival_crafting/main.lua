@@ -1,4 +1,4 @@
-﻿-- Survival Crafting — Luna2D Demo
+-- Survival Crafting — Luna2D Demo
 -- WASD to move, click to mine, C to craft, P to place wall
 
 local function clamp(v, mn, mx) return math.max(mn, math.min(mx, v)) end
@@ -66,13 +66,13 @@ local function spawnEnemy()
     end
 end
 
-function luna.load()
+function luna.init()
     luna.window.setTitle("Survival Crafting")
-    luna.render.setBackgroundColor(0.1, 0.1, 0.15)
+    luna.gfx.setBackgroundColor(0.1, 0.1, 0.15)
     genMap()
 end
 
-function luna.update(dt)
+function luna.process(dt)
     -- day cycle
     dayTime = dayTime + dt
     if dayTime >= dayLength then
@@ -148,7 +148,7 @@ function luna.update(dt)
     end
 end
 
-function luna.draw()
+function luna.render()
     -- darkness overlay intensity
     local nightAlpha = 0
     if isNight() then
@@ -160,56 +160,56 @@ function luna.draw()
         for x = 1, COLS do
             local t = map[y][x]
             local c = tileColors[t] or tileColors.grass
-            luna.render.setColor(c[1], c[2], c[3], 1)
-            luna.render.rectangle("fill", (x - 1) * TILE, (y - 1) * TILE, TILE - 1, TILE - 1)
+            luna.gfx.setColor(c[1], c[2], c[3], 1)
+            luna.gfx.rectangle("fill", (x - 1) * TILE, (y - 1) * TILE, TILE - 1, TILE - 1)
         end
     end
 
     -- enemies
-    luna.render.setColor(0.9, 0.15, 0.15, 1)
+    luna.gfx.setColor(0.9, 0.15, 0.15, 1)
     for _, e in ipairs(enemies) do
-        luna.render.rectangle("fill", (e.gx - 1) * TILE + 4, (e.gy - 1) * TILE + 4, TILE - 8, TILE - 8)
+        luna.gfx.rectangle("fill", (e.gx - 1) * TILE + 4, (e.gy - 1) * TILE + 4, TILE - 8, TILE - 8)
     end
 
     -- player
-    luna.render.setColor(0.2, 0.5, 1, 1)
-    luna.render.circle("fill", (player.gx - 0.5) * TILE, (player.gy - 0.5) * TILE, 12)
+    luna.gfx.setColor(0.2, 0.5, 1, 1)
+    luna.gfx.circle("fill", (player.gx - 0.5) * TILE, (player.gy - 0.5) * TILE, 12)
 
     -- mining bar
     if mining.active then
         local bx = (mining.gx - 1) * TILE
         local by = (mining.gy - 1) * TILE - 8
-        luna.render.setColor(0.3, 0.3, 0.3, 1)
-        luna.render.rectangle("fill", bx, by, TILE, 6)
-        luna.render.setColor(0, 1, 0.3, 1)
-        luna.render.rectangle("fill", bx, by, TILE * (mining.progress / mining.needed), 6)
+        luna.gfx.setColor(0.3, 0.3, 0.3, 1)
+        luna.gfx.rectangle("fill", bx, by, TILE, 6)
+        luna.gfx.setColor(0, 1, 0.3, 1)
+        luna.gfx.rectangle("fill", bx, by, TILE * (mining.progress / mining.needed), 6)
     end
 
     -- night overlay
     if nightAlpha > 0 then
-        luna.render.setColor(0, 0, 0.05, nightAlpha)
-        luna.render.rectangle("fill", 0, 0, 800, 600)
+        luna.gfx.setColor(0, 0, 0.05, nightAlpha)
+        luna.gfx.rectangle("fill", 0, 0, 800, 600)
     end
 
     -- HUD
-    luna.render.setColor(0, 0, 0, 0.6)
-    luna.render.rectangle("fill", 0, ROWS * TILE, 800, 40)
-    luna.render.setColor(1, 1, 1, 1)
+    luna.gfx.setColor(0, 0, 0, 0.6)
+    luna.gfx.rectangle("fill", 0, ROWS * TILE, 800, 40)
+    luna.gfx.setColor(1, 1, 1, 1)
     local dayStr = isNight() and "NIGHT" or "Day"
-    luna.render.print(dayStr .. " " .. dayNum .. "  HP:" .. math.floor(player.hp) .. "  Hunger:" .. math.floor(player.hunger), 10, ROWS * TILE + 5)
-    luna.render.print("Wood:" .. inventory.wood .. " Stone:" .. inventory.stone .. " Berry:" .. inventory.berry .. " Pick:" .. inventory.pickaxe .. " Wall:" .. inventory.wall, 10, ROWS * TILE + 22)
+    luna.gfx.print(dayStr .. " " .. dayNum .. "  HP:" .. math.floor(player.hp) .. "  Hunger:" .. math.floor(player.hunger), 10, ROWS * TILE + 5)
+    luna.gfx.print("Wood:" .. inventory.wood .. " Stone:" .. inventory.stone .. " Berry:" .. inventory.berry .. " Pick:" .. inventory.pickaxe .. " Wall:" .. inventory.wall, 10, ROWS * TILE + 22)
 
     -- craft menu
     if craftOpen then
-        luna.render.setColor(0, 0, 0, 0.8)
-        luna.render.rectangle("fill", 250, 150, 300, 200)
-        luna.render.setColor(1, 1, 0.6, 1)
-        luna.render.print("CRAFTING (1-2 to craft, C to close)", 260, 160)
+        luna.gfx.setColor(0, 0, 0, 0.8)
+        luna.gfx.rectangle("fill", 250, 150, 300, 200)
+        luna.gfx.setColor(1, 1, 0.6, 1)
+        luna.gfx.print("CRAFTING (1-2 to craft, C to close)", 260, 160)
         for i, r in ipairs(recipes) do
             local parts = {}
             for k, v in pairs(r.needs) do parts[#parts + 1] = k .. "x" .. v end
-            luna.render.setColor(1, 1, 1, 1)
-            luna.render.print(i .. ") " .. r.name .. " = " .. table.concat(parts, " + "), 270, 185 + i * 22)
+            luna.gfx.setColor(1, 1, 1, 1)
+            luna.gfx.print(i .. ") " .. r.name .. " = " .. table.concat(parts, " + "), 270, 185 + i * 22)
         end
     end
 end

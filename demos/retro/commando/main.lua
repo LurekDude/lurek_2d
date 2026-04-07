@@ -1,4 +1,4 @@
-﻿-- Commando — C-64 Classic (Luna2D demo)
+-- Commando — C-64 Classic (Luna2D demo)
 -- Vertical-scrolling top-down shooter inspired by Capcom's 1985 arcade classic.
 -- Shoot enemies, rescue POWs, and advance through the jungle level.
 
@@ -55,15 +55,15 @@ end
 
 -- ── Load ─────────────────────────────────────────────────────────────────
 
-function luna.load()
-    luna.render.setBackgroundColor(0.08, 0.18, 0.05)
+function luna.init()
+    luna.gfx.setBackgroundColor(0.08, 0.18, 0.05)
     score = 0; lives = 3; grenades_left = 3
     reset()
 end
 
 -- ── Update ───────────────────────────────────────────────────────────────
 
-function luna.update(dt)
+function luna.process(dt)
     if game_state ~= "playing" then return end
 
     anim_timer = anim_timer + dt
@@ -227,96 +227,96 @@ end
 
 -- ── Draw ─────────────────────────────────────────────────────────────────
 
-function luna.draw()
+function luna.render()
     -- Background jungle tiles (scroll with world)
     for _, t in ipairs(tiles) do
         local sy = (t.y + world_y) % (H + 200) - 50
-        luna.render.setColor(t.c[1], t.c[2], t.c[3])
-        luna.render.rectangle("fill", t.x, sy, t.w, t.h)
+        luna.gfx.setColor(t.c[1], t.c[2], t.c[3])
+        luna.gfx.rectangle("fill", t.x, sy, t.w, t.h)
     end
 
     -- Road stripe
-    luna.render.setColor(0.4, 0.35, 0.2, 0.3)
+    luna.gfx.setColor(0.4, 0.35, 0.2, 0.3)
     local roffset = world_y % 60
     for ry = -roffset, H, 60 do
-        luna.render.rectangle("fill", W/2 - 20, ry, 40, 30)
+        luna.gfx.rectangle("fill", W/2 - 20, ry, 40, 30)
     end
 
     -- POWs
     for _, p in ipairs(pows) do
         if p.alive then
-            luna.render.setColor(1, 0.8, 0.1)
-            luna.render.rectangle("fill", p.x, p.y, p.w, p.h)
-            luna.render.setColor(0, 0, 0)
-            luna.render.print("POW", p.x + 1, p.y + 6, 1.1)
+            luna.gfx.setColor(1, 0.8, 0.1)
+            luna.gfx.rectangle("fill", p.x, p.y, p.w, p.h)
+            luna.gfx.setColor(0, 0, 0)
+            luna.gfx.print("POW", p.x + 1, p.y + 6, 1.1)
         end
     end
 
     -- Enemies
     for _, e in ipairs(enemies) do
-        luna.render.setColor(0.6, 0.2, 0.1)
-        luna.render.rectangle("fill", e.x + 2, e.y + 8, e.w - 4, e.h - 8)
-        luna.render.setColor(0.75, 0.55, 0.35)
-        luna.render.circle("fill", e.x + e.w/2, e.y + 8, 9)
-        luna.render.setColor(0.4, 0.2, 0)
-        luna.render.rectangle("fill", e.x, e.y, e.w, 7)
+        luna.gfx.setColor(0.6, 0.2, 0.1)
+        luna.gfx.rectangle("fill", e.x + 2, e.y + 8, e.w - 4, e.h - 8)
+        luna.gfx.setColor(0.75, 0.55, 0.35)
+        luna.gfx.circle("fill", e.x + e.w/2, e.y + 8, 9)
+        luna.gfx.setColor(0.4, 0.2, 0)
+        luna.gfx.rectangle("fill", e.x, e.y, e.w, 7)
     end
 
     -- Enemy bullets
-    luna.render.setColor(1, 0.4, 0.1)
+    luna.gfx.setColor(1, 0.4, 0.1)
     for _, b in ipairs(bullets) do
         if b.enemy then
-            luna.render.rectangle("fill", b.x - 2, b.y - 4, b.w, b.h)
+            luna.gfx.rectangle("fill", b.x - 2, b.y - 4, b.w, b.h)
         end
     end
 
     -- Player
-    luna.render.setColor(0.2, 0.35, 0.7)
-    luna.render.rectangle("fill", player.x + 4, player.y + 10, player.w - 8, player.h - 10)
-    luna.render.setColor(0.85, 0.65, 0.4)
-    luna.render.circle("fill", player.x + player.w/2, player.y + 10, 11)
-    luna.render.setColor(0.3, 0.3, 0.1)
-    luna.render.rectangle("fill", player.x, player.y, player.w, 8)
+    luna.gfx.setColor(0.2, 0.35, 0.7)
+    luna.gfx.rectangle("fill", player.x + 4, player.y + 10, player.w - 8, player.h - 10)
+    luna.gfx.setColor(0.85, 0.65, 0.4)
+    luna.gfx.circle("fill", player.x + player.w/2, player.y + 10, 11)
+    luna.gfx.setColor(0.3, 0.3, 0.1)
+    luna.gfx.rectangle("fill", player.x, player.y, player.w, 8)
     -- Gun
-    luna.render.setColor(0.4, 0.4, 0.4)
-    luna.render.rectangle("fill", player.x + player.w/2 - 2, player.y - 10, 4, 14)
+    luna.gfx.setColor(0.4, 0.4, 0.4)
+    luna.gfx.rectangle("fill", player.x + player.w/2 - 2, player.y - 10, 4, 14)
 
     -- Player bullets
-    luna.render.setColor(1, 1, 0.4)
+    luna.gfx.setColor(1, 1, 0.4)
     for _, b in ipairs(bullets) do
         if not b.enemy then
-            luna.render.rectangle("fill", b.x - 2, b.y, 4, 12)
+            luna.gfx.rectangle("fill", b.x - 2, b.y, 4, 12)
         end
     end
 
     -- Grenades
-    luna.render.setColor(0, 0.8, 0.1)
+    luna.gfx.setColor(0, 0.8, 0.1)
     for _, g in ipairs(grenades) do
-        luna.render.circle("fill", g.x, g.y, 8)
+        luna.gfx.circle("fill", g.x, g.y, 8)
     end
 
     -- HUD
-    luna.render.setColor(0, 0, 0, 0.55)
-    luna.render.rectangle("fill", 0, 0, W, 28)
-    luna.render.setColor(0.9, 0.8, 0.2)
-    luna.render.print("COMMANDO", 8, 5, 1.8)
-    luna.render.setColor(1, 1, 1)
-    luna.render.print("Score: " .. score, W/2 - 50, 5, 1.6)
-    luna.render.setColor(1, 0.4, 0.4)
-    luna.render.print("Lives: " .. lives, W - 100, 5, 1.5)
-    luna.render.setColor(0.4, 1, 0.4)
-    luna.render.print("Grenades: " .. grenades_left, W/2 + 60, 5, 1.5)
+    luna.gfx.setColor(0, 0, 0, 0.55)
+    luna.gfx.rectangle("fill", 0, 0, W, 28)
+    luna.gfx.setColor(0.9, 0.8, 0.2)
+    luna.gfx.print("COMMANDO", 8, 5, 1.8)
+    luna.gfx.setColor(1, 1, 1)
+    luna.gfx.print("Score: " .. score, W/2 - 50, 5, 1.6)
+    luna.gfx.setColor(1, 0.4, 0.4)
+    luna.gfx.print("Lives: " .. lives, W - 100, 5, 1.5)
+    luna.gfx.setColor(0.4, 1, 0.4)
+    luna.gfx.print("Grenades: " .. grenades_left, W/2 + 60, 5, 1.5)
 
     -- Overlay
     if game_state == "gameover" then
-        luna.render.setColor(0, 0, 0, 0.72)
-        luna.render.rectangle("fill", 0, 0, W, H)
-        luna.render.setColor(1, 0.2, 0.2)
-        luna.render.print("MISSION FAILED", W/2 - 110, H/2 - 25, 3)
-        luna.render.setColor(1, 1, 1)
-        luna.render.print("Score: " .. score, W/2 - 50, H/2 + 15, 2)
-        luna.render.setColor(0.6, 0.6, 0.6)
-        luna.render.print("Press R to restart", W/2 - 100, H/2 + 48, 2)
+        luna.gfx.setColor(0, 0, 0, 0.72)
+        luna.gfx.rectangle("fill", 0, 0, W, H)
+        luna.gfx.setColor(1, 0.2, 0.2)
+        luna.gfx.print("MISSION FAILED", W/2 - 110, H/2 - 25, 3)
+        luna.gfx.setColor(1, 1, 1)
+        luna.gfx.print("Score: " .. score, W/2 - 50, H/2 + 15, 2)
+        luna.gfx.setColor(0.6, 0.6, 0.6)
+        luna.gfx.print("Press R to restart", W/2 - 100, H/2 + 48, 2)
     end
 end
 

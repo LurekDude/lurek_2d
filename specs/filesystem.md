@@ -1,4 +1,4 @@
-﻿# `filesystem` — Agent Reference
+# `filesystem` — Agent Reference
 
 | Property       | Value                                                |
 |----------------|------------------------------------------------------|
@@ -212,7 +212,7 @@ Exposed under `luna.fs.*` by `src/lua_api/filesystem_api.rs`. The API provides s
 
 ```lua
 -- Basic file read/write
-function luna.load()
+function luna.init()
     -- Write save data (must be under save/)
     luna.fs.write("save/progress.json", '{"score": 100}')
 
@@ -236,7 +236,7 @@ end
 
 ```lua
 -- Directory listing and file handle I/O
-function luna.load()
+function luna.init()
     -- List files in current directory
     local items = luna.fs.getDirectoryItems(".")
     for _, name in ipairs(items) do
@@ -259,7 +259,7 @@ end
 
 ```lua
 -- Async loading and VFS mounting
-function luna.load()
+function luna.init()
     -- Mount a mod directory
     luna.fs.mount("mods/expansion", "/mods/expansion")
 
@@ -271,7 +271,7 @@ function luna.load()
     handle = luna.fs.readAsync("assets/large_texture.png")
 end
 
-function luna.update(dt)
+function luna.process(dt)
     if handle then
         local status, data = luna.fs.pollAsync(handle)
         if status == "done" then

@@ -1,4 +1,4 @@
-﻿# Docs Demo
+# Docs Demo
 
 Demonstrates `luna.docs`: the self-documenting API introspection module. Scan the `luna` namespace at runtime, list modules, query function signatures, and display available APIs in-game.
 
@@ -9,7 +9,7 @@ Demonstrates `luna.docs`: the self-documenting API introspection module. Scan th
 - `catalog:getFunctions(module)` — list all functions in a module
 - `catalog:getSignature(module, fn)` — retrieve a function's signature string
 - `catalog:search(query)` — fuzzy-search across all function names and descriptions
-- Rendering scrollable lists of API entries using `luna.render.print()`
+- Rendering scrollable lists of API entries using `luna.gfx.print()`
 
 ## How to Run
 

@@ -1,15 +1,15 @@
-﻿local score = 0
+local score = 0
 local lives = 3
 local state = "playing"
 
 local ball = { x = 400, y = 300, vx = 200, vy = 150, r = 8 }
 local paddle = { x = 350, y = 560, w = 100, h = 12 }
 
-function luna.load()
+function luna.init()
     -- Ready to play
 end
 
-function luna.update(dt)
+function luna.process(dt)
     if state ~= "playing" then return end
 
     -- Move paddle
@@ -44,24 +44,24 @@ function luna.update(dt)
     end
 end
 
-function luna.draw()
-    luna.render.clear(0.05, 0.05, 0.1)
+function luna.render()
+    luna.gfx.clear(0.05, 0.05, 0.1)
 
     -- Ball
-    luna.render.setColor(1, 0.9, 0.2, 1)
-    luna.render.circle("fill", ball.x, ball.y, ball.r)
+    luna.gfx.setColor(1, 0.9, 0.2, 1)
+    luna.gfx.circle("fill", ball.x, ball.y, ball.r)
 
     -- Paddle
-    luna.render.setColor(0.2, 0.7, 1, 1)
-    luna.render.rectangle("fill", paddle.x, paddle.y, paddle.w, paddle.h)
+    luna.gfx.setColor(0.2, 0.7, 1, 1)
+    luna.gfx.rectangle("fill", paddle.x, paddle.y, paddle.w, paddle.h)
 
     -- UI
-    luna.render.setColor(1, 1, 1, 1)
-    luna.render.print("Score: " .. score, 10, 10)
-    luna.render.print("Lives: " .. lives, 710, 10)
+    luna.gfx.setColor(1, 1, 1, 1)
+    luna.gfx.print("Score: " .. score, 10, 10)
+    luna.gfx.print("Lives: " .. lives, 710, 10)
 
     if state == "gameover" then
-        luna.render.print("GAME OVER - Press R to restart", 260, 280)
+        luna.gfx.print("GAME OVER - Press R to restart", 260, 280)
     end
 end
 

@@ -1,6 +1,10 @@
-function luna.conf(t)
-    t.window.title  = "Pac-Man"
-    t.window.width  = 800
-    t.window.height = 600
-    t.performance.target_fps = 60
-end
+return {
+    window = {
+        title = "Pac-Man",
+        width = 800,
+        height = 600,
+    },
+    performance = {
+        target_fps = 60,
+    },
+}

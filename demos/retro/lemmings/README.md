@@ -1,4 +1,4 @@
-﻿# Lemmings
+# Lemmings
 
 A puzzle platformer inspired by DMA Design's 1991 Amiga classic. Guide a horde of
 mindless lemmings to the exit by assigning them specialised jobs before they walk
@@ -6,7 +6,7 @@ into danger.
 
 ## What It Demonstrates
 
-- `luna.render.rectangle()` / `luna.render.circle()` — terrain tiles, lemming sprites
+- `luna.gfx.rectangle()` / `luna.gfx.circle()` — terrain tiles, lemming sprites
 - Complex per-frame agent logic for multiple independently-moving entities
 - Destructible terrain via a 2D boolean grid
 - Job-system state machine per agent (walk, block, dig, build, bash)

@@ -1,4 +1,4 @@
-﻿---
+---
 description: "Create a new DrawCommand variant for the rendering pipeline with full integration."
 ---
 
@@ -27,7 +27,7 @@ Add a new DrawCommand variant to the rendering pipeline.
 
 - [ ] DrawCommand variant is data-only (no logic)
 - [ ] Renderer processes command correctly
-- [ ] Lua binding follows `luna.render.*` pattern
+- [ ] Lua binding follows `luna.gfx.*` pattern
 - [ ] Tests pass, clippy clean
 
 ## References

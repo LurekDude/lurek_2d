@@ -1,4 +1,4 @@
-﻿-- Luna2D Validation Test: Invalid API Arguments
+-- Luna2D Validation Test: Invalid API Arguments
 -- Tests that API functions handle bad inputs without crashing
 
 describe("validation: physics invalid args", function()
@@ -53,25 +53,25 @@ end)
 describe("validation: compute invalid args", function()
     it("rejects zero-dimension array", function()
         expect_error(function()
-            luna.gpu.zeros({0}, "float32")
+            luna.compute.zeros({0}, "float32")
         end, "zero dimension should error")
     end)
 
     it("rejects negative dimension", function()
         expect_error(function()
-            luna.gpu.zeros({-5}, "float32")
+            luna.compute.zeros({-5}, "float32")
         end, "negative dimension should error")
     end)
 
     it("rejects invalid dtype string", function()
         expect_error(function()
-            luna.gpu.zeros({10}, "invalid_type")
+            luna.compute.zeros({10}, "invalid_type")
         end, "invalid dtype should error")
     end)
 
     it("rejects too many dimensions", function()
         expect_error(function()
-            luna.gpu.zeros({2, 3, 4, 5}, "float32")
+            luna.compute.zeros({2, 3, 4, 5}, "float32")
         end, "4D should error")
     end)
 end)

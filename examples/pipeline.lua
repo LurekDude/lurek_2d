@@ -1,4 +1,4 @@
-﻿-- examples/pipeline.lua
+-- examples/pipeline.lua
 -- luna.pipeline — Dependency-aware task runner with retry, delay, and condition gates.
 -- Build DAGs of steps, run synchronously or spread across frames (async mode).
 -- All luna.pipeline API methods demonstrated with code and comments.
@@ -19,7 +19,7 @@ load_config:setCallback(function(ctx)
 end)
 
 load_assets:setCallback(function(ctx)
-    ctx.hero_img = luna.render.newImage("hero.png")
+    ctx.hero_img = luna.gfx.newImage("hero.png")
 end)
 
 init_world:setCallback(function(ctx)
@@ -163,7 +163,7 @@ local mode = pipeline:getErrorMode()
 local async_ctx = {}
 pipeline:runAsync(async_ctx)
 
-function luna.update(dt)
+function luna.process(dt)
     local done = pipeline:update(dt)
     if done then
         local res = pipeline:getResult()  -- full result table

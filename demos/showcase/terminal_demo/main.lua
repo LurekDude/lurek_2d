@@ -1,4 +1,4 @@
-﻿-- Terminal Demo for Luna2D
+-- Terminal Demo for Luna2D
 -- Demonstrates the luna.terminal widget system with a "Character Creator" UI.
 -- Features: grid manipulation, borders, labels, textbox, list, button, focus, callbacks.
 
@@ -30,9 +30,9 @@ local function initSmokeMode()
     end
 end
 
-function luna.load()
+function luna.init()
     initSmokeMode()
-    luna.render.setBackgroundColor(0, 0, 0)
+    luna.gfx.setBackgroundColor(0, 0, 0)
 
     -- Create an 80×25 terminal grid
     term = luna.terminal.newTerminal(80, 25)
@@ -160,21 +160,21 @@ end
 
 -- ── Callbacks ────────────────────────────────────────────────────────────
 
-function luna.update(dt)
+function luna.process(dt)
     if smokeQuitNextFrame then
         luna.signal.quit()
     end
 end
 
-function luna.draw()
+function luna.render()
     term:draw(0, 0)
 
     -- Draw a small hint below the terminal
-    luna.render.setColor(0.4, 0.4, 0.4)
-    luna.render.print("Terminal Demo  |  Tab = cycle focus  |  ESC = quit", 10, 580, 1)
+    luna.gfx.setColor(0.4, 0.4, 0.4)
+    luna.gfx.print("Terminal Demo  |  Tab = cycle focus  |  ESC = quit", 10, 580, 1)
 
     if smokeMode and not smokeRequested then
-        luna.render.saveScreenshot(smokeScreenshotPath)
+        luna.gfx.saveScreenshot(smokeScreenshotPath)
         smokeRequested = true
         smokeQuitNextFrame = true
     end

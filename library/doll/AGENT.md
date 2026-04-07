@@ -1,4 +1,4 @@
-﻿# Doll Library
+# Doll Library
 
 **Tier**: 3 — Lunasome (Pure Lua)
 **Status**: Implemented
@@ -35,7 +35,7 @@ local drawList = doll:getDrawList()
 
 ## Dependencies
 
-- None (pure Lua, optionally calls `luna.render` in `draw()`)
+- None (pure Lua, optionally calls `luna.gfx` in `draw()`)
 
 ## Tests
 

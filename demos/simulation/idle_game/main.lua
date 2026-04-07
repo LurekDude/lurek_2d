@@ -1,4 +1,4 @@
-﻿-- Idle Game: Incremental clicker with generators, upgrades, and prestige
+-- Idle Game: Incremental clicker with generators, upgrades, and prestige
 -- Click to earn, buy generators, prestige for multipliers
 
 local SCREEN_W, SCREEN_H = 800, 600
@@ -50,9 +50,9 @@ local function get_cps()
     return cps * prestige_mult
 end
 
-function luna.load() end
+function luna.init() end
 
-function luna.update(dt)
+function luna.process(dt)
     -- Auto-generation
     local earned = get_cps() * dt
     coins = coins + earned
@@ -135,15 +135,15 @@ function luna.keypressed(key)
     if key == "escape" then luna.signal.quit() end
 end
 
-function luna.draw()
-    luna.render.setBackgroundColor(0.1, 0.08, 0.15)
+function luna.render()
+    luna.gfx.setBackgroundColor(0.1, 0.08, 0.15)
 
     -- Coins display
-    luna.render.setColor(1, 0.85, 0.1, 1)
-    luna.render.print(format_num(coins) .. " coins", 60, 20, 2.5)
-    luna.render.setColor(0.7, 0.7, 0.7, 1)
-    luna.render.print(format_num(get_cps()) .. " per second", 60, 65)
-    luna.render.print("Click power: " .. format_num(click_power * prestige_mult), 60, 85)
+    luna.gfx.setColor(1, 0.85, 0.1, 1)
+    luna.gfx.print(format_num(coins) .. " coins", 60, 20, 2.5)
+    luna.gfx.setColor(0.7, 0.7, 0.7, 1)
+    luna.gfx.print(format_num(get_cps()) .. " per second", 60, 65)
+    luna.gfx.print("Click power: " .. format_num(click_power * prestige_mult), 60, 85)
 
     -- Big button
     local s = 1.0 + math.sin(pulse) * 0.03
@@ -151,75 +151,75 @@ function luna.draw()
     local by = big_button.y + big_button.h / 2
     local hw = big_button.w / 2 * s
     local hh = big_button.h / 2 * s
-    luna.render.setColor(0.9, 0.7, 0.1, 1)
-    luna.render.circle("fill", bx, by, hw)
-    luna.render.setColor(1, 0.85, 0.2, 1)
-    luna.render.circle("fill", bx, by, hw - 6)
-    luna.render.setColor(0.3, 0.2, 0, 1)
-    luna.render.print("CLICK", bx - 30, by - 10, 1.5)
+    luna.gfx.setColor(0.9, 0.7, 0.1, 1)
+    luna.gfx.circle("fill", bx, by, hw)
+    luna.gfx.setColor(1, 0.85, 0.2, 1)
+    luna.gfx.circle("fill", bx, by, hw - 6)
+    luna.gfx.setColor(0.3, 0.2, 0, 1)
+    luna.gfx.print("CLICK", bx - 30, by - 10, 1.5)
 
     -- Click particles
     for _, p in ipairs(click_particles) do
-        luna.render.setColor(1, 1, 0.3, p.life)
-        luna.render.print(p.text, p.x, p.y, 1.2)
+        luna.gfx.setColor(1, 1, 0.3, p.life)
+        luna.gfx.print(p.text, p.x, p.y, 1.2)
     end
 
     -- Generator panel
-    luna.render.setColor(1, 1, 1, 1)
-    luna.render.print("GENERATORS", 350, 95, 1.2)
+    luna.gfx.setColor(1, 1, 1, 1)
+    luna.gfx.print("GENERATORS", 350, 95, 1.2)
     for i, g in ipairs(generators) do
         local by = 120 + (i - 1) * 52
         local affordable = coins >= g.cost
         if affordable then
-            luna.render.setColor(0.15, 0.3, 0.15, 1)
+            luna.gfx.setColor(0.15, 0.3, 0.15, 1)
         else
-            luna.render.setColor(0.2, 0.15, 0.15, 1)
+            luna.gfx.setColor(0.2, 0.15, 0.15, 1)
         end
-        luna.render.rectangle("fill", 320, by, 240, 44)
-        luna.render.setColor(0.4, 0.4, 0.4, 1)
-        luna.render.rectangle("line", 320, by, 240, 44)
-        luna.render.setColor(1, 1, 1, affordable and 1 or 0.4)
-        luna.render.print(g.name .. " (" .. g.count .. ")", 328, by + 4)
-        luna.render.setColor(0.7, 0.7, 0.5, 1)
-        luna.render.print("Cost: " .. format_num(g.cost) .. "  +" .. format_num(g.cps * prestige_mult) .. "/s", 328, by + 22)
+        luna.gfx.rectangle("fill", 320, by, 240, 44)
+        luna.gfx.setColor(0.4, 0.4, 0.4, 1)
+        luna.gfx.rectangle("line", 320, by, 240, 44)
+        luna.gfx.setColor(1, 1, 1, affordable and 1 or 0.4)
+        luna.gfx.print(g.name .. " (" .. g.count .. ")", 328, by + 4)
+        luna.gfx.setColor(0.7, 0.7, 0.5, 1)
+        luna.gfx.print("Cost: " .. format_num(g.cost) .. "  +" .. format_num(g.cps * prestige_mult) .. "/s", 328, by + 22)
     end
 
     -- Upgrades panel
-    luna.render.setColor(1, 1, 1, 1)
-    luna.render.print("UPGRADES", 640, 95, 1.2)
+    luna.gfx.setColor(1, 1, 1, 1)
+    luna.gfx.print("UPGRADES", 640, 95, 1.2)
     for i, u in ipairs(upgrades) do
         local by = 120 + (i - 1) * 42
         if u.bought then
-            luna.render.setColor(0.15, 0.15, 0.25, 1)
+            luna.gfx.setColor(0.15, 0.15, 0.25, 1)
         elseif coins >= u.cost then
-            luna.render.setColor(0.15, 0.25, 0.35, 1)
+            luna.gfx.setColor(0.15, 0.25, 0.35, 1)
         else
-            luna.render.setColor(0.15, 0.12, 0.12, 1)
+            luna.gfx.setColor(0.15, 0.12, 0.12, 1)
         end
-        luna.render.rectangle("fill", 590, by, 200, 34)
-        luna.render.setColor(0.4, 0.4, 0.4, 1)
-        luna.render.rectangle("line", 590, by, 200, 34)
+        luna.gfx.rectangle("fill", 590, by, 200, 34)
+        luna.gfx.setColor(0.4, 0.4, 0.4, 1)
+        luna.gfx.rectangle("line", 590, by, 200, 34)
         if u.bought then
-            luna.render.setColor(0.4, 0.7, 0.4, 1)
-            luna.render.print(u.name .. " [OWNED]", 598, by + 4)
+            luna.gfx.setColor(0.4, 0.7, 0.4, 1)
+            luna.gfx.print(u.name .. " [OWNED]", 598, by + 4)
         else
-            luna.render.setColor(1, 1, 1, coins >= u.cost and 1 or 0.4)
-            luna.render.print(u.name .. " - " .. format_num(u.cost), 598, by + 4)
+            luna.gfx.setColor(1, 1, 1, coins >= u.cost and 1 or 0.4)
+            luna.gfx.print(u.name .. " - " .. format_num(u.cost), 598, by + 4)
         end
-        luna.render.setColor(0.6, 0.6, 0.6, 1)
-        luna.render.print(u.desc, 598, by + 18)
+        luna.gfx.setColor(0.6, 0.6, 0.6, 1)
+        luna.gfx.print(u.desc, 598, by + 18)
     end
 
     -- Prestige button
-    luna.render.setColor(0.5, 0.2, 0.6, total_earned >= 10000 and 1 or 0.3)
-    luna.render.rectangle("fill", 60, 500, 200, 40)
-    luna.render.setColor(1, 1, 1, 1)
-    luna.render.print("PRESTIGE (10K req)", 75, 508)
+    luna.gfx.setColor(0.5, 0.2, 0.6, total_earned >= 10000 and 1 or 0.3)
+    luna.gfx.rectangle("fill", 60, 500, 200, 40)
+    luna.gfx.setColor(1, 1, 1, 1)
+    luna.gfx.print("PRESTIGE (10K req)", 75, 508)
 
     -- Stats
-    luna.render.setColor(0.6, 0.6, 0.6, 1)
-    luna.render.print("Total earned: " .. format_num(total_earned), 60, 400)
-    luna.render.print("Total clicks: " .. total_clicked, 60, 418)
-    luna.render.print("Prestige: x" .. prestige_mult .. " (" .. prestige_count .. ")", 60, 436)
-    luna.render.print("FPS: " .. luna.time.getFPS(), 60, 460)
+    luna.gfx.setColor(0.6, 0.6, 0.6, 1)
+    luna.gfx.print("Total earned: " .. format_num(total_earned), 60, 400)
+    luna.gfx.print("Total clicks: " .. total_clicked, 60, 418)
+    luna.gfx.print("Prestige: x" .. prestige_mult .. " (" .. prestige_count .. ")", 60, 436)
+    luna.gfx.print("FPS: " .. luna.time.getFPS(), 60, 460)
 end

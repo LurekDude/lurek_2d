@@ -172,11 +172,11 @@ Returned by `service()`:
 -- Server: host a game on port 12345 with up to 4 peers
 local server
 
-function luna.load()
+function luna.init()
     server = luna.network.newHost({ addr = "0.0.0.0:12345", peers = 4, channels = 2 })
 end
 
-function luna.update(dt)
+function luna.process(dt)
     local event = server:service()
     while event do
         if event.type == "connect" then
@@ -198,12 +198,12 @@ end
 local client
 local peer_id
 
-function luna.load()
+function luna.init()
     client = luna.network.newHost()
     peer_id = client:connect("127.0.0.1:12345", 2, 0)
 end
 
-function luna.update(dt)
+function luna.process(dt)
     local event = client:service()
     while event do
         if event.type == "connect" then

@@ -1,4 +1,4 @@
-﻿-- examples/light.lua
+-- examples/light.lua
 -- luna.light — 2D lighting, shadow occluders, and ambient control.
 -- All luna.light API methods demonstrated with code and comments.
 
@@ -155,7 +155,7 @@ wall:setLightMask(0xFFFF)        -- bitmask controls which lights cast on it
 -- ── Typical Usage ─────────────────────────────────────────────────────────────
 
 --[[
-function luna.load()
+function luna.init()
     luna.light.setEnabled(true)
     luna.light.setAmbient(0.04, 0.04, 0.1, 1.0)
 
@@ -168,14 +168,14 @@ function luna.load()
     })
 end
 
-function luna.update(dt)
+function luna.process(dt)
     local mx, my = luna.mouse.getPosition()
     player_light:setPosition(mx, my)
 end
 
-function luna.draw()
+function luna.render()
     -- draw scene (lighting composited automatically)
-    luna.render.setColor(0.6, 0.4, 0.2)
-    luna.render.rectangle("fill", 200, 200, 80, 80)
+    luna.gfx.setColor(0.6, 0.4, 0.2)
+    luna.gfx.rectangle("fill", 200, 200, 80, 80)
 end
 ]]

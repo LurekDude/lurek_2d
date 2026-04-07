@@ -1,4 +1,4 @@
-﻿-- Physics demo for Luna2D
+-- Physics demo for Luna2D
 -- Demonstrates: circle bodies, rect bodies, sensors, collision events, layer filtering
 
 local world_id
@@ -22,9 +22,9 @@ local sensor_triggered = false
 local _shape_type, _shape_r = luna.physics.newCircleShape(25)
 print("[physics_demo] shape type:", _shape_type, "radius:", _shape_r)
 
-function luna.load()
+function luna.init()
     luna.window.setTitle("Physics Demo -- Luna2D (Circles + Sensors + Layers)")
-    luna.render.setBackgroundColor(0.05, 0.05, 0.15)
+    luna.gfx.setBackgroundColor(0.05, 0.05, 0.15)
 
     world_id = luna.physics.newWorld(0, 400)
 
@@ -66,7 +66,7 @@ function luna.load()
     layer_ball_id:setLayer(4); layer_ball_id:setMask(4)
 end
 
-function luna.update(dt)
+function luna.process(dt)
     world_id:step(dt)
 
     -- Read collision events
@@ -102,71 +102,71 @@ function luna.update(dt)
     end
 end
 
-function luna.draw()
+function luna.render()
     -- Ground
     local gx, gy = ground_id:getPosition()
-    luna.render.setColor(0.25, 0.6, 0.25)
-    luna.render.rectangle("fill", gx - W/2, gy - 25, W, 50)
+    luna.gfx.setColor(0.25, 0.6, 0.25)
+    luna.gfx.rectangle("fill", gx - W/2, gy - 25, W, 50)
 
     -- Walls
-    luna.render.setColor(0.3, 0.3, 0.5)
+    luna.gfx.setColor(0.3, 0.3, 0.5)
     local lx, ly = wall_left_id:getPosition()
-    luna.render.rectangle("fill", lx - 25, ly - H/2, 50, H)
+    luna.gfx.rectangle("fill", lx - 25, ly - H/2, 50, H)
     local rx, ry = wall_right_id:getPosition()
-    luna.render.rectangle("fill", rx - 25, ry - H/2, 50, H)
+    luna.gfx.rectangle("fill", rx - 25, ry - H/2, 50, H)
 
     -- Sensor zone
     local sx, sy = sensor_id:getPosition()
     if sensor_triggered then
-        luna.render.setColor(1.0, 1.0, 0.0, 0.35)
+        luna.gfx.setColor(1.0, 1.0, 0.0, 0.35)
     else
-        luna.render.setColor(0.8, 0.8, 0.0, 0.18)
+        luna.gfx.setColor(0.8, 0.8, 0.0, 0.18)
     end
-    luna.render.rectangle("fill", sx - (W-100)/2, sy - 10, W-100, 20)
-    luna.render.setColor(0.8, 0.8, 0.0)
-    luna.render.rectangle("line", sx - (W-100)/2, sy - 10, W-100, 20)
+    luna.gfx.rectangle("fill", sx - (W-100)/2, sy - 10, W-100, 20)
+    luna.gfx.setColor(0.8, 0.8, 0.0)
+    luna.gfx.rectangle("line", sx - (W-100)/2, sy - 10, W-100, 20)
 
     -- Ghost ball (layer 4 -- falls through without colliding with others)
     local px, py = layer_ball_id:getPosition()
-    luna.render.setColor(0.5, 0.5, 1.0, 0.6)
-    luna.render.circle("fill", px, py, 18)
-    luna.render.setColor(0.7, 0.7, 1.0)
-    luna.render.circle("line", px, py, 18)
+    luna.gfx.setColor(0.5, 0.5, 1.0, 0.6)
+    luna.gfx.circle("fill", px, py, 18)
+    luna.gfx.setColor(0.7, 0.7, 1.0)
+    luna.gfx.circle("line", px, py, 18)
 
     -- Dynamic box
     local bx2, by2 = box_id:getPosition()
     if collision_flash > 0 then
-        luna.render.setColor(1.0, 0.8, 0.2)
+        luna.gfx.setColor(1.0, 0.8, 0.2)
     else
-        luna.render.setColor(0.8, 0.5, 0.2)
+        luna.gfx.setColor(0.8, 0.5, 0.2)
     end
-    luna.render.rectangle("fill", bx2 - 20, by2 - 20, 40, 40)
+    luna.gfx.rectangle("fill", bx2 - 20, by2 - 20, 40, 40)
 
     -- Dynamic circle ball
     local bx, by = ball_id:getPosition()
     if collision_flash > 0 then
-        luna.render.setColor(1.0, 0.5, 0.5)
+        luna.gfx.setColor(1.0, 0.5, 0.5)
     else
-        luna.render.setColor(1.0, 0.3, 0.2)
+        luna.gfx.setColor(1.0, 0.3, 0.2)
     end
-    luna.render.circle("fill", bx, by, 22)
+    luna.gfx.circle("fill", bx, by, 22)
 
     -- HUD
-    luna.render.setColor(0.9, 0.9, 0.9)
-    luna.render.print("Physics Demo -- Circles + Sensors + Layers", 60, 10, 2)
-    luna.render.setColor(0.7, 0.7, 0.7)
-    luna.render.print("SPACE: reset  |  R: random impulse", 60, 35, 2)
-    luna.render.print("Red circle (layer 1) + Orange box (layer 2) collide with each other", 60, 55, 2)
-    luna.render.print("Blue ghost ball (layer 4) passes through everything", 60, 73, 2)
-    luna.render.print("Yellow band = sensor zone (detects but does not block)", 60, 91, 2)
+    luna.gfx.setColor(0.9, 0.9, 0.9)
+    luna.gfx.print("Physics Demo -- Circles + Sensors + Layers", 60, 10, 2)
+    luna.gfx.setColor(0.7, 0.7, 0.7)
+    luna.gfx.print("SPACE: reset  |  R: random impulse", 60, 35, 2)
+    luna.gfx.print("Red circle (layer 1) + Orange box (layer 2) collide with each other", 60, 55, 2)
+    luna.gfx.print("Blue ghost ball (layer 4) passes through everything", 60, 73, 2)
+    luna.gfx.print("Yellow band = sensor zone (detects but does not block)", 60, 91, 2)
 
     -- Collision counter
     local cc_color = collision_flash > 0 and {1.0, 1.0, 0.2} or {0.5, 0.9, 0.5}
-    luna.render.setColor(cc_color[1], cc_color[2], cc_color[3])
-    luna.render.print("Total collisions: " .. tostring(collision_count), 60, 115, 2)
+    luna.gfx.setColor(cc_color[1], cc_color[2], cc_color[3])
+    luna.gfx.print("Total collisions: " .. tostring(collision_count), 60, 115, 2)
 
     if sensor_triggered then
-        luna.render.setColor(1.0, 1.0, 0.0)
-        luna.render.print("SENSOR TRIGGERED!", 60, 135, 2)
+        luna.gfx.setColor(1.0, 1.0, 0.0)
+        luna.gfx.print("SENSOR TRIGGERED!", 60, 135, 2)
     end
 end

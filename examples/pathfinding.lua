@@ -1,4 +1,4 @@
-﻿-- examples/pathfinding.lua
+-- examples/pathfinding.lua
 -- luna.pathfinding — Grid-based A*, flow fields, hierarchical pathfinding,
 -- NavGrid, UnitPathfinder, PathGrid, FlowField, and AiFlowField.
 -- All luna.pathfinding API methods demonstrated with code and comments.
@@ -141,7 +141,7 @@ local path_idx = 1
 local unit_x, unit_y = 64, 64
 local TILE_SIZE = 32
 
-function luna.load()
+function luna.init()
     nav_grid = luna.pathfinding.newNavGrid(20, 20)
     -- Place some walls
     nav_grid:fillRect(5, 0, 2, 15, true)
@@ -154,7 +154,7 @@ function luna.load()
     path_idx = 1
 end
 
-function luna.update(dt)
+function luna.process(dt)
     if path_idx <= #path_nodes - 1 then
         local tx = path_nodes[path_idx]   * TILE_SIZE + TILE_SIZE / 2
         local ty = path_nodes[path_idx+1] * TILE_SIZE + TILE_SIZE / 2
@@ -169,8 +169,8 @@ function luna.update(dt)
     end
 end
 
-function luna.draw()
-    luna.render.setColor(0.3, 0.7, 1.0)
-    luna.render.circle("fill", unit_x, unit_y, 8)
+function luna.render()
+    luna.gfx.setColor(0.3, 0.7, 1.0)
+    luna.gfx.circle("fill", unit_x, unit_y, 8)
 end
 ]]

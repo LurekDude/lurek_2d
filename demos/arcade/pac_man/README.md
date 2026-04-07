@@ -1,14 +1,14 @@
-﻿# Pac-Man
+# Pac-Man
 
 Navigate the maze, eat all dots, and avoid the 4 ghosts.
 Eat a power pellet to turn the tables and devour frightened ghosts.
 
 ## What It Demonstrates
 
-- `luna.render.circle()` — pac-man, ghosts, and dots
-- `luna.render.rectangle()` — maze walls and header bar
+- `luna.gfx.circle()` — pac-man, ghosts, and dots
+- `luna.gfx.rectangle()` — maze walls and header bar
 - `luna.input.isKeyDown()` — directional movement with input buffering
-- `luna.render.print()` — score and status overlays
+- `luna.gfx.print()` — score and status overlays
 
 ## Controls
 

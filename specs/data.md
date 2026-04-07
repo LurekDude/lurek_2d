@@ -248,7 +248,7 @@ functions plus two UserData types with their own methods.
 
 ```lua
 -- Compression round-trip
-function luna.load()
+function luna.init()
     local original = "Hello, Luna2D! Compress me!"
     local compressed = luna.data.compress("gzip", original, 6)
     local restored = luna.data.decompress("gzip", compressed)

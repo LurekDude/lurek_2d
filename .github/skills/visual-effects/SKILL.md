@@ -1,4 +1,4 @@
-﻿---
+---
 name: visual-effects
 description: "Load this skill when implementing visual post-processing effects, image filters, or shader-based rendering techniques in Luna2D: full-screen passes using canvas render-to-texture, custom WGSL fragment shaders for blur/bloom/distortion/colour grading, screen-space overlays, or multi-pass render pipelines. Use for: CRT scanlines, vignette, colour correction, bloom, distortion, pixelation, palette swap. Skip it for basic sprite/image drawing (use gpu-programming), or 3D-style rendering (out of scope for Luna2D)."
 ---
@@ -46,11 +46,11 @@ This single pattern covers every post-processing effect. Multi-pass effects chai
 local sceneCanvas   -- off-screen render target
 local effectShader  -- WGSL shader that reads from the canvas
 
-function luna.load()
+function luna.init()
     local w, h = luna.window.getWidth(), luna.window.getHeight()
-    sceneCanvas = luna.render.newCanvas(w, h)
+    sceneCanvas = luna.gfx.newCanvas(w, h)
 
-    effectShader = luna.render.newShader([[
+    effectShader = luna.gfx.newShader([[
         @group(0) @binding(0) var tex: texture_2d<f32>;
         @group(0) @binding(1) var smp: sampler;
 
@@ -68,17 +68,17 @@ function luna.load()
     ]])
 end
 
-function luna.draw()
+function luna.render()
     -- Phase 1: render scene to canvas
-    luna.render.setCanvas(sceneCanvas)
-    luna.render.clear()
+    luna.gfx.setCanvas(sceneCanvas)
+    luna.gfx.clear()
     drawScene()           -- all normal draw calls go here
-    luna.render.setCanvas(nil)
+    luna.gfx.setCanvas(nil)
 
     -- Phase 2: draw canvas through effect shader
-    luna.render.setShader(effectShader)
-    luna.render.draw(sceneCanvas, 0, 0)
-    luna.render.setShader(nil)
+    luna.gfx.setShader(effectShader)
+    luna.gfx.draw(sceneCanvas, 0, 0)
+    luna.gfx.setShader(nil)
 end
 ```
 
@@ -179,29 +179,29 @@ Chain effects by using multiple canvases as intermediate render targets:
 ```lua
 local sceneCanvas, blurH, blurV  -- three render targets
 
-function luna.load()
+function luna.init()
     local w, h = luna.window.getWidth(), luna.window.getHeight()
-    sceneCanvas = luna.render.newCanvas(w, h)
-    blurH       = luna.render.newCanvas(w, h)
-    blurV       = luna.render.newCanvas(w, h)
-    blurHShader = luna.render.newShader(BLUR_H_WGSL)
-    blurVShader = luna.render.newShader(BLUR_V_WGSL)
+    sceneCanvas = luna.gfx.newCanvas(w, h)
+    blurH       = luna.gfx.newCanvas(w, h)
+    blurV       = luna.gfx.newCanvas(w, h)
+    blurHShader = luna.gfx.newShader(BLUR_H_WGSL)
+    blurVShader = luna.gfx.newShader(BLUR_V_WGSL)
 end
 
-function luna.draw()
+function luna.render()
     -- Pass 1: scene → sceneCanvas
-    luna.render.setCanvas(sceneCanvas) ; drawScene() ; luna.render.setCanvas(nil)
+    luna.gfx.setCanvas(sceneCanvas) ; drawScene() ; luna.gfx.setCanvas(nil)
 
     -- Pass 2: horizontal blur
-    luna.render.setCanvas(blurH)
-    luna.render.setShader(blurHShader)
-    luna.render.draw(sceneCanvas, 0, 0)
-    luna.render.setCanvas(nil) ; luna.render.setShader(nil)
+    luna.gfx.setCanvas(blurH)
+    luna.gfx.setShader(blurHShader)
+    luna.gfx.draw(sceneCanvas, 0, 0)
+    luna.gfx.setCanvas(nil) ; luna.gfx.setShader(nil)
 
     -- Pass 3: vertical blur → screen
-    luna.render.setShader(blurVShader)
-    luna.render.draw(blurH, 0, 0)
-    luna.render.setShader(nil)
+    luna.gfx.setShader(blurVShader)
+    luna.gfx.draw(blurH, 0, 0)
+    luna.gfx.setShader(nil)
 end
 ```
 
@@ -225,7 +225,7 @@ imgData:mapPixel(function(x, y, r, g, b, a)
 end)
 
 -- Upload to GPU
-local img = luna.render.newImage(imgData)
+local img = luna.gfx.newImage(imgData)
 ```
 
 ---
@@ -246,5 +246,5 @@ Full-screen shader passes are expensive on integrated GPUs. Target: **≤ 2ms to
 
 ```lua
 -- Half-resolution bloom canvas
-local bloomCanvas = luna.render.newCanvas(w // 2, h // 2)
+local bloomCanvas = luna.gfx.newCanvas(w // 2, h // 2)
 ```

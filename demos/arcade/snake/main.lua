@@ -1,4 +1,4 @@
-﻿-- Snake — Classic Arcade (Luna2D demo)
+-- Snake — Classic Arcade (Luna2D demo)
 -- Guide the snake to eat food and grow. Avoid walls and your own tail.
 -- Arrow keys to change direction, game speeds up as score increases.
 
@@ -65,14 +65,14 @@ end
 
 -- ── Load ─────────────────────────────────────────────────────────────────
 
-function luna.load()
-    luna.render.setBackgroundColor(0.04, 0.06, 0.04)
+function luna.init()
+    luna.gfx.setBackgroundColor(0.04, 0.06, 0.04)
     reset()
 end
 
 -- ── Update ───────────────────────────────────────────────────────────────
 
-function luna.update(dt)
+function luna.process(dt)
     if game_state ~= "playing" then return end
 
     move_timer = move_timer + dt
@@ -129,38 +129,38 @@ end
 
 -- ── Draw ─────────────────────────────────────────────────────────────────
 
-function luna.draw()
+function luna.render()
     -- Header
-    luna.render.setColor(0.08, 0.12, 0.08)
-    luna.render.rectangle("fill", 0, 0, W, 40)
-    luna.render.setColor(0.4, 0.9, 0.4)
-    luna.render.print("SNAKE", 8, 8, 2)
-    luna.render.setColor(1, 1, 1)
-    luna.render.print("Score: " .. score, W/2 - 50, 10, 1.8)
-    luna.render.setColor(0.6, 0.8, 0.6)
-    luna.render.print("Best: " .. high_score, W - 100, 10, 1.5)
+    luna.gfx.setColor(0.08, 0.12, 0.08)
+    luna.gfx.rectangle("fill", 0, 0, W, 40)
+    luna.gfx.setColor(0.4, 0.9, 0.4)
+    luna.gfx.print("SNAKE", 8, 8, 2)
+    luna.gfx.setColor(1, 1, 1)
+    luna.gfx.print("Score: " .. score, W/2 - 50, 10, 1.8)
+    luna.gfx.setColor(0.6, 0.8, 0.6)
+    luna.gfx.print("Best: " .. high_score, W - 100, 10, 1.5)
 
     -- Grid background
-    luna.render.setColor(0.06, 0.08, 0.06)
-    luna.render.rectangle("fill", 0, 40, W, ROWS * CELL)
+    luna.gfx.setColor(0.06, 0.08, 0.06)
+    luna.gfx.rectangle("fill", 0, 40, W, ROWS * CELL)
 
     -- Subtle grid lines
-    luna.render.setColor(0.09, 0.12, 0.09)
+    luna.gfx.setColor(0.09, 0.12, 0.09)
     for gx = 0, COLS do
-        luna.render.line(gx * CELL, 40, gx * CELL, 40 + ROWS * CELL)
+        luna.gfx.line(gx * CELL, 40, gx * CELL, 40 + ROWS * CELL)
     end
     for gy = 0, ROWS do
-        luna.render.line(0, 40 + gy * CELL, W, 40 + gy * CELL)
+        luna.gfx.line(0, 40 + gy * CELL, W, 40 + gy * CELL)
     end
 
     -- Food
     for _, f in ipairs(food) do
         local fx = f[1] * CELL + 3
         local fy = f[2] * CELL + 40 + 3
-        luna.render.setColor(1, 0.2, 0.2)
-        luna.render.circle("fill", f[1] * CELL + CELL/2, f[2] * CELL + 40 + CELL/2, CELL/2 - 3)
-        luna.render.setColor(0.2, 0.8, 0.2)
-        luna.render.rectangle("fill", f[1] * CELL + CELL/2 - 1, f[2] * CELL + 40 + 2, 3, 5)
+        luna.gfx.setColor(1, 0.2, 0.2)
+        luna.gfx.circle("fill", f[1] * CELL + CELL/2, f[2] * CELL + 40 + CELL/2, CELL/2 - 3)
+        luna.gfx.setColor(0.2, 0.8, 0.2)
+        luna.gfx.rectangle("fill", f[1] * CELL + CELL/2 - 1, f[2] * CELL + 40 + 2, 3, 5)
     end
 
     -- Snake body
@@ -171,29 +171,29 @@ function luna.draw()
         local gb = 0.3 + t * 0.2
         if i == #snake then
             -- Head: brighter
-            luna.render.setColor(0.4, 1.0, 0.4)
-            luna.render.rectangle("fill", seg[1]*CELL + 1, seg[2]*CELL + 40 + 1, CELL - 2, CELL - 2)
+            luna.gfx.setColor(0.4, 1.0, 0.4)
+            luna.gfx.rectangle("fill", seg[1]*CELL + 1, seg[2]*CELL + 40 + 1, CELL - 2, CELL - 2)
             -- Eyes
-            luna.render.setColor(0, 0, 0)
+            luna.gfx.setColor(0, 0, 0)
             local ex = seg[1]*CELL + (dir[1] == 1 and CELL - 5 or (dir[1] == -1 and 3 or CELL/2 - 3))
             local ey = seg[2]*CELL + 40 + (dir[2] == 1 and CELL - 5 or (dir[2] == -1 and 3 or CELL/2 - 3))
-            luna.render.circle("fill", ex, ey, 2)
+            luna.gfx.circle("fill", ex, ey, 2)
         else
-            luna.render.setColor(gr, gg, gb)
-            luna.render.rectangle("fill", seg[1]*CELL + 2, seg[2]*CELL + 40 + 2, CELL - 4, CELL - 4)
+            luna.gfx.setColor(gr, gg, gb)
+            luna.gfx.rectangle("fill", seg[1]*CELL + 2, seg[2]*CELL + 40 + 2, CELL - 4, CELL - 4)
         end
     end
 
     -- Game over overlay
     if game_state == "dead" then
-        luna.render.setColor(0, 0, 0, 0.7)
-        luna.render.rectangle("fill", 0, 0, W, H)
-        luna.render.setColor(1, 0.3, 0.3)
-        luna.render.print("GAME OVER", W/2 - 80, H/2 - 30, 3)
-        luna.render.setColor(1, 1, 1)
-        luna.render.print("Score: " .. score, W/2 - 45, H/2 + 10, 2)
-        luna.render.setColor(0.7, 0.7, 0.7)
-        luna.render.print("Press R to restart", W/2 - 100, H/2 + 40, 2)
+        luna.gfx.setColor(0, 0, 0, 0.7)
+        luna.gfx.rectangle("fill", 0, 0, W, H)
+        luna.gfx.setColor(1, 0.3, 0.3)
+        luna.gfx.print("GAME OVER", W/2 - 80, H/2 - 30, 3)
+        luna.gfx.setColor(1, 1, 1)
+        luna.gfx.print("Score: " .. score, W/2 - 45, H/2 + 10, 2)
+        luna.gfx.setColor(0.7, 0.7, 0.7)
+        luna.gfx.print("Press R to restart", W/2 - 100, H/2 + 40, 2)
     end
 end
 

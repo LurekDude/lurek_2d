@@ -1,4 +1,4 @@
-﻿-- Endless Runner — Luna2D Demo
+-- Endless Runner — Luna2D Demo
 -- Space to jump, Down to slide, dodge obstacles, collect coins
 
 local player, obstacles, coins, particles
@@ -53,14 +53,14 @@ end
 local spawnTimer = 0
 local coinTimer = 0
 
-function luna.load()
+function luna.init()
     luna.window.setTitle("Endless Runner")
-    luna.render.setBackgroundColor(0.05, 0.05, 0.12)
+    luna.gfx.setBackgroundColor(0.05, 0.05, 0.12)
     highScore = 0
     resetGame()
 end
 
-function luna.update(dt)
+function luna.process(dt)
     if gameState == "dead" then return end
 
     -- speed ramp: world accelerates continuously — eventual death is by design
@@ -149,64 +149,64 @@ function luna.update(dt)
     end
 end
 
-function luna.draw()
+function luna.render()
     -- parallax bg
     for _, l in ipairs(bgLayers) do
-        luna.render.setColor(l.color[1], l.color[2], l.color[3], 1)
+        luna.gfx.setColor(l.color[1], l.color[2], l.color[3], 1)
         for ox = 0, 1 do
-            luna.render.rectangle("fill", l.x + ox * 800, l.y, 810, l.h)
+            luna.gfx.rectangle("fill", l.x + ox * 800, l.y, 810, l.h)
         end
     end
 
     -- ground
-    luna.render.setColor(0.25, 0.55, 0.2, 1)
-    luna.render.rectangle("fill", 0, groundY, 800, 100)
+    luna.gfx.setColor(0.25, 0.55, 0.2, 1)
+    luna.gfx.rectangle("fill", 0, groundY, 800, 100)
 
     -- obstacles
     for _, o in ipairs(obstacles) do
         if o.kind == "tall" then
-            luna.render.setColor(0.7, 0.2, 0.2, 1)
+            luna.gfx.setColor(0.7, 0.2, 0.2, 1)
         else
-            luna.render.setColor(0.6, 0.4, 0.1, 1)
+            luna.gfx.setColor(0.6, 0.4, 0.1, 1)
         end
-        luna.render.rectangle("fill", o.x, o.y, o.w, o.h)
+        luna.gfx.rectangle("fill", o.x, o.y, o.w, o.h)
     end
 
     -- coins
-    luna.render.setColor(1, 0.85, 0.1, 1)
+    luna.gfx.setColor(1, 0.85, 0.1, 1)
     for _, c in ipairs(coins) do
-        luna.render.circle("fill", c.x, c.y, c.r)
+        luna.gfx.circle("fill", c.x, c.y, c.r)
     end
 
     -- player
     local ph = player.sliding and 25 or 50
     local py = player.sliding and (groundY - 25) or (groundY - 50)
-    luna.render.setColor(0.2, 0.6, 1, 1)
-    luna.render.rectangle("fill", player.x, py, player.w, ph)
+    luna.gfx.setColor(0.2, 0.6, 1, 1)
+    luna.gfx.rectangle("fill", player.x, py, player.w, ph)
     -- eye
-    luna.render.setColor(1, 1, 1, 1)
-    luna.render.circle("fill", player.x + 22, py + 10, 4)
+    luna.gfx.setColor(1, 1, 1, 1)
+    luna.gfx.circle("fill", player.x + 22, py + 10, 4)
 
     -- particles
     for _, p in ipairs(particles) do
-        luna.render.setColor(p.r, p.g, p.b, p.life * 2)
-        luna.render.circle("fill", p.x, p.y, 3)
+        luna.gfx.setColor(p.r, p.g, p.b, p.life * 2)
+        luna.gfx.circle("fill", p.x, p.y, 3)
     end
 
     -- HUD
-    luna.render.setColor(1, 1, 1, 1)
-    luna.render.print("Score: " .. score, 10, 10)
-    luna.render.print("High: " .. highScore, 10, 30)
-    luna.render.print("FPS: " .. luna.time.getFPS(), 700, 10)
+    luna.gfx.setColor(1, 1, 1, 1)
+    luna.gfx.print("Score: " .. score, 10, 10)
+    luna.gfx.print("High: " .. highScore, 10, 30)
+    luna.gfx.print("FPS: " .. luna.time.getFPS(), 700, 10)
 
     if gameState == "dead" then
-        luna.render.setColor(0, 0, 0, 0.6)
-        luna.render.rectangle("fill", 200, 220, 400, 120)
-        luna.render.setColor(1, 0.3, 0.3, 1)
-        luna.render.print("GAME OVER", 310, 240, 1.5)
-        luna.render.setColor(1, 1, 1, 1)
-        luna.render.print("Score: " .. score, 340, 280)
-        luna.render.print("Press SPACE to restart", 290, 310)
+        luna.gfx.setColor(0, 0, 0, 0.6)
+        luna.gfx.rectangle("fill", 200, 220, 400, 120)
+        luna.gfx.setColor(1, 0.3, 0.3, 1)
+        luna.gfx.print("GAME OVER", 310, 240, 1.5)
+        luna.gfx.setColor(1, 1, 1, 1)
+        luna.gfx.print("Score: " .. score, 340, 280)
+        luna.gfx.print("Press SPACE to restart", 290, 310)
     end
 end
 

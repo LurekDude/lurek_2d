@@ -1,4 +1,4 @@
-﻿---
+---
 name: performance-profiling
 description: "Load this skill when analyzing or optimizing Luna2D performance: frame time, allocations, hot paths, rendering throughput, or Lua/Rust boundary overhead. Skip it for correctness bugs or feature implementation."
 ---
@@ -144,25 +144,25 @@ Draw call count is the primary render budget variable on integrated GPUs.
 ```lua
 -- BAD: O(N) draw calls — one per sprite
 for _, e in ipairs(entities) do
-    luna.render.draw(e.image, e.x, e.y)   -- 1 draw call each
+    luna.gfx.draw(e.image, e.x, e.y)   -- 1 draw call each
 end
 
 -- GOOD: 1 draw call for all sprites using the same texture
-local batch = luna.render.newSpriteBatch(atlas_image, 1000)
-function luna.update(dt)
+local batch = luna.gfx.newSpriteBatch(atlas_image, 1000)
+function luna.process(dt)
     batch:clear()
     for _, e in ipairs(entities) do
         batch:add(e.quad, e.x, e.y)
     end
 end
-function luna.draw()
-    luna.render.draw(batch, 0, 0)  -- 1 draw call
+function luna.render()
+    luna.gfx.draw(batch, 0, 0)  -- 1 draw call
 end
 ```
 
 ### Texture atlas
 
-Pack small sprites into a single large texture. Use `luna.render.newQuad()` to define sub-regions. This keeps SpriteBatch at exactly 1 draw call regardless of sprite count.
+Pack small sprites into a single large texture. Use `luna.gfx.newQuad()` to define sub-regions. This keeps SpriteBatch at exactly 1 draw call regardless of sprite count.
 
 ---
 
@@ -185,13 +185,13 @@ end
 
 ```lua
 -- BAD: per-frame table allocation
-function luna.update(dt)
+function luna.process(dt)
     local pos = vector(player.x, player.y)   -- new table every frame
 end
 
 -- GOOD: pre-allocate, reuse
 local _pos = { x = 0, y = 0 }
-function luna.update(dt)
+function luna.process(dt)
     _pos.x = player.x
     _pos.y = player.y
     -- use _pos

@@ -1,4 +1,4 @@
-﻿# Luna Toolkit — Implementation Plan
+# Luna Toolkit — Implementation Plan
 
 > Phased implementation plan for building the complete Luna Toolkit extension.
 > Each phase is self-contained with its own acceptance gates.
@@ -155,8 +155,8 @@ See `02-intellisense-design.md` for the full baseline spec.
 ### Acceptance Gates (Phase 2a)
 
 - [ ] Typing `luna.` shows module completions
-- [ ] Typing `luna.render.` shows function list
-- [ ] Hovering over `luna.render.draw` shows full docs with params
+- [ ] Typing `luna.gfx.` shows function list
+- [ ] Hovering over `luna.gfx.draw` shows full docs with params
 - [ ] Function signature help shows on `(`
 - [ ] `F12` on `require("module")` jumps to file
 - [ ] `Shift+F12` finds all references across workspace
@@ -194,9 +194,9 @@ See `08-intellisense-enhanced.md` for fullspec.
 - [ ] `bit.` completions show band, bor, bxor, etc.
 - [ ] `jit.` completions show on, off, flush, status
 - [ ] Resource creation in `luna.draw` shows Hint diagnostic
-- [ ] `local img = luna.render.newImage(...)` enables `img:` method completions
+- [ ] `local img = luna.gfx.newImage(...)` enables `img:` method completions
 - [ ] `luna.input.isDown("|")` shows key name completions
-- [ ] `luna.render.setBlendMode("|")` shows blend mode completions
+- [ ] `luna.gfx.setBlendMode("|")` shows blend mode completions
 - [ ] Easing function hover shows ASCII curve chart
 - [ ] Pattern library snippets appear under `luna.pattern.*` prefix
 - [ ] Circular require shows error diagnostic

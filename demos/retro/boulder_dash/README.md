@@ -1,4 +1,4 @@
-﻿# Boulder Dash
+# Boulder Dash
 
 Recreates the 1984 C-64 classic by First Star Software. Dig through earth,
 collect diamonds, and escape through the exit before time runs out — without
@@ -6,10 +6,10 @@ being crushed by falling boulders.
 
 ## What It Demonstrates
 
-- `luna.render.circle()` / `luna.render.rectangle()` — map cells, boulders, diamonds
+- `luna.gfx.circle()` / `luna.gfx.rectangle()` — map cells, boulders, diamonds
 - `luna.input.isKeyDown()` — tile-based movement with cooldown
 - Falling physics simulation at a fixed step rate
-- `luna.render.print()` — diamond counter, timer, and score HUD
+- `luna.gfx.print()` — diamond counter, timer, and score HUD
 
 ## Controls
 

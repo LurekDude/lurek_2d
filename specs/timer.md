@@ -1,4 +1,4 @@
-﻿# `timer` — Agent Reference
+# `timer` — Agent Reference
 
 | Property       | Value                                                |
 |----------------|------------------------------------------------------|
@@ -247,7 +247,7 @@ automatically unregistered from the Lua registry after each `update()` call.
 
 ```lua
 -- Basic frame timing
-function luna.update(dt)
+function luna.process(dt)
     local fps = luna.time.getFPS()
     local total = luna.time.getTime()
     local avg = luna.time.getAverageDelta()
@@ -256,7 +256,7 @@ end
 
 ```lua
 -- Scheduler: one-shot, repeating, named, pause/resume
-function luna.load()
+function luna.init()
     sched = luna.time.newScheduler()
 
     -- Fire once after 3 seconds
@@ -278,7 +278,7 @@ function luna.load()
     sched:setTimeScale(0.5)
 end
 
-function luna.update(dt)
+function luna.process(dt)
     sched:update(dt)
 
     -- Pause/resume example

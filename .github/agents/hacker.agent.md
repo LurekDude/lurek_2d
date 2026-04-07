@@ -1,4 +1,4 @@
-﻿---
+---
 description: "**Hacker** — Red-team adversarial tester. Find edge cases, crash paths, API misuse, and boundary conditions that break the Luna2D engine or escape the Lua sandbox. Reports findings to Security and Tester — never implements fixes."
 tools: [vscode, execute, read, agent, edit, search, web, browser, todo]
 name: Hacker
@@ -75,9 +75,9 @@ Every Hacker output includes:
 
 ```lua
 -- Stale key: release then draw
-local img = luna.render.newImage("test.png")
-luna.render.release(img)
-luna.render.draw(img, 0, 0)   -- must LuaError, not panic
+local img = luna.gfx.newImage("test.png")
+luna.gfx.release(img)
+luna.gfx.draw(img, 0, 0)   -- must LuaError, not panic
 
 -- Path traversal probes
 luna.fs.read("../../../etc/passwd")      -- must fail
@@ -90,19 +90,19 @@ print(dofile)   -- must be nil
 print(debug)    -- must be nil or restricted
 
 -- Double release
-local c = luna.render.newCanvas(100, 100)
-luna.render.releaseCanvas(c)
-luna.render.releaseCanvas(c)   -- must not crash
+local c = luna.gfx.newCanvas(100, 100)
+luna.gfx.releaseCanvas(c)
+luna.gfx.releaseCanvas(c)   -- must not crash
 
 -- Nil argument spam
-luna.render.draw(nil, nil, nil)
+luna.gfx.draw(nil, nil, nil)
 luna.audio.newSource(nil, nil)
 luna.physics.newWorld(nil, nil)
-luna.render.newImage("")        -- empty path
+luna.gfx.newImage("")        -- empty path
 
 -- Boundary values
-luna.render.rectangle("fill", math.maxinteger, math.maxinteger, 0, 0)
-luna.render.newCanvas(0, 0)    -- zero-size canvas
+luna.gfx.rectangle("fill", math.maxinteger, math.maxinteger, 0, 0)
+luna.gfx.newCanvas(0, 0)    -- zero-size canvas
 
 -- Resource exhaustion
 for i = 1, 100000 do
@@ -111,7 +111,7 @@ for i = 1, 100000 do
 end
 
 -- Sequence attack: setCanvas before newCanvas
-luna.render.setCanvas(nil)     -- unset without ever setting
+luna.gfx.setCanvas(nil)     -- unset without ever setting
 ```
 
 ## WORKFLOW

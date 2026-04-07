@@ -1,4 +1,4 @@
-﻿-- Track & Field — Sport Game (Luna2D demo)
+-- Track & Field — Sport Game (Luna2D demo)
 -- Alternate A and D (or Left/Right) keys rapidly to run.  
 -- Four events: 100m Sprint, Long Jump, Hurdles, and Hammer Throw.
 
@@ -59,8 +59,8 @@ end
 
 -- ── Load ─────────────────────────────────────────────────────────────────
 
-function luna.load()
-    luna.render.setBackgroundColor(0.4, 0.7, 1)
+function luna.init()
+    luna.gfx.setBackgroundColor(0.4, 0.7, 1)
     init()
 end
 
@@ -87,7 +87,7 @@ end
 
 -- ── Update ────────────────────────────────────────────────────────────────
 
-function luna.update(dt)
+function luna.process(dt)
     anim = anim + dt
 
     if game_state == "ready" then return end
@@ -201,159 +201,159 @@ end
 local function draw_athlete(x, y, running)
     local leg_off = running and math.sin(anim * 12) * 8 or 0
     -- Body
-    luna.render.setColor(0.9, 0.6, 0.3)
-    luna.render.rectangle("fill", x - 6, y - 30, 12, 18)
+    luna.gfx.setColor(0.9, 0.6, 0.3)
+    luna.gfx.rectangle("fill", x - 6, y - 30, 12, 18)
     -- Head
-    luna.render.circle("fill", x, y - 36, 7)
+    luna.gfx.circle("fill", x, y - 36, 7)
     -- Legs
-    luna.render.setColor(0.2, 0.3, 0.8)
-    luna.render.rectangle("fill", x - 5, y - 12, 5, 18 + leg_off)
-    luna.render.rectangle("fill", x,     y - 12, 5, 18 - leg_off)
+    luna.gfx.setColor(0.2, 0.3, 0.8)
+    luna.gfx.rectangle("fill", x - 5, y - 12, 5, 18 + leg_off)
+    luna.gfx.rectangle("fill", x,     y - 12, 5, 18 - leg_off)
     -- Arms
-    luna.render.setColor(0.9, 0.6, 0.3)
-    luna.render.line(x - 6, y - 26, x - 14, y - 20 + leg_off/2)
-    luna.render.line(x + 6, y - 26, x + 14, y - 20 - leg_off/2)
+    luna.gfx.setColor(0.9, 0.6, 0.3)
+    luna.gfx.line(x - 6, y - 26, x - 14, y - 20 + leg_off/2)
+    luna.gfx.line(x + 6, y - 26, x + 14, y - 20 - leg_off/2)
 end
 
-function luna.draw()
+function luna.render()
     -- Sky
-    luna.render.setColor(0.4, 0.7, 1)
-    luna.render.rectangle("fill", 0, 0, W, H)
+    luna.gfx.setColor(0.4, 0.7, 1)
+    luna.gfx.rectangle("fill", 0, 0, W, H)
     -- Crowd stands
-    luna.render.setColor(0.6, 0.3, 0.1)
-    luna.render.rectangle("fill", 0, 0, W, 60)
+    luna.gfx.setColor(0.6, 0.3, 0.1)
+    luna.gfx.rectangle("fill", 0, 0, W, 60)
     for i = 0, 15 do
         local cx = 24 + i * 50
-        luna.render.setColor(0.2 + (i % 3)*0.2, 0.1, 0.4 + (i % 2)*0.2)
-        luna.render.circle("fill", cx, 35 + (i % 3) * 7, 10)
+        luna.gfx.setColor(0.2 + (i % 3)*0.2, 0.1, 0.4 + (i % 2)*0.2)
+        luna.gfx.circle("fill", cx, 35 + (i % 3) * 7, 10)
     end
     -- Ground / track
-    luna.render.setColor(0.85, 0.65, 0.3)
-    luna.render.rectangle("fill", 0, H - 130, W, 130)
-    luna.render.setColor(0.8, 0.6, 0.25)
+    luna.gfx.setColor(0.85, 0.65, 0.3)
+    luna.gfx.rectangle("fill", 0, H - 130, W, 130)
+    luna.gfx.setColor(0.8, 0.6, 0.25)
     for i = 0, 3 do
-        luna.render.rectangle("fill", 0, H - 130 + i * 32, W, 2)
+        luna.gfx.rectangle("fill", 0, H - 130 + i * 32, W, 2)
     end
 
     local ev = event_idx
 
     -- ── Sprint lane markings ──────────────────────────────────────────────
     if ev == 1 then
-        luna.render.setColor(1, 1, 1)
-        luna.render.rectangle("line", 80, H - 120, 640, 20)
-        luna.render.line(720, H - 130, 720, H)  -- finish line
+        luna.gfx.setColor(1, 1, 1)
+        luna.gfx.rectangle("line", 80, H - 120, 640, 20)
+        luna.gfx.line(720, H - 130, 720, H)  -- finish line
         draw_athlete(athlete_x, H - 90, game_state == "running" or game_state == "ready")
-        luna.render.setColor(1, 1, 0.5)
-        luna.render.print("SPEED: " .. string.format("%.1f", speed), 20, 70, 2.2)
-        luna.render.setColor(1, 1, 1)
-        luna.render.print("Time: " .. string.format("%.2f", run_timer) .. "s", 20, 96, 1.8)
+        luna.gfx.setColor(1, 1, 0.5)
+        luna.gfx.print("SPEED: " .. string.format("%.1f", speed), 20, 70, 2.2)
+        luna.gfx.setColor(1, 1, 1)
+        luna.gfx.print("Time: " .. string.format("%.2f", run_timer) .. "s", 20, 96, 1.8)
 
     -- ── Long Jump ────────────────────────────────────────────────────────
     elseif ev == 2 then
-        luna.render.setColor(0.85, 0.75, 0.5)
-        luna.render.rectangle("fill", 420, H - 98, 260, 30)   -- sand pit
-        luna.render.setColor(1, 1, 1)
-        luna.render.rectangle("fill", 420, H - 115, 8, 30)    -- take-off board
+        luna.gfx.setColor(0.85, 0.75, 0.5)
+        luna.gfx.rectangle("fill", 420, H - 98, 260, 30)   -- sand pit
+        luna.gfx.setColor(1, 1, 1)
+        luna.gfx.rectangle("fill", 420, H - 115, 8, 30)    -- take-off board
         draw_athlete(athlete_x, athlete_y, game_state == "running")
-        luna.render.setColor(1, 1, 0.5)
-        luna.render.print("SPEED: " .. string.format("%.1f", speed), 20, 70, 2.2)
+        luna.gfx.setColor(1, 1, 0.5)
+        luna.gfx.print("SPEED: " .. string.format("%.1f", speed), 20, 70, 2.2)
         if game_state == "result" then
-            luna.render.setColor(0.2, 1, 0.5)
-            luna.render.print(string.format("%.1f m", result), 20, 96, 2.5)
+            luna.gfx.setColor(0.2, 1, 0.5)
+            luna.gfx.print(string.format("%.1f m", result), 20, 96, 2.5)
         end
 
     -- ── Hurdles ──────────────────────────────────────────────────────────
     elseif ev == 3 then
         for _, hrd in ipairs(hurdles) do
             if not hrd.cleared then
-                luna.render.setColor(1, 0.8, 0.1)
-                luna.render.rectangle("fill", hrd.x - 3, H - 130, 6, 30)
-                luna.render.rectangle("fill", hrd.x - 15, H - 100, 30, 5)
+                luna.gfx.setColor(1, 0.8, 0.1)
+                luna.gfx.rectangle("fill", hrd.x - 3, H - 130, 6, 30)
+                luna.gfx.rectangle("fill", hrd.x - 15, H - 100, 30, 5)
             end
         end
         lua_ath_y = (game_state == "airborne") and athlete_y or H - 100
         draw_athlete(athlete_x, lua_ath_y, game_state == "running")
-        luna.render.setColor(1, 1, 0.5)
-        luna.render.print("SPEED: " .. string.format("%.1f", speed), 20, 70, 2.2)
-        luna.render.setColor(1, 1, 1)
-        luna.render.print("Time: " .. string.format("%.2f", run_timer) .. "s", 20, 96, 1.8)
+        luna.gfx.setColor(1, 1, 0.5)
+        luna.gfx.print("SPEED: " .. string.format("%.1f", speed), 20, 70, 2.2)
+        luna.gfx.setColor(1, 1, 1)
+        luna.gfx.print("Time: " .. string.format("%.2f", run_timer) .. "s", 20, 96, 1.8)
 
     -- ── Hammer Throw ─────────────────────────────────────────────────────
     elseif ev == 4 then
         -- Spinning athlete
         local hr = 90 + math.sin(hammer_spin) * 40
-        luna.render.setColor(0.9, 0.6, 0.3)
-        luna.render.circle("fill", W/2, H - 90, 12)
-        luna.render.setColor(0.3, 0.4, 0.8)
-        luna.render.circle("fill", W/2, H - 70, 9)
+        luna.gfx.setColor(0.9, 0.6, 0.3)
+        luna.gfx.circle("fill", W/2, H - 90, 12)
+        luna.gfx.setColor(0.3, 0.4, 0.8)
+        luna.gfx.circle("fill", W/2, H - 70, 9)
         -- Hammer chain
         local hx = W/2 + math.cos(hammer_spin) * 45
         local hy = H - 80 + math.sin(hammer_spin) * 20
-        luna.render.setColor(0.7, 0.7, 0.7)
-        luna.render.line(W/2, H - 80, hx, hy)
-        luna.render.setColor(0.3, 0.3, 0.3)
-        luna.render.circle("fill", hx, hy, 10)
+        luna.gfx.setColor(0.7, 0.7, 0.7)
+        luna.gfx.line(W/2, H - 80, hx, hy)
+        luna.gfx.setColor(0.3, 0.3, 0.3)
+        luna.gfx.circle("fill", hx, hy, 10)
 
         -- Power bar
-        luna.render.setColor(0.3, 0.3, 0.3)
-        luna.render.rectangle("fill", W - 60, H - 200, 30, 160)
+        luna.gfx.setColor(0.3, 0.3, 0.3)
+        luna.gfx.rectangle("fill", W - 60, H - 200, 30, 160)
         local bar_r = power >= 70 and 1 or 0.3
         local bar_g = power <= 30 and 0.6 or (power <= 70 and 1 or 0.2)
-        luna.render.setColor(bar_r, bar_g, 0.1)
-        luna.render.rectangle("fill", W - 60, H - 200 + 160 * (1 - power/100), 30, 160 * power/100)
-        luna.render.setColor(1, 1, 1)
-        luna.render.print("POWER", W - 70, H - 210, 1.3)
-        luna.render.print("Release:", W - 110, H/2, 1.5)
-        luna.render.print("[Space]", W - 100, H/2 + 22, 1.5)
+        luna.gfx.setColor(bar_r, bar_g, 0.1)
+        luna.gfx.rectangle("fill", W - 60, H - 200 + 160 * (1 - power/100), 30, 160 * power/100)
+        luna.gfx.setColor(1, 1, 1)
+        luna.gfx.print("POWER", W - 70, H - 210, 1.3)
+        luna.gfx.print("Release:", W - 110, H/2, 1.5)
+        luna.gfx.print("[Space]", W - 100, H/2 + 22, 1.5)
 
         if game_state == "result" then
-            luna.render.setColor(0.2, 1, 0.6)
-            luna.render.print(tostring(result) .. " m", W/2 - 30, 70, 3)
+            luna.gfx.setColor(0.2, 1, 0.6)
+            luna.gfx.print(tostring(result) .. " m", W/2 - 30, 70, 3)
         end
     end
 
     -- Event header
-    luna.render.setColor(0, 0, 0, 0.65)
-    luna.render.rectangle("fill", 0, 0, W, 60)
-    luna.render.setColor(1, 1, 0.3)
-    luna.render.print(EVENTS[event_idx], W/2 - 100, 12, 2.5)
+    luna.gfx.setColor(0, 0, 0, 0.65)
+    luna.gfx.rectangle("fill", 0, 0, W, 60)
+    luna.gfx.setColor(1, 1, 0.3)
+    luna.gfx.print(EVENTS[event_idx], W/2 - 100, 12, 2.5)
     local instr = { "[A] [D] Alternate fast!", "[A/D] Run then [Space] Jump", "[A/D] Run [Space] Leap hurdle", "[A/D] Spin then [Space] Release" }
-    luna.render.setColor(0.8, 0.9, 1, 0.8)
-    luna.render.print(instr[event_idx], W/2 - 150, 36, 1.4)
+    luna.gfx.setColor(0.8, 0.9, 1, 0.8)
+    luna.gfx.print(instr[event_idx], W/2 - 150, 36, 1.4)
 
     -- Best scores
-    luna.render.setColor(0.2, 0.2, 0.2, 0.65)
-    luna.render.rectangle("fill", 0, H - 26, W, 26)
+    luna.gfx.setColor(0.2, 0.2, 0.2, 0.65)
+    luna.gfx.rectangle("fill", 0, H - 26, W, 26)
     for i, nm in ipairs(EVENTS) do
-        luna.render.setColor(i == event_idx and 0.9 or 0.5, 0.9, 0.5)
+        luna.gfx.setColor(i == event_idx and 0.9 or 0.5, 0.9, 0.5)
         local bstr = best[i] > 0 and (i >= 2 and best[i] .. "m" or best[i] .. "s") or "—"
-        luna.render.print(nm .. ": " .. bstr, (i-1)*200 + 8, H - 22, 1.3)
+        luna.gfx.print(nm .. ": " .. bstr, (i-1)*200 + 8, H - 22, 1.3)
     end
 
     -- Result overlay
     if game_state == "result" then
-        luna.render.setColor(0, 0, 0, 0.6)
-        luna.render.rectangle("fill", W/2 - 180, H/2 - 45, 360, 90)
-        luna.render.setColor(1, 1, 0)
-        luna.render.print("RESULT", W/2 - 50, H/2 - 40, 2)
+        luna.gfx.setColor(0, 0, 0, 0.6)
+        luna.gfx.rectangle("fill", W/2 - 180, H/2 - 45, 360, 90)
+        luna.gfx.setColor(1, 1, 0)
+        luna.gfx.print("RESULT", W/2 - 50, H/2 - 40, 2)
         local rstr = (ev == 1 or ev == 3) and (string.format("%.2f", result) .. " s") or (tostring(result) .. " m")
-        luna.render.setColor(1, 1, 1)
-        luna.render.print(rstr, W/2 - 40, H/2 - 5, 2.5)
+        luna.gfx.setColor(1, 1, 1)
+        luna.gfx.print(rstr, W/2 - 40, H/2 - 5, 2.5)
     end
 
     -- Game over
     if game_state == "gameover" then
-        luna.render.setColor(0, 0, 0, 0.8)
-        luna.render.rectangle("fill", 0, 0, W, H)
-        luna.render.setColor(1, 0.9, 0.2)
-        luna.render.print("ALL EVENTS COMPLETE!", W/2 - 140, H/2 - 60, 2.5)
+        luna.gfx.setColor(0, 0, 0, 0.8)
+        luna.gfx.rectangle("fill", 0, 0, W, H)
+        luna.gfx.setColor(1, 0.9, 0.2)
+        luna.gfx.print("ALL EVENTS COMPLETE!", W/2 - 140, H/2 - 60, 2.5)
         for i, nm in ipairs(EVENTS) do
-            luna.render.setColor(0.8, 1, 0.8)
+            luna.gfx.setColor(0.8, 1, 0.8)
             local bstr = best[i] > 0 and (i >= 2 and best[i] .. " m" or best[i] .. " s") or "—"
-            luna.render.print(nm .. ": " .. bstr, W/2 - 100, H/2 - 10 + i * 28, 1.7)
+            luna.gfx.print(nm .. ": " .. bstr, W/2 - 100, H/2 - 10 + i * 28, 1.7)
         end
-        luna.render.setColor(0.6, 0.6, 0.6)
-        luna.render.print("Press R to try again", W/2 - 110, H/2 + 130, 2)
+        luna.gfx.setColor(0.6, 0.6, 0.6)
+        luna.gfx.print("Press R to try again", W/2 - 110, H/2 + 130, 2)
     end
 end
 

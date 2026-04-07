@@ -1,4 +1,4 @@
-﻿# Leaderboard
+# Leaderboard
 
 High score table with persistence, sorted display, new high score highlight, and reset.
 
@@ -70,29 +70,29 @@ end
 local highlight_rank = nil
 
 local function draw_leaderboard(ox, oy)
-    luna.render.setColor(0, 0, 0, 0.9)
-    luna.render.rectangle("fill", ox, oy, 400, 40 + #leaderboard * 28)
-    luna.render.setColor(1, 1, 0.5, 1)
-    luna.render.print("HIGH SCORES", ox + 140, oy + 8)
+    luna.gfx.setColor(0, 0, 0, 0.9)
+    luna.gfx.rectangle("fill", ox, oy, 400, 40 + #leaderboard * 28)
+    luna.gfx.setColor(1, 1, 0.5, 1)
+    luna.gfx.print("HIGH SCORES", ox + 140, oy + 8)
 
     for i, entry in ipairs(leaderboard) do
         local y = oy + 36 + (i - 1) * 28
         -- Highlight new score
         if i == highlight_rank then
-            luna.render.setColor(1, 1, 0, 1)
+            luna.gfx.setColor(1, 1, 0, 1)
         else
-            luna.render.setColor(0.9, 0.9, 0.9, 1)
+            luna.gfx.setColor(0.9, 0.9, 0.9, 1)
         end
 
         local rank = string.format("%2d.", i)
         local name = entry.name
         local score_str = tostring(entry.score)
-        luna.render.print(rank, ox + 20, y)
-        luna.render.print(name, ox + 60, y)
-        luna.render.print(score_str, ox + 280, y)
-        luna.render.print(entry.date or "", ox + 340, y)
+        luna.gfx.print(rank, ox + 20, y)
+        luna.gfx.print(name, ox + 60, y)
+        luna.gfx.print(score_str, ox + 280, y)
+        luna.gfx.print(entry.date or "", ox + 340, y)
     end
-    luna.render.setColor(1, 1, 1, 1)
+    luna.gfx.setColor(1, 1, 1, 1)
 end
 ```
 
@@ -113,13 +113,13 @@ local function draw_leaderboard_animated(ox, oy)
         local y = oy + 36 + (i - 1) * 28
         if i == highlight_rank then
             local pulse = 0.5 + 0.5 * math.sin(flash_timer * 6)
-            luna.render.setColor(1, 1, pulse, 1)
+            luna.gfx.setColor(1, 1, pulse, 1)
         else
-            luna.render.setColor(0.9, 0.9, 0.9, 1)
+            luna.gfx.setColor(0.9, 0.9, 0.9, 1)
         end
-        luna.render.print(string.format("%2d. %-12s %8d", i, entry.name, entry.score), ox + 20, y)
+        luna.gfx.print(string.format("%2d. %-12s %8d", i, entry.name, entry.score), ox + 20, y)
     end
-    luna.render.setColor(1, 1, 1, 1)
+    luna.gfx.setColor(1, 1, 1, 1)
 end
 ```
 

@@ -1,4 +1,4 @@
-﻿# `input` — Agent Reference
+# `input` — Agent Reference
 
 | Property       | Value                                                |
 |----------------|------------------------------------------------------|
@@ -228,7 +228,7 @@ Returned by `luna.mouse.newCursor()` and `luna.mouse.getSystemCursor()`.
 
 ```lua
 -- Movement with keyboard + mouse aiming
-function luna.update(dt)
+function luna.process(dt)
     -- Keyboard movement with modifier check
     local speed = 200
     if luna.keyboard.isModifierActive("shift") then
@@ -277,7 +277,7 @@ function luna.gamepadaxis(id, axis, value)
 end
 
 -- Custom cursor
-function luna.load()
+function luna.init()
     local hand = luna.mouse.getSystemCursor("hand")
     luna.mouse.setCursor(hand)
 end

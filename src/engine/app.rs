@@ -1,4 +1,4 @@
-﻿//! Luna2D application lifecycle using winit 0.30 + wgpu GPU rendering.
+//! Luna2D application lifecycle using winit 0.30 + wgpu GPU rendering.
 //!
 //! Uses a `winit` event loop with `GpuRenderer` for hardware-accelerated rendering.
 //! The game loop structure (callbacks, SharedState, Lua VM) follows the standard pattern.
@@ -537,7 +537,7 @@ impl LunaApp {
 
         let state = Rc::new(RefCell::new(shared_state));
 
-        // Load the embedded OpenSans default font before Lua starts — all luna.render.print()
+        // Load the embedded OpenSans default font before Lua starts — all luna.gfx.print()
         // calls without an active font will use this instead of the bitmap fallback.
         state.borrow_mut().load_default_font();
 
@@ -563,7 +563,7 @@ impl LunaApp {
                         log_msg!(error, L011_LUA_ERROR, "main.lua: {}", e);
                         self.run_state = RunState::Error(ErrorScreen::from_lua_error(&e));
                     } else {
-                        if let Err(e) = call_lua_callback_checked(&lua, "load", ()) {
+                        if let Err(e) = call_lua_callback_checked(&lua, "init", ()) {
                             self.run_state = RunState::Error(try_errorhandler_or_screen(&lua, &e));
                         }
                         self.has_game = true;
@@ -804,13 +804,13 @@ impl LunaApp {
         }
 
         let dt = state.borrow().clock.delta();
-        if let Err(e) = call_lua_callback_checked(lua, "update", dt) {
+        if let Err(e) = call_lua_callback_checked(lua, "process", dt) {
             self.run_state = RunState::Error(try_errorhandler_or_screen(lua, &e));
             return;
         }
 
         state.borrow_mut().draw_commands.clear();
-        if let Err(e) = call_lua_callback_checked(lua, "draw", ()) {
+        if let Err(e) = call_lua_callback_checked(lua, "render", ()) {
             self.run_state = RunState::Error(try_errorhandler_or_screen(lua, &e));
             return;
         }
@@ -1619,6 +1619,9 @@ impl ApplicationHandler for LunaApp {
         match event {
             WindowEvent::CloseRequested => {
                 log_msg!(info, L039_WINDOW_CLOSE);
+                if let Some(lua) = &self.lua {
+                    call_lua_callback(lua, "exit", ());
+                }
                 event_loop.exit();
             }
 

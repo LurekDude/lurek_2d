@@ -1,4 +1,4 @@
-﻿-- Music Composer / DAW Simulation
+-- Music Composer / DAW Simulation
 -- Piano roll grid, multi-track, BPM, playback, note placement
 
 local function clamp(v, mn, mx) return math.max(mn, math.min(mx, v)) end
@@ -26,7 +26,7 @@ local show_export = false
 local export_text = ""
 local drag_start = nil  -- for long notes: {col, row}
 
-function luna.load()
+function luna.init()
     for t = 1, 3 do
         tracks[t] = {}
         for r = 1, GRID_ROWS do
@@ -90,7 +90,7 @@ local function export_notes()
     export_text = table.concat(lines, "\n")
 end
 
-function luna.update(dt)
+function luna.process(dt)
     if playing then
         play_cursor = play_cursor + beats_per_sec() * dt
         if play_cursor >= GRID_COLS then
@@ -170,14 +170,14 @@ local function draw_waveform()
     local ww = GRID_COLS * CELL_W
     local wh = 40
 
-    luna.render.setColor(0.15, 0.15, 0.2, 1)
-    luna.render.rectangle("fill", wx, wy, ww, wh)
+    luna.gfx.setColor(0.15, 0.15, 0.2, 1)
+    luna.gfx.rectangle("fill", wx, wy, ww, wh)
 
     local time = luna.time.getTime()
     for t = 1, 3 do
         if not track_muted[t] then
             local tc = track_colors[t]
-            luna.render.setColor(tc[1], tc[2], tc[3], 0.6)
+            luna.gfx.setColor(tc[1], tc[2], tc[3], 0.6)
             local beat = math.floor(play_cursor) + 1
             local active = 0
             if beat >= 1 and beat <= GRID_COLS then
@@ -187,56 +187,56 @@ local function draw_waveform()
             end
             -- Draw sine-like wave scaled by active notes
             local amp = active * 6
-            luna.render.setLineWidth(1.5)
+            luna.gfx.setLineWidth(1.5)
             for px = 0, ww - 2 do
                 local phase = (px / ww) * 12 + time * (3 + t) + t * 2
                 local y1 = wy + wh / 2 + math.sin(phase) * amp
                 local y2 = wy + wh / 2 + math.sin(phase + 0.1) * amp
-                luna.render.line(wx + px, y1, wx + px + 1, y2)
+                luna.gfx.line(wx + px, y1, wx + px + 1, y2)
             end
         end
     end
-    luna.render.setLineWidth(1)
+    luna.gfx.setLineWidth(1)
 end
 
-function luna.draw()
-    luna.render.setBackgroundColor(0.08, 0.08, 0.12)
+function luna.render()
+    luna.gfx.setBackgroundColor(0.08, 0.08, 0.12)
 
     -- Title bar
-    luna.render.setColor(0.9, 0.7, 1, 1)
-    luna.render.print("Music Composer", 10, 5, 1.2)
-    luna.render.setColor(0.7, 0.7, 0.8, 1)
-    luna.render.print("Track: " .. track_names[current_track], 200, 8, 0.85)
-    luna.render.print("BPM: " .. bpm, 370, 8, 0.85)
-    luna.render.print(playing and "PLAYING" or "STOPPED", 460, 8, 0.85)
-    luna.render.print(looping and "[LOOP]" or "", 560, 8, 0.85)
+    luna.gfx.setColor(0.9, 0.7, 1, 1)
+    luna.gfx.print("Music Composer", 10, 5, 1.2)
+    luna.gfx.setColor(0.7, 0.7, 0.8, 1)
+    luna.gfx.print("Track: " .. track_names[current_track], 200, 8, 0.85)
+    luna.gfx.print("BPM: " .. bpm, 370, 8, 0.85)
+    luna.gfx.print(playing and "PLAYING" or "STOPPED", 460, 8, 0.85)
+    luna.gfx.print(looping and "[LOOP]" or "", 560, 8, 0.85)
 
     -- Controls
-    luna.render.setColor(0.5, 0.5, 0.55, 1)
-    luna.render.print("Space=play/stop | 1/2/3=track | Up/Down=BPM | L=loop | C=clear | M=mute | E=export | Esc=quit", 10, 30, 0.55)
-    luna.render.print("Left-click=toggle note | Right-click=long note (2-4 beats)", 10, 42, 0.55)
+    luna.gfx.setColor(0.5, 0.5, 0.55, 1)
+    luna.gfx.print("Space=play/stop | 1/2/3=track | Up/Down=BPM | L=loop | C=clear | M=mute | E=export | Esc=quit", 10, 30, 0.55)
+    luna.gfx.print("Left-click=toggle note | Right-click=long note (2-4 beats)", 10, 42, 0.55)
 
     -- Note labels (left side)
     for r = 1, GRID_ROWS do
         local label = note_label(r)
         local sharp = is_sharp(r)
         if sharp then
-            luna.render.setColor(0.6, 0.5, 0.7, 1)
+            luna.gfx.setColor(0.6, 0.5, 0.7, 1)
         else
-            luna.render.setColor(0.7, 0.7, 0.75, 1)
+            luna.gfx.setColor(0.7, 0.7, 0.75, 1)
         end
-        luna.render.print(label, OX - 40, OY + (r - 1) * CELL_H + 1, 0.55)
+        luna.gfx.print(label, OX - 40, OY + (r - 1) * CELL_H + 1, 0.55)
     end
 
     -- Beat numbers (top)
     for c = 1, GRID_COLS do
         local is_measure = (c - 1) % 4 == 0
         if is_measure then
-            luna.render.setColor(0.8, 0.8, 0.5, 1)
+            luna.gfx.setColor(0.8, 0.8, 0.5, 1)
         else
-            luna.render.setColor(0.4, 0.4, 0.4, 1)
+            luna.gfx.setColor(0.4, 0.4, 0.4, 1)
         end
-        luna.render.print(tostring(c), OX + (c - 1) * CELL_W + 4, OY - 14, 0.5)
+        luna.gfx.print(tostring(c), OX + (c - 1) * CELL_W + 4, OY - 14, 0.5)
     end
 
     -- Grid
@@ -249,16 +249,16 @@ function luna.draw()
             local sharp = is_sharp(r)
             local is_measure_line = (c - 1) % 4 == 0
             if sharp then
-                luna.render.setColor(0.12, 0.12, 0.16, 1)
+                luna.gfx.setColor(0.12, 0.12, 0.16, 1)
             else
-                luna.render.setColor(0.14, 0.14, 0.18, 1)
+                luna.gfx.setColor(0.14, 0.14, 0.18, 1)
             end
-            luna.render.rectangle("fill", gx, gy, CELL_W - 1, CELL_H - 1)
+            luna.gfx.rectangle("fill", gx, gy, CELL_W - 1, CELL_H - 1)
 
             -- Measure lines
             if is_measure_line then
-                luna.render.setColor(0.3, 0.3, 0.35, 0.6)
-                luna.render.line(gx, gy, gx, gy + CELL_H)
+                luna.gfx.setColor(0.3, 0.3, 0.35, 0.6)
+                luna.gfx.line(gx, gy, gx, gy + CELL_H)
             end
 
             -- Draw notes from all visible tracks (current track on top)
@@ -267,8 +267,8 @@ function luna.draw()
                     local tc = track_colors[t]
                     local alpha = (t == current_track) and 0.9 or 0.35
                     if track_muted[t] then alpha = alpha * 0.3 end
-                    luna.render.setColor(tc[1], tc[2], tc[3], alpha)
-                    luna.render.rectangle("fill", gx + 1, gy + 1, CELL_W - 3, CELL_H - 3)
+                    luna.gfx.setColor(tc[1], tc[2], tc[3], alpha)
+                    luna.gfx.rectangle("fill", gx + 1, gy + 1, CELL_W - 3, CELL_H - 3)
                 end
             end
         end
@@ -277,10 +277,10 @@ function luna.draw()
     -- Play cursor
     if playing then
         local cx = OX + play_cursor * CELL_W
-        luna.render.setColor(1, 1, 1, 0.7)
-        luna.render.setLineWidth(2)
-        luna.render.line(cx, OY, cx, OY + GRID_ROWS * CELL_H)
-        luna.render.setLineWidth(1)
+        luna.gfx.setColor(1, 1, 1, 0.7)
+        luna.gfx.setLineWidth(2)
+        luna.gfx.line(cx, OY, cx, OY + GRID_ROWS * CELL_H)
+        luna.gfx.setLineWidth(1)
 
         -- Highlight active notes
         local beat = math.floor(play_cursor) + 1
@@ -291,8 +291,8 @@ function luna.draw()
                         if tracks[t][r][beat] then
                             local gx = OX + (beat - 1) * CELL_W
                             local gy = OY + (r - 1) * CELL_H
-                            luna.render.setColor(1, 1, 1, 0.4)
-                            luna.render.rectangle("fill", gx, gy, CELL_W - 1, CELL_H - 1)
+                            luna.gfx.setColor(1, 1, 1, 0.4)
+                            luna.gfx.rectangle("fill", gx, gy, CELL_W - 1, CELL_H - 1)
                         end
                     end
                 end
@@ -302,51 +302,51 @@ function luna.draw()
 
     -- Track status panel
     local px = OX + GRID_COLS * CELL_W + 15
-    luna.render.setColor(0.8, 0.75, 0.9, 1)
-    luna.render.print("Tracks:", px, OY, 0.85)
+    luna.gfx.setColor(0.8, 0.75, 0.9, 1)
+    luna.gfx.print("Tracks:", px, OY, 0.85)
     for t = 1, 3 do
         local ty = OY + 22 + (t - 1) * 30
         local tc = track_colors[t]
         if t == current_track then
-            luna.render.setColor(tc[1], tc[2], tc[3], 1)
-            luna.render.rectangle("fill", px, ty, 10, 14)
-            luna.render.setColor(1, 1, 1, 1)
+            luna.gfx.setColor(tc[1], tc[2], tc[3], 1)
+            luna.gfx.rectangle("fill", px, ty, 10, 14)
+            luna.gfx.setColor(1, 1, 1, 1)
         else
-            luna.render.setColor(tc[1], tc[2], tc[3], 0.5)
-            luna.render.rectangle("fill", px, ty, 10, 14)
-            luna.render.setColor(0.6, 0.6, 0.6, 1)
+            luna.gfx.setColor(tc[1], tc[2], tc[3], 0.5)
+            luna.gfx.rectangle("fill", px, ty, 10, 14)
+            luna.gfx.setColor(0.6, 0.6, 0.6, 1)
         end
         local mute_txt = track_muted[t] and " [M]" or ""
-        luna.render.print(t .. " " .. track_names[t] .. mute_txt, px + 14, ty, 0.7)
+        luna.gfx.print(t .. " " .. track_names[t] .. mute_txt, px + 14, ty, 0.7)
     end
 
     -- Time signature and info
-    luna.render.setColor(0.6, 0.6, 0.7, 1)
-    luna.render.print("4/4 time", px, OY + 120, 0.7)
-    luna.render.print(GRID_COLS .. " beats", px, OY + 138, 0.7)
-    luna.render.print(math.floor(GRID_COLS / 4) .. " measures", px, OY + 156, 0.7)
+    luna.gfx.setColor(0.6, 0.6, 0.7, 1)
+    luna.gfx.print("4/4 time", px, OY + 120, 0.7)
+    luna.gfx.print(GRID_COLS .. " beats", px, OY + 138, 0.7)
+    luna.gfx.print(math.floor(GRID_COLS / 4) .. " measures", px, OY + 156, 0.7)
 
     -- Waveform
     draw_waveform()
 
     -- Export overlay
     if show_export then
-        luna.render.setColor(0, 0, 0, 0.85)
-        luna.render.rectangle("fill", 40, 40, 700, 400)
-        luna.render.setColor(0.4, 0.4, 0.6, 1)
-        luna.render.rectangle("line", 40, 40, 700, 400)
-        luna.render.setColor(1, 0.9, 0.5, 1)
-        luna.render.print("Note Export (press E or Esc to close)", 60, 50, 1)
-        luna.render.setColor(0.85, 0.85, 0.9, 1)
+        luna.gfx.setColor(0, 0, 0, 0.85)
+        luna.gfx.rectangle("fill", 40, 40, 700, 400)
+        luna.gfx.setColor(0.4, 0.4, 0.6, 1)
+        luna.gfx.rectangle("line", 40, 40, 700, 400)
+        luna.gfx.setColor(1, 0.9, 0.5, 1)
+        luna.gfx.print("Note Export (press E or Esc to close)", 60, 50, 1)
+        luna.gfx.setColor(0.85, 0.85, 0.9, 1)
         -- Print export text line by line
         local line_y = 80
         for line in export_text:gmatch("[^\n]+") do
-            luna.render.print(line, 60, line_y, 0.65)
+            luna.gfx.print(line, 60, line_y, 0.65)
             line_y = line_y + 16
             if line_y > 420 then break end
         end
     end
 
-    luna.render.setColor(0.4, 0.4, 0.4, 1)
-    luna.render.print("FPS: " .. luna.time.getFPS(), 730, 5, 0.6)
+    luna.gfx.setColor(0.4, 0.4, 0.4, 1)
+    luna.gfx.print("FPS: " .. luna.time.getFPS(), 730, 5, 0.6)
 end

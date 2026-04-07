@@ -1,4 +1,4 @@
-﻿# Luna2D — Test Framework Architecture
+# Luna2D — Test Framework Architecture
 
 > **Source of truth** for the test suite structure, naming conventions, BDD framework, and CI quality gates.
 > Companion documents: [engine-architecture.md](engine-architecture.md) (runtime module structure) · [philosophy.md](philosophy.md) (principles + design assumptions).
@@ -561,7 +561,7 @@ Returns `(Rc<RefCell<SharedState>>, Lua)` — a SharedState + Lua VM pair for st
 ### Lua Tests
 
 - File naming: `test_<module>.lua`
-- `describe()` blocks named after the API namespace: `"luna.math"`, `"luna.render"`
+- `describe()` blocks named after the API namespace: `"luna.math"`, `"luna.gfx"`
 - `it()` blocks use natural language: `"should return zero for empty input"`
 
 ---

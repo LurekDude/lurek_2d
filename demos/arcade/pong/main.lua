@@ -1,4 +1,4 @@
-﻿-- Pong — Classic Arcade (Luna2D demo)
+-- Pong — Classic Arcade (Luna2D demo)
 -- Two-player Pong: Player 1 = W/S, Player 2 = Up/Down arrow keys.
 -- First to 7 points wins.
 
@@ -37,14 +37,14 @@ end
 
 -- ── Load ─────────────────────────────────────────────────────────────────
 
-function luna.load()
-    luna.render.setBackgroundColor(0.05, 0.05, 0.05)
+function luna.init()
+    luna.gfx.setBackgroundColor(0.05, 0.05, 0.05)
     ball_reset(1)
 end
 
 -- ── Update ───────────────────────────────────────────────────────────────
 
-function luna.update(dt)
+function luna.process(dt)
     flash_timer = math.max(0, flash_timer - dt)
     if game_over then return end
 
@@ -93,44 +93,44 @@ end
 
 -- ── Draw ─────────────────────────────────────────────────────────────────
 
-function luna.draw()
+function luna.render()
     -- Center dashed line
-    luna.render.setColor(0.25, 0.25, 0.25)
+    luna.gfx.setColor(0.25, 0.25, 0.25)
     for i = 0, H, 24 do
-        luna.render.rectangle("fill", W/2 - 2, i, 4, 12)
+        luna.gfx.rectangle("fill", W/2 - 2, i, 4, 12)
     end
 
     -- Paddles
-    luna.render.setColor(1, 1, 1)
-    luna.render.rectangle("fill", p1.x, p1.y, PADDLE_W, PADDLE_H)
-    luna.render.rectangle("fill", p2.x, p2.y, PADDLE_W, PADDLE_H)
+    luna.gfx.setColor(1, 1, 1)
+    luna.gfx.rectangle("fill", p1.x, p1.y, PADDLE_W, PADDLE_H)
+    luna.gfx.rectangle("fill", p2.x, p2.y, PADDLE_W, PADDLE_H)
 
     -- Ball (flash white/yellow after score)
     if flash_timer > 0 then
-        luna.render.setColor(1, 1, 0)
+        luna.gfx.setColor(1, 1, 0)
     else
-        luna.render.setColor(1, 1, 1)
+        luna.gfx.setColor(1, 1, 1)
     end
-    luna.render.rectangle("fill", ball.x, ball.y, BALL_SIZE, BALL_SIZE)
+    luna.gfx.rectangle("fill", ball.x, ball.y, BALL_SIZE, BALL_SIZE)
 
     -- Scores
-    luna.render.setColor(1, 1, 1)
-    luna.render.print(tostring(p1.score), W/2 - 70, 18, 4)
-    luna.render.print(tostring(p2.score), W/2 + 38, 18, 4)
+    luna.gfx.setColor(1, 1, 1)
+    luna.gfx.print(tostring(p1.score), W/2 - 70, 18, 4)
+    luna.gfx.print(tostring(p2.score), W/2 + 38, 18, 4)
 
     -- Controls hint
-    luna.render.setColor(0.4, 0.4, 0.4)
-    luna.render.print("P1: W/S", 8, H - 18, 1)
-    luna.render.print("P2: Up/Down", W - 112, H - 18, 1)
+    luna.gfx.setColor(0.4, 0.4, 0.4)
+    luna.gfx.print("P1: W/S", 8, H - 18, 1)
+    luna.gfx.print("P2: Up/Down", W - 112, H - 18, 1)
 
     -- Game-over overlay
     if game_over then
-        luna.render.setColor(0, 0, 0, 0.6)
-        luna.render.rectangle("fill", 0, 0, W, H)
-        luna.render.setColor(1, 0.9, 0.1)
-        luna.render.print("Player " .. winner .. " Wins!", W/2 - 130, H/2 - 30, 3)
-        luna.render.setColor(0.7, 0.7, 0.7)
-        luna.render.print("Press R to restart", W/2 - 100, H/2 + 20, 2)
+        luna.gfx.setColor(0, 0, 0, 0.6)
+        luna.gfx.rectangle("fill", 0, 0, W, H)
+        luna.gfx.setColor(1, 0.9, 0.1)
+        luna.gfx.print("Player " .. winner .. " Wins!", W/2 - 130, H/2 - 30, 3)
+        luna.gfx.setColor(0.7, 0.7, 0.7)
+        luna.gfx.print("Press R to restart", W/2 - 100, H/2 + 20, 2)
     end
 end
 

@@ -1,4 +1,4 @@
-﻿# `scene` — Agent Reference
+# `scene` — Agent Reference
 
 | Property       | Value                                                |
 |----------------|------------------------------------------------------|
@@ -260,7 +260,7 @@ local menu = {
     leave  = function(self) print("Menu left") end,
     update = function(self, dt) end,
     draw   = function(self)
-        luna.render.print("Main Menu - Press Enter", 100, 100)
+        luna.gfx.print("Main Menu - Press Enter", 100, 100)
     end,
 }
 
@@ -273,19 +273,19 @@ local game = {
     leave  = function(self) print("Game over") end,
     update = function(self, dt) end,
     draw   = function(self)
-        luna.render.print("Level " .. self.level, 100, 100)
+        luna.gfx.print("Level " .. self.level, 100, 100)
     end,
 }
 
-function luna.load()
+function luna.init()
     luna.scene.push(menu)
 end
 
-function luna.update(dt)
+function luna.process(dt)
     luna.scene.update(dt)
 end
 
-function luna.draw()
+function luna.render()
     luna.scene.draw()
 end
 
@@ -303,11 +303,11 @@ end
 ```lua
 local sorter = luna.scene.newDepthSorter()
 
-function luna.draw()
+function luna.render()
     -- Add draw calls at different depths (lower = drawn first)
-    sorter:add(function() luna.render.print("Background", 0, 0) end, 0)
-    sorter:add(function() luna.render.print("Player", 100, 100) end, 50)
-    sorter:add(function() luna.render.print("UI", 200, 10) end, 100)
+    sorter:add(function() luna.gfx.print("Background", 0, 0) end, 0)
+    sorter:add(function() luna.gfx.print("Player", 100, 100) end, 50)
+    sorter:add(function() luna.gfx.print("UI", 200, 10) end, 100)
 
     -- Flush invokes them in depth order: 0, 50, 100
     sorter:flush()
@@ -317,11 +317,11 @@ end
 ### Named registry and inter-scene data
 
 ```lua
-function luna.load()
+function luna.init()
     luna.scene.registerScene("menu", {
         enter = function(self) end,
         draw  = function(self)
-            luna.render.print("Menu", 10, 10)
+            luna.gfx.print("Menu", 10, 10)
         end,
     })
 

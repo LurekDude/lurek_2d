@@ -48,7 +48,7 @@ Choose the simplest model that satisfies the design requirement.
 All AI agents live inside an `AIWorld` registry. Create one world per scene.
 
 ```lua
-function luna.load()
+function luna.init()
     world = luna.ai.newWorld()
     grid  = luna.pathfinding.newGrid(40, 30, 16)   -- integration with pathfinding
 end
@@ -77,7 +77,7 @@ fsm:addTransition("alert",  "patrol", 1, function() return lostSight(5) end)
 fsm:setState("patrol")
 
 -- Per-frame update
-function luna.update(dt)
+function luna.process(dt)
     world:update(dt)   -- updates all agents
 end
 ```
@@ -159,7 +159,7 @@ bb:set("lastSeenX", nil)
 local px = bb:get("playerX")   -- reads from global blackboard
 
 -- Update global facts each frame
-function luna.update(dt)
+function luna.process(dt)
     world:blackboard():set("playerX", player.x)
     world:blackboard():set("playerY", player.y)
     world:update(dt)
@@ -190,7 +190,7 @@ sm:setCombineMode("weighted")   -- sum all weighted forces (default)
 sm:setCombineMode("priority")   -- use first non-zero force (for override behaviour)
 
 -- Apply per-frame
-function luna.update(dt)
+function luna.process(dt)
     world:update(dt)
     -- agent position updated automatically by SteeringManager
 end

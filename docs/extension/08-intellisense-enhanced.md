@@ -1,4 +1,4 @@
-﻿# Luna Toolkit — Enhanced IntelliSense Design
+# Luna Toolkit � Enhanced IntelliSense Design
 
 > Expands the baseline IntelliSense design (02-intellisense-design.md) with deeper
 > intelligence specifically for LuaJIT game development with Luna2D.
@@ -14,7 +14,7 @@ but not in standard Lua 5.4:
 
 **`bit.*` namespace** (LuaJIT bit operations, highly useful for game flags/masks):
 ```lua
-bit.band(a, b)    -- bitwise AND         → completion + hover
+bit.band(a, b)    -- bitwise AND         � completion + hover
 bit.bor(a, b)     -- bitwise OR
 bit.bxor(a, b)    -- bitwise XOR
 bit.bnot(a)       -- bitwise NOT
@@ -42,13 +42,13 @@ New diagnostic rule category: `luna.luajit` (severity: Hint).
 | Rule ID | Pattern | Hint Message |
 |---|---|---|
 | `luajit.newTableHotPath` | `{}` or `table.create` in `luna.update`/`luna.draw` | "Table allocation in hot path prevents JIT compilation. Consider caching or using an object pool." |
-| `luajit.newImageHotPath` | `luna.render.newImage()` in `update`/`draw` | "Resource creation in hot path is expensive. Move to luna.load()." |
-| `luajit.floatToInt` | `math.floor(x)` in computation chain | "Consider bit.tobit() for integer conversion — up to 4× faster on LuaJIT." |
-| `luajit.globalAccess` | Reading global variable repeatedly in loop | "Cache global in local: 'local draw = luna.render.draw' is ~2× faster." |
+| `luajit.newImageHotPath` | `luna.gfx.newImage()` in `update`/`draw` | "Resource creation in hot path is expensive. Move to luna.load()." |
+| `luajit.floatToInt` | `math.floor(x)` in computation chain | "Consider bit.tobit() for integer conversion � up to 4� faster on LuaJIT." |
+| `luajit.globalAccess` | Reading global variable repeatedly in loop | "Cache global in local: 'local draw = luna.gfx.draw' is ~2� faster." |
 | `luajit.stringConcat` | `..` in loop body | "String concatenation in loops creates many temporaries. Use table.concat() instead." |
 | `luajit.pcallTrace` | `pcall` in hot path | "pcall interrupts trace compilation. Move error handling outside the inner loop." |
 | `luajit.mixedTypes` | Variable assigned both number and string | "Mixed types prevent optimal JIT trace. Keep variables single-typed." |
-| `luajit.mathRandom` | `math.random()` | "luna.math.random() is a separate state from the Lua VM random — prefer it for reproducible games." |
+| `luajit.mathRandom` | `math.random()` | "luna.math.random() is a separate state from the Lua VM random � prefer it for reproducible games." |
 
 ### 1.3 LuaJIT vs Lua 5.4 Feature Warnings
 
@@ -68,7 +68,7 @@ All `luna.*` factory functions have known return types. The extension tracks the
 through variable assignments and propagates completions:
 
 ```lua
-local img = luna.render.newImage("player.png")
+local img = luna.gfx.newImage("player.png")
 --    ^^^
 --    inferred: Image type
 --    enables: img:getDimensions(), img:getWidth(), img:getHeight(),
@@ -91,7 +91,7 @@ local src = luna.audio.newSource("music.ogg", "stream")
 ```
 
 **Implementation**: Single-pass type propagation. Assignments are registered in
-a per-document symbol table. No full type inference graph — just direct assignments
+a per-document symbol table. No full type inference graph � just direct assignments
 from known-typed factory functions.
 
 ### 2.2 Object Method Completion
@@ -117,7 +117,7 @@ function luna.keypressed(key, scancode, isrepeat)
 --                       ^^^  ^^^^^^^^  ^^^^^^^^^
 --                  string  string    boolean
 -- key hover shows: "Key name string, e.g. 'space', 'a', 'left'"
--- Completion inside body: key == "|" → key name completions
+-- Completion inside body: key == "|" � key name completions
 ```
 
 ```lua
@@ -143,7 +143,7 @@ end
 function Enemy:update(dt) ... end
 function Enemy:draw() ... end
 -- After detection: local e = Enemy.new(...)
---                  e:  → suggests update, draw, + any method defined on Enemy
+--                  e:  � suggests update, draw, + any method defined on Enemy
 ```
 
 **Pattern 2: Class-with-inheritance**
@@ -155,7 +155,7 @@ Enemy.__index = Enemy
 -- Inherits Base methods in completion list
 ```
 
-**Detection heuristic**: `setmetatable({}, Class)` or `Class.__index = Class` triggers class tracking. No AST required — regex-based pattern matching on declaration lines is sufficient.
+**Detection heuristic**: `setmetatable({}, Class)` or `Class.__index = Class` triggers class tracking. No AST required � regex-based pattern matching on declaration lines is sufficient.
 
 ---
 
@@ -178,7 +178,7 @@ luna.input.isDown("|")
 
 ### 3.2 Blend Modes
 ```lua
-luna.render.setBlendMode("|")
+luna.gfx.setBlendMode("|")
 -- Suggests: "alpha", "add", "subtract", "multiply",
 --            "premultiplied", "replace", "screen", "darken", "lighten"
 ```
@@ -197,7 +197,7 @@ luna.audio.newSource("file.ogg", "|")
 
 ### 3.5 Easing Functions
 ```lua
-luna.math.lerp(a, b, t, "|")    -- or luna.tween.to(obj, dur, target, "|")
+luna.math.lerp(a, b, t, "|")    -- or luna.animation.to(obj, dur, target, "|")
 -- Suggests: "linear", "quad", "cubic", "quart", "quint",
 --            "sine", "expo", "circ", "back", "bounce", "elastic"
 -- Hover shows: MINI CURVE CHART as ASCII or SVG
@@ -217,9 +217,9 @@ img:setWrap("|", "|")
 
 ### 3.8 Line Cap / Join
 ```lua
-luna.render.setLineCap("|")    -- "none", "butt", "square", "round"
-luna.render.setLineJoin("|")   -- "miter", "bevel", "none"
-luna.render.setLineStyle("|")  -- "rough", "smooth"
+luna.gfx.setLineCap("|")    -- "none", "butt", "square", "round"
+luna.gfx.setLineJoin("|")   -- "miter", "bevel", "none"
+luna.gfx.setLineStyle("|")  -- "rough", "smooth"
 ```
 
 ---
@@ -232,27 +232,27 @@ show a mini ASCII curve diagram in the hover popup:
 ```
 luna.math.easing.easeInBounce
 
-┐ • • • • •
-│           ●
-│         ●
-│       ●
-│     ●
-│    ●      ●
-│  ● ●      ●
-│●          ●●●●
-└──────────────► t
+� � � � � �
+-           ?
+-         ?
+-       ?
+-     ?
+-    ?      ?
+-  ? ?      ?
+-?          ????
+L��������������> t
 Starts slow, bounces at end
 ```
 
-This is generated from pre-computed sample points — no runtime math needed.
+This is generated from pre-computed sample points � no runtime math needed.
 
 ---
 
 ## 5. Pattern Library (Snippets + LuaCATS)
 
 A curated set of idiomatic game programming patterns, provided as:
-1. **Snippets** — quickly insert the full pattern
-2. **LuaCATS-annotated module stubs** — type-checked library files
+1. **Snippets** � quickly insert the full pattern
+2. **LuaCATS-annotated module stubs** � type-checked library files
 
 ### 5.1 Available Patterns
 
@@ -261,10 +261,10 @@ A curated set of idiomatic game programming patterns, provided as:
 | **Class** | `luna.class` | Metatble-based OOP with `new()`, `__index`, inheritance |
 | **State Machine** | `luna.states` | State table with `enter`/`exit`/`update`/`draw` callbacks |
 | **Event Bus** | `luna.signals` | Pub/sub: `on(event, handler)`, `emit(event, ...)` |
-| **Object Pool** | `luna.pool` | Pre-allocated table, `acquire()` / `release()` → zero alloc in hot path |
+| **Object Pool** | `luna.pool` | Pre-allocated table, `acquire()` / `release()` � zero alloc in hot path |
 | **Component System** | `luna.components` | Entities as IDs, components as tables, systems as loops |
 | **Timer** | `luna.time` | Delay/repeat without coroutines: `after(seconds, fn)`, `every(interval, fn)` |
-| **Tween** | `luna.tween` | Smooth value animation: `to(target, secs, {x=100}, "ease_out_quad")` |
+| **Tween** | `luna.animation` | Smooth value animation: `to(target, secs, {x=100}, "ease_out_quad")` |
 | **Finite State Machine** | `luna.fsm` | Strict FSM: states, transitions, guards |
 | **Signal** | `luna.signal` | Observer: `signal:connect(fn)`, `signal:emit(...)` |
 | **Grid** | `luna.grid` | 2D grid with get/set/iterate/neighbours |
@@ -312,7 +312,7 @@ function StateMachine:draw()     if self.states[self.current].draw   then self.s
 
 When a pattern snippet is inserted:
 1. The snippet body is inserted at cursor
-2. A prompt appears: "Add typed library stub to `lib/patterns/`?" → Yes/No
+2. A prompt appears: "Add typed library stub to `lib/patterns/`?" � Yes/No
 3. If Yes: the corresponding annotated `.lua` is written to `lib/patterns/`, enabling full type checking
 
 ---
@@ -325,11 +325,11 @@ The extension builds a cached require graph at activation and updates it on file
 
 ```
 Diagnostic: luna.circularRequire
-  main.lua → require("player")
-  player.lua → require("weapons")
-  weapons.lua → require("player")  ← ERROR: circular dependency
+  main.lua � require("player")
+  player.lua � require("weapons")
+  weapons.lua � require("player")  � ERROR: circular dependency
 
-  Warning: "Circular require detected: player → weapons → player"
+  Warning: "Circular require detected: player � weapons � player"
   Code action: "Break cycle by using late-binding require()"
 ```
 
@@ -340,24 +340,24 @@ two different files, warn:
 
 ```lua
 -- in enemy.lua
-HP = 100        -- ⚠ Global write: 'HP' also written in player.lua
+HP = 100        -- ? Global write: 'HP' also written in player.lua
                 -- "Avoid implicit globals. Use local or pass as parameter."
 ```
 
 ### 6.3 Asset Reference Validation (Enhanced)
 
-Build an asset index at activation. Paths found in `luna.render.newImage()`,
+Build an asset index at activation. Paths found in `luna.gfx.newImage()`,
 `luna.audio.newSource()`, and `luna.fs.read()` are validated against the real
 filesystem. Results cached and updated on file save.
 
-Additional: detect **unused assets** — files in `assets/` that are never referenced.
+Additional: detect **unused assets** � files in `assets/` that are never referenced.
 
 ### 6.4 Symbol Index for Find All References
 
 A persistent workspace index maps every symbol to its definition site and all
 reference locations. Updated incrementally on file change. Enables:
-- `Shift+F12` (Find All References) — workspace-wide in < 50ms
-- Rename symbol (`F2`) — renames across all `.lua` files
+- `Shift+F12` (Find All References) � workspace-wide in < 50ms
+- Rename symbol (`F2`) � renames across all `.lua` files
 - Unused symbol detection (functions defined but never called)
 
 ---
@@ -388,14 +388,14 @@ reference locations. Updated incrementally on file change. Enables:
 
 ### 8.1 Hover on Color Values
 
-When hovering over `{0.2, 0.8, 1.0, 1.0}` or `luna.render.setColor(r, g, b)`:
+When hovering over `{0.2, 0.8, 1.0, 1.0}` or `luna.gfx.setColor(r, g, b)`:
 - Show an inline color swatch
 - Show both 0-1 and 0-255 representations
 - Suggest named palette color if close match is found
 
 ### 8.2 Hover on Math Constants
 ```lua
-math.pi   -- Shows: "3.141592653589793 (π)" + note about luna.math.pi
+math.pi   -- Shows: "3.141592653589793 (?)" + note about luna.math.pi
 math.huge -- Shows: "+infinity overflow sentinel"
 ```
 
@@ -404,14 +404,14 @@ math.huge -- Shows: "+infinity overflow sentinel"
 -- When hovering a number in physics context:
 luna.physics.newWorld(0, 200)
 --                       ^^^
--- Hover: "Gravity Y = 200 px/s². Earth = ~980 px/s² (at 1px=1cm scale)"
+-- Hover: "Gravity Y = 200 px/s2. Earth = ~980 px/s2 (at 1px=1cm scale)"
 ```
 
 ### 8.4 Hover on Deprecated API
 ```lua
-luna.render.drawImage(img, x, y)
--- ⚠ Deprecated since v0.3.0
--- Use: luna.render.draw(img, x, y) instead
+luna.gfx.drawImage(img, x, y)
+-- ? Deprecated since v0.3.0
+-- Use: luna.gfx.draw(img, x, y) instead
 -- See: migration guide
 ```
 
@@ -480,12 +480,12 @@ ESLint's `eslint-disable-line`.
 |---|---|---|
 | completion | Enhanced | + contextual string values, + type-inferred methods |
 | hover | Enhanced | + color swatch, + easing chart, + physics hints |
-| signature | Unchanged | — |
+| signature | Unchanged | � |
 | definition | Enhanced | + symbol index, + OOP method definitions |
 | references | Enhanced | + workspace index, + rename support |
 | diagnostics | Enhanced | + luajit rules, + global writes, + circular deps |
 | symbols | Enhanced | + class methods in outline |
-| color | Unchanged | — |
+| color | Unchanged | � |
 | assetPath | Enhanced | + unused asset detection |
 | inlayHints | Enhanced | + callback param types |
 | codeActions | Massively expanded | + 12 new actions |

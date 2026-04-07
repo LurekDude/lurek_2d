@@ -1,11 +1,11 @@
-﻿# Commando
+# Commando
 
 A vertical-scrolling top-down shooter inspired by Capcom's 1985 arcade classic.
 Shoot enemy soldiers, throw grenades, and rescue POW prisoners.
 
 ## What It Demonstrates
 
-- `luna.render.rectangle()` / `luna.render.circle()` — character sprites without textures
+- `luna.gfx.rectangle()` / `luna.gfx.circle()` — character sprites without textures
 - `luna.input.isKeyDown()` — 8-directional player movement
 - `luna.keypressed()` — shooting and grenade throwing
 - Procedural background tile scrolling

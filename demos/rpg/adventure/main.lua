@@ -1,4 +1,4 @@
-﻿-- Point-and-Click Adventure Demo — explore rooms, collect items, solve puzzles
+-- Point-and-Click Adventure Demo — explore rooms, collect items, solve puzzles
 -- Mouse click to interact | Escape to quit
 
 -- ── State ────────────────────────────────────────────────────────
@@ -119,14 +119,14 @@ local function defineRooms()
     }
 end
 
-function luna.load()
+function luna.init()
     luna.window.setTitle("Point-and-Click Adventure")
-    luna.render.setBackgroundColor(0.15, 0.15, 0.2)
+    luna.gfx.setBackgroundColor(0.15, 0.15, 0.2)
     defineRooms()
     showDialog("You wake up in your bedroom. Something feels different tonight...")
 end
 
-function luna.update(dt)
+function luna.process(dt)
     -- ── Typewriter effect ────────────────────────────────────────
     -- Reveal dialogFull one character at a time using dialogSpeed (seconds/char).
     if dialogIdx < #dialogFull then
@@ -152,77 +152,77 @@ function luna.update(dt)
     end
 end
 
-function luna.draw()
+function luna.render()
     local room = rooms[currentRoom]
     if not room then return end
 
     -- room background
-    luna.render.setBackgroundColor(room.bg[1], room.bg[2], room.bg[3])
+    luna.gfx.setBackgroundColor(room.bg[1], room.bg[2], room.bg[3])
 
     -- floor
-    luna.render.setColor(room.bg[1] * 0.7, room.bg[2] * 0.7, room.bg[3] * 0.7, 1)
-    luna.render.rectangle("fill", 0, 460, 800, 40)
+    luna.gfx.setColor(room.bg[1] * 0.7, room.bg[2] * 0.7, room.bg[3] * 0.7, 1)
+    luna.gfx.rectangle("fill", 0, 460, 800, 40)
 
     -- objects
     for _, obj in ipairs(room.objects) do
         local c = obj.color
         local hover = (hoverObj == obj)
         if hover then
-            luna.render.setColor(c[1] + 0.2, c[2] + 0.2, c[3] + 0.2, 1)
+            luna.gfx.setColor(c[1] + 0.2, c[2] + 0.2, c[3] + 0.2, 1)
         else
-            luna.render.setColor(c[1], c[2], c[3], 1)
+            luna.gfx.setColor(c[1], c[2], c[3], 1)
         end
-        luna.render.rectangle("fill", obj.x, obj.y, obj.w, obj.h)
+        luna.gfx.rectangle("fill", obj.x, obj.y, obj.w, obj.h)
         if hover then
-            luna.render.setColor(1, 1, 0.5, 1)
-            luna.render.rectangle("line", obj.x - 1, obj.y - 1, obj.w + 2, obj.h + 2)
+            luna.gfx.setColor(1, 1, 0.5, 1)
+            luna.gfx.rectangle("line", obj.x - 1, obj.y - 1, obj.w + 2, obj.h + 2)
         end
     end
 
     -- hover label
     if hoverObj then
         local mx, my = luna.mouse.getPosition()
-        luna.render.setColor(0, 0, 0, 0.7)
-        luna.render.rectangle("fill", mx + 10, my - 22, #hoverObj.label * 8 + 10, 20)
-        luna.render.setColor(1, 1, 0.8, 1)
-        luna.render.print(hoverObj.label, mx + 15, my - 20)
+        luna.gfx.setColor(0, 0, 0, 0.7)
+        luna.gfx.rectangle("fill", mx + 10, my - 22, #hoverObj.label * 8 + 10, 20)
+        luna.gfx.setColor(1, 1, 0.8, 1)
+        luna.gfx.print(hoverObj.label, mx + 15, my - 20)
     end
 
     -- inventory bar
-    luna.render.setColor(0.1, 0.1, 0.12, 0.9)
-    luna.render.rectangle("fill", 0, 520, 800, 80)
-    luna.render.setColor(0.3, 0.3, 0.35, 1)
-    luna.render.line(0, 520, 800, 520)
-    luna.render.setColor(0.7, 0.7, 0.7, 1)
-    luna.render.print("Inventory:", 10, 530)
+    luna.gfx.setColor(0.1, 0.1, 0.12, 0.9)
+    luna.gfx.rectangle("fill", 0, 520, 800, 80)
+    luna.gfx.setColor(0.3, 0.3, 0.35, 1)
+    luna.gfx.line(0, 520, 800, 520)
+    luna.gfx.setColor(0.7, 0.7, 0.7, 1)
+    luna.gfx.print("Inventory:", 10, 530)
     for i, item in ipairs(inventory) do
         local ix = 20 + (i - 1) * 90
-        luna.render.setColor(0.25, 0.25, 0.3, 1)
-        luna.render.rectangle("fill", ix, 550, 80, 30)
-        luna.render.setColor(0.8, 0.8, 0.5, 1)
-        luna.render.rectangle("line", ix, 550, 80, 30)
-        luna.render.setColor(1, 1, 1, 1)
-        luna.render.print(item, ix + 8, 557)
+        luna.gfx.setColor(0.25, 0.25, 0.3, 1)
+        luna.gfx.rectangle("fill", ix, 550, 80, 30)
+        luna.gfx.setColor(0.8, 0.8, 0.5, 1)
+        luna.gfx.rectangle("line", ix, 550, 80, 30)
+        luna.gfx.setColor(1, 1, 1, 1)
+        luna.gfx.print(item, ix + 8, 557)
     end
 
     -- dialog box
     if #dialogText > 0 then
-        luna.render.setColor(0, 0, 0, 0.85)
-        luna.render.rectangle("fill", 50, 460, 700, 50)
-        luna.render.setColor(0.8, 0.8, 0.6, 1)
-        luna.render.rectangle("line", 50, 460, 700, 50)
-        luna.render.setColor(1, 1, 1, 1)
-        luna.render.print(dialogText, 65, 475)
+        luna.gfx.setColor(0, 0, 0, 0.85)
+        luna.gfx.rectangle("fill", 50, 460, 700, 50)
+        luna.gfx.setColor(0.8, 0.8, 0.6, 1)
+        luna.gfx.rectangle("line", 50, 460, 700, 50)
+        luna.gfx.setColor(1, 1, 1, 1)
+        luna.gfx.print(dialogText, 65, 475)
     end
 
     -- room name
-    luna.render.setColor(1, 1, 1, 0.4)
-    luna.render.print(string.upper(currentRoom), 700, 10)
+    luna.gfx.setColor(1, 1, 1, 0.4)
+    luna.gfx.print(string.upper(currentRoom), 700, 10)
 
     -- cursor
     local mx, my = luna.mouse.getPosition()
-    luna.render.setColor(1, 1, 1, 0.6)
-    luna.render.circle("line", mx, my, 6)
+    luna.gfx.setColor(1, 1, 1, 0.6)
+    luna.gfx.circle("line", mx, my, 6)
 end
 
 -- ── Click handler ───────────────────────────────────────────────

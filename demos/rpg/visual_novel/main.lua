@@ -1,4 +1,4 @@
-﻿-- Visual Novel — Narrative branching with typewriter text, choices, and multiple endings
+-- Visual Novel — Narrative branching with typewriter text, choices, and multiple endings
 
 local function clamp(v, mn, mx) return math.max(mn, math.min(mx, v)) end
 
@@ -218,14 +218,14 @@ local function advance()
     end
 end
 
-function luna.load()
+function luna.init()
     luna.window.setTitle("Visual Novel")
-    luna.render.setBackgroundColor(0.1, 0.15, 0.1)
+    luna.gfx.setBackgroundColor(0.1, 0.15, 0.1)
     build_scenes()
     go_to_scene("intro")
 end
 
-function luna.update(dt)
+function luna.process(dt)
     if ending_text then return end
     local scene = scenes[current_scene]
     if not scene then return end
@@ -260,30 +260,30 @@ local function draw_portrait(speaker, side)
     local px = (side == "left") and 60 or (W - 120)
     local py = H - 260
     -- body
-    luna.render.setColor(c[1], c[2], c[3], 0.9)
-    luna.render.rectangle("fill", px, py + 40, 60, 80)
+    luna.gfx.setColor(c[1], c[2], c[3], 0.9)
+    luna.gfx.rectangle("fill", px, py + 40, 60, 80)
     -- head
-    luna.render.circle("fill", px + 30, py + 20, 25)
+    luna.gfx.circle("fill", px + 30, py + 20, 25)
     -- eyes
-    luna.render.setColor(1, 1, 1, 1)
-    luna.render.circle("fill", px + 22, py + 16, 4)
-    luna.render.circle("fill", px + 38, py + 16, 4)
-    luna.render.setColor(0, 0, 0, 1)
-    luna.render.circle("fill", px + 23, py + 17, 2)
-    luna.render.circle("fill", px + 39, py + 17, 2)
+    luna.gfx.setColor(1, 1, 1, 1)
+    luna.gfx.circle("fill", px + 22, py + 16, 4)
+    luna.gfx.circle("fill", px + 38, py + 16, 4)
+    luna.gfx.setColor(0, 0, 0, 1)
+    luna.gfx.circle("fill", px + 23, py + 17, 2)
+    luna.gfx.circle("fill", px + 39, py + 17, 2)
 end
 
-function luna.draw()
+function luna.render()
     -- background
     local bg = get_current_bg()
-    luna.render.setColor(bg[1], bg[2], bg[3], 1)
-    luna.render.rectangle("fill", 0, 0, W, H)
+    luna.gfx.setColor(bg[1], bg[2], bg[3], 1)
+    luna.gfx.rectangle("fill", 0, 0, W, H)
 
     if ending_text then
-        luna.render.setColor(1, 1, 1, 1)
-        luna.render.print(ending_text, W / 2 - 180, H / 2 - 40, 1.1)
-        luna.render.setColor(0.7, 0.7, 0.7, 1)
-        luna.render.print("Press R to replay", W / 2 - 60, H / 2 + 60, 1)
+        luna.gfx.setColor(1, 1, 1, 1)
+        luna.gfx.print(ending_text, W / 2 - 180, H / 2 - 40, 1.1)
+        luna.gfx.setColor(0.7, 0.7, 0.7, 1)
+        luna.gfx.print("Press R to replay", W / 2 - 60, H / 2 + 60, 1)
         return
     end
 
@@ -297,23 +297,23 @@ function luna.draw()
     draw_portrait(entry.speaker, side)
 
     -- dialog box
-    luna.render.setColor(0, 0, 0, 0.75)
-    luna.render.rectangle("fill", 30, H - 160, W - 60, 130)
-    luna.render.setColor(0.5, 0.5, 0.7, 1)
-    luna.render.rectangle("line", 30, H - 160, W - 60, 130)
+    luna.gfx.setColor(0, 0, 0, 0.75)
+    luna.gfx.rectangle("fill", 30, H - 160, W - 60, 130)
+    luna.gfx.setColor(0.5, 0.5, 0.7, 1)
+    luna.gfx.rectangle("line", 30, H - 160, W - 60, 130)
 
     -- speaker name
     local name = CHAR_NAMES[entry.speaker] or ""
     if name ~= "" then
         local nc = CHAR_COLORS[entry.speaker] or { 1, 1, 1 }
-        luna.render.setColor(nc[1], nc[2], nc[3], 1)
-        luna.render.print(name, 50, H - 155, 1.1)
+        luna.gfx.setColor(nc[1], nc[2], nc[3], 1)
+        luna.gfx.print(name, 50, H - 155, 1.1)
     end
 
     -- text (typewriter)
     local shown = string.sub(entry.text, 1, char_index)
-    luna.render.setColor(1, 1, 1, 1)
-    luna.render.print(shown, 50, H - 130, 1)
+    luna.gfx.setColor(1, 1, 1, 1)
+    luna.gfx.print(shown, 50, H - 130, 1)
 
     -- choices
     if choices_visible and entry.choices then
@@ -323,29 +323,29 @@ function luna.draw()
             local mx, my = luna.mouse.getPosition()
             local hover = mx > 60 and mx < 500 and my > cy and my < cy + 32
             if hover then
-                luna.render.setColor(0.3, 0.3, 0.5, 0.9)
+                luna.gfx.setColor(0.3, 0.3, 0.5, 0.9)
             else
-                luna.render.setColor(0.15, 0.15, 0.25, 0.9)
+                luna.gfx.setColor(0.15, 0.15, 0.25, 0.9)
             end
-            luna.render.rectangle("fill", 60, cy, 440, 32)
-            luna.render.setColor(1, 1, 0.8, 1)
-            luna.render.print(i .. ". " .. ch.text, 75, cy + 6, 1)
+            luna.gfx.rectangle("fill", 60, cy, 440, 32)
+            luna.gfx.setColor(1, 1, 0.8, 1)
+            luna.gfx.print(i .. ". " .. ch.text, 75, cy + 6, 1)
         end
     end
 
     -- controls hint
-    luna.render.setColor(0.5, 0.5, 0.5, 0.6)
-    luna.render.print("Space=Advance  Tab=Skip  Click=Choose", 10, 10, 0.8)
+    luna.gfx.setColor(0.5, 0.5, 0.5, 0.6)
+    luna.gfx.print("Space=Advance  Tab=Skip  Click=Choose", 10, 10, 0.8)
 
     -- affection display
     local ay = 10
     for _, key in ipairs({"luna_char", "sol", "nova"}) do
         if affection[key] > 0 then
             local nc = CHAR_COLORS[key]
-            luna.render.setColor(nc[1], nc[2], nc[3], 0.7)
+            luna.gfx.setColor(nc[1], nc[2], nc[3], 0.7)
             local hearts = ""
             for h = 1, clamp(affection[key], 0, 5) do hearts = hearts .. "<3 " end
-            luna.render.print(CHAR_NAMES[key] .. ": " .. hearts, W - 200, ay, 0.8)
+            luna.gfx.print(CHAR_NAMES[key] .. ": " .. hearts, W - 200, ay, 0.8)
             ay = ay + 18
         end
     end

@@ -230,7 +230,7 @@ Exposed under `luna.entity.*` by `src/lua_api/entity_api.rs`. The module registe
 ## Lua Examples
 
 ```lua
-function luna.load()
+function luna.init()
     -- Create a new ECS universe
     world = luna.entity.newUniverse()
 
@@ -287,7 +287,7 @@ function luna.load()
     world:setParent(weapon, player)
 end
 
-function luna.update(dt)
+function luna.process(dt)
     -- Run all systems in registration order
     world:update(dt)
 
@@ -304,7 +304,7 @@ function luna.update(dt)
     local sorted = world:getEntitiesSorted()
 end
 
-function luna.draw()
+function luna.render()
     world:draw()
 end
 ```

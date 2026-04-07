@@ -1,4 +1,4 @@
-﻿# Turrican
+# Turrican
 
 A run-and-gun platformer inspired by Manfred Trenz's legendary Turrican (1990).
 Blast enemies with your cannon or sweep them away with your energy beam weapon.
@@ -6,7 +6,7 @@ Collect power crystals and reach the exit to advance.
 
 ## What It Demonstrates
 
-- `luna.render.rectangle()` / `luna.render.circle()` — character and environment rendering
+- `luna.gfx.rectangle()` / `luna.gfx.circle()` — character and environment rendering
 - `luna.input.isKeyDown()` — movement and held beam activation
 - `luna.keypressed()` — jumping and shooting
 - Full tile collision resolution with wall bounce

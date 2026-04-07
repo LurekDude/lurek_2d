@@ -1,4 +1,4 @@
-﻿# Luna Toolkit — Game Developer CAG Layer
+# Luna Toolkit — Game Developer CAG Layer
 
 > A self-contained AI-first workflow layer for **game developers** using Luna2D.
 > This is NOT for engine developers. These agents, skills, prompts, and instructions
@@ -970,9 +970,9 @@ local state = {
     draw   = function() end,
 }
 
-function luna.load()    state.load()    end
-function luna.update(dt) state.update(dt) end
-function luna.draw()    state.draw()    end
+function luna.init()    state.load()    end
+function luna.process(dt) state.update(dt) end
+function luna.render()    state.draw()    end
 
 -- Replace state table to change what's running
 ```
@@ -1038,7 +1038,7 @@ Language: Lua (LuaJIT target). API: luna.*
 
 ## Luna2D API Quick Reference
 All APIs are under luna.* — never external engine prefixes or third-party runtime prefixes.
-Key modules: luna.render, luna.audio, luna.physics, luna.input,
+Key modules: luna.gfx, luna.audio, luna.physics, luna.input,
   luna.math, luna.time, luna.fs, luna.entity, luna.signal
 
 ## Agent Map

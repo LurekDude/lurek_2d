@@ -1,4 +1,4 @@
-﻿---
+---
 description: "Design a new luna.* Lua API surface. Use when adding a new function or module to the luna.* namespace. Produces a finalized API spec ready for Rust implementation."
 ---
 
@@ -11,7 +11,7 @@ description: "Design a new luna.* Lua API surface. Use when adding a new functio
 
 ## Inputs
 
-- `DOMAIN` — which sub-namespace is affected (e.g., `luna.render`, `luna.audio`, `luna.input`)
+- `DOMAIN` — which sub-namespace is affected (e.g., `luna.gfx`, `luna.audio`, `luna.input`)
 - `USE_CASE` — describe the game developer scenario this API serves (e.g., "draw a sprite with rotation")
 - `REFERENCE_EQUIVALENT` — optional reference-engine equivalent for inspiration (never copy the signature verbatim)
 

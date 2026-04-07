@@ -1,11 +1,11 @@
-﻿# Another World
+# Another World
 
 A cinematic puzzle-platformer inspired by Eric Chahi's landmark 1991 Amiga masterpiece.
 Navigate three alien scenes, defeat a guardian using your energy gun, and reach the exit.
 
 ## What It Demonstrates
 
-- `luna.render.rectangle()` / `luna.render.circle()` — silhouette-style visuals
+- `luna.gfx.rectangle()` / `luna.gfx.circle()` — silhouette-style visuals
 - `luna.input.isKeyDown()` — movement and held shield
 - `luna.keypressed()` — jump, shoot, shield
 - Scene-based room transitions

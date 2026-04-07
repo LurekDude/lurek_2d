@@ -1,4 +1,4 @@
-﻿# Luna Toolkit — VS Code Extension Architecture
+# Luna Toolkit — VS Code Extension Architecture
 
 > Design document for the Luna2D integrated development environment extension.
 > This extension is **standalone-optional**: everything it provides can also be done
@@ -220,10 +220,10 @@ At activation:
 User types "luna.gr"
          │
          ▼
-  completion.ts → apiData.ts → match "luna.render.*" → return CompletionItems
+  completion.ts → apiData.ts → match "luna.gfx.*" → return CompletionItems
          │
          ▼
-User selects "luna.render.draw"
+User selects "luna.gfx.draw"
          │
          ▼
   signature.ts → apiData.ts → return SignatureHelp(image, x, y, r, sx, sy, ox, oy)

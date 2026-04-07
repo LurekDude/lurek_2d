@@ -1,4 +1,4 @@
-﻿# Lua Parser Service Analysis
+# Lua Parser Service Analysis
 
 ## Current State
 
@@ -69,7 +69,7 @@ It is the foundation that all language providers depend on.
 
 **Enhancement**: Track types through assignment chains:
 ```lua
-local img = luna.render.newImage("player.png")  -- Image
+local img = luna.gfx.newImage("player.png")  -- Image
 local w = img:getWidth()                          -- number
 local pos = luna.math.vec2(w, 0)                 -- Vec2
 local x = pos.x                                  -- number
@@ -93,7 +93,7 @@ Each step requires knowing return types from the previous step.
 **Important for IDE use**: Parser must handle incomplete/broken code gracefully.
 
 **Scenarios**:
-- User is mid-typing: `luna.render.` → show completions despite syntax error
+- User is mid-typing: `luna.gfx.` → show completions despite syntax error
 - Missing `end`: keep parsing subsequent code
 - Unmatched parentheses: recover scope tracking
 - Incomplete string: don't break tokenizer

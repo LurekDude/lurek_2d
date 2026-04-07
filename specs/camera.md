@@ -1,4 +1,4 @@
-﻿# `camera` — Agent Reference
+# `camera` — Agent Reference
 
 | Property       | Value                                    |
 |----------------|------------------------------------------|
@@ -14,7 +14,7 @@
 
 The `camera` module provides camera and viewport types for 2D rendering. It is a Tier 1 engine module extracted from `src/graphics/` during the graphics-module-split session; it depends only on `crate::math` (Vec2, Mat3, Rect) and never imports wgpu, winit, or any other engine module. `SharedState` holds a `Camera` field accessed by the GPU renderer each frame to apply the view transform to all draw commands.
 
-Two camera types are provided. `Camera` is the original flat camera with position, zoom, and rotation that powers the `luna.render.setCamera()` API — it produces a `Mat3` view matrix combining translation, rotation, and uniform scale. `Camera2D` is the full-featured Phase 24 camera with smooth follow (configurable interpolation speed), dead-zone (the camera ignores target movement within a rectangle centred on the camera), look-ahead (velocity-based prediction), world-space bounds clamping (the visible area never extends beyond configured bounds), and screen-shake (deterministic sinusoidal offset that decays over time). `Camera2D` exposes its own `update(dt)` method to advance all simulation and a `view_matrix()` that incorporates shake offset.
+Two camera types are provided. `Camera` is the original flat camera with position, zoom, and rotation that powers the `luna.gfx.setCamera()` API — it produces a `Mat3` view matrix combining translation, rotation, and uniform scale. `Camera2D` is the full-featured Phase 24 camera with smooth follow (configurable interpolation speed), dead-zone (the camera ignores target movement within a rectangle centred on the camera), look-ahead (velocity-based prediction), world-space bounds clamping (the visible area never extends beyond configured bounds), and screen-shake (deterministic sinusoidal offset that decays over time). `Camera2D` exposes its own `update(dt)` method to advance all simulation and a `view_matrix()` that incorporates shake offset.
 
 Two viewport types handle virtual-resolution mapping. `Viewport` maps a fixed game resolution onto an arbitrary window size using one of three `ScaleMode` strategies (Letterbox, Stretch, PixelPerfect) and provides coordinate conversion between screen and game space. `ViewportScale` extends `Viewport` by additionally tracking `scaled_width` and `scaled_height` — the game area in window pixels after scaling — for integration with the automatic graphics transform stack.
 
@@ -27,7 +27,7 @@ camera (Tier 1 — depends only on crate::math)
 │
 ├── types.rs
 │   ├── Camera          ← position / zoom / rotation → view_matrix() → Mat3
-│   │   └── Used by SharedState for luna.render.setCamera()
+│   │   └── Used by SharedState for luna.gfx.setCamera()
 │   │
 │   └── Camera2D        ← full 2D camera with simulation
 │       ├── Follow system: target → dead zone → look-ahead → smooth lerp
@@ -58,7 +58,7 @@ camera (Tier 1 — depends only on crate::math)
 
 ### `camera::types`
 
-Camera types for 2D viewport control. Provides the original `Camera` (used by `SharedState` for the flat `luna.render.setCamera()` API) and the full-featured `Camera2D` with smooth follow, dead zone, bounds clamping, look-ahead, and screen-shake.
+Camera types for 2D viewport control. Provides the original `Camera` (used by `SharedState` for the flat `luna.gfx.setCamera()` API) and the full-featured `Camera2D` with smooth follow, dead zone, bounds clamping, look-ahead, and screen-shake.
 
 - **`Camera`** (struct): Basic camera with position, zoom, and rotation; produces a `Mat3` view matrix.
 - **`Camera2D`** (struct): Full-featured 2D camera with follow system, shake, bounds clamping, and coordinate conversion.
@@ -82,7 +82,7 @@ Virtual-resolution viewport with automatic scaling and transform-stack integrati
 
 #### `camera::types::Camera`
 
-Basic camera with position, zoom, and rotation. Used by `SharedState` for the flat `luna.render.setCamera()` API. Exposes `view_matrix()` which combines translation (negate position), rotation, and scale (zoom) into a single `Mat3`. Default state is origin position, zoom 1.0, rotation 0.0.
+Basic camera with position, zoom, and rotation. Used by `SharedState` for the flat `luna.gfx.setCamera()` API. Exposes `view_matrix()` which combines translation (negate position), rotation, and scale (zoom) into a single `Mat3`. Default state is origin position, zoom 1.0, rotation 0.0.
 
 Public methods: `new(position, zoom, rotation)`, `view_matrix()`, `set_position(pos)`, `set_zoom(zoom)`, `set_rotation(rotation)`.
 
@@ -122,7 +122,7 @@ Exposed under `luna.camera.*` by `src/lua_api/camera_api.rs`.
 
 The Lua API provides a `Camera2D` userdata object created via `luna.camera.new(viewport_w, viewport_h)`. The userdata wraps a `Camera2D` instance behind `Rc<RefCell<Camera2D>>` and exposes methods for position, zoom, rotation, viewport, bounds, follow system, shake, coordinate conversion, and per-frame update.
 
-**Note**: The flat `Camera` struct is not directly exposed via `luna.camera`; it is used internally by `SharedState` and accessible through `luna.render.setCamera()` / `luna.render.getCamera()`.
+**Note**: The flat `Camera` struct is not directly exposed via `luna.camera`; it is used internally by `SharedState` and accessible through `luna.gfx.setCamera()` / `luna.gfx.getCamera()`.
 
 ### Module-level functions
 
@@ -164,14 +164,14 @@ The Lua API provides a `Camera2D` userdata object created via `luna.camera.new(v
 local cam
 local player = { x = 400, y = 300 }
 
-function luna.load()
+function luna.init()
     cam = luna.camera.new(800, 600)
     cam:setFollowSmooth(5.0)
     cam:setDeadZone(50, 30)
     cam:setBounds(0, 0, 2000, 1500)
 end
 
-function luna.update(dt)
+function luna.process(dt)
     -- Move player with arrow keys
     if luna.keyboard.isDown("right") then player.x = player.x + 200 * dt end
     if luna.keyboard.isDown("left")  then player.x = player.x - 200 * dt end
@@ -182,10 +182,10 @@ function luna.update(dt)
     cam:update(dt)
 end
 
-function luna.draw()
+function luna.render()
     -- Use camera transform for drawing
     local wx, wy = cam:toScreen(player.x, player.y)
-    luna.render.circle("fill", wx, wy, 16)
+    luna.gfx.circle("fill", wx, wy, 16)
 end
 ```
 

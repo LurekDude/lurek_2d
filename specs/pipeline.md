@@ -294,7 +294,7 @@ factory functions on the `luna.pipeline` table.
 
 ```lua
 -- Synchronous pipeline: multi-stage world generation
-function luna.load()
+function luna.init()
     local terrain = luna.pipeline.newStep("terrain", function(ctx)
         return { heightmap = generate_heightmap(ctx.seed) }
     end)
@@ -327,7 +327,7 @@ end
 -- Async pipeline: spread loading across frames
 local loader
 
-function luna.load()
+function luna.init()
     loader = luna.pipeline.fromTable({
         name = "asset_loader",
         steps = {
@@ -343,7 +343,7 @@ function luna.load()
     loader:runAsync()
 end
 
-function luna.update(dt)
+function luna.process(dt)
     if loader:isRunning() then
         loader:update(dt)
     end

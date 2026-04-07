@@ -1,11 +1,11 @@
-﻿-- Modding Demo for Luna2D
+-- Modding Demo for Luna2D
 -- Demonstrates luna.fs.mount / unmount and load via luna.fs.load.
 -- Mounts a local "mods" folder and loads a Lua chunk from it.
 
 local mod_greeting = "No mod loaded."
 local mod_init_ran = false
 
-function luna.load()
+function luna.init()
     -- Mount the mod directory at a virtual path
     local ok = luna.fs.mount("mods/hello_mod", "/hello_mod")
     if ok then
@@ -25,9 +25,9 @@ function luna.load()
     end
 end
 
-function luna.draw()
-    luna.render.setColor(1, 1, 1)
-    luna.render.print(mod_greeting, 20, 20)
-    luna.render.print("init.lua executed: " .. tostring(mod_init_ran), 20, 50)
-    luna.render.print("luna.fs.mount / unmount / load demo", 20, 80)
+function luna.render()
+    luna.gfx.setColor(1, 1, 1)
+    luna.gfx.print(mod_greeting, 20, 20)
+    luna.gfx.print("init.lua executed: " .. tostring(mod_init_ran), 20, 50)
+    luna.gfx.print("luna.fs.mount / unmount / load demo", 20, 80)
 end

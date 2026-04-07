@@ -1,17 +1,17 @@
-﻿# Drift Racing
+# Drift Racing
 
 A top-down arcade racing game on a procedurally generated oval track. Compete against three AI drivers across three laps, using boost zones for bursts of speed and exploiting the car's drift physics to carry momentum through corners.
 
 ## What It Demonstrates
 
-- `luna.render.polygon()` — tessellated track outer edge and car body rendering
-- `luna.render.rectangle()` — boost zone highlight and HUD panels
-- `luna.render.setColor()` — per-car colour differentiation and skid-mark fade
-- `luna.render.print()` — lap counter, race time, best lap, and position HUD
+- `luna.gfx.polygon()` — tessellated track outer edge and car body rendering
+- `luna.gfx.rectangle()` — boost zone highlight and HUD panels
+- `luna.gfx.setColor()` — per-car colour differentiation and skid-mark fade
+- `luna.gfx.print()` — lap counter, race time, best lap, and position HUD
 - `luna.keyboard.isDown()` — analogue-style throttle, brake, and steering input each frame
-- `luna.render.line()` — skid mark trail drawn as point history
-- `luna.render.circle()` — checkpoint and boost zone radius indicators
-- `luna.render.setBackgroundColor()` — dark asphalt track background
+- `luna.gfx.line()` — skid mark trail drawn as point history
+- `luna.gfx.circle()` — checkpoint and boost zone radius indicators
+- `luna.gfx.setBackgroundColor()` — dark asphalt track background
 
 ## How to Run
 

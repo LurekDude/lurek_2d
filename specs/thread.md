@@ -1,4 +1,4 @@
-﻿# `thread` — Agent Reference
+# `thread` — Agent Reference
 
 | Property       | Value                                          |
 |----------------|------------------------------------------------|
@@ -14,7 +14,7 @@
 
 The `thread` module provides Luna2D's only concurrency primitive: background Lua worker threads communicating through typed MPMC channels. It directly implements design constraint B-04 — concurrency lives in Rust threads; LuaJIT VMs cannot share state; cross-VM communication uses typed `Channel` objects.
 
-Each `LuaThread` accepts a Lua code string, spawns a dedicated OS thread running its own isolated `mlua::Lua` VM, and communicates with the main game thread exclusively through `Channel` objects. The worker VM receives a minimal API surface — only `luna.thread.getChannel(name)` and a global `arg` table — deliberately excluding `luna.render`, `luna.audio`, `luna.window`, `luna.input`, `luna.physics`, `luna.particles`, and anything that touches `SharedState`. This hard boundary prevents an entire category of concurrency bugs.
+Each `LuaThread` accepts a Lua code string, spawns a dedicated OS thread running its own isolated `mlua::Lua` VM, and communicates with the main game thread exclusively through `Channel` objects. The worker VM receives a minimal API surface — only `luna.thread.getChannel(name)` and a global `arg` table — deliberately excluding `luna.gfx`, `luna.audio`, `luna.window`, `luna.input`, `luna.physics`, `luna.particles`, and anything that touches `SharedState`. This hard boundary prevents an entire category of concurrency bugs.
 
 `ChannelValue` is the wire format: `Nil`, `Bool(bool)`, `Number(f64)`, or `String(String)`. Only these four Lua-native primitive types can cross thread boundaries. Tables, functions, coroutines, and UserData are rejected at the send boundary with a descriptive runtime error. The `Channel` struct is an MPMC queue backed by `Mutex<VecDeque<ChannelValue>>` with a `Condvar` for the blocking `demand()` call. Channels can be unnamed (created per-use) or named (registered in a global `HashMap` shared across all worker threads for the session).
 
@@ -169,7 +169,7 @@ All other `luna.*` modules are unavailable.
 ### Background computation with channel polling
 
 ```lua
-function luna.load()
+function luna.init()
     -- Create a named channel for results
     local ch = luna.thread.getChannel("results")
 
@@ -184,7 +184,7 @@ function luna.load()
     worker:start()
 end
 
-function luna.update(dt)
+function luna.process(dt)
     -- Poll for results without blocking the game loop
     local ch = luna.thread.getChannel("results")
     local val = ch:pop()
@@ -199,7 +199,7 @@ end
 ### Bidirectional communication with arguments
 
 ```lua
-function luna.load()
+function luna.init()
     local ch = luna.thread.getChannel("pipe")
 
     worker = luna.thread.newThread([[
@@ -216,7 +216,7 @@ function luna.load()
     ch:push(10)  -- send input value
 end
 
-function luna.update(dt)
+function luna.process(dt)
     local ch = luna.thread.getChannel("pipe")
     local result = ch:pop()
     if result then
@@ -228,14 +228,14 @@ end
 ### Error handling
 
 ```lua
-function luna.load()
+function luna.init()
     worker = luna.thread.newThread([[
         error("something went wrong")
     ]])
     worker:start()
 end
 
-function luna.update(dt)
+function luna.process(dt)
     if not worker:isRunning() then
         local err = worker:getError()
         if err then

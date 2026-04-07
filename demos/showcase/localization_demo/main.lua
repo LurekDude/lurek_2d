@@ -1,8 +1,8 @@
-﻿-- Module availability guard (added by fix_nil_module_demos.py)
+-- Module availability guard (added by fix_nil_module_demos.py)
 if not luna.localization then
-    function luna.load()
-        luna.render.setBackgroundColor(0.08, 0.08, 0.12)
-        luna.render.print("luna.localization is not available in this build", 180, 270)
+    function luna.init()
+        luna.gfx.setBackgroundColor(0.08, 0.08, 0.12)
+        luna.gfx.print("luna.localization is not available in this build", 180, 270)
     end
     return
 end
@@ -61,8 +61,8 @@ local points = 0
 local flash_timer = 0
 local lang_changed_msg = ""
 
-function luna.load()
-    luna.render.setBackgroundColor(0.12, 0.12, 0.18)
+function luna.init()
+    luna.gfx.setBackgroundColor(0.12, 0.12, 0.18)
 
     -- Load all three languages
     for code, tbl in pairs(translations) do
@@ -78,44 +78,44 @@ function luna.load()
     end)
 end
 
-function luna.update(dt)
+function luna.process(dt)
     if flash_timer > 0 then
         flash_timer = flash_timer - dt
     end
 end
 
-function luna.draw()
+function luna.render()
     -- Title
-    luna.render.setColor(0.9, 0.8, 0.3)
-    luna.render.print(L.t("title"), 40, 30)
+    luna.gfx.setColor(0.9, 0.8, 0.3)
+    luna.gfx.print(L.t("title"), 40, 30)
 
     -- Greeting with interpolation
-    luna.render.setColor(1, 1, 1)
-    luna.render.print(L.t("greeting", { name = "Luna" }), 40, 80)
+    luna.gfx.setColor(1, 1, 1)
+    luna.gfx.print(L.t("greeting", { name = "Luna" }), 40, 80)
 
     -- Pluralization demo
-    luna.render.setColor(0.6, 0.9, 0.6)
-    luna.render.print(L.t("score", { count = points }), 40, 130)
+    luna.gfx.setColor(0.6, 0.9, 0.6)
+    luna.gfx.print(L.t("score", { count = points }), 40, 130)
 
     -- Nested key demo
-    luna.render.setColor(0.6, 0.7, 1.0)
-    luna.render.print("Menu: " .. L.t("menu.play") .. " | " .. L.t("menu.quit"), 40, 180)
+    luna.gfx.setColor(0.6, 0.7, 1.0)
+    luna.gfx.print("Menu: " .. L.t("menu.play") .. " | " .. L.t("menu.quit"), 40, 180)
 
     -- Available languages
     local langs = L.getAvailableLanguages()
-    luna.render.setColor(0.5, 0.5, 0.5)
-    luna.render.print("Available: " .. table.concat(langs, ", "), 40, 230)
+    luna.gfx.setColor(0.5, 0.5, 0.5)
+    luna.gfx.print("Available: " .. table.concat(langs, ", "), 40, 230)
 
     -- Key prompt
-    luna.render.setColor(0.8, 0.8, 0.8)
-    luna.render.print(L.t("prompt"), 40, 290)
-    luna.render.print("Press [UP/DOWN] to change score", 40, 320)
+    luna.gfx.setColor(0.8, 0.8, 0.8)
+    luna.gfx.print(L.t("prompt"), 40, 290)
+    luna.gfx.print("Press [UP/DOWN] to change score", 40, 320)
 
     -- Language-change flash
     if flash_timer > 0 then
         local alpha = math.min(flash_timer, 1.0)
-        luna.render.setColor(1, 1, 0.2, alpha)
-        luna.render.print(lang_changed_msg, 40, 380)
+        luna.gfx.setColor(1, 1, 0.2, alpha)
+        luna.gfx.print(lang_changed_msg, 40, 380)
     end
 end
 

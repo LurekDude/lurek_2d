@@ -1,14 +1,14 @@
-﻿# Space Invaders
+# Space Invaders
 
 Defend Earth from wave after wave of alien invaders.
 Shoot them before they march all the way down to the ground.
 
 ## What It Demonstrates
 
-- `luna.render.rectangle()` — invader bodies, player ship, barriers
+- `luna.gfx.rectangle()` — invader bodies, player ship, barriers
 - `luna.input.isKeyDown()` — smooth horizontal player movement
 - `luna.keypressed()` — firing with cooldown
-- `luna.render.print()` — HUD with score, lives, and wave counter
+- `luna.gfx.print()` — HUD with score, lives, and wave counter
 - Barrier erosion: blocks lose HP and fade as bullets pass through
 
 ## Controls

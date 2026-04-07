@@ -1,15 +1,15 @@
-﻿# Logic Game
+# Logic Game
 
 A programming-puzzle game where you assemble a command sequence to guide a robot through a grid maze to reach the flag. Commands are placed into a program slot-by-slot from a palette (Forward, Left, Right, Loop), then executed step-by-step with visual animation. Three handcrafted levels of increasing complexity teach sequencing, rotation, and looping.
 
 ## What It Demonstrates
 
-- `luna.render.rectangle()` — drawing the grid, command slots, and UI panels
-- `luna.render.print()` — labelling commands, level names, and status messages
+- `luna.gfx.rectangle()` — drawing the grid, command slots, and UI panels
+- `luna.gfx.print()` — labelling commands, level names, and status messages
 - `luna.mouse.getPosition()` / `luna.mousepressed()` — palette selection and program slot clicking
 - `luna.keyboard.isDown()` — run, reset, and quit key handling
 - `luna.time.getTime()` — step execution timing and animation lerp
-- `luna.render.setColor()` — colour-coded command blocks and robot direction indicator
+- `luna.gfx.setColor()` — colour-coded command blocks and robot direction indicator
 
 ## How to Run
 

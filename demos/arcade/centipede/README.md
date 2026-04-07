@@ -1,14 +1,14 @@
-﻿# Centipede
+# Centipede
 
 Shoot the descending centipede creeping through a mushroom field.
 Mushrooms block bullets and redirect the worm. Watch for bonus spiders!
 
 ## What It Demonstrates
 
-- `luna.render.circle()` / `luna.render.rectangle()` — mushrooms, centipede segments, player
+- `luna.gfx.circle()` / `luna.gfx.rectangle()` — mushrooms, centipede segments, player
 - `luna.input.isKeyDown()` — 4-directional player movement in player zone
 - `luna.keypressed()` — rapid-fire shooting with cooldown
-- `luna.render.print()` — HUD with score, lives, and wave
+- `luna.gfx.print()` — HUD with score, lives, and wave
 - Grid-based centipede pathfinding that reverses and descends on obstacles
 
 ## Controls

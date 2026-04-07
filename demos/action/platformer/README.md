@@ -1,4 +1,4 @@
-﻿# Platformer Demo
+# Platformer Demo
 
 A side-scrolling platformer with physics-based movement, jump mechanics, platform collision, and easing-based animations. A complete mini-game loop.
 
@@ -8,7 +8,7 @@ A side-scrolling platformer with physics-based movement, jump mechanics, platfor
 - `luna.keyboard.isDown()` — real-time movement and jump input
 - `luna.math.lerp()` / easing functions for camera smoothing
 - `luna.scene` — integrating the engine scene system
-- `luna.render.rectangle()` for world geometry rendering
+- `luna.gfx.rectangle()` for world geometry rendering
 - Simple camera follow with offset easing
 - Game-over detection and restart flow
 

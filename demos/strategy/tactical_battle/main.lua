@@ -1,4 +1,4 @@
-﻿-- Tactical Turn-Based Battle
+-- Tactical Turn-Based Battle
 -- Controls: Click unit to select, click tile to move/attack, Enter to end turn, Escape to quit
 -- Defeat all enemy units to win!
 
@@ -86,9 +86,9 @@ local function makeUnit(gx, gy, team, class)
     return u
 end
 
-function luna.load()
+function luna.init()
     luna.window.setTitle("Tactical Battle")
-    luna.render.setBackgroundColor(0.15, 0.12, 0.1)
+    luna.gfx.setBackgroundColor(0.15, 0.12, 0.1)
     -- Player units (blue)
     table.insert(units, makeUnit(1, 5, "player", "knight"))
     table.insert(units, makeUnit(1, 2, "player", "knight"))
@@ -160,7 +160,7 @@ local function aiTurn()
     endTurn()
 end
 
-function luna.update(dt)
+function luna.process(dt)
     if gameOver then return end
     if msgTimer > 0 then msgTimer = msgTimer - dt end
     if turn == "enemy" then
@@ -169,32 +169,32 @@ function luna.update(dt)
     end
 end
 
-function luna.draw()
+function luna.render()
     -- Grid
     for gx = 0, GRID - 1 do
         for gy = 0, GRID - 1 do
             local px, py = OX + gx * TILE, OY + gy * TILE
             if (gx + gy) % 2 == 0 then
-                luna.render.setColor(0.25, 0.22, 0.18, 1)
+                luna.gfx.setColor(0.25, 0.22, 0.18, 1)
             else
-                luna.render.setColor(0.3, 0.27, 0.22, 1)
+                luna.gfx.setColor(0.3, 0.27, 0.22, 1)
             end
-            luna.render.rectangle("fill", px, py, TILE, TILE)
-            luna.render.setColor(0.15, 0.12, 0.1, 1)
-            luna.render.rectangle("line", px, py, TILE, TILE)
+            luna.gfx.rectangle("fill", px, py, TILE, TILE)
+            luna.gfx.setColor(0.15, 0.12, 0.1, 1)
+            luna.gfx.rectangle("line", px, py, TILE, TILE)
         end
     end
 
     -- Reachable tiles
-    luna.render.setColor(0.2, 0.5, 0.9, 0.25)
+    luna.gfx.setColor(0.2, 0.5, 0.9, 0.25)
     for _, r in ipairs(reachable) do
-        luna.render.rectangle("fill", OX + r.x * TILE, OY + r.y * TILE, TILE, TILE)
+        luna.gfx.rectangle("fill", OX + r.x * TILE, OY + r.y * TILE, TILE, TILE)
     end
 
     -- Attackable highlights
-    luna.render.setColor(0.9, 0.2, 0.2, 0.3)
+    luna.gfx.setColor(0.9, 0.2, 0.2, 0.3)
     for _, a in ipairs(attackable) do
-        luna.render.rectangle("fill", OX + a.gx * TILE, OY + a.gy * TILE, TILE, TILE)
+        luna.gfx.rectangle("fill", OX + a.gx * TILE, OY + a.gy * TILE, TILE, TILE)
     end
 
     -- Units
@@ -204,55 +204,55 @@ function luna.draw()
             local py = OY + u.gy * TILE + TILE / 2
             -- Team color
             if u.team == "player" then
-                luna.render.setColor(0.2, 0.4, 0.9, 1)
+                luna.gfx.setColor(0.2, 0.4, 0.9, 1)
             else
-                luna.render.setColor(0.9, 0.25, 0.2, 1)
+                luna.gfx.setColor(0.9, 0.25, 0.2, 1)
             end
             if u.class == "knight" then
-                luna.render.rectangle("fill", px - 14, py - 14, 28, 28)
+                luna.gfx.rectangle("fill", px - 14, py - 14, 28, 28)
             else
-                luna.render.circle("fill", px, py, 14)
+                luna.gfx.circle("fill", px, py, 14)
             end
             -- Selection ring
             if selected == i then
-                luna.render.setColor(1, 1, 0, 1)
-                luna.render.setLineWidth(2)
-                luna.render.circle("line", px, py, 20)
-                luna.render.setLineWidth(1)
+                luna.gfx.setColor(1, 1, 0, 1)
+                luna.gfx.setLineWidth(2)
+                luna.gfx.circle("line", px, py, 20)
+                luna.gfx.setLineWidth(1)
             end
             -- HP bar
             local hpFrac = u.hp / u.maxHp
-            luna.render.setColor(0.2, 0.2, 0.2, 1)
-            luna.render.rectangle("fill", px - 14, py + 18, 28, 4)
-            luna.render.setColor(0.1, 0.9, 0.2, 1)
-            luna.render.rectangle("fill", px - 14, py + 18, 28 * hpFrac, 4)
+            luna.gfx.setColor(0.2, 0.2, 0.2, 1)
+            luna.gfx.rectangle("fill", px - 14, py + 18, 28, 4)
+            luna.gfx.setColor(0.1, 0.9, 0.2, 1)
+            luna.gfx.rectangle("fill", px - 14, py + 18, 28 * hpFrac, 4)
             -- Label
-            luna.render.setColor(1, 1, 1, 1)
+            luna.gfx.setColor(1, 1, 1, 1)
             local label = u.class == "knight" and "K" or "A"
-            luna.render.print(label, px - 4, py - 6)
+            luna.gfx.print(label, px - 4, py - 6)
             -- Moved indicator
             if u.moved then
-                luna.render.setColor(0.5, 0.5, 0.5, 0.5)
-                luna.render.rectangle("fill", px - 14, py - 14, 28, 28)
+                luna.gfx.setColor(0.5, 0.5, 0.5, 0.5)
+                luna.gfx.rectangle("fill", px - 14, py - 14, 28, 28)
             end
         end
     end
 
     -- HUD
-    luna.render.setColor(1, 1, 1, 1)
-    luna.render.print("Turn: " .. turn, 10, 10)
-    luna.render.print("[Enter] End Turn", 10, 30)
-    luna.render.print("K=Knight(melee)  A=Archer(ranged)", 10, 560)
+    luna.gfx.setColor(1, 1, 1, 1)
+    luna.gfx.print("Turn: " .. turn, 10, 10)
+    luna.gfx.print("[Enter] End Turn", 10, 30)
+    luna.gfx.print("K=Knight(melee)  A=Archer(ranged)", 10, 560)
 
     -- Message
     if msgTimer > 0 then
-        luna.render.setColor(1, 1, 0.5, clamp(msgTimer, 0, 1))
-        luna.render.print(gameMessage, 240, 10, 1.2)
+        luna.gfx.setColor(1, 1, 0.5, clamp(msgTimer, 0, 1))
+        luna.gfx.print(gameMessage, 240, 10, 1.2)
     end
 
     if gameOver then
-        luna.render.setColor(1, 1, 1, 1)
-        luna.render.print(gameMessage, 300, 280, 2)
+        luna.gfx.setColor(1, 1, 1, 1)
+        luna.gfx.print(gameMessage, 300, 280, 2)
     end
 end
 

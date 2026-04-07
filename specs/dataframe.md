@@ -228,7 +228,7 @@ Exposed under `luna.dataframe.*` by `src/lua_api/dataframe_api.rs`. Two UserData
 ## Lua Examples
 
 ```lua
-function luna.load()
+function luna.init()
     -- Create from inline data
     local df = luna.dataframe.fromTable({
         { name = "Alice", score = 95, active = true },

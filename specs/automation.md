@@ -206,7 +206,7 @@ Each entry in the `steps` array is a table with these fields:
 
 ```lua
 -- Load a script with keyboard and mouse steps
-function luna.load()
+function luna.init()
     luna.simulator.load("test_input", {
         steps = {
             { time = 0.1, action = "keypress",    key = "space" },
@@ -222,7 +222,7 @@ function luna.load()
     luna.simulator.start("test_input")
 end
 
-function luna.update(dt)
+function luna.process(dt)
     luna.simulator.update(dt)
 
     if luna.simulator.isComplete() then
@@ -234,7 +234,7 @@ end
 
 ```lua
 -- Pause/resume and introspection
-function luna.update(dt)
+function luna.process(dt)
     luna.simulator.update(dt)
 
     -- Pause on a specific step

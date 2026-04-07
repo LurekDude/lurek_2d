@@ -1,10 +1,10 @@
-﻿# `graphics` — Agent Reference
+# `graphics` — Agent Reference
 
 | Property       | Value                                                        |
 |----------------|--------------------------------------------------------------|
 | **Tier**       | Tier 1 — Core Engine Subsystems                              |
 | **Status**     | Implemented — Full                                           |
-| **Lua API**    | `luna.render`                                              |
+| **Lua API**    | `luna.gfx`                                              |
 | **Source**     | `src/graphics/`                                              |
 | **Rust Tests** | `tests/rust/unit/graphics_tests.rs`, `tests/rust/ext/graphics_ext_tests.rs`, `tests/rust/ext/graphics_runtime_smoke_tests.rs` |
 | **Lua Tests**  | `tests/lua/unit/test_graphics.lua`                           |
@@ -12,11 +12,11 @@
 
 ## Summary
 
-The graphics module owns the entire GPU rendering pipeline for Luna2D — from the high-level draw calls that Lua scripts issue through `luna.render.*`, through a deferred `DrawCommand` queue that batches all rendering work, to the wgpu GPU backend that executes those commands against the swapchain. No other module writes pixels to the screen; everything visual flows through this module.
+The graphics module owns the entire GPU rendering pipeline for Luna2D — from the high-level draw calls that Lua scripts issue through `luna.gfx.*`, through a deferred `DrawCommand` queue that batches all rendering work, to the wgpu GPU backend that executes those commands against the swapchain. No other module writes pixels to the screen; everything visual flows through this module.
 
 The module is built around a **deferred command queue** architecture: during `luna.draw()`, Lua pushes `DrawCommand` variants into a `Vec<DrawCommand>` stored in `SharedState`. After the Lua callback returns, the engine calls `GpuRenderer::render_frame()` which processes the queue in one GPU encoder pass. This means Lua never touches the GPU directly — it constructs a declarative list of rendering intent, and the renderer has full visibility over the draw list to minimise pipeline state switches before any GPU work begins.
 
-All GPU resources (textures, fonts, canvases, shaders, meshes, sprite batches, and compound shapes) are identified by typed `SlotMap` keys that are opaque to Lua. When a script calls `luna.render.newImage("hero.png")`, Lua receives a lightweight `LuaImage` userdata wrapping a `TextureKey`; the actual `wgpu::Texture` and `wgpu::TextureView` live inside `GpuRenderer` and are never exposed to Lua. This keeps Lua values small and eliminates the need for Lua `__gc` finalizers on GPU resources.
+All GPU resources (textures, fonts, canvases, shaders, meshes, sprite batches, and compound shapes) are identified by typed `SlotMap` keys that are opaque to Lua. When a script calls `luna.gfx.newImage("hero.png")`, Lua receives a lightweight `LuaImage` userdata wrapping a `TextureKey`; the actual `wgpu::Texture` and `wgpu::TextureView` live inside `GpuRenderer` and are never exposed to Lua. This keeps Lua values small and eliminates the need for Lua `__gc` finalizers on GPU resources.
 
 The transform stack (`push/pop/translate/rotate/scale/shear/origin`) is implemented as `DrawCommand` variants — the renderer maintains a `Mat3` matrix stack as it processes the queue, multiplying incoming transforms and applying the accumulated matrix to all vertices in scope. The module also provides stencil buffer support (write + test), depth mode control, blend modes (five pre-built pipeline variants), scissor clipping, color masking, wireframe mode, and custom WGSL shader support with per-shader uniform buffers.
 
@@ -25,7 +25,7 @@ Scope boundary: the `animation`, `camera`, and `Color` types have been **extract
 ## Architecture
 
 ```
-luna.render.* (Lua API — 66 functions, 7 UserData types)
+luna.gfx.* (Lua API — 66 functions, 7 UserData types)
   │
   ▼
 DrawCommand queue (SharedState::draw_commands)
@@ -161,7 +161,7 @@ Draw command types, blend modes, stencil state, and texture data for the renderi
 - **`TextureData`** (struct): Raw RGBA pixel data (premultiplied alpha) with width and height.
 - **`ParticleRenderShape`** (enum): Geometric shape for untextured particle rendering — `Square`, `Circle`, `Triangle`, `Spark`, `Diamond`.
 - **`ParticleInstance`** (struct): Pre-computed per-particle render data (position, color, rotation, size, shape, optional texture/quad).
-- **`DrawableKind`** (enum): Type discriminator for `luna.render.draw()` polymorphism — `Image`, `Canvas`, `SpriteBatch`, `Mesh`.
+- **`DrawableKind`** (enum): Type discriminator for `luna.gfx.draw()` polymorphism — `Image`, `Canvas`, `SpriteBatch`, `Mesh`.
 
 ### `graphics::shader`
 
@@ -256,7 +256,7 @@ Per-frame rendering statistics: draw calls, texture switches, canvas switches, s
 Custom geometry mesh with per-vertex position, UV, and color data. Supports optional index buffers and optional textures. Three draw modes: triangles, fan, strip.
 
 **Public functions:**
-- `from_vertex_rows(rows: &[[f32; 8]], mode: MeshDrawMode) -> Self` — Creates a `Mesh` from a slice of flat 8-element rows `[x, y, u, v, r, g, b, a]`; convenience constructor used by `luna.render.newMesh`.
+- `from_vertex_rows(rows: &[[f32; 8]], mode: MeshDrawMode) -> Self` — Creates a `Mesh` from a slice of flat 8-element rows `[x, y, u, v, r, g, b, a]`; convenience constructor used by `luna.gfx.newMesh`.
 
 #### `graphics::mesh::MeshVertex`
 
@@ -346,7 +346,7 @@ Shape fill mode — `Fill` (solid) or `Line` (outline using current line width).
 
 #### `graphics::renderer::DrawableKind`
 
-Type discriminator for `luna.render.draw()` polymorphism — `Image(TextureKey)`, `Canvas(CanvasKey)`, `SpriteBatch(SpriteBatchKey)`, `Mesh(MeshKey)`.
+Type discriminator for `luna.gfx.draw()` polymorphism — `Image(TextureKey)`, `Canvas(CanvasKey)`, `SpriteBatch(SpriteBatchKey)`, `Mesh(MeshKey)`.
 
 #### `graphics::mesh::MeshDrawMode`
 
@@ -380,119 +380,119 @@ Single patch rectangle tuple: `(src_x, src_y, src_w, src_h, dst_x, dst_y, dst_w,
 
 ## Lua API
 
-Exposed under `luna.render.*` by `src/lua_api/graphics_api.rs` (2,407 lines). The API provides 66 namespace functions and 7 UserData types.
+Exposed under `luna.gfx.*` by `src/lua_api/graphics_api.rs` (2,407 lines). The API provides 66 namespace functions and 7 UserData types.
 
 ### Namespace Functions (66)
 
 #### Color
-- `luna.render.setColor(r, g, b, a?)` — set the active draw color
-- `luna.render.getColor()` — get the current draw color (r, g, b, a)
-- `luna.render.setBackgroundColor(r, g, b, a?)` — set the clear/background color
-- `luna.render.getBackgroundColor()` — get the current background color
+- `luna.gfx.setColor(r, g, b, a?)` — set the active draw color
+- `luna.gfx.getColor()` — get the current draw color (r, g, b, a)
+- `luna.gfx.setBackgroundColor(r, g, b, a?)` — set the clear/background color
+- `luna.gfx.getBackgroundColor()` — get the current background color
 
 #### Shape Drawing
-- `luna.render.rectangle(mode, x, y, w, h, rx?, ry?)` — draw a rectangle (optionally rounded)
-- `luna.render.circle(mode, x, y, r)` — draw a circle
-- `luna.render.ellipse(mode, x, y, rx, ry)` — draw an ellipse
-- `luna.render.triangle(mode, x1, y1, x2, y2, x3, y3)` — draw a triangle
-- `luna.render.line(x1, y1, x2, y2, ...)` — draw a line or polyline
-- `luna.render.polygon(mode, vertices)` — draw a polygon from a flat vertex list
-- `luna.render.arc(mode, x, y, r, angle1, angle2, segments?)` — draw an arc
-- `luna.render.points(...)` — draw points at specified coordinates
+- `luna.gfx.rectangle(mode, x, y, w, h, rx?, ry?)` — draw a rectangle (optionally rounded)
+- `luna.gfx.circle(mode, x, y, r)` — draw a circle
+- `luna.gfx.ellipse(mode, x, y, rx, ry)` — draw an ellipse
+- `luna.gfx.triangle(mode, x1, y1, x2, y2, x3, y3)` — draw a triangle
+- `luna.gfx.line(x1, y1, x2, y2, ...)` — draw a line or polyline
+- `luna.gfx.polygon(mode, vertices)` — draw a polygon from a flat vertex list
+- `luna.gfx.arc(mode, x, y, r, angle1, angle2, segments?)` — draw an arc
+- `luna.gfx.points(...)` — draw points at specified coordinates
 
 #### Drawing
-- `luna.render.draw(drawable, x?, y?, r?, sx?, sy?, ox?, oy?)` — draw an Image, Canvas, SpriteBatch, or Mesh
-- `luna.render.drawq(image, quad, x, y, r?, sx?, sy?, ox?, oy?)` — draw a sub-region of an image using a Quad
+- `luna.gfx.draw(drawable, x?, y?, r?, sx?, sy?, ox?, oy?)` — draw an Image, Canvas, SpriteBatch, or Mesh
+- `luna.gfx.drawq(image, quad, x, y, r?, sx?, sy?, ox?, oy?)` — draw a sub-region of an image using a Quad
 
 #### Text
-- `luna.render.print(text, x, y)` — draw text at a position
-- `luna.render.printf(text, x, y, limit, align?)` — draw word-wrapped, aligned text
+- `luna.gfx.print(text, x, y)` — draw text at a position
+- `luna.gfx.printf(text, x, y, limit, align?)` — draw word-wrapped, aligned text
 
 #### Clear
-- `luna.render.clear(r?, g?, b?, a?)` — clear the screen or active canvas
+- `luna.gfx.clear(r?, g?, b?, a?)` — clear the screen or active canvas
 
 #### Line and Point Style
-- `luna.render.setLineWidth(width)` — set the stroke width
-- `luna.render.getLineWidth()` — get the current stroke width
-- `luna.render.setPointSize(size)` — set the point size
-- `luna.render.getPointSize()` — get the current point size
+- `luna.gfx.setLineWidth(width)` — set the stroke width
+- `luna.gfx.getLineWidth()` — get the current stroke width
+- `luna.gfx.setPointSize(size)` — set the point size
+- `luna.gfx.getPointSize()` — get the current point size
 
 #### Blend Mode
-- `luna.render.setBlendMode(mode)` — set the active blend mode
-- `luna.render.getBlendMode()` — get the current blend mode
+- `luna.gfx.setBlendMode(mode)` — set the active blend mode
+- `luna.gfx.getBlendMode()` — get the current blend mode
 
 #### Font Management
-- `luna.render.newFont(path, size)` — load a TTF/OTF font
-- `luna.render.setFont(font)` — set the active font
-- `luna.render.getFont()` — get the active font
-- `luna.render.getFontWidth(text)` — get pixel width of text in the current font
-- `luna.render.getFontHeight()` — get the line height of the current font
-- `luna.render.getFontAscent()` — get the ascent of the current font
-- `luna.render.getFontDescent()` — get the descent of the current font
-- `luna.render.getFontWrap(text, limit)` — get word-wrap info for the current font
+- `luna.gfx.newFont(path, size)` — load a TTF/OTF font
+- `luna.gfx.setFont(font)` — set the active font
+- `luna.gfx.getFont()` — get the active font
+- `luna.gfx.getFontWidth(text)` — get pixel width of text in the current font
+- `luna.gfx.getFontHeight()` — get the line height of the current font
+- `luna.gfx.getFontAscent()` — get the ascent of the current font
+- `luna.gfx.getFontDescent()` — get the descent of the current font
+- `luna.gfx.getFontWrap(text, limit)` — get word-wrap info for the current font
 
 #### Image Management
-- `luna.render.newImage(path)` — load an image from file as a GPU texture
+- `luna.gfx.newImage(path)` — load an image from file as a GPU texture
 
 #### Canvas Management
-- `luna.render.newCanvas(width, height)` — create an off-screen render target
-- `luna.render.setCanvas(canvas?)` — set the active render target (nil = screen)
-- `luna.render.getCanvas()` — get the active canvas (nil if drawing to screen)
-- `luna.render.getCanvasSize(canvas)` — get canvas dimensions
+- `luna.gfx.newCanvas(width, height)` — create an off-screen render target
+- `luna.gfx.setCanvas(canvas?)` — set the active render target (nil = screen)
+- `luna.gfx.getCanvas()` — get the active canvas (nil if drawing to screen)
+- `luna.gfx.getCanvasSize(canvas)` — get canvas dimensions
 
 #### SpriteBatch
-- `luna.render.newSpriteBatch(image, maxSprites?)` — create a sprite batch
+- `luna.gfx.newSpriteBatch(image, maxSprites?)` — create a sprite batch
 
 #### Mesh
-- `luna.render.newMesh(vertices, mode?, image?)` — create a custom geometry mesh
+- `luna.gfx.newMesh(vertices, mode?, image?)` — create a custom geometry mesh
 
 #### Shader
-- `luna.render.newShader(source)` — compile a custom WGSL fragment shader
-- `luna.render.setShader(shader?)` — set the active shader (nil = default pipeline)
-- `luna.render.getShader()` — get the active shader
+- `luna.gfx.newShader(source)` — compile a custom WGSL fragment shader
+- `luna.gfx.setShader(shader?)` — set the active shader (nil = default pipeline)
+- `luna.gfx.getShader()` — get the active shader
 
 #### Quad
-- `luna.render.newQuad(x, y, w, h, sw, sh)` — create a sub-region quad for sprite-sheet access
+- `luna.gfx.newQuad(x, y, w, h, sw, sh)` — create a sub-region quad for sprite-sheet access
 
 #### Transform Stack
-- `luna.render.push()` — push a copy of the current transform
-- `luna.render.pop()` — pop the top transform
-- `luna.render.translate(x, y)` — apply a translation
-- `luna.render.rotate(angle)` — apply a rotation (radians)
-- `luna.render.scale(sx, sy?)` — apply a scale
-- `luna.render.shear(kx, ky)` — apply a shear (skew)
-- `luna.render.origin()` — reset transform to identity
-- `luna.render.applyTransform(transform)` — apply a Transform userdata
+- `luna.gfx.push()` — push a copy of the current transform
+- `luna.gfx.pop()` — pop the top transform
+- `luna.gfx.translate(x, y)` — apply a translation
+- `luna.gfx.rotate(angle)` — apply a rotation (radians)
+- `luna.gfx.scale(sx, sy?)` — apply a scale
+- `luna.gfx.shear(kx, ky)` — apply a shear (skew)
+- `luna.gfx.origin()` — reset transform to identity
+- `luna.gfx.applyTransform(transform)` — apply a Transform userdata
 
 #### Scissor
-- `luna.render.setScissor(x?, y?, w?, h?)` — set or clear the scissor rectangle
-- `luna.render.getScissor()` — get the current scissor rectangle
-- `luna.render.intersectScissor(x, y, w, h)` — intersect with the current scissor
+- `luna.gfx.setScissor(x?, y?, w?, h?)` — set or clear the scissor rectangle
+- `luna.gfx.getScissor()` — get the current scissor rectangle
+- `luna.gfx.intersectScissor(x, y, w, h)` — intersect with the current scissor
 
 #### Color Mask
-- `luna.render.setColorMask(r, g, b, a)` — set which color channels can be written
-- `luna.render.getColorMask()` — get the current color mask
+- `luna.gfx.setColorMask(r, g, b, a)` — set which color channels can be written
+- `luna.gfx.getColorMask()` — get the current color mask
 
 #### Wireframe
-- `luna.render.setWireframe(enable)` — enable or disable wireframe mode
-- `luna.render.isWireframe()` — check if wireframe mode is active
+- `luna.gfx.setWireframe(enable)` — enable or disable wireframe mode
+- `luna.gfx.isWireframe()` — check if wireframe mode is active
 
 #### Stencil
-- `luna.render.stencil(func, action?, value?)` — execute a function that writes to the stencil buffer
-- `luna.render.setStencilTest(compareMode?, value?)` — set or disable stencil testing
+- `luna.gfx.stencil(func, action?, value?)` — execute a function that writes to the stencil buffer
+- `luna.gfx.setStencilTest(compareMode?, value?)` — set or disable stencil testing
 
 #### Window Dimensions
-- `luna.render.getWidth()` — get the window width in pixels
-- `luna.render.getHeight()` — get the window height in pixels
-- `luna.render.getDimensions()` — get the window dimensions (w, h)
+- `luna.gfx.getWidth()` — get the window width in pixels
+- `luna.gfx.getHeight()` — get the window height in pixels
+- `luna.gfx.getDimensions()` — get the window dimensions (w, h)
 
 #### Default Filter
-- `luna.render.setDefaultFilter(mode)` — set the default texture filter mode ("nearest" or "linear")
-- `luna.render.getDefaultFilter()` — get the current default filter mode
+- `luna.gfx.setDefaultFilter(mode)` — set the default texture filter mode ("nearest" or "linear")
+- `luna.gfx.getDefaultFilter()` — get the current default filter mode
 
 #### Stats and Screenshot
-- `luna.render.getStats()` — get per-frame render statistics table
-- `luna.render.saveScreenshot(path)` — save a screenshot PNG to the save directory
+- `luna.gfx.getStats()` — get per-frame render statistics table
+- `luna.gfx.saveScreenshot(path)` — save a screenshot PNG to the save directory
 
 ### UserData Types (7)
 
@@ -520,12 +520,12 @@ Methods: `getViewport()`, `setViewport(x, y, w, h)`, `getTextureDimensions()`, `
 ## Lua Examples
 
 ```lua
-function luna.load()
+function luna.init()
     -- Load resources
-    img = luna.render.newImage("player.png")
-    font = luna.render.newFont("font.ttf", 18)
-    canvas = luna.render.newCanvas(800, 600)
-    batch = luna.render.newSpriteBatch(img, 100)
+    img = luna.gfx.newImage("player.png")
+    font = luna.gfx.newFont("font.ttf", 18)
+    canvas = luna.gfx.newCanvas(800, 600)
+    batch = luna.gfx.newSpriteBatch(img, 100)
 
     -- Add sprites to batch
     for i = 1, 10 do
@@ -533,39 +533,39 @@ function luna.load()
     end
 end
 
-function luna.draw()
+function luna.render()
     -- Render scene to canvas
-    luna.render.setCanvas(canvas)
-    luna.render.clear(0.1, 0.1, 0.2)
+    luna.gfx.setCanvas(canvas)
+    luna.gfx.clear(0.1, 0.1, 0.2)
 
     -- Transform stack
-    luna.render.push()
-    luna.render.translate(400, 300)
-    luna.render.rotate(0.5)
-    luna.render.draw(img, -32, -32)
-    luna.render.pop()
+    luna.gfx.push()
+    luna.gfx.translate(400, 300)
+    luna.gfx.rotate(0.5)
+    luna.gfx.draw(img, -32, -32)
+    luna.gfx.pop()
 
     -- Draw shapes
-    luna.render.setColor(1, 0, 0)
-    luna.render.rectangle("fill", 50, 50, 100, 80)
-    luna.render.setColor(0, 1, 0)
-    luna.render.circle("line", 300, 200, 40)
+    luna.gfx.setColor(1, 0, 0)
+    luna.gfx.rectangle("fill", 50, 50, 100, 80)
+    luna.gfx.setColor(0, 1, 0)
+    luna.gfx.circle("line", 300, 200, 40)
 
     -- Draw batch
-    luna.render.setColor(1, 1, 1)
-    luna.render.draw(batch, 0, 300)
+    luna.gfx.setColor(1, 1, 1)
+    luna.gfx.draw(batch, 0, 300)
 
     -- Switch to screen
-    luna.render.setCanvas()
+    luna.gfx.setCanvas()
 
     -- Composite canvas to screen
-    luna.render.draw(canvas, 0, 0)
+    luna.gfx.draw(canvas, 0, 0)
 
     -- Draw text
-    luna.render.setFont(font)
-    luna.render.setColor(1, 1, 1)
-    luna.render.print("Score: 42", 10, 10)
-    luna.render.printf("Centered text", 0, 560, 800, "center")
+    luna.gfx.setFont(font)
+    luna.gfx.setColor(1, 1, 1)
+    luna.gfx.print("Score: 42", 10, 10)
+    luna.gfx.printf("Centered text", 0, 560, 800, "center")
 end
 ```
 
@@ -590,7 +590,7 @@ end
 | `animation` | Related       | Extracted module; `animation` provides sprite animation types      |
 | `particle`  | Related       | Tier 2 module; pushes `DrawParticleSystem` commands into the draw queue |
 | `postfx`    | Related       | Tier 2 module; provides `PostFxStack` and `PostFxEffect`; graphics handles `BeginPostFx`/`EndPostFx`/`ApplyPostFx` commands |
-| `lua_api`   | Imported by   | `src/lua_api/graphics_api.rs` registers all `luna.render.*` bindings |
+| `lua_api`   | Imported by   | `src/lua_api/graphics_api.rs` registers all `luna.gfx.*` bindings |
 
 **Similar modules and differentiation:**
 - `image` vs `graphics`: `image` owns CPU-side pixel buffers (`ImageData`) for manipulation; `graphics` owns GPU-side textures and rendering.
@@ -612,4 +612,4 @@ end
 - **Coordinate system**: Origin at top-left, Y increases downward (screen coordinates).
 - **Custom shaders**: WGSL fragment shaders with auto-prepended globals (`luna_ScreenSize`, `luna_Time`). Validated by naga before pipeline creation. Return a descriptive `LuaError` on validation failure.
 - **Stencil support**: Two-phase workflow — `stencil()` writes to the stencil buffer, then `setStencilTest()` configures subsequent draws to pass/fail based on the stencil value.
-- **Screenshot**: `luna.render.saveScreenshot(path)` reads back the surface buffer asynchronously and encodes to PNG. Not suitable for per-frame capture.
+- **Screenshot**: `luna.gfx.saveScreenshot(path)` reads back the surface buffer asynchronously and encodes to PNG. Not suitable for per-frame capture.

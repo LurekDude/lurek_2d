@@ -1,4 +1,4 @@
-﻿# `engine` — Agent Reference
+# `engine` — Agent Reference
 
 | Property       | Value                                                |
 |----------------|------------------------------------------------------|
@@ -339,7 +339,7 @@ No Lua API — foundation module. The engine module does not expose a `luna.engi
 namespace. It provides the infrastructure consumed by all other modules and by
 `src/lua_api/` for lifecycle orchestration. Lua interacts with engine functionality
 indirectly through `luna.platform` (log level, system info), `luna.window` (window
-state), `luna.signal` (quit, restart), and `luna.render` (draw commands, screenshot).
+state), `luna.signal` (quit, restart), and `luna.gfx` (draw commands, screenshot).
 
 ## Lua Examples
 
@@ -360,15 +360,15 @@ end
 
 ```lua
 -- main.lua — engine callbacks (dispatched by engine::app)
-function luna.load()
+function luna.init()
     -- called once after main.lua executes
 end
 
-function luna.update(dt)
+function luna.process(dt)
     -- called every frame with delta time
 end
 
-function luna.draw()
+function luna.render()
     -- called every frame; push DrawCommands here
 end
 

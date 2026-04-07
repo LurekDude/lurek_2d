@@ -1,4 +1,4 @@
-﻿-- Medical Simulation — Luna2D Demo
+-- Medical Simulation — Luna2D Demo
 -- Perform surgery on patients: clean, cut layers, repair, suture
 
 local function clamp(v, mn, mx) return math.max(mn, math.min(mx, v)) end
@@ -41,7 +41,7 @@ local function show_msg(txt)
     msg_timer = 2
 end
 
-function luna.load()
+function luna.init()
     state = "playing"
     score = 0
     total_time = 0
@@ -81,7 +81,7 @@ local function apply_tool(p, tool, mx, my)
     end
 end
 
-function luna.update(dt)
+function luna.process(dt)
     if game_over then return end
     total_time = total_time + dt
     if msg_timer > 0 then msg_timer = msg_timer - dt end
@@ -125,73 +125,73 @@ function luna.keypressed(key)
 end
 
 local function draw_vitals(p)
-    luna.render.setColor(1,1,1,1)
-    luna.render.print("Heart Rate: " .. math.floor(p.heart_rate), 20, 420, 1)
+    luna.gfx.setColor(1,1,1,1)
+    luna.gfx.print("Heart Rate: " .. math.floor(p.heart_rate), 20, 420, 1)
     local hr_pct = clamp((p.heart_rate - 30) / 70, 0, 1)
-    luna.render.setColor(0.3,0.3,0.3,1)
-    luna.render.rectangle("fill", 20, 440, 160, 14)
-    luna.render.setColor(1 - hr_pct, hr_pct, 0.2, 1)
-    luna.render.rectangle("fill", 20, 440, 160 * hr_pct, 14)
+    luna.gfx.setColor(0.3,0.3,0.3,1)
+    luna.gfx.rectangle("fill", 20, 440, 160, 14)
+    luna.gfx.setColor(1 - hr_pct, hr_pct, 0.2, 1)
+    luna.gfx.rectangle("fill", 20, 440, 160 * hr_pct, 14)
 
-    luna.render.setColor(1,1,1,1)
-    luna.render.print("Blood Pressure: " .. math.floor(p.blood_pressure), 20, 465, 1)
+    luna.gfx.setColor(1,1,1,1)
+    luna.gfx.print("Blood Pressure: " .. math.floor(p.blood_pressure), 20, 465, 1)
     local bp_pct = clamp((p.blood_pressure - 60) / 80, 0, 1)
-    luna.render.setColor(0.3,0.3,0.3,1)
-    luna.render.rectangle("fill", 20, 485, 160, 14)
-    luna.render.setColor(1 - bp_pct, bp_pct, 0.2, 1)
-    luna.render.rectangle("fill", 20, 485, 160 * bp_pct, 14)
+    luna.gfx.setColor(0.3,0.3,0.3,1)
+    luna.gfx.rectangle("fill", 20, 485, 160, 14)
+    luna.gfx.setColor(1 - bp_pct, bp_pct, 0.2, 1)
+    luna.gfx.rectangle("fill", 20, 485, 160 * bp_pct, 14)
 end
 
 local function draw_patient(p)
     -- table
-    luna.render.setColor(0.4,0.35,0.3,1)
-    luna.render.rectangle("fill", 200, 360, 400, 40)
+    luna.gfx.setColor(0.4,0.35,0.3,1)
+    luna.gfx.rectangle("fill", 200, 360, 400, 40)
     -- body outline
-    luna.render.setColor(0.9,0.75,0.65,1)
+    luna.gfx.setColor(0.9,0.75,0.65,1)
     if p.layers.skin then
-        luna.render.rectangle("fill", 250, 200, 300, 160)
+        luna.gfx.rectangle("fill", 250, 200, 300, 160)
     end
     if not p.layers.skin and p.layers.muscle then
-        luna.render.setColor(0.7,0.25,0.2,1)
-        luna.render.rectangle("fill", 250, 200, 300, 160)
+        luna.gfx.setColor(0.7,0.25,0.2,1)
+        luna.gfx.rectangle("fill", 250, 200, 300, 160)
     end
     if not p.layers.skin and not p.layers.muscle then
-        luna.render.setColor(0.8,0.4,0.4,1)
-        luna.render.rectangle("fill", 250, 200, 300, 160)
+        luna.gfx.setColor(0.8,0.4,0.4,1)
+        luna.gfx.rectangle("fill", 250, 200, 300, 160)
         -- problem zone
         if not p.repaired then
-            luna.render.setColor(1,0.1,0.1, 0.5 + 0.3 * math.sin(luna.time.getTime() * 5))
-            luna.render.circle("fill", p.problem_x, p.problem_y, 20)
+            luna.gfx.setColor(1,0.1,0.1, 0.5 + 0.3 * math.sin(luna.time.getTime() * 5))
+            luna.gfx.circle("fill", p.problem_x, p.problem_y, 20)
         else
-            luna.render.setColor(0.2,1,0.2,0.6)
-            luna.render.circle("fill", p.problem_x, p.problem_y, 20)
+            luna.gfx.setColor(0.2,1,0.2,0.6)
+            luna.gfx.circle("fill", p.problem_x, p.problem_y, 20)
         end
     end
     -- body outline
-    luna.render.setColor(0.2,0.2,0.2,1)
-    luna.render.rectangle("line", 250, 200, 300, 160)
+    luna.gfx.setColor(0.2,0.2,0.2,1)
+    luna.gfx.rectangle("line", 250, 200, 300, 160)
     -- step label
     local steps = {"1: Clean area","2: Cut skin","3: Cut muscle","4: Remove/repair","5: Suture","6: Clean wound","Done!"}
-    luna.render.setColor(1,1,0.6,1)
-    luna.render.print("Step: " .. (steps[p.step] or "Done!"), 250, 185, 1)
+    luna.gfx.setColor(1,1,0.6,1)
+    luna.gfx.print("Step: " .. (steps[p.step] or "Done!"), 250, 185, 1)
 end
 
-function luna.draw()
-    luna.render.setBackgroundColor(0.15,0.18,0.22)
+function luna.render()
+    luna.gfx.setBackgroundColor(0.15,0.18,0.22)
 
     if game_over then
-        luna.render.setColor(1,1,1,1)
-        luna.render.print("ALL PATIENTS COMPLETE", 260, 220, 1.5)
-        luna.render.print("Score: " .. score, 320, 270, 1.4)
-        luna.render.print("Time: " .. math.floor(total_time) .. "s", 320, 310, 1)
-        luna.render.print("Press R to restart", 300, 370, 1)
+        luna.gfx.setColor(1,1,1,1)
+        luna.gfx.print("ALL PATIENTS COMPLETE", 260, 220, 1.5)
+        luna.gfx.print("Score: " .. score, 320, 270, 1.4)
+        luna.gfx.print("Time: " .. math.floor(total_time) .. "s", 320, 310, 1)
+        luna.gfx.print("Press R to restart", 300, 370, 1)
         return
     end
 
-    luna.render.setColor(1,1,1,1)
-    luna.render.print("MEDICAL SIM — Patient " .. current_patient .. "/5", 20, 10, 1.2)
-    luna.render.print("Score: " .. score, 20, 40, 1)
-    luna.render.print("FPS: " .. luna.time.getFPS(), 700, 10, 0.8)
+    luna.gfx.setColor(1,1,1,1)
+    luna.gfx.print("MEDICAL SIM — Patient " .. current_patient .. "/5", 20, 10, 1.2)
+    luna.gfx.print("Score: " .. score, 20, 40, 1)
+    luna.gfx.print("FPS: " .. luna.time.getFPS(), 700, 10, 0.8)
 
     local p = patients[current_patient]
     if p then
@@ -200,29 +200,29 @@ function luna.draw()
     end
 
     -- tool palette
-    luna.render.setColor(0.2,0.2,0.25,1)
-    luna.render.rectangle("fill", 630, 170, 160, 320)
-    luna.render.setColor(1,1,1,1)
-    luna.render.print("TOOLS", 680, 155, 1)
+    luna.gfx.setColor(0.2,0.2,0.25,1)
+    luna.gfx.rectangle("fill", 630, 170, 160, 320)
+    luna.gfx.setColor(1,1,1,1)
+    luna.gfx.print("TOOLS", 680, 155, 1)
     for i, t in ipairs(tools) do
         local ty = 180 + (i-1) * 60
         local c = tool_colors[t]
         if selected_tool == t then
-            luna.render.setColor(1,1,0.3,0.4)
-            luna.render.rectangle("fill", 640, ty, 140, 50)
+            luna.gfx.setColor(1,1,0.3,0.4)
+            luna.gfx.rectangle("fill", 640, ty, 140, 50)
         end
-        luna.render.setColor(c[1],c[2],c[3],1)
-        luna.render.rectangle("fill", 645, ty + 5, 40, 40)
-        luna.render.setColor(1,1,1,1)
-        luna.render.print(t, 690, ty + 15, 0.9)
+        luna.gfx.setColor(c[1],c[2],c[3],1)
+        luna.gfx.rectangle("fill", 645, ty + 5, 40, 40)
+        luna.gfx.setColor(1,1,1,1)
+        luna.gfx.print(t, 690, ty + 15, 0.9)
     end
 
     -- message
     if message and msg_timer > 0 then
-        luna.render.setColor(1,1,0.5,1)
-        luna.render.print(message, 220, 520, 1)
+        luna.gfx.setColor(1,1,0.5,1)
+        luna.gfx.print(message, 220, 520, 1)
     end
 
-    luna.render.setColor(0.6,0.6,0.6,1)
-    luna.render.print("[R] Restart   [ESC] Quit", 20, 570, 0.8)
+    luna.gfx.setColor(0.6,0.6,0.6,1)
+    luna.gfx.print("[R] Restart   [ESC] Quit", 20, 570, 0.8)
 end

@@ -1,4 +1,4 @@
-﻿# Hex Strategy
+# Hex Strategy
 
 A turn-based hex-grid strategy game where you expand a civilisation across procedurally generated terrain. Each city gathers gold, wood, and food from its surrounding hexes every turn, and you spend resources to found new cities on conquered tiles. Terrain ranges from grassland and forest to mountains and desert, each with distinct resource yields.
 
@@ -7,9 +7,9 @@ A turn-based hex-grid strategy game where you expand a civilisation across proce
 - `luna.math.simplex2d()` — two-octave noise layers that determine terrain type per hex
 - `luna.mouse.getPosition()` / `luna.mousepressed()` — pixel-to-hex coordinate conversion for tile selection
 - `luna.keyboard.wasPressed()` — `C` to place a city, `N` to end the turn
-- `luna.render.polygon()` — flat-top hexagon rendering for both fill and outline passes
-- `luna.render.setColor()` — per-terrain colour lookup and selection highlight
-- `luna.render.print()` — resource HUD panel and hex info tooltip
+- `luna.gfx.polygon()` — flat-top hexagon rendering for both fill and outline passes
+- `luna.gfx.setColor()` — per-terrain colour lookup and selection highlight
+- `luna.gfx.print()` — resource HUD panel and hex info tooltip
 - `luna.window.setTitle()` — window caption set at load time
 - Cube-coordinate hex math — `hexToPixel` / `pixelToHex` with proper cube rounding for accurate selection
 

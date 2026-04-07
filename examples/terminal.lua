@@ -208,7 +208,7 @@ local focused = term:getFocused()
 --[[
 local my_term
 
-function luna.load()
+function luna.init()
     my_term = luna.terminal.newTerminal(80, 30)
 
     local brd = luna.terminal.newBorder(1, 1, 40, 12)
@@ -250,7 +250,7 @@ function luna.mousepressed(x, y, button)
     )
 end
 
-function luna.draw()
+function luna.render()
     my_term:draw(0, 0)
 end
 ]]

@@ -1,4 +1,4 @@
-﻿# Luna Toolkit
+# Luna Toolkit
 
 > The official VS Code extension for Luna2D game engine development.
 
@@ -19,11 +19,11 @@ Luna Toolkit provides deep Lua language intelligence tuned to the `luna.*` API:
 - **Find All References** — Cross-file reference search across the entire workspace
 - **Rename Symbol** — Safe rename across all files in the project
 - **Document & Workspace Symbols** — File outline (⌘/Ctrl+Shift+O) and global symbol search (⌘/Ctrl+T)
-- **Type Inference** — Infer return types of `luna.render.newImage`, `luna.physics.newBody`, etc. to provide follow-on completions on the result
+- **Type Inference** — Infer return types of `luna.gfx.newImage`, `luna.physics.newBody`, etc. to provide follow-on completions on the result
 - **LuaJIT Intelligence** — Completions and performance hints for `bit.*`, `jit.*`, and FFI patterns
 - **Require Graph** — On-save circular dependency detection across all `require` chains
 - **Inlay Hints** — Lightweight parameter name labels for `luna.*` call sites
-- **Color Provider** — Inline color swatches for `luna.render.setColor(r, g, b, a)` calls
+- **Color Provider** — Inline color swatches for `luna.gfx.setColor(r, g, b, a)` calls
 - **Asset Path Completion** — `newImage`, `newSource`, `loadFont`, etc. complete asset paths relative to the game directory with broken-path detection
 - **LuaCats / EmmyLua Types** — Full `.d.lua` annotation generation for use with any Lua LSP
 - **Code Lens** — Reference counts and callback labels on `luna.load`, `luna.update`, `luna.draw`, and event handlers
@@ -40,7 +40,7 @@ Luna Toolkit provides deep Lua language intelligence tuned to the `luna.*` API:
 | Asset Validation | Image/sound/font paths that do not exist on disk |
 | Type Mismatch | Passing a number where a Color/Vec2 is expected |
 | Missing Callbacks | `luna.draw()` missing while `luna.update()` uses rendering |
-| Unclosed Resources | `luna.render.newCanvas()` that is never released |
+| Unclosed Resources | `luna.gfx.newCanvas()` that is never released |
 | Circular Requires | Detected at save time across all Lua files |
 | Infinite Loop Risk | Tight loops without a `break` or `return` |
 | Non-local Function | Public function inside a module that should be `local` |
@@ -226,7 +226,7 @@ MIT
 - **Code Actions** — Extract function, convert to local, generate stubs, and more
 - **Diagnostics** — Deprecation warnings, common mistakes, unused requires, asset path validation
 - **Inlay Hints** — Parameter name hints for `luna.*` calls
-- **Color Provider** — Color swatches for `luna.render.setColor` calls
+- **Color Provider** — Color swatches for `luna.gfx.setColor` calls
 - **Asset Path Completion** — Auto-complete file paths in `newImage`, `newSource`, etc.
 
 ### Visual Editors (27)

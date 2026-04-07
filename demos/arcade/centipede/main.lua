@@ -1,4 +1,4 @@
-﻿-- Centipede — Classic Arcade (Luna2D demo)
+-- Centipede — Classic Arcade (Luna2D demo)
 -- Shoot the descending centipede. Mushrooms block bullets and redirect the worm.
 -- Mouse/WASD to move, Space to shoot. Centipede splits when hit.
 
@@ -68,15 +68,15 @@ end
 
 -- ── Load ─────────────────────────────────────────────────────────────────
 
-function luna.load()
-    luna.render.setBackgroundColor(0, 0, 0.04)
+function luna.init()
+    luna.gfx.setBackgroundColor(0, 0, 0.04)
     score = 0; lives = 3; wave = 1
     reset()
 end
 
 -- ── Update ───────────────────────────────────────────────────────────────
 
-function luna.update(dt)
+function luna.process(dt)
     if game_state ~= "playing" then return end
     shoot_cd = math.max(0, shoot_cd - dt)
 
@@ -223,14 +223,14 @@ end
 
 -- ── Draw ─────────────────────────────────────────────────────────────────
 
-function luna.draw()
+function luna.render()
     -- Mushrooms
     for col = 0, COLS - 1 do
         if mushrooms[col] then
             for row, hp in pairs(mushrooms[col]) do
                 local t = hp / MUSHROOM_HP
-                luna.render.setColor(0.2 + t * 0.4, 0.6 * t, 0.1)
-                luna.render.circle("fill", col * CELL + CELL/2, row * CELL + CELL/2, CELL/2 - 1)
+                luna.gfx.setColor(0.2 + t * 0.4, 0.6 * t, 0.1)
+                luna.gfx.circle("fill", col * CELL + CELL/2, row * CELL + CELL/2, CELL/2 - 1)
             end
         end
     end
@@ -238,64 +238,64 @@ function luna.draw()
     -- Centipede
     for _, seg in ipairs(segments) do
         if seg.head then
-            luna.render.setColor(0.9, 0.3, 0.8)
+            luna.gfx.setColor(0.9, 0.3, 0.8)
         else
-            luna.render.setColor(0.2, 0.8, 0.3)
+            luna.gfx.setColor(0.2, 0.8, 0.3)
         end
-        luna.render.circle("fill", seg.px + CELL/2, seg.py + CELL/2, CELL/2 - 1)
+        luna.gfx.circle("fill", seg.px + CELL/2, seg.py + CELL/2, CELL/2 - 1)
         -- Eyes on head
         if seg.head then
-            luna.render.setColor(1, 1, 0)
-            luna.render.circle("fill", seg.px + CELL/2 - 3, seg.py + CELL/2 - 3, 2)
-            luna.render.circle("fill", seg.px + CELL/2 + 3, seg.py + CELL/2 - 3, 2)
+            luna.gfx.setColor(1, 1, 0)
+            luna.gfx.circle("fill", seg.px + CELL/2 - 3, seg.py + CELL/2 - 3, 2)
+            luna.gfx.circle("fill", seg.px + CELL/2 + 3, seg.py + CELL/2 - 3, 2)
         end
     end
 
     -- Spiders
-    luna.render.setColor(1, 0.6, 0.1)
+    luna.gfx.setColor(1, 0.6, 0.1)
     for _, sp in ipairs(spiders) do
-        luna.render.circle("fill", sp.x + CELL/2, sp.y + CELL/2, CELL/2 - 1)
+        luna.gfx.circle("fill", sp.x + CELL/2, sp.y + CELL/2, CELL/2 - 1)
         -- Legs
         for li = 0, 3 do
             local ang = li * math.pi / 2
-            luna.render.line(sp.x + CELL/2, sp.y + CELL/2,
+            luna.gfx.line(sp.x + CELL/2, sp.y + CELL/2,
                 sp.x + CELL/2 + math.cos(ang) * CELL, sp.y + CELL/2 + math.sin(ang) * CELL)
         end
     end
 
     -- Player
-    luna.render.setColor(0.4, 0.7, 1.0)
-    luna.render.rectangle("fill", player.x + 5, player.y, player.w - 10, player.h)
-    luna.render.rectangle("fill", player.x, player.y + 10, player.w, 10)
+    luna.gfx.setColor(0.4, 0.7, 1.0)
+    luna.gfx.rectangle("fill", player.x + 5, player.y, player.w - 10, player.h)
+    luna.gfx.rectangle("fill", player.x, player.y + 10, player.w, 10)
 
     -- Bullets
-    luna.render.setColor(1, 1, 0.5)
+    luna.gfx.setColor(1, 1, 0.5)
     for _, b in ipairs(bullets) do
-        luna.render.rectangle("fill", b.x - 2, b.y, 4, 12)
+        luna.gfx.rectangle("fill", b.x - 2, b.y, 4, 12)
     end
 
     -- Player zone separator line
-    luna.render.setColor(0.2, 0.2, 0.4)
-    luna.render.line(0, PLAYER_ZONE_TOP * CELL, W, PLAYER_ZONE_TOP * CELL)
+    luna.gfx.setColor(0.2, 0.2, 0.4)
+    luna.gfx.line(0, PLAYER_ZONE_TOP * CELL, W, PLAYER_ZONE_TOP * CELL)
 
     -- HUD
-    luna.render.setColor(1, 1, 1)
-    luna.render.print("Score: " .. score, 8, 4, 1.5)
-    luna.render.setColor(1, 0.4, 0.4)
-    luna.render.print("Lives: " .. lives, W - 95, 4, 1.5)
-    luna.render.setColor(0.5, 0.7, 0.5)
-    luna.render.print("Wave " .. wave, W/2 - 30, 4, 1.5)
+    luna.gfx.setColor(1, 1, 1)
+    luna.gfx.print("Score: " .. score, 8, 4, 1.5)
+    luna.gfx.setColor(1, 0.4, 0.4)
+    luna.gfx.print("Lives: " .. lives, W - 95, 4, 1.5)
+    luna.gfx.setColor(0.5, 0.7, 0.5)
+    luna.gfx.print("Wave " .. wave, W/2 - 30, 4, 1.5)
 
     -- Overlay
     if game_state == "gameover" then
-        luna.render.setColor(0, 0, 0, 0.7)
-        luna.render.rectangle("fill", 0, 0, W, H)
-        luna.render.setColor(1, 0.2, 0.2)
-        luna.render.print("GAME OVER", W/2 - 80, H/2 - 25, 3)
-        luna.render.setColor(1, 1, 1)
-        luna.render.print("Score: " .. score, W/2 - 50, H/2 + 15, 2)
-        luna.render.setColor(0.6, 0.6, 0.6)
-        luna.render.print("Press R to restart", W/2 - 100, H/2 + 45, 2)
+        luna.gfx.setColor(0, 0, 0, 0.7)
+        luna.gfx.rectangle("fill", 0, 0, W, H)
+        luna.gfx.setColor(1, 0.2, 0.2)
+        luna.gfx.print("GAME OVER", W/2 - 80, H/2 - 25, 3)
+        luna.gfx.setColor(1, 1, 1)
+        luna.gfx.print("Score: " .. score, W/2 - 50, H/2 + 15, 2)
+        luna.gfx.setColor(0.6, 0.6, 0.6)
+        luna.gfx.print("Press R to restart", W/2 - 100, H/2 + 45, 2)
     end
 end
 

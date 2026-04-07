@@ -1,4 +1,4 @@
-﻿-- Tower Sim — Idle Stacking Tower
+-- Tower Sim — Idle Stacking Tower
 -- Time your clicks to stack blocks; misaligned blocks get trimmed
 
 local function clamp(v, mn, mx) return math.max(mn, math.min(mx, v)) end
@@ -130,16 +130,16 @@ local function drawStars()
         local sx = (i * 137 + math.floor(t * 10)) % 800
         local sy = (i * 91) % 300
         local brightness = 0.3 + 0.3 * math.sin(t * 2 + i)
-        luna.render.setColor(1, 1, 1, brightness)
-        luna.render.circle("fill", sx, sy, 1)
+        luna.gfx.setColor(1, 1, 1, brightness)
+        luna.gfx.circle("fill", sx, sy, 1)
     end
 end
 
-function luna.load()
+function luna.init()
     spawnPending()
 end
 
-function luna.update(dt)
+function luna.process(dt)
     if gameOver then return end
     if not pendingBlock then return end
 
@@ -185,47 +185,47 @@ function luna.mousepressed(mx, my, btn)
     end
 end
 
-function luna.draw()
+function luna.render()
     local sky = getSkyColor()
-    luna.render.setBackgroundColor(sky[1], sky[2], sky[3])
+    luna.gfx.setBackgroundColor(sky[1], sky[2], sky[3])
 
     drawStars()
 
     -- Draw ground
     local groundY = BASE_Y + BLOCK_H - scrollY
-    luna.render.setColor(0.3, 0.25, 0.2, 1)
-    luna.render.rectangle("fill", 0, groundY, 800, 200)
+    luna.gfx.setColor(0.3, 0.25, 0.2, 1)
+    luna.gfx.rectangle("fill", 0, groundY, 800, 200)
 
     -- Foundation
-    luna.render.setColor(0.5, 0.5, 0.55, 1)
-    luna.render.rectangle("fill", BASE_X, groundY - BLOCK_H, BASE_W, BLOCK_H)
+    luna.gfx.setColor(0.5, 0.5, 0.55, 1)
+    luna.gfx.rectangle("fill", BASE_X, groundY - BLOCK_H, BASE_W, BLOCK_H)
 
     -- Placed blocks
     for i, b in ipairs(blocks) do
         local r, g, bl = getBlockColor(i)
-        luna.render.setColor(r, g, bl, 1)
+        luna.gfx.setColor(r, g, bl, 1)
         local by = groundY - (i + 1) * BLOCK_H
-        luna.render.rectangle("fill", b.x, by, b.w, BLOCK_H - 1)
+        luna.gfx.rectangle("fill", b.x, by, b.w, BLOCK_H - 1)
 
         -- Perfect indicator
         if b.perfect then
-            luna.render.setColor(1, 1, 1, 0.4)
-            luna.render.rectangle("fill", b.x, by, b.w, BLOCK_H - 1)
+            luna.gfx.setColor(1, 1, 1, 0.4)
+            luna.gfx.rectangle("fill", b.x, by, b.w, BLOCK_H - 1)
         end
 
         -- Edge outlines
-        luna.render.setColor(r * 0.7, g * 0.7, bl * 0.7, 1)
-        luna.render.rectangle("line", b.x, by, b.w, BLOCK_H - 1)
+        luna.gfx.setColor(r * 0.7, g * 0.7, bl * 0.7, 1)
+        luna.gfx.rectangle("line", b.x, by, b.w, BLOCK_H - 1)
     end
 
     -- Pending block (swinging)
     if pendingBlock and not gameOver then
         local pendingIdx = #blocks + 1
         local r, g, bl = getBlockColor(pendingIdx)
-        luna.render.setColor(r, g, bl, 0.85)
+        luna.gfx.setColor(r, g, bl, 0.85)
         local px = swingX + 400 - pendingBlock.w / 2
         local py = groundY - (pendingIdx + 1) * BLOCK_H
-        luna.render.rectangle("fill", px, py, pendingBlock.w, BLOCK_H - 1)
+        luna.gfx.rectangle("fill", px, py, pendingBlock.w, BLOCK_H - 1)
 
         -- Guide line from previous block
         local prevX, prevW
@@ -234,61 +234,61 @@ function luna.draw()
         else
             prevX, prevW = blocks[#blocks].x, blocks[#blocks].w
         end
-        luna.render.setColor(1, 1, 1, 0.15)
-        luna.render.setLineWidth(1)
-        luna.render.line(prevX, py, prevX, py + BLOCK_H)
-        luna.render.line(prevX + prevW, py, prevX + prevW, py + BLOCK_H)
+        luna.gfx.setColor(1, 1, 1, 0.15)
+        luna.gfx.setLineWidth(1)
+        luna.gfx.line(prevX, py, prevX, py + BLOCK_H)
+        luna.gfx.line(prevX + prevW, py, prevX + prevW, py + BLOCK_H)
     end
 
     -- HUD
-    luna.render.setColor(0, 0, 0, 0.6)
-    luna.render.rectangle("fill", 0, 0, 800, 50)
+    luna.gfx.setColor(0, 0, 0, 0.6)
+    luna.gfx.rectangle("fill", 0, 0, 800, 50)
 
     -- Score
-    luna.render.setColor(1, 1, 1, 1)
-    luna.render.print("Height: " .. score, 20, 5, 1.5)
+    luna.gfx.setColor(1, 1, 1, 1)
+    luna.gfx.print("Height: " .. score, 20, 5, 1.5)
 
     -- High score
-    luna.render.setColor(0.8, 0.8, 0.5, 1)
-    luna.render.print("Best: " .. highScore, 200, 10)
+    luna.gfx.setColor(0.8, 0.8, 0.5, 1)
+    luna.gfx.print("Best: " .. highScore, 200, 10)
 
     -- Combo
     if combo > 0 then
         local comboAlpha = clamp(1, 0.5, 1)
-        luna.render.setColor(1, 0.8, 0.2, comboAlpha)
-        luna.render.print("COMBO x" .. combo, 350, 8, 1.3)
+        luna.gfx.setColor(1, 0.8, 0.2, comboAlpha)
+        luna.gfx.print("COMBO x" .. combo, 350, 8, 1.3)
     end
 
     -- Floor indicator
     local floor = math.floor(score / 10)
     local floorNames = {"Sky", "Clouds", "Twilight", "Night", "Space"}
     local fi = clamp(floor + 1, 1, #floorNames)
-    luna.render.setColor(0.6, 0.6, 0.8, 1)
-    luna.render.print("Zone: " .. floorNames[fi], 600, 10)
-    luna.render.setColor(0.5, 0.5, 0.5, 1)
-    luna.render.print("Best combo: " .. bestCombo, 600, 30)
+    luna.gfx.setColor(0.6, 0.6, 0.8, 1)
+    luna.gfx.print("Zone: " .. floorNames[fi], 600, 10)
+    luna.gfx.setColor(0.5, 0.5, 0.5, 1)
+    luna.gfx.print("Best combo: " .. bestCombo, 600, 30)
 
     -- Controls hint
-    luna.render.setColor(0.5, 0.5, 0.5, 0.8)
-    luna.render.print("Click or Space to place block", 250, 35)
+    luna.gfx.setColor(0.5, 0.5, 0.5, 0.8)
+    luna.gfx.print("Click or Space to place block", 250, 35)
 
     -- Game over overlay
     if gameOver then
-        luna.render.setColor(0, 0, 0, 0.7)
-        luna.render.rectangle("fill", 200, 200, 400, 160)
+        luna.gfx.setColor(0, 0, 0, 0.7)
+        luna.gfx.rectangle("fill", 200, 200, 400, 160)
 
-        luna.render.setColor(1, 0.4, 0.3, 1)
-        luna.render.print("GAME OVER", 310, 215, 1.8)
+        luna.gfx.setColor(1, 0.4, 0.3, 1)
+        luna.gfx.print("GAME OVER", 310, 215, 1.8)
 
-        luna.render.setColor(1, 1, 1, 1)
-        luna.render.print("Final Height: " .. score, 310, 270)
-        luna.render.print("Best Combo: " .. bestCombo, 310, 295)
+        luna.gfx.setColor(1, 1, 1, 1)
+        luna.gfx.print("Final Height: " .. score, 310, 270)
+        luna.gfx.print("Best Combo: " .. bestCombo, 310, 295)
         if score >= highScore and score > 0 then
-            luna.render.setColor(1, 1, 0, 1)
-            luna.render.print("NEW HIGH SCORE!", 310, 320)
+            luna.gfx.setColor(1, 1, 0, 1)
+            luna.gfx.print("NEW HIGH SCORE!", 310, 320)
         else
-            luna.render.setColor(0.7, 0.7, 0.7, 1)
-            luna.render.print("Click or Space to retry", 310, 320)
+            luna.gfx.setColor(0.7, 0.7, 0.7, 1)
+            luna.gfx.print("Click or Space to retry", 310, 320)
         end
     end
 end

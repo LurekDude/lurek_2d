@@ -1,5 +1,7 @@
-function luna.conf(t)
-    t.window.title = "Dialog Demo"
-    t.window.width = 800
-    t.window.height = 600
-end
+return {
+    window = {
+        title = "Dialog Demo",
+        width = 800,
+        height = 600,
+    },
+}

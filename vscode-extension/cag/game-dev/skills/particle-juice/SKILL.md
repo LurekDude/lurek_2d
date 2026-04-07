@@ -1,4 +1,4 @@
-﻿# Particle Juice
+# Particle Juice
 
 On-hit sparks, walk dust, landing impact, death explosion, coin collect, and healing shimmer using luna.particles.
 
@@ -111,7 +111,7 @@ end
 
 local function draw_particles()
     for _, ps in ipairs(active_particles) do
-        luna.render.draw(ps, 0, 0)
+        luna.gfx.draw(ps, 0, 0)
     end
 end
 ```

@@ -1,4 +1,4 @@
-﻿# Maze Defense
+# Maze Defense
 
 A tower defense game where the player controls both the maze and the towers. Place walls to redirect enemies through longer paths, and build shooting towers to eliminate them before they reach the exit. Every wall placement recalculates the BFS shortest path, so mazing strategy is core.
 
@@ -10,7 +10,7 @@ A tower defense game where the player controls both the maze and the towers. Pla
 - Bullet-enemy circular collision detection with sweep cleanup
 - Gold economy: enemies award gold on death, walls and towers have costs
 - Path blocking guard: if a wall would seal the exit the placement is rejected
-- Screen-space grid drawing with `luna.render.drawRect` per cell
+- Screen-space grid drawing with `luna.gfx.drawRect` per cell
 
 ## How to Run
 

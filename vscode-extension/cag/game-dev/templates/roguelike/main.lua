@@ -1,11 +1,11 @@
-﻿local Dungeon = require("generator.dungeon")
+local Dungeon = require("generator.dungeon")
 
 local TILE = 16
 local map
 local player = { gx = 5, gy = 5 }
 local turn = 0
 
-function luna.load()
+function luna.init()
     map = Dungeon.generate(50, 38)
     -- Place player in first open cell
     for y = 1, #map do
@@ -18,27 +18,27 @@ function luna.load()
     end
 end
 
-function luna.update(dt)
+function luna.process(dt)
     -- Turn-based: logic runs in keypressed
 end
 
-function luna.draw()
-    luna.render.clear(0.05, 0.05, 0.08)
+function luna.render()
+    luna.gfx.clear(0.05, 0.05, 0.08)
     -- Draw map
     for y = 1, #map do
         for x = 1, #map[1] do
             if map[y][x] == 1 then
-                luna.render.setColor(0.3, 0.3, 0.35, 1)
-                luna.render.rectangle("fill", (x - 1) * TILE, (y - 1) * TILE, TILE, TILE)
+                luna.gfx.setColor(0.3, 0.3, 0.35, 1)
+                luna.gfx.rectangle("fill", (x - 1) * TILE, (y - 1) * TILE, TILE, TILE)
             end
         end
     end
     -- Draw player
-    luna.render.setColor(0.2, 0.8, 0.4, 1)
-    luna.render.rectangle("fill", (player.gx - 1) * TILE, (player.gy - 1) * TILE, TILE, TILE)
+    luna.gfx.setColor(0.2, 0.8, 0.4, 1)
+    luna.gfx.rectangle("fill", (player.gx - 1) * TILE, (player.gy - 1) * TILE, TILE, TILE)
     -- UI
-    luna.render.setColor(1, 1, 1, 1)
-    luna.render.print("Turn: " .. turn, 10, 580)
+    luna.gfx.setColor(1, 1, 1, 1)
+    luna.gfx.print("Turn: " .. turn, 10, 580)
 end
 
 function luna.keypressed(key)

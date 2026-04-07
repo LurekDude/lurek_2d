@@ -1,4 +1,4 @@
-﻿# Game States
+# Game States
 
 State stack with push/pop for pause and overlays, state table pattern, transitions, and persistent state.
 
@@ -86,23 +86,23 @@ end
 
 function pause_state.draw()
     -- Draw semi-transparent overlay
-    luna.render.setColor(0, 0, 0, 0.6)
-    luna.render.rectangle("fill", 0, 0, 800, 600)
-    luna.render.setColor(1, 1, 1, 1)
-    luna.render.print("PAUSED", 370, 280)
-    luna.render.print("Press ESC to resume", 310, 310)
+    luna.gfx.setColor(0, 0, 0, 0.6)
+    luna.gfx.rectangle("fill", 0, 0, 800, 600)
+    luna.gfx.setColor(1, 1, 1, 1)
+    luna.gfx.print("PAUSED", 370, 280)
+    luna.gfx.print("Press ESC to resume", 310, 310)
 end
 ```
 
 ## Engine Integration
 
 ```lua
-function luna.update(dt)
+function luna.process(dt)
     local s = current_state()
     if s and s.update then s.update(dt) end
 end
 
-function luna.draw()
+function luna.render()
     -- Draw all states bottom to top (so overlay draws over game)
     for _, s in ipairs(state_stack) do
         if s.draw then s.draw() end
@@ -132,13 +132,13 @@ function gameover_state.update(dt)
 end
 
 function gameover_state.draw()
-    luna.render.setColor(0.1, 0, 0, 0.9)
-    luna.render.rectangle("fill", 0, 0, 800, 600)
-    luna.render.setColor(1, 0.2, 0.2, 1)
-    luna.render.print("GAME OVER", 340, 260)
+    luna.gfx.setColor(0.1, 0, 0, 0.9)
+    luna.gfx.rectangle("fill", 0, 0, 800, 600)
+    luna.gfx.setColor(1, 0.2, 0.2, 1)
+    luna.gfx.print("GAME OVER", 340, 260)
     if gameover_state.timer > 2 then
-        luna.render.setColor(1, 1, 1, 1)
-        luna.render.print("Press ENTER", 350, 300)
+        luna.gfx.setColor(1, 1, 1, 1)
+        luna.gfx.print("Press ENTER", 350, 300)
     end
 end
 ```

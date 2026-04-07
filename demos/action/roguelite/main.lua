@@ -1,4 +1,4 @@
-﻿-- Roguelite Action Demo (Hades-style)
+-- Roguelite Action Demo (Hades-style)
 -- Real-time room-based combat with perks and boss fights
 -- Controls: WASD to move, Left Click to attack, Shift to dash
 -- Clear rooms, pick perks, fight bosses every 5 rooms
@@ -88,13 +88,13 @@ local function resetGame()
     startRoom()
 end
 
-function luna.load()
+function luna.init()
     luna.window.setTitle("Roguelite Action")
-    luna.render.setBackgroundColor(0.06, 0.05, 0.1)
+    luna.gfx.setBackgroundColor(0.06, 0.05, 0.1)
     startRoom()
 end
 
-function luna.update(dt)
+function luna.process(dt)
     if state == "gameOver" or state == "perkSelect" then return end
     -- Player movement
     local mx, my = 0, 0
@@ -191,72 +191,72 @@ function luna.update(dt)
     end
 end
 
-function luna.draw()
+function luna.render()
     -- Arena
-    luna.render.setColor(0.1, 0.1, 0.15)
-    luna.render.rectangle("fill", ARENA_X, ARENA_Y, ARENA_W, ARENA_H)
-    luna.render.setColor(0.3, 0.25, 0.4)
-    luna.render.rectangle("line", ARENA_X, ARENA_Y, ARENA_W, ARENA_H)
+    luna.gfx.setColor(0.1, 0.1, 0.15)
+    luna.gfx.rectangle("fill", ARENA_X, ARENA_Y, ARENA_W, ARENA_H)
+    luna.gfx.setColor(0.3, 0.25, 0.4)
+    luna.gfx.rectangle("line", ARENA_X, ARENA_Y, ARENA_W, ARENA_H)
     -- Door indicator
     if roomCleared then
-        luna.render.setColor(0.2, 0.8, 0.3, 0.7 + 0.3 * math.sin(luna.time.getTime() * 4))
-        luna.render.rectangle("fill", ARENA_X + ARENA_W / 2 - 15, ARENA_Y - 8, 30, 10)
+        luna.gfx.setColor(0.2, 0.8, 0.3, 0.7 + 0.3 * math.sin(luna.time.getTime() * 4))
+        luna.gfx.rectangle("fill", ARENA_X + ARENA_W / 2 - 15, ARENA_Y - 8, 30, 10)
     end
     -- Enemies
     for _, e in ipairs(enemies) do
-        if e.hitTimer > 0 then luna.render.setColor(1, 1, 1)
-        elseif e.kind == "boss" then luna.render.setColor(0.8, 0.1, 0.6)
-        elseif e.kind == "fast" then luna.render.setColor(1, 0.6, 0.1)
-        else luna.render.setColor(0.9, 0.2, 0.2) end
-        luna.render.rectangle("fill", e.x, e.y, e.w, e.h)
+        if e.hitTimer > 0 then luna.gfx.setColor(1, 1, 1)
+        elseif e.kind == "boss" then luna.gfx.setColor(0.8, 0.1, 0.6)
+        elseif e.kind == "fast" then luna.gfx.setColor(1, 0.6, 0.1)
+        else luna.gfx.setColor(0.9, 0.2, 0.2) end
+        luna.gfx.rectangle("fill", e.x, e.y, e.w, e.h)
         -- HP bar
-        luna.render.setColor(0.3, 0.3, 0.3); luna.render.rectangle("fill", e.x, e.y - 6, e.w, 3)
-        luna.render.setColor(0.9, 0.2, 0.2); luna.render.rectangle("fill", e.x, e.y - 6, e.w * (e.hp / e.maxHp), 3)
+        luna.gfx.setColor(0.3, 0.3, 0.3); luna.gfx.rectangle("fill", e.x, e.y - 6, e.w, 3)
+        luna.gfx.setColor(0.9, 0.2, 0.2); luna.gfx.rectangle("fill", e.x, e.y - 6, e.w * (e.hp / e.maxHp), 3)
     end
     -- Player
     local blink = player.iframes > 0 and math.sin(luna.time.getTime() * 25) > 0
     if not blink then
-        if player.dashing then luna.render.setColor(0.5, 0.8, 1, 0.7)
-        else luna.render.setColor(0.3, 0.8, 1) end
-        luna.render.rectangle("fill", player.x, player.y, player.w, player.h)
+        if player.dashing then luna.gfx.setColor(0.5, 0.8, 1, 0.7)
+        else luna.gfx.setColor(0.3, 0.8, 1) end
+        luna.gfx.rectangle("fill", player.x, player.y, player.w, player.h)
     end
     -- Attack arc
     if player.atkDuration > 0 then
-        luna.render.setColor(1, 1, 0.5, 0.6)
+        luna.gfx.setColor(1, 1, 0.5, 0.6)
         local ax = player.x + player.w / 2 + math.cos(player.atkAngle) * 20
         local ay = player.y + player.h / 2 + math.sin(player.atkAngle) * 20
-        luna.render.circle("fill", ax, ay, player.atkRange * 0.6)
+        luna.gfx.circle("fill", ax, ay, player.atkRange * 0.6)
     end
     -- HUD
-    luna.render.setColor(0, 0, 0, 0.7); luna.render.rectangle("fill", 0, 0, 800, 28)
-    luna.render.setColor(1, 1, 1)
-    luna.render.print("HP: " .. math.floor(player.hp) .. "/" .. player.maxHp .. "  Room: " .. roomNum .. "  Score: " .. score .. "  Kills: " .. killCount, 10, 6)
+    luna.gfx.setColor(0, 0, 0, 0.7); luna.gfx.rectangle("fill", 0, 0, 800, 28)
+    luna.gfx.setColor(1, 1, 1)
+    luna.gfx.print("HP: " .. math.floor(player.hp) .. "/" .. player.maxHp .. "  Room: " .. roomNum .. "  Score: " .. score .. "  Kills: " .. killCount, 10, 6)
     -- HP bar
-    luna.render.setColor(0.2, 0.2, 0.2); luna.render.rectangle("fill", 580, 6, 150, 16)
-    luna.render.setColor(0.1, 0.7, 0.3); luna.render.rectangle("fill", 580, 6, 150 * clamp(player.hp / player.maxHp, 0, 1), 16)
+    luna.gfx.setColor(0.2, 0.2, 0.2); luna.gfx.rectangle("fill", 580, 6, 150, 16)
+    luna.gfx.setColor(0.1, 0.7, 0.3); luna.gfx.rectangle("fill", 580, 6, 150 * clamp(player.hp / player.maxHp, 0, 1), 16)
     -- Room info
     if bossRoom and #enemies > 0 then
-        luna.render.setColor(1, 0.3, 0.6); luna.render.print("!! BOSS !!", 370, 35, 1.5)
+        luna.gfx.setColor(1, 0.3, 0.6); luna.gfx.print("!! BOSS !!", 370, 35, 1.5)
     end
     -- Perk selection
     if state == "perkSelect" then
-        luna.render.setColor(0, 0, 0, 0.8); luna.render.rectangle("fill", 150, 180, 500, 220)
-        luna.render.setColor(1, 0.9, 0.3); luna.render.print("ROOM CLEARED! Choose a perk:", 250, 200, 1.2)
+        luna.gfx.setColor(0, 0, 0, 0.8); luna.gfx.rectangle("fill", 150, 180, 500, 220)
+        luna.gfx.setColor(1, 0.9, 0.3); luna.gfx.print("ROOM CLEARED! Choose a perk:", 250, 200, 1.2)
         for i, p in ipairs(perkOptions) do
             local bx, by = 180, 230 + (i - 1) * 50
-            luna.render.setColor(0.2, 0.2, 0.3); luna.render.rectangle("fill", bx, by, 440, 40)
-            luna.render.setColor(0.3, 0.4, 0.6); luna.render.rectangle("line", bx, by, 440, 40)
-            luna.render.setColor(1, 1, 1); luna.render.print("[" .. i .. "] " .. p.name, bx + 15, by + 12)
+            luna.gfx.setColor(0.2, 0.2, 0.3); luna.gfx.rectangle("fill", bx, by, 440, 40)
+            luna.gfx.setColor(0.3, 0.4, 0.6); luna.gfx.rectangle("line", bx, by, 440, 40)
+            luna.gfx.setColor(1, 1, 1); luna.gfx.print("[" .. i .. "] " .. p.name, bx + 15, by + 12)
         end
     end
     -- Game over
     if state == "gameOver" then
-        luna.render.setColor(0, 0, 0, 0.85); luna.render.rectangle("fill", 0, 0, 800, 600)
-        luna.render.setColor(1, 0.2, 0.2); luna.render.print("GAME OVER", 300, 220, 2.5)
-        luna.render.setColor(1, 1, 1); luna.render.print("Score: " .. score .. "  |  Best: " .. bestScore .. "  |  Rooms: " .. roomNum, 240, 310, 1.2)
-        luna.render.print("Press R to restart", 320, 360)
+        luna.gfx.setColor(0, 0, 0, 0.85); luna.gfx.rectangle("fill", 0, 0, 800, 600)
+        luna.gfx.setColor(1, 0.2, 0.2); luna.gfx.print("GAME OVER", 300, 220, 2.5)
+        luna.gfx.setColor(1, 1, 1); luna.gfx.print("Score: " .. score .. "  |  Best: " .. bestScore .. "  |  Rooms: " .. roomNum, 240, 310, 1.2)
+        luna.gfx.print("Press R to restart", 320, 360)
     end
-    luna.render.setColor(0.5, 0.5, 0.5); luna.render.print("FPS: " .. luna.time.getFPS(), 730, 580)
+    luna.gfx.setColor(0.5, 0.5, 0.5); luna.gfx.print("FPS: " .. luna.time.getFPS(), 730, 580)
 end
 
 function luna.keypressed(key)

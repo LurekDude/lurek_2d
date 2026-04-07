@@ -1,4 +1,4 @@
-﻿-- examples/automation.lua
+-- examples/automation.lua
 -- luna.simulator — Scripted input automation / replay system.
 -- Load named automation scripts, play them back step by step, and integrate with
 -- the game loop for deterministic testing or demo playback.
@@ -101,7 +101,7 @@ print(("Step %d / %d  [%s]  elapsed: %.2fs")
 -- ── Typical Usage Inside luna.update ─────────────────────────────────────────
 
 --[[
-function luna.load()
+function luna.init()
     local script = { meta={description="CI smoke test"}, steps={
         { action="wait", time=0.1 },
         { action="keypress",   key="space" },
@@ -112,7 +112,7 @@ function luna.load()
     luna.simulator.start("smoke")
 end
 
-function luna.update(dt)
+function luna.process(dt)
     luna.simulator.update(dt)
     if luna.simulator.isComplete() then
         print("Smoke test passed — quitting")

@@ -1,4 +1,4 @@
-﻿-- Mining Demo: Side-view destructible mining world
+-- Mining Demo: Side-view destructible mining world
 -- WASD to move, click adjacent tiles to mine, L to place ladders
 
 local function clamp(v, mn, mx) return math.max(mn, math.min(mx, v)) end
@@ -46,7 +46,7 @@ local function is_solid(gx, gy)
     return t ~= EMPTY and t ~= LADDER and t ~= SKY
 end
 
-function luna.load()
+function luna.init()
     for y = 1, GRID_H do
         grid[y] = {}
         for x = 1, GRID_W do
@@ -74,7 +74,7 @@ function luna.load()
     set_tile(player.x, SURFACE_Y + 1, EMPTY)
 end
 
-function luna.update(dt)
+function luna.process(dt)
     local px, py = player.x, player.y
     local speed = 8 * dt
 
@@ -180,8 +180,8 @@ function luna.keypressed(key)
     if key == "escape" then luna.signal.quit() end
 end
 
-function luna.draw()
-    luna.render.setBackgroundColor(0.05, 0.05, 0.08)
+function luna.render()
+    luna.gfx.setBackgroundColor(0.05, 0.05, 0.08)
 
     local pgx = math.floor(player.x) + 1
     local pgy = math.floor(player.y) + 1
@@ -198,8 +198,8 @@ function luna.draw()
                 local light = clamp(1.0 - dist / 12, 0.1, 1.0)
                 if t == SKY then light = 1.0 end
                 local c = tile_colors[t]
-                luna.render.setColor(c[1] * light, c[2] * light, c[3] * light, 1)
-                luna.render.rectangle("fill",
+                luna.gfx.setColor(c[1] * light, c[2] * light, c[3] * light, 1)
+                luna.gfx.rectangle("fill",
                     (x - 1) * TILE_SIZE,
                     (y - 1) * TILE_SIZE - camera_y,
                     TILE_SIZE, TILE_SIZE)
@@ -212,23 +212,23 @@ function luna.draw()
         local mx = (mining.tx - 1) * TILE_SIZE
         local my = (mining.ty - 1) * TILE_SIZE - camera_y
         local pct = mining.progress / mining.required
-        luna.render.setColor(1, 1, 0, 0.8)
-        luna.render.rectangle("fill", mx, my - 4, TILE_SIZE * pct, 3)
+        luna.gfx.setColor(1, 1, 0, 0.8)
+        luna.gfx.rectangle("fill", mx, my - 4, TILE_SIZE * pct, 3)
     end
 
     -- Player
     local sx = player.x * TILE_SIZE
     local sy = player.y * TILE_SIZE - camera_y
-    luna.render.setColor(0.2, 0.9, 0.3, 1)
-    luna.render.rectangle("fill", sx, sy, TILE_SIZE, TILE_SIZE)
+    luna.gfx.setColor(0.2, 0.9, 0.3, 1)
+    luna.gfx.rectangle("fill", sx, sy, TILE_SIZE, TILE_SIZE)
 
     -- HUD
-    luna.render.setColor(1, 1, 1, 1)
+    luna.gfx.setColor(1, 1, 1, 1)
     local depth = math.floor(player.y - SURFACE_Y)
     if depth < 0 then depth = 0 end
-    luna.render.print("Depth: " .. depth .. "m", 10, 10)
-    luna.render.print("Dirt:" .. inventory.dirt .. " Stone:" .. inventory.stone ..
+    luna.gfx.print("Depth: " .. depth .. "m", 10, 10)
+    luna.gfx.print("Dirt:" .. inventory.dirt .. " Stone:" .. inventory.stone ..
         " Ore:" .. inventory.ore .. " Gem:" .. inventory.gem, 10, 28)
-    luna.render.print("WASD:move  Click:mine  L:ladder", 10, 46)
-    luna.render.print("FPS: " .. luna.time.getFPS(), 700, 10)
+    luna.gfx.print("WASD:move  Click:mine  L:ladder", 10, 46)
+    luna.gfx.print("FPS: " .. luna.time.getFPS(), 700, 10)
 end

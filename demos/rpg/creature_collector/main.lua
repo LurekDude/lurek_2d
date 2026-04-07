@@ -1,4 +1,4 @@
-﻿-- Creature Collector — Luna2D Demo
+-- Creature Collector — Luna2D Demo
 -- WASD to walk, random encounters, catch creatures
 
 local function clamp(v, mn, mx) return math.max(mn, math.min(mx, v)) end
@@ -95,15 +95,15 @@ local function doAttack(attacker, defender)
     return dmg, mult
 end
 
-function luna.load()
+function luna.init()
     luna.window.setTitle("Creature Collector")
-    luna.render.setBackgroundColor(0.05, 0.08, 0.05)
+    luna.gfx.setBackgroundColor(0.05, 0.08, 0.05)
     genMap()
     -- starter creature
     party[1] = makeCreature(creatureDB[1], 3)
 end
 
-function luna.update(dt)
+function luna.process(dt)
     if state == "overworld" then
         moveCD = moveCD - dt
         if moveCD <= 0 then
@@ -132,97 +132,97 @@ function luna.update(dt)
     end
 end
 
-function luna.draw()
+function luna.render()
     if state == "overworld" then
         -- map
         for y = 1, ROWS do
             for x = 1, COLS do
                 local t = map[y][x]
                 local c = tileColors[t] or tileColors.grass
-                luna.render.setColor(c[1], c[2], c[3], 1)
-                luna.render.rectangle("fill", (x - 1) * TILE, (y - 1) * TILE, TILE - 1, TILE - 1)
+                luna.gfx.setColor(c[1], c[2], c[3], 1)
+                luna.gfx.rectangle("fill", (x - 1) * TILE, (y - 1) * TILE, TILE - 1, TILE - 1)
             end
         end
 
         -- player
-        luna.render.setColor(1, 0.85, 0.2, 1)
-        luna.render.circle("fill", (player.gx - 0.5) * TILE, (player.gy - 0.5) * TILE, 12)
+        luna.gfx.setColor(1, 0.85, 0.2, 1)
+        luna.gfx.circle("fill", (player.gx - 0.5) * TILE, (player.gy - 0.5) * TILE, 12)
 
         -- HUD
-        luna.render.setColor(0, 0, 0, 0.6)
-        luna.render.rectangle("fill", 0, ROWS * TILE, 800, 40)
-        luna.render.setColor(1, 1, 1, 1)
+        luna.gfx.setColor(0, 0, 0, 0.6)
+        luna.gfx.rectangle("fill", 0, ROWS * TILE, 800, 40)
+        luna.gfx.setColor(1, 1, 1, 1)
         local partyStr = "Party: "
         for i, c in ipairs(party) do
             partyStr = partyStr .. c.name .. "(HP:" .. c.hp .. "/" .. c.maxHp .. ") "
         end
-        luna.render.print(partyStr, 10, ROWS * TILE + 5)
-        luna.render.print("Steps to encounter: ~" .. (encounterRate - stepCount), 10, ROWS * TILE + 22)
+        luna.gfx.print(partyStr, 10, ROWS * TILE + 5)
+        luna.gfx.print("Steps to encounter: ~" .. (encounterRate - stepCount), 10, ROWS * TILE + 22)
 
     elseif state == "battle" then
         local active = party[battle.activeIdx]
         local wild = battle.wild
 
         -- background
-        luna.render.setColor(0.1, 0.15, 0.1, 1)
-        luna.render.rectangle("fill", 0, 0, 800, 600)
+        luna.gfx.setColor(0.1, 0.15, 0.1, 1)
+        luna.gfx.rectangle("fill", 0, 0, 800, 600)
 
         -- wild creature (right)
-        luna.render.setColor(wild.color[1], wild.color[2], wild.color[3], 1)
-        luna.render.circle("fill", 580, 180, 45)
-        luna.render.setColor(1, 1, 1, 1)
-        luna.render.print(wild.name .. " Lv" .. wild.level .. " [" .. wild.type .. "]", 500, 100)
+        luna.gfx.setColor(wild.color[1], wild.color[2], wild.color[3], 1)
+        luna.gfx.circle("fill", 580, 180, 45)
+        luna.gfx.setColor(1, 1, 1, 1)
+        luna.gfx.print(wild.name .. " Lv" .. wild.level .. " [" .. wild.type .. "]", 500, 100)
         -- hp bar
-        luna.render.setColor(0.3, 0.3, 0.3, 1)
-        luna.render.rectangle("fill", 500, 130, 160, 12)
+        luna.gfx.setColor(0.3, 0.3, 0.3, 1)
+        luna.gfx.rectangle("fill", 500, 130, 160, 12)
         local whp = clamp(wild.hp / wild.maxHp, 0, 1)
-        luna.render.setColor(1 - whp, whp, 0.1, 1)
-        luna.render.rectangle("fill", 500, 130, 160 * whp, 12)
-        luna.render.setColor(1, 1, 1, 1)
-        luna.render.print(wild.hp .. "/" .. wild.maxHp, 520, 145)
+        luna.gfx.setColor(1 - whp, whp, 0.1, 1)
+        luna.gfx.rectangle("fill", 500, 130, 160 * whp, 12)
+        luna.gfx.setColor(1, 1, 1, 1)
+        luna.gfx.print(wild.hp .. "/" .. wild.maxHp, 520, 145)
 
         -- player creature (left)
         if active then
-            luna.render.setColor(active.color[1], active.color[2], active.color[3], 1)
-            luna.render.circle("fill", 200, 350, 45)
-            luna.render.setColor(1, 1, 1, 1)
-            luna.render.print(active.name .. " Lv" .. active.level .. " [" .. active.type .. "]", 100, 270)
-            luna.render.setColor(0.3, 0.3, 0.3, 1)
-            luna.render.rectangle("fill", 100, 300, 160, 12)
+            luna.gfx.setColor(active.color[1], active.color[2], active.color[3], 1)
+            luna.gfx.circle("fill", 200, 350, 45)
+            luna.gfx.setColor(1, 1, 1, 1)
+            luna.gfx.print(active.name .. " Lv" .. active.level .. " [" .. active.type .. "]", 100, 270)
+            luna.gfx.setColor(0.3, 0.3, 0.3, 1)
+            luna.gfx.rectangle("fill", 100, 300, 160, 12)
             local php = clamp(active.hp / active.maxHp, 0, 1)
-            luna.render.setColor(1 - php, php, 0.1, 1)
-            luna.render.rectangle("fill", 100, 300, 160 * php, 12)
-            luna.render.setColor(1, 1, 1, 1)
-            luna.render.print(active.hp .. "/" .. active.maxHp, 120, 315)
+            luna.gfx.setColor(1 - php, php, 0.1, 1)
+            luna.gfx.rectangle("fill", 100, 300, 160 * php, 12)
+            luna.gfx.setColor(1, 1, 1, 1)
+            luna.gfx.print(active.hp .. "/" .. active.maxHp, 120, 315)
         end
 
         -- battle log
-        luna.render.setColor(0, 0, 0, 0.7)
-        luna.render.rectangle("fill", 20, 440, 760, 50)
-        luna.render.setColor(1, 1, 0.7, 1)
-        luna.render.print(battleLog, 30, 450)
+        luna.gfx.setColor(0, 0, 0, 0.7)
+        luna.gfx.rectangle("fill", 20, 440, 760, 50)
+        luna.gfx.setColor(1, 1, 0.7, 1)
+        luna.gfx.print(battleLog, 30, 450)
 
         -- menu
         if battle.turn == "player" then
             local opts = { "Attack", "Capture", "Run" }
-            luna.render.setColor(0, 0, 0, 0.8)
-            luna.render.rectangle("fill", 20, 500, 760, 90)
+            luna.gfx.setColor(0, 0, 0, 0.8)
+            luna.gfx.rectangle("fill", 20, 500, 760, 90)
             for i, opt in ipairs(opts) do
                 if i == battleChoice then
-                    luna.render.setColor(1, 1, 0.3, 1)
-                    luna.render.print("> " .. opt, 30 + (i - 1) * 200, 530)
+                    luna.gfx.setColor(1, 1, 0.3, 1)
+                    luna.gfx.print("> " .. opt, 30 + (i - 1) * 200, 530)
                 else
-                    luna.render.setColor(0.7, 0.7, 0.7, 1)
-                    luna.render.print("  " .. opt, 30 + (i - 1) * 200, 530)
+                    luna.gfx.setColor(0.7, 0.7, 0.7, 1)
+                    luna.gfx.print("  " .. opt, 30 + (i - 1) * 200, 530)
                 end
             end
         elseif battle.turn == "result" then
-            luna.render.setColor(0, 0, 0, 0.8)
-            luna.render.rectangle("fill", 20, 500, 760, 90)
-            luna.render.setColor(0.3, 1, 0.5, 1)
-            luna.render.print(battle.result, 30, 520)
-            luna.render.setColor(0.7, 0.7, 0.7, 1)
-            luna.render.print("Press SPACE to continue", 30, 550)
+            luna.gfx.setColor(0, 0, 0, 0.8)
+            luna.gfx.rectangle("fill", 20, 500, 760, 90)
+            luna.gfx.setColor(0.3, 1, 0.5, 1)
+            luna.gfx.print(battle.result, 30, 520)
+            luna.gfx.setColor(0.7, 0.7, 0.7, 1)
+            luna.gfx.print("Press SPACE to continue", 30, 550)
         end
     end
 end

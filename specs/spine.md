@@ -169,7 +169,7 @@ The `opts` table for `addBone`/`addChildBone` accepts: `x`, `y`, `rotation`, `sc
 
 ```lua
 -- Build a simple character skeleton and query world positions
-function luna.load()
+function luna.init()
     skeleton = luna.spine.newSkeleton("character")
 
     -- Root bone at (100, 200)
@@ -193,7 +193,7 @@ function luna.load()
     end
 end
 
-function luna.update(dt)
+function luna.process(dt)
     -- Move skeleton and re-propagate
     skeleton:setPosition(150, 250)
 end

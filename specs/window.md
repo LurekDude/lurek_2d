@@ -132,7 +132,7 @@ Exposed under `luna.window.*` by `src/lua_api/window_api.rs`. The API provides 3
 
 ```lua
 -- Query window dimensions and set title
-function luna.load()
+function luna.init()
     local w, h = luna.window.getDimensions()
     luna.window.setTitle("My Game — " .. w .. "×" .. h)
 end
@@ -146,7 +146,7 @@ function luna.keypressed(key)
 end
 
 -- Set a combined window mode with flags
-function luna.load()
+function luna.init()
     luna.window.setMode(1280, 720, {
         fullscreen = false,
         fullscreentype = "desktop",
@@ -155,7 +155,7 @@ function luna.load()
 end
 
 -- Viewport scaling: letterbox with fixed game resolution
-function luna.load()
+function luna.init()
     luna.window.setScaleMode("letterbox")
     local gw = luna.window.getGameWidth()
     local gh = luna.window.getGameHeight()
@@ -163,14 +163,14 @@ function luna.load()
 end
 
 -- DPI-aware coordinate conversion
-function luna.draw()
+function luna.render()
     local px = luna.window.toPixels(100)
     local dp = luna.window.fromPixels(px)
     -- px == 200 on a 2× HiDPI display, dp == 100
 end
 
 -- Platform-native message box
-function luna.quit()
+function luna.exit()
     local btn = luna.window.showMessageBox(
         "Quit?", "Save before exiting?", "warning", "yesno"
     )

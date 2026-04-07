@@ -1,4 +1,4 @@
-﻿# Object Pool
+# Object Pool
 
 Pre-allocated tables for bullets, particles, and enemies. Acquire/release pattern with resize policy.
 
@@ -80,7 +80,7 @@ end
 
 local function draw_bullets()
     for_each_active(bullet_pool, function(b)
-        luna.render.rectangle("fill", b.x - 2, b.y - 2, 4, 4)
+        luna.gfx.rectangle("fill", b.x - 2, b.y - 2, 4, 4)
     end)
 end
 ```
@@ -107,12 +107,12 @@ end
 local function draw_pool_debug(pool, name, x, y)
     local pct = pool.active_count / pool.size
     local color = pct > 0.9 and {1,0,0} or (pct > 0.7 and {1,1,0} or {0,1,0})
-    luna.render.setColor(color[1], color[2], color[3], 1)
-    luna.render.print(
+    luna.gfx.setColor(color[1], color[2], color[3], 1)
+    luna.gfx.print(
         name .. ": " .. pool.active_count .. "/" .. pool.size,
         x, y
     )
-    luna.render.setColor(1, 1, 1, 1)
+    luna.gfx.setColor(1, 1, 1, 1)
 end
 ```
 

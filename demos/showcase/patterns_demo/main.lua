@@ -1,8 +1,8 @@
-﻿-- Module availability guard (added by fix_nil_module_demos.py)
+-- Module availability guard (added by fix_nil_module_demos.py)
 if not luna.patterns then
-    function luna.load()
-        luna.render.setBackgroundColor(0.08, 0.08, 0.12)
-        luna.render.print("luna.patterns is not available in this build", 180, 270)
+    function luna.init()
+        luna.gfx.setBackgroundColor(0.08, 0.08, 0.12)
+        luna.gfx.print("luna.patterns is not available in this build", 180, 270)
     end
     return
 end
@@ -72,31 +72,31 @@ fsm:addState("gameover", {
 -- ===================================================================
 local x = 100
 
-function luna.load()
+function luna.init()
     luna.window.setTitle("Patterns Demo")
     fsm:transitionTo("menu")
 end
 
-function luna.update(dt)
+function luna.process(dt)
     fsm:update(dt)
 end
 
-function luna.draw()
-    luna.render.setColor(1, 1, 1)
-    luna.render.print("Patterns Demo", 20, 20)
-    luna.render.print("State: " .. (fsm:getCurrent() or "none"), 20, 40)
-    luna.render.print("[1] Spawn enemy  [2] Acquire bullet  [3] Move +10", 20, 60)
-    luna.render.print("[U] Undo  [R] Redo  [SPACE] Toggle play/menu  [G] Game over", 20, 78)
+function luna.render()
+    luna.gfx.setColor(1, 1, 1)
+    luna.gfx.print("Patterns Demo", 20, 20)
+    luna.gfx.print("State: " .. (fsm:getCurrent() or "none"), 20, 40)
+    luna.gfx.print("[1] Spawn enemy  [2] Acquire bullet  [3] Move +10", 20, 60)
+    luna.gfx.print("[U] Undo  [R] Redo  [SPACE] Toggle play/menu  [G] Game over", 20, 78)
 
     local score = loc:locate("score")
-    luna.render.print("Score: " .. (score and score.value or 0), 20, 100)
-    luna.render.print("x = " .. x, 200, 100)
-    luna.render.print("Pool: " .. pool:getAvailableCount() .. " avail / " .. pool:getActiveCount() .. " active", 20, 118)
-    luna.render.print("History: " .. cmds:getHistorySize() .. " cmds", 300, 118)
+    luna.gfx.print("Score: " .. (score and score.value or 0), 20, 100)
+    luna.gfx.print("x = " .. x, 200, 100)
+    luna.gfx.print("Pool: " .. pool:getAvailableCount() .. " avail / " .. pool:getActiveCount() .. " active", 20, 118)
+    luna.gfx.print("History: " .. cmds:getHistorySize() .. " cmds", 300, 118)
 
-    luna.render.setColor(0.7, 0.85, 1)
+    luna.gfx.setColor(0.7, 0.85, 1)
     for i, msg in ipairs(log) do
-        luna.render.print(msg, 30, 140 + (i - 1) * 18)
+        luna.gfx.print(msg, 30, 140 + (i - 1) * 18)
     end
 end
 

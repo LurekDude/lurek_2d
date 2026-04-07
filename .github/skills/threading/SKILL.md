@@ -1,4 +1,4 @@
-﻿---
+---
 name: threading
 description: "Load this skill when designing or implementing multi-threaded Lua behaviour in Luna2D using the luna.thread API: spawning worker threads, using Channel for inter-VM communication, handling errors in background threads, or understanding which luna.* modules are safe to use in worker VMs. Use for: background computation, async file I/O in workers, producer-consumer patterns, parallel data processing. Skip it for Rust-side thread management internals (see src/thread/AGENT.md), or for general game scripting (use lua-scripting)."
 ---
@@ -41,7 +41,7 @@ Worker Thread N
 └── Channel ◄────────► Main Thread Channel
 ```
 
-**Key consequence**: The main thread is the only thread that can call `luna.render.*`, `luna.audio.*`, `luna.physics.*`, and `luna.input.*`. Workers send results back via `Channel` and the main thread applies them.
+**Key consequence**: The main thread is the only thread that can call `luna.gfx.*`, `luna.audio.*`, `luna.physics.*`, and `luna.input.*`. Workers send results back via `Channel` and the main thread applies them.
 
 ---
 
@@ -131,7 +131,7 @@ Worker threads get an isolated VM with only these `luna.*` modules available:
 | `luna.time` | ✅ Read-only | `luna.time.getTime()`, `luna.time.getDelta()` |
 | `luna.fs` | ✅ Read-only | File reads only; no write |
 | `luna.platform` | ✅ Read-only | OS info, `getProcessorCount()` |
-| `luna.render` | ❌ | GPU resources are main-thread only |
+| `luna.gfx` | ❌ | GPU resources are main-thread only |
 | `luna.audio` | ❌ | Audio is main-thread only |
 | `luna.physics` | ❌ | Physics world is main-thread only |
 | `luna.input` | ❌ | Input state is main-thread only |
@@ -169,7 +169,7 @@ end
 
 ```lua
 -- Main thread checks error channel each frame:
-function luna.update(dt)
+function luna.process(dt)
     local err = errors:pop()
     if err then
         print("Background error: " .. err)
@@ -202,7 +202,7 @@ worker:start(queue, results)
 queue:push(42)
 
 -- Main thread: collect results each frame (non-blocking)
-function luna.update(dt)
+function luna.process(dt)
     local result = results:pop()
     if result then applyResult(result) end
 end

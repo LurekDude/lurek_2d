@@ -1,4 +1,4 @@
-﻿-- Strategic Deckbuilder (Slay the Spire style)
+-- Strategic Deckbuilder (Slay the Spire style)
 -- Turn-based combat with cards. Click cards to play them.
 -- 3 floors with different monsters, card rewards between fights.
 
@@ -101,7 +101,7 @@ local function spawn_hit_particles(x, y, r, g, b)
     end
 end
 
-function luna.load()
+function luna.init()
     player = { hp = 50, max_hp = 50, block = 0 }
     deck = {}
     -- starter deck: 5 strikes, 4 defends, 1 bash
@@ -198,7 +198,7 @@ local function enemy_turn()
     start_player_turn()
 end
 
-function luna.update(dt)
+function luna.process(dt)
     -- particles
     local dead = {}
     for i, p in ipairs(particles) do
@@ -274,13 +274,13 @@ function luna.keypressed(key)
 end
 
 local function draw_health_bar(x, y, w, h, hp, max_hp, r, g, b)
-    luna.render.setColor(0.2, 0.2, 0.2, 0.8)
-    luna.render.rectangle("fill", x, y, w, h)
+    luna.gfx.setColor(0.2, 0.2, 0.2, 0.8)
+    luna.gfx.rectangle("fill", x, y, w, h)
     local frac = clamp(hp / max_hp, 0, 1)
-    luna.render.setColor(r, g, b, 1)
-    luna.render.rectangle("fill", x + 1, y + 1, (w - 2) * frac, h - 2)
-    luna.render.setColor(1, 1, 1, 1)
-    luna.render.print(hp .. "/" .. max_hp, x + w / 2 - 15, y + 1)
+    luna.gfx.setColor(r, g, b, 1)
+    luna.gfx.rectangle("fill", x + 1, y + 1, (w - 2) * frac, h - 2)
+    luna.gfx.setColor(1, 1, 1, 1)
+    luna.gfx.print(hp .. "/" .. max_hp, x + w / 2 - 15, y + 1)
 end
 
 local function card_color(card)
@@ -290,23 +290,23 @@ local function card_color(card)
     return 0.5, 0.5, 0.5
 end
 
-function luna.draw()
-    luna.render.setBackgroundColor(0.1, 0.08, 0.12)
+function luna.render()
+    luna.gfx.setBackgroundColor(0.1, 0.08, 0.12)
 
     if state.phase == "combat" or state.phase == "gameover" or state.phase == "victory" then
         -- floor label
-        luna.render.setColor(0.5, 0.5, 0.6, 1)
-        luna.render.print("Floor " .. state.floor .. "/" .. state.total_floors, W / 2 - 30, 10)
+        luna.gfx.setColor(0.5, 0.5, 0.6, 1)
+        luna.gfx.print("Floor " .. state.floor .. "/" .. state.total_floors, W / 2 - 30, 10)
 
         -- player
-        luna.render.setColor(0.3, 0.6, 0.9, 1)
-        luna.render.rectangle("fill", 140, 240, 80, 100)
-        luna.render.setColor(1, 1, 1, 1)
-        luna.render.print("You", 160, 220)
+        luna.gfx.setColor(0.3, 0.6, 0.9, 1)
+        luna.gfx.rectangle("fill", 140, 240, 80, 100)
+        luna.gfx.setColor(1, 1, 1, 1)
+        luna.gfx.print("You", 160, 220)
         draw_health_bar(120, 350, 120, 16, player.hp, player.max_hp, 0.8, 0.2, 0.2)
         if player.block > 0 then
-            luna.render.setColor(0.3, 0.5, 1, 1)
-            luna.render.print("Block: " .. player.block, 140, 370)
+            luna.gfx.setColor(0.3, 0.5, 1, 1)
+            luna.gfx.print("Block: " .. player.block, 140, 370)
         end
 
         -- monster
@@ -314,31 +314,31 @@ function luna.draw()
             local mr = 0.7
             local mg = 0.2
             if monster.vuln > 0 then mr = 1; mg = 0.5 end
-            luna.render.setColor(mr, mg, 0.2, 1)
+            luna.gfx.setColor(mr, mg, 0.2, 1)
             local mw = 80 + state.floor * 10
             local mh = 90 + state.floor * 10
-            luna.render.rectangle("fill", 550 - mw / 2, 280 - mh / 2, mw, mh)
-            luna.render.setColor(1, 1, 1, 1)
-            luna.render.print(monster.name, 530, 200)
+            luna.gfx.rectangle("fill", 550 - mw / 2, 280 - mh / 2, mw, mh)
+            luna.gfx.setColor(1, 1, 1, 1)
+            luna.gfx.print(monster.name, 530, 200)
             draw_health_bar(490, 350, 120, 16, monster.hp, monster.max_hp, 0.8, 0.2, 0.2)
             -- intent
-            luna.render.setColor(1, 0.4, 0.4, 0.8)
-            luna.render.print("Intent: " .. monster.atk .. " dmg", 500, 370)
+            luna.gfx.setColor(1, 0.4, 0.4, 0.8)
+            luna.gfx.print("Intent: " .. monster.atk .. " dmg", 500, 370)
             if monster.vuln > 0 then
-                luna.render.setColor(1, 0.6, 0, 1)
-                luna.render.print("Vulnerable (" .. monster.vuln .. ")", 500, 385)
+                luna.gfx.setColor(1, 0.6, 0, 1)
+                luna.gfx.print("Vulnerable (" .. monster.vuln .. ")", 500, 385)
             end
             if monster.block > 0 then
-                luna.render.setColor(0.3, 0.5, 1, 1)
-                luna.render.print("Block: " .. monster.block, 510, 400)
+                luna.gfx.setColor(0.3, 0.5, 1, 1)
+                luna.gfx.print("Block: " .. monster.block, 510, 400)
             end
         end
 
         -- energy
-        luna.render.setColor(1, 0.9, 0.2, 1)
-        luna.render.circle("fill", 40, H - 80, 22)
-        luna.render.setColor(0.2, 0.15, 0, 1)
-        luna.render.print(state.energy .. "/3", 28, H - 88)
+        luna.gfx.setColor(1, 0.9, 0.2, 1)
+        luna.gfx.circle("fill", 40, H - 80, 22)
+        luna.gfx.setColor(0.2, 0.15, 0, 1)
+        luna.gfx.print(state.energy .. "/3", 28, H - 88)
 
         -- draw hand
         local card_w = 90
@@ -355,39 +355,39 @@ function luna.draw()
             local cr, cg, cb = card_color(card)
             local playable = card.cost <= state.energy
             if not playable then cr = cr * 0.4; cg = cg * 0.4; cb = cb * 0.4 end
-            luna.render.setColor(cr, cg, cb, 0.9)
-            luna.render.rectangle("fill", cx, cy, card_w, card_h)
-            luna.render.setColor(1, 1, 1, 0.3)
-            luna.render.rectangle("line", cx, cy, card_w, card_h)
+            luna.gfx.setColor(cr, cg, cb, 0.9)
+            luna.gfx.rectangle("fill", cx, cy, card_w, card_h)
+            luna.gfx.setColor(1, 1, 1, 0.3)
+            luna.gfx.rectangle("line", cx, cy, card_w, card_h)
 
-            luna.render.setColor(1, 1, 1, 1)
-            luna.render.print(card.name, cx + 5, cy + 5)
-            luna.render.setColor(1, 0.9, 0.2, 1)
-            luna.render.print(card.cost .. "E", cx + card_w - 20, cy + 5)
-            luna.render.setColor(0.85, 0.85, 0.85, 0.9)
-            luna.render.print(card.desc, cx + 5, cy + 30, 0.7)
+            luna.gfx.setColor(1, 1, 1, 1)
+            luna.gfx.print(card.name, cx + 5, cy + 5)
+            luna.gfx.setColor(1, 0.9, 0.2, 1)
+            luna.gfx.print(card.cost .. "E", cx + card_w - 20, cy + 5)
+            luna.gfx.setColor(0.85, 0.85, 0.85, 0.9)
+            luna.gfx.print(card.desc, cx + 5, cy + 30, 0.7)
             -- key hint
-            luna.render.setColor(0.7, 0.7, 0.7, 0.5)
-            luna.render.print("[" .. i .. "]", cx + card_w / 2 - 6, cy + card_h - 18)
+            luna.gfx.setColor(0.7, 0.7, 0.7, 0.5)
+            luna.gfx.print("[" .. i .. "]", cx + card_w / 2 - 6, cy + card_h - 18)
         end
 
         -- pile info
-        luna.render.setColor(0.6, 0.6, 0.6, 0.8)
-        luna.render.print("Draw: " .. #draw_pile, 10, H - 20)
-        luna.render.print("Discard: " .. #discard, 10, H - 40)
-        luna.render.print("Deck: " .. #deck, 10, H - 60)
+        luna.gfx.setColor(0.6, 0.6, 0.6, 0.8)
+        luna.gfx.print("Draw: " .. #draw_pile, 10, H - 20)
+        luna.gfx.print("Discard: " .. #discard, 10, H - 40)
+        luna.gfx.print("Deck: " .. #deck, 10, H - 60)
 
         -- end turn hint
         if state.turn == "player" and state.phase == "combat" then
-            luna.render.setColor(0.8, 0.8, 0.3, 0.7)
-            luna.render.print("[E] End Turn", W - 100, H - 80)
+            luna.gfx.setColor(0.8, 0.8, 0.3, 0.7)
+            luna.gfx.print("[E] End Turn", W - 100, H - 80)
         end
     end
 
     -- reward phase
     if state.phase == "reward" then
-        luna.render.setColor(1, 1, 0.5, 1)
-        luna.render.print("Victory! Choose a card to add:", W / 2 - 110, 60, 1.2)
+        luna.gfx.setColor(1, 1, 0.5, 1)
+        luna.gfx.print("Victory! Choose a card to add:", W / 2 - 110, 60, 1.2)
 
         local rw = 110
         local rh = 150
@@ -401,51 +401,51 @@ function luna.draw()
             if hovered then cy = cy - 8 end
 
             local cr, cg, cb = card_color(card)
-            luna.render.setColor(cr, cg, cb, 0.95)
-            luna.render.rectangle("fill", cx, cy, rw, rh)
-            luna.render.setColor(1, 1, 1, 0.4)
-            luna.render.rectangle("line", cx, cy, rw, rh)
-            luna.render.setColor(1, 1, 1, 1)
-            luna.render.print(card.name, cx + 8, cy + 10, 1.1)
-            luna.render.setColor(1, 0.9, 0.2, 1)
-            luna.render.print(card.cost .. " energy", cx + 8, cy + 35)
-            luna.render.setColor(0.9, 0.9, 0.9, 0.9)
-            luna.render.print(card.desc, cx + 8, cy + 60, 0.7)
+            luna.gfx.setColor(cr, cg, cb, 0.95)
+            luna.gfx.rectangle("fill", cx, cy, rw, rh)
+            luna.gfx.setColor(1, 1, 1, 0.4)
+            luna.gfx.rectangle("line", cx, cy, rw, rh)
+            luna.gfx.setColor(1, 1, 1, 1)
+            luna.gfx.print(card.name, cx + 8, cy + 10, 1.1)
+            luna.gfx.setColor(1, 0.9, 0.2, 1)
+            luna.gfx.print(card.cost .. " energy", cx + 8, cy + 35)
+            luna.gfx.setColor(0.9, 0.9, 0.9, 0.9)
+            luna.gfx.print(card.desc, cx + 8, cy + 60, 0.7)
         end
     end
 
     -- particles
     for _, p in ipairs(particles) do
         local a = clamp(p.life * 3, 0, 1)
-        luna.render.setColor(p.r, p.g, p.b, a)
-        luna.render.circle("fill", p.x, p.y, 3)
+        luna.gfx.setColor(p.r, p.g, p.b, a)
+        luna.gfx.circle("fill", p.x, p.y, 3)
     end
 
     -- log
     for i, m in ipairs(log_messages) do
         local a = clamp(m.timer, 0, 1)
-        luna.render.setColor(1, 1, 0.8, a)
-        luna.render.print(m.text, W - 250, 10 + (i - 1) * 18, 0.8)
+        luna.gfx.setColor(1, 1, 0.8, a)
+        luna.gfx.print(m.text, W - 250, 10 + (i - 1) * 18, 0.8)
     end
 
     -- game over / victory
     if state.phase == "gameover" then
-        luna.render.setColor(0, 0, 0, 0.6)
-        luna.render.rectangle("fill", 0, H / 2 - 40, W, 80)
-        luna.render.setColor(1, 0.2, 0.2, 1)
-        luna.render.print("DEFEATED", W / 2 - 60, H / 2 - 20, 2)
-        luna.render.setColor(1, 1, 1, 1)
-        luna.render.print("R to restart", W / 2 - 30, H / 2 + 20)
+        luna.gfx.setColor(0, 0, 0, 0.6)
+        luna.gfx.rectangle("fill", 0, H / 2 - 40, W, 80)
+        luna.gfx.setColor(1, 0.2, 0.2, 1)
+        luna.gfx.print("DEFEATED", W / 2 - 60, H / 2 - 20, 2)
+        luna.gfx.setColor(1, 1, 1, 1)
+        luna.gfx.print("R to restart", W / 2 - 30, H / 2 + 20)
     end
     if state.phase == "victory" then
-        luna.render.setColor(0, 0, 0, 0.6)
-        luna.render.rectangle("fill", 0, H / 2 - 40, W, 80)
-        luna.render.setColor(0.3, 1, 0.3, 1)
-        luna.render.print("VICTORY!", W / 2 - 60, H / 2 - 20, 2)
-        luna.render.setColor(1, 1, 1, 1)
-        luna.render.print("HP remaining: " .. player.hp .. "  |  R to replay", W / 2 - 90, H / 2 + 20)
+        luna.gfx.setColor(0, 0, 0, 0.6)
+        luna.gfx.rectangle("fill", 0, H / 2 - 40, W, 80)
+        luna.gfx.setColor(0.3, 1, 0.3, 1)
+        luna.gfx.print("VICTORY!", W / 2 - 60, H / 2 - 20, 2)
+        luna.gfx.setColor(1, 1, 1, 1)
+        luna.gfx.print("HP remaining: " .. player.hp .. "  |  R to replay", W / 2 - 90, H / 2 + 20)
     end
 
-    luna.render.setColor(0.5, 0.5, 0.5, 0.4)
-    luna.render.print("FPS: " .. luna.time.getFPS(), W - 70, H - 15)
+    luna.gfx.setColor(0.5, 0.5, 0.5, 0.4)
+    luna.gfx.print("FPS: " .. luna.time.getFPS(), W - 70, H - 15)
 end

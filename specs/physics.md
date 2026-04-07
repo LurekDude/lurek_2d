@@ -1,4 +1,4 @@
-﻿# `physics` — Agent Reference
+# `physics` — Agent Reference
 
 | Property       | Value                                                |
 |----------------|------------------------------------------------------|
@@ -286,7 +286,7 @@ Exposed under `luna.physics.*` by `src/lua_api/physics_api.rs`. The API provides
 ## Lua Examples
 
 ```lua
-function luna.load()
+function luna.init()
     -- Create a world with downward gravity
     world = luna.physics.newWorld(0, 9.81)
 
@@ -307,7 +307,7 @@ function luna.load()
     trigger = world:newBody(600, 300, "sensor")
 end
 
-function luna.update(dt)
+function luna.process(dt)
     world:step(dt)
 
     -- Read ball state
@@ -334,21 +334,21 @@ function luna.update(dt)
     end
 end
 
-function luna.draw()
+function luna.render()
     -- Draw ball
     local bx, by = ball:getPosition()
-    luna.render.circle("fill", bx, by, 20)
+    luna.gfx.circle("fill", bx, by, 20)
 
     -- Draw ground
     local gx, gy = ground:getPosition()
-    luna.render.rectangle("fill", gx - 400, gy - 10, 800, 20)
+    luna.gfx.rectangle("fill", gx - 400, gy - 10, 800, 20)
 end
 ```
 
 ### Joints example
 
 ```lua
-function luna.load()
+function luna.init()
     world = luna.physics.newWorld(0, 9.81)
 
     -- Two bodies connected by a revolute joint
@@ -366,7 +366,7 @@ function luna.load()
     mouseJoint = world:addMouseJoint(draggable:getId(), 500, 300, 1000)
 end
 
-function luna.update(dt)
+function luna.process(dt)
     -- Update mouse joint target to cursor position
     local mx, my = luna.mouse.getPosition()
     world:setMouseJointTarget(mouseJoint, mx, my)

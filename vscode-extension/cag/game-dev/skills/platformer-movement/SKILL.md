@@ -34,7 +34,7 @@ local player = { x = 100, y = 100, vx = 0, vy = 0, grounded = false }
 local coyote_timer = 0
 local jump_buffer  = 0
 
-function luna.update(dt)
+function luna.process(dt)
     -- Horizontal acceleration
     local ix = 0
     if luna.keyboard.isDown("left")  then ix = ix - 1 end

@@ -1,4 +1,4 @@
-﻿# Game-Dev CAG Layer Analysis
+# Game-Dev CAG Layer Analysis
 
 ## Current State
 
@@ -41,7 +41,7 @@ The doc specifies a **game developer-facing CAG layer** (separate from the engin
 - `lua-scripter` should know about luna.signal, luna.time, luna.entity
 - `level-designer` should know about luna.tilemap, luna.scene, luna.physics
 - `audio-designer` should know about luna.audio.* API
-- `visual-artist` should know about luna.render, luna.particles, luna.tween
+- `visual-artist` should know about luna.gfx, luna.particles, luna.animation
 - Include API examples in agent system prompts
 
 ### 2. Template Quality Assessment
@@ -61,7 +61,7 @@ The doc specifies a **game developer-facing CAG layer** (separate from the engin
 | arcade | high score + lives | Should demonstrate luna.data |
 | tower-defense | pathfinding + entities | Should use luna.pathfinding |
 | game-jam | fast scaffold | Should be minimal + timer |
-| demo-scene | graphics showcase | Should use multiple luna.render calls |
+| demo-scene | graphics showcase | Should use multiple luna.gfx calls |
 
 **Action**: Verify each template actually uses the relevant luna.* APIs and library/ modules.
 
@@ -118,11 +118,11 @@ The doc specifies a **game developer-facing CAG layer** (separate from the engin
 **Current**: `luna.cag.deploy` copies CAG files to the game project.
 
 **Improvements**:
-- Version the CAG files — track which version was deployed
+- Version the CAG files � track which version was deployed
 - Diff before deploying (show what changed since last deploy)
-- Selective deploy — choose which agents/skills to install
-- Auto-update check — notify when new CAG content is available
-- Dry-run mode — show what would be copied without actually copying
+- Selective deploy � choose which agents/skills to install
+- Auto-update check � notify when new CAG content is available
+- Dry-run mode � show what would be copied without actually copying
 
 ### 7. Template Live Preview
 

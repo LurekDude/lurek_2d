@@ -1,14 +1,14 @@
-﻿# Hello World
+# Hello World
 
 The minimum viable Luna2D game. Draws coloured shapes and text, shows FPS, and demonstrates the basic `luna.load / update / draw / keypressed` callback structure.
 
 ## What It Demonstrates
 
-- `luna.render.rectangle()` — filled rectangle
-- `luna.render.circle()` — filled circle
-- `luna.render.line()` — line primitive
-- `luna.render.print()` — text rendering with scale
-- `luna.render.setColor()` / `setBackgroundColor()`
+- `luna.gfx.rectangle()` — filled rectangle
+- `luna.gfx.circle()` — filled circle
+- `luna.gfx.line()` — line primitive
+- `luna.gfx.print()` — text rendering with scale
+- `luna.gfx.setColor()` / `setBackgroundColor()`
 - `luna.time.getFPS()` — frame rate query
 - `luna.keypressed` callback — reacting to input
 

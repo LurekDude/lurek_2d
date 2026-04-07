@@ -1,4 +1,4 @@
-﻿-- Culinary / Cooking Simulation Demo
+-- Culinary / Cooking Simulation Demo
 -- Pick up ingredients, chop/cook them, assemble orders for customers
 
 local function clamp(v, mn, mx) return math.max(mn, math.min(mx, v)) end
@@ -138,13 +138,13 @@ local function interact()
     end
 end
 
-function luna.load()
-    luna.render.setBackgroundColor(0.2, 0.18, 0.15)
+function luna.init()
+    luna.gfx.setBackgroundColor(0.2, 0.18, 0.15)
     newOrder()
     newOrder()
 end
 
-function luna.update(dt)
+function luna.process(dt)
     -- Chef movement
     local dx, dy = 0, 0
     if luna.keyboard.isDown("w") or luna.keyboard.isDown("up") then dy = -1 end
@@ -209,28 +209,28 @@ local function drawStation(s)
         serve = {0.2, 0.7, 0.3},
     }
     local c = colors[s.type]
-    luna.render.setColor(c[1], c[2], c[3], 1)
-    luna.render.rectangle("fill", s.x, s.y, s.w, s.h)
-    luna.render.setColor(1, 1, 1, 1)
-    luna.render.rectangle("line", s.x, s.y, s.w, s.h)
-    luna.render.print(s.label, s.x + 5, s.y + s.h + 4, 0.8)
+    luna.gfx.setColor(c[1], c[2], c[3], 1)
+    luna.gfx.rectangle("fill", s.x, s.y, s.w, s.h)
+    luna.gfx.setColor(1, 1, 1, 1)
+    luna.gfx.rectangle("line", s.x, s.y, s.w, s.h)
+    luna.gfx.print(s.label, s.x + 5, s.y + s.h + 4, 0.8)
 end
 
-function luna.draw()
+function luna.render()
     -- Draw stations
     for _, s in ipairs(stations) do drawStation(s) end
 
     -- Shelf ingredient list
-    luna.render.setColor(1, 1, 1, 1)
-    luna.render.print("Ingredients (1-" .. #INGREDIENTS .. "):", 10, 220, 0.8)
+    luna.gfx.setColor(1, 1, 1, 1)
+    luna.gfx.print("Ingredients (1-" .. #INGREDIENTS .. "):", 10, 220, 0.8)
     for i, name in ipairs(INGREDIENTS) do
         local c = INGR_COLORS[name]
         if i == shelfSelect then
-            luna.render.setColor(1, 1, 0, 1)
-            luna.render.print("> ", 10, 240 + (i - 1) * 18, 0.8)
+            luna.gfx.setColor(1, 1, 0, 1)
+            luna.gfx.print("> ", 10, 240 + (i - 1) * 18, 0.8)
         end
-        luna.render.setColor(c[1], c[2], c[3], 1)
-        luna.render.print(i .. ". " .. name, 25, 240 + (i - 1) * 18, 0.8)
+        luna.gfx.setColor(c[1], c[2], c[3], 1)
+        luna.gfx.print(i .. ". " .. name, 25, 240 + (i - 1) * 18, 0.8)
     end
 
     -- Stove item
@@ -238,75 +238,75 @@ function luna.draw()
         local sx = stations[3].x + 10
         local sy = stations[3].y + 10
         local c = INGR_COLORS[stoveItem.name] or {1, 1, 1}
-        luna.render.setColor(c[1], c[2], c[3], 1)
-        luna.render.circle("fill", sx + 20, sy + 15, 12)
-        luna.render.setColor(1, 1, 1, 1)
+        luna.gfx.setColor(c[1], c[2], c[3], 1)
+        luna.gfx.circle("fill", sx + 20, sy + 15, 12)
+        luna.gfx.setColor(1, 1, 1, 1)
         local pct = clamp(stoveTimer / COOK_TIME, 0, 1)
-        luna.render.rectangle("fill", sx, sy + 35, pct * 60, 6)
+        luna.gfx.rectangle("fill", sx, sy + 35, pct * 60, 6)
         if stoveItem.state == "burnt" then
-            luna.render.setColor(1, 0, 0, 1)
-            luna.render.print("BURNT!", sx, sy + 44, 0.7)
+            luna.gfx.setColor(1, 0, 0, 1)
+            luna.gfx.print("BURNT!", sx, sy + 44, 0.7)
         elseif stoveItem.state == "cooked" then
-            luna.render.setColor(0, 1, 0, 1)
-            luna.render.print("DONE!", sx, sy + 44, 0.7)
+            luna.gfx.setColor(0, 1, 0, 1)
+            luna.gfx.print("DONE!", sx, sy + 44, 0.7)
         end
     end
 
     -- Chop progress
     if chopProgress > 0 then
         local cx = stations[2].x
-        luna.render.setColor(0, 1, 0, 1)
-        luna.render.rectangle("fill", cx, stations[2].y - 10, chopProgress * 80, 6)
+        luna.gfx.setColor(0, 1, 0, 1)
+        luna.gfx.rectangle("fill", cx, stations[2].y - 10, chopProgress * 80, 6)
     end
 
     -- Plate contents
-    luna.render.setColor(1, 1, 1, 1)
-    luna.render.print("Plate:", stations[4].x, stations[4].y + stations[4].h + 20, 0.7)
+    luna.gfx.setColor(1, 1, 1, 1)
+    luna.gfx.print("Plate:", stations[4].x, stations[4].y + stations[4].h + 20, 0.7)
     for i, item in ipairs(plate) do
-        luna.render.print("- " .. item, stations[4].x, stations[4].y + stations[4].h + 35 + (i - 1) * 14, 0.65)
+        luna.gfx.print("- " .. item, stations[4].x, stations[4].y + stations[4].h + 35 + (i - 1) * 14, 0.65)
     end
 
     -- Chef
-    luna.render.setColor(1, 0.9, 0.7, 1)
-    luna.render.circle("fill", chef.x, chef.y, chef.size)
-    luna.render.setColor(0.3, 0.3, 0.8, 1)
-    luna.render.rectangle("fill", chef.x - 12, chef.y - 5, 24, 20)
+    luna.gfx.setColor(1, 0.9, 0.7, 1)
+    luna.gfx.circle("fill", chef.x, chef.y, chef.size)
+    luna.gfx.setColor(0.3, 0.3, 0.8, 1)
+    luna.gfx.rectangle("fill", chef.x - 12, chef.y - 5, 24, 20)
     -- Holding indicator
     if chef.holding then
         local c = INGR_COLORS[chef.holding.name] or {1, 1, 1}
-        luna.render.setColor(c[1], c[2], c[3], 1)
-        luna.render.circle("fill", chef.x, chef.y - 30, 8)
-        luna.render.setColor(1, 1, 1, 1)
-        luna.render.print(chef.holding.name .. "(" .. chef.holding.state .. ")", chef.x - 30, chef.y - 48, 0.6)
+        luna.gfx.setColor(c[1], c[2], c[3], 1)
+        luna.gfx.circle("fill", chef.x, chef.y - 30, 8)
+        luna.gfx.setColor(1, 1, 1, 1)
+        luna.gfx.print(chef.holding.name .. "(" .. chef.holding.state .. ")", chef.x - 30, chef.y - 48, 0.6)
     end
 
     -- Orders
-    luna.render.setColor(0, 0, 0, 0.8)
-    luna.render.rectangle("fill", 0, 0, W, 70)
-    luna.render.setColor(1, 1, 1, 1)
-    luna.render.print("ORDERS:", 10, 5, 1)
+    luna.gfx.setColor(0, 0, 0, 0.8)
+    luna.gfx.rectangle("fill", 0, 0, W, 70)
+    luna.gfx.setColor(1, 1, 1, 1)
+    luna.gfx.print("ORDERS:", 10, 5, 1)
     for i, order in ipairs(orders) do
         local ox = 10 + (i - 1) * 195
         local urgency = order.timer < 10 and {1, 0.3, 0.3} or {1, 1, 1}
-        luna.render.setColor(urgency[1], urgency[2], urgency[3], 1)
-        luna.render.print(order.recipe.name .. " ($" .. order.recipe.reward .. ")", ox, 25, 0.8)
-        luna.render.setColor(0.7, 0.7, 0.7, 1)
+        luna.gfx.setColor(urgency[1], urgency[2], urgency[3], 1)
+        luna.gfx.print(order.recipe.name .. " ($" .. order.recipe.reward .. ")", ox, 25, 0.8)
+        luna.gfx.setColor(0.7, 0.7, 0.7, 1)
         local ingStr = table.concat(order.recipe.ingredients, ", ")
-        luna.render.print(ingStr, ox, 40, 0.55)
-        luna.render.setColor(1, 0.8, 0, 1)
-        luna.render.print(math.floor(order.timer) .. "s", ox + 150, 25, 0.7)
+        luna.gfx.print(ingStr, ox, 40, 0.55)
+        luna.gfx.setColor(1, 0.8, 0, 1)
+        luna.gfx.print(math.floor(order.timer) .. "s", ox + 150, 25, 0.7)
     end
 
     -- HUD
-    luna.render.setColor(0, 0, 0, 0.7)
-    luna.render.rectangle("fill", 0, H - 30, W, 30)
-    luna.render.setColor(1, 1, 1, 1)
-    luna.render.print("Score: " .. score .. "  Money: $" .. money .. "  |  WASD move, Space/E interact, 1-6 select ingredient", 10, H - 25, 0.8)
+    luna.gfx.setColor(0, 0, 0, 0.7)
+    luna.gfx.rectangle("fill", 0, H - 30, W, 30)
+    luna.gfx.setColor(1, 1, 1, 1)
+    luna.gfx.print("Score: " .. score .. "  Money: $" .. money .. "  |  WASD move, Space/E interact, 1-6 select ingredient", 10, H - 25, 0.8)
 
     -- Message
     if msgTimer > 0 then
-        luna.render.setColor(1, 1, 0, clamp(msgTimer, 0, 1))
-        luna.render.print(message, W / 2 - 80, H / 2, 1.2)
+        luna.gfx.setColor(1, 1, 0, clamp(msgTimer, 0, 1))
+        luna.gfx.print(message, W / 2 - 80, H / 2, 1.2)
     end
 end
 

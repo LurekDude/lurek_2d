@@ -1,4 +1,4 @@
-﻿# Luna2D
+# Luna2D
 
 **A ~20 MB 2D game engine.** Written in Rust. Scripted in Lua. GPU-rendered via wgpu. AI-first.
 
@@ -37,12 +37,12 @@ With no game directory, the engine displays a built-in splash screen. **Drag and
 Create a folder with a `main.lua`:
 
 ```lua
-function luna.load()
-    luna.render.setBackgroundColor(0.1, 0.1, 0.2)
+function luna.init()
+    luna.gfx.setBackgroundColor(0.1, 0.1, 0.2)
 end
 
-function luna.draw()
-    luna.render.print("Hello, Luna2D!", 100, 100)
+function luna.render()
+    luna.gfx.print("Hello, Luna2D!", 100, 100)
 end
 ```
 
@@ -83,7 +83,7 @@ That's it. No project files, no build steps, no configuration. An empty `main.lu
 All bindings live under `luna.*` — a single, consistent namespace:
 
 ```
-luna.render    luna.audio      luna.keyboard    luna.mouse
+luna.gfx    luna.audio      luna.keyboard    luna.mouse
 luna.gamepad     luna.touch      luna.time       luna.math
 luna.physics     luna.fs luna.window      luna.signal
 luna.platform      luna.particles   luna.data        luna.img

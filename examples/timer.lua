@@ -1,4 +1,4 @@
-﻿-- examples/timer.lua
+-- examples/timer.lua
 -- Luna2D luna.time API Reference
 -- This file is documentation code, not a runnable game.
 -- Every luna.time function is demonstrated with inline comments.
@@ -112,6 +112,6 @@ local scale = sched:getTimeScale()
 -- ── Drive the scheduler each frame ───────────────────────────────────────────
 
 -- This is mandatory — put it inside luna.update:
-function luna.update(dt)
+function luna.process(dt)
     sched:update(dt)
 end

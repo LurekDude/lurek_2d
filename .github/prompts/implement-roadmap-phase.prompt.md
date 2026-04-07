@@ -1,4 +1,4 @@
-﻿---
+---
 description: "Complete phase implementation from a roadmap file. Runs pre-flight analysis of what already exists, audits external libraries so nothing is hand-rolled unnecessarily, aligns Lua API with API conventions, implements Rust bindings + full docstrings, writes Lua and Rust integration tests, runs all quality gates, generates API docs, and updates the phase file and architecture docs."
 ---
 
@@ -181,7 +181,7 @@ luna.set("functionName", lua.create_function(move |_, args: (T1, T2)| {
 **Every** new or modified `pub` item requires a `///` doc comment:
 
 - `pub struct` — one-sentence summary + field descriptions
-- `pub fn` — one-sentence summary; mention the Lua binding name if one exists (`/// Called by \`luna.render.newCanvas()\``)
+- `pub fn` — one-sentence summary; mention the Lua binding name if one exists (`/// Called by \`luna.gfx.newCanvas()\``)
 - `pub enum` — one-sentence summary + every variant documented
 - Modules (`mod.rs`, `lib.rs`) — `//!` module-level doc at top of file
 

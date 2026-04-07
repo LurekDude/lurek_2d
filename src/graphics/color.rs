@@ -1,6 +1,6 @@
-﻿/// RGBA color stored as `f32` components in the range `[0.0, 1.0]`.
+/// RGBA color stored as `f32` components in the range `[0.0, 1.0]`.
 ///
-/// Used everywhere the API accepts a color: `luna.render.setColor`, sprite tints,
+/// Used everywhere the API accepts a color: `luna.gfx.setColor`, sprite tints,
 /// background color, etc.
 ///
 /// # Fields

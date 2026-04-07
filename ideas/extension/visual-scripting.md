@@ -1,4 +1,4 @@
-﻿# Visual Scripting Integration
+# Visual Scripting Integration
 
 ## Documentation (visual_scripting.md)
 
@@ -63,7 +63,7 @@ No visual scripting files exist in vscode-extension/. No `luna.scripting.*` API 
 
 ### Phase 2: Engine API Blocks
 
-6. Add blocks for luna.render.* (rectangle, circle, image, text)
+6. Add blocks for luna.gfx.* (rectangle, circle, image, text)
 7. Add blocks for luna.input.* (keypressed, mousepressed)
 8. Add blocks for luna.time.* (after, every)
 9. Add blocks for luna.entity.* (create, find, destroy)

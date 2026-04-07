@@ -1,4 +1,4 @@
-﻿//! RGBA color value type for the Luna2D math layer.
+//! RGBA color value type for the Luna2D math layer.
 //!
 //! This module is part of Luna2D's `math` subsystem (Baseline layer).
 //! `Color` is a pure value type with no engine dependencies.
@@ -10,7 +10,7 @@
 
 /// RGBA color stored as `f32` components in the range `[0.0, 1.0]`.
 ///
-/// Used everywhere the API accepts a color: `luna.render.setColor`, sprite tints,
+/// Used everywhere the API accepts a color: `luna.gfx.setColor`, sprite tints,
 /// background color, etc.
 ///
 /// # Fields

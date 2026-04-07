@@ -1,4 +1,4 @@
-﻿-- examples/minimap.lua
+-- examples/minimap.lua
 -- luna.minimap — Mini-map renderer: terrain colors, fog of war, tracked
 -- objects, owner/faction tinting, zoom, and viewport indicator.
 -- All luna.minimap API methods demonstrated with code and comments.
@@ -151,7 +151,7 @@ local vx, vy, vw, vh = minimap:getViewportRect()
 --[[
 local mm, player_id
 
-function luna.load()
+function luna.init()
     mm = luna.minimap.newMinimap(MAP_W, MAP_H, 200, 200)
     mm:setFogEnabled(true)
     mm:setTerrainColor(0, 0.1, 0.5, 0.1)
@@ -161,7 +161,7 @@ function luna.load()
     mm:setObject(player_id, player.x/TILE, player.y/TILE, 1)
 end
 
-function luna.update(dt)
+function luna.process(dt)
     -- track player on minimap
     mm:setObject(player_id, player.x/TILE, player.y/TILE, 1)
     -- update viewport indicator
@@ -173,8 +173,8 @@ function luna.update(dt)
     end end
 end
 
-function luna.draw()
+function luna.render()
     -- draw minimap in top-right corner
-    luna.render.draw(mm:getImageData(), SCREEN_W - 210, 10)
+    luna.gfx.draw(mm:getImageData(), SCREEN_W - 210, 10)
 end
 ]]

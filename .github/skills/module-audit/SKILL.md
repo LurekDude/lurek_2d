@@ -118,11 +118,11 @@ Exposed under `luna.<module>.*` by `src/lua_api/<module>_api.rs`.
 
 ```lua
 -- Example: Basic usage of luna.<module>
-function luna.load()
+function luna.init()
     -- setup code
 end
 
-function luna.update(dt)
+function luna.process(dt)
     -- update code
 end
 ```

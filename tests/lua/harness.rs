@@ -1,4 +1,4 @@
-﻿//! Test harness that discovers and runs all Lua integration test scripts.
+//! Test harness that discovers and runs all Lua integration test scripts.
 
 use std::cell::RefCell;
 use std::path::PathBuf;
@@ -206,7 +206,7 @@ fn lua_test_log() {
     run_lua_test("unit/test_log.lua");
 }
 
-// === luna.render.newShape / CompoundShape tests ===
+// === luna.gfx.newShape / CompoundShape tests ===
 
 #[test]
 fn lua_test_shape() {

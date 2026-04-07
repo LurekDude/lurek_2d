@@ -1,4 +1,4 @@
-﻿//! Central shared runtime state for the Luna2D engine.
+//! Central shared runtime state for the Luna2D engine.
 //!
 //! [`SharedState`] is the hub that connects every subsystem to every API call.
 //! It is created once at startup, wrapped in `Rc<RefCell<SharedState>>`, and
@@ -223,7 +223,7 @@ pub struct ScreenshotRequest {
 /// # Fields
 /// - `draw_commands` — Queue of pending `DrawCommand` values, flushed each frame.
 /// - `current_color` — Active RGBA draw color `[r, g, b, a]`.
-/// - `background_color` — Screen clear color set by `luna.render.setBackgroundColor`.
+/// - `background_color` — Screen clear color set by `luna.gfx.setBackgroundColor`.
 /// - `textures` — Loaded texture pixel data, indexed by `Texture::id`.
 /// - `keys_down` — Set of currently held key name strings.
 /// - `mouse` — Mouse cursor position, button state, scroll, and cursor settings.
@@ -342,11 +342,11 @@ pub struct SharedState {
     pub midi_state: MidiState,
     /// Pending save request for the next fully rendered screen frame.
     ///
-    /// Set by `luna.render.saveScreenshot` and consumed after a successful render.
+    /// Set by `luna.gfx.saveScreenshot` and consumed after a successful render.
     pub pending_screenshot: Option<ScreenshotRequest>,
-    /// Active stencil mode — written by `luna.render.setStencilMode`, read at render time.
+    /// Active stencil mode — written by `luna.gfx.setStencilMode`, read at render time.
     pub stencil_mode: StencilMode,
-    /// Active depth test mode and write-enable flag — written by `luna.render.setDepthMode`.
+    /// Active depth test mode and write-enable flag — written by `luna.gfx.setDepthMode`.
     ///
     /// The first field is the comparison function; the second controls depth writes.
     pub depth_mode: (DepthMode, bool),

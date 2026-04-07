@@ -1,14 +1,14 @@
-﻿function luna.load()
+function luna.init()
     -- Load resources here
 end
 
-function luna.update(dt)
+function luna.process(dt)
     -- Game logic here
 end
 
-function luna.draw()
-    luna.render.clear(0.1, 0.1, 0.15)
-    luna.render.print("Hello, Luna2D!", 320, 280)
+function luna.render()
+    luna.gfx.clear(0.1, 0.1, 0.15)
+    luna.gfx.print("Hello, Luna2D!", 320, 280)
 end
 
 function luna.keypressed(key)

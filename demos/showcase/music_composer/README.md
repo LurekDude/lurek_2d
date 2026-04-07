@@ -1,4 +1,4 @@
-﻿# Music Composer
+# Music Composer
 
 A piano-roll DAW simulator with three independent tracks spanning two octaves (C3–B4). Click cells on the grid to toggle notes, right-click to stamp multi-beat notes, and press Space to play back the composition at the chosen BPM. Tracks can be individually muted, and the full composition can be exported to a human-readable text format.
 
@@ -7,10 +7,10 @@ A piano-roll DAW simulator with three independent tracks spanning two octaves (C
 - `luna.mousepressed()` — left-click to toggle single notes, right-click to stamp random-length notes
 - `luna.mouse.isDown()` — drag-to-paint note fills across columns
 - `luna.keyboard.wasPressed()` — track switching (1–3), BPM adjustment, loop, mute, clear, export
-- `luna.render.rectangle()` — piano-roll grid cells with per-track color and sharp-key shading
-- `luna.render.setColor()` — active/inactive note state and muted-track greying
-- `luna.render.print()` — note labels (C3, D#4 etc.), beat numbers, BPM counter, and track names
-- `luna.render.line()` — playback cursor scrolling across the grid
+- `luna.gfx.rectangle()` — piano-roll grid cells with per-track color and sharp-key shading
+- `luna.gfx.setColor()` — active/inactive note state and muted-track greying
+- `luna.gfx.print()` — note labels (C3, D#4 etc.), beat numbers, BPM counter, and track names
+- `luna.gfx.line()` — playback cursor scrolling across the grid
 - Beat-to-time conversion — `beats_per_sec()` maps BPM to a `play_cursor` float updated each frame
 
 ## How to Run

@@ -170,7 +170,7 @@ impl LunaApp {
                     if let Err(e) = lua.load(&code).set_name("main.lua").exec() {
                         log::error!("Lua error in main.lua: {}", e);
                     } else {
-                        call_lua_callback(&lua, "load", ());
+                        call_lua_callback(&lua, "init", ());
                         self.has_game = true;
                     }
                 }
@@ -200,10 +200,10 @@ impl LunaApp {
         let (Some(lua), Some(state)) = (&self.lua, &self.state) else {
             return;
         };
-        call_lua_callback(lua, "update", self.clock.last_dt() as f64);
+        call_lua_callback(lua, "process", self.clock.last_dt() as f64);
 
         state.borrow_mut().draw_commands.clear();
-        call_lua_callback(lua, "draw", ());
+        call_lua_callback(lua, "render", ());
     }
 
     fn render(&mut self) {
@@ -324,6 +324,9 @@ impl ApplicationHandler for LunaApp {
         match event {
             WindowEvent::CloseRequested => {
                 log::info!("Window close requested.");
+                if let Some(lua) = &self.lua {
+                    call_lua_callback(lua, "exit", ());
+                }
                 event_loop.exit();
             }
 

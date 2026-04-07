@@ -1,4 +1,4 @@
-﻿# `event` — Agent Reference
+# `event` — Agent Reference
 
 | Property       | Value                                                |
 |----------------|------------------------------------------------------|
@@ -137,7 +137,7 @@ Registered by `src/lua_api/event_api.rs` under the `luna.signal` namespace. Prov
 
 ```lua
 -- Polling events in the game loop
-function luna.update(dt)
+function luna.process(dt)
     for name, a1, a2 in luna.signal.poll() do
         if name == "coin_collected" then
             score = score + a1
@@ -158,7 +158,7 @@ end
 -- Using Signal for decoupled pub-sub
 local sig = luna.signal.newSignal()
 
-function luna.load()
+function luna.init()
     -- Register two listeners for "damage"
     sig:register("damage", function(amount)
         hp = hp - amount

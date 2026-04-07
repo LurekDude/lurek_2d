@@ -218,7 +218,7 @@ Exposed under `luna.modding.*` by `src/lua_api/modding_api.rs`. The API surface 
 ## Lua Examples
 
 ```lua
-function luna.load()
+function luna.init()
     -- Create a mod manager
     local mgr = luna.modding.newModManager()
 

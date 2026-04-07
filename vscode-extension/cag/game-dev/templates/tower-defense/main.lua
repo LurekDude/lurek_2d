@@ -1,4 +1,4 @@
-﻿-- Simple tower defense starter
+-- Simple tower defense starter
 local path = {
     { x = 0,   y = 300 },
     { x = 200, y = 300 },
@@ -19,7 +19,7 @@ local spawn_timer = 0
 local spawn_count = 0
 local TOWER_COST = 25
 
-function luna.load()
+function luna.init()
     spawnWave()
 end
 
@@ -28,7 +28,7 @@ function spawnWave()
     spawn_timer = 0
 end
 
-function luna.update(dt)
+function luna.process(dt)
     -- Spawn enemies
     if spawn_count > 0 then
         spawn_timer = spawn_timer - dt
@@ -95,31 +95,31 @@ function luna.update(dt)
     end
 end
 
-function luna.draw()
-    luna.render.clear(0.1, 0.15, 0.1)
+function luna.render()
+    luna.gfx.clear(0.1, 0.15, 0.1)
 
     -- Draw path
-    luna.render.setColor(0.3, 0.3, 0.25, 1)
+    luna.gfx.setColor(0.3, 0.3, 0.25, 1)
     for i = 1, #path - 1 do
-        luna.render.line(path[i].x, path[i].y, path[i + 1].x, path[i + 1].y)
+        luna.gfx.line(path[i].x, path[i].y, path[i + 1].x, path[i + 1].y)
     end
 
     -- Draw towers
     for _, t in ipairs(towers) do
-        luna.render.setColor(0.2, 0.6, 1, 1)
-        luna.render.rectangle("fill", t.x - 12, t.y - 12, 24, 24)
+        luna.gfx.setColor(0.2, 0.6, 1, 1)
+        luna.gfx.rectangle("fill", t.x - 12, t.y - 12, 24, 24)
     end
 
     -- Draw enemies
     for _, e in ipairs(enemies) do
-        luna.render.setColor(0.9, 0.2, 0.2, 1)
-        luna.render.circle("fill", e.x, e.y, 8)
+        luna.gfx.setColor(0.9, 0.2, 0.2, 1)
+        luna.gfx.circle("fill", e.x, e.y, 8)
     end
 
     -- UI
-    luna.render.setColor(1, 1, 1, 1)
-    luna.render.print("Wave: " .. wave .. "  Gold: " .. gold .. "  Lives: " .. lives, 10, 10)
-    luna.render.print("Click to place tower (" .. TOWER_COST .. "g)", 10, 580)
+    luna.gfx.setColor(1, 1, 1, 1)
+    luna.gfx.print("Wave: " .. wave .. "  Gold: " .. gold .. "  Lives: " .. lives, 10, 10)
+    luna.gfx.print("Click to place tower (" .. TOWER_COST .. "g)", 10, 580)
 end
 
 function luna.mousepressed(x, y, btn)

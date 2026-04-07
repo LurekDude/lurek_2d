@@ -1,11 +1,11 @@
-﻿# Galaga
+# Galaga
 
 Take on the insect invasion fleet as enemies break formation and swoop down
 in diving attack runs. Every cleared wave speeds up the assault.
 
 ## What It Demonstrates
 
-- `luna.render.rectangle()` / `luna.render.circle()` / `luna.render.line()` — enemy and ship shapes
+- `luna.gfx.rectangle()` / `luna.gfx.circle()` / `luna.gfx.line()` — enemy and ship shapes
 - `luna.input.isKeyDown()` — smooth ship movement
 - `luna.keypressed()` — firing with bullet-count cap
 - Sine-wave diving path with formation return

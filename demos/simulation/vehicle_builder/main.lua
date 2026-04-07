@@ -1,4 +1,4 @@
-﻿-- Vehicle Builder — Physics-Based Construction & Test Track
+-- Vehicle Builder — Physics-Based Construction & Test Track
 -- Build a vehicle from parts, then test it on a track with physics
 
 local mode = "build"  -- "build" or "test"
@@ -139,11 +139,11 @@ local function startTest()
     end
 end
 
-function luna.load()
+function luna.init()
     buildTrack()
 end
 
-function luna.update(dt)
+function luna.process(dt)
     if testMsgTimer > 0 then testMsgTimer = testMsgTimer - dt end
 
     if mode == "test" and testActive then
@@ -222,113 +222,113 @@ function luna.mousepressed(mx, my, btn)
     end
 end
 
-function luna.draw()
+function luna.render()
     if mode == "build" then
-        luna.render.setBackgroundColor(0.12, 0.12, 0.15)
+        luna.gfx.setBackgroundColor(0.12, 0.12, 0.15)
 
         -- Track preview (top half)
-        luna.render.setColor(0.2, 0.2, 0.25, 1)
-        luna.render.rectangle("fill", 0, 0, 800, 300)
-        luna.render.setColor(0.3, 0.5, 0.3, 1)
-        luna.render.rectangle("fill", 0, 280, 800, 20)
-        luna.render.setColor(0.6, 0.6, 0.6, 1)
-        luna.render.print("TRACK PREVIEW (press T to test)", 280, 140)
+        luna.gfx.setColor(0.2, 0.2, 0.25, 1)
+        luna.gfx.rectangle("fill", 0, 0, 800, 300)
+        luna.gfx.setColor(0.3, 0.5, 0.3, 1)
+        luna.gfx.rectangle("fill", 0, 280, 800, 20)
+        luna.gfx.setColor(0.6, 0.6, 0.6, 1)
+        luna.gfx.print("TRACK PREVIEW (press T to test)", 280, 140)
 
         -- Ramps in preview
-        luna.render.setColor(0.5, 0.4, 0.2, 1)
+        luna.gfx.setColor(0.5, 0.4, 0.2, 1)
         for _, r in ipairs(ramps) do
             local rx = r.x * 0.2 + 50
             if rx < 800 then
-                luna.render.rectangle("fill", rx, 280 - r.h * 0.5, r.w * 0.3, r.h * 0.5)
+                luna.gfx.rectangle("fill", rx, 280 - r.h * 0.5, r.w * 0.3, r.h * 0.5)
             end
         end
 
         -- Build grid
-        luna.render.setColor(0.2, 0.2, 0.25, 1)
+        luna.gfx.setColor(0.2, 0.2, 0.25, 1)
         for gy = 0, BUILD_H - 1 do
             for gx = 0, BUILD_W - 1 do
-                luna.render.rectangle("line", BUILD_OX + gx * GRID, BUILD_OY + gy * GRID, GRID, GRID)
+                luna.gfx.rectangle("line", BUILD_OX + gx * GRID, BUILD_OY + gy * GRID, GRID, GRID)
             end
         end
 
         -- Parts
         for _, p in ipairs(parts) do
             local c = partColors[p.type]
-            luna.render.setColor(c[1], c[2], c[3], 1)
+            luna.gfx.setColor(c[1], c[2], c[3], 1)
             if p.type == "wheel" then
-                luna.render.circle("fill", BUILD_OX + p.gx * GRID + GRID/2, BUILD_OY + p.gy * GRID + GRID/2, GRID/2 - 1)
+                luna.gfx.circle("fill", BUILD_OX + p.gx * GRID + GRID/2, BUILD_OY + p.gy * GRID + GRID/2, GRID/2 - 1)
             else
-                luna.render.rectangle("fill", BUILD_OX + p.gx * GRID + 1, BUILD_OY + p.gy * GRID + 1, GRID - 2, GRID - 2)
+                luna.gfx.rectangle("fill", BUILD_OX + p.gx * GRID + 1, BUILD_OY + p.gy * GRID + 1, GRID - 2, GRID - 2)
             end
             -- Label
-            luna.render.setColor(1, 1, 1, 0.7)
+            luna.gfx.setColor(1, 1, 1, 0.7)
             local label = p.type:sub(1, 1):upper()
-            luna.render.print(label, BUILD_OX + p.gx * GRID + 5, BUILD_OY + p.gy * GRID + 3)
+            luna.gfx.print(label, BUILD_OX + p.gx * GRID + 5, BUILD_OY + p.gy * GRID + 3)
         end
 
         -- Center of mass
         if #parts > 0 then
             local cx, cy = getCenterOfMass()
-            luna.render.setColor(1, 1, 0, 1)
-            luna.render.circle("fill", BUILD_OX + cx * GRID + GRID/2, BUILD_OY + cy * GRID + GRID/2, 4)
-            luna.render.print("CoM", BUILD_OX + cx * GRID + GRID/2 + 6, BUILD_OY + cy * GRID + GRID/2 - 6)
+            luna.gfx.setColor(1, 1, 0, 1)
+            luna.gfx.circle("fill", BUILD_OX + cx * GRID + GRID/2, BUILD_OY + cy * GRID + GRID/2, 4)
+            luna.gfx.print("CoM", BUILD_OX + cx * GRID + GRID/2 + 6, BUILD_OY + cy * GRID + GRID/2 - 6)
         end
 
         -- HUD
-        luna.render.setColor(0, 0, 0, 0.8)
-        luna.render.rectangle("fill", 0, 560, 800, 40)
-        luna.render.setColor(1, 1, 1, 1)
-        luna.render.print("Budget: $" .. (budget - getTotalCost()) .. "/" .. budget, 10, 568)
-        luna.render.print("[1]Chassis($20) [2]Wheel($50) [3]Engine($80) [4]Wing($40)", 200, 568)
-        luna.render.setColor(0.5, 1, 0.5, 1)
-        luna.render.print("Selected: " .. selectedPart, 10, 548)
-        luna.render.print("[T]Test [C]Clear [RClick]Remove", 500, 548)
+        luna.gfx.setColor(0, 0, 0, 0.8)
+        luna.gfx.rectangle("fill", 0, 560, 800, 40)
+        luna.gfx.setColor(1, 1, 1, 1)
+        luna.gfx.print("Budget: $" .. (budget - getTotalCost()) .. "/" .. budget, 10, 568)
+        luna.gfx.print("[1]Chassis($20) [2]Wheel($50) [3]Engine($80) [4]Wing($40)", 200, 568)
+        luna.gfx.setColor(0.5, 1, 0.5, 1)
+        luna.gfx.print("Selected: " .. selectedPart, 10, 548)
+        luna.gfx.print("[T]Test [C]Clear [RClick]Remove", 500, 548)
 
     else
         -- Test mode
-        luna.render.setBackgroundColor(0.3, 0.5, 0.8)
+        luna.gfx.setBackgroundColor(0.3, 0.5, 0.8)
 
         local sx = -trackScroll
 
         -- Ground
-        luna.render.setColor(0.3, 0.5, 0.3, 1)
-        luna.render.rectangle("fill", sx, 280, 8000, 40)
+        luna.gfx.setColor(0.3, 0.5, 0.3, 1)
+        luna.gfx.rectangle("fill", sx, 280, 8000, 40)
 
         -- Ramps
-        luna.render.setColor(0.6, 0.5, 0.2, 1)
+        luna.gfx.setColor(0.6, 0.5, 0.2, 1)
         for _, r in ipairs(ramps) do
-            luna.render.rectangle("fill", r.x + sx, 280 - r.h, r.w, r.h)
+            luna.gfx.rectangle("fill", r.x + sx, 280 - r.h, r.w, r.h)
         end
 
         -- Obstacles
-        luna.render.setColor(0.5, 0.3, 0.3, 1)
+        luna.gfx.setColor(0.5, 0.3, 0.3, 1)
         for _, o in ipairs(obstacles) do
-            luna.render.rectangle("fill", o.x + sx, 290 - o.h, o.w, o.h)
+            luna.gfx.rectangle("fill", o.x + sx, 290 - o.h, o.w, o.h)
         end
 
         -- Vehicle
         for _, p in ipairs(parts) do
             local c = partColors[p.type]
-            luna.render.setColor(c[1], c[2], c[3], 1)
+            luna.gfx.setColor(c[1], c[2], c[3], 1)
             local px = testX + p.gx * GRID - 40 + sx
             local py = testY + p.gy * GRID - 60
             if p.type == "wheel" then
-                luna.render.circle("fill", px + GRID/2, py + GRID/2, GRID/2)
+                luna.gfx.circle("fill", px + GRID/2, py + GRID/2, GRID/2)
             else
-                luna.render.rectangle("fill", px, py, GRID, GRID)
+                luna.gfx.rectangle("fill", px, py, GRID, GRID)
             end
         end
 
         -- HUD
-        luna.render.setColor(0, 0, 0, 0.7)
-        luna.render.rectangle("fill", 0, 0, 800, 30)
-        luna.render.setColor(1, 1, 1, 1)
-        luna.render.print("Distance: " .. testScore .. "m   [R] Return to build   [Left/Right] Brake/Accel", 10, 6)
+        luna.gfx.setColor(0, 0, 0, 0.7)
+        luna.gfx.rectangle("fill", 0, 0, 800, 30)
+        luna.gfx.setColor(1, 1, 1, 1)
+        luna.gfx.print("Distance: " .. testScore .. "m   [R] Return to build   [Left/Right] Brake/Accel", 10, 6)
     end
 
     -- Messages
     if testMsgTimer > 0 then
-        luna.render.setColor(1, 1, 0.5, 1)
-        luna.render.print(testMsg, 250, 150, 1.3)
+        luna.gfx.setColor(1, 1, 0.5, 1)
+        luna.gfx.print(testMsg, 250, 150, 1.3)
     end
 end

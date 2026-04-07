@@ -1,4 +1,4 @@
-﻿---
+---
 name: testing-rust
 description: "Load this skill when writing or organizing tests for the Luna2D engine. It owns test patterns, float comparison strategies, test naming, and integration test architecture for both Rust and Lua BDD tests. Skip it for writing production code."
 ---
@@ -267,7 +267,7 @@ test_summary()
 
 | Available in Lua tests | Not available |
 |---|---|
-| `luna.math.*` | `luna.render.draw*` (no GPU) |
+| `luna.math.*` | `luna.gfx.draw*` (no GPU) |
 | `luna.physics.*` | `luna.audio.newSource` (no audio device) |
 | `luna.time.*` | Any API that calls `winit` window methods |
 | `luna.input.*` (state, no events) | `luna.window.setSize` |

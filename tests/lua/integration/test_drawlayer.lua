@@ -1,5 +1,5 @@
-﻿-- tests/lua/test_drawlayer.lua
--- Integration tests for luna.render.newDrawLayer()
+-- tests/lua/test_drawlayer.lua
+-- Integration tests for luna.gfx.newDrawLayer()
 
 local total, passed, failed = 0, 0, 0
 local current_describe = ""
@@ -30,13 +30,13 @@ end
 
 -- -------------------------------------------------------------------
 describe("DrawLayer creation", function()
-    it("creates a DrawLayer via luna.render.newDrawLayer()", function()
-        local layer = luna.render.newDrawLayer()
+    it("creates a DrawLayer via luna.gfx.newDrawLayer()", function()
+        local layer = luna.gfx.newDrawLayer()
         expect_type(layer, "userdata")
     end)
 
     it("starts with count 0", function()
-        local layer = luna.render.newDrawLayer()
+        local layer = luna.gfx.newDrawLayer()
         expect_eq(layer:getCount(), 0)
     end)
 end)
@@ -44,7 +44,7 @@ end)
 -- -------------------------------------------------------------------
 describe("DrawLayer queue", function()
     it("queuing increases count", function()
-        local layer = luna.render.newDrawLayer()
+        local layer = luna.gfx.newDrawLayer()
         layer:queue(1.0, function() end)
         expect_eq(layer:getCount(), 1)
         layer:queue(2.0, function() end)
@@ -52,13 +52,13 @@ describe("DrawLayer queue", function()
     end)
 
     it("queue accepts negative z-order", function()
-        local layer = luna.render.newDrawLayer()
+        local layer = luna.gfx.newDrawLayer()
         layer:queue(-5.0, function() end)
         expect_eq(layer:getCount(), 1)
     end)
 
     it("queue accepts zero z-order", function()
-        local layer = luna.render.newDrawLayer()
+        local layer = luna.gfx.newDrawLayer()
         layer:queue(0, function() end)
         expect_eq(layer:getCount(), 1)
     end)
@@ -67,7 +67,7 @@ end)
 -- -------------------------------------------------------------------
 describe("DrawLayer flush", function()
     it("flush calls callbacks in z-order (ascending)", function()
-        local layer = luna.render.newDrawLayer()
+        local layer = luna.gfx.newDrawLayer()
         local order = {}
         layer:queue(3.0, function() table.insert(order, "C") end)
         layer:queue(1.0, function() table.insert(order, "A") end)
@@ -80,7 +80,7 @@ describe("DrawLayer flush", function()
     end)
 
     it("flush empties the queue", function()
-        local layer = luna.render.newDrawLayer()
+        local layer = luna.gfx.newDrawLayer()
         layer:queue(1.0, function() end)
         layer:queue(2.0, function() end)
         expect_eq(layer:getCount(), 2)
@@ -89,13 +89,13 @@ describe("DrawLayer flush", function()
     end)
 
     it("flush on empty layer is a no-op", function()
-        local layer = luna.render.newDrawLayer()
+        local layer = luna.gfx.newDrawLayer()
         layer:flush() -- should not error
         expect_eq(layer:getCount(), 0)
     end)
 
     it("flush handles negative z-orders correctly", function()
-        local layer = luna.render.newDrawLayer()
+        local layer = luna.gfx.newDrawLayer()
         local order = {}
         layer:queue(0.0, function() table.insert(order, "zero") end)
         layer:queue(-1.0, function() table.insert(order, "neg") end)
@@ -107,7 +107,7 @@ describe("DrawLayer flush", function()
     end)
 
     it("flush handles equal z-orders (stable-ish)", function()
-        local layer = luna.render.newDrawLayer()
+        local layer = luna.gfx.newDrawLayer()
         local count = 0
         layer:queue(1.0, function() count = count + 1 end)
         layer:queue(1.0, function() count = count + 1 end)
@@ -120,7 +120,7 @@ end)
 -- -------------------------------------------------------------------
 describe("DrawLayer clear", function()
     it("clear removes all queued entries", function()
-        local layer = luna.render.newDrawLayer()
+        local layer = luna.gfx.newDrawLayer()
         layer:queue(1.0, function() end)
         layer:queue(2.0, function() end)
         layer:queue(3.0, function() end)
@@ -130,13 +130,13 @@ describe("DrawLayer clear", function()
     end)
 
     it("clear on empty layer is safe", function()
-        local layer = luna.render.newDrawLayer()
+        local layer = luna.gfx.newDrawLayer()
         layer:clear()
         expect_eq(layer:getCount(), 0)
     end)
 
     it("cleared callbacks are not called on flush", function()
-        local layer = luna.render.newDrawLayer()
+        local layer = luna.gfx.newDrawLayer()
         local called = false
         layer:queue(1.0, function() called = true end)
         layer:clear()
@@ -148,7 +148,7 @@ end)
 -- -------------------------------------------------------------------
 describe("DrawLayer reuse", function()
     it("layer can be reused after flush", function()
-        local layer = luna.render.newDrawLayer()
+        local layer = luna.gfx.newDrawLayer()
         layer:queue(1.0, function() end)
         layer:flush()
         expect_eq(layer:getCount(), 0)
@@ -157,7 +157,7 @@ describe("DrawLayer reuse", function()
     end)
 
     it("layer can be reused after clear", function()
-        local layer = luna.render.newDrawLayer()
+        local layer = luna.gfx.newDrawLayer()
         layer:queue(1.0, function() end)
         layer:clear()
         layer:queue(5.0, function() end)
@@ -165,7 +165,7 @@ describe("DrawLayer reuse", function()
     end)
 
     it("multiple flush cycles work correctly", function()
-        local layer = luna.render.newDrawLayer()
+        local layer = luna.gfx.newDrawLayer()
         local results = {}
 
         layer:queue(2.0, function() table.insert(results, "B1") end)
@@ -185,22 +185,22 @@ end)
 -- -------------------------------------------------------------------
 describe("DrawLayer type system", function()
     it("has type() method returning DrawLayer", function()
-        local layer = luna.render.newDrawLayer()
+        local layer = luna.gfx.newDrawLayer()
         expect_eq(layer:type(), "DrawLayer")
     end)
 
     it("typeOf Object returns true", function()
-        local layer = luna.render.newDrawLayer()
+        local layer = luna.gfx.newDrawLayer()
         expect_eq(layer:typeOf("Object"), true)
     end)
 
     it("typeOf DrawLayer returns true", function()
-        local layer = luna.render.newDrawLayer()
+        local layer = luna.gfx.newDrawLayer()
         expect_eq(layer:typeOf("DrawLayer"), true)
     end)
 
     it("typeOf wrong type returns false", function()
-        local layer = luna.render.newDrawLayer()
+        local layer = luna.gfx.newDrawLayer()
         expect_eq(layer:typeOf("Image"), false)
     end)
 end)
@@ -208,7 +208,7 @@ end)
 -- -------------------------------------------------------------------
 describe("DrawLayer large queue", function()
     it("handles many entries", function()
-        local layer = luna.render.newDrawLayer()
+        local layer = luna.gfx.newDrawLayer()
         local sum = 0
         for i = 100, 1, -1 do
             layer:queue(i, function() sum = sum + 1 end)

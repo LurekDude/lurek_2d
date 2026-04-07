@@ -1,4 +1,4 @@
-﻿# File I/O & Filesystem — Threading Opportunities
+# File I/O & Filesystem — Threading Opportunities
 
 ## Current Architecture
 
@@ -207,10 +207,10 @@ Script loading must remain synchronous — Lua execution order matters.
 However, **asset preloading** triggered by scripts can be async:
 
 ```lua
-function luna.load()
+function luna.init()
     -- These should return immediately, load in background
-    local img1 = luna.render.newImageAsync("player.png")
-    local img2 = luna.render.newImageAsync("enemy.png")
+    local img1 = luna.gfx.newImageAsync("player.png")
+    local img2 = luna.gfx.newImageAsync("enemy.png")
     local snd1 = luna.audio.newSourceAsync("music.ogg")
 
     -- Game loop polls readiness

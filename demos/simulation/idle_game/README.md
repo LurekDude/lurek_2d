@@ -1,4 +1,4 @@
-﻿# Idle Game
+# Idle Game
 
 A classic incremental clicker with passive generators, one-time upgrades, and a prestige reset loop. Click the large coin button to earn manually, buy generators that produce coins per second, and purchase upgrades that multiply click power or generator output. Prestiging at 10 000 lifetime coins resets progress but doubles all future earnings.
 
@@ -6,11 +6,11 @@ A classic incremental clicker with passive generators, one-time upgrades, and a 
 
 - `luna.mousepressed()` — big-button click detection and shop-panel interaction
 - `luna.keyboard.wasPressed()` — escape to quit
-- `luna.render.circle()` — animated pulsing coin button with `math.sin()` scale oscillation
-- `luna.render.rectangle()` — generator and upgrade purchase panels with cost and count labels
-- `luna.render.print()` — large coin counter, CPS display, and floating click-particle text
-- `luna.render.setColor()` — affordability tinting (grey = can't afford, gold = available)
-- `luna.render.setBackgroundColor()` — dark purple background set each draw frame
+- `luna.gfx.circle()` — animated pulsing coin button with `math.sin()` scale oscillation
+- `luna.gfx.rectangle()` — generator and upgrade purchase panels with cost and count labels
+- `luna.gfx.print()` — large coin counter, CPS display, and floating click-particle text
+- `luna.gfx.setColor()` — affordability tinting (grey = can't afford, gold = available)
+- `luna.gfx.setBackgroundColor()` — dark purple background set each draw frame
 - Number formatter — `format_num()` abbreviates large values to K / M / B suffixes
 
 ## How to Run

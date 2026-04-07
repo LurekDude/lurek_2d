@@ -1,11 +1,11 @@
-﻿# Sensible Soccer
+# Sensible Soccer
 
 A fast-paced top-down football game inspired by Sensible Software's beloved 1992
 Amiga classic. Score more goals than the CPU in 3 minutes to win.
 
 ## What It Demonstrates
 
-- `luna.render.circle()` / `luna.render.rectangle()` — pitch markings, players, ball
+- `luna.gfx.circle()` / `luna.gfx.rectangle()` — pitch markings, players, ball
 - `luna.input.isKeyDown()` — smooth player movement
 - `luna.keypressed()` — kicking, tackling, player switching
 - Multi-agent CPU AI (chase ball, attack, support)

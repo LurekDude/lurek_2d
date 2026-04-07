@@ -1,4 +1,4 @@
-﻿-- Shadow of the Beast — Amiga 500 Classic (Luna2D demo)
+-- Shadow of the Beast — Amiga 500 Classic (Luna2D demo)
 -- Atmospheric side-scrolling action inspired by Psygnosis' stunning 1989 Amiga title.
 -- The Beast Man fights through layers of parallax landscapes to break the curse.
 
@@ -81,14 +81,14 @@ end
 
 -- ── Load ─────────────────────────────────────────────────────────────────
 
-function luna.load()
-    luna.render.setBackgroundColor(0.05, 0.02, 0.15)
+function luna.init()
+    luna.gfx.setBackgroundColor(0.05, 0.02, 0.15)
     reset()
 end
 
 -- ── Update ───────────────────────────────────────────────────────────────
 
-function luna.update(dt)
+function luna.process(dt)
     if game_state ~= "playing" then return end
     anim = anim + dt
     attack_cd = math.max(0, attack_cd - dt)
@@ -210,16 +210,16 @@ end
 
 -- ── Draw ─────────────────────────────────────────────────────────────────
 
-function luna.draw()
+function luna.render()
     -- Sky
-    luna.render.setColor(LAYERS[1].r, LAYERS[1].g, LAYERS[1].b)
-    luna.render.rectangle("fill", 0, 0, W, H)
+    luna.gfx.setColor(LAYERS[1].r, LAYERS[1].g, LAYERS[1].b)
+    luna.gfx.rectangle("fill", 0, 0, W, H)
 
     -- Moon
-    luna.render.setColor(0.9, 0.85, 0.65)
-    luna.render.circle("fill", MOON.x, MOON.y, MOON.r)
-    luna.render.setColor(LAYERS[1].r, LAYERS[1].g + 0.01, LAYERS[1].b + 0.02)
-    luna.render.circle("fill", MOON.x + 18, MOON.y - 10, MOON.r * 0.85)
+    luna.gfx.setColor(0.9, 0.85, 0.65)
+    luna.gfx.circle("fill", MOON.x, MOON.y, MOON.r)
+    luna.gfx.setColor(LAYERS[1].r, LAYERS[1].g + 0.01, LAYERS[1].b + 0.02)
+    luna.gfx.circle("fill", MOON.x + 18, MOON.y - 10, MOON.r * 0.85)
 
     -- Parallax layers (mountains / trees / hills)
     for li = 2, 4 do
@@ -228,18 +228,18 @@ function luna.draw()
             local horizon = H * (0.3 + (li - 2) * 0.12)
             for _, t in ipairs(layer_trees[li]) do
                 local dark = li / 5
-                luna.render.setColor(lc.r, lc.g, lc.b)
-                luna.render.rectangle("fill", t.x, horizon, t.w, H - horizon)
-                luna.render.rectangle("fill", t.x + t.w/2 - t.w * 0.3, horizon - t.h, t.w * 0.6, t.h)
+                luna.gfx.setColor(lc.r, lc.g, lc.b)
+                luna.gfx.rectangle("fill", t.x, horizon, t.w, H - horizon)
+                luna.gfx.rectangle("fill", t.x + t.w/2 - t.w * 0.3, horizon - t.h, t.w * 0.6, t.h)
             end
         end
     end
 
     -- Ground
-    luna.render.setColor(0.12, 0.08, 0.05)
-    luna.render.rectangle("fill", 0, GROUND_Y, W, H - GROUND_Y)
-    luna.render.setColor(0.25, 0.14, 0.28)
-    luna.render.rectangle("fill", 0, GROUND_Y, W, 6)
+    luna.gfx.setColor(0.12, 0.08, 0.05)
+    luna.gfx.rectangle("fill", 0, GROUND_Y, W, H - GROUND_Y)
+    luna.gfx.setColor(0.25, 0.14, 0.28)
+    luna.gfx.rectangle("fill", 0, GROUND_Y, W, 6)
 
     -- Enemies
     for _, e in ipairs(enemies) do
@@ -247,21 +247,21 @@ function luna.draw()
             local sz = e.boss and 1.8 or 1
             local gx = e.x + e.w/2
             -- Body
-            luna.render.setColor(0.5 * sz, 0.2, 0.05)
-            luna.render.rectangle("fill", e.x, e.y, e.w, e.h)
+            luna.gfx.setColor(0.5 * sz, 0.2, 0.05)
+            luna.gfx.rectangle("fill", e.x, e.y, e.w, e.h)
             -- Head
-            luna.render.setColor(0.35, 0.15, 0.04)
-            luna.render.circle("fill", gx, e.y + e.h * 0.25, e.w * 0.4)
+            luna.gfx.setColor(0.35, 0.15, 0.04)
+            luna.gfx.circle("fill", gx, e.y + e.h * 0.25, e.w * 0.4)
             -- Eyes
-            luna.render.setColor(1, 0.1, 0)
-            luna.render.circle("fill", gx - 4, e.y + e.h * 0.22, 4)
-            luna.render.circle("fill", gx + 4, e.y + e.h * 0.22, 4)
+            luna.gfx.setColor(1, 0.1, 0)
+            luna.gfx.circle("fill", gx - 4, e.y + e.h * 0.22, 4)
+            luna.gfx.circle("fill", gx + 4, e.y + e.h * 0.22, 4)
             -- HP bar
             if e.boss then
-                luna.render.setColor(0.4, 0, 0)
-                luna.render.rectangle("fill", e.x, e.y - 10, e.w, 6)
-                luna.render.setColor(0.9, 0.1, 0.1)
-                luna.render.rectangle("fill", e.x, e.y - 10, e.w * (e.hp / 8), 6)
+                luna.gfx.setColor(0.4, 0, 0)
+                luna.gfx.rectangle("fill", e.x, e.y - 10, e.w, 6)
+                luna.gfx.setColor(0.9, 0.1, 0.1)
+                luna.gfx.rectangle("fill", e.x, e.y - 10, e.w * (e.hp / 8), 6)
             end
         end
     end
@@ -269,67 +269,67 @@ function luna.draw()
     -- Attack sparks
     for _, a in ipairs(attacks) do
         local t = a.life / 0.4
-        luna.render.setColor(1, 0.8, 0.2, t)
-        luna.render.circle("fill", a.x, a.y, 10 * t)
+        luna.gfx.setColor(1, 0.8, 0.2, t)
+        luna.gfx.circle("fill", a.x, a.y, 10 * t)
     end
 
     -- Player (beast man)
     if player.attacking then
-        luna.render.setColor(0.9, 0.7, 0.2, 0.5)
-        luna.render.circle("fill", player.x + player.w/2 + player.facing * 25, player.y + 15, 18)
+        luna.gfx.setColor(0.9, 0.7, 0.2, 0.5)
+        luna.gfx.circle("fill", player.x + player.w/2 + player.facing * 25, player.y + 15, 18)
     end
     -- Body
-    luna.render.setColor(0.55, 0.42, 0.28)
-    luna.render.rectangle("fill", player.x + 4, player.y + 16, player.w - 8, player.h - 16)
+    luna.gfx.setColor(0.55, 0.42, 0.28)
+    luna.gfx.rectangle("fill", player.x + 4, player.y + 16, player.w - 8, player.h - 16)
     -- Head
-    luna.render.setColor(0.6, 0.45, 0.3)
-    luna.render.circle("fill", player.x + player.w/2, player.y + 13, 13)
+    luna.gfx.setColor(0.6, 0.45, 0.3)
+    luna.gfx.circle("fill", player.x + player.w/2, player.y + 13, 13)
     -- Horn / beast features
-    luna.render.setColor(0.3, 0.2, 0.1)
-    luna.render.rectangle("fill", player.x + player.w/2 - 2, player.y, 4, 10)
+    luna.gfx.setColor(0.3, 0.2, 0.1)
+    luna.gfx.rectangle("fill", player.x + player.w/2 - 2, player.y, 4, 10)
     -- Eyes
-    luna.render.setColor(0.9, 0.5, 0.1)
+    luna.gfx.setColor(0.9, 0.5, 0.1)
     local ex2 = player.x + (player.facing > 0 and player.w - 7 or 7)
-    luna.render.circle("fill", ex2, player.y + 11, 3)
+    luna.gfx.circle("fill", ex2, player.y + 11, 3)
 
     -- HUD
-    luna.render.setColor(0, 0, 0, 0.65)
-    luna.render.rectangle("fill", 0, 0, W, 28)
-    luna.render.setColor(0.8, 0.4, 1)
-    luna.render.print("SHADOW OF THE BEAST", 8, 4, 1.8)
-    luna.render.setColor(1, 0.8, 0.2)
-    luna.render.print("Score: " .. score, W/2 - 50, 4, 1.6)
+    luna.gfx.setColor(0, 0, 0, 0.65)
+    luna.gfx.rectangle("fill", 0, 0, W, 28)
+    luna.gfx.setColor(0.8, 0.4, 1)
+    luna.gfx.print("SHADOW OF THE BEAST", 8, 4, 1.8)
+    luna.gfx.setColor(1, 0.8, 0.2)
+    luna.gfx.print("Score: " .. score, W/2 - 50, 4, 1.6)
     -- Health orbs
     for i = 1, HEALTH_MAX do
         local hx = W - 24 * i - 5
-        luna.render.setColor(i <= health and 0.9 or 0.3, i <= health and 0.2 or 0.2, i <= health and 0.1 or 0.2)
-        luna.render.circle("fill", hx + 10, 14, 9)
+        luna.gfx.setColor(i <= health and 0.9 or 0.3, i <= health and 0.2 or 0.2, i <= health and 0.1 or 0.2)
+        luna.gfx.circle("fill", hx + 10, 14, 9)
     end
-    luna.render.setColor(0.6, 0.4, 0.9)
-    luna.render.print("Stage " .. stage .. "/3", W/2 + 70, 4, 1.6)
+    luna.gfx.setColor(0.6, 0.4, 0.9)
+    luna.gfx.print("Stage " .. stage .. "/3", W/2 + 70, 4, 1.6)
 
-    luna.render.setColor(0.5, 0.4, 0.65, 0.65)
-    luna.render.print("[A/D] Walk  [Space/W] Jump  [X] Attack  Defeat all beasts each stage!", 8, H - 20, 1.3)
+    luna.gfx.setColor(0.5, 0.4, 0.65, 0.65)
+    luna.gfx.print("[A/D] Walk  [Space/W] Jump  [X] Attack  Defeat all beasts each stage!", 8, H - 20, 1.3)
 
     -- Overlay
     if game_state == "gameover" then
-        luna.render.setColor(0, 0, 0, 0.8)
-        luna.render.rectangle("fill", 0, 0, W, H)
-        luna.render.setColor(0.9, 0.3, 0.8)
-        luna.render.print("THE BEAST CLAIMS YOU", W/2 - 150, H/2 - 25, 2.5)
-        luna.render.setColor(1, 0.8, 0.2)
-        luna.render.print("Score: " .. score, W/2 - 50, H/2 + 20, 2)
-        luna.render.setColor(0.6, 0.6, 0.6)
-        luna.render.print("Press R to restart", W/2 - 100, H/2 + 55, 2)
+        luna.gfx.setColor(0, 0, 0, 0.8)
+        luna.gfx.rectangle("fill", 0, 0, W, H)
+        luna.gfx.setColor(0.9, 0.3, 0.8)
+        luna.gfx.print("THE BEAST CLAIMS YOU", W/2 - 150, H/2 - 25, 2.5)
+        luna.gfx.setColor(1, 0.8, 0.2)
+        luna.gfx.print("Score: " .. score, W/2 - 50, H/2 + 20, 2)
+        luna.gfx.setColor(0.6, 0.6, 0.6)
+        luna.gfx.print("Press R to restart", W/2 - 100, H/2 + 55, 2)
     elseif game_state == "win" then
-        luna.render.setColor(0, 0, 0, 0.78)
-        luna.render.rectangle("fill", 0, 0, W, H)
-        luna.render.setColor(0.7, 0.3, 1)
-        luna.render.print("CURSE BROKEN!", W/2 - 110, H/2 - 30, 3)
-        luna.render.setColor(1, 0.9, 0.5)
-        luna.render.print("Score: " .. score, W/2 - 50, H/2 + 20, 2)
-        luna.render.setColor(0.6, 0.6, 0.6)
-        luna.render.print("Press R to play again", W/2 - 110, H/2 + 55, 2)
+        luna.gfx.setColor(0, 0, 0, 0.78)
+        luna.gfx.rectangle("fill", 0, 0, W, H)
+        luna.gfx.setColor(0.7, 0.3, 1)
+        luna.gfx.print("CURSE BROKEN!", W/2 - 110, H/2 - 30, 3)
+        luna.gfx.setColor(1, 0.9, 0.5)
+        luna.gfx.print("Score: " .. score, W/2 - 50, H/2 + 20, 2)
+        luna.gfx.setColor(0.6, 0.6, 0.6)
+        luna.gfx.print("Press R to play again", W/2 - 110, H/2 + 55, 2)
     end
 end
 

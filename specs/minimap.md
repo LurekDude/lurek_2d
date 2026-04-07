@@ -1,4 +1,4 @@
-﻿# `minimap` — Agent Reference
+# `minimap` — Agent Reference
 
 | Property       | Value                                                |
 |----------------|------------------------------------------------------|
@@ -283,7 +283,7 @@ Exposed under `luna.minimap.*` by `src/lua_api/minimap_api.rs`. The module regis
 ## Lua Examples
 
 ```lua
-function luna.load()
+function luna.init()
     -- Create a 64x48 minimap displayed at 200x160 pixels
     minimap = luna.minimap.newMinimap(64, 48, 200, 160)
 
@@ -337,7 +337,7 @@ function luna.load()
     minimap:setCenter(32, 24)
 end
 
-function luna.update(dt)
+function luna.process(dt)
     minimap:update(dt) -- expire pings
 
     -- Example: add a ping on key press
@@ -350,9 +350,9 @@ function luna.update(dt)
     minimap:setViewportRect(cx - 8, cy - 6, 16, 12)
 end
 
-function luna.draw()
+function luna.render()
     -- Draw the minimap at screen position (580, 10)
-    -- (actual rendering is done by luna.render using the minimap data)
+    -- (actual rendering is done by luna.gfx using the minimap data)
 end
 ```
 

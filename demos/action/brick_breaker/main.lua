@@ -1,4 +1,4 @@
-﻿-- Brick Breaker (Arkanoid)
+-- Brick Breaker (Arkanoid)
 -- Mouse to move paddle. Ball bounces off bricks, walls, paddle.
 -- Power-ups: wider paddle, multi-ball, slow ball. 3 lives.
 
@@ -66,7 +66,7 @@ local function spawn_particles(x, y, r, g, b, count)
     end
 end
 
-function luna.load()
+function luna.init()
     paddle = { x = W / 2 - 50, y = H - 40, w = 100, h = 12 }
     balls = { make_ball(W / 2, H - 60, 180, -220) }
     powerups = {}
@@ -82,7 +82,7 @@ function luna.load()
     make_bricks(1)
 end
 
-function luna.update(dt)
+function luna.process(dt)
     if state.game_over then return end
 
     -- paddle follows mouse
@@ -257,94 +257,94 @@ local function brick_color(hp)
     return 0.3, 0.9, 0.3
 end
 
-function luna.draw()
-    luna.render.setBackgroundColor(0.08, 0.08, 0.14)
+function luna.render()
+    luna.gfx.setBackgroundColor(0.08, 0.08, 0.14)
 
     -- bricks
     for _, brick in ipairs(bricks) do
         if brick.alive then
             local r, g, b = brick_color(brick.hp)
-            luna.render.setColor(r, g, b, 1)
-            luna.render.rectangle("fill", brick.x, brick.y, brick.w, brick.h)
-            luna.render.setColor(r * 0.6, g * 0.6, b * 0.6, 1)
-            luna.render.rectangle("line", brick.x, brick.y, brick.w, brick.h)
+            luna.gfx.setColor(r, g, b, 1)
+            luna.gfx.rectangle("fill", brick.x, brick.y, brick.w, brick.h)
+            luna.gfx.setColor(r * 0.6, g * 0.6, b * 0.6, 1)
+            luna.gfx.rectangle("line", brick.x, brick.y, brick.w, brick.h)
         end
     end
 
     -- particles
     for _, p in ipairs(particles) do
         local a = clamp(p.life * 3, 0, 1)
-        luna.render.setColor(p.r, p.g, p.b, a)
-        luna.render.circle("fill", p.x, p.y, 3)
+        luna.gfx.setColor(p.r, p.g, p.b, a)
+        luna.gfx.circle("fill", p.x, p.y, 3)
     end
 
     -- powerups
     for _, pu in ipairs(powerups) do
-        if pu.type == "wide" then luna.render.setColor(0.2, 0.6, 1, 1)
-        elseif pu.type == "multi" then luna.render.setColor(1, 0.4, 1, 1)
-        else luna.render.setColor(0.4, 1, 0.4, 1) end
-        luna.render.rectangle("fill", pu.x - pu.w / 2, pu.y, pu.w, pu.h)
-        luna.render.setColor(1, 1, 1, 0.8)
+        if pu.type == "wide" then luna.gfx.setColor(0.2, 0.6, 1, 1)
+        elseif pu.type == "multi" then luna.gfx.setColor(1, 0.4, 1, 1)
+        else luna.gfx.setColor(0.4, 1, 0.4, 1) end
+        luna.gfx.rectangle("fill", pu.x - pu.w / 2, pu.y, pu.w, pu.h)
+        luna.gfx.setColor(1, 1, 1, 0.8)
         local label = pu.type:sub(1, 1):upper()
-        luna.render.print(label, pu.x - 3, pu.y)
+        luna.gfx.print(label, pu.x - 3, pu.y)
     end
 
     -- paddle
-    luna.render.setColor(0.3, 0.5, 1, 1)
-    luna.render.rectangle("fill", paddle.x, paddle.y, paddle.w, paddle.h)
+    luna.gfx.setColor(0.3, 0.5, 1, 1)
+    luna.gfx.rectangle("fill", paddle.x, paddle.y, paddle.w, paddle.h)
     if state.wide_timer > 0 then
-        luna.render.setColor(0.5, 0.8, 1, 0.4)
-        luna.render.rectangle("fill", paddle.x - 2, paddle.y - 2, paddle.w + 4, paddle.h + 4)
+        luna.gfx.setColor(0.5, 0.8, 1, 0.4)
+        luna.gfx.rectangle("fill", paddle.x - 2, paddle.y - 2, paddle.w + 4, paddle.h + 4)
     end
 
     -- balls
     for _, ball in ipairs(balls) do
-        luna.render.setColor(1, 1, 1, 1)
-        luna.render.circle("fill", ball.x, ball.y, ball.radius)
+        luna.gfx.setColor(1, 1, 1, 1)
+        luna.gfx.circle("fill", ball.x, ball.y, ball.radius)
         if state.slow_timer > 0 then
-            luna.render.setColor(0.4, 1, 0.4, 0.3)
-            luna.render.circle("fill", ball.x, ball.y, ball.radius + 3)
+            luna.gfx.setColor(0.4, 1, 0.4, 0.3)
+            luna.gfx.circle("fill", ball.x, ball.y, ball.radius + 3)
         end
     end
 
     -- HUD
-    luna.render.setColor(1, 1, 1, 1)
-    luna.render.print("Score: " .. state.score, 10, 10)
-    luna.render.print("Level: " .. state.level, 10, 30)
-    luna.render.print("Combo: x" .. state.combo, W / 2 - 30, 10)
+    luna.gfx.setColor(1, 1, 1, 1)
+    luna.gfx.print("Score: " .. state.score, 10, 10)
+    luna.gfx.print("Level: " .. state.level, 10, 30)
+    luna.gfx.print("Combo: x" .. state.combo, W / 2 - 30, 10)
 
     -- lives
-    luna.render.setColor(1, 0.3, 0.3, 1)
+    luna.gfx.setColor(1, 0.3, 0.3, 1)
     for i = 1, state.lives do
-        luna.render.circle("fill", W - 20 * i, 20, 7)
+        luna.gfx.circle("fill", W - 20 * i, 20, 7)
     end
 
     -- serving prompt
     if state.serving and not state.game_over then
-        luna.render.setColor(1, 1, 0.5, 0.7 + math.sin(luna.time.getTime() * 5) * 0.3)
-        luna.render.print("Click or press Space to launch!", W / 2 - 100, H / 2)
+        luna.gfx.setColor(1, 1, 0.5, 0.7 + math.sin(luna.time.getTime() * 5) * 0.3)
+        luna.gfx.print("Click or press Space to launch!", W / 2 - 100, H / 2)
     end
 
     -- active effects
     if state.wide_timer > 0 then
-        luna.render.setColor(0.2, 0.6, 1, 0.8)
-        luna.render.print("Wide: " .. math.floor(state.wide_timer) .. "s", W - 100, 40)
+        luna.gfx.setColor(0.2, 0.6, 1, 0.8)
+        luna.gfx.print("Wide: " .. math.floor(state.wide_timer) .. "s", W - 100, 40)
     end
     if state.slow_timer > 0 then
-        luna.render.setColor(0.4, 1, 0.4, 0.8)
-        luna.render.print("Slow: " .. math.floor(state.slow_timer) .. "s", W - 100, 55)
+        luna.gfx.setColor(0.4, 1, 0.4, 0.8)
+        luna.gfx.print("Slow: " .. math.floor(state.slow_timer) .. "s", W - 100, 55)
     end
 
     -- game over
     if state.game_over then
-        luna.render.setColor(0, 0, 0, 0.6)
-        luna.render.rectangle("fill", 0, H / 2 - 40, W, 80)
-        luna.render.setColor(1, 0.3, 0.3, 1)
-        luna.render.print("GAME OVER", W / 2 - 60, H / 2 - 25, 2)
-        luna.render.setColor(1, 1, 1, 1)
-        luna.render.print("Score: " .. state.score .. "  |  R to restart", W / 2 - 80, H / 2 + 15)
+        luna.gfx.setColor(0, 0, 0, 0.6)
+        luna.gfx.rectangle("fill", 0, H / 2 - 40, W, 80)
+        luna.gfx.setColor(1, 0.3, 0.3, 1)
+        luna.gfx.print("GAME OVER", W / 2 - 60, H / 2 - 25, 2)
+        luna.gfx.setColor(1, 1, 1, 1)
+        luna.gfx.print("Score: " .. state.score .. "  |  R to restart", W / 2 - 80, H / 2 + 15)
     end
 
-    luna.render.setColor(0.5, 0.5, 0.5, 0.5)
-    luna.render.print("FPS: " .. luna.time.getFPS(), W - 70, H - 20)
+    luna.gfx.setColor(0.5, 0.5, 0.5, 0.5)
+    luna.gfx.print("FPS: " .. luna.time.getFPS(), W - 70, H - 20)
 end

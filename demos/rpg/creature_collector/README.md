@@ -1,16 +1,16 @@
-﻿# Creature Collector
+# Creature Collector
 
 A Pokémon-inspired RPG demo with overworld exploration and turn-based battles. Walk through a procedurally generated tile map, trigger random encounters in tall grass, and battle wild creatures using type-advantage multipliers. Catch defeated creatures to grow your party.
 
 ## What It Demonstrates
 
-- `luna.render.rectangle()` — tile map rendering with per-tile colour coding
-- `luna.render.circle()` — creature sprites and player avatar on the overworld
-- `luna.render.print()` — battle log, HP values, party summary HUD
-- `luna.render.setColor()` — type-coloured creature indicators and HP bar gradient
+- `luna.gfx.rectangle()` — tile map rendering with per-tile colour coding
+- `luna.gfx.circle()` — creature sprites and player avatar on the overworld
+- `luna.gfx.print()` — battle log, HP values, party summary HUD
+- `luna.gfx.setColor()` — type-coloured creature indicators and HP bar gradient
 - `luna.keyboard.isDown()` — grid-based WASD movement with cooldown gating
 - `luna.keyboard.isPressed()` — battle menu navigation (1=attack, 2=switch, 3=catch, 4=run)
-- `luna.render.setBackgroundColor()` — distinct overworld vs. battle scene backgrounds
+- `luna.gfx.setBackgroundColor()` — distinct overworld vs. battle scene backgrounds
 
 ## How to Run
 

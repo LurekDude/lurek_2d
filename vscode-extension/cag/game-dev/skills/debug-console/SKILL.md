@@ -1,4 +1,4 @@
-﻿# Debug Console
+# Debug Console
 
 Toggle overlay with command input, built-in commands, and extensible command registration.
 
@@ -153,24 +153,24 @@ local function draw_console()
     local ch = 250  -- console height
 
     -- Background
-    luna.render.setColor(0, 0, 0, 0.85)
-    luna.render.rectangle("fill", 0, 0, sw, ch)
+    luna.gfx.setColor(0, 0, 0, 0.85)
+    luna.gfx.rectangle("fill", 0, 0, sw, ch)
 
     -- Log lines
-    luna.render.setColor(0.8, 0.8, 0.8, 1)
+    luna.gfx.setColor(0.8, 0.8, 0.8, 1)
     local start = math.max(1, #console.log - 12)
     for i = start, #console.log do
         local y = (i - start) * 16 + 4
-        luna.render.print(console.log[i], 8, y)
+        luna.gfx.print(console.log[i], 8, y)
     end
 
     -- Input line
-    luna.render.setColor(0.2, 0.2, 0.2, 1)
-    luna.render.rectangle("fill", 0, ch - 22, sw, 22)
-    luna.render.setColor(0, 1, 0, 1)
-    luna.render.print("> " .. console.input .. "_", 8, ch - 20)
+    luna.gfx.setColor(0.2, 0.2, 0.2, 1)
+    luna.gfx.rectangle("fill", 0, ch - 22, sw, 22)
+    luna.gfx.setColor(0, 1, 0, 1)
+    luna.gfx.print("> " .. console.input .. "_", 8, ch - 20)
 
-    luna.render.setColor(1, 1, 1, 1)
+    luna.gfx.setColor(1, 1, 1, 1)
 end
 ```
 

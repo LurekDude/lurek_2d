@@ -1,4 +1,4 @@
-﻿-- Maze Defense — Tower Defense with Player-Built Mazing
+-- Maze Defense — Tower Defense with Player-Built Mazing
 -- Place walls to redirect enemies, build towers to shoot them
 
 local GRID_W, GRID_H = 20, 15
@@ -98,7 +98,7 @@ local function startWave()
     waveActive = true
 end
 
-function luna.load()
+function luna.init()
     for y = 1, GRID_H do
         grid[y] = {}
         for x = 1, GRID_W do
@@ -109,7 +109,7 @@ function luna.load()
     startWave()
 end
 
-function luna.update(dt)
+function luna.process(dt)
     if gameOver then return end
 
     -- Spawn enemies
@@ -278,8 +278,8 @@ function luna.mousepressed(mx, my, btn)
     end
 end
 
-function luna.draw()
-    luna.render.setBackgroundColor(0.08, 0.1, 0.08)
+function luna.render()
+    luna.gfx.setBackgroundColor(0.08, 0.1, 0.08)
 
     -- Grid
     for y = 1, GRID_H do
@@ -287,38 +287,38 @@ function luna.draw()
             local px = OX + (x - 1) * CELL
             local py = OY + (y - 1) * CELL
             if grid[y][x] == 0 then
-                luna.render.setColor(0.15, 0.18, 0.15, 1)
+                luna.gfx.setColor(0.15, 0.18, 0.15, 1)
             elseif grid[y][x] == 1 then
-                luna.render.setColor(0.4, 0.35, 0.25, 1)
+                luna.gfx.setColor(0.4, 0.35, 0.25, 1)
             elseif grid[y][x] == 2 then
-                luna.render.setColor(0.2, 0.3, 0.6, 1)
+                luna.gfx.setColor(0.2, 0.3, 0.6, 1)
             end
-            luna.render.rectangle("fill", px, py, CELL - 1, CELL - 1)
+            luna.gfx.rectangle("fill", px, py, CELL - 1, CELL - 1)
         end
     end
 
     -- Spawn and exit markers
-    luna.render.setColor(0, 1, 0, 1)
-    luna.render.rectangle("fill", OX + (SPAWN[1]-1)*CELL, OY + (SPAWN[2]-1)*CELL, CELL-1, CELL-1)
-    luna.render.setColor(1, 0, 0, 1)
-    luna.render.rectangle("fill", OX + (EXIT[1]-1)*CELL, OY + (EXIT[2]-1)*CELL, CELL-1, CELL-1)
+    luna.gfx.setColor(0, 1, 0, 1)
+    luna.gfx.rectangle("fill", OX + (SPAWN[1]-1)*CELL, OY + (SPAWN[2]-1)*CELL, CELL-1, CELL-1)
+    luna.gfx.setColor(1, 0, 0, 1)
+    luna.gfx.rectangle("fill", OX + (EXIT[1]-1)*CELL, OY + (EXIT[2]-1)*CELL, CELL-1, CELL-1)
 
     -- Path visualization
-    luna.render.setColor(0.3, 0.8, 0.3, 0.3)
+    luna.gfx.setColor(0.3, 0.8, 0.3, 0.3)
     for _, p in ipairs(path) do
         if grid[p[2]][p[1]] == 0 then
-            luna.render.rectangle("fill", OX + (p[1]-1)*CELL + 8, OY + (p[2]-1)*CELL + 8, CELL - 17, CELL - 17)
+            luna.gfx.rectangle("fill", OX + (p[1]-1)*CELL + 8, OY + (p[2]-1)*CELL + 8, CELL - 17, CELL - 17)
         end
     end
 
     -- Tower range indicators
-    luna.render.setColor(0.3, 0.4, 0.8, 0.15)
+    luna.gfx.setColor(0.3, 0.4, 0.8, 0.15)
     for y = 1, GRID_H do
         for x = 1, GRID_W do
             if grid[y][x] == 2 then
                 local tx = (x - 0.5) * CELL + OX
                 local ty = (y - 0.5) * CELL + OY
-                luna.render.circle("fill", tx, ty, CELL * 3)
+                luna.gfx.circle("fill", tx, ty, CELL * 3)
             end
         end
     end
@@ -326,38 +326,38 @@ function luna.draw()
     -- Enemies
     for _, e in ipairs(enemies) do
         -- HP bar
-        luna.render.setColor(0.3, 0.3, 0.3, 1)
-        luna.render.rectangle("fill", e.x - 8, e.y - 14, 16, 3)
-        luna.render.setColor(1, 0.2, 0.2, 1)
-        luna.render.rectangle("fill", e.x - 8, e.y - 14, 16 * (e.hp / e.maxHp), 3)
+        luna.gfx.setColor(0.3, 0.3, 0.3, 1)
+        luna.gfx.rectangle("fill", e.x - 8, e.y - 14, 16, 3)
+        luna.gfx.setColor(1, 0.2, 0.2, 1)
+        luna.gfx.rectangle("fill", e.x - 8, e.y - 14, 16 * (e.hp / e.maxHp), 3)
         -- Body
-        luna.render.setColor(0.9, 0.3, 0.3, 1)
-        luna.render.circle("fill", e.x, e.y, 6)
+        luna.gfx.setColor(0.9, 0.3, 0.3, 1)
+        luna.gfx.circle("fill", e.x, e.y, 6)
     end
 
     -- Bullets
-    luna.render.setColor(1, 1, 0.4, 1)
+    luna.gfx.setColor(1, 1, 0.4, 1)
     for _, b in ipairs(bullets) do
-        luna.render.circle("fill", b.x, b.y, 3)
+        luna.gfx.circle("fill", b.x, b.y, 3)
     end
 
     -- HUD
-    luna.render.setColor(0, 0, 0, 0.8)
-    luna.render.rectangle("fill", 0, 0, 800, 18)
-    luna.render.setColor(1, 1, 1, 1)
-    luna.render.print("Wave: " .. wave .. "  Gold: " .. gold .. "  Lives: " .. lives .. "  Score: " .. score, 10, 2)
+    luna.gfx.setColor(0, 0, 0, 0.8)
+    luna.gfx.rectangle("fill", 0, 0, 800, 18)
+    luna.gfx.setColor(1, 1, 1, 1)
+    luna.gfx.print("Wave: " .. wave .. "  Gold: " .. gold .. "  Lives: " .. lives .. "  Score: " .. score, 10, 2)
     local modeText = buildMode == "wall" and "[1]>WALL($5)" or "  [1] Wall($5)"
     local modeText2 = buildMode == "tower" and " [2]>TOWER($20)" or " [2] Tower($20)"
-    luna.render.setColor(0.8, 0.8, 0.5, 1)
-    luna.render.print(modeText .. modeText2 .. "  RClick=Remove", 400, 2)
+    luna.gfx.setColor(0.8, 0.8, 0.5, 1)
+    luna.gfx.print(modeText .. modeText2 .. "  RClick=Remove", 400, 2)
 
     if gameOver then
-        luna.render.setColor(0, 0, 0, 0.7)
-        luna.render.rectangle("fill", 250, 250, 300, 80)
-        luna.render.setColor(1, 0.3, 0.3, 1)
-        luna.render.print("GAME OVER", 330, 265, 1.5)
-        luna.render.setColor(1, 1, 1, 1)
-        luna.render.print("Score: " .. score .. "  Wave: " .. wave, 320, 300)
-        luna.render.print("Press R to restart", 320, 318)
+        luna.gfx.setColor(0, 0, 0, 0.7)
+        luna.gfx.rectangle("fill", 250, 250, 300, 80)
+        luna.gfx.setColor(1, 0.3, 0.3, 1)
+        luna.gfx.print("GAME OVER", 330, 265, 1.5)
+        luna.gfx.setColor(1, 1, 1, 1)
+        luna.gfx.print("Score: " .. score .. "  Wave: " .. wave, 320, 300)
+        luna.gfx.print("Press R to restart", 320, 318)
     end
 end

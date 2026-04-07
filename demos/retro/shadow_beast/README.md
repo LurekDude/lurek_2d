@@ -1,4 +1,4 @@
-﻿# Shadow of the Beast
+# Shadow of the Beast
 
 An atmospheric side-scrolling action game inspired by Psygnosis's visually stunning 1989
 Amiga classic. Battle through three stages of increasingly powerful beasts and their bosses
@@ -6,7 +6,7 @@ to break the ancient curse.
 
 ## What It Demonstrates
 
-- `luna.render.rectangle()` / `luna.render.circle()` — silhouette art style
+- `luna.gfx.rectangle()` / `luna.gfx.circle()` — silhouette art style
 - Multi-layer parallax scrolling using different scroll speed factors
 - `luna.input.isKeyDown()` — smooth player movement and scrolling
 - `luna.keypressed()` — jump and attack

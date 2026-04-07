@@ -1,4 +1,4 @@
-﻿-- Bullet Hell Shooter
+-- Bullet Hell Shooter
 -- Controls: Arrow keys to move, Space to shoot, Escape to quit
 -- Survive waves of enemies and their bullet patterns!
 
@@ -18,9 +18,9 @@ local wave = 1
 local shootTimer = 0
 local W, H = 800, 600
 
-function luna.load()
+function luna.init()
     luna.window.setTitle("Bullet Hell")
-    luna.render.setBackgroundColor(0.05, 0.02, 0.1)
+    luna.gfx.setBackgroundColor(0.05, 0.02, 0.1)
     player.x = W / 2
     player.y = H - 60
     player.w = 20
@@ -64,7 +64,7 @@ local function fireEnemyBullet(e, angle, speed)
     })
 end
 
-function luna.update(dt)
+function luna.process(dt)
     if gameOver then return end
 
     -- Player movement
@@ -170,19 +170,19 @@ function luna.update(dt)
     end
 end
 
-function luna.draw()
+function luna.render()
     -- Stars background
-    luna.render.setColor(0.3, 0.3, 0.4, 0.6)
+    luna.gfx.setColor(0.3, 0.3, 0.4, 0.6)
     for i = 1, 60 do
         local sx = (i * 137) % W
         local sy = ((i * 251) + luna.time.getTime() * (20 + i % 3 * 10)) % H
-        luna.render.rectangle("fill", sx, sy, 2, 2)
+        luna.gfx.rectangle("fill", sx, sy, 2, 2)
     end
 
     -- Player
     if not gameOver then
-        luna.render.setColor(0.3, 0.7, 1, 1)
-        luna.render.polygon("fill", {
+        luna.gfx.setColor(0.3, 0.7, 1, 1)
+        luna.gfx.polygon("fill", {
             player.x, player.y - 14,
             player.x - 10, player.y + 10,
             player.x + 10, player.y + 10
@@ -190,44 +190,44 @@ function luna.draw()
     end
 
     -- Player bullets
-    luna.render.setColor(0.4, 1, 0.4, 1)
+    luna.gfx.setColor(0.4, 1, 0.4, 1)
     for _, b in ipairs(bullets) do
-        luna.render.rectangle("fill", b.x - 2, b.y, 4, 10)
+        luna.gfx.rectangle("fill", b.x - 2, b.y, 4, 10)
     end
 
     -- Enemies
-    luna.render.setColor(1, 0.3, 0.3, 1)
+    luna.gfx.setColor(1, 0.3, 0.3, 1)
     for _, e in ipairs(enemies) do
-        luna.render.rectangle("fill", e.x - e.w / 2, e.y - e.h / 2, e.w, e.h)
-        luna.render.setColor(1, 0.6, 0, 1)
-        luna.render.rectangle("fill", e.x - 4, e.y - 4, 8, 8)
-        luna.render.setColor(1, 0.3, 0.3, 1)
+        luna.gfx.rectangle("fill", e.x - e.w / 2, e.y - e.h / 2, e.w, e.h)
+        luna.gfx.setColor(1, 0.6, 0, 1)
+        luna.gfx.rectangle("fill", e.x - 4, e.y - 4, 8, 8)
+        luna.gfx.setColor(1, 0.3, 0.3, 1)
     end
 
     -- Enemy bullets
-    luna.render.setColor(1, 1, 0.2, 1)
+    luna.gfx.setColor(1, 1, 0.2, 1)
     for _, b in ipairs(enemyBullets) do
-        luna.render.circle("fill", b.x, b.y, 4)
+        luna.gfx.circle("fill", b.x, b.y, 4)
     end
 
     -- Particles
     for _, p in ipairs(particles) do
-        luna.render.setColor(p.r, p.g, p.b, p.life * 2)
-        luna.render.circle("fill", p.x, p.y, 3)
+        luna.gfx.setColor(p.r, p.g, p.b, p.life * 2)
+        luna.gfx.circle("fill", p.x, p.y, 3)
     end
 
     -- HUD
-    luna.render.setColor(1, 1, 1, 1)
-    luna.render.print("Score: " .. score, 10, 10)
-    luna.render.print("Lives: " .. lives, 10, 30)
-    luna.render.print("Wave: " .. wave, 10, 50)
-    luna.render.print("FPS: " .. luna.time.getFPS(), W - 90, 10)
+    luna.gfx.setColor(1, 1, 1, 1)
+    luna.gfx.print("Score: " .. score, 10, 10)
+    luna.gfx.print("Lives: " .. lives, 10, 30)
+    luna.gfx.print("Wave: " .. wave, 10, 50)
+    luna.gfx.print("FPS: " .. luna.time.getFPS(), W - 90, 10)
 
     if gameOver then
-        luna.render.setColor(1, 0.2, 0.2, 1)
-        luna.render.print("GAME OVER", W / 2 - 60, H / 2 - 20, 2)
-        luna.render.setColor(1, 1, 1, 1)
-        luna.render.print("Final Score: " .. score, W / 2 - 55, H / 2 + 20)
+        luna.gfx.setColor(1, 0.2, 0.2, 1)
+        luna.gfx.print("GAME OVER", W / 2 - 60, H / 2 - 20, 2)
+        luna.gfx.setColor(1, 1, 1, 1)
+        luna.gfx.print("Final Score: " .. score, W / 2 - 55, H / 2 + 20)
     end
 end
 

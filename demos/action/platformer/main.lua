@@ -1,4 +1,4 @@
-﻿-- Platformer Demo for Luna2D
+-- Platformer Demo for Luna2D
 -- A simple platformer showcasing physics, input, easing, and scene management.
 -- Arrow keys / WASD to move, SPACE to jump.
 
@@ -91,9 +91,9 @@ end
 
 -- ── Luna2D callbacks ─────────────────────────────────────────────────────
 
-function luna.load()
+function luna.init()
     luna.window.setTitle("Platformer Demo - Luna2D")
-    luna.render.setBackgroundColor(0.05, 0.07, 0.15)
+    luna.gfx.setBackgroundColor(0.05, 0.07, 0.15)
     generate_level()
 
     -- Phase 4: load optional footstep sound for spatial audio demo
@@ -103,7 +103,7 @@ function luna.load()
     end
 end
 
-function luna.update(dt)
+function luna.process(dt)
     if not player.alive then
         return
     end
@@ -203,74 +203,74 @@ function luna.update(dt)
     end
 end
 
-function luna.draw()
-    luna.render.push()
-    luna.render.translate(-camera_x, 0)
+function luna.render()
+    luna.gfx.push()
+    luna.gfx.translate(-camera_x, 0)
 
     -- Draw sky gradient (simple horizontal bands)
     for i = 0, 5 do
         local shade = 0.05 + i * 0.02
-        luna.render.setColor(shade * 0.5, shade * 0.7, shade * 1.5)
-        luna.render.rectangle("fill", camera_x, i * 100, 800, 100)
+        luna.gfx.setColor(shade * 0.5, shade * 0.7, shade * 1.5)
+        luna.gfx.rectangle("fill", camera_x, i * 100, 800, 100)
     end
 
     -- Draw platforms
     for _, p in ipairs(platforms) do
-        luna.render.setColor(p.color[1], p.color[2], p.color[3])
-        luna.render.rectangle("fill", p.x, p.y, p.w, p.h)
+        luna.gfx.setColor(p.color[1], p.color[2], p.color[3])
+        luna.gfx.rectangle("fill", p.x, p.y, p.w, p.h)
         -- Platform top highlight
-        luna.render.setColor(p.color[1] + 0.1, p.color[2] + 0.1, p.color[3] + 0.1)
-        luna.render.rectangle("fill", p.x, p.y, p.w, 3)
+        luna.gfx.setColor(p.color[1] + 0.1, p.color[2] + 0.1, p.color[3] + 0.1)
+        luna.gfx.rectangle("fill", p.x, p.y, p.w, 3)
     end
 
     -- Draw coins
     for _, coin in ipairs(coins) do
         if not coin.collected then
             local bob_y = math.sin(coin.bob * 3) * 5
-            luna.render.setColor(1.0, 0.85, 0.0)
-            luna.render.circle("fill", coin.x, coin.y + bob_y, 8)
-            luna.render.setColor(1.0, 0.95, 0.5)
-            luna.render.circle("fill", coin.x - 2, coin.y + bob_y - 2, 3)
+            luna.gfx.setColor(1.0, 0.85, 0.0)
+            luna.gfx.circle("fill", coin.x, coin.y + bob_y, 8)
+            luna.gfx.setColor(1.0, 0.95, 0.5)
+            luna.gfx.circle("fill", coin.x - 2, coin.y + bob_y - 2, 3)
         end
     end
 
     -- Draw particles
     for _, p in ipairs(particles) do
         local alpha = p.life / p.max_life
-        luna.render.setColor(p.r, p.g, p.b, alpha)
-        luna.render.rectangle("fill", p.x - p.size / 2, p.y - p.size / 2, p.size, p.size)
+        luna.gfx.setColor(p.r, p.g, p.b, alpha)
+        luna.gfx.rectangle("fill", p.x - p.size / 2, p.y - p.size / 2, p.size, p.size)
     end
 
     -- Draw player
     if player.alive then
         -- Body
-        luna.render.setColor(0.3, 0.6, 1.0)
-        luna.render.rectangle("fill", player.x, player.y, player.w, player.h)
+        luna.gfx.setColor(0.3, 0.6, 1.0)
+        luna.gfx.rectangle("fill", player.x, player.y, player.w, player.h)
         -- Eyes
         local eye_x = player.x + (player.facing > 0 and 16 or 4)
-        luna.render.setColor(1, 1, 1)
-        luna.render.rectangle("fill", eye_x, player.y + 8, 6, 6)
-        luna.render.setColor(0, 0, 0)
-        luna.render.rectangle("fill", eye_x + (player.facing > 0 and 2 or 0), player.y + 10, 3, 3)
+        luna.gfx.setColor(1, 1, 1)
+        luna.gfx.rectangle("fill", eye_x, player.y + 8, 6, 6)
+        luna.gfx.setColor(0, 0, 0)
+        luna.gfx.rectangle("fill", eye_x + (player.facing > 0 and 2 or 0), player.y + 10, 3, 3)
     end
 
-    luna.render.pop()
+    luna.gfx.pop()
 
     -- HUD (not affected by camera)
-    luna.render.setColor(1, 1, 1)
-    luna.render.print("Coins: " .. tostring(player.score), 10, 10, 2)
+    luna.gfx.setColor(1, 1, 1)
+    luna.gfx.print("Coins: " .. tostring(player.score), 10, 10, 2)
 
     local fps = math.floor(luna.time.getFPS())
-    luna.render.setColor(0.5, 0.5, 0.5)
-    luna.render.print("FPS: " .. tostring(fps), 700, 10, 1.5)
+    luna.gfx.setColor(0.5, 0.5, 0.5)
+    luna.gfx.print("FPS: " .. tostring(fps), 700, 10, 1.5)
 
     if not player.alive then
-        luna.render.setColor(1, 0.2, 0.2)
-        luna.render.print("GAME OVER - Press R to restart", 200, 280, 2.5)
+        luna.gfx.setColor(1, 0.2, 0.2)
+        luna.gfx.print("GAME OVER - Press R to restart", 200, 280, 2.5)
     end
 
-    luna.render.setColor(0.4, 0.4, 0.4)
-    luna.render.print("Arrows/WASD + SPACE to jump", 10, 575, 1.5)
+    luna.gfx.setColor(0.4, 0.4, 0.4)
+    luna.gfx.print("Arrows/WASD + SPACE to jump", 10, 575, 1.5)
 end
 
 function luna.keypressed(key)

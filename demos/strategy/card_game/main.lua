@@ -1,4 +1,4 @@
-﻿-- Card Game (CCG)
+-- Card Game (CCG)
 -- Controls: Click card in hand to play it, Enter to end turn, Escape to quit
 -- Defeat the AI opponent by reducing their HP to 0!
 
@@ -59,9 +59,9 @@ local function addLog(msg)
     if #log > 6 then table.remove(log) end
 end
 
-function luna.load()
+function luna.init()
     luna.window.setTitle("Card Game")
-    luna.render.setBackgroundColor(0.1, 0.08, 0.15)
+    luna.gfx.setBackgroundColor(0.1, 0.08, 0.15)
     player = { hp = 30, maxHp = 30, mana = 0, maxMana = 1, shield = 0, deck = makeDeck(), hand = {} }
     enemy  = { hp = 30, maxHp = 30, mana = 0, maxMana = 1, shield = 0, deck = makeDeck(), hand = {} }
     turnNum = 0
@@ -127,7 +127,7 @@ local function aiPlay()
     end
 end
 
-function luna.update(dt)
+function luna.process(dt)
     if gameOver then return end
     if phase == "wait" then
         waitTimer = waitTimer - dt
@@ -142,71 +142,71 @@ local function drawCard(c, x, y, hovered)
     local cr, cg, cb = c.color[1], c.color[2], c.color[3]
     -- Card bg
     if hovered then
-        luna.render.setColor(cr, cg, cb, 1)
+        luna.gfx.setColor(cr, cg, cb, 1)
     else
-        luna.render.setColor(cr * 0.6, cg * 0.6, cb * 0.6, 1)
+        luna.gfx.setColor(cr * 0.6, cg * 0.6, cb * 0.6, 1)
     end
-    luna.render.rectangle("fill", x, y, CARD_W, CARD_H)
-    luna.render.setColor(0.9, 0.9, 0.8, 1)
-    luna.render.rectangle("line", x, y, CARD_W, CARD_H)
+    luna.gfx.rectangle("fill", x, y, CARD_W, CARD_H)
+    luna.gfx.setColor(0.9, 0.9, 0.8, 1)
+    luna.gfx.rectangle("line", x, y, CARD_W, CARD_H)
     -- Name
-    luna.render.setColor(1, 1, 1, 1)
-    luna.render.print(c.name, x + 4, y + 6)
+    luna.gfx.setColor(1, 1, 1, 1)
+    luna.gfx.print(c.name, x + 4, y + 6)
     -- Cost
-    luna.render.setColor(0.3, 0.5, 1, 1)
-    luna.render.circle("fill", x + CARD_W - 14, y + 14, 12)
-    luna.render.setColor(1, 1, 1, 1)
-    luna.render.print(c.cost, x + CARD_W - 18, y + 7)
+    luna.gfx.setColor(0.3, 0.5, 1, 1)
+    luna.gfx.circle("fill", x + CARD_W - 14, y + 14, 12)
+    luna.gfx.setColor(1, 1, 1, 1)
+    luna.gfx.print(c.cost, x + CARD_W - 18, y + 7)
     -- Stats
-    luna.render.setColor(1, 0.9, 0.7, 1)
+    luna.gfx.setColor(1, 0.9, 0.7, 1)
     if c.kind == "attack" or c.kind == "drain" then
-        luna.render.print("ATK:" .. c.atk, x + 6, y + 50)
+        luna.gfx.print("ATK:" .. c.atk, x + 6, y + 50)
     end
-    luna.render.setColor(0.7, 0.7, 0.7, 1)
-    luna.render.print(c.kind, x + 6, y + 80)
+    luna.gfx.setColor(0.7, 0.7, 0.7, 1)
+    luna.gfx.print(c.kind, x + 6, y + 80)
 end
 
-function luna.draw()
+function luna.render()
     local mx, my = luna.mouse.getPosition()
 
     -- Enemy area
-    luna.render.setColor(0.15, 0.1, 0.1, 1)
-    luna.render.rectangle("fill", 50, 20, 700, 80)
-    luna.render.setColor(0.9, 0.3, 0.3, 1)
-    luna.render.print("ENEMY", 60, 26)
-    luna.render.setColor(1, 1, 1, 1)
-    luna.render.print("HP: " .. enemy.hp .. "/" .. enemy.maxHp, 60, 46)
-    luna.render.print("Mana: " .. enemy.mana .. "/" .. enemy.maxMana, 60, 66)
-    luna.render.print("Shield: " .. enemy.shield, 200, 46)
-    luna.render.print("Cards: " .. #enemy.hand, 200, 66)
+    luna.gfx.setColor(0.15, 0.1, 0.1, 1)
+    luna.gfx.rectangle("fill", 50, 20, 700, 80)
+    luna.gfx.setColor(0.9, 0.3, 0.3, 1)
+    luna.gfx.print("ENEMY", 60, 26)
+    luna.gfx.setColor(1, 1, 1, 1)
+    luna.gfx.print("HP: " .. enemy.hp .. "/" .. enemy.maxHp, 60, 46)
+    luna.gfx.print("Mana: " .. enemy.mana .. "/" .. enemy.maxMana, 60, 66)
+    luna.gfx.print("Shield: " .. enemy.shield, 200, 46)
+    luna.gfx.print("Cards: " .. #enemy.hand, 200, 66)
     -- Enemy HP bar
-    luna.render.setColor(0.3, 0.1, 0.1, 1)
-    luna.render.rectangle("fill", 340, 40, 200, 16)
-    luna.render.setColor(0.9, 0.2, 0.2, 1)
-    luna.render.rectangle("fill", 340, 40, 200 * (enemy.hp / enemy.maxHp), 16)
+    luna.gfx.setColor(0.3, 0.1, 0.1, 1)
+    luna.gfx.rectangle("fill", 340, 40, 200, 16)
+    luna.gfx.setColor(0.9, 0.2, 0.2, 1)
+    luna.gfx.rectangle("fill", 340, 40, 200 * (enemy.hp / enemy.maxHp), 16)
 
     -- Player area
-    luna.render.setColor(0.1, 0.1, 0.15, 1)
-    luna.render.rectangle("fill", 50, 110, 700, 80)
-    luna.render.setColor(0.3, 0.5, 1, 1)
-    luna.render.print("YOU", 60, 116)
-    luna.render.setColor(1, 1, 1, 1)
-    luna.render.print("HP: " .. player.hp .. "/" .. player.maxHp, 60, 136)
-    luna.render.print("Mana: " .. player.mana .. "/" .. player.maxMana, 60, 156)
-    luna.render.print("Shield: " .. player.shield, 200, 136)
-    luna.render.print("Deck: " .. #player.deck, 200, 156)
+    luna.gfx.setColor(0.1, 0.1, 0.15, 1)
+    luna.gfx.rectangle("fill", 50, 110, 700, 80)
+    luna.gfx.setColor(0.3, 0.5, 1, 1)
+    luna.gfx.print("YOU", 60, 116)
+    luna.gfx.setColor(1, 1, 1, 1)
+    luna.gfx.print("HP: " .. player.hp .. "/" .. player.maxHp, 60, 136)
+    luna.gfx.print("Mana: " .. player.mana .. "/" .. player.maxMana, 60, 156)
+    luna.gfx.print("Shield: " .. player.shield, 200, 136)
+    luna.gfx.print("Deck: " .. #player.deck, 200, 156)
     -- Player HP bar
-    luna.render.setColor(0.1, 0.1, 0.3, 1)
-    luna.render.rectangle("fill", 340, 130, 200, 16)
-    luna.render.setColor(0.2, 0.5, 1, 1)
-    luna.render.rectangle("fill", 340, 130, 200 * (player.hp / player.maxHp), 16)
+    luna.gfx.setColor(0.1, 0.1, 0.3, 1)
+    luna.gfx.rectangle("fill", 340, 130, 200, 16)
+    luna.gfx.setColor(0.2, 0.5, 1, 1)
+    luna.gfx.rectangle("fill", 340, 130, 200 * (player.hp / player.maxHp), 16)
 
     -- Log
-    luna.render.setColor(0, 0, 0, 0.5)
-    luna.render.rectangle("fill", 50, 200, 300, 120)
+    luna.gfx.setColor(0, 0, 0, 0.5)
+    luna.gfx.rectangle("fill", 50, 200, 300, 120)
     for i, msg in ipairs(log) do
-        luna.render.setColor(0.8, 0.8, 0.7, clamp(1.2 - i * 0.15, 0.3, 1))
-        luna.render.print(msg, 58, 200 + (i - 1) * 18)
+        luna.gfx.setColor(0.8, 0.8, 0.7, clamp(1.2 - i * 0.15, 0.3, 1))
+        luna.gfx.print(msg, 58, 200 + (i - 1) * 18)
     end
 
     -- Player hand
@@ -219,7 +219,7 @@ function luna.draw()
         if hovered then cy = cy - 12 end
         local canPlay = c.cost <= player.mana and phase == "play" and turn == "player"
         if not canPlay then
-            luna.render.setColor(0.4, 0.4, 0.4, 0.4)
+            luna.gfx.setColor(0.4, 0.4, 0.4, 0.4)
             drawCard(c, cx, cy, false)
         else
             drawCard(c, cx, cy, hovered)
@@ -227,15 +227,15 @@ function luna.draw()
     end
 
     -- Phase info
-    luna.render.setColor(1, 1, 1, 1)
-    luna.render.print("Turn " .. turnNum .. "  [Enter] End Turn", 400, 200)
+    luna.gfx.setColor(1, 1, 1, 1)
+    luna.gfx.print("Turn " .. turnNum .. "  [Enter] End Turn", 400, 200)
 
     if gameOver then
-        luna.render.setColor(0, 0, 0, 0.6)
-        luna.render.rectangle("fill", 200, 250, 400, 80)
-        luna.render.setColor(1, 1, 0.3, 1)
+        luna.gfx.setColor(0, 0, 0, 0.6)
+        luna.gfx.rectangle("fill", 200, 250, 400, 80)
+        luna.gfx.setColor(1, 1, 0.3, 1)
         local msg = enemy.hp <= 0 and "YOU WIN!" or "YOU LOSE!"
-        luna.render.print(msg, 330, 270, 2)
+        luna.gfx.print(msg, 330, 270, 2)
     end
 end
 

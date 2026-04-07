@@ -1,4 +1,4 @@
-﻿-- Scene Management Demo for Luna2D
+-- Scene Management Demo for Luna2D
 -- Demonstrates a Lua-side scene state machine:
 --   Title Screen -> Gameplay -> Game Over
 -- Press ENTER to advance scenes, ESC to go back.
@@ -27,7 +27,7 @@ end
 local title = {}
 
 function title.enter()
-    luna.render.setBackgroundColor(0.08, 0.05, 0.18)
+    luna.gfx.setBackgroundColor(0.08, 0.05, 0.18)
 end
 
 function title.update(dt)
@@ -36,20 +36,20 @@ function title.update(dt)
 end
 
 function title.draw()
-    local w = luna.render.getWidth()
-    local h = luna.render.getHeight()
+    local w = luna.gfx.getWidth()
+    local h = luna.gfx.getHeight()
 
     -- Title text
     local pulse = math.sin((title.pulse or 0) * 2) * 0.15 + 0.85
-    luna.render.setColor(0.3 * pulse, 0.6 * pulse, 1.0 * pulse)
-    luna.render.print("LUNA2D", w / 2 - 100, h / 3, 5)
+    luna.gfx.setColor(0.3 * pulse, 0.6 * pulse, 1.0 * pulse)
+    luna.gfx.print("LUNA2D", w / 2 - 100, h / 3, 5)
 
-    luna.render.setColor(0.7, 0.7, 0.7)
-    luna.render.print("Scene Management Demo", w / 2 - 120, h / 3 + 70, 2)
+    luna.gfx.setColor(0.7, 0.7, 0.7)
+    luna.gfx.print("Scene Management Demo", w / 2 - 120, h / 3 + 70, 2)
 
     -- Instructions
-    luna.render.setColor(0.5, 0.5, 0.5)
-    luna.render.print("Press ENTER to start", w / 2 - 100, h * 0.7, 2)
+    luna.gfx.setColor(0.5, 0.5, 0.5)
+    luna.gfx.print("Press ENTER to start", w / 2 - 100, h * 0.7, 2)
 end
 
 function title.keypressed(key)
@@ -65,7 +65,7 @@ local player = { x = 400, y = 300, speed = 200, score = 0 }
 local coins = {}
 
 function gameplay.enter()
-    luna.render.setBackgroundColor(0.05, 0.1, 0.05)
+    luna.gfx.setBackgroundColor(0.05, 0.1, 0.05)
     player.x = 400
     player.y = 300
     player.score = 0
@@ -119,22 +119,22 @@ function gameplay.draw()
     -- Draw coins
     for _, coin in ipairs(coins) do
         if not coin.collected then
-            luna.render.setColor(1.0, 0.85, 0.0)
-            luna.render.circle("fill", coin.x, coin.y, 10)
-            luna.render.setColor(0.8, 0.65, 0.0)
-            luna.render.circle("line", coin.x, coin.y, 10)
+            luna.gfx.setColor(1.0, 0.85, 0.0)
+            luna.gfx.circle("fill", coin.x, coin.y, 10)
+            luna.gfx.setColor(0.8, 0.65, 0.0)
+            luna.gfx.circle("line", coin.x, coin.y, 10)
         end
     end
 
     -- Draw player
-    luna.render.setColor(0.3, 0.8, 1.0)
-    luna.render.rectangle("fill", player.x - 15, player.y - 15, 30, 30)
+    luna.gfx.setColor(0.3, 0.8, 1.0)
+    luna.gfx.rectangle("fill", player.x - 15, player.y - 15, 30, 30)
 
     -- HUD
-    luna.render.setColor(1, 1, 1)
-    luna.render.print("Score: " .. tostring(player.score) .. " / 5", 10, 10, 2)
-    luna.render.setColor(0.5, 0.5, 0.5)
-    luna.render.print("WASD to move | ESC for title", 10, 570, 1.5)
+    luna.gfx.setColor(1, 1, 1)
+    luna.gfx.print("Score: " .. tostring(player.score) .. " / 5", 10, 10, 2)
+    luna.gfx.setColor(0.5, 0.5, 0.5)
+    luna.gfx.print("WASD to move | ESC for title", 10, 570, 1.5)
 end
 
 function gameplay.keypressed(key)
@@ -148,7 +148,7 @@ end
 local gameover = {}
 
 function gameover.enter()
-    luna.render.setBackgroundColor(0.15, 0.05, 0.05)
+    luna.gfx.setBackgroundColor(0.15, 0.05, 0.05)
     gameover.timer = 0
 end
 
@@ -157,18 +157,18 @@ function gameover.update(dt)
 end
 
 function gameover.draw()
-    local w = luna.render.getWidth()
-    local h = luna.render.getHeight()
+    local w = luna.gfx.getWidth()
+    local h = luna.gfx.getHeight()
 
-    luna.render.setColor(0.2, 1.0, 0.3)
-    luna.render.print("YOU WIN!", w / 2 - 80, h / 3, 4)
+    luna.gfx.setColor(0.2, 1.0, 0.3)
+    luna.gfx.print("YOU WIN!", w / 2 - 80, h / 3, 4)
 
-    luna.render.setColor(0.7, 0.7, 0.7)
-    luna.render.print("All coins collected!", w / 2 - 100, h / 3 + 60, 2)
+    luna.gfx.setColor(0.7, 0.7, 0.7)
+    luna.gfx.print("All coins collected!", w / 2 - 100, h / 3 + 60, 2)
 
-    luna.render.setColor(0.5, 0.5, 0.5)
-    luna.render.print("Press ENTER to play again", w / 2 - 120, h * 0.7, 2)
-    luna.render.print("Press ESC to return to title", w / 2 - 130, h * 0.7 + 30, 2)
+    luna.gfx.setColor(0.5, 0.5, 0.5)
+    luna.gfx.print("Press ENTER to play again", w / 2 - 120, h * 0.7, 2)
+    luna.gfx.print("Press ESC to return to title", w / 2 - 130, h * 0.7 + 30, 2)
 end
 
 function gameover.keypressed(key)
@@ -187,18 +187,18 @@ scenes.gameover = gameover
 
 -- ── Luna2D callbacks ─────────────────────────────────────────────────────
 
-function luna.load()
+function luna.init()
     luna.window.setTitle("Scene Demo - Luna2D")
     switch_scene(scenes.title)
 end
 
-function luna.update(dt)
+function luna.process(dt)
     if current_scene and current_scene.update then
         current_scene.update(dt)
     end
 end
 
-function luna.draw()
+function luna.render()
     if current_scene and current_scene.draw then
         current_scene.draw()
     end

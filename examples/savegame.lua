@@ -157,7 +157,7 @@ save:enableAutoSave(300, "autosave")   -- save to "autosave" every 5 minutes
 -- update(dt) → slotName?
 -- Call this every frame; returns slot name when an auto-save fires, else nil.
 --[[
-function luna.update(dt)
+function luna.process(dt)
     local auto_slot = save:update(dt)
     if auto_slot then
         -- auto-save fired; you can show "Saving..." UI here
@@ -170,7 +170,7 @@ end
 --[[
 local save_mgr
 
-function luna.load()
+function luna.init()
     save_mgr = luna.savegame.newSaveManager()
     save_mgr:setSchemaVersion(1)
     save_mgr:setSummary("New Game")
@@ -185,7 +185,7 @@ function luna.load()
     end
 end
 
-function luna.update(dt)
+function luna.process(dt)
     save_mgr:update(dt)
 end
 

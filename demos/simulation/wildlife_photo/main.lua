@@ -1,4 +1,4 @@
-﻿-- Wildlife Photography — Luna2D Demo
+-- Wildlife Photography — Luna2D Demo
 -- Explore a nature reserve, photograph animals, fill your encyclopedia
 
 local function clamp(v, mn, mx) return math.max(mn, math.min(mx, v)) end
@@ -59,7 +59,7 @@ local function spawn_animal()
     }
 end
 
-function luna.load()
+function luna.init()
     gen_biome_map()
     player = {x = MAP_W / 2, y = MAP_H / 2, crouching = false}
     camera_mode = false
@@ -83,7 +83,7 @@ local function dist(x1, y1, x2, y2)
     return math.sqrt(dx*dx + dy*dy)
 end
 
-function luna.update(dt)
+function luna.process(dt)
     if msg_timer > 0 then msg_timer = msg_timer - dt end
 
     -- day cycle
@@ -207,7 +207,7 @@ function luna.keypressed(key)
     if key == "lshift" or key == "rshift" then player.crouching = not player.crouching end
 end
 
-function luna.draw()
+function luna.render()
     -- camera offset
     local ox = player.x - W / 2
     local oy = player.y - H / 2
@@ -222,8 +222,8 @@ function luna.draw()
         for x = sx + 1, ex do
             if biomes[y] and biomes[y][x] then
                 local c = BIOME_COLORS[biomes[y][x]]
-                luna.render.setColor(c[1]*visibility, c[2]*visibility, c[3]*visibility, 1)
-                luna.render.rectangle("fill", (x-1)*TILE - ox, (y-1)*TILE - oy, TILE, TILE)
+                luna.gfx.setColor(c[1]*visibility, c[2]*visibility, c[3]*visibility, 1)
+                luna.gfx.rectangle("fill", (x-1)*TILE - ox, (y-1)*TILE - oy, TILE, TILE)
             end
         end
     end
@@ -236,15 +236,15 @@ function luna.draw()
             local c = a.species.color
             local alpha = 1
             if a.state == "sleep" then alpha = 0.6 end
-            luna.render.setColor(c[1]*visibility, c[2]*visibility, c[3]*visibility, alpha)
-            luna.render.circle("fill", ax, ay, a.species.size)
+            luna.gfx.setColor(c[1]*visibility, c[2]*visibility, c[3]*visibility, alpha)
+            luna.gfx.circle("fill", ax, ay, a.species.size)
             -- state indicator
             if a.state == "sleep" then
-                luna.render.setColor(1,1,1,0.5*visibility)
-                luna.render.print("z", ax+6, ay-10, 0.7)
+                luna.gfx.setColor(1,1,1,0.5*visibility)
+                luna.gfx.print("z", ax+6, ay-10, 0.7)
             elseif a.state == "flee" then
-                luna.render.setColor(1,0.3,0.3,0.7)
-                luna.render.print("!", ax+6, ay-10, 0.7)
+                luna.gfx.setColor(1,0.3,0.3,0.7)
+                luna.gfx.print("!", ax+6, ay-10, 0.7)
             end
         end
     end
@@ -252,69 +252,69 @@ function luna.draw()
     -- player
     local px, py = W / 2, H / 2
     local pr = player.crouching and 5 or 7
-    luna.render.setColor(0.9, 0.85, 0.3, 1)
-    luna.render.circle("fill", px, py, pr)
-    luna.render.setColor(0.2, 0.2, 0.2, 1)
-    luna.render.circle("line", px, py, pr)
+    luna.gfx.setColor(0.9, 0.85, 0.3, 1)
+    luna.gfx.circle("fill", px, py, pr)
+    luna.gfx.setColor(0.2, 0.2, 0.2, 1)
+    luna.gfx.circle("line", px, py, pr)
 
     -- camera mode crosshair
     if camera_mode then
         local mx, my = luna.mouse.getPosition()
-        luna.render.setColor(1, 1, 1, 0.8)
-        luna.render.line(mx - 15, my, mx + 15, my)
-        luna.render.line(mx, my - 15, mx, my + 15)
-        luna.render.circle("line", mx, my, 25)
-        luna.render.setColor(1,0.3,0.3,0.6)
-        luna.render.print("CAMERA", mx + 20, my - 8, 0.8)
+        luna.gfx.setColor(1, 1, 1, 0.8)
+        luna.gfx.line(mx - 15, my, mx + 15, my)
+        luna.gfx.line(mx, my - 15, mx, my + 15)
+        luna.gfx.circle("line", mx, my, 25)
+        luna.gfx.setColor(1,0.3,0.3,0.6)
+        luna.gfx.print("CAMERA", mx + 20, my - 8, 0.8)
     end
 
     -- night overlay
     if visibility < 0.9 then
-        luna.render.setColor(0, 0, 0.05, 1 - visibility)
-        luna.render.rectangle("fill", 0, 0, W, H)
+        luna.gfx.setColor(0, 0, 0.05, 1 - visibility)
+        luna.gfx.rectangle("fill", 0, 0, W, H)
     end
 
     -- HUD
-    luna.render.setColor(0, 0, 0, 0.6)
-    luna.render.rectangle("fill", 0, 0, W, 28)
-    luna.render.setColor(1,1,1,1)
+    luna.gfx.setColor(0, 0, 0, 0.6)
+    luna.gfx.rectangle("fill", 0, 0, W, 28)
+    luna.gfx.setColor(1,1,1,1)
     local discovered = 0
     for _ in pairs(encyclopedia) do discovered = discovered + 1 end
-    luna.render.print("Photos: " .. #photos .. "  Best: " .. best_score
+    luna.gfx.print("Photos: " .. #photos .. "  Best: " .. best_score
         .. "  Species: " .. discovered .. "/" .. #SPECIES, 10, 5, 0.9)
-    luna.render.print(camera_mode and "[CAMERA ON]" or "[C] Camera", 500, 5, 0.9)
-    luna.render.print(player.crouching and "Crouching" or "Standing", 630, 5, 0.9)
-    luna.render.print("FPS: " .. luna.time.getFPS(), 740, 5, 0.7)
+    luna.gfx.print(camera_mode and "[CAMERA ON]" or "[C] Camera", 500, 5, 0.9)
+    luna.gfx.print(player.crouching and "Crouching" or "Standing", 630, 5, 0.9)
+    luna.gfx.print("FPS: " .. luna.time.getFPS(), 740, 5, 0.7)
 
     -- noise meter
-    luna.render.setColor(0.3,0.3,0.3,0.7)
-    luna.render.rectangle("fill", 10, H-22, 80, 12)
+    luna.gfx.setColor(0.3,0.3,0.3,0.7)
+    luna.gfx.rectangle("fill", 10, H-22, 80, 12)
     local np = noise_level / 100
-    luna.render.setColor(np, 1-np, 0, 0.8)
-    luna.render.rectangle("fill", 10, H-22, 80*np, 12)
-    luna.render.setColor(1,1,1,0.7)
-    luna.render.print("Noise", 14, H-24, 0.7)
+    luna.gfx.setColor(np, 1-np, 0, 0.8)
+    luna.gfx.rectangle("fill", 10, H-22, 80*np, 12)
+    luna.gfx.setColor(1,1,1,0.7)
+    luna.gfx.print("Noise", 14, H-24, 0.7)
 
     -- photo log (last 5)
     if #photos > 0 then
-        luna.render.setColor(0,0,0,0.5)
-        luna.render.rectangle("fill", W-160, H-110, 155, 105)
-        luna.render.setColor(1,1,1,0.9)
-        luna.render.print("Recent Photos:", W-155, H-108, 0.7)
+        luna.gfx.setColor(0,0,0,0.5)
+        luna.gfx.rectangle("fill", W-160, H-110, 155, 105)
+        luna.gfx.setColor(1,1,1,0.9)
+        luna.gfx.print("Recent Photos:", W-155, H-108, 0.7)
         local start = clamp(#photos - 4, 1, #photos)
         for i = start, #photos do
             local p = photos[i]
             local yi = (i - start) * 16 + (H - 92)
-            luna.render.print(p.species .. ": " .. p.score .. "pts", W-150, yi, 0.7)
+            luna.gfx.print(p.species .. ": " .. p.score .. "pts", W-150, yi, 0.7)
         end
     end
 
     -- message
     if message and msg_timer > 0 then
-        luna.render.setColor(1,1,0.4,1)
-        luna.render.print(message, 200, 50, 1.1)
+        luna.gfx.setColor(1,1,0.4,1)
+        luna.gfx.print(message, 200, 50, 1.1)
     end
 
-    luna.render.setColor(0.6,0.6,0.6,0.7)
-    luna.render.print("[WASD] Move  [Shift] Crouch  [C] Camera  [Space] Photo  [R] Restart", 100, H-14, 0.65)
+    luna.gfx.setColor(0.6,0.6,0.6,0.7)
+    luna.gfx.print("[WASD] Move  [Shift] Crouch  [C] Camera  [Space] Photo  [R] Restart", 100, H-14, 0.65)
 end

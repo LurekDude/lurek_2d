@@ -1,8 +1,8 @@
-﻿local DialogRunner = require("engine.dialog_runner")
+local DialogRunner = require("engine.dialog_runner")
 
 local dialog
 
-function luna.load()
+function luna.init()
     dialog = DialogRunner.new({
         { speaker = "Luna", text = "Welcome to the Luna2D visual novel template!" },
         { speaker = "Luna", text = "Press SPACE or click to advance the dialog." },
@@ -11,15 +11,15 @@ function luna.load()
     })
 end
 
-function luna.update(dt)
+function luna.process(dt)
     dialog:update(dt)
 end
 
-function luna.draw()
-    luna.render.clear(0.08, 0.06, 0.12)
+function luna.render()
+    luna.gfx.clear(0.08, 0.06, 0.12)
     -- Background area
-    luna.render.setColor(0.15, 0.1, 0.2, 1)
-    luna.render.rectangle("fill", 0, 0, 800, 400)
+    luna.gfx.setColor(0.15, 0.1, 0.2, 1)
+    luna.gfx.rectangle("fill", 0, 0, 800, 400)
     -- Dialog box
     dialog:draw()
 end

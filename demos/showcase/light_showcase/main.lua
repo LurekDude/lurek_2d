@@ -1,4 +1,4 @@
-﻿-- Light Showcase — A multi-screen demo of Luna2D's 2D lighting system
+-- Light Showcase — A multi-screen demo of Luna2D's 2D lighting system
 -- Press number keys 1-8 to switch screens.  WASD moves the player light.
 -- Each screen demonstrates a different lighting feature.
 
@@ -227,11 +227,11 @@ local setup_fns = {
 
 -- ── Callbacks ────────────────────────────────────────────────────────────
 
-function luna.load()
+function luna.init()
     setup_fns[screen]()
 end
 
-function luna.update(dt)
+function luna.process(dt)
     time = time + dt
 
     -- WASD movement for the player light (group 99)
@@ -255,86 +255,86 @@ function luna.update(dt)
     end
 end
 
-function luna.draw()
+function luna.render()
     -- Background
-    luna.render.clear(0.02, 0.02, 0.04)
+    luna.gfx.clear(0.02, 0.02, 0.04)
 
     -- Draw a simple grid floor
-    luna.render.setColor(0.15, 0.15, 0.2, 1.0)
+    luna.gfx.setColor(0.15, 0.15, 0.2, 1.0)
     for x = 0, W, 64 do
-        luna.render.line(x, 0, x, H)
+        luna.gfx.line(x, 0, x, H)
     end
     for y = 0, H, 64 do
-        luna.render.line(0, y, W, y)
+        luna.gfx.line(0, y, W, y)
     end
 
     -- Draw occluder outlines (screen 7)
     if screen == 7 then
-        luna.render.setColor(0.4, 0.4, 0.5, 1.0)
-        luna.render.rectangle("fill", 280, 280, 40, 140)
-        luna.render.rectangle("fill", 580, 280, 40, 140)
-        luna.render.rectangle("fill", 880, 280, 40, 140)
+        luna.gfx.setColor(0.4, 0.4, 0.5, 1.0)
+        luna.gfx.rectangle("fill", 280, 280, 40, 140)
+        luna.gfx.rectangle("fill", 580, 280, 40, 140)
+        luna.gfx.rectangle("fill", 880, 280, 40, 140)
     end
 
     -- Draw player dot
-    luna.render.setColor(1.0, 1.0, 0.8, 0.8)
-    luna.render.circle("fill", player_x, player_y, 6)
+    luna.gfx.setColor(1.0, 1.0, 0.8, 0.8)
+    luna.gfx.circle("fill", player_x, player_y, 6)
 
     -- HUD — screen title and description
-    luna.render.setColor(1.0, 1.0, 1.0, 1.0)
+    luna.gfx.setColor(1.0, 1.0, 1.0, 1.0)
     local s = screens[screen]
-    luna.render.print("Screen " .. screen .. "/" .. NUM_SCREENS .. ": " .. s.title, 20, 20)
-    luna.render.setColor(0.7, 0.7, 0.8, 1.0)
-    luna.render.print(s.desc, 20, 45)
+    luna.gfx.print("Screen " .. screen .. "/" .. NUM_SCREENS .. ": " .. s.title, 20, 20)
+    luna.gfx.setColor(0.7, 0.7, 0.8, 1.0)
+    luna.gfx.print(s.desc, 20, 45)
 
     -- Controls
-    luna.render.setColor(0.5, 0.5, 0.6, 1.0)
-    luna.render.print("Keys 1-8: switch screen  |  WASD: move light", 20, H - 30)
+    luna.gfx.setColor(0.5, 0.5, 0.6, 1.0)
+    luna.gfx.print("Keys 1-8: switch screen  |  WASD: move light", 20, H - 30)
     if screen == 6 then
         local state_str = group1_on and "ON" or "OFF"
-        luna.render.print("G: toggle torch group (" .. state_str .. ")", 20, H - 55)
+        luna.gfx.print("G: toggle torch group (" .. state_str .. ")", 20, H - 55)
     end
 
     -- Per-screen labels
     if screen == 1 then
         -- Labels for each light
-        luna.render.setColor(1.0, 0.6, 0.2, 0.7)
-        luna.render.print("Warm orange", 160, 230)
-        luna.render.setColor(0.3, 0.5, 1.0, 0.7)
-        luna.render.print("Cool blue", 460, 130)
-        luna.render.setColor(0.2, 1.0, 0.3, 0.7)
-        luna.render.print("Green", 720, 430)
-        luna.render.setColor(0.8, 0.2, 1.0, 0.7)
-        luna.render.print("Purple", 310, 480)
+        luna.gfx.setColor(1.0, 0.6, 0.2, 0.7)
+        luna.gfx.print("Warm orange", 160, 230)
+        luna.gfx.setColor(0.3, 0.5, 1.0, 0.7)
+        luna.gfx.print("Cool blue", 460, 130)
+        luna.gfx.setColor(0.2, 1.0, 0.3, 0.7)
+        luna.gfx.print("Green", 720, 430)
+        luna.gfx.setColor(0.8, 0.2, 1.0, 0.7)
+        luna.gfx.print("Purple", 310, 480)
     elseif screen == 2 then
-        luna.render.setColor(1.0, 0.9, 0.5, 0.7)
-        luna.render.print("Narrow cone ->", 50, 320)
-        luna.render.setColor(0.5, 0.8, 1.0, 0.7)
-        luna.render.print("Wide cone v", 450, 60)
-        luna.render.setColor(1.0, 0.3, 0.3, 0.7)
-        luna.render.print("Tight cone", 750, 560)
+        luna.gfx.setColor(1.0, 0.9, 0.5, 0.7)
+        luna.gfx.print("Narrow cone ->", 50, 320)
+        luna.gfx.setColor(0.5, 0.8, 1.0, 0.7)
+        luna.gfx.print("Wide cone v", 450, 60)
+        luna.gfx.setColor(1.0, 0.3, 0.3, 0.7)
+        luna.gfx.print("Tight cone", 750, 560)
     elseif screen == 4 then
-        luna.render.setColor(0.8, 0.8, 0.8, 0.6)
-        luna.render.print("Slow candle", 155, 270)
-        luna.render.print("Medium torch", 395, 270)
-        luna.render.print("Fast campfire", 640, 270)
-        luna.render.print("Strobe", 870, 140)
+        luna.gfx.setColor(0.8, 0.8, 0.8, 0.6)
+        luna.gfx.print("Slow candle", 155, 270)
+        luna.gfx.print("Medium torch", 395, 270)
+        luna.gfx.print("Fast campfire", 640, 270)
+        luna.gfx.print("Strobe", 870, 140)
     elseif screen == 5 then
-        luna.render.setColor(0.8, 0.8, 0.8, 0.6)
-        luna.render.print("Default (none)", 140, 270)
-        luna.render.print("Linear", 410, 270)
-        luna.render.print("Quadratic", 650, 270)
-        luna.render.print("Mixed", 910, 270)
+        luna.gfx.setColor(0.8, 0.8, 0.8, 0.6)
+        luna.gfx.print("Default (none)", 140, 270)
+        luna.gfx.print("Linear", 410, 270)
+        luna.gfx.print("Quadratic", 650, 270)
+        luna.gfx.print("Mixed", 910, 270)
     elseif screen == 7 then
-        luna.render.setColor(0.8, 0.8, 0.8, 0.6)
-        luna.render.print("No filter", 155, 230)
-        luna.render.print("PCF5", 470, 230)
-        luna.render.print("PCF13", 760, 230)
+        luna.gfx.setColor(0.8, 0.8, 0.8, 0.6)
+        luna.gfx.print("No filter", 155, 230)
+        luna.gfx.print("PCF5", 470, 230)
+        luna.gfx.print("PCF13", 760, 230)
     elseif screen == 8 then
-        luna.render.setColor(0.8, 0.8, 0.8, 0.6)
-        luna.render.print("Add (brighten)", 140, 270)
-        luna.render.print("Sub (darken)", 445, 270)
-        luna.render.print("Mix (tint)", 750, 270)
+        luna.gfx.setColor(0.8, 0.8, 0.8, 0.6)
+        luna.gfx.print("Add (brighten)", 140, 270)
+        luna.gfx.print("Sub (darken)", 445, 270)
+        luna.gfx.print("Mix (tint)", 750, 270)
     end
 end
 

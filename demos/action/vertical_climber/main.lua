@@ -1,4 +1,4 @@
-﻿-- Vertical Climber: Doodle Jump-style procedural platformer
+-- Vertical Climber: Doodle Jump-style procedural platformer
 -- A/D to move, auto-bounce on platforms, avoid enemies
 
 local function lerp(a, b, t) return a + (b - a) * t end
@@ -72,11 +72,11 @@ local function init_game()
     platforms[1] = { x = SCREEN_W / 2 - PLAT_W / 2, y = SCREEN_H - 50, kind = NORMAL, alive = true }
 end
 
-function luna.load()
+function luna.init()
     init_game()
 end
 
-function luna.update(dt)
+function luna.process(dt)
     if game_over then return end
 
     -- Input
@@ -183,58 +183,58 @@ function luna.keypressed(key)
     if key == "escape" then luna.signal.quit() end
 end
 
-function luna.draw()
-    luna.render.setBackgroundColor(0.12, 0.12, 0.2)
+function luna.render()
+    luna.gfx.setBackgroundColor(0.12, 0.12, 0.2)
 
     -- Platforms
     for _, p in ipairs(platforms) do
         if p.alive then
             local c = plat_colors[p.kind]
-            luna.render.setColor(c[1], c[2], c[3], 1)
-            luna.render.rectangle("fill", p.x, p.y - camera_y, PLAT_W, PLAT_H)
+            luna.gfx.setColor(c[1], c[2], c[3], 1)
+            luna.gfx.rectangle("fill", p.x, p.y - camera_y, PLAT_W, PLAT_H)
         end
     end
 
     -- Springs
     for _, s in ipairs(springs) do
         if s.plat.alive then
-            luna.render.setColor(1, 0.3, 0.3, 1)
-            luna.render.rectangle("fill", s.x, s.y - camera_y, s.w, s.h)
+            luna.gfx.setColor(1, 0.3, 0.3, 1)
+            luna.gfx.rectangle("fill", s.x, s.y - camera_y, s.w, s.h)
         end
     end
 
     -- Enemies
     for _, e in ipairs(enemies) do
-        luna.render.setColor(0.9, 0.2, 0.2, 1)
-        luna.render.rectangle("fill", e.x, e.y - camera_y, e.w, e.h)
+        luna.gfx.setColor(0.9, 0.2, 0.2, 1)
+        luna.gfx.rectangle("fill", e.x, e.y - camera_y, e.w, e.h)
         -- Eyes
-        luna.render.setColor(1, 1, 1, 1)
-        luna.render.circle("fill", e.x + 5, e.y + 6 - camera_y, 3)
-        luna.render.circle("fill", e.x + 15, e.y + 6 - camera_y, 3)
+        luna.gfx.setColor(1, 1, 1, 1)
+        luna.gfx.circle("fill", e.x + 5, e.y + 6 - camera_y, 3)
+        luna.gfx.circle("fill", e.x + 15, e.y + 6 - camera_y, 3)
     end
 
     -- Player
-    luna.render.setColor(1, 0.85, 0.2, 1)
-    luna.render.rectangle("fill", player.x, player.y - camera_y, PLAYER_W, PLAYER_H)
+    luna.gfx.setColor(1, 0.85, 0.2, 1)
+    luna.gfx.rectangle("fill", player.x, player.y - camera_y, PLAYER_W, PLAYER_H)
     -- Eyes
-    luna.render.setColor(0, 0, 0, 1)
-    luna.render.circle("fill", player.x + 7, player.y + 8 - camera_y, 3)
-    luna.render.circle("fill", player.x + 17, player.y + 8 - camera_y, 3)
+    luna.gfx.setColor(0, 0, 0, 1)
+    luna.gfx.circle("fill", player.x + 7, player.y + 8 - camera_y, 3)
+    luna.gfx.circle("fill", player.x + 17, player.y + 8 - camera_y, 3)
 
     -- HUD
-    luna.render.setColor(1, 1, 1, 1)
-    luna.render.print("Score: " .. score, 10, 10, 1.2)
-    luna.render.print("High: " .. high_score, 10, 32)
-    luna.render.print("FPS: " .. luna.time.getFPS(), SCREEN_W - 90, 10)
+    luna.gfx.setColor(1, 1, 1, 1)
+    luna.gfx.print("Score: " .. score, 10, 10, 1.2)
+    luna.gfx.print("High: " .. high_score, 10, 32)
+    luna.gfx.print("FPS: " .. luna.time.getFPS(), SCREEN_W - 90, 10)
 
     if game_over then
-        luna.render.setColor(0, 0, 0, 0.6)
-        luna.render.rectangle("fill", 0, SCREEN_H / 2 - 60, SCREEN_W, 120)
-        luna.render.setColor(1, 0.3, 0.3, 1)
-        luna.render.print("GAME OVER", SCREEN_W / 2 - 80, SCREEN_H / 2 - 40, 2)
-        luna.render.setColor(1, 1, 1, 1)
-        luna.render.print("Score: " .. score .. "  High: " .. high_score,
+        luna.gfx.setColor(0, 0, 0, 0.6)
+        luna.gfx.rectangle("fill", 0, SCREEN_H / 2 - 60, SCREEN_W, 120)
+        luna.gfx.setColor(1, 0.3, 0.3, 1)
+        luna.gfx.print("GAME OVER", SCREEN_W / 2 - 80, SCREEN_H / 2 - 40, 2)
+        luna.gfx.setColor(1, 1, 1, 1)
+        luna.gfx.print("Score: " .. score .. "  High: " .. high_score,
             SCREEN_W / 2 - 90, SCREEN_H / 2 + 10, 1.2)
-        luna.render.print("Press SPACE to restart", SCREEN_W / 2 - 90, SCREEN_H / 2 + 40)
+        luna.gfx.print("Press SPACE to restart", SCREEN_W / 2 - 90, SCREEN_H / 2 + 40)
     end
 end

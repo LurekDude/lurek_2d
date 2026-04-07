@@ -1,4 +1,4 @@
-﻿//! Integration tests for the Luna2D graphics module.
+//! Integration tests for the Luna2D graphics module.
 
 use std::cell::RefCell;
 use std::path::PathBuf;
@@ -95,22 +95,22 @@ fn test_phase01_released_texture_handle_reuse_reports_invalid_texture() {
     let result = lua
         .load(
             r#"
-            local released = luna.render.newImage("assets/icon.png")
+            local released = luna.gfx.newImage("assets/icon.png")
             assert(type(released) == "userdata")
-            assert(luna.render.release(released) == true)
+            assert(luna.gfx.release(released) == true)
 
-            local replacement = luna.render.newImage("assets/splash.png")
+            local replacement = luna.gfx.newImage("assets/splash.png")
             assert(type(replacement) == "userdata")
             assert(replacement:getWidth() > 0)
 
-            luna.render.draw(released, 10, 20)
+            luna.gfx.draw(released, 10, 20)
             "#,
         )
         .exec();
 
     assert_lua_error_contains(
         result,
-        "luna.render.draw: invalid or already-released texture handle",
+        "luna.gfx.draw: invalid or already-released texture handle",
     );
 }
 
@@ -119,7 +119,7 @@ fn test_phase01_released_numeric_texture_handle_reports_invalid_texture() {
     let (state, lua) = make_graphics_vm();
     lua.load(
         r#"
-        _phase01_texture = luna.render.newImage("assets/icon.png")
+        _phase01_texture = luna.gfx.newImage("assets/icon.png")
         assert(type(_phase01_texture) == "userdata")
         "#,
     )
@@ -139,20 +139,20 @@ fn test_phase01_released_numeric_texture_handle_reports_invalid_texture() {
 
     let script = format!(
         r#"
-        assert(luna.render.release({released_texture_id}) == true)
+        assert(luna.gfx.release({released_texture_id}) == true)
 
-        local replacement = luna.render.newImage("assets/splash.png")
+        local replacement = luna.gfx.newImage("assets/splash.png")
         assert(type(replacement) == "userdata")
         assert(replacement:getWidth() > 0)
 
-        luna.render.draw({released_texture_id}, 10, 20)
+        luna.gfx.draw({released_texture_id}, 10, 20)
         "#,
     );
     let result = lua.load(&script).exec();
 
     assert_lua_error_contains(
         result,
-        "luna.render.draw: invalid or already-released texture handle",
+        "luna.gfx.draw: invalid or already-released texture handle",
     );
 }
 
@@ -162,22 +162,22 @@ fn test_phase01_released_font_handle_reuse_reports_invalid_font() {
     let result = lua
         .load(
             r#"
-            local released = luna.render.newFont("assets/fonts/Roboto-Regular.ttf", 18)
+            local released = luna.gfx.newFont("assets/fonts/Roboto-Regular.ttf", 18)
             assert(type(released) == "userdata")
-            assert(luna.render.releaseFont(released) == true)
+            assert(luna.gfx.releaseFont(released) == true)
 
-            local replacement = luna.render.newFont("assets/fonts/OpenSans.ttf", 20)
+            local replacement = luna.gfx.newFont("assets/fonts/OpenSans.ttf", 20)
             assert(type(replacement) == "userdata")
             assert(replacement:getHeight() > 0)
 
-            luna.render.setFont(released)
+            luna.gfx.setFont(released)
             "#,
         )
         .exec();
 
     assert_lua_error_contains(
         result,
-        "luna.render.setFont: font handle is not valid or was released",
+        "luna.gfx.setFont: font handle is not valid or was released",
     );
 }
 
@@ -187,23 +187,23 @@ fn test_phase01_released_sprite_batch_handle_reuse_reports_invalid_batch() {
     let result = lua
         .load(
             r#"
-            local image = luna.render.newImage("assets/icon.png")
-            local released = luna.render.newSpriteBatch(image, 4)
+            local image = luna.gfx.newImage("assets/icon.png")
+            local released = luna.gfx.newSpriteBatch(image, 4)
             assert(type(released) == "userdata")
-            assert(luna.render.releaseBatch(released) == true)
+            assert(luna.gfx.releaseBatch(released) == true)
 
-            local replacement = luna.render.newSpriteBatch(image, 4)
+            local replacement = luna.gfx.newSpriteBatch(image, 4)
             assert(type(replacement) == "userdata")
             assert(replacement:getCount() == 0)
 
-            luna.render.spriteBatchAdd(released, 1, 2)
+            luna.gfx.spriteBatchAdd(released, 1, 2)
             "#,
         )
         .exec();
 
     assert_lua_error_contains(
         result,
-        "luna.render.spriteBatchAdd: batch handle is not valid or was released",
+        "luna.gfx.spriteBatchAdd: batch handle is not valid or was released",
     );
 }
 
@@ -214,7 +214,7 @@ fn test_phase01_released_sprite_batch_handle_reuse_reports_invalid_batch() {
 #[test]
 fn test_transform_push_queues_push_transform() {
     let (state, lua) = make_graphics_vm();
-    run_draw(&lua, "luna.render.push()");
+    run_draw(&lua, "luna.gfx.push()");
     assert!(matches!(
         state.borrow().draw_commands.last(),
         Some(DrawCommand::PushTransform)
@@ -224,7 +224,7 @@ fn test_transform_push_queues_push_transform() {
 #[test]
 fn test_transform_pop_queues_pop_transform() {
     let (state, lua) = make_graphics_vm();
-    run_draw(&lua, "luna.render.pop()");
+    run_draw(&lua, "luna.gfx.pop()");
     assert!(matches!(
         state.borrow().draw_commands.last(),
         Some(DrawCommand::PopTransform)
@@ -234,7 +234,7 @@ fn test_transform_pop_queues_pop_transform() {
 #[test]
 fn test_transform_translate_queues_correct_values() {
     let (state, lua) = make_graphics_vm();
-    run_draw(&lua, "luna.render.translate(30, 45)");
+    run_draw(&lua, "luna.gfx.translate(30, 45)");
     let st = state.borrow();
     if let Some(DrawCommand::Translate { x, y }) = st.draw_commands.last() {
         assert!((x - 30.0).abs() < 1e-5);
@@ -247,7 +247,7 @@ fn test_transform_translate_queues_correct_values() {
 #[test]
 fn test_transform_rotate_queues_angle() {
     let (state, lua) = make_graphics_vm();
-    run_draw(&lua, "luna.render.rotate(1.5707963)");
+    run_draw(&lua, "luna.gfx.rotate(1.5707963)");
     let st = state.borrow();
     if let Some(DrawCommand::Rotate { angle }) = st.draw_commands.last() {
         assert!((angle - std::f32::consts::FRAC_PI_2).abs() < 1e-5);
@@ -259,7 +259,7 @@ fn test_transform_rotate_queues_angle() {
 #[test]
 fn test_transform_scale_uniform_defaults_sy_to_sx() {
     let (state, lua) = make_graphics_vm();
-    run_draw(&lua, "luna.render.scale(2)");
+    run_draw(&lua, "luna.gfx.scale(2)");
     let st = state.borrow();
     if let Some(DrawCommand::Scale { sx, sy }) = st.draw_commands.last() {
         assert!((sx - 2.0).abs() < 1e-5);
@@ -272,7 +272,7 @@ fn test_transform_scale_uniform_defaults_sy_to_sx() {
 #[test]
 fn test_transform_scale_nonuniform_queues_distinct_sx_sy() {
     let (state, lua) = make_graphics_vm();
-    run_draw(&lua, "luna.render.scale(3, 0.5)");
+    run_draw(&lua, "luna.gfx.scale(3, 0.5)");
     let st = state.borrow();
     if let Some(DrawCommand::Scale { sx, sy }) = st.draw_commands.last() {
         assert!((sx - 3.0).abs() < 1e-5);
@@ -291,7 +291,7 @@ fn test_arc_fill_mode_queues_arc_command_with_default_segments() {
     let (state, lua) = make_graphics_vm();
     run_draw(
         &lua,
-        r#"luna.render.arc("fill", 100, 200, 50, 0, 3.14159265)"#,
+        r#"luna.gfx.arc("fill", 100, 200, 50, 0, 3.14159265)"#,
     );
     let st = state.borrow();
     if let Some(DrawCommand::Arc {
@@ -319,7 +319,7 @@ fn test_arc_fill_mode_queues_arc_command_with_default_segments() {
 #[test]
 fn test_arc_line_mode_queues_line_draw_mode() {
     let (state, lua) = make_graphics_vm();
-    run_draw(&lua, r#"luna.render.arc("line", 0, 0, 10, 0, 1)"#);
+    run_draw(&lua, r#"luna.gfx.arc("line", 0, 0, 10, 0, 1)"#);
     let st = state.borrow();
     if let Some(DrawCommand::Arc { mode, .. }) = st.draw_commands.last() {
         assert!(matches!(mode, DrawMode::Line));
@@ -331,7 +331,7 @@ fn test_arc_line_mode_queues_line_draw_mode() {
 #[test]
 fn test_arc_explicit_segments_overrides_default() {
     let (state, lua) = make_graphics_vm();
-    run_draw(&lua, r#"luna.render.arc("fill", 0, 0, 20, 0, 6.28, 16)"#);
+    run_draw(&lua, r#"luna.gfx.arc("fill", 0, 0, 20, 0, 6.28, 16)"#);
     let st = state.borrow();
     if let Some(DrawCommand::Arc { segments, .. }) = st.draw_commands.last() {
         assert_eq!(*segments, 16);
@@ -347,7 +347,7 @@ fn test_arc_explicit_segments_overrides_default() {
 #[test]
 fn test_drawex_defaults_rotation_scale_origin_to_identity() {
     let (state, lua) = make_graphics_vm();
-    run_draw(&lua, "luna.render.drawEx(0, 100, 200)");
+    run_draw(&lua, "luna.gfx.drawEx(0, 100, 200)");
     let st = state.borrow();
     if let Some(DrawCommand::DrawImageEx {
         texture_key,
@@ -379,7 +379,7 @@ fn test_drawex_with_all_params_queues_correct_values() {
     let (state, lua) = make_graphics_vm();
     run_draw(
         &lua,
-        "luna.render.drawEx(1, 50, 60, 0.785, 2.0, 1.5, 10, 20)",
+        "luna.gfx.drawEx(1, 50, 60, 0.785, 2.0, 1.5, 10, 20)",
     );
     let st = state.borrow();
     if let Some(DrawCommand::DrawImageEx {
@@ -413,8 +413,8 @@ fn test_newquad_and_drawquad_queue_draw_quad_command() {
     run_draw(
         &lua,
         r#"
-        local q = luna.render.newQuad(10, 20, 64, 64, 256, 256)
-        luna.render.drawQuad(0, q, 100, 200)
+        local q = luna.gfx.newQuad(10, 20, 64, 64, 256, 256)
+        luna.gfx.drawQuad(0, q, 100, 200)
         "#,
     );
     let st = state.borrow();
@@ -464,8 +464,8 @@ fn test_get_color_returns_set_color_values() {
     let (_state, lua) = make_graphics_vm();
     lua.load(
         r#"
-        luna.render.setColor(0.5, 0.25, 0.75, 1.0)
-        _r, _g, _b, _a = luna.render.getColor()
+        luna.gfx.setColor(0.5, 0.25, 0.75, 1.0)
+        _r, _g, _b, _a = luna.gfx.getColor()
         "#,
     )
     .exec()
@@ -483,7 +483,7 @@ fn test_get_color_returns_set_color_values() {
 #[test]
 fn test_get_color_default_is_white() {
     let (_state, lua) = make_graphics_vm();
-    lua.load("_r, _g, _b, _a = luna.render.getColor()")
+    lua.load("_r, _g, _b, _a = luna.gfx.getColor()")
         .exec()
         .unwrap();
     let r: f32 = lua.globals().get("_r").unwrap();
@@ -503,7 +503,7 @@ fn test_get_color_default_is_white() {
 #[test]
 fn test_polyline_two_points_queues_polyline_command() {
     let (state, lua) = make_graphics_vm();
-    run_draw(&lua, "luna.render.polyline(10, 20, 30, 40)");
+    run_draw(&lua, "luna.gfx.polyline(10, 20, 30, 40)");
     let st = state.borrow();
     if let Some(DrawCommand::Polyline { points }) = st.draw_commands.last() {
         assert_eq!(points.len(), 4);
@@ -519,7 +519,7 @@ fn test_polyline_two_points_queues_polyline_command() {
 #[test]
 fn test_polyline_three_points_queues_six_coordinates() {
     let (state, lua) = make_graphics_vm();
-    run_draw(&lua, "luna.render.polyline(0, 0, 50, 100, 100, 0)");
+    run_draw(&lua, "luna.gfx.polyline(0, 0, 50, 100, 100, 0)");
     let st = state.borrow();
     if let Some(DrawCommand::Polyline { points }) = st.draw_commands.last() {
         assert_eq!(points.len(), 6);
@@ -604,7 +604,7 @@ fn test_new_font_lua_binding() {
     let (_, lua) = make_graphics_vm();
     lua.load(
         r#"
-        local font = luna.render.newFont("assets/fonts/Roboto-Regular.ttf", 16)
+        local font = luna.gfx.newFont("assets/fonts/Roboto-Regular.ttf", 16)
         assert(font ~= nil, "newFont should return a Font object")
         assert(type(font) == "userdata", "Font should be userdata")
         "#,
@@ -618,9 +618,9 @@ fn test_set_get_font_lua_binding() {
     let (_, lua) = make_graphics_vm();
     lua.load(
         r#"
-        local font = luna.render.newFont("assets/fonts/Roboto-Regular.ttf", 16)
-        luna.render.setFont(font)
-        local got = luna.render.getFont()
+        local font = luna.gfx.newFont("assets/fonts/Roboto-Regular.ttf", 16)
+        luna.gfx.setFont(font)
+        local got = luna.gfx.getFont()
         assert(got ~= nil, "getFont should return the set font")
         "#,
     )
@@ -633,9 +633,9 @@ fn test_print_with_font_pushes_print_font_command() {
     let (state, lua) = make_graphics_vm();
     lua.load(
         r#"
-        local font = luna.render.newFont("assets/fonts/Roboto-Regular.ttf", 16)
-        luna.render.setFont(font)
-        luna.render.print("Hello TTF", 10, 20)
+        local font = luna.gfx.newFont("assets/fonts/Roboto-Regular.ttf", 16)
+        luna.gfx.setFont(font)
+        luna.gfx.print("Hello TTF", 10, 20)
         "#,
     )
     .exec()
@@ -657,8 +657,8 @@ fn test_get_font_width_returns_positive() {
     let width: f32 = lua
         .load(
             r#"
-        local font = luna.render.newFont("assets/fonts/Roboto-Regular.ttf", 16)
-        return luna.render.getFontWidth(font, "Hello")
+        local font = luna.gfx.newFont("assets/fonts/Roboto-Regular.ttf", 16)
+        return luna.gfx.getFontWidth(font, "Hello")
         "#,
         )
         .eval()
@@ -675,8 +675,8 @@ fn test_get_font_height_returns_positive() {
     let height: f32 = lua
         .load(
             r#"
-        local font = luna.render.newFont("assets/fonts/Roboto-Regular.ttf", 16)
-        return luna.render.getFontHeight(font)
+        local font = luna.gfx.newFont("assets/fonts/Roboto-Regular.ttf", 16)
+        return luna.gfx.getFontHeight(font)
         "#,
         )
         .eval()
@@ -760,9 +760,9 @@ fn test_draw_batch_lua_command() {
         .unwrap();
     lua.load(
         r#"
-        local batch = luna.render.newSpriteBatch(_tex_id, 100)
-        luna.render.spriteBatchAdd(batch, 10, 20)
-        luna.render.drawBatch(batch)
+        local batch = luna.gfx.newSpriteBatch(_tex_id, 100)
+        luna.gfx.spriteBatchAdd(batch, 10, 20)
+        luna.gfx.drawBatch(batch)
         "#,
     )
     .exec()
@@ -789,8 +789,8 @@ fn test_set_blend_mode_lua() {
     let (state, lua) = make_graphics_vm();
     lua.load(
         r#"
-        luna.render.setBlendMode("add")
-        assert(luna.render.getBlendMode() == "add")
+        luna.gfx.setBlendMode("add")
+        assert(luna.gfx.getBlendMode() == "add")
         "#,
     )
     .exec()
@@ -805,7 +805,7 @@ fn test_set_blend_mode_lua() {
 #[test]
 fn test_set_blend_mode_invalid() {
     let (_state, lua) = make_graphics_vm();
-    let result = lua.load(r#"luna.render.setBlendMode("invalid")"#).exec();
+    let result = lua.load(r#"luna.gfx.setBlendMode("invalid")"#).exec();
     assert!(result.is_err(), "Invalid blend mode should error");
 }
 
@@ -814,9 +814,9 @@ fn test_set_blend_mode_pushes_draw_command() {
     let (state, lua) = make_graphics_vm();
     lua.load(
         r#"
-        luna.render.setBlendMode("multiply")
-        luna.render.rectangle("fill", 10, 20, 100, 100)
-        luna.render.setBlendMode("alpha")
+        luna.gfx.setBlendMode("multiply")
+        luna.gfx.rectangle("fill", 10, 20, 100, 100)
+        luna.gfx.setBlendMode("alpha")
         "#,
     )
     .exec()
@@ -833,7 +833,7 @@ fn test_set_blend_mode_pushes_draw_command() {
 fn test_get_blend_mode_default_is_alpha() {
     let (_state, lua) = make_graphics_vm();
     let mode: String = lua
-        .load("return luna.render.getBlendMode()")
+        .load("return luna.gfx.getBlendMode()")
         .eval()
         .unwrap();
     assert_eq!(mode, "alpha");
@@ -842,7 +842,7 @@ fn test_get_blend_mode_default_is_alpha() {
 #[test]
 fn test_set_blend_mode_additive_alias() {
     let (state, lua) = make_graphics_vm();
-    lua.load(r#"luna.render.setBlendMode("additive")"#)
+    lua.load(r#"luna.gfx.setBlendMode("additive")"#)
         .exec()
         .unwrap();
     let st = state.borrow();
@@ -858,8 +858,8 @@ fn test_blend_mode_all_variants() {
     for mode in &["alpha", "add", "multiply", "replace", "screen"] {
         lua.load(&format!(
             r#"
-            luna.render.setBlendMode("{}")
-            assert(luna.render.getBlendMode() == "{}")
+            luna.gfx.setBlendMode("{}")
+            assert(luna.gfx.getBlendMode() == "{}")
             "#,
             mode, mode
         ))
@@ -929,10 +929,10 @@ fn test_animation_lua_create_and_query() {
     let (state, lua) = make_graphics_vm();
     lua.load(
         r#"
-        local id = luna.render.newAnimation(32, 32, 4, 8, 0.1)
+        local id = luna.gfx.newAnimation(32, 32, 4, 8, 0.1)
         assert(type(id) == "number")
-        assert(luna.render.isAnimationPlaying(id) == true)
-        assert(luna.render.getAnimationFrame(id) == 0)
+        assert(luna.gfx.isAnimationPlaying(id) == true)
+        assert(luna.gfx.getAnimationFrame(id) == 0)
     "#,
     )
     .exec()
@@ -956,10 +956,10 @@ fn test_animation_lua_update_and_draw() {
     }
     lua.load(
         r#"
-        local anim = luna.render.newAnimation(32, 32, 2, 4, 0.1)
-        luna.render.updateAnimation(anim, 0.15)
-        assert(luna.render.getAnimationFrame(anim) == 1)
-        luna.render.drawAnimation(anim, 0, 100, 200)
+        local anim = luna.gfx.newAnimation(32, 32, 2, 4, 0.1)
+        luna.gfx.updateAnimation(anim, 0.15)
+        assert(luna.gfx.getAnimationFrame(anim) == 1)
+        luna.gfx.drawAnimation(anim, 0, 100, 200)
     "#,
     )
     .exec()
@@ -977,15 +977,15 @@ fn test_animation_lua_pause_resume_reset() {
     let (_state, lua) = make_graphics_vm();
     lua.load(
         r#"
-        local id = luna.render.newAnimation(32, 32, 4, 4, 0.1)
-        luna.render.pauseAnimation(id)
-        assert(luna.render.isAnimationPlaying(id) == false)
-        luna.render.resumeAnimation(id)
-        assert(luna.render.isAnimationPlaying(id) == true)
-        luna.render.updateAnimation(id, 0.2)
-        assert(luna.render.getAnimationFrame(id) > 0)
-        luna.render.resetAnimation(id)
-        assert(luna.render.getAnimationFrame(id) == 0)
+        local id = luna.gfx.newAnimation(32, 32, 4, 4, 0.1)
+        luna.gfx.pauseAnimation(id)
+        assert(luna.gfx.isAnimationPlaying(id) == false)
+        luna.gfx.resumeAnimation(id)
+        assert(luna.gfx.isAnimationPlaying(id) == true)
+        luna.gfx.updateAnimation(id, 0.2)
+        assert(luna.gfx.getAnimationFrame(id) > 0)
+        luna.gfx.resetAnimation(id)
+        assert(luna.gfx.getAnimationFrame(id) == 0)
     "#,
     )
     .exec()
@@ -1001,8 +1001,8 @@ fn test_canvas_new_returns_userdata_handles() {
     let (state, lua) = make_graphics_vm();
     lua.load(
         r#"
-        local c0 = luna.render.newCanvas(256, 128)
-        local c1 = luna.render.newCanvas(64, 64)
+        local c0 = luna.gfx.newCanvas(256, 128)
+        local c1 = luna.gfx.newCanvas(64, 64)
         assert(type(c0) == "userdata", "canvas should return userdata")
         assert(type(c1) == "userdata", "canvas should return userdata")
         assert(c0:type() == "Canvas")
@@ -1029,8 +1029,8 @@ fn test_canvas_get_size_accepts_canvas_userdata() {
     let (_state, lua) = make_graphics_vm();
     lua.load(
         r#"
-        local canvas = luna.render.newCanvas(320, 240)
-        local w, h = luna.render.getCanvasSize(canvas)
+        local canvas = luna.gfx.newCanvas(320, 240)
+        local w, h = luna.gfx.getCanvasSize(canvas)
         assert(w == 320, "width should be 320")
         assert(h == 240, "height should be 240")
     "#,
@@ -1044,16 +1044,16 @@ fn test_canvas_set_canvas_pushes_command_and_get_canvas_round_trips() {
     let (state, lua) = make_graphics_vm();
     lua.load(
         r#"
-        local canvas = luna.render.newCanvas(100, 100)
-        luna.render.setCanvas(canvas)
-        local active = luna.render.getCanvas()
+        local canvas = luna.gfx.newCanvas(100, 100)
+        luna.gfx.setCanvas(canvas)
+        local active = luna.gfx.getCanvas()
         assert(active ~= nil)
         assert(active:type() == "Canvas")
         assert(active:getWidth() == 100)
         assert(active:getHeight() == 100)
-        luna.render.rectangle("fill", 0, 0, 50, 50)
-        luna.render.setCanvas()
-        assert(luna.render.getCanvas() == nil)
+        luna.gfx.rectangle("fill", 0, 0, 50, 50)
+        luna.gfx.setCanvas()
+        assert(luna.gfx.getCanvas() == nil)
     "#,
     )
     .exec()
@@ -1076,8 +1076,8 @@ fn test_canvas_draw_pushes_command() {
     let (state, lua) = make_graphics_vm();
     lua.load(
         r#"
-        local canvas = luna.render.newCanvas(200, 200)
-        luna.render.drawCanvas(canvas, 10, 20)
+        local canvas = luna.gfx.newCanvas(200, 200)
+        luna.gfx.drawCanvas(canvas, 10, 20)
     "#,
     )
     .exec()
@@ -1095,8 +1095,8 @@ fn test_canvas_draw_with_transform() {
     let (state, lua) = make_graphics_vm();
     lua.load(
         r#"
-        local canvas = luna.render.newCanvas(100, 100)
-        luna.render.drawCanvas(canvas, 50, 60, 1.57, 2.0, 3.0, 10, 20)
+        local canvas = luna.gfx.newCanvas(100, 100)
+        luna.gfx.drawCanvas(canvas, 50, 60, 1.57, 2.0, 3.0, 10, 20)
     "#,
     )
     .exec()
@@ -1135,20 +1135,20 @@ fn test_canvas_release_active_canvas_clears_target_and_invalidates_handle() {
     let result = lua
         .load(
             r#"
-            local canvas = luna.render.newCanvas(100, 100)
-            luna.render.setCanvas(canvas)
-            assert(luna.render.getCanvas() ~= nil)
-            assert(luna.render.releaseCanvas(canvas) == true)
-            assert(luna.render.getCanvas() == nil)
+            local canvas = luna.gfx.newCanvas(100, 100)
+            luna.gfx.setCanvas(canvas)
+            assert(luna.gfx.getCanvas() ~= nil)
+            assert(luna.gfx.releaseCanvas(canvas) == true)
+            assert(luna.gfx.getCanvas() == nil)
 
-            luna.render.drawCanvas(canvas, 1, 2)
+            luna.gfx.drawCanvas(canvas, 1, 2)
             "#,
         )
         .exec();
 
     assert_lua_error_contains(
         result,
-        "luna.render.drawCanvas: invalid or already-released canvas handle",
+        "luna.gfx.drawCanvas: invalid or already-released canvas handle",
     );
 
     let st = state.borrow();
@@ -1177,7 +1177,7 @@ fn test_canvas_release_active_canvas_clears_target_and_invalidates_handle() {
 #[test]
 fn test_phase02_shear_queues_command_with_expected_factors() {
     let (state, lua) = make_graphics_vm();
-    run_draw(&lua, "luna.render.shear(0.5, -0.25)");
+    run_draw(&lua, "luna.gfx.shear(0.5, -0.25)");
 
     let st = state.borrow();
     if let Some(DrawCommand::Shear { kx, ky }) = st.draw_commands.last() {
@@ -1191,7 +1191,7 @@ fn test_phase02_shear_queues_command_with_expected_factors() {
 #[test]
 fn test_phase02_origin_queues_origin_command() {
     let (state, lua) = make_graphics_vm();
-    run_draw(&lua, "luna.render.origin()");
+    run_draw(&lua, "luna.gfx.origin()");
 
     assert!(matches!(
         state.borrow().draw_commands.last(),
@@ -1204,16 +1204,16 @@ fn test_phase02_get_stack_depth_tracks_push_pop_origin_and_reset() {
     let (_state, lua) = make_graphics_vm();
     lua.load(
         r#"
-        assert(luna.render.getStackDepth() == 1)
-        luna.render.push()
-        luna.render.push()
-        assert(luna.render.getStackDepth() == 3)
-        luna.render.origin()
-        assert(luna.render.getStackDepth() == 3)
-        luna.render.pop()
-        assert(luna.render.getStackDepth() == 2)
-        luna.render.reset()
-        assert(luna.render.getStackDepth() == 1)
+        assert(luna.gfx.getStackDepth() == 1)
+        luna.gfx.push()
+        luna.gfx.push()
+        assert(luna.gfx.getStackDepth() == 3)
+        luna.gfx.origin()
+        assert(luna.gfx.getStackDepth() == 3)
+        luna.gfx.pop()
+        assert(luna.gfx.getStackDepth() == 2)
+        luna.gfx.reset()
+        assert(luna.gfx.getStackDepth() == 1)
         "#,
     )
     .exec()
@@ -1225,12 +1225,12 @@ fn test_phase02_scissor_round_trips_and_intersects() {
     let (state, lua) = make_graphics_vm();
     lua.load(
         r#"
-        luna.render.setScissor(10, 20, 100, 50)
-        local x, y, w, h = luna.render.getScissor()
+        luna.gfx.setScissor(10, 20, 100, 50)
+        local x, y, w, h = luna.gfx.getScissor()
         assert(x == 10 and y == 20 and w == 100 and h == 50)
 
-        luna.render.intersectScissor(50, 30, 100, 100)
-        x, y, w, h = luna.render.getScissor()
+        luna.gfx.intersectScissor(50, 30, 100, 100)
+        x, y, w, h = luna.gfx.getScissor()
         assert(x == 50 and y == 30 and w == 60 and h == 40)
         "#,
     )
@@ -1253,12 +1253,12 @@ fn test_phase02_color_mask_round_trips_and_resets() {
     let (_state, lua) = make_graphics_vm();
     lua.load(
         r#"
-        luna.render.setColorMask(false, true, false, true)
-        local r, g, b, a = luna.render.getColorMask()
+        luna.gfx.setColorMask(false, true, false, true)
+        local r, g, b, a = luna.gfx.getColorMask()
         assert(r == false and g == true and b == false and a == true)
 
-        luna.render.setColorMask()
-        r, g, b, a = luna.render.getColorMask()
+        luna.gfx.setColorMask()
+        r, g, b, a = luna.gfx.getColorMask()
         assert(r == true and g == true and b == true and a == true)
         "#,
     )
@@ -1271,8 +1271,8 @@ fn test_phase02_default_filter_round_trips_min_and_mag() {
     let (_state, lua) = make_graphics_vm();
     lua.load(
         r#"
-        luna.render.setDefaultFilter("linear", "nearest")
-        local min, mag = luna.render.getDefaultFilter()
+        luna.gfx.setDefaultFilter("linear", "nearest")
+        local min, mag = luna.gfx.getDefaultFilter()
         assert(min == "linear")
         assert(mag == "nearest")
         "#,
@@ -1287,8 +1287,8 @@ fn test_phase02_default_filter_round_trips_anisotropy() {
     let result = lua
         .load(
             r#"
-            luna.render.setDefaultFilter("linear", "nearest", 4)
-            local min, mag, anisotropy = luna.render.getDefaultFilter()
+            luna.gfx.setDefaultFilter("linear", "nearest", 4)
+            local min, mag, anisotropy = luna.gfx.getDefaultFilter()
             assert(min == "linear")
             assert(mag == "nearest")
             assert(anisotropy == 4, "anisotropy should round-trip")
@@ -1307,9 +1307,9 @@ fn test_phase02_stats_report_resource_counts_and_render_counters() {
     let (state, lua) = make_graphics_vm();
     lua.load(
         r#"
-        _phase02_image = luna.render.newImage("assets/icon.png")
-        _phase02_canvas = luna.render.newCanvas(32, 16)
-        _phase02_font = luna.render.newFont("assets/fonts/Roboto-Regular.ttf", 16)
+        _phase02_image = luna.gfx.newImage("assets/icon.png")
+        _phase02_canvas = luna.gfx.newCanvas(32, 16)
+        _phase02_font = luna.gfx.newFont("assets/fonts/Roboto-Regular.ttf", 16)
         "#,
     )
     .exec()
@@ -1323,7 +1323,7 @@ fn test_phase02_stats_report_resource_counts_and_render_counters() {
 
     lua.load(
         r#"
-        local stats = luna.render.getStats()
+        local stats = luna.gfx.getStats()
         assert(stats.drawcalls == 3)
         assert(stats.canvasswitches == 2)
         assert(stats.images == 1)
@@ -1341,8 +1341,8 @@ fn test_phase02_stats_texture_memory_reflects_loaded_images() {
     let result = lua
         .load(
             r#"
-            luna.render.newImage("assets/icon.png")
-            local stats = luna.render.getStats()
+            luna.gfx.newImage("assets/icon.png")
+            local stats = luna.gfx.getStats()
             assert(stats.texturememory > 0, "texturememory should grow after loading an image")
             "#,
         )
@@ -1359,11 +1359,11 @@ fn test_phase02_stencil_queues_begin_geometry_end_and_test_commands() {
     let (state, lua) = make_graphics_vm();
     lua.load(
         r#"
-        luna.render.stencil(function()
-            luna.render.rectangle("fill", 1, 2, 3, 4)
+        luna.gfx.stencil(function()
+            luna.gfx.rectangle("fill", 1, 2, 3, 4)
         end, "increment", 7, true)
-        luna.render.setStencilTest("greater", 7)
-        luna.render.setStencilTest()
+        luna.gfx.setStencilTest("greater", 7)
+        luna.gfx.setStencilTest()
         "#,
     )
     .exec()
@@ -1400,13 +1400,13 @@ fn test_phase02_shader_round_trips_active_shader_and_uniforms() {
     let (state, lua) = make_graphics_vm();
     let script = format!(
         r#"
-        local shader = luna.render.newShader([=[{}]=])
-        luna.render.setShader(shader)
-        assert(luna.render.getShader() == shader)
-        luna.render.sendShader(shader, "tint", {{1.0, 0.5, 0.25, 1.0}})
-        assert(luna.render.hasShaderUniform(shader, "tint"))
-        luna.render.setShader()
-        assert(luna.render.getShader() == nil)
+        local shader = luna.gfx.newShader([=[{}]=])
+        luna.gfx.setShader(shader)
+        assert(luna.gfx.getShader() == shader)
+        luna.gfx.sendShader(shader, "tint", {{1.0, 0.5, 0.25, 1.0}})
+        assert(luna.gfx.hasShaderUniform(shader, "tint"))
+        luna.gfx.setShader()
+        assert(luna.gfx.getShader() == nil)
         "#,
         VALID_WGSL_FRAGMENT_SHADER
     );
@@ -1429,7 +1429,7 @@ fn test_phase02_shader_round_trips_active_shader_and_uniforms() {
 fn test_phase02_shader_compile_rejects_invalid_wgsl() {
     let (_state, lua) = make_graphics_vm();
     let result = lua
-        .load(r#"luna.render.newShader("not valid wgsl")"#)
+        .load(r#"luna.gfx.newShader("not valid wgsl")"#)
         .exec();
 
     assert!(result.is_err(), "invalid WGSL should fail to compile");
@@ -1441,28 +1441,28 @@ fn test_phase02_released_mesh_handle_reports_invalid_mesh_and_skips_queueing_dra
     let result = lua
         .load(
             r#"
-            local released = luna.render.newMesh({
+            local released = luna.gfx.newMesh({
                 {0, 0, 0, 0, 1, 0, 0, 1},
                 {8, 0, 1, 0, 0, 1, 0, 1},
                 {0, 8, 0, 1, 0, 0, 1, 1},
             })
-            assert(luna.render.releaseMesh(released) == true)
+            assert(luna.gfx.releaseMesh(released) == true)
 
-            local replacement = luna.render.newMesh({
+            local replacement = luna.gfx.newMesh({
                 {1, 1, 0, 0, 1, 1, 1, 1},
                 {9, 1, 1, 0, 1, 1, 1, 1},
                 {1, 9, 0, 1, 1, 1, 1, 1},
             })
-            assert(luna.render.getMeshVertexCount(replacement) == 3)
+            assert(luna.gfx.getMeshVertexCount(replacement) == 3)
 
-            luna.render.drawMesh(released, 5, 6)
+            luna.gfx.drawMesh(released, 5, 6)
             "#,
         )
         .exec();
 
     assert_lua_error_contains(
         result,
-        "luna.render.drawMesh: invalid or already-released mesh handle",
+        "luna.gfx.drawMesh: invalid or already-released mesh handle",
     );
 
     let st = state.borrow();
@@ -1488,22 +1488,22 @@ fn test_phase02_mesh_round_trips_vertex_state_texture_and_draw_command() {
 
     lua.load(
         r#"
-        local mesh = luna.render.newMesh({
+        local mesh = luna.gfx.newMesh({
             {0, 0, 0, 0, 1, 0, 0, 1},
             {8, 0, 1, 0, 0, 1, 0, 1},
             {0, 8, 0, 1, 0, 0, 1, 1},
         }, "fan")
 
-        assert(luna.render.getMeshVertexCount(mesh) == 3)
+        assert(luna.gfx.getMeshVertexCount(mesh) == 3)
 
-        luna.render.setMeshVertex(mesh, 2, {10, 0, 1, 0, 1, 1, 0, 1})
-        local x, y, u, v, r, g, b, a = luna.render.getMeshVertex(mesh, 2)
+        luna.gfx.setMeshVertex(mesh, 2, {10, 0, 1, 0, 1, 1, 0, 1})
+        local x, y, u, v, r, g, b, a = luna.gfx.getMeshVertex(mesh, 2)
         assert(x == 10 and y == 0 and u == 1 and v == 0)
         assert(r == 1 and g == 1 and b == 0 and a == 1)
 
-        luna.render.setMeshTexture(mesh, _phase02_mesh_texture)
-        luna.render.setMeshVertexMap(mesh, {1, 2, 3})
-        luna.render.drawMesh(mesh, 5, 6, 0.5, 2, 3, 4, 5)
+        luna.gfx.setMeshTexture(mesh, _phase02_mesh_texture)
+        luna.gfx.setMeshVertexMap(mesh, {1, 2, 3})
+        luna.gfx.drawMesh(mesh, 5, 6, 0.5, 2, 3, 4, 5)
         "#,
     )
     .exec()
@@ -1547,7 +1547,7 @@ fn test_phase02_points_accept_table_pairs_and_queue_draw_command() {
     let (state, lua) = make_graphics_vm();
     lua.load(
         r#"
-        luna.render.points({
+        luna.gfx.points({
             {1, 2},
             {3, 4},
             {5, 6},
@@ -1573,9 +1573,9 @@ fn test_phase02_printf_pushes_formatted_text_command_with_alignment() {
     let (state, lua) = make_graphics_vm();
     lua.load(
         r#"
-        local font = luna.render.newFont("assets/fonts/Roboto-Regular.ttf", 16)
-        luna.render.setFont(font)
-        luna.render.printf("wrapped text", 12, 34, 56, "center")
+        local font = luna.gfx.newFont("assets/fonts/Roboto-Regular.ttf", 16)
+        luna.gfx.setFont(font)
+        luna.gfx.printf("wrapped text", 12, 34, 56, "center")
         "#,
     )
     .exec()
@@ -1754,9 +1754,9 @@ fn nine_slice_lua_api_creates_and_draws() {
 
     lua.load(
         r#"
-        local img = luna.render.newImage("assets/icon.png")
-        local ns = luna.render.newNineSlice(img, 10, 10, 10, 10)
-        luna.render.drawNineSlice(ns, 50, 50, 300, 200)
+        local img = luna.gfx.newImage("assets/icon.png")
+        local ns = luna.gfx.newNineSlice(img, 10, 10, 10, 10)
+        luna.gfx.drawNineSlice(ns, 50, 50, 300, 200)
         "#,
     )
     .exec()
@@ -1783,8 +1783,8 @@ fn nine_slice_lua_method_draw() {
 
     lua.load(
         r#"
-        local img = luna.render.newImage("assets/icon.png")
-        local ns = luna.render.newNineSlice(img, 5, 5, 5, 5)
+        local img = luna.gfx.newImage("assets/icon.png")
+        local ns = luna.gfx.newNineSlice(img, 5, 5, 5, 5)
         ns:draw(10, 20, 400, 300)
         "#,
     )
@@ -1813,8 +1813,8 @@ fn nine_slice_lua_get_insets() {
     let result: (f32, f32, f32, f32) = lua
         .load(
             r#"
-            local img = luna.render.newImage("assets/icon.png")
-            local ns = luna.render.newNineSlice(img, 12, 8, 15, 6)
+            local img = luna.gfx.newImage("assets/icon.png")
+            local ns = luna.gfx.newNineSlice(img, 12, 8, 15, 6)
             return ns:getInsets()
             "#,
         )
@@ -1834,8 +1834,8 @@ fn nine_slice_lua_negative_insets_error() {
     let result = lua
         .load(
             r#"
-            local img = luna.render.newImage("assets/icon.png")
-            local ns = luna.render.newNineSlice(img, -5, 10, 10, 10)
+            local img = luna.gfx.newImage("assets/icon.png")
+            local ns = luna.gfx.newNineSlice(img, -5, 10, 10, 10)
             "#,
         )
         .exec();
@@ -1850,8 +1850,8 @@ fn nine_slice_lua_excessive_insets_error() {
     let result = lua
         .load(
             r#"
-            local img = luna.render.newImage("assets/icon.png")
-            local ns = luna.render.newNineSlice(img, 500, 500, 500, 500)
+            local img = luna.gfx.newImage("assets/icon.png")
+            local ns = luna.gfx.newNineSlice(img, 500, 500, 500, 500)
             "#,
         )
         .exec();
@@ -1864,36 +1864,36 @@ fn test_phase02_reset_restores_phase02_state_defaults() {
     let (_state, lua) = make_graphics_vm();
     let setup = format!(
         r#"
-        local shader = luna.render.newShader([=[{}]=])
-        local canvas = luna.render.newCanvas(8, 8)
+        local shader = luna.gfx.newShader([=[{}]=])
+        local canvas = luna.gfx.newCanvas(8, 8)
 
-        luna.render.push()
-        luna.render.push()
-        luna.render.setScissor(1, 2, 3, 4)
-        luna.render.setColorMask(false, true, false, true)
-        luna.render.setPointSize(5)
-        luna.render.setShader(shader)
-        luna.render.setCanvas(canvas)
-        luna.render.reset()
+        luna.gfx.push()
+        luna.gfx.push()
+        luna.gfx.setScissor(1, 2, 3, 4)
+        luna.gfx.setColorMask(false, true, false, true)
+        luna.gfx.setPointSize(5)
+        luna.gfx.setShader(shader)
+        luna.gfx.setCanvas(canvas)
+        luna.gfx.reset()
         "#,
         VALID_WGSL_FRAGMENT_SHADER
     );
     lua.load(&setup).exec().unwrap();
 
     let scissor_arity: i64 = lua
-        .load("return select('#', luna.render.getScissor())")
+        .load("return select('#', luna.gfx.getScissor())")
         .eval()
         .unwrap();
     let color_mask: (bool, bool, bool, bool) = lua
-        .load("return luna.render.getColorMask()")
+        .load("return luna.gfx.getColorMask()")
         .eval()
         .unwrap();
     let point_size: f32 = lua
-        .load("return luna.render.getPointSize()")
+        .load("return luna.gfx.getPointSize()")
         .eval()
         .unwrap();
-    let shader_value: mlua::Value = lua.load("return luna.render.getShader()").eval().unwrap();
-    let canvas_value: mlua::Value = lua.load("return luna.render.getCanvas()").eval().unwrap();
+    let shader_value: mlua::Value = lua.load("return luna.gfx.getShader()").eval().unwrap();
+    let canvas_value: mlua::Value = lua.load("return luna.gfx.getCanvas()").eval().unwrap();
 
     assert_eq!(scissor_arity, 0, "reset should disable scissor");
     assert_eq!(
@@ -1920,11 +1920,11 @@ fn test_phase02_wireframe_round_trips_and_queues_command() {
     let (state, lua) = make_graphics_vm();
     lua.load(
         r#"
-        assert(luna.render.isWireframe() == false)
-        luna.render.setWireframe(true)
-        assert(luna.render.isWireframe() == true)
-        luna.render.setWireframe(false)
-        assert(luna.render.isWireframe() == false)
+        assert(luna.gfx.isWireframe() == false)
+        luna.gfx.setWireframe(true)
+        assert(luna.gfx.isWireframe() == true)
+        luna.gfx.setWireframe(false)
+        assert(luna.gfx.isWireframe() == false)
         "#,
     )
     .exec()
@@ -1993,8 +1993,8 @@ fn graphics_draw_dispatch_image_userdata_pushes_draw_image() {
     run_draw(
         &lua,
         r#"
-        local img = luna.render.newImage("assets/icon.png")
-        luna.render.draw(img, 10, 20)
+        local img = luna.gfx.newImage("assets/icon.png")
+        luna.gfx.draw(img, 10, 20)
         "#,
     );
     let st = state.borrow();
@@ -2014,8 +2014,8 @@ fn graphics_draw_dispatch_image_with_rotation_pushes_draw_image_ex() {
     run_draw(
         &lua,
         r#"
-        local img = luna.render.newImage("assets/icon.png")
-        luna.render.draw(img, 5, 10, 1.57)
+        local img = luna.gfx.newImage("assets/icon.png")
+        luna.gfx.draw(img, 5, 10, 1.57)
         "#,
     );
     let st = state.borrow();
@@ -2034,8 +2034,8 @@ fn graphics_draw_dispatch_canvas_userdata_pushes_draw_canvas() {
     run_draw(
         &lua,
         r#"
-        local canvas = luna.render.newCanvas(64, 64)
-        luna.render.draw(canvas, 30, 40)
+        local canvas = luna.gfx.newCanvas(64, 64)
+        luna.gfx.draw(canvas, 30, 40)
         "#,
     );
     let st = state.borrow();
@@ -2054,9 +2054,9 @@ fn graphics_draw_dispatch_sprite_batch_userdata_pushes_draw_batch() {
     run_draw(
         &lua,
         r#"
-        local img = luna.render.newImage("assets/icon.png")
-        local batch = luna.render.newSpriteBatch(img, 10)
-        luna.render.draw(batch, 0, 0)
+        local img = luna.gfx.newImage("assets/icon.png")
+        local batch = luna.gfx.newSpriteBatch(img, 10)
+        luna.gfx.draw(batch, 0, 0)
         "#,
     );
     let st = state.borrow();
@@ -2073,14 +2073,14 @@ fn graphics_draw_dispatch_sprite_batch_userdata_pushes_draw_batch() {
 #[test]
 fn graphics_draw_dispatch_nil_returns_error() {
     let (_state, lua) = make_graphics_vm();
-    let result = lua.load("luna.render.draw(nil, 0, 0)").exec();
+    let result = lua.load("luna.gfx.draw(nil, 0, 0)").exec();
     assert_lua_error_contains(result, "nil");
 }
 
 #[test]
 fn graphics_draw_dispatch_string_returns_error() {
     let (_state, lua) = make_graphics_vm();
-    let result = lua.load("luna.render.draw('not_drawable', 0, 0)").exec();
+    let result = lua.load("luna.gfx.draw('not_drawable', 0, 0)").exec();
     assert_lua_error_contains(result, "drawable");
 }
 
@@ -2090,8 +2090,8 @@ fn graphics_draw_ex_dispatch_image_userdata_pushes_draw_image_ex() {
     run_draw(
         &lua,
         r#"
-        local img = luna.render.newImage("assets/icon.png")
-        luna.render.drawEx(img, 15, 25, 0.5, 2.0, 2.0, 0, 0)
+        local img = luna.gfx.newImage("assets/icon.png")
+        luna.gfx.drawEx(img, 15, 25, 0.5, 2.0, 2.0, 0, 0)
         "#,
     );
     let st = state.borrow();
@@ -2114,8 +2114,8 @@ fn graphics_draw_ex_dispatch_canvas_userdata_pushes_draw_canvas() {
     run_draw(
         &lua,
         r#"
-        local canvas = luna.render.newCanvas(32, 32)
-        luna.render.drawEx(canvas, 5, 10, 0, 1, 1, 0, 0)
+        local canvas = luna.gfx.newCanvas(32, 32)
+        luna.gfx.drawEx(canvas, 5, 10, 0, 1, 1, 0, 0)
         "#,
     );
     let st = state.borrow();
@@ -2135,8 +2135,8 @@ fn graphics_draw_ex_sy_defaults_to_sx() {
     run_draw(
         &lua,
         r#"
-        local img = luna.render.newImage("assets/icon.png")
-        luna.render.drawEx(img, 0, 0, 0, 3.0)
+        local img = luna.gfx.newImage("assets/icon.png")
+        luna.gfx.drawEx(img, 0, 0, 0, 3.0)
         "#,
     );
     let st = state.borrow();
@@ -2161,7 +2161,7 @@ fn graphics_capture_screenshot_stores_callback() {
         .load(
             r#"
         local fired = false
-        luna.render.captureScreenshot(function(img)
+        luna.gfx.captureScreenshot(function(img)
             fired = true
             assert(type(img) == "userdata", "expected ImageData userdata")
         end)
@@ -2187,8 +2187,8 @@ fn graphics_draw_command_image_variant() {
     run_draw(
         &lua,
         r#"
-        local img = luna.render.newImage("assets/icon.png")
-        luna.render.draw(img, 10, 20)
+        local img = luna.gfx.newImage("assets/icon.png")
+        luna.gfx.draw(img, 10, 20)
     "#,
     );
     let st = state.borrow();
@@ -2205,8 +2205,8 @@ fn graphics_draw_command_canvas_variant() {
     run_draw(
         &lua,
         r#"
-        local c = luna.render.newCanvas(64, 64)
-        luna.render.draw(c, 5, 15)
+        local c = luna.gfx.newCanvas(64, 64)
+        luna.gfx.draw(c, 5, 15)
     "#,
     );
     let st = state.borrow();
@@ -2228,7 +2228,7 @@ fn graphics_screenshot_request_queued_without_panic() {
         .load(
             r#"
         local fired = false
-        luna.render.captureScreenshot(function(img)
+        luna.gfx.captureScreenshot(function(img)
             fired = true
         end)
         assert(fired, "captureScreenshot callback must be invoked")
@@ -2245,7 +2245,7 @@ fn graphics_screenshot_request_queued_without_panic() {
 #[test]
 fn graphics_save_screenshot_queues_save_path() {
     let (state, lua) = make_graphics_vm();
-    lua.load(r#"luna.render.saveScreenshot('save/test_frame.png')"#)
+    lua.load(r#"luna.gfx.saveScreenshot('save/test_frame.png')"#)
         .exec()
         .expect("saveScreenshot should queue a request");
 
@@ -2261,7 +2261,7 @@ fn graphics_save_screenshot_queues_save_path() {
 fn graphics_save_screenshot_rejects_non_save_path() {
     let (_state, lua) = make_graphics_vm();
     let result = lua
-        .load(r#"luna.render.saveScreenshot('frame.png')"#)
+        .load(r#"luna.gfx.saveScreenshot('frame.png')"#)
         .exec();
     assert!(
         result.is_err(),
@@ -2304,7 +2304,7 @@ fn graphics_depth_default_is_always() {
 #[test]
 fn graphics_stencil_mode_round_trip() {
     let (state, lua) = make_graphics_vm();
-    lua.load(r#"luna.render.setStencilMode("replace", "always", 1)"#)
+    lua.load(r#"luna.gfx.setStencilMode("replace", "always", 1)"#)
         .exec()
         .expect("setStencilMode failed");
     let st = state.borrow();
@@ -2316,7 +2316,7 @@ fn graphics_stencil_mode_round_trip() {
 #[test]
 fn graphics_depth_mode_round_trip() {
     let (state, lua) = make_graphics_vm();
-    lua.load(r#"luna.render.setDepthMode("less", true)"#)
+    lua.load(r#"luna.gfx.setDepthMode("less", true)"#)
         .exec()
         .expect("setDepthMode failed");
     let st = state.borrow();
@@ -2328,7 +2328,7 @@ fn graphics_depth_mode_round_trip() {
 fn graphics_stencil_mode_defaults_in_get() {
     let (_state, lua) = make_graphics_vm();
     let result: (String, String, u8) = lua
-        .load(r#"return luna.render.getStencilMode()"#)
+        .load(r#"return luna.gfx.getStencilMode()"#)
         .eval()
         .expect("getStencilMode failed");
     assert_eq!(result.0, "keep");
@@ -2340,7 +2340,7 @@ fn graphics_stencil_mode_defaults_in_get() {
 fn graphics_depth_mode_defaults_in_get() {
     let (_state, lua) = make_graphics_vm();
     let result: (String, bool) = lua
-        .load(r#"return luna.render.getDepthMode()"#)
+        .load(r#"return luna.gfx.getDepthMode()"#)
         .eval()
         .expect("getDepthMode failed");
     assert_eq!(result.0, "always");
@@ -2352,8 +2352,8 @@ fn graphics_clear_stencil_resets_to_default() {
     let (state, lua) = make_graphics_vm();
     lua.load(
         r#"
-        luna.render.setStencilMode("replace", "equal", 7)
-        luna.render.clearStencil()
+        luna.gfx.setStencilMode("replace", "equal", 7)
+        luna.gfx.clearStencil()
         "#,
     )
     .exec()
@@ -2367,7 +2367,7 @@ fn graphics_clear_stencil_resets_to_default() {
 fn graphics_stencil_mode_unknown_action_errors() {
     let (_state, lua) = make_graphics_vm();
     let result = lua
-        .load(r#"luna.render.setStencilMode("explode")"#)
+        .load(r#"luna.gfx.setStencilMode("explode")"#)
         .exec();
     assert!(result.is_err(), "expected error for unknown stencil action");
 }
@@ -2375,6 +2375,6 @@ fn graphics_stencil_mode_unknown_action_errors() {
 #[test]
 fn graphics_depth_mode_unknown_mode_errors() {
     let (_state, lua) = make_graphics_vm();
-    let result = lua.load(r#"luna.render.setDepthMode("turbo")"#).exec();
+    let result = lua.load(r#"luna.gfx.setDepthMode("turbo")"#).exec();
     assert!(result.is_err(), "expected error for unknown depth mode");
 }

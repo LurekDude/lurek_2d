@@ -1,13 +1,13 @@
-﻿# Snake
+# Snake
 
 Guide the snake to eat food and grow longer — but don't bite your own tail
 or run into a wall. Game wraps horizontally and vertically.
 
 ## What It Demonstrates
 
-- `luna.render.rectangle()` / `luna.render.circle()` — drawing snake segments and food
+- `luna.gfx.rectangle()` / `luna.gfx.circle()` — drawing snake segments and food
 - `luna.keypressed()` — direction changes with 180° reversal prevention
-- `luna.render.print()` — live score and high-score tracking
+- `luna.gfx.print()` — live score and high-score tracking
 - Timer-based grid movement with speed scaling by score
 
 ## Controls

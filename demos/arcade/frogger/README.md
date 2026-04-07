@@ -1,13 +1,13 @@
-﻿# Frogger
+# Frogger
 
 Help the frog cross a busy road, then ride logs and turtles across the river
 to reach the lily pads at the top.
 
 ## What It Demonstrates
 
-- `luna.render.rectangle()` / `luna.render.circle()` — frog, vehicles, logs, lily pads
+- `luna.gfx.rectangle()` / `luna.gfx.circle()` — frog, vehicles, logs, lily pads
 - `luna.keypressed()` — hop-based grid movement
-- `luna.render.print()` — HUD score, lives, and level
+- `luna.gfx.print()` — HUD score, lives, and level
 - Multiple scrolling lane types: road (avoid obstacles) and river (ride platforms)
 
 ## Controls

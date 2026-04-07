@@ -1,4 +1,4 @@
-﻿-- Tower Defense
+-- Tower Defense
 -- Controls: Click grid to place tower, 1 for basic tower, 2 for cannon tower, N for next wave, Escape to quit
 -- Stop enemies from reaching the right side!
 
@@ -72,9 +72,9 @@ local function isPathTile(gx, gy)
     return false
 end
 
-function luna.load()
+function luna.init()
     luna.window.setTitle("Tower Defense")
-    luna.render.setBackgroundColor(0.12, 0.15, 0.1)
+    luna.gfx.setBackgroundColor(0.12, 0.15, 0.1)
     -- Mark path tiles
     for gx = 0, COLS - 1 do
         for gy = 0, ROWS - 1 do
@@ -111,7 +111,7 @@ local function addParticles(x, y, r, g, b, n)
     end
 end
 
-function luna.update(dt)
+function luna.process(dt)
     if gameOver then return end
 
     -- Spawn enemies
@@ -204,7 +204,7 @@ function luna.update(dt)
     end
 end
 
-function luna.draw()
+function luna.render()
     -- Grid
     for gx = 0, COLS - 1 do
         for gy = 0, ROWS - 1 do
@@ -212,75 +212,75 @@ function luna.draw()
             local cell = grid[key]
             local px, py = gx * TILE, gy * TILE
             if cell and cell.path then
-                luna.render.setColor(0.3, 0.28, 0.2, 1)
+                luna.gfx.setColor(0.3, 0.28, 0.2, 1)
             else
-                luna.render.setColor(0.18, 0.22, 0.14, 1)
+                luna.gfx.setColor(0.18, 0.22, 0.14, 1)
             end
-            luna.render.rectangle("fill", px, py, TILE, TILE)
-            luna.render.setColor(0.1, 0.12, 0.08, 0.3)
-            luna.render.rectangle("line", px, py, TILE, TILE)
+            luna.gfx.rectangle("fill", px, py, TILE, TILE)
+            luna.gfx.setColor(0.1, 0.12, 0.08, 0.3)
+            luna.gfx.rectangle("line", px, py, TILE, TILE)
         end
     end
 
     -- Towers
     for _, tw in ipairs(towers) do
         if tw.kind == "basic" then
-            luna.render.setColor(0.3, 0.7, 0.9, 1)
+            luna.gfx.setColor(0.3, 0.7, 0.9, 1)
         else
-            luna.render.setColor(0.8, 0.4, 0.2, 1)
+            luna.gfx.setColor(0.8, 0.4, 0.2, 1)
         end
-        luna.render.rectangle("fill", tw.x - 12, tw.y - 12, 24, 24)
-        luna.render.setColor(0.1, 0.1, 0.1, 1)
-        luna.render.rectangle("line", tw.x - 12, tw.y - 12, 24, 24)
+        luna.gfx.rectangle("fill", tw.x - 12, tw.y - 12, 24, 24)
+        luna.gfx.setColor(0.1, 0.1, 0.1, 1)
+        luna.gfx.rectangle("line", tw.x - 12, tw.y - 12, 24, 24)
         -- Range indicator on hover
         local mx, my = luna.mouse.getPosition()
         if distXY(mx, my, tw.x, tw.y) < 18 then
-            luna.render.setColor(1, 1, 1, 0.1)
-            luna.render.circle("line", tw.x, tw.y, tw.range)
+            luna.gfx.setColor(1, 1, 1, 0.1)
+            luna.gfx.circle("line", tw.x, tw.y, tw.range)
         end
     end
 
     -- Enemies
     for _, e in ipairs(enemies) do
-        luna.render.setColor(0.9, 0.2, 0.2, 1)
-        luna.render.circle("fill", e.x, e.y, 8)
+        luna.gfx.setColor(0.9, 0.2, 0.2, 1)
+        luna.gfx.circle("fill", e.x, e.y, 8)
         -- HP bar
-        luna.render.setColor(0.2, 0.2, 0.2, 1)
-        luna.render.rectangle("fill", e.x - 10, e.y - 14, 20, 4)
-        luna.render.setColor(0.1, 0.9, 0.1, 1)
-        luna.render.rectangle("fill", e.x - 10, e.y - 14, 20 * (e.hp / e.maxHp), 4)
+        luna.gfx.setColor(0.2, 0.2, 0.2, 1)
+        luna.gfx.rectangle("fill", e.x - 10, e.y - 14, 20, 4)
+        luna.gfx.setColor(0.1, 0.9, 0.1, 1)
+        luna.gfx.rectangle("fill", e.x - 10, e.y - 14, 20 * (e.hp / e.maxHp), 4)
     end
 
     -- Projectiles
-    luna.render.setColor(1, 1, 0.6, 1)
+    luna.gfx.setColor(1, 1, 0.6, 1)
     for _, p in ipairs(projectiles) do
-        luna.render.circle("fill", p.x, p.y, 3)
+        luna.gfx.circle("fill", p.x, p.y, 3)
     end
 
     -- Particles
     for _, p in ipairs(particles) do
-        luna.render.setColor(p.r, p.g, p.b, p.life * 2.5)
-        luna.render.circle("fill", p.x, p.y, 3)
+        luna.gfx.setColor(p.r, p.g, p.b, p.life * 2.5)
+        luna.gfx.circle("fill", p.x, p.y, 3)
     end
 
     -- HUD
-    luna.render.setColor(0, 0, 0, 0.7)
-    luna.render.rectangle("fill", 0, H - 30, W, 30)
-    luna.render.setColor(1, 0.85, 0.2, 1)
-    luna.render.print("Gold: " .. cash, 10, H - 24)
-    luna.render.setColor(1, 0.3, 0.3, 1)
-    luna.render.print("Lives: " .. lives, 120, H - 24)
-    luna.render.setColor(1, 1, 1, 1)
-    luna.render.print("Wave: " .. wave, 230, H - 24)
+    luna.gfx.setColor(0, 0, 0, 0.7)
+    luna.gfx.rectangle("fill", 0, H - 30, W, 30)
+    luna.gfx.setColor(1, 0.85, 0.2, 1)
+    luna.gfx.print("Gold: " .. cash, 10, H - 24)
+    luna.gfx.setColor(1, 0.3, 0.3, 1)
+    luna.gfx.print("Lives: " .. lives, 120, H - 24)
+    luna.gfx.setColor(1, 1, 1, 1)
+    luna.gfx.print("Wave: " .. wave, 230, H - 24)
     local tInfo = towerType == "basic" and "[1]Basic(20g)" or "[2]Cannon(40g)"
-    luna.render.print(tInfo .. "  [N]NextWave", 340, H - 24)
-    luna.render.print("FPS:" .. luna.time.getFPS(), W - 70, H - 24)
+    luna.gfx.print(tInfo .. "  [N]NextWave", 340, H - 24)
+    luna.gfx.print("FPS:" .. luna.time.getFPS(), W - 70, H - 24)
 
     if gameOver then
-        luna.render.setColor(0, 0, 0, 0.6)
-        luna.render.rectangle("fill", 250, 260, 300, 60)
-        luna.render.setColor(1, 0.2, 0.2, 1)
-        luna.render.print("GAME OVER — Wave " .. wave, 280, 275, 1.5)
+        luna.gfx.setColor(0, 0, 0, 0.6)
+        luna.gfx.rectangle("fill", 250, 260, 300, 60)
+        luna.gfx.setColor(1, 0.2, 0.2, 1)
+        luna.gfx.print("GAME OVER — Wave " .. wave, 280, 275, 1.5)
     end
 end
 

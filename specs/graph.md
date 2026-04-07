@@ -333,7 +333,7 @@ The Lua API is registered in `src/lua_api/graph_api.rs` under the `luna.graph` n
 
 ```lua
 -- Build a simple resource pipeline: mine → smelter → warehouse
-function luna.load()
+function luna.init()
     graph = luna.graph.newGraph()
 
     -- Create nodes with types and capacities
@@ -373,7 +373,7 @@ function luna.load()
     end
 end
 
-function luna.update(dt)
+function luna.process(dt)
     graph:update(dt)
 
     -- Check stats
@@ -390,7 +390,7 @@ end
 
 ```lua
 -- Supply/demand example: village demands food from farm
-function luna.load()
+function luna.init()
     g = luna.graph.newGraph()
 
     local farm    = g:addNode("farm", -1)

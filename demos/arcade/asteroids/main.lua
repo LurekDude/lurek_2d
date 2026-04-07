@@ -1,4 +1,4 @@
-﻿-- Asteroids — Classic Arcade (Luna2D demo)
+-- Asteroids — Classic Arcade (Luna2D demo)
 -- Pilot your ship through an asteroid belt. Shoot or dodge to survive.
 -- Rotate with Left/Right, thrust with Up, shoot with Space. Screen wraps.
 
@@ -93,8 +93,8 @@ end
 
 -- ── Load ─────────────────────────────────────────────────────────────────
 
-function luna.load()
-    luna.render.setBackgroundColor(0, 0, 0.02)
+function luna.init()
+    luna.gfx.setBackgroundColor(0, 0, 0.02)
     score = 0; lives = 3; wave = 1
     reset_ship()
     init_wave()
@@ -103,7 +103,7 @@ end
 
 -- ── Update ───────────────────────────────────────────────────────────────
 
-function luna.update(dt)
+function luna.process(dt)
     if game_state ~= "playing" then return end
 
     shoot_cd = math.max(0, shoot_cd - dt)
@@ -213,41 +213,41 @@ local function draw_ship(sx, sy, angle)
     local x1, y1 = rot(16, 0)
     local x2, y2 = rot(-10, -9)
     local x3, y3 = rot(-10, 9)
-    luna.render.line(x1, y1, x2, y2)
-    luna.render.line(x2, y2, x3, y3)
-    luna.render.line(x3, y3, x1, y1)
+    luna.gfx.line(x1, y1, x2, y2)
+    luna.gfx.line(x2, y2, x3, y3)
+    luna.gfx.line(x3, y3, x1, y1)
 end
 
 local star_seed = 7
-function luna.draw()
+function luna.render()
     -- Stars
     math.randomseed(star_seed)
     for i = 1, 90 do
         local alpha = 0.3 + math.random() * 0.5
-        luna.render.setColor(alpha, alpha, alpha)
-        luna.render.circle("fill", math.random(W), math.random(H), 1)
+        luna.gfx.setColor(alpha, alpha, alpha)
+        luna.gfx.circle("fill", math.random(W), math.random(H), 1)
     end
     math.randomseed(os.time())
 
     -- HUD
-    luna.render.setColor(1, 1, 1)
-    luna.render.print("ASTEROIDS", W/2 - 55, 5, 2)
-    luna.render.setColor(0.8, 0.9, 1)
-    luna.render.print("Score: " .. score, 8, 8, 1.5)
-    luna.render.setColor(1, 0.4, 0.4)
-    luna.render.print("Lives: " .. lives, W - 100, 8, 1.5)
-    luna.render.setColor(0.5, 0.6, 0.8)
-    luna.render.print("Wave " .. wave, W - 70, H - 20, 1.5)
+    luna.gfx.setColor(1, 1, 1)
+    luna.gfx.print("ASTEROIDS", W/2 - 55, 5, 2)
+    luna.gfx.setColor(0.8, 0.9, 1)
+    luna.gfx.print("Score: " .. score, 8, 8, 1.5)
+    luna.gfx.setColor(1, 0.4, 0.4)
+    luna.gfx.print("Lives: " .. lives, W - 100, 8, 1.5)
+    luna.gfx.setColor(0.5, 0.6, 0.8)
+    luna.gfx.print("Wave " .. wave, W - 70, H - 20, 1.5)
 
     -- Particles
     for _, p in ipairs(particles) do
         local t = p.life / p.max_life
-        luna.render.setColor(1, 0.6 * t + 0.2, 0.1, t)
-        luna.render.circle("fill", p.x, p.y, p.size * t)
+        luna.gfx.setColor(1, 0.6 * t + 0.2, 0.1, t)
+        luna.gfx.circle("fill", p.x, p.y, p.size * t)
     end
 
     -- Asteroids
-    luna.render.setColor(0.8, 0.75, 0.65)
+    luna.gfx.setColor(0.8, 0.75, 0.65)
     for _, a in ipairs(asteroids) do
         local rad = deg2rad(a.angle)
         local cos_a, sin_a = math.cos(rad), math.sin(rad)
@@ -259,14 +259,14 @@ function luna.draw()
                 local y1 = a.y + v1[1] * sin_a + v1[2] * cos_a
                 local x2 = a.x + v2[1] * cos_a - v2[2] * sin_a
                 local y2 = a.y + v2[1] * sin_a + v2[2] * cos_a
-                luna.render.line(x1, y1, x2, y2)
+                luna.gfx.line(x1, y1, x2, y2)
             end
         end
     end
 
     -- Ship (blink when invincible)
     if game_state == "playing" and (invincible <= 0 or math.floor(invincible * 8) % 2 == 0) then
-        luna.render.setColor(0.4, 0.9, 1.0)
+        luna.gfx.setColor(0.4, 0.9, 1.0)
         draw_ship(ship.x, ship.y, ship.angle)
         -- Thrust flame
         if ship.thrusting then
@@ -274,27 +274,27 @@ function luna.draw()
             local cos_a, sin_a = math.cos(rad), math.sin(rad)
             local fx = ship.x + math.cos(deg2rad(ship.angle)) * (-12)
             local fy = ship.y + math.sin(deg2rad(ship.angle)) * (-12)
-            luna.render.setColor(1, 0.5, 0.1, 0.8)
-            luna.render.circle("fill", fx, fy, 5 + math.random() * 4)
+            luna.gfx.setColor(1, 0.5, 0.1, 0.8)
+            luna.gfx.circle("fill", fx, fy, 5 + math.random() * 4)
         end
     end
 
     -- Bullets
-    luna.render.setColor(1, 1, 0.6)
+    luna.gfx.setColor(1, 1, 0.6)
     for _, b in ipairs(bullets) do
-        luna.render.circle("fill", b.x, b.y, 3)
+        luna.gfx.circle("fill", b.x, b.y, 3)
     end
 
     -- Overlay
     if game_state == "gameover" then
-        luna.render.setColor(0, 0, 0, 0.7)
-        luna.render.rectangle("fill", 0, 0, W, H)
-        luna.render.setColor(1, 0.3, 0.3)
-        luna.render.print("GAME OVER", W/2 - 80, H/2 - 30, 3)
-        luna.render.setColor(1, 1, 1)
-        luna.render.print("Score: " .. score, W/2 - 50, H/2 + 15, 2)
-        luna.render.setColor(0.6, 0.6, 0.6)
-        luna.render.print("Press R to restart", W/2 - 100, H/2 + 48, 2)
+        luna.gfx.setColor(0, 0, 0, 0.7)
+        luna.gfx.rectangle("fill", 0, 0, W, H)
+        luna.gfx.setColor(1, 0.3, 0.3)
+        luna.gfx.print("GAME OVER", W/2 - 80, H/2 - 30, 3)
+        luna.gfx.setColor(1, 1, 1)
+        luna.gfx.print("Score: " .. score, W/2 - 50, H/2 + 15, 2)
+        luna.gfx.setColor(0.6, 0.6, 0.6)
+        luna.gfx.print("Press R to restart", W/2 - 100, H/2 + 48, 2)
     end
 end
 

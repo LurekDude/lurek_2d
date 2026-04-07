@@ -1,4 +1,4 @@
-﻿-- Top-Down Drift Racing
+-- Top-Down Drift Racing
 -- W=accelerate, S=brake, A/D=steer. Drift around an oval track.
 -- 3 laps to win. AI cars follow the track. Boost zones on track.
 
@@ -86,7 +86,7 @@ local function closest_track_idx(px, py)
     return best_i
 end
 
-function luna.load()
+function luna.init()
     build_track()
     car = make_car(1, 0, 0.8, 1)
     car.angle = -math.pi / 2
@@ -186,7 +186,7 @@ local function update_checkpoints(c)
     end
 end
 
-function luna.update(dt)
+function luna.process(dt)
     if state.finished then return end
     state.race_time = state.race_time + dt
 
@@ -263,53 +263,53 @@ local function draw_car(c)
         c.x - cos_a * hw + sin_a * hh, c.y - sin_a * hw - cos_a * hh,
         c.x - cos_a * hw - sin_a * hh, c.y - sin_a * hw + cos_a * hh
     }
-    luna.render.setColor(c.r, c.g, c.b, 1)
-    luna.render.polygon("fill", corners)
-    luna.render.setColor(1, 1, 1, 0.5)
-    luna.render.polygon("line", corners)
+    luna.gfx.setColor(c.r, c.g, c.b, 1)
+    luna.gfx.polygon("fill", corners)
+    luna.gfx.setColor(1, 1, 1, 0.5)
+    luna.gfx.polygon("line", corners)
 end
 
-function luna.draw()
-    luna.render.setBackgroundColor(0.15, 0.18, 0.12)
+function luna.render()
+    luna.gfx.setBackgroundColor(0.15, 0.18, 0.12)
 
     -- draw track road
-    luna.render.setColor(0.3, 0.3, 0.3, 1)
+    luna.gfx.setColor(0.3, 0.3, 0.3, 1)
     for i = 1, #track_outer - 1 do
         local a = track_outer[i]; local b = track_outer[i + 1]
         local c = track_inner[i + 1]; local d = track_inner[i]
-        luna.render.polygon("fill", { a.x, a.y, b.x, b.y, c.x, c.y, d.x, d.y })
+        luna.gfx.polygon("fill", { a.x, a.y, b.x, b.y, c.x, c.y, d.x, d.y })
     end
 
     -- track edges
-    luna.render.setColor(1, 1, 1, 0.3)
-    luna.render.setLineWidth(2)
+    luna.gfx.setColor(1, 1, 1, 0.3)
+    luna.gfx.setLineWidth(2)
     for i = 1, #track_outer - 1 do
-        luna.render.line(track_outer[i].x, track_outer[i].y, track_outer[i + 1].x, track_outer[i + 1].y)
-        luna.render.line(track_inner[i].x, track_inner[i].y, track_inner[i + 1].x, track_inner[i + 1].y)
+        luna.gfx.line(track_outer[i].x, track_outer[i].y, track_outer[i + 1].x, track_outer[i + 1].y)
+        luna.gfx.line(track_inner[i].x, track_inner[i].y, track_inner[i + 1].x, track_inner[i + 1].y)
     end
 
     -- boost zones
     for _, bz in ipairs(boost_zones) do
         if bz.active then
-            luna.render.setColor(0, 1, 1, 0.4)
-            luna.render.circle("fill", bz.x, bz.y, bz.radius)
-            luna.render.setColor(0, 1, 1, 0.8)
-            luna.render.circle("line", bz.x, bz.y, bz.radius)
+            luna.gfx.setColor(0, 1, 1, 0.4)
+            luna.gfx.circle("fill", bz.x, bz.y, bz.radius)
+            luna.gfx.setColor(0, 1, 1, 0.8)
+            luna.gfx.circle("line", bz.x, bz.y, bz.radius)
         end
     end
 
     -- checkpoints
     for i, cp in ipairs(checkpoints) do
-        luna.render.setColor(1, 1, 0, 0.3)
-        luna.render.circle("fill", cp.x, cp.y, 10)
-        luna.render.setColor(1, 1, 0, 0.7)
-        luna.render.print(tostring(i), cp.x - 3, cp.y - 6)
+        luna.gfx.setColor(1, 1, 0, 0.3)
+        luna.gfx.circle("fill", cp.x, cp.y, 10)
+        luna.gfx.setColor(1, 1, 0, 0.7)
+        luna.gfx.print(tostring(i), cp.x - 3, cp.y - 6)
     end
 
     -- skid marks
-    luna.render.setColor(0.15, 0.15, 0.15, 0.5)
+    luna.gfx.setColor(0.15, 0.15, 0.15, 0.5)
     for _, s in ipairs(skid_marks) do
-        luna.render.circle("fill", s.x, s.y, 2)
+        luna.gfx.circle("fill", s.x, s.y, 2)
     end
 
     -- AI cars
@@ -318,46 +318,46 @@ function luna.draw()
     -- player car
     draw_car(car)
     if car.boost > 0 then
-        luna.render.setColor(0, 1, 1, 0.6)
-        luna.render.circle("fill", car.x, car.y, 15)
+        luna.gfx.setColor(0, 1, 1, 0.6)
+        luna.gfx.circle("fill", car.x, car.y, 15)
     end
 
     -- HUD
-    luna.render.setColor(1, 1, 1, 1)
-    luna.render.print("Speed: " .. math.floor(car.speed), 10, 10)
-    luna.render.print("Lap: " .. car.lap .. "/" .. state.laps_to_win, 10, 30)
+    luna.gfx.setColor(1, 1, 1, 1)
+    luna.gfx.print("Speed: " .. math.floor(car.speed), 10, 10)
+    luna.gfx.print("Lap: " .. car.lap .. "/" .. state.laps_to_win, 10, 30)
     local lt = math.floor(car.lap_time * 10) / 10
-    luna.render.print("Lap Time: " .. lt .. "s", 10, 50)
-    luna.render.print("Drift: " .. math.floor(car.drift), 10, 70)
+    luna.gfx.print("Lap Time: " .. lt .. "s", 10, 50)
+    luna.gfx.print("Drift: " .. math.floor(car.drift), 10, 70)
 
     if car.boost > 0 then
-        luna.render.setColor(0, 1, 1, 1)
-        luna.render.print("BOOST!", 10, 90)
+        luna.gfx.setColor(0, 1, 1, 1)
+        luna.gfx.print("BOOST!", 10, 90)
     end
 
     -- mini map
     local mx, my, ms = W - 110, 10, 0.12
-    luna.render.setColor(0, 0, 0, 0.5)
-    luna.render.rectangle("fill", mx - 5, my - 5, 110, 85)
-    luna.render.setColor(0.4, 0.4, 0.4, 0.8)
+    luna.gfx.setColor(0, 0, 0, 0.5)
+    luna.gfx.rectangle("fill", mx - 5, my - 5, 110, 85)
+    luna.gfx.setColor(0.4, 0.4, 0.4, 0.8)
     for i = 1, #track_pts - 1 do
         local a, b = track_pts[i], track_pts[i + 1]
-        luna.render.line(mx + a.x * ms, my + a.y * ms, mx + b.x * ms, my + b.y * ms)
+        luna.gfx.line(mx + a.x * ms, my + a.y * ms, mx + b.x * ms, my + b.y * ms)
     end
-    luna.render.setColor(0, 0.8, 1, 1)
-    luna.render.circle("fill", mx + car.x * ms, my + car.y * ms, 3)
+    luna.gfx.setColor(0, 0.8, 1, 1)
+    luna.gfx.circle("fill", mx + car.x * ms, my + car.y * ms, 3)
     for _, ai in ipairs(ai_cars) do
-        luna.render.setColor(ai.r, ai.g, ai.b, 1)
-        luna.render.circle("fill", mx + ai.x * ms, my + ai.y * ms, 2)
+        luna.gfx.setColor(ai.r, ai.g, ai.b, 1)
+        luna.gfx.circle("fill", mx + ai.x * ms, my + ai.y * ms, 2)
     end
 
     -- finished message
     if state.finished then
-        luna.render.setColor(1, 1, 0.3, 1)
-        luna.render.print(state.message, W / 2 - 120, H / 2 - 15, 1.5)
+        luna.gfx.setColor(1, 1, 0.3, 1)
+        luna.gfx.print(state.message, W / 2 - 120, H / 2 - 15, 1.5)
     end
 
-    luna.render.setColor(0.6, 0.6, 0.6, 0.5)
-    luna.render.print("WASD: Drive | R: Restart", W / 2 - 80, H - 20)
-    luna.render.print("FPS: " .. luna.time.getFPS(), W - 80, H - 20)
+    luna.gfx.setColor(0.6, 0.6, 0.6, 0.5)
+    luna.gfx.print("WASD: Drive | R: Restart", W / 2 - 80, H - 20)
+    luna.gfx.print("FPS: " .. luna.time.getFPS(), W - 80, H - 20)
 end

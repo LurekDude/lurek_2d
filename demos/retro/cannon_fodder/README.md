@@ -1,4 +1,4 @@
-﻿# Cannon Fodder
+# Cannon Fodder
 
 A top-down squad-based shooter inspired by Sensible Software's 1993 Amiga classic.
 Command a team of soldiers through five increasingly difficult jungle missions.
@@ -6,7 +6,7 @@ Eliminate every enemy, then lead your squad to the red flag.
 
 ## What It Demonstrates
 
-- `luna.render.rectangle()` / `luna.render.circle()` — soldier and enemy sprites
+- `luna.gfx.rectangle()` / `luna.gfx.circle()` — soldier and enemy sprites
 - `luna.input.isKeyDown()` — move squad target cursor
 - Automatic squad pathfinding using a shared move-target
 - Auto-fire AI — soldiers shoot the nearest visible enemy

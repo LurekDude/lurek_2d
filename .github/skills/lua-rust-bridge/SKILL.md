@@ -1,4 +1,4 @@
-﻿---
+---
 name: lua-rust-bridge
 description: "Load this skill when designing or implementing the bridge between Rust engine modules and the luna.* Lua API: creating UserData types, registration functions, binding domain types to Lua, or keeping src/lua_api/ thin. Use for: new Lua API modules, Lua↔Rust data conversion, AGENT.md↔lua_api sync. Skip it for domain Rust logic, game scripting, or GPU code."
 ---
@@ -118,7 +118,7 @@ let texture = state.borrow().load_texture(path)
 // Validate Lua input with a descriptive message:
 if width == 0 {
     return Err(LuaError::RuntimeError(
-        "luna.render.newCanvas: width must be > 0".into()
+        "luna.gfx.newCanvas: width must be > 0".into()
     ));
 }
 ```

@@ -1,4 +1,4 @@
-﻿-- examples/filesystem.lua
+-- examples/filesystem.lua
 -- Luna2D luna.fs API Reference
 -- This file is documentation code, not a runnable game.
 -- Demonstrates the sandboxed GameFS, virtual FS, and file API.
@@ -152,7 +152,7 @@ local filename = fd:getFilename()    -- → "textures/player.png"
 local handle = luna.fs.readAsync("levels/bigmap.bin")
 
 -- Poll each frame until done (returns status + data when ready)
-function luna.update(dt)
+function luna.process(dt)
     if handle then
         local status, data = luna.fs.pollAsync(handle)
         if status == "done" then

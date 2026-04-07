@@ -1,4 +1,4 @@
-﻿-- tests/lua/test_docs.lua
+-- tests/lua/test_docs.lua
 -- BDD tests for luna.docs.* documentation management API
 
 describe("luna.docs", function()
@@ -18,7 +18,7 @@ describe("luna.docs", function()
         expect_true(#modules > 0, "should have found at least one module")
     end)
 
-    it("scan should find luna.render functions", function()
+    it("scan should find luna.gfx functions", function()
         local catalog = luna.docs.scan()
         local entries = catalog:getEntries("graphics")
         expect_not_nil(entries, "getEntries('graphics') should return a table")
@@ -117,7 +117,7 @@ describe("luna.docs", function()
         local catalog = luna.docs.scan()
         local results = catalog:search("graphics")
         expect_not_nil(results, "search should return results")
-        -- At least luna.render.* functions contain 'graphics' in qualified name
+        -- At least luna.gfx.* functions contain 'graphics' in qualified name
         expect_true(#results > 0, "should find graphics entries")
     end)
 

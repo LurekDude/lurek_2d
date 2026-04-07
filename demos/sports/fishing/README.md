@@ -1,4 +1,4 @@
-﻿# Fishing
+# Fishing
 
 A marine fishing simulation where you cast a line, wait for a bite, and reel in a catch using a live tension mini-game. Six fish species are distributed by depth and matched to specific bait types. Each 120-second day ends with an automatic sell phase that tallies earnings.
 
@@ -6,8 +6,8 @@ A marine fishing simulation where you cast a line, wait for a bite, and reel in 
 
 - `luna.keyboard.isDown()` — movement, cast hold, and reel up/down input
 - `luna.keyboard.wasPressed()` — cast release and bait cycling
-- `luna.render.setColor()` / `luna.render.rectangle()` — underwater scene, tension bar, and HUD
-- `luna.render.circle()` — fish sprites and bobber rendering
+- `luna.gfx.setColor()` / `luna.gfx.rectangle()` — underwater scene, tension bar, and HUD
+- `luna.gfx.circle()` — fish sprites and bobber rendering
 - `luna.time.getTime()` — sinusoidal fish-pull oscillation during the reel phase
 - `luna.mouse.getPosition()` — used indirectly to track cast direction
 - Boid-lite fish movement — independent fish entities with random velocity changes

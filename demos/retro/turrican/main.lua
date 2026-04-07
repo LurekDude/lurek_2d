@@ -1,4 +1,4 @@
-﻿-- Turrican — C-64/Amiga Classic (Luna2D demo)
+-- Turrican — C-64/Amiga Classic (Luna2D demo)
 -- A run-and-gun platformer inspired by Manfred Trenz's legendary 1990 game.
 -- Blast enemies, power up, and clear each world.
 
@@ -118,15 +118,15 @@ end
 
 -- ── Load ─────────────────────────────────────────────────────────────────
 
-function luna.load()
-    luna.render.setBackgroundColor(0.06, 0.04, 0.14)
+function luna.init()
+    luna.gfx.setBackgroundColor(0.06, 0.04, 0.14)
     score = 0; health = MAX_HEALTH; level = 1
     init_level()
 end
 
 -- ── Update ───────────────────────────────────────────────────────────────
 
-function luna.update(dt)
+function luna.process(dt)
     if game_state ~= "playing" then return end
     anim = anim + dt
     beam_timer = math.max(0, beam_timer - dt)
@@ -245,7 +245,7 @@ end
 
 -- ── Draw ─────────────────────────────────────────────────────────────────
 
-function luna.draw()
+function luna.render()
     local cam = math.floor(camera_x)
     local fc = math.floor(cam / TILE)
     local lc = fc + math.ceil(W / TILE) + 2
@@ -255,10 +255,10 @@ function luna.draw()
         for col = fc, lc do
             if tile_at(col, row) == "1" then
                 local sx, sy = (col - 1) * TILE - cam, (row - 1) * TILE
-                luna.render.setColor(0.22, 0.14, 0.38)
-                luna.render.rectangle("fill", sx, sy, TILE, TILE)
-                luna.render.setColor(0.4, 0.25, 0.6)
-                luna.render.rectangle("line", sx, sy, TILE, TILE)
+                luna.gfx.setColor(0.22, 0.14, 0.38)
+                luna.gfx.rectangle("fill", sx, sy, TILE, TILE)
+                luna.gfx.setColor(0.4, 0.25, 0.6)
+                luna.gfx.rectangle("line", sx, sy, TILE, TILE)
             end
         end
     end
@@ -266,20 +266,20 @@ function luna.draw()
     -- Exit
     if exit_tile.x then
         local sx = exit_tile.x - cam
-        luna.render.setColor(0, 0.8, 1)
-        luna.render.rectangle("fill", sx, exit_tile.y, exit_tile.w, exit_tile.h)
-        luna.render.setColor(0, 0, 0)
-        luna.render.print("EXIT", sx + 3, exit_tile.y + 8, 1.2)
+        luna.gfx.setColor(0, 0.8, 1)
+        luna.gfx.rectangle("fill", sx, exit_tile.y, exit_tile.w, exit_tile.h)
+        luna.gfx.setColor(0, 0, 0)
+        luna.gfx.print("EXIT", sx + 3, exit_tile.y + 8, 1.2)
     end
 
     -- Powerups (pulsing)
     local pulse = 0.6 + 0.4 * math.sin(anim * 5)
     for _, p in ipairs(powerups) do
         if p.alive then
-            luna.render.setColor(0.9 * pulse, 0.5, 1)
-            luna.render.circle("fill", p.x - cam + p.w/2, p.y + p.h/2, 10)
-            luna.render.setColor(1, 1, 1)
-            luna.render.print("+", p.x - cam + 6, p.y + 4, 1.4)
+            luna.gfx.setColor(0.9 * pulse, 0.5, 1)
+            luna.gfx.circle("fill", p.x - cam + p.w/2, p.y + p.h/2, 10)
+            luna.gfx.setColor(1, 1, 1)
+            luna.gfx.print("+", p.x - cam + 6, p.y + 4, 1.4)
         end
     end
 
@@ -287,75 +287,75 @@ function luna.draw()
     for _, e in ipairs(enemies) do
         if e.alive then
             local sx = e.x - cam
-            luna.render.setColor(0.7, 0.2, 0.4)
-            luna.render.rectangle("fill", sx + 3, e.y + 6, e.w - 6, e.h - 6)
-            luna.render.setColor(0.9, 0.5, 0.2)
-            luna.render.circle("fill", sx + e.w/2, e.y + 7, 8)
+            luna.gfx.setColor(0.7, 0.2, 0.4)
+            luna.gfx.rectangle("fill", sx + 3, e.y + 6, e.w - 6, e.h - 6)
+            luna.gfx.setColor(0.9, 0.5, 0.2)
+            luna.gfx.circle("fill", sx + e.w/2, e.y + 7, 8)
             -- HP bar
-            luna.render.setColor(0.2, 0, 0)
-            luna.render.rectangle("fill", sx, e.y - 7, e.w, 5)
-            luna.render.setColor(0.8, 0.1, 0.1)
-            luna.render.rectangle("fill", sx, e.y - 7, e.w * (e.hp / 2), 5)
+            luna.gfx.setColor(0.2, 0, 0)
+            luna.gfx.rectangle("fill", sx, e.y - 7, e.w, 5)
+            luna.gfx.setColor(0.8, 0.1, 0.1)
+            luna.gfx.rectangle("fill", sx, e.y - 7, e.w * (e.hp / 2), 5)
         end
     end
 
     -- Bullets
-    luna.render.setColor(1, 0.9, 0.1)
+    luna.gfx.setColor(1, 0.9, 0.1)
     for _, b in ipairs(bullets) do
-        if not b.enemy then luna.render.rectangle("fill", b.x - cam - 2, b.y, 5, 8) end
+        if not b.enemy then luna.gfx.rectangle("fill", b.x - cam - 2, b.y, 5, 8) end
     end
-    luna.render.setColor(1, 0.3, 0.1)
+    luna.gfx.setColor(1, 0.3, 0.1)
     for _, b in ipairs(bullets) do
-        if b.enemy then luna.render.rectangle("fill", b.x - cam - 2, b.y, 5, 5) end
+        if b.enemy then luna.gfx.rectangle("fill", b.x - cam - 2, b.y, 5, 5) end
     end
 
     -- Beam weapon
     if player.beam_active then
         local bx = player.x - cam + (player.facing > 0 and player.w or -BEAM_DIST)
-        luna.render.setColor(0.1, 0.8, 1, 0.7)
-        luna.render.rectangle("fill", bx, player.y + 10, BEAM_DIST, 12)
+        luna.gfx.setColor(0.1, 0.8, 1, 0.7)
+        luna.gfx.rectangle("fill", bx, player.y + 10, BEAM_DIST, 12)
     end
 
     -- Player
     local px = player.x - cam
-    luna.render.setColor(0.1, 0.5, 0.9)
-    luna.render.rectangle("fill", px + 3, player.y + 10, player.w - 6, player.h - 10)
-    luna.render.setColor(0.85, 0.75, 0.6)
-    luna.render.circle("fill", px + player.w/2, player.y + 10, 11)
+    luna.gfx.setColor(0.1, 0.5, 0.9)
+    luna.gfx.rectangle("fill", px + 3, player.y + 10, player.w - 6, player.h - 10)
+    luna.gfx.setColor(0.85, 0.75, 0.6)
+    luna.gfx.circle("fill", px + player.w/2, player.y + 10, 11)
     -- Helmet
-    luna.render.setColor(0.15, 0.15, 0.5)
-    luna.render.rectangle("fill", px + 2, player.y, player.w - 4, 12)
+    luna.gfx.setColor(0.15, 0.15, 0.5)
+    luna.gfx.rectangle("fill", px + 2, player.y, player.w - 4, 12)
 
     -- HUD
-    luna.render.setColor(0, 0, 0, 0.6)
-    luna.render.rectangle("fill", 0, 0, W, 30)
-    luna.render.setColor(0.5, 0.3, 1)
-    luna.render.print("TURRICAN", 8, 4, 1.8)
-    luna.render.setColor(1, 1, 1)
-    luna.render.print("Score: " .. score, W/2 - 50, 4, 1.6)
+    luna.gfx.setColor(0, 0, 0, 0.6)
+    luna.gfx.rectangle("fill", 0, 0, W, 30)
+    luna.gfx.setColor(0.5, 0.3, 1)
+    luna.gfx.print("TURRICAN", 8, 4, 1.8)
+    luna.gfx.setColor(1, 1, 1)
+    luna.gfx.print("Score: " .. score, W/2 - 50, 4, 1.6)
     -- Health bar
     for i = 1, MAX_HEALTH do
         local hx = W - 22 * i - 8
-        luna.render.setColor(i <= health and 0.9 or 0.25, 0.2, 0.4)
-        luna.render.rectangle("fill", hx, 5, 18, 20)
+        luna.gfx.setColor(i <= health and 0.9 or 0.25, 0.2, 0.4)
+        luna.gfx.rectangle("fill", hx, 5, 18, 20)
     end
-    luna.render.setColor(0.4, 0.8, 1)
-    luna.render.print("Lv " .. level, W/2 + 70, 4, 1.6)
+    luna.gfx.setColor(0.4, 0.8, 1)
+    luna.gfx.print("Lv " .. level, W/2 + 70, 4, 1.6)
 
     -- Controls hint
-    luna.render.setColor(0.5, 0.5, 0.7, 0.7)
-    luna.render.print("[A/D] Move  [W/Up/Space] Jump  [X] Shoot  [Z] Beam", 10, H - 22, 1.3)
+    luna.gfx.setColor(0.5, 0.5, 0.7, 0.7)
+    luna.gfx.print("[A/D] Move  [W/Up/Space] Jump  [X] Shoot  [Z] Beam", 10, H - 22, 1.3)
 
     -- Overlay
     if game_state == "gameover" then
-        luna.render.setColor(0, 0, 0, 0.75)
-        luna.render.rectangle("fill", 0, 0, W, H)
-        luna.render.setColor(0.6, 0.2, 1)
-        luna.render.print("TURRICAN FALLS", W/2 - 115, H/2 - 25, 3)
-        luna.render.setColor(1, 1, 1)
-        luna.render.print("Score: " .. score, W/2 - 50, H/2 + 15, 2)
-        luna.render.setColor(0.6, 0.6, 0.6)
-        luna.render.print("Press R to restart", W/2 - 100, H/2 + 48, 2)
+        luna.gfx.setColor(0, 0, 0, 0.75)
+        luna.gfx.rectangle("fill", 0, 0, W, H)
+        luna.gfx.setColor(0.6, 0.2, 1)
+        luna.gfx.print("TURRICAN FALLS", W/2 - 115, H/2 - 25, 3)
+        luna.gfx.setColor(1, 1, 1)
+        luna.gfx.print("Score: " .. score, W/2 - 50, H/2 + 15, 2)
+        luna.gfx.setColor(0.6, 0.6, 0.6)
+        luna.gfx.print("Press R to restart", W/2 - 100, H/2 + 48, 2)
     end
 end
 

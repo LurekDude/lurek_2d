@@ -1,4 +1,4 @@
-﻿# Math Module — SIMD and Parallel Opportunities
+# Math Module — SIMD and Parallel Opportunities
 
 ## Module Covered
 - `src/math/noise.rs` — Simplex/Perlin noise, FBM
@@ -84,7 +84,7 @@ local map = luna.math.noiseMap(512, 512, {octaves=6, seed=42})
 
 -- GPU (proposed): instant
 local tex = luna.math.noiseTexture(512, 512, {octaves=6, seed=42})
-luna.render.draw(tex, 0, 0)
+luna.gfx.draw(tex, 0, 0)
 ```
 
 ---

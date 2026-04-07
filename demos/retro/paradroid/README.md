@@ -1,4 +1,4 @@
-﻿# Paradroid
+# Paradroid
 
 A top-down shooter on a space station, inspired by Andrew Braybrook's legendary 1985
 C-64 game. Battle enemy droids, then use the Transfer Override minigame to take control
@@ -6,8 +6,8 @@ of high-rated robots and boost your capabilities.
 
 ## What It Demonstrates
 
-- `luna.render.rectangle()` / `luna.render.line()` — grid floor and droid sprites
-- `luna.render.circle()` — transfer range indicator
+- `luna.gfx.rectangle()` / `luna.gfx.line()` — grid floor and droid sprites
+- `luna.gfx.circle()` — transfer range indicator
 - `luna.input.isKeyDown()` — 8-directional movement
 - `luna.keypressed()` — shooting and initiating transfer
 - Procedural room generation with wall collision

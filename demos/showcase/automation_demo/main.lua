@@ -1,4 +1,4 @@
-﻿-- Automation Demo
+-- Automation Demo
 -- Demonstrates the luna.simulator input automation system.
 -- The simulator replays scripted input events (key presses, mouse moves, etc.)
 -- into the engine's event queue, useful for testing, replays, and tutorials.
@@ -15,8 +15,8 @@ local function addLog(msg)
     end
 end
 
-function luna.load()
-    luna.render.setBackgroundColor(0.15, 0.15, 0.2)
+function luna.init()
+    luna.gfx.setBackgroundColor(0.15, 0.15, 0.2)
 
     -- Load a demo script with mixed input events
     luna.simulator.load("demo_sequence", {
@@ -52,7 +52,7 @@ function luna.load()
     addLog("Press P to pause/resume, S to stop")
 end
 
-function luna.update(dt)
+function luna.process(dt)
     -- Update the simulator (dispatches events into the engine queue)
     luna.simulator.update(dt)
 
@@ -72,38 +72,38 @@ function luna.update(dt)
     end
 end
 
-function luna.draw()
+function luna.render()
     -- Title
-    luna.render.setColor(1, 1, 0.6)
-    luna.render.print("Automation Demo", 20, 20)
+    luna.gfx.setColor(1, 1, 0.6)
+    luna.gfx.print("Automation Demo", 20, 20)
 
     -- Status
-    luna.render.setColor(0.6, 1, 0.6)
-    luna.render.print("Status: " .. status, 20, 50)
+    luna.gfx.setColor(0.6, 1, 0.6)
+    luna.gfx.print("Status: " .. status, 20, 50)
 
     -- Scripts loaded
-    luna.render.setColor(0.8, 0.8, 0.8)
+    luna.gfx.setColor(0.8, 0.8, 0.8)
     local scripts = luna.simulator.getScripts()
-    luna.render.print("Scripts loaded: " .. #scripts, 20, 80)
+    luna.gfx.print("Scripts loaded: " .. #scripts, 20, 80)
     for i, name in ipairs(scripts) do
-        luna.render.print("  " .. i .. ". " .. name, 30, 80 + i * 20)
+        luna.gfx.print("  " .. i .. ". " .. name, 30, 80 + i * 20)
     end
 
     -- Controls
-    luna.render.setColor(0.6, 0.8, 1)
+    luna.gfx.setColor(0.6, 0.8, 1)
     local y = 180
-    luna.render.print("Controls:", 20, y)
-    luna.render.print("  1 = Play demo_sequence", 30, y + 20)
-    luna.render.print("  2 = Play toml_script", 30, y + 40)
-    luna.render.print("  P = Pause / Resume", 30, y + 60)
-    luna.render.print("  S = Stop", 30, y + 80)
+    luna.gfx.print("Controls:", 20, y)
+    luna.gfx.print("  1 = Play demo_sequence", 30, y + 20)
+    luna.gfx.print("  2 = Play toml_script", 30, y + 40)
+    luna.gfx.print("  P = Pause / Resume", 30, y + 60)
+    luna.gfx.print("  S = Stop", 30, y + 80)
 
     -- Log
-    luna.render.setColor(0.7, 0.7, 0.7)
+    luna.gfx.setColor(0.7, 0.7, 0.7)
     local logY = y + 120
-    luna.render.print("Log:", 20, logY)
+    luna.gfx.print("Log:", 20, logY)
     for i, entry in ipairs(log) do
-        luna.render.print(entry, 30, logY + i * 18)
+        luna.gfx.print(entry, 30, logY + i * 18)
     end
 end
 

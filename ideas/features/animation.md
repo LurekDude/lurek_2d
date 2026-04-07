@@ -1,4 +1,4 @@
-﻿# animation — Feature Analysis
+# animation � Feature Analysis
 
 **Tier**: 1 (Core)
 **Spec**: `specs/animation.md`
@@ -6,7 +6,7 @@
 
 ## Purpose
 
-Frame-based sprite animation: clips with frame sequences, looping, speed, events at specific frames. CPU-side data model — rendering delegated to graphics.
+Frame-based sprite animation: clips with frame sequences, looping, speed, events at specific frames. CPU-side data model � rendering delegated to graphics.
 
 ## Current Feature Summary
 
@@ -20,10 +20,10 @@ Frame-based sprite animation: clips with frame sequences, looping, speed, events
 
 ## Feature Gaps
 
-1. **No animation blending/crossfade**: Can't smoothly transition between two clips (e.g., walk → run). Must hard-cut.
-2. **No animation state machine**: No built-in FSM for animation states (idle → walk → jump → fall). Must implement manually.
+1. **No animation blending/crossfade**: Can't smoothly transition between two clips (e.g., walk � run). Must hard-cut.
+2. **No animation state machine**: No built-in FSM for animation states (idle � walk � jump � fall). Must implement manually.
 3. **No animation curves**: Only frame-based (discrete). No continuous interpolation curves (Bezier, linear) for smooth property animation.
-4. **No skeletal animation**: Frame-only — no bone/joint animation. `spine` module handles bones but there's no bridge.
+4. **No skeletal animation**: Frame-only � no bone/joint animation. `spine` module handles bones but there's no bridge.
 5. **No animation layers/masks**: Can't blend upper body attack with lower body walk.
 6. **No sprite sheet loading from JSON**: Must manually define frame regions. No TexturePacker/Aseprite import.
 7. **No reverse playback**: Listed in spec but unclear if properly implemented.
@@ -37,23 +37,23 @@ Frame-based sprite animation: clips with frame sequences, looping, speed, events
 
 ## Suggestions
 
-1. **Add animation state machine**: `luna.tween.newStateMachine({idle=clipA, walk=clipB, jump=clipC}, transitions)` — declarative state transitions with optional blend times.
-2. **Add crossfade**: `anim:crossfade(targetClip, duration)` — smooth transition between clips.
-3. **Add Aseprite import**: `luna.tween.fromAseprite(jsonPath)` — load frame data from Aseprite export. Very common pixel art workflow.
-4. **Create a tween module** (new): Extract property animation from math/animation into `luna.tween.to(target, {x=100}, 2.0, "easeOutQuad")`. Solar2D's `transition.to()` is the gold standard here.
+1. **Add animation state machine**: `luna.animation.newStateMachine({idle=clipA, walk=clipB, jump=clipC}, transitions)` � declarative state transitions with optional blend times.
+2. **Add crossfade**: `anim:crossfade(targetClip, duration)` � smooth transition between clips.
+3. **Add Aseprite import**: `luna.animation.fromAseprite(jsonPath)` � load frame data from Aseprite export. Very common pixel art workflow.
+4. **Create a tween module** (new): Extract property animation from math/animation into `luna.animation.to(target, {x=100}, 2.0, "easeOutQuad")`. Solar2D's `transition.to()` is the gold standard here.
 5. **Bridge with spine**: Allow animation clips to drive bone transforms from the spine module.
 
 ## Competitor Comparison
 
 | Feature | Luna2D | Love2D | Solar2D | Gideros |
 |---|---|---|---|---|
-| Frame animation | ✅ | ❌ (manual) | ✅ (sheets) | ✅ (MovieClip) |
-| Animation blend | ❌ | N/A | ❌ | ❌ |
-| State machine | ❌ | N/A | ❌ | ❌ |
-| Tween/transition | ❌ (math only) | ❌ | ✅ (transition.to) | ✅ (GTween) |
-| Skeleton | ❌ (spine module) | ❌ | ❌ | ✅ (Spine plugin) |
-| Aseprite import | ❌ | ❌ | ❌ | ❌ |
+| Frame animation | ? | ? (manual) | ? (sheets) | ? (MovieClip) |
+| Animation blend | ? | N/A | ? | ? |
+| State machine | ? | N/A | ? | ? |
+| Tween/transition | ? (math only) | ? | ? (transition.to) | ? (GTween) |
+| Skeleton | ? (spine module) | ? | ? | ? (Spine plugin) |
+| Aseprite import | ? | ? | ? | ? |
 
 ## Priority
 
-**MEDIUM-HIGH** — Tween extraction and animation state machine are high impact. Aseprite import serves the pixel art community directly. Crossfade is essential for polished games.
+**MEDIUM-HIGH** � Tween extraction and animation state machine are high impact. Aseprite import serves the pixel art community directly. Crossfade is essential for polished games.

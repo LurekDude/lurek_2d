@@ -1,4 +1,4 @@
-﻿# `pathfinding` — Agent Reference
+# `pathfinding` — Agent Reference
 
 | Property       | Value                                                |
 |----------------|------------------------------------------------------|
@@ -368,7 +368,7 @@ Exposed under `luna.pathfinding.*` by `src/lua_api/pathfinding_api.rs`. All grid
 
 ```lua
 -- Basic A★ pathfinding with NavGrid + UnitPathfinder
-function luna.load()
+function luna.init()
     -- Create a 40x30 navigation grid (1-based in Lua)
     grid = luna.pathfinding.newNavGrid(40, 30)
 
@@ -403,7 +403,7 @@ end
 
 ```lua
 -- Flow field for crowd steering
-function luna.load()
+function luna.init()
     grid = luna.pathfinding.newNavGrid(50, 50)
     flow = luna.pathfinding.newFlowField(grid)
 
@@ -411,7 +411,7 @@ function luna.load()
     flow:calculate(25, 25)
 end
 
-function luna.update(dt)
+function luna.process(dt)
     if flow:isCalculated() then
         -- Steer a unit at world position toward the target
         local vx, vy = flow:steer(unit_x, unit_y, 100, 32, 32)
@@ -423,7 +423,7 @@ end
 
 ```lua
 -- PathGrid with per-cell costs and path smoothing
-function luna.load()
+function luna.init()
     local pg = luna.pathfinding.newPathGrid(20, 20, 32)
 
     -- Create a swamp region with higher cost

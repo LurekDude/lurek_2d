@@ -1,4 +1,4 @@
-﻿-- God Game / Ecosystem Simulator — Luna2D Demo
+-- God Game / Ecosystem Simulator — Luna2D Demo
 -- Top-down world: guide tribes, perform miracles, balance ecosystem
 
 local function clamp(v, mn, mx) return math.max(mn, math.min(mx, v)) end
@@ -44,7 +44,7 @@ local function spawn_entity(list, count)
     end
 end
 
-function luna.load()
+function luna.init()
     gen_world()
     tribes = {}
     predators = {}
@@ -84,7 +84,7 @@ local function dist(a, b)
     return math.sqrt(dx*dx + dy*dy)
 end
 
-function luna.update(dt)
+function luna.process(dt)
     game_time = game_time + dt
     if msg_timer > 0 then msg_timer = msg_timer - dt end
 
@@ -238,82 +238,82 @@ function luna.keypressed(key)
     if key == "4" then selected_miracle = 4 end
 end
 
-function luna.draw()
+function luna.render()
     -- terrain
     for y = 1, ROWS do
         for x = 1, COLS do
             local c = TERRAIN_COLORS[world[y][x]]
             local bright = is_night and 0.4 or 1
-            luna.render.setColor(c[1]*bright, c[2]*bright, c[3]*bright, 1)
-            luna.render.rectangle("fill", (x-1)*TILE, (y-1)*TILE, TILE, TILE)
+            luna.gfx.setColor(c[1]*bright, c[2]*bright, c[3]*bright, 1)
+            luna.gfx.rectangle("fill", (x-1)*TILE, (y-1)*TILE, TILE, TILE)
         end
     end
 
     -- temples
     for _, tp in ipairs(temples) do
-        luna.render.setColor(1,0.85,0.3,1)
+        luna.gfx.setColor(1,0.85,0.3,1)
         local verts = {tp.x, tp.y-12, tp.x-8, tp.y+6, tp.x+8, tp.y+6}
-        luna.render.polygon("fill", verts)
+        luna.gfx.polygon("fill", verts)
     end
 
     -- prey (deer)
-    luna.render.setColor(0.6,0.45,0.2,1)
-    for _, pr in ipairs(prey) do luna.render.circle("fill", pr.x, pr.y, 4) end
+    luna.gfx.setColor(0.6,0.45,0.2,1)
+    for _, pr in ipairs(prey) do luna.gfx.circle("fill", pr.x, pr.y, 4) end
 
     -- predators (wolves)
-    luna.render.setColor(0.5,0.1,0.1,1)
-    for _, p in ipairs(predators) do luna.render.circle("fill", p.x, p.y, 5) end
+    luna.gfx.setColor(0.5,0.1,0.1,1)
+    for _, p in ipairs(predators) do luna.gfx.circle("fill", p.x, p.y, 5) end
 
     -- tribes
     for _, t in ipairs(tribes) do
         local g = t.hp / 100
-        luna.render.setColor(0.2, 0.2 + g * 0.6, 1, 1)
-        luna.render.circle("fill", t.x, t.y, 5)
+        luna.gfx.setColor(0.2, 0.2 + g * 0.6, 1, 1)
+        luna.gfx.circle("fill", t.x, t.y, 5)
     end
 
     -- storms
     for _, s in ipairs(storms) do
-        luna.render.setColor(0.7,0.7,1, 0.3)
-        luna.render.circle("fill", s.x, s.y, s.r)
-        luna.render.setColor(1,1,0.5,0.8)
-        luna.render.line(s.x, s.y - 20, s.x + 5, s.y + 10)
+        luna.gfx.setColor(0.7,0.7,1, 0.3)
+        luna.gfx.circle("fill", s.x, s.y, s.r)
+        luna.gfx.setColor(1,1,0.5,0.8)
+        luna.gfx.line(s.x, s.y - 20, s.x + 5, s.y + 10)
     end
 
     -- night overlay
     if is_night then
-        luna.render.setColor(0, 0, 0.1, 0.35)
-        luna.render.rectangle("fill", 0, 0, W, H)
+        luna.gfx.setColor(0, 0, 0.1, 0.35)
+        luna.gfx.rectangle("fill", 0, 0, W, H)
     end
 
     -- HUD
-    luna.render.setColor(0, 0, 0, 0.6)
-    luna.render.rectangle("fill", 0, 0, W, 30)
-    luna.render.setColor(1,1,1,1)
-    luna.render.print("Day " .. day_count .. (is_night and " (Night)" or ""), 10, 5, 0.9)
-    luna.render.print("Faith: " .. math.floor(faith), 150, 5, 0.9)
-    luna.render.print("Food: " .. math.floor(food_supply), 290, 5, 0.9)
-    luna.render.print("Pop: " .. #tribes, 400, 5, 0.9)
-    luna.render.print("Wolves: " .. #predators .. "  Deer: " .. #prey, 490, 5, 0.9)
-    luna.render.print("FPS: " .. luna.time.getFPS(), 720, 5, 0.8)
+    luna.gfx.setColor(0, 0, 0, 0.6)
+    luna.gfx.rectangle("fill", 0, 0, W, 30)
+    luna.gfx.setColor(1,1,1,1)
+    luna.gfx.print("Day " .. day_count .. (is_night and " (Night)" or ""), 10, 5, 0.9)
+    luna.gfx.print("Faith: " .. math.floor(faith), 150, 5, 0.9)
+    luna.gfx.print("Food: " .. math.floor(food_supply), 290, 5, 0.9)
+    luna.gfx.print("Pop: " .. #tribes, 400, 5, 0.9)
+    luna.gfx.print("Wolves: " .. #predators .. "  Deer: " .. #prey, 490, 5, 0.9)
+    luna.gfx.print("FPS: " .. luna.time.getFPS(), 720, 5, 0.8)
 
     -- miracle bar
-    luna.render.setColor(0, 0, 0, 0.7)
-    luna.render.rectangle("fill", 0, H - 40, W, 40)
+    luna.gfx.setColor(0, 0, 0, 0.7)
+    luna.gfx.rectangle("fill", 0, H - 40, W, 40)
     for i, m in ipairs(MIRACLES) do
         local bx = 10 + (i-1) * 100
         if i == selected_miracle then
-            luna.render.setColor(1,1,0.3,0.4)
-            luna.render.rectangle("fill", bx, H-35, 90, 30)
+            luna.gfx.setColor(1,1,0.3,0.4)
+            luna.gfx.rectangle("fill", bx, H-35, 90, 30)
         end
-        luna.render.setColor(1,1,1,1)
-        luna.render.print(m .. "(" .. MIRACLE_COST[m] .. ")", bx+5, H-28, 0.8)
+        luna.gfx.setColor(1,1,1,1)
+        luna.gfx.print(m .. "(" .. MIRACLE_COST[m] .. ")", bx+5, H-28, 0.8)
     end
-    luna.render.setColor(0.7,0.7,0.7,1)
-    luna.render.print("[T+click] Build Temple(30)  [1-4] Select  [R] Restart", 420, H-28, 0.7)
+    luna.gfx.setColor(0.7,0.7,0.7,1)
+    luna.gfx.print("[T+click] Build Temple(30)  [1-4] Select  [R] Restart", 420, H-28, 0.7)
 
     -- message
     if message and msg_timer > 0 then
-        luna.render.setColor(1,1,0.5,1)
-        luna.render.print(message, 300, 50, 1.1)
+        luna.gfx.setColor(1,1,0.5,1)
+        luna.gfx.print(message, 300, 50, 1.1)
     end
 end

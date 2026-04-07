@@ -1,6 +1,6 @@
-﻿-- Sprites example for Luna2D
+-- Sprites example for Luna2D
 -- Move a rectangle with arrow keys
--- Demonstrates luna.render.draw() polymorphic dispatch
+-- Demonstrates luna.gfx.draw() polymorphic dispatch
 
 local x, y = 400, 300
 local speed = 200
@@ -43,18 +43,18 @@ local function createIcon()
         end
     end
 
-    return luna.render.newImage(imageData)
+    return luna.gfx.newImage(imageData)
 end
 
-function luna.load()
+function luna.init()
     initSmokeMode()
     luna.window.setTitle("Movement Demo - Luna2D")
-    luna.render.setBackgroundColor(0.08, 0.08, 0.18)
-    -- Create a small sprite image locally; luna.render.draw() dispatches based on type
+    luna.gfx.setBackgroundColor(0.08, 0.08, 0.18)
+    -- Create a small sprite image locally; luna.gfx.draw() dispatches based on type
     icon = createIcon()
 end
 
-function luna.update(dt)
+function luna.process(dt)
     if smokeQuitNextFrame then
         luna.signal.quit()
         return
@@ -74,42 +74,42 @@ function luna.update(dt)
     end
 
     -- Keep in bounds
-    local w = luna.render.getWidth()
-    local h = luna.render.getHeight()
+    local w = luna.gfx.getWidth()
+    local h = luna.gfx.getHeight()
     if x < 0 then x = 0 end
     if y < 0 then y = 0 end
     if x > w - size then x = w - size end
     if y > h - size then y = h - size end
 end
 
-function luna.draw()
+function luna.render()
     -- Trail circles
-    luna.render.setColor(0.2, 0.3, 0.6, 0.5)
-    luna.render.circle("fill", x + size/2, y + size/2, size)
+    luna.gfx.setColor(0.2, 0.3, 0.6, 0.5)
+    luna.gfx.circle("fill", x + size/2, y + size/2, size)
 
     -- Player square
-    luna.render.setColor(0.3, 0.8, 1.0)
-    luna.render.rectangle("fill", x, y, size, size)
+    luna.gfx.setColor(0.3, 0.8, 1.0)
+    luna.gfx.rectangle("fill", x, y, size, size)
 
-    -- Draw icon using polymorphic luna.render.draw(drawable, x, y)
-    luna.render.setColor(1, 1, 1)
+    -- Draw icon using polymorphic luna.gfx.draw(drawable, x, y)
+    luna.gfx.setColor(1, 1, 1)
     if icon then
-        luna.render.draw(icon, x + size + 4, y)
+        luna.gfx.draw(icon, x + size + 4, y)
     end
 
     -- Outline
-    luna.render.setColor(1, 1, 1)
-    luna.render.rectangle("line", x, y, size, size)
+    luna.gfx.setColor(1, 1, 1)
+    luna.gfx.rectangle("line", x, y, size, size)
 
     -- Instructions
-    luna.render.setColor(0.6, 0.6, 0.6)
-    luna.render.print("WASD or Arrow Keys to move", 250, 20, 2)
+    luna.gfx.setColor(0.6, 0.6, 0.6)
+    luna.gfx.print("WASD or Arrow Keys to move", 250, 20, 2)
 
     -- Position info
-    luna.render.print("X:" .. tostring(math.floor(x)) .. " Y:" .. tostring(math.floor(y)), 10, 570, 2)
+    luna.gfx.print("X:" .. tostring(math.floor(x)) .. " Y:" .. tostring(math.floor(y)), 10, 570, 2)
 
     if smokeMode and not smokeRequested then
-        luna.render.saveScreenshot(smokeScreenshotPath)
+        luna.gfx.saveScreenshot(smokeScreenshotPath)
         smokeRequested = true
         smokeQuitNextFrame = true
     end

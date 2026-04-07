@@ -1,4 +1,4 @@
-﻿-- examples/particle.lua
+-- examples/particle.lua
 -- luna.particles — Emitter-based 2D particle systems and trail ribbons.
 -- All luna.particles API methods demonstrated with code and comments.
 
@@ -148,8 +148,8 @@ local full = ps:isFull()
 -- update(dt) — call each frame to advance simulation
 ps:update(luna.time.getDelta())
 
--- To draw the particle system, pass it to luna.render.draw():
--- luna.render.draw(ps, 0, 0)
+-- To draw the particle system, pass it to luna.gfx.draw():
+-- luna.gfx.draw(ps, 0, 0)
 
 -- ── Release ───────────────────────────────────────────────────────────────────
 
@@ -193,12 +193,12 @@ local pts = trail:getPointCount()
 -- clear() — remove all segments
 trail:clear()
 
--- To draw: luna.render.draw(trail, 0, 0)
+-- To draw: luna.gfx.draw(trail, 0, 0)
 
 -- ── Typical Particle Usage ────────────────────────────────────────────────────
 
 --[[
-function luna.load()
+function luna.init()
     fire = luna.particles.newSystem({
         maxParticles  = 300,
         emissionRate  = 80,
@@ -217,11 +217,11 @@ function luna.load()
     fire:start()
 end
 
-function luna.update(dt)
+function luna.process(dt)
     fire:update(dt)
 end
 
-function luna.draw()
-    luna.render.draw(fire, 0, 0)
+function luna.render()
+    luna.gfx.draw(fire, 0, 0)
 end
 ]]

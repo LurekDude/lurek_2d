@@ -1,4 +1,4 @@
-﻿# Luna2D Ecosystem Implementation Plan
+# Luna2D Ecosystem Implementation Plan
 
 > **Purpose**: Detailed, task-level implementation plan for all ecosystem changes described in `docs/ecosystem-recommendations.md` (v2, 2026-03-31).
 > Each task has: scope, affected files, acceptance criteria, estimated SLoC, dependencies, and priority.
@@ -13,11 +13,11 @@ This plan covers **30 implementation tasks** organized into **6 phases**. Phases
 
 ---
 
-## Phase 1 — Cleanup & Safe Bumps
+## Phase 1 � Cleanup & Safe Bumps
 
 Remove dead dependencies and apply non-breaking version bumps. No API changes. Low risk.
 
-### Task 1.1 — Remove tiny-skia and minifb ✅ DONE
+### Task 1.1 � Remove tiny-skia and minifb ? DONE
 
 | Field | Details |
 |---|---|
@@ -27,21 +27,21 @@ Remove dead dependencies and apply non-breaking version bumps. No API changes. L
 | **SLoC change** | -200 to -500 (removal) |
 | **Dependencies** | None |
 | **Agent** | Developer |
-| **Status** | **COMPLETE** — renderer.rs stripped to type definitions only (1542→365 lines), archived to `references/legacy/renderer.rs`, minifb_key_to_string removed from keyboard.rs, all docs updated. |
+| **Status** | **COMPLETE** � renderer.rs stripped to type definitions only (1542�365 lines), archived to `references/legacy/renderer.rs`, minifb_key_to_string removed from keyboard.rs, all docs updated. |
 
 **Steps**:
 1. Remove `tiny-skia = "0.11"` and `minifb = "0.27"` from `Cargo.toml` `[dependencies]`.
-2. Search all `src/` files for `use tiny_skia` and `use minifb` — remove imports and any code that references them.
+2. Search all `src/` files for `use tiny_skia` and `use minifb` � remove imports and any code that references them.
 3. Archive or delete `src/graphics/renderer.rs` (the legacy CPU renderer). If it contains reference code worth keeping, move to `references/legacy/renderer.rs`.
-4. Run `cargo build` — verify clean compilation with zero errors.
-5. Run `cargo test` — verify no tests depended on the removed crates.
-6. Run `cargo clippy -- -D warnings` — verify no warnings.
+4. Run `cargo build` � verify clean compilation with zero errors.
+5. Run `cargo test` � verify no tests depended on the removed crates.
+6. Run `cargo clippy -- -D warnings` � verify no warnings.
 
 **Acceptance gate**: `cargo build && cargo test && cargo clippy -- -D warnings` passes. No `tiny_skia` or `minifb` references remain in `src/`.
 
 ---
 
-### Task 1.2 — Safe version bumps (non-breaking)
+### Task 1.2 � Safe version bumps (non-breaking)
 
 | Field | Details |
 |---|---|
@@ -54,12 +54,12 @@ Remove dead dependencies and apply non-breaking version bumps. No API changes. L
 
 **Steps**:
 1. Update these versions in `Cargo.toml` (semver-compatible, no code changes needed):
-   - `lz4_flex`: `"0.11"` → `"0.13"`
-   - `rfd`: `"0.14"` → `"0.17"`
-   - `pollster`: `"0.3"` → `"0.4"`
-   - `arboard`: `"3"` → `"3.6"`
-   - `fastrand`: `"2"` → `"2.3"`
-   - `slotmap`: `"1"` → `"1.1"`
+   - `lz4_flex`: `"0.11"` � `"0.13"`
+   - `rfd`: `"0.14"` � `"0.17"`
+   - `pollster`: `"0.3"` � `"0.4"`
+   - `arboard`: `"3"` � `"3.6"`
+   - `fastrand`: `"2"` � `"2.3"`
+   - `slotmap`: `"1"` � `"1.1"`
 2. Run `cargo update` to fetch new versions.
 3. Run `cargo build && cargo test && cargo clippy -- -D warnings`.
 
@@ -67,7 +67,7 @@ Remove dead dependencies and apply non-breaking version bumps. No API changes. L
 
 ---
 
-### Task 1.3 — Add `toml` crate ✅ DONE
+### Task 1.3 � Add `toml` crate ? DONE
 
 | Field | Details |
 |---|---|
@@ -77,12 +77,12 @@ Remove dead dependencies and apply non-breaking version bumps. No API changes. L
 | **SLoC change** | +50-80 (Lua bindings for TOML encode/decode) |
 | **Dependencies** | None |
 | **Agent** | Developer |
-| **Status** | **COMPLETE** — canonical `luna.data.parseToml()` / `luna.data.encodeToml()` shipped with targeted Rust and Lua coverage, prefixed Lua-facing errors, and synchronized docs. |
+| **Status** | **COMPLETE** � canonical `luna.data.parseToml()` / `luna.data.encodeToml()` shipped with targeted Rust and Lua coverage, prefixed Lua-facing errors, and synchronized docs. |
 
 **Steps**:
 1. Add `toml = "0.8"` to `Cargo.toml` `[dependencies]`.
-2. Implement `luna.data.encodeToml(table) → string` and `luna.data.parseToml(string) → table` in the Lua API.
-3. Reuse the existing `serde` + Lua table ↔ serde_json::Value conversion pattern.
+2. Implement `luna.data.encodeToml(table) � string` and `luna.data.parseToml(string) � table` in the Lua API.
+3. Reuse the existing `serde` + Lua table - serde_json::Value conversion pattern.
 4. Write integration tests in `tests/data_tests.rs`.
 5. Run quality gate.
 
@@ -90,7 +90,7 @@ Remove dead dependencies and apply non-breaking version bumps. No API changes. L
 
 ---
 
-### Task 1.4 — Add `glam` crate
+### Task 1.4 � Add `glam` crate
 
 | Field | Details |
 |---|---|
@@ -104,33 +104,33 @@ Remove dead dependencies and apply non-breaking version bumps. No API changes. L
 **Steps**:
 1. Add `glam = "0.30"` to `Cargo.toml` `[dependencies]`.
 2. Verify it compiles alongside existing math code.
-3. No code changes yet — glam integration happens in Phase 4.
+3. No code changes yet � glam integration happens in Phase 4.
 
 **Acceptance gate**: `cargo build` succeeds with glam as a dependency.
 
 ---
 
-## Phase 2 — Major Dependency Migrations
+## Phase 2 � Major Dependency Migrations
 
 Breaking version bumps that require code changes. Each is a dedicated migration effort. **Order matters**: mlua first (it affects all Lua API code), then image/rodio/env_logger, then wgpu last (largest).
 
-### Task 2.1 — Migrate mlua 0.9 → 0.11
+### Task 2.1 � Migrate mlua 0.9 � 0.11
 
 | Field | Details |
 |---|---|
 | **Priority** | CRITICAL |
-| **Risk** | HIGH — affects all 18,161 SLoC of Lua API bindings |
+| **Risk** | HIGH � affects all 18,161 SLoC of Lua API bindings |
 | **Affected files** | All `src/lua_api/*.rs`, `src/engine/app.rs`, `src/lua_api/mod.rs` |
 | **SLoC change** | ~200-500 (API adaptation) |
 | **Dependencies** | Phase 1 complete |
 | **Agent** | Developer |
 
 **Steps**:
-1. Read mlua 0.9 → 0.10 → 0.11 migration guide / changelog.
+1. Read mlua 0.9 � 0.10 � 0.11 migration guide / changelog.
 2. Update `mlua` version in `Cargo.toml` to `"0.11"`.
 3. Update feature flags: `luajit`, `vendored` may have moved.
-4. Fix all compilation errors — the `send`, `serialize`, `module` features changed.
-5. Test `UserData` registration patterns — mlua 0.10+ changed `UserData` method registration.
+4. Fix all compilation errors � the `send`, `serialize`, `module` features changed.
+5. Test `UserData` registration patterns � mlua 0.10+ changed `UserData` method registration.
 6. Test all Lua callbacks (`luna.load`, `luna.update`, `luna.draw`, etc.).
 7. Run full test suite: `cargo test`.
 8. Run all examples: `cargo run -- demos/hello_world`, etc.
@@ -139,12 +139,12 @@ Breaking version bumps that require code changes. Each is a dedicated migration 
 
 ---
 
-### Task 2.2 — Migrate rodio 0.17 → 0.22
+### Task 2.2 � Migrate rodio 0.17 � 0.22
 
 | Field | Details |
 |---|---|
 | **Priority** | HIGH |
-| **Risk** | HIGH — symphonia replaces legacy decoders |
+| **Risk** | HIGH � symphonia replaces legacy decoders |
 | **Affected files** | `src/audio/mixer.rs`, `src/lua_api/audio_api.rs`, `tests/audio_tests.rs` |
 | **SLoC change** | ~100-300 (audio loading/playback adaptation) |
 | **Dependencies** | Task 2.1 (mlua migration must be done first) |
@@ -161,7 +161,7 @@ Breaking version bumps that require code changes. Each is a dedicated migration 
 
 ---
 
-### Task 2.3 — Migrate image 0.24 → 0.25
+### Task 2.3 � Migrate image 0.24 � 0.25
 
 | Field | Details |
 |---|---|
@@ -174,7 +174,7 @@ Breaking version bumps that require code changes. Each is a dedicated migration 
 
 **Steps**:
 1. Update `image` version in `Cargo.toml` to `"0.25"`.
-2. Fix feature flags: `default-features = false, features = ["png", "jpeg", "bmp"]` — verify these features still exist in 0.25.
+2. Fix feature flags: `default-features = false, features = ["png", "jpeg", "bmp"]` � verify these features still exist in 0.25.
 3. Fix any breaking API changes in image loading/saving code.
 4. Run `cargo test graphics image`.
 
@@ -182,13 +182,13 @@ Breaking version bumps that require code changes. Each is a dedicated migration 
 
 ---
 
-### Task 2.4 — Migrate thiserror 1 → 2
+### Task 2.4 � Migrate thiserror 1 � 2
 
 | Field | Details |
 |---|---|
 | **Priority** | MEDIUM |
 | **Risk** | LOW-MEDIUM |
-| **Affected files** | All files with `#[derive(Error)]` — `src/engine/error.rs` and possibly others |
+| **Affected files** | All files with `#[derive(Error)]` � `src/engine/error.rs` and possibly others |
 | **SLoC change** | ~20-50 (derive macro changes) |
 | **Dependencies** | None (independent of other migrations) |
 | **Agent** | Developer |
@@ -202,7 +202,7 @@ Breaking version bumps that require code changes. Each is a dedicated migration 
 
 ---
 
-### Task 2.5 — Migrate directories 5 → 6
+### Task 2.5 � Migrate directories 5 � 6
 
 | Field | Details |
 |---|---|
@@ -222,7 +222,7 @@ Breaking version bumps that require code changes. Each is a dedicated migration 
 
 ---
 
-### Task 2.6 — Migrate env_logger 0.10 → 0.11
+### Task 2.6 � Migrate env_logger 0.10 � 0.11
 
 | Field | Details |
 |---|---|
@@ -242,12 +242,12 @@ Breaking version bumps that require code changes. Each is a dedicated migration 
 
 ---
 
-### Task 2.7 — Migrate sysinfo 0.30 → 0.38
+### Task 2.7 � Migrate sysinfo 0.30 � 0.38
 
 | Field | Details |
 |---|---|
 | **Priority** | MEDIUM |
-| **Risk** | MEDIUM — major API restructuring |
+| **Risk** | MEDIUM � major API restructuring |
 | **Affected files** | `src/lua_api/system_api.rs` |
 | **SLoC change** | ~50-100 (reimplemented system queries) |
 | **Dependencies** | Task 2.1 |
@@ -265,7 +265,7 @@ Breaking version bumps that require code changes. Each is a dedicated migration 
 
 ---
 
-### Task 2.8 — Migrate winit 0.30 → 0.31
+### Task 2.8 � Migrate winit 0.30 � 0.31
 
 | Field | Details |
 |---|---|
@@ -286,19 +286,19 @@ Breaking version bumps that require code changes. Each is a dedicated migration 
 
 ---
 
-### Task 2.9 — Migrate wgpu 22 → 29
+### Task 2.9 � Migrate wgpu 22 � 29
 
 | Field | Details |
 |---|---|
 | **Priority** | CRITICAL |
-| **Risk** | **VERY HIGH** — 7 major versions, massive API churn |
+| **Risk** | **VERY HIGH** � 7 major versions, massive API churn |
 | **Affected files** | `src/graphics/gpu_renderer.rs` (8,148 SLoC), `src/engine/app.rs`, `Cargo.toml` |
 | **SLoC change** | ~300-800 (renderer adaptation) |
 | **Dependencies** | ALL other Phase 2 tasks should be done first. This is the final migration. |
 | **Agent** | Renderer |
 
 **Steps**:
-1. Research wgpu 22→23→24→25→26→27→28→29 migration guides.
+1. Research wgpu 22�23�24�25�26�27�28�29 migration guides.
 2. Update `wgpu` version to `"29"`.
 3. Update feature flags (wgpu 29 has `std`, `parking_lot` in defaults).
 4. Fix surface configuration API (changed multiple times between 22-29).
@@ -306,19 +306,19 @@ Breaking version bumps that require code changes. Each is a dedicated migration 
 6. Fix texture creation and binding API.
 7. Fix shader module creation.
 8. Fix pipeline layout creation.
-9. Run `cargo build` — iteratively fix all compilation errors.
-10. Run visual tests — verify rendering output matches expectations.
+9. Run `cargo build` � iteratively fix all compilation errors.
+10. Run visual tests � verify rendering output matches expectations.
 11. Test on integrated GPU.
 
 **Acceptance gate**: `cargo build && cargo test && cargo clippy -- -D warnings` passes. All examples render correctly. No visual regressions.
 
 ---
 
-## Phase 3 — Native Audio Effects
+## Phase 3 � Native Audio Effects
 
 Expand the audio system with native effects. Uses rodio 0.22's Source trait.
 
-### Task 3.1 — Implement native audio DSP effects
+### Task 3.1 � Implement native audio DSP effects
 
 | Field | Details |
 |---|---|
@@ -339,25 +339,25 @@ Expand the audio system with native effects. Uses rodio 0.22's Source trait.
    - **3-Band EQ**: Low/mid/high shelf biquad filters. Params: `low_gain`, `mid_gain`, `high_gain`, `low_freq`, `high_freq`. ~150 SLoC.
    - **Bandpass filter**: Combine existing lowpass + highpass. Params: `low_cutoff`, `high_cutoff`. ~30 SLoC.
 2. Register effects in Lua API:
-   - `luna.audio.newEffect(type, params) → Effect`
+   - `luna.audio.newEffect(type, params) � Effect`
    - `source:addEffect(effect)`
    - `effect:setParam(name, value)`
-3. Write tests for each effect type (at least: silence in → silence out, impulse response sanity check).
+3. Write tests for each effect type (at least: silence in � silence out, impulse response sanity check).
 
 **Acceptance gate**: Each effect type creates, processes audio, and can be chained. Lua API works. Tests pass.
 
 ---
 
-## Phase 4 — Math & glam Integration
+## Phase 4 � Math & glam Integration
 
 Integrate glam as the backing math library for hot-path operations.
 
-### Task 4.1 — Integrate glam into Vec2/Mat3
+### Task 4.1 � Integrate glam into Vec2/Mat3
 
 | Field | Details |
 |---|---|
 | **Priority** | HIGH |
-| **Risk** | MEDIUM — touching core math types used everywhere |
+| **Risk** | MEDIUM � touching core math types used everywhere |
 | **Affected files** | `src/math/vec2.rs`, `src/math/mat3.rs`, `src/math/mod.rs` |
 | **SLoC change** | ~100-200 (refactoring internal representation) |
 | **Dependencies** | Task 1.4 (glam added as dep) |
@@ -366,17 +366,17 @@ Integrate glam as the backing math library for hot-path operations.
 **Steps**:
 1. Change `Vec2` internal fields to wrap a `glam::Vec2`.
 2. Delegate hot-path operations: `add`, `sub`, `mul`, `dot`, `normalize`, `length`, `distance`, `lerp` to glam.
-3. Keep the Lua API surface unchanged — `luna.math.newVec2(x, y)` still works.
+3. Keep the Lua API surface unchanged � `luna.math.newVec2(x, y)` still works.
 4. Change `Mat3` internal representation to wrap `glam::Mat3`.
 5. Delegate transform operations to glam.
-6. Run math tests — verify no precision regression.
-7. Run all examples — verify visual correctness.
+6. Run math tests � verify no precision regression.
+7. Run all examples � verify visual correctness.
 
 **Acceptance gate**: All math tests pass. Float comparisons within 1e-5 tolerance. All examples render correctly. No Lua API surface change.
 
 ---
 
-### Task 4.2 — Expand easing functions
+### Task 4.2 � Expand easing functions
 
 | Field | Details |
 |---|---|
@@ -393,7 +393,7 @@ Integrate glam as the backing math library for hot-path operations.
    - `ease_in_circ`, `ease_out_circ`, `ease_in_out_circ` (circular)
    - `smooth_step`, `smoother_step` (Hermite)
    - `spring(damping, frequency, t)` (spring physics)
-   - `bezier(p1x, p1y, p2x, p2y, t)` (cubic Bézier)
+   - `bezier(p1x, p1y, p2x, p2y, t)` (cubic B�zier)
    - `catmull_rom(p0, p1, p2, p3, t)` (spline)
 2. Register new functions in the `apply(name, t)` lookup.
 3. Write tests for each new function.
@@ -403,11 +403,11 @@ Integrate glam as the backing math library for hot-path operations.
 
 ---
 
-## Phase 5 — Native Module Expansions
+## Phase 5 � Native Module Expansions
 
 Expand game system modules with more features. All native Rust, no new crates.
 
-### Task 5.1 — Expand noise/procgen
+### Task 5.1 � Expand noise/procgen
 
 | Field | Details |
 |---|---|
@@ -433,7 +433,7 @@ Expand game system modules with more features. All native Rust, no new crates.
 
 ---
 
-### Task 5.2 — Expand scene management
+### Task 5.2 � Expand scene management
 
 | Field | Details |
 |---|---|
@@ -458,7 +458,7 @@ Expand game system modules with more features. All native Rust, no new crates.
 
 ---
 
-### Task 5.3 — Expand entity system
+### Task 5.3 � Expand entity system
 
 | Field | Details |
 |---|---|
@@ -470,7 +470,7 @@ Expand game system modules with more features. All native Rust, no new crates.
 | **Agent** | Developer |
 
 **Steps**:
-1. Add **entity queries**: `universe:query("component1", "component2")` → filtered list. ~60 SLoC.
+1. Add **entity queries**: `universe:query("component1", "component2")` � filtered list. ~60 SLoC.
 2. Add **component lifecycle hooks**: `on_add`, `on_remove` callbacks. ~50 SLoC.
 3. Add **entity groups/pools**: Named collections with O(1) membership. ~60 SLoC.
 4. Add **parent-child hierarchies**: `setParent`, kill cascading. ~80 SLoC.
@@ -482,7 +482,7 @@ Expand game system modules with more features. All native Rust, no new crates.
 
 ---
 
-### Task 5.4 — Expand graph module (petgraph algorithms, native)
+### Task 5.4 � Expand graph module (petgraph algorithms, native)
 
 | Field | Details |
 |---|---|
@@ -506,7 +506,7 @@ Expand game system modules with more features. All native Rust, no new crates.
 
 ---
 
-### Task 5.5 — Expand compute module
+### Task 5.5 � Expand compute module
 
 | Field | Details |
 |---|---|
@@ -531,7 +531,7 @@ Expand game system modules with more features. All native Rust, no new crates.
 
 ---
 
-### Task 5.6 — Expand tilemap (hex grid + object layers)
+### Task 5.6 � Expand tilemap (hex grid + object layers)
 
 | Field | Details |
 |---|---|
@@ -550,7 +550,7 @@ Expand game system modules with more features. All native Rust, no new crates.
    - Hex distance, hex-to-pixel, pixel-to-hex. ~30 SLoC.
 2. Add **object layers** to TileMap:
    - Named objects with type, position, size, rotation, properties. ~60 SLoC.
-3. Add **tile properties table** — arbitrary key/value per tile ID. ~30 SLoC.
+3. Add **tile properties table** � arbitrary key/value per tile ID. ~30 SLoC.
 4. Add **layer blend modes** (normal, additive, multiply). ~20 SLoC.
 5. Register all in Lua API.
 6. Write tests.
@@ -559,7 +559,7 @@ Expand game system modules with more features. All native Rust, no new crates.
 
 ---
 
-### Task 5.7 — Expand tweening and sprite animation
+### Task 5.7 � Expand tweening and sprite animation
 
 | Field | Details |
 |---|---|
@@ -590,7 +590,7 @@ Expand game system modules with more features. All native Rust, no new crates.
 
 ---
 
-### Task 5.8 — Implement native binary serialization
+### Task 5.8 � Implement native binary serialization
 
 | Field | Details |
 |---|---|
@@ -607,15 +607,15 @@ Expand game system modules with more features. All native Rust, no new crates.
    - Decode: reverse process.
    - ~200 SLoC.
 2. Register in Lua API:
-   - `luna.data.encodeBinary(table) → ByteData`
-   - `luna.data.decodeBinary(ByteData) → table`
-3. Write round-trip tests (encode → decode → compare).
+   - `luna.data.encodeBinary(table) � ByteData`
+   - `luna.data.decodeBinary(ByteData) � table`
+3. Write round-trip tests (encode � decode � compare).
 
 **Acceptance gate**: Round-trip serialization preserves all Lua value types. Nested tables work. Tests pass.
 
 ---
 
-### Task 5.9 — Expand image processing (PNG workflow)
+### Task 5.9 � Expand image processing (PNG workflow)
 
 | Field | Details |
 |---|---|
@@ -628,8 +628,8 @@ Expand game system modules with more features. All native Rust, no new crates.
 
 **Steps**:
 1. Add **PNG saving**: `ImageData:save(path)` using `image::save_buffer()`. ~20 SLoC.
-2. Add **PNG encoding to memory**: `ImageData:encode("png") → ByteData`. ~30 SLoC.
-3. Add **screenshot capture**: `luna.render.captureScreenshot(path)` that reads the GPU framebuffer and saves to PNG. ~50 SLoC.
+2. Add **PNG encoding to memory**: `ImageData:encode("png") � ByteData`. ~30 SLoC.
+3. Add **screenshot capture**: `luna.gfx.captureScreenshot(path)` that reads the GPU framebuffer and saves to PNG. ~50 SLoC.
 4. Add **sub-image extraction**: `ImageData:getSubImage(x, y, w, h)`. ~20 SLoC.
 5. Add **image paste/blit**: `ImageData:paste(source, x, y)`. ~20 SLoC.
 6. Add **clone**: `ImageData:clone()`. ~10 SLoC.
@@ -640,9 +640,9 @@ Expand game system modules with more features. All native Rust, no new crates.
 
 ---
 
-## Phase 6 — Feature-Gated Tier 3 Additions & Logging
+## Phase 6 � Feature-Gated Tier 3 Additions & Logging
 
-### Task 6.1 — Feature-gate rapier2d
+### Task 6.1 � Feature-gate rapier2d
 
 | Field | Details |
 |---|---|
@@ -664,7 +664,7 @@ Expand game system modules with more features. All native Rust, no new crates.
 
 ---
 
-### Task 6.2 — Add `tiled` crate (feature-gated)
+### Task 6.2 � Add `tiled` crate (feature-gated)
 
 | Field | Details |
 |---|---|
@@ -679,8 +679,8 @@ Expand game system modules with more features. All native Rust, no new crates.
 1. Add `tiled = { version = "0.15", optional = true }` to `Cargo.toml`.
 2. Add `tiled-import = ["dep:tiled"]` feature flag.
 3. Implement `src/tilemap/tiled_import.rs` behind `#[cfg(feature = "tiled-import")]`:
-   - `load_tmx(path) → TileMap` — parse TMX and populate native TileMap.
-   - Map TMX layers → TileLayer, TMX tilesets → TileSet.
+   - `load_tmx(path) � TileMap` � parse TMX and populate native TileMap.
+   - Map TMX layers � TileLayer, TMX tilesets � TileSet.
 4. Register `luna.tilemap.loadTiled(path)` in Lua API (behind cfg).
 5. Write test with a sample TMX file.
 
@@ -688,7 +688,7 @@ Expand game system modules with more features. All native Rust, no new crates.
 
 ---
 
-### Task 6.3 — Implement structured logging system
+### Task 6.3 � Implement structured logging system
 
 | Field | Details |
 |---|---|
@@ -706,16 +706,16 @@ Expand game system modules with more features. All native Rust, no new crates.
    - File output: `set_log_file(path)` for persistent logging. ~100 SLoC.
 2. Add Lua-side logging API:
    - `luna.log.info(msg)`, `luna.log.warn(msg)`, `luna.log.error(msg)`, `luna.log.debug(msg)`. ~30 SLoC.
-   - `luna.log.setFile(path)` — redirect to file. ~20 SLoC.
-   - `luna.log.perf(label, fn)` — timed execution logging. ~30 SLoC.
-   - `luna.log.event(category, data_table)` — structured analytics event for AI consumption. ~50 SLoC.
+   - `luna.log.setFile(path)` � redirect to file. ~20 SLoC.
+   - `luna.log.perf(label, fn)` � timed execution logging. ~30 SLoC.
+   - `luna.log.event(category, data_table)` � structured analytics event for AI consumption. ~50 SLoC.
 3. Write tests for JSON format, file output, Lua integration.
 
 **Acceptance gate**: JSON-formatted log lines parse correctly. File output writes. Lua `luna.log.info("test")` appears in log stream. `luna.log.event("combat", {damage=25})` produces structured JSON. Tests pass.
 
 ---
 
-### Task 6.4 — GPU compute exploration
+### Task 6.4 � GPU compute exploration
 
 | Field | Details |
 |---|---|
@@ -731,7 +731,7 @@ Expand game system modules with more features. All native Rust, no new crates.
    - GPU buffer management for NdArray data.
    - Compute shader for parallel matmul.
    - Compute shader for parallel element-wise operations.
-2. Register `luna.gpu.gpuMatmul(a, b)` in Lua API.
+2. Register `luna.compute.gpuMatmul(a, b)` in Lua API.
 3. Implement fallback to CPU when GPU compute is unavailable.
 4. Benchmark: measure speedup for large arrays (>100K elements).
 
@@ -743,12 +743,12 @@ Expand game system modules with more features. All native Rust, no new crates.
 
 | Phase | Tasks | Priority | Risk | Estimated SLoC |
 |---|---|---|---|---|
-| **1 — Cleanup & Safe Bumps** | 1.1, 1.2, 1.3, 1.4 | HIGH | LOW | ~50-80 added, ~200-500 removed |
-| **2 — Major Migrations** | 2.1-2.9 | CRITICAL | HIGH | ~500-1,500 modified |
-| **3 — Audio Effects** | 3.1 | HIGH | MEDIUM | +500-700 |
-| **4 — Math & glam** | 4.1, 4.2 | HIGH | MEDIUM | +250-400 |
-| **5 — Native Expansions** | 5.1-5.9 | MEDIUM | LOW | +2,350-3,100 |
-| **6 — Tier 3 & Logging** | 6.1-6.4 | MIXED | MIXED | +700-1,150 |
+| **1 � Cleanup & Safe Bumps** | 1.1, 1.2, 1.3, 1.4 | HIGH | LOW | ~50-80 added, ~200-500 removed |
+| **2 � Major Migrations** | 2.1-2.9 | CRITICAL | HIGH | ~500-1,500 modified |
+| **3 � Audio Effects** | 3.1 | HIGH | MEDIUM | +500-700 |
+| **4 � Math & glam** | 4.1, 4.2 | HIGH | MEDIUM | +250-400 |
+| **5 � Native Expansions** | 5.1-5.9 | MEDIUM | LOW | +2,350-3,100 |
+| **6 � Tier 3 & Logging** | 6.1-6.4 | MIXED | MIXED | +700-1,150 |
 
 **Total**: ~4,350-6,930 SLoC of changes across 30 tasks.
 
@@ -758,45 +758,45 @@ Expand game system modules with more features. All native Rust, no new crates.
 
 ```
 Phase 1 (Cleanup)
-├── 1.1 Remove tiny-skia/minifb
-├── 1.2 Safe bumps ← 1.1
-├── 1.3 Add toml crate
-└── 1.4 Add glam crate
++�� 1.1 Remove tiny-skia/minifb
++�� 1.2 Safe bumps � 1.1
++�� 1.3 Add toml crate
+L�� 1.4 Add glam crate
 
-Phase 2 (Migrations) ← Phase 1
-├── 2.1 mlua 0.9 → 0.11 (FIRST — all Lua API code depends on this)
-├── 2.2 rodio → 0.22 ← 2.1
-├── 2.3 image → 0.25 ← 2.1
-├── 2.4 thiserror → 2 (independent)
-├── 2.5 directories → 6 (independent)
-├── 2.6 env_logger → 0.11 (independent)
-├── 2.7 sysinfo → 0.38 ← 2.1
-├── 2.8 winit → 0.31 (do with or after 2.9)
-└── 2.9 wgpu → 29 (LAST — largest migration)
+Phase 2 (Migrations) � Phase 1
++�� 2.1 mlua 0.9 � 0.11 (FIRST � all Lua API code depends on this)
++�� 2.2 rodio � 0.22 � 2.1
++�� 2.3 image � 0.25 � 2.1
++�� 2.4 thiserror � 2 (independent)
++�� 2.5 directories � 6 (independent)
++�� 2.6 env_logger � 0.11 (independent)
++�� 2.7 sysinfo � 0.38 � 2.1
++�� 2.8 winit � 0.31 (do with or after 2.9)
+L�� 2.9 wgpu � 29 (LAST � largest migration)
 
-Phase 3 (Audio Effects) ← 2.2
-└── 3.1 Native DSP effects
+Phase 3 (Audio Effects) � 2.2
+L�� 3.1 Native DSP effects
 
-Phase 4 (Math) ← 1.4
-├── 4.1 glam integration
-└── 4.2 Easing expansion
+Phase 4 (Math) � 1.4
++�� 4.1 glam integration
+L�� 4.2 Easing expansion
 
-Phase 5 (Expansions) — mostly independent, can parallelize
-├── 5.1 Noise/procgen expansion
-├── 5.2 Scene management expansion
-├── 5.3 Entity system expansion
-├── 5.4 Graph algorithms expansion
-├── 5.5 Compute expansion
-├── 5.6 Tilemap expansion (hex + objects)
-├── 5.7 Tweening + animation expansion ← 4.2
-├── 5.8 Binary serialization
-└── 5.9 Image processing (PNG workflow) ← 2.3
+Phase 5 (Expansions) � mostly independent, can parallelize
++�� 5.1 Noise/procgen expansion
++�� 5.2 Scene management expansion
++�� 5.3 Entity system expansion
++�� 5.4 Graph algorithms expansion
++�� 5.5 Compute expansion
++�� 5.6 Tilemap expansion (hex + objects)
++�� 5.7 Tweening + animation expansion � 4.2
++�� 5.8 Binary serialization
+L�� 5.9 Image processing (PNG workflow) � 2.3
 
 Phase 6 (Tier 3 & Logging)
-├── 6.1 Feature-gate rapier2d
-├── 6.2 Add tiled crate ← 5.6
-├── 6.3 Structured logging ← 2.6
-└── 6.4 GPU compute ← 2.9
++�� 6.1 Feature-gate rapier2d
++�� 6.2 Add tiled crate � 5.6
++�� 6.3 Structured logging � 2.6
+L�� 6.4 GPU compute � 2.9
 ```
 
 ---
@@ -805,13 +805,13 @@ Phase 6 (Tier 3 & Logging)
 
 The critical path (longest chain of dependent tasks):
 
-**Phase 1.1 → 1.2 → 2.1 (mlua) → 2.2 (rodio) → 3.1 (audio effects)**
+**Phase 1.1 � 1.2 � 2.1 (mlua) � 2.2 (rodio) � 3.1 (audio effects)**
 
 And in parallel:
 
-**Phase 1.1 → 1.2 → 2.1 (mlua) → 2.9 (wgpu) → 6.4 (GPU compute)**
+**Phase 1.1 � 1.2 � 2.1 (mlua) � 2.9 (wgpu) � 6.4 (GPU compute)**
 
-The mlua migration (Task 2.1) is the **single most critical blocker** — almost every other Phase 2+ task depends on it. Prioritize it.
+The mlua migration (Task 2.1) is the **single most critical blocker** � almost every other Phase 2+ task depends on it. Prioritize it.
 
 ---
 
@@ -819,8 +819,8 @@ The mlua migration (Task 2.1) is the **single most critical blocker** — almost
 
 | Risk | Impact | Likelihood | Mitigation |
 |---|---|---|---|
-| wgpu 22→29 migration breaks rendering | HIGH | HIGH | Research migration guides per version. Test each intermediate step. |
-| mlua 0.9→0.11 breaks Lua bindings | HIGH | MEDIUM | Test every Lua API module individually. Keep 0.9 on a branch as fallback. |
+| wgpu 22�29 migration breaks rendering | HIGH | HIGH | Research migration guides per version. Test each intermediate step. |
+| mlua 0.9�0.11 breaks Lua bindings | HIGH | MEDIUM | Test every Lua API module individually. Keep 0.9 on a branch as fallback. |
 | rodio 0.22 drops support for a format | MEDIUM | LOW | Check symphonia codec support matrix before migrating. |
 | glam precision differs from hand-rolled math | LOW | LOW | Float comparison tests already use 1e-5 tolerance. |
 | Native audio effects sound bad | MEDIUM | MEDIUM | Use proven DSP algorithms (Schroeder reverb, biquad filters). Reference implementations available. |

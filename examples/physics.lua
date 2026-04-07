@@ -24,7 +24,7 @@ world:setGravity(0, 0)
 local gx, gy = world:getGravity()
 
 -- Step the simulation (call once per frame from luna.update)
-function luna.update(dt)
+function luna.process(dt)
     world:step(dt)
 end
 
@@ -310,7 +310,7 @@ end
 -- Collision Events (process AFTER world:step)
 -- ─────────────────────────────────────────────────────────────────────────────
 
-function luna.update(dt)
+function luna.process(dt)
     world:step(dt)
 
     -- All contacts currently active (pair per step)

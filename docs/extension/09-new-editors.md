@@ -1,4 +1,4 @@
-﻿# Luna Toolkit — New Visual Editors (Batch 2)
+# Luna Toolkit — New Visual Editors (Batch 2)
 
 > 11 new visual editors: Sprite Sheet/Animation, Tileset, Audio Mixer,
 > Color Palette, Input Mapper, Timeline/Cutscene, Shader Preview,
@@ -240,7 +240,7 @@ return {
 }
 ```
 IntelliSense: When `palette.lua` is loaded with `require("palette")`, the keys
-appear in completion when calling `luna.render.setColor(palette.|)`.
+appear in completion when calling `luna.gfx.setColor(palette.|)`.
 
 ---
 

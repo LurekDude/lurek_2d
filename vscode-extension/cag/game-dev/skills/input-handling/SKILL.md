@@ -79,7 +79,7 @@ function luna.keypressed(key)
     end
 end
 
-function luna.update(dt)
+function luna.process(dt)
     -- Decrement buffer timers
     for action, frames in pairs(input_buffer) do
         input_buffer[action] = frames - 1

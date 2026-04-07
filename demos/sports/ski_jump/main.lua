@@ -1,4 +1,4 @@
-﻿-- Ski Jump — Sport Game (Luna2D demo)
+-- Ski Jump — Sport Game (Luna2D demo)
 -- Three phases: crouch (hold Space) → in-air lean (A/D) → land (Space).
 -- Your distance depends on all three phases perfectly timed.
 
@@ -57,14 +57,14 @@ end
 
 -- ── Load ─────────────────────────────────────────────────────────────────
 
-function luna.load()
-    luna.render.setBackgroundColor(0.55, 0.75, 0.92)
+function luna.init()
+    luna.gfx.setBackgroundColor(0.55, 0.75, 0.92)
     reset()
 end
 
 -- ── Update ────────────────────────────────────────────────────────────────
 
-function luna.update(dt)
+function luna.process(dt)
     anim = anim + dt
     if phase == "intro" or phase == "score" or phase == "gameover" then return end
 
@@ -120,80 +120,80 @@ end
 -- ── Draw ──────────────────────────────────────────────────────────────────
 
 local function draw_skier(x, y, angle, crouching)
-    luna.render.setColor(0.1, 0.2, 0.7)
+    luna.gfx.setColor(0.1, 0.2, 0.7)
     -- Body
     local bx = x + math.cos(angle) * 6
     local by = y + math.sin(angle) * 6
     if crouching then
-        luna.render.rectangle("fill", x - 5, y - 6, 10, 10)
+        luna.gfx.rectangle("fill", x - 5, y - 6, 10, 10)
     else
-        luna.render.rectangle("fill", x - 5, y - 14, 10, 16)
+        luna.gfx.rectangle("fill", x - 5, y - 14, 10, 16)
     end
     -- Head
-    luna.render.setColor(0.9, 0.6, 0.3)
-    luna.render.circle("fill", x, crouching and y - 10 or y - 18, 7)
+    luna.gfx.setColor(0.9, 0.6, 0.3)
+    luna.gfx.circle("fill", x, crouching and y - 10 or y - 18, 7)
     -- Skis
-    luna.render.setColor(0.9, 0.1, 0.1)
-    luna.render.rectangle("fill", x - 14, y, 28, 4)
+    luna.gfx.setColor(0.9, 0.1, 0.1)
+    luna.gfx.rectangle("fill", x - 14, y, 28, 4)
 end
 
 local function draw_ramp()
     -- Fill
-    luna.render.setColor(0.88, 0.94, 1)
+    luna.gfx.setColor(0.88, 0.94, 1)
     local pts_x, pts_y = {}, {}
     for _, p in ipairs(RAMP) do pts_x[#pts_x+1] = p.x; pts_y[#pts_y+1] = p.y end
     -- Draw ramp as thick segments
-    luna.render.setColor(0.88, 0.94, 1)
+    luna.gfx.setColor(0.88, 0.94, 1)
     for i = 1, #RAMP - 1 do
         local a, b = RAMP[i], RAMP[i+1]
-        luna.render.line(a.x, a.y, b.x, b.y)
+        luna.gfx.line(a.x, a.y, b.x, b.y)
     end
     -- Draw outline
-    luna.render.setColor(0.6, 0.75, 0.95)
+    luna.gfx.setColor(0.6, 0.75, 0.95)
     for i = 1, #RAMP - 1 do
         local a, b = RAMP[i], RAMP[i+1]
-        luna.render.rectangle("fill", a.x - 5, a.y - 5, b.x - a.x + 10, 10)
+        luna.gfx.rectangle("fill", a.x - 5, a.y - 5, b.x - a.x + 10, 10)
     end
 end
 
 local function draw_landing_slope()
     -- Slope continues from takeoff point
-    luna.render.setColor(0.88, 0.94, 1)
+    luna.gfx.setColor(0.88, 0.94, 1)
     for xi = LANDING_X, W - 10, 10 do
         local ya = TAKEOFF_Y + (xi - LANDING_X) * LANDING_SLOPE
         local yb = TAKEOFF_Y + (xi + 10 - LANDING_X) * LANDING_SLOPE
-        luna.render.line(xi, ya, xi + 10, yb)
+        luna.gfx.line(xi, ya, xi + 10, yb)
     end
     -- Slope fill
-    luna.render.setColor(0.72, 0.88, 0.98)
+    luna.gfx.setColor(0.72, 0.88, 0.98)
     for xi = LANDING_X, W - 20, 20 do
         local sy = TAKEOFF_Y + (xi - LANDING_X) * LANDING_SLOPE
-        luna.render.rectangle("fill", xi, sy, 20, 12)
+        luna.gfx.rectangle("fill", xi, sy, 20, 12)
     end
     -- Distance markers (every ~30m)
     for m = 30, 120, 30 do
         local mx = LANDING_X + m * 3.5
         local my = TAKEOFF_Y + (mx - LANDING_X) * LANDING_SLOPE - 10
         if mx < W then
-            luna.render.setColor(0.4, 0.4, 0.4, 0.8)
-            luna.render.line(mx, my, mx, my + 10)
-            luna.render.setColor(0.2, 0.2, 0.2)
-            luna.render.print(tostring(m), mx - 8, my - 14, 1.2)
+            luna.gfx.setColor(0.4, 0.4, 0.4, 0.8)
+            luna.gfx.line(mx, my, mx, my + 10)
+            luna.gfx.setColor(0.2, 0.2, 0.2)
+            luna.gfx.print(tostring(m), mx - 8, my - 14, 1.2)
         end
     end
 end
 
-function luna.draw()
+function luna.render()
     -- Background
-    luna.render.setColor(0.55, 0.75, 0.92)
-    luna.render.rectangle("fill", 0, 0, W, H)
+    luna.gfx.setColor(0.55, 0.75, 0.92)
+    luna.gfx.rectangle("fill", 0, 0, W, H)
     -- Mountains
-    luna.render.setColor(0.8, 0.88, 0.96)
-    luna.render.rectangle("fill", 0, H - 150, W, 150)
-    luna.render.setColor(0.92, 0.96, 1)
+    luna.gfx.setColor(0.8, 0.88, 0.96)
+    luna.gfx.rectangle("fill", 0, H - 150, W, 150)
+    luna.gfx.setColor(0.92, 0.96, 1)
     for i = 0, 6 do
         local mx = 60 + i * 110
-        luna.render.rectangle("fill", mx - 50, H - 200 - (i%3)*40, 100, 100)
+        luna.gfx.rectangle("fill", mx - 50, H - 200 - (i%3)*40, 100, 100)
     end
 
     draw_landing_slope()
@@ -204,76 +204,76 @@ function luna.draw()
     draw_skier(skier.x, skier.y, phase == "airborne" and skier.angle or 0, crouching)
 
     -- HUD
-    luna.render.setColor(0, 0, 0, 0.6)
-    luna.render.rectangle("fill", 0, 0, W, 50)
-    luna.render.setColor(1, 0.9, 0.3)
-    luna.render.print("SKI JUMP", 14, 8, 2.5)
+    luna.gfx.setColor(0, 0, 0, 0.6)
+    luna.gfx.rectangle("fill", 0, 0, W, 50)
+    luna.gfx.setColor(1, 0.9, 0.3)
+    luna.gfx.print("SKI JUMP", 14, 8, 2.5)
 
     -- Scores
     for i = 1, 3 do
-        luna.render.setColor(i <= attempt and 1 or 0.5, i <= attempt and 1 or 0.5, 0.5)
+        luna.gfx.setColor(i <= attempt and 1 or 0.5, i <= attempt and 1 or 0.5, 0.5)
         local s = scores[i] and (scores[i] .. "m") or "—"
-        luna.render.print("Jump " .. i .. ": " .. s, W/2 + (i-2)*140 - 50, 12, 1.6)
+        luna.gfx.print("Jump " .. i .. ": " .. s, W/2 + (i-2)*140 - 50, 12, 1.6)
     end
-    luna.render.setColor(0.4, 1, 0.6)
-    luna.render.print("Best: " .. best .. "m", W - 130, 12, 1.8)
+    luna.gfx.setColor(0.4, 1, 0.6)
+    luna.gfx.print("Best: " .. best .. "m", W - 130, 12, 1.8)
 
     -- Phase instruction
     if phase == "slide" then
-        luna.render.setColor(1, 1, 0.6, 0.9)
-        luna.render.print("Hold SPACE to crouch low on the ramp!", 14, H - 24, 1.6)
+        luna.gfx.setColor(1, 1, 0.6, 0.9)
+        luna.gfx.print("Hold SPACE to crouch low on the ramp!", 14, H - 24, 1.6)
         -- Crouch indicator
         local cb = luna.input.isKeyDown("space") and 1 or 0.3
-        luna.render.setColor(cb, cb * 0.7, 0)
-        luna.render.print("[HOLD SPACE] = Crouch", 14, H - 46, 1.4)
+        luna.gfx.setColor(cb, cb * 0.7, 0)
+        luna.gfx.print("[HOLD SPACE] = Crouch", 14, H - 46, 1.4)
     elseif phase == "airborne" then
-        luna.render.setColor(1, 1, 0.6, 0.9)
-        luna.render.print("A = Lean back   D = Lean forward   (neutral = straight arms)", 14, H - 24, 1.4)
+        luna.gfx.setColor(1, 1, 0.6, 0.9)
+        luna.gfx.print("A = Lean back   D = Lean forward   (neutral = straight arms)", 14, H - 24, 1.4)
         -- Lean bar
-        luna.render.setColor(0.3, 0.3, 0.3)
-        luna.render.rectangle("fill", W - 150, H - 55, 130, 20)
-        luna.render.setColor(0.1, 0.8, 0.3)
-        luna.render.rectangle("fill", W - 85, H - 55, lean * 60, 20)
-        luna.render.setColor(1, 1, 1)
-        luna.render.line(W - 85, H - 60, W - 85, H - 30)
-        luna.render.print("LEAN", W - 152, H - 55, 1.2)
+        luna.gfx.setColor(0.3, 0.3, 0.3)
+        luna.gfx.rectangle("fill", W - 150, H - 55, 130, 20)
+        luna.gfx.setColor(0.1, 0.8, 0.3)
+        luna.gfx.rectangle("fill", W - 85, H - 55, lean * 60, 20)
+        luna.gfx.setColor(1, 1, 1)
+        luna.gfx.line(W - 85, H - 60, W - 85, H - 30)
+        luna.gfx.print("LEAN", W - 152, H - 55, 1.2)
     elseif phase == "landing" then
-        luna.render.setColor(0.5, 0.9, 1, 0.9)
-        luna.render.print("Landing...", 14, H - 24, 2)
+        luna.gfx.setColor(0.5, 0.9, 1, 0.9)
+        luna.gfx.print("Landing...", 14, H - 24, 2)
     end
 
     -- Score overlay
     if phase == "score" then
-        luna.render.setColor(0, 0, 0, 0.65)
-        luna.render.rectangle("fill", W/2 - 160, H/2 - 50, 320, 100)
-        luna.render.setColor(1, 1, 0.3)
-        luna.render.print("JUMP " .. attempt .. ":", W/2 - 50, H/2 - 42, 1.8)
-        luna.render.setColor(0.3, 1, 0.3)
-        luna.render.print(land_dist .. " m", W/2 - 30, H/2 - 10, 3)
-        luna.render.setColor(0.7, 0.7, 0.7)
+        luna.gfx.setColor(0, 0, 0, 0.65)
+        luna.gfx.rectangle("fill", W/2 - 160, H/2 - 50, 320, 100)
+        luna.gfx.setColor(1, 1, 0.3)
+        luna.gfx.print("JUMP " .. attempt .. ":", W/2 - 50, H/2 - 42, 1.8)
+        luna.gfx.setColor(0.3, 1, 0.3)
+        luna.gfx.print(land_dist .. " m", W/2 - 30, H/2 - 10, 3)
+        luna.gfx.setColor(0.7, 0.7, 0.7)
         if attempt < 3 then
-            luna.render.print("Press SPACE for attempt " .. (attempt+1), W/2 - 110, H/2 + 38, 1.5)
+            luna.gfx.print("Press SPACE for attempt " .. (attempt+1), W/2 - 110, H/2 + 38, 1.5)
         else
-            luna.render.print("Press SPACE to see final", W/2 - 110, H/2 + 38, 1.5)
+            luna.gfx.print("Press SPACE to see final", W/2 - 110, H/2 + 38, 1.5)
         end
     end
 
     -- Game over
     if phase == "gameover" then
-        luna.render.setColor(0, 0, 0, 0.8)
-        luna.render.rectangle("fill", 0, 0, W, H)
-        luna.render.setColor(1, 0.9, 0.2)
-        luna.render.print("COMPETITION OVER", W/2 - 130, H/2 - 60, 2.8)
+        luna.gfx.setColor(0, 0, 0, 0.8)
+        luna.gfx.rectangle("fill", 0, 0, W, H)
+        luna.gfx.setColor(1, 0.9, 0.2)
+        luna.gfx.print("COMPETITION OVER", W/2 - 130, H/2 - 60, 2.8)
         local golds = {}
         for i = 1, 3 do golds[i] = scores[i] and (scores[i] .. " m") or "—" end
-        luna.render.setColor(1, 1, 1)
+        luna.gfx.setColor(1, 1, 1)
         for i = 1, 3 do
-            luna.render.print("Jump " .. i .. ": " .. golds[i], W/2 - 60, H/2 - 10 + i*30, 2)
+            luna.gfx.print("Jump " .. i .. ": " .. golds[i], W/2 - 60, H/2 - 10 + i*30, 2)
         end
-        luna.render.setColor(0.3, 1, 0.5)
-        luna.render.print("BEST: " .. best .. " m", W/2 - 55, H/2 + 110, 2.5)
-        luna.render.setColor(0.6, 0.6, 0.6)
-        luna.render.print("Press R to compete again", W/2 - 120, H/2 + 145, 1.8)
+        luna.gfx.setColor(0.3, 1, 0.5)
+        luna.gfx.print("BEST: " .. best .. " m", W/2 - 55, H/2 + 110, 2.5)
+        luna.gfx.setColor(0.6, 0.6, 0.6)
+        luna.gfx.print("Press R to compete again", W/2 - 120, H/2 + 145, 1.8)
     end
 end
 

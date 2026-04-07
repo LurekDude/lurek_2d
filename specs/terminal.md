@@ -1,4 +1,4 @@
-﻿# `terminal` — Agent Reference
+# `terminal` — Agent Reference
 
 | Property       | Value                                                |
 |----------------|------------------------------------------------------|
@@ -249,7 +249,7 @@ Exposed under `luna.terminal.*` by `src/lua_api/terminal_api.rs`. The API provid
 
 local term, input, output, border
 
-function luna.load()
+function luna.init()
     -- Create a 60×20 terminal grid
     term = luna.terminal.newTerminal(60, 20)
 
@@ -291,7 +291,7 @@ function luna.textinput(text)
     term:textinput(text)
 end
 
-function luna.draw()
+function luna.render()
     term:draw(20, 20)
 end
 ```
@@ -301,7 +301,7 @@ end
 
 local term, btn_start, btn_quit
 
-function luna.load()
+function luna.init()
     term = luna.terminal.newTerminal(30, 10)
 
     local title = luna.terminal.newLabel(8, 2, "== Main Menu ==")
@@ -325,7 +325,7 @@ function luna.keypressed(key)
     term:keypressed(key)
 end
 
-function luna.draw()
+function luna.render()
     term:draw(100, 80)
 end
 ```

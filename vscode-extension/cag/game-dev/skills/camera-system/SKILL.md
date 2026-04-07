@@ -1,4 +1,4 @@
-﻿# Camera System
+# Camera System
 
 Smooth follow, deadzone, screenshake, zoom, and bounds-clamped camera for 2D games.
 
@@ -64,12 +64,12 @@ function apply_shake(dt)
     return ox, oy
 end
 
-function luna.draw()
+function luna.render()
     local ox, oy = apply_shake(dt_global)
-    luna.render.push()
-    luna.render.translate(-cam.x + ox, -cam.y + oy)
+    luna.gfx.push()
+    luna.gfx.translate(-cam.x + ox, -cam.y + oy)
     -- draw world here
-    luna.render.pop()
+    luna.gfx.pop()
 end
 ```
 

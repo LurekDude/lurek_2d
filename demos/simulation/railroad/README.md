@@ -1,4 +1,4 @@
-﻿# Railroad / Transport Logistics
+# Railroad / Transport Logistics
 
 A transport logistics game on a 25 × 19 tile grid. Place track tiles to connect stations, spawn trains, and earn revenue when a train delivers cargo from a producing station to a consuming one. The train pathfinding uses the directional connection graph defined by each track type.
 
@@ -9,7 +9,7 @@ A transport logistics game on a 25 × 19 tile grid. Place track tiles to connect
 - Station-based cargo production and consumption with a stock/capacity system
 - Day cycle timer driving revenue per delivery and a history array for the revenue chart
 - Train spawning via `T` and automatic pathfinding along placed track
-- `luna.render.drawLine` for the track shapes and `drawRect` for train cars
+- `luna.gfx.drawLine` for the track shapes and `drawRect` for train cars
 
 ## How to Run
 

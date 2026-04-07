@@ -1,4 +1,4 @@
-﻿-- Tycoon — Luna2D Demo
+-- Tycoon — Luna2D Demo
 -- Build a restaurant, serve customers, earn profit
 
 local function clamp(v, mn, mx) return math.max(mn, math.min(mx, v)) end
@@ -57,13 +57,13 @@ local function spawnCustomer()
     table.insert(customers, { x = dx * TILE, y = (ROWS - 1) * TILE, state = "enter", wait = 0, served = false, patience = 12 + math.random(0, 8) })
 end
 
-function luna.load()
+function luna.init()
     luna.window.setTitle("Restaurant Tycoon")
-    luna.render.setBackgroundColor(0.12, 0.1, 0.08)
+    luna.gfx.setBackgroundColor(0.12, 0.1, 0.08)
     initGrid()
 end
 
-function luna.update(dt)
+function luna.process(dt)
     dayTimer = dayTimer + dt
 
     -- update facilities flags
@@ -156,38 +156,38 @@ function luna.update(dt)
     end
 end
 
-function luna.draw()
+function luna.render()
     -- grid
     for y = 1, ROWS do
         for x = 1, COLS do
             local t = grid[y][x]
             if t == "wall" then
-                luna.render.setColor(0.3, 0.25, 0.2, 1)
+                luna.gfx.setColor(0.3, 0.25, 0.2, 1)
             elseif t == "door" then
-                luna.render.setColor(0.5, 0.4, 0.15, 1)
+                luna.gfx.setColor(0.5, 0.4, 0.15, 1)
             elseif t == "counter" then
-                luna.render.setColor(0.7, 0.5, 0.2, 1)
+                luna.gfx.setColor(0.7, 0.5, 0.2, 1)
             elseif t == "table" then
-                luna.render.setColor(0.5, 0.35, 0.2, 1)
+                luna.gfx.setColor(0.5, 0.35, 0.2, 1)
             elseif t == "kitchen" then
-                luna.render.setColor(0.6, 0.2, 0.2, 1)
+                luna.gfx.setColor(0.6, 0.2, 0.2, 1)
             else
-                luna.render.setColor(0.2, 0.18, 0.15, 1)
+                luna.gfx.setColor(0.2, 0.18, 0.15, 1)
             end
-            luna.render.rectangle("fill", (x - 1) * TILE, (y - 1) * TILE, TILE - 1, TILE - 1)
+            luna.gfx.rectangle("fill", (x - 1) * TILE, (y - 1) * TILE, TILE - 1, TILE - 1)
         end
     end
 
     -- customers
     for _, c in ipairs(customers) do
         if c.state == "order" then
-            luna.render.setColor(1, 0.8, 0.2, 1)
+            luna.gfx.setColor(1, 0.8, 0.2, 1)
         elseif c.state == "eat" then
-            luna.render.setColor(0.3, 0.9, 0.3, 1)
+            luna.gfx.setColor(0.3, 0.9, 0.3, 1)
         else
-            luna.render.setColor(0.3, 0.6, 1, 1)
+            luna.gfx.setColor(0.3, 0.6, 1, 1)
         end
-        luna.render.circle("fill", c.x, c.y, 10)
+        luna.gfx.circle("fill", c.x, c.y, 10)
     end
 
     -- build cursor
@@ -197,39 +197,39 @@ function luna.draw()
         local gy = math.floor(my / TILE) + 1
         if gx >= 2 and gx <= COLS - 1 and gy >= 2 and gy <= ROWS - 1 then
             local b = buildings[buildType]
-            luna.render.setColor(b.color[1], b.color[2], b.color[3], 0.4)
-            luna.render.rectangle("fill", (gx - 1) * TILE, (gy - 1) * TILE, TILE - 1, TILE - 1)
+            luna.gfx.setColor(b.color[1], b.color[2], b.color[3], 0.4)
+            luna.gfx.rectangle("fill", (gx - 1) * TILE, (gy - 1) * TILE, TILE - 1, TILE - 1)
         end
     end
 
     -- RIGHT PANEL
     local px = COLS * TILE + 10
-    luna.render.setColor(0, 0, 0, 0.5)
-    luna.render.rectangle("fill", COLS * TILE, 0, 200, ROWS * TILE)
+    luna.gfx.setColor(0, 0, 0, 0.5)
+    luna.gfx.rectangle("fill", COLS * TILE, 0, 200, ROWS * TILE)
 
-    luna.render.setColor(1, 0.85, 0.2, 1)
-    luna.render.print("$" .. money, px, 10, 1.3)
-    luna.render.setColor(1, 1, 1, 1)
-    luna.render.print("Day " .. day, px, 40)
-    luna.render.print("Served: " .. customersServed, px, 60)
-    luna.render.print("Satisfaction: " .. math.floor(satisfaction) .. "%", px, 80)
-    luna.render.print("Cooks: " .. staff.cooks .. " ($" .. staffCost.cook .. "/d)", px, 110)
-    luna.render.print("Waiters: " .. staff.waiters .. " ($" .. staffCost.waiter .. "/d)", px, 130)
+    luna.gfx.setColor(1, 0.85, 0.2, 1)
+    luna.gfx.print("$" .. money, px, 10, 1.3)
+    luna.gfx.setColor(1, 1, 1, 1)
+    luna.gfx.print("Day " .. day, px, 40)
+    luna.gfx.print("Served: " .. customersServed, px, 60)
+    luna.gfx.print("Satisfaction: " .. math.floor(satisfaction) .. "%", px, 80)
+    luna.gfx.print("Cooks: " .. staff.cooks .. " ($" .. staffCost.cook .. "/d)", px, 110)
+    luna.gfx.print("Waiters: " .. staff.waiters .. " ($" .. staffCost.waiter .. "/d)", px, 130)
 
     -- build panel
-    luna.render.setColor(0.6, 0.8, 1, 1)
-    luna.render.print("BUILD (B toggle):", px, 170)
+    luna.gfx.setColor(0.6, 0.8, 1, 1)
+    luna.gfx.print("BUILD (B toggle):", px, 170)
     for i, b in ipairs(buildings) do
         local sel = (buildMode and i == buildType) and "> " or "  "
-        luna.render.setColor(1, 1, 1, 1)
-        luna.render.print(sel .. i .. ") " .. b.name .. " $" .. b.cost, px, 190 + i * 18)
+        luna.gfx.setColor(1, 1, 1, 1)
+        luna.gfx.print(sel .. i .. ") " .. b.name .. " $" .. b.cost, px, 190 + i * 18)
     end
 
-    luna.render.setColor(0.7, 0.7, 0.7, 1)
-    luna.render.print("H=Hire Cook", px, 280)
-    luna.render.print("J=Hire Waiter", px, 298)
-    luna.render.print("Day: " .. math.floor(dayTimer) .. "/" .. dayLength, px, 330)
-    luna.render.print("FPS: " .. luna.time.getFPS(), px, 360)
+    luna.gfx.setColor(0.7, 0.7, 0.7, 1)
+    luna.gfx.print("H=Hire Cook", px, 280)
+    luna.gfx.print("J=Hire Waiter", px, 298)
+    luna.gfx.print("Day: " .. math.floor(dayTimer) .. "/" .. dayLength, px, 330)
+    luna.gfx.print("FPS: " .. luna.time.getFPS(), px, 360)
 end
 
 function luna.keypressed(key)

@@ -1,4 +1,4 @@
-﻿# Luna2D — Lua BDD Tests
+# Luna2D — Lua BDD Tests
 
 Lua tests exercise the `luna.*` API surface through a Behaviour-Driven Development framework.
 They run headless inside a minimal Lua VM — no GPU, audio, or window is required.
@@ -103,7 +103,7 @@ fn lua_test_<module>() {
 
 ## Constraints
 
-- Lua tests **must not** call `luna.render.draw*`, `luna.audio.*`, or anything requiring a window
+- Lua tests **must not** call `luna.gfx.draw*`, `luna.audio.*`, or anything requiring a window
 - Tests must not write files outside `target/`
 - Every test file **must** end with `test_summary()`
 - New `luna.*` API functions require at least one Lua test before merge

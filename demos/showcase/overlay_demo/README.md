@@ -1,13 +1,13 @@
-﻿# Overlay Demo
+# Overlay Demo
 
-Demonstrates `luna.render.newDrawLayer()` for z-ordered rendering. Layers can be reordered at runtime, enabling dynamic depth sorting for UI and game objects.
+Demonstrates `luna.gfx.newDrawLayer()` for z-ordered rendering. Layers can be reordered at runtime, enabling dynamic depth sorting for UI and game objects.
 
 ## What It Demonstrates
 
-- `luna.render.newDrawLayer()` — create a named render layer
+- `luna.gfx.newDrawLayer()` — create a named render layer
 - Layer z-order: sorting layers and changing depth at runtime
 - `layer:draw()` — submitting draw commands to a layer
-- `luna.render.flushLayers()` — compositing all layers in z-order
+- `luna.gfx.flushLayers()` — compositing all layers in z-order
 - Selecting and reordering layers with keyboard
 - Visual feedback showing layer priorities
 

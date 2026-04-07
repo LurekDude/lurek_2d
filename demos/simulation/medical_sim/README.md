@@ -1,4 +1,4 @@
-﻿# Medical Simulation
+# Medical Simulation
 
 A surgical workflow minigame where the player operates on a series of five patients. Each surgery follows a strict six-step sequence — clean, cut skin, cut muscle, repair the organ, suture, and clean again. Apply the wrong tool at the wrong step and the patient suffers a complication that reduces your final score per case.
 
@@ -9,7 +9,7 @@ A surgical workflow minigame where the player operates on a series of five patie
 - Click-region validation distinguishing the tool palette from the body area and the target zone
 - Multi-patient progression: completing one patient advances to the next automatically
 - Penalty / bonus scoring: score per patient is `200 − (complications × 30)`, floored at 50
-- `luna.render.drawCircle` and `drawRect` for all UI and body rendering
+- `luna.gfx.drawCircle` and `drawRect` for all UI and body rendering
 
 ## How to Run
 

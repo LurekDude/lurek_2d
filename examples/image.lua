@@ -1,4 +1,4 @@
-﻿-- examples/image.lua
+-- examples/image.lua
 -- luna.img — CPU-side pixel buffer manipulation (ImageData and CompressedImageData).
 -- All luna.img API methods demonstrated with code and comments.
 
@@ -70,8 +70,8 @@ luna.fs.write("output.png", png_bytes)
 -- ── Using ImageData to modify a GPU texture ───────────────────────────────────
 
 -- Luna2D allows uploading an ImageData as a GPU texture:
---   local tex = luna.render.newImage(img_data)
---   luna.render.draw(tex, x, y)
+--   local tex = luna.gfx.newImage(img_data)
+--   luna.gfx.draw(tex, x, y)
 
 -- ── CompressedImageData ───────────────────────────────────────────────────────
 
@@ -101,7 +101,7 @@ luna.fs.write("output.png", png_bytes)
 -- ── Typical use — procedural texture ─────────────────────────────────────────
 
 --[[
-function luna.load()
+function luna.init()
     local pixels = luna.img.newImageData(256, 256)
     pixels:mapPixel(function(x, y)
         -- Simple noise-based terrain colour
@@ -114,10 +114,10 @@ function luna.load()
             return 20, 80, 200, 255    -- water
         end
     end)
-    terrain_tex = luna.render.newImage(pixels)
+    terrain_tex = luna.gfx.newImage(pixels)
 end
 
-function luna.draw()
-    luna.render.draw(terrain_tex, 0, 0)
+function luna.render()
+    luna.gfx.draw(terrain_tex, 0, 0)
 end
 ]]

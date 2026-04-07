@@ -1,4 +1,4 @@
-﻿# `lua_api` — Agent Reference
+# `lua_api` — Agent Reference
 
 | Property | Value |
 |----------|-------|
@@ -28,7 +28,7 @@ follows the same registration contract — `pub fn register(lua, luna_table, sta
 src/lua_api/
 ├── mod.rs            — create_lua_vm(), VM init, StdLib selection, global nulling
 ├── userdata.rs       — LunaType trait, shared UserData patterns
-├── graphics_api/     — luna.render.*
+├── graphics_api/     — luna.gfx.*
 ├── audio_api.rs      — luna.audio.*
 ├── input_api.rs      — luna.input.*, luna.keyboard.*, luna.mouse.*, luna.gamepad.*
 ├── timer_api.rs      — luna.time.*
@@ -164,7 +164,7 @@ impl LuaUserData for LuaImage {
 |------|---------|
 | `mod.rs` | VM creation, StdLib selection, global nulling, module registration |
 | `userdata.rs` | `LunaType` trait, shared UserData patterns |
-| `graphics_api/` | `luna.render.*` — drawing, images, fonts, canvases, shaders |
+| `graphics_api/` | `luna.gfx.*` — drawing, images, fonts, canvases, shaders |
 | `audio_api.rs` | `luna.audio.*` — sources, playback, volume, buses |
 | `input_api.rs` | `luna.input.*`, `luna.keyboard.*`, `luna.mouse.*`, `luna.gamepad.*`, `luna.touch.*` |
 | `timer_api.rs` | `luna.time.*` — delta time, FPS, sleep (Gold standard for docstring format) |

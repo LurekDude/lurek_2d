@@ -1,24 +1,24 @@
-﻿local Grid = require("entities.grid")
+local Grid = require("entities.grid")
 
 local grid
 local moves = 0
 local won = false
 
-function luna.load()
+function luna.init()
     grid = Grid.new(8, 8, 60)
 end
 
-function luna.update(dt)
+function luna.process(dt)
     -- Puzzle logic runs on input, not per-frame
 end
 
-function luna.draw()
-    luna.render.clear(0.12, 0.12, 0.18)
+function luna.render()
+    luna.gfx.clear(0.12, 0.12, 0.18)
     grid:draw()
-    luna.render.setColor(1, 1, 1, 1)
-    luna.render.print("Moves: " .. moves, 10, 10)
+    luna.gfx.setColor(1, 1, 1, 1)
+    luna.gfx.print("Moves: " .. moves, 10, 10)
     if won then
-        luna.render.print("You Win!", 250, 280)
+        luna.gfx.print("You Win!", 250, 280)
     end
 end
 

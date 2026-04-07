@@ -1,4 +1,4 @@
-﻿---
+---
 description: "**Lua-Designer** — Design and evolve the `luna.*` Lua API surface. Owns naming, signatures, callback conventions, and API consistency. Does NOT write Rust implementation."
 tools: [vscode, execute, read, agent, edit, search, web, browser, todo]
 name: Lua-Designer
@@ -83,7 +83,7 @@ Every Lua-Designer output includes:
 
 ## BEST PRACTICES
 
-- Audit existing patterns first: read how similar capabilities are named in `luna.render`, `luna.audio`, `luna.physics` before proposing new names
+- Audit existing patterns first: read how similar capabilities are named in `luna.gfx`, `luna.audio`, `luna.physics` before proposing new names
 - Use standard parameter aliases: `dt` for delta time, `x, y` for 2D position, `w, h` for dimensions, `r, g, b, a` for color, `key` for key name strings, `btn` for mouse buttons
 - Every new function must have a sensible no-argument form or fully defaulted parameters — a beginner should pass the minimum required args and get a working result
 - Write the usage example **before** writing the signature — the example exposes awkward naming or parameter order before they are locked into Rust

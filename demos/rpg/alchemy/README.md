@@ -1,4 +1,4 @@
-﻿# Alchemy Demo
+# Alchemy Demo
 
 An alchemy workshop where you grind ingredients in a mortar, transfer them to a cauldron, control the temperature, brew potions, bottle the results, and sell them for gold.
 
@@ -10,7 +10,7 @@ An alchemy workshop where you grind ingredients in a mortar, transfer them to a 
 - `luna.mousepressed` callback for drag-free click interactions
 - Accumulator-based cooldown timer for the grinding animation
 - Discovery tracking: first successful brew reveals a recipe name in the log
-- `luna.render.circle()`, `rectangle()`, and `print()` for all UI
+- `luna.gfx.circle()`, `rectangle()`, and `print()` for all UI
 
 ## How to Run
 

@@ -1,4 +1,4 @@
-﻿-- Sports Manager — 2D Data-Driven Football Management
+-- Sports Manager — 2D Data-Driven Football Management
 -- Manage roster, tactics, training, transfers, play a 10-match season
 
 local function clamp(v, mn, mx) return math.max(mn, math.min(mx, v)) end
@@ -54,7 +54,7 @@ local function team_overall(roster)
     return n > 0 and math.floor(total / n) or 30
 end
 
-function luna.load()
+function luna.init()
     for i = 1, 11 do
         local p = make_player()
         p.value = calc_value(p)
@@ -264,152 +264,152 @@ function luna.keypressed(key)
     end
 end
 
-function luna.draw()
-    luna.render.setBackgroundColor(0.06, 0.08, 0.12)
+function luna.render()
+    luna.gfx.setBackgroundColor(0.06, 0.08, 0.12)
 
     -- Header
-    luna.render.setColor(0.3, 0.8, 0.4, 1)
-    luna.render.print(team_name .. " — Sports Manager", 10, 5, 1.2)
-    luna.render.setColor(0.8, 0.8, 0.6, 1)
-    luna.render.print("Budget: " .. budget .. "  |  Match " .. clamp(season_match, 1, TOTAL_MATCHES) .. "/" .. TOTAL_MATCHES .. "  |  Formation: " .. formation, 10, 28, 0.75)
+    luna.gfx.setColor(0.3, 0.8, 0.4, 1)
+    luna.gfx.print(team_name .. " — Sports Manager", 10, 5, 1.2)
+    luna.gfx.setColor(0.8, 0.8, 0.6, 1)
+    luna.gfx.print("Budget: " .. budget .. "  |  Match " .. clamp(season_match, 1, TOTAL_MATCHES) .. "/" .. TOTAL_MATCHES .. "  |  Formation: " .. formation, 10, 28, 0.75)
 
     local Y = 55
 
     if state == "menu" then
-        luna.render.setColor(1, 0.9, 0.5, 1)
-        luna.render.print("Main Menu", 30, Y, 1.2)
+        luna.gfx.setColor(1, 0.9, 0.5, 1)
+        luna.gfx.print("Main Menu", 30, Y, 1.2)
         for i, item in ipairs(menu_items) do
             local iy = Y + 30 + (i - 1) * 28
             if i == selected then
-                luna.render.setColor(0.2, 0.3, 0.5, 1)
-                luna.render.rectangle("fill", 25, iy - 2, 300, 24)
-                luna.render.setColor(1, 1, 0.6, 1)
+                luna.gfx.setColor(0.2, 0.3, 0.5, 1)
+                luna.gfx.rectangle("fill", 25, iy - 2, 300, 24)
+                luna.gfx.setColor(1, 1, 0.6, 1)
             else
-                luna.render.setColor(0.8, 0.8, 0.8, 1)
+                luna.gfx.setColor(0.8, 0.8, 0.8, 1)
             end
-            luna.render.print("> " .. item, 35, iy, 1)
+            luna.gfx.print("> " .. item, 35, iy, 1)
         end
-        luna.render.setColor(0.5, 0.5, 0.5, 1)
-        luna.render.print("Up/Down=select  Enter=confirm  Esc=back/quit", 30, 400, 0.7)
+        luna.gfx.setColor(0.5, 0.5, 0.5, 1)
+        luna.gfx.print("Up/Down=select  Enter=confirm  Esc=back/quit", 30, 400, 0.7)
 
     elseif state == "roster" then
-        luna.render.setColor(1, 0.9, 0.5, 1)
-        luna.render.print("Roster  (OVR: " .. team_overall(players) .. ")", 30, Y, 1)
-        luna.render.setColor(0.6, 0.6, 0.6, 1)
-        luna.render.print("#   Name               SPD  PWR  STA  SKL  MOR  Status", 30, Y + 25, 0.65)
+        luna.gfx.setColor(1, 0.9, 0.5, 1)
+        luna.gfx.print("Roster  (OVR: " .. team_overall(players) .. ")", 30, Y, 1)
+        luna.gfx.setColor(0.6, 0.6, 0.6, 1)
+        luna.gfx.print("#   Name               SPD  PWR  STA  SKL  MOR  Status", 30, Y + 25, 0.65)
         for i, p in ipairs(players) do
             local py = Y + 42 + (i - 1) * 20
             if i == selected then
-                luna.render.setColor(0.2, 0.3, 0.5, 1)
-                luna.render.rectangle("fill", 25, py - 1, 720, 18)
+                luna.gfx.setColor(0.2, 0.3, 0.5, 1)
+                luna.gfx.rectangle("fill", 25, py - 1, 720, 18)
             end
             local status = p.injured and "INJURED" or "OK"
             local clr = p.injured and {0.9, 0.3, 0.3} or {0.8, 0.9, 0.8}
-            luna.render.setColor(clr[1], clr[2], clr[3], 1)
+            luna.gfx.setColor(clr[1], clr[2], clr[3], 1)
             local line = string.format("%-3d %-18s %3d  %3d  %3d  %3d  %3d  %s", i, p.name, p.speed, p.power, p.stamina, p.skill, p.morale, status)
-            luna.render.print(line, 30, py, 0.6)
+            luna.gfx.print(line, 30, py, 0.6)
         end
 
     elseif state == "formation" then
-        luna.render.setColor(1, 0.9, 0.5, 1)
-        luna.render.print("Select Formation", 30, Y, 1.2)
+        luna.gfx.setColor(1, 0.9, 0.5, 1)
+        luna.gfx.print("Select Formation", 30, Y, 1.2)
         for i, f in ipairs(formations) do
             local fy = Y + 40 + (i - 1) * 35
             if i == form_idx then
-                luna.render.setColor(0.2, 0.4, 0.6, 1)
-                luna.render.rectangle("fill", 30, fy - 2, 200, 28)
-                luna.render.setColor(1, 1, 0.6, 1)
+                luna.gfx.setColor(0.2, 0.4, 0.6, 1)
+                luna.gfx.rectangle("fill", 30, fy - 2, 200, 28)
+                luna.gfx.setColor(1, 1, 0.6, 1)
             else
-                luna.render.setColor(0.7, 0.7, 0.7, 1)
+                luna.gfx.setColor(0.7, 0.7, 0.7, 1)
             end
-            luna.render.print(f, 40, fy, 1.2)
+            luna.gfx.print(f, 40, fy, 1.2)
         end
-        luna.render.setColor(0.5, 0.5, 0.5, 1)
-        luna.render.print("Up/Down=select  Enter=confirm", 30, 250, 0.75)
+        luna.gfx.setColor(0.5, 0.5, 0.5, 1)
+        luna.gfx.print("Up/Down=select  Enter=confirm", 30, 250, 0.75)
 
     elseif state == "training" then
-        luna.render.setColor(1, 0.9, 0.5, 1)
-        luna.render.print("Training (10 budget per session)", 30, Y, 1)
+        luna.gfx.setColor(1, 0.9, 0.5, 1)
+        luna.gfx.print("Training (10 budget per session)", 30, Y, 1)
         for i, p in ipairs(players) do
             local py = Y + 30 + (i - 1) * 20
             if i == selected then
-                luna.render.setColor(0.2, 0.3, 0.5, 1)
-                luna.render.rectangle("fill", 25, py - 1, 500, 18)
-                luna.render.setColor(1, 1, 0.6, 1)
+                luna.gfx.setColor(0.2, 0.3, 0.5, 1)
+                luna.gfx.rectangle("fill", 25, py - 1, 500, 18)
+                luna.gfx.setColor(1, 1, 0.6, 1)
             else
-                luna.render.setColor(0.7, 0.8, 0.7, 1)
+                luna.gfx.setColor(0.7, 0.8, 0.7, 1)
             end
-            luna.render.print(string.format("%-18s SPD:%d PWR:%d STA:%d SKL:%d", p.name, p.speed, p.power, p.stamina, p.skill), 30, py, 0.65)
+            luna.gfx.print(string.format("%-18s SPD:%d PWR:%d STA:%d SKL:%d", p.name, p.speed, p.power, p.stamina, p.skill), 30, py, 0.65)
         end
-        luna.render.setColor(0.5, 0.5, 0.5, 1)
-        luna.render.print("Enter=train selected player (random stat +1-5)", 30, 400, 0.7)
+        luna.gfx.setColor(0.5, 0.5, 0.5, 1)
+        luna.gfx.print("Enter=train selected player (random stat +1-5)", 30, 400, 0.7)
 
     elseif state == "transfer" then
-        luna.render.setColor(1, 0.9, 0.5, 1)
-        luna.render.print("Transfer Market", 30, Y, 1)
+        luna.gfx.setColor(1, 0.9, 0.5, 1)
+        luna.gfx.print("Transfer Market", 30, Y, 1)
         if #transfer_list == 0 then
-            luna.render.setColor(0.7, 0.7, 0.7, 1)
-            luna.render.print("No players available.", 30, Y + 30, 0.9)
+            luna.gfx.setColor(0.7, 0.7, 0.7, 1)
+            luna.gfx.print("No players available.", 30, Y + 30, 0.9)
         end
         for i, p in ipairs(transfer_list) do
             local py = Y + 30 + (i - 1) * 22
             if i == selected then
-                luna.render.setColor(0.2, 0.3, 0.5, 1)
-                luna.render.rectangle("fill", 25, py - 1, 600, 20)
-                luna.render.setColor(1, 1, 0.6, 1)
+                luna.gfx.setColor(0.2, 0.3, 0.5, 1)
+                luna.gfx.rectangle("fill", 25, py - 1, 600, 20)
+                luna.gfx.setColor(1, 1, 0.6, 1)
             else
-                luna.render.setColor(0.7, 0.7, 0.8, 1)
+                luna.gfx.setColor(0.7, 0.7, 0.8, 1)
             end
-            luna.render.print(string.format("%-18s SPD:%d PWR:%d STA:%d SKL:%d  Cost:%d", p.name, p.speed, p.power, p.stamina, p.skill, p.value), 30, py, 0.65)
+            luna.gfx.print(string.format("%-18s SPD:%d PWR:%d STA:%d SKL:%d  Cost:%d", p.name, p.speed, p.power, p.stamina, p.skill, p.value), 30, py, 0.65)
         end
-        luna.render.setColor(0.5, 0.5, 0.5, 1)
-        luna.render.print("Enter=buy  S=sell last player  Esc=back", 30, 400, 0.7)
+        luna.gfx.setColor(0.5, 0.5, 0.5, 1)
+        luna.gfx.print("Enter=buy  S=sell last player  Esc=back", 30, 400, 0.7)
 
     elseif state == "match_log" then
-        luna.render.setColor(1, 0.9, 0.5, 1)
-        luna.render.print("Match Result: " .. match_result, 30, Y, 1.2)
+        luna.gfx.setColor(1, 0.9, 0.5, 1)
+        luna.gfx.print("Match Result: " .. match_result, 30, Y, 1.2)
         local max_lines = 20
         for i = 1, max_lines do
             local idx = i + scroll
             if idx <= #match_log then
-                luna.render.setColor(0.8, 0.85, 0.9, 1)
-                luna.render.print(match_log[idx], 30, Y + 25 + (i - 1) * 18, 0.65)
+                luna.gfx.setColor(0.8, 0.85, 0.9, 1)
+                luna.gfx.print(match_log[idx], 30, Y + 25 + (i - 1) * 18, 0.65)
             end
         end
-        luna.render.setColor(0.5, 0.5, 0.5, 1)
-        luna.render.print("Up/Down=scroll  Enter=continue", 30, 430, 0.7)
+        luna.gfx.setColor(0.5, 0.5, 0.5, 1)
+        luna.gfx.print("Up/Down=scroll  Enter=continue", 30, 430, 0.7)
 
     elseif state == "table" then
-        luna.render.setColor(1, 0.9, 0.5, 1)
-        luna.render.print("League Table", 30, Y, 1.2)
+        luna.gfx.setColor(1, 0.9, 0.5, 1)
+        luna.gfx.print("League Table", 30, Y, 1.2)
         -- Sort by points
         table.sort(league, function(a, b) return a.pts > b.pts end)
-        luna.render.setColor(0.6, 0.6, 0.6, 1)
-        luna.render.print("#   Team               W   D   L   GF  GA  PTS", 30, Y + 30, 0.7)
+        luna.gfx.setColor(0.6, 0.6, 0.6, 1)
+        luna.gfx.print("#   Team               W   D   L   GF  GA  PTS", 30, Y + 30, 0.7)
         for i, e in ipairs(league) do
             local ey = Y + 50 + (i - 1) * 22
-            if e.name == team_name then luna.render.setColor(0.4, 1, 0.5, 1)
-            else luna.render.setColor(0.8, 0.8, 0.8, 1) end
-            luna.render.print(string.format("%-3d %-18s %2d  %2d  %2d  %2d  %2d  %3d", i, e.name, e.w, e.d, e.l, e.gf, e.ga, e.pts), 30, ey, 0.65)
+            if e.name == team_name then luna.gfx.setColor(0.4, 1, 0.5, 1)
+            else luna.gfx.setColor(0.8, 0.8, 0.8, 1) end
+            luna.gfx.print(string.format("%-3d %-18s %2d  %2d  %2d  %2d  %2d  %3d", i, e.name, e.w, e.d, e.l, e.gf, e.ga, e.pts), 30, ey, 0.65)
         end
-        luna.render.setColor(0.5, 0.5, 0.5, 1)
-        luna.render.print("Enter=back", 30, 400, 0.7)
+        luna.gfx.setColor(0.5, 0.5, 0.5, 1)
+        luna.gfx.print("Enter=back", 30, 400, 0.7)
 
     elseif state == "season_end" then
         table.sort(league, function(a, b) return a.pts > b.pts end)
-        luna.render.setColor(1, 0.85, 0.3, 1)
-        luna.render.print("Season Complete!", 200, 100, 2)
+        luna.gfx.setColor(1, 0.85, 0.3, 1)
+        luna.gfx.print("Season Complete!", 200, 100, 2)
         local pos = 1
         for i, e in ipairs(league) do
             if e.name == team_name then pos = i; break end
         end
-        luna.render.setColor(0.9, 0.9, 0.9, 1)
-        luna.render.print(team_name .. " finished in position #" .. pos, 180, 200, 1.2)
-        luna.render.print("W:" .. league[1].w .. " D:" .. league[1].d .. " L:" .. league[1].l, 250, 240, 1)
-        luna.render.setColor(0.5, 1, 0.5, 1)
-        luna.render.print("Press ENTER", 300, 340, 1)
+        luna.gfx.setColor(0.9, 0.9, 0.9, 1)
+        luna.gfx.print(team_name .. " finished in position #" .. pos, 180, 200, 1.2)
+        luna.gfx.print("W:" .. league[1].w .. " D:" .. league[1].d .. " L:" .. league[1].l, 250, 240, 1)
+        luna.gfx.setColor(0.5, 1, 0.5, 1)
+        luna.gfx.print("Press ENTER", 300, 340, 1)
     end
 
-    luna.render.setColor(0.4, 0.4, 0.4, 1)
-    luna.render.print("FPS: " .. luna.time.getFPS(), 730, 5, 0.6)
+    luna.gfx.setColor(0.4, 0.4, 0.4, 1)
+    luna.gfx.print("FPS: " .. luna.time.getFPS(), 730, 5, 0.6)
 end

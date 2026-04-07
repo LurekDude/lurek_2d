@@ -1,11 +1,11 @@
-﻿-- Minimap Demo
+-- Minimap Demo
 -- Demonstrates luna.minimap: terrain, fog, objects, pings, markers, viewport
 
 local minimap
 local playerX, playerY = 50, 50
 local speed = 60
 
-function luna.load()
+function luna.init()
     -- Create a 100x100 grid minimap displayed at 200x200 pixels
     minimap = luna.minimap.newMinimap(100, 100, 200, 200)
 
@@ -89,7 +89,7 @@ function updateViewport()
     minimap:setViewportRect(playerX - 20, playerY - 15, 40, 30)
 end
 
-function luna.update(dt)
+function luna.process(dt)
     -- Move player with arrow keys
     local moved = false
     if luna.keyboard.isDown("left") then
@@ -148,42 +148,42 @@ function luna.keypressed(key)
     end
 end
 
-function luna.draw()
+function luna.render()
     -- Draw game world background
-    luna.render.setBackgroundColor(0.15, 0.15, 0.2)
-    luna.render.clear(0.15, 0.15, 0.2)
+    luna.gfx.setBackgroundColor(0.15, 0.15, 0.2)
+    luna.gfx.clear(0.15, 0.15, 0.2)
 
     -- Draw simple game world representation
-    luna.render.setColor(1, 1, 1)
-    luna.render.print("Game World", 10, 10)
-    luna.render.print(string.format("Player: %.0f, %.0f", playerX, playerY), 10, 30)
+    luna.gfx.setColor(1, 1, 1)
+    luna.gfx.print("Game World", 10, 10)
+    luna.gfx.print(string.format("Player: %.0f, %.0f", playerX, playerY), 10, 30)
 
     -- Draw player indicator in game world
     local wx = playerX * 5
     local wy = playerY * 4 + 60
-    luna.render.setColor(0, 1, 0)
-    luna.render.circle("fill", wx, wy, 6)
+    luna.gfx.setColor(0, 1, 0)
+    luna.gfx.circle("fill", wx, wy, 6)
 
     -- Draw minimap background (top-right corner)
     local mx, my = 580, 10
-    luna.render.setColor(0.1, 0.1, 0.1, 0.8)
-    luna.render.rectangle("fill", mx - 2, my - 2, 204, 204)
+    luna.gfx.setColor(0.1, 0.1, 0.1, 0.8)
+    luna.gfx.rectangle("fill", mx - 2, my - 2, 204, 204)
 
     -- Draw minimap border
-    luna.render.setColor(0.5, 0.5, 0.5)
-    luna.render.rectangle("line", mx - 2, my - 2, 204, 204)
+    luna.gfx.setColor(0.5, 0.5, 0.5)
+    luna.gfx.rectangle("line", mx - 2, my - 2, 204, 204)
 
     -- Draw HUD text
-    luna.render.setColor(1, 1, 1, 0.8)
-    luna.render.print("Controls:", 10, 520)
-    luna.render.print("Arrows=Move  P=Ping  M=Mode  F=Fog  Z=Zoom", 10, 540)
-    luna.render.print(string.format("Mode: %s | Fog: %s | Zoom: %.1fx | Pings: %d",
+    luna.gfx.setColor(1, 1, 1, 0.8)
+    luna.gfx.print("Controls:", 10, 520)
+    luna.gfx.print("Arrows=Move  P=Ping  M=Mode  F=Fog  Z=Zoom", 10, 540)
+    luna.gfx.print(string.format("Mode: %s | Fog: %s | Zoom: %.1fx | Pings: %d",
         minimap:getColorMode(),
         minimap:isFogEnabled() and "ON" or "OFF",
         minimap:getZoom(),
         minimap:getPingCount()),
         10, 560)
-    luna.render.print(string.format("Objects: %d | Markers: %d",
+    luna.gfx.print(string.format("Objects: %d | Markers: %d",
         minimap:getObjectCount(),
         minimap:getMarkerCount()),
         10, 580)

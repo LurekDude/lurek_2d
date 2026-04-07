@@ -1,4 +1,4 @@
-﻿---
+---
 description: "Write or update API reference documentation for luna.* functions. Use when new Lua bindings are added or existing ones change. Produces updated docs/API/lua_api_reference_generated.md."
 ---
 
@@ -10,7 +10,7 @@ description: "Write or update API reference documentation for luna.* functions. 
 
 ## Inputs
 
-- `FUNCTIONS` — list of `luna.*` functions to document (e.g., `luna.render.setColor`, `luna.audio.setLooping`)
+- `FUNCTIONS` — list of `luna.*` functions to document (e.g., `luna.gfx.setColor`, `luna.audio.setLooping`)
 - `SOURCE_FILES` — corresponding Rust source files in `src/lua_api/` to read for accurate signatures
 
 ## Steps
@@ -22,7 +22,7 @@ description: "Write or update API reference documentation for luna.* functions. 
    c. Identify return value (what Lua receives back)
    d. Note any optional parameters (those with defaults or guarded by `if` in the closure)
 3. Open `docs/API/lua_api_reference_generated.md`
-4. Find the correct sub-section (e.g., `## luna.render`)
+4. Find the correct sub-section (e.g., `## luna.gfx`)
 5. Write the entry following this format:
    ```
    ### luna.<module>.<function>([params])

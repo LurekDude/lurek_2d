@@ -1,4 +1,4 @@
-﻿-- Physics Sandbox: Spawn, drag, and connect 2D physics objects
+-- Physics Sandbox: Spawn, drag, and connect 2D physics objects
 -- C=circle R=rect, right-click=delete, drag=move, G=gravity,
 -- Space=pause, Delete=clear, J+click two=joint, B=bounce, +/-=size
 
@@ -59,7 +59,7 @@ local function remove_object(idx)
     table.remove(objects, idx)
 end
 
-function luna.load()
+function luna.init()
     world = luna.physics.newWorld(0, 400)
 
     -- Ground
@@ -73,7 +73,7 @@ function luna.load()
     world:addFixture(right:getId(), "rectangle", 1, 0.3, 0, false, 10, SCREEN_H)
 end
 
-function luna.update(dt)
+function luna.process(dt)
     if not paused then
         -- Wind
         if wind_on then
@@ -158,58 +158,58 @@ function luna.keypressed(key)
     if key == "escape" then luna.signal.quit() end
 end
 
-function luna.draw()
-    luna.render.setBackgroundColor(0.1, 0.1, 0.12)
+function luna.render()
+    luna.gfx.setBackgroundColor(0.1, 0.1, 0.12)
 
     -- Ground
-    luna.render.setColor(0.3, 0.3, 0.3, 1)
-    luna.render.rectangle("fill", 0, SCREEN_H - 20, SCREEN_W, 20)
+    luna.gfx.setColor(0.3, 0.3, 0.3, 1)
+    luna.gfx.rectangle("fill", 0, SCREEN_H - 20, SCREEN_W, 20)
 
     -- Joints
-    luna.render.setLineWidth(2)
+    luna.gfx.setLineWidth(2)
     for _, j in ipairs(joints) do
         local ax, ay = j.a.body:getPosition()
         local bx, by = j.b.body:getPosition()
-        luna.render.setColor(0.6, 0.9, 0.3, 0.7)
-        luna.render.line(ax, ay, bx, by)
+        luna.gfx.setColor(0.6, 0.9, 0.3, 0.7)
+        luna.gfx.line(ax, ay, bx, by)
     end
-    luna.render.setLineWidth(1)
+    luna.gfx.setLineWidth(1)
 
     -- Objects
     for _, o in ipairs(objects) do
         local ox, oy = o.body:getPosition()
 
         local cr, cg, cb = o.color[1], o.color[2], o.color[3]
-        luna.render.setColor(cr, cg, cb, 1)
+        luna.gfx.setColor(cr, cg, cb, 1)
 
         if o.kind == "circle" then
-            luna.render.circle("fill", ox, oy, o.size)
-            luna.render.setColor(cr * 0.6, cg * 0.6, cb * 0.6, 1)
-            luna.render.circle("line", ox, oy, o.size)
+            luna.gfx.circle("fill", ox, oy, o.size)
+            luna.gfx.setColor(cr * 0.6, cg * 0.6, cb * 0.6, 1)
+            luna.gfx.circle("line", ox, oy, o.size)
         else
-            luna.render.rectangle("fill", ox - o.size, oy - o.size, o.size * 2, o.size * 2)
-            luna.render.setColor(cr * 0.6, cg * 0.6, cb * 0.6, 1)
-            luna.render.rectangle("line", ox - o.size, oy - o.size, o.size * 2, o.size * 2)
+            luna.gfx.rectangle("fill", ox - o.size, oy - o.size, o.size * 2, o.size * 2)
+            luna.gfx.setColor(cr * 0.6, cg * 0.6, cb * 0.6, 1)
+            luna.gfx.rectangle("line", ox - o.size, oy - o.size, o.size * 2, o.size * 2)
         end
     end
 
     -- Joint mode indicator
     if joint_mode then
-        luna.render.setColor(0.3, 1, 0.3, 0.5)
+        luna.gfx.setColor(0.3, 1, 0.3, 0.5)
         if joint_first then
             local ax, ay = joint_first.body:getPosition()
             local mx, my = luna.mouse.getPosition()
-            luna.render.line(ax, ay, mx, my)
+            luna.gfx.line(ax, ay, mx, my)
         end
     end
 
     -- HUD
-    luna.render.setColor(1, 1, 1, 1)
-    luna.render.print("Objects: " .. #objects .. "  FPS: " .. luna.time.getFPS(), 10, 10)
+    luna.gfx.setColor(1, 1, 1, 1)
+    luna.gfx.print("Objects: " .. #objects .. "  FPS: " .. luna.time.getFPS(), 10, 10)
 
     -- Mode display
     local mode_text = "Mode: " .. spawn_mode:upper() .. "  Size: " .. spawn_size .. "  Bounce: " .. (math.floor(bounciness * 100)) .. "%"
-    luna.render.print(mode_text, 10, 30)
+    luna.gfx.print(mode_text, 10, 30)
 
     -- Status flags
     local flags = {}
@@ -217,10 +217,10 @@ function luna.draw()
     if wind_on then flags[#flags + 1] = "WIND" end
     if paused then flags[#flags + 1] = "PAUSED" end
     if joint_mode then flags[#flags + 1] = "JOINT" end
-    luna.render.setColor(0.8, 0.8, 0.3, 1)
-    luna.render.print(table.concat(flags, " | "), 10, 50)
+    luna.gfx.setColor(0.8, 0.8, 0.3, 1)
+    luna.gfx.print(table.concat(flags, " | "), 10, 50)
 
     -- Controls
-    luna.render.setColor(0.5, 0.5, 0.5, 1)
-    luna.render.print("C/R:shape G:gravity W:wind Space:pause Del:clear J:joint B:bounce +/-:size", 10, SCREEN_H - 24)
+    luna.gfx.setColor(0.5, 0.5, 0.5, 1)
+    luna.gfx.print("C/R:shape G:gravity W:wind Space:pause Del:clear J:joint B:bounce +/-:size", 10, SCREEN_H - 24)
 end

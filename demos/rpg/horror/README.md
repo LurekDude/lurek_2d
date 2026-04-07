@@ -1,4 +1,4 @@
-﻿# Horror
+# Horror
 
 An atmospheric psychological horror game set in a hand-crafted tile maze. You carry a flashlight with a finite battery that drains in the dark, and your sanity erodes whenever the light is off. Collect five keys scattered through the maze to unlock the exit while evading a patrolling enemy that chases you on line-of-sight.
 
@@ -6,11 +6,11 @@ An atmospheric psychological horror game set in a hand-crafted tile maze. You ca
 
 - `luna.keyboard.isDown()` — WASD and arrow-key movement with wall-slide collision
 - `luna.mouse.getPosition()` — flashlight cone direction follows the cursor in world space
-- `luna.render.rectangle()` — tile map, sanity bar, battery bar, and key HUD
-- `luna.render.setColor()` — darkness overlay tinted by sanity level; distortion tint when sanity is low
-- `luna.render.polygon()` — flashlight cone rendered as a triangle fan in world space
-- `luna.render.print()` — key counter, note text pop-ups, win/lose overlays
-- `luna.render.setBackgroundColor()` — full black to simulate total darkness
+- `luna.gfx.rectangle()` — tile map, sanity bar, battery bar, and key HUD
+- `luna.gfx.setColor()` — darkness overlay tinted by sanity level; distortion tint when sanity is low
+- `luna.gfx.polygon()` — flashlight cone rendered as a triangle fan in world space
+- `luna.gfx.print()` — key counter, note text pop-ups, win/lose overlays
+- `luna.gfx.setBackgroundColor()` — full black to simulate total darkness
 - Tile-based collision — `isWall()` maps world coordinates to LEVEL grid characters for per-axis resolution
 
 ## How to Run

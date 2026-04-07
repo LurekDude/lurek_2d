@@ -1,4 +1,4 @@
-﻿-- Farming / Life Simulation Demo
+-- Farming / Life Simulation Demo
 -- Top-down farming with crops, seasons, day/night cycle, and economy
 -- Controls: WASD to move, Click soil to plant/harvest, N to advance day
 -- Number keys 1-3 to select crop, B to buy seeds, S to sell harvest
@@ -83,13 +83,13 @@ local function advanceDay()
     end
 end
 
-function luna.load()
+function luna.init()
     luna.window.setTitle("Farming Simulator")
-    luna.render.setBackgroundColor(0.2, 0.45, 0.15)
+    luna.gfx.setBackgroundColor(0.2, 0.45, 0.15)
     initTiles()
 end
 
-function luna.update(dt)
+function luna.process(dt)
     -- Farmer movement
     local fx, fy = 0, 0
     if luna.keyboard.isDown("w") or luna.keyboard.isDown("up") then fy = -1 end
@@ -105,103 +105,103 @@ function luna.update(dt)
     end
 end
 
-function luna.draw()
+function luna.render()
     local dnf = getDayNightFactor()
     local sr, sg, sb = getSeasonColor()
     -- Update background for day/night
-    luna.render.setBackgroundColor(sr * dnf * 0.5, sg * dnf * 0.5, sb * dnf * 0.5)
+    luna.gfx.setBackgroundColor(sr * dnf * 0.5, sg * dnf * 0.5, sb * dnf * 0.5)
     -- Draw ground
     for y = 1, MAP_H do
         for x = 1, MAP_W do
             local t = tiles[y][x]
             local px, py = (x - 1) * TILE, (y - 1) * TILE
             if t.soil then
-                luna.render.setColor(0.35 * dnf, 0.22 * dnf, 0.1 * dnf)
-                luna.render.rectangle("fill", px, py, TILE - 1, TILE - 1)
+                luna.gfx.setColor(0.35 * dnf, 0.22 * dnf, 0.1 * dnf)
+                luna.gfx.rectangle("fill", px, py, TILE - 1, TILE - 1)
                 -- Crops
                 if t.crop then
                     local c = crops[t.crop.type]
                     if t.crop.grown then
-                        luna.render.setColor(c.color[1] * dnf, c.color[2] * dnf, c.color[3] * dnf)
-                        luna.render.circle("fill", px + TILE / 2, py + TILE / 2, 10)
-                        luna.render.setColor(0, 0.4 * dnf, 0)
-                        luna.render.rectangle("fill", px + TILE / 2 - 1, py + 4, 2, TILE / 2 - 4)
+                        luna.gfx.setColor(c.color[1] * dnf, c.color[2] * dnf, c.color[3] * dnf)
+                        luna.gfx.circle("fill", px + TILE / 2, py + TILE / 2, 10)
+                        luna.gfx.setColor(0, 0.4 * dnf, 0)
+                        luna.gfx.rectangle("fill", px + TILE / 2 - 1, py + 4, 2, TILE / 2 - 4)
                     else
                         local progress = (day - t.crop.plantDay) / c.growTime
                         local sz = lerp(3, 10, clamp(progress, 0, 1))
-                        luna.render.setColor(0.2 * dnf, 0.6 * dnf, 0.15 * dnf)
-                        luna.render.circle("fill", px + TILE / 2, py + TILE / 2, sz)
-                        luna.render.setColor(0.3 * dnf, 0.4 * dnf, 0.1 * dnf)
-                        luna.render.rectangle("fill", px + TILE / 2 - 1, py + TILE / 2, 2, TILE / 2 - 2)
+                        luna.gfx.setColor(0.2 * dnf, 0.6 * dnf, 0.15 * dnf)
+                        luna.gfx.circle("fill", px + TILE / 2, py + TILE / 2, sz)
+                        luna.gfx.setColor(0.3 * dnf, 0.4 * dnf, 0.1 * dnf)
+                        luna.gfx.rectangle("fill", px + TILE / 2 - 1, py + TILE / 2, 2, TILE / 2 - 2)
                     end
                 end
             else
-                luna.render.setColor(sr * dnf, sg * dnf, sb * dnf)
-                luna.render.rectangle("fill", px, py, TILE - 1, TILE - 1)
+                luna.gfx.setColor(sr * dnf, sg * dnf, sb * dnf)
+                luna.gfx.rectangle("fill", px, py, TILE - 1, TILE - 1)
             end
         end
     end
     -- Farm border
-    luna.render.setColor(0.6 * dnf, 0.4 * dnf, 0.2 * dnf)
-    luna.render.rectangle("line", (FARM_X - 1) * TILE - 2, (FARM_Y - 1) * TILE - 2, FARM_W * TILE + 4, FARM_H * TILE + 4)
+    luna.gfx.setColor(0.6 * dnf, 0.4 * dnf, 0.2 * dnf)
+    luna.gfx.rectangle("line", (FARM_X - 1) * TILE - 2, (FARM_Y - 1) * TILE - 2, FARM_W * TILE + 4, FARM_H * TILE + 4)
     -- Farmer
-    luna.render.setColor(0.2 * dnf, 0.5 * dnf, 0.9 * dnf)
+    luna.gfx.setColor(0.2 * dnf, 0.5 * dnf, 0.9 * dnf)
     local fpx = (farmer.x - 1) * TILE
     local fpy = (farmer.y - 1) * TILE
-    luna.render.rectangle("fill", fpx + 4, fpy + 4, TILE - 8, TILE - 8)
+    luna.gfx.rectangle("fill", fpx + 4, fpy + 4, TILE - 8, TILE - 8)
     -- Head
-    luna.render.setColor(0.9 * dnf, 0.75 * dnf, 0.55 * dnf)
-    luna.render.circle("fill", fpx + TILE / 2, fpy + 6, 6)
+    luna.gfx.setColor(0.9 * dnf, 0.75 * dnf, 0.55 * dnf)
+    luna.gfx.circle("fill", fpx + TILE / 2, fpy + 6, 6)
     -- Hat
-    luna.render.setColor(0.6 * dnf, 0.3 * dnf, 0.1 * dnf)
-    luna.render.rectangle("fill", fpx + 6, fpy, TILE - 12, 5)
+    luna.gfx.setColor(0.6 * dnf, 0.3 * dnf, 0.1 * dnf)
+    luna.gfx.rectangle("fill", fpx + 6, fpy, TILE - 12, 5)
     -- HUD Panel
-    luna.render.setColor(0, 0, 0, 0.75)
-    luna.render.rectangle("fill", 0, MAP_H * TILE, 800, 600 - MAP_H * TILE)
+    luna.gfx.setColor(0, 0, 0, 0.75)
+    luna.gfx.rectangle("fill", 0, MAP_H * TILE, 800, 600 - MAP_H * TILE)
     -- Day/Season info
-    luna.render.setColor(1, 1, 0.8)
-    luna.render.print("Day " .. day .. " | " .. seasonNames[season] .. " (Day " .. (((day - 1) % seasonLen) + 1) .. "/" .. seasonLen .. ")", 10, MAP_H * TILE + 6)
-    luna.render.print("Money: $" .. money, 10, MAP_H * TILE + 24)
+    luna.gfx.setColor(1, 1, 0.8)
+    luna.gfx.print("Day " .. day .. " | " .. seasonNames[season] .. " (Day " .. (((day - 1) % seasonLen) + 1) .. "/" .. seasonLen .. ")", 10, MAP_H * TILE + 6)
+    luna.gfx.print("Money: $" .. money, 10, MAP_H * TILE + 24)
     -- Time bar
     local tbx, tby = 350, MAP_H * TILE + 6
-    luna.render.setColor(0.2, 0.2, 0.3); luna.render.rectangle("fill", tbx, tby, 120, 12)
-    luna.render.setColor(1, 0.8, 0.2); luna.render.rectangle("fill", tbx, tby, 120 * (dayTimer / dayDuration), 12)
-    luna.render.setColor(1, 1, 1); luna.render.print(autoTime and "Auto" or "Manual (N)", tbx + 130, tby)
+    luna.gfx.setColor(0.2, 0.2, 0.3); luna.gfx.rectangle("fill", tbx, tby, 120, 12)
+    luna.gfx.setColor(1, 0.8, 0.2); luna.gfx.rectangle("fill", tbx, tby, 120 * (dayTimer / dayDuration), 12)
+    luna.gfx.setColor(1, 1, 1); luna.gfx.print(autoTime and "Auto" or "Manual (N)", tbx + 130, tby)
     -- Inventory
-    luna.render.setColor(1, 1, 1)
-    luna.render.print("Seeds:", 10, MAP_H * TILE + 44)
+    luna.gfx.setColor(1, 1, 1)
+    luna.gfx.print("Seeds:", 10, MAP_H * TILE + 44)
     for i, c in ipairs(crops) do
         local sel = (i == selectedCrop)
-        if sel then luna.render.setColor(1, 1, 0.3) else luna.render.setColor(0.7, 0.7, 0.7) end
-        luna.render.print("[" .. i .. "] " .. c.name .. ": " .. inventory.seeds[i], 10 + (i - 1) * 160, MAP_H * TILE + 60)
+        if sel then luna.gfx.setColor(1, 1, 0.3) else luna.gfx.setColor(0.7, 0.7, 0.7) end
+        luna.gfx.print("[" .. i .. "] " .. c.name .. ": " .. inventory.seeds[i], 10 + (i - 1) * 160, MAP_H * TILE + 60)
     end
-    luna.render.setColor(1, 1, 1)
-    luna.render.print("Harvest:", 10, MAP_H * TILE + 78)
+    luna.gfx.setColor(1, 1, 1)
+    luna.gfx.print("Harvest:", 10, MAP_H * TILE + 78)
     for i, c in ipairs(crops) do
-        luna.render.setColor(c.color[1], c.color[2], c.color[3])
-        luna.render.print(c.name .. ": " .. inventory.harvest[i], 80 + (i - 1) * 160, MAP_H * TILE + 78)
+        luna.gfx.setColor(c.color[1], c.color[2], c.color[3])
+        luna.gfx.print(c.name .. ": " .. inventory.harvest[i], 80 + (i - 1) * 160, MAP_H * TILE + 78)
     end
     -- Controls hint
-    luna.render.setColor(0.5, 0.5, 0.6)
-    luna.render.print("B=Buy seeds  S=Sell harvest  T=Toggle auto-time  1/2/3=Select crop  Click=Plant/Harvest", 10, MAP_H * TILE + 98)
+    luna.gfx.setColor(0.5, 0.5, 0.6)
+    luna.gfx.print("B=Buy seeds  S=Sell harvest  T=Toggle auto-time  1/2/3=Select crop  Click=Plant/Harvest", 10, MAP_H * TILE + 98)
     -- Shop overlay
     if shopOpen then
-        luna.render.setColor(0, 0, 0, 0.85); luna.render.rectangle("fill", 200, 150, 400, 250)
-        luna.render.setColor(0.8, 0.7, 0.3); luna.render.print("SEED SHOP", 340, 160, 1.3)
-        luna.render.setColor(1, 1, 1); luna.render.print("Money: $" .. money, 340, 185)
+        luna.gfx.setColor(0, 0, 0, 0.85); luna.gfx.rectangle("fill", 200, 150, 400, 250)
+        luna.gfx.setColor(0.8, 0.7, 0.3); luna.gfx.print("SEED SHOP", 340, 160, 1.3)
+        luna.gfx.setColor(1, 1, 1); luna.gfx.print("Money: $" .. money, 340, 185)
         for i, c in ipairs(crops) do
             local by = 210 + (i - 1) * 55
-            luna.render.setColor(0.15, 0.15, 0.2); luna.render.rectangle("fill", 220, by, 360, 45)
-            luna.render.setColor(c.color[1], c.color[2], c.color[3])
-            luna.render.print(c.name .. " Seeds", 235, by + 5, 1.1)
-            luna.render.setColor(0.7, 0.7, 0.7)
-            luna.render.print("Cost: $" .. c.seedCost .. "/seed  |  Grow: " .. c.growTime .. " days  |  Sells: $" .. c.sellPrice, 235, by + 24)
-            luna.render.setColor(0.3, 0.8, 0.3)
-            luna.render.print("[" .. i .. "] Buy", 520, by + 10)
+            luna.gfx.setColor(0.15, 0.15, 0.2); luna.gfx.rectangle("fill", 220, by, 360, 45)
+            luna.gfx.setColor(c.color[1], c.color[2], c.color[3])
+            luna.gfx.print(c.name .. " Seeds", 235, by + 5, 1.1)
+            luna.gfx.setColor(0.7, 0.7, 0.7)
+            luna.gfx.print("Cost: $" .. c.seedCost .. "/seed  |  Grow: " .. c.growTime .. " days  |  Sells: $" .. c.sellPrice, 235, by + 24)
+            luna.gfx.setColor(0.3, 0.8, 0.3)
+            luna.gfx.print("[" .. i .. "] Buy", 520, by + 10)
         end
-        luna.render.setColor(0.6, 0.6, 0.6); luna.render.print("Press B to close shop", 320, 380)
+        luna.gfx.setColor(0.6, 0.6, 0.6); luna.gfx.print("Press B to close shop", 320, 380)
     end
-    luna.render.setColor(0.5, 0.5, 0.5); luna.render.print("FPS: " .. luna.time.getFPS(), 730, 580)
+    luna.gfx.setColor(0.5, 0.5, 0.5); luna.gfx.print("FPS: " .. luna.time.getFPS(), 730, 580)
 end
 
 function luna.mousepressed(mx, my, button)

@@ -1,14 +1,14 @@
-﻿# Tetris
+# Tetris
 
 The classic falling-block puzzle game. Rotate and place tetrominoes to
 clear horizontal lines and rack up points.
 
 ## What It Demonstrates
 
-- `luna.render.rectangle()` — board grid, tetromino cells, ghost preview
+- `luna.gfx.rectangle()` — board grid, tetromino cells, ghost preview
 - `luna.keypressed()` — rotation with wall-kick, hard drop
 - `luna.input.isKeyDown()` — soft drop for continuous downward pressure
-- `luna.render.print()` — score, level, and lines counter sidebar
+- `luna.gfx.print()` — score, level, and lines counter sidebar
 
 ## Controls
 

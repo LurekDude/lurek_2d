@@ -1,4 +1,4 @@
-﻿# Scene Management
+# Scene Management
 
 Scene table pattern, transitions, scene stacking, preloading, and cleanup for multi-screen games.
 
@@ -15,7 +15,7 @@ Scene table pattern, transitions, scene stacking, preloading, and cleanup for mu
 ```lua
 local title_scene = {}
 function title_scene.load()
-    title_scene.bg = luna.render.newImage("title_bg.png")
+    title_scene.bg = luna.gfx.newImage("title_bg.png")
 end
 function title_scene.update(dt)
     if luna.keyboard.isDown("return") then
@@ -23,8 +23,8 @@ function title_scene.update(dt)
     end
 end
 function title_scene.draw()
-    luna.render.draw(title_scene.bg, 0, 0)
-    luna.render.print("Press ENTER", 300, 400)
+    luna.gfx.draw(title_scene.bg, 0, 0)
+    luna.gfx.print("Press ENTER", 300, 400)
 end
 function title_scene.unload()
     title_scene.bg = nil
@@ -92,16 +92,16 @@ end
 
 local function draw_transition()
     if not transition.active then return end
-    luna.render.setColor(0, 0, 0, transition.alpha)
-    luna.render.rectangle("fill", 0, 0, 800, 600)
-    luna.render.setColor(1, 1, 1, 1)
+    luna.gfx.setColor(0, 0, 0, transition.alpha)
+    luna.gfx.rectangle("fill", 0, 0, 800, 600)
+    luna.gfx.setColor(1, 1, 1, 1)
 end
 ```
 
 ## Engine Hooks
 
 ```lua
-function luna.update(dt)
+function luna.process(dt)
     update_transition(dt)
     if not transition.active then
         local s = current_scene()
@@ -109,7 +109,7 @@ function luna.update(dt)
     end
 end
 
-function luna.draw()
+function luna.render()
     local s = current_scene()
     if s and s.draw then s.draw() end
     draw_transition()

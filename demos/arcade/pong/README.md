@@ -1,13 +1,13 @@
-﻿# Pong
+# Pong
 
 Classic two-player paddle game — the one that started the video game industry.
 First player to reach 7 points wins.
 
 ## What It Demonstrates
 
-- `luna.render.rectangle()` — drawing paddles, ball, and score dividers
+- `luna.gfx.rectangle()` — drawing paddles, ball, and score dividers
 - `luna.input.isKeyDown()` — real-time two-player simultaneous input
-- `luna.render.print()` — scoreboard display
+- `luna.gfx.print()` — scoreboard display
 - `luna.signal.quit()` — clean exit
 
 ## Controls

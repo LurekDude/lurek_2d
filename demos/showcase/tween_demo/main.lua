@@ -1,4 +1,4 @@
-﻿-- examples/tween_demo/main.lua
+-- examples/tween_demo/main.lua
 -- Demonstrates luna.math.newTween() with multiple easing curves.
 -- Press R to reset all tweens. Press SPACE to pause/resume.
 
@@ -21,7 +21,7 @@ local duration = 3.0
 local start_x  = 150
 local end_x    = 700
 
-function luna.load()
+function luna.init()
     reset_tweens()
 end
 
@@ -34,17 +34,17 @@ function reset_tweens()
     end
 end
 
-function luna.update(dt)
+function luna.process(dt)
     if paused then return end
     for _, entry in ipairs(tweens) do
         entry.tween:update(dt)
     end
 end
 
-function luna.draw()
-    luna.render.setColor(1, 1, 1, 1)
-    luna.render.print("Tween Demo — Easing Curves", 20, 15)
-    luna.render.print("R = reset   SPACE = " .. (paused and "resume" or "pause"), 20, 38)
+function luna.render()
+    luna.gfx.setColor(1, 1, 1, 1)
+    luna.gfx.print("Tween Demo — Easing Curves", 20, 15)
+    luna.gfx.print("R = reset   SPACE = " .. (paused and "resume" or "pause"), 20, 38)
 
     local y = 80
     local row_h = 48
@@ -54,21 +54,21 @@ function luna.draw()
         local x = entry.tween:getValue(1)
 
         -- Label
-        luna.render.setColor(0.7, 0.7, 0.7, 1)
-        luna.render.print(entry.easing, 10, y + 2)
+        luna.gfx.setColor(0.7, 0.7, 0.7, 1)
+        luna.gfx.print(entry.easing, 10, y + 2)
 
         -- Track line
-        luna.render.setColor(0.3, 0.3, 0.3, 1)
-        luna.render.rectangle("fill", start_x, y + ball_r - 1, end_x - start_x, 2)
+        luna.gfx.setColor(0.3, 0.3, 0.3, 1)
+        luna.gfx.rectangle("fill", start_x, y + ball_r - 1, end_x - start_x, 2)
 
         -- Ball
         local complete = entry.tween:isComplete()
         if complete then
-            luna.render.setColor(0.2, 0.9, 0.2, 1)
+            luna.gfx.setColor(0.2, 0.9, 0.2, 1)
         else
-            luna.render.setColor(1, 0.5, 0.1, 1)
+            luna.gfx.setColor(1, 0.5, 0.1, 1)
         end
-        luna.render.circle("fill", x, y + ball_r, ball_r)
+        luna.gfx.circle("fill", x, y + ball_r, ball_r)
 
         y = y + row_h
     end

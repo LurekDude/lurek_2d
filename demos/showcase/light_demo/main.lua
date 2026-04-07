@@ -1,4 +1,4 @@
-﻿-- Luna2D Light Demo
+-- Luna2D Light Demo
 -- Demonstrates the 2D lighting system: point lights, shadow occluders,
 -- blend modes, falloff modes, and ambient control.
 --
@@ -80,12 +80,12 @@ local function create_scene()
     end
 end
 
-function luna.load()
+function luna.init()
     create_scene()
 end
 
 -- ── Update ─────────────────────────────────────────────────────────────────
-function luna.update(dt)
+function luna.process(dt)
     -- Player movement
     local speed = 250 * dt
     if luna.keyboard.isDown("w") then player_y = player_y - speed end
@@ -116,50 +116,50 @@ function luna.update(dt)
 end
 
 -- ── Draw ───────────────────────────────────────────────────────────────────
-function luna.draw()
+function luna.render()
     -- Dark background
-    luna.render.clear(0.02, 0.02, 0.03)
+    luna.gfx.clear(0.02, 0.02, 0.03)
 
     -- Draw walls as dark rectangles
-    luna.render.setColor(0.15, 0.12, 0.1)
+    luna.gfx.setColor(0.15, 0.12, 0.1)
     -- Pillar 1
-    luna.render.rectangle("fill", 250, 180, 30, 200)
+    luna.gfx.rectangle("fill", 250, 180, 30, 200)
     -- Pillar 2
-    luna.render.rectangle("fill", 620, 180, 30, 200)
+    luna.gfx.rectangle("fill", 620, 180, 30, 200)
     -- Horizontal wall
-    luna.render.rectangle("fill", 350, 250, 150, 20)
+    luna.gfx.rectangle("fill", 350, 250, 150, 20)
     -- L-shape
-    luna.render.rectangle("fill", 150, 300, 50, 20)
-    luna.render.rectangle("fill", 180, 320, 20, 100)
+    luna.gfx.rectangle("fill", 150, 300, 50, 20)
+    luna.gfx.rectangle("fill", 180, 320, 20, 100)
     -- Diamond obstacle
-    luna.render.polygon("fill", 700, 300, 730, 280, 760, 300, 730, 320)
+    luna.gfx.polygon("fill", 700, 300, 730, 280, 760, 300, 730, 320)
 
     -- Draw player marker
-    luna.render.setColor(1, 1, 1)
-    luna.render.circle("fill", player_x, player_y, 8)
+    luna.gfx.setColor(1, 1, 1)
+    luna.gfx.circle("fill", player_x, player_y, 8)
 
     -- Draw torch markers
-    luna.render.setColor(1, 0.6, 0.2)
+    luna.gfx.setColor(1, 0.6, 0.2)
     for _, t in ipairs(torch_lights) do
         if t.light:isValid() then
             local tx, ty = t.light:getPosition()
-            luna.render.circle("fill", tx, ty, 5)
+            luna.gfx.circle("fill", tx, ty, 5)
         end
     end
 
     -- HUD
-    luna.render.setColor(1, 1, 1)
+    luna.gfx.setColor(1, 1, 1)
     local blend = player_light and player_light:isValid() and player_light:getBlendMode() or "?"
     local falloff = player_light and player_light:isValid() and player_light:getFalloff() or "?"
     local shadows = player_light and player_light:isValid() and player_light:isShadowEnabled()
     local lights_count = luna.light.getLightCount()
     local occluder_count = luna.light.getOccluderCount()
 
-    luna.render.print("Luna2D Light Demo", 10, 10)
-    luna.render.print(string.format("Lights: %d  Occluders: %d", lights_count, occluder_count), 10, 30)
-    luna.render.print(string.format("Blend: %s  Falloff: %s  Shadows: %s", blend, falloff, tostring(shadows)), 10, 50)
-    luna.render.print(string.format("Ambient: %.2f", ambient_level), 10, 70)
-    luna.render.print("WASD=move  1/2/3=blend  F/G/H=falloff  SPACE=shadows  +/-=ambient  T=torches  C=clear", 10, H - 25)
+    luna.gfx.print("Luna2D Light Demo", 10, 10)
+    luna.gfx.print(string.format("Lights: %d  Occluders: %d", lights_count, occluder_count), 10, 30)
+    luna.gfx.print(string.format("Blend: %s  Falloff: %s  Shadows: %s", blend, falloff, tostring(shadows)), 10, 50)
+    luna.gfx.print(string.format("Ambient: %.2f", ambient_level), 10, 70)
+    luna.gfx.print("WASD=move  1/2/3=blend  F/G/H=falloff  SPACE=shadows  +/-=ambient  T=torches  C=clear", 10, H - 25)
 end
 
 -- ── Key handling ───────────────────────────────────────────────────────────

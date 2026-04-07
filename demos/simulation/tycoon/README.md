@@ -1,4 +1,4 @@
-﻿# Restaurant Tycoon
+# Restaurant Tycoon
 
 A grid-based restaurant management simulation. Place counters, tables, and kitchens on a 15 × 12 tile grid; hire cooks and waiters; and serve customers as they arrive, order, and pay. Track daily satisfaction to grow your revenue.
 
@@ -10,7 +10,7 @@ A grid-based restaurant management simulation. Place counters, tables, and kitch
 - Satisfaction score that rises on fast service and drops on long waits
 - Day cycle timer (`DAY_LENGTH = 45 s`) ending the day and tallying revenue
 - Build mode toggle (`B`): separates placement input from the simulation update
-- `luna.render.drawRect` + `drawText` for the entire grid and HUD, no sprites needed
+- `luna.gfx.drawRect` + `drawText` for the entire grid and HUD, no sprites needed
 
 ## How to Run
 

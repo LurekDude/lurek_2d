@@ -1,4 +1,4 @@
-﻿# Genre → API Patterns
+# Genre → API Patterns
 
 Pre-mapped table of common game genres with recommended `luna.*` API namespaces,
 library modules, conf.lua resolution, and structural notes.
@@ -55,7 +55,7 @@ Use this to bootstrap `main.lua` and `conf.lua` choices for a given genre.
 - Turn-based: `luna.update` may be empty (logic fires in `luna.keypressed`)
 - Fog of war / FOV can be pure Lua arrays — no `luna.physics` needed
 - Resolution: 800×640 to fit message log at bottom (6–8 line history strip)
-- `luna.render.print()` with a small monospaced font for dungeon grid
+- `luna.gfx.print()` with a small monospaced font for dungeon grid
 
 ### Card Game / Deck Builder
 - State machine: `MENU → DRAW → PLAY → RESOLVE → END`
@@ -66,7 +66,7 @@ Use this to bootstrap `main.lua` and `conf.lua` choices for a given genre.
 ### Dialog / Visual Novel
 - Always use `library.dialog` — **do not reimplement** the sequencer
 - Dialog assets (portraits, backgrounds) go in `demos/<name>/assets/`
-- Text rendering uses `luna.render.print()` inside a letterbox at bottom 25% of screen
+- Text rendering uses `luna.gfx.print()` inside a letterbox at bottom 25% of screen
 - Keyboard `space`/`enter` advance; `up`/`down` select choice
 
 ### Horror / Stealth

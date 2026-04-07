@@ -1,5 +1,7 @@
-function luna.conf(t)
-    t.window.title = "Luna2D — Terminal Demo"
-    t.window.width = 800
-    t.window.height = 600
-end
+return {
+    window = {
+        title = "Luna2D — Terminal Demo",
+        width = 800,
+        height = 600,
+    },
+}

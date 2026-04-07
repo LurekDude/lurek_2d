@@ -1,4 +1,4 @@
-﻿# Dialogue System
+# Dialogue System
 
 Dialog node trees, portraits, typewriter text, conditional branches, choices, and shop integration.
 
@@ -119,25 +119,25 @@ local function draw_dialog()
     local sw, sh = 800, 600
     local bx, by, bw, bh = 20, sh - 140, sw - 40, 120
 
-    luna.render.setColor(0, 0, 0, 0.85)
-    luna.render.rectangle("fill", bx, by, bw, bh)
-    luna.render.setColor(1, 1, 1, 1)
-    luna.render.rectangle("line", bx, by, bw, bh)
+    luna.gfx.setColor(0, 0, 0, 0.85)
+    luna.gfx.rectangle("fill", bx, by, bw, bh)
+    luna.gfx.setColor(1, 1, 1, 1)
+    luna.gfx.rectangle("line", bx, by, bw, bh)
 
     -- Speaker name
     if node.speaker then
-        luna.render.print(node.speaker, bx + 10, by + 6)
+        luna.gfx.print(node.speaker, bx + 10, by + 6)
     end
 
     -- Typewriter text
     local visible = node.text:sub(1, dialog.char_index)
-    luna.render.print(visible, bx + 10, by + 26)
+    luna.gfx.print(visible, bx + 10, by + 26)
 
     -- Choices
     if node.choices and dialog.char_index >= #node.text then
         for i, c in ipairs(node.choices) do
             local prefix = (i == (dialog.choice_index or 1)) and "> " or "  "
-            luna.render.print(prefix .. c.text, bx + 20, by + 50 + (i - 1) * 18)
+            luna.gfx.print(prefix .. c.text, bx + 20, by + 50 + (i - 1) * 18)
         end
     end
 end

@@ -1,4 +1,4 @@
-﻿local Player = {}
+local Player = {}
 Player.__index = Player
 
 local SPEED = 120
@@ -37,9 +37,9 @@ function Player:update(dt)
 end
 
 function Player:draw()
-    luna.render.setColor(0.3, 0.6, 0.9, 1)
-    luna.render.rectangle("fill", self.x - self.width / 2, self.y - self.height / 2, self.width, self.height)
-    luna.render.setColor(1, 1, 1, 1)
+    luna.gfx.setColor(0.3, 0.6, 0.9, 1)
+    luna.gfx.rectangle("fill", self.x - self.width / 2, self.y - self.height / 2, self.width, self.height)
+    luna.gfx.setColor(1, 1, 1, 1)
 end
 
 return Player

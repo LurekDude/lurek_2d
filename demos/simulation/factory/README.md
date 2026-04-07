@@ -1,14 +1,14 @@
-﻿# Factory
+# Factory
 
 A grid-based factory automation demo in the style of Factorio. Place miners on ore patches to extract raw ore, route it along conveyor belts to smelters that smelt ingots, and feed those ingots into assemblers that produce finished products. Items move tile-by-tile at a configurable belt speed.
 
 ## What It Demonstrates
 
-- `luna.render.rectangle()` — grid cell backgrounds, building footprints, and item dots
-- `luna.render.polygon()` — directional arrows drawn on each machine to show output direction
-- `luna.render.line()` — grid line overlay over the entire play area
-- `luna.render.setColor()` — distinct colours per machine type and item type
-- `luna.render.print()` — product and ingot counters, placement HUD, and input queue display
+- `luna.gfx.rectangle()` — grid cell backgrounds, building footprints, and item dots
+- `luna.gfx.polygon()` — directional arrows drawn on each machine to show output direction
+- `luna.gfx.line()` — grid line overlay over the entire play area
+- `luna.gfx.setColor()` — distinct colours per machine type and item type
+- `luna.gfx.print()` — product and ingot counters, placement HUD, and input queue display
 - `luna.mouse.getPosition()` — grid cursor calculation from pixel coordinates
 - `luna.mouse.isPressed()` — left-click place, right-click delete
 - `luna.keyboard.isPressed()` — 1–4 to select machine, R to rotate output direction

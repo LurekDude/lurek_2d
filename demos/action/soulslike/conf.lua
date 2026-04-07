@@ -1,7 +1,11 @@
 -- conf.lua — engine configuration for the Soulslike demo
-function luna.conf(t)
-    t.window.title  = "Soulslike Combat"
-    t.window.width  = 800
-    t.window.height = 600
-    t.performance.target_fps = 60
-end
+return {
+    window = {
+        title = "Soulslike Combat",
+        width = 800,
+        height = 600,
+    },
+    performance = {
+        target_fps = 60,
+    },
+}

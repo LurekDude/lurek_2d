@@ -1,7 +1,11 @@
 -- conf.lua — engine configuration for modding_demo
-function luna.conf(t)
-    t.window.title  = "Modding Demo"
-    t.window.width  = 800
-    t.window.height = 600
-    t.performance.target_fps = 60
-end
+return {
+    window = {
+        title = "Modding Demo",
+        width = 800,
+        height = 600,
+    },
+    performance = {
+        target_fps = 60,
+    },
+}

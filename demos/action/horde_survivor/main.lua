@@ -1,4 +1,4 @@
-﻿-- Horde Survivor — Vampire Survivors style bullet heaven
+-- Horde Survivor — Vampire Survivors style bullet heaven
 -- WASD to move, auto-attack orbiting projectiles, collect XP, level up
 
 local player, enemies, projectiles, xp_gems, particles
@@ -70,9 +70,9 @@ local function apply_upgrade(u)
     upgrade_choices = nil
 end
 
-function luna.load()
+function luna.init()
     luna.window.setTitle("Horde Survivor")
-    luna.render.setBackgroundColor(0.08, 0.08, 0.12)
+    luna.gfx.setBackgroundColor(0.08, 0.08, 0.12)
     player = { x = ARENA.w / 2, y = ARENA.h / 2, r = 12, speed = 160, hp = 100, max_hp = 100,
                proj_count = 3, proj_dmg = 5, orbit_r = 50, orbit_speed = 3, proj_pierce = 1, angle = 0 }
     enemies = {}; projectiles = {}; xp_gems = {}; particles = {}
@@ -80,7 +80,7 @@ function luna.load()
     level = 1; xp = 0; xp_next = 10; paused = false; upgrade_choices = nil
 end
 
-function luna.update(dt)
+function luna.process(dt)
     if paused then return end
     game_time = game_time + dt
 
@@ -184,90 +184,90 @@ function luna.update(dt)
     if player.hp <= 0 then player.hp = 0; paused = true end
 end
 
-function luna.draw()
+function luna.render()
     local ox, oy = -cam.x, -cam.y
 
     -- arena border
-    luna.render.setColor(0.2, 0.2, 0.3, 1)
-    luna.render.rectangle("line", ARENA.x + ox, ARENA.y + oy, ARENA.w, ARENA.h)
+    luna.gfx.setColor(0.2, 0.2, 0.3, 1)
+    luna.gfx.rectangle("line", ARENA.x + ox, ARENA.y + oy, ARENA.w, ARENA.h)
 
     -- xp gems
-    luna.render.setColor(0.2, 1, 0.4, 1)
+    luna.gfx.setColor(0.2, 1, 0.4, 1)
     for _, g in ipairs(xp_gems) do
-        luna.render.rectangle("fill", g.x + ox - 3, g.y + oy - 3, 6, 6)
+        luna.gfx.rectangle("fill", g.x + ox - 3, g.y + oy - 3, 6, 6)
     end
 
     -- particles
     for _, p in ipairs(particles) do
         local a = clamp(p.life / 0.4, 0, 1)
-        luna.render.setColor(1, 0.6, 0.1, a)
-        luna.render.circle("fill", p.x + ox, p.y + oy, 3)
+        luna.gfx.setColor(1, 0.6, 0.1, a)
+        luna.gfx.circle("fill", p.x + ox, p.y + oy, 3)
     end
 
     -- enemies
     for _, e in ipairs(enemies) do
-        luna.render.setColor(0.9, 0.2, 0.2, 1)
-        luna.render.circle("fill", e.x + ox, e.y + oy, e.r)
+        luna.gfx.setColor(0.9, 0.2, 0.2, 1)
+        luna.gfx.circle("fill", e.x + ox, e.y + oy, e.r)
         -- hp bar
-        luna.render.setColor(0.2, 0.2, 0.2, 0.8)
-        luna.render.rectangle("fill", e.x + ox - 10, e.y + oy - e.r - 6, 20, 3)
-        luna.render.setColor(0, 1, 0, 0.8)
-        luna.render.rectangle("fill", e.x + ox - 10, e.y + oy - e.r - 6, 20 * (e.hp / e.max_hp), 3)
+        luna.gfx.setColor(0.2, 0.2, 0.2, 0.8)
+        luna.gfx.rectangle("fill", e.x + ox - 10, e.y + oy - e.r - 6, 20, 3)
+        luna.gfx.setColor(0, 1, 0, 0.8)
+        luna.gfx.rectangle("fill", e.x + ox - 10, e.y + oy - e.r - 6, 20 * (e.hp / e.max_hp), 3)
     end
 
     -- projectiles
-    luna.render.setColor(0.4, 0.8, 1, 1)
+    luna.gfx.setColor(0.4, 0.8, 1, 1)
     for _, p in ipairs(projectiles) do
-        luna.render.circle("fill", p.x + ox, p.y + oy, p.r)
+        luna.gfx.circle("fill", p.x + ox, p.y + oy, p.r)
     end
 
     -- player
-    luna.render.setColor(0.3, 0.9, 0.3, 1)
-    luna.render.circle("fill", player.x + ox, player.y + oy, player.r)
+    luna.gfx.setColor(0.3, 0.9, 0.3, 1)
+    luna.gfx.circle("fill", player.x + ox, player.y + oy, player.r)
 
     -- HUD
-    luna.render.setColor(0.2, 0.2, 0.2, 0.7)
-    luna.render.rectangle("fill", 0, 0, W, 36)
+    luna.gfx.setColor(0.2, 0.2, 0.2, 0.7)
+    luna.gfx.rectangle("fill", 0, 0, W, 36)
 
     -- HP bar
-    luna.render.setColor(0.3, 0.3, 0.3, 1)
-    luna.render.rectangle("fill", 10, 8, 150, 14)
-    luna.render.setColor(0.9, 0.2, 0.2, 1)
-    luna.render.rectangle("fill", 10, 8, 150 * (player.hp / player.max_hp), 14)
+    luna.gfx.setColor(0.3, 0.3, 0.3, 1)
+    luna.gfx.rectangle("fill", 10, 8, 150, 14)
+    luna.gfx.setColor(0.9, 0.2, 0.2, 1)
+    luna.gfx.rectangle("fill", 10, 8, 150 * (player.hp / player.max_hp), 14)
 
     -- XP bar
-    luna.render.setColor(0.3, 0.3, 0.3, 1)
-    luna.render.rectangle("fill", 170, 8, 100, 14)
-    luna.render.setColor(0.2, 0.8, 1, 1)
-    luna.render.rectangle("fill", 170, 8, 100 * (xp / xp_next), 14)
+    luna.gfx.setColor(0.3, 0.3, 0.3, 1)
+    luna.gfx.rectangle("fill", 170, 8, 100, 14)
+    luna.gfx.setColor(0.2, 0.8, 1, 1)
+    luna.gfx.rectangle("fill", 170, 8, 100 * (xp / xp_next), 14)
 
-    luna.render.setColor(1, 1, 1, 1)
-    luna.render.print("Lv " .. level, 280, 8)
-    luna.render.print("Kills: " .. kills, 340, 8)
-    luna.render.print(string.format("Time: %d:%02d", math.floor(game_time / 60), math.floor(game_time) % 60), 460, 8)
-    luna.render.print("FPS: " .. luna.time.getFPS(), 600, 8)
-    luna.render.print("Enemies: " .. #enemies, 680, 8)
+    luna.gfx.setColor(1, 1, 1, 1)
+    luna.gfx.print("Lv " .. level, 280, 8)
+    luna.gfx.print("Kills: " .. kills, 340, 8)
+    luna.gfx.print(string.format("Time: %d:%02d", math.floor(game_time / 60), math.floor(game_time) % 60), 460, 8)
+    luna.gfx.print("FPS: " .. luna.time.getFPS(), 600, 8)
+    luna.gfx.print("Enemies: " .. #enemies, 680, 8)
 
     -- upgrade menu
     if paused and upgrade_choices then
-        luna.render.setColor(0, 0, 0, 0.7)
-        luna.render.rectangle("fill", 0, 0, W, H)
-        luna.render.setColor(1, 1, 0.3, 1)
-        luna.render.print("LEVEL UP! Choose an upgrade:", 240, 180, 1.5)
+        luna.gfx.setColor(0, 0, 0, 0.7)
+        luna.gfx.rectangle("fill", 0, 0, W, H)
+        luna.gfx.setColor(1, 1, 0.3, 1)
+        luna.gfx.print("LEVEL UP! Choose an upgrade:", 240, 180, 1.5)
         for i, u in ipairs(upgrade_choices) do
-            luna.render.setColor(0.15, 0.15, 0.25, 0.9)
-            luna.render.rectangle("fill", 200, 220 + i * 60, 400, 45)
-            luna.render.setColor(1, 1, 1, 1)
-            luna.render.print("[" .. i .. "] " .. u.name, 220, 232 + i * 60, 1.2)
+            luna.gfx.setColor(0.15, 0.15, 0.25, 0.9)
+            luna.gfx.rectangle("fill", 200, 220 + i * 60, 400, 45)
+            luna.gfx.setColor(1, 1, 1, 1)
+            luna.gfx.print("[" .. i .. "] " .. u.name, 220, 232 + i * 60, 1.2)
         end
     elseif paused then
-        luna.render.setColor(0, 0, 0, 0.7)
-        luna.render.rectangle("fill", 0, 0, W, H)
-        luna.render.setColor(0.9, 0.15, 0.15, 1)
-        luna.render.print("YOU DIED", 280, 240, 3)
-        luna.render.setColor(1, 1, 1, 1)
-        luna.render.print("Kills: " .. kills .. "  Score: " .. score .. "  Time: " .. math.floor(game_time) .. "s", 220, 320, 1.2)
-        luna.render.print("Press R to restart", 300, 370)
+        luna.gfx.setColor(0, 0, 0, 0.7)
+        luna.gfx.rectangle("fill", 0, 0, W, H)
+        luna.gfx.setColor(0.9, 0.15, 0.15, 1)
+        luna.gfx.print("YOU DIED", 280, 240, 3)
+        luna.gfx.setColor(1, 1, 1, 1)
+        luna.gfx.print("Kills: " .. kills .. "  Score: " .. score .. "  Time: " .. math.floor(game_time) .. "s", 220, 320, 1.2)
+        luna.gfx.print("Press R to restart", 300, 370)
     end
 end
 

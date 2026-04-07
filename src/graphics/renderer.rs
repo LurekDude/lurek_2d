@@ -1,4 +1,4 @@
-﻿//! Draw command types, blend modes, and texture data for the Luna2D rendering pipeline.
+//! Draw command types, blend modes, and texture data for the Luna2D rendering pipeline.
 //!
 //! This module is part of Luna2D's `graphics` subsystem and provides the implementation
 //! details for renderer-related operations and data management.
@@ -13,7 +13,7 @@ use crate::engine::resource_keys::{
 use crate::graphics::image_effect::ShaderPassDescriptor;
 use crate::graphics::mesh::Mesh;
 
-/// Stencil comparison mode for `luna.render.setStencilTest`.
+/// Stencil comparison mode for `luna.gfx.setStencilTest`.
 ///
 /// # Variants
 /// - `Equal` — Equal variant.
@@ -44,7 +44,7 @@ pub enum CompareMode {
     Never,
 }
 
-/// Stencil write action for `luna.render.stencil` and `luna.render.setStencilMode`.
+/// Stencil write action for `luna.gfx.stencil` and `luna.gfx.setStencilMode`.
 ///
 /// # Variants
 /// - `Keep` — Keep variant.
@@ -106,7 +106,7 @@ impl Default for StencilMode {
     }
 }
 
-/// Depth test comparison mode for `luna.render.setDepthMode`.
+/// Depth test comparison mode for `luna.gfx.setDepthMode`.
 ///
 /// # Variants
 /// - `Always` — Always variant.
@@ -638,7 +638,7 @@ pub struct ParticleInstance {
     pub quad_tex_dims: Option<(f32, f32)>,
 }
 
-/// Type discriminator for resources that can be passed to luna.render.draw.
+/// Type discriminator for resources that can be passed to luna.gfx.draw.
 ///
 /// Used to dispatch the polymorphic draw(drawable, ...) Lua API to the
 /// correct DrawCommand variant based on resource type.

@@ -1,4 +1,4 @@
-﻿-- Shooting Gallery -- Luna2D demo game
+-- Shooting Gallery -- Luna2D demo game
 -- Physics shooter: aim with the mouse, click to fire balls at targets.
 -- Demonstrates: physics, raycast, collision events, shapes, input, text rendering.
 
@@ -46,13 +46,13 @@ local function init_world()
     end
 end
 
-function luna.load()
+function luna.init()
     luna.window.setTitle("Shooting Gallery -- Luna2D")
-    luna.render.setBackgroundColor(0.05, 0.05, 0.15)
+    luna.gfx.setBackgroundColor(0.05, 0.05, 0.15)
     init_world()
 end
 
-function luna.update(dt)
+function luna.process(dt)
     world_id:step(dt)
 
     -- Collision: ball (layer 1) hits target (layer 2)?
@@ -111,13 +111,13 @@ function luna.keypressed(key)
     end
 end
 
-function luna.draw()
+function luna.render()
     local mx, my = luna.mouse.getPosition()
 
     -- Walls (visual borders)
-    luna.render.setColor(0.15, 0.25, 0.45)
-    luna.render.rectangle("fill", 0, 0, W, 10)
-    luna.render.rectangle("fill", 0, H - 10, W, 10)
+    luna.gfx.setColor(0.15, 0.25, 0.45)
+    luna.gfx.rectangle("fill", 0, 0, W, 10)
+    luna.gfx.rectangle("fill", 0, H - 10, W, 10)
 
     -- Aim ray (raycast from cannon toward mouse)
     local dx = mx - CANNON_X
@@ -127,16 +127,16 @@ function luna.draw()
         local ux, uy = dx / dist, dy / dist
         local ex = CANNON_X + ux * 900
         local ey = CANNON_Y + uy * 900
-        luna.render.setLineWidth(1)
+        luna.gfx.setLineWidth(1)
         local hit = world_id:raycast(CANNON_X, CANNON_Y, ex, ey)
         if hit then
-            luna.render.setColor(1.0, 1.0, 0.2, 0.55)
-            luna.render.line(CANNON_X, CANNON_Y, hit.x, hit.y)
-            luna.render.setColor(1.0, 0.6, 0.0)
-            luna.render.circle("fill", hit.x, hit.y, 5)
+            luna.gfx.setColor(1.0, 1.0, 0.2, 0.55)
+            luna.gfx.line(CANNON_X, CANNON_Y, hit.x, hit.y)
+            luna.gfx.setColor(1.0, 0.6, 0.0)
+            luna.gfx.circle("fill", hit.x, hit.y, 5)
         else
-            luna.render.setColor(1.0, 1.0, 0.2, 0.2)
-            luna.render.line(CANNON_X, CANNON_Y, ex, ey)
+            luna.gfx.setColor(1.0, 1.0, 0.2, 0.2)
+            luna.gfx.line(CANNON_X, CANNON_Y, ex, ey)
         end
     end
 
@@ -144,51 +144,51 @@ function luna.draw()
     for _, t in ipairs(targets) do
         local tx, ty = t.id:getPosition()
         if t.alive then
-            luna.render.setColor(0.85, 0.18, 0.18)
-            luna.render.rectangle("fill", tx - 15, ty - 35, 30, 70)
-            luna.render.setColor(1.0, 0.5, 0.5)
-            luna.render.rectangle("line", tx - 15, ty - 35, 30, 70)
+            luna.gfx.setColor(0.85, 0.18, 0.18)
+            luna.gfx.rectangle("fill", tx - 15, ty - 35, 30, 70)
+            luna.gfx.setColor(1.0, 0.5, 0.5)
+            luna.gfx.rectangle("line", tx - 15, ty - 35, 30, 70)
         else
-            luna.render.setColor(0.22, 0.22, 0.22)
-            luna.render.rectangle("fill", tx - 15, ty - 35, 30, 70)
+            luna.gfx.setColor(0.22, 0.22, 0.22)
+            luna.gfx.rectangle("fill", tx - 15, ty - 35, 30, 70)
         end
     end
 
     -- Fired balls
     for _, bid in ipairs(balls) do
         local bx, by = bid:getPosition()
-        luna.render.setColor(0.3, 0.65, 1.0)
-        luna.render.circle("fill", bx, by, 12)
-        luna.render.setColor(0.65, 0.9, 1.0)
-        luna.render.circle("line", bx, by, 12)
+        luna.gfx.setColor(0.3, 0.65, 1.0)
+        luna.gfx.circle("fill", bx, by, 12)
+        luna.gfx.setColor(0.65, 0.9, 1.0)
+        luna.gfx.circle("line", bx, by, 12)
     end
 
     -- Cannon body
-    luna.render.setColor(0.55, 0.55, 0.65)
-    luna.render.rectangle("fill", CANNON_X - 22, CANNON_Y - 16, 44, 32)
-    luna.render.setColor(0.75, 0.75, 0.85)
-    luna.render.rectangle("line", CANNON_X - 22, CANNON_Y - 16, 44, 32)
+    luna.gfx.setColor(0.55, 0.55, 0.65)
+    luna.gfx.rectangle("fill", CANNON_X - 22, CANNON_Y - 16, 44, 32)
+    luna.gfx.setColor(0.75, 0.75, 0.85)
+    luna.gfx.rectangle("line", CANNON_X - 22, CANNON_Y - 16, 44, 32)
     -- Barrel pointing at mouse
     if dist > 1 then
-        luna.render.setLineWidth(5)
-        luna.render.setColor(0.45, 0.45, 0.55)
-        luna.render.line(CANNON_X, CANNON_Y,
+        luna.gfx.setLineWidth(5)
+        luna.gfx.setColor(0.45, 0.45, 0.55)
+        luna.gfx.line(CANNON_X, CANNON_Y,
             CANNON_X + (dx / dist) * 32,
             CANNON_Y + (dy / dist) * 32)
-        luna.render.setLineWidth(1)
+        luna.gfx.setLineWidth(1)
     end
 
     -- Mouse crosshair
-    luna.render.setColor(1.0, 1.0, 1.0, 0.7)
-    luna.render.line(mx - 12, my, mx + 12, my)
-    luna.render.line(mx, my - 12, mx, my + 12)
+    luna.gfx.setColor(1.0, 1.0, 1.0, 0.7)
+    luna.gfx.line(mx - 12, my, mx + 12, my)
+    luna.gfx.line(mx, my - 12, mx, my + 12)
 
     -- HUD
-    luna.render.setColor(1.0, 1.0, 1.0)
-    luna.render.print("Score: " .. score .. " / 5", 10, 18, 2)
+    luna.gfx.setColor(1.0, 1.0, 1.0)
+    luna.gfx.print("Score: " .. score .. " / 5", 10, 18, 2)
 
-    luna.render.setColor(0.55, 0.65, 0.75)
-    luna.render.print("Click = Fire    SPACE = Reset    ESC = Quit", 10, H - 28, 2)
+    luna.gfx.setColor(0.55, 0.65, 0.75)
+    luna.gfx.print("Click = Fire    SPACE = Reset    ESC = Quit", 10, H - 28, 2)
 
     -- Win banner
     local all_dead = true
@@ -196,11 +196,11 @@ function luna.draw()
         if t.alive then all_dead = false; break end
     end
     if all_dead then
-        luna.render.setColor(0.0, 0.0, 0.0, 0.55)
-        luna.render.rectangle("fill", 160, 240, 480, 90)
-        luna.render.setColor(1.0, 0.9, 0.1)
-        luna.render.print("YOU WIN!", 270, 255, 4)
-        luna.render.setColor(0.8, 0.8, 0.9)
-        luna.render.print("Press SPACE to play again", 220, 300, 2)
+        luna.gfx.setColor(0.0, 0.0, 0.0, 0.55)
+        luna.gfx.rectangle("fill", 160, 240, 480, 90)
+        luna.gfx.setColor(1.0, 0.9, 0.1)
+        luna.gfx.print("YOU WIN!", 270, 255, 4)
+        luna.gfx.setColor(0.8, 0.8, 0.9)
+        luna.gfx.print("Press SPACE to play again", 220, 300, 2)
     end
 end
