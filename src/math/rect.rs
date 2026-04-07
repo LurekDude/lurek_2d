@@ -93,4 +93,25 @@ impl Rect {
             && self.y < other.y + other.height
             && self.y + self.height > other.y
     }
+
+    /// Computes the rectangle intersection of `self` and `other`.
+    ///
+    /// Returns a zero-area rectangle at the origin if the two rectangles do not overlap.
+    ///
+    /// # Parameters
+    /// - `other` — `&Rect`.
+    ///
+    /// # Returns
+    /// `Rect`.
+    pub fn intersect(&self, other: &Rect) -> Rect {
+        let left = self.x.max(other.x);
+        let top = self.y.max(other.y);
+        let right = (self.x + self.width).min(other.x + other.width);
+        let bottom = (self.y + self.height).min(other.y + other.height);
+        if right > left && bottom > top {
+            Rect::new(left, top, right - left, bottom - top)
+        } else {
+            Rect::new(0.0, 0.0, 0.0, 0.0)
+        }
+    }
 }

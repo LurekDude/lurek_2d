@@ -5,49 +5,8 @@ use mlua::prelude::*;
 use std::cell::RefCell;
 use std::rc::Rc;
 
-use crate::automation::{Action, Script, Simulator, Step};
+use crate::automation::{Script, Simulator, Step};
 
-/// Parse a Lua step-array table into a `Vec<Step>`.
-///
-/// Each element must be a table with at least an `"action"` string field.
-/// All other fields are optional and mapped to the corresponding [`Step`]
-/// fields. Returns a descriptive `LuaError` for unknown action names.
-fn parse_steps(steps_table: &LuaTable) -> LuaResult<Vec<Step>> {
-    let len = steps_table.len()? as usize;
-    let mut steps = Vec::with_capacity(len);
-
-    for i in 1..=len {
-        let entry: LuaTable = steps_table.get(i)?;
-        let action_str: String = entry.get::<_, String>("action").map_err(|_| {
-            LuaError::external("simulator.load: each step must have an 'action' field")
-        })?;
-
-        let action = Action::parse_action(&action_str).ok_or_else(|| {
-            LuaError::external(format!(
-                "simulator.load: unknown action '{}' — expected one of: keypress, keyrelease, mousemove, mousepress, mouserelease, mousewheel, textinput, wait",
-                action_str
-            ))
-        })?;
-
-        let time: f32 = entry.get::<_, Option<f32>>("time")?.unwrap_or(0.0);
-
-        let mut step = Step::new(time, action);
-        step.key = entry.get::<_, Option<String>>("key")?;
-        step.scancode = entry.get::<_, Option<String>>("scancode")?;
-        step.x = entry.get::<_, Option<f64>>("x")?;
-        step.y = entry.get::<_, Option<f64>>("y")?;
-        step.dx = entry.get::<_, Option<f64>>("dx")?;
-        step.dy = entry.get::<_, Option<f64>>("dy")?;
-        step.button = entry.get::<_, Option<u32>>("button")?;
-        step.text = entry.get::<_, Option<String>>("text")?;
-        step.is_repeat = entry.get::<_, Option<bool>>("isRepeat")?.unwrap_or(false);
-        step.clicks = entry.get::<_, Option<u32>>("clicks")?;
-
-        steps.push(step);
-    }
-
-    Ok(steps)
-}
 
 // -------------------------------------------------------------------------------
 // Register
@@ -70,7 +29,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
             let steps_table: LuaTable = data.get::<_, LuaTable>("steps").map_err(|_| {
                 LuaError::external("simulator.load: data table must have a 'steps' array")
             })?;
-            let steps = parse_steps(&steps_table)?;
+            let steps = Step::vec_from_lua_table(&steps_table)?;
             let description: Option<String> = data
                 .get::<_, Option<LuaTable>>("meta")?
                 .and_then(|meta| meta.get::<_, Option<String>>("description").ok().flatten());

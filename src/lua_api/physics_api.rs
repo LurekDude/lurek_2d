@@ -6,7 +6,7 @@ use std::rc::Rc;
 
 use super::SharedState;
 use crate::math::Vec2;
-use crate::physics::{Body, BodyType, Shape, World};
+use crate::physics::{Body, BodyType, RaycastHit, Shape, World};
 
 // -------------------------------------------------------------------------------
 // Helper: parse BodyType from string
@@ -29,72 +29,49 @@ fn parse_body_type(s: &str) -> LuaResult<BodyType> {
 // Helper: parse Shape from string + args
 // -------------------------------------------------------------------------------
 
-fn parse_shape(lua: &Lua, shape_type: &str, args: LuaMultiValue) -> LuaResult<Shape> {
-    match shape_type {
-        "rectangle" => {
-            let mut iter = args.into_iter();
-            let w: f32 = lua.unpack(iter.next().unwrap_or(LuaValue::Nil))?;
-            let h: f32 = lua.unpack(iter.next().unwrap_or(LuaValue::Nil))?;
-            Ok(Shape::Rect {
-                width: w,
-                height: h,
-            })
+fn shape_from_lua(lua: &Lua, shape_type: &str, args: LuaMultiValue) -> LuaResult<Shape> {
+    let mut float_args: Vec<f32> = Vec::new();
+    let mut closed = false;
+    let mut iter = args.into_iter();
+    let first = iter.next().unwrap_or(LuaValue::Nil);
+    if matches!(shape_type, "polygon" | "chain") {
+        let tbl: LuaTable = lua.unpack(first)?;
+        let len = tbl.raw_len();
+        let mut i = 1i64;
+        while i < len as i64 {
+            float_args.push(tbl.raw_get(i)?);
+            float_args.push(tbl.raw_get(i + 1)?);
+            i += 2;
         }
-        "circle" => {
-            let mut iter = args.into_iter();
-            let r: f32 = lua.unpack(iter.next().unwrap_or(LuaValue::Nil))?;
-            Ok(Shape::Circle { radius: r })
-        }
-        "polygon" => {
-            let mut iter = args.into_iter();
-            let tbl: LuaTable = lua.unpack(iter.next().unwrap_or(LuaValue::Nil))?;
-            let mut verts = Vec::new();
-            let len = tbl.raw_len();
-            let mut i = 1;
-            while i + 1 <= len {
-                let x: f32 = tbl.raw_get(i)?;
-                let y: f32 = tbl.raw_get(i + 1)?;
-                verts.push(Vec2::new(x, y));
-                i += 2;
-            }
-            Ok(Shape::Polygon { vertices: verts })
-        }
-        "edge" => {
-            let mut iter = args.into_iter();
-            let x1: f32 = lua.unpack(iter.next().unwrap_or(LuaValue::Nil))?;
-            let y1: f32 = lua.unpack(iter.next().unwrap_or(LuaValue::Nil))?;
-            let x2: f32 = lua.unpack(iter.next().unwrap_or(LuaValue::Nil))?;
-            let y2: f32 = lua.unpack(iter.next().unwrap_or(LuaValue::Nil))?;
-            Ok(Shape::Edge {
-                v1: Vec2::new(x1, y1),
-                v2: Vec2::new(x2, y2),
-            })
-        }
-        "chain" => {
-            let mut iter = args.into_iter();
-            let tbl: LuaTable = lua.unpack(iter.next().unwrap_or(LuaValue::Nil))?;
-            let closed: bool = lua
+        if shape_type == "chain" {
+            closed = lua
                 .unpack(iter.next().unwrap_or(LuaValue::Boolean(false)))
                 .unwrap_or(false);
-            let mut verts = Vec::new();
-            let len = tbl.raw_len();
-            let mut i = 1;
-            while i + 1 <= len {
-                let x: f32 = tbl.raw_get(i)?;
-                let y: f32 = tbl.raw_get(i + 1)?;
-                verts.push(Vec2::new(x, y));
-                i += 2;
-            }
-            Ok(Shape::Chain {
-                vertices: verts,
-                closed,
-            })
         }
-        _ => Err(LuaError::external(format!(
-            "invalid shape type '{}': expected rectangle, circle, polygon, edge, or chain",
-            shape_type
-        ))),
+    } else {
+        float_args.push(lua.unpack(first)?);
+        for v in iter {
+            if let Ok(f) = lua.unpack::<f32>(v) {
+                float_args.push(f);
+            }
+        }
     }
+    Shape::from_parts(shape_type, &float_args, closed).map_err(LuaError::runtime)
+}
+
+// -------------------------------------------------------------------------------
+// Helper: convert RaycastHit to a Lua table
+// -------------------------------------------------------------------------------
+
+fn raycast_hit_to_table<'lua>(lua: &'lua Lua, hit: &RaycastHit) -> LuaResult<LuaTable<'lua>> {
+    let tbl = lua.create_table()?;
+    tbl.set("bodyId", hit.body_id)?;
+    tbl.set("x", hit.point.0)?;
+    tbl.set("y", hit.point.1)?;
+    tbl.set("normalX", hit.normal.0)?;
+    tbl.set("normalY", hit.normal.1)?;
+    tbl.set("toi", hit.toi)?;
+    Ok(tbl)
 }
 
 // -------------------------------------------------------------------------------
@@ -251,7 +228,7 @@ impl LuaUserData for LuaWorld {
                 let mut verts = Vec::new();
                 let len = tbl.raw_len();
                 let mut i = 1;
-                while i + 1 <= len {
+                while i < len {
                     let vx: f32 = tbl.raw_get(i)?;
                     let vy: f32 = tbl.raw_get(i + 1)?;
                     verts.push(Vec2::new(vx, vy));
@@ -306,7 +283,7 @@ impl LuaUserData for LuaWorld {
                 let mut verts = Vec::new();
                 let len = tbl.raw_len();
                 let mut i = 1;
-                while i + 1 <= len {
+                while i < len {
                     let vx: f32 = tbl.raw_get(i)?;
                     let vy: f32 = tbl.raw_get(i + 1)?;
                     verts.push(Vec2::new(vx, vy));
@@ -340,7 +317,7 @@ impl LuaUserData for LuaWorld {
                 bool,
                 LuaMultiValue,
             )| {
-                let shape = parse_shape(lua, &shape_type, args)?;
+                let shape = shape_from_lua(lua, &shape_type, args)?;
                 let idx = this
                     .world
                     .borrow_mut()
@@ -714,16 +691,7 @@ impl LuaUserData for LuaWorld {
             "raycast",
             |lua, this, (x1, y1, x2, y2): (f32, f32, f32, f32)| {
                 match this.world.borrow().raycast(x1, y1, x2, y2) {
-                    Some(hit) => {
-                        let tbl = lua.create_table()?;
-                        tbl.set("bodyId", hit.body_id)?;
-                        tbl.set("x", hit.point.0)?;
-                        tbl.set("y", hit.point.1)?;
-                        tbl.set("normalX", hit.normal.0)?;
-                        tbl.set("normalY", hit.normal.1)?;
-                        tbl.set("toi", hit.toi)?;
-                        Ok(LuaValue::Table(tbl))
-                    }
+                    Some(hit) => Ok(LuaValue::Table(raycast_hit_to_table(lua, &hit)?)),
                     None => Ok(LuaValue::Nil),
                 }
             },
@@ -740,21 +708,8 @@ impl LuaUserData for LuaWorld {
         methods.add_method(
             "raycastClosest",
             |lua, this, (x1, y1, dx, dy, max_dist): (f32, f32, f32, f32, f32)| {
-                match this
-                    .world
-                    .borrow()
-                    .raycast_closest(x1, y1, dx, dy, max_dist)
-                {
-                    Some(hit) => {
-                        let tbl = lua.create_table()?;
-                        tbl.set("bodyId", hit.body_id)?;
-                        tbl.set("x", hit.point.0)?;
-                        tbl.set("y", hit.point.1)?;
-                        tbl.set("normalX", hit.normal.0)?;
-                        tbl.set("normalY", hit.normal.1)?;
-                        tbl.set("toi", hit.toi)?;
-                        Ok(LuaValue::Table(tbl))
-                    }
+                match this.world.borrow().raycast_closest(x1, y1, dx, dy, max_dist) {
+                    Some(hit) => Ok(LuaValue::Table(raycast_hit_to_table(lua, &hit)?)),
                     None => Ok(LuaValue::Nil),
                 }
             },
@@ -771,20 +726,10 @@ impl LuaUserData for LuaWorld {
         methods.add_method(
             "raycastAll",
             |lua, this, (x1, y1, dx, dy, max_dist): (f32, f32, f32, f32, f32)| {
-                let hits = this
-                    .world
-                    .borrow()
-                    .raycast_all(x1, y1, dx, dy, max_dist);
+                let hits = this.world.borrow().raycast_all(x1, y1, dx, dy, max_dist);
                 let result = lua.create_table()?;
                 for (i, hit) in hits.iter().enumerate() {
-                    let tbl = lua.create_table()?;
-                    tbl.set("bodyId", hit.body_id)?;
-                    tbl.set("x", hit.point.0)?;
-                    tbl.set("y", hit.point.1)?;
-                    tbl.set("normalX", hit.normal.0)?;
-                    tbl.set("normalY", hit.normal.1)?;
-                    tbl.set("toi", hit.toi)?;
-                    result.set(i + 1, tbl)?;
+                    result.set(i + 1, raycast_hit_to_table(lua, hit)?)?;
                 }
                 Ok(result)
             },

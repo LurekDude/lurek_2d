@@ -31,6 +31,7 @@ pub struct ImageEffect {
     /// Ordered list of shader passes in this chain (shared references).
     pub(crate) effects: Vec<Rc<RefCell<PostFxEffect>>>,
     /// Optional human-readable label for the effect chain.
+    #[allow(dead_code)]
     pub(crate) name: String,
 }
 
@@ -66,6 +67,7 @@ impl ImageEffect {
     ///
     /// # Parameters
     /// - `effect` â€” `Rc<RefCell<PostFxEffect>>` â€” Shared reference to append.
+    #[allow(dead_code)]
     pub(crate) fn add_effect_rc(&mut self, effect: Rc<RefCell<PostFxEffect>>) {
         self.effects.push(effect);
     }

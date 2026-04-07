@@ -121,132 +121,7 @@ fn invalid_occluder(method: &str) -> LuaError {
     ))
 }
 
-/// Parses a flat Lua table `{x1,y1,x2,y2,...}` into `Vec<Vec2>`.
-fn parse_vertex_table(tbl: &LuaTable) -> LuaResult<Vec<Vec2>> {
-    let len = tbl.len()? as usize;
-    if len < 6 || len > 512 || len % 2 != 0 {
-        return Err(LuaError::RuntimeError(format!(
-            "vertex table must have an even number of elements (6..=512), got {}",
-            len
-        )));
-    }
-    let count = len / 2;
-    let mut verts = Vec::with_capacity(count);
-    for i in 0..count {
-        let x: f32 = tbl.get((i * 2 + 1) as i64)?;
-        let y: f32 = tbl.get((i * 2 + 2) as i64)?;
-        verts.push(Vec2::new(x, y));
-    }
-    Ok(verts)
-}
 
-/// Parses an optional color table `{r, g, b [, a]}` from an opts table field.
-fn parse_opt_color(opts: &LuaTable, field: &str) -> LuaResult<Option<Color>> {
-    let val: LuaValue = opts.get(field)?;
-    match val {
-        LuaValue::Table(tbl) => {
-            let r: f32 = tbl.get(1i32).unwrap_or(1.0);
-            let g: f32 = tbl.get(2i32).unwrap_or(1.0);
-            let b: f32 = tbl.get(3i32).unwrap_or(1.0);
-            let a: f32 = tbl.get(4i32).unwrap_or(1.0);
-            Ok(Some(Color::new(r, g, b, a)))
-        }
-        LuaValue::Nil => Ok(None),
-        _ => Err(LuaError::RuntimeError(format!(
-            "expected color table for '{}', got {}",
-            field,
-            val.type_name()
-        ))),
-    }
-}
-
-/// Applies optional settings from a Lua opts table to a `Light2D`.
-fn apply_light_opts(light: &mut Light2D, opts: &LuaTable) -> LuaResult<()> {
-    if let Ok(Some(c)) = parse_opt_color(opts, "color") {
-        light.set_color(c);
-    }
-    if let Ok(v) = opts.get::<_, f32>("intensity") {
-        light.set_intensity(v);
-    }
-    if let Ok(v) = opts.get::<_, f32>("energy") {
-        light.set_energy(v);
-    }
-    if let Ok(s) = opts.get::<_, String>("blend") {
-        light.set_blend_mode(parse_blend_mode(&s)?);
-    }
-    if let Ok(s) = opts.get::<_, String>("falloff") {
-        light.set_falloff(parse_falloff(&s)?);
-    }
-    if let Ok(v) = opts.get::<_, bool>("shadowEnabled") {
-        light.set_shadow_enabled(v);
-    }
-    if let Ok(Some(c)) = parse_opt_color(opts, "shadowColor") {
-        light.set_shadow_color(c);
-    }
-    if let Ok(s) = opts.get::<_, String>("shadowFilter") {
-        light.set_shadow_filter(parse_shadow_filter(&s)?);
-    }
-    if let Ok(v) = opts.get::<_, f32>("shadowSmooth") {
-        light.set_shadow_smooth(v);
-    }
-    if let Ok(v) = opts.get::<_, u16>("lightMask") {
-        light.set_light_mask(v);
-    }
-    if let Ok(v) = opts.get::<_, u16>("shadowMask") {
-        light.set_shadow_mask(v);
-    }
-    if let Ok(v) = opts.get::<_, bool>("enabled") {
-        light.set_enabled(v);
-    }
-    if let Ok(s) = opts.get::<_, String>("type") {
-        light.set_light_type(parse_light_type(&s)?);
-    }
-    if let Ok(v) = opts.get::<_, f32>("direction") {
-        light.set_direction(v);
-    }
-    if let Ok(v) = opts.get::<_, f32>("innerAngle") {
-        light.set_inner_angle(v);
-    }
-    if let Ok(v) = opts.get::<_, f32>("outerAngle") {
-        light.set_outer_angle(v);
-    }
-    if let Ok(v) = opts.get::<_, u16>("groupId") {
-        light.set_group_id(v);
-    }
-    if let Ok(v) = opts.get::<_, bool>("volumetric") {
-        light.set_volumetric(v);
-    }
-    if let Ok(v) = opts.get::<_, f32>("flickerSpeed") {
-        light.flicker_mut().speed = v;
-        light.flicker_mut().enabled = true;
-    }
-    if let Ok(v) = opts.get::<_, f32>("flickerStrength") {
-        light.flicker_mut().strength = v;
-        light.flicker_mut().enabled = true;
-    }
-    if let Ok(v) = opts.get::<_, f32>("attConstant") {
-        light.set_attenuation(Attenuation::new(
-            v,
-            light.get_attenuation().linear,
-            light.get_attenuation().quadratic,
-        ));
-    }
-    if let Ok(v) = opts.get::<_, f32>("attLinear") {
-        light.set_attenuation(Attenuation::new(
-            light.get_attenuation().constant,
-            v,
-            light.get_attenuation().quadratic,
-        ));
-    }
-    if let Ok(v) = opts.get::<_, f32>("attQuadratic") {
-        light.set_attenuation(Attenuation::new(
-            light.get_attenuation().constant,
-            light.get_attenuation().linear,
-            v,
-        ));
-    }
-    Ok(())
-}
 
 /// Applies optional settings from a Lua opts table to an `Occluder`.
 fn apply_occluder_opts(occ: &mut Occluder, opts: &LuaTable) -> LuaResult<()> {
@@ -851,11 +726,12 @@ impl LuaUserData for LuaOccluder {
         /// @param vertices : table
         /// @return nil
         methods.add_method("setVertices", |_, this, tbl: LuaTable| {
-            let verts = parse_vertex_table(&tbl)?;
+            let flat: Vec<f32> = tbl.sequence_values::<f32>().collect::<LuaResult<_>>()?;
+            let tmp = Occluder::from_flat_coords(&flat).map_err(LuaError::RuntimeError)?;
             let mut st = this.state.borrow_mut();
             let occ = st.light_world.get_occluder_mut(this.key)
                 .ok_or_else(|| invalid_occluder("Occluder:setVertices"))?;
-            occ.set_vertices(verts);
+            occ.set_vertices(tmp.vertices);
             Ok(())
         });
 
@@ -1015,7 +891,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
             move |_, (x, y, radius, opts): (f32, f32, f32, Option<LuaTable>)| {
                 let mut light = Light2D::new(x, y, radius);
                 if let Some(ref opts) = opts {
-                    apply_light_opts(&mut light, opts)?;
+                    light.apply_lua_opts(opts)?;
                 }
                 let key = s.borrow_mut().light_world.add_light(light);
                 Ok(LuaLight {
@@ -1035,8 +911,8 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
     tbl.set(
         "newOccluder",
         lua.create_function(move |_, (vtbl, opts): (LuaTable, Option<LuaTable>)| {
-            let verts = parse_vertex_table(&vtbl)?;
-            let mut occ = Occluder::new(verts);
+            let flat: Vec<f32> = vtbl.sequence_values::<f32>().collect::<LuaResult<_>>()?;
+            let mut occ = Occluder::from_flat_coords(&flat).map_err(LuaError::RuntimeError)?;
             if let Some(ref opts) = opts {
                 apply_occluder_opts(&mut occ, opts)?;
             }

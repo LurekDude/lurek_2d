@@ -1146,28 +1146,10 @@ impl LuaUserData for LuaUtilityAI {
         /// Evaluates all actions and returns the best action name, or nil.
         /// @return string?
         methods.add_method("evaluate", |lua, this, ()| {
-            let mut ai = this.inner.borrow_mut();
-            if ai.actions.is_empty() {
-                return Ok(LuaValue::Nil);
+            match this.inner.borrow_mut().evaluate(lua)? {
+                Some(name) => Ok(LuaValue::String(lua.create_string(&name)?)),
+                None => Ok(LuaValue::Nil),
             }
-            let mut best_idx = 0;
-            let mut best_score = f64::NEG_INFINITY;
-            let mut scores = Vec::with_capacity(ai.actions.len());
-            for (i, action) in ai.actions.iter().enumerate() {
-                let func: LuaFunction = lua.registry_value(&action.scorer)?;
-                let score: f64 = func.call(())?;
-                let weighted = score * action.momentum_bonus;
-                scores.push(weighted);
-                if weighted > best_score {
-                    best_score = weighted;
-                    best_idx = i;
-                }
-            }
-            ai.last_scores = scores;
-            ai.last_action = Some(best_idx);
-            Ok(LuaValue::String(
-                lua.create_string(&ai.actions[best_idx].name)?,
-            ))
         });
 
         // -- getActionCount --

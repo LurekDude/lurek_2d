@@ -164,3 +164,42 @@ impl Default for EventQueue {
         Self::new()
     }
 }
+
+// -------------------------------------------------------------------------------
+// Lua conversion helpers  (available when mlua is compiled in)
+// -------------------------------------------------------------------------------
+
+use mlua::prelude::*;
+
+impl EventArg {
+    /// Converts a [`LuaValue`] to an [`EventArg`] for event queue storage.
+    pub fn from_lua_val(val: &LuaValue) -> LuaResult<Self> {
+        match val {
+            LuaValue::String(s) => Ok(EventArg::Str(
+                s.to_str()
+                    .map_err(|e| LuaError::RuntimeError(e.to_string()))?
+                    .to_string(),
+            )),
+            LuaValue::Integer(n) => Ok(EventArg::Num(*n as f64)),
+            LuaValue::Number(n) => Ok(EventArg::Num(*n)),
+            LuaValue::Boolean(b) => Ok(EventArg::Bool(*b)),
+            _ => Ok(EventArg::Nil),
+        }
+    }
+}
+
+/// Converts an [`Event`] into a Lua multi-value (name followed by args).
+pub fn event_to_lua_multi<'lua>(lua: &'lua Lua, event: &Event) -> LuaResult<LuaMultiValue<'lua>> {
+    let mut values = Vec::with_capacity(1 + event.args.len());
+    values.push(LuaValue::String(lua.create_string(&event.name)?));
+    for arg in &event.args {
+        let val = match arg {
+            EventArg::Str(s) => LuaValue::String(lua.create_string(s)?),
+            EventArg::Num(n) => LuaValue::Number(*n),
+            EventArg::Bool(b) => LuaValue::Boolean(*b),
+            EventArg::Nil => LuaValue::Nil,
+        };
+        values.push(val);
+    }
+    Ok(LuaMultiValue::from_vec(values))
+}

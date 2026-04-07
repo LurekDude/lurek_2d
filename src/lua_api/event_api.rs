@@ -6,42 +6,11 @@ use std::cell::RefCell;
 use std::collections::HashMap;
 use std::rc::Rc;
 
-use crate::event::{Event, EventArg, Signal};
+use crate::event::{event_to_lua_multi, EventArg, Signal};
 
 // -------------------------------------------------------------------------------
 // Helpers
 // -------------------------------------------------------------------------------
-
-/// Converts a [`LuaValue`] to an [`EventArg`] for queue storage.
-fn lua_value_to_event_arg(val: &LuaValue) -> LuaResult<EventArg> {
-    match val {
-        LuaValue::String(s) => Ok(EventArg::Str(
-            s.to_str()
-                .map_err(|e| LuaError::RuntimeError(e.to_string()))?
-                .to_string(),
-        )),
-        LuaValue::Integer(n) => Ok(EventArg::Num(*n as f64)),
-        LuaValue::Number(n) => Ok(EventArg::Num(*n)),
-        LuaValue::Boolean(b) => Ok(EventArg::Bool(*b)),
-        _ => Ok(EventArg::Nil),
-    }
-}
-
-/// Converts an [`Event`] into a Lua multi-value (name followed by args).
-fn event_to_lua_multi<'lua>(lua: &'lua Lua, event: &Event) -> LuaResult<LuaMultiValue<'lua>> {
-    let mut values = Vec::with_capacity(1 + event.args.len());
-    values.push(LuaValue::String(lua.create_string(&event.name)?));
-    for arg in &event.args {
-        let val = match arg {
-            EventArg::Str(s) => LuaValue::String(lua.create_string(s)?),
-            EventArg::Num(n) => LuaValue::Number(*n),
-            EventArg::Bool(b) => LuaValue::Boolean(*b),
-            EventArg::Nil => LuaValue::Nil,
-        };
-        values.push(val);
-    }
-    Ok(LuaMultiValue::from_vec(values))
-}
 
 // -------------------------------------------------------------------------------
 // LuaSignal UserData
@@ -206,7 +175,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
             };
             let mut event_args = Vec::new();
             for val in iter {
-                event_args.push(lua_value_to_event_arg(&val)?);
+                event_args.push(EventArg::from_lua_val(&val)?);
             }
             s.borrow_mut().event_queue.push_event(&name, event_args);
             Ok(())

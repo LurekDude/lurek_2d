@@ -14,6 +14,7 @@ use crate::graphics::{
     Shader, SpriteBatch, StencilAction, TextAlign, Texture, UniformValue,
 };
 use crate::image::ImageData;
+use crate::math::Rect;
 
 // ===============================================================================
 // UserData wrapper types
@@ -311,6 +312,7 @@ pub struct LuaSpriteBatch {
 }
 
 impl LuaUserData for LuaSpriteBatch {
+    #[allow(clippy::type_complexity)]
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
         // -- add --
         /// Adds a sprite entry to this batch.
@@ -966,10 +968,8 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
                     LuaValue::Number(n) => vertices.push(*n as f32),
                     LuaValue::Integer(n) => vertices.push(*n as f32),
                     LuaValue::Table(t) => {
-                        for val in t.clone().sequence_values::<f64>() {
-                            if let Ok(n) = val {
-                                vertices.push(n as f32);
-                            }
+                        for n in t.clone().sequence_values::<f64>().flatten() {
+                            vertices.push(n as f32);
                         }
                     }
                     _ => {}
@@ -2073,8 +2073,8 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
         "applyTransform",
         lua.create_function(move |_, mat: LuaTable| {
             let mut m = [0.0f32; 9];
-            for i in 0..9 {
-                m[i] = mat.get::<_, f32>(i + 1).unwrap_or(if i == 0 || i == 4 || i == 8 {
+            for (i, item) in m.iter_mut().enumerate() {
+                *item = mat.get::<_, f32>(i + 1).unwrap_or(if i == 0 || i == 4 || i == 8 {
                     1.0
                 } else {
                     0.0
@@ -2152,21 +2152,11 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
         "intersectScissor",
         lua.create_function(move |_, (x, y, w, h): (f32, f32, f32, f32)| {
             let mut st = s.borrow_mut();
-            let rect = if let Some((cx, cy, cw, ch)) = st.scissor {
-                let left = x.max(cx);
-                let top = y.max(cy);
-                let right = (x + w).min(cx + cw);
-                let bottom = (y + h).min(cy + ch);
-                if right > left && bottom > top {
-                    Some((left, top, right - left, bottom - top))
-                } else {
-                    Some((0.0, 0.0, 0.0, 0.0))
-                }
-            } else {
-                Some((x, y, w, h))
-            };
-            st.scissor = rect;
-            st.draw_commands.push(DrawCommand::SetScissor(rect));
+            let new = Rect::new(x, y, w, h);
+            let result = st.scissor.map(|(cx, cy, cw, ch)| Rect::new(cx, cy, cw, ch).intersect(&new));
+            let tuple = result.map(|r| (r.x, r.y, r.width, r.height)).or(Some((x, y, w, h)));
+            st.scissor = tuple;
+            st.draw_commands.push(DrawCommand::SetScissor(tuple));
             Ok(())
         })?,
     )?;
@@ -2373,17 +2363,13 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
         "getStats",
         lua.create_function(move |lua, ()| {
             let st = s.borrow();
+            let r = st.compute_stats();
             let stats = lua.create_table()?;
-            let texture_memory: usize = st
-                .textures
-                .values()
-                .map(|t| (t.width * t.height * 4) as usize)
-                .sum();
-            stats.set("drawcalls", st.draw_commands.len())?;
-            stats.set("textures", st.textures.len())?;
-            stats.set("fonts", st.fonts.len())?;
-            stats.set("canvases", st.canvases.len())?;
-            stats.set("texture_memory", texture_memory)?;
+            stats.set("drawcalls", r.draw_calls)?;
+            stats.set("textures", r.textures)?;
+            stats.set("fonts", r.fonts)?;
+            stats.set("canvases", r.canvases)?;
+            stats.set("texture_memory", r.texture_memory)?;
             Ok(stats)
         })?,
     )?;

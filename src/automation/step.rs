@@ -8,6 +8,8 @@
 //! Steps are created programmatically and collected into a [`Script`](super::Script)
 //! to be played back by the [`Simulator`](super::Simulator).
 
+use mlua::prelude::*;
+
 /// The action type for a simulation step.
 ///
 /// Each variant maps to a synthetic input event that the
@@ -272,5 +274,43 @@ impl Step {
     /// `Option<&str>`.
     pub fn effective_scancode(&self) -> Option<&str> {
         self.scancode.as_deref().or(self.key.as_deref())
+    }
+
+    /// Parses a Lua step-array table into a `Vec<Step>`.
+    ///
+    /// # Parameters
+    /// - `t` — `&LuaTable`.
+    ///
+    /// # Returns
+    /// `LuaResult<Vec<Self>>`.
+    pub fn vec_from_lua_table(t: &LuaTable) -> LuaResult<Vec<Self>> {
+        let len = t.len()? as usize;
+        let mut steps = Vec::with_capacity(len);
+        for i in 1..=len {
+            let entry: LuaTable = t.get(i)?;
+            let action_str: String = entry.get::<_, String>("action").map_err(|_| {
+                LuaError::external("simulator.load: each step must have an 'action' field")
+            })?;
+            let action = Action::parse_action(&action_str).ok_or_else(|| {
+                LuaError::external(format!(
+                    "simulator.load: unknown action '{}' \u{2014} expected one of: keypress, keyrelease, mousemove, mousepress, mouserelease, mousewheel, textinput, wait",
+                    action_str
+                ))
+            })?;
+            let time: f32 = entry.get::<_, Option<f32>>("time")?.unwrap_or(0.0);
+            let mut step = Self::new(time, action);
+            step.key = entry.get::<_, Option<String>>("key")?;
+            step.scancode = entry.get::<_, Option<String>>("scancode")?;
+            step.x = entry.get::<_, Option<f64>>("x")?;
+            step.y = entry.get::<_, Option<f64>>("y")?;
+            step.dx = entry.get::<_, Option<f64>>("dx")?;
+            step.dy = entry.get::<_, Option<f64>>("dy")?;
+            step.button = entry.get::<_, Option<u32>>("button")?;
+            step.text = entry.get::<_, Option<String>>("text")?;
+            step.is_repeat = entry.get::<_, Option<bool>>("isRepeat")?.unwrap_or(false);
+            step.clicks = entry.get::<_, Option<u32>>("clicks")?;
+            steps.push(step);
+        }
+        Ok(steps)
     }
 }

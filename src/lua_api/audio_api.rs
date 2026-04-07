@@ -4,9 +4,7 @@ use super::SharedState;
 use mlua::prelude::*;
 use std::cell::RefCell;
 use std::rc::Rc;
-use std::sync::Arc;
 
-use crate::audio::dsp::{AtomicParam, EffectParams, EffectType};
 use crate::audio::sound_data::SoundData;
 use crate::audio::{Decoder, MidiPlayer, SourceType};
 use crate::engine::log_messages::LA01_API_STUB;
@@ -67,6 +65,45 @@ fn require_sound_key(
 /// Reconstructs a `QueueableKey` from the packed u64 used in Lua.
 fn queueable_key_from_u64(raw: u64) -> QueueableKey {
     QueueableKey::from(slotmap::KeyData::from_ffi(raw))
+}
+
+/// Parses `newSoundData` arguments from a Lua multi-value into typed components.
+///
+/// Returns `(path, count, sample_rate, channels)` where `path` is `Some` for
+/// file-based construction and `None` for a silent buffer.
+fn extract_sound_data_args(args: LuaMultiValue) -> LuaResult<(Option<String>, usize, u32, u16)> {
+    let mut it = args.into_iter();
+    let first = it
+        .next()
+        .ok_or_else(|| LuaError::RuntimeError("newSoundData: expected argument".into()))?;
+    let (path, count) = match first {
+        LuaValue::String(s) => (
+            Some(
+                s.to_str()
+                    .map_err(|e| LuaError::RuntimeError(e.to_string()))?
+                    .to_string(),
+            ),
+            0usize,
+        ),
+        LuaValue::Integer(n) => (None, n as usize),
+        LuaValue::Number(n) => (None, n as usize),
+        _ => {
+            return Err(LuaError::RuntimeError(
+                "newSoundData expects a filename or sample count".into(),
+            ))
+        }
+    };
+    let rate = match it.next() {
+        Some(LuaValue::Integer(n)) => n as u32,
+        Some(LuaValue::Number(n)) => n as u32,
+        _ => 44100,
+    };
+    let channels = match it.next() {
+        Some(LuaValue::Integer(n)) => n as u16,
+        Some(LuaValue::Number(n)) => n as u16,
+        _ => 1,
+    };
+    Ok((path, count, rate, channels))
 }
 
 // -------------------------------------------------------------------------------
@@ -1905,58 +1942,12 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
     tbl.set(
         "newSoundData",
         lua.create_function(move |lua, args: LuaMultiValue| {
-            let snd_data = if args.len() == 1 {
-                match args.into_iter().next().unwrap() {
-                    LuaValue::String(ls) => {
-                        let filename = ls
-                            .to_str()
-                            .map_err(|e| LuaError::RuntimeError(e.to_string()))?
-                            .to_string();
-                        let st = s.borrow();
-                        let path = st.game_dir.join(&filename);
-                        SoundData::from_file(path.to_str().ok_or_else(|| {
-                            LuaError::RuntimeError("Invalid path".to_string())
-                        })?)
-                        .map_err(LuaError::RuntimeError)?
-                    }
-                    LuaValue::Integer(n) => SoundData::new(n as usize, 44100, 1),
-                    LuaValue::Number(n) => SoundData::new(n as usize, 44100, 1),
-                    _ => {
-                        return Err(LuaError::RuntimeError(
-                            "newSoundData expects a filename or sample count".to_string(),
-                        ))
-                    }
-                }
-            } else {
-                let mut iter = args.into_iter();
-                let count = match iter.next().unwrap() {
-                    LuaValue::Integer(n) => n as usize,
-                    LuaValue::Number(n) => n as usize,
-                    _ => {
-                        return Err(LuaError::RuntimeError(
-                            "sample count must be a number".to_string(),
-                        ))
-                    }
-                };
-                let rate = iter
-                    .next()
-                    .and_then(|v| match v {
-                        LuaValue::Integer(n) => Some(n as u32),
-                        LuaValue::Number(n) => Some(n as u32),
-                        _ => None,
-                    })
-                    .unwrap_or(44100);
-                let channels = iter
-                    .next()
-                    .and_then(|v| match v {
-                        LuaValue::Integer(n) => Some(n as u16),
-                        LuaValue::Number(n) => Some(n as u16),
-                        _ => None,
-                    })
-                    .unwrap_or(1);
-                SoundData::new(count, rate, channels)
-            };
-            lua.create_userdata(snd_data)
+            let (path_opt, count, rate, channels) = extract_sound_data_args(args)?;
+            let full_path_buf = path_opt.as_ref().map(|p| s.borrow().game_dir.join(p));
+            let full_path = full_path_buf.as_ref().and_then(|p| p.to_str());
+            let sd = SoundData::from_lua_args(full_path, count, rate, channels)
+                .map_err(LuaError::RuntimeError)?;
+            lua.create_userdata(sd)
         })?,
     )?;
 
@@ -2198,36 +2189,13 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
         lua.create_function(
             move |_, (bus_name, effect_type_str, params): (String, String, Option<mlua::Table>)| {
                 let st = s.borrow();
-                if let Some(bus_key) = st.mixer.get_bus_by_name(&bus_name) {
-                    if let Some(bus) = st.mixer.get_bus(bus_key) {
-                        let effect_type = match effect_type_str.as_str() {
-                            "lowpass" => EffectType::Lowpass,
-                            "highpass" => EffectType::Highpass,
-                            "bandpass" => EffectType::Bandpass,
-                            "reverb" => EffectType::Reverb,
-                            "chorus" => EffectType::Chorus,
-                            _ => return Err(LuaError::external("invalid effect")),
-                        };
-                        let mut fx_list = bus.effects.write().unwrap();
-                        let eid = (fx_list.len() + 1) as u32;
-                        let p1_val = params
-                            .as_ref()
-                            .and_then(|t| t.get::<_, f32>("value").ok())
-                            .unwrap_or(1000.0);
-                        fx_list.push(Arc::new(EffectParams {
-                            id: eid,
-                            typ: effect_type,
-                            p1: AtomicParam::new(p1_val),
-                            p2: AtomicParam::new(1.0),
-                            p3: AtomicParam::new(0.5),
-                        }));
-                        return Ok(Some(eid));
-                    }
-                }
-                Err(LuaError::external(format!(
-                    "Bus not found: {}",
-                    bus_name
-                )))
+                let bus_key = st.mixer.get_bus_by_name(&bus_name)
+                    .ok_or_else(|| LuaError::external(format!("Bus not found: {}", bus_name)))?;
+                let bus = st.mixer.get_bus(bus_key)
+                    .ok_or_else(|| LuaError::external(format!("Bus not found: {}", bus_name)))?;
+                let p1_val = params.as_ref().and_then(|t| t.get::<_, f32>("value").ok()).unwrap_or(1000.0);
+                let eid = bus.add_effect(&effect_type_str, p1_val).map_err(LuaError::RuntimeError)?;
+                Ok(Some(eid))
             },
         )?,
     )?;
@@ -2242,21 +2210,11 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
         "remove_effect",
         lua.create_function(move |_, (bus_name, effect_id): (String, u32)| {
             let st = s.borrow();
-            if let Some(bus_key) = st.mixer.get_bus_by_name(&bus_name) {
-                if let Some(bus) = st.mixer.get_bus(bus_key) {
-                    let mut fx_list = bus.effects.write().unwrap();
-                    let len_before = fx_list.len();
-                    fx_list.retain(|fx| fx.id != effect_id);
-                    if fx_list.len() == len_before {
-                        return Err(LuaError::external("effect not found"));
-                    }
-                    return Ok(true);
-                }
-            }
-            Err(LuaError::external(format!(
-                "Bus not found: {}",
-                bus_name
-            )))
+            let bus_key = st.mixer.get_bus_by_name(&bus_name)
+                .ok_or_else(|| LuaError::external(format!("Bus not found: {}", bus_name)))?;
+            let bus = st.mixer.get_bus(bus_key)
+                .ok_or_else(|| LuaError::external(format!("Bus not found: {}", bus_name)))?;
+            bus.remove_effect(effect_id).map_err(LuaError::RuntimeError).map(|_| true)
         })?,
     )?;
 
@@ -2273,70 +2231,14 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
         lua.create_function(
             move |_, (bus_name, effect_id, param_name, value): (String, u32, String, f32)| {
                 let st = s.borrow();
-                if let Some(bus_key) = st.mixer.get_bus_by_name(&bus_name) {
-                    if let Some(bus) = st.mixer.get_bus(bus_key) {
-                        let fx_list = bus.effects.read().unwrap();
-                        if let Some(fx) = fx_list.iter().find(|fx| fx.id == effect_id) {
-                            return match fx.typ {
-                                EffectType::Lowpass
-                                | EffectType::Highpass
-                                | EffectType::Bandpass => match param_name.as_str() {
-                                    "cutoff" | "frequency" => {
-                                        fx.p1.set(value);
-                                        Ok(true)
-                                    }
-                                    "q" => {
-                                        fx.p2.set(value);
-                                        Ok(true)
-                                    }
-                                    "mix" => {
-                                        fx.p3.set(value);
-                                        Ok(true)
-                                    }
-                                    _ => Err(LuaError::external("invalid parameter")),
-                                },
-                                EffectType::Reverb => match param_name.as_str() {
-                                    "room_size" => {
-                                        fx.p1.set(value);
-                                        Ok(true)
-                                    }
-                                    "damping" => {
-                                        fx.p2.set(value);
-                                        Ok(true)
-                                    }
-                                    "mix" => {
-                                        fx.p3.set(value);
-                                        Ok(true)
-                                    }
-                                    _ => Err(LuaError::external("invalid parameter")),
-                                },
-                                EffectType::Chorus => match param_name.as_str() {
-                                    "rate" => {
-                                        fx.p1.set(value);
-                                        Ok(true)
-                                    }
-                                    "depth" => {
-                                        fx.p2.set(value);
-                                        Ok(true)
-                                    }
-                                    "mix" => {
-                                        fx.p3.set(value);
-                                        Ok(true)
-                                    }
-                                    _ => Err(LuaError::external("invalid parameter")),
-                                },
-                            };
-                        }
-                        return Err(LuaError::external(format!(
-                            "Effect not found: {}",
-                            effect_id
-                        )));
-                    }
-                }
-                Err(LuaError::external(format!(
-                    "Bus not found: {}",
-                    bus_name
-                )))
+                let bus_key = st.mixer.get_bus_by_name(&bus_name)
+                    .ok_or_else(|| LuaError::external(format!("Bus not found: {}", bus_name)))?;
+                let bus = st.mixer.get_bus(bus_key)
+                    .ok_or_else(|| LuaError::external(format!("Bus not found: {}", bus_name)))?;
+                let fx_list = bus.effects.read().unwrap();
+                let fx = fx_list.iter().find(|fx| fx.id == effect_id)
+                    .ok_or_else(|| LuaError::external(format!("Effect not found: {}", effect_id)))?;
+                fx.set_param(&param_name, value).map_err(LuaError::RuntimeError).map(|_| true)
             },
         )?,
     )?;

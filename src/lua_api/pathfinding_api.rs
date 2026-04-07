@@ -176,7 +176,7 @@ impl LuaUserData for LuaNavGrid {
         /// Exports the cost grid as a byte string (row-major, one byte per cell).
         /// @return string
         methods.add_method("saveToString", |lua, this, ()| {
-            lua.create_string(&this.inner.borrow().save_to_bytes())
+            lua.create_string(this.inner.borrow().save_to_bytes())
         });
 
         // -- setChunkSize --

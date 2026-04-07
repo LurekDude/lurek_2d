@@ -480,3 +480,44 @@ impl SharedState {
         }
     }
 }
+
+/// Snapshot of renderer statistics for a single frame.
+///
+/// # Fields
+/// - `draw_calls` — `usize`.
+/// - `textures` — `usize`.
+/// - `fonts` — `usize`.
+/// - `canvases` — `usize`.
+/// - `texture_memory` — `usize`. RGBA byte estimate.
+pub struct RendererStats {
+    /// Number of draw commands queued this frame.
+    pub draw_calls: usize,
+    /// Number of loaded textures.
+    pub textures: usize,
+    /// Number of loaded fonts.
+    pub fonts: usize,
+    /// Number of canvases.
+    pub canvases: usize,
+    /// Estimated total RGBA bytes used by textures.
+    pub texture_memory: usize,
+}
+
+impl SharedState {
+    /// Computes a snapshot of the current renderer statistics.
+    ///
+    /// # Returns
+    /// `RendererStats`.
+    pub fn compute_stats(&self) -> RendererStats {
+        RendererStats {
+            draw_calls: self.draw_commands.len(),
+            textures: self.textures.len(),
+            fonts: self.fonts.len(),
+            canvases: self.canvases.len(),
+            texture_memory: self
+                .textures
+                .values()
+                .map(|t| (t.width * t.height * 4) as usize)
+                .sum(),
+        }
+    }
+}

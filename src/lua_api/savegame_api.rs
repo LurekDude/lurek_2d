@@ -13,41 +13,7 @@ use crate::savegame::{serialize_table, SaveManager, SaveValue};
 // Helpers
 // -------------------------------------------------------------------------------
 
-/// Converts a [`LuaValue`] into a [`SaveValue`] for Rust-side serialization.
-fn lua_value_to_save_value(value: &LuaValue) -> LuaResult<SaveValue> {
-    match value {
-        LuaValue::Nil => Ok(SaveValue::Nil),
-        LuaValue::Boolean(b) => Ok(SaveValue::Bool(*b)),
-        LuaValue::Integer(i) => Ok(SaveValue::Number(*i as f64)),
-        LuaValue::Number(n) => Ok(SaveValue::Number(*n)),
-        LuaValue::String(s) => Ok(SaveValue::Str(s.to_str()?.to_string())),
-        LuaValue::Table(t) => {
-            let mut map = HashMap::new();
-            for pair in t.clone().pairs::<LuaValue, LuaValue>() {
-                let (k, v) = pair?;
-                let key_str = match &k {
-                    LuaValue::String(s) => s.to_str()?.to_string(),
-                    LuaValue::Integer(i) => i.to_string(),
-                    LuaValue::Number(n) => format!("{}", n),
-                    _ => {
-                        return Err(LuaError::RuntimeError(format!(
-                            "cannot serialize table key of type {}",
-                            k.type_name()
-                        )))
-                    }
-                };
-                map.insert(key_str, lua_value_to_save_value(&v)?);
-            }
-            Ok(SaveValue::Table(map))
-        }
-        other => Err(LuaError::RuntimeError(format!(
-            "cannot serialize value of type {}",
-            other.type_name()
-        ))),
-    }
-}
-
-/// Extracts a slot name from a save filename (e.g. `"slot_quick.sav"` → `"quick"`).
+/// Extracts a slot name from a save filename (e.g. `"slot_quick.sav"` → `"quick"`)..
 fn slot_name_from_filename(filename: &str) -> Option<&str> {
     filename
         .strip_prefix("slot_")
@@ -56,7 +22,8 @@ fn slot_name_from_filename(filename: &str) -> Option<&str> {
 
 /// Evaluates a Lua chunk from save-file content and returns the result table.
 fn eval_save_content<'a>(vm: &'a Lua, content: &str) -> LuaResult<LuaTable<'a>> {
-    vm.load(content).eval()
+    let validated = SaveManager::parse_save_string(content).map_err(LuaError::RuntimeError)?;
+    vm.load(validated.as_str()).eval()
 }
 
 // -------------------------------------------------------------------------------
@@ -167,7 +134,7 @@ impl LuaSaveManager {
         let mut data_map = HashMap::new();
         for pair in data_table.pairs::<String, LuaValue>() {
             let (k, v) = pair?;
-            data_map.insert(k, lua_value_to_save_value(&v)?);
+            data_map.insert(k, SaveValue::from_lua(&v)?);
         }
         let body = serialize_table(&data_map, 0).map_err(LuaError::RuntimeError)?;
         Ok(format!("return {}\n", body))

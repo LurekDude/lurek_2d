@@ -105,6 +105,69 @@ impl EffectParams {
             p3: AtomicParam::new(0.0),
         }
     }
+
+    /// Sets an effect parameter by name using lock-free atomic writes.
+    ///
+    /// Valid parameter names depend on the effect type:
+    /// - Filters (`lowpass`/`highpass`/`bandpass`): `"cutoff"` / `"frequency"`, `"q"`, `"mix"`.
+    /// - `reverb`: `"room_size"`, `"damping"`, `"mix"`.
+    /// - `chorus`: `"rate"`, `"depth"`, `"mix"`.
+    ///
+    /// # Parameters
+    /// - `param` — `&str`. The parameter name.
+    /// - `value` — `f32`. The parameter value.
+    ///
+    /// # Returns
+    /// `Result<(), String>`.
+    pub fn set_param(&self, param: &str, value: f32) -> Result<(), String> {
+        match self.typ {
+            EffectType::Lowpass | EffectType::Highpass | EffectType::Bandpass => match param {
+                "cutoff" | "frequency" => {
+                    self.p1.set(value);
+                    Ok(())
+                }
+                "q" => {
+                    self.p2.set(value);
+                    Ok(())
+                }
+                "mix" => {
+                    self.p3.set(value);
+                    Ok(())
+                }
+                _ => Err(format!("invalid parameter: {}", param)),
+            },
+            EffectType::Reverb => match param {
+                "room_size" => {
+                    self.p1.set(value);
+                    Ok(())
+                }
+                "damping" => {
+                    self.p2.set(value);
+                    Ok(())
+                }
+                "mix" => {
+                    self.p3.set(value);
+                    Ok(())
+                }
+                _ => Err(format!("invalid parameter: {}", param)),
+            },
+            EffectType::Chorus => match param {
+                "rate" => {
+                    self.p1.set(value);
+                    Ok(())
+                }
+                "depth" => {
+                    self.p2.set(value);
+                    Ok(())
+                }
+                "mix" => {
+                    self.p3.set(value);
+                    Ok(())
+                }
+                _ => Err(format!("invalid parameter: {}", param)),
+            },
+        }
+    }
 }
 
 /// Per-stream instantiation of an `EffectParams` slot, holding the filter state for a single audio stream.

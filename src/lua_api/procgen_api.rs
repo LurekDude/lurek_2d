@@ -27,14 +27,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
     tbl.set(
         "cellularAutomata",
         lua.create_function(|lua, (w, h, opts): (u32, u32, Option<LuaTable>)| {
-            let mut cfg = CellularOpts::default();
-            if let Some(t) = opts {
-                if let Ok(v) = t.get::<_, f32>("fill") { cfg.fill = v; }
-                if let Ok(v) = t.get::<_, u32>("iterations") { cfg.iterations = v; }
-                if let Ok(v) = t.get::<_, u32>("birth") { cfg.birth = v; }
-                if let Ok(v) = t.get::<_, u32>("survive") { cfg.survive = v; }
-                if let Ok(v) = t.get::<_, u64>("seed") { cfg.seed = v; }
-            }
+            let cfg = opts.map(|t| CellularOpts::from_lua_table(&t)).transpose()?.unwrap_or_default();
             let data = cellular_automata(w, h, &cfg);
             let out = lua.create_table()?;
             for (i, v) in data.iter().enumerate() {
@@ -138,12 +131,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
                     let y: f32 = pt.get("y")?;
                     points.push((x, y));
                 }
-                let mut vopts = VoronoiOpts::default();
-                if let Some(ot) = opts_tbl {
-                    if let Ok(v) = ot.get::<_, f32>("warp_scale") { vopts.warp_scale = v; }
-                    if let Ok(v) = ot.get::<_, f32>("warp_strength") { vopts.warp_strength = v; }
-                    if let Ok(v) = ot.get::<_, u64>("seed") { vopts.seed = v; }
-                }
+                let vopts = opts_tbl.map(|t| VoronoiOpts::from_lua_table(&t)).transpose()?.unwrap_or_default();
                 let (regions, distances, distances2) = voronoi_diagram(w, h, &points, &vopts);
                 let r_tbl = lua.create_table()?;
                 let d_tbl = lua.create_table()?;

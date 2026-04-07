@@ -48,4 +48,4 @@ pub use debug_overlay::DebugOverlay;
 pub use error::{EngineError, EngineResult, ErrorCategory};
 pub use error_screen::ErrorScreen;
 pub use messages::MessageCatalog;
-pub use shared_state::{ErrorInfo, FullscreenType, ScreenshotRequest, SharedState, WindowState};
+pub use shared_state::{ErrorInfo, FullscreenType, RendererStats, ScreenshotRequest, SharedState, WindowState};

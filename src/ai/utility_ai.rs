@@ -28,6 +28,7 @@
 //! The AIWorld evaluates the UtilityAI for agents with the appropriate decision
 //! model. `last_action` and `last_scores` are cached for debugging/inspection.
 
+use mlua::prelude::*;
 use mlua::RegistryKey;
 
 /// Mathematical function shapes for transforming raw consideration inputs
@@ -227,6 +228,7 @@ impl UtilityAI {
     /// - `p2` — `f64`.
     /// - `p3` — `f64`.
     /// - `weight` — `f64`.
+    #[allow(clippy::too_many_arguments)]
     pub fn add_consideration(
         &mut self,
         action_name: &str,
@@ -259,6 +261,34 @@ impl UtilityAI {
         self.last_action
             .and_then(|i| self.actions.get(i))
             .map(|a| a.name.as_str())
+    }
+    /// Evaluates all actions using Lua scorer callbacks and returns the best action name.
+    ///
+    /// # Parameters
+    /// - `lua` — `&Lua`.
+    ///
+    /// # Returns
+    /// `LuaResult<Option<String>>`.
+    pub fn evaluate(&mut self, lua: &Lua) -> LuaResult<Option<String>> {
+        if self.actions.is_empty() {
+            return Ok(None);
+        }
+        let mut best_idx = 0;
+        let mut best_score = f64::NEG_INFINITY;
+        let mut scores = Vec::with_capacity(self.actions.len());
+        for (i, action) in self.actions.iter().enumerate() {
+            let func: LuaFunction = lua.registry_value(&action.scorer)?;
+            let score: f64 = func.call(())?;
+            let weighted = score * action.momentum_bonus;
+            scores.push(weighted);
+            if weighted > best_score {
+                best_score = weighted;
+                best_idx = i;
+            }
+        }
+        self.last_scores = scores;
+        self.last_action = Some(best_idx);
+        Ok(Some(self.actions[best_idx].name.clone()))
     }
 }
 

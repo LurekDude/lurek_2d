@@ -17,6 +17,8 @@ use crate::light::light_type::LightType;
 use crate::light::shadow::ShadowFilter;
 use crate::log_msg;
 use crate::math::Color;
+use mlua::prelude::{LuaError, LuaResult, LuaTable, LuaValue};
+
 
 /// 2D point light with position, radius, color, intensity, and shadow settings.
 ///
@@ -495,3 +497,174 @@ impl Light2D {
         self.volumetric
     }
 }
+
+
+/// Parses a blend mode string into `LightBlendMode`.
+fn parse_blend_mode(s: &str) -> LuaResult<LightBlendMode> {
+    match s {
+        "add" => Ok(LightBlendMode::Add),
+        "sub" => Ok(LightBlendMode::Sub),
+        "mix" => Ok(LightBlendMode::Mix),
+        _ => Err(LuaError::RuntimeError(format!(
+            "invalid blend mode '{}', expected 'add', 'sub', or 'mix'",
+            s
+        ))),
+    }
+}
+
+/// Parses a falloff mode string into `FalloffMode`.
+fn parse_falloff(s: &str) -> LuaResult<FalloffMode> {
+    match s {
+        "linear" => Ok(FalloffMode::Linear),
+        "smooth" => Ok(FalloffMode::Smooth),
+        "constant" => Ok(FalloffMode::Constant),
+        _ => Err(LuaError::RuntimeError(format!(
+            "invalid falloff '{}', expected 'linear', 'smooth', or 'constant'",
+            s
+        ))),
+    }
+}
+
+/// Parses a shadow filter string into `ShadowFilter`.
+fn parse_shadow_filter(s: &str) -> LuaResult<ShadowFilter> {
+    match s {
+        "none" => Ok(ShadowFilter::None),
+        "pcf5" => Ok(ShadowFilter::Pcf5),
+        "pcf13" => Ok(ShadowFilter::Pcf13),
+        _ => Err(LuaError::RuntimeError(format!(
+            "invalid shadow filter '{}', expected 'none', 'pcf5', or 'pcf13'",
+            s
+        ))),
+    }
+}
+
+/// Parses a light type string into `LightType`.
+fn parse_light_type(s: &str) -> LuaResult<LightType> {
+    match s {
+        "point" => Ok(LightType::Point),
+        "directional" => Ok(LightType::Directional),
+        "spot" => Ok(LightType::Spot),
+        _ => Err(LuaError::RuntimeError(format!(
+            "invalid light type '{}', expected 'point', 'directional', or 'spot'",
+            s
+        ))),
+    }
+}
+
+/// Parses an optional color table `{r, g, b [, a]}` from an opts table field.
+fn parse_opt_color(opts: &LuaTable, field: &str) -> LuaResult<Option<Color>> {
+    let val: LuaValue = opts.get(field)?;
+    match val {
+        LuaValue::Table(tbl) => {
+            let r: f32 = tbl.get(1i32).unwrap_or(1.0);
+            let g: f32 = tbl.get(2i32).unwrap_or(1.0);
+            let b: f32 = tbl.get(3i32).unwrap_or(1.0);
+            let a: f32 = tbl.get(4i32).unwrap_or(1.0);
+            Ok(Some(Color::new(r, g, b, a)))
+        }
+        LuaValue::Nil => Ok(None),
+        _ => Err(LuaError::RuntimeError(format!(
+            "expected color table for '{}', got {}",
+            field,
+            val.type_name()
+        ))),
+    }
+}
+
+impl Light2D {
+
+    /// Applies configuration fields from a Lua options table to this `Light2D`.
+    ///
+    /// # Parameters
+    /// - `opts` — `&LuaTable`. The Lua options table.
+    ///
+    /// # Returns
+    /// `LuaResult<()>`.
+    pub fn apply_lua_opts(&mut self, opts: &LuaTable) -> LuaResult<()> {
+    if let Ok(Some(c)) = parse_opt_color(opts, "color") {
+        self.set_color(c);
+    }
+    if let Ok(v) = opts.get::<_, f32>("intensity") {
+        self.set_intensity(v);
+    }
+    if let Ok(v) = opts.get::<_, f32>("energy") {
+        self.set_energy(v);
+    }
+    if let Ok(s) = opts.get::<_, String>("blend") {
+        self.set_blend_mode(parse_blend_mode(&s)?);
+    }
+    if let Ok(s) = opts.get::<_, String>("falloff") {
+        self.set_falloff(parse_falloff(&s)?);
+    }
+    if let Ok(v) = opts.get::<_, bool>("shadowEnabled") {
+        self.set_shadow_enabled(v);
+    }
+    if let Ok(Some(c)) = parse_opt_color(opts, "shadowColor") {
+        self.set_shadow_color(c);
+    }
+    if let Ok(s) = opts.get::<_, String>("shadowFilter") {
+        self.set_shadow_filter(parse_shadow_filter(&s)?);
+    }
+    if let Ok(v) = opts.get::<_, f32>("shadowSmooth") {
+        self.set_shadow_smooth(v);
+    }
+    if let Ok(v) = opts.get::<_, u16>("lightMask") {
+        self.set_light_mask(v);
+    }
+    if let Ok(v) = opts.get::<_, u16>("shadowMask") {
+        self.set_shadow_mask(v);
+    }
+    if let Ok(v) = opts.get::<_, bool>("enabled") {
+        self.set_enabled(v);
+    }
+    if let Ok(s) = opts.get::<_, String>("type") {
+        self.set_light_type(parse_light_type(&s)?);
+    }
+    if let Ok(v) = opts.get::<_, f32>("direction") {
+        self.set_direction(v);
+    }
+    if let Ok(v) = opts.get::<_, f32>("innerAngle") {
+        self.set_inner_angle(v);
+    }
+    if let Ok(v) = opts.get::<_, f32>("outerAngle") {
+        self.set_outer_angle(v);
+    }
+    if let Ok(v) = opts.get::<_, u16>("groupId") {
+        self.set_group_id(v);
+    }
+    if let Ok(v) = opts.get::<_, bool>("volumetric") {
+        self.set_volumetric(v);
+    }
+    if let Ok(v) = opts.get::<_, f32>("flickerSpeed") {
+        self.flicker_mut().speed = v;
+        self.flicker_mut().enabled = true;
+    }
+    if let Ok(v) = opts.get::<_, f32>("flickerStrength") {
+        self.flicker_mut().strength = v;
+        self.flicker_mut().enabled = true;
+    }
+    if let Ok(v) = opts.get::<_, f32>("attConstant") {
+        self.set_attenuation(Attenuation::new(
+            v,
+            self.get_attenuation().linear,
+            self.get_attenuation().quadratic,
+        ));
+    }
+    if let Ok(v) = opts.get::<_, f32>("attLinear") {
+        self.set_attenuation(Attenuation::new(
+            self.get_attenuation().constant,
+            v,
+            self.get_attenuation().quadratic,
+        ));
+    }
+    if let Ok(v) = opts.get::<_, f32>("attQuadratic") {
+        self.set_attenuation(Attenuation::new(
+            self.get_attenuation().constant,
+            self.get_attenuation().linear,
+            v,
+        ));
+    }
+    Ok(())
+}
+}
+

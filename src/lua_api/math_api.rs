@@ -166,7 +166,7 @@ impl LuaUserData for LuaTransform {
         /// @param oy : number?
         /// @param kx : number?
         /// @param ky : number?
-        #[allow(clippy::too_many_arguments)]
+        #[allow(clippy::too_many_arguments, clippy::type_complexity)]
         methods.add_method_mut(
             "setTransformation",
             |_,
@@ -904,6 +904,7 @@ impl LuaUserData for LuaNoiseGenerator {
 // -------------------------------------------------------------------------------
 
 /// Registers the `luna.math` API table with the Lua VM.
+#[allow(clippy::type_complexity)]
 pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) -> LuaResult<()> {
     let tbl = lua.create_table()?;
 
@@ -980,7 +981,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
         "newBezierCurve",
         lua.create_function(|lua, points: LuaTable| {
             let len = points.len()? as usize;
-            if len < 4 || len % 2 != 0 {
+            if len < 4 || !len.is_multiple_of(2) {
                 return Err(LuaError::external(
                     "newBezierCurve requires a flat table of at least 4 numbers (2 points): {x1,y1, x2,y2, ...}",
                 ));
@@ -1264,7 +1265,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
         "triangulate",
         lua.create_function(|lua, pts: LuaTable| {
             let len = pts.len()? as usize;
-            if len < 6 || len % 2 != 0 {
+            if len < 6 || !len.is_multiple_of(2) {
                 return Err(LuaError::external(
                     "triangulate requires a flat table of at least 6 numbers (3 points)",
                 ));
@@ -1299,7 +1300,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
         "isConvex",
         lua.create_function(|_, pts: LuaTable| {
             let len = pts.len()? as usize;
-            if len < 6 || len % 2 != 0 {
+            if len < 6 || !len.is_multiple_of(2) {
                 return Ok(false);
             }
             let mut verts = Vec::with_capacity(len / 2);

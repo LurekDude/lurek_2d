@@ -7,6 +7,7 @@
 //!
 //! All public items are documented. See the parent module for architectural context
 //! and the `luna.*` Lua API for the scripting interface.
+use crate::audio::dsp::{AtomicParam, EffectParams, EffectType};
 use crate::engine::log_messages::{BU01, BU02, BU03};
 use crate::log_msg;
 
@@ -111,5 +112,59 @@ impl Bus {
     /// `bool`.
     pub fn is_paused(&self) -> bool {
         self.paused
+    }
+
+    /// Adds a DSP effect to this audio bus.
+    ///
+    /// Parses the effect type name, constructs an [`EffectParams`] slot with a monotonic ID,
+    /// and appends it to the shared effects list. The returned ID can be used to set parameters
+    /// or remove the effect later.
+    ///
+    /// # Parameters
+    /// - `effect_type_str` — `&str`. Effect type: `"lowpass"`, `"highpass"`, `"bandpass"`, `"reverb"`, `"chorus"`.
+    /// - `p1_val` — `f32`. Initial primary parameter value (cutoff frequency in Hz for filters; room size for reverb/chorus).
+    ///
+    /// # Returns
+    /// `Result<u32, String>`. The assigned effect ID on success, or an error string for an unknown type.
+    pub fn add_effect(&self, effect_type_str: &str, p1_val: f32) -> Result<u32, String> {
+        let effect_type = match effect_type_str {
+            "lowpass" => EffectType::Lowpass,
+            "highpass" => EffectType::Highpass,
+            "bandpass" => EffectType::Bandpass,
+            "reverb" => EffectType::Reverb,
+            "chorus" => EffectType::Chorus,
+            other => return Err(format!("invalid effect type: {}", other)),
+        };
+        let mut fx_list = self.effects.write().unwrap();
+        let eid = (fx_list.len() + 1) as u32;
+        fx_list.push(std::sync::Arc::new(EffectParams {
+            id: eid,
+            typ: effect_type,
+            p1: AtomicParam::new(p1_val),
+            p2: AtomicParam::new(1.0),
+            p3: AtomicParam::new(0.5),
+        }));
+        Ok(eid)
+    }
+
+    /// Removes a DSP effect from this audio bus by ID.
+    ///
+    /// Acquires a write lock on the effects list and retains all entries whose ID
+    /// differs from `effect_id`. Returns an error if no effect with that ID exists.
+    ///
+    /// # Parameters
+    /// - `effect_id` — `u32`. The ID of the effect to remove, as returned by [`Bus::add_effect`].
+    ///
+    /// # Returns
+    /// `Result<(), String>`.
+    pub fn remove_effect(&self, effect_id: u32) -> Result<(), String> {
+        let mut fx_list = self.effects.write().unwrap();
+        let len_before = fx_list.len();
+        fx_list.retain(|fx| fx.id != effect_id);
+        if fx_list.len() == len_before {
+            Err(format!("effect {} not found", effect_id))
+        } else {
+            Ok(())
+        }
     }
 }

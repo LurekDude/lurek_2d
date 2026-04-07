@@ -65,6 +65,32 @@ impl SoundData {
         }
     }
 
+    /// Creates `SoundData` from Lua-originated arguments, supporting both file loading and silent buffer creation.
+    ///
+    /// When `path` is `Some`, the audio file at that path is decoded into PCM samples via
+    /// [`SoundData::from_file`].  When `path` is `None`, a zero-filled silent buffer of
+    /// `count` samples is created with [`SoundData::new`].
+    ///
+    /// # Parameters
+    /// - `path` — `Option<&str>`. Full resolved file path for file loading; `None` for a silent buffer.
+    /// - `count` — `usize`. Sample count for a silent buffer; ignored when `path` is `Some`.
+    /// - `sample_rate` — `u32`. Sample rate in Hz (e.g. `44100`).
+    /// - `channels` — `u16`. Channel count (e.g. `1` for mono, `2` for stereo).
+    ///
+    /// # Returns
+    /// `Result<Self, String>`.
+    pub fn from_lua_args(
+        path: Option<&str>,
+        count: usize,
+        sample_rate: u32,
+        channels: u16,
+    ) -> Result<Self, String> {
+        match path {
+            Some(p) => Self::from_file(p),
+            None => Ok(Self::new(count, sample_rate, channels)),
+        }
+    }
+
     /// Decode an audio file to SoundData. Returns a fully initialised instance with all fields set to their initial values.
     ///
     /// # Parameters

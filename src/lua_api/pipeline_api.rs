@@ -23,6 +23,77 @@ pub struct LuaStep {
     on_error_key: Rc<RefCell<Option<LuaRegistryKey>>>,
 }
 
+impl LuaStep {
+    /// Executes this step's callback synchronously, handling retries and status transitions.
+    fn execute_sync<'lua>(&self, lua: &'lua Lua, ctx: &LuaTable<'lua>, abort_on_fail: bool) -> LuaResult<bool> {
+        let name = self.inner.borrow().name.clone();
+        let retry_count = self.inner.borrow().retry_count;
+
+        // Check condition gate
+        if let Some(key) = self.condition_key.borrow().as_ref() {
+            let cond_fn: LuaFunction = lua.registry_value(key)?;
+            let should_run: bool = cond_fn.call(ctx.clone())?;
+            if !should_run {
+                self.inner.borrow_mut().status = StepStatus::Skipped;
+                return Ok(true);
+            }
+        }
+
+        // Retrieve callback
+        let cb_key_opt = self.callback_key.borrow();
+        let cb_key = cb_key_opt.as_ref().ok_or_else(|| {
+            LuaError::runtime(format!("step '{}' has no callback registered", name))
+        })?;
+        let cb: LuaFunction = lua.registry_value(cb_key)?;
+        drop(cb_key_opt);
+
+        let max_attempts = retry_count + 1;
+        let mut last_error: Option<LuaError> = None;
+
+        for attempt in 0..max_attempts {
+            self.inner.borrow_mut().attempt = attempt + 1;
+            self.inner.borrow_mut().status = StepStatus::Running;
+
+            match cb.call::<_, LuaValue<'_>>(ctx.clone()) {
+                Ok(result) => {
+                    let results: LuaTable = match ctx.get("results") {
+                        Ok(t) => t,
+                        Err(_) => lua.create_table()?,
+                    };
+                    results.set(name.clone(), result)?;
+                    ctx.set("results", results)?;
+
+                    self.inner.borrow_mut().status = StepStatus::Completed;
+                    self.inner.borrow_mut().error_msg = None;
+                    return Ok(true);
+                }
+                Err(e) => {
+                    last_error = Some(e);
+                    if attempt + 1 < max_attempts { continue; }
+                }
+            }
+        }
+
+        // All attempts exhausted
+        let err_msg = last_error.as_ref().map(|e| e.to_string()).unwrap_or_default();
+        {
+            let mut inner = self.inner.borrow_mut();
+            inner.status = StepStatus::Failed;
+            inner.error_msg = Some(err_msg.clone());
+        }
+
+        // Call per-step on_error callback if set
+        if let Some(key) = self.on_error_key.borrow().as_ref() {
+            let err_fn: LuaFunction = lua.registry_value(key)?;
+            if let Err(e) = err_fn.call::<_, LuaValue<'_>>((name.clone(), err_msg)) {
+                log_msg!(warn, LA02_PIPELINE_CALLBACK_FAIL, "on_error: {e}");
+            }
+        }
+
+        if abort_on_fail { Ok(false) } else { Ok(true) }
+    }
+}
+
 impl LuaUserData for LuaStep {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
 
@@ -277,182 +348,109 @@ pub struct LuaPipeline {
 // Helpers
 // -------------------------------------------------------------------------------
 
-/// Checks whether all required dependencies of `step_name` are satisfied.
-fn deps_satisfied(
-    pipeline: &Pipeline,
-    step_name: &str,
-    wrappers: &HashMap<String, LuaStep>,
-) -> Result<bool, String> {
-    let step = match pipeline.get_step(step_name) {
-        Some(s) => s,
-        None => return Err(format!("step '{}' not found", step_name)),
-    };
-
-    for dep_name in &step.deps {
-        let dep_status = match wrappers.get(dep_name) {
-            Some(w) => w.inner.borrow().status.clone(),
-            None => return Ok(false),
-        };
-        match dep_status {
-            StepStatus::Completed => {}
-            StepStatus::Skipped | StepStatus::Failed => {
-                let dep_step = pipeline.get_step(dep_name.as_str());
-                let is_optional = dep_step.map(|s| s.optional).unwrap_or(false);
-                if !is_optional {
-                    return Ok(false);
-                }
-            }
-            _ => {
-                return Err(format!(
-                    "dep '{}' of '{}' is still in state {:?}",
-                    dep_name,
-                    step_name,
-                    dep_status
-                ));
-            }
-        }
-    }
-    Ok(true)
-}
-
-/// Builds the Lua result table from the current state of all step wrappers.
-fn build_result_table<'lua>(
+/// Converts a `PipelineResult` to a Lua result table for the `run` return value.
+fn pipeline_result_to_lua<'lua>(
     lua: &'lua Lua,
-    wrappers: &HashMap<String, LuaStep>,
-    total_duration: f32,
+    result: &crate::pipeline::PipelineResult,
 ) -> LuaResult<LuaTable<'lua>> {
     let t = lua.create_table()?;
     let completed = lua.create_table()?;
-    let failed = lua.create_table()?;
-    let skipped = lua.create_table()?;
-    let cancelled = lua.create_table()?;
-    let errors = lua.create_table()?;
-
-    let mut c_i = 1usize;
-    let mut f_i = 1usize;
-    let mut s_i = 1usize;
-    let mut ca_i = 1usize;
-    let mut err_i = 1usize;
-
-    for (name, wrapper) in wrappers {
-        let inner = wrapper.inner.borrow();
-        match inner.status {
-            StepStatus::Completed => {
-                completed.set(c_i, name.clone())?;
-                c_i += 1;
-            }
-            StepStatus::Failed => {
-                failed.set(f_i, name.clone())?;
-                f_i += 1;
-                let err_entry = lua.create_table()?;
-                err_entry.set(1, name.clone())?;
-                err_entry.set(2, inner.error_msg.clone().unwrap_or_default())?;
-                errors.set(err_i, err_entry)?;
-                err_i += 1;
-            }
-            StepStatus::Skipped => {
-                skipped.set(s_i, name.clone())?;
-                s_i += 1;
-            }
-            StepStatus::Cancelled => {
-                cancelled.set(ca_i, name.clone())?;
-                ca_i += 1;
-            }
-            _ => {}
-        }
+    for (i, name) in result.completed.iter().enumerate() {
+        completed.set(i + 1, name.clone())?;
     }
-
-    t.set("success", f_i == 1)?;
+    let failed = lua.create_table()?;
+    for (i, name) in result.failed.iter().enumerate() {
+        failed.set(i + 1, name.clone())?;
+    }
+    let skipped = lua.create_table()?;
+    for (i, name) in result.skipped.iter().enumerate() {
+        skipped.set(i + 1, name.clone())?;
+    }
+    let cancelled = lua.create_table()?;
+    for (i, name) in result.cancelled.iter().enumerate() {
+        cancelled.set(i + 1, name.clone())?;
+    }
+    let errors = lua.create_table()?;
+    for (i, (name, msg)) in result.errors.iter().enumerate() {
+        let entry = lua.create_table()?;
+        entry.set(1, name.clone())?;
+        entry.set(2, msg.clone())?;
+        errors.set(i + 1, entry)?;
+    }
+    t.set("success", result.is_success())?;
     t.set("completed", completed)?;
     t.set("failed", failed)?;
     t.set("skipped", skipped)?;
     t.set("cancelled", cancelled)?;
-    t.set("totalDuration", total_duration)?;
+    t.set("totalDuration", result.total_duration)?;
     t.set("errors", errors)?;
     Ok(t)
 }
 
-/// Executes a single step synchronously: calls its callback, handles retries, updates status.
-fn execute_step_sync<'lua>(
+/// Cancels all steps in `order` that are still pending.
+fn cancel_remaining_steps(wrappers: &HashMap<String, LuaStep>, order: &[String]) {
+    for name in order {
+        if let Some(w) = wrappers.get(name) {
+            if w.inner.borrow().status == StepStatus::Pending {
+                w.inner.borrow_mut().status = StepStatus::Cancelled;
+            }
+        }
+    }
+}
+
+/// Fires the per-step pipeline callbacks based on the step's terminal status.
+fn fire_step_callbacks<'lua>(
     lua: &'lua Lua,
-    wrapper: &LuaStep,
+    this: &LuaPipeline,
+    step_name: &str,
     ctx: &LuaTable<'lua>,
-    abort_on_fail: bool,
-) -> LuaResult<bool> {
-    let name = wrapper.inner.borrow().name.clone();
-    let retry_count = wrapper.inner.borrow().retry_count;
-
-    // Check condition gate
-    if let Some(key) = wrapper.condition_key.borrow().as_ref() {
-        let cond_fn: LuaFunction = lua.registry_value(key)?;
-        let should_run: bool = cond_fn.call(ctx.clone())?;
-        if !should_run {
-            wrapper.inner.borrow_mut().status = StepStatus::Skipped;
-            return Ok(true);
-        }
-    }
-
-    // Retrieve callback
-    let cb_key_opt = wrapper.callback_key.borrow();
-    let cb_key = cb_key_opt.as_ref().ok_or_else(|| {
-        LuaError::runtime(format!("step '{}' has no callback registered", name))
-    })?;
-    let cb: LuaFunction = lua.registry_value(cb_key)?;
-    drop(cb_key_opt);
-
-    let max_attempts = retry_count + 1;
-    let mut last_error: Option<LuaError> = None;
-
-    for attempt in 0..max_attempts {
-        wrapper.inner.borrow_mut().attempt = attempt + 1;
-        wrapper.inner.borrow_mut().status = StepStatus::Running;
-
-        match cb.call::<_, LuaValue<'_>>(ctx.clone()) {
-            Ok(result) => {
-                let results: LuaTable = match ctx.get("results") {
-                    Ok(t) => t,
-                    Err(_) => lua.create_table()?,
-                };
-                results.set(name.clone(), result)?;
-                ctx.set("results", results)?;
-
-                wrapper.inner.borrow_mut().status = StepStatus::Completed;
-                wrapper.inner.borrow_mut().error_msg = None;
-                return Ok(true);
+    wrapper: &LuaStep,
+) -> LuaResult<()> {
+    let step_status = wrapper.inner.borrow().status.clone();
+    if step_status == StepStatus::Completed {
+        if let Some(key) = this.on_step_complete_key.borrow().as_ref() {
+            let f: LuaFunction = lua.registry_value(key)?;
+            if let Err(e) = f.call::<_, LuaValue<'_>>((step_name.to_string(), ctx.clone())) {
+                log_msg!(warn, LA02_PIPELINE_CALLBACK_FAIL, "on_step_complete: {e}");
             }
-            Err(e) => {
-                last_error = Some(e);
-                if attempt + 1 < max_attempts {
-                    continue;
-                }
+        }
+    } else if step_status == StepStatus::Failed {
+        if let Some(key) = this.on_step_error_key.borrow().as_ref() {
+            let f: LuaFunction = lua.registry_value(key)?;
+            let err = wrapper.inner.borrow().error_msg.clone().unwrap_or_default();
+            if let Err(e) = f.call::<_, LuaValue<'_>>((step_name.to_string(), err)) {
+                log_msg!(warn, LA02_PIPELINE_CALLBACK_FAIL, "on_step_error: {e}");
             }
         }
     }
+    Ok(())
+}
 
-    // All attempts exhausted
-    let err_msg = last_error
-        .as_ref()
-        .map(|e| e.to_string())
-        .unwrap_or_default();
-    {
-        let mut inner = wrapper.inner.borrow_mut();
-        inner.status = StepStatus::Failed;
-        inner.error_msg = Some(err_msg.clone());
-    }
-
-    // Call per-step on_error callback if set
-    if let Some(key) = wrapper.on_error_key.borrow().as_ref() {
-        let err_fn: LuaFunction = lua.registry_value(key)?;
-        if let Err(e) = err_fn.call::<_, LuaValue<'_>>((name.clone(), err_msg)) {
-            log_msg!(warn, LA02_PIPELINE_CALLBACK_FAIL, "on_error: {e}");
+/// Finalises a pipeline run: collects the `PipelineResult`, converts it to a Lua table,
+/// and fires the `on_complete` callback if registered.
+fn finalize_pipeline_result<'lua>(
+    lua: &'lua Lua,
+    this: &LuaPipeline,
+    elapsed: f32,
+) -> LuaResult<LuaTable<'lua>> {
+    let step_statuses: HashMap<String, (StepStatus, Option<String>)> = this
+        .step_wrappers
+        .borrow()
+        .iter()
+        .map(|(k, v)| {
+            let inner = v.inner.borrow();
+            (k.clone(), (inner.status.clone(), inner.error_msg.clone()))
+        })
+        .collect();
+    let result = this.inner.borrow().collect_result(&step_statuses, elapsed);
+    let result_tbl = pipeline_result_to_lua(lua, &result)?;
+    if let Some(key) = this.on_complete_key.borrow().as_ref() {
+        let f: LuaFunction = lua.registry_value(key)?;
+        if let Err(e) = f.call::<_, LuaValue<'_>>(result_tbl.clone()) {
+            log_msg!(warn, LA02_PIPELINE_CALLBACK_FAIL, "on_complete: {e}");
         }
     }
-
-    if abort_on_fail {
-        Ok(false)
-    } else {
-        Ok(true)
-    }
+    Ok(result_tbl)
 }
 
 // -------------------------------------------------------------------------------
@@ -592,113 +590,34 @@ impl LuaUserData for LuaPipeline {
         /// @param context : table?
         /// @return table
         methods.add_method("run", |lua, this, context: Option<LuaTable>| {
-            let order = this
-                .inner
-                .borrow()
-                .get_execution_order()
-                .map_err(LuaError::runtime)?;
-
-            // Reset all step states
+            let order = this.inner.borrow().get_execution_order().map_err(LuaError::runtime)?;
             this.inner.borrow_mut().reset();
-            for wrapper in this.step_wrappers.borrow().values() {
-                wrapper.inner.borrow_mut().reset();
-            }
-
-            let ctx = match context {
-                Some(c) => c,
-                None => lua.create_table()?,
-            };
-            let results_table = lua.create_table()?;
-            ctx.set("results", results_table)?;
-
+            for w in this.step_wrappers.borrow().values() { w.inner.borrow_mut().reset(); }
+            let ctx = context.unwrap_or(lua.create_table()?);
+            ctx.set("results", lua.create_table()?)?;
             let abort_on_fail = this.inner.borrow().error_mode == ErrorMode::Abort;
             let start = std::time::Instant::now();
-
             'steps: for step_name in &order {
-                let wrapper = {
-                    let wrappers = this.step_wrappers.borrow();
-                    wrappers.get(step_name).cloned()
+                let wrapper = match this.step_wrappers.borrow().get(step_name).cloned() {
+                    Some(w) => w, None => continue,
                 };
-                let wrapper = match wrapper {
-                    Some(w) => w,
-                    None => continue,
-                };
-
-                // Check dependencies
-                {
-                    let pipeline = this.inner.borrow();
-                    let wrappers = this.step_wrappers.borrow();
-                    match deps_satisfied(&pipeline, step_name, &wrappers) {
-                        Ok(true) => {}
-                        Ok(false) => {
-                            if abort_on_fail {
-                                wrapper.inner.borrow_mut().status = StepStatus::Cancelled;
-                                for remaining in &order {
-                                    if let Some(w) = wrappers.get(remaining) {
-                                        if w.inner.borrow().status == StepStatus::Pending {
-                                            w.inner.borrow_mut().status = StepStatus::Cancelled;
-                                        }
-                                    }
-                                }
-                                break 'steps;
-                            } else {
-                                wrapper.inner.borrow_mut().status = StepStatus::Skipped;
-                                continue;
-                            }
-                        }
-                        Err(_) => {
-                            wrapper.inner.borrow_mut().status = StepStatus::Skipped;
-                            continue;
-                        }
+                let statuses: HashMap<String, StepStatus> = this.step_wrappers.borrow().iter()
+                    .map(|(k, v)| (k.clone(), v.inner.borrow().status.clone())).collect();
+                match this.inner.borrow().are_deps_satisfied(step_name, &statuses) {
+                    Ok(true) => {}
+                    Ok(false) => {
+                        if abort_on_fail {
+                            cancel_remaining_steps(&this.step_wrappers.borrow(), &order);
+                            break 'steps;
+                        } else { wrapper.inner.borrow_mut().status = StepStatus::Skipped; continue; }
                     }
+                    Err(_) => { wrapper.inner.borrow_mut().status = StepStatus::Skipped; continue; }
                 }
-
-                let succeeded = execute_step_sync(lua, &wrapper, &ctx, abort_on_fail)?;
-
-                // Fire per-step pipeline callbacks
-                let step_status = wrapper.inner.borrow().status.clone();
-                if step_status == StepStatus::Completed {
-                    if let Some(key) = this.on_step_complete_key.borrow().as_ref() {
-                        let f: LuaFunction = lua.registry_value(key)?;
-                        if let Err(e) = f.call::<_, LuaValue<'_>>((step_name.clone(), ctx.clone())) {
-                            log_msg!(warn, LA02_PIPELINE_CALLBACK_FAIL, "on_step_complete: {e}");
-                        }
-                    }
-                } else if step_status == StepStatus::Failed {
-                    if let Some(key) = this.on_step_error_key.borrow().as_ref() {
-                        let f: LuaFunction = lua.registry_value(key)?;
-                        let err = wrapper.inner.borrow().error_msg.clone().unwrap_or_default();
-                        if let Err(e) = f.call::<_, LuaValue<'_>>((step_name.clone(), err)) {
-                            log_msg!(warn, LA02_PIPELINE_CALLBACK_FAIL, "on_step_error: {e}");
-                        }
-                    }
-                }
-
-                if !succeeded {
-                    let wrappers = this.step_wrappers.borrow();
-                    for remaining in &order {
-                        if let Some(w) = wrappers.get(remaining) {
-                            if w.inner.borrow().status == StepStatus::Pending {
-                                w.inner.borrow_mut().status = StepStatus::Cancelled;
-                            }
-                        }
-                    }
-                    break;
-                }
+                let succeeded = wrapper.execute_sync(lua, &ctx, abort_on_fail)?;
+                fire_step_callbacks(lua, this, step_name, &ctx, &wrapper)?;
+                if !succeeded { cancel_remaining_steps(&this.step_wrappers.borrow(), &order); break; }
             }
-
-            let total_duration = start.elapsed().as_secs_f32();
-            let result = build_result_table(lua, &this.step_wrappers.borrow(), total_duration)?;
-
-            // Fire on_complete callback
-            if let Some(key) = this.on_complete_key.borrow().as_ref() {
-                let f: LuaFunction = lua.registry_value(key)?;
-                if let Err(e) = f.call::<_, LuaValue<'_>>(result.clone()) {
-                    log_msg!(warn, LA02_PIPELINE_CALLBACK_FAIL, "on_complete: {e}");
-                }
-            }
-
-            Ok(result)
+            finalize_pipeline_result(lua, this, start.elapsed().as_secs_f32())
         });
 
         // -- runAsync --
@@ -745,126 +664,49 @@ impl LuaUserData for LuaPipeline {
         /// @param dt : number
         /// @return boolean
         methods.add_method("update", |lua, this, dt: f32| {
-            if !*this.is_async.borrow() {
-                return Ok(false);
-            }
-
+            if !*this.is_async.borrow() { return Ok(false); }
             let ctx: LuaTable = {
                 let key_opt = this.context_key.borrow();
-                match key_opt.as_ref() {
-                    Some(k) => lua.registry_value(k)?,
-                    None => return Ok(false),
-                }
+                match key_opt.as_ref() { Some(k) => lua.registry_value(k)?, None => return Ok(false) }
             };
-
             let abort_on_fail = this.inner.borrow().error_mode == ErrorMode::Abort;
-
-            let ready_names = {
+            let ready_names: Vec<String> = {
                 let pipeline = this.inner.borrow();
                 this.scheduler.borrow_mut().update(dt, &pipeline)
             };
-
             for step_name in ready_names {
-                let wrapper = {
-                    let wrappers = this.step_wrappers.borrow();
-                    wrappers.get(&step_name).cloned()
-                };
-                let wrapper = match wrapper {
-                    Some(w) => w,
-                    None => continue,
-                };
-
-                let succeeded = execute_step_sync(lua, &wrapper, &ctx, abort_on_fail)?;
-
-                let step_status = wrapper.inner.borrow().status.clone();
-                if step_status == StepStatus::Completed {
-                    if let Some(key) = this.on_step_complete_key.borrow().as_ref() {
-                        let f: LuaFunction = lua.registry_value(key)?;
-                        if let Err(e) =
-                            f.call::<_, LuaValue<'_>>((step_name.clone(), ctx.clone()))
-                        {
-                            log_msg!(warn, LA02_PIPELINE_CALLBACK_FAIL, "on_step_complete: {e}");
-                        }
-                    }
-                } else if step_status == StepStatus::Failed {
-                    if let Some(key) = this.on_step_error_key.borrow().as_ref() {
-                        let f: LuaFunction = lua.registry_value(key)?;
-                        let err = wrapper.inner.borrow().error_msg.clone().unwrap_or_default();
-                        if let Err(e) = f.call::<_, LuaValue<'_>>((step_name.clone(), err)) {
-                            log_msg!(warn, LA02_PIPELINE_CALLBACK_FAIL, "on_step_error: {e}");
-                        }
-                    }
-                }
-
+                let wrapper = match this.step_wrappers.borrow().get(&step_name).cloned() { Some(w) => w, None => continue };
+                let succeeded = wrapper.execute_sync(lua, &ctx, abort_on_fail)?;
+                fire_step_callbacks(lua, this, &step_name, &ctx, &wrapper)?;
                 if !succeeded {
-                    let wrappers = this.step_wrappers.borrow();
-                    for w in wrappers.values() {
+                    this.step_wrappers.borrow().values().for_each(|w| {
                         let s = w.inner.borrow().status.clone();
-                        if s == StepStatus::Pending || s == StepStatus::Waiting {
-                            w.inner.borrow_mut().status = StepStatus::Cancelled;
-                        }
-                    }
+                        if s == StepStatus::Pending || s == StepStatus::Waiting { w.inner.borrow_mut().status = StepStatus::Cancelled; }
+                    });
                     *this.is_async.borrow_mut() = false;
                     this.scheduler.borrow_mut().reset();
-
-                    let result = build_result_table(
-                        lua,
-                        &this.step_wrappers.borrow(),
-                        this.scheduler.borrow().elapsed,
-                    )?;
-                    if let Some(key) = this.on_complete_key.borrow().as_ref() {
-                        let f: LuaFunction = lua.registry_value(key)?;
-                        let _: LuaResult<LuaValue> = f.call(result);
-                    }
-                    return Ok(true);
+                    return finalize_pipeline_result(lua, this, this.scheduler.borrow().elapsed).map(|_| true);
                 }
-
-                // Mark newly-ready dependents as Waiting
-                {
+                let statuses: HashMap<String, StepStatus> = this.step_wrappers.borrow().iter()
+                    .map(|(k, v)| (k.clone(), v.inner.borrow().status.clone())).collect();
+                for (name, w) in this.step_wrappers.borrow().iter() {
+                    if w.inner.borrow().status != StepStatus::Pending { continue; }
                     let pipeline = this.inner.borrow();
-                    let wrappers = this.step_wrappers.borrow();
-                    for (name, w) in wrappers.iter() {
-                        if w.inner.borrow().status != StepStatus::Pending {
-                            continue;
-                        }
-                        if let Ok(true) = deps_satisfied(&pipeline, name, &wrappers) {
-                            w.inner.borrow_mut().status = StepStatus::Waiting;
-                            this.scheduler.borrow_mut().mark_step_waiting(name, &pipeline);
-                        }
+                    if let Ok(true) = pipeline.are_deps_satisfied(name, &statuses) {
+                        w.inner.borrow_mut().status = StepStatus::Waiting;
+                        this.scheduler.borrow_mut().mark_step_waiting(name, &pipeline);
                     }
                 }
             }
-
-            // Check if all steps are terminal
-            let all_done = {
-                let wrappers = this.step_wrappers.borrow();
-                wrappers.values().all(|w| {
-                    matches!(
-                        w.inner.borrow().status,
-                        StepStatus::Completed
-                            | StepStatus::Failed
-                            | StepStatus::Skipped
-                            | StepStatus::Cancelled
-                    )
-                })
-            };
-
+            let all_done = this.step_wrappers.borrow().values().all(|w| matches!(
+                w.inner.borrow().status,
+                StepStatus::Completed | StepStatus::Failed | StepStatus::Skipped | StepStatus::Cancelled
+            ));
             if all_done {
                 *this.is_async.borrow_mut() = false;
                 this.scheduler.borrow_mut().reset();
-
-                let elapsed = this.scheduler.borrow().elapsed;
-                let result =
-                    build_result_table(lua, &this.step_wrappers.borrow(), elapsed)?;
-                if let Some(key) = this.on_complete_key.borrow().as_ref() {
-                    let f: LuaFunction = lua.registry_value(key)?;
-                    if let Err(e) = f.call::<_, LuaValue<'_>>(result) {
-                        log_msg!(warn, LA02_PIPELINE_CALLBACK_FAIL, "on_complete: {e}");
-                    }
-                }
-            }
-
-            Ok(all_done)
+                finalize_pipeline_result(lua, this, this.scheduler.borrow().elapsed).map(|_| true)
+            } else { Ok(false) }
         });
 
         // -- cancel --
@@ -940,13 +782,14 @@ impl LuaUserData for LuaPipeline {
         /// Returns the current result table built from step states, or nil.
         /// @return table?
         methods.add_method("getResult", |lua, this, ()| {
-            let wrappers = this.step_wrappers.borrow();
-            if wrappers.is_empty() {
-                return Ok(None);
-            }
+            if this.step_wrappers.borrow().is_empty() { return Ok(None); }
             let elapsed = this.scheduler.borrow().elapsed;
-            let t = build_result_table(lua, &wrappers, elapsed)?;
-            Ok(Some(t))
+            let step_statuses: HashMap<String, (StepStatus, Option<String>)> = this
+                .step_wrappers.borrow().iter()
+                .map(|(k, v)| { let i = v.inner.borrow(); (k.clone(), (i.status.clone(), i.error_msg.clone())) })
+                .collect();
+            let result = this.inner.borrow().collect_result(&step_statuses, elapsed);
+            Ok(Some(pipeline_result_to_lua(lua, &result)?))
         });
 
         // -- getContext --

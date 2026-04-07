@@ -505,6 +505,35 @@ impl Graph {
             .map(|e| e.id)
             .collect()
     }
+
+    /// Returns edge IDs for a node filtered by direction string.
+    ///
+    /// # Parameters
+    /// - `node_id` — `u64`.
+    /// - `direction` — `&str`. One of `"in"`, `"out"`, `"both"`.
+    ///
+    /// # Returns
+    /// `Result<Vec<u64>, String>`.
+    pub fn get_edges_by_direction(&self, node_id: u64, direction: &str) -> Result<Vec<u64>, String> {
+        if !self.nodes.contains_key(&node_id) {
+            return Err("node not found".into());
+        }
+        match direction {
+            "in" => Ok(self.get_incoming_edges(node_id)),
+            "out" => Ok(self.get_outgoing_edges(node_id)),
+            "both" => {
+                let mut combined = self.get_outgoing_edges(node_id);
+                combined.extend(self.get_incoming_edges(node_id));
+                combined.sort();
+                combined.dedup();
+                Ok(combined)
+            }
+            _ => Err(format!(
+                "invalid direction: '{}'. Use 'in', 'out', or 'both'",
+                direction
+            )),
+        }
+    }
 }
 
 #[cfg(test)]

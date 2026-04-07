@@ -3,6 +3,8 @@
 
 use std::collections::HashMap;
 
+use mlua::prelude::{LuaError, LuaResult, LuaValue};
+
 use crate::engine::log_messages::{SV01, SV02, SV03, SV04};
 use crate::log_msg;
 
@@ -218,6 +220,20 @@ impl SaveManager {
     pub fn summary(&self) -> &str {
         &self.summary
     }
+
+    /// Validates and returns save-file content, rejecting empty input.
+    ///
+    /// # Parameters
+    /// - `content` — `&str`. The raw save-file string.
+    ///
+    /// # Returns
+    /// `Result<String, String>`.
+    pub fn parse_save_string(content: &str) -> Result<String, String> {
+        if content.trim().is_empty() {
+            return Err("save file is empty".to_string());
+        }
+        Ok(content.to_string())
+    }
 }
 
 /// Serialize a simple Lua-compatible value hierarchy into a `return { ... }` string.
@@ -293,6 +309,48 @@ pub enum SaveValue {
     Str(String),
     /// Lua table (string keys only for save data).
     Table(HashMap<String, SaveValue>),
+}
+
+impl SaveValue {
+    /// Converts a [`LuaValue`] into a [`SaveValue`] for Rust-side serialization.
+    ///
+    /// # Parameters
+    /// - `value` — `&LuaValue`. The Lua value to convert.
+    ///
+    /// # Returns
+    /// `LuaResult<Self>`.
+    pub fn from_lua(value: &LuaValue) -> LuaResult<Self> {
+        match value {
+            LuaValue::Nil => Ok(SaveValue::Nil),
+            LuaValue::Boolean(b) => Ok(SaveValue::Bool(*b)),
+            LuaValue::Integer(i) => Ok(SaveValue::Number(*i as f64)),
+            LuaValue::Number(n) => Ok(SaveValue::Number(*n)),
+            LuaValue::String(s) => Ok(SaveValue::Str(s.to_str()?.to_string())),
+            LuaValue::Table(t) => {
+                let mut map = HashMap::new();
+                for pair in t.clone().pairs::<LuaValue, LuaValue>() {
+                    let (k, v) = pair?;
+                    let key_str = match &k {
+                        LuaValue::String(s) => s.to_str()?.to_string(),
+                        LuaValue::Integer(i) => i.to_string(),
+                        LuaValue::Number(n) => format!("{}", n),
+                        _ => {
+                            return Err(LuaError::RuntimeError(format!(
+                                "cannot serialize table key of type {}",
+                                k.type_name()
+                            )))
+                        }
+                    };
+                    map.insert(key_str, SaveValue::from_lua(&v)?);
+                }
+                Ok(SaveValue::Table(map))
+            }
+            other => Err(LuaError::RuntimeError(format!(
+                "cannot serialize value of type {}",
+                other.type_name()
+            ))),
+        }
+    }
 }
 
 fn is_lua_identifier(s: &str) -> bool {

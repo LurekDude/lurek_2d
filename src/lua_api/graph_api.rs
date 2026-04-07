@@ -8,6 +8,7 @@ use std::str::FromStr;
 
 use crate::engine::SharedState;
 use crate::graph::{ConversionRule, FlowMode, Graph, GraphEvent, ItemPosition, OverflowPolicy};
+use crate::graph::pathfinding::PathResult;
 
 // ── Constants ───────────────────────────────────────────────────────────
 
@@ -128,6 +129,28 @@ macro_rules! with_item_mut {
             .ok_or_else(|| LuaError::RuntimeError("item not found".into()))?;
         $body
     }};
+}
+
+// ── Helpers ─────────────────────────────────────────────────────────────
+
+fn path_result_to_lua<'lua>(
+    lua: &'lua Lua,
+    graph: &Rc<RefCell<Graph>>,
+    result: &PathResult,
+) -> LuaResult<LuaTable<'lua>> {
+    let table = lua.create_table()?;
+    let nodes_table = lua.create_table()?;
+    for (i, nid) in result.nodes.iter().enumerate() {
+        nodes_table.set(i + 1, LuaNode { graph: graph.clone(), id: *nid })?;
+    }
+    table.set("nodes", nodes_table)?;
+    let edges_table = lua.create_table()?;
+    for (i, eid) in result.edges.iter().enumerate() {
+        edges_table.set(i + 1, LuaEdge { graph: graph.clone(), id: *eid })?;
+    }
+    table.set("edges", edges_table)?;
+    table.set("cost", result.cost)?;
+    Ok(table)
 }
 
 // ── GraphItem UserData ──────────────────────────────────────────────────
@@ -801,37 +824,13 @@ impl LuaUserData for LuaNode {
         /// @param dir : string?
         /// @return table
         methods.add_method("getEdges", |lua, this, dir: Option<String>| {
-            let graph = this.graph.borrow();
-            if !graph.nodes.contains_key(&this.id) {
-                return Err(LuaError::RuntimeError("node not found".into()));
-            }
             let direction = dir.as_deref().unwrap_or("both");
-            let ids = match direction {
-                "in" => graph.get_incoming_edges(this.id),
-                "out" => graph.get_outgoing_edges(this.id),
-                "both" => {
-                    let mut combined = graph.get_outgoing_edges(this.id);
-                    combined.extend(graph.get_incoming_edges(this.id));
-                    combined.sort();
-                    combined.dedup();
-                    combined
-                }
-                _ => {
-                    return Err(LuaError::RuntimeError(format!(
-                        "invalid direction: '{}'. Use 'in', 'out', or 'both'",
-                        direction
-                    )));
-                }
-            };
+            let ids = this.graph.borrow()
+                .get_edges_by_direction(this.id, direction)
+                .map_err(LuaError::runtime)?;
             let table = lua.create_table()?;
             for (i, eid) in ids.iter().enumerate() {
-                table.set(
-                    i + 1,
-                    LuaEdge {
-                        graph: this.graph.clone(),
-                        id: *eid,
-                    },
-                )?;
+                table.set(i + 1, LuaEdge { graph: this.graph.clone(), id: *eid })?;
             }
             Ok(table)
         });
@@ -1336,33 +1335,7 @@ impl LuaUserData for LuaGraph {
                 let to = to_ud.borrow::<LuaNode>()?;
                 let graph = this.inner.borrow();
                 match graph.find_path(from.id, to.id) {
-                    Some(result) => {
-                        let table = lua.create_table()?;
-                        let nodes_table = lua.create_table()?;
-                        for (i, nid) in result.nodes.iter().enumerate() {
-                            nodes_table.set(
-                                i + 1,
-                                LuaNode {
-                                    graph: this.inner.clone(),
-                                    id: *nid,
-                                },
-                            )?;
-                        }
-                        table.set("nodes", nodes_table)?;
-                        let edges_table = lua.create_table()?;
-                        for (i, eid) in result.edges.iter().enumerate() {
-                            edges_table.set(
-                                i + 1,
-                                LuaEdge {
-                                    graph: this.inner.clone(),
-                                    id: *eid,
-                                },
-                            )?;
-                        }
-                        table.set("edges", edges_table)?;
-                        table.set("cost", result.cost)?;
-                        Ok(Some(table))
-                    }
+                    Some(result) => Ok(Some(path_result_to_lua(lua, &this.inner, &result)?)),
                     None => Ok(None),
                 }
             },
@@ -1383,33 +1356,7 @@ impl LuaUserData for LuaGraph {
                 let to = to_ud.borrow::<LuaNode>()?;
                 let graph = this.inner.borrow();
                 match graph.find_path_for_item(item.id, from.id, to.id) {
-                    Some(result) => {
-                        let table = lua.create_table()?;
-                        let nodes_table = lua.create_table()?;
-                        for (i, nid) in result.nodes.iter().enumerate() {
-                            nodes_table.set(
-                                i + 1,
-                                LuaNode {
-                                    graph: this.inner.clone(),
-                                    id: *nid,
-                                },
-                            )?;
-                        }
-                        table.set("nodes", nodes_table)?;
-                        let edges_table = lua.create_table()?;
-                        for (i, eid) in result.edges.iter().enumerate() {
-                            edges_table.set(
-                                i + 1,
-                                LuaEdge {
-                                    graph: this.inner.clone(),
-                                    id: *eid,
-                                },
-                            )?;
-                        }
-                        table.set("edges", edges_table)?;
-                        table.set("cost", result.cost)?;
-                        Ok(Some(table))
-                    }
+                    Some(result) => Ok(Some(path_result_to_lua(lua, &this.inner, &result)?)),
                     None => Ok(None),
                 }
             },

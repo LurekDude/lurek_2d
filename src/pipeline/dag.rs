@@ -8,7 +8,8 @@ use std::collections::{HashMap, HashSet, VecDeque};
 
 use crate::engine::log_messages::{PL01_PIPELINE_INIT, PL02_STEP_ADD};
 use crate::log_msg;
-use crate::pipeline::step::PipelineStep;
+use crate::pipeline::result::{PipelineResult, PipelineStatus};
+use crate::pipeline::step::{PipelineStep, StepStatus};
 
 /// Determines how the pipeline responds when a step fails.
 ///
@@ -334,6 +335,91 @@ impl Pipeline {
         for step in self.steps.values_mut() {
             step.reset();
         }
+    }
+
+    /// Checks whether all declared dependencies of `step_name` have reached a terminal-success state.
+    ///
+    /// Returns `Ok(true)` when all deps are satisfied, `Ok(false)` when a required dep failed/skipped,
+    /// and `Err` when a required dep is still mid-flight (caller should skip or defer the step).
+    ///
+    /// # Parameters
+    /// - `step_name` — `&str`. The step whose deps to evaluate.
+    /// - `statuses` — `&HashMap<String, StepStatus>`. Current status of every step in the pipeline.
+    ///
+    /// # Returns
+    /// `Result<bool, String>`.
+    pub fn are_deps_satisfied(
+        &self,
+        step_name: &str,
+        statuses: &HashMap<String, StepStatus>,
+    ) -> Result<bool, String> {
+        let step = match self.get_step(step_name) {
+            Some(s) => s,
+            None => return Err(format!("step '{}' not found", step_name)),
+        };
+        for dep_name in &step.deps {
+            let dep_status = match statuses.get(dep_name) {
+                Some(s) => s.clone(),
+                None => return Ok(false),
+            };
+            match dep_status {
+                StepStatus::Completed => {}
+                StepStatus::Skipped | StepStatus::Failed => {
+                    let is_optional = self
+                        .get_step(dep_name)
+                        .map(|s| s.optional)
+                        .unwrap_or(false);
+                    if !is_optional {
+                        return Ok(false);
+                    }
+                }
+                _ => {
+                    return Err(format!(
+                        "dep '{}' of '{}' is still in state {:?}",
+                        dep_name, step_name, dep_status
+                    ));
+                }
+            }
+        }
+        Ok(true)
+    }
+
+    /// Aggregates per-step runtime data into a `PipelineResult` summary.
+    ///
+    /// # Parameters
+    /// - `step_statuses` — `&HashMap<String, (StepStatus, Option<String>)>`. Each entry is
+    ///   `(name, (status, error_message))`.
+    /// - `duration` — `f32`. Total wall-clock execution time in seconds.
+    ///
+    /// # Returns
+    /// `PipelineResult`.
+    pub fn collect_result(
+        &self,
+        step_statuses: &HashMap<String, (StepStatus, Option<String>)>,
+        duration: f32,
+    ) -> PipelineResult {
+        let mut result = PipelineResult::new();
+        result.total_duration = duration;
+        for (name, (status, error_msg)) in step_statuses {
+            match status {
+                StepStatus::Completed => result.completed.push(name.clone()),
+                StepStatus::Failed => {
+                    result.failed.push(name.clone());
+                    if let Some(msg) = error_msg {
+                        result.errors.push((name.clone(), msg.clone()));
+                    }
+                }
+                StepStatus::Skipped => result.skipped.push(name.clone()),
+                StepStatus::Cancelled => result.cancelled.push(name.clone()),
+                _ => {}
+            }
+        }
+        result.status = if result.failed.is_empty() {
+            PipelineStatus::Completed
+        } else {
+            PipelineStatus::Failed
+        };
+        result
     }
 
     // ---------------------------------------------------------------------------

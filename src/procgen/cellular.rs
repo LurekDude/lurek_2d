@@ -3,6 +3,7 @@
 //! Produces a flat grid of wall/open cells via random fill followed by
 //! iterative neighbor-count smoothing.
 
+use mlua::prelude::*;
 use super::lcg::Lcg;
 use crate::engine::log_messages::{PG01_CELLULAR_START, PG02_CELLULAR_DONE};
 use crate::log_msg;
@@ -38,6 +39,25 @@ impl Default for CellularOpts {
             survive: 4,
             seed: 12345,
         }
+    }
+}
+
+impl CellularOpts {
+    /// Constructs `CellularOpts` from a Lua table, using defaults for missing keys.
+    ///
+    /// # Parameters
+    /// - `t` -- `&LuaTable`.
+    ///
+    /// # Returns
+    /// `LuaResult<Self>`.
+    pub fn from_lua_table(t: &LuaTable) -> LuaResult<Self> {
+        let mut opts = Self::default();
+        if let Ok(v) = t.get::<_, f32>("fill") { opts.fill = v; }
+        if let Ok(v) = t.get::<_, u32>("iterations") { opts.iterations = v; }
+        if let Ok(v) = t.get::<_, u32>("birth") { opts.birth = v; }
+        if let Ok(v) = t.get::<_, u32>("survive") { opts.survive = v; }
+        if let Ok(v) = t.get::<_, u64>("seed") { opts.seed = v; }
+        Ok(opts)
     }
 }
 

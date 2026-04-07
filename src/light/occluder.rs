@@ -71,6 +71,26 @@ impl Occluder {
         self.vertices = vertices;
     }
 
+    /// Creates an `Occluder` from a flat `{x1, y1, x2, y2, ...}` coordinate sequence.
+    ///
+    /// The flat array must have an even length in `6..=1024` (representing 3 to 512 vertices).
+    ///
+    /// # Parameters
+    /// - `flat` — `&[f32]`. Flat coordinate array alternating x, y values.
+    ///
+    /// # Returns
+    /// `Result<Self, String>`.
+    pub fn from_flat_coords(flat: &[f32]) -> Result<Self, String> {
+        if flat.len() < 6 || flat.len() > 1024 || !flat.len().is_multiple_of(2) {
+            return Err(format!(
+                "vertex array must have 6..=1024 coordinates (3..=512 vertices), got {}",
+                flat.len()
+            ));
+        }
+        let verts: Vec<Vec2> = flat.chunks(2).map(|c| Vec2::new(c[0], c[1])).collect();
+        Ok(Self::new(verts))
+    }
+
     /// Returns a reference to the polygon vertices.
     ///
     /// # Returns
