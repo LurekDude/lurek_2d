@@ -139,7 +139,7 @@ Every `src/lua_api/<module>_api.rs` must stay aligned with the module's AGENT.md
 | `## Lua API` section describes `luna.<module>.*` | All listed functions must exist in the api file |
 | `## Notes` on constraints | Enforced as `LuaError` at the binding boundary |
 
-To check alignment: `python tools/gen_api_data.py --module <name> --check`
+To check alignment: `python tools/docs/gen_lua_api_data.py`
 
 ## Adding a New API Module (Checklist)
 
@@ -147,7 +147,7 @@ To check alignment: `python tools/gen_api_data.py --module <name> --check`
 2. Register it in `src/lua_api/mod.rs` under the appropriate `modules.<flag>` guard
 3. Add `/// @param` / `/// @return` docstrings to every public function
 4. Update `src/<module>/AGENT.md` — add `## Lua API` section listing new functions
-5. Regenerate API docs: `python tools/gen_api_data.py`
+5. Regenerate API docs: `python tools/docs/gen_lua_api_data.py`
 6. Write Lua BDD test: `tests/lua/unit/test_<module>.lua`
 7. Register the test in `tests/lua/harness.rs`
 8. Run: `cargo test lua_test_<module>`

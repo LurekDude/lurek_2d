@@ -379,7 +379,7 @@ If the domain module lacks a needed method, **add `pub fn` to domain first, then
 ## Validation
 
 ```powershell
-python tools/validate_lua_api.py src/lua_api/<module>_api.rs
+python tools/validate/validate_lua_api.py src/lua_api/<module>_api.rs
 ```
 
 Exit code `0` = pass. Exit code `1` = errors.

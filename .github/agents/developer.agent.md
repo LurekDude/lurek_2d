@@ -79,36 +79,36 @@ Run these checks after every feature implementation, in order:
 
 ### 1. Docstring coverage
 - Every new `pub struct / pub fn / pub enum / pub trait` MUST have a `///` doc comment
-- Run: `python tools/collect_docs.py --report-missing` — must exit 0
-- Run: `python tools/doc_coverage.py --report-missing` — lists any Lua API gaps too
+- Run: `python tools/docs/collect_docs.py --report-missing` — must exit 0
+- Run: `python tools/audit/doc_coverage.py --report-missing` — lists any Lua API gaps too
 
 ### 2. API documentation regeneration
 - If ANY Lua API binding changed (new function, renamed, removed):
   ```powershell
-  python tools/gen_lua_api.py
+  python tools/docs/gen_lua_api.py
   python tools/gen_all_docs.py --skip-legacy
   ```
 - To generate a new `src/lua_api/<module>_api.rs` skeleton from an existing Rust module:
   ```powershell
-  python tools/gen_lua_api_skeleton.py --module <name> --dry-run   # preview first
-  python tools/gen_lua_api_skeleton.py --module <name>              # write file
+  python tools/docs/gen_lua_api_skeleton.py --module <name> --dry-run   # preview first
+  python tools/docs/gen_lua_api_skeleton.py --module <name>              # write file
   ```
-- If only Rust internals changed: `python tools/collect_docs.py`
+- If only Rust internals changed: `python tools/docs/collect_docs.py`
 
 ### 3. Test coverage
 - New public Rust API items need at least one test in `tests/<module>_tests.rs`
 - New `luna.*` API functions need at least one Lua test in `tests/lua/`
 - Run `cargo test` — all tests must pass
-- Run `python tools/test_coverage.py` to check for regressions in coverage %
+- Run `python tools/audit/test_coverage.py` to check for regressions in coverage %
 
 ### 4. CAG review
 - New major feature area → check if a new `.github/skills/<feature>/SKILL.md` is needed
-- Validate: `python tools/cag_validate.py`
+- Validate: `python tools/validate/cag_validate.py`
 
 ### 5. Wiki update
 - New `luna.*` API functions → update `wiki/API-Reference.md`:
   ```powershell
-  python tools/gen_wiki_api.py
+  python tools/docs/gen_wiki_api.py
   git -C wiki add API-Reference.md
   git -C wiki commit -m "docs(api): describe what changed"
   ```
@@ -183,11 +183,11 @@ some_engine_call().map_err(LuaError::external)?
 - Read the relevant `src/<module>/AGENT.md` before touching that module — it contains the invariants, types, and patterns specific to that subsystem
 - Clone `Rc` before every closure; scope `borrow_mut()` to the narrowest block and never hold it across a Lua callback boundary
 - New resource types need a typed key in `src/engine/resource_keys.rs` plus a corresponding `SlotMap` field in `SharedState` — never use `HashMap<String, T>` for resources
-- Add `///` doc comments to every `pub fn`, `pub struct`, `pub enum`, and `pub trait` before committing — `python tools/collect_docs.py --report-missing` must exit 0
+- Add `///` doc comments to every `pub fn`, `pub struct`, `pub enum`, and `pub trait` before committing — `python tools/docs/collect_docs.py --report-missing` must exit 0
 - Per-frame code must not allocate on the heap — grow draw-call and command buffers once at startup
 - Use `log::info!` / `log::debug!` / `log::warn!` / `log::error!` throughout; never `println!` in engine code
 - During development run `cargo check` and `cargo test --test <module>_tests` — never full `cargo build` or `cargo test` (they block parallel work)
-- Regenerate generated docs after any Lua API change: `python tools/gen_lua_api.py && python tools/gen_all_docs.py --skip-legacy`
+- Regenerate generated docs after any Lua API change: `python tools/docs/gen_lua_api.py && python tools/gen_all_docs.py --skip-legacy`
 
 ## ANTI-PATTERNS
 

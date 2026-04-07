@@ -309,15 +309,15 @@ cargo fmt --check                   # format check
 
 ### Analytics tools
 ```powershell
-python tools/test_coverage.py                  # coverage metrics → docs/logs/test_coverage.json
-python tools/integration_coverage.py           # Lua integration coverage map
-python tools/collect_docs.py --report-missing  # undocumented public items (exit 1 if any)
-python tools/quality_report.py                 # combined quality snapshot
+python tools/audit/test_coverage.py                  # coverage metrics → docs/logs/test_coverage.json
+python tools/audit/integration_coverage.py           # Lua integration coverage map
+python tools/docs/collect_docs.py --report-missing  # undocumented public items (exit 1 if any)
+python tools/audit/quality_report.py                 # combined quality snapshot
 ```
 
 ### Adding missing docs
 ```powershell
-python tools/collect_docs.py --suggest         # starter /// lines for undocumented items
+python tools/docs/collect_docs.py --suggest         # starter /// lines for undocumented items
 ```
 
 ### What "covered" means

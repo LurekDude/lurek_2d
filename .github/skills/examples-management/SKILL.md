@@ -123,13 +123,13 @@ The tools pipeline uses examples to validate the API surface:
 
 ```powershell
 # Check that all luna.* calls in examples/ are documented in api_data.json
-python tools/gen_api_data.py --check-examples
+python tools/docs/gen_lua_api.py --check
 
 # Generate Lua API reference including usage patterns from examples
-python tools/gen_lua_api.py
+python tools/docs/gen_lua_api.py
 ```
 
-When an `examples/` file uses an API function that lacks an `/// @param`/`/// @return` docstring, `gen_api_data.py --check-examples` will report it. Fix the docstring, not the example.
+When an `examples/` file uses an API function that lacks an `/// @param`/`/// @return` docstring, `tools/docs/gen_lua_api.py --check` will report it. Fix the docstring, not the example.
 
 ## Smoke Testing
 

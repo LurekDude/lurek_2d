@@ -58,7 +58,7 @@ type/short-description
 4. Must pass all quality gates before merge:
    - `cargo test && cargo clippy -- -D warnings`
    - `cargo fmt --check`
-   - `python tools/collect_docs.py --report-missing`
+   - `python tools/docs/collect_docs.py --report-missing`
 5. Request review via `mcp_github_pull_request_review_write` or GitHub UI
 6. Squash-merge to main — keep main history clean
 

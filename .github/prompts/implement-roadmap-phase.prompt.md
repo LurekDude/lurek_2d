@@ -79,7 +79,7 @@ For each file listed in the phase's task blocks:
 
 Run or simulate:
 ```
-python tools/collect_docs.py --report-missing
+python tools/docs/collect_docs.py --report-missing
 ```
 
 Read `docs/API/lua_api_reference_generated.md` (if present) and compare with phase's target API functions. Mark each target function as: `present` / `partial` / `missing`.
@@ -187,7 +187,7 @@ luna.set("functionName", lua.create_function(move |_, args: (T1, T2)| {
 
 Run after implementing all tasks:
 ```
-python tools/collect_docs.py --report-missing
+python tools/docs/collect_docs.py --report-missing
 ```
 
 Zero missing docs is required before proceeding to Step 6.
@@ -277,10 +277,10 @@ cargo clippy -- -D warnings
 cargo fmt --check
 
 # Gate 5: Doc coverage — zero missing public items
-python tools/collect_docs.py --report-missing
+python tools/docs/collect_docs.py --report-missing
 
 # Gate 6: API reference regeneration
-python tools/collect_docs.py
+python tools/docs/collect_docs.py
 ```
 
 If any gate fails:
@@ -371,8 +371,8 @@ The phase is not done until every item below is checked:
 - [ ] `cargo test` passes — all existing tests still pass; new tests for all new functions present
 - [ ] `cargo clippy -- -D warnings` produces zero warnings
 - [ ] `cargo fmt --check` produces zero diffs
-- [ ] `python tools/collect_docs.py --report-missing` exits 0 (zero missing public docs)
-- [ ] `python tools/collect_docs.py` completes and `docs/API/lua_api_reference_generated.md` is updated
+- [ ] `python tools/docs/collect_docs.py --report-missing` exits 0 (zero missing public docs)
+- [ ] `python tools/docs/collect_docs.py` completes and `docs/API/lua_api_reference_generated.md` is updated
 - [ ] Every new `luna.*` function appears in `docs/API/lua_api_reference_generated.md`
 - [ ] Every new `luna.*` function has a corresponding Lua test in `tests/lua/`
 - [ ] Every new Rust public function has a corresponding Rust test in `tests/<module>_tests.rs`
@@ -408,5 +408,5 @@ The phase is not done until every item below is checked:
 - `.github/skills/rust-coding/SKILL.md` — Rust code style and safety rules
 - `.github/skills/testing-rust/SKILL.md` — test writing patterns
 - `references/similar-engine-ref/` — a similar game engine source for direct API comparison
-- `tools/collect_docs.py` — run to check and generate API docs
-- `tools/cag_validate.py` — run to validate CAG layer after any `.github/` edits
+- `tools/docs/collect_docs.py` — run to check and generate API docs
+- `tools/validate/cag_validate.py` — run to validate CAG layer after any `.github/` edits

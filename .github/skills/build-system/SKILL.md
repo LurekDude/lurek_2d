@@ -10,9 +10,9 @@ description: "Load this skill when working with the Luna2D build system: Cargo p
 - Building or running the engine locally for the first time
 - Choosing between `cargo build`, `cargo check`, `cargo build --release`, or `cargo build --profile dist`
 - Tuning binary size or runtime speed via Cargo profile settings
-- Packaging a distribution release with `tools/dist.ps1` or `tools/dist.sh`
-- Installing the engine binary locally with `tools/install.ps1` or `tools/install.sh`
-- Building an NSIS Windows installer with `tools/installer.nsi`
+- Packaging a distribution release with `tools/dist/dist.ps1` or `tools/dist/dist.sh`
+- Installing the engine binary locally with `tools/dist/install.ps1` or `tools/dist/install.sh`
+- Building an NSIS Windows installer with `tools/dist/installer.nsi`
 - Switching between the LuaJIT and Lua 5.4 scripting backends
 
 ## Owns
@@ -149,10 +149,10 @@ cargo build --profile dist
 
 ```powershell
 # Full release build + package → dist/luna2d-windows-x86_64/
-powershell -ExecutionPolicy Bypass -File tools/dist.ps1
+powershell -ExecutionPolicy Bypass -File tools/dist/dist.ps1
 
 # Skip cargo build (repackage already-built binary)
-powershell -ExecutionPolicy Bypass -File tools/dist.ps1 -SkipBuild
+powershell -ExecutionPolicy Bypass -File tools/dist/dist.ps1 -SkipBuild
 ```
 
 Output: `dist/luna2d-windows-x86_64/luna2d.exe` + demos + `dist/luna2d-windows-x86_64.zip`
@@ -160,7 +160,7 @@ Output: `dist/luna2d-windows-x86_64/luna2d.exe` + demos + `dist/luna2d-windows-x
 ### Linux / macOS — TAR.GZ
 
 ```bash
-bash tools/dist.sh
+bash tools/dist/dist.sh
 ```
 
 Output: `dist/luna2d-<os>-<arch>/` + `.tar.gz`
@@ -169,7 +169,7 @@ Output: `dist/luna2d-<os>-<arch>/` + `.tar.gz`
 
 ```powershell
 # Requires NSIS 3.x on PATH
-makensis tools/installer.nsi
+makensis tools/dist/installer.nsi
 ```
 
 Output: `dist/luna2d-<version>-setup.exe`
@@ -180,15 +180,15 @@ Output: `dist/luna2d-<version>-setup.exe`
 
 ```powershell
 # Install luna2d.exe to PATH (Windows)
-powershell -ExecutionPolicy Bypass -File tools/install.ps1
+powershell -ExecutionPolicy Bypass -File tools/dist/install.ps1
 
 # Uninstall
-powershell -ExecutionPolicy Bypass -File tools/uninstall.ps1
+powershell -ExecutionPolicy Bypass -File tools/dist/install.ps1 --uninstall
 ```
 
 ```bash
 # Install (Linux/macOS)
-bash tools/install.sh
+bash tools/dist/install.sh
 ```
 
 After install: `luna demos/hello_world` works from any directory.
@@ -206,9 +206,9 @@ These tasks are in `.vscode/tasks.json` (Ctrl+Shift+B or Terminal → Run Task):
 | `Build: Check (fast)` | `cargo check` |
 | `Run Debug: Pick Example` | `cargo run -- demos/<pick>` |
 | `Run Release: Pick Example` | `cargo run --release -- demos/<pick>` |
-| `Dist: Package Windows` | `tools/dist.ps1` |
-| `Dist: Package Windows (skip build)` | `tools/dist.ps1 -SkipBuild` |
-| `Dist: NSIS Installer (Windows)` | `makensis tools/installer.nsi` |
+| `Dist: Package Windows` | `tools/dist/dist.ps1` |
+| `Dist: Package Windows (skip build)` | `tools/dist/dist.ps1 -SkipBuild` |
+| `Dist: NSIS Installer (Windows)` | `makensis tools/dist/installer.nsi` |
 
 ---
 

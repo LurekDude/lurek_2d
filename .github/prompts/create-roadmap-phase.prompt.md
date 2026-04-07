@@ -107,7 +107,7 @@ For every phase listed in `Depends On`, open it and update its `Blocks:` line to
 ### Step 5: Validate
 
 ```powershell
-python tools/cag_validate.py
+python tools/validate/cag_validate.py
 ```
 
 CAG validation does not check roadmap files, but confirms no CAG breakage from this step.

@@ -24,23 +24,23 @@ import time
 from pathlib import Path
 
 SCRIPTS = [
-    ("gen_rust_api_data.py", "Rust JSON (docs/API/rust_api_data.json)"),
-    ("gen_lua_api_data.py",  "Lua JSON (docs/API/lua_api_data.json)"),
-    ("gen_luadoc.py",        "LuaCATS Stubs (docs/API/luna.lua)"),
-    ("gen_docs_lua.py",      "Lua API reference (docs/API/lua-api.md)"),
-    ("gen_docs_rust.py",     "Rust API reference (docs/API/rust-api.md)"),
-    ("gen_wiki_api.py",      "Wiki cheatsheet (wiki/API-Reference.md)"),
-    ("doc_coverage.py",      "Doc coverage analytics (docs/logs/doc_coverage.json)"),
-    ("test_coverage.py",     "Test coverage analytics (docs/logs/test_coverage.json)"),
+    ("docs/gen_rust_api_data.py", "Rust JSON (docs/API/rust_api_data.json)"),
+    ("docs/gen_lua_api_data.py",  "Lua JSON (docs/API/lua_api_data.json)"),
+    ("docs/gen_luadoc.py",        "LuaCATS Stubs (docs/API/luna.lua)"),
+    ("docs/gen_docs_lua.py",      "Lua API reference (docs/API/lua-api.md)"),
+    ("docs/gen_docs_rust.py",     "Rust API reference (docs/API/rust-api.md)"),
+    ("docs/gen_wiki_api.py",      "Wiki cheatsheet (wiki/API-Reference.md)"),
+    ("audit/doc_coverage.py",      "Doc coverage analytics (docs/logs/doc_coverage.json)"),
+    ("audit/test_coverage.py",     "Test coverage analytics (docs/logs/test_coverage.json)"),
 ]
 
 # Scripts that need extra arguments (script_name, args_list, label)
 SCRIPTS_WITH_ARGS = [
-    ("gen_test_docs.py", ["--mode", "rust", "--output", "docs/API/test_docs_rust.md"],
+    ("docs/gen_test_docs.py", ["--mode", "rust", "--output", "docs/API/test_docs_rust.md"],
      "Rust test docs (docs/API/test_docs_rust.md)"),
-    ("gen_test_docs.py", ["--mode", "lua",  "--output", "docs/API/test_docs_lua.md"],
+    ("docs/gen_test_docs.py", ["--mode", "lua",  "--output", "docs/API/test_docs_lua.md"],
      "Lua test docs (docs/API/test_docs_lua.md)"),
-    ("gen_coverage_gaps.py", [],
+    ("audit/gen_coverage_gaps.py", [],
      "Coverage gaps (docs/API/coverage_gaps.md)"),
 ]
 

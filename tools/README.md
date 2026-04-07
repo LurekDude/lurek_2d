@@ -1,131 +1,107 @@
 # Luna2D Tools Directory
 
-This directory contains **permanent** CLI scripts for the Luna2D engine pipeline.
+Permanent CLI scripts for the Luna2D engine pipeline, organised by category.
+Every subfolder has its own `README.md` with the full script list and usage examples.
 
 ## Policy: Permanent vs Temporary Scripts
 
 | Location | For |
 |---|---|
-| `tools/*.py / *.ps1 / *.sh / *.nsi` | Permanent CLI utilities — reusable by any agent, CI, or developer |
+| `tools/<category>/` | Permanent CLI utilities — reusable by any agent, CI, or developer |
 | `work/{session}/scripts/` | One-off or session-scoped scripts — archived at session end |
 
-**Rule**: Do NOT create `_*.py` or any one-off helper scripts in `tools/`. If a script is temporary or session-specific, put it under `work/{session}/scripts/` instead. The `_` prefix is the signal that a file is a rogue/temp script and will be moved.
+**Rule**: Do NOT create `_*.py` or one-off helper scripts in `tools/`. Temporary scripts
+go under `work/{session}/scripts/` and are archived at session end.
 
 ---
 
-## Permanent Tools
+## Subfolders
+
+| Folder | Purpose |
+|---|---|
+| [`tools/docs/`](docs/README.md) | Documentation generators — produce `docs/API/`, `docs/logs/`, `wiki/` |
+| [`tools/audit/`](audit/README.md) | Quality auditing, coverage analytics, gap reports |
+| [`tools/fix/`](fix/README.md) | Code fixers and docstring improvers |
+| [`tools/validate/`](validate/README.md) | Schema and structure validators (exit 1 on failure) |
+| [`tools/assets/`](assets/README.md) | Branding and visual asset generators |
+| [`tools/dist/`](dist/README.md) | Build, package, and install scripts |
+| [`tools/github/`](github/README.md) | GitHub project management automation |
+
+---
+
+## Pipeline Orchestrator
+
+```powershell
+# Run the full documentation pipeline (all gen_* + coverage steps)
+python tools/gen_all_docs.py
+```
+
+`gen_all_docs.py` lives at the tools root and calls scripts from `tools/docs/`
+and `tools/audit/` in the correct dependency order.
+
+---
+
+## Key Scripts — Quick Reference
 
 ### Documentation
 
-| Script | Purpose | Output |
-|---|---|---|
-| `gen_all_docs.py` | Run the full doc pipeline in one command | `docs/` + `wiki/` |
-| `gen_api_data.py` | Build master machine-readable API JSON | `docs/API/api_data.json` |
-| `gen_docs_lua.py` | Compact Lua API reference | `docs/API/lua-api.md` |
-| `gen_docs_rust.py` | Compact Rust API reference | `docs/API/rust-api.md` |
-| `gen_docs_tests.py` | Test catalog from Rust test files | `docs/API/test-docs.md` |
-| `gen_wiki_api.py` | Game-developer API cheatsheet | `wiki/API-Reference.md` |
-| `gen_lua_api.py` | Lua API reference from `@param`/`@return` tags in `src/lua_api/` | `docs/API/lua_api_reference_generated.md` |
-| `gen_lua_api_skeleton.py` | Generate `src/lua_api/*_api.rs` skeletons from Rust module docstrings | `src/lua_api/*.rs` |
-| `collect_docs.py` | Rich Rust API collector with missing-doc report | `docs/API/api_generated.md` |
-| `doc_coverage.py` | Rust + Lua docstring coverage analytics | `docs/API/doc_coverage.json` |
-| `gen_test_docs.py` | Human-readable test documentation from metadata | `docs/API/test_docs.md` |
+```powershell
+python tools/docs/gen_lua_api.py                     # Lua API reference
+python tools/docs/gen_lua_api.py --check             # coverage check (exit 1 if stale)
+python tools/docs/gen_lua_api_skeleton.py --all      # generate lua_api stubs for all modules
+python tools/docs/collect_docs.py --report-missing   # list items missing /// docs (exit 1 if any)
+```
 
-### Coverage & Analytics
+### Auditing & Coverage
 
-| Script | Purpose | Output |
-|---|---|---|
-| `doc_coverage.py` | Count public items with/without `///` docs | `docs/API/doc_coverage.json` |
-| `test_coverage.py` | Cross-reference API functions vs test files | stdout + `docs/API/test_coverage.json` |
-| `integration_coverage.py` | Integration test coverage check | stdout |
-| `module_audit.py` | Module structure and coverage audit | stdout |
-| `audit_module.py` | End-to-end module quality audit (PASS/WARN/ERROR) | stdout / JSON |
-| `validate_agent_md.py` | Validate `src/<module>/AGENT.md` structure, sync, and content quality (M-01–M-12) | stdout / JSON |
-| `quality_report.py` | Quality metrics report | stdout |
+```powershell
+python tools/audit/doc_coverage.py                   # docstring coverage
+python tools/audit/doc_coverage.py --report-missing  # missing items (exit 1 if any)
+python tools/audit/test_coverage.py                  # test coverage summary
+python tools/audit/audit_module.py physics           # end-to-end module audit
+python tools/audit/validate_agent_md.py              # validate all AGENT.md files
+```
 
-### Code Helpers
+### Validation
 
-| Script | Purpose |
-|---|---|
-| `add_lua_docstrings.py` | Add missing `---` Lua docstrings interactively |
-| `add_lua_docstrings_auto.py` | Auto-generate Lua docstrings |
-| `improve_lua_docstrings.py` | Improve existing Lua docstrings |
-| `doc_audit.py` | Audit Rust `///` doc comment quality |
-| `golden_test.py` | Run and compare golden output tests |
-| `validate_game.py` | Validate a game directory structure |
-| `stress_report.py` | Parse and summarize stress test output |
-
-### Lua API Doc Generation
-
-| Script | Purpose |
-|---|---|
-| `gen_docs_lua.py` | Lua-facing API reference Markdown |
-| `gen_lua_api.py` | Lua API reference scanner — reads `@param`/`@return` tags from named `pub fn` in `src/lua_api/` |
-| `gen_lua_api_skeleton.py` | One-time skeleton generator — converts Rust module docstrings into `src/lua_api/*_api.rs` stubs with named `pub fn` pattern |
-
-### Build & Distribution
-
-| Script | Purpose |
-|---|---|
-| `dist.ps1` | Windows release build + zip archive |
-| `dist.sh` | Linux/macOS release build + tarball |
-| `install.ps1` | Install `luna.exe` locally (Windows) |
-| `install.sh` | Install `luna2d` locally (Linux/macOS) |
-| `installer.nsi` | NSIS Windows installer (installs engine + registers `.lunar` file association) |
-| `pack.ps1` | Pack a game directory into a `.lunar` archive (PowerShell) |
-| `pack.py` | Pack a game directory into a `.lunar` archive (Python, cross-platform) |
+```powershell
+python tools/validate/cag_validate.py                # validate entire .github/ CAG layer
+python tools/validate/cag_validate.py --type agent   # agents only
+python tools/validate/cag_validate.py --file PATH    # single file
+python tools/validate/validate_lua_api.py src/lua_api/physics_api.rs
+```
 
 ### Assets
 
-| Script | Purpose |
-|---|---|
-| `gen_splash.py` | Regenerate `assets/splash.png` |
-| `gen_icon.py` | Regenerate `assets/icon.ico` + `assets/icon.png` |
+```powershell
+python tools/assets/gen_splash.py                    # regenerate assets/splash.png
+python tools/assets/gen_icon.py                      # regenerate assets/icon.ico + icon.png
+```
 
-### CAG & Validation
-
-| Script | Purpose |
-|---|---|
-| `cag_validate.py` | Validate all `.github/` CAG files |
-| `ideas_to_github_issues.py` | Generate GitHub issues from `docs/ideas/*.md` |
-| `print_issue_mapping.py` | Print idea → GitHub issue mapping |
-
----
-
-## Usage Examples
+### Build & Distribution
 
 ```powershell
-# Full doc pipeline
-python tools/gen_all_docs.py
+powershell -ExecutionPolicy Bypass -File tools/dist/dist.ps1        # Windows release package
+bash tools/dist/dist.sh                                              # Linux/macOS release package
+powershell -ExecutionPolicy Bypass -File tools/dist/install.ps1     # install locally (Windows)
+bash tools/dist/install.sh                                           # install locally (Linux/macOS)
+makensis tools/dist/installer.nsi                                    # NSIS installer
+```
 
-# Check what's missing docs (exits 1 if any)
-python tools/collect_docs.py --report-missing
+### GitHub
 
-# Documentation coverage analytics
-python tools/doc_coverage.py
-python tools/doc_coverage.py --report-missing
-
-# Test coverage analytics
-python tools/test_coverage.py
-python tools/test_coverage.py --json
-
-# Generate human-readable test docs
-python tools/gen_test_docs.py
-
-# Validate CAG layer
-python tools/cag_validate.py
-
-# Build release binary and package
-powershell tools/dist.ps1          # Windows
-bash tools/dist.sh                 # Linux / macOS
+```powershell
+python tools/github/ideas_to_github_issues.py       # create issues from docs/ideas/
 ```
 
 ---
 
-## Adding a New Permanent Tool
+## Adding a New Tool
 
-1. Place the script in `tools/` (no leading `_`)
-2. Add a `--help` argument (use `argparse`)
-3. Add an entry to the table above in this README
-4. Add an entry to the CLI Tools table in `.github/copilot-instructions.md`
-5. Add a VS Code task in `.vscode/tasks.json` if it has interactive use
+1. Choose the right subfolder (`docs/`, `audit/`, `fix/`, `validate/`, `assets/`, `dist/`, or `github/`)
+2. Add a module-level docstring with:
+   - One-sentence purpose
+   - Usage examples matching the new path
+3. Update the subfolder's `README.md` table
+4. If the tool is invoked from `gen_all_docs.py`, add it to the `SCRIPTS` list there
+5. If it needs a VS Code task, add an entry in `.vscode/tasks.json`

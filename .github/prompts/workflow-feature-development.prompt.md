@@ -69,7 +69,7 @@ description: "Full feature development workflow from design to merged code. Use 
     - Ensure `# Parameters`, `# Fields` / `# Variants`, and `# Returns` sections are present and accurate (these are machine-readable — never remove them)
     - Module-level `//!` must include a purpose statement, subsystem inventory, architecture note, and typical usage sequence
     - Lua API files (`src/lua_api/*.rs`) must document the `register()` function and every Lua-callable closure
-12. Gate: `python tools/collect_docs.py --report-missing` exits 0 — no public items lack a doc comment
+12. Gate: `python tools/docs/collect_docs.py --report-missing` exits 0 — no public items lack a doc comment
 
 ### Phase 7: Spec File Cleanup
 
@@ -90,7 +90,7 @@ description: "Full feature development workflow from design to merged code. Use 
 
 ### Phase 9: AGENT.md Validation
 
-17. Run `python tools/cag_validate.py --file src/<module>/AGENT.md`
+17. Run `python tools/validate/cag_validate.py --file src/<module>/AGENT.md`
 18. Gate: validator exits 0 or warns only about non-critical style issues (no ERROR-level findings)
 
 ## Outputs
@@ -112,10 +112,10 @@ description: "Full feature development workflow from design to merged code. Use 
 - [ ] `docs/API/lua_api_reference_generated.md` updated
 - [ ] Reviewer signoff
 - [ ] All public items have expanded docstrings (`# Parameters`, `# Fields`, `# Returns` present)
-- [ ] `python tools/collect_docs.py --report-missing` exits 0
+- [ ] `python tools/docs/collect_docs.py --report-missing` exits 0
 - [ ] Spec MDs removed from `src/` — content in `docs/API/<module>-design.md`
 - [ ] `src/<module>/AGENT.md` tier and test paths are accurate
-- [ ] `python tools/cag_validate.py --file src/<module>/AGENT.md` passes
+- [ ] `python tools/validate/cag_validate.py --file src/<module>/AGENT.md` passes
 
 ## References
 

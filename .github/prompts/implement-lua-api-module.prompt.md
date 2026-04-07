@@ -142,7 +142,7 @@ Also apply the **mlua Best Practices** table from the skill before writing any c
 ## Step 6 — Validate
 
 ```powershell
-python tools/validate_lua_api.py src/lua_api/<module>_api.rs
+python tools/validate/validate_lua_api.py src/lua_api/<module>_api.rs
 ```
 
 Exit 0 = pass. Fix ALL errors and warnings. Repeat until clean.
@@ -186,7 +186,7 @@ And in `create_lua_vm()`:
 
 - Step 0 inventory is complete (both sources listed as a table)
 - All business logic migrated to domain module (no loops/conditionals in closures)
-- `python tools/validate_lua_api.py src/lua_api/<module>_api.rs` exits 0
+- `python tools/validate/validate_lua_api.py src/lua_api/<module>_api.rs` exits 0
 - `cargo check --lib 2>&1 | Select-String "error"` produces no output
 - Every `methods.add_method*(` call has a docstring with `@return` above it
 - No `impl mlua::UserData` (use prelude `impl LuaUserData`)

@@ -305,12 +305,12 @@ Handoff to Doc-Writer:
 1. Task: add missing /// docstrings for every WARNING-level docstring gap; regenerate API reference
 2. Context: Gap Report (G-* items with gap type "Missing docstring")
 3. Constraints: one-sentence summary + optional detail; no # Examples unless runnable and tested
-4. Files: all Rust files listed in docstring gaps; then run: python tools/gen_lua_api.py
-5. Done-when: python tools/collect_docs.py --report-missing shows 0 missing for this module; API ref regenerated
+4. Files: all Rust files listed in docstring gaps; then run: python tools/docs/gen_lua_api.py
+5. Done-when: python tools/docs/collect_docs.py --report-missing shows 0 missing for this module; API ref regenerated
 ```
 
 After Doc-Writer returns:
-- Run `python tools/collect_docs.py --report-missing | Select-String "<module>"` — must show 0 missing
+- Run `python tools/docs/collect_docs.py --report-missing | Select-String "<module>"` — must show 0 missing
 - Gate fail → route back to Doc-Writer
 
 ---

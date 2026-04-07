@@ -42,7 +42,7 @@ cargo test
 
 ### Gate 5: CAG Validation
 ```powershell
-python tools/cag_validate.py
+python tools/validate/cag_validate.py
 ```
 - Must produce grade B or better on all file families
 - 0 CRITICAL issues, ≤ 3 HIGH issues
@@ -92,6 +92,6 @@ cargo build --release
 cargo clippy -- -D warnings
 cargo fmt --check
 cargo test
-python tools/cag_validate.py
+python tools/validate/cag_validate.py
 cargo audit
 ```

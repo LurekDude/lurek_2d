@@ -3,8 +3,8 @@
 Luna2D is a 2D game engine written in Rust that loads and executes Lua game scripts.
 This file is the always-on backbone for AI-assisted development in the Luna2D repository.
 
-- **CAG load order**: System Prompt → `src/<module>/AGENT.md` (module knowledge) → Skills (on-demand) → Prompts → Agents
-- **Module knowledge**: Every `src/<module>/AGENT.md` is the canonical domain reference for that module. Read it before implementing module-specific features.
+- **CAG load order**: System Prompt → `src/<module>/AGENT.md` (module overview) → `specs/<module>.md` (full technical detail) → Skills (on-demand) → Prompts → Agents
+- **Module knowledge two-layer system**: `src/<module>/AGENT.md` is a short overview (purpose, source file list, pointer to spec). `specs/<module>.md` is the full canonical reference (architecture, types, Lua API, examples, cross-module refs). Read the AGENT.md first; load the corresponding spec when you need deep technical detail.
 - **Tech baseline**: Rust stable ≥1.78 | LuaJIT vendored via mlua 0.9 (`lua54` feature = non-shipping fallback) | wgpu 22 | winit 0.30 | rapier2d 0.32 | rodio 0.17 | fontdue 0.9
 - **Sources of truth**: `docs/architecture/philosophy.md` (binding constraints) · `docs/architecture/engine-architecture.md` (module structure, tier system) · `docs/architecture/test-framework.md` (test suite). Consult all three before implementing any feature.
 - **API namespace**: All Lua bindings live under `luna.*` — never external engine prefixes, never bare globals
@@ -36,9 +36,9 @@ Active binding decisions from `docs/architecture/philosophy.md` — do not propo
 
 **CAG validation** (run after every `.github/` edit):
 ```powershell
-python tools/cag_validate.py                              # Full validation
-python tools/cag_validate.py --type agent|skill|prompt    # One family
-python tools/cag_validate.py --file <path>                # Single file
+python tools/validate/cag_validate.py                              # Full validation
+python tools/validate/cag_validate.py --type agent|skill|prompt    # One family
+python tools/validate/cag_validate.py --file <path>                # Single file
 ```
 
 **Commit quality gate**:
@@ -70,7 +70,7 @@ Luna2D uses a strictly layered architecture enforced by Rust's module visibility
 
 ## CAG Routing
 
-**Load order**: System Prompt → `src/<module>/AGENT.md` → relevant skill files → agent
+**Load order**: System Prompt → `src/<module>/AGENT.md` (overview) → `specs/<module>.md` (full spec, load when deep detail needed) → relevant skill files → agent
 
 **Skill catalog** — all skills live in `.github/skills/`. Load the relevant `SKILL.md` before working in that domain.
 `agent-md` · `analytics` · `asset-pipeline` · `build-system` · `cag-workflow` · `ci-cd-pipeline` · `cross-platform` · `dev-debugging` · `documentation` · `error-handling` · `examples-management` · `game-ai` · `github-workflow` · `gpu-programming` · `logging` · `lua-api-design` · `lua-rust-bridge` · `lua-runtime` · `lua-scripting` · `module-architecture` · `module-audit` · `performance-profiling` · `roadmap-planning` · `rust-coding` · `testing-rust` · `threading` · `tools-cag-validation` · `visual-effects` · `vscode-extension`
@@ -95,7 +95,7 @@ Luna2D uses a strictly layered architecture enforced by Rust's module visibility
 | `Architect` | Makes module boundary decisions, assigns tiers to new modules, designs the dependency graph, and enforces the DAG invariant across the codebase |
 | `Doc-Writer` | Writes and maintains all documentation in `docs/`, ensures `///` coverage on public items, runs the doc pipeline, and keeps `demos/README.md` current |
 | `Security` | Audits the Lua sandbox, GameFS path-traversal guards, Lua input validation, and `unsafe` blocks — reports findings to Developer, never implements fixes directly |
-| `CAG-Architect` | Maintains the `.github/` CAG layer — agents, skills, prompts, and the system prompt — and always runs `tools/cag_validate.py` after every edit |
+| `CAG-Architect` | Maintains the `.github/` CAG layer — agents, skills, prompts, and the system prompt — and always runs `tools/validate/cag_validate.py` after every edit |
 | `Configurator` | Authors, validates, and documents `conf.lua` and `conf.toml` templates against the `Config` struct in `src/engine/config.rs` — does not modify engine Rust code |
 | `Hacker` | Performs adversarial probing of the `luna.*` API and sandbox — stale keys, path traversal, double-release, nil spam, resource exhaustion — and feeds findings to Security and Tester |
 | `Player` | Reviews demos and API proposals through named user personas; provides subjective fun ratings and friction reports to Lua-Designer and Doc-Writer — never performs correctness checks |
@@ -141,7 +141,7 @@ Luna2D has a two-layer test system. Both layers run **headless** — no window, 
 
 ### Docstrings
 
-Every `pub` Rust item needs `///`. Every module (`mod.rs`, `lib.rs`) needs `//!`. Format: one-sentence summary, optional detail paragraph. Verify: `python tools/collect_docs.py --report-missing` (exits 1 if any missing).
+Every `pub` Rust item needs `///`. Every module (`mod.rs`, `lib.rs`) needs `//!`. Format: one-sentence summary, optional detail paragraph. Verify: `python tools/docs/collect_docs.py --report-missing` (exits 1 if any missing).
 
 **Lua API files** (`src/lua_api/`) use inline `@param name : type` and `@return type` annotations — **never** `# Parameters` / `# Returns` rustdoc sections. Gold standard: `src/lua_api/timer_api.rs`.
 
@@ -166,15 +166,26 @@ Completed session folders move to `work/archive/` — never delete.
 
 ### CLI Tools (tools/)
 
-All permanent tools live in `tools/`. See `tools/README.md` for the full index. Key categories:
+All permanent tools live in `tools/` organised by category. See `tools/README.md` for the full index. Each subfolder has its own `README.md`.
 
-- **CAG**: `cag_validate.py [--type agent|skill|prompt] [--file <path>]`
-- **Docs**: `gen_all_docs.py` · `collect_docs.py [--report-missing|--suggest]` · `gen_lua_api.py` · `doc_coverage.py`
-- **Tests**: `test_coverage.py [--suggest]` · `integration_coverage.py` · `gen_test_docs.py`
-- **Audit**: `audit_module.py <name>` · `module_audit.py` · `quality_report.py`
-- **Lua API**: `gen_lua_api_skeleton.py [--all|--module <name>|--list]`
-- **Assets**: `gen_splash.py` · `gen_icon.py`
-- **Distribution**: `dist.ps1` / `dist.sh` · `install.ps1` / `install.sh`
+| Subfolder | Contains |
+|---|---|
+| `tools/docs/` | Documentation generators (`gen_lua_api.py`, `collect_docs.py`, `gen_all_docs.py` …) |
+| `tools/audit/` | Quality auditing & coverage analytics (`audit_module.py`, `doc_coverage.py`, `test_coverage.py` …) |
+| `tools/fix/` | Code fixers & docstring improvers (`add_lua_docstrings.py`, `fix_docstrings.py` …) |
+| `tools/validate/` | Schema & structure validators (`cag_validate.py`, `validate_lua_api.py` …) |
+| `tools/assets/` | Asset generators (`gen_splash.py`, `gen_icon.py` …) |
+| `tools/dist/` | Build, package & install (`dist.ps1`, `dist.sh`, `install.ps1`, `install.sh` …) |
+| `tools/github/` | GitHub automation (`ideas_to_github_issues.py` …) |
+
+Key invocations:
+- **CAG**: `python tools/validate/cag_validate.py [--type agent|skill|prompt] [--file <path>]`
+- **Docs**: `python tools/gen_all_docs.py` · `python tools/docs/collect_docs.py [--report-missing|--suggest]` · `python tools/docs/gen_lua_api.py`
+- **Coverage**: `python tools/audit/doc_coverage.py` · `python tools/audit/test_coverage.py [--suggest]`
+- **Audit**: `python tools/audit/audit_module.py <name>` · `python tools/audit/module_audit.py`
+- **Lua API**: `python tools/docs/gen_lua_api_skeleton.py [--all|--module <name>|--list]`
+- **Assets**: `python tools/assets/gen_splash.py` · `python tools/assets/gen_icon.py`
+- **Distribution**: `powershell tools/dist/dist.ps1` / `bash tools/dist/dist.sh`
 
 ### Logging
 
@@ -204,6 +215,7 @@ Use scoped `--test <module>` during development. Full `cargo test` only at commi
 
 ```
 src/              Rust source — Baseline, Tier 1, Tier 2, and lua_api bridge
+specs/            Full technical specifications for every src/<module>/ (one <module>.md per module)
 library/          Tier 3 Lunasome — pure-Lua libraries (no Rust engine internals)
 demos/            Playable Lua game demos — each has main.lua and optional conf.lua
 examples/         Single-file Lua API usage scripts — one per luna.* module
@@ -221,4 +233,18 @@ assets/           Engine assets: splash screen, window icon, embedded fonts
 - **`demos/`** — Run any demo with `cargo run -- demos/<name>`. Use as reference for complete, idiomatic game structures built on the `luna.*` API.
 - **`examples/`** — Focused single-file API usage scripts (e.g. `physics.lua`, `tilemap.lua`). Use when you need to understand a specific `luna.*` namespace in isolation.
 - **`library/`** — Lunasome Tier 3 pure-Lua libraries. Each has a `README.md`. Load in a game with `require("library/combat")` etc. Never reach into Rust engine internals from library code.
-- **`docs/API/lua_api_reference_generated.md`** — Full `luna.*` API reference generated from `///` inline annotations by `tools/gen_lua_api.py`. Canonical source — do not hand-edit.
+- **`docs/API/lua_api_reference_generated.md`** — Full `luna.*` API reference generated from `///` inline annotations by `tools/docs/gen_lua_api.py`. Canonical source — do not hand-edit.
+- **`specs/`** — One `<module>.md` per engine module. Full architecture, types, Lua API details, and cross-module references. Read alongside `src/<module>/AGENT.md`. See `specs/README.md` for the sync contract.
+
+### Cross-Artifact Sync Contract
+
+Every time you add a feature, fix a bug, or change the API, you **must** update all of the following in the same commit:
+
+| Changed artifact | Files that must also change |
+|---|---|
+| Rust source `src/<module>/*.rs` | `src/<module>/AGENT.md` · `specs/<module>.md` |
+| Lua binding `src/lua_api/<module>_api.rs` | `specs/<module>.md` · `docs/API/lua_api_reference_generated.md` (run `tools/docs/gen_lua_api.py`) |
+| `luna.*` API added/renamed/removed | `examples/<module>.lua` · any `demos/` that use the API · `library/` modules that depend on it |
+| New module created | New `src/<module>/AGENT.md` (short) · new `specs/<module>.md` (full) · entry in `specs/README.md` |
+
+This list is the canonical sync requirement. Never commit a code change without checking every row.

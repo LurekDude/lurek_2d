@@ -101,14 +101,14 @@ tools: [<tool list>]
 
 ```powershell
 # Validate all .github/ CAG files
-python tools/cag_validate.py
+python tools/validate/cag_validate.py
 
 # Validate one family
-python tools/cag_validate.py --type skill
-python tools/cag_validate.py --type agent
+python tools/validate/cag_validate.py --type skill
+python tools/validate/cag_validate.py --type agent
 
 # Validate a single file
-python tools/cag_validate.py --file .github/skills/my-skill/SKILL.md
+python tools/validate/cag_validate.py --file .github/skills/my-skill/SKILL.md
 ```
 
 - Exit 1 = validation failures (schema errors, missing required sections)

@@ -41,4 +41,4 @@ description: "Load this skill when setting up or maintaining CI/CD for Luna2D: G
 - **Fail fast**: Stop pipeline on first failure
 - **No secrets in logs**: Never echo keys or tokens in CI output
 - **Artifact storage**: Build artifacts attached to release, not committed to repo
-- **CAG validation**: Include `python tools/cag_validate.py` in CI pipeline
+- **CAG validation**: Include `python tools/validate/cag_validate.py` in CI pipeline

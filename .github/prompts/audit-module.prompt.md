@@ -69,10 +69,10 @@ A module **FAILS** the audit if it has:
 | # | Check | What to verify |
 |---|-------|----------------|
 | D-01 | **Module-level docs** | Every `.rs` file has a `//!` module-level doc comment. Missing = ERROR. |
-| D-02 | **Public item docs** | Every `pub struct`, `pub enum`, `pub fn`, `pub trait`, `pub type`, `pub const` has a `///` doc comment. Missing = ERROR. Use `python tools/collect_docs.py --report-missing` scoped to the module. |
+| D-02 | **Public item docs** | Every `pub struct`, `pub enum`, `pub fn`, `pub trait`, `pub type`, `pub const` has a `///` doc comment. Missing = ERROR. Use `python tools/docs/collect_docs.py --report-missing` scoped to the module. |
 | D-03 | **Structured sections** | Docstrings for structs include `# Fields`, enums include `# Variants`, functions include `# Parameters` and `# Returns` where applicable. Missing structured sections = WARNING. |
 | D-04 | **Doc quality** | Doc comments are not stub/placeholder text (e.g., "TODO", "Consult the module-level documentation"). Stubs = WARNING. |
-| D-05 | **Validation tool** | Run `python tools/collect_docs.py --report-missing` and confirm zero findings for this module. Any findings = ERROR. |
+| D-05 | **Validation tool** | Run `python tools/docs/collect_docs.py --report-missing` and confirm zero findings for this module. Any findings = ERROR. |
 
 ### Phase 4 — Architecture Compliance
 

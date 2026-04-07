@@ -8,18 +8,18 @@ description: "Load this skill when performing end-to-end quality audits on Luna2
 ## Owns
 
 - End-to-end module quality audit workflow for all `src/` modules
-- Docstring coverage checks via `python tools/collect_docs.py --report-missing`
+- Docstring coverage checks via `python tools/docs/collect_docs.py --report-missing`
 - AGENT.md sync verification against source files and Lua API
-- Test coverage meta-analysis via `python tools/test_coverage.py`
+- Test coverage meta-analysis via `python tools/audit/test_coverage.py`
 - Architecture compliance: tier rules, dependency direction, import graph
-- Module audit runner: `python tools/audit_module.py <name>` (PASS/WARN/ERROR verdict)
+- Module audit runner: `python tools/audit/audit_module.py <name>` (PASS/WARN/ERROR verdict)
 - Wiki page completeness for all audited modules
 
 ## Load When
 
 - Performing a quality audit on one or more `src/` modules
 - Checking docstring coverage, test coverage, or AGENT.md sync for a module
-- Running `python tools/audit_module.py <name>` and interpreting results
+- Running `python tools/audit/audit_module.py <name>` and interpreting results
 - Verifying architecture compliance (tier rules, dependency direction) before merging
 
 ## Purpose
@@ -194,7 +194,7 @@ Run manually by reviewing file names, checking if pure-Lua alternative exists, a
 ### D-01–D-05: Docstring Checks
 
 ```
-1. Run: python tools/collect_docs.py --report-missing 2>&1 | grep "src/<module>"
+1. Run: python tools/docs/collect_docs.py --report-missing 2>&1 | grep "src/<module>"
 2. If any output: ERROR (D-02, D-05)
 3. For each .rs file, check first line for //! comment (D-01)
 4. For structs: check for `# Fields` section (D-03)
@@ -247,9 +247,9 @@ Verification:
 
 For automated checks, use:
 ```
-python tools/audit_module.py <module_name>
-python tools/audit_module.py --all
-python tools/audit_module.py --tier 1
+python tools/audit/audit_module.py <module_name>
+python tools/audit/audit_module.py --all
+python tools/audit/audit_module.py --tier 1
 ```
 
 This tool automates checks S-01 through S-03, D-01, D-02, D-05, R-02, R-03, Q-01, Q-02, Q-03, and T-01, T-02. Manual checks are flagged as `MANUAL` in the output.

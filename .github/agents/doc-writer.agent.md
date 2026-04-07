@@ -83,8 +83,8 @@ Every Doc-Writer output includes:
 ## BEST PRACTICES
 
 - Verify every Lua code example against the current `luna.*` API before publishing — wrong examples are worse than no examples
-- Run `python tools/collect_docs.py --report-missing` before declaring documentation complete; zero undocumented public items is the exit gate
-- Use `python tools/gen_lua_api.py` to regenerate `docs/API/lua_api_reference_generated.md` — never hand-edit generated files
+- Run `python tools/docs/collect_docs.py --report-missing` before declaring documentation complete; zero undocumented public items is the exit gate
+- Use `python tools/docs/gen_lua_api.py` to regenerate `docs/API/lua_api_reference_generated.md` — never hand-edit generated files
 - Keep `examples/` scripts runnable: `cargo run -- examples/<module>` must succeed with the current binary
 - One concept per section: split long API references into named subsections (`### Sources`, `### Mixer`, etc.) rather than one flat list
 - Link architecture docs to the canonical source of truth (`docs/architecture/philosophy.md`, `engine-architecture.md`, `test-framework.md`) — never duplicate policy

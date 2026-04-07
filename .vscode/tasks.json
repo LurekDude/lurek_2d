@@ -161,23 +161,23 @@
         // ─── 📖 LUA API DOCUMENTATION ─────────────────────────────────────────
         {
             "label": "Lua API: Generate Reference",
-            "detail": "📝 Run tools/gen_lua_api.py to regenerate docs/lua_api_reference_generated.md from docstrings in src/lua_api/*.rs",
+            "detail": "📝 Run tools/docs/gen_lua_api.py to regenerate docs/lua_api_reference_generated.md from docstrings in src/lua_api/*.rs",
             "type": "shell",
-            "command": "python tools/gen_lua_api.py",
+            "command": "python tools/docs/gen_lua_api.py",
             "problemMatcher": []
         },
         {
             "label": "Lua API: Check Coverage",
-            "detail": "✓ Run tools/gen_lua_api.py --check to validate all 77 Lua functions have docstrings. Exit code 1 if any missing.",
+            "detail": "✓ Run tools/docs/gen_lua_api.py --check to validate all 77 Lua functions have docstrings. Exit code 1 if any missing.",
             "type": "shell",
-            "command": "python tools/gen_lua_api.py --check",
+            "command": "python tools/docs/gen_lua_api.py --check",
             "problemMatcher": []
         },
         {
             "label": "Lua API: Add Docstrings (Setup)",
-            "detail": "🔧 Run tools/add_lua_docstrings.py to auto-add /// docstrings from inline comments. Run once during project setup.",
+            "detail": "🔧 Run tools/fix/add_lua_docstrings.py to auto-add /// docstrings from inline comments. Run once during project setup.",
             "type": "shell",
-            "command": "python tools/add_lua_docstrings.py",
+            "command": "python tools/fix/add_lua_docstrings.py",
             "problemMatcher": []
         },
         // ─── 📖 DOCUMENTATION ─────────────────────────────────────────────────
@@ -190,51 +190,51 @@
         },
         {
             "label": "Docs: Collect API (Python)",
-            "detail": "📝 Run tools/collect_docs.py to scan src/ and regenerate docs/api_generated.md with all public API items and doc comments.",
+            "detail": "📝 Run tools/docs/collect_docs.py to scan src/ and regenerate docs/api_generated.md with all public API items and doc comments.",
             "type": "shell",
-            "command": "python tools/collect_docs.py",
+            "command": "python tools/docs/collect_docs.py",
             "problemMatcher": []
         },
         {
             "label": "Docs: Report Missing Docs",
-            "detail": "📋 Run tools/collect_docs.py --report-missing to list every public item that lacks a /// doc comment.",
+            "detail": "📋 Run tools/docs/collect_docs.py --report-missing to list every public item that lacks a /// doc comment.",
             "type": "shell",
-            "command": "python tools/collect_docs.py --report-missing",
+            "command": "python tools/docs/collect_docs.py --report-missing",
             "problemMatcher": []
         },
         {
             "label": "Docs: Suggest Missing Docstrings",
-            "detail": "💡 Run tools/collect_docs.py --suggest to print starter /// doc lines for every undocumented public item.",
+            "detail": "💡 Run tools/docs/collect_docs.py --suggest to print starter /// doc lines for every undocumented public item.",
             "type": "shell",
-            "command": "python tools/collect_docs.py --suggest",
+            "command": "python tools/docs/collect_docs.py --suggest",
             "problemMatcher": []
         },
         {
             "label": "Docs: Coverage Report",
-            "detail": "📊 Run tools/doc_coverage.py to show docstring coverage for all Rust public items and Lua API bindings. Writes docs/logs/doc_coverage.json.",
+            "detail": "📊 Run tools/audit/doc_coverage.py to show docstring coverage for all Rust public items and Lua API bindings. Writes docs/logs/doc_coverage.json.",
             "type": "shell",
-            "command": "python tools/doc_coverage.py",
+            "command": "python tools/audit/doc_coverage.py",
             "problemMatcher": []
         },
         {
             "label": "Docs: Coverage Check (Missing)",
-            "detail": "🔍 Run tools/doc_coverage.py --report-missing to list all public items missing /// doc comments. Exits 1 if any found.",
+            "detail": "🔍 Run tools/audit/doc_coverage.py --report-missing to list all public items missing /// doc comments. Exits 1 if any found.",
             "type": "shell",
-            "command": "python tools/doc_coverage.py --report-missing",
+            "command": "python tools/audit/doc_coverage.py --report-missing",
             "problemMatcher": []
         },
         {
             "label": "Docs: Generate Test Docs",
-            "detail": "🧪 Run tools/gen_test_docs.py to generate docs/test_docs.md — a human-readable description of all tests and coverage gaps. Requires docs/logs/test_coverage.json (run 'Docs: Test Coverage' first).",
+            "detail": "🧪 Run tools/docs/gen_test_docs.py to generate docs/test_docs.md — a human-readable description of all tests and coverage gaps. Requires docs/logs/test_coverage.json (run 'Docs: Test Coverage' first).",
             "type": "shell",
-            "command": "python tools/gen_test_docs.py",
+            "command": "python tools/docs/gen_test_docs.py",
             "problemMatcher": []
         },
         {
             "label": "Docs: Test Coverage",
-            "detail": "📊 Run tools/test_coverage.py to analyse Rust and Lua API test coverage. Writes docs/logs/test_coverage.json.",
+            "detail": "📊 Run tools/audit/test_coverage.py to analyse Rust and Lua API test coverage. Writes docs/logs/test_coverage.json.",
             "type": "shell",
-            "command": "python tools/test_coverage.py",
+            "command": "python tools/audit/test_coverage.py",
             "problemMatcher": []
         },
         {
@@ -249,21 +249,21 @@
             "label": "Install: Local (Windows)",
             "detail": "📦 Build release binary and install luna.exe to %USERPROFILE%\\bin. Copies demos/ too. Run once — then use 'Run (Installed):' tasks.",
             "type": "shell",
-            "command": "powershell -ExecutionPolicy Bypass -File tools/install.ps1",
+            "command": "powershell -ExecutionPolicy Bypass -File tools/dist/install.ps1",
             "problemMatcher": []
         },
         {
             "label": "Install: Local (Linux / macOS)",
             "detail": "📦 Build release binary and install luna2d to /usr/local/bin. Copies demos/ folder. May require sudo.",
             "type": "shell",
-            "command": "bash tools/install.sh",
+            "command": "bash tools/dist/install.sh",
             "problemMatcher": []
         },
         {
             "label": "Uninstall: Local (Windows)",
             "detail": "🗑️  Remove luna.exe from %USERPROFILE%\\bin and the installed demos/ folder.",
             "type": "shell",
-            "command": "powershell -ExecutionPolicy Bypass -File tools/install.ps1 --uninstall",
+            "command": "powershell -ExecutionPolicy Bypass -File tools/dist/install.ps1 --uninstall",
             "problemMatcher": []
         },
         // ─── 🌙 RUN WITH INSTALLED BINARY ────────────────────────────────────
@@ -327,16 +327,16 @@
         // ─── 🎨 ASSETS ────────────────────────────────────────────────────────
         {
             "label": "Assets: Generate Splash",
-            "detail": "🎨 Run tools/gen_splash.py to (re)generate assets/splash.png (800×600 moon/space theme). Requires: pip install Pillow.",
+            "detail": "🎨 Run tools/assets/gen_splash.py to (re)generate assets/splash.png (800×600 moon/space theme). Requires: pip install Pillow.",
             "type": "shell",
-            "command": "python tools/gen_splash.py",
+            "command": "python tools/assets/gen_splash.py",
             "problemMatcher": []
         },
         {
             "label": "Assets: Generate Icon",
-            "detail": "🎨 Run tools/gen_icon.py to (re)generate assets/icon.ico (multi-size) and assets/icon.png (256×256). Requires Pillow.",
+            "detail": "🎨 Run tools/assets/gen_icon.py to (re)generate assets/icon.ico (multi-size) and assets/icon.png (256×256). Requires Pillow.",
             "type": "shell",
-            "command": "python tools/gen_icon.py",
+            "command": "python tools/assets/gen_icon.py",
             "problemMatcher": []
         },
         {
@@ -351,36 +351,36 @@
             "label": "Dist: Package Windows",
             "detail": "🚀 Release build → dist/luna2d-windows-x86_64/ folder + .zip archive. Output is ready to distribute to end users.",
             "type": "shell",
-            "command": "powershell -ExecutionPolicy Bypass -File tools/dist.ps1",
+            "command": "powershell -ExecutionPolicy Bypass -File tools/dist/dist.ps1",
             "problemMatcher": []
         },
         {
             "label": "Dist: Package Windows (skip build)",
             "detail": "🚀 Re-package using an already-compiled release binary — skips cargo build. Faster for iteration.",
             "type": "shell",
-            "command": "powershell -ExecutionPolicy Bypass -File tools/dist.ps1 -SkipBuild",
+            "command": "powershell -ExecutionPolicy Bypass -File tools/dist/dist.ps1 -SkipBuild",
             "problemMatcher": []
         },
         {
             "label": "Dist: Package Linux / macOS",
             "detail": "🚀 Release build → dist/luna2d-<os>-<arch>/ folder + .tar.gz archive. Run in WSL or a Linux/macOS shell.",
             "type": "shell",
-            "command": "bash tools/dist.sh",
+            "command": "bash tools/dist/dist.sh",
             "problemMatcher": []
         },
         {
             "label": "Dist: NSIS Installer (Windows)",
-            "detail": "📦 Build a Windows installer from tools/installer.nsi → dist/luna2d-0.4.0-setup.exe. Requires NSIS 3.x on PATH.",
+            "detail": "📦 Build a Windows installer from tools/dist/installer.nsi → dist/luna2d-0.4.0-setup.exe. Requires NSIS 3.x on PATH.",
             "type": "shell",
-            "command": "makensis tools/installer.nsi",
+            "command": "makensis tools/dist/installer.nsi",
             "problemMatcher": []
         },
         // ─── 🤖 CAG VALIDATION ────────────────────────────────────────────────
         {
             "label": "CAG: Validate All",
-            "detail": "🤖 Run tools/cag_validate.py to check all agent, skill, prompt, and instruction files for schema compliance.",
+            "detail": "🤖 Run tools/validate/cag_validate.py to check all agent, skill, prompt, and instruction files for schema compliance.",
             "type": "shell",
-            "command": "python tools/cag_validate.py",
+            "command": "python tools/validate/cag_validate.py",
             "problemMatcher": []
         }
     ],

@@ -89,7 +89,7 @@ Every Lua-Designer output includes:
 - Write the usage example **before** writing the signature — the example exposes awkward naming or parameter order before they are locked into Rust
 - Avoid boolean traps: `newImage(path, premultiply)` is worse than two named functions or a flags table
 - Every API change that affects existing `demos/` game scripts must include a migration note with before/after snippets
-- `docs/API/lua_api_reference_generated.md` is generated — update the `///` comments in `src/lua_api/` and regenerate via `python tools/gen_lua_api.py`, never hand-edit the generated file
+- `docs/API/lua_api_reference_generated.md` is generated — update the `///` comments in `src/lua_api/` and regenerate via `python tools/docs/gen_lua_api.py`, never hand-edit the generated file
 - Ask: “Could a Copilot agent call this correctly without a clarifying question?” If no, redesign.
 
 ## ANTI-PATTERNS
