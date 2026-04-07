@@ -201,14 +201,32 @@ pub fn luna_run() {
         eprintln!("{}", msg);
     }));
 
-    let explicit_arg = env::args().nth(1);
-    let explicit_game_dir = explicit_arg.is_some();
+    // Parse CLI arguments. Supported flags:
+    //   --screenshot=<path>       Absolute output path for the auto-screenshot PNG.
+    //   --screenshot-delay=<secs> Seconds to wait after game start before capturing (default 1.5).
+    let mut screenshot_path: Option<std::path::PathBuf> = None;
+    let mut screenshot_delay: f64 = 1.5;
+    let mut game_arg: Option<String> = None;
+
+    for arg in env::args().skip(1) {
+        if let Some(val) = arg.strip_prefix("--screenshot=") {
+            screenshot_path = Some(std::path::PathBuf::from(val));
+        } else if let Some(val) = arg.strip_prefix("--screenshot-delay=") {
+            if let Ok(d) = val.parse::<f64>() {
+                screenshot_delay = d;
+            }
+        } else if !arg.starts_with("--") {
+            game_arg = Some(arg);
+        }
+    }
+
+    let explicit_game_dir = game_arg.is_some();
 
     // Keep the temp dir alive for the entire engine session; it is dropped (and deleted)
     // after app.run() returns.
     let mut _lunar_temp_dir: Option<tempfile::TempDir> = None;
 
-    let game_dir = if let Some(ref arg) = explicit_arg {
+    let game_dir = if let Some(ref arg) = game_arg {
         let path = std::path::PathBuf::from(arg);
         if path
             .extension()
@@ -245,7 +263,7 @@ pub fn luna_run() {
     let (mut config, conf_error) = Config::load_from_conf_lua(&game_dir);
     config.modules.validate_and_fix();
     let app = App::new(config, conf_error);
-    app.run(game_dir, explicit_game_dir);
+    app.run(game_dir, explicit_game_dir, screenshot_path, screenshot_delay);
 }
 
 /// Shows a Windows message box with an error message.

@@ -79,7 +79,7 @@ function luna.draw()
     luna.graphics.setColor(1, 1, 1)
     luna.graphics.print("PostFX Demo", 10, 10, 2)
 
-    local fps = luna.math.floor(luna.timer.getFPS())
+    local fps = math.floor(luna.timer.getFPS())
     luna.graphics.print("FPS: " .. tostring(fps), 700, 10, 1.5)
 
     -- Show effect list

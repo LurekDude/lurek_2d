@@ -848,7 +848,7 @@ fn test_inverted_tag_index_consistent_after_tag_remove() {
 
 #[test]
 fn test_parent_set_and_get() {
-    let lua = make_lua();
+    let _lua = make_lua();
     let mut u = Universe::new();
     let parent = u.spawn();
     let child = u.spawn();

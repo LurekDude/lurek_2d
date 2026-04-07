@@ -1,6 +1,6 @@
 //! Integration tests for the Overlay (screen-effect overlay) module.
 
-use luna2d::fx::screen::{
+use luna2d::fx::{
     AmbientState, CloudState, FadeState, FilmGrainState, FlashState, FogState, HeatHazeState,
     LightningState, Overlay, ShakeState, VignetteState, WeatherState, WeatherType,
 };

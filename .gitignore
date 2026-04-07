@@ -13,6 +13,7 @@
 /docs/competition/
 /docs/future/
 /docs/references/
+/ideas/competition/
 
 # Root diagnostics and runtime logs
 /cargo_check_err.txt

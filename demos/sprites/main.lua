@@ -106,7 +106,7 @@ function luna.draw()
     luna.graphics.print("WASD or Arrow Keys to move", 250, 20, 2)
 
     -- Position info
-    luna.graphics.print("X:" .. tostring(luna.math.floor(x)) .. " Y:" .. tostring(luna.math.floor(y)), 10, 570, 2)
+    luna.graphics.print("X:" .. tostring(math.floor(x)) .. " Y:" .. tostring(math.floor(y)), 10, 570, 2)
 
     if smokeMode and not smokeRequested then
         luna.graphics.saveScreenshot(smokeScreenshotPath)

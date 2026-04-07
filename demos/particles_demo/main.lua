@@ -264,7 +264,7 @@ function luna.draw()
     local ps  = presets[active]
     local def = preset_defs[active]
     local cnt = ps:getCount()
-    local fps = luna.math.floor(luna.timer.getFPS())
+    local fps = math.floor(luna.timer.getFPS())
     local pg  = preset_gravity[active]
 
     -- Draw particle system

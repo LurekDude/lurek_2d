@@ -4,6 +4,10 @@
 
 -- ── Game state ───────────────────────────────────────────────────────────
 
+local function clamp(v, mn, mx) return math.max(mn, math.min(mx, v)) end
+local function lerp(a, b, t) return a + (b - a) * t end
+local function distance(x1, y1, x2, y2) return math.sqrt((x2 - x1)^2 + (y2 - y1)^2) end
+
 local player = {
     x = 100,
     y = 400,
@@ -44,16 +48,16 @@ local function generate_level()
     -- Platforms
     local px = 200
     for i = 1, 12 do
-        local py = 550 - luna.math.random(80, 280)
-        local pw = luna.math.random(80, 160)
+        local py = 550 - math.random(80, 280)
+        local pw = math.random(80, 160)
         table.insert(platforms, { x = px, y = py, w = pw, h = 16, color = {0.4, 0.35, 0.25} })
 
         -- Place a coin above some platforms
-        if luna.math.random() > 0.3 then
+        if math.random() > 0.3 then
             table.insert(coins, { x = px + pw / 2, y = py - 30, collected = false, bob = 0 })
         end
 
-        px = px + luna.math.random(120, 250)
+        px = px + math.random(120, 250)
     end
 
     -- Goal flag
@@ -67,14 +71,14 @@ local function spawn_particles(x, y, count, color)
         table.insert(particles, {
             x = x,
             y = y,
-            vx = luna.math.random(-100, 100),
-            vy = luna.math.random(-200, -50),
-            life = luna.math.random() * 0.5 + 0.3,
+            vx = math.random(-100, 100),
+            vy = math.random(-200, -50),
+            life = math.random() * 0.5 + 0.3,
             max_life = 0.8,
             r = color[1],
             g = color[2],
             b = color[3],
-            size = luna.math.random(2, 5),
+            size = math.random(2, 5),
         })
     end
 end
@@ -152,7 +156,7 @@ function luna.update(dt)
     for _, coin in ipairs(coins) do
         if not coin.collected then
             coin.bob = coin.bob + dt
-            local dist = luna.math.distance(
+            local dist = distance(
                 player.x + player.w / 2, player.y + player.h / 2,
                 coin.x, coin.y
             )
@@ -172,8 +176,8 @@ function luna.update(dt)
     -- Camera follow with easing
     camera_target_x = player.x - 350
     if camera_target_x < 0 then camera_target_x = 0 end
-    local ease_t = luna.math.ease("outCubic", luna.math.clamp(dt * 5, 0, 1))
-    camera_x = luna.math.lerp(camera_x, camera_target_x, ease_t)
+    local ease_t = luna.math.applyEasing("outCubic", clamp(dt * 5, 0, 1))
+    camera_x = lerp(camera_x, camera_target_x, ease_t)
 
     -- Update particles
     for i = #particles, 1, -1 do
@@ -222,7 +226,7 @@ function luna.draw()
     -- Draw coins
     for _, coin in ipairs(coins) do
         if not coin.collected then
-            local bob_y = luna.math.sin(coin.bob * 3) * 5
+            local bob_y = math.sin(coin.bob * 3) * 5
             luna.graphics.setColor(1.0, 0.85, 0.0)
             luna.graphics.circle("fill", coin.x, coin.y + bob_y, 8)
             luna.graphics.setColor(1.0, 0.95, 0.5)
@@ -256,7 +260,7 @@ function luna.draw()
     luna.graphics.setColor(1, 1, 1)
     luna.graphics.print("Coins: " .. tostring(player.score), 10, 10, 2)
 
-    local fps = luna.math.floor(luna.timer.getFPS())
+    local fps = math.floor(luna.timer.getFPS())
     luna.graphics.setColor(0.5, 0.5, 0.5)
     luna.graphics.print("FPS: " .. tostring(fps), 700, 10, 1.5)
 

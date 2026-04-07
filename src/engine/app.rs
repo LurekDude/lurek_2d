@@ -179,6 +179,15 @@ struct LunaApp {
 
     /// Reusable command buffer for viewport-wrapped draw commands; avoids per-frame allocation.
     render_cmd_buf: Vec<DrawCommand>,
+
+    /// If `Some`, write an auto-screenshot PNG to this absolute path and quit after the delay.
+    auto_screenshot_path: Option<PathBuf>,
+    /// Delay in seconds after game start before the auto-screenshot is taken.
+    auto_screenshot_delay: f64,
+    /// `true` once the auto-screenshot has been written (prevents double-capture).
+    auto_screenshot_done: bool,
+    /// `Instant` recorded when `has_game` first becomes `true`; drives the delay countdown.
+    auto_screenshot_start: Option<Instant>,
 }
 
 impl LunaApp {
@@ -187,6 +196,8 @@ impl LunaApp {
         game_dir: PathBuf,
         conf_error: Option<String>,
         explicit_game_dir: bool,
+        auto_screenshot_path: Option<PathBuf>,
+        auto_screenshot_delay: f64,
     ) -> Self {
         let window_vsync_mode = if config.window.vsync { 1 } else { 0 };
 
@@ -220,6 +231,10 @@ impl LunaApp {
             drag_hover: false,
             max_surface_dim: 4096,
             render_cmd_buf: Vec::new(),
+            auto_screenshot_path,
+            auto_screenshot_delay,
+            auto_screenshot_done: false,
+            auto_screenshot_start: None,
         }
     }
 
@@ -723,6 +738,12 @@ impl LunaApp {
         let (Some(lua), Some(state)) = (&self.lua, &self.state) else {
             return;
         };
+
+        // Start the auto-screenshot countdown on the first game frame.
+        if self.auto_screenshot_path.is_some() && !self.auto_screenshot_done && self.auto_screenshot_start.is_none() {
+            self.auto_screenshot_start = Some(Instant::now());
+        }
+
         let dt = state.borrow().clock.delta();
         if let Err(e) = call_lua_callback_checked(lua, "update", dt) {
             self.run_state = RunState::Error(try_errorhandler_or_screen(lua, &e));
@@ -833,6 +854,15 @@ impl LunaApp {
         let screenshot_supported = self.surface_usage.contains(wgpu::TextureUsages::COPY_SRC);
         let capture_screenshot = screenshot_request.is_some() && screenshot_supported;
 
+        // Auto-screenshot: capture pixels this frame when the delay has elapsed.
+        let should_auto_capture = screenshot_supported
+            && !self.auto_screenshot_done
+            && self.auto_screenshot_path.is_some()
+            && self
+                .auto_screenshot_start
+                .map(|t| t.elapsed().as_secs_f64() >= self.auto_screenshot_delay)
+                .unwrap_or(false);
+
         let screenshot_pixels = {
             let s_ref = state.borrow();
             renderer.render_frame(
@@ -849,7 +879,7 @@ impl LunaApp {
                 bg,
                 &cam_matrix,
                 frame_time,
-                capture_screenshot,
+                capture_screenshot || should_auto_capture,
             )
         };
         let screenshot_pixels = match screenshot_pixels {
@@ -905,6 +935,50 @@ impl LunaApp {
                 }
             }
             state.borrow_mut().pending_screenshot = None;
+        }
+
+        // Auto-screenshot: write pixels directly to the absolute path and quit.
+        if should_auto_capture {
+            if let Some(ref path) = self.auto_screenshot_path.clone() {
+                if let Some((width, height, pixels)) = screenshot_pixels {
+                    match crate::image::ImageData::from_bytes(width, height, pixels)
+                        .and_then(|image| image.encode_png())
+                    {
+                        Ok(png) => {
+                            if let Some(parent) = path.parent() {
+                                let _ = std::fs::create_dir_all(parent);
+                            }
+                            if let Err(err) = std::fs::write(path, &png) {
+                                log_msg!(
+                                    error,
+                                    L075_SCREENSHOT_SAVE_FAIL,
+                                    "auto-screenshot path: {}, err: {}",
+                                    path.display(),
+                                    err
+                                );
+                            } else {
+                                log_msg!(
+                                    info,
+                                    crate::engine::log_messages::L001_ENGINE_START,
+                                    "auto-screenshot saved to: {}",
+                                    path.display()
+                                );
+                            }
+                        }
+                        Err(err) => {
+                            log_msg!(
+                                error,
+                                L076_SCREENSHOT_ENCODE_FAIL,
+                                "auto-screenshot path: {}, err: {}",
+                                path.display(),
+                                err
+                            );
+                        }
+                    }
+                }
+                self.auto_screenshot_done = true;
+                state.borrow_mut().quit_requested = true;
+            }
         }
     }
 
@@ -1972,7 +2046,9 @@ impl App {
     /// # Parameters
     /// - `game_dir` — Path to the game directory.
     /// - `explicit_game_dir` — `true` when the user explicitly passed a path argument.
-    pub fn run(self, game_dir: PathBuf, explicit_game_dir: bool) {
+    /// - `screenshot_path` — If `Some`, take a screenshot at this absolute path and quit after the delay.
+    /// - `screenshot_delay` — Seconds to wait after game start before taking the auto-screenshot.
+    pub fn run(self, game_dir: PathBuf, explicit_game_dir: bool, screenshot_path: Option<PathBuf>, screenshot_delay: f64) {
         init_logging(
             &game_dir,
             self.config.log_file.as_deref(),
@@ -1994,7 +2070,7 @@ impl App {
         // possible. about_to_wait() switches to WaitUntil after that.
         event_loop.set_control_flow(ControlFlow::Poll);
 
-        let mut app = LunaApp::new(self.config, game_dir, self.conf_error, explicit_game_dir);
+        let mut app = LunaApp::new(self.config, game_dir, self.conf_error, explicit_game_dir, screenshot_path, screenshot_delay);
         event_loop.run_app(&mut app).expect("Event loop error");
 
         log_msg!(info, crate::engine::log_messages::L002_ENGINE_STOP);
@@ -2423,7 +2499,7 @@ mod tests {
         let mut config = Config::default();
         config.identity = Some("phase01-save".to_string());
 
-        let mut app = LunaApp::new(config, temp_dir.path().to_path_buf(), None, false);
+        let mut app = LunaApp::new(config, temp_dir.path().to_path_buf(), None, false, None, 1.5);
         app.init_lua();
 
         let lua = app.lua.as_ref().expect("Lua VM should be initialized");

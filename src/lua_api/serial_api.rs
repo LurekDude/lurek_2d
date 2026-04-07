@@ -5,7 +5,10 @@ use mlua::prelude::*;
 use std::cell::RefCell;
 use std::rc::Rc;
 
-use crate::serial::{lua_table::{from_lua, to_lua}, CsvOptions};
+use crate::serial::{
+    lua_table::{from_lua, to_lua},
+    CsvOptions,
+};
 
 /// Extract the first byte from an optional delimiter string, defaulting to comma.
 fn parse_delimiter(delim: Option<String>) -> u8 {

@@ -306,6 +306,9 @@ pub fn create_lua_vm(state: Rc<RefCell<SharedState>>, modules: &ModulesConfig) -
     // math: luna.math (always registered — mandatory)
     math_api::register(&lua, &luna, state.clone())?;
 
+    // system: luna.system (always registered — OS info, openURL, locales)
+    system_api::register(&lua, &luna, state.clone())?;
+
     // physics: luna.physics
     if modules.physics {
         physics_api::register(&lua, &luna, state.clone())?;

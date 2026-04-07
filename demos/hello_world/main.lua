@@ -1,5 +1,5 @@
 ﻿-- Hello World example for Luna2D
--- Phase 12: simplex noise available via luna.math.simplexNoise(x, y) or luna.math.simplexNoise(x, y, z)
+-- Phase 12: simplex noise available via luna.math.simplex2d(x, y) or luna.math.simplex2d(x, y, z)
 
 function luna.load()
     luna.window.setTitle("Hello World - Luna2D")
@@ -27,16 +27,16 @@ function luna.draw()
 
     -- Show FPS
     luna.graphics.setColor(0.7, 0.7, 0.7)
-    local fps = luna.math.floor(luna.timer.getFPS())
+    local fps = math.floor(luna.timer.getFPS())
     luna.graphics.print("FPS: " .. tostring(fps), 10, 10, 2)
 end
 
 function luna.keypressed(key)
     if key == "space" then
         luna.graphics.setBackgroundColor(
-            luna.math.random(),
-            luna.math.random(),
-            luna.math.random()
+            math.random(),
+            math.random(),
+            math.random()
         )
     end
 

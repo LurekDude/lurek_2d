@@ -1,6 +1,6 @@
 # Luna2D Demos
 
-27 fully playable demo games showcasing `luna.*` engine features. Every demo is self-contained: it runs as-is with `cargo run -- demos/<name>`.
+86 fully playable demo games showcasing `luna.*` engine features. Every demo is self-contained: it runs as-is with `cargo run -- demos/<name>`.
 
 For API reference code (not runnable games), see [`examples/`](../examples/).
 
@@ -47,6 +47,65 @@ luna demos/<name>                  # installed binary
 | [docs_demo](#docs_demo) | In-game API browser | `docs.scan`, catalog, search |
 | [terminal_demo](#terminal_demo) | In-game developer terminal | `terminal`, widgets, REPL |
 | [demo_game](#demo_game) | Complete shooting gallery game | `physics`, `mouse`, scoring |
+| [adventure](#adventure) | Point-and-click adventure game | `entity`, `event`, `graphics` |
+| [alchemy](#alchemy) | Potion brewing with ingredient combos | `data`, `gui`, `graphics` |
+| [brick_breaker](#brick_breaker) | Breakout-style brick breaking game | `physics`, `graphics`, `input` |
+| [bridge_builder](#bridge_builder) | Structural bridge building puzzle | `physics`, `graphics`, `input` |
+| [bullet_hell](#bullet_hell) | Bullet-hell shoot-em-up | `entity`, `graphics`, `input` |
+| [card_game](#card_game) | Collectible card battles | `library/cardgame`, `graphics` |
+| [colony_sim](#colony_sim) | Ant colony management sim | `ai`, `entity`, `pathfinding` |
+| [cooking_sim](#cooking_sim) | Multi-step recipe cooking | `timer`, `gui`, `graphics` |
+| [courtroom](#courtroom) | Courtroom debate evidence game | `event`, `gui`, `graphics` |
+| [creature_collector](#creature_collector) | Monster catching and battling | `entity`, `library/combat`, `data` |
+| [deckbuilder](#deckbuilder) | Roguelike deckbuilding card game | `library/cardgame`, `graphics` |
+| [drift_racing](#drift_racing) | Top-down drift racing | `physics`, `camera`, `graphics` |
+| [endless_runner](#endless_runner) | Auto-scrolling obstacle runner | `physics`, `graphics`, `timer` |
+| [factory](#factory) | Factory automation conveyor sim | `entity`, `pathfinding`, `graphics` |
+| [farming_sim](#farming_sim) | Crop planting and harvesting sim | `tilemap`, `timer`, `graphics` |
+| [fighting_game](#fighting_game) | 2-player fighting game | `input`, `animation`, `graphics` |
+| [fishing](#fishing) | Fishing minigame with rod physics | `physics`, `timer`, `graphics` |
+| [god_game](#god_game) | God simulation with worshippers | `ai`, `entity`, `graphics` |
+| [hacking_game](#hacking_game) | Network-hacking puzzle game | `terminal`, `timer`, `graphics` |
+| [hex_strategy](#hex_strategy) | Hex-grid turn-based strategy | `tilemap`, `ai`, `pathfinding` |
+| [horde_survivor](#horde_survivor) | Vampire Survivors-style horde game | `entity`, `physics`, `graphics` |
+| [horror](#horror) | First-person horror exploration | `light`, `audio`, `graphics` |
+| [hotel_manager](#hotel_manager) | Hotel management tycoon | `ai`, `timer`, `graphics` |
+| [idle_game](#idle_game) | Incremental idle clicker | `timer`, `savegame`, `graphics` |
+| [infiltration](#infiltration) | Stealth infiltration stealth game | `ai`, `light`, `pathfinding` |
+| [logic_game](#logic_game) | Logic circuit puzzle game | `graph`, `gui`, `graphics` |
+| [match3](#match3) | Match-3 gem swapping puzzle | `animation`, `graphics`, `input` |
+| [maze_defense](#maze_defense) | Maze-building tower defense | `pathfinding`, `entity`, `graphics` |
+| [medical_sim](#medical_sim) | Medical diagnosis triage game | `timer`, `gui`, `graphics` |
+| [metroidvania](#metroidvania) | Metroidvania exploration platformer | `physics`, `tilemap`, `camera` |
+| [mining](#mining) | Dig-down mining resource game | `tilemap`, `physics`, `graphics` |
+| [music_composer](#music_composer) | Music sequencer and composer | `audio`, `gui`, `graphics` |
+| [party_games](#party_games) | Multi-minigame party collection | `scene`, `input`, `graphics` |
+| [physics_puzzle](#physics_puzzle) | Physics-based puzzle game | `physics`, `graphics`, `input` |
+| [physics_sandbox](#physics_sandbox) | Interactive physics sandbox | `physics`, `graphics`, `input` |
+| [pinball](#pinball) | Classic pinball machine | `physics`, `graphics`, `input` |
+| [platform_fighter](#platform_fighter) | Smash-style platform fighting | `physics`, `input`, `animation` |
+| [railroad](#railroad) | Train network railroad tycoon | `graph`, `pathfinding`, `graphics` |
+| [rhythm_game](#rhythm_game) | Musical rhythm note matching | `audio`, `timer`, `graphics` |
+| [roguelike](#roguelike) | Turn-based dungeon roguelike | `tilemap`, `ai`, `entity` |
+| [roguelite](#roguelite) | Action roguelite with runs | `physics`, `entity`, `graphics` |
+| [rts](#rts) | Real-time strategy base building | `ai`, `pathfinding`, `entity` |
+| [sniper](#sniper) | Precision sniping stealth game | `camera`, `physics`, `graphics` |
+| [social_deduction](#social_deduction) | Among Us-style social deduction | `ai`, `event`, `graphics` |
+| [soulslike](#soulslike) | Stamina-based combat action game | `physics`, `animation`, `entity` |
+| [sports_manager](#sports_manager) | Sports team management sim | `ai`, `data`, `graphics` |
+| [stealth](#stealth) | Stealth infiltration game | `ai`, `light`, `pathfinding` |
+| [survival_crafting](#survival_crafting) | Survival crafting game | `library/crafting`, `entity`, `tilemap` |
+| [tactical_battle](#tactical_battle) | Grid-based tactical combat | `tilemap`, `ai`, `entity` |
+| [tower_defense](#tower_defense) | Tower placement defense game | `ai`, `pathfinding`, `entity` |
+| [tower_sim](#tower_sim) | Corporate tower building sim | `entity`, `ai`, `graphics` |
+| [trajectory_sports](#trajectory_sports) | Trajectory-based sports game | `physics`, `graphics`, `camera` |
+| [tycoon](#tycoon) | Theme park tycoon management | `ai`, `entity`, `graphics` |
+| [vehicle_builder](#vehicle_builder) | Vehicle construction physics | `physics`, `graphics`, `input` |
+| [vertical_climber](#vertical_climber) | Vertical climbing platformer | `physics`, `camera`, `graphics` |
+| [visual_novel](#visual_novel) | Visual novel story engine | `library/dialog`, `graphics` |
+| [wargame](#wargame) | Hex-grid military wargame | `tilemap`, `ai`, `entity` |
+| [wildlife_photo](#wildlife_photo) | Wildlife photography safari | `ai`, `camera`, `graphics` |
+| [zoo_tycoon](#zoo_tycoon) | Zoo management tycoon | `ai`, `entity`, `graphics` |
 
 ---
 

@@ -1,8 +1,8 @@
 //! Integration tests for the Luna2D math module.
 
 use luna2d::math::{
-    bezier::BezierCurve, color, easing, noise_functions, noise_generator, polygon,
-    random::RandomGenerator, transform::Transform, Mat3, Rect, Vec2,
+    bezier::BezierCurve, color, easing, noise_functions, polygon, random::RandomGenerator,
+    transform::Transform, Mat3, Rect, Vec2,
 };
 
 #[test]
@@ -177,30 +177,30 @@ fn easing_unknown_returns_none() {
 
 #[test]
 fn noise_perlin_deterministic() {
-    let a = noise::perlin2d(3.7, 8.2, 42);
-    let b = noise::perlin2d(3.7, 8.2, 42);
+    let a = noise_functions::perlin2d(3.7, 8.2, 42);
+    let b = noise_functions::perlin2d(3.7, 8.2, 42);
     assert!((a - b).abs() < f32::EPSILON);
 }
 
 #[test]
 fn noise_simplex_deterministic() {
-    let a = noise::simplex2d(3.7, 8.2, 42);
-    let b = noise::simplex2d(3.7, 8.2, 42);
+    let a = noise_functions::simplex2d(3.7, 8.2, 42);
+    let b = noise_functions::simplex2d(3.7, 8.2, 42);
     assert!((a - b).abs() < f32::EPSILON);
 }
 
 #[test]
 fn noise_perlin_varies_with_position() {
-    let a = noise::perlin2d(0.0, 0.0, 0);
-    let b = noise::perlin2d(5.7, 3.2, 0);
+    let a = noise_functions::perlin2d(0.0, 0.0, 0);
+    let b = noise_functions::perlin2d(5.7, 3.2, 0);
     // Noise at different positions should generally differ
     assert!((a - b).abs() > f32::EPSILON || a.abs() < f32::EPSILON);
 }
 
 #[test]
 fn noise_fbm_single_octave_matches_perlin() {
-    let fbm_val = noise::fbm(2.5, 1.3, 7, 1, 2.0, 0.5);
-    let perlin_val = noise::perlin2d(2.5, 1.3, 7);
+    let fbm_val = noise_functions::fbm(2.5, 1.3, 7, 1, 2.0, 0.5);
+    let perlin_val = noise_functions::perlin2d(2.5, 1.3, 7);
     assert!((fbm_val - perlin_val).abs() < 1e-5);
 }
 
@@ -708,8 +708,8 @@ fn color_linear_to_gamma_boundary() {
 
 #[test]
 fn noise_perlin3d_deterministic() {
-    let a = noise::perlin3d(1.5, 2.3, 3.7, 42);
-    let b = noise::perlin3d(1.5, 2.3, 3.7, 42);
+    let a = noise_functions::perlin3d(1.5, 2.3, 3.7, 42);
+    let b = noise_functions::perlin3d(1.5, 2.3, 3.7, 42);
     assert!((a - b).abs() < f32::EPSILON, "3D noise not deterministic");
 }
 
@@ -719,7 +719,7 @@ fn noise_perlin3d_range() {
         let x = i as f32 * 0.37;
         let y = i as f32 * 0.53;
         let z = i as f32 * 0.71;
-        let v = noise::perlin3d(x, y, z, 0);
+        let v = noise_functions::perlin3d(x, y, z, 0);
         assert!(
             v >= -2.0 && v <= 2.0,
             "3D noise out of range: {v} at ({x}, {y}, {z})"
@@ -729,8 +729,8 @@ fn noise_perlin3d_range() {
 
 #[test]
 fn noise_perlin3d_varies() {
-    let a = noise::perlin3d(0.0, 0.0, 0.0, 0);
-    let b = noise::perlin3d(5.7, 3.2, 1.1, 0);
+    let a = noise_functions::perlin3d(0.0, 0.0, 0.0, 0);
+    let b = noise_functions::perlin3d(5.7, 3.2, 1.1, 0);
     // At least some pairs should differ
     assert!(
         (a - b).abs() > f32::EPSILON || a.abs() < f32::EPSILON,
@@ -740,8 +740,8 @@ fn noise_perlin3d_varies() {
 
 #[test]
 fn noise_perlin4d_deterministic() {
-    let a = noise::perlin4d(1.5, 2.3, 3.7, 4.1, 42);
-    let b = noise::perlin4d(1.5, 2.3, 3.7, 4.1, 42);
+    let a = noise_functions::perlin4d(1.5, 2.3, 3.7, 4.1, 42);
+    let b = noise_functions::perlin4d(1.5, 2.3, 3.7, 4.1, 42);
     assert!((a - b).abs() < f32::EPSILON, "4D noise not deterministic");
 }
 
@@ -752,7 +752,7 @@ fn noise_perlin4d_range() {
         let y = i as f32 * 0.53;
         let z = i as f32 * 0.71;
         let w = i as f32 * 0.29;
-        let v = noise::perlin4d(x, y, z, w, 0);
+        let v = noise_functions::perlin4d(x, y, z, w, 0);
         assert!(
             v >= -3.0 && v <= 3.0,
             "4D noise out of range: {v} at ({x}, {y}, {z}, {w})"
@@ -766,7 +766,7 @@ fn noise_remapped_to_zero_one() {
     for i in 0..100 {
         let x = i as f32 * 0.37;
         let y = i as f32 * 0.53;
-        let raw = noise::perlin2d(x, y, 0);
+        let raw = noise_functions::perlin2d(x, y, 0);
         let mapped = (raw + 1.0) / 2.0;
         assert!(
             mapped >= -0.5 && mapped <= 1.5,

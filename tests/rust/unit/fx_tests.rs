@@ -5,8 +5,8 @@
 //!
 //! These tests are purely in-memory (no GPU, no window, no audio).
 
-use luna2d::fx::post::{ImageEffect, PostFxEffect, PostFxEffectType, PostFxStack};
-use luna2d::fx::screen::{
+use luna2d::fx::{ImageEffect, PostFxEffect, PostFxEffectType, PostFxStack};
+use luna2d::fx::{
     AmbientState, FadeState, FilmGrainState, FogState, HeatHazeState, Overlay, ShakeState,
     VignetteState, WeatherType,
 };

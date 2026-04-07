@@ -74,7 +74,7 @@ function luna.draw()
 
     -- FPS
     luna.graphics.setColor(0.5, 0.5, 0.5)
-    local fps = luna.math.floor(luna.timer.getFPS())
+    local fps = math.floor(luna.timer.getFPS())
     luna.graphics.print("FPS: " .. tostring(fps), screenW - 120, 10, 1.5)
 end
 

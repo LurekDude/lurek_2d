@@ -391,262 +391,262 @@ impl ParticleConfig {
     /// # Returns
     /// `LuaResult<Self>`.
     pub fn from_lua_opts(t: &LuaTable) -> LuaResult<Self> {
-    let mut c = ParticleConfig::default();
-    if let Ok(v) = t.get::<_, u32>("maxParticles") {
-        c.max_particles = v;
-    }
-    if let Ok(v) = t.get::<_, f32>("emissionRate") {
-        c.emission_rate = v;
-    }
-    if let Ok(v) = t.get::<_, f32>("lifetimeMin") {
-        c.lifetime_min = v;
-    }
-    if let Ok(v) = t.get::<_, f32>("lifetimeMax") {
-        c.lifetime_max = v;
-    }
-    if let Ok(v) = t.get::<_, f32>("speedMin") {
-        c.speed_min = v;
-    }
-    if let Ok(v) = t.get::<_, f32>("speedMax") {
-        c.speed_max = v;
-    }
-    if let Ok(v) = t.get::<_, f32>("direction") {
-        c.direction = v;
-    }
-    if let Ok(v) = t.get::<_, f32>("spread") {
-        c.spread = v;
-    }
-    if let Ok(v) = t.get::<_, f32>("gravityX") {
-        c.gravity_x = v;
-    }
-    if let Ok(v) = t.get::<_, f32>("gravityY") {
-        c.gravity_y = v;
-    }
-    if let Ok(v) = t.get::<_, f32>("spinMin") {
-        c.spin_min = v;
-    }
-    if let Ok(v) = t.get::<_, f32>("spinMax") {
-        c.spin_max = v;
-    }
-    if let Ok(v) = t.get::<_, f32>("spinVariation") {
-        c.spin_variation = v;
-    }
-    if let Ok(v) = t.get::<_, f32>("sizeVariation") {
-        c.size_variation = v;
-    }
-    if let Ok(v) = t.get::<_, f32>("rotationMin") {
-        c.rotation_min = v;
-    }
-    if let Ok(v) = t.get::<_, f32>("rotationMax") {
-        c.rotation_max = v;
-    }
-    if let Ok(v) = t.get::<_, f32>("emitterLifetime") {
-        c.emitter_lifetime = v;
-    }
-    if let Ok(v) = t.get::<_, f32>("linearAccelXMin") {
-        c.linear_accel_x_min = v;
-    }
-    if let Ok(v) = t.get::<_, f32>("linearAccelXMax") {
-        c.linear_accel_x_max = v;
-    }
-    if let Ok(v) = t.get::<_, f32>("linearAccelYMin") {
-        c.linear_accel_y_min = v;
-    }
-    if let Ok(v) = t.get::<_, f32>("linearAccelYMax") {
-        c.linear_accel_y_max = v;
-    }
-    if let Ok(v) = t.get::<_, f32>("radialAccelMin") {
-        c.radial_accel_min = v;
-    }
-    if let Ok(v) = t.get::<_, f32>("radialAccelMax") {
-        c.radial_accel_max = v;
-    }
-    if let Ok(v) = t.get::<_, f32>("tangentialAccelMin") {
-        c.tangential_accel_min = v;
-    }
-    if let Ok(v) = t.get::<_, f32>("tangentialAccelMax") {
-        c.tangential_accel_max = v;
-    }
-    if let Ok(v) = t.get::<_, f32>("linearDampingMin") {
-        c.linear_damping_min = v;
-    }
-    if let Ok(v) = t.get::<_, f32>("linearDampingMax") {
-        c.linear_damping_max = v;
-    }
-    if let Ok(v) = t.get::<_, f32>("areaWidth") {
-        c.area_width = v;
-    }
-    if let Ok(v) = t.get::<_, f32>("areaHeight") {
-        c.area_height = v;
-    }
-    if let Ok(v) = t.get::<_, f32>("areaAngle") {
-        c.area_angle = v;
-    }
-    if let Ok(v) = t.get::<_, bool>("areaDirectionRelative") {
-        c.area_direction_relative = v;
-    }
-    if let Ok(v) = t.get::<_, bool>("relativeRotation") {
-        c.relative_rotation = v;
-    }
-    if let Ok(v) = t.get::<_, f32>("offsetX") {
-        c.offset_x = v;
-    }
-    if let Ok(v) = t.get::<_, f32>("offsetY") {
-        c.offset_y = v;
-    }
-    if let Ok(v) = t.get::<_, f32>("turbulence") {
-        c.turbulence = v;
-    }
-    if let Ok(v) = t.get::<_, f32>("drag") {
-        c.drag = v;
-    }
-    if let Ok(v) = t.get::<_, f32>("orbitSpeed") {
-        c.orbit_speed = v;
-    }
-    if let Ok(v) = t.get::<_, u32>("animatedFrames") {
-        c.animated_frames = v;
-    }
-    if let Ok(v) = t.get::<_, f32>("frameRate") {
-        c.frame_rate = v;
-    }
-    if let Ok(v) = t.get::<_, bool>("colorBySpeed") {
-        c.color_by_speed = v;
-    }
-    if let Ok(v) = t.get::<_, f32>("speedColorMin") {
-        c.speed_color_min = v;
-    }
-    if let Ok(v) = t.get::<_, f32>("speedColorMax") {
-        c.speed_color_max = v;
-    }
-
-    // sizes: table of floats
-    if let Ok(st) = t.get::<_, LuaTable>("sizes") {
-        let mut sizes = Vec::new();
-        for i in 1..=32 {
-            match st.get::<_, f32>(i) {
-                Ok(v) => sizes.push(v),
-                Err(_) => break,
-            }
+        let mut c = ParticleConfig::default();
+        if let Ok(v) = t.get::<_, u32>("maxParticles") {
+            c.max_particles = v;
         }
-        if !sizes.is_empty() {
-            c.sizes = sizes;
+        if let Ok(v) = t.get::<_, f32>("emissionRate") {
+            c.emission_rate = v;
         }
-    }
+        if let Ok(v) = t.get::<_, f32>("lifetimeMin") {
+            c.lifetime_min = v;
+        }
+        if let Ok(v) = t.get::<_, f32>("lifetimeMax") {
+            c.lifetime_max = v;
+        }
+        if let Ok(v) = t.get::<_, f32>("speedMin") {
+            c.speed_min = v;
+        }
+        if let Ok(v) = t.get::<_, f32>("speedMax") {
+            c.speed_max = v;
+        }
+        if let Ok(v) = t.get::<_, f32>("direction") {
+            c.direction = v;
+        }
+        if let Ok(v) = t.get::<_, f32>("spread") {
+            c.spread = v;
+        }
+        if let Ok(v) = t.get::<_, f32>("gravityX") {
+            c.gravity_x = v;
+        }
+        if let Ok(v) = t.get::<_, f32>("gravityY") {
+            c.gravity_y = v;
+        }
+        if let Ok(v) = t.get::<_, f32>("spinMin") {
+            c.spin_min = v;
+        }
+        if let Ok(v) = t.get::<_, f32>("spinMax") {
+            c.spin_max = v;
+        }
+        if let Ok(v) = t.get::<_, f32>("spinVariation") {
+            c.spin_variation = v;
+        }
+        if let Ok(v) = t.get::<_, f32>("sizeVariation") {
+            c.size_variation = v;
+        }
+        if let Ok(v) = t.get::<_, f32>("rotationMin") {
+            c.rotation_min = v;
+        }
+        if let Ok(v) = t.get::<_, f32>("rotationMax") {
+            c.rotation_max = v;
+        }
+        if let Ok(v) = t.get::<_, f32>("emitterLifetime") {
+            c.emitter_lifetime = v;
+        }
+        if let Ok(v) = t.get::<_, f32>("linearAccelXMin") {
+            c.linear_accel_x_min = v;
+        }
+        if let Ok(v) = t.get::<_, f32>("linearAccelXMax") {
+            c.linear_accel_x_max = v;
+        }
+        if let Ok(v) = t.get::<_, f32>("linearAccelYMin") {
+            c.linear_accel_y_min = v;
+        }
+        if let Ok(v) = t.get::<_, f32>("linearAccelYMax") {
+            c.linear_accel_y_max = v;
+        }
+        if let Ok(v) = t.get::<_, f32>("radialAccelMin") {
+            c.radial_accel_min = v;
+        }
+        if let Ok(v) = t.get::<_, f32>("radialAccelMax") {
+            c.radial_accel_max = v;
+        }
+        if let Ok(v) = t.get::<_, f32>("tangentialAccelMin") {
+            c.tangential_accel_min = v;
+        }
+        if let Ok(v) = t.get::<_, f32>("tangentialAccelMax") {
+            c.tangential_accel_max = v;
+        }
+        if let Ok(v) = t.get::<_, f32>("linearDampingMin") {
+            c.linear_damping_min = v;
+        }
+        if let Ok(v) = t.get::<_, f32>("linearDampingMax") {
+            c.linear_damping_max = v;
+        }
+        if let Ok(v) = t.get::<_, f32>("areaWidth") {
+            c.area_width = v;
+        }
+        if let Ok(v) = t.get::<_, f32>("areaHeight") {
+            c.area_height = v;
+        }
+        if let Ok(v) = t.get::<_, f32>("areaAngle") {
+            c.area_angle = v;
+        }
+        if let Ok(v) = t.get::<_, bool>("areaDirectionRelative") {
+            c.area_direction_relative = v;
+        }
+        if let Ok(v) = t.get::<_, bool>("relativeRotation") {
+            c.relative_rotation = v;
+        }
+        if let Ok(v) = t.get::<_, f32>("offsetX") {
+            c.offset_x = v;
+        }
+        if let Ok(v) = t.get::<_, f32>("offsetY") {
+            c.offset_y = v;
+        }
+        if let Ok(v) = t.get::<_, f32>("turbulence") {
+            c.turbulence = v;
+        }
+        if let Ok(v) = t.get::<_, f32>("drag") {
+            c.drag = v;
+        }
+        if let Ok(v) = t.get::<_, f32>("orbitSpeed") {
+            c.orbit_speed = v;
+        }
+        if let Ok(v) = t.get::<_, u32>("animatedFrames") {
+            c.animated_frames = v;
+        }
+        if let Ok(v) = t.get::<_, f32>("frameRate") {
+            c.frame_rate = v;
+        }
+        if let Ok(v) = t.get::<_, bool>("colorBySpeed") {
+            c.color_by_speed = v;
+        }
+        if let Ok(v) = t.get::<_, f32>("speedColorMin") {
+            c.speed_color_min = v;
+        }
+        if let Ok(v) = t.get::<_, f32>("speedColorMax") {
+            c.speed_color_max = v;
+        }
 
-    // colors: table of {r, g, b, a}
-    if let Ok(ct) = t.get::<_, LuaTable>("colors") {
-        let mut colors = Vec::new();
-        for i in 1..=16 {
-            match ct.get::<_, LuaTable>(i) {
-                Ok(entry) => {
-                    let r = entry.get::<_, f32>(1).unwrap_or(1.0);
-                    let g = entry.get::<_, f32>(2).unwrap_or(1.0);
-                    let b = entry.get::<_, f32>(3).unwrap_or(1.0);
-                    let a = entry.get::<_, f32>(4).unwrap_or(1.0);
-                    colors.push([r, g, b, a]);
+        // sizes: table of floats
+        if let Ok(st) = t.get::<_, LuaTable>("sizes") {
+            let mut sizes = Vec::new();
+            for i in 1..=32 {
+                match st.get::<_, f32>(i) {
+                    Ok(v) => sizes.push(v),
+                    Err(_) => break,
                 }
-                Err(_) => break,
+            }
+            if !sizes.is_empty() {
+                c.sizes = sizes;
             }
         }
-        if !colors.is_empty() {
-            c.colors = colors;
-        }
-    }
 
-    // alphaKeyframes: table of floats
-    if let Ok(at) = t.get::<_, LuaTable>("alphaKeyframes") {
-        let mut alphas = Vec::new();
-        for i in 1..=16 {
-            match at.get::<_, f32>(i) {
-                Ok(v) => alphas.push(v),
-                Err(_) => break,
+        // colors: table of {r, g, b, a}
+        if let Ok(ct) = t.get::<_, LuaTable>("colors") {
+            let mut colors = Vec::new();
+            for i in 1..=16 {
+                match ct.get::<_, LuaTable>(i) {
+                    Ok(entry) => {
+                        let r = entry.get::<_, f32>(1).unwrap_or(1.0);
+                        let g = entry.get::<_, f32>(2).unwrap_or(1.0);
+                        let b = entry.get::<_, f32>(3).unwrap_or(1.0);
+                        let a = entry.get::<_, f32>(4).unwrap_or(1.0);
+                        colors.push([r, g, b, a]);
+                    }
+                    Err(_) => break,
+                }
+            }
+            if !colors.is_empty() {
+                c.colors = colors;
             }
         }
-        if !alphas.is_empty() {
-            c.alpha_keyframes = alphas;
+
+        // alphaKeyframes: table of floats
+        if let Ok(at) = t.get::<_, LuaTable>("alphaKeyframes") {
+            let mut alphas = Vec::new();
+            for i in 1..=16 {
+                match at.get::<_, f32>(i) {
+                    Ok(v) => alphas.push(v),
+                    Err(_) => break,
+                }
+            }
+            if !alphas.is_empty() {
+                c.alpha_keyframes = alphas;
+            }
         }
-    }
 
-    // areaDistribution: string → enum
-    if let Ok(v) = t.get::<_, String>("areaDistribution") {
-        c.area_distribution = match v.as_str() {
-            "uniform" => AreaDistribution::Uniform,
-            "normal" => AreaDistribution::Normal,
-            "ellipse" => AreaDistribution::Ellipse,
-            "borderRectangle" => AreaDistribution::BorderRectangle,
-            "borderEllipse" => AreaDistribution::BorderEllipse,
-            _ => AreaDistribution::default(),
-        };
-    }
+        // areaDistribution: string → enum
+        if let Ok(v) = t.get::<_, String>("areaDistribution") {
+            c.area_distribution = match v.as_str() {
+                "uniform" => AreaDistribution::Uniform,
+                "normal" => AreaDistribution::Normal,
+                "ellipse" => AreaDistribution::Ellipse,
+                "borderRectangle" => AreaDistribution::BorderRectangle,
+                "borderEllipse" => AreaDistribution::BorderEllipse,
+                _ => AreaDistribution::default(),
+            };
+        }
 
-    // insertMode: string → enum
-    if let Ok(v) = t.get::<_, String>("insertMode") {
-        c.insert_mode = match v.as_str() {
-            "top" => InsertMode::Top,
-            "bottom" => InsertMode::Bottom,
-            "random" => InsertMode::Random,
-            _ => InsertMode::default(),
-        };
-    }
+        // insertMode: string → enum
+        if let Ok(v) = t.get::<_, String>("insertMode") {
+            c.insert_mode = match v.as_str() {
+                "top" => InsertMode::Top,
+                "bottom" => InsertMode::Bottom,
+                "random" => InsertMode::Random,
+                _ => InsertMode::default(),
+            };
+        }
 
-    // emissionShape: string → enum
-    if let Ok(v) = t.get::<_, String>("emissionShape") {
-        c.emission_shape = match v.as_str() {
-            "point" => EmissionShape::Point,
-            "circle" => EmissionShape::Circle {
-                radius: 50.0,
-                fill: true,
-            },
-            "rectangle" => EmissionShape::Rectangle {
-                width: 100.0,
-                height: 100.0,
-            },
-            "ring" => EmissionShape::Ring {
-                inner_radius: 20.0,
-                outer_radius: 50.0,
-            },
-            "line" => EmissionShape::Line {
-                length: 100.0,
-                angle: 0.0,
-            },
-            "cone" => EmissionShape::Cone {
-                radius: 50.0,
-                angle: 0.0,
-                spread: 0.5,
-            },
-            "star" => EmissionShape::Star {
-                points: 5,
-                outer_radius: 50.0,
-                inner_radius: 25.0,
-            },
-            "spiral" => EmissionShape::Spiral {
-                revolutions: 2.0,
-                radius: 50.0,
-            },
-            _ => EmissionShape::default(),
-        };
-    }
+        // emissionShape: string → enum
+        if let Ok(v) = t.get::<_, String>("emissionShape") {
+            c.emission_shape = match v.as_str() {
+                "point" => EmissionShape::Point,
+                "circle" => EmissionShape::Circle {
+                    radius: 50.0,
+                    fill: true,
+                },
+                "rectangle" => EmissionShape::Rectangle {
+                    width: 100.0,
+                    height: 100.0,
+                },
+                "ring" => EmissionShape::Ring {
+                    inner_radius: 20.0,
+                    outer_radius: 50.0,
+                },
+                "line" => EmissionShape::Line {
+                    length: 100.0,
+                    angle: 0.0,
+                },
+                "cone" => EmissionShape::Cone {
+                    radius: 50.0,
+                    angle: 0.0,
+                    spread: 0.5,
+                },
+                "star" => EmissionShape::Star {
+                    points: 5,
+                    outer_radius: 50.0,
+                    inner_radius: 25.0,
+                },
+                "spiral" => EmissionShape::Spiral {
+                    revolutions: 2.0,
+                    radius: 50.0,
+                },
+                _ => EmissionShape::default(),
+            };
+        }
 
-    // relativeMode: string → enum
-    if let Ok(v) = t.get::<_, String>("relativeMode") {
-        c.relative_mode = match v.as_str() {
-            "attached" => RelativeMode::Attached,
-            _ => RelativeMode::Detached,
-        };
-    }
+        // relativeMode: string → enum
+        if let Ok(v) = t.get::<_, String>("relativeMode") {
+            c.relative_mode = match v.as_str() {
+                "attached" => RelativeMode::Attached,
+                _ => RelativeMode::Detached,
+            };
+        }
 
-    // shape: string → ParticleShape
-    if let Ok(v) = t.get::<_, String>("shape") {
-        c.shape = match v.as_str() {
-            "square" => ParticleShape::Square,
-            "circle" => ParticleShape::Circle,
-            "triangle" => ParticleShape::Triangle,
-            "spark" => ParticleShape::Spark,
-            "diamond" => ParticleShape::Diamond,
-            _ => ParticleShape::Square,
-        };
-    }
+        // shape: string → ParticleShape
+        if let Ok(v) = t.get::<_, String>("shape") {
+            c.shape = match v.as_str() {
+                "square" => ParticleShape::Square,
+                "circle" => ParticleShape::Circle,
+                "triangle" => ParticleShape::Triangle,
+                "spark" => ParticleShape::Spark,
+                "diamond" => ParticleShape::Diamond,
+                _ => ParticleShape::Square,
+            };
+        }
 
-    Ok(c)
-}
+        Ok(c)
+    }
 }

@@ -28,6 +28,8 @@ local group1_on = true
 -- ── Helpers ──────────────────────────────────────────────────────────────
 
 local function clear_all()
+    -- Clear every registered light so each screen starts from a clean slate
+    -- luna.light.clear() is the idiomatic way to tear down the whole light list
     luna.light.clear()
     player_x, player_y = W / 2, H / 2
 end
@@ -101,6 +103,8 @@ end
 local function setup_flicker()
     clear_all()
     luna.light.setAmbient(0.04, 0.04, 0.06, 1.0)
+    -- flickerSpeed controls oscillation frequency; flickerStrength controls amplitude
+    -- Candle (slow, subtle) → Torch (medium) → Campfire (fast) → Strobe (very fast)
     -- Slow candle
     luna.light.newLight(200, 350, 140, {
         color = {1.0, 0.7, 0.3, 1.0}, intensity = 1.0,

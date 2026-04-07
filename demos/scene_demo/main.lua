@@ -5,6 +5,9 @@
 
 -- ── Scene system ──────────────────────────────────────────────────────────
 
+local function clamp(v, mn, mx) return math.max(mn, math.min(mx, v)) end
+local function distance(x1, y1, x2, y2) return math.sqrt((x2 - x1)^2 + (y2 - y1)^2) end
+
 local scenes = {}
 local current_scene = nil
 
@@ -37,7 +40,7 @@ function title.draw()
     local h = luna.graphics.getHeight()
 
     -- Title text
-    local pulse = luna.math.sin((title.pulse or 0) * 2) * 0.15 + 0.85
+    local pulse = math.sin((title.pulse or 0) * 2) * 0.15 + 0.85
     luna.graphics.setColor(0.3 * pulse, 0.6 * pulse, 1.0 * pulse)
     luna.graphics.print("LUNA2D", w / 2 - 100, h / 3, 5)
 
@@ -69,8 +72,8 @@ function gameplay.enter()
     coins = {}
     for i = 1, 5 do
         coins[i] = {
-            x = luna.math.random(50, 750),
-            y = luna.math.random(50, 550),
+            x = math.random(50, 750),
+            y = math.random(50, 550),
             collected = false,
         }
     end
@@ -92,13 +95,13 @@ function gameplay.update(dt)
     end
 
     -- Clamp to bounds
-    player.x = luna.math.clamp(player.x, 20, 780)
-    player.y = luna.math.clamp(player.y, 20, 580)
+    player.x = clamp(player.x, 20, 780)
+    player.y = clamp(player.y, 20, 580)
 
     -- Coin collection
     for _, coin in ipairs(coins) do
         if not coin.collected then
-            local dist = luna.math.distance(player.x, player.y, coin.x, coin.y)
+            local dist = distance(player.x, player.y, coin.x, coin.y)
             if dist < 25 then
                 coin.collected = true
                 player.score = player.score + 1

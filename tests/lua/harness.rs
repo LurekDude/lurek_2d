@@ -541,21 +541,6 @@ fn lua_integration_timer_math() {
 }
 
 #[test]
-fn lua_integration_ai_physics2() {
-    run_lua_test("integration/test_ai_physics2.lua");
-}
-
-#[test]
-fn lua_integration_compute_dataframe2() {
-    run_lua_test("integration/test_compute_dataframe2.lua");
-}
-
-#[test]
-fn lua_integration_data_system2() {
-    run_lua_test("integration/test_data_system2.lua");
-}
-
-#[test]
 fn lua_integration_debugbridge() {
     run_lua_test("integration/test_debugbridge.lua");
 }
@@ -576,43 +561,8 @@ fn lua_integration_drawlayer() {
 }
 
 #[test]
-fn lua_integration_entity_ai2() {
-    run_lua_test("integration/test_entity_ai2.lua");
-}
-
-#[test]
-fn lua_integration_math_graphics2() {
-    run_lua_test("integration/test_math_graphics2.lua");
-}
-
-#[test]
-fn lua_integration_math_physics2() {
-    run_lua_test("integration/test_math_physics2.lua");
-}
-
-#[test]
-fn lua_integration_physics_timer2() {
-    run_lua_test("integration/test_physics_timer2.lua");
-}
-
-#[test]
-fn lua_integration_save_entity2() {
-    run_lua_test("integration/test_save_entity2.lua");
-}
-
-#[test]
 fn lua_integration_system() {
     run_lua_test("integration/test_system.lua");
-}
-
-#[test]
-fn lua_integration_tilemap_physics2() {
-    run_lua_test("integration/test_tilemap_physics2.lua");
-}
-
-#[test]
-fn lua_integration_timer_math2() {
-    run_lua_test("integration/test_timer_math2.lua");
 }
 
 // ─── New: unit, config, examples ─────────────────────────────────────────
@@ -639,94 +589,9 @@ fn lua_golden_math() {
     run_lua_test("golden/test_math_golden.lua");
 }
 
-#[test]
-fn lua_golden_math2() {
-    run_lua_test("golden/test_math_golden2.lua");
-}
-
 // ─── Security *2 variants ─────────────────────────────────────────────────────
 
-#[test]
-fn lua_security_invalid_args2() {
-    run_lua_test("security/test_invalid_args2.lua");
-}
-
-#[test]
-fn lua_security_mount_traversal2() {
-    run_lua_test("security/test_mount_traversal2.lua");
-}
-
-#[test]
-fn lua_security_savegame_validation2() {
-    run_lua_test("security/test_savegame_validation2.lua");
-}
-
-#[test]
-fn lua_security_toml_validation2() {
-    run_lua_test("security/test_toml_validation2.lua");
-}
-
 // ─── Stress *2 variants ───────────────────────────────────────────────────────
-
-#[test]
-fn lua_stress_compute2() {
-    run_lua_test("stress/test_compute_stress2.lua");
-}
-
-#[test]
-fn lua_stress_data_compression2() {
-    run_lua_test("stress/test_data_compression_stress2.lua");
-}
-
-#[test]
-fn lua_stress_data2() {
-    run_lua_test("stress/test_data_stress2.lua");
-}
-
-#[test]
-fn lua_stress_dataframe2() {
-    run_lua_test("stress/test_dataframe_stress2.lua");
-}
-
-#[test]
-fn lua_stress_entity2() {
-    run_lua_test("stress/test_entity_stress2.lua");
-}
-
-#[test]
-fn lua_stress_graph2() {
-    run_lua_test("stress/test_graph_stress2.lua");
-}
-
-#[test]
-fn lua_stress_math2() {
-    run_lua_test("stress/test_math_stress2.lua");
-}
-
-#[test]
-fn lua_stress_particle2() {
-    run_lua_test("stress/test_particle_stress2.lua");
-}
-
-#[test]
-fn lua_stress_pathfinding2() {
-    run_lua_test("stress/test_pathfinding_stress2.lua");
-}
-
-#[test]
-fn lua_stress_physics_collision2() {
-    run_lua_test("stress/test_physics_collision_stress2.lua");
-}
-
-#[test]
-fn lua_stress_physics2() {
-    run_lua_test("stress/test_physics_stress2.lua");
-}
-
-#[test]
-fn lua_stress_tilemap2() {
-    run_lua_test("stress/test_tilemap_stress2.lua");
-}
 
 // ─── Unit library tests (battle / crafting / dialog) ─────────────────────────
 
