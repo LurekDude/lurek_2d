@@ -18,10 +18,15 @@ Usage:
     python tools/gen_all_docs.py          # run all steps
 """
 
+import os
 import subprocess
 import sys
 import time
 from pathlib import Path
+
+# Ensure stdout can handle UTF-8 arrow characters on Windows consoles.
+if hasattr(sys.stdout, "reconfigure"):
+    sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 
 SCRIPTS = [
     ("docs/gen_rust_api_data.py", "Rust JSON (docs/logs/rust_api_data.json)"),
@@ -52,11 +57,13 @@ def run_script(script_name: str, extra_args: list, label: str) -> bool:
     script = TOOLS_DIR / script_name
     print(f"  [{label}]")
     t0 = time.monotonic()
+    env = {**os.environ, "PYTHONIOENCODING": "utf-8"}
     result = subprocess.run(
         [sys.executable, str(script)] + extra_args,
         capture_output=True,
         text=True,
         encoding="utf-8",
+        env=env,
     )
     elapsed = time.monotonic() - t0
     if result.returncode != 0:

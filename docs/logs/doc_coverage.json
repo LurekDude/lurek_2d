@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-04-07T21:13:55.116000+00:00",
+  "generated_at": "2026-04-07T21:43:41.862002+00:00",
   "summary": {
     "rust": {
       "total": 3264,
@@ -17342,7 +17342,7 @@
       "source": "rust",
       "module": "lua_api",
       "file": "src/lua_api/math_api.rs",
-      "line": 27,
+      "line": 28,
       "kind": "struct",
       "name": "LuaRandomGenerator",
       "has_doc": true
@@ -17351,7 +17351,7 @@
       "source": "rust",
       "module": "lua_api",
       "file": "src/lua_api/math_api.rs",
-      "line": 105,
+      "line": 106,
       "kind": "struct",
       "name": "LuaTransform",
       "has_doc": true
@@ -17360,7 +17360,7 @@
       "source": "rust",
       "module": "lua_api",
       "file": "src/lua_api/math_api.rs",
-      "line": 259,
+      "line": 260,
       "kind": "struct",
       "name": "LuaBezierCurve",
       "has_doc": true
@@ -17369,7 +17369,7 @@
       "source": "rust",
       "module": "lua_api",
       "file": "src/lua_api/math_api.rs",
-      "line": 402,
+      "line": 403,
       "kind": "struct",
       "name": "LuaTween",
       "has_doc": true
@@ -17378,7 +17378,7 @@
       "source": "rust",
       "module": "lua_api",
       "file": "src/lua_api/math_api.rs",
-      "line": 499,
+      "line": 500,
       "kind": "struct",
       "name": "LuaSpatialHash",
       "has_doc": true
@@ -17387,7 +17387,7 @@
       "source": "rust",
       "module": "lua_api",
       "file": "src/lua_api/math_api.rs",
-      "line": 605,
+      "line": 606,
       "kind": "struct",
       "name": "LuaNoiseGenerator",
       "has_doc": true
@@ -17396,7 +17396,7 @@
       "source": "rust",
       "module": "lua_api",
       "file": "src/lua_api/math_api.rs",
-      "line": 916,
+      "line": 917,
       "kind": "fn",
       "name": "register",
       "has_doc": true
@@ -29402,7 +29402,7 @@
       "source": "lua_api",
       "module": "math_api",
       "file": "src/lua_api/math_api.rs",
-      "line": 1137,
+      "line": 1138,
       "kind": "fn",
       "name": "linear",
       "has_doc": true
@@ -29411,7 +29411,7 @@
       "source": "lua_api",
       "module": "math_api",
       "file": "src/lua_api/math_api.rs",
-      "line": 1143,
+      "line": 1144,
       "kind": "fn",
       "name": "inQuad",
       "has_doc": true
@@ -29420,7 +29420,7 @@
       "source": "lua_api",
       "module": "math_api",
       "file": "src/lua_api/math_api.rs",
-      "line": 1149,
+      "line": 1150,
       "kind": "fn",
       "name": "outQuad",
       "has_doc": true
@@ -29429,7 +29429,7 @@
       "source": "lua_api",
       "module": "math_api",
       "file": "src/lua_api/math_api.rs",
-      "line": 1155,
+      "line": 1156,
       "kind": "fn",
       "name": "inOutQuad",
       "has_doc": true
@@ -29438,7 +29438,7 @@
       "source": "lua_api",
       "module": "math_api",
       "file": "src/lua_api/math_api.rs",
-      "line": 1161,
+      "line": 1162,
       "kind": "fn",
       "name": "inCubic",
       "has_doc": true
@@ -29447,7 +29447,7 @@
       "source": "lua_api",
       "module": "math_api",
       "file": "src/lua_api/math_api.rs",
-      "line": 1167,
+      "line": 1168,
       "kind": "fn",
       "name": "outCubic",
       "has_doc": true
@@ -29456,7 +29456,7 @@
       "source": "lua_api",
       "module": "math_api",
       "file": "src/lua_api/math_api.rs",
-      "line": 1173,
+      "line": 1174,
       "kind": "fn",
       "name": "inOutCubic",
       "has_doc": true
@@ -29465,7 +29465,7 @@
       "source": "lua_api",
       "module": "math_api",
       "file": "src/lua_api/math_api.rs",
-      "line": 1179,
+      "line": 1180,
       "kind": "fn",
       "name": "inQuart",
       "has_doc": true
@@ -29474,7 +29474,7 @@
       "source": "lua_api",
       "module": "math_api",
       "file": "src/lua_api/math_api.rs",
-      "line": 1185,
+      "line": 1186,
       "kind": "fn",
       "name": "outQuart",
       "has_doc": true
@@ -29483,7 +29483,7 @@
       "source": "lua_api",
       "module": "math_api",
       "file": "src/lua_api/math_api.rs",
-      "line": 1191,
+      "line": 1192,
       "kind": "fn",
       "name": "inOutQuart",
       "has_doc": true
@@ -29492,7 +29492,7 @@
       "source": "lua_api",
       "module": "math_api",
       "file": "src/lua_api/math_api.rs",
-      "line": 1197,
+      "line": 1198,
       "kind": "fn",
       "name": "inSine",
       "has_doc": true
@@ -29501,7 +29501,7 @@
       "source": "lua_api",
       "module": "math_api",
       "file": "src/lua_api/math_api.rs",
-      "line": 1203,
+      "line": 1204,
       "kind": "fn",
       "name": "outSine",
       "has_doc": true
@@ -29510,7 +29510,7 @@
       "source": "lua_api",
       "module": "math_api",
       "file": "src/lua_api/math_api.rs",
-      "line": 1209,
+      "line": 1210,
       "kind": "fn",
       "name": "inOutSine",
       "has_doc": true
@@ -29519,7 +29519,7 @@
       "source": "lua_api",
       "module": "math_api",
       "file": "src/lua_api/math_api.rs",
-      "line": 1215,
+      "line": 1216,
       "kind": "fn",
       "name": "inExpo",
       "has_doc": true
@@ -29528,7 +29528,7 @@
       "source": "lua_api",
       "module": "math_api",
       "file": "src/lua_api/math_api.rs",
-      "line": 1221,
+      "line": 1222,
       "kind": "fn",
       "name": "outExpo",
       "has_doc": true
@@ -29537,7 +29537,7 @@
       "source": "lua_api",
       "module": "math_api",
       "file": "src/lua_api/math_api.rs",
-      "line": 1227,
+      "line": 1228,
       "kind": "fn",
       "name": "inOutExpo",
       "has_doc": true
@@ -29546,7 +29546,7 @@
       "source": "lua_api",
       "module": "math_api",
       "file": "src/lua_api/math_api.rs",
-      "line": 1233,
+      "line": 1234,
       "kind": "fn",
       "name": "inElastic",
       "has_doc": true
@@ -29555,7 +29555,7 @@
       "source": "lua_api",
       "module": "math_api",
       "file": "src/lua_api/math_api.rs",
-      "line": 1239,
+      "line": 1240,
       "kind": "fn",
       "name": "outElastic",
       "has_doc": true
@@ -29564,7 +29564,7 @@
       "source": "lua_api",
       "module": "math_api",
       "file": "src/lua_api/math_api.rs",
-      "line": 1245,
+      "line": 1246,
       "kind": "fn",
       "name": "outBounce",
       "has_doc": true
@@ -29573,7 +29573,7 @@
       "source": "lua_api",
       "module": "math_api",
       "file": "src/lua_api/math_api.rs",
-      "line": 1251,
+      "line": 1252,
       "kind": "fn",
       "name": "inBounce",
       "has_doc": true
@@ -29582,7 +29582,7 @@
       "source": "lua_api",
       "module": "math_api",
       "file": "src/lua_api/math_api.rs",
-      "line": 1257,
+      "line": 1258,
       "kind": "fn",
       "name": "inBack",
       "has_doc": true
@@ -29591,7 +29591,7 @@
       "source": "lua_api",
       "module": "math_api",
       "file": "src/lua_api/math_api.rs",
-      "line": 1263,
+      "line": 1264,
       "kind": "fn",
       "name": "outBack",
       "has_doc": true

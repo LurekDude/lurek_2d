@@ -4275,7 +4275,7 @@ local Accordion = {}
 function Accordion:addSection(title, content_idx) end
 
 --- Returns the section count of this Accordion widget.
----@return nil
+---@return integer
 function Accordion:getSectionCount() end
 
 --- Returns the section title of this Accordion widget.
@@ -4284,12 +4284,12 @@ function Accordion:getSectionCount() end
 function Accordion:getSectionTitle(section_idx) end
 
 --- Returns true if exclusive is enabled for this Accordion widget.
----@return nil
+---@return boolean
 function Accordion:isExclusive() end
 
 --- Returns true if section expanded is enabled for this Accordion widget.
 ---@param section_idx any
----@return nil
+---@return boolean
 function Accordion:isSectionExpanded(section_idx) end
 
 --- Sets the exclusive for this Accordion widget.
@@ -4307,7 +4307,7 @@ function Accordion:toggleSection(section_idx) end
 local Button = {}
 
 --- Returns the text of this Button widget.
----@return nil
+---@return string
 function Button:getText() end
 
 --- Sets the text for this Button widget.
@@ -4320,11 +4320,11 @@ function Button:setText(text) end
 local Checkbox = {}
 
 --- Returns the text of this Checkbox widget.
----@return nil
+---@return string
 function Checkbox:getText() end
 
 --- Returns true if checked is enabled for this Checkbox widget.
----@return nil
+---@return boolean
 function Checkbox:isChecked() end
 
 --- Sets the checked for this Checkbox widget.
@@ -4342,15 +4342,15 @@ function Checkbox:setText(text) end
 local Color_Picker = {}
 
 --- Returns the color of this Color_Picker widget.
----@return nil
+---@return number
 function Color_Picker:getColor() end
 
 --- Returns the color mode of this Color_Picker widget.
----@return nil
+---@return string
 function Color_Picker:getColorMode() end
 
 --- Returns the show alpha of this Color_Picker widget.
----@return nil
+---@return boolean
 function Color_Picker:getShowAlpha() end
 
 --- Sets the color for this Color_Picker widget.
@@ -4391,19 +4391,19 @@ function Combo_Box:clearItems() end
 
 --- Returns the item of this Combo_Box widget.
 ---@param index any
----@return nil
+---@return string
 function Combo_Box:getItem(index) end
 
 --- Returns the item count of this Combo_Box widget.
----@return nil
+---@return integer
 function Combo_Box:getItemCount() end
 
 --- Returns the selected index of this Combo_Box widget.
----@return nil
+---@return integer
 function Combo_Box:getSelectedIndex() end
 
 --- Returns the selected item of this Combo_Box widget.
----@return nil
+---@return string
 function Combo_Box:getSelectedItem() end
 
 --- Removes the item from this Combo_Box widget.
@@ -4431,19 +4431,19 @@ function Dialog:addButton(text, cb) end
 function Dialog:close() end
 
 --- Returns the content of this Dialog widget.
----@return nil
+---@return integer
 function Dialog:getContent() end
 
 --- Returns the title of this Dialog widget.
----@return nil
+---@return string
 function Dialog:getTitle() end
 
 --- Returns true if modal is enabled for this Dialog widget.
----@return nil
+---@return boolean
 function Dialog:isModal() end
 
 --- Returns true if open is enabled for this Dialog widget.
----@return nil
+---@return boolean
 function Dialog:isOpen() end
 
 --- Performs the open operation on this Dialog widget.
@@ -4481,7 +4481,7 @@ local Dock_Panel = {}
 function Dock_Panel:dock(child_idx, side) end
 
 --- Returns the docked count of this Dock_Panel widget.
----@return nil
+---@return integer
 function Dock_Panel:getDockedCount() end
 
 --- Returns the split size of this Dock_Panel widget.
@@ -4522,11 +4522,11 @@ function Gui_Table:addRow(cells) end
 function Gui_Table:getCell(row, col) end
 
 --- Returns the column count of this Gui_Table widget.
----@return nil
+---@return integer
 function Gui_Table:getColumnCount() end
 
 --- Returns the row count of this Gui_Table widget.
----@return nil
+---@return integer
 function Gui_Table:getRowCount() end
 
 --- Returns the selected row of this Gui_Table widget.
@@ -4534,7 +4534,7 @@ function Gui_Table:getRowCount() end
 function Gui_Table:getSelectedRow() end
 
 --- Returns true if sortable is enabled for this Gui_Table widget.
----@return nil
+---@return boolean
 function Gui_Table:isSortable() end
 
 --- Sets the cell for this Gui_Table widget.
@@ -4564,19 +4564,19 @@ function Gui_Table:setSortable(v) end
 local Gui_Window = {}
 
 --- Returns the title of this Gui_Window widget.
----@return nil
+---@return string
 function Gui_Window:getTitle() end
 
 --- Returns true if closeable is enabled for this Gui_Window widget.
----@return nil
+---@return boolean
 function Gui_Window:isCloseable() end
 
 --- Returns true if draggable is enabled for this Gui_Window widget.
----@return nil
+---@return boolean
 function Gui_Window:isDraggable() end
 
 --- Returns true if resizable is enabled for this Gui_Window widget.
----@return nil
+---@return boolean
 function Gui_Window:isResizable() end
 
 --- Sets the closeable for this Gui_Window widget.
@@ -4634,7 +4634,7 @@ function Image_Widget:getFocus() end
 function Image_Widget:getRoot() end
 
 --- Returns the scale mode of this Image_Widget widget.
----@return nil
+---@return string
 function Image_Widget:getScaleMode() end
 
 --- Returns whether a theme is set.
@@ -4642,7 +4642,7 @@ function Image_Widget:getScaleMode() end
 function Image_Widget:getTheme() end
 
 --- Returns the tint of this Image_Widget widget.
----@return nil
+---@return number
 function Image_Widget:getTint() end
 
 --- Returns the number of active toasts.
@@ -4876,7 +4876,7 @@ function Image_Widget:wheelmoved(x, y) end
 local Label = {}
 
 --- Returns the text of this Label widget.
----@return nil
+---@return string
 function Label:getText() end
 
 --- Sets the text for this Label widget.
@@ -4889,23 +4889,23 @@ function Label:setText(text) end
 local Layout = {}
 
 --- Returns the align of this Layout widget.
----@return nil
+---@return string
 function Layout:getAlign() end
 
 --- Returns the direction of this Layout widget.
----@return nil
+---@return string
 function Layout:getDirection() end
 
 --- Returns the justify of this Layout widget.
----@return nil
+---@return string
 function Layout:getJustify() end
 
 --- Returns the spacing of this Layout widget.
----@return nil
+---@return number
 function Layout:getSpacing() end
 
 --- Returns the wrap of this Layout widget.
----@return nil
+---@return boolean
 function Layout:getWrap() end
 
 --- Sets the align for this Layout widget.
@@ -4953,15 +4953,15 @@ function List_Box:clearItems() end
 
 --- Returns the item of this List_Box widget.
 ---@param index any
----@return nil
+---@return string
 function List_Box:getItem(index) end
 
 --- Returns the item count of this List_Box widget.
----@return nil
+---@return integer
 function List_Box:getItemCount() end
 
 --- Returns the selected index of this List_Box widget.
----@return nil
+---@return integer
 function List_Box:getSelectedIndex() end
 
 --- Removes the item from this List_Box widget.
@@ -4989,7 +4989,7 @@ local Menu_Bar = {}
 function Menu_Bar:addMenu(menu_idx) end
 
 --- Returns the menu count of this Menu_Bar widget.
----@return nil
+---@return integer
 function Menu_Bar:getMenuCount() end
 
 --- Returns the menus of this Menu_Bar widget.
@@ -5011,7 +5011,7 @@ local Menu_Item = {}
 function Menu_Item:addSubItem(child_idx) end
 
 --- Returns the shortcut of this Menu_Item widget.
----@return nil
+---@return string
 function Menu_Item:getShortcut() end
 
 --- Returns the sub items of this Menu_Item widget.
@@ -5019,11 +5019,11 @@ function Menu_Item:getShortcut() end
 function Menu_Item:getSubItems() end
 
 --- Returns the text of this Menu_Item widget.
----@return nil
+---@return string
 function Menu_Item:getText() end
 
 --- Returns true if checked is enabled for this Menu_Item widget.
----@return nil
+---@return boolean
 function Menu_Item:isChecked() end
 
 --- Sets the checked for this Menu_Item widget.
@@ -5051,15 +5051,15 @@ function Menu_Item:setText(text) end
 local Nine_Patch = {}
 
 --- Returns the image dimensions of this Nine_Patch widget.
----@return nil
+---@return integer
 function Nine_Patch:getImageDimensions() end
 
 --- Returns the insets of this Nine_Patch widget.
----@return nil
+---@return integer
 function Nine_Patch:getInsets() end
 
 --- Returns the slices of this Nine_Patch widget.
----@return nil
+---@return table
 function Nine_Patch:getSlices() end
 
 --- Sets the image dimensions for this Nine_Patch widget.
@@ -5081,7 +5081,7 @@ function Nine_Patch:setInsets(left, top, right, bottom) end
 local Panel = {}
 
 --- Returns the title of this Panel widget.
----@return nil
+---@return string
 function Panel:getTitle() end
 
 --- Sets the scrollable for this Panel widget.
@@ -5099,19 +5099,19 @@ function Panel:setTitle(title) end
 local Progress_Bar = {}
 
 --- Returns the max of this Progress_Bar widget.
----@return nil
+---@return number
 function Progress_Bar:getMax() end
 
 --- Returns the min of this Progress_Bar widget.
----@return nil
+---@return number
 function Progress_Bar:getMin() end
 
 --- Returns the progress of this Progress_Bar widget.
----@return nil
+---@return number
 function Progress_Bar:getProgress() end
 
 --- Returns the value of this Progress_Bar widget.
----@return nil
+---@return number
 function Progress_Bar:getValue() end
 
 --- Sets the range for this Progress_Bar widget.
@@ -5130,15 +5130,15 @@ function Progress_Bar:setValue(v) end
 local Radio_Button = {}
 
 --- Returns the group of this Radio_Button widget.
----@return nil
+---@return string
 function Radio_Button:getGroup() end
 
 --- Returns the text of this Radio_Button widget.
----@return nil
+---@return string
 function Radio_Button:getText() end
 
 --- Returns true if selected is enabled for this Radio_Button widget.
----@return nil
+---@return boolean
 function Radio_Button:isSelected() end
 
 --- Sets the group for this Radio_Button widget.
@@ -5166,19 +5166,19 @@ function Radio_Button:setText(text) end
 local Scroll_Bar = {}
 
 --- Returns the content size of this Scroll_Bar widget.
----@return nil
+---@return number
 function Scroll_Bar:getContentSize() end
 
 --- Returns the scroll position of this Scroll_Bar widget.
----@return nil
+---@return number
 function Scroll_Bar:getScrollPosition() end
 
 --- Returns the view size of this Scroll_Bar widget.
----@return nil
+---@return number
 function Scroll_Bar:getViewSize() end
 
 --- Returns true if vertical is enabled for this Scroll_Bar widget.
----@return nil
+---@return boolean
 function Scroll_Bar:isVertical() end
 
 --- Sets the content size for this Scroll_Bar widget.
@@ -5206,19 +5206,19 @@ function Scroll_Bar:setViewSize(v) end
 local Scroll_Panel = {}
 
 --- Returns the content size of this Scroll_Panel widget.
----@return nil
+---@return number
 function Scroll_Panel:getContentSize() end
 
 --- Returns the max scroll of this Scroll_Panel widget.
----@return nil
+---@return number
 function Scroll_Panel:getMaxScroll() end
 
 --- Returns the scroll position of this Scroll_Panel widget.
----@return nil
+---@return number
 function Scroll_Panel:getScrollPosition() end
 
 --- Returns the scroll speed of this Scroll_Panel widget.
----@return nil
+---@return number
 function Scroll_Panel:getScrollSpeed() end
 
 --- Sets the content size for this Scroll_Panel widget.
@@ -5243,11 +5243,11 @@ function Scroll_Panel:setScrollSpeed(speed) end
 local Separator = {}
 
 --- Returns the thickness of this Separator widget.
----@return nil
+---@return number
 function Separator:getThickness() end
 
 --- Returns true if vertical is enabled for this Separator widget.
----@return nil
+---@return boolean
 function Separator:isVertical() end
 
 --- Sets the thickness for this Separator widget.
@@ -5265,15 +5265,15 @@ function Separator:setVertical(v) end
 local Slider = {}
 
 --- Returns the max of this Slider widget.
----@return nil
+---@return number
 function Slider:getMax() end
 
 --- Returns the min of this Slider widget.
----@return nil
+---@return number
 function Slider:getMin() end
 
 --- Returns the value of this Slider widget.
----@return nil
+---@return number
 function Slider:getValue() end
 
 --- Sets the range for this Slider widget.
@@ -5301,11 +5301,11 @@ local Split_Panel = {}
 function Split_Panel:getFirstChild() end
 
 --- Returns the min panel size of this Split_Panel widget.
----@return nil
+---@return number
 function Split_Panel:getMinPanelSize() end
 
 --- Returns the orientation of this Split_Panel widget.
----@return nil
+---@return string
 function Split_Panel:getOrientation() end
 
 --- Returns the second child of this Split_Panel widget.
@@ -5313,7 +5313,7 @@ function Split_Panel:getOrientation() end
 function Split_Panel:getSecondChild() end
 
 --- Returns the split position of this Split_Panel widget.
----@return nil
+---@return number
 function Split_Panel:getSplitPosition() end
 
 --- Sets the first child for this Split_Panel widget.
@@ -5352,12 +5352,12 @@ local Status_Bar = {}
 function Status_Bar:addSection(text, width) end
 
 --- Returns the section count of this Status_Bar widget.
----@return nil
+---@return integer
 function Status_Bar:getSectionCount() end
 
 --- Returns the section text of this Status_Bar widget.
 ---@param section_idx any
----@return nil
+---@return integer
 function Status_Bar:getSectionText(section_idx) end
 
 --- Sets the section text for this Status_Bar widget.
@@ -5376,16 +5376,16 @@ local Tab_Bar = {}
 function Tab_Bar:addTab(label) end
 
 --- Returns the active tab of this Tab_Bar widget.
----@return nil
+---@return integer
 function Tab_Bar:getActiveTab() end
 
 --- Returns the tab of this Tab_Bar widget.
 ---@param index any
----@return nil
+---@return integer
 function Tab_Bar:getTab(index) end
 
 --- Returns the tab count of this Tab_Bar widget.
----@return nil
+---@return integer
 function Tab_Bar:getTabCount() end
 
 --- Removes the tab from this Tab_Bar widget.
@@ -5403,19 +5403,19 @@ function Tab_Bar:setActiveTab(index) end
 local Text_Input = {}
 
 --- Returns the cursor position of this Text_Input widget.
----@return nil
+---@return integer
 function Text_Input:getCursorPosition() end
 
 --- Returns the placeholder of this Text_Input widget.
----@return nil
+---@return string
 function Text_Input:getPlaceholder() end
 
 --- Returns the text of this Text_Input widget.
----@return nil
+---@return string
 function Text_Input:getText() end
 
 --- Returns true if focused is enabled for this Text_Input widget.
----@return nil
+---@return boolean
 function Text_Input:isFocused() end
 
 --- Sets the max length for this Text_Input widget.
@@ -5438,19 +5438,19 @@ function Text_Input:setText(text) end
 local Toast = {}
 
 --- Returns the duration of this Toast widget.
----@return nil
+---@return number
 function Toast:getDuration() end
 
 --- Returns the message of this Toast widget.
----@return nil
+---@return string
 function Toast:getMessage() end
 
 --- Returns the progress of this Toast widget.
----@return nil
+---@return number
 function Toast:getProgress() end
 
 --- Returns true if expired is enabled for this Toast widget.
----@return nil
+---@return boolean
 function Toast:isExpired() end
 
 --- Sets the duration for this Toast widget.
@@ -5475,16 +5475,16 @@ function Toolbar:addButton(id, tooltip) end
 
 --- Returns the button of this Toolbar widget.
 ---@param id any
----@return nil
+---@return boolean
 function Toolbar:getButton(id) end
 
 --- Returns the orientation of this Toolbar widget.
----@return nil
+---@return string
 function Toolbar:getOrientation() end
 
 --- Returns true if button toggled is enabled for this Toolbar widget.
 ---@param id any
----@return nil
+---@return boolean
 function Toolbar:isButtonToggled(id) end
 
 --- Sets the button enabled for this Toolbar widget.
@@ -5509,7 +5509,7 @@ function Toolbar:setOrientation(v) end
 local Tooltip_Panel = {}
 
 --- Returns the delay of this Tooltip_Panel widget.
----@return nil
+---@return number
 function Tooltip_Panel:getDelay() end
 
 --- Returns the target of this Tooltip_Panel widget.
@@ -5517,7 +5517,7 @@ function Tooltip_Panel:getDelay() end
 function Tooltip_Panel:getTarget() end
 
 --- Returns the text of this Tooltip_Panel widget.
----@return nil
+---@return string
 function Tooltip_Panel:getText() end
 
 --- Sets the delay for this Tooltip_Panel widget.
@@ -5573,7 +5573,7 @@ function Tree_View:expandNode(index) end
 function Tree_View:getChildNodes(index) end
 
 --- Returns the node count of this Tree_View widget.
----@return nil
+---@return integer
 function Tree_View:getNodeCount() end
 
 --- Returns the node depth of this Tree_View widget.
@@ -5583,7 +5583,7 @@ function Tree_View:getNodeDepth(index) end
 
 --- Returns the node text of this Tree_View widget.
 ---@param index any
----@return nil
+---@return string
 function Tree_View:getNodeText(index) end
 
 --- Returns the parent node of this Tree_View widget.
@@ -5592,17 +5592,17 @@ function Tree_View:getNodeText(index) end
 function Tree_View:getParentNode(index) end
 
 --- Returns the selected node of this Tree_View widget.
----@return nil
+---@return integer
 function Tree_View:getSelectedNode() end
 
 --- Returns true if expanded is enabled for this Tree_View widget.
 ---@param index any
----@return nil
+---@return boolean
 function Tree_View:isExpanded(index) end
 
 --- Returns true if node expanded is enabled for this Tree_View widget.
 ---@param index any
----@return nil
+---@return boolean
 function Tree_View:isNodeExpanded(index) end
 
 --- Removes the node from this Tree_View widget.
@@ -6794,11 +6794,88 @@ function Tween:setTime(t) end
 ---@return boolean
 function Tween:update(dt) end
 
+--- Returns the angle in radians from (x1, y1) to (x2, y2).
+---@param x1 any
+---@param y1 any
+---@param x2 any
+---@param y2 any
+---@return number
+function luna.math.angleBetween(x1, y1, x2, y2) end
+
 --- Applies a named easing function to progress value t.
 ---@param name any
 ---@param t any
 ---@return number
 function luna.math.applyEasing(name, t) end
+
+--- Rasterizes a line from (x1,y1) to (x2,y2) using Bresenham's algorithm. Returns a table of {x,y} tables.
+---@param x1 any
+---@param y1 any
+---@param x2 any
+---@param y2 any
+---@return table
+function luna.math.bresenham(x1, y1, x2, y2) end
+
+--- Returns true if the point (px, py) lies inside the circle.
+---@param cx any
+---@param cy any
+---@param r any
+---@param px any
+---@param py any
+---@return boolean
+function luna.math.circleContainsPoint(cx, cy, r, px, py) end
+
+--- Returns true if two circles overlap.
+---@param x1 any
+---@param y1 any
+---@param r1 any
+---@param x2 any
+---@param y2 any
+---@param r2 any
+---@return boolean
+function luna.math.circleIntersectsCircle(x1, y1, r1, x2, y2, r2) end
+
+--- Tests an infinite line against a circle. Returns hit, then two optional hit-point pairs.
+---@param cx any
+---@param cy any
+---@param r any
+---@param lx1 any
+---@param ly1 any
+---@param lx2 any
+---@param ly2 any
+---@return boolean
+function luna.math.circleIntersectsLine(cx, cy, r, lx1, ly1, lx2, ly2) end
+
+--- Tests a line segment against a circle. Returns hit, then two optional hit-point pairs.
+---@param cx any
+---@param cy any
+---@param r any
+---@param sx1 any
+---@param sy1 any
+---@param sx2 any
+---@param sy2 any
+---@return boolean
+function luna.math.circleIntersectsSegment(cx, cy, r, sx1, sy1, sx2, sy2) end
+
+--- Returns the closest point on segment (x1,y1)-(x2,y2) to point (px,py).
+---@param px any
+---@param py any
+---@param x1 any
+---@param y1 any
+---@param x2 any
+---@param y2 any
+---@return number
+function luna.math.closestPointOnSegment(px, py, x1, y1, x2, y2) end
+
+--- Computes the convex hull of a flat {x1,y1,...} point list. Returns a flat table.
+---@param pts any
+---@return table
+function luna.math.convexHull(pts) end
+
+--- Delaunay triangulation of a flat {x1,y1,...} point list. Returns a table of flat 6-number triangle tables.
+---@param pts any
+---@return table
+function luna.math.delaunayTriangulate(pts) end
 
 --- Returns fractal Brownian motion noise at (x, y).
 ---@param x any
@@ -6884,6 +6961,18 @@ function luna.math.inSine(t) end
 ---@param pts any
 ---@return boolean
 function luna.math.isConvex(pts) end
+
+--- Infinite line intersection. Returns (x, y) or (nil, nil) if lines are parallel.
+---@param x1 number
+---@param y1 number
+---@param x2 number
+---@param y2 number
+---@param x3 number
+---@param y3 number
+---@param x4 number
+---@param y4 number
+---@return number?
+function luna.math.lineIntersect(x1, y1, x2, y2, x3, y3, x4, y4) end
 
 --- Linear easing (identity).
 ---@param t any
@@ -6988,6 +7077,35 @@ function luna.math.perlin2d(x, y, seed) end
 ---@param seed? any (optional)
 ---@return number
 function luna.math.perlin3d(x, y, z, seed) end
+
+--- Returns true if (px, py) is inside the polygon given as a flat {x1,y1,...} table.
+---@param pts any
+---@param px any
+---@param py any
+---@return boolean
+function luna.math.pointInPolygon(pts, px, py) end
+
+--- Returns the signed area of a polygon given as a flat {x1,y1,...} table.
+---@param pts any
+---@return number
+function luna.math.polygonArea(pts) end
+
+--- Returns the centroid (cx, cy) of a polygon given as a flat {x1,y1,...} table.
+---@param pts any
+---@return number
+function luna.math.polygonCentroid(pts) end
+
+--- Tests if two line segments intersect. Returns (hit, ix?, iy?).
+---@param x1 number
+---@param y1 number
+---@param x2 number
+---@param y2 number
+---@param x3 number
+---@param y3 number
+---@param x4 number
+---@param y4 number
+---@return boolean
+function luna.math.segmentIntersectsSegment(x1, y1, x2, y2, x3, y3, x4, y4) end
 
 --- Returns 2D Simplex noise at (x, y) with the given seed.
 ---@param x any

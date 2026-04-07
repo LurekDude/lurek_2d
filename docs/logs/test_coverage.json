@@ -6987,7 +6987,7 @@
         "module": "lua_api",
         "name": "register",
         "file": "src/lua_api/math_api.rs",
-        "line": 916
+        "line": 917
       },
       {
         "module": "lua_api",
@@ -14860,10 +14860,10 @@
     ]
   },
   "lua": {
-    "total": 2021,
+    "total": 2035,
     "covered": 1662,
-    "uncovered": 359,
-    "coverage_pct": 82.2,
+    "uncovered": 373,
+    "coverage_pct": 81.7,
     "covered_items": [
       {
         "module": "ai",
@@ -22787,273 +22787,273 @@
         "lua_name": "RandomGenerator:random",
         "kind": "method",
         "file": "src/lua_api/math_api.rs",
-        "line": 36
+        "line": 37
       },
       {
         "module": "math",
         "lua_name": "RandomGenerator:getState",
         "kind": "method",
         "file": "src/lua_api/math_api.rs",
-        "line": 85
+        "line": 86
       },
       {
         "module": "math",
         "lua_name": "RandomGenerator:setState",
         "kind": "method",
         "file": "src/lua_api/math_api.rs",
-        "line": 91
+        "line": 92
       },
       {
         "module": "math",
         "lua_name": "Transform:translate",
         "kind": "method",
         "file": "src/lua_api/math_api.rs",
-        "line": 116
+        "line": 117
       },
       {
         "module": "math",
         "lua_name": "Transform:rotate",
         "kind": "method",
         "file": "src/lua_api/math_api.rs",
-        "line": 125
+        "line": 126
       },
       {
         "module": "math",
         "lua_name": "Transform:scale",
         "kind": "method",
         "file": "src/lua_api/math_api.rs",
-        "line": 135
+        "line": 136
       },
       {
         "module": "math",
         "lua_name": "Transform:reset",
         "kind": "method",
         "file": "src/lua_api/math_api.rs",
-        "line": 153
+        "line": 154
       },
       {
         "module": "math",
         "lua_name": "Transform:inverse",
         "kind": "method",
         "file": "src/lua_api/math_api.rs",
-        "line": 221
+        "line": 222
       },
       {
         "module": "math",
         "lua_name": "Transform:clone",
         "kind": "method",
         "file": "src/lua_api/math_api.rs",
-        "line": 230
+        "line": 231
       },
       {
         "module": "math",
         "lua_name": "BezierCurve:evaluate",
         "kind": "method",
         "file": "src/lua_api/math_api.rs",
-        "line": 269
+        "line": 270
       },
       {
         "module": "math",
         "lua_name": "BezierCurve:render",
         "kind": "method",
         "file": "src/lua_api/math_api.rs",
-        "line": 278
+        "line": 279
       },
       {
         "module": "math",
         "lua_name": "BezierCurve:length",
         "kind": "method",
         "file": "src/lua_api/math_api.rs",
-        "line": 361
+        "line": 362
       },
       {
         "module": "math",
         "lua_name": "BezierCurve:translate",
         "kind": "method",
         "file": "src/lua_api/math_api.rs",
-        "line": 368
+        "line": 369
       },
       {
         "module": "math",
         "lua_name": "BezierCurve:rotate",
         "kind": "method",
         "file": "src/lua_api/math_api.rs",
-        "line": 379
+        "line": 380
       },
       {
         "module": "math",
         "lua_name": "BezierCurve:scale",
         "kind": "method",
         "file": "src/lua_api/math_api.rs",
-        "line": 390
+        "line": 391
       },
       {
         "module": "math",
         "lua_name": "Tween:update",
         "kind": "method",
         "file": "src/lua_api/math_api.rs",
-        "line": 412
+        "line": 413
       },
       {
         "module": "math",
         "lua_name": "Tween:reset",
         "kind": "method",
         "file": "src/lua_api/math_api.rs",
-        "line": 417
+        "line": 418
       },
       {
         "module": "math",
         "lua_name": "Tween:getValue",
         "kind": "method",
         "file": "src/lua_api/math_api.rs",
-        "line": 426
+        "line": 427
       },
       {
         "module": "math",
         "lua_name": "Tween:isComplete",
         "kind": "method",
         "file": "src/lua_api/math_api.rs",
-        "line": 448
+        "line": 449
       },
       {
         "module": "math",
         "lua_name": "Tween:getValueCount",
         "kind": "method",
         "file": "src/lua_api/math_api.rs",
-        "line": 453
+        "line": 454
       },
       {
         "module": "math",
         "lua_name": "Tween:getDuration",
         "kind": "method",
         "file": "src/lua_api/math_api.rs",
-        "line": 467
+        "line": 468
       },
       {
         "module": "math",
         "lua_name": "Tween:getTime",
         "kind": "method",
         "file": "src/lua_api/math_api.rs",
-        "line": 472
+        "line": 473
       },
       {
         "module": "math",
         "lua_name": "Tween:setTime",
         "kind": "method",
         "file": "src/lua_api/math_api.rs",
-        "line": 478
+        "line": 479
       },
       {
         "module": "math",
         "lua_name": "Tween:addValue",
         "kind": "method",
         "file": "src/lua_api/math_api.rs",
-        "line": 488
+        "line": 489
       },
       {
         "module": "math",
         "lua_name": "SpatialHash:remove",
         "kind": "method",
         "file": "src/lua_api/math_api.rs",
-        "line": 539
+        "line": 540
       },
       {
         "module": "math",
         "lua_name": "SpatialHash:clear",
         "kind": "method",
         "file": "src/lua_api/math_api.rs",
-        "line": 547
+        "line": 548
       },
       {
         "module": "math",
         "lua_name": "SpatialHash:queryRect",
         "kind": "method",
         "file": "src/lua_api/math_api.rs",
-        "line": 559
+        "line": 560
       },
       {
         "module": "math",
         "lua_name": "SpatialHash:getCellSize",
         "kind": "method",
         "file": "src/lua_api/math_api.rs",
-        "line": 589
+        "line": 590
       },
       {
         "module": "math",
         "lua_name": "SpatialHash:getItemCount",
         "kind": "method",
         "file": "src/lua_api/math_api.rs",
-        "line": 594
+        "line": 595
       },
       {
         "module": "math",
         "lua_name": "luna.math.newTween",
         "kind": "function",
         "file": "src/lua_api/math_api.rs",
-        "line": 1014
+        "line": 1015
       },
       {
         "module": "math",
         "lua_name": "luna.math.linear",
         "kind": "function",
         "file": "src/lua_api/math_api.rs",
-        "line": 1137
+        "line": 1138
       },
       {
         "module": "math",
         "lua_name": "luna.math.inQuad",
         "kind": "function",
         "file": "src/lua_api/math_api.rs",
-        "line": 1143
+        "line": 1144
       },
       {
         "module": "math",
         "lua_name": "luna.math.outQuad",
         "kind": "function",
         "file": "src/lua_api/math_api.rs",
-        "line": 1149
+        "line": 1150
       },
       {
         "module": "math",
         "lua_name": "luna.math.inCubic",
         "kind": "function",
         "file": "src/lua_api/math_api.rs",
-        "line": 1161
+        "line": 1162
       },
       {
         "module": "math",
         "lua_name": "luna.math.outCubic",
         "kind": "function",
         "file": "src/lua_api/math_api.rs",
-        "line": 1167
+        "line": 1168
       },
       {
         "module": "math",
         "lua_name": "luna.math.inSine",
         "kind": "function",
         "file": "src/lua_api/math_api.rs",
-        "line": 1197
+        "line": 1198
       },
       {
         "module": "math",
         "lua_name": "luna.math.outSine",
         "kind": "function",
         "file": "src/lua_api/math_api.rs",
-        "line": 1203
+        "line": 1204
       },
       {
         "module": "math",
         "lua_name": "luna.math.inExpo",
         "kind": "function",
         "file": "src/lua_api/math_api.rs",
-        "line": 1215
+        "line": 1216
       },
       {
         "module": "math",
         "lua_name": "luna.math.outExpo",
         "kind": "function",
         "file": "src/lua_api/math_api.rs",
-        "line": 1221
+        "line": 1222
       },
       {
         "module": "minimap",
@@ -27647,364 +27647,462 @@
         "lua_name": "RandomGenerator:randomFloat",
         "kind": "method",
         "file": "src/lua_api/math_api.rs",
-        "line": 43
+        "line": 44
       },
       {
         "module": "math",
         "lua_name": "RandomGenerator:randomInt",
         "kind": "method",
         "file": "src/lua_api/math_api.rs",
-        "line": 52
+        "line": 53
       },
       {
         "module": "math",
         "lua_name": "RandomGenerator:getSeed",
         "kind": "method",
         "file": "src/lua_api/math_api.rs",
-        "line": 71
+        "line": 72
       },
       {
         "module": "math",
         "lua_name": "RandomGenerator:setSeed",
         "kind": "method",
         "file": "src/lua_api/math_api.rs",
-        "line": 77
+        "line": 78
       },
       {
         "module": "math",
         "lua_name": "Transform:shear",
         "kind": "method",
         "file": "src/lua_api/math_api.rs",
-        "line": 145
+        "line": 146
       },
       {
         "module": "math",
         "lua_name": "Transform:transformPoint",
         "kind": "method",
         "file": "src/lua_api/math_api.rs",
-        "line": 205
+        "line": 206
       },
       {
         "module": "math",
         "lua_name": "Transform:inverseTransformPoint",
         "kind": "method",
         "file": "src/lua_api/math_api.rs",
-        "line": 214
+        "line": 215
       },
       {
         "module": "math",
         "lua_name": "Transform:getMatrix",
         "kind": "method",
         "file": "src/lua_api/math_api.rs",
-        "line": 239
+        "line": 240
       },
       {
         "module": "math",
         "lua_name": "BezierCurve:getDerivative",
         "kind": "method",
         "file": "src/lua_api/math_api.rs",
-        "line": 290
+        "line": 291
       },
       {
         "module": "math",
         "lua_name": "BezierCurve:getControlPoint",
         "kind": "method",
         "file": "src/lua_api/math_api.rs",
-        "line": 300
+        "line": 301
       },
       {
         "module": "math",
         "lua_name": "BezierCurve:removeControlPoint",
         "kind": "method",
         "file": "src/lua_api/math_api.rs",
-        "line": 344
+        "line": 345
       },
       {
         "module": "math",
         "lua_name": "BezierCurve:getControlPointCount",
         "kind": "method",
         "file": "src/lua_api/math_api.rs",
-        "line": 354
+        "line": 355
       },
       {
         "module": "math",
         "lua_name": "Tween:getAllValues",
         "kind": "method",
         "file": "src/lua_api/math_api.rs",
-        "line": 436
+        "line": 437
       },
       {
         "module": "math",
         "lua_name": "Tween:getEasingName",
         "kind": "method",
         "file": "src/lua_api/math_api.rs",
-        "line": 460
+        "line": 461
       },
       {
         "module": "math",
         "lua_name": "NoiseGenerator:perlin1d",
         "kind": "method",
         "file": "src/lua_api/math_api.rs",
-        "line": 641
+        "line": 642
       },
       {
         "module": "math",
         "lua_name": "NoiseGenerator:perlin2d",
         "kind": "method",
         "file": "src/lua_api/math_api.rs",
-        "line": 650
+        "line": 651
       },
       {
         "module": "math",
         "lua_name": "NoiseGenerator:perlin3d",
         "kind": "method",
         "file": "src/lua_api/math_api.rs",
-        "line": 660
+        "line": 661
       },
       {
         "module": "math",
         "lua_name": "NoiseGenerator:perlin4d",
         "kind": "method",
         "file": "src/lua_api/math_api.rs",
-        "line": 671
+        "line": 672
       },
       {
         "module": "math",
         "lua_name": "NoiseGenerator:simplex1d",
         "kind": "method",
         "file": "src/lua_api/math_api.rs",
-        "line": 679
+        "line": 680
       },
       {
         "module": "math",
         "lua_name": "NoiseGenerator:simplex2d",
         "kind": "method",
         "file": "src/lua_api/math_api.rs",
-        "line": 688
+        "line": 689
       },
       {
         "module": "math",
         "lua_name": "NoiseGenerator:simplex3d",
         "kind": "method",
         "file": "src/lua_api/math_api.rs",
-        "line": 698
+        "line": 699
       },
       {
         "module": "math",
         "lua_name": "NoiseGenerator:warpDomain",
         "kind": "method",
         "file": "src/lua_api/math_api.rs",
-        "line": 844
+        "line": 845
       },
       {
         "module": "math",
         "lua_name": "NoiseGenerator:generateMap",
         "kind": "method",
         "file": "src/lua_api/math_api.rs",
-        "line": 854
+        "line": 855
       },
       {
         "module": "math",
         "lua_name": "NoiseGenerator:getSeed",
         "kind": "method",
         "file": "src/lua_api/math_api.rs",
-        "line": 889
+        "line": 890
       },
       {
         "module": "math",
         "lua_name": "NoiseGenerator:setSeed",
         "kind": "method",
         "file": "src/lua_api/math_api.rs",
-        "line": 895
+        "line": 896
       },
       {
         "module": "math",
         "lua_name": "luna.math.newRandomGenerator",
         "kind": "function",
         "file": "src/lua_api/math_api.rs",
-        "line": 925
+        "line": 926
       },
       {
         "module": "math",
         "lua_name": "luna.math.newTransform",
         "kind": "function",
         "file": "src/lua_api/math_api.rs",
-        "line": 948
+        "line": 949
       },
       {
         "module": "math",
         "lua_name": "luna.math.newBezierCurve",
         "kind": "function",
         "file": "src/lua_api/math_api.rs",
-        "line": 988
+        "line": 989
       },
       {
         "module": "math",
         "lua_name": "luna.math.newSpatialHash",
         "kind": "function",
         "file": "src/lua_api/math_api.rs",
-        "line": 1028
+        "line": 1029
       },
       {
         "module": "math",
         "lua_name": "luna.math.newNoiseGenerator",
         "kind": "function",
         "file": "src/lua_api/math_api.rs",
-        "line": 1041
+        "line": 1042
       },
       {
         "module": "math",
         "lua_name": "luna.math.perlin2d",
         "kind": "function",
         "file": "src/lua_api/math_api.rs",
-        "line": 1058
+        "line": 1059
       },
       {
         "module": "math",
         "lua_name": "luna.math.perlin3d",
         "kind": "function",
         "file": "src/lua_api/math_api.rs",
-        "line": 1072
+        "line": 1073
       },
       {
         "module": "math",
         "lua_name": "luna.math.simplex2d",
         "kind": "function",
         "file": "src/lua_api/math_api.rs",
-        "line": 1085
+        "line": 1086
       },
       {
         "module": "math",
         "lua_name": "luna.math.fbm",
         "kind": "function",
         "file": "src/lua_api/math_api.rs",
-        "line": 1101
+        "line": 1102
       },
       {
         "module": "math",
         "lua_name": "luna.math.applyEasing",
         "kind": "function",
         "file": "src/lua_api/math_api.rs",
-        "line": 1124
+        "line": 1125
       },
       {
         "module": "math",
         "lua_name": "luna.math.inOutQuad",
         "kind": "function",
         "file": "src/lua_api/math_api.rs",
-        "line": 1155
+        "line": 1156
       },
       {
         "module": "math",
         "lua_name": "luna.math.inOutCubic",
         "kind": "function",
         "file": "src/lua_api/math_api.rs",
-        "line": 1173
+        "line": 1174
       },
       {
         "module": "math",
         "lua_name": "luna.math.inQuart",
         "kind": "function",
         "file": "src/lua_api/math_api.rs",
-        "line": 1179
+        "line": 1180
       },
       {
         "module": "math",
         "lua_name": "luna.math.outQuart",
         "kind": "function",
         "file": "src/lua_api/math_api.rs",
-        "line": 1185
+        "line": 1186
       },
       {
         "module": "math",
         "lua_name": "luna.math.inOutQuart",
         "kind": "function",
         "file": "src/lua_api/math_api.rs",
-        "line": 1191
+        "line": 1192
       },
       {
         "module": "math",
         "lua_name": "luna.math.inOutSine",
         "kind": "function",
         "file": "src/lua_api/math_api.rs",
-        "line": 1209
+        "line": 1210
       },
       {
         "module": "math",
         "lua_name": "luna.math.inOutExpo",
         "kind": "function",
         "file": "src/lua_api/math_api.rs",
-        "line": 1227
+        "line": 1228
       },
       {
         "module": "math",
         "lua_name": "luna.math.inElastic",
         "kind": "function",
         "file": "src/lua_api/math_api.rs",
-        "line": 1233
+        "line": 1234
       },
       {
         "module": "math",
         "lua_name": "luna.math.outElastic",
         "kind": "function",
         "file": "src/lua_api/math_api.rs",
-        "line": 1239
+        "line": 1240
       },
       {
         "module": "math",
         "lua_name": "luna.math.outBounce",
         "kind": "function",
         "file": "src/lua_api/math_api.rs",
-        "line": 1245
+        "line": 1246
       },
       {
         "module": "math",
         "lua_name": "luna.math.inBounce",
         "kind": "function",
         "file": "src/lua_api/math_api.rs",
-        "line": 1251
+        "line": 1252
       },
       {
         "module": "math",
         "lua_name": "luna.math.inBack",
         "kind": "function",
         "file": "src/lua_api/math_api.rs",
-        "line": 1257
+        "line": 1258
       },
       {
         "module": "math",
         "lua_name": "luna.math.outBack",
         "kind": "function",
         "file": "src/lua_api/math_api.rs",
-        "line": 1263
+        "line": 1264
       },
       {
         "module": "math",
         "lua_name": "luna.math.triangulate",
         "kind": "function",
         "file": "src/lua_api/math_api.rs",
-        "line": 1272
+        "line": 1273
       },
       {
         "module": "math",
         "lua_name": "luna.math.isConvex",
         "kind": "function",
         "file": "src/lua_api/math_api.rs",
-        "line": 1307
+        "line": 1308
       },
       {
         "module": "math",
         "lua_name": "luna.math.gammaToLinear",
         "kind": "function",
         "file": "src/lua_api/math_api.rs",
-        "line": 1330
+        "line": 1331
       },
       {
         "module": "math",
         "lua_name": "luna.math.linearToGamma",
         "kind": "function",
         "file": "src/lua_api/math_api.rs",
-        "line": 1339
+        "line": 1340
+      },
+      {
+        "module": "math",
+        "lua_name": "luna.math.angleBetween",
+        "kind": "function",
+        "file": "src/lua_api/math_api.rs",
+        "line": 1354
+      },
+      {
+        "module": "math",
+        "lua_name": "luna.math.circleContainsPoint",
+        "kind": "function",
+        "file": "src/lua_api/math_api.rs",
+        "line": 1369
+      },
+      {
+        "module": "math",
+        "lua_name": "luna.math.circleIntersectsCircle",
+        "kind": "function",
+        "file": "src/lua_api/math_api.rs",
+        "line": 1385
+      },
+      {
+        "module": "math",
+        "lua_name": "luna.math.circleIntersectsLine",
+        "kind": "function",
+        "file": "src/lua_api/math_api.rs",
+        "line": 1404
+      },
+      {
+        "module": "math",
+        "lua_name": "luna.math.circleIntersectsSegment",
+        "kind": "function",
+        "file": "src/lua_api/math_api.rs",
+        "line": 1438
+      },
+      {
+        "module": "math",
+        "lua_name": "luna.math.closestPointOnSegment",
+        "kind": "function",
+        "file": "src/lua_api/math_api.rs",
+        "line": 1471
+      },
+      {
+        "module": "math",
+        "lua_name": "luna.math.convexHull",
+        "kind": "function",
+        "file": "src/lua_api/math_api.rs",
+        "line": 1484
+      },
+      {
+        "module": "math",
+        "lua_name": "luna.math.delaunayTriangulate",
+        "kind": "function",
+        "file": "src/lua_api/math_api.rs",
+        "line": 1506
+      },
+      {
+        "module": "math",
+        "lua_name": "luna.math.lineIntersect",
+        "kind": "function",
+        "file": "src/lua_api/math_api.rs",
+        "line": 1542
+      },
+      {
+        "module": "math",
+        "lua_name": "luna.math.pointInPolygon",
+        "kind": "function",
+        "file": "src/lua_api/math_api.rs",
+        "line": 1570
+      },
+      {
+        "module": "math",
+        "lua_name": "luna.math.polygonArea",
+        "kind": "function",
+        "file": "src/lua_api/math_api.rs",
+        "line": 1587
+      },
+      {
+        "module": "math",
+        "lua_name": "luna.math.polygonCentroid",
+        "kind": "function",
+        "file": "src/lua_api/math_api.rs",
+        "line": 1604
+      },
+      {
+        "module": "math",
+        "lua_name": "luna.math.segmentIntersectsSegment",
+        "kind": "function",
+        "file": "src/lua_api/math_api.rs",
+        "line": 1628
+      },
+      {
+        "module": "math",
+        "lua_name": "luna.math.bresenham",
+        "kind": "function",
+        "file": "src/lua_api/math_api.rs",
+        "line": 1659
       },
       {
         "module": "modding",

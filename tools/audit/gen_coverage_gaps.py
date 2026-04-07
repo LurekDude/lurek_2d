@@ -72,6 +72,10 @@ _INTERNAL_MODULES = {
     # Math sub-modules exposed via renamed Lua bindings
     # (e.g. simplex_noise_2d → luna.math.simplex2d, polygon functions → luna.math.*)
     "math::noise_functions",
+    # Compute ops/spatial are exposed as Array instance methods (via dispatch_arith! and add_method),
+    # not as free luna.compute.* functions — they are fully accessible to Lua via array:method()
+    "compute::ops",
+    "compute::spatial",
 }
 
 # Minimum description length to be considered "documented"

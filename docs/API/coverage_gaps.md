@@ -10,58 +10,12 @@ This report identifies three categories of coverage issues:
 
 ---
 
-## 1. Rust→Lua Gaps (39 items)
+## 1. Rust→Lua Gaps (0 items)
 
 These public Rust functions are **not exposed** to the `luna.*` Lua API.
 This may be intentional (engine internals) or an oversight.
 
-### `compute::ops`
-
-- `add_scalar` — Add a scalar to every element. The insertion is O(1) amortis `src/compute/ops.rs:114`
-- `clone_array` — Clone an array (convenience wrapper). Consult the module-lev `src/compute/ops.rs:956`
-- `div` — Element-wise division of two arrays (same shape and dtype).  `src/compute/ops.rs:174`
-- `div_scalar` — Divide every element by a scalar. Consult the module-level d `src/compute/ops.rs:186`
-- `eq_scalar` — Element-wise equality comparison against a scalar. Returns F `src/compute/ops.rs:290`
-- `gt_scalar` — Element-wise greater-than comparison against a scalar. Retur `src/compute/ops.rs:378`
-- `gte` — Element-wise greater-than-or-equal comparison of two arrays. `src/compute/ops.rs:434`
-- `gte_scalar` — Element-wise greater-than-or-equal comparison against a scal `src/compute/ops.rs:458`
-- `lt_scalar` — Element-wise less-than comparison against a scalar. Returns  `src/compute/ops.rs:418`
-- `lte_scalar` — Element-wise less-than-or-equal comparison against a scalar. `src/compute/ops.rs:498`
-- `max_axis` — Maximum along a given axis. Consult the module-level documen `src/compute/ops.rs:850`
-- `max_val` — Maximum value across all elements. Consult the module-level  `src/compute/ops.rs:706`
-- `mean_axis` — Mean along a given axis. Consult the module-level documentat `src/compute/ops.rs:796`
-- `min_axis` — Minimum along a given axis. Consult the module-level documen `src/compute/ops.rs:814`
-- `min_val` — Minimum value across all elements. Consult the module-level  `src/compute/ops.rs:688`
-- `mul_scalar` — Multiply every element by a scalar. Consult the module-level `src/compute/ops.rs:162`
-- `neq` — Element-wise not-equal comparison of two arrays. Returns Flo `src/compute/ops.rs:311`
-- `neq_scalar` — Element-wise not-equal comparison against a scalar. Returns  `src/compute/ops.rs:333`
-- `pow_scalar` — Raise every element to a scalar exponent.  # Parameters - `a `src/compute/ops.rs:198`
-- `sub_scalar` — Subtract a scalar from every element. Consult the module-lev `src/compute/ops.rs:138`
-- `sum_axis` — Sum along a given axis, producing an array with that axis re `src/compute/ops.rs:764`
-- `transpose_2d` — Transpose a 2D array (swap rows and columns).  # Parameters  `src/compute/ops.rs:918`
-- `where_mask` — Conditional selection: where `cond != 0`, choose from `a`; o `src/compute/ops.rs:534`
-
-### `compute::spatial`
-
-- `get_region` — Extract a rectangular sub-region from a 2D array.  # Paramet `src/compute/spatial.rs:246`
-- `set_region` — Copy a source 2D array into a target 2D array at position `( `src/compute/spatial.rs:290`
-
-### `math::geometry`
-
-- `angle_between` — Returns the angle in radians from (x1, y1) to (x2, y2).  # P `src/math/geometry.rs:23`
-- `bresenham` — Bresenham line rasterization from (x1, y1) to (x2, y2).  # P `src/math/geometry.rs:396`
-- `circle_contains_point` — Returns true if the point (px, py) is inside the circle cent `src/math/geometry.rs:38`
-- `circle_intersects_circle` — Returns true if two circles overlap. Consult the module-leve `src/math/geometry.rs:56`
-- `circle_intersects_line` — Line-circle intersection. Returns (intersects, hit1, hit2).  `src/math/geometry.rs:79`
-- `circle_intersects_segment` — Segment-circle intersection. Same as line-circle but clamped `src/math/geometry.rs:133`
-- `closest_point_on_segment` — Returns the closest point on a line segment to a given point `src/math/geometry.rs:300`
-- `convex_hull` — Computes the convex hull of a set of 2D points using Andrew' `src/math/geometry.rs:433`
-- `delaunay_triangulate` — Delaunay triangulation using the Bowyer-Watson algorithm.  # `src/math/geometry.rs:491`
-- `line_intersect` — Infinite line intersection. Returns the intersection point i `src/math/geometry.rs:366`
-- `point_in_polygon` — Tests if a point is inside a polygon using the ray casting a `src/math/geometry.rs:330`
-- `polygon_area` — Computes the signed area of a polygon using the Shoelace for `src/math/geometry.rs:187`
-- `polygon_centroid` — Computes the centroid of a polygon. Consult the module-level `src/math/geometry.rs:213`
-- `segment_intersects_segment` — Tests if two line segments intersect. Returns (intersects, i `src/math/geometry.rs:262`
+*All public Rust functions appear to be exposed to Lua.*
 
 ---
 

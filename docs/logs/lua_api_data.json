@@ -1,17 +1,17 @@
 {
   "meta": {
-    "generated": "2026-04-07T21:13:54.593688+00:00",
+    "generated": "2026-04-07T21:43:41.375654+00:00",
     "generator": "tools/gen_lua_api_data.py",
     "version": "0.5.0",
     "stats": {
-      "lua_functions": 2021,
+      "lua_functions": 2035,
       "lua_modules": 38
     }
   },
   "lua_api": {
     "summary": {
-      "total_functions": 2021,
-      "documented": 2021,
+      "total_functions": 2035,
+      "documented": 2035,
       "coverage_pct": 100.0,
       "modules": 38
     },
@@ -17823,12 +17823,12 @@
                 "kind": "method",
                 "owner_type": "Button",
                 "description": "Returns the text of this Button widget.",
-                "full_doc": "Returns the text of this Button widget.\n@return nil",
+                "full_doc": "Returns the text of this Button widget.\n@return string",
                 "params_doc": "",
                 "returns_doc": "",
                 "inferred_sig": "()",
                 "typed_params": [],
-                "inferred_return": "nil",
+                "inferred_return": "string",
                 "line": 735,
                 "file": "src/lua_api/gui_api.rs"
               }
@@ -17858,12 +17858,12 @@
                 "kind": "method",
                 "owner_type": "Label",
                 "description": "Returns the text of this Label widget.",
-                "full_doc": "Returns the text of this Label widget.\n@return nil",
+                "full_doc": "Returns the text of this Label widget.\n@return string",
                 "params_doc": "",
                 "returns_doc": "",
                 "inferred_sig": "()",
                 "typed_params": [],
-                "inferred_return": "nil",
+                "inferred_return": "string",
                 "line": 771,
                 "file": "src/lua_api/gui_api.rs"
               }
@@ -17893,12 +17893,12 @@
                 "kind": "method",
                 "owner_type": "Text_Input",
                 "description": "Returns the text of this Text_Input widget.",
-                "full_doc": "Returns the text of this Text_Input widget.\n@return nil",
+                "full_doc": "Returns the text of this Text_Input widget.\n@return string",
                 "params_doc": "",
                 "returns_doc": "",
                 "inferred_sig": "()",
                 "typed_params": [],
-                "inferred_return": "nil",
+                "inferred_return": "string",
                 "line": 808,
                 "file": "src/lua_api/gui_api.rs"
               },
@@ -17923,12 +17923,12 @@
                 "kind": "method",
                 "owner_type": "Text_Input",
                 "description": "Returns the placeholder of this Text_Input widget.",
-                "full_doc": "Returns the placeholder of this Text_Input widget.\n@return nil",
+                "full_doc": "Returns the placeholder of this Text_Input widget.\n@return string",
                 "params_doc": "",
                 "returns_doc": "",
                 "inferred_sig": "()",
                 "typed_params": [],
-                "inferred_return": "nil",
+                "inferred_return": "string",
                 "line": 834,
                 "file": "src/lua_api/gui_api.rs"
               },
@@ -17953,12 +17953,12 @@
                 "kind": "method",
                 "owner_type": "Text_Input",
                 "description": "Returns true if focused is enabled for this Text_Input widget.",
-                "full_doc": "Returns true if focused is enabled for this Text_Input widget.\n@return nil",
+                "full_doc": "Returns true if focused is enabled for this Text_Input widget.\n@return boolean",
                 "params_doc": "",
                 "returns_doc": "",
                 "inferred_sig": "()",
                 "typed_params": [],
-                "inferred_return": "nil",
+                "inferred_return": "boolean",
                 "line": 860,
                 "file": "src/lua_api/gui_api.rs"
               },
@@ -17968,12 +17968,12 @@
                 "kind": "method",
                 "owner_type": "Text_Input",
                 "description": "Returns the cursor position of this Text_Input widget.",
-                "full_doc": "Returns the cursor position of this Text_Input widget.\n@return nil",
+                "full_doc": "Returns the cursor position of this Text_Input widget.\n@return integer",
                 "params_doc": "",
                 "returns_doc": "",
                 "inferred_sig": "()",
                 "typed_params": [],
-                "inferred_return": "nil",
+                "inferred_return": "integer",
                 "line": 873,
                 "file": "src/lua_api/gui_api.rs"
               }
@@ -18003,12 +18003,12 @@
                 "kind": "method",
                 "owner_type": "Checkbox",
                 "description": "Returns true if checked is enabled for this Checkbox widget.",
-                "full_doc": "Returns true if checked is enabled for this Checkbox widget.\n@return nil",
+                "full_doc": "Returns true if checked is enabled for this Checkbox widget.\n@return boolean",
                 "params_doc": "",
                 "returns_doc": "",
                 "inferred_sig": "()",
                 "typed_params": [],
-                "inferred_return": "nil",
+                "inferred_return": "boolean",
                 "line": 909,
                 "file": "src/lua_api/gui_api.rs"
               },
@@ -18033,12 +18033,12 @@
                 "kind": "method",
                 "owner_type": "Checkbox",
                 "description": "Returns the text of this Checkbox widget.",
-                "full_doc": "Returns the text of this Checkbox widget.\n@return nil",
+                "full_doc": "Returns the text of this Checkbox widget.\n@return string",
                 "params_doc": "",
                 "returns_doc": "",
                 "inferred_sig": "()",
                 "typed_params": [],
-                "inferred_return": "nil",
+                "inferred_return": "string",
                 "line": 935,
                 "file": "src/lua_api/gui_api.rs"
               }
@@ -18068,12 +18068,12 @@
                 "kind": "method",
                 "owner_type": "Slider",
                 "description": "Returns the value of this Slider widget.",
-                "full_doc": "Returns the value of this Slider widget.\n@return nil",
+                "full_doc": "Returns the value of this Slider widget.\n@return number",
                 "params_doc": "",
                 "returns_doc": "",
                 "inferred_sig": "()",
                 "typed_params": [],
-                "inferred_return": "nil",
+                "inferred_return": "number",
                 "line": 971,
                 "file": "src/lua_api/gui_api.rs"
               },
@@ -18113,12 +18113,12 @@
                 "kind": "method",
                 "owner_type": "Slider",
                 "description": "Returns the min of this Slider widget.",
-                "full_doc": "Returns the min of this Slider widget.\n@return nil",
+                "full_doc": "Returns the min of this Slider widget.\n@return number",
                 "params_doc": "",
                 "returns_doc": "",
                 "inferred_sig": "()",
                 "typed_params": [],
-                "inferred_return": "nil",
+                "inferred_return": "number",
                 "line": 1012,
                 "file": "src/lua_api/gui_api.rs"
               },
@@ -18128,12 +18128,12 @@
                 "kind": "method",
                 "owner_type": "Slider",
                 "description": "Returns the max of this Slider widget.",
-                "full_doc": "Returns the max of this Slider widget.\n@return nil",
+                "full_doc": "Returns the max of this Slider widget.\n@return number",
                 "params_doc": "",
                 "returns_doc": "",
                 "inferred_sig": "()",
                 "typed_params": [],
-                "inferred_return": "nil",
+                "inferred_return": "number",
                 "line": 1025,
                 "file": "src/lua_api/gui_api.rs"
               }
@@ -18163,12 +18163,12 @@
                 "kind": "method",
                 "owner_type": "Progress_Bar",
                 "description": "Returns the value of this Progress_Bar widget.",
-                "full_doc": "Returns the value of this Progress_Bar widget.\n@return nil",
+                "full_doc": "Returns the value of this Progress_Bar widget.\n@return number",
                 "params_doc": "",
                 "returns_doc": "",
                 "inferred_sig": "()",
                 "typed_params": [],
-                "inferred_return": "nil",
+                "inferred_return": "number",
                 "line": 1061,
                 "file": "src/lua_api/gui_api.rs"
               },
@@ -18178,12 +18178,12 @@
                 "kind": "method",
                 "owner_type": "Progress_Bar",
                 "description": "Returns the progress of this Progress_Bar widget.",
-                "full_doc": "Returns the progress of this Progress_Bar widget.\n@return nil",
+                "full_doc": "Returns the progress of this Progress_Bar widget.\n@return number",
                 "params_doc": "",
                 "returns_doc": "",
                 "inferred_sig": "()",
                 "typed_params": [],
-                "inferred_return": "nil",
+                "inferred_return": "number",
                 "line": 1074,
                 "file": "src/lua_api/gui_api.rs"
               },
@@ -18208,12 +18208,12 @@
                 "kind": "method",
                 "owner_type": "Progress_Bar",
                 "description": "Returns the min of this Progress_Bar widget.",
-                "full_doc": "Returns the min of this Progress_Bar widget.\n@return nil",
+                "full_doc": "Returns the min of this Progress_Bar widget.\n@return number",
                 "params_doc": "",
                 "returns_doc": "",
                 "inferred_sig": "()",
                 "typed_params": [],
-                "inferred_return": "nil",
+                "inferred_return": "number",
                 "line": 1102,
                 "file": "src/lua_api/gui_api.rs"
               },
@@ -18223,12 +18223,12 @@
                 "kind": "method",
                 "owner_type": "Progress_Bar",
                 "description": "Returns the max of this Progress_Bar widget.",
-                "full_doc": "Returns the max of this Progress_Bar widget.\n@return nil",
+                "full_doc": "Returns the max of this Progress_Bar widget.\n@return number",
                 "params_doc": "",
                 "returns_doc": "",
                 "inferred_sig": "()",
                 "typed_params": [],
-                "inferred_return": "nil",
+                "inferred_return": "number",
                 "line": 1115,
                 "file": "src/lua_api/gui_api.rs"
               }
@@ -18288,12 +18288,12 @@
                 "kind": "method",
                 "owner_type": "Combo_Box",
                 "description": "Returns the item count of this Combo_Box widget.",
-                "full_doc": "Returns the item count of this Combo_Box widget.\n@return nil",
+                "full_doc": "Returns the item count of this Combo_Box widget.\n@return integer",
                 "params_doc": "",
                 "returns_doc": "",
                 "inferred_sig": "()",
                 "typed_params": [],
-                "inferred_return": "nil",
+                "inferred_return": "integer",
                 "line": 1180,
                 "file": "src/lua_api/gui_api.rs"
               },
@@ -18303,12 +18303,12 @@
                 "kind": "method",
                 "owner_type": "Combo_Box",
                 "description": "Returns the item of this Combo_Box widget.",
-                "full_doc": "Returns the item of this Combo_Box widget.\n@return nil",
+                "full_doc": "Returns the item of this Combo_Box widget.\n@return string",
                 "params_doc": "",
                 "returns_doc": "",
                 "inferred_sig": "(index)",
                 "typed_params": [],
-                "inferred_return": "nil",
+                "inferred_return": "string",
                 "line": 1193,
                 "file": "src/lua_api/gui_api.rs"
               },
@@ -18333,12 +18333,12 @@
                 "kind": "method",
                 "owner_type": "Combo_Box",
                 "description": "Returns the selected index of this Combo_Box widget.",
-                "full_doc": "Returns the selected index of this Combo_Box widget.\n@return nil",
+                "full_doc": "Returns the selected index of this Combo_Box widget.\n@return integer",
                 "params_doc": "",
                 "returns_doc": "",
                 "inferred_sig": "()",
                 "typed_params": [],
-                "inferred_return": "nil",
+                "inferred_return": "integer",
                 "line": 1227,
                 "file": "src/lua_api/gui_api.rs"
               },
@@ -18348,12 +18348,12 @@
                 "kind": "method",
                 "owner_type": "Combo_Box",
                 "description": "Returns the selected item of this Combo_Box widget.",
-                "full_doc": "Returns the selected item of this Combo_Box widget.\n@return nil",
+                "full_doc": "Returns the selected item of this Combo_Box widget.\n@return string",
                 "params_doc": "",
                 "returns_doc": "",
                 "inferred_sig": "()",
                 "typed_params": [],
-                "inferred_return": "nil",
+                "inferred_return": "string",
                 "line": 1240,
                 "file": "src/lua_api/gui_api.rs"
               }
@@ -18413,12 +18413,12 @@
                 "kind": "method",
                 "owner_type": "List_Box",
                 "description": "Returns the item count of this List_Box widget.",
-                "full_doc": "Returns the item count of this List_Box widget.\n@return nil",
+                "full_doc": "Returns the item count of this List_Box widget.\n@return integer",
                 "params_doc": "",
                 "returns_doc": "",
                 "inferred_sig": "()",
                 "typed_params": [],
-                "inferred_return": "nil",
+                "inferred_return": "integer",
                 "line": 1304,
                 "file": "src/lua_api/gui_api.rs"
               },
@@ -18428,12 +18428,12 @@
                 "kind": "method",
                 "owner_type": "List_Box",
                 "description": "Returns the item of this List_Box widget.",
-                "full_doc": "Returns the item of this List_Box widget.\n@return nil",
+                "full_doc": "Returns the item of this List_Box widget.\n@return string",
                 "params_doc": "",
                 "returns_doc": "",
                 "inferred_sig": "(index)",
                 "typed_params": [],
-                "inferred_return": "nil",
+                "inferred_return": "string",
                 "line": 1317,
                 "file": "src/lua_api/gui_api.rs"
               },
@@ -18458,12 +18458,12 @@
                 "kind": "method",
                 "owner_type": "List_Box",
                 "description": "Returns the selected index of this List_Box widget.",
-                "full_doc": "Returns the selected index of this List_Box widget.\n@return nil",
+                "full_doc": "Returns the selected index of this List_Box widget.\n@return integer",
                 "params_doc": "",
                 "returns_doc": "",
                 "inferred_sig": "()",
                 "typed_params": [],
-                "inferred_return": "nil",
+                "inferred_return": "integer",
                 "line": 1351,
                 "file": "src/lua_api/gui_api.rs"
               },
@@ -18523,12 +18523,12 @@
                 "kind": "method",
                 "owner_type": "Tab_Bar",
                 "description": "Returns the tab of this Tab_Bar widget.",
-                "full_doc": "Returns the tab of this Tab_Bar widget.\n@return nil",
+                "full_doc": "Returns the tab of this Tab_Bar widget.\n@return integer",
                 "params_doc": "",
                 "returns_doc": "",
                 "inferred_sig": "(index)",
                 "typed_params": [],
-                "inferred_return": "nil",
+                "inferred_return": "integer",
                 "line": 1416,
                 "file": "src/lua_api/gui_api.rs"
               },
@@ -18538,12 +18538,12 @@
                 "kind": "method",
                 "owner_type": "Tab_Bar",
                 "description": "Returns the tab count of this Tab_Bar widget.",
-                "full_doc": "Returns the tab count of this Tab_Bar widget.\n@return nil",
+                "full_doc": "Returns the tab count of this Tab_Bar widget.\n@return integer",
                 "params_doc": "",
                 "returns_doc": "",
                 "inferred_sig": "()",
                 "typed_params": [],
-                "inferred_return": "nil",
+                "inferred_return": "integer",
                 "line": 1435,
                 "file": "src/lua_api/gui_api.rs"
               },
@@ -18568,12 +18568,12 @@
                 "kind": "method",
                 "owner_type": "Tab_Bar",
                 "description": "Returns the active tab of this Tab_Bar widget.",
-                "full_doc": "Returns the active tab of this Tab_Bar widget.\n@return nil",
+                "full_doc": "Returns the active tab of this Tab_Bar widget.\n@return integer",
                 "params_doc": "",
                 "returns_doc": "",
                 "inferred_sig": "()",
                 "typed_params": [],
-                "inferred_return": "nil",
+                "inferred_return": "integer",
                 "line": 1463,
                 "file": "src/lua_api/gui_api.rs"
               }
@@ -18603,12 +18603,12 @@
                 "kind": "method",
                 "owner_type": "Panel",
                 "description": "Returns the title of this Panel widget.",
-                "full_doc": "Returns the title of this Panel widget.\n@return nil",
+                "full_doc": "Returns the title of this Panel widget.\n@return string",
                 "params_doc": "",
                 "returns_doc": "",
                 "inferred_sig": "()",
                 "typed_params": [],
-                "inferred_return": "nil",
+                "inferred_return": "string",
                 "line": 1499,
                 "file": "src/lua_api/gui_api.rs"
               },
@@ -18653,12 +18653,12 @@
                 "kind": "method",
                 "owner_type": "Layout",
                 "description": "Returns the direction of this Layout widget.",
-                "full_doc": "Returns the direction of this Layout widget.\n@return nil",
+                "full_doc": "Returns the direction of this Layout widget.\n@return string",
                 "params_doc": "",
                 "returns_doc": "",
                 "inferred_sig": "()",
                 "typed_params": [],
-                "inferred_return": "nil",
+                "inferred_return": "string",
                 "line": 1550,
                 "file": "src/lua_api/gui_api.rs"
               },
@@ -18683,12 +18683,12 @@
                 "kind": "method",
                 "owner_type": "Layout",
                 "description": "Returns the spacing of this Layout widget.",
-                "full_doc": "Returns the spacing of this Layout widget.\n@return nil",
+                "full_doc": "Returns the spacing of this Layout widget.\n@return number",
                 "params_doc": "",
                 "returns_doc": "",
                 "inferred_sig": "()",
                 "typed_params": [],
-                "inferred_return": "nil",
+                "inferred_return": "number",
                 "line": 1576,
                 "file": "src/lua_api/gui_api.rs"
               },
@@ -18728,12 +18728,12 @@
                 "kind": "method",
                 "owner_type": "Layout",
                 "description": "Returns the wrap of this Layout widget.",
-                "full_doc": "Returns the wrap of this Layout widget.\n@return nil",
+                "full_doc": "Returns the wrap of this Layout widget.\n@return boolean",
                 "params_doc": "",
                 "returns_doc": "",
                 "inferred_sig": "()",
                 "typed_params": [],
-                "inferred_return": "nil",
+                "inferred_return": "boolean",
                 "line": 1615,
                 "file": "src/lua_api/gui_api.rs"
               },
@@ -18758,12 +18758,12 @@
                 "kind": "method",
                 "owner_type": "Layout",
                 "description": "Returns the align of this Layout widget.",
-                "full_doc": "Returns the align of this Layout widget.\n@return nil",
+                "full_doc": "Returns the align of this Layout widget.\n@return string",
                 "params_doc": "",
                 "returns_doc": "",
                 "inferred_sig": "()",
                 "typed_params": [],
-                "inferred_return": "nil",
+                "inferred_return": "string",
                 "line": 1641,
                 "file": "src/lua_api/gui_api.rs"
               },
@@ -18788,12 +18788,12 @@
                 "kind": "method",
                 "owner_type": "Layout",
                 "description": "Returns the justify of this Layout widget.",
-                "full_doc": "Returns the justify of this Layout widget.\n@return nil",
+                "full_doc": "Returns the justify of this Layout widget.\n@return string",
                 "params_doc": "",
                 "returns_doc": "",
                 "inferred_sig": "()",
                 "typed_params": [],
-                "inferred_return": "nil",
+                "inferred_return": "string",
                 "line": 1667,
                 "file": "src/lua_api/gui_api.rs"
               }
@@ -18823,12 +18823,12 @@
                 "kind": "method",
                 "owner_type": "Scroll_Panel",
                 "description": "Returns the content size of this Scroll_Panel widget.",
-                "full_doc": "Returns the content size of this Scroll_Panel widget.\n@return nil",
+                "full_doc": "Returns the content size of this Scroll_Panel widget.\n@return number, number",
                 "params_doc": "",
                 "returns_doc": "",
                 "inferred_sig": "()",
                 "typed_params": [],
-                "inferred_return": "nil",
+                "inferred_return": "number",
                 "line": 1705,
                 "file": "src/lua_api/gui_api.rs"
               },
@@ -18853,12 +18853,12 @@
                 "kind": "method",
                 "owner_type": "Scroll_Panel",
                 "description": "Returns the scroll position of this Scroll_Panel widget.",
-                "full_doc": "Returns the scroll position of this Scroll_Panel widget.\n@return nil",
+                "full_doc": "Returns the scroll position of this Scroll_Panel widget.\n@return number, number",
                 "params_doc": "",
                 "returns_doc": "",
                 "inferred_sig": "()",
                 "typed_params": [],
-                "inferred_return": "nil",
+                "inferred_return": "number",
                 "line": 1733,
                 "file": "src/lua_api/gui_api.rs"
               },
@@ -18868,12 +18868,12 @@
                 "kind": "method",
                 "owner_type": "Scroll_Panel",
                 "description": "Returns the max scroll of this Scroll_Panel widget.",
-                "full_doc": "Returns the max scroll of this Scroll_Panel widget.\n@return nil",
+                "full_doc": "Returns the max scroll of this Scroll_Panel widget.\n@return number, number",
                 "params_doc": "",
                 "returns_doc": "",
                 "inferred_sig": "()",
                 "typed_params": [],
-                "inferred_return": "nil",
+                "inferred_return": "number",
                 "line": 1746,
                 "file": "src/lua_api/gui_api.rs"
               },
@@ -18898,12 +18898,12 @@
                 "kind": "method",
                 "owner_type": "Scroll_Panel",
                 "description": "Returns the scroll speed of this Scroll_Panel widget.",
-                "full_doc": "Returns the scroll speed of this Scroll_Panel widget.\n@return nil",
+                "full_doc": "Returns the scroll speed of this Scroll_Panel widget.\n@return number",
                 "params_doc": "",
                 "returns_doc": "",
                 "inferred_sig": "()",
                 "typed_params": [],
-                "inferred_return": "nil",
+                "inferred_return": "number",
                 "line": 1772,
                 "file": "src/lua_api/gui_api.rs"
               }
@@ -18933,12 +18933,12 @@
                 "kind": "method",
                 "owner_type": "Nine_Patch",
                 "description": "Returns the insets of this Nine_Patch widget.",
-                "full_doc": "Returns the insets of this Nine_Patch widget.\n@return nil",
+                "full_doc": "Returns the insets of this Nine_Patch widget.\n@return integer, integer, integer, integer",
                 "params_doc": "",
                 "returns_doc": "",
                 "inferred_sig": "()",
                 "typed_params": [],
-                "inferred_return": "nil",
+                "inferred_return": "integer",
                 "line": 1811,
                 "file": "src/lua_api/gui_api.rs"
               },
@@ -18963,12 +18963,12 @@
                 "kind": "method",
                 "owner_type": "Nine_Patch",
                 "description": "Returns the image dimensions of this Nine_Patch widget.",
-                "full_doc": "Returns the image dimensions of this Nine_Patch widget.\n@return nil",
+                "full_doc": "Returns the image dimensions of this Nine_Patch widget.\n@return integer, integer",
                 "params_doc": "",
                 "returns_doc": "",
                 "inferred_sig": "()",
                 "typed_params": [],
-                "inferred_return": "nil",
+                "inferred_return": "integer",
                 "line": 1840,
                 "file": "src/lua_api/gui_api.rs"
               },
@@ -18978,12 +18978,12 @@
                 "kind": "method",
                 "owner_type": "Nine_Patch",
                 "description": "Returns the slices of this Nine_Patch widget.",
-                "full_doc": "Returns the slices of this Nine_Patch widget.\n@return nil",
+                "full_doc": "Returns the slices of this Nine_Patch widget.\n@return table",
                 "params_doc": "",
                 "returns_doc": "",
                 "inferred_sig": "()",
                 "typed_params": [],
-                "inferred_return": "nil",
+                "inferred_return": "table",
                 "line": 1853,
                 "file": "src/lua_api/gui_api.rs"
               }
@@ -19013,12 +19013,12 @@
                 "kind": "method",
                 "owner_type": "Toast",
                 "description": "Returns the message of this Toast widget.",
-                "full_doc": "Returns the message of this Toast widget.\n@return nil",
+                "full_doc": "Returns the message of this Toast widget.\n@return string",
                 "params_doc": "",
                 "returns_doc": "",
                 "inferred_sig": "()",
                 "typed_params": [],
-                "inferred_return": "nil",
+                "inferred_return": "string",
                 "line": 1905,
                 "file": "src/lua_api/gui_api.rs"
               },
@@ -19043,12 +19043,12 @@
                 "kind": "method",
                 "owner_type": "Toast",
                 "description": "Returns the duration of this Toast widget.",
-                "full_doc": "Returns the duration of this Toast widget.\n@return nil",
+                "full_doc": "Returns the duration of this Toast widget.\n@return number",
                 "params_doc": "",
                 "returns_doc": "",
                 "inferred_sig": "()",
                 "typed_params": [],
-                "inferred_return": "nil",
+                "inferred_return": "number",
                 "line": 1931,
                 "file": "src/lua_api/gui_api.rs"
               },
@@ -19058,12 +19058,12 @@
                 "kind": "method",
                 "owner_type": "Toast",
                 "description": "Returns the progress of this Toast widget.",
-                "full_doc": "Returns the progress of this Toast widget.\n@return nil",
+                "full_doc": "Returns the progress of this Toast widget.\n@return number",
                 "params_doc": "",
                 "returns_doc": "",
                 "inferred_sig": "()",
                 "typed_params": [],
-                "inferred_return": "nil",
+                "inferred_return": "number",
                 "line": 1944,
                 "file": "src/lua_api/gui_api.rs"
               },
@@ -19073,12 +19073,12 @@
                 "kind": "method",
                 "owner_type": "Toast",
                 "description": "Returns true if expired is enabled for this Toast widget.",
-                "full_doc": "Returns true if expired is enabled for this Toast widget.\n@return nil",
+                "full_doc": "Returns true if expired is enabled for this Toast widget.\n@return boolean",
                 "params_doc": "",
                 "returns_doc": "",
                 "inferred_sig": "()",
                 "typed_params": [],
-                "inferred_return": "nil",
+                "inferred_return": "boolean",
                 "line": 1957,
                 "file": "src/lua_api/gui_api.rs"
               }
@@ -19108,12 +19108,12 @@
                 "kind": "method",
                 "owner_type": "Separator",
                 "description": "Returns true if vertical is enabled for this Separator widget.",
-                "full_doc": "Returns true if vertical is enabled for this Separator widget.\n@return nil",
+                "full_doc": "Returns true if vertical is enabled for this Separator widget.\n@return boolean",
                 "params_doc": "",
                 "returns_doc": "",
                 "inferred_sig": "()",
                 "typed_params": [],
-                "inferred_return": "nil",
+                "inferred_return": "boolean",
                 "line": 1993,
                 "file": "src/lua_api/gui_api.rs"
               },
@@ -19138,12 +19138,12 @@
                 "kind": "method",
                 "owner_type": "Separator",
                 "description": "Returns the thickness of this Separator widget.",
-                "full_doc": "Returns the thickness of this Separator widget.\n@return nil",
+                "full_doc": "Returns the thickness of this Separator widget.\n@return number",
                 "params_doc": "",
                 "returns_doc": "",
                 "inferred_sig": "()",
                 "typed_params": [],
-                "inferred_return": "nil",
+                "inferred_return": "number",
                 "line": 2019,
                 "file": "src/lua_api/gui_api.rs"
               }
@@ -19188,12 +19188,12 @@
                 "kind": "method",
                 "owner_type": "Tree_View",
                 "description": "Returns true if expanded is enabled for this Tree_View widget.",
-                "full_doc": "Returns true if expanded is enabled for this Tree_View widget.\n@return nil",
+                "full_doc": "Returns true if expanded is enabled for this Tree_View widget.\n@return boolean",
                 "params_doc": "",
                 "returns_doc": "",
                 "inferred_sig": "(index)",
                 "typed_params": [],
-                "inferred_return": "nil",
+                "inferred_return": "boolean",
                 "line": 2073,
                 "file": "src/lua_api/gui_api.rs"
               },
@@ -19203,12 +19203,12 @@
                 "kind": "method",
                 "owner_type": "Tree_View",
                 "description": "Returns the node count of this Tree_View widget.",
-                "full_doc": "Returns the node count of this Tree_View widget.\n@return nil",
+                "full_doc": "Returns the node count of this Tree_View widget.\n@return integer",
                 "params_doc": "",
                 "returns_doc": "",
                 "inferred_sig": "()",
                 "typed_params": [],
-                "inferred_return": "nil",
+                "inferred_return": "integer",
                 "line": 2088,
                 "file": "src/lua_api/gui_api.rs"
               },
@@ -19248,12 +19248,12 @@
                 "kind": "method",
                 "owner_type": "Tree_View",
                 "description": "Returns the node text of this Tree_View widget.",
-                "full_doc": "Returns the node text of this Tree_View widget.\n@return nil",
+                "full_doc": "Returns the node text of this Tree_View widget.\n@return string",
                 "params_doc": "",
                 "returns_doc": "",
                 "inferred_sig": "(index)",
                 "typed_params": [],
-                "inferred_return": "nil",
+                "inferred_return": "string",
                 "line": 2128,
                 "file": "src/lua_api/gui_api.rs"
               },
@@ -19323,12 +19323,12 @@
                 "kind": "method",
                 "owner_type": "Tree_View",
                 "description": "Returns true if node expanded is enabled for this Tree_View widget.",
-                "full_doc": "Returns true if node expanded is enabled for this Tree_View widget.\n@return nil",
+                "full_doc": "Returns true if node expanded is enabled for this Tree_View widget.\n@return boolean",
                 "params_doc": "",
                 "returns_doc": "",
                 "inferred_sig": "(index)",
                 "typed_params": [],
-                "inferred_return": "nil",
+                "inferred_return": "boolean",
                 "line": 2205,
                 "file": "src/lua_api/gui_api.rs"
               },
@@ -19383,12 +19383,12 @@
                 "kind": "method",
                 "owner_type": "Tree_View",
                 "description": "Returns the selected node of this Tree_View widget.",
-                "full_doc": "Returns the selected node of this Tree_View widget.\n@return nil",
+                "full_doc": "Returns the selected node of this Tree_View widget.\n@return integer",
                 "params_doc": "",
                 "returns_doc": "",
                 "inferred_sig": "()",
                 "typed_params": [],
-                "inferred_return": "nil",
+                "inferred_return": "integer",
                 "line": 2261,
                 "file": "src/lua_api/gui_api.rs"
               },
@@ -19448,12 +19448,12 @@
                 "kind": "method",
                 "owner_type": "Radio_Button",
                 "description": "Returns the text of this Radio_Button widget.",
-                "full_doc": "Returns the text of this Radio_Button widget.\n@return nil",
+                "full_doc": "Returns the text of this Radio_Button widget.\n@return string",
                 "params_doc": "",
                 "returns_doc": "",
                 "inferred_sig": "()",
                 "typed_params": [],
-                "inferred_return": "nil",
+                "inferred_return": "string",
                 "line": 2336,
                 "file": "src/lua_api/gui_api.rs"
               },
@@ -19478,12 +19478,12 @@
                 "kind": "method",
                 "owner_type": "Radio_Button",
                 "description": "Returns true if selected is enabled for this Radio_Button widget.",
-                "full_doc": "Returns true if selected is enabled for this Radio_Button widget.\n@return nil",
+                "full_doc": "Returns true if selected is enabled for this Radio_Button widget.\n@return boolean",
                 "params_doc": "",
                 "returns_doc": "",
                 "inferred_sig": "()",
                 "typed_params": [],
-                "inferred_return": "nil",
+                "inferred_return": "boolean",
                 "line": 2362,
                 "file": "src/lua_api/gui_api.rs"
               },
@@ -19508,12 +19508,12 @@
                 "kind": "method",
                 "owner_type": "Radio_Button",
                 "description": "Returns the group of this Radio_Button widget.",
-                "full_doc": "Returns the group of this Radio_Button widget.\n@return nil",
+                "full_doc": "Returns the group of this Radio_Button widget.\n@return string",
                 "params_doc": "",
                 "returns_doc": "",
                 "inferred_sig": "()",
                 "typed_params": [],
-                "inferred_return": "nil",
+                "inferred_return": "string",
                 "line": 2388,
                 "file": "src/lua_api/gui_api.rs"
               },
@@ -19564,12 +19564,12 @@
                 "kind": "method",
                 "owner_type": "Scroll_Bar",
                 "description": "Returns the scroll position of this Scroll_Bar widget.",
-                "full_doc": "Returns the scroll position of this Scroll_Bar widget.\n@return nil",
+                "full_doc": "Returns the scroll position of this Scroll_Bar widget.\n@return number",
                 "params_doc": "",
                 "returns_doc": "",
                 "inferred_sig": "()",
                 "typed_params": [],
-                "inferred_return": "nil",
+                "inferred_return": "number",
                 "line": 2437,
                 "file": "src/lua_api/gui_api.rs"
               },
@@ -19594,12 +19594,12 @@
                 "kind": "method",
                 "owner_type": "Scroll_Bar",
                 "description": "Returns the content size of this Scroll_Bar widget.",
-                "full_doc": "Returns the content size of this Scroll_Bar widget.\n@return nil",
+                "full_doc": "Returns the content size of this Scroll_Bar widget.\n@return number",
                 "params_doc": "",
                 "returns_doc": "",
                 "inferred_sig": "()",
                 "typed_params": [],
-                "inferred_return": "nil",
+                "inferred_return": "number",
                 "line": 2463,
                 "file": "src/lua_api/gui_api.rs"
               },
@@ -19624,12 +19624,12 @@
                 "kind": "method",
                 "owner_type": "Scroll_Bar",
                 "description": "Returns the view size of this Scroll_Bar widget.",
-                "full_doc": "Returns the view size of this Scroll_Bar widget.\n@return nil",
+                "full_doc": "Returns the view size of this Scroll_Bar widget.\n@return number",
                 "params_doc": "",
                 "returns_doc": "",
                 "inferred_sig": "()",
                 "typed_params": [],
-                "inferred_return": "nil",
+                "inferred_return": "number",
                 "line": 2489,
                 "file": "src/lua_api/gui_api.rs"
               },
@@ -19654,12 +19654,12 @@
                 "kind": "method",
                 "owner_type": "Scroll_Bar",
                 "description": "Returns true if vertical is enabled for this Scroll_Bar widget.",
-                "full_doc": "Returns true if vertical is enabled for this Scroll_Bar widget.\n@return nil",
+                "full_doc": "Returns true if vertical is enabled for this Scroll_Bar widget.\n@return boolean",
                 "params_doc": "",
                 "returns_doc": "",
                 "inferred_sig": "()",
                 "typed_params": [],
-                "inferred_return": "nil",
+                "inferred_return": "boolean",
                 "line": 2515,
                 "file": "src/lua_api/gui_api.rs"
               },
@@ -19695,12 +19695,12 @@
                 "kind": "method",
                 "owner_type": "Gui_Window",
                 "description": "Returns the title of this Gui_Window widget.",
-                "full_doc": "Returns the title of this Gui_Window widget.\n@return nil",
+                "full_doc": "Returns the title of this Gui_Window widget.\n@return string",
                 "params_doc": "",
                 "returns_doc": "",
                 "inferred_sig": "()",
                 "typed_params": [],
-                "inferred_return": "nil",
+                "inferred_return": "string",
                 "line": 2551,
                 "file": "src/lua_api/gui_api.rs"
               },
@@ -19725,12 +19725,12 @@
                 "kind": "method",
                 "owner_type": "Gui_Window",
                 "description": "Returns true if closeable is enabled for this Gui_Window widget.",
-                "full_doc": "Returns true if closeable is enabled for this Gui_Window widget.\n@return nil",
+                "full_doc": "Returns true if closeable is enabled for this Gui_Window widget.\n@return boolean",
                 "params_doc": "",
                 "returns_doc": "",
                 "inferred_sig": "()",
                 "typed_params": [],
-                "inferred_return": "nil",
+                "inferred_return": "boolean",
                 "line": 2577,
                 "file": "src/lua_api/gui_api.rs"
               },
@@ -19755,12 +19755,12 @@
                 "kind": "method",
                 "owner_type": "Gui_Window",
                 "description": "Returns true if draggable is enabled for this Gui_Window widget.",
-                "full_doc": "Returns true if draggable is enabled for this Gui_Window widget.\n@return nil",
+                "full_doc": "Returns true if draggable is enabled for this Gui_Window widget.\n@return boolean",
                 "params_doc": "",
                 "returns_doc": "",
                 "inferred_sig": "()",
                 "typed_params": [],
-                "inferred_return": "nil",
+                "inferred_return": "boolean",
                 "line": 2603,
                 "file": "src/lua_api/gui_api.rs"
               },
@@ -19785,12 +19785,12 @@
                 "kind": "method",
                 "owner_type": "Gui_Window",
                 "description": "Returns true if resizable is enabled for this Gui_Window widget.",
-                "full_doc": "Returns true if resizable is enabled for this Gui_Window widget.\n@return nil",
+                "full_doc": "Returns true if resizable is enabled for this Gui_Window widget.\n@return boolean",
                 "params_doc": "",
                 "returns_doc": "",
                 "inferred_sig": "()",
                 "typed_params": [],
-                "inferred_return": "nil",
+                "inferred_return": "boolean",
                 "line": 2629,
                 "file": "src/lua_api/gui_api.rs"
               },
@@ -19841,12 +19841,12 @@
                 "kind": "method",
                 "owner_type": "Split_Panel",
                 "description": "Returns the orientation of this Split_Panel widget.",
-                "full_doc": "Returns the orientation of this Split_Panel widget.\n@return nil",
+                "full_doc": "Returns the orientation of this Split_Panel widget.\n@return string",
                 "params_doc": "",
                 "returns_doc": "",
                 "inferred_sig": "()",
                 "typed_params": [],
-                "inferred_return": "nil",
+                "inferred_return": "string",
                 "line": 2677,
                 "file": "src/lua_api/gui_api.rs"
               },
@@ -19871,12 +19871,12 @@
                 "kind": "method",
                 "owner_type": "Split_Panel",
                 "description": "Returns the split position of this Split_Panel widget.",
-                "full_doc": "Returns the split position of this Split_Panel widget.\n@return nil",
+                "full_doc": "Returns the split position of this Split_Panel widget.\n@return number",
                 "params_doc": "",
                 "returns_doc": "",
                 "inferred_sig": "()",
                 "typed_params": [],
-                "inferred_return": "nil",
+                "inferred_return": "number",
                 "line": 2703,
                 "file": "src/lua_api/gui_api.rs"
               },
@@ -19901,12 +19901,12 @@
                 "kind": "method",
                 "owner_type": "Split_Panel",
                 "description": "Returns the min panel size of this Split_Panel widget.",
-                "full_doc": "Returns the min panel size of this Split_Panel widget.\n@return nil",
+                "full_doc": "Returns the min panel size of this Split_Panel widget.\n@return number",
                 "params_doc": "",
                 "returns_doc": "",
                 "inferred_sig": "()",
                 "typed_params": [],
-                "inferred_return": "nil",
+                "inferred_return": "number",
                 "line": 2729,
                 "file": "src/lua_api/gui_api.rs"
               },
@@ -20026,12 +20026,12 @@
                 "kind": "method",
                 "owner_type": "Dock_Panel",
                 "description": "Returns the docked count of this Dock_Panel widget.",
-                "full_doc": "Returns the docked count of this Dock_Panel widget.\n@return nil",
+                "full_doc": "Returns the docked count of this Dock_Panel widget.\n@return integer",
                 "params_doc": "",
                 "returns_doc": "",
                 "inferred_sig": "()",
                 "typed_params": [],
-                "inferred_return": "nil",
+                "inferred_return": "integer",
                 "line": 2843,
                 "file": "src/lua_api/gui_api.rs"
               },
@@ -20076,12 +20076,12 @@
                 "kind": "method",
                 "owner_type": "Toolbar",
                 "description": "Returns the orientation of this Toolbar widget.",
-                "full_doc": "Returns the orientation of this Toolbar widget.\n@return nil",
+                "full_doc": "Returns the orientation of this Toolbar widget.\n@return string",
                 "params_doc": "",
                 "returns_doc": "",
                 "inferred_sig": "()",
                 "typed_params": [],
-                "inferred_return": "nil",
+                "inferred_return": "string",
                 "line": 2900,
                 "file": "src/lua_api/gui_api.rs"
               },
@@ -20121,12 +20121,12 @@
                 "kind": "method",
                 "owner_type": "Toolbar",
                 "description": "Returns the button of this Toolbar widget.",
-                "full_doc": "Returns the button of this Toolbar widget.\n@return nil",
+                "full_doc": "Returns the button of this Toolbar widget.\n@return boolean",
                 "params_doc": "",
                 "returns_doc": "",
                 "inferred_sig": "(id)",
                 "typed_params": [],
-                "inferred_return": "nil",
+                "inferred_return": "boolean",
                 "line": 2940,
                 "file": "src/lua_api/gui_api.rs"
               },
@@ -20166,12 +20166,12 @@
                 "kind": "method",
                 "owner_type": "Toolbar",
                 "description": "Returns true if button toggled is enabled for this Toolbar widget.",
-                "full_doc": "Returns true if button toggled is enabled for this Toolbar widget.\n@return nil",
+                "full_doc": "Returns true if button toggled is enabled for this Toolbar widget.\n@return boolean",
                 "params_doc": "",
                 "returns_doc": "",
                 "inferred_sig": "(id)",
                 "typed_params": [],
-                "inferred_return": "nil",
+                "inferred_return": "boolean",
                 "line": 2986,
                 "file": "src/lua_api/gui_api.rs"
               }
@@ -20231,12 +20231,12 @@
                 "kind": "method",
                 "owner_type": "Menu_Bar",
                 "description": "Returns the menu count of this Menu_Bar widget.",
-                "full_doc": "Returns the menu count of this Menu_Bar widget.\n@return nil",
+                "full_doc": "Returns the menu count of this Menu_Bar widget.\n@return integer",
                 "params_doc": "",
                 "returns_doc": "",
                 "inferred_sig": "()",
                 "typed_params": [],
-                "inferred_return": "nil",
+                "inferred_return": "integer",
                 "line": 3052,
                 "file": "src/lua_api/gui_api.rs"
               }
@@ -20251,12 +20251,12 @@
                 "kind": "method",
                 "owner_type": "Menu_Item",
                 "description": "Returns the text of this Menu_Item widget.",
-                "full_doc": "Returns the text of this Menu_Item widget.\n@return nil",
+                "full_doc": "Returns the text of this Menu_Item widget.\n@return string",
                 "params_doc": "",
                 "returns_doc": "",
                 "inferred_sig": "()",
                 "typed_params": [],
-                "inferred_return": "nil",
+                "inferred_return": "string",
                 "line": 3076,
                 "file": "src/lua_api/gui_api.rs"
               },
@@ -20281,12 +20281,12 @@
                 "kind": "method",
                 "owner_type": "Menu_Item",
                 "description": "Returns the shortcut of this Menu_Item widget.",
-                "full_doc": "Returns the shortcut of this Menu_Item widget.\n@return nil",
+                "full_doc": "Returns the shortcut of this Menu_Item widget.\n@return string",
                 "params_doc": "",
                 "returns_doc": "",
                 "inferred_sig": "()",
                 "typed_params": [],
-                "inferred_return": "nil",
+                "inferred_return": "string",
                 "line": 3102,
                 "file": "src/lua_api/gui_api.rs"
               },
@@ -20311,12 +20311,12 @@
                 "kind": "method",
                 "owner_type": "Menu_Item",
                 "description": "Returns true if checked is enabled for this Menu_Item widget.",
-                "full_doc": "Returns true if checked is enabled for this Menu_Item widget.\n@return nil",
+                "full_doc": "Returns true if checked is enabled for this Menu_Item widget.\n@return boolean",
                 "params_doc": "",
                 "returns_doc": "",
                 "inferred_sig": "()",
                 "typed_params": [],
-                "inferred_return": "nil",
+                "inferred_return": "boolean",
                 "line": 3128,
                 "file": "src/lua_api/gui_api.rs"
               },
@@ -20397,12 +20397,12 @@
                 "kind": "method",
                 "owner_type": "Dialog",
                 "description": "Returns the title of this Dialog widget.",
-                "full_doc": "Returns the title of this Dialog widget.\n@return nil",
+                "full_doc": "Returns the title of this Dialog widget.\n@return string",
                 "params_doc": "",
                 "returns_doc": "",
                 "inferred_sig": "()",
                 "typed_params": [],
-                "inferred_return": "nil",
+                "inferred_return": "string",
                 "line": 3205,
                 "file": "src/lua_api/gui_api.rs"
               },
@@ -20427,12 +20427,12 @@
                 "kind": "method",
                 "owner_type": "Dialog",
                 "description": "Returns true if modal is enabled for this Dialog widget.",
-                "full_doc": "Returns true if modal is enabled for this Dialog widget.\n@return nil",
+                "full_doc": "Returns true if modal is enabled for this Dialog widget.\n@return boolean",
                 "params_doc": "",
                 "returns_doc": "",
                 "inferred_sig": "()",
                 "typed_params": [],
-                "inferred_return": "nil",
+                "inferred_return": "boolean",
                 "line": 3231,
                 "file": "src/lua_api/gui_api.rs"
               },
@@ -20457,12 +20457,12 @@
                 "kind": "method",
                 "owner_type": "Dialog",
                 "description": "Returns true if open is enabled for this Dialog widget.",
-                "full_doc": "Returns true if open is enabled for this Dialog widget.\n@return nil",
+                "full_doc": "Returns true if open is enabled for this Dialog widget.\n@return boolean",
                 "params_doc": "",
                 "returns_doc": "",
                 "inferred_sig": "()",
                 "typed_params": [],
-                "inferred_return": "nil",
+                "inferred_return": "boolean",
                 "line": 3257,
                 "file": "src/lua_api/gui_api.rs"
               },
@@ -20538,12 +20538,12 @@
                 "kind": "method",
                 "owner_type": "Dialog",
                 "description": "Returns the content of this Dialog widget.",
-                "full_doc": "Returns the content of this Dialog widget.\n@return nil",
+                "full_doc": "Returns the content of this Dialog widget.\n@return integer",
                 "params_doc": "",
                 "returns_doc": "",
                 "inferred_sig": "()",
                 "typed_params": [],
-                "inferred_return": "nil",
+                "inferred_return": "integer",
                 "line": 3325,
                 "file": "src/lua_api/gui_api.rs"
               },
@@ -20603,12 +20603,12 @@
                 "kind": "method",
                 "owner_type": "Status_Bar",
                 "description": "Returns the section text of this Status_Bar widget.",
-                "full_doc": "Returns the section text of this Status_Bar widget.\n@return nil",
+                "full_doc": "Returns the section text of this Status_Bar widget.\n@return integer",
                 "params_doc": "",
                 "returns_doc": "",
                 "inferred_sig": "(section_idx)",
                 "typed_params": [],
-                "inferred_return": "nil",
+                "inferred_return": "integer",
                 "line": 3391,
                 "file": "src/lua_api/gui_api.rs"
               },
@@ -20618,12 +20618,12 @@
                 "kind": "method",
                 "owner_type": "Status_Bar",
                 "description": "Returns the section count of this Status_Bar widget.",
-                "full_doc": "Returns the section count of this Status_Bar widget.\n@return nil",
+                "full_doc": "Returns the section count of this Status_Bar widget.\n@return integer",
                 "params_doc": "",
                 "returns_doc": "",
                 "inferred_sig": "()",
                 "typed_params": [],
-                "inferred_return": "nil",
+                "inferred_return": "integer",
                 "line": 3410,
                 "file": "src/lua_api/gui_api.rs"
               }
@@ -20653,12 +20653,12 @@
                 "kind": "method",
                 "owner_type": "Accordion",
                 "description": "Returns the section count of this Accordion widget.",
-                "full_doc": "Returns the section count of this Accordion widget.\n@return nil",
+                "full_doc": "Returns the section count of this Accordion widget.\n@return integer",
                 "params_doc": "",
                 "returns_doc": "",
                 "inferred_sig": "()",
                 "typed_params": [],
-                "inferred_return": "nil",
+                "inferred_return": "integer",
                 "line": 3450,
                 "file": "src/lua_api/gui_api.rs"
               },
@@ -20683,12 +20683,12 @@
                 "kind": "method",
                 "owner_type": "Accordion",
                 "description": "Returns true if section expanded is enabled for this Accordion widget.",
-                "full_doc": "Returns true if section expanded is enabled for this Accordion widget.\n@return nil",
+                "full_doc": "Returns true if section expanded is enabled for this Accordion widget.\n@return boolean",
                 "params_doc": "",
                 "returns_doc": "",
                 "inferred_sig": "(section_idx)",
                 "typed_params": [],
-                "inferred_return": "nil",
+                "inferred_return": "boolean",
                 "line": 3485,
                 "file": "src/lua_api/gui_api.rs"
               },
@@ -20698,12 +20698,12 @@
                 "kind": "method",
                 "owner_type": "Accordion",
                 "description": "Returns true if exclusive is enabled for this Accordion widget.",
-                "full_doc": "Returns true if exclusive is enabled for this Accordion widget.\n@return nil",
+                "full_doc": "Returns true if exclusive is enabled for this Accordion widget.\n@return boolean",
                 "params_doc": "",
                 "returns_doc": "",
                 "inferred_sig": "()",
                 "typed_params": [],
-                "inferred_return": "nil",
+                "inferred_return": "boolean",
                 "line": 3502,
                 "file": "src/lua_api/gui_api.rs"
               },
@@ -20748,12 +20748,12 @@
                 "kind": "method",
                 "owner_type": "Tooltip_Panel",
                 "description": "Returns the text of this Tooltip_Panel widget.",
-                "full_doc": "Returns the text of this Tooltip_Panel widget.\n@return nil",
+                "full_doc": "Returns the text of this Tooltip_Panel widget.\n@return string",
                 "params_doc": "",
                 "returns_doc": "",
                 "inferred_sig": "()",
                 "typed_params": [],
-                "inferred_return": "nil",
+                "inferred_return": "string",
                 "line": 3557,
                 "file": "src/lua_api/gui_api.rs"
               },
@@ -20778,12 +20778,12 @@
                 "kind": "method",
                 "owner_type": "Tooltip_Panel",
                 "description": "Returns the delay of this Tooltip_Panel widget.",
-                "full_doc": "Returns the delay of this Tooltip_Panel widget.\n@return nil",
+                "full_doc": "Returns the delay of this Tooltip_Panel widget.\n@return number",
                 "params_doc": "",
                 "returns_doc": "",
                 "inferred_sig": "()",
                 "typed_params": [],
-                "inferred_return": "nil",
+                "inferred_return": "number",
                 "line": 3583,
                 "file": "src/lua_api/gui_api.rs"
               },
@@ -20843,12 +20843,12 @@
                 "kind": "method",
                 "owner_type": "Color_Picker",
                 "description": "Returns the color of this Color_Picker widget.",
-                "full_doc": "Returns the color of this Color_Picker widget.\n@return nil",
+                "full_doc": "Returns the color of this Color_Picker widget.\n@return number, number, number, number",
                 "params_doc": "",
                 "returns_doc": "",
                 "inferred_sig": "()",
                 "typed_params": [],
-                "inferred_return": "nil",
+                "inferred_return": "number",
                 "line": 3646,
                 "file": "src/lua_api/gui_api.rs"
               },
@@ -20873,12 +20873,12 @@
                 "kind": "method",
                 "owner_type": "Color_Picker",
                 "description": "Returns the show alpha of this Color_Picker widget.",
-                "full_doc": "Returns the show alpha of this Color_Picker widget.\n@return nil",
+                "full_doc": "Returns the show alpha of this Color_Picker widget.\n@return boolean",
                 "params_doc": "",
                 "returns_doc": "",
                 "inferred_sig": "()",
                 "typed_params": [],
-                "inferred_return": "nil",
+                "inferred_return": "boolean",
                 "line": 3675,
                 "file": "src/lua_api/gui_api.rs"
               },
@@ -20903,12 +20903,12 @@
                 "kind": "method",
                 "owner_type": "Color_Picker",
                 "description": "Returns the color mode of this Color_Picker widget.",
-                "full_doc": "Returns the color mode of this Color_Picker widget.\n@return nil",
+                "full_doc": "Returns the color mode of this Color_Picker widget.\n@return string",
                 "params_doc": "",
                 "returns_doc": "",
                 "inferred_sig": "()",
                 "typed_params": [],
-                "inferred_return": "nil",
+                "inferred_return": "string",
                 "line": 3701,
                 "file": "src/lua_api/gui_api.rs"
               },
@@ -20974,12 +20974,12 @@
                 "kind": "method",
                 "owner_type": "Gui_Table",
                 "description": "Returns the column count of this Gui_Table widget.",
-                "full_doc": "Returns the column count of this Gui_Table widget.\n@return nil",
+                "full_doc": "Returns the column count of this Gui_Table widget.\n@return integer",
                 "params_doc": "",
                 "returns_doc": "",
                 "inferred_sig": "()",
                 "typed_params": [],
-                "inferred_return": "nil",
+                "inferred_return": "integer",
                 "line": 3766,
                 "file": "src/lua_api/gui_api.rs"
               },
@@ -21004,12 +21004,12 @@
                 "kind": "method",
                 "owner_type": "Gui_Table",
                 "description": "Returns the row count of this Gui_Table widget.",
-                "full_doc": "Returns the row count of this Gui_Table widget.\n@return nil",
+                "full_doc": "Returns the row count of this Gui_Table widget.\n@return integer",
                 "params_doc": "",
                 "returns_doc": "",
                 "inferred_sig": "()",
                 "typed_params": [],
-                "inferred_return": "nil",
+                "inferred_return": "integer",
                 "line": 3792,
                 "file": "src/lua_api/gui_api.rs"
               },
@@ -21079,12 +21079,12 @@
                 "kind": "method",
                 "owner_type": "Gui_Table",
                 "description": "Returns true if sortable is enabled for this Gui_Table widget.",
-                "full_doc": "Returns true if sortable is enabled for this Gui_Table widget.\n@return nil",
+                "full_doc": "Returns true if sortable is enabled for this Gui_Table widget.\n@return boolean",
                 "params_doc": "",
                 "returns_doc": "",
                 "inferred_sig": "()",
                 "typed_params": [],
-                "inferred_return": "nil",
+                "inferred_return": "boolean",
                 "line": 3869,
                 "file": "src/lua_api/gui_api.rs"
               },
@@ -21135,12 +21135,12 @@
                 "kind": "method",
                 "owner_type": "Image_Widget",
                 "description": "Returns the scale mode of this Image_Widget widget.",
-                "full_doc": "Returns the scale mode of this Image_Widget widget.\n@return nil",
+                "full_doc": "Returns the scale mode of this Image_Widget widget.\n@return string",
                 "params_doc": "",
                 "returns_doc": "",
                 "inferred_sig": "()",
                 "typed_params": [],
-                "inferred_return": "nil",
+                "inferred_return": "string",
                 "line": 3917,
                 "file": "src/lua_api/gui_api.rs"
               },
@@ -21165,12 +21165,12 @@
                 "kind": "method",
                 "owner_type": "Image_Widget",
                 "description": "Returns the tint of this Image_Widget widget.",
-                "full_doc": "Returns the tint of this Image_Widget widget.\n@return nil",
+                "full_doc": "Returns the tint of this Image_Widget widget.\n@return number, number, number, number",
                 "params_doc": "",
                 "returns_doc": "",
                 "inferred_sig": "()",
                 "typed_params": [],
-                "inferred_return": "nil",
+                "inferred_return": "number",
                 "line": 3943,
                 "file": "src/lua_api/gui_api.rs"
               },
@@ -24859,7 +24859,7 @@
               ]
             ],
             "inferred_return": "RandomGenerator",
-            "line": 925,
+            "line": 926,
             "file": "src/lua_api/math_api.rs"
           },
           {
@@ -24920,7 +24920,7 @@
               ]
             ],
             "inferred_return": "Transform",
-            "line": 948,
+            "line": 949,
             "file": "src/lua_api/math_api.rs"
           },
           {
@@ -24941,7 +24941,7 @@
               ]
             ],
             "inferred_return": "BezierCurve",
-            "line": 988,
+            "line": 989,
             "file": "src/lua_api/math_api.rs"
           },
           {
@@ -24967,7 +24967,7 @@
               ]
             ],
             "inferred_return": "Tween",
-            "line": 1014,
+            "line": 1015,
             "file": "src/lua_api/math_api.rs"
           },
           {
@@ -24988,7 +24988,7 @@
               ]
             ],
             "inferred_return": "SpatialHash",
-            "line": 1028,
+            "line": 1029,
             "file": "src/lua_api/math_api.rs"
           },
           {
@@ -25009,7 +25009,7 @@
               ]
             ],
             "inferred_return": "NoiseGenerator",
-            "line": 1041,
+            "line": 1042,
             "file": "src/lua_api/math_api.rs"
           },
           {
@@ -25040,7 +25040,7 @@
               ]
             ],
             "inferred_return": "number",
-            "line": 1058,
+            "line": 1059,
             "file": "src/lua_api/math_api.rs"
           },
           {
@@ -25076,7 +25076,7 @@
               ]
             ],
             "inferred_return": "number",
-            "line": 1072,
+            "line": 1073,
             "file": "src/lua_api/math_api.rs"
           },
           {
@@ -25107,7 +25107,7 @@
               ]
             ],
             "inferred_return": "number",
-            "line": 1085,
+            "line": 1086,
             "file": "src/lua_api/math_api.rs"
           },
           {
@@ -25153,7 +25153,7 @@
               ]
             ],
             "inferred_return": "number",
-            "line": 1101,
+            "line": 1102,
             "file": "src/lua_api/math_api.rs"
           },
           {
@@ -25179,7 +25179,7 @@
               ]
             ],
             "inferred_return": "number",
-            "line": 1124,
+            "line": 1125,
             "file": "src/lua_api/math_api.rs"
           },
           {
@@ -25200,7 +25200,7 @@
               ]
             ],
             "inferred_return": "number",
-            "line": 1137,
+            "line": 1138,
             "file": "src/lua_api/math_api.rs"
           },
           {
@@ -25221,7 +25221,7 @@
               ]
             ],
             "inferred_return": "number",
-            "line": 1143,
+            "line": 1144,
             "file": "src/lua_api/math_api.rs"
           },
           {
@@ -25242,7 +25242,7 @@
               ]
             ],
             "inferred_return": "number",
-            "line": 1149,
+            "line": 1150,
             "file": "src/lua_api/math_api.rs"
           },
           {
@@ -25263,7 +25263,7 @@
               ]
             ],
             "inferred_return": "number",
-            "line": 1155,
+            "line": 1156,
             "file": "src/lua_api/math_api.rs"
           },
           {
@@ -25284,7 +25284,7 @@
               ]
             ],
             "inferred_return": "number",
-            "line": 1161,
+            "line": 1162,
             "file": "src/lua_api/math_api.rs"
           },
           {
@@ -25305,7 +25305,7 @@
               ]
             ],
             "inferred_return": "number",
-            "line": 1167,
+            "line": 1168,
             "file": "src/lua_api/math_api.rs"
           },
           {
@@ -25326,7 +25326,7 @@
               ]
             ],
             "inferred_return": "number",
-            "line": 1173,
+            "line": 1174,
             "file": "src/lua_api/math_api.rs"
           },
           {
@@ -25347,7 +25347,7 @@
               ]
             ],
             "inferred_return": "number",
-            "line": 1179,
+            "line": 1180,
             "file": "src/lua_api/math_api.rs"
           },
           {
@@ -25368,7 +25368,7 @@
               ]
             ],
             "inferred_return": "number",
-            "line": 1185,
+            "line": 1186,
             "file": "src/lua_api/math_api.rs"
           },
           {
@@ -25389,7 +25389,7 @@
               ]
             ],
             "inferred_return": "number",
-            "line": 1191,
+            "line": 1192,
             "file": "src/lua_api/math_api.rs"
           },
           {
@@ -25410,7 +25410,7 @@
               ]
             ],
             "inferred_return": "number",
-            "line": 1197,
+            "line": 1198,
             "file": "src/lua_api/math_api.rs"
           },
           {
@@ -25431,7 +25431,7 @@
               ]
             ],
             "inferred_return": "number",
-            "line": 1203,
+            "line": 1204,
             "file": "src/lua_api/math_api.rs"
           },
           {
@@ -25452,7 +25452,7 @@
               ]
             ],
             "inferred_return": "number",
-            "line": 1209,
+            "line": 1210,
             "file": "src/lua_api/math_api.rs"
           },
           {
@@ -25473,7 +25473,7 @@
               ]
             ],
             "inferred_return": "number",
-            "line": 1215,
+            "line": 1216,
             "file": "src/lua_api/math_api.rs"
           },
           {
@@ -25494,7 +25494,7 @@
               ]
             ],
             "inferred_return": "number",
-            "line": 1221,
+            "line": 1222,
             "file": "src/lua_api/math_api.rs"
           },
           {
@@ -25515,7 +25515,7 @@
               ]
             ],
             "inferred_return": "number",
-            "line": 1227,
+            "line": 1228,
             "file": "src/lua_api/math_api.rs"
           },
           {
@@ -25536,7 +25536,7 @@
               ]
             ],
             "inferred_return": "number",
-            "line": 1233,
+            "line": 1234,
             "file": "src/lua_api/math_api.rs"
           },
           {
@@ -25557,7 +25557,7 @@
               ]
             ],
             "inferred_return": "number",
-            "line": 1239,
+            "line": 1240,
             "file": "src/lua_api/math_api.rs"
           },
           {
@@ -25578,7 +25578,7 @@
               ]
             ],
             "inferred_return": "number",
-            "line": 1245,
+            "line": 1246,
             "file": "src/lua_api/math_api.rs"
           },
           {
@@ -25599,7 +25599,7 @@
               ]
             ],
             "inferred_return": "number",
-            "line": 1251,
+            "line": 1252,
             "file": "src/lua_api/math_api.rs"
           },
           {
@@ -25620,7 +25620,7 @@
               ]
             ],
             "inferred_return": "number",
-            "line": 1257,
+            "line": 1258,
             "file": "src/lua_api/math_api.rs"
           },
           {
@@ -25641,7 +25641,7 @@
               ]
             ],
             "inferred_return": "number",
-            "line": 1263,
+            "line": 1264,
             "file": "src/lua_api/math_api.rs"
           },
           {
@@ -25662,7 +25662,7 @@
               ]
             ],
             "inferred_return": "table",
-            "line": 1272,
+            "line": 1273,
             "file": "src/lua_api/math_api.rs"
           },
           {
@@ -25683,7 +25683,7 @@
               ]
             ],
             "inferred_return": "boolean",
-            "line": 1307,
+            "line": 1308,
             "file": "src/lua_api/math_api.rs"
           },
           {
@@ -25704,7 +25704,7 @@
               ]
             ],
             "inferred_return": "number",
-            "line": 1330,
+            "line": 1331,
             "file": "src/lua_api/math_api.rs"
           },
           {
@@ -25725,7 +25725,541 @@
               ]
             ],
             "inferred_return": "number",
-            "line": 1339,
+            "line": 1340,
+            "file": "src/lua_api/math_api.rs"
+          },
+          {
+            "name": "angleBetween",
+            "lua_name": "luna.math.angleBetween",
+            "kind": "function",
+            "owner_type": "",
+            "description": "Returns the angle in radians from (x1, y1) to (x2, y2).",
+            "full_doc": "Returns the angle in radians from (x1, y1) to (x2, y2).\n@param x1 : number\n@param y1 : number\n@param x2 : number\n@param y2 : number\n@return number",
+            "params_doc": "",
+            "returns_doc": "",
+            "inferred_sig": "(x1, y1, x2, y2)",
+            "typed_params": [
+              [
+                "x1",
+                "number",
+                false
+              ],
+              [
+                "y1",
+                "number",
+                false
+              ],
+              [
+                "x2",
+                "number",
+                false
+              ],
+              [
+                "y2",
+                "number",
+                false
+              ]
+            ],
+            "inferred_return": "number",
+            "line": 1354,
+            "file": "src/lua_api/math_api.rs"
+          },
+          {
+            "name": "circleContainsPoint",
+            "lua_name": "luna.math.circleContainsPoint",
+            "kind": "function",
+            "owner_type": "",
+            "description": "Returns true if the point (px, py) lies inside the circle.",
+            "full_doc": "Returns true if the point (px, py) lies inside the circle.\n@param cx : number\n@param cy : number\n@param r : number\n@param px : number\n@param py : number\n@return boolean",
+            "params_doc": "",
+            "returns_doc": "",
+            "inferred_sig": "(cx, cy, r, px, py)",
+            "typed_params": [
+              [
+                "cx",
+                "number",
+                false
+              ],
+              [
+                "cy",
+                "number",
+                false
+              ],
+              [
+                "r",
+                "number",
+                false
+              ],
+              [
+                "px",
+                "number",
+                false
+              ],
+              [
+                "py",
+                "number",
+                false
+              ]
+            ],
+            "inferred_return": "boolean",
+            "line": 1369,
+            "file": "src/lua_api/math_api.rs"
+          },
+          {
+            "name": "circleIntersectsCircle",
+            "lua_name": "luna.math.circleIntersectsCircle",
+            "kind": "function",
+            "owner_type": "",
+            "description": "Returns true if two circles overlap.",
+            "full_doc": "Returns true if two circles overlap.\n@param x1 : number\n@param y1 : number\n@param r1 : number\n@param x2 : number\n@param y2 : number\n@param r2 : number\n@return boolean",
+            "params_doc": "",
+            "returns_doc": "",
+            "inferred_sig": "(x1, y1, r1, x2, y2, r2)",
+            "typed_params": [
+              [
+                "x1",
+                "number",
+                false
+              ],
+              [
+                "y1",
+                "number",
+                false
+              ],
+              [
+                "r1",
+                "number",
+                false
+              ],
+              [
+                "x2",
+                "number",
+                false
+              ],
+              [
+                "y2",
+                "number",
+                false
+              ],
+              [
+                "r2",
+                "number",
+                false
+              ]
+            ],
+            "inferred_return": "boolean",
+            "line": 1385,
+            "file": "src/lua_api/math_api.rs"
+          },
+          {
+            "name": "circleIntersectsLine",
+            "lua_name": "luna.math.circleIntersectsLine",
+            "kind": "function",
+            "owner_type": "",
+            "description": "Tests an infinite line against a circle. Returns hit, then two optional hit-point pairs.",
+            "full_doc": "Tests an infinite line against a circle. Returns hit, then two optional hit-point pairs.\n@param cx : number\n@param cy : number\n@param r : number\n@param lx1 : number\n@param ly1 : number\n@param lx2 : number\n@param ly2 : number\n@return boolean, number?, number?, number?, number?",
+            "params_doc": "",
+            "returns_doc": "",
+            "inferred_sig": "(cx, cy, r, lx1, ly1, lx2, ly2)",
+            "typed_params": [
+              [
+                "cx",
+                "number",
+                false
+              ],
+              [
+                "cy",
+                "number",
+                false
+              ],
+              [
+                "r",
+                "number",
+                false
+              ],
+              [
+                "lx1",
+                "number",
+                false
+              ],
+              [
+                "ly1",
+                "number",
+                false
+              ],
+              [
+                "lx2",
+                "number",
+                false
+              ],
+              [
+                "ly2",
+                "number",
+                false
+              ]
+            ],
+            "inferred_return": "boolean",
+            "line": 1404,
+            "file": "src/lua_api/math_api.rs"
+          },
+          {
+            "name": "circleIntersectsSegment",
+            "lua_name": "luna.math.circleIntersectsSegment",
+            "kind": "function",
+            "owner_type": "",
+            "description": "Tests a line segment against a circle. Returns hit, then two optional hit-point pairs.",
+            "full_doc": "Tests a line segment against a circle. Returns hit, then two optional hit-point pairs.\n@param cx : number\n@param cy : number\n@param r : number\n@param sx1 : number\n@param sy1 : number\n@param sx2 : number\n@param sy2 : number\n@return boolean, number?, number?, number?, number?",
+            "params_doc": "",
+            "returns_doc": "",
+            "inferred_sig": "(cx, cy, r, sx1, sy1, sx2, sy2)",
+            "typed_params": [
+              [
+                "cx",
+                "number",
+                false
+              ],
+              [
+                "cy",
+                "number",
+                false
+              ],
+              [
+                "r",
+                "number",
+                false
+              ],
+              [
+                "sx1",
+                "number",
+                false
+              ],
+              [
+                "sy1",
+                "number",
+                false
+              ],
+              [
+                "sx2",
+                "number",
+                false
+              ],
+              [
+                "sy2",
+                "number",
+                false
+              ]
+            ],
+            "inferred_return": "boolean",
+            "line": 1438,
+            "file": "src/lua_api/math_api.rs"
+          },
+          {
+            "name": "closestPointOnSegment",
+            "lua_name": "luna.math.closestPointOnSegment",
+            "kind": "function",
+            "owner_type": "",
+            "description": "Returns the closest point on segment (x1,y1)-(x2,y2) to point (px,py).",
+            "full_doc": "Returns the closest point on segment (x1,y1)-(x2,y2) to point (px,py).\n@param px : number\n@param py : number\n@param x1 : number\n@param y1 : number\n@param x2 : number\n@param y2 : number\n@return number, number",
+            "params_doc": "",
+            "returns_doc": "",
+            "inferred_sig": "(px, py, x1, y1, x2, y2)",
+            "typed_params": [
+              [
+                "px",
+                "number",
+                false
+              ],
+              [
+                "py",
+                "number",
+                false
+              ],
+              [
+                "x1",
+                "number",
+                false
+              ],
+              [
+                "y1",
+                "number",
+                false
+              ],
+              [
+                "x2",
+                "number",
+                false
+              ],
+              [
+                "y2",
+                "number",
+                false
+              ]
+            ],
+            "inferred_return": "number",
+            "line": 1471,
+            "file": "src/lua_api/math_api.rs"
+          },
+          {
+            "name": "convexHull",
+            "lua_name": "luna.math.convexHull",
+            "kind": "function",
+            "owner_type": "",
+            "description": "Computes the convex hull of a flat {x1,y1,...} point list. Returns a flat table.",
+            "full_doc": "Computes the convex hull of a flat {x1,y1,...} point list. Returns a flat table.\n@param points : table\n@return table",
+            "params_doc": "",
+            "returns_doc": "",
+            "inferred_sig": "(pts)",
+            "typed_params": [
+              [
+                "points",
+                "table",
+                false
+              ]
+            ],
+            "inferred_return": "table",
+            "line": 1484,
+            "file": "src/lua_api/math_api.rs"
+          },
+          {
+            "name": "delaunayTriangulate",
+            "lua_name": "luna.math.delaunayTriangulate",
+            "kind": "function",
+            "owner_type": "",
+            "description": "Delaunay triangulation of a flat {x1,y1,...} point list. Returns a table of flat 6-number triangle tables.",
+            "full_doc": "Delaunay triangulation of a flat {x1,y1,...} point list. Returns a table of flat 6-number triangle tables.\n@param points : table\n@return table",
+            "params_doc": "",
+            "returns_doc": "",
+            "inferred_sig": "(pts)",
+            "typed_params": [
+              [
+                "points",
+                "table",
+                false
+              ]
+            ],
+            "inferred_return": "table",
+            "line": 1506,
+            "file": "src/lua_api/math_api.rs"
+          },
+          {
+            "name": "lineIntersect",
+            "lua_name": "luna.math.lineIntersect",
+            "kind": "function",
+            "owner_type": "",
+            "description": "Infinite line intersection. Returns (x, y) or (nil, nil) if lines are parallel.",
+            "full_doc": "Infinite line intersection. Returns (x, y) or (nil, nil) if lines are parallel.\n@param x1 : number\n@param y1 : number\n@param x2 : number\n@param y2 : number\n@param x3 : number\n@param y3 : number\n@param x4 : number\n@param y4 : number\n@return number?, number?",
+            "params_doc": "",
+            "returns_doc": "",
+            "inferred_sig": "",
+            "typed_params": [
+              [
+                "x1",
+                "number",
+                false
+              ],
+              [
+                "y1",
+                "number",
+                false
+              ],
+              [
+                "x2",
+                "number",
+                false
+              ],
+              [
+                "y2",
+                "number",
+                false
+              ],
+              [
+                "x3",
+                "number",
+                false
+              ],
+              [
+                "y3",
+                "number",
+                false
+              ],
+              [
+                "x4",
+                "number",
+                false
+              ],
+              [
+                "y4",
+                "number",
+                false
+              ]
+            ],
+            "inferred_return": "number?",
+            "line": 1542,
+            "file": "src/lua_api/math_api.rs"
+          },
+          {
+            "name": "pointInPolygon",
+            "lua_name": "luna.math.pointInPolygon",
+            "kind": "function",
+            "owner_type": "",
+            "description": "Returns true if (px, py) is inside the polygon given as a flat {x1,y1,...} table.",
+            "full_doc": "Returns true if (px, py) is inside the polygon given as a flat {x1,y1,...} table.\n@param polygon : table\n@param px : number\n@param py : number\n@return boolean",
+            "params_doc": "",
+            "returns_doc": "",
+            "inferred_sig": "(pts, px, py)",
+            "typed_params": [
+              [
+                "polygon",
+                "table",
+                false
+              ],
+              [
+                "px",
+                "number",
+                false
+              ],
+              [
+                "py",
+                "number",
+                false
+              ]
+            ],
+            "inferred_return": "boolean",
+            "line": 1570,
+            "file": "src/lua_api/math_api.rs"
+          },
+          {
+            "name": "polygonArea",
+            "lua_name": "luna.math.polygonArea",
+            "kind": "function",
+            "owner_type": "",
+            "description": "Returns the signed area of a polygon given as a flat {x1,y1,...} table.",
+            "full_doc": "Returns the signed area of a polygon given as a flat {x1,y1,...} table.\n@param polygon : table\n@return number",
+            "params_doc": "",
+            "returns_doc": "",
+            "inferred_sig": "(pts)",
+            "typed_params": [
+              [
+                "polygon",
+                "table",
+                false
+              ]
+            ],
+            "inferred_return": "number",
+            "line": 1587,
+            "file": "src/lua_api/math_api.rs"
+          },
+          {
+            "name": "polygonCentroid",
+            "lua_name": "luna.math.polygonCentroid",
+            "kind": "function",
+            "owner_type": "",
+            "description": "Returns the centroid (cx, cy) of a polygon given as a flat {x1,y1,...} table.",
+            "full_doc": "Returns the centroid (cx, cy) of a polygon given as a flat {x1,y1,...} table.\n@param polygon : table\n@return number, number",
+            "params_doc": "",
+            "returns_doc": "",
+            "inferred_sig": "(pts)",
+            "typed_params": [
+              [
+                "polygon",
+                "table",
+                false
+              ]
+            ],
+            "inferred_return": "number",
+            "line": 1604,
+            "file": "src/lua_api/math_api.rs"
+          },
+          {
+            "name": "segmentIntersectsSegment",
+            "lua_name": "luna.math.segmentIntersectsSegment",
+            "kind": "function",
+            "owner_type": "",
+            "description": "Tests if two line segments intersect. Returns (hit, ix?, iy?).",
+            "full_doc": "Tests if two line segments intersect. Returns (hit, ix?, iy?).\n@param x1 : number\n@param y1 : number\n@param x2 : number\n@param y2 : number\n@param x3 : number\n@param y3 : number\n@param x4 : number\n@param y4 : number\n@return boolean, number?, number?",
+            "params_doc": "",
+            "returns_doc": "",
+            "inferred_sig": "",
+            "typed_params": [
+              [
+                "x1",
+                "number",
+                false
+              ],
+              [
+                "y1",
+                "number",
+                false
+              ],
+              [
+                "x2",
+                "number",
+                false
+              ],
+              [
+                "y2",
+                "number",
+                false
+              ],
+              [
+                "x3",
+                "number",
+                false
+              ],
+              [
+                "y3",
+                "number",
+                false
+              ],
+              [
+                "x4",
+                "number",
+                false
+              ],
+              [
+                "y4",
+                "number",
+                false
+              ]
+            ],
+            "inferred_return": "boolean",
+            "line": 1628,
+            "file": "src/lua_api/math_api.rs"
+          },
+          {
+            "name": "bresenham",
+            "lua_name": "luna.math.bresenham",
+            "kind": "function",
+            "owner_type": "",
+            "description": "Rasterizes a line from (x1,y1) to (x2,y2) using Bresenham's algorithm. Returns a table of {x,y} tables.",
+            "full_doc": "Rasterizes a line from (x1,y1) to (x2,y2) using Bresenham's algorithm. Returns a table of {x,y} tables.\n@param x1 : integer\n@param y1 : integer\n@param x2 : integer\n@param y2 : integer\n@return table",
+            "params_doc": "",
+            "returns_doc": "",
+            "inferred_sig": "(x1, y1, x2, y2)",
+            "typed_params": [
+              [
+                "x1",
+                "integer",
+                false
+              ],
+              [
+                "y1",
+                "integer",
+                false
+              ],
+              [
+                "x2",
+                "integer",
+                false
+              ],
+              [
+                "y2",
+                "integer",
+                false
+              ]
+            ],
+            "inferred_return": "table",
+            "line": 1659,
             "file": "src/lua_api/math_api.rs"
           }
         ],
@@ -25745,7 +26279,7 @@
                 "inferred_sig": "()",
                 "typed_params": [],
                 "inferred_return": "number",
-                "line": 36,
+                "line": 37,
                 "file": "src/lua_api/math_api.rs"
               },
               {
@@ -25771,7 +26305,7 @@
                   ]
                 ],
                 "inferred_return": "number",
-                "line": 43,
+                "line": 44,
                 "file": "src/lua_api/math_api.rs"
               },
               {
@@ -25797,7 +26331,7 @@
                   ]
                 ],
                 "inferred_return": "integer",
-                "line": 52,
+                "line": 53,
                 "file": "src/lua_api/math_api.rs"
               },
               {
@@ -25812,7 +26346,7 @@
                 "inferred_sig": "()",
                 "typed_params": [],
                 "inferred_return": "integer",
-                "line": 71,
+                "line": 72,
                 "file": "src/lua_api/math_api.rs"
               },
               {
@@ -25833,7 +26367,7 @@
                   ]
                 ],
                 "inferred_return": "nil",
-                "line": 77,
+                "line": 78,
                 "file": "src/lua_api/math_api.rs"
               },
               {
@@ -25848,7 +26382,7 @@
                 "inferred_sig": "()",
                 "typed_params": [],
                 "inferred_return": "string",
-                "line": 85,
+                "line": 86,
                 "file": "src/lua_api/math_api.rs"
               },
               {
@@ -25869,7 +26403,7 @@
                   ]
                 ],
                 "inferred_return": "nil",
-                "line": 91,
+                "line": 92,
                 "file": "src/lua_api/math_api.rs"
               }
             ]
@@ -25900,7 +26434,7 @@
                   ]
                 ],
                 "inferred_return": "nil",
-                "line": 116,
+                "line": 117,
                 "file": "src/lua_api/math_api.rs"
               },
               {
@@ -25921,7 +26455,7 @@
                   ]
                 ],
                 "inferred_return": "nil",
-                "line": 125,
+                "line": 126,
                 "file": "src/lua_api/math_api.rs"
               },
               {
@@ -25947,7 +26481,7 @@
                   ]
                 ],
                 "inferred_return": "nil",
-                "line": 135,
+                "line": 136,
                 "file": "src/lua_api/math_api.rs"
               },
               {
@@ -25973,7 +26507,7 @@
                   ]
                 ],
                 "inferred_return": "nil",
-                "line": 145,
+                "line": 146,
                 "file": "src/lua_api/math_api.rs"
               },
               {
@@ -25988,7 +26522,7 @@
                 "inferred_sig": "()",
                 "typed_params": [],
                 "inferred_return": "nil",
-                "line": 153,
+                "line": 154,
                 "file": "src/lua_api/math_api.rs"
               },
               {
@@ -26014,7 +26548,7 @@
                   ]
                 ],
                 "inferred_return": "number",
-                "line": 205,
+                "line": 206,
                 "file": "src/lua_api/math_api.rs"
               },
               {
@@ -26040,7 +26574,7 @@
                   ]
                 ],
                 "inferred_return": "number",
-                "line": 214,
+                "line": 215,
                 "file": "src/lua_api/math_api.rs"
               },
               {
@@ -26055,7 +26589,7 @@
                 "inferred_sig": "()",
                 "typed_params": [],
                 "inferred_return": "Transform",
-                "line": 221,
+                "line": 222,
                 "file": "src/lua_api/math_api.rs"
               },
               {
@@ -26070,7 +26604,7 @@
                 "inferred_sig": "()",
                 "typed_params": [],
                 "inferred_return": "Transform",
-                "line": 230,
+                "line": 231,
                 "file": "src/lua_api/math_api.rs"
               },
               {
@@ -26085,7 +26619,7 @@
                 "inferred_sig": "()",
                 "typed_params": [],
                 "inferred_return": "table",
-                "line": 239,
+                "line": 240,
                 "file": "src/lua_api/math_api.rs"
               }
             ]
@@ -26111,7 +26645,7 @@
                   ]
                 ],
                 "inferred_return": "number",
-                "line": 269,
+                "line": 270,
                 "file": "src/lua_api/math_api.rs"
               },
               {
@@ -26132,7 +26666,7 @@
                   ]
                 ],
                 "inferred_return": "table",
-                "line": 278,
+                "line": 279,
                 "file": "src/lua_api/math_api.rs"
               },
               {
@@ -26147,7 +26681,7 @@
                 "inferred_sig": "()",
                 "typed_params": [],
                 "inferred_return": "BezierCurve",
-                "line": 290,
+                "line": 291,
                 "file": "src/lua_api/math_api.rs"
               },
               {
@@ -26168,7 +26702,7 @@
                   ]
                 ],
                 "inferred_return": "number?",
-                "line": 300,
+                "line": 301,
                 "file": "src/lua_api/math_api.rs"
               },
               {
@@ -26189,7 +26723,7 @@
                   ]
                 ],
                 "inferred_return": "boolean",
-                "line": 344,
+                "line": 345,
                 "file": "src/lua_api/math_api.rs"
               },
               {
@@ -26204,7 +26738,7 @@
                 "inferred_sig": "()",
                 "typed_params": [],
                 "inferred_return": "integer",
-                "line": 354,
+                "line": 355,
                 "file": "src/lua_api/math_api.rs"
               },
               {
@@ -26219,7 +26753,7 @@
                 "inferred_sig": "()",
                 "typed_params": [],
                 "inferred_return": "number",
-                "line": 361,
+                "line": 362,
                 "file": "src/lua_api/math_api.rs"
               },
               {
@@ -26245,7 +26779,7 @@
                   ]
                 ],
                 "inferred_return": "nil",
-                "line": 368,
+                "line": 369,
                 "file": "src/lua_api/math_api.rs"
               },
               {
@@ -26276,7 +26810,7 @@
                   ]
                 ],
                 "inferred_return": "nil",
-                "line": 379,
+                "line": 380,
                 "file": "src/lua_api/math_api.rs"
               },
               {
@@ -26307,7 +26841,7 @@
                   ]
                 ],
                 "inferred_return": "nil",
-                "line": 390,
+                "line": 391,
                 "file": "src/lua_api/math_api.rs"
               }
             ]
@@ -26333,7 +26867,7 @@
                   ]
                 ],
                 "inferred_return": "boolean",
-                "line": 412,
+                "line": 413,
                 "file": "src/lua_api/math_api.rs"
               },
               {
@@ -26348,7 +26882,7 @@
                 "inferred_sig": "()",
                 "typed_params": [],
                 "inferred_return": "nil",
-                "line": 417,
+                "line": 418,
                 "file": "src/lua_api/math_api.rs"
               },
               {
@@ -26369,7 +26903,7 @@
                   ]
                 ],
                 "inferred_return": "number",
-                "line": 426,
+                "line": 427,
                 "file": "src/lua_api/math_api.rs"
               },
               {
@@ -26384,7 +26918,7 @@
                 "inferred_sig": "()",
                 "typed_params": [],
                 "inferred_return": "table",
-                "line": 436,
+                "line": 437,
                 "file": "src/lua_api/math_api.rs"
               },
               {
@@ -26399,7 +26933,7 @@
                 "inferred_sig": "()",
                 "typed_params": [],
                 "inferred_return": "boolean",
-                "line": 448,
+                "line": 449,
                 "file": "src/lua_api/math_api.rs"
               },
               {
@@ -26414,7 +26948,7 @@
                 "inferred_sig": "()",
                 "typed_params": [],
                 "inferred_return": "integer",
-                "line": 453,
+                "line": 454,
                 "file": "src/lua_api/math_api.rs"
               },
               {
@@ -26429,7 +26963,7 @@
                 "inferred_sig": "()",
                 "typed_params": [],
                 "inferred_return": "string",
-                "line": 460,
+                "line": 461,
                 "file": "src/lua_api/math_api.rs"
               },
               {
@@ -26444,7 +26978,7 @@
                 "inferred_sig": "()",
                 "typed_params": [],
                 "inferred_return": "number",
-                "line": 467,
+                "line": 468,
                 "file": "src/lua_api/math_api.rs"
               },
               {
@@ -26459,7 +26993,7 @@
                 "inferred_sig": "()",
                 "typed_params": [],
                 "inferred_return": "number",
-                "line": 472,
+                "line": 473,
                 "file": "src/lua_api/math_api.rs"
               },
               {
@@ -26480,7 +27014,7 @@
                   ]
                 ],
                 "inferred_return": "nil",
-                "line": 478,
+                "line": 479,
                 "file": "src/lua_api/math_api.rs"
               },
               {
@@ -26506,7 +27040,7 @@
                   ]
                 ],
                 "inferred_return": "integer",
-                "line": 488,
+                "line": 489,
                 "file": "src/lua_api/math_api.rs"
               }
             ]
@@ -26532,7 +27066,7 @@
                   ]
                 ],
                 "inferred_return": "nil",
-                "line": 539,
+                "line": 540,
                 "file": "src/lua_api/math_api.rs"
               },
               {
@@ -26547,7 +27081,7 @@
                 "inferred_sig": "()",
                 "typed_params": [],
                 "inferred_return": "nil",
-                "line": 547,
+                "line": 548,
                 "file": "src/lua_api/math_api.rs"
               },
               {
@@ -26583,7 +27117,7 @@
                   ]
                 ],
                 "inferred_return": "table",
-                "line": 559,
+                "line": 560,
                 "file": "src/lua_api/math_api.rs"
               },
               {
@@ -26598,7 +27132,7 @@
                 "inferred_sig": "()",
                 "typed_params": [],
                 "inferred_return": "number",
-                "line": 589,
+                "line": 590,
                 "file": "src/lua_api/math_api.rs"
               },
               {
@@ -26613,7 +27147,7 @@
                 "inferred_sig": "()",
                 "typed_params": [],
                 "inferred_return": "integer",
-                "line": 594,
+                "line": 595,
                 "file": "src/lua_api/math_api.rs"
               }
             ]
@@ -26639,7 +27173,7 @@
                   ]
                 ],
                 "inferred_return": "number",
-                "line": 641,
+                "line": 642,
                 "file": "src/lua_api/math_api.rs"
               },
               {
@@ -26665,7 +27199,7 @@
                   ]
                 ],
                 "inferred_return": "number",
-                "line": 650,
+                "line": 651,
                 "file": "src/lua_api/math_api.rs"
               },
               {
@@ -26696,7 +27230,7 @@
                   ]
                 ],
                 "inferred_return": "number",
-                "line": 660,
+                "line": 661,
                 "file": "src/lua_api/math_api.rs"
               },
               {
@@ -26732,7 +27266,7 @@
                   ]
                 ],
                 "inferred_return": "number",
-                "line": 671,
+                "line": 672,
                 "file": "src/lua_api/math_api.rs"
               },
               {
@@ -26753,7 +27287,7 @@
                   ]
                 ],
                 "inferred_return": "number",
-                "line": 679,
+                "line": 680,
                 "file": "src/lua_api/math_api.rs"
               },
               {
@@ -26779,7 +27313,7 @@
                   ]
                 ],
                 "inferred_return": "number",
-                "line": 688,
+                "line": 689,
                 "file": "src/lua_api/math_api.rs"
               },
               {
@@ -26810,7 +27344,7 @@
                   ]
                 ],
                 "inferred_return": "number",
-                "line": 698,
+                "line": 699,
                 "file": "src/lua_api/math_api.rs"
               },
               {
@@ -26841,7 +27375,7 @@
                   ]
                 ],
                 "inferred_return": "number",
-                "line": 844,
+                "line": 845,
                 "file": "src/lua_api/math_api.rs"
               },
               {
@@ -26872,7 +27406,7 @@
                   ]
                 ],
                 "inferred_return": "table",
-                "line": 854,
+                "line": 855,
                 "file": "src/lua_api/math_api.rs"
               },
               {
@@ -26887,7 +27421,7 @@
                 "inferred_sig": "()",
                 "typed_params": [],
                 "inferred_return": "integer",
-                "line": 889,
+                "line": 890,
                 "file": "src/lua_api/math_api.rs"
               },
               {
@@ -26908,7 +27442,7 @@
                   ]
                 ],
                 "inferred_return": "nil",
-                "line": 895,
+                "line": 896,
                 "file": "src/lua_api/math_api.rs"
               }
             ]

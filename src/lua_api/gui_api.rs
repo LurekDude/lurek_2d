@@ -731,7 +731,7 @@ fn add_button_methods(
     // -- getText --
     let c = ctx.clone();
     /// Returns the text of this Button widget.
-    /// @return nil
+    /// @return string
     t.set(
         "getText",
         lua.create_function(move |_, ()| {
@@ -767,7 +767,7 @@ fn add_label_methods(
     )?;
     let c = ctx.clone();
     /// Returns the text of this Label widget.
-    /// @return nil
+    /// @return string
     t.set(
         "getText",
         lua.create_function(move |_, ()| {
@@ -804,7 +804,7 @@ fn add_text_input_methods(
     )?;
     let c = ctx.clone();
     /// Returns the text of this Text_Input widget.
-    /// @return nil
+    /// @return string
     t.set(
         "getText",
         lua.create_function(move |_, ()| {
@@ -830,7 +830,7 @@ fn add_text_input_methods(
     )?;
     let c = ctx.clone();
     /// Returns the placeholder of this Text_Input widget.
-    /// @return nil
+    /// @return string
     t.set(
         "getPlaceholder",
         lua.create_function(move |_, ()| {
@@ -856,7 +856,7 @@ fn add_text_input_methods(
     )?;
     let c = ctx.clone();
     /// Returns true if focused is enabled for this Text_Input widget.
-    /// @return nil
+    /// @return boolean
     t.set(
         "isFocused",
         lua.create_function(move |_, ()| {
@@ -869,7 +869,7 @@ fn add_text_input_methods(
     )?;
     let c = ctx.clone();
     /// Returns the cursor position of this Text_Input widget.
-    /// @return nil
+    /// @return integer
     t.set(
         "getCursorPosition",
         lua.create_function(move |_, ()| {
@@ -905,7 +905,7 @@ fn add_checkbox_methods(
     )?;
     let c = ctx.clone();
     /// Returns true if checked is enabled for this Checkbox widget.
-    /// @return nil
+    /// @return boolean
     t.set(
         "isChecked",
         lua.create_function(move |_, ()| {
@@ -931,7 +931,7 @@ fn add_checkbox_methods(
     )?;
     let c = ctx.clone();
     /// Returns the text of this Checkbox widget.
-    /// @return nil
+    /// @return string
     t.set(
         "getText",
         lua.create_function(move |_, ()| {
@@ -967,7 +967,7 @@ fn add_slider_methods(
     )?;
     let c = ctx.clone();
     /// Returns the value of this Slider widget.
-    /// @return nil
+    /// @return number
     t.set(
         "getValue",
         lua.create_function(move |_, ()| {
@@ -1008,7 +1008,7 @@ fn add_slider_methods(
     )?;
     let c = ctx.clone();
     /// Returns the min of this Slider widget.
-    /// @return nil
+    /// @return number
     t.set(
         "getMin",
         lua.create_function(move |_, ()| {
@@ -1021,7 +1021,7 @@ fn add_slider_methods(
     )?;
     let c = ctx.clone();
     /// Returns the max of this Slider widget.
-    /// @return nil
+    /// @return number
     t.set(
         "getMax",
         lua.create_function(move |_, ()| {
@@ -1057,7 +1057,7 @@ fn add_progress_bar_methods(
     )?;
     let c = ctx.clone();
     /// Returns the value of this Progress_Bar widget.
-    /// @return nil
+    /// @return number
     t.set(
         "getValue",
         lua.create_function(move |_, ()| {
@@ -1070,7 +1070,7 @@ fn add_progress_bar_methods(
     )?;
     let c = ctx.clone();
     /// Returns the progress of this Progress_Bar widget.
-    /// @return nil
+    /// @return number
     t.set(
         "getProgress",
         lua.create_function(move |_, ()| {
@@ -1098,7 +1098,7 @@ fn add_progress_bar_methods(
     )?;
     let c = ctx.clone();
     /// Returns the min of this Progress_Bar widget.
-    /// @return nil
+    /// @return number
     t.set(
         "getMin",
         lua.create_function(move |_, ()| {
@@ -1111,7 +1111,7 @@ fn add_progress_bar_methods(
     )?;
     let c = ctx.clone();
     /// Returns the max of this Progress_Bar widget.
-    /// @return nil
+    /// @return number
     t.set(
         "getMax",
         lua.create_function(move |_, ()| {
@@ -1176,7 +1176,7 @@ fn add_combo_box_methods(
     )?;
     let c = ctx.clone();
     /// Returns the item count of this Combo_Box widget.
-    /// @return nil
+    /// @return integer
     t.set(
         "getItemCount",
         lua.create_function(move |_, ()| {
@@ -1189,7 +1189,7 @@ fn add_combo_box_methods(
     )?;
     let c = ctx.clone();
     /// Returns the item of this Combo_Box widget.
-    /// @return nil
+    /// @return string
     t.set(
         "getItem",
         lua.create_function(move |_, index: usize| {
@@ -1223,7 +1223,7 @@ fn add_combo_box_methods(
     )?;
     let c = ctx.clone();
     /// Returns the selected index of this Combo_Box widget.
-    /// @return nil
+    /// @return integer
     t.set(
         "getSelectedIndex",
         lua.create_function(move |_, ()| {
@@ -1236,7 +1236,7 @@ fn add_combo_box_methods(
     )?;
     let c = ctx.clone();
     /// Returns the selected item of this Combo_Box widget.
-    /// @return nil
+    /// @return string
     t.set(
         "getSelectedItem",
         lua.create_function(move |_, ()| {
@@ -1300,7 +1300,7 @@ fn add_list_box_methods(
     )?;
     let c = ctx.clone();
     /// Returns the item count of this List_Box widget.
-    /// @return nil
+    /// @return integer
     t.set(
         "getItemCount",
         lua.create_function(move |_, ()| {
@@ -1313,7 +1313,7 @@ fn add_list_box_methods(
     )?;
     let c = ctx.clone();
     /// Returns the item of this List_Box widget.
-    /// @return nil
+    /// @return string
     t.set(
         "getItem",
         lua.create_function(move |_, index: usize| {
@@ -1347,7 +1347,7 @@ fn add_list_box_methods(
     )?;
     let c = ctx.clone();
     /// Returns the selected index of this List_Box widget.
-    /// @return nil
+    /// @return integer
     t.set(
         "getSelectedIndex",
         lua.create_function(move |_, ()| {
@@ -1412,7 +1412,7 @@ fn add_tab_bar_methods(
     )?;
     let c = ctx.clone();
     /// Returns the tab of this Tab_Bar widget.
-    /// @return nil
+    /// @return integer
     t.set(
         "getTab",
         lua.create_function(move |_, index: usize| {
@@ -1431,7 +1431,7 @@ fn add_tab_bar_methods(
     )?;
     let c = ctx.clone();
     /// Returns the tab count of this Tab_Bar widget.
-    /// @return nil
+    /// @return integer
     t.set(
         "getTabCount",
         lua.create_function(move |_, ()| {
@@ -1459,7 +1459,7 @@ fn add_tab_bar_methods(
     )?;
     let c = ctx.clone();
     /// Returns the active tab of this Tab_Bar widget.
-    /// @return nil
+    /// @return integer
     t.set(
         "getActiveTab",
         lua.create_function(move |_, ()| {
@@ -1495,7 +1495,7 @@ fn add_panel_methods(
     )?;
     let c = ctx.clone();
     /// Returns the title of this Panel widget.
-    /// @return nil
+    /// @return string
     t.set(
         "getTitle",
         lua.create_function(move |_, ()| {
@@ -1546,7 +1546,7 @@ fn add_layout_methods(
     )?;
     let c = ctx.clone();
     /// Returns the direction of this Layout widget.
-    /// @return nil
+    /// @return string
     t.set(
         "getDirection",
         lua.create_function(move |_, ()| {
@@ -1572,7 +1572,7 @@ fn add_layout_methods(
     )?;
     let c = ctx.clone();
     /// Returns the spacing of this Layout widget.
-    /// @return nil
+    /// @return number
     t.set(
         "getSpacing",
         lua.create_function(move |_, ()| {
@@ -1611,7 +1611,7 @@ fn add_layout_methods(
     )?;
     let c = ctx.clone();
     /// Returns the wrap of this Layout widget.
-    /// @return nil
+    /// @return boolean
     t.set(
         "getWrap",
         lua.create_function(move |_, ()| {
@@ -1637,7 +1637,7 @@ fn add_layout_methods(
     )?;
     let c = ctx.clone();
     /// Returns the align of this Layout widget.
-    /// @return nil
+    /// @return string
     t.set(
         "getAlign",
         lua.create_function(move |_, ()| {
@@ -1663,7 +1663,7 @@ fn add_layout_methods(
     )?;
     let c = ctx.clone();
     /// Returns the justify of this Layout widget.
-    /// @return nil
+    /// @return string
     t.set(
         "getJustify",
         lua.create_function(move |_, ()| {
@@ -1701,7 +1701,7 @@ fn add_scroll_panel_methods(
     )?;
     let c = ctx.clone();
     /// Returns the content size of this Scroll_Panel widget.
-    /// @return nil
+    /// @return number, number
     t.set(
         "getContentSize",
         lua.create_function(move |_, ()| {
@@ -1729,7 +1729,7 @@ fn add_scroll_panel_methods(
     )?;
     let c = ctx.clone();
     /// Returns the scroll position of this Scroll_Panel widget.
-    /// @return nil
+    /// @return number, number
     t.set(
         "getScrollPosition",
         lua.create_function(move |_, ()| {
@@ -1742,7 +1742,7 @@ fn add_scroll_panel_methods(
     )?;
     let c = ctx.clone();
     /// Returns the max scroll of this Scroll_Panel widget.
-    /// @return nil
+    /// @return number, number
     t.set(
         "getMaxScroll",
         lua.create_function(move |_, ()| {
@@ -1768,7 +1768,7 @@ fn add_scroll_panel_methods(
     )?;
     let c = ctx.clone();
     /// Returns the scroll speed of this Scroll_Panel widget.
-    /// @return nil
+    /// @return number
     t.set(
         "getScrollSpeed",
         lua.create_function(move |_, ()| {
@@ -1807,7 +1807,7 @@ fn add_nine_patch_methods(
     )?;
     let c = ctx.clone();
     /// Returns the insets of this Nine_Patch widget.
-    /// @return nil
+    /// @return integer, integer, integer, integer
     t.set(
         "getInsets",
         lua.create_function(move |_, ()| {
@@ -1836,7 +1836,7 @@ fn add_nine_patch_methods(
     )?;
     let c = ctx.clone();
     /// Returns the image dimensions of this Nine_Patch widget.
-    /// @return nil
+    /// @return integer, integer
     t.set(
         "getImageDimensions",
         lua.create_function(move |_, ()| {
@@ -1849,7 +1849,7 @@ fn add_nine_patch_methods(
     )?;
     let c = ctx.clone();
     /// Returns the slices of this Nine_Patch widget.
-    /// @return nil
+    /// @return table
     t.set(
         "getSlices",
         lua.create_function(move |lua, ()| {
@@ -1901,7 +1901,7 @@ fn add_toast_methods(
     )?;
     let c = ctx.clone();
     /// Returns the message of this Toast widget.
-    /// @return nil
+    /// @return string
     t.set(
         "getMessage",
         lua.create_function(move |_, ()| {
@@ -1927,7 +1927,7 @@ fn add_toast_methods(
     )?;
     let c = ctx.clone();
     /// Returns the duration of this Toast widget.
-    /// @return nil
+    /// @return number
     t.set(
         "getDuration",
         lua.create_function(move |_, ()| {
@@ -1940,7 +1940,7 @@ fn add_toast_methods(
     )?;
     let c = ctx.clone();
     /// Returns the progress of this Toast widget.
-    /// @return nil
+    /// @return number
     t.set(
         "getProgress",
         lua.create_function(move |_, ()| {
@@ -1953,7 +1953,7 @@ fn add_toast_methods(
     )?;
     let c = ctx.clone();
     /// Returns true if expired is enabled for this Toast widget.
-    /// @return nil
+    /// @return boolean
     t.set(
         "isExpired",
         lua.create_function(move |_, ()| {
@@ -1989,7 +1989,7 @@ fn add_separator_methods(
     )?;
     let c = ctx.clone();
     /// Returns true if vertical is enabled for this Separator widget.
-    /// @return nil
+    /// @return boolean
     t.set(
         "isVertical",
         lua.create_function(move |_, ()| {
@@ -2015,7 +2015,7 @@ fn add_separator_methods(
     )?;
     let c = ctx.clone();
     /// Returns the thickness of this Separator widget.
-    /// @return nil
+    /// @return number
     t.set(
         "getThickness",
         lua.create_function(move |_, ()| {
@@ -2069,7 +2069,7 @@ fn add_tree_view_methods(
     )?;
     let c = ctx.clone();
     /// Returns true if expanded is enabled for this Tree_View widget.
-    /// @return nil
+    /// @return boolean
     t.set(
         "isExpanded",
         lua.create_function(move |_, index: usize| {
@@ -2084,7 +2084,7 @@ fn add_tree_view_methods(
     )?;
     let c = ctx.clone();
     /// Returns the node count of this Tree_View widget.
-    /// @return nil
+    /// @return integer
     t.set(
         "getNodeCount",
         lua.create_function(move |_, ()| {
@@ -2124,7 +2124,7 @@ fn add_tree_view_methods(
     )?;
     let c = ctx.clone();
     /// Returns the node text of this Tree_View widget.
-    /// @return nil
+    /// @return string
     t.set(
         "getNodeText",
         lua.create_function(move |_, index: usize| {
@@ -2201,7 +2201,7 @@ fn add_tree_view_methods(
     )?;
     let c = ctx.clone();
     /// Returns true if node expanded is enabled for this Tree_View widget.
-    /// @return nil
+    /// @return boolean
     t.set(
         "isNodeExpanded",
         lua.create_function(move |_, index: usize| {
@@ -2257,7 +2257,7 @@ fn add_tree_view_methods(
     )?;
     let c = ctx.clone();
     /// Returns the selected node of this Tree_View widget.
-    /// @return nil
+    /// @return integer
     t.set(
         "getSelectedNode",
         lua.create_function(move |_, ()| {
@@ -2332,7 +2332,7 @@ fn add_radio_button_methods(
 ) -> LuaResult<()> {
     let c = ctx.clone();
     /// Returns the text of this Radio_Button widget.
-    /// @return nil
+    /// @return string
     t.set(
         "getText",
         lua.create_function(move |_, ()| {
@@ -2358,7 +2358,7 @@ fn add_radio_button_methods(
     )?;
     let c = ctx.clone();
     /// Returns true if selected is enabled for this Radio_Button widget.
-    /// @return nil
+    /// @return boolean
     t.set(
         "isSelected",
         lua.create_function(move |_, ()| {
@@ -2384,7 +2384,7 @@ fn add_radio_button_methods(
     )?;
     let c = ctx.clone();
     /// Returns the group of this Radio_Button widget.
-    /// @return nil
+    /// @return string
     t.set(
         "getGroup",
         lua.create_function(move |_, ()| {
@@ -2433,7 +2433,7 @@ fn add_scroll_bar_methods(
 ) -> LuaResult<()> {
     let c = ctx.clone();
     /// Returns the scroll position of this Scroll_Bar widget.
-    /// @return nil
+    /// @return number
     t.set(
         "getScrollPosition",
         lua.create_function(move |_, ()| {
@@ -2459,7 +2459,7 @@ fn add_scroll_bar_methods(
     )?;
     let c = ctx.clone();
     /// Returns the content size of this Scroll_Bar widget.
-    /// @return nil
+    /// @return number
     t.set(
         "getContentSize",
         lua.create_function(move |_, ()| {
@@ -2485,7 +2485,7 @@ fn add_scroll_bar_methods(
     )?;
     let c = ctx.clone();
     /// Returns the view size of this Scroll_Bar widget.
-    /// @return nil
+    /// @return number
     t.set(
         "getViewSize",
         lua.create_function(move |_, ()| {
@@ -2511,7 +2511,7 @@ fn add_scroll_bar_methods(
     )?;
     let c = ctx.clone();
     /// Returns true if vertical is enabled for this Scroll_Bar widget.
-    /// @return nil
+    /// @return boolean
     t.set(
         "isVertical",
         lua.create_function(move |_, ()| {
@@ -2547,7 +2547,7 @@ fn add_gui_window_methods(
 ) -> LuaResult<()> {
     let c = ctx.clone();
     /// Returns the title of this Gui_Window widget.
-    /// @return nil
+    /// @return string
     t.set(
         "getTitle",
         lua.create_function(move |_, ()| {
@@ -2573,7 +2573,7 @@ fn add_gui_window_methods(
     )?;
     let c = ctx.clone();
     /// Returns true if closeable is enabled for this Gui_Window widget.
-    /// @return nil
+    /// @return boolean
     t.set(
         "isCloseable",
         lua.create_function(move |_, ()| {
@@ -2599,7 +2599,7 @@ fn add_gui_window_methods(
     )?;
     let c = ctx.clone();
     /// Returns true if draggable is enabled for this Gui_Window widget.
-    /// @return nil
+    /// @return boolean
     t.set(
         "isDraggable",
         lua.create_function(move |_, ()| {
@@ -2625,7 +2625,7 @@ fn add_gui_window_methods(
     )?;
     let c = ctx.clone();
     /// Returns true if resizable is enabled for this Gui_Window widget.
-    /// @return nil
+    /// @return boolean
     t.set(
         "isResizable",
         lua.create_function(move |_, ()| {
@@ -2673,7 +2673,7 @@ fn add_split_panel_methods(
 ) -> LuaResult<()> {
     let c = ctx.clone();
     /// Returns the orientation of this Split_Panel widget.
-    /// @return nil
+    /// @return string
     t.set(
         "getOrientation",
         lua.create_function(move |_, ()| {
@@ -2699,7 +2699,7 @@ fn add_split_panel_methods(
     )?;
     let c = ctx.clone();
     /// Returns the split position of this Split_Panel widget.
-    /// @return nil
+    /// @return number
     t.set(
         "getSplitPosition",
         lua.create_function(move |_, ()| {
@@ -2725,7 +2725,7 @@ fn add_split_panel_methods(
     )?;
     let c = ctx.clone();
     /// Returns the min panel size of this Split_Panel widget.
-    /// @return nil
+    /// @return number
     t.set(
         "getMinPanelSize",
         lua.create_function(move |_, ()| {
@@ -2839,7 +2839,7 @@ fn add_dock_panel_methods(
     )?;
     let c = ctx.clone();
     /// Returns the docked count of this Dock_Panel widget.
-    /// @return nil
+    /// @return integer
     t.set(
         "getDockedCount",
         lua.create_function(move |_, ()| {
@@ -2896,7 +2896,7 @@ fn add_toolbar_methods(
 ) -> LuaResult<()> {
     let c = ctx.clone();
     /// Returns the orientation of this Toolbar widget.
-    /// @return nil
+    /// @return string
     t.set(
         "getOrientation",
         lua.create_function(move |_, ()| {
@@ -2936,7 +2936,7 @@ fn add_toolbar_methods(
     )?;
     let c = ctx.clone();
     /// Returns the button of this Toolbar widget.
-    /// @return nil
+    /// @return boolean
     t.set(
         "getButton",
         lua.create_function(move |lua, id: String| {
@@ -2982,7 +2982,7 @@ fn add_toolbar_methods(
     )?;
     let c = ctx.clone();
     /// Returns true if button toggled is enabled for this Toolbar widget.
-    /// @return nil
+    /// @return boolean
     t.set(
         "isButtonToggled",
         lua.create_function(move |_, id: String| {
@@ -3048,7 +3048,7 @@ fn add_menu_bar_methods(
     )?;
     let c = ctx.clone();
     /// Returns the menu count of this Menu_Bar widget.
-    /// @return nil
+    /// @return integer
     t.set(
         "getMenuCount",
         lua.create_function(move |_, ()| {
@@ -3072,7 +3072,7 @@ fn add_menu_item_methods(
 ) -> LuaResult<()> {
     let c = ctx.clone();
     /// Returns the text of this Menu_Item widget.
-    /// @return nil
+    /// @return string
     t.set(
         "getText",
         lua.create_function(move |_, ()| {
@@ -3098,7 +3098,7 @@ fn add_menu_item_methods(
     )?;
     let c = ctx.clone();
     /// Returns the shortcut of this Menu_Item widget.
-    /// @return nil
+    /// @return string
     t.set(
         "getShortcut",
         lua.create_function(move |_, ()| {
@@ -3124,7 +3124,7 @@ fn add_menu_item_methods(
     )?;
     let c = ctx.clone();
     /// Returns true if checked is enabled for this Menu_Item widget.
-    /// @return nil
+    /// @return boolean
     t.set(
         "isChecked",
         lua.create_function(move |_, ()| {
@@ -3201,7 +3201,7 @@ fn add_dialog_methods(
 ) -> LuaResult<()> {
     let c = ctx.clone();
     /// Returns the title of this Dialog widget.
-    /// @return nil
+    /// @return string
     t.set(
         "getTitle",
         lua.create_function(move |_, ()| {
@@ -3227,7 +3227,7 @@ fn add_dialog_methods(
     )?;
     let c = ctx.clone();
     /// Returns true if modal is enabled for this Dialog widget.
-    /// @return nil
+    /// @return boolean
     t.set(
         "isModal",
         lua.create_function(move |_, ()| {
@@ -3253,7 +3253,7 @@ fn add_dialog_methods(
     )?;
     let c = ctx.clone();
     /// Returns true if open is enabled for this Dialog widget.
-    /// @return nil
+    /// @return boolean
     t.set(
         "isOpen",
         lua.create_function(move |_, ()| {
@@ -3321,7 +3321,7 @@ fn add_dialog_methods(
     )?;
     let c = ctx.clone();
     /// Returns the content of this Dialog widget.
-    /// @return nil
+    /// @return integer
     t.set(
         "getContent",
         lua.create_function(move |_, ()| {
@@ -3387,7 +3387,7 @@ fn add_status_bar_methods(
     )?;
     let c = ctx.clone();
     /// Returns the section text of this Status_Bar widget.
-    /// @return nil
+    /// @return integer
     t.set(
         "getSectionText",
         lua.create_function(move |_, section_idx: usize| {
@@ -3406,7 +3406,7 @@ fn add_status_bar_methods(
     )?;
     let c = ctx.clone();
     /// Returns the section count of this Status_Bar widget.
-    /// @return nil
+    /// @return integer
     t.set(
         "getSectionCount",
         lua.create_function(move |_, ()| {
@@ -3446,7 +3446,7 @@ fn add_accordion_methods(
     )?;
     let c = ctx.clone();
     /// Returns the section count of this Accordion widget.
-    /// @return nil
+    /// @return integer
     t.set(
         "getSectionCount",
         lua.create_function(move |_, ()| {
@@ -3481,7 +3481,7 @@ fn add_accordion_methods(
     )?;
     let c = ctx.clone();
     /// Returns true if section expanded is enabled for this Accordion widget.
-    /// @return nil
+    /// @return boolean
     t.set(
         "isSectionExpanded",
         lua.create_function(move |_, section_idx: usize| {
@@ -3498,7 +3498,7 @@ fn add_accordion_methods(
     )?;
     let c = ctx.clone();
     /// Returns true if exclusive is enabled for this Accordion widget.
-    /// @return nil
+    /// @return boolean
     t.set(
         "isExclusive",
         lua.create_function(move |_, ()| {
@@ -3553,7 +3553,7 @@ fn add_tooltip_panel_methods(
 ) -> LuaResult<()> {
     let c = ctx.clone();
     /// Returns the text of this Tooltip_Panel widget.
-    /// @return nil
+    /// @return string
     t.set(
         "getText",
         lua.create_function(move |_, ()| {
@@ -3579,7 +3579,7 @@ fn add_tooltip_panel_methods(
     )?;
     let c = ctx.clone();
     /// Returns the delay of this Tooltip_Panel widget.
-    /// @return nil
+    /// @return number
     t.set(
         "getDelay",
         lua.create_function(move |_, ()| {
@@ -3642,7 +3642,7 @@ fn add_color_picker_methods(
 ) -> LuaResult<()> {
     let c = ctx.clone();
     /// Returns the color of this Color_Picker widget.
-    /// @return nil
+    /// @return number, number, number, number
     t.set(
         "getColor",
         lua.create_function(move |_, ()| {
@@ -3671,7 +3671,7 @@ fn add_color_picker_methods(
     )?;
     let c = ctx.clone();
     /// Returns the show alpha of this Color_Picker widget.
-    /// @return nil
+    /// @return boolean
     t.set(
         "getShowAlpha",
         lua.create_function(move |_, ()| {
@@ -3697,7 +3697,7 @@ fn add_color_picker_methods(
     )?;
     let c = ctx.clone();
     /// Returns the color mode of this Color_Picker widget.
-    /// @return nil
+    /// @return string
     t.set(
         "getColorMode",
         lua.create_function(move |_, ()| {
@@ -3762,7 +3762,7 @@ fn add_gui_table_methods(
     )?;
     let c = ctx.clone();
     /// Returns the column count of this Gui_Table widget.
-    /// @return nil
+    /// @return integer
     t.set(
         "getColumnCount",
         lua.create_function(move |_, ()| {
@@ -3788,7 +3788,7 @@ fn add_gui_table_methods(
     )?;
     let c = ctx.clone();
     /// Returns the row count of this Gui_Table widget.
-    /// @return nil
+    /// @return integer
     t.set(
         "getRowCount",
         lua.create_function(move |_, ()| {
@@ -3865,7 +3865,7 @@ fn add_gui_table_methods(
     )?;
     let c = ctx.clone();
     /// Returns true if sortable is enabled for this Gui_Table widget.
-    /// @return nil
+    /// @return boolean
     t.set(
         "isSortable",
         lua.create_function(move |_, ()| {
@@ -3913,7 +3913,7 @@ fn add_image_widget_methods(
 ) -> LuaResult<()> {
     let c = ctx.clone();
     /// Returns the scale mode of this Image_Widget widget.
-    /// @return nil
+    /// @return string
     t.set(
         "getScaleMode",
         lua.create_function(move |_, ()| {
@@ -3939,7 +3939,7 @@ fn add_image_widget_methods(
     )?;
     let c = ctx.clone();
     /// Returns the tint of this Image_Widget widget.
-    /// @return nil
+    /// @return number, number, number, number
     t.set(
         "getTint",
         lua.create_function(move |_, ()| {

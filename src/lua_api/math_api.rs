@@ -9,6 +9,7 @@ use super::SharedState;
 use crate::math::color::{gamma_to_linear, linear_to_gamma};
 use crate::math::easing;
 use crate::math::noise_functions;
+use crate::math::geometry;
 use crate::math::polygon;
 use crate::math::BezierCurve;
 use crate::math::NoiseGenerator;
@@ -1339,6 +1340,335 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
     tbl.set(
         "linearToGamma",
         lua.create_function(|_, c: f32| Ok(linear_to_gamma(c)))?,
+    )?;
+
+    // ── Geometry ────────────────────────────────────────────────────
+
+    // -- angleBetween --
+    /// Returns the angle in radians from (x1, y1) to (x2, y2).
+    /// @param x1 : number
+    /// @param y1 : number
+    /// @param x2 : number
+    /// @param y2 : number
+    /// @return number
+    tbl.set(
+        "angleBetween",
+        lua.create_function(|_, (x1, y1, x2, y2): (f32, f32, f32, f32)| {
+            Ok(geometry::angle_between(x1, y1, x2, y2))
+        })?,
+    )?;
+
+    // -- circleContainsPoint --
+    /// Returns true if the point (px, py) lies inside the circle.
+    /// @param cx : number
+    /// @param cy : number
+    /// @param r : number
+    /// @param px : number
+    /// @param py : number
+    /// @return boolean
+    tbl.set(
+        "circleContainsPoint",
+        lua.create_function(|_, (cx, cy, r, px, py): (f32, f32, f32, f32, f32)| {
+            Ok(geometry::circle_contains_point(cx, cy, r, px, py))
+        })?,
+    )?;
+
+    // -- circleIntersectsCircle --
+    /// Returns true if two circles overlap.
+    /// @param x1 : number
+    /// @param y1 : number
+    /// @param r1 : number
+    /// @param x2 : number
+    /// @param y2 : number
+    /// @param r2 : number
+    /// @return boolean
+    tbl.set(
+        "circleIntersectsCircle",
+        lua.create_function(
+            |_, (x1, y1, r1, x2, y2, r2): (f32, f32, f32, f32, f32, f32)| {
+                Ok(geometry::circle_intersects_circle(x1, y1, r1, x2, y2, r2))
+            },
+        )?,
+    )?;
+
+    // -- circleIntersectsLine --
+    /// Tests an infinite line against a circle. Returns hit, then two optional hit-point pairs.
+    /// @param cx : number
+    /// @param cy : number
+    /// @param r : number
+    /// @param lx1 : number
+    /// @param ly1 : number
+    /// @param lx2 : number
+    /// @param ly2 : number
+    /// @return boolean, number?, number?, number?, number?
+    tbl.set(
+        "circleIntersectsLine",
+        lua.create_function(
+            |_,
+             (cx, cy, r, lx1, ly1, lx2, ly2): (f32, f32, f32, f32, f32, f32, f32)| {
+                let (hit, p1, p2) =
+                    geometry::circle_intersects_line(cx, cy, r, lx1, ly1, lx2, ly2);
+                if hit {
+                    let (hx1, hy1) = p1.unwrap_or((0.0, 0.0));
+                    let (hx2, hy2) = p2.unwrap_or((0.0, 0.0));
+                    Ok((
+                        true,
+                        Some(hx1),
+                        Some(hy1),
+                        p2.map(|_| hx2),
+                        p2.map(|_| hy2),
+                    ))
+                } else {
+                    Ok((false, None, None, None, None))
+                }
+            },
+        )?,
+    )?;
+
+    // -- circleIntersectsSegment --
+    /// Tests a line segment against a circle. Returns hit, then two optional hit-point pairs.
+    /// @param cx : number
+    /// @param cy : number
+    /// @param r : number
+    /// @param sx1 : number
+    /// @param sy1 : number
+    /// @param sx2 : number
+    /// @param sy2 : number
+    /// @return boolean, number?, number?, number?, number?
+    tbl.set(
+        "circleIntersectsSegment",
+        lua.create_function(
+            |_,
+             (cx, cy, r, sx1, sy1, sx2, sy2): (f32, f32, f32, f32, f32, f32, f32)| {
+                let (hit, p1, p2) =
+                    geometry::circle_intersects_segment(cx, cy, r, sx1, sy1, sx2, sy2);
+                if hit {
+                    let (hx1, hy1) = p1.unwrap_or((0.0, 0.0));
+                    let (hx2, hy2) = p2.unwrap_or((0.0, 0.0));
+                    Ok((
+                        true,
+                        Some(hx1),
+                        Some(hy1),
+                        p2.map(|_| hx2),
+                        p2.map(|_| hy2),
+                    ))
+                } else {
+                    Ok((false, None, None, None, None))
+                }
+            },
+        )?,
+    )?;
+
+    // -- closestPointOnSegment --
+    /// Returns the closest point on segment (x1,y1)-(x2,y2) to point (px,py).
+    /// @param px : number
+    /// @param py : number
+    /// @param x1 : number
+    /// @param y1 : number
+    /// @param x2 : number
+    /// @param y2 : number
+    /// @return number, number
+    tbl.set(
+        "closestPointOnSegment",
+        lua.create_function(
+            |_, (px, py, x1, y1, x2, y2): (f32, f32, f32, f32, f32, f32)| {
+                Ok(geometry::closest_point_on_segment(px, py, x1, y1, x2, y2))
+            },
+        )?,
+    )?;
+
+    // -- convexHull --
+    /// Computes the convex hull of a flat {x1,y1,...} point list. Returns a flat table.
+    /// @param points : table
+    /// @return table
+    tbl.set(
+        "convexHull",
+        lua.create_function(|lua, pts: LuaTable| {
+            let len = pts.len()? as usize;
+            let mut flat: Vec<f32> = Vec::with_capacity(len);
+            for i in 1..=(len as i64) {
+                let v: f32 = pts.get(i)?;
+                flat.push(v);
+            }
+            let hull = geometry::convex_hull(&flat);
+            let result = lua.create_table()?;
+            for (i, v) in hull.iter().enumerate() {
+                result.set(i + 1, *v)?;
+            }
+            Ok(result)
+        })?,
+    )?;
+
+    // -- delaunayTriangulate --
+    /// Delaunay triangulation of a flat {x1,y1,...} point list. Returns a table of flat 6-number triangle tables.
+    /// @param points : table
+    /// @return table
+    tbl.set(
+        "delaunayTriangulate",
+        lua.create_function(|lua, pts: LuaTable| {
+            let len = pts.len()? as usize;
+            let mut pairs: Vec<(f64, f64)> = Vec::with_capacity(len / 2);
+            let mut i: i64 = 1;
+            while i <= len as i64 {
+                let x: f64 = pts.get(i)?;
+                let y: f64 = pts.get(i + 1)?;
+                pairs.push((x, y));
+                i += 2;
+            }
+            let tris = geometry::delaunay_triangulate(&pairs);
+            let result = lua.create_table()?;
+            for (idx, tri) in tris.iter().enumerate() {
+                let t = lua.create_table()?;
+                for (j, v) in tri.iter().enumerate() {
+                    t.set(j + 1, *v)?;
+                }
+                result.set(idx + 1, t)?;
+            }
+            Ok(result)
+        })?,
+    )?;
+
+    // -- lineIntersect --
+    /// Infinite line intersection. Returns (x, y) or (nil, nil) if lines are parallel.
+    /// @param x1 : number
+    /// @param y1 : number
+    /// @param x2 : number
+    /// @param y2 : number
+    /// @param x3 : number
+    /// @param y3 : number
+    /// @param x4 : number
+    /// @param y4 : number
+    /// @return number?, number?
+    tbl.set(
+        "lineIntersect",
+        lua.create_function(
+            |_,
+             (x1, y1, x2, y2, x3, y3, x4, y4): (
+                f32,
+                f32,
+                f32,
+                f32,
+                f32,
+                f32,
+                f32,
+                f32,
+            )| {
+                match geometry::line_intersect(x1, y1, x2, y2, x3, y3, x4, y4) {
+                    Some((ix, iy)) => Ok((Some(ix), Some(iy))),
+                    None => Ok((None, None)),
+                }
+            },
+        )?,
+    )?;
+
+    // -- pointInPolygon --
+    /// Returns true if (px, py) is inside the polygon given as a flat {x1,y1,...} table.
+    /// @param polygon : table
+    /// @param px : number
+    /// @param py : number
+    /// @return boolean
+    tbl.set(
+        "pointInPolygon",
+        lua.create_function(|_, (pts, px, py): (LuaTable, f32, f32)| {
+            let len = pts.len()? as usize;
+            let mut flat: Vec<f32> = Vec::with_capacity(len);
+            for i in 1..=(len as i64) {
+                let v: f32 = pts.get(i)?;
+                flat.push(v);
+            }
+            Ok(geometry::point_in_polygon(&flat, px, py))
+        })?,
+    )?;
+
+    // -- polygonArea --
+    /// Returns the signed area of a polygon given as a flat {x1,y1,...} table.
+    /// @param polygon : table
+    /// @return number
+    tbl.set(
+        "polygonArea",
+        lua.create_function(|_, pts: LuaTable| {
+            let len = pts.len()? as usize;
+            let mut flat: Vec<f32> = Vec::with_capacity(len);
+            for i in 1..=(len as i64) {
+                let v: f32 = pts.get(i)?;
+                flat.push(v);
+            }
+            Ok(geometry::polygon_area(&flat))
+        })?,
+    )?;
+
+    // -- polygonCentroid --
+    /// Returns the centroid (cx, cy) of a polygon given as a flat {x1,y1,...} table.
+    /// @param polygon : table
+    /// @return number, number
+    tbl.set(
+        "polygonCentroid",
+        lua.create_function(|_, pts: LuaTable| {
+            let len = pts.len()? as usize;
+            let mut flat: Vec<f32> = Vec::with_capacity(len);
+            for i in 1..=(len as i64) {
+                let v: f32 = pts.get(i)?;
+                flat.push(v);
+            }
+            Ok(geometry::polygon_centroid(&flat))
+        })?,
+    )?;
+
+    // -- segmentIntersectsSegment --
+    /// Tests if two line segments intersect. Returns (hit, ix?, iy?).
+    /// @param x1 : number
+    /// @param y1 : number
+    /// @param x2 : number
+    /// @param y2 : number
+    /// @param x3 : number
+    /// @param y3 : number
+    /// @param x4 : number
+    /// @param y4 : number
+    /// @return boolean, number?, number?
+    tbl.set(
+        "segmentIntersectsSegment",
+        lua.create_function(
+            |_,
+             (x1, y1, x2, y2, x3, y3, x4, y4): (
+                f32,
+                f32,
+                f32,
+                f32,
+                f32,
+                f32,
+                f32,
+                f32,
+            )| {
+                match geometry::segment_intersects_segment(
+                    x1, y1, x2, y2, x3, y3, x4, y4,
+                ) {
+                    (true, Some((ix, iy))) => Ok((true, Some(ix), Some(iy))),
+                    _ => Ok((false, None, None)),
+                }
+            },
+        )?,
+    )?;
+
+    // -- bresenham --
+    /// Rasterizes a line from (x1,y1) to (x2,y2) using Bresenham's algorithm. Returns a table of {x,y} tables.
+    /// @param x1 : integer
+    /// @param y1 : integer
+    /// @param x2 : integer
+    /// @param y2 : integer
+    /// @return table
+    tbl.set(
+        "bresenham",
+        lua.create_function(|lua, (x1, y1, x2, y2): (i32, i32, i32, i32)| {
+            let pts = geometry::bresenham(x1, y1, x2, y2);
+            let result = lua.create_table()?;
+            for (i, (px, py)) in pts.iter().enumerate() {
+                let t = lua.create_table()?;
+                t.set(1, *px)?;
+                t.set(2, *py)?;
+                result.set(i + 1, t)?;
+            }
+            Ok(result)
+        })?,
     )?;
 
     luna.set("math", tbl)?;
