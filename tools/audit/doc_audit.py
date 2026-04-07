@@ -210,7 +210,7 @@ def main() -> int:
         return 2
 
     print("[INFO] Running Lua API scan...", file=sys.stderr)
-    lua_data = _run_json_tool("gen_lua_api.py", ["--src", str(WORKSPACE_ROOT / "src" / "lua_api")])
+    lua_data = _run_json_tool("docs/gen_lua_api_data.py", [])
     if not lua_data:
         return 2
 

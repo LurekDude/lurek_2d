@@ -88,10 +88,10 @@ end
 function luna.update(dt)
     -- Player movement
     local speed = 250 * dt
-    if luna.input.isDown("w") then player_y = player_y - speed end
-    if luna.input.isDown("s") then player_y = player_y + speed end
-    if luna.input.isDown("a") then player_x = player_x - speed end
-    if luna.input.isDown("d") then player_x = player_x + speed end
+    if luna.keyboard.isDown("w") then player_y = player_y - speed end
+    if luna.keyboard.isDown("s") then player_y = player_y + speed end
+    if luna.keyboard.isDown("a") then player_x = player_x - speed end
+    if luna.keyboard.isDown("d") then player_x = player_x + speed end
 
     -- Clamp to window
     player_x = math.max(0, math.min(W, player_x))

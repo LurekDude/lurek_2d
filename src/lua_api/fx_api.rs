@@ -969,6 +969,11 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
 
     // Also expose luna.overlay as a dedicated namespace for the Overlay constructor.
     let overlay_tbl = lua.create_table()?;
+    // -- newOverlay --
+    /// Creates a new screen overlay controller for weather, flash, shake, and fade effects.
+    /// @param width : integer
+    /// @param height : integer
+    /// @return Overlay
     overlay_tbl.set(
         "newOverlay",
         lua.create_function(|lua, (w, h): (Option<u32>, Option<u32>)| {

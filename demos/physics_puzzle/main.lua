@@ -1,4 +1,4 @@
--- Physics Puzzle Demo — drop shapes to guide a ball to the goal
+-- Physics Puzzle Demo -- drop shapes to guide a ball to the goal
 -- Click to place shapes | 1/2: toggle circle/rect | R: reset | Escape: quit
 
 local world = nil
@@ -47,17 +47,17 @@ local function loadLevel(idx)
     world = luna.physics.newWorld(0, 400)
 
     -- ball
-    ballBody = luna.physics.newCircleBody(world, lv.ballX, lv.ballY, 12, "dynamic")
-    luna.physics.setBodyRestitution(world, ballBody, 0.5)
+    ballBody = world:newCircleBody(lv.ballX, lv.ballY, 12, "dynamic")
+    ballBody:setRestitution(0.5)
 
     -- platforms
     for _, p in ipairs(lv.platforms) do
-        local b = luna.physics.newBody(world, p.x + p.w / 2, p.y + p.h / 2, "static")
-        luna.physics.setBodySize(world, b, p.w, p.h)
+        local b = world:newBody(p.x + p.w / 2, p.y + p.h / 2, "static")
+        world:addFixture(b:getId(), "rectangle", 1, 0.3, 0, false, p.w, p.h)
         table.insert(staticBodies, { body = b, x = p.x, y = p.y, w = p.w, h = p.h })
     end
 
-    message = "Level " .. level .. " — Get the ball to the green goal!"
+    message = "Level " .. level .. " -- Get the ball to the green goal!"
     messageTimer = 3
 end
 
@@ -77,13 +77,13 @@ local function placePiece(mx, my)
     local piece = { mode = placeMode, x = mx, y = my }
     local b
     if placeMode == "circle" then
-        b = luna.physics.newCircleBody(world, mx, my, placeRadius, "static")
-        luna.physics.setBodyRestitution(world, b, 0.3)
+        b = world:newCircleBody(mx, my, placeRadius, "static")
+        b:setRestitution(0.3)
         piece.r = placeRadius
     else
-        b = luna.physics.newBody(world, mx, my, "static")
-        luna.physics.setBodySize(world, b, placeW, placeH)
-        luna.physics.setBodyRestitution(world, b, 0.3)
+        b = world:newBody(mx, my, "static")
+        world:addFixture(b:getId(), "rectangle", 1, 0.3, 0, false, placeW, placeH)
+        b:setRestitution(0.3)
         piece.w, piece.h = placeW, placeH
     end
     piece.body = b
@@ -93,9 +93,9 @@ end
 function luna.update(dt)
     if won then return end
 
-    luna.physics.step(world, dt)
+    world:step(dt)
 
-    local bx, by = luna.physics.getBody(world, ballBody)
+    local bx, by = ballBody:getPosition()
 
     -- check goal
     if bx > goal.x and bx < goal.x + goal.w and by > goal.y and by < goal.y + goal.h then
@@ -145,7 +145,7 @@ function luna.draw()
     end
 
     -- ball
-    local bx, by = luna.physics.getBody(world, ballBody)
+    local bx, by = ballBody:getPosition()
     luna.graphics.setColor(1, 0.4, 0.2, 1)
     luna.graphics.circle("fill", bx, by, 12)
     luna.graphics.setColor(1, 0.6, 0.3, 1)

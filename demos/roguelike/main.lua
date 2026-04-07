@@ -51,6 +51,9 @@ local function generateDungeon()
         map[y] = {}; revealed[y] = {}
         for x = 1, MAP_W do map[y][x] = WALL; revealed[y][x] = false end
     end
+    -- Room placement: try 8 random rectangles, reject any that overlap an existing
+    -- room (with a 1-cell buffer). Store each accepted room's bounding box and centre
+    -- so corridors can connect them without searching.
     local rooms = {}
     for _ = 1, 8 do
         local rw = math.random(4, 8)
@@ -67,7 +70,8 @@ local function generateDungeon()
                 cx = math.floor(rx + rw / 2), cy = math.floor(ry + rh / 2) }
         end
     end
-    -- Connect rooms
+    -- Connect adjacent rooms with L-shaped corridors.
+    -- Randomly pick either H-then-V or V-then-H to avoid monotonous layouts.
     for i = 2, #rooms do
         local a, b = rooms[i - 1], rooms[i]
         if math.random() > 0.5 then
@@ -76,12 +80,11 @@ local function generateDungeon()
             carveVCorridor(a.cy, b.cy, a.cx); carveHCorridor(a.cx, b.cx, b.cy)
         end
     end
-    -- Place player in first room
+    -- Player always starts in the first room's centre; stairs are in the last room.
     player = { x = rooms[1].cx, y = rooms[1].cy, hp = 10, maxHp = 10, atk = 3, kills = 0 }
-    -- Place stairs in last room
     local lr = rooms[#rooms]
     map[lr.cy][lr.cx] = STAIRS
-    -- Place enemies in other rooms
+    -- Scale enemy count with floor depth so later floors are progressively harder.
     for i = 2, #rooms do
         local r = rooms[i]
         local count = math.random(1, 2 + math.floor(floor_num / 2))
@@ -93,7 +96,7 @@ local function generateDungeon()
             end
         end
     end
-    -- Place pickups
+    -- Skip first and last rooms for pickups: start room is too forgiving, last room has stairs.
     for i = 2, #rooms - 1 do
         if math.random() > 0.4 then
             local r = rooms[i]
@@ -102,6 +105,11 @@ local function generateDungeon()
     end
 end
 
+-- updateFOV: marks all cells within VIEW_RADIUS of the player as permanently revealed.
+-- Uses a circular mask (dx²+dy² ≤ r²) rather than a square so the visible area
+-- looks natural. Revealed cells stay visible even after the player walks away —
+-- this is the classic "remember explored tiles" pattern for dungeon crawlers.
+-- (For a true shadow-casting FOV, replace this with a Bresenham ray-march.)
 local function updateFOV()
     for dy = -VIEW_RADIUS, VIEW_RADIUS do
         for dx = -VIEW_RADIUS, VIEW_RADIUS do

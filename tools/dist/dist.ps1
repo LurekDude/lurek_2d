@@ -58,18 +58,20 @@ if (-not (Test-Path (Join-Path $WorkspaceRoot 'Cargo.toml'))) {
     Write-Fail "Must be run from the luna2d workspace root."
 }
 
-# ── 1. (Optional) generate assets ────────────────────────────────────────────
-Write-Step "Checking generated assets …"
+# ── 1. Verify branding assets ────────────────────────────────────────────────
+Write-Step "Checking branding assets …"
 $SplashPng = Join-Path $WorkspaceRoot 'assets\splash.png'
+$IconPng   = Join-Path $WorkspaceRoot 'assets\icon.png'
 $IconIco   = Join-Path $WorkspaceRoot 'assets\icon.ico'
 
 if (-not (Test-Path $SplashPng)) {
-    Write-Step "splash.png missing — running gen_splash.py …"
-    python (Join-Path $WorkspaceRoot 'tools\gen_splash.py')
+    Write-Fail "Missing assets\splash.png. Restore the prebuilt raster asset or rebuild it from assets\svg\large_icon.png and assets\svg\banner.png."
+}
+if (-not (Test-Path $IconPng)) {
+    Write-Fail "Missing assets\icon.png. Restore the prebuilt raster asset or rebuild it from assets\svg\col_icon.png."
 }
 if (-not (Test-Path $IconIco)) {
-    Write-Step "icon.ico missing — running gen_icon.py …"
-    python (Join-Path $WorkspaceRoot 'tools\gen_icon.py')
+    Write-Fail "Missing assets\icon.ico. Restore the prebuilt raster asset or rebuild it from assets\svg\col_icon.png."
 }
 
 # ── 2. Release build ──────────────────────────────────────────────────────────

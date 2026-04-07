@@ -195,25 +195,33 @@ pub fn luna_run() {
 
         #[cfg(target_os = "windows")]
         {
-            show_windows_error_box(&msg);
+            // Skip the blocking dialog in non-interactive (screenshot) mode.
+            let is_screenshot_mode = std::env::args().any(|a| a.starts_with("--screenshot"));
+            if !is_screenshot_mode {
+                show_windows_error_box(&msg);
+            }
         }
 
         eprintln!("{}", msg);
+        // Exit immediately to avoid WER (Windows Error Reporting) holding the
+        // process alive after abort() is called.  std::process::exit bypasses
+        // destructors but that is acceptable in a crash scenario.
+        std::process::exit(1);
     }));
 
     // Parse CLI arguments. Supported flags:
-    //   --screenshot=<path>       Absolute output path for the auto-screenshot PNG.
-    //   --screenshot-delay=<secs> Seconds to wait after game start before capturing (default 1.5).
+    //   --screenshot=<path>        Absolute output path for the auto-screenshot PNG.
+    //   --screenshot-frames=<n>    Rendered game frames to wait before capturing (default 3).
     let mut screenshot_path: Option<std::path::PathBuf> = None;
-    let mut screenshot_delay: f64 = 1.5;
+    let mut screenshot_frames: u32 = 3;
     let mut game_arg: Option<String> = None;
 
     for arg in env::args().skip(1) {
         if let Some(val) = arg.strip_prefix("--screenshot=") {
             screenshot_path = Some(std::path::PathBuf::from(val));
-        } else if let Some(val) = arg.strip_prefix("--screenshot-delay=") {
-            if let Ok(d) = val.parse::<f64>() {
-                screenshot_delay = d;
+        } else if let Some(val) = arg.strip_prefix("--screenshot-frames=") {
+            if let Ok(n) = val.parse::<u32>() {
+                screenshot_frames = n;
             }
         } else if !arg.starts_with("--") {
             game_arg = Some(arg);
@@ -263,7 +271,12 @@ pub fn luna_run() {
     let (mut config, conf_error) = Config::load_from_conf_lua(&game_dir);
     config.modules.validate_and_fix();
     let app = App::new(config, conf_error);
-    app.run(game_dir, explicit_game_dir, screenshot_path, screenshot_delay);
+    app.run(
+        game_dir,
+        explicit_game_dir,
+        screenshot_path,
+        screenshot_frames,
+    );
 }
 
 /// Shows a Windows message box with an error message.

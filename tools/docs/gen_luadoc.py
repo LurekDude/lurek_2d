@@ -2,7 +2,7 @@
 """
 gen_luadoc.py — Generate LuaCATS type-annotation stubs for the Luna2D VS Code extension.
 
-Reads docs/API/lua_api_data.json and emits docs/API/luna.lua — a LuaCATS
+Reads docs/logs/lua_api_data.json and emits docs/API/luna.lua — a LuaCATS
 stub file that gives the VS Code Lua language server full type information
 for the luna.* API. Consumed by the vscode-extension IntelliSense provider.
 
@@ -14,7 +14,7 @@ import os
 import re
 
 WORKSPACE_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-INPUT_FILE = os.path.join(WORKSPACE_ROOT, "docs", "API", "lua_api_data.json")
+INPUT_FILE = os.path.join(WORKSPACE_ROOT, "docs", "logs", "lua_api_data.json")
 OUTPUT_FILE = os.path.join(WORKSPACE_ROOT, "docs", "API", "luna.lua")
 
 def guess_type(text, is_return=False):

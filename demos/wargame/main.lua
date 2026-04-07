@@ -67,7 +67,9 @@ end
 local function calcAttackTargets(u)
     local targets = {}
     local r = u.range
-    if terrain[u.gy] and terrain[u.gy][u.gx] == 2 then r = r + 1 end  -- hill bonus
+    -- Hill bonus: artillery and ranged units on elevated terrain gain +1 range.
+    -- This makes holding the high ground a meaningful tactical decision.
+    if terrain[u.gy] and terrain[u.gy][u.gx] == 2 then r = r + 1 end
     for _, other in ipairs(units) do
         if other.team ~= u.team and other.hp > 0 then
             local d = dist(u, other)
@@ -80,14 +82,18 @@ local function calcAttackTargets(u)
 end
 
 local function doAttack(attacker, defender)
+    -- Terrain attack bonus: hills give the attacker +1 damage.
     local bonus = 0
     if terrain[attacker.gy] and terrain[attacker.gy][attacker.gx] == 2 then bonus = bonus + 1 end
+    -- Terrain defence bonus: forests reduce incoming damage by 1.
     local defBonus = 0
     if terrain[defender.gy] and terrain[defender.gy][defender.gx] == 1 then defBonus = defBonus + 1 end
 
+    -- d6 swing keeps individual combats unpredictable. The die roll is centred at 3
+    -- so the expected delta is 0 — terrain bonuses are the deciding swing.
     local roll = math.random(1, 6)
     local damage = attacker.atk + bonus + roll - 3 - defBonus
-    if damage < 1 then damage = 1 end
+    if damage < 1 then damage = 1 end  -- always deal at least 1 damage
     defender.hp = defender.hp - damage
 
     local log = attacker.team .. " " .. attacker.type .. " hits " .. defender.team .. " " .. defender.type .. " for " .. damage
@@ -135,11 +141,13 @@ local function endTurn()
 
     if turn == "blue" then
         turn = "red"
-        cp = MAX_CP
-        -- AI turn
+        cp = MAX_CP  -- Red always gets a full 4 CP at the start of its turn
+        -- Red AI: each unit costs 1 CP to act. The AI prefers attacking over
+        -- moving — it charges the closest blue unit and attacks if in range,
+        -- otherwise uses a greedy best-move scan (all cells within move range,
+        -- pick the one with smallest remaining distance to target).
         for _, u in ipairs(units) do
             if u.team == "red" and u.hp > 0 and cp > 0 then
-                -- Find closest blue unit
                 local closest = nil
                 local closestDist = 999
                 for _, b in ipairs(units) do
@@ -153,11 +161,12 @@ local function endTurn()
                 end
                 if closest then
                     if closestDist <= u.range then
-                        -- Attack
+                        -- enemy in range — attack immediately and spend 1 CP
                         doAttack(u, closest)
                         cp = cp - 1
                     else
-                        -- Move toward
+                        -- Greedy move: scan all cells within Manhattan range,
+                        -- ignore occupied cells, pick the one closest to the target.
                         local bestx, besty = u.gx, u.gy
                         local bestd = closestDist
                         for dy = -u.move, u.move do
@@ -185,7 +194,7 @@ local function endTurn()
                 end
             end
         end
-        -- Remove dead from AI attacks
+        -- Purge units destroyed during the AI's attacks before checking victory.
         for i = #units, 1, -1 do
             if units[i].hp <= 0 then table.remove(units, i) end
         end

@@ -108,6 +108,30 @@ enum RunState {
     Restarting,
 }
 
+#[derive(Clone, Copy)]
+struct SplashTexture {
+    texture_key: TextureKey,
+    width: u32,
+    height: u32,
+}
+
+struct SplashBranding {
+    textures: SlotMap<TextureKey, TextureData>,
+    large_icon: SplashTexture,
+    banner: SplashTexture,
+}
+
+fn splash_window_title(base_title: &str) -> String {
+    format!("{} v{}", base_title, env!("CARGO_PKG_VERSION"))
+}
+
+fn fit_contain_size(src_w: u32, src_h: u32, max_w: f32, max_h: f32) -> (f32, f32) {
+    let src_w = src_w.max(1) as f32;
+    let src_h = src_h.max(1) as f32;
+    let scale = (max_w.max(1.0) / src_w).min(max_h.max(1.0) / src_h);
+    (src_w * scale, src_h * scale)
+}
+
 // ─── Luna2D Application handler ──────────────────────────────────────────────
 
 /// Luna2D application state managed by the winit event loop.
@@ -161,6 +185,12 @@ struct LunaApp {
     /// Tuple: (font_store, title_key at 36 pt, body_key at 18 pt).
     engine_fonts: Option<(SlotMap<FontKey, crate::graphics::Font>, FontKey, FontKey)>,
 
+    /// Cached embedded PNG branding used by the no-game splash screen.
+    splash_branding: Option<SplashBranding>,
+
+    /// Prevents retrying splash branding decode every frame after a load failure.
+    splash_branding_failed: bool,
+
     /// Tracks whether any Ctrl modifier (left or right) is currently held.
     ///
     /// Updated by `ModifiersChanged` events so that the error screen key handler can
@@ -180,13 +210,15 @@ struct LunaApp {
     /// Reusable command buffer for viewport-wrapped draw commands; avoids per-frame allocation.
     render_cmd_buf: Vec<DrawCommand>,
 
-    /// If `Some`, write an auto-screenshot PNG to this absolute path and quit after the delay.
+    /// If `Some`, write an auto-screenshot PNG to this absolute path and quit.
     auto_screenshot_path: Option<PathBuf>,
-    /// Delay in seconds after game start before the auto-screenshot is taken.
-    auto_screenshot_delay: f64,
+    /// Minimum number of rendered game frames to wait before capturing (default 3).
+    auto_screenshot_frames: u32,
     /// `true` once the auto-screenshot has been written (prevents double-capture).
     auto_screenshot_done: bool,
-    /// `Instant` recorded when `has_game` first becomes `true`; drives the delay countdown.
+    /// Count of rendered game frames since `has_game` became `true`.
+    auto_screenshot_frame_count: u32,
+    /// Wall-clock time when the first game frame started (used as a safety-exit deadline).
     auto_screenshot_start: Option<Instant>,
 }
 
@@ -197,7 +229,7 @@ impl LunaApp {
         conf_error: Option<String>,
         explicit_game_dir: bool,
         auto_screenshot_path: Option<PathBuf>,
-        auto_screenshot_delay: f64,
+        auto_screenshot_frames: u32,
     ) -> Self {
         let window_vsync_mode = if config.window.vsync { 1 } else { 0 };
 
@@ -226,15 +258,30 @@ impl LunaApp {
             explicit_game_dir,
             window_vsync_mode,
             engine_fonts: None,
+            splash_branding: None,
+            splash_branding_failed: false,
             ctrl_held: false,
             lua_initialized: false,
             drag_hover: false,
             max_surface_dim: 4096,
             render_cmd_buf: Vec::new(),
             auto_screenshot_path,
-            auto_screenshot_delay,
+            auto_screenshot_frames,
             auto_screenshot_done: false,
+            auto_screenshot_frame_count: 0,
             auto_screenshot_start: None,
+        }
+    }
+
+    fn wants_splash_screen(&self) -> bool {
+        !self.explicit_game_dir && !self.game_dir.join("main.lua").exists()
+    }
+
+    fn current_window_title(&self) -> String {
+        if self.wants_splash_screen() {
+            splash_window_title(&self.config.window.title)
+        } else {
+            self.config.window.title.clone()
         }
     }
 
@@ -453,10 +500,15 @@ impl LunaApp {
             )));
         }
 
+        let window_title = self.current_window_title();
+        if let Some(window) = &self.window {
+            window.set_title(&window_title);
+        }
+
         let mut shared_state = SharedState::new(
             self.config.window.width,
             self.config.window.height,
-            &self.config.window.title,
+            &window_title,
             self.game_dir.clone(),
         );
         if let Some(identity) = &self.config.identity {
@@ -484,6 +536,10 @@ impl LunaApp {
         }
 
         let state = Rc::new(RefCell::new(shared_state));
+
+        // Load the embedded OpenSans default font before Lua starts — all luna.graphics.print()
+        // calls without an active font will use this instead of the bitmap fallback.
+        state.borrow_mut().load_default_font();
 
         let lua = match create_lua_vm(state.clone(), &self.config.modules) {
             Ok(l) => l,
@@ -739,9 +795,12 @@ impl LunaApp {
             return;
         };
 
-        // Start the auto-screenshot countdown on the first game frame.
-        if self.auto_screenshot_path.is_some() && !self.auto_screenshot_done && self.auto_screenshot_start.is_none() {
-            self.auto_screenshot_start = Some(Instant::now());
+        // Count frames for the auto-screenshot delay.
+        if self.auto_screenshot_path.is_some() && !self.auto_screenshot_done {
+            if self.auto_screenshot_frame_count == 0 {
+                self.auto_screenshot_start = Some(Instant::now());
+            }
+            self.auto_screenshot_frame_count += 1;
         }
 
         let dt = state.borrow().clock.delta();
@@ -854,14 +913,11 @@ impl LunaApp {
         let screenshot_supported = self.surface_usage.contains(wgpu::TextureUsages::COPY_SRC);
         let capture_screenshot = screenshot_request.is_some() && screenshot_supported;
 
-        // Auto-screenshot: capture pixels this frame when the delay has elapsed.
+        // Auto-screenshot: capture pixels this frame once enough frames have been rendered.
         let should_auto_capture = screenshot_supported
             && !self.auto_screenshot_done
             && self.auto_screenshot_path.is_some()
-            && self
-                .auto_screenshot_start
-                .map(|t| t.elapsed().as_secs_f64() >= self.auto_screenshot_delay)
-                .unwrap_or(false);
+            && self.auto_screenshot_frame_count >= self.auto_screenshot_frames;
 
         let screenshot_pixels = {
             let s_ref = state.borrow();
@@ -908,8 +964,8 @@ impl LunaApp {
         if let Some(request) = screenshot_request {
             if !screenshot_supported {
                 log_msg!(error, L074_SCREENSHOT_NO_READBACK, "path: {}", request.path);
-            } else if let Some((width, height, pixels)) = screenshot_pixels {
-                match crate::image::ImageData::from_bytes(width, height, pixels)
+            } else if let Some((width, height, ref pixels)) = screenshot_pixels {
+                match crate::image::ImageData::from_bytes(width, height, pixels.clone())
                     .and_then(|image| image.encode_png())
                 {
                     Ok(png) => {
@@ -1003,29 +1059,36 @@ impl LunaApp {
             let small_key = fonts.insert(small_font);
             self.engine_fonts = Some((fonts, title_key, small_key));
         }
-        let (splash_fonts, title_key, small_key) = self.engine_fonts.as_mut().unwrap();
+        let (splash_fonts, _title_key, small_key) = self.engine_fonts.as_mut().unwrap();
+
+        if self.splash_branding.is_none() && !self.splash_branding_failed {
+            self.splash_branding = load_splash_branding();
+            self.splash_branding_failed = self.splash_branding.is_none();
+        }
+
+        let branding = self.splash_branding.as_ref();
 
         let cmds = make_splash_commands(
             renderer.width,
             renderer.height,
-            total_time,
-            *title_key,
             *small_key,
             splash_fonts,
+            branding,
             self.drag_hover,
         );
         let bg = [0.12, 0.08, 0.20, 1.0];
         let no_batches: SlotMap<SpriteBatchKey, crate::graphics::SpriteBatch> = SlotMap::with_key();
         let no_canvases: SlotMap<CanvasKey, crate::graphics::Canvas> = SlotMap::with_key();
-        let no_textures: SlotMap<TextureKey, TextureData> = SlotMap::with_key();
+        let empty_textures: SlotMap<TextureKey, TextureData> = SlotMap::with_key();
         let no_meshes: SlotMap<MeshKey, crate::graphics::Mesh> = SlotMap::with_key();
         let no_shaders: SlotMap<ShaderKey, crate::graphics::Shader> = SlotMap::with_key();
         let default_filter = ("linear".to_string(), "linear".to_string(), 1);
         let no_lights = crate::light::light_world::LightWorld::new();
+        let splash_textures = branding.map_or(&empty_textures, |assets| &assets.textures);
         if let Err(e) = renderer.render_frame(
             surface,
             &cmds,
-            &no_textures,
+            splash_textures,
             splash_fonts,
             &no_lights,
             &no_batches,
@@ -1389,6 +1452,59 @@ fn load_window_icon(game_dir: &Path, icon_path: &str) -> Option<winit::window::I
     }
 }
 
+fn load_embedded_splash_texture(
+    bytes: &[u8],
+    asset_name: &str,
+    textures: &mut SlotMap<TextureKey, TextureData>,
+) -> Option<SplashTexture> {
+    let image = match ::image::load_from_memory(bytes) {
+        Ok(image) => image,
+        Err(error) => {
+            log::warn!(
+                "Failed to decode embedded splash texture '{}': {}",
+                asset_name,
+                error
+            );
+            return None;
+        }
+    };
+
+    let rgba = image.to_rgba8();
+    let (width, height) = rgba.dimensions();
+    match crate::graphics::Texture::from_rgba(width, height, rgba.into_raw(), textures) {
+        Ok(texture) => Some(SplashTexture {
+            texture_key: texture.key,
+            width: texture.width,
+            height: texture.height,
+        }),
+        Err(error) => {
+            log::warn!(
+                "Failed to prepare embedded splash texture '{}': {}",
+                asset_name,
+                error
+            );
+            None
+        }
+    }
+}
+
+fn load_splash_branding() -> Option<SplashBranding> {
+    static LARGE_ICON_BYTES: &[u8] = include_bytes!("../../assets/icon-large.png");
+    static BANNER_BYTES: &[u8] = include_bytes!("../../assets/banner.png");
+
+    let mut textures: SlotMap<TextureKey, TextureData> = SlotMap::with_key();
+    let large_icon =
+        load_embedded_splash_texture(LARGE_ICON_BYTES, "assets/svg/large_icon.png", &mut textures)?;
+    let banner =
+        load_embedded_splash_texture(BANNER_BYTES, "assets/svg/banner.png", &mut textures)?;
+
+    Some(SplashBranding {
+        textures,
+        large_icon,
+        banner,
+    })
+}
+
 fn select_startup_monitor(
     event_loop: &ActiveEventLoop,
     display_index: u32,
@@ -1431,8 +1547,9 @@ impl ApplicationHandler for LunaApp {
             return;
         } // already initialised
 
+        let initial_title = self.current_window_title();
         let mut window_attrs = Window::default_attributes()
-            .with_title(&self.config.window.title)
+            .with_title(&initial_title)
             .with_inner_size(winit::dpi::PhysicalSize::new(
                 self.config.window.width,
                 self.config.window.height,
@@ -1818,6 +1935,10 @@ impl ApplicationHandler for LunaApp {
                     self.render_splash();
                     self.init_lua();
                     self.lua_initialized = true;
+                    // Start the screenshot safety timer now that the game is loaded.
+                    if self.auto_screenshot_path.is_some() {
+                        self.auto_screenshot_start = Some(Instant::now());
+                    }
                     // Sync window state into SharedState now that state exists.
                     if let (Some(window), Some(state)) = (&self.window, &self.state) {
                         let mut st = state.borrow_mut();
@@ -1856,6 +1977,14 @@ impl ApplicationHandler for LunaApp {
                     RunState::Error(ref screen) => {
                         self.render_error(screen);
                         self.run_state = run_state;
+                        // In screenshot mode quit immediately instead of waiting for user input.
+                        if self.auto_screenshot_path.is_some() {
+                            if let Some(state) = &self.state {
+                                state.borrow_mut().quit_requested = true;
+                            } else {
+                                event_loop.exit();
+                            }
+                        }
                     }
                     RunState::Running => {
                         if self.has_game {
@@ -1998,6 +2127,21 @@ impl ApplicationHandler for LunaApp {
 
     fn about_to_wait(&mut self, event_loop: &ActiveEventLoop) {
         use std::time::Duration;
+
+        // Safety-net: if screenshot mode has been active for > 3 s without a capture,
+        // force-quit so the batch tool never hangs indefinitely.
+        if !self.auto_screenshot_done {
+            if let Some(start) = self.auto_screenshot_start {
+                if start.elapsed() > Duration::from_secs(3) {
+                    if let Some(state) = &self.state {
+                        state.borrow_mut().quit_requested = true;
+                    } else {
+                        event_loop.exit();
+                    }
+                }
+            }
+        }
+
         let target = Duration::from_secs_f64(1.0 / self.config.performance.target_fps as f64);
         let elapsed = self.last_frame.elapsed();
         if elapsed >= target {
@@ -2046,9 +2190,15 @@ impl App {
     /// # Parameters
     /// - `game_dir` — Path to the game directory.
     /// - `explicit_game_dir` — `true` when the user explicitly passed a path argument.
-    /// - `screenshot_path` — If `Some`, take a screenshot at this absolute path and quit after the delay.
-    /// - `screenshot_delay` — Seconds to wait after game start before taking the auto-screenshot.
-    pub fn run(self, game_dir: PathBuf, explicit_game_dir: bool, screenshot_path: Option<PathBuf>, screenshot_delay: f64) {
+    /// - `screenshot_path` — If `Some`, take a screenshot at this absolute path and quit.
+    /// - `screenshot_frames` — Minimum rendered game frames before capturing (default 3).
+    pub fn run(
+        self,
+        game_dir: PathBuf,
+        explicit_game_dir: bool,
+        screenshot_path: Option<PathBuf>,
+        screenshot_frames: u32,
+    ) {
         init_logging(
             &game_dir,
             self.config.log_file.as_deref(),
@@ -2070,7 +2220,14 @@ impl App {
         // possible. about_to_wait() switches to WaitUntil after that.
         event_loop.set_control_flow(ControlFlow::Poll);
 
-        let mut app = LunaApp::new(self.config, game_dir, self.conf_error, explicit_game_dir, screenshot_path, screenshot_delay);
+        let mut app = LunaApp::new(
+            self.config,
+            game_dir,
+            self.conf_error,
+            explicit_game_dir,
+            screenshot_path,
+            screenshot_frames,
+        );
         event_loop.run_app(&mut app).expect("Event loop error");
 
         log_msg!(info, crate::engine::log_messages::L002_ENGINE_STOP);
@@ -2257,210 +2414,76 @@ fn try_errorhandler_or_screen(lua: &Lua, err: &mlua::Error) -> ErrorScreen {
 fn make_splash_commands(
     width: u32,
     height: u32,
-    _time: f64,
-    title_key: FontKey,
     small_key: FontKey,
     fonts: &mut SlotMap<FontKey, crate::graphics::Font>,
+    branding: Option<&SplashBranding>,
     drag_hover: bool,
 ) -> Vec<DrawCommand> {
-    let cx = width as f32 / 2.0;
-    let cy = height as f32 / 2.0;
-
-    // ── Text ─────────────────────────────────────────────────────────────────
-    let title_text = "LUNA2D";
-    let subtitle_text = "2D Game Engine";
-    let version_text = format!("v{}", env!("CARGO_PKG_VERSION"));
+    let width_f = width as f32;
+    let height_f = height as f32;
+    let cx = width_f / 2.0;
     let hint_text = if drag_hover {
         "Release to load game"
     } else {
         "Drop a game folder here to load it"
     };
-
-    let title_w = fonts
-        .get_mut(title_key)
-        .map(|f| f.text_width(title_text))
-        .unwrap_or(0.0);
-    let subtitle_w = fonts
-        .get_mut(small_key)
-        .map(|f| f.text_width(subtitle_text))
-        .unwrap_or(0.0);
-    let version_w = fonts
-        .get_mut(small_key)
-        .map(|f| f.text_width(&version_text))
-        .unwrap_or(0.0);
     let hint_w = fonts
         .get_mut(small_key)
         .map(|f| f.text_width(hint_text))
         .unwrap_or(0.0);
 
-    // ── Logo group centred at (cx, cy - 30) ──────────────────────────────────
-    let logo_x = cx;
-    let logo_y = cy - 30.0;
-
-    // ── Combined moon + gear + pacman mark ───────────────────────────────────
-    // 9 wide teeth with explicit radial rise/fall walls — cog look, not sun-ray look.
-    let mark_r_outer = 62.0_f32;
-    let mark_r_inner = 44.0_f32;
-    let gear_teeth: usize = 9;
-    let mouth_half = 36.0_f32.to_radians();
-    let tooth_top_frac = 0.50_f32;
-    let gap_frac = 1.0_f32 - tooth_top_frac;
-    let sweep = std::f32::consts::TAU - 2.0 * mouth_half;
-    let per_tooth = sweep / gear_teeth as f32;
-    const GEAR_ARC: usize = 4; // arc subdivision steps per tooth/gap
-    let mark_vertices: Vec<f32> = {
-        let mut pts = Vec::new();
-        pts.push(logo_x);
-        pts.push(logo_y);
-
-        for i in 0..gear_teeth {
-            let a_rise = mouth_half + i as f32 * per_tooth;
-            let a_fall = a_rise + tooth_top_frac * per_tooth;
-            let a_next = a_fall + gap_frac * per_tooth;
-
-            // Radial rise wall: inner → outer (same angle, both radii)
-            let (s, c) = a_rise.sin_cos();
-            pts.push(logo_x + c * mark_r_inner);
-            pts.push(logo_y + s * mark_r_inner);
-            pts.push(logo_x + c * mark_r_outer);
-            pts.push(logo_y + s * mark_r_outer);
-
-            // Tooth top arc at outer radius
-            for j in 1..GEAR_ARC {
-                let a = a_rise + (j as f32 / GEAR_ARC as f32) * (a_fall - a_rise);
-                let (s, c) = a.sin_cos();
-                pts.push(logo_x + c * mark_r_outer);
-                pts.push(logo_y + s * mark_r_outer);
-            }
-
-            // Radial fall wall: outer → inner (same angle, both radii)
-            let (s, c) = a_fall.sin_cos();
-            pts.push(logo_x + c * mark_r_outer);
-            pts.push(logo_y + s * mark_r_outer);
-            pts.push(logo_x + c * mark_r_inner);
-            pts.push(logo_y + s * mark_r_inner);
-
-            // Gap arc at inner radius
-            for j in 1..GEAR_ARC {
-                let a = a_fall + (j as f32 / GEAR_ARC as f32) * (a_next - a_fall);
-                let (s, c) = a.sin_cos();
-                pts.push(logo_x + c * mark_r_inner);
-                pts.push(logo_y + s * mark_r_inner);
-            }
-        }
-
-        // Final: inner radius at end of last gap (TAU - mouth_half)
-        let (s, c) = (std::f32::consts::TAU - mouth_half).sin_cos();
-        pts.push(logo_x + c * mark_r_inner);
-        pts.push(logo_y + s * mark_r_inner);
-
-        pts
-    };
-    let cutout_x = logo_x + 16.0;
-    let cutout_y = logo_y - 2.0;
-    let cutout_r = 35.0_f32;
-    let eye_x = logo_x - 12.0;
-    let eye_y = logo_y - 24.0;
-    let eye_r = 5.0_f32;
-    let cube_size = 12.0_f32;
-    let cube_x = logo_x + mark_r_outer + 16.0; // just outside mouth tip
-    let cube_y = logo_y; // centred on the horizontal mouth axis (was logo_y - 4.0)
+    let top_margin = 24.0_f32;
+    let hint_band_top = height_f - 82.0;
 
     let mut cmds: Vec<DrawCommand> = Vec::new();
 
-    // ── Static incoming cube ─────────────────────────────────────────────────
-    cmds.push(DrawCommand::SetColor(0.47, 0.71, 0.95, 1.0));
-    cmds.push(DrawCommand::Polygon {
-        mode: DrawMode::Fill,
-        vertices: vec![
-            cube_x,
-            cube_y - cube_size,
-            cube_x + cube_size,
-            cube_y - cube_size * 0.5,
-            cube_x,
-            cube_y,
-            cube_x - cube_size,
-            cube_y - cube_size * 0.5,
-        ],
-    });
-    cmds.push(DrawCommand::SetColor(0.30, 0.53, 0.82, 1.0));
-    cmds.push(DrawCommand::Polygon {
-        mode: DrawMode::Fill,
-        vertices: vec![
-            cube_x - cube_size,
-            cube_y - cube_size * 0.5,
-            cube_x,
-            cube_y,
-            cube_x,
-            cube_y + cube_size,
-            cube_x - cube_size,
-            cube_y + cube_size * 0.5,
-        ],
-    });
-    cmds.push(DrawCommand::SetColor(0.17, 0.36, 0.66, 1.0));
-    cmds.push(DrawCommand::Polygon {
-        mode: DrawMode::Fill,
-        vertices: vec![
-            cube_x,
-            cube_y,
-            cube_x + cube_size,
-            cube_y - cube_size * 0.5,
-            cube_x + cube_size,
-            cube_y + cube_size * 0.5,
-            cube_x,
-            cube_y + cube_size,
-        ],
-    });
+    if let Some(branding) = branding {
+        let (icon_w, icon_h) = fit_contain_size(
+            branding.large_icon.width,
+            branding.large_icon.height,
+            width_f * 0.46,
+            height_f * 0.40,
+        );
+        let (banner_w, banner_h) = fit_contain_size(
+            branding.banner.width,
+            branding.banner.height,
+            width_f * 0.80,
+            height_f * 0.22,
+        );
 
-    // ── Single Luna mark: moon + gear + pacman in one static silhouette ──────
-    cmds.push(DrawCommand::SetColor(0.55, 0.82, 0.93, 1.0));
-    cmds.push(DrawCommand::Polygon {
-        mode: DrawMode::Fill,
-        vertices: mark_vertices,
-    });
+        let banner_center_min = top_margin + banner_h * 0.5;
+        let banner_center_max = (hint_band_top - 18.0 - banner_h * 0.5).max(banner_center_min);
+        let banner_center_y = (height_f * 0.72).clamp(banner_center_min, banner_center_max);
 
-    cmds.push(DrawCommand::SetColor(0.12, 0.08, 0.20, 1.0));
-    cmds.push(DrawCommand::Circle {
-        mode: DrawMode::Fill,
-        x: cutout_x,
-        y: cutout_y,
-        r: cutout_r,
-    });
+        let icon_center_min = top_margin + icon_h * 0.5;
+        let icon_center_max =
+            (banner_center_y - banner_h * 0.5 - 32.0 - icon_h * 0.5).max(icon_center_min);
+        let icon_center_y = (height_f * 0.33).clamp(icon_center_min, icon_center_max);
 
-    cmds.push(DrawCommand::SetColor(0.07, 0.05, 0.12, 1.0));
-    cmds.push(DrawCommand::Circle {
-        mode: DrawMode::Fill,
-        x: eye_x,
-        y: eye_y,
-        r: eye_r,
-    });
-
-    // ── Text ──────────────────────────────────────────────────────────────────
-    let text_y = logo_y + 72.0;
-    cmds.push(DrawCommand::SetColor(0.95, 0.90, 0.55, 1.0));
-    cmds.push(DrawCommand::PrintFont {
-        font_key: title_key,
-        text: title_text.to_string(),
-        x: cx - title_w / 2.0,
-        y: text_y,
-        scale: 1.0,
-    });
-    cmds.push(DrawCommand::SetColor(0.60, 0.55, 0.70, 1.0));
-    cmds.push(DrawCommand::PrintFont {
-        font_key: small_key,
-        text: subtitle_text.to_string(),
-        x: cx - subtitle_w / 2.0,
-        y: text_y + 42.0,
-        scale: 1.0,
-    });
-    cmds.push(DrawCommand::SetColor(0.40, 0.35, 0.50, 1.0));
-    cmds.push(DrawCommand::PrintFont {
-        font_key: small_key,
-        text: version_text,
-        x: cx - version_w / 2.0,
-        y: text_y + 66.0,
-        scale: 1.0,
-    });
+        cmds.push(DrawCommand::SetColor(1.0, 1.0, 1.0, 1.0));
+        cmds.push(DrawCommand::DrawImageEx {
+            texture_key: branding.large_icon.texture_key,
+            x: cx,
+            y: icon_center_y,
+            rotation: 0.0,
+            sx: icon_w / branding.large_icon.width as f32,
+            sy: icon_h / branding.large_icon.height as f32,
+            ox: branding.large_icon.width as f32 * 0.5,
+            oy: branding.large_icon.height as f32 * 0.5,
+            effect: None,
+        });
+        cmds.push(DrawCommand::DrawImageEx {
+            texture_key: branding.banner.texture_key,
+            x: cx,
+            y: banner_center_y,
+            rotation: 0.0,
+            sx: banner_w / branding.banner.width as f32,
+            sy: banner_h / branding.banner.height as f32,
+            ox: branding.banner.width as f32 * 0.5,
+            oy: branding.banner.height as f32 * 0.5,
+            effect: None,
+        });
+    }
 
     // ── Drop hint (bottom of screen) ─────────────────────────────────────────
     if drag_hover {
@@ -2468,7 +2491,7 @@ fn make_splash_commands(
         cmds.push(DrawCommand::Rectangle {
             mode: DrawMode::Fill,
             x: cx - 220.0,
-            y: height as f32 - 70.0,
+            y: height_f - 70.0,
             w: 440.0,
             h: 40.0,
         });
@@ -2480,7 +2503,7 @@ fn make_splash_commands(
         font_key: small_key,
         text: hint_text.to_string(),
         x: cx - hint_w / 2.0,
-        y: height as f32 - 55.0,
+        y: height_f - 55.0,
         scale: 1.0,
     });
 
@@ -2499,7 +2522,7 @@ mod tests {
         let mut config = Config::default();
         config.identity = Some("phase01-save".to_string());
 
-        let mut app = LunaApp::new(config, temp_dir.path().to_path_buf(), None, false, None, 1.5);
+        let mut app = LunaApp::new(config, temp_dir.path().to_path_buf(), None, false, None, 1);
         app.init_lua();
 
         let lua = app.lua.as_ref().expect("Lua VM should be initialized");

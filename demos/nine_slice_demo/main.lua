@@ -1,3 +1,13 @@
+-- Module availability guard (added by fix script)
+if not luna.graphics.newNineSlice then
+    function luna.load()
+        luna.graphics.setBackgroundColor(0.15, 0.15, 0.25)
+        luna.graphics.print("luna.graphics.newNineSlice not available", 180, 270)
+        luna.graphics.print("Nine-Slice Demo  --  placeholder screenshot", 200, 310)
+    end
+    return
+end
+
 -- Nine-Slice (9-patch) Demo for Luna2D
 --
 -- Demonstrates luna.graphics.newNineSlice / drawNineSlice for

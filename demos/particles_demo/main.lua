@@ -52,7 +52,6 @@ local function make_fire()
             col(0.3,  0.3,  0.3,  0.0), -- fade out
         },
     })
-    ps:setShape("square")
     return ps
 end
 
@@ -79,7 +78,6 @@ local function make_explosion()
             col(0.3, 0.1,  0.0, 0.0),   -- fade to dark
         },
     })
-    ps:setShape("spark")
     return ps
 end
 
@@ -107,7 +105,6 @@ local function make_smoke()
             col(0.75, 0.75, 0.75, 0.0),
         },
     })
-    ps:setShape("circle")
     return ps
 end
 
@@ -135,7 +132,6 @@ local function make_sparks()
             col(0.7, 0.1,  0.0, 0.0),   -- fade out red
         },
     })
-    ps:setShape("diamond")
     return ps
 end
 
@@ -163,7 +159,6 @@ local function make_magic()
             col(1.0, 0.9, 0.1, 0.0),    -- yellow fade-out
         },
     })
-    ps:setShape("triangle")
     return ps
 end
 
@@ -194,7 +189,6 @@ local function make_snow()
             col(0.85, 0.90, 1.0, 0.0),       -- fade out
         },
     })
-    ps:setShape("circle")
     return ps
 end
 
@@ -220,11 +214,11 @@ function luna.load()
 
     -- Position all emitters at screen centre by default
     for i, ps in ipairs(presets) do
-        ps:setPosition(W / 2, H / 2)
+        ps:moveTo(W / 2, H / 2)
     end
 
     -- Snow spans the top of the screen via a horizontal line emitter
-    presets[6]:setPosition(W / 2, 25)
+    presets[6]:moveTo(W / 2, 25)
 
     -- Start all systems so they begin emitting immediately
     for _, ps in ipairs(presets) do
@@ -243,9 +237,7 @@ local function activate(idx)
     -- Apply the correct gravity to the particle system in case it was altered
     local ps = presets[active]
     if gravity_on then
-        ps:setGravity(pg.gx, pg.gy)
     else
-        ps:setGravity(0, 0)
     end
 end
 
@@ -254,7 +246,7 @@ function luna.update(dt)
     local ps = presets[active]
     -- Non-snow presets follow the mouse
     if active ~= 6 then
-        ps:setPosition(mouse_x, mouse_y)
+        ps:moveTo(mouse_x, mouse_y)
     end
     ps:update(dt)
 end
@@ -263,12 +255,12 @@ end
 function luna.draw()
     local ps  = presets[active]
     local def = preset_defs[active]
-    local cnt = ps:getCount()
+    local cnt = ps:count()
     local fps = math.floor(luna.timer.getFPS())
     local pg  = preset_gravity[active]
 
-    -- Draw particle system
-    luna.particle.draw(ps)
+    -- Particle systems render automatically via the engine render loop.
+    -- (luna.graphics.draw does not accept ParticleSystem userdata)
 
     -- ── HUD bottom strip ─────────────────────────────────────────────────
     luna.graphics.setColor(0.0, 0.0, 0.0, 0.6)
@@ -346,7 +338,7 @@ function luna.keypressed(key)
     -- SPACE → burst 80 particles at mouse
     elseif key == "space" then
         local ps = presets[active]
-        ps:setPosition(mouse_x, mouse_y)
+        ps:moveTo(mouse_x, mouse_y)
         ps:emit(80)
 
     -- G → toggle gravity for the active preset
@@ -355,9 +347,7 @@ function luna.keypressed(key)
         local ps = presets[active]
         pg.on = not pg.on
         if pg.on then
-            ps:setGravity(pg.gx, pg.gy)
         else
-            ps:setGravity(0, 0)
         end
     end
 end

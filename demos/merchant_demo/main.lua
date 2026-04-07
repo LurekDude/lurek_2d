@@ -18,6 +18,11 @@
     [R]    Restock the merchant (refills all stacks)
 --]]
 
+-- Polyfill: map luna.item and luna.inventory to library modules
+luna.item      = require("library.item")
+luna.inventory = require("library.inventory")
+
+
 -- ── Item catalog ──────────────────────────────────────────────────────────
 luna.item.clearTypes()
 luna.item.defineType("iron_sword",   { category="weapon",    base_stats={ price=30, dmg=10, weight=3.0 }, base_tags={"weapon","equippable"} })
@@ -35,7 +40,7 @@ local SHELF_ITEMS = {
 
 -- ── Merchant stock as StackManager ────────────────────────────────────────
 local merchant   = luna.item.newStackManager()
-local sales_log  = luna.item.newHistory(50)   -- sales ledger
+local sales_log  = luna.item.newStackHistory(50)   -- sales ledger
 
 local function restock()
     for _, type_name in ipairs(SHELF_ITEMS) do

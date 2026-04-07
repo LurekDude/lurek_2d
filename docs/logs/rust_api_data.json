@@ -1,20 +1,20 @@
 {
   "meta": {
-    "generated": "2026-04-07T12:47:42.455825+00:00",
+    "generated": "2026-04-07T21:13:54.349220+00:00",
     "generator": "tools/gen_rust_api_data.py",
     "version": "0.5.0",
     "stats": {
       "rust_items": 1136,
-      "rust_modules": 257,
+      "rust_modules": 259,
       "rust_tests": 0,
-      "lua_tests": 132
+      "lua_tests": 105
     }
   },
   "rust_api": {
     "summary": {
       "total_items": 1136,
       "documented": 1136,
-      "modules": 257
+      "modules": 259
     },
     "modules": {
       "ai::agent": {
@@ -1699,7 +1699,7 @@
             "kind": "struct",
             "description": "Entry point for the Luna2D engine. Owns the game loop, GPU renderer, and Lua VM lifecycle.  # Fields - `config` — `Config`. - `conf_error` — `Option<String>`.",
             "file": "src/engine/app.rs",
-            "line": 1951
+            "line": 2169
           }
         ]
       },
@@ -3774,7 +3774,7 @@
             "kind": "struct",
             "description": "Snapshot of renderer statistics for a single frame.  # Fields - `draw_calls` — `usize`. - `textures` — `usize`. - `fonts` — `usize`. - `canvases` — `usize`. - `texture_memory` — `usize`. RGBA byte estimate.",
             "file": "src/engine/shared_state.rs",
-            "line": 492
+            "line": 514
           }
         ]
       },
@@ -3845,39 +3845,44 @@
           }
         ]
       },
-      "event": {
-        "module_doc": "Event queue for polling system and custom events.  Provides an alternative to the callback model where game code can poll events from a FIFO queue. Also contains the `Signal` pub-sub type for handle-based event dispatching.",
-        "source_file": "src/event/mod.rs",
+      "event::event_queue": {
+        "module_doc": "Event types and FIFO event queue.",
+        "source_file": "src/event/event_queue.rs",
         "items": [
           {
             "name": "EventArg",
             "kind": "enum",
             "description": "Argument values that can be attached to events.  # Variants - `Str` — Str variant. - `Num` — Num variant. - `Bool` — Bool variant. - `Nil` — Nil variant.",
-            "file": "src/event/mod.rs",
-            "line": 21
+            "file": "src/event/event_queue.rs",
+            "line": 13
           },
           {
             "name": "Event",
             "kind": "struct",
             "description": "A single event in the event queue. Consult the module-level documentation for the broader usage context and preconditions.  # Fields - `name` — `String`. - `args` — `Vec<EventArg>`.",
-            "file": "src/event/mod.rs",
-            "line": 38
+            "file": "src/event/event_queue.rs",
+            "line": 30
           },
           {
             "name": "EventQueue",
             "kind": "struct",
             "description": "FIFO event queue for system and custom events.  # Fields - `events` — `VecDeque<Event>`.",
-            "file": "src/event/mod.rs",
-            "line": 50
+            "file": "src/event/event_queue.rs",
+            "line": 42
           },
           {
             "name": "event_to_lua_multi",
             "kind": "fn",
             "description": "Converts an [`Event`] into a Lua multi-value (name followed by args).  The first value is the event name as a Lua string; subsequent values are each [`EventArg`] converted to its Lua equivalent.  # Parameters - `lua` — `&Lua`. The Lua VM. - `event` — `&Event`. The event to convert.  # Returns `LuaResult<LuaMultiValue>`.",
-            "file": "src/event/mod.rs",
-            "line": 211
+            "file": "src/event/event_queue.rs",
+            "line": 203
           }
         ]
+      },
+      "event": {
+        "module_doc": "Event queue for polling system and custom events.  Provides an alternative to the callback model where game code can poll events from a FIFO queue. Also contains the \\Signal\\ pub-sub type for handle-based event dispatching.",
+        "source_file": "src/event/mod.rs",
+        "items": []
       },
       "event::signal": {
         "module_doc": "Handle-based pub-sub signal system.  `Signal` provides a lightweight event bus where listeners subscribe by name and receive a monotonically increasing handle ID for later removal. Callbacks fire in registration order.",
@@ -8023,43 +8028,7 @@
       "savegame": {
         "module_doc": "Save/load slot system with collectors, schema versioning, dirty tracking, and auto-save.",
         "source_file": "src/savegame/mod.rs",
-        "items": [
-          {
-            "name": "SlotMeta",
-            "kind": "struct",
-            "description": "Metadata extracted from a save slot.  # Fields - `slot` — `String`. Slot name. - `timestamp` — `f64`. Unix epoch timestamp. - `version` — `i32`. Schema version. - `summary` — `String`. Optional summary string.",
-            "file": "src/savegame/mod.rs",
-            "line": 19
-          },
-          {
-            "name": "SaveManager",
-            "kind": "struct",
-            "description": "Pure-data save manager providing registration of named collectors, schema versioning, dirty-state tracking, and auto-save timer.  Actual serialisation and filesystem calls happen on the Lua side; this struct tracks the bookkeeping.",
-            "file": "src/savegame/mod.rs",
-            "line": 36
-          },
-          {
-            "name": "serialize_table",
-            "kind": "fn",
-            "description": "Serialize a simple Lua-compatible value hierarchy into a `return { ... }` string.  Supports nil, bool, number (f64), string, and nested tables (HashMap). Does not handle userdata, functions, or circular references.  # Parameters - `data` — `&HashMap<String, SaveValue>`. The table data to serialize. - `depth` — `u32`. Current nesting depth (internal; call with `0`).  # Returns `Result<String, String>`.",
-            "file": "src/savegame/mod.rs",
-            "line": 250
-          },
-          {
-            "name": "serialize_value",
-            "kind": "fn",
-            "description": "Serialize a single value.  # Parameters - `value` — `&SaveValue`. The value to serialize. - `depth` — `u32`. Current nesting depth.  # Returns `Result<String, String>`.",
-            "file": "src/savegame/mod.rs",
-            "line": 282
-          },
-          {
-            "name": "SaveValue",
-            "kind": "enum",
-            "description": "A simple value type matching the Lua subset we can serialize.  # Variants - `Nil` — Lua nil. - `Bool` — Lua boolean. - `Number` — Lua number. - `Str` — Lua string. - `Table` — Lua table (string keys only for save data).",
-            "file": "src/savegame/mod.rs",
-            "line": 301
-          }
-        ]
+        "items": []
       },
       "savegame::save_data": {
         "module_doc": "Save/load slot system with collectors, schema versioning, dirty tracking, and auto-save.  This module is part of Luna2D's `savegame` subsystem and provides the implementation details for save data-related operations and data management. Key types exported from this module: `SlotMeta`, `SaveManager`, `SaveValue`. Primary functions: `new()`, `register()`, `unregister()`, `registered_names()`.  All public items are documented. See the parent module for architectural context and the `luna.*` Lua API for the scripting interface.",
@@ -8099,6 +8068,47 @@
             "description": "A simple value type matching the Lua subset we can serialize.  # Variants - `Nil` — Nil variant. - `Bool` — Bool variant. - `Number` — Number variant. - `Str` — Str variant. - `Table` — Table variant.",
             "file": "src/savegame/save_data.rs",
             "line": 263
+          }
+        ]
+      },
+      "savegame::save_manager": {
+        "module_doc": "SaveManager, SlotMeta, SaveValue, and Lua serialization helpers.",
+        "source_file": "src/savegame/save_manager.rs",
+        "items": [
+          {
+            "name": "SlotMeta",
+            "kind": "struct",
+            "description": "Metadata extracted from a save slot.  # Fields - `slot` — `String`. Slot name. - `timestamp` — `f64`. Unix epoch timestamp. - `version` — `i32`. Schema version. - `summary` — `String`. Optional summary string.",
+            "file": "src/savegame/save_manager.rs",
+            "line": 18
+          },
+          {
+            "name": "SaveManager",
+            "kind": "struct",
+            "description": "Pure-data save manager providing registration of named collectors, schema versioning, dirty-state tracking, and auto-save timer.  Actual serialisation and filesystem calls happen on the Lua side; this struct tracks the bookkeeping.",
+            "file": "src/savegame/save_manager.rs",
+            "line": 35
+          },
+          {
+            "name": "serialize_table",
+            "kind": "fn",
+            "description": "Serialize a simple Lua-compatible value hierarchy into a `return { ... }` string.  Supports nil, bool, number (f64), string, and nested tables (HashMap). Does not handle userdata, functions, or circular references.  # Parameters - `data` — `&HashMap<String, SaveValue>`. The table data to serialize. - `depth` — `u32`. Current nesting depth (internal; call with `0`).  # Returns `Result<String, String>`.",
+            "file": "src/savegame/save_manager.rs",
+            "line": 249
+          },
+          {
+            "name": "serialize_value",
+            "kind": "fn",
+            "description": "Serialize a single value.  # Parameters - `value` — `&SaveValue`. The value to serialize. - `depth` — `u32`. Current nesting depth.  # Returns `Result<String, String>`.",
+            "file": "src/savegame/save_manager.rs",
+            "line": 281
+          },
+          {
+            "name": "SaveValue",
+            "kind": "enum",
+            "description": "A simple value type matching the Lua subset we can serialize.  # Variants - `Nil` — Lua nil. - `Bool` — Lua boolean. - `Number` — Lua number. - `Str` — Lua string. - `Table` — Lua table (string keys only for save data).",
+            "file": "src/savegame/save_manager.rs",
+            "line": 300
           }
         ]
       },
@@ -9529,13 +9539,6 @@
         "kind": "lua"
       },
       {
-        "file": "tests/lua/golden/test_math_golden2.lua",
-        "module": "test_math_golden2",
-        "name": "test_math_golden2",
-        "description": "Luna2D Golden File Test: Math Constants",
-        "kind": "lua"
-      },
-      {
         "file": "tests/lua/init.lua",
         "module": "init",
         "name": "init",
@@ -9550,13 +9553,6 @@
         "kind": "lua"
       },
       {
-        "file": "tests/lua/integration/test_ai_physics2.lua",
-        "module": "test_ai_physics2",
-        "name": "test_ai_physics2",
-        "description": "Luna2D Integration Test: AI + Physics",
-        "kind": "lua"
-      },
-      {
         "file": "tests/lua/integration/test_compute_dataframe.lua",
         "module": "test_compute_dataframe",
         "name": "test_compute_dataframe",
@@ -9564,23 +9560,9 @@
         "kind": "lua"
       },
       {
-        "file": "tests/lua/integration/test_compute_dataframe2.lua",
-        "module": "test_compute_dataframe2",
-        "name": "test_compute_dataframe2",
-        "description": "Luna2D Integration Test: Compute + DataFrame",
-        "kind": "lua"
-      },
-      {
         "file": "tests/lua/integration/test_data_system.lua",
         "module": "test_data_system",
         "name": "test_data_system",
-        "description": "Luna2D Integration Test: Data + Filesystem",
-        "kind": "lua"
-      },
-      {
-        "file": "tests/lua/integration/test_data_system2.lua",
-        "module": "test_data_system2",
-        "name": "test_data_system2",
         "description": "Luna2D Integration Test: Data + Filesystem",
         "kind": "lua"
       },
@@ -9620,23 +9602,9 @@
         "kind": "lua"
       },
       {
-        "file": "tests/lua/integration/test_entity_ai2.lua",
-        "module": "test_entity_ai2",
-        "name": "test_entity_ai2",
-        "description": "Luna2D Integration Test: Entity + AI",
-        "kind": "lua"
-      },
-      {
         "file": "tests/lua/integration/test_math_graphics.lua",
         "module": "test_math_graphics",
         "name": "test_math_graphics",
-        "description": "Luna2D Integration Test: Math + Graphics (headless-safe)",
-        "kind": "lua"
-      },
-      {
-        "file": "tests/lua/integration/test_math_graphics2.lua",
-        "module": "test_math_graphics2",
-        "name": "test_math_graphics2",
         "description": "Luna2D Integration Test: Math + Graphics (headless-safe)",
         "kind": "lua"
       },
@@ -9648,23 +9616,9 @@
         "kind": "lua"
       },
       {
-        "file": "tests/lua/integration/test_math_physics2.lua",
-        "module": "test_math_physics2",
-        "name": "test_math_physics2",
-        "description": "Luna2D Integration Test: Math + Physics",
-        "kind": "lua"
-      },
-      {
         "file": "tests/lua/integration/test_physics_timer.lua",
         "module": "test_physics_timer",
         "name": "test_physics_timer",
-        "description": "Luna2D Integration Test: Physics + Timer",
-        "kind": "lua"
-      },
-      {
-        "file": "tests/lua/integration/test_physics_timer2.lua",
-        "module": "test_physics_timer2",
-        "name": "test_physics_timer2",
         "description": "Luna2D Integration Test: Physics + Timer",
         "kind": "lua"
       },
@@ -9673,13 +9627,6 @@
         "module": "test_save_entity",
         "name": "test_save_entity",
         "description": "Luna2D Integration Test: Save + Entity",
-        "kind": "lua"
-      },
-      {
-        "file": "tests/lua/integration/test_save_entity2.lua",
-        "module": "test_save_entity2",
-        "name": "test_save_entity2",
-        "description": "Luna2D Integration Test: SaveGame + Entity",
         "kind": "lua"
       },
       {
@@ -9697,23 +9644,9 @@
         "kind": "lua"
       },
       {
-        "file": "tests/lua/integration/test_tilemap_physics2.lua",
-        "module": "test_tilemap_physics2",
-        "name": "test_tilemap_physics2",
-        "description": "Luna2D Integration Test: Tilemap + Physics",
-        "kind": "lua"
-      },
-      {
         "file": "tests/lua/integration/test_timer_math.lua",
         "module": "test_timer_math",
         "name": "test_timer_math",
-        "description": "Luna2D Integration Test: Timer + Math",
-        "kind": "lua"
-      },
-      {
-        "file": "tests/lua/integration/test_timer_math2.lua",
-        "module": "test_timer_math2",
-        "name": "test_timer_math2",
         "description": "Luna2D Integration Test: Timer + Math",
         "kind": "lua"
       },
@@ -9809,23 +9742,9 @@
         "kind": "lua"
       },
       {
-        "file": "tests/lua/security/test_invalid_args2.lua",
-        "module": "test_invalid_args2",
-        "name": "test_invalid_args2",
-        "description": "Luna2D Validation Test: Invalid API Arguments",
-        "kind": "lua"
-      },
-      {
         "file": "tests/lua/security/test_mount_traversal.lua",
         "module": "test_mount_traversal",
         "name": "test_mount_traversal",
-        "description": "Validate that mount() rejects path traversal attempts",
-        "kind": "lua"
-      },
-      {
-        "file": "tests/lua/security/test_mount_traversal2.lua",
-        "module": "test_mount_traversal2",
-        "name": "test_mount_traversal2",
         "description": "Validate that mount() rejects path traversal attempts",
         "kind": "lua"
       },
@@ -9837,23 +9756,9 @@
         "kind": "lua"
       },
       {
-        "file": "tests/lua/security/test_savegame_validation2.lua",
-        "module": "test_savegame_validation2",
-        "name": "test_savegame_validation2",
-        "description": "Luna2D Validation Test: SaveManager Edge Cases",
-        "kind": "lua"
-      },
-      {
         "file": "tests/lua/security/test_toml_validation.lua",
         "module": "test_toml_validation",
         "name": "test_toml_validation",
-        "description": "Luna2D Validation Test: Corrupted and Malformed TOML",
-        "kind": "lua"
-      },
-      {
-        "file": "tests/lua/security/test_toml_validation2.lua",
-        "module": "test_toml_validation2",
-        "name": "test_toml_validation2",
         "description": "Luna2D Validation Test: Corrupted and Malformed TOML",
         "kind": "lua"
       },
@@ -9865,23 +9770,9 @@
         "kind": "lua"
       },
       {
-        "file": "tests/lua/stress/test_compute_stress2.lua",
-        "module": "test_compute_stress2",
-        "name": "test_compute_stress2",
-        "description": "Luna2D Stress Test: Heavy Compute Operations",
-        "kind": "lua"
-      },
-      {
         "file": "tests/lua/stress/test_data_compression_stress.lua",
         "module": "test_data_compression_stress",
         "name": "test_data_compression_stress",
-        "description": "Luna2D Stress Test: Data Compression, Hash, and Encoding Throughput",
-        "kind": "lua"
-      },
-      {
-        "file": "tests/lua/stress/test_data_compression_stress2.lua",
-        "module": "test_data_compression_stress2",
-        "name": "test_data_compression_stress2",
         "description": "Luna2D Stress Test: Data Compression, Hash, and Encoding Throughput",
         "kind": "lua"
       },
@@ -9893,23 +9784,9 @@
         "kind": "lua"
       },
       {
-        "file": "tests/lua/stress/test_data_stress2.lua",
-        "module": "test_data_stress2",
-        "name": "test_data_stress2",
-        "description": "Luna2D Stress Test: Data Structure Operations",
-        "kind": "lua"
-      },
-      {
         "file": "tests/lua/stress/test_dataframe_stress.lua",
         "module": "test_dataframe_stress",
         "name": "test_dataframe_stress",
-        "description": "Luna2D Stress Test: DataFrame Bulk Operations",
-        "kind": "lua"
-      },
-      {
-        "file": "tests/lua/stress/test_dataframe_stress2.lua",
-        "module": "test_dataframe_stress2",
-        "name": "test_dataframe_stress2",
         "description": "Luna2D Stress Test: DataFrame Bulk Operations",
         "kind": "lua"
       },
@@ -9921,23 +9798,9 @@
         "kind": "lua"
       },
       {
-        "file": "tests/lua/stress/test_entity_stress2.lua",
-        "module": "test_entity_stress2",
-        "name": "test_entity_stress2",
-        "description": "Luna2D Stress Test: Entity Mass Spawn",
-        "kind": "lua"
-      },
-      {
         "file": "tests/lua/stress/test_graph_stress.lua",
         "module": "test_graph_stress",
         "name": "test_graph_stress",
-        "description": "Luna2D Stress Test: Graph Flow Simulation",
-        "kind": "lua"
-      },
-      {
-        "file": "tests/lua/stress/test_graph_stress2.lua",
-        "module": "test_graph_stress2",
-        "name": "test_graph_stress2",
         "description": "Luna2D Stress Test: Graph Flow Simulation",
         "kind": "lua"
       },
@@ -9949,23 +9812,9 @@
         "kind": "lua"
       },
       {
-        "file": "tests/lua/stress/test_math_stress2.lua",
-        "module": "test_math_stress2",
-        "name": "test_math_stress2",
-        "description": "Luna2D Stress Test: Math Operations",
-        "kind": "lua"
-      },
-      {
         "file": "tests/lua/stress/test_particle_stress.lua",
         "module": "test_particle_stress",
         "name": "test_particle_stress",
-        "description": "Luna2D Stress Test: Particle System Burst Emission",
-        "kind": "lua"
-      },
-      {
-        "file": "tests/lua/stress/test_particle_stress2.lua",
-        "module": "test_particle_stress2",
-        "name": "test_particle_stress2",
         "description": "Luna2D Stress Test: Particle System Burst Emission",
         "kind": "lua"
       },
@@ -9977,23 +9826,9 @@
         "kind": "lua"
       },
       {
-        "file": "tests/lua/stress/test_pathfinding_stress2.lua",
-        "module": "test_pathfinding_stress2",
-        "name": "test_pathfinding_stress2",
-        "description": "Luna2D Stress Test: Pathfinding on Large Grids",
-        "kind": "lua"
-      },
-      {
         "file": "tests/lua/stress/test_physics_collision_stress.lua",
         "module": "test_physics_collision_stress",
         "name": "test_physics_collision_stress",
-        "description": "Luna2D Stress Test: Physics Collision Storm",
-        "kind": "lua"
-      },
-      {
-        "file": "tests/lua/stress/test_physics_collision_stress2.lua",
-        "module": "test_physics_collision_stress2",
-        "name": "test_physics_collision_stress2",
         "description": "Luna2D Stress Test: Physics Collision Storm",
         "kind": "lua"
       },
@@ -10005,23 +9840,9 @@
         "kind": "lua"
       },
       {
-        "file": "tests/lua/stress/test_physics_stress2.lua",
-        "module": "test_physics_stress2",
-        "name": "test_physics_stress2",
-        "description": "Luna2D Stress Test: Mass Body Creation",
-        "kind": "lua"
-      },
-      {
         "file": "tests/lua/stress/test_tilemap_stress.lua",
         "module": "test_tilemap_stress",
         "name": "test_tilemap_stress",
-        "description": "Luna2D Stress Test: Large Tilemap Operations",
-        "kind": "lua"
-      },
-      {
-        "file": "tests/lua/stress/test_tilemap_stress2.lua",
-        "module": "test_tilemap_stress2",
-        "name": "test_tilemap_stress2",
         "description": "Luna2D Stress Test: Large Tilemap Operations",
         "kind": "lua"
       },

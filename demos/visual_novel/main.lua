@@ -159,7 +159,9 @@ end
 
 local function go_to_scene(name)
     if name == "_ending" then
-        -- determine ending
+        -- Evaluate the ending by finding the character with the highest affection score.
+        -- Affection is accumulated through dialogue choices (each choice awards 1–3 points).
+        -- The same character must be picked more often to unlock the "True Connection" ending.
         local best = "luna_char"
         if affection.sol > affection[best] then best = "sol" end
         if affection.nova > affection[best] then best = "nova" end
@@ -230,7 +232,10 @@ function luna.update(dt)
     local entry = scene[current_line]
     if not entry then return end
 
-    -- typewriter
+    -- Typewriter effect: char_index tracks how many characters have been revealed.
+    -- Each frame, accumulate dt into char_timer and emit one character per CHAR_SPEED
+    -- seconds. In skip_mode the speed drops to 5 ms per char — effectively instant.
+    -- Using a while loop handles cases where dt > CHAR_SPEED (low-fps drops).
     if char_index < #entry.text then
         char_timer = char_timer + dt
         local spd = skip_mode and 0.005 or CHAR_SPEED
@@ -239,7 +244,9 @@ function luna.update(dt)
             char_index = char_index + 1
         end
     else
-        -- auto-advance with space held
+        -- Auto-advance: when the full line is visible and the player holds Space,
+        -- wait 0.3 s (enough to glance at the line) then move on automatically.
+        -- Choice nodes are excluded — the player must pick an option manually.
         if skip_mode and not entry.choices then
             auto_timer = auto_timer + dt
             if auto_timer > 0.3 then advance() end

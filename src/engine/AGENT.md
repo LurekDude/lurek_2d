@@ -24,7 +24,7 @@ engine is the only upward-facing dependency root.
 | File | Purpose |
 |------|---------|
 | `mod.rs` | Module declaration, re-exports of `App`, `Config`, `SharedState`, `EngineError`, etc. |
-| `app.rs` | Application lifecycle: `App`, private `LunaApp` (winit `ApplicationHandler`), `RunState`, game loop, GPU init, Lua VM init, input routing, splash screen, drag-and-drop |
+| `app.rs` | Application lifecycle: `App`, private `LunaApp` (winit `ApplicationHandler`), `RunState`, game loop, GPU init, Lua VM init, input routing, PNG-branded splash screen, drag-and-drop, window title state |
 | `app_winit.rs` | **Dead file** — not declared in `mod.rs`, not compiled. Preserved for historical reference only. |
 | `config.rs` | `Config`, `WindowConfig`, `GraphicsConfig`, `ModulesConfig`, `PerformanceConfig`, `conf.lua` loading |
 | `debug_overlay.rs` | `DebugOverlay` — FPS and draw-call counter rendered in the top-right corner |

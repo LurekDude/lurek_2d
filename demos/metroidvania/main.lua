@@ -118,7 +118,7 @@ end
 function luna.load()
     luna.window.setTitle("Metroidvania Exploration")
     luna.graphics.setBackgroundColor(0.08, 0.06, 0.12)
-    camera = luna.camera.new()
+    camera = luna.camera.new(800, 600)
     camera:setZoom(2.5)
     loadRoom(0, 0)
 end
@@ -181,9 +181,21 @@ function luna.update(dt)
     end
 end
 
+-- Polyfill: camera:apply()/reset() via graphics transform stack
+local function camera_apply()
+    local x, y = camera:getPosition()
+    local z    = camera:getZoom()
+    luna.graphics.push()
+    luna.graphics.scale(z, z)
+    luna.graphics.translate(-x, -y)
+end
+local function camera_reset()
+    luna.graphics.pop()
+end
+
 function luna.draw()
     camera:setPosition(player.x - 120, player.y - 80)
-    camera:apply()
+    camera_apply()
     -- Draw room tiles
     local rd = roomData[roomKey(currentRoom.x, currentRoom.y)]
     if rd then
@@ -221,7 +233,7 @@ function luna.draw()
         local ex = player.facing > 0 and player.x + 9 or player.x + 3
         luna.graphics.rectangle("fill", ex, player.y + 5, 4, 4)
     end
-    camera:reset()
+    camera_reset()
     -- HUD
     luna.graphics.setColor(1, 1, 1)
     luna.graphics.print("HP: " .. player.hp .. "/" .. player.maxHp, 10, 10)

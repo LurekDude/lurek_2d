@@ -23,12 +23,12 @@ local joints = {}
 local function spawn_object(x, y, kind, size)
     local body
     if kind == "circle" then
-        body = luna.physics.newCircleBody(world, x, y, size, "dynamic")
+        body = world:newCircleBody(x, y, size, "dynamic")
     else
-        body = luna.physics.newBody(world, x, y, "dynamic")
-        luna.physics.setBodySize(world, body, size * 2, size * 2)
+        body = world:newBody(x, y, "dynamic")
+        world:addFixture(body:getId(), "rectangle", 1, 0.3, 0, false, size * 2, size * 2)
     end
-    luna.physics.setBodyRestitution(world, body, bounciness)
+    body:setRestitution(bounciness)
 
     local obj = {
         id = next_id,
@@ -46,7 +46,7 @@ end
 local function find_object_at(mx, my)
     for i = #objects, 1, -1 do
         local o = objects[i]
-        local ox, oy = luna.physics.getBody(world, o.body)
+        local ox, oy = o.body:getPosition()
         local dx = mx - ox
         local dy = my - oy
         local dist = math.sqrt(dx * dx + dy * dy)
@@ -63,14 +63,14 @@ function luna.load()
     world = luna.physics.newWorld(0, 400)
 
     -- Ground
-    local ground = luna.physics.newBody(world, SCREEN_W / 2, SCREEN_H - 10, "static")
-    luna.physics.setBodySize(world, ground, SCREEN_W, 20)
+    local ground = world:newBody(SCREEN_W / 2, SCREEN_H - 10, "static")
+    world:addFixture(ground:getId(), "rectangle", 1, 0.3, 0, false, SCREEN_W, 20)
 
     -- Walls
-    local left = luna.physics.newBody(world, -5, SCREEN_H / 2, "static")
-    luna.physics.setBodySize(world, left, 10, SCREEN_H)
-    local right = luna.physics.newBody(world, SCREEN_W + 5, SCREEN_H / 2, "static")
-    luna.physics.setBodySize(world, right, 10, SCREEN_H)
+    local left = world:newBody(-5, SCREEN_H / 2, "static")
+    world:addFixture(left:getId(), "rectangle", 1, 0.3, 0, false, 10, SCREEN_H)
+    local right = world:newBody(SCREEN_W + 5, SCREEN_H / 2, "static")
+    world:addFixture(right:getId(), "rectangle", 1, 0.3, 0, false, 10, SCREEN_H)
 end
 
 function luna.update(dt)
@@ -78,22 +78,20 @@ function luna.update(dt)
         -- Wind
         if wind_on then
             for _, o in ipairs(objects) do
-                local ox, oy = luna.physics.getBody(world, o.body)
-                luna.physics.setBodyVelocity(world, o.body,
-                    100 * math.sin(luna.timer.getTime() * 2), 0)
+                o.body:setVelocity(100 * math.sin(luna.timer.getTime() * 2), 0)
             end
         end
 
-        luna.physics.step(world, dt)
+        world:step(dt)
     end
 
     -- Dragging
     if dragging then
         local mx, my = luna.mouse.getPosition()
-        local ox, oy = luna.physics.getBody(world, dragging.body)
+        local ox, oy = dragging.body:getPosition()
         local fx = (mx - ox) * 15
         local fy = (my - oy) * 15
-        luna.physics.setBodyVelocity(world, dragging.body, fx, fy)
+        dragging.body:setVelocity(fx, fy)
     end
 end
 
@@ -170,8 +168,8 @@ function luna.draw()
     -- Joints
     luna.graphics.setLineWidth(2)
     for _, j in ipairs(joints) do
-        local ax, ay = luna.physics.getBody(world, j.a.body)
-        local bx, by = luna.physics.getBody(world, j.b.body)
+        local ax, ay = j.a.body:getPosition()
+        local bx, by = j.b.body:getPosition()
         luna.graphics.setColor(0.6, 0.9, 0.3, 0.7)
         luna.graphics.line(ax, ay, bx, by)
     end
@@ -179,9 +177,8 @@ function luna.draw()
 
     -- Objects
     for _, o in ipairs(objects) do
-        local ox, oy = luna.physics.getBody(world, o.body)
+        local ox, oy = o.body:getPosition()
 
-        -- Color based on velocity (approximate via position delta)
         local cr, cg, cb = o.color[1], o.color[2], o.color[3]
         luna.graphics.setColor(cr, cg, cb, 1)
 
@@ -200,7 +197,7 @@ function luna.draw()
     if joint_mode then
         luna.graphics.setColor(0.3, 1, 0.3, 0.5)
         if joint_first then
-            local ax, ay = luna.physics.getBody(world, joint_first.body)
+            local ax, ay = joint_first.body:getPosition()
             local mx, my = luna.mouse.getPosition()
             luna.graphics.line(ax, ay, mx, my)
         end

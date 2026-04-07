@@ -567,6 +567,565 @@ cargo run -- demos/demo_game
 
 ---
 
+## maze_defense
+
+Maze-building tower defense: place walls to funnel enemies along longer paths and shoot them with towers. A BFS path check prevents placing walls that seal the exit.
+
+**Key APIs**: `luna.graphics`, `luna.mouse`, `luna.timer.getTime`
+
+| Key / Input | Action |
+|-------------|--------|
+| W | Select wall |
+| T | Select tower |
+| Left click | Place/upgrade |
+| Escape | Quit |
+
+```bash
+cargo run -- demos/maze_defense
+```
+
+---
+
+## medical_sim
+
+Step-based medical diagnosis and triage sim. Your team treats a queue of patients with different conditions; each step of the treatment workflow must be completed in the correct order.
+
+**Key APIs**: `luna.timer`, `luna.gui`, `luna.graphics`
+
+| Input | Action |
+|-------|--------|
+| Click | Select tool / apply |
+| Space | Advance step |
+
+```bash
+cargo run -- demos/medical_sim
+```
+
+---
+
+## metroidvania
+
+Multi-room exploration platformer with ability unlocks. Rooms connect through doors; some paths require abilities found in other areas.
+
+**Key APIs**: `luna.physics`, `luna.tilemap`, `luna.camera`
+
+| Key | Action |
+|-----|--------|
+| WASD / Arrow | Move |
+| Space | Jump |
+| Z | Use ability |
+
+```bash
+cargo run -- demos/metroidvania
+```
+
+---
+
+## mining
+
+Dig-down resource extraction on a 50×80 destructible grid. Break tiles to expose ore veins and collect materials before oxygen runs out.
+
+**Key APIs**: `luna.tilemap`, `luna.physics`, `luna.graphics`
+
+| Key | Action |
+|-----|--------|
+| WASD | Move |
+| Space | Drill |
+| R | Restart |
+
+```bash
+cargo run -- demos/mining
+```
+
+---
+
+## party_games
+
+Three quick minigames — avoid meteors, pop balloons, and play reaction bingo — in a single session. Demonstrates scene switching and per-game scoring.
+
+**Key APIs**: `luna.scene`, `luna.input`, `luna.graphics`
+
+| Key | Action |
+|-----|--------|
+| Arrow / WASD | Move |
+| Space | Action |
+| Tab | Skip to next game |
+
+```bash
+cargo run -- demos/party_games
+```
+
+---
+
+## physics_puzzle
+
+Physics-based level progression: position ramps, wedges, and balls to knock a target into a goal. Physics joints let you hinge and anchor pieces.
+
+**Key APIs**: `luna.physics`, `luna.graphics`, `luna.input`
+
+| Input | Action |
+|-------|--------|
+| Drag | Place / move piece |
+| Space | Launch ball |
+| R | Reset level |
+
+```bash
+cargo run -- demos/physics_puzzle
+```
+
+---
+
+## physics_sandbox
+
+Open-ended physics playground: spawn circles, rectangles, and polygons; apply gravity flips and explosions.
+
+**Key APIs**: `luna.physics`, `luna.graphics`, `luna.input`
+
+| Key / Input | Action |
+|-------------|--------|
+| Left click | Spawn shape |
+| G | Flip gravity |
+| E | Explosion |
+| C | Clear all |
+
+```bash
+cargo run -- demos/physics_sandbox
+```
+
+---
+
+## pinball
+
+Classic electromechanical pinball with flippers, bumpers, ramps, and a persistent high-score.
+
+**Key APIs**: `luna.physics`, `luna.graphics`, `luna.input`
+
+| Key | Action |
+|-----|--------|
+| Z | Left flipper |
+| / | Right flipper |
+| Space | Launch ball |
+
+```bash
+cargo run -- demos/pinball
+```
+
+---
+
+## platform_fighter
+
+Two-player Smash-style platform fighting: knockback, hitstun, and percent damage instead of HP.
+
+**Key APIs**: `luna.physics`, `luna.input`, `luna.animation`
+
+| Player 1 | Player 2 | Action |
+|----------|----------|--------|
+| WASD | Arrow keys | Move |
+| J / K | Numpad 1/2 | Attack / Special |
+
+```bash
+cargo run -- demos/platform_fighter
+```
+
+---
+
+## railroad
+
+Train network logistics: lay H/V/curve track tiles to link stations, spawn trains automatically, and earn revenue per delivery.
+
+**Key APIs**: `luna.graph`, `luna.pathfinding`, `luna.graphics`
+
+| Input | Action |
+|-------|--------|
+| Left click | Place selected track |
+| 1–6 | Select track type |
+
+```bash
+cargo run -- demos/railroad
+```
+
+---
+
+## rhythm_game
+
+Four-lane rhythm game with scrolling notes, three timing tiers (Perfect / Good / OK), and a combo multiplier that scales score.
+
+**Key APIs**: `luna.audio`, `luna.timer`, `luna.graphics`
+
+| Key | Action |
+|-----|--------|
+| D F J K | Hit lanes 1–4 |
+| Space | Start / skip |
+
+```bash
+cargo run -- demos/rhythm_game
+```
+
+---
+
+## roguelike
+
+Turn-based dungeon crawler: BSP room generation, L-shaped corridors, fog of war, bump-to-attack combat, and procedural floor depth scaling.
+
+**Key APIs**: `luna.tilemap`, `luna.ai`, `luna.entity`
+
+| Key | Action |
+|-----|--------|
+| Arrow keys | Move / attack |
+| R | Restart on death |
+
+```bash
+cargo run -- demos/roguelike
+```
+
+---
+
+## roguelite
+
+Hades-style real-time action roguelite: room-clearing combat, perk selection after each room, and boss encounters every 5 rooms.
+
+**Key APIs**: `luna.physics`, `luna.entity`, `luna.graphics`
+
+| Key / Input | Action |
+|-------------|--------|
+| WASD | Move |
+| Left click | Attack |
+| Shift | Dash |
+
+```bash
+cargo run -- demos/roguelite
+```
+
+---
+
+## rts
+
+Real-time strategy with two unit types (workers and soldiers), base building, and resource gathering. Click to select and right-click to command.
+
+**Key APIs**: `luna.ai`, `luna.pathfinding`, `luna.entity`
+
+| Input | Action |
+|-------|--------|
+| Left click | Select |
+| Right click | Move / attack |
+| B | Build |
+
+```bash
+cargo run -- demos/rts
+```
+
+---
+
+## sniper
+
+Long-range precision sniping with realistic bullet drag and drop. Hostile targets move along patrol paths; bullets travel ballistic arcs.
+
+**Key APIs**: `luna.camera`, `luna.physics`, `luna.graphics`
+
+| Key / Input | Action |
+|-------------|--------|
+| Mouse | Aim |
+| Left click | Fire |
+| Right click | Zoom |
+| R | Reload |
+
+```bash
+cargo run -- demos/sniper
+```
+
+---
+
+## social_deduction
+
+Among Us-style social deduction: one traitor wins by sabotage; crew wins by completing tasks. NPC characters vote each round.
+
+**Key APIs**: `luna.ai`, `luna.event`, `luna.graphics`
+
+| Key | Action |
+|-----|--------|
+| WASD | Move |
+| E | Interact |
+| Space | Call meeting |
+
+```bash
+cargo run -- demos/social_deduction
+```
+
+---
+
+## soulslike
+
+Stamina-gated combat boss duel: light and heavy attacks, block (with stamina drain), dodge with invincibility frames, and a two-phase boss that telegraphs its swings.
+
+**Key APIs**: `luna.physics`, `luna.animation`, `luna.entity`
+
+| Key | Action |
+|-----|--------|
+| A / D | Move left / right |
+| J | Light attack |
+| K | Heavy attack |
+| Space | Block |
+| Shift | Dodge |
+
+```bash
+cargo run -- demos/soulslike
+```
+
+---
+
+## sports_manager
+
+Season-based football management: assemble a squad, choose tactics, simulate matches, and manage the wage bill to avoid relegation.
+
+**Key APIs**: `luna.ai`, `luna.data`, `luna.graphics`
+
+| Key | Action |
+|-----|--------|
+| Click | Select player / action |
+| Space | Simulate match |
+| T | Change tactics |
+
+```bash
+cargo run -- demos/sports_manager
+```
+
+---
+
+## stealth
+
+Top-down stealth infiltration with guard vision cones, LoS occlusion through walls, suspicion meters, and hiding spots.
+
+**Key APIs**: `luna.ai`, `luna.light`, `luna.pathfinding`
+
+| Key | Action |
+|-----|--------|
+| WASD | Move |
+| Shift | Crouch (reduces LoS range) |
+| Escape | Quit |
+
+```bash
+cargo run -- demos/stealth
+```
+
+---
+
+## survival_crafting
+
+Day/night survival: gather resources, craft tools and shelter, and survive increasingly harsh nights. A crafting-tree UI shows available recipes.
+
+**Key APIs**: `luna.library/crafting`, `luna.entity`, `luna.tilemap`
+
+| Key | Action |
+|-----|--------|
+| WASD | Move |
+| E | Interact / gather |
+| C | Open crafting |
+
+```bash
+cargo run -- demos/survival_crafting
+```
+
+---
+
+## tactical_battle
+
+Grid-based tactical combat (8×8) with knights and archers. Manhattan-diamond movement, terrain cover, and alternating player / AI turns.
+
+**Key APIs**: `luna.tilemap`, `luna.ai`, `luna.entity`
+
+| Input | Action |
+|-------|--------|
+| Click unit | Select |
+| Click tile | Move |
+| Click enemy | Attack |
+| Enter | End turn |
+
+```bash
+cargo run -- demos/tactical_battle
+```
+
+---
+
+## tower_defense
+
+Classic fixed-path tower defense: place towers to reduce the health of waves of enemies following a preset route.
+
+**Key APIs**: `luna.ai`, `luna.pathfinding`, `luna.entity`
+
+| Input | Action |
+|-------|--------|
+| Click tower button | Select type |
+| Click tile | Place tower |
+| Space | Start wave |
+
+```bash
+cargo run -- demos/tower_defense
+```
+
+---
+
+## tower_sim
+
+Build-up corporate tower sim: stack floors — offices, labs, cafes — to attract tenants and maximize profit. Simulates elevator capacity and employee happiness.
+
+**Key APIs**: `luna.entity`, `luna.ai`, `luna.graphics`
+
+| Input | Action |
+|-------|--------|
+| Click floor type | Select |
+| Click column | Add floor |
+| Space | Advance day |
+
+```bash
+cargo run -- demos/tower_sim
+```
+
+---
+
+## trajectory_sports
+
+Multi-sport trajectory challenge (golf, basketball, artillery). Aim angle + power determine the arc; wind and slope modify the result.
+
+**Key APIs**: `luna.physics`, `luna.graphics`, `luna.camera`
+
+| Key / Input | Action |
+|-------------|--------|
+| Left / Right | Adjust angle |
+| Hold Space | Charge power |
+| Release Space | Shoot |
+| Tab | Switch sport |
+
+```bash
+cargo run -- demos/trajectory_sports
+```
+
+---
+
+## tycoon
+
+Restaurant tycoon on a 15×12 pixel-art grid: place kitchens, seating, and decor to attract customers, earn income, and expand.
+
+**Key APIs**: `luna.ai`, `luna.entity`, `luna.graphics`
+
+| Input | Action |
+|-------|--------|
+| Click item | Select |
+| Click tile | Place |
+| Space | Advance time |
+
+```bash
+cargo run -- demos/tycoon
+```
+
+---
+
+## vehicle_builder
+
+Design a vehicle from parts (wheels, hull, engine, wings), then test it on a physics track. Adjust weight distribution to find the optimal configuration.
+
+**Key APIs**: `luna.physics`, `luna.graphics`, `luna.input`
+
+| Input | Action |
+|-------|--------|
+| Drag part | Position |
+| T | Test drive |
+| R | Reset |
+| B | Back to builder |
+
+```bash
+cargo run -- demos/vehicle_builder
+```
+
+---
+
+## vertical_climber
+
+Doodle Jump-style endless vertical climber (400×600 portrait). Jump on platforms that scroll down; fall off the screen and it's over.
+
+**Key APIs**: `luna.physics`, `luna.camera`, `luna.graphics`
+
+| Key | Action |
+|-----|--------|
+| Left / Right (or A / D) | Move |
+| Space | Jump boost |
+
+```bash
+cargo run -- demos/vertical_climber
+```
+
+---
+
+## visual_novel
+
+Branching visual novel engine with three romanceable characters (Luna, Sol, Nova). Affection scores determine which of three endings plays. Typewriter text with auto-advance on Space hold.
+
+**Key APIs**: `luna.library/dialog`, `luna.graphics`
+
+| Key | Action |
+|-----|--------|
+| Space / Enter | Advance / confirm choice |
+| 1 / 2 / 3 | Select choice |
+
+```bash
+cargo run -- demos/visual_novel
+```
+
+---
+
+## wargame
+
+Hex-adjacent grid military wargame: command Blue versus a greedy Red AI. Three unit classes (infantry, cavalry, artillery), terrain modifiers, and d6 combat rolls.
+
+**Key APIs**: `luna.tilemap`, `luna.ai`, `luna.entity`
+
+| Key / Input | Action |
+|-------------|--------|
+| Click unit | Select |
+| Click tile / enemy | Move / attack (costs 1 CP) |
+| Space | End turn |
+
+```bash
+cargo run -- demos/wargame
+```
+
+---
+
+## wildlife_photo
+
+Wildlife photography safari on a 1600×1200 scrolling world. Stalk animals, wait for good poses, and score bonus points for rare species.
+
+**Key APIs**: `luna.ai`, `luna.camera`, `luna.graphics`
+
+| Key / Input | Action |
+|-------------|--------|
+| WASD | Move |
+| Space / Left click | Take photo |
+| Zoom in when still | Bonus score |
+
+```bash
+cargo run -- demos/wildlife_photo
+```
+
+---
+
+## zoo_tycoon
+
+Zoo management tycoon on a 20×15 grid: build enclosures, buy animals, hire keepers, and keep visitor happiness high to earn income.
+
+**Key APIs**: `luna.ai`, `luna.entity`, `luna.graphics`
+
+| Input | Action |
+|-------|--------|
+| Click button | Select object |
+| Click tile | Place |
+| Space | Advance day |
+
+```bash
+cargo run -- demos/zoo_tycoon
+```
+
+---
+
 ## See Also
 
 - [`examples/`](../examples/) — API reference code (one `.lua` file per module)

@@ -1,3 +1,12 @@
+-- Module availability guard (added by fix_nil_module_demos.py)
+if not luna.localization then
+    function luna.load()
+        luna.graphics.setBackgroundColor(0.08, 0.08, 0.12)
+        luna.graphics.print("luna.localization is not available in this build", 180, 270)
+    end
+    return
+end
+
 -- examples/localization_demo/main.lua
 -- Demonstrates the luna.localization module: multi-language text, interpolation,
 -- pluralization, and on-the-fly language switching.

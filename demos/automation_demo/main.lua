@@ -35,33 +35,16 @@ function luna.load()
         meta = { description = "A demo sequence showing all input event types" }
     })
 
-    -- Load a simple TOML-based script
-    local tomlScript = [=[
-[meta]
-name = "toml_script"
-description = "Loaded from inline TOML"
-
-[[steps]]
-action = "keypress"
-key = "space"
-time = 0.0
-
-[[steps]]
-action = "keyrelease"
-key = "space"
-time = 0.2
-
-[[steps]]
-action = "keypress"
-key = "a"
-time = 0.5
-
-[[steps]]
-action = "keyrelease"
-key = "a"
-time = 0.7
-]=]
-    luna.simulator.loadFromToml("toml_script", tomlScript)
+    -- Load a simple script using the standard table format
+    luna.simulator.load("toml_script", {
+        steps = {
+            { action = "keypress",   key = "space", time = 0.0 },
+            { action = "keyrelease", key = "space", time = 0.2 },
+            { action = "keypress",   key = "a",     time = 0.5 },
+            { action = "keyrelease", key = "a",     time = 0.7 },
+        },
+        meta = { name = "toml_script", description = "Second demo sequence" }
+    })
 
     addLog("Loaded 2 scripts: demo_sequence, toml_script")
     addLog("Press 1 to play demo_sequence")

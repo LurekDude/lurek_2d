@@ -1,3 +1,12 @@
+-- Module availability guard (added by fix_nil_module_demos.py)
+if not luna.patterns then
+    function luna.load()
+        luna.graphics.setBackgroundColor(0.08, 0.08, 0.12)
+        luna.graphics.print("luna.patterns is not available in this build", 180, 270)
+    end
+    return
+end
+
 -- Patterns Demo — Luna2D example
 -- Demonstrates the 6 design patterns: EventBus, ObjectPool, CommandStack,
 -- ServiceLocator, Factory, SimpleState (FSM).

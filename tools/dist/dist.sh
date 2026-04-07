@@ -56,15 +56,13 @@ fail() { echo -e "\033[31m[FAIL]\033[0m  $*" >&2; exit 1; }
 
 [[ -f "$WORKSPACE/Cargo.toml" ]] || fail "Cargo.toml not found — run from workspace root."
 
-# ── 1. Assets ─────────────────────────────────────────────────────────────────
-step "Checking generated assets …"
+# ── 1. Verify branding assets ────────────────────────────────────────────────
+step "Checking branding assets …"
 if [[ ! -f "$WORKSPACE/assets/splash.png" ]]; then
-    step "splash.png missing — running gen_splash.py …"
-    python3 "$WORKSPACE/tools/gen_splash.py" || true
+  fail "Missing assets/splash.png. Restore the prebuilt raster asset or rebuild it from assets/svg/large_icon.png and assets/svg/banner.png."
 fi
 if [[ ! -f "$WORKSPACE/assets/icon.png" ]]; then
-    step "icon.png missing — running gen_icon.py …"
-    python3 "$WORKSPACE/tools/gen_icon.py" || true
+  fail "Missing assets/icon.png. Restore the prebuilt raster asset or rebuild it from assets/svg/col_icon.png."
 fi
 
 # ── 2. Release build ───────────────────────────────────────────────────────────

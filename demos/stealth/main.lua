@@ -35,17 +35,27 @@ local function lineRect(x1, y1, x2, y2, rx, ry, rw, rh)
     return false
 end
 
+-- canSee: determines whether a guard can see a target at (tx, ty).
+-- The check has three layers:
+--   1) Distance — target must be within guard.viewDist pixels.
+--   2) Angle   — the angle from guard to target must fall within ±guard.fov radians
+--                of the guard's current facing angle (guard.angle).
+--                math.atan2 gives the absolute angle; the difference is normalised
+--                to the (-π, π] range before comparison.
+--   3) Occlusion — a simplified wall-intersection test using lineRect. Any wall
+--                rectangle that the line-of-sight segment passes through blocks vision.
 local function canSee(guard, tx, ty)
     local dx, dy = tx - guard.x, ty - guard.y
     local d = math.sqrt(dx * dx + dy * dy)
-    if d > guard.viewDist then return false end
+    if d > guard.viewDist then return false end       -- outside range
     local angleToTarget = math.atan2(dy, dx)
     local diff = angleToTarget - guard.angle
-    -- normalize to [-pi, pi]
-    while diff > math.pi do diff = diff - 2 * math.pi end
+    -- Normalise angle difference to [-π, π] so a guard facing left at -π
+    -- still correctly detects targets on either side of the wrap boundary.
+    while diff > math.pi  do diff = diff - 2 * math.pi end
     while diff < -math.pi do diff = diff + 2 * math.pi end
-    if math.abs(diff) > guard.fov then return false end
-    -- check walls
+    if math.abs(diff) > guard.fov then return false end -- outside cone
+    -- Wall occlusion: if the LoS segment intersects any wall rect, vision is blocked.
     for _, w in ipairs(walls) do
         if lineRect(guard.x, guard.y, tx, ty, w.x, w.y, w.w, w.h) then return false end
     end

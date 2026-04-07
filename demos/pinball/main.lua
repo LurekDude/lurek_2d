@@ -1,4 +1,4 @@
--- Pinball — Physics-based pinball table
+-- Pinball -- Physics-based pinball table
 -- Left/Right arrows or Z/slash for flippers, Space to launch
 
 local function clamp(v, mn, mx) return math.max(mn, math.min(mx, v)) end
@@ -16,28 +16,28 @@ local function make_wall(x1, y1, x2, y2)
     local dx = x2 - x1
     local dy = y2 - y1
     local len = math.sqrt(dx * dx + dy * dy)
-    local b = luna.physics.newBody(world, cx, cy, "static")
-    luna.physics.setBodySize(world, b, len, 6)
+    local b = world:newBody(cx, cy, "static")
+    world:addFixture(b:getId(), "rectangle", 1, 0.3, 0, false, len, 6)
     return { body = b, x1 = x1, y1 = y1, x2 = x2, y2 = y2 }
 end
 
 local function make_bumper(x, y, r)
-    local b = luna.physics.newCircleBody(world, x, y, r, "static")
-    luna.physics.setBodyRestitution(world, b, 1.8)
+    local b = world:newCircleBody(x, y, r, "static")
+    b:setRestitution(1.8)
     return { body = b, x = x, y = y, r = r, flash = 0 }
 end
 
 local function make_target(x, y)
-    local b = luna.physics.newBody(world, x, y, "static")
-    luna.physics.setBodySize(world, b, 20, 8)
-    luna.physics.setBodyRestitution(world, b, 1.2)
+    local b = world:newBody(x, y, "static")
+    world:addFixture(b:getId(), "rectangle", 1, 0.3, 0, false, 20, 8)
+    b:setRestitution(1.2)
     return { body = b, x = x, y = y, hit = false, flash = 0 }
 end
 
 local function reset_ball()
     -- launcher slot right side
-    ball_body = luna.physics.newCircleBody(world, W - 20, H - 80, ball_r, "dynamic")
-    luna.physics.setBodyRestitution(world, ball_body, 0.4)
+    ball_body = world:newCircleBody(W - 20, H - 80, ball_r, "dynamic")
+    ball_body:setRestitution(0.4)
     state = "launch"
     launch_power = 0
 end
@@ -81,10 +81,10 @@ function luna.load()
         left  = { x = 170, y = H - 40, angle = 0, body = nil },
         right = { x = 310, y = H - 40, angle = 0, body = nil },
     }
-    flippers.left.body = luna.physics.newBody(world, 170, H - 40, "static")
-    luna.physics.setBodySize(world, flippers.left.body, FLIPPER_LEN, 10)
-    flippers.right.body = luna.physics.newBody(world, 310, H - 40, "static")
-    luna.physics.setBodySize(world, flippers.right.body, FLIPPER_LEN, 10)
+    flippers.left.body = world:newBody(170, H - 40, "static")
+    world:addFixture(flippers.left.body:getId(), "rectangle", 1, 0.3, 0, false, FLIPPER_LEN, 10)
+    flippers.right.body = world:newBody(310, H - 40, "static")
+    world:addFixture(flippers.right.body:getId(), "rectangle", 1, 0.3, 0, false, FLIPPER_LEN, 10)
 
     reset_ball()
 end
@@ -105,13 +105,13 @@ function luna.update(dt)
     local right_active = luna.keyboard.isDown("right") or luna.keyboard.isDown("/")
 
     -- apply flipper impulse to ball when activated
-    local bx, by = luna.physics.getBody(world, ball_body)
+    local bx, by = ball_body:getPosition()
 
     if left_active then
         local fx, fy = flippers.left.x, flippers.left.y
         local d = math.sqrt((bx - fx) * (bx - fx) + (by - fy) * (by - fy))
         if d < FLIPPER_LEN and by > fy - 20 then
-            luna.physics.setBodyVelocity(world, ball_body, -100, -500)
+            ball_body:setVelocity(-100, -500)
         end
     end
 
@@ -119,24 +119,24 @@ function luna.update(dt)
         local fx, fy = flippers.right.x, flippers.right.y
         local d = math.sqrt((bx - fx) * (bx - fx) + (by - fy) * (by - fy))
         if d < FLIPPER_LEN and by > fy - 20 then
-            luna.physics.setBodyVelocity(world, ball_body, 100, -500)
+            ball_body:setVelocity(100, -500)
         end
     end
 
-    luna.physics.step(world, dt)
+    world:step(dt)
 
     -- check collisions
-    local cols = luna.physics.getCollisions(world)
+    local cols = world:getCollisionEvents()
     for _, col in ipairs(cols) do
-        local a, b = col.body_a, col.body_b
+        local a, b = col.bodyA, col.bodyB
         for _, bump in ipairs(bumpers) do
-            if a == bump.body or b == bump.body then
+            if a == bump.body:getId() or b == bump.body:getId() then
                 score = score + 100
                 bump.flash = 0.3
             end
         end
         for _, tgt in ipairs(targets) do
-            if a == tgt.body or b == tgt.body then
+            if a == tgt.body:getId() or b == tgt.body:getId() then
                 if not tgt.hit then
                     score = score + 500
                     tgt.hit = true
@@ -155,7 +155,7 @@ function luna.update(dt)
     end
 
     -- ball out of bounds (drain)
-    bx, by = luna.physics.getBody(world, ball_body)
+    bx, by = ball_body:getPosition()
     if by > H + 20 then
         balls_left = balls_left - 1
         if balls_left <= 0 then
@@ -226,7 +226,7 @@ function luna.draw()
 
     -- ball
     if state ~= "dead" then
-        local bx, by = luna.physics.getBody(world, ball_body)
+        local bx, by = ball_body:getPosition()
         luna.graphics.setColor(0.9, 0.9, 0.95, 1)
         luna.graphics.circle("fill", bx, by, ball_r)
         luna.graphics.setColor(1, 1, 1, 0.4)
@@ -258,19 +258,18 @@ function luna.draw()
         luna.graphics.print("GAME OVER", 130, 280, 3)
         luna.graphics.setColor(1, 1, 1, 1)
         luna.graphics.print("Final Score: " .. score, 180, 350, 1.5)
-        luna.graphics.print("Press R to restart", 180, 400)
     end
 end
 
 function luna.keypressed(key)
     if key == "escape" then luna.event.quit() end
-    if key == "r" then luna.load() end
+    if state == "launch" and key == "space" then
+        -- release: launch ball upward
+        ball_body:setVelocity(0, -launch_power)
+        state = "play"
+    end
 end
 
 function luna.keyreleased(key)
-    if state == "launch" and key == "space" then
-        luna.physics.setBodyVelocity(world, ball_body, 0, -launch_power)
-        state = "play"
-        launch_power = 0
-    end
+    -- (handled inline above)
 end

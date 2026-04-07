@@ -1,6 +1,21 @@
 -- examples/docs_demo/main.lua
 -- Demonstrates the luna.docs.* documentation management API
 
+-- luna.docs is not yet implemented in this build
+if not luna.docs then
+    function luna.load()
+        luna.graphics.setBackgroundColor(0.05, 0.05, 0.1)
+    end
+    function luna.draw()
+        luna.graphics.setColor(1, 0.6, 0.2)
+        luna.graphics.print("Docs API Demo", 20, 20)
+        luna.graphics.setColor(0.7, 0.7, 0.7)
+        luna.graphics.print("luna.docs is not available in this build.", 20, 60)
+        luna.graphics.print("(API not yet implemented)", 20, 85)
+    end
+    return
+end
+
 function luna.load()
     -- Scan the entire luna namespace
     catalog = luna.docs.scan()

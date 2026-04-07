@@ -1150,11 +1150,11 @@ pub fn deep_copy_table()  // Deep-copies a Lua table recursively. Consult the mo
 
 *Coverage: 6/6 items (100%)*
 
-### `event`
+### `event::event_queue`
 
-> Event queue for polling system and custom events.  Provides an alternative to the callback model where game code can poll events from a FIFO queue. Also contains the `Signal` pub-sub type for handle-based event dispatching.
+> Event types and FIFO event queue.
 
-*[src/event/mod.rs](src/event/mod.rs) — 4/4 documented (100%)*
+*[src/event/event_queue.rs](src/event/event_queue.rs) — 4/4 documented (100%)*
 
 ```rust
 pub struct Event  // A single event in the event queue. Consult the module-level documentation for the broad...
@@ -2999,20 +2999,6 @@ pub fn field_of_view()  // Computes a visibility polygon by casting rays at segm
 
 *Coverage: 10/10 items (100%)*
 
-### `savegame`
-
-> Save/load slot system with collectors, schema versioning, dirty tracking, and auto-save.
-
-*[src/savegame/mod.rs](src/savegame/mod.rs) — 5/5 documented (100%)*
-
-```rust
-pub struct SaveManager  // Pure-data save manager providing registration of named collectors, schema versioning, d...
-pub struct SlotMeta  // Metadata extracted from a save slot.  # Fields - `slot` — `String`. Slot name. - `times...
-pub enum SaveValue  // A simple value type matching the Lua subset we can serialize.  # Variants - `Nil` — Lua...
-pub fn serialize_table()  // Serialize a simple Lua-compatible value hierarchy into a `return { ... }` string.  Supp...
-pub fn serialize_value()  // Serialize a single value.  # Parameters - `value` — `&SaveValue`. The value to serializ...
-```
-
 ### `savegame::save_data`
 
 > Save/load slot system with collectors, schema versioning, dirty tracking, and auto-save.  This module is part of Luna2D's `savegame` subsystem and provides the implementation details for save data-related operations and data management. Key types exported from this module: `SlotMeta`, `SaveManager`, `SaveValue`. Primary functions: `new()`, `register()`, `unregister()`, `registered_names()`.  All public items are documented. See the parent module for architectural context and the `luna.*` Lua API for the scripting interface.
@@ -3025,6 +3011,20 @@ pub struct SlotMeta  // Metadata extracted from a save slot. Consult the module-
 pub enum SaveValue  // A simple value type matching the Lua subset we can serialize.  # Variants - `Nil` — Nil...
 pub fn serialize_table()  // Serialize a simple Lua-compatible value hierarchy into a `return { ... }` string.  # Pa...
 pub fn serialize_value()  // Serialize a single value. Consult the module-level documentation for the broader usage ...
+```
+
+### `savegame::save_manager`
+
+> SaveManager, SlotMeta, SaveValue, and Lua serialization helpers.
+
+*[src/savegame/save_manager.rs](src/savegame/save_manager.rs) — 5/5 documented (100%)*
+
+```rust
+pub struct SaveManager  // Pure-data save manager providing registration of named collectors, schema versioning, d...
+pub struct SlotMeta  // Metadata extracted from a save slot.  # Fields - `slot` — `String`. Slot name. - `times...
+pub enum SaveValue  // A simple value type matching the Lua subset we can serialize.  # Variants - `Nil` — Lua...
+pub fn serialize_table()  // Serialize a simple Lua-compatible value hierarchy into a `return { ... }` string.  Supp...
+pub fn serialize_value()  // Serialize a single value.  # Parameters - `value` — `&SaveValue`. The value to serializ...
 ```
 
 ## `scene` {#scene}

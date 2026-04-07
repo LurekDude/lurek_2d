@@ -1,6 +1,6 @@
 ﻿#!/usr/bin/env python3
 """
-gen_docs_lua.py -- Generate Lua API reference from docs/API/lua_api_data.json.
+gen_docs_lua.py -- Generate Lua API reference from docs/logs/lua_api_data.json.
 
 Each function/method is rendered in a Lua code block:
     name( param : type, optional : type? ) -> ReturnType  -- description
@@ -14,7 +14,7 @@ import argparse, json, re, sys
 from pathlib import Path
 
 WORKSPACE_ROOT = Path(__file__).resolve().parent.parent.parent
-INPUT_FILE  = WORKSPACE_ROOT / "docs" / "API" / "lua_api_data.json"
+INPUT_FILE  = WORKSPACE_ROOT / "docs" / "logs" / "lua_api_data.json"
 OUTPUT_FILE = WORKSPACE_ROOT / "docs" / "API" / "lua-api.md"
 
 _MODULE_ORDER = [

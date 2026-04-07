@@ -24,10 +24,12 @@ local WALL_COST = 5
 local TOWER_COST = 20
 local buildMode = "wall"  -- "wall" or "tower"
 
--- BFS pathfinding
+-- BFS pathfinding: finds the shortest 4-directional path through empty cells
+-- from SPAWN to EXIT. Returns a list of {gx,gy} grid cells, or nil if the
+-- exit is completely walled off.
 local function findPath()
     local visited = {}
-    local parent = {}
+    local parent = {}   -- parent[gy][gx] = {px, py}  — used to reconstruct the path
     for y = 1, GRID_H do
         visited[y] = {}
         parent[y] = {}
@@ -36,18 +38,19 @@ local function findPath()
             parent[y][x] = nil
         end
     end
+    -- BFS frontier initialised at the spawn cell
     local queue = {{SPAWN[1], SPAWN[2]}}
     visited[SPAWN[2]][SPAWN[1]] = true
 
     while #queue > 0 do
-        local cur = table.remove(queue, 1)
+        local cur = table.remove(queue, 1)  -- dequeue from front (O(n) but grid is small)
         local cx, cy = cur[1], cur[2]
         if cx == EXIT[1] and cy == EXIT[2] then
-            -- Reconstruct
+            -- Reached exit — walk parent chain backward to rebuild ordered path
             local p = {}
             local nx, ny = cx, cy
             while nx and ny do
-                table.insert(p, 1, {nx, ny})
+                table.insert(p, 1, {nx, ny})   -- prepend so result is SPAWN→EXIT order
                 local pr = parent[ny][nx]
                 if pr then nx, ny = pr[1], pr[2] else break end
             end
@@ -57,6 +60,7 @@ local function findPath()
         for _, d in ipairs(dirs) do
             local nx, ny = cx + d[1], cy + d[2]
             if nx >= 1 and nx <= GRID_W and ny >= 1 and ny <= GRID_H then
+                -- Only traverse empty cells (grid==0); walls and towers block passage
                 if not visited[ny][nx] and grid[ny][nx] == 0 then
                     visited[ny][nx] = true
                     parent[ny][nx] = {cx, cy}
@@ -65,7 +69,7 @@ local function findPath()
             end
         end
     end
-    return nil -- no path
+    return nil -- no path exists — exit is blocked
 end
 
 local function recalcPath()
@@ -241,16 +245,20 @@ function luna.mousepressed(mx, my, btn)
     if btn == 1 then
         if grid[gy][gx] == 0 then
             if buildMode == "wall" and gold >= WALL_COST then
+                -- Tentatively place the wall, then run BFS to verify the path survives.
+                -- If no path exists after placement, undo immediately — blocking the exit
+                -- would make the game impossible to win.
                 grid[gy][gx] = 1
                 local testPath = findPath()
                 if not testPath then
-                    grid[gy][gx] = 0  -- blocked path, reject
+                    grid[gy][gx] = 0  -- path sealed — reject placement
                 else
                     gold = gold - WALL_COST
-                    path = testPath
+                    path = testPath   -- accept new (longer) path
                 end
             elseif buildMode == "tower" and gold >= TOWER_COST then
-                -- Towers go on walls
+                -- Towers are placed on solid cells, so we first test with a wall tile
+                -- to confirm the exit is still reachable, then promote the cell to tower.
                 grid[gy][gx] = 1
                 local testPath = findPath()
                 if not testPath then

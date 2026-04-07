@@ -1,27 +1,23 @@
-#!/usr/bin/env python3
+﻿#!/usr/bin/env python3
 """
-gen_lua_api.py — Generate Luna2D Lua API reference from Rust source code.
+gen_lua_api.py — Luna2D Lua API parser library.
 
-Parses src/lua_api/*.rs files, extracts all registered Lua functions and
-userdata methods by scanning for .set("name", lua.create_function(...))
-and methods.add_method("name", ...) patterns. Associates each function
-with preceding /// docstrings.
+Parses src/lua_api/*.rs files and extracts all registered Lua functions and
+userdata methods by scanning for .set() and add_method() patterns, associating
+each entry with its preceding /// docstrings.
 
-Usage:
-    python tools/gen_lua_api.py                     # -> docs/API/lua_api_reference_generated.md
-    python tools/gen_lua_api.py --output FILE       # custom output path
-    python tools/gen_lua_api.py --src DIR           # custom source directory
-    python tools/gen_lua_api.py --check             # validate docstring coverage
-    python tools/gen_lua_api.py --json              # structured JSON output
-    python tools/gen_lua_api.py --help              # show this help
+This module is a library used by other tools:
+    gen_lua_api_data.py  -- builds docs/logs/lua_api_data.json
+    gen_rust_api_data.py -- cross-references Rust <-> Lua symbols
+    gen_coverage_gaps.py -- detects missing Lua API coverage
+    test_coverage.py     -- measures test coverage against the Lua API
 
-Exit codes:
-    0  - success
-    1  - missing docstrings (--check only)
-    2  - fatal error (bad arguments, missing source directory)
+Key exports:
+    collect_all_functions(src_dir) -> Dict[str, List[LuaFunction]]
+    collect_class_descriptions(api_file) -> Dict[str, str]
+    extract_lua_functions(api_file) -> List[LuaFunction]
+    LuaFunction (dataclass)
 """
-
-import argparse
 import json
 import re
 import sys
@@ -82,6 +78,15 @@ def _collect_docstring_above(lines: List[str], line_idx: int) -> str:
             seen.add(line)
             deduped.append(line)
     return "\n".join(deduped).strip()
+
+
+def _first_desc_line(docstring: str) -> str:
+    """Return the first non-@param/@return description line from a /// docstring."""
+    for line in docstring.split("\n"):
+        stripped = line.strip()
+        if stripped and not stripped.startswith("@"):
+            return stripped
+    return ""
 
 
 def _extract_params_returns(docstring: str) -> tuple:
@@ -212,9 +217,9 @@ def collect_class_descriptions(api_file: Path) -> Dict[str, str]:
 
     result: Dict[str, str] = {}
 
-    # Pass 1: pub struct LuaXxx (highest priority — struct-level docs)
+    # Pass 1: struct LuaXxx or pub struct LuaXxx (highest priority — struct-level docs)
     for i, line in enumerate(lines):
-        m = re.match(r"\s*pub struct (Lua\w+)", line)
+        m = re.match(r"\s*(?:pub\s+)?struct (Lua\w+)", line)
         if not m:
             continue
         struct_name = m.group(1)
@@ -232,6 +237,19 @@ def collect_class_descriptions(api_file: Path) -> Dict[str, str]:
         class_name = struct_name[3:] if struct_name.startswith("Lua") else struct_name
         if class_name in result:
             continue  # already found via pub struct
+        desc = _collect_doc_above(lines, i)
+        if desc:
+            result[class_name] = desc
+
+    # Pass 3: fn add_X_methods( — GUI-style widget factory functions
+    for i, line in enumerate(lines):
+        m = re.search(r"fn\s+add_(\w+)_methods\(", line)
+        if not m:
+            continue
+        raw_name = m.group(1)  # e.g. "accordion", "gui_window"
+        class_name = raw_name.title()  # "Accordion", "Gui_Window"
+        if class_name in result:
+            continue  # already found via struct or impl
         desc = _collect_doc_above(lines, i)
         if desc:
             result[class_name] = desc
@@ -434,7 +452,7 @@ def extract_lua_functions(api_file: Path) -> List[LuaFunction]:
                     if not docstring and owner:
                         docstring = f"/// Returns a value for {func_name} (auto-generated)."
 
-                    desc = docstring.split("\n")[0] if docstring else ""
+                    desc = _first_desc_line(docstring)
                     params, returns = _extract_params_returns(docstring)
                     inferred = _infer_signature(lines, i)
 
@@ -462,7 +480,7 @@ def extract_lua_functions(api_file: Path) -> List[LuaFunction]:
             if not docstring and owner:
                 docstring = f"/// Returns a value for {func_name} (auto-generated)."
 
-            desc = docstring.split("\n")[0] if docstring else ""
+            desc = _first_desc_line(docstring)
             params, returns = _extract_params_returns(docstring)
             inferred = _infer_signature(lines, i)
 
@@ -485,7 +503,7 @@ def extract_lua_functions(api_file: Path) -> List[LuaFunction]:
             owner = current_impl_type or "Unknown"
             display_owner = type_names.get(owner, owner.replace("Lua", "") if owner.startswith("Lua") else owner)
             docstring = _collect_docstring_above(lines, i)
-            desc = docstring.split("\n")[0] if docstring else ""
+            desc = _first_desc_line(docstring)
             params, returns = _extract_params_returns(docstring)
             inferred = _infer_signature(lines, i)
             functions.append(LuaFunction(
@@ -509,7 +527,7 @@ def extract_lua_functions(api_file: Path) -> List[LuaFunction]:
             display_owner = type_names.get(owner, owner.replace("Lua", "") if owner.startswith("Lua") else owner)
             # Look up docstring on the named pub fn declaration
             docstring = _find_pub_fn_docstring(rust_fn) or _collect_docstring_above(lines, i)
-            desc = docstring.split("\n")[0] if docstring else ""
+            desc = _first_desc_line(docstring)
             params, returns = _extract_params_returns(docstring)
             inferred = _infer_signature(lines, i)
             functions.append(LuaFunction(
@@ -536,7 +554,7 @@ def extract_lua_functions(api_file: Path) -> List[LuaFunction]:
                 lua_name = f"{owner}:{func_name}" if owner else f"luna.{module}.{func_name}"
                 # Look up docstring from the named pub fn declaration
                 docstring = _find_pub_fn_docstring(rust_fn) or _collect_docstring_above(lines, i)
-                desc = docstring.split("\n")[0] if docstring else ""
+                desc = _first_desc_line(docstring)
                 params, returns = _extract_params_returns(docstring)
                 inferred = _infer_signature(lines, i)
                 functions.append(LuaFunction(
@@ -562,293 +580,3 @@ def collect_all_functions(src_dir: Path) -> Dict[str, List[LuaFunction]]:
         for func in functions:
             all_functions.setdefault(func.module, []).append(func)
     return all_functions
-
-
-def render_json(all_functions: Dict[str, List[LuaFunction]]) -> str:
-    items = []
-    for module, funcs in sorted(all_functions.items()):
-        for func in sorted(funcs, key=lambda f: (f.owner_type, f.name)):
-            items.append({
-                "module": func.module, "name": func.name,
-                "lua_name": func.lua_name, "owner_type": func.owner_type,
-                "kind": func.kind, "description": func.description,
-                "full_doc": func.full_doc, "params": func.params,
-                "returns": func.returns, "line": func.line,
-                "file": func.file,
-            })
-    summary = {}
-    for module, funcs in all_functions.items():
-        mf = [f for f in funcs if f.kind == "function"]
-        mm = [f for f in funcs if f.kind == "method"]
-        documented = sum(1 for f in funcs if f.description)
-        summary[module] = {
-            "functions": len(mf), "methods": len(mm),
-            "total": len(funcs), "documented": documented,
-            "undocumented": len(funcs) - documented,
-        }
-    return json.dumps({"summary": summary, "functions": items}, indent=2, ensure_ascii=False)
-
-
-# Canonical module display order
-_MODULE_ORDER = [
-    "graphics", "graphics_ext", "window", "input",
-    "timer", "math", "math_ext",
-    "audio", "physics", "filesystem", "particle",
-    "event", "system", "thread",
-    "ai", "compute", "dataframe",
-    "data", "image", "sound", "graph", "tilemap",
-]
-
-
-def generate_markdown(all_functions: Dict[str, List[LuaFunction]], src_dir: Path = SRC_LUA_API_DIR) -> str:
-    output = []
-    # Build a lookup: module_name -> api_file Path (supports subdirectories)
-    api_file_map: Dict[str, Path] = {}
-    for rs_file in src_dir.rglob("*_api.rs"):
-        mod_name = rs_file.stem.replace("_api", "")
-        api_file_map[mod_name] = rs_file
-    output.append("# Luna2D Lua API Reference")
-    output.append("")
-    output.append("> Auto-generated by `tools/gen_lua_api.py`. Do not edit by hand.")
-    output.append("> Re-run the script after changing `///` docstrings in `src/lua_api/*.rs`.")
-    output.append("")
-
-    # ── Coverage summary ─────────────────────────────────────────────────────
-    total_funcs = sum(len(f) for f in all_functions.values())
-    total_docs = sum(1 for funcs in all_functions.values() for f in funcs if f.description)
-    pct = (total_docs / total_funcs * 100) if total_funcs else 0
-    output.append(f"> **Coverage:** {total_docs}/{total_funcs} functions documented ({pct:.0f}%)")
-    output.append("")
-
-    # ── Table of Contents ────────────────────────────────────────────────────
-    output.append("## Contents")
-    output.append("")
-    output.append("| Module | Functions | Methods | Documented |")
-    output.append("|--------|-----------|---------|------------|")
-
-    seen: set = set()
-    ordered_modules: List[str] = []
-    for mod in _MODULE_ORDER:
-        if mod in all_functions:
-            seen.add(mod)
-            ordered_modules.append(mod)
-    for mod in sorted(all_functions.keys()):
-        if mod not in seen:
-            ordered_modules.append(mod)
-
-    for mod in ordered_modules:
-        funcs = all_functions[mod]
-        n_funcs = sum(1 for f in funcs if f.kind == "function")
-        n_methods = sum(1 for f in funcs if f.kind == "method")
-        n_docs = sum(1 for f in funcs if f.description)
-        anchor = mod.replace("_", "-")
-        output.append(f"| [`luna.{mod}`](#{anchor}) | {n_funcs} | {n_methods} | {n_docs}/{len(funcs)} |")
-    output.append("")
-
-    # ── Callbacks ────────────────────────────────────────────────────────────
-    output.append("## Callbacks")
-    output.append("")
-    output.append("These functions are called by the engine automatically:")
-    output.append("")
-    output.append("| Callback | Description |")
-    output.append("|----------|-------------|")
-    output.append("| `luna.load()` | Called once after the script is loaded |")
-    output.append("| `luna.update(dt)` | Called every frame; `dt` is elapsed seconds |")
-    output.append("| `luna.draw()` | Called every frame for rendering |")
-    output.append("| `luna.keypressed(key)` | Called when a keyboard key is pressed |")
-    output.append("| `luna.keyreleased(key)` | Called when a keyboard key is released |")
-    output.append("| `luna.mousepressed(x, y, button)` | Called when a mouse button is pressed |")
-    output.append("| `luna.mousereleased(x, y, button)` | Called when a mouse button is released |")
-    output.append("| `luna.touchpressed(id, x, y, dx, dy, pressure)` | Called on touch start |")
-    output.append("| `luna.touchmoved(id, x, y, dx, dy, pressure)` | Called on touch move |")
-    output.append("| `luna.touchreleased(id, x, y, dx, dy, pressure)` | Called on touch end |")
-    output.append("| `luna.resize(w, h)` | Called when window is resized |")
-    output.append("| `luna.focus(focused)` | Called when window gains/loses focus |")
-    output.append("| `luna.quit()` | Called when the window is closed |")
-    output.append("| `luna.gamepadpressed(id, button)` | Called on gamepad button press |")
-    output.append("| `luna.gamepadreleased(id, button)` | Called on gamepad button release |")
-    output.append("| `luna.gamepadaxis(id, axis, value)` | Called on gamepad axis change |")
-    output.append("")
-
-    for mod in ordered_modules:
-        api_file = api_file_map.get(mod, src_dir / f"{mod}_api.rs")
-        module_doc = _collect_module_doc(api_file) if api_file.exists() else ""
-        _render_module(output, mod, all_functions[mod], module_doc)
-
-    return "\n".join(output)
-
-
-def _render_function_entry(
-    output: list, heading: str, func: LuaFunction, src_base: str = ""
-) -> None:
-    """Render a single function or method entry."""
-    # Determine display signature
-    if func.params:
-        # Docstring has explicit params — parse first line to see if it's a sig
-        first_param_line = func.params.split("\n")[0].strip()
-        display_sig = func.inferred_sig or ""
-    else:
-        display_sig = func.inferred_sig
-
-    output.append(f"#### `{heading}{display_sig}`")
-    output.append("")
-
-    if func.description:
-        output.append(func.description)
-        if func.full_doc.count("\n") > 0:
-            # Additional paragraphs from the full doc beyond the first line
-            extra_lines = func.full_doc.split("\n")[1:]
-            extra_paragraphs: List[str] = []
-            buf: List[str] = []
-            for ln in extra_lines:
-                ln_stripped = ln.strip()
-                if re.match(r"^#\s+", ln_stripped):
-                    break  # stop before sections; rendered below
-                if ln_stripped:
-                    buf.append(ln_stripped)
-                elif buf:
-                    extra_paragraphs.append(" ".join(buf))
-                    buf = []
-            if buf:
-                extra_paragraphs.append(" ".join(buf))
-            for para in extra_paragraphs:
-                output.append("")
-                output.append(para)
-        output.append("")
-    else:
-        output.append("*(undocumented)*")
-        output.append("")
-
-    if func.params:
-        output.append("**Parameters:**")
-        output.append("")
-        for pl in func.params.split("\n"):
-            if pl.strip():
-                output.append(pl)
-        output.append("")
-    elif display_sig and display_sig not in ("()", ""):
-        # Show inferred params as a lightweight note
-        param_names = [p.strip().strip("[]") for p in display_sig.strip("()").split(",") if p.strip()]
-        output.append("**Parameters:** " + ", ".join(f"`{p}`" for p in param_names))
-        output.append("")
-
-    if func.returns:
-        output.append(f"**Returns:** {func.returns}")
-        output.append("")
-
-    # Source link
-    fwd = func.file.replace("\\", "/")
-    output.append(f"*Source: [{fwd}]({fwd}#L{func.line})*")
-    output.append("")
-    output.append("---")
-    output.append("")
-
-
-def _render_module(output: list, module: str, funcs: List[LuaFunction], module_doc: str = "") -> None:
-    anchor = module.replace("_", "-")
-    output.append(f"## luna.{module}")
-    output.append("")
-
-    if module_doc:
-        # First line summary
-        first_line = module_doc.split("\n")[0]
-        output.append(first_line)
-        rest = module_doc[len(first_line):].strip()
-        if rest:
-            output.append("")
-            output.append(rest)
-        output.append("")
-
-    module_funcs = sorted([f for f in funcs if f.kind == "function"], key=lambda f: f.name)
-    methods_by_type: Dict[str, List[LuaFunction]] = {}
-    for f in funcs:
-        if f.kind == "method":
-            methods_by_type.setdefault(f.owner_type, []).append(f)
-
-    n_docs = sum(1 for f in funcs if f.description)
-    output.append(f"*{len(funcs)} entries | {n_docs} documented*")
-    output.append("")
-
-    if module_funcs:
-        output.append("### Functions")
-        output.append("")
-        for func in module_funcs:
-            heading = f"luna.{module}.{func.name}"
-            _render_function_entry(output, heading, func)
-
-    for type_name in sorted(methods_by_type.keys()):
-        type_methods = sorted(methods_by_type[type_name], key=lambda f: f.name)
-        output.append(f"### {type_name} Methods")
-        output.append("")
-        for func in type_methods:
-            heading = func.lua_name
-            _render_function_entry(output, heading, func)
-    output.append("")
-
-
-def main():
-    parser = argparse.ArgumentParser(
-        description="Generate Luna2D Lua API reference from Rust docstrings",
-        formatter_class=argparse.RawDescriptionHelpFormatter,
-        epilog=__doc__,
-    )
-    parser.add_argument("--output", type=Path, default=OUTPUT_FILE,
-                        help="Output file path")
-    parser.add_argument("--src", type=Path, default=SRC_LUA_API_DIR,
-                        help="Source directory")
-    parser.add_argument("--check", action="store_true",
-                        help="Check for missing docstrings")
-    parser.add_argument("--json", action="store_true",
-                        help="Output structured JSON instead of Markdown")
-    args = parser.parse_args()
-
-    if not args.src.is_dir():
-        print(f"Error: Source directory not found: {args.src}", file=sys.stderr)
-        return 2
-
-    all_functions = collect_all_functions(args.src)
-    total = sum(len(f) for f in all_functions.values())
-
-    if args.check:
-        missing = 0
-        for module, funcs in sorted(all_functions.items()):
-            for func in funcs:
-                if not func.description:
-                    print(f"Missing docstring: {func.lua_name} ({func.file}:{func.line})")
-                    missing += 1
-        documented = total - missing
-        pct = (documented / total * 100) if total else 100
-        print(f"\nLua API coverage: {documented}/{total} ({pct:.1f}%)")
-        if missing > 0:
-            print(f"Total missing docstrings: {missing}", file=sys.stderr)
-            return 1
-        print(f"[OK] All {total} Lua functions have docstrings")
-        return 0
-
-    if args.json:
-        j = render_json(all_functions)
-        args.output.parent.mkdir(parents=True, exist_ok=True)
-        args.output.write_text(j, encoding="utf-8")
-        try:
-            out_display = args.output.relative_to(WORKSPACE_ROOT)
-        except ValueError:
-            out_display = args.output
-        print(f"[OK] Generated JSON for {total} Lua functions -> {out_display}")
-        return 0
-
-    markdown = generate_markdown(all_functions, args.src)
-    args.output.parent.mkdir(parents=True, exist_ok=True)
-    args.output.write_text(markdown, encoding="utf-8")
-    try:
-        out_display = args.output.relative_to(WORKSPACE_ROOT)
-    except ValueError:
-        out_display = args.output
-    total_docs = sum(1 for funcs in all_functions.values() for f in funcs if f.description)
-    pct = (total_docs / total * 100) if total else 0
-    print(f"[OK] Generated API reference: {out_display}")
-    print(f"  {total} functions across {len(all_functions)} modules | {total_docs} documented ({pct:.0f}%)")
-    return 0
-
-
-if __name__ == "__main__":
-    sys.exit(main())

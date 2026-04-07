@@ -274,8 +274,10 @@ pub struct SharedState {
     pub blend_mode: BlendMode,
     /// Loaded TTF fonts for text rendering.
     pub fonts: SlotMap<FontKey, crate::graphics::Font>,
-    /// Key of the currently active font (`None` = use bitmap fallback).
+    /// Key of the currently active font (`None` = use default engine font).
     pub active_font: Option<FontKey>,
+    /// Built-in OpenSans engine font loaded at startup — used when `active_font` is `None`.
+    pub default_font: Option<FontKey>,
     /// Loaded sprite batches for batched rendering.
     pub sprite_batches: SlotMap<SpriteBatchKey, crate::graphics::SpriteBatch>,
     /// Off-screen render targets (canvases) for compositing.
@@ -391,6 +393,7 @@ impl SharedState {
             blend_mode: BlendMode::default(),
             fonts: SlotMap::with_key(),
             active_font: None,
+            default_font: None,
             sprite_batches: SlotMap::with_key(),
             canvases: SlotMap::with_key(),
             particle_systems: SlotMap::with_key(),
@@ -455,6 +458,25 @@ impl SharedState {
         }
         let handle = self.async_loader.as_ref().unwrap().request_load(resolved);
         Ok(handle.0)
+    }
+
+    /// Loads the embedded OpenSans-Regular font into `fonts` and stores the key in `default_font`.
+    ///
+    /// Called once during `init_lua`. Idempotent — does nothing if `default_font` is already set.
+    pub fn load_default_font(&mut self) {
+        if self.default_font.is_some() {
+            return;
+        }
+        const OPENSANS: &[u8] = include_bytes!("../../assets/fonts/OpenSans.ttf");
+        match crate::graphics::Font::from_bytes(OPENSANS, 16.0) {
+            Ok(font) => {
+                let key = self.fonts.insert(font);
+                self.default_font = Some(key);
+            }
+            Err(err) => {
+                log::warn!("Failed to load built-in OpenSans font: {}", err);
+            }
+        }
     }
 
     /// Polls a pending async load and returns the status and optional data.

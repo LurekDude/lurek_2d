@@ -2,8 +2,6 @@
 
 local item      = require("library.item")
 local inventory = require("library.inventory")
-local item      = require("library.item")
-local inventory = require("library.inventory")
 
 --[[
   loot_rpg_demo — Item System + Inventory Integration Example
@@ -56,7 +54,7 @@ starter_builder:add("coin",   10)
 local starter_gear = starter_builder:build("starter")
 
 -- ── 4. Pickup journal ─────────────────────────────────────────────────────
-local pickup_log = item.newHistory(20)
+local pickup_log = item.newStackHistory(20)
 
 -- ── 5. Player inventory ───────────────────────────────────────────────────
 local player_inv  = inventory.newInventory()

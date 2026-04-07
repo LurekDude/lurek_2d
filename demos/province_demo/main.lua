@@ -1,3 +1,12 @@
+-- Module availability guard (added by fix_nil_module_demos.py)
+if not luna.province then
+    function luna.load()
+        luna.graphics.setBackgroundColor(0.08, 0.08, 0.12)
+        luna.graphics.print("luna.province is not available in this build", 180, 270)
+    end
+    return
+end
+
 -- Province Map Demo for Luna2D
 -- Demonstrates: world generation, map modes, fog of war, pathfinding, objects
 -- Uses the generic property system -- terrain, owner, etc. are just properties.

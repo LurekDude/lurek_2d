@@ -2,7 +2,7 @@
 //
 // Responsibilities:
 //   1. If assets/splash.png exists → set cfg(luna2d_has_splash) so app.rs
-//      uses the embedded PNG instead of the procedural fallback.
+//      can use the embedded PNG instead of the procedural fallback.
 //   2. On Windows — embed assets/icon.ico into the .exe via winresource
 //      (requires:  [build-dependencies] winresource = "0.1" in Cargo.toml).
 
@@ -43,7 +43,9 @@ fn main() {
                 eprintln!("cargo:warning=winresource: {e}");
             }
         } else {
-            eprintln!("cargo:warning=assets/icon.ico not found — run python tools/gen_icon.py");
+            eprintln!(
+                "cargo:warning=assets/icon.ico not found — restore the prebuilt raster asset or rebuild it from assets/svg/col_icon.png"
+            );
         }
     }
 }

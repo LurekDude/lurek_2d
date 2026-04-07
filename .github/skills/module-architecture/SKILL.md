@@ -33,14 +33,17 @@ description: "Load this skill when designing module boundaries, dependency direc
 
 ## Decision Rules
 
-- **Dependency direction** (strict):
-  - `math` → depends on nothing (foundational)
-  - `graphics`, `physics`, `audio`, `input`, `timer`, `filesystem`, `window` → depend only on `math`
-  - `engine` → may depend on ALL domain modules
-  - `lua_api` → depends on `engine` + ALL domain modules
-- **No cross-domain deps**: `graphics` must NOT import from `physics`, `audio`, etc. (and vice versa)
+- **Layer model** (strict):
+  - `math` → depends on nothing; it is the Baseline leaf
+  - `engine` → Baseline runtime lifecycle and shared state
+  - Tier 1 Rust modules → depend only on `math` and `engine`
+  - Tier 2 Rust modules → depend on Baseline + Tier 1, never other Tier 2 modules
+  - `lua_api` → bridge layer that imports engine modules to expose `luna.*`
+  - `library/` → Tier 3 Lunasome, pure Lua; when a new gameplay-domain helper can live there, prefer that over a new Rust gameplay module
+  - Gameplay-oriented Rust modules still under `src/` are migration-state code, not the target Tier 3 architecture for new work
+- **No same-tier cross-imports**: Tier 1 modules must not import other Tier 1 modules; Tier 2 modules must not import other Tier 2 modules
 - **One responsibility**: Each module owns one subsystem — no shared kitchen-sink modules
 - **mod.rs pattern**: Each module has `mod.rs` for re-exports + separate files for types
 - **Visibility**: Default to `pub(crate)`; use `pub` only for types used by `tests/` or external consumers
-- **New module checklist**: Create directory, add `mod.rs`, add `pub mod` to `lib.rs`, add tests
+- **New module checklist**: Create directory, add `mod.rs`, add `pub mod` to `lib.rs` when it belongs in the Rust crate surface, and add tests in the correct registered test family
 - **Math is special**: `Vec2`, `Mat3`, `Rect` are foundational — all modules may depend on `math`

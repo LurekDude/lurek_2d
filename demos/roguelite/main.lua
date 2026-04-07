@@ -67,6 +67,9 @@ local function startRoom()
 end
 
 local function offerPerks()
+    -- Present 3 randomly-chosen perks from the pool after each room is cleared.
+    -- The loop draws without replacement (duplicate index check) so the same perk
+    -- cannot appear twice in one offer — even if the pool is small.
     perkOptions = {}
     local indices = {}
     while #indices < 3 and #indices < #perkPool do
@@ -119,7 +122,12 @@ function luna.update(dt)
     -- Attack cooldown
     player.atkCooldown = clamp(player.atkCooldown - dt, 0, 9)
     player.atkDuration = clamp(player.atkDuration - dt, 0, 9)
-    -- Attack hit detection
+    -- Attack hit detection: a circular hitbox emanates from the point in front of the
+    -- player (offset by atkRange in the attack direction). Any enemy whose centre falls
+    -- within atkRange of that point is hit. The `hitTimer` guard (0.2 s cooldown per
+    -- enemy) prevents the same swing from hitting the same enemy multiple times.
+    -- atkDuration is zeroed after the first frame of hit-detection so each click
+    -- produces exactly one hit event (melee sweep, not sustained contact).
     if player.atkDuration > 0.08 then
         local ax = player.x + player.w / 2 + math.cos(player.atkAngle) * player.atkRange
         local ay = player.y + player.h / 2 + math.sin(player.atkAngle) * player.atkRange
@@ -129,11 +137,11 @@ function luna.update(dt)
             if math.sqrt(edx * edx + edy * edy) < player.atkRange then
                 if e.hitTimer <= 0 then
                     e.hp = e.hp - (player.atk + player.bonusAtk)
-                    e.hitTimer = 0.2
+                    e.hitTimer = 0.2  -- brief immunity to prevent double-registration
                 end
             end
         end
-        player.atkDuration = 0 -- single hit
+        player.atkDuration = 0 -- one swing = one hit; reset to avoid repeat checks
     end
     -- Enemies
     for i = #enemies, 1, -1 do

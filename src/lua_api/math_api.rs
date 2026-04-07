@@ -1155,7 +1155,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
     tbl.set("inOutQuad", lua.create_function(|_, t: f32| Ok(easing::ease_in_out_quad(t)))?)?;
 
     // -- inCubic --
-    /// Cubic ease-in.
+    /// Cubic ease-in — acceleration starts slowly then increases sharply.
     /// @param t : number
     /// @return number
     tbl.set("inCubic", lua.create_function(|_, t: f32| Ok(easing::ease_in_cubic(t)))?)?;
@@ -1251,13 +1251,13 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
     tbl.set("inBounce", lua.create_function(|_, t: f32| Ok(easing::ease_in_bounce(t)))?)?;
 
     // -- inBack --
-    /// Back ease-in.
+    /// Back ease-in — overshoots slightly before settling at the target.
     /// @param t : number
     /// @return number
     tbl.set("inBack", lua.create_function(|_, t: f32| Ok(easing::ease_in_back(t)))?)?;
 
     // -- outBack --
-    /// Back ease-out.
+    /// Back ease-out — overshoots the target then snaps back into place.
     /// @param t : number
     /// @return number
     tbl.set("outBack", lua.create_function(|_, t: f32| Ok(easing::ease_out_back(t)))?)?;

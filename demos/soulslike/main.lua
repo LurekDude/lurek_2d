@@ -7,7 +7,7 @@ local state -- "play", "dead", "victory"
 
 local function dist(a, b) return math.abs(a.x - b.x) end
 
-local function clamp(v, lo, hi) return clamp(v, lo, hi) end
+local function clamp(v, lo, hi) return math.max(lo, math.min(hi, v)) end
 
 local function spawn_hit_particles(x, y, r, g, b)
     for i = 1, 6 do
@@ -120,25 +120,29 @@ function luna.update(dt)
     if player.hurt_flash > 0 then player.hurt_flash = player.hurt_flash - dt end
     if boss.hurt_flash > 0 then boss.hurt_flash = boss.hurt_flash - dt end
 
-    -- player stamina regen
+    -- Stamina regenerates only when completely idle (no attack, dodge, or block).
+    -- This means the player cannot safely attack-spam then regenerate mid-combo.
     if not player.attacking and not player.dodging and not player.blocking then
         player.stamina = clamp(player.stamina + player.stam_regen * dt, 0, player.max_stamina)
     end
 
-    -- player dodge
+    -- Dodge: the player slides laterally at 350 px/s for dodge_dur seconds.
+    -- Invincibility frames (iframe) cover the first 0.25 s of the dodge window,
+    -- so dodge_into an attack to nullify it, then punish during the boss recovery.
     if player.dodging then
         player.dodge_timer = player.dodge_timer + dt
         player.x = player.x + player.dodge_dir * 350 * dt
-        player.iframe = player.dodge_timer < 0.25
+        player.iframe = player.dodge_timer < 0.25  -- only ~half the dodge has i-frames
         if player.dodge_timer >= player.dodge_dur then
             player.dodging = false; player.iframe = false
         end
     end
 
-    -- player attack
+    -- Attack: hit registers at exactly the mid-point of the animation window
+    -- (atk_timer reaches 50% of atk_dur), matching how "active frames" work in
+    -- fighting games — there is only one hit check per swing.
     if player.attacking then
         player.atk_timer = player.atk_timer + dt
-        -- hit on middle of attack
         if player.atk_timer >= player.atk_dur * 0.5 and player.atk_timer - dt < player.atk_dur * 0.5 then
             local range = player.atk_type == "light" and player.light_range or player.heavy_range
             local dmg = player.atk_type == "light" and player.light_dmg or player.heavy_dmg
@@ -168,7 +172,8 @@ function luna.update(dt)
     boss.timer = boss.timer + dt
 
     if boss.state == "idle" then
-        -- approach player
+        -- Phase 1: approach then pause 1.8 s before telegraphing.
+        -- Phase 2 cuts the wait to 1.0 s, making attacks arrive faster.
         local d = dist(player, boss)
         if d > 70 then
             boss.x = boss.x + boss.facing * boss.speed * dt
@@ -177,9 +182,12 @@ function luna.update(dt)
         if boss.timer > approach_time then
             boss.state = "telegraph"
             boss.timer = 0
+            -- Phase 2 mixes in heavy attacks at 50% probability
             boss.atk_type = (boss.phase == 2 and math.random() > 0.5) and "heavy" or "light"
         end
     elseif boss.state == "telegraph" then
+        -- The tele_flash oscillation gives the player a visual cue that an attack is coming.
+        -- dodge during this window to be safe; the boss cannot change direction here.
         boss.tele_flash = math.sin(boss.timer * 20) * 0.5 + 0.5
         if boss.timer >= boss.telegraph_dur then
             boss.state = "attack"
@@ -188,12 +196,12 @@ function luna.update(dt)
         end
     elseif boss.state == "attack" then
         if boss.timer < 0.05 then
-            -- lunge
+            -- Lunge happens in the first 50 ms of the attack state — only one frame fires it.
             boss.x = boss.x + boss.facing * 100
             boss_try_hit_player()
         end
         if boss.timer >= boss.atk_dur then
-            boss.state = "recovery"
+            boss.state = "recovery"  -- recovery window: player can safely counter-attack
             boss.timer = 0
         end
     elseif boss.state == "recovery" then

@@ -1,4 +1,4 @@
--- Shooting Gallery — Luna2D demo game
+-- Shooting Gallery -- Luna2D demo game
 -- Physics shooter: aim with the mouse, click to fire balls at targets.
 -- Demonstrates: physics, raycast, collision events, shapes, input, text rendering.
 
@@ -7,9 +7,9 @@ local CANNON_X, CANNON_Y = 60, 300
 local MAX_BALLS = 10
 
 local world_id
-local targets = {}     -- array of {id, alive}
-local target_ids = {}  -- body_id -> targets index (fast lookup)
-local balls = {}       -- array of active ball body IDs
+local targets = {}     -- array of {id=LuaBody, alive}
+local target_ids = {}  -- body integer id -> targets index (fast lookup)
+local balls = {}       -- array of active ball LuaBody objects
 local score = 0
 
 local function init_world()
@@ -21,46 +21,47 @@ local function init_world()
     world_id = luna.physics.newWorld(0, 150)
 
     -- Ground and ceiling (layer 3 collides with all)
-    local gnd = luna.physics.newBody(world_id, W / 2, H - 5, "static")
-    luna.physics.setBodySize(world_id, gnd, W, 10)
-    luna.physics.setBodyLayer(world_id, gnd, 3, 3)
+    local gnd = world_id:newBody(W / 2, H - 5, "static")
+    world_id:addFixture(gnd:getId(), "rectangle", 1, 0.3, 0, false, W, 10)
+    gnd:setLayer(3); gnd:setMask(3)
 
-    local ceil = luna.physics.newBody(world_id, W / 2, 5, "static")
-    luna.physics.setBodySize(world_id, ceil, W, 10)
-    luna.physics.setBodyLayer(world_id, ceil, 3, 3)
+    local ceil = world_id:newBody(W / 2, 5, "static")
+    world_id:addFixture(ceil:getId(), "rectangle", 1, 0.3, 0, false, W, 10)
+    ceil:setLayer(3); ceil:setMask(3)
 
     -- Right catch-wall (keeps balls from escaping)
-    local rwall = luna.physics.newBody(world_id, W - 5, H / 2, "static")
-    luna.physics.setBodySize(world_id, rwall, 10, H)
-    luna.physics.setBodyLayer(world_id, rwall, 3, 3)
+    local rwall = world_id:newBody(W - 5, H / 2, "static")
+    world_id:addFixture(rwall:getId(), "rectangle", 1, 0.3, 0, false, 10, H)
+    rwall:setLayer(3); rwall:setMask(3)
 
     -- 5 targets spaced down the right side (layer 2, hit by balls on layer 1)
     for i = 1, 5 do
         local ty = 80 + (i - 1) * 100
-        local id = luna.physics.newBody(world_id, 720, ty, "static")
-        luna.physics.setBodySize(world_id, id, 30, 70)
-        luna.physics.setBodyLayer(world_id, id, 2, 3)
-        local entry = { id = id, alive = true }
+        local body = world_id:newBody(720, ty, "static")
+        world_id:addFixture(body:getId(), "rectangle", 1, 0.3, 0, false, 30, 70)
+        body:setLayer(2); body:setMask(3)
+        local entry = { id = body, alive = true }
         table.insert(targets, entry)
-        target_ids[id] = #targets
+        target_ids[body:getId()] = #targets
     end
 end
 
 function luna.load()
-    luna.window.setTitle("Shooting Gallery — Luna2D")
+    luna.window.setTitle("Shooting Gallery -- Luna2D")
     luna.graphics.setBackgroundColor(0.05, 0.05, 0.15)
     init_world()
 end
 
 function luna.update(dt)
-    luna.physics.step(world_id, dt)
+    world_id:step(dt)
 
     -- Collision: ball (layer 1) hits target (layer 2)?
-    local collisions = luna.physics.getCollisions(world_id)
+    local collisions = world_id:getCollisionEvents()
     for _, c in ipairs(collisions) do
         for _, bid in ipairs(balls) do
-            if c.body_a == bid or c.body_b == bid then
-                local other = (c.body_a == bid) and c.body_b or c.body_a
+            local bid_int = bid:getId()
+            if c.bodyA == bid_int or c.bodyB == bid_int then
+                local other = (c.bodyA == bid_int) and c.bodyB or c.bodyA
                 local tidx = target_ids[other]
                 if tidx and targets[tidx].alive then
                     targets[tidx].alive = false
@@ -73,7 +74,7 @@ function luna.update(dt)
     -- Cull out-of-bounds balls from tracking list
     local live = {}
     for _, bid in ipairs(balls) do
-        local bx, by = luna.physics.getBody(world_id, bid)
+        local bx, by = bid:getPosition()
         if bx > -100 and bx < W + 100 and by > -100 and by < H + 100 then
             table.insert(live, bid)
         end
@@ -94,10 +95,10 @@ function luna.mousepressed(x, y, btn)
     local dist = math.sqrt(dx * dx + dy * dy)
     if dist < 1 then return end
 
-    local bid = luna.physics.newCircleBody(world_id, CANNON_X, CANNON_Y, 12, "dynamic")
-    luna.physics.setBodyRestitution(world_id, bid, 0.3)
-    luna.physics.setBodyLayer(world_id, bid, 1, 3)
-    luna.physics.setBodyVelocity(world_id, bid, 500 * dx / dist, 500 * dy / dist)
+    local bid = world_id:newCircleBody(CANNON_X, CANNON_Y, 12, "dynamic")
+    bid:setRestitution(0.3)
+    bid:setLayer(1); bid:setMask(3)
+    bid:setVelocity(500 * dx / dist, 500 * dy / dist)
     table.insert(balls, bid)
 end
 
@@ -127,7 +128,7 @@ function luna.draw()
         local ex = CANNON_X + ux * 900
         local ey = CANNON_Y + uy * 900
         luna.graphics.setLineWidth(1)
-        local hit = luna.physics.raycast(world_id, CANNON_X, CANNON_Y, ex, ey)
+        local hit = world_id:raycast(CANNON_X, CANNON_Y, ex, ey)
         if hit then
             luna.graphics.setColor(1.0, 1.0, 0.2, 0.55)
             luna.graphics.line(CANNON_X, CANNON_Y, hit.x, hit.y)
@@ -141,7 +142,7 @@ function luna.draw()
 
     -- Targets
     for _, t in ipairs(targets) do
-        local tx, ty = luna.physics.getBody(world_id, t.id)
+        local tx, ty = t.id:getPosition()
         if t.alive then
             luna.graphics.setColor(0.85, 0.18, 0.18)
             luna.graphics.rectangle("fill", tx - 15, ty - 35, 30, 70)
@@ -155,7 +156,7 @@ function luna.draw()
 
     -- Fired balls
     for _, bid in ipairs(balls) do
-        local bx, by = luna.physics.getBody(world_id, bid)
+        local bx, by = bid:getPosition()
         luna.graphics.setColor(0.3, 0.65, 1.0)
         luna.graphics.circle("fill", bx, by, 12)
         luna.graphics.setColor(0.65, 0.9, 1.0)

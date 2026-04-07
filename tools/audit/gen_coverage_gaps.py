@@ -27,19 +27,51 @@ Exit codes:
 
 import argparse
 import json
+import re
 import sys
 from pathlib import Path
 
 WORKSPACE_ROOT = Path(__file__).resolve().parent.parent.parent
-RUST_INPUT = WORKSPACE_ROOT / "docs" / "API" / "rust_api_data.json"
-LUA_INPUT = WORKSPACE_ROOT / "docs" / "API" / "lua_api_data.json"
+RUST_INPUT = WORKSPACE_ROOT / "docs" / "logs" / "rust_api_data.json"
+LUA_INPUT = WORKSPACE_ROOT / "docs" / "logs" / "lua_api_data.json"
 OUTPUT_FILE = WORKSPACE_ROOT / "docs" / "API" / "coverage_gaps.md"
 
 # Rust modules that are deliberately not exposed to Lua (engine internals, CLI, etc.)
 _INTERNAL_MODULES = {
     "main", "lib", "root",
+    # Engine internals
     "engine::app", "engine::error_screen", "engine::debug_overlay",
     "engine::resource_keys", "engine::config",
+    "engine::log_messages", "engine::messages",
+    # Internal Rust→Lua conversion helpers (never user-visible)
+    "serial::lua_table", "thread::channel",
+    "event::event_queue",
+    # Internal domain helpers not in the Lua surface
+    "savegame::save_data", "savegame::save_manager",
+    "data::bin_pack", "data::pack", "data::toml_convert",
+    "entity::universe",
+    # Internal platform/engine converters
+    "input::keyboard", "input::gamepad",
+    # Internal particle sub-helpers
+    "particle::emission", "particle::math",
+    # Low-level raycaster sub-helpers (wrapped by higher-level Lua API)
+    "raycaster::lighting", "raycaster::minimap_overlay",
+    "raycaster::projection", "raycaster::segment", "raycaster::visibility",
+    # Internal tilemap helpers (coords exposed via higher-level tilemap API)
+    "tilemap::coords", "tilemap::tmx",
+    # Window sub-modules (wrapped by luna.window)
+    "window::management", "window::viewport",
+    # DataFrame/serial internal format helpers
+    "dataframe::serial", "dataframe::sql",
+    "serial::csv", "serial::json", "serial::toml", "serial::yaml",
+    # Pathfinding internal algorithms (wrapped by luna.pathfinding)
+    "pathfinding::astar", "pathfinding::graph_path", "pathfinding::hpa",
+    # Procgen internal algorithms (wrapped by luna.procgen)
+    "procgen::cellular", "procgen::flood_fill", "procgen::noise_ext",
+    "procgen::poisson", "procgen::voronoi",
+    # Math sub-modules exposed via renamed Lua bindings
+    # (e.g. simplex_noise_2d → luna.math.simplex2d, polygon functions → luna.math.*)
+    "math::noise_functions",
 }
 
 # Minimum description length to be considered "documented"
@@ -53,7 +85,8 @@ def _collect_lua_names(lua_data: dict) -> set[str]:
         for fn in mod_data.get("functions", []):
             lua_name = fn.get("lua_name") or fn.get("name") or ""
             if lua_name:
-                names.add(f"{mod_name}.{lua_name}")
+                # lua_name may already be fully qualified (e.g. "luna.math.inBack"); avoid double prefix
+                names.add(lua_name if lua_name.startswith("luna.") else f"{mod_name}.{lua_name}")
         for cls_name, cls_data in mod_data.get("classes", {}).items():
             if cls_name == "mlua":
                 continue  # skip spurious mlua pseudo-class entries
@@ -124,7 +157,8 @@ def _lua_undocumented(lua_data: dict) -> list[dict]:
                 results.append({
                     "module": mod_name,
                     "kind": "function",
-                    "name": f"luna.{mod_name}.{lua_name}",
+                    # lua_name may already be fully qualified; avoid double prefix
+                    "name": lua_name if lua_name.startswith("luna.") else f"luna.{mod_name}.{lua_name}",
                     "desc": desc,
                 })
 
@@ -143,10 +177,12 @@ def _lua_undocumented(lua_data: dict) -> list[dict]:
                 mdesc = (method.get("description", "") or "").strip()
                 if len(mdesc) < _MIN_DESC_LENGTH:
                     mname = method.get("lua_name") or method.get("name") or "?"
+                    # lua_name is already "ClassName:methodName"; avoid double class prefix
+                    display = mname if mname.startswith(f"{cls_name}:") else f"{cls_name}:{mname}"
                     results.append({
                         "module": mod_name,
                         "kind": "method",
-                        "name": f"{cls_name}:{mname}",
+                        "name": display,
                         "desc": mdesc,
                     })
     return results
@@ -162,13 +198,20 @@ def generate_report(rust_data: dict, lua_data: dict) -> str:
     lua_bad_docs = _lua_undocumented(lua_modules)
 
     # Section 1: Rust fns not in Lua
-    # Heuristic: if any lua_name starts with the Rust fn name (case-insensitive), consider it covered
+    # Matching: try exact substring, then underscore-stripped (camelCase), then ease_ prefix stripped
     unexposed: list[dict] = []
     for item in rust_fns:
         fn_name_lower = item["name"].lower()
         mod_lower = item["module"].split("::")[-1].lower()
+        # Normalize by removing underscores (handles snake_case vs camelCase)
+        fn_no_us = fn_name_lower.replace("_", "")
+        # Handle easing convention: ease_in_* -> in*, ease_out_* -> out*
+        fn_ease = re.sub(r"^ease_", "", fn_name_lower).replace("_", "")
         found = any(
-            fn_name_lower in lua_key.lower() or mod_lower + "." + fn_name_lower in lua_key.lower()
+            fn_name_lower in lua_key.lower()
+            or fn_no_us in lua_key.lower().replace("_", "")
+            or fn_ease in lua_key.lower().replace("_", "")
+            or mod_lower + "." + fn_name_lower in lua_key.lower()
             for lua_key in lua_names
         )
         if not found:

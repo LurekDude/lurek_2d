@@ -22,13 +22,22 @@ engine is the only upward-facing dependency root.
 `App` drives the winit 0.30 `ApplicationHandler` event loop.  Internally a private
 `LunaApp` struct owns the wgpu surface, GPU renderer, Lua VM, gamepad polling via
 gilrs, and the `RunState` machine (`Running → Error → Restarting`).  `resumed()`
-initialises the GPU adapter/device/surface and fires the first redraw;
+initialises the GPU adapter/device/surface, applies the correct startup window
+title for either game mode or the no-game splash, and fires the first redraw;
 `window_event()` routes OS input events to `KeyboardState`, `MouseState`,
 `GamepadState`, and `TouchState` and fires the corresponding `luna.*` callbacks;
 `about_to_wait()` calls `tick_frame()` which runs the full update/draw cycle and
 presents the rendered frame.  This event-driven architecture is required for correct
 behaviour on macOS and ensures tight integration with the OS event queue on all
 desktop targets (Windows, Linux, macOS).
+
+When no game is loaded, `app.rs` renders a lightweight engine splash directly through
+the existing renderer path instead of opening a separate asset viewer.  The splash
+now embeds and caches two branded PNGs (`assets/svg/large_icon.png` and
+`assets/svg/banner.png`) once per process, draws the large icon in the upper portion
+of the window and the banner near the bottom, preserves the drag-and-drop hint and
+hover highlight, and keeps the engine version out of the draw list by appending it
+to the window title only while the splash is active.
 
 `SharedState` is the central hub connecting every subsystem to every Lua API closure.
 It is `Rc<RefCell<SharedState>>` — not `Arc<Mutex<>>` — because all Lua callbacks
@@ -79,7 +88,7 @@ App::run(game_dir)
         │     │     └── GpuRenderer::new(device, queue, format, w, h)
         │     └── first RedrawRequested triggers init_lua()
         │           ├── create_lua_vm(SharedState, ModulesConfig)
-        │           ├── load and exec main.lua (or show splash)
+        │           ├── load and exec main.lua (or show cached PNG splash)
         │           └── call luna.load()
         │
         ├── window_event()
@@ -151,7 +160,7 @@ App::run(game_dir)
 | File | Purpose |
 |------|---------|
 | `mod.rs` | Module declaration, re-exports of `App`, `Config`, `SharedState`, `EngineError`, etc. |
-| `app.rs` | Application lifecycle: `App`, private `LunaApp` (winit `ApplicationHandler`), `RunState`, game loop, GPU init, Lua VM init, input routing, splash screen, drag-and-drop |
+| `app.rs` | Application lifecycle: `App`, private `LunaApp` (winit `ApplicationHandler`), `RunState`, game loop, GPU init, Lua VM init, input routing, PNG-branded splash screen, drag-and-drop, window title state |
 | `app_winit.rs` | **Dead file** — not declared in `mod.rs`, not compiled. Preserved for historical reference only. |
 | `config.rs` | `Config`, `WindowConfig`, `GraphicsConfig`, `ModulesConfig`, `PerformanceConfig`, `conf.lua` loading |
 | `debug_overlay.rs` | `DebugOverlay` — FPS and draw-call counter rendered in the top-right corner |
@@ -413,5 +422,7 @@ end
 - **Resource keys are cross-module**: The 14 key types defined in `resource_keys.rs` are used throughout the entire engine (graphics, audio, particle, light, etc.), not just within the engine module.
 - **`log_msg!` macro requires `MessageCatalog::init()`**: Called automatically by `App::new()`. If used before init, the macro falls back to printing the raw message ID.
 - **Viewport scaling**: `recompute_viewport()` supports four modes (`"none"`, `"letterbox"`, `"stretch"`, `"pixel"`) and is called on every window resize. Coordinates are transformed from game-space to window-space.
+- **Splash branding is embedded and cached**: The no-game splash decodes `assets/svg/large_icon.png` and `assets/svg/banner.png` once, stores them in a private `SlotMap<TextureKey, TextureData>`, and reuses those textures on every splash frame instead of regenerating vector-style art.
+- **Splash title carries the version**: The version string is no longer rendered into the splash draw commands. While no game is loaded, `app.rs` appends `v{CARGO_PKG_VERSION}` to the window title and resets back to the normal configured title when a game is loaded.
 - **Drag-and-drop**: The splash screen supports dropping a game folder onto the window to load it immediately, enabling a zero-CLI workflow.
 - **No `unsafe` in this module** except one `// SAFETY:` documented cast in `get_message()` to extend the lifetime of `OnceLock`-stored strings to `'static`.

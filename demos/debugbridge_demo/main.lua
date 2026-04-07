@@ -2,7 +2,21 @@
 -- Demonstrates the luna.debugbridge TCP debug server API
 -- Connect with: telnet 127.0.0.1 19740
 -- or netcat: nc 127.0.0.1 19740
--- Then send: {"id":1,"method":"ping"}\n
+-- Then send: {"id":1,"method":"ping"}
+
+if not luna.debugbridge then
+    function luna.load()
+        luna.graphics.setBackgroundColor(0.08, 0.08, 0.12)
+    end
+    function luna.draw()
+        luna.graphics.setColor(1, 0.6, 0.2)
+        luna.graphics.print("Debug Bridge Demo", 20, 20)
+        luna.graphics.setColor(0.7, 0.7, 0.7)
+        luna.graphics.print("luna.debugbridge is not available in this build.", 20, 60)
+        luna.graphics.print("(API not yet implemented)", 20, 85)
+    end
+    return
+end
 
 local db = luna.debugbridge
 local frame_count = 0

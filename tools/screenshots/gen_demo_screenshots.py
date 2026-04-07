@@ -6,19 +6,22 @@ Usage:
     python tools/screenshots/gen_demo_screenshots.py [options]
 
 Options:
-    --binary PATH        Path to the luna2d binary (default: auto-detect build/release or build/debug)
-    --delay SECS         Seconds to wait after game start before capturing (default: 1.5)
-    --demo NAME          Only run the named demo (can be repeated)
-    --overwrite          Overwrite existing screen.png files (default: skip)
-    --timeout SECS       Kill the process after this many seconds if it hasn't quit (default: 15)
-    --demos-dir PATH     Path to the demos directory (default: demos/)
-    --rebuild            Run 'cargo build --release' before capturing
-    --dry-run            Print what would run without executing
+    --binary PATH          Path to the luna2d binary (default: auto-detect build/release / build/debug)
+    --frames N             Rendered game frames to wait before capturing (default: 3, fastest)
+    --demo NAME            Only run the named demo (can be repeated)
+    --overwrite            Overwrite existing screen.png files (default: skip)
+    --timeout SECS         Kill the process after this many seconds if it hasn't quit (default: 20)
+    --demos-dir PATH       Path to the demos directory (default: demos/)
+    --rebuild              Run 'cargo build --release' before capturing
+    --dry-run              Print what would run without executing
+    --log PATH             Write per-demo logs to this folder (default: work/demo-screenshots/logs/)
+    --no-log               Disable per-demo log files
 
 Each demo that has a main.lua will be launched with:
-    luna2d <demo_dir> --screenshot=<abs_path_to_screen.png> --screenshot-delay=<delay>
+    luna2d <demo_dir> --screenshot=<abs_path> --screenshot-frames=<n>
 
-The engine will render <delay> seconds of the game, save screen.png, and exit automatically.
+The engine renders N frames of the game, saves screen.png, and exits automatically.
+RUST_LOG=luna2d=debug is set so errors surface in the log.
 """
 
 import argparse
@@ -27,13 +30,14 @@ import platform
 import subprocess
 import sys
 import time
+import json
 from pathlib import Path
+from datetime import datetime
 
 REPO_ROOT = Path(__file__).resolve().parent.parent.parent
 
 
 def find_binary(repo_root: Path) -> Path:
-    """Return the best available luna2d binary under build/."""
     candidates = [
         repo_root / "build" / "release" / ("luna2d.exe" if platform.system() == "Windows" else "luna2d"),
         repo_root / "build" / "debug"   / ("luna2d.exe" if platform.system() == "Windows" else "luna2d"),
@@ -42,19 +46,15 @@ def find_binary(repo_root: Path) -> Path:
         if c.exists():
             return c
     raise FileNotFoundError(
-        "Could not find luna2d binary. Build the project first with:\n"
+        "Could not find luna2d binary. Build first with:\n"
         "  cargo build --release\n"
         "or pass --binary <path>."
     )
 
 
 def rebuild(repo_root: Path) -> None:
-    print("[build] Running: cargo build --release")
-    result = subprocess.run(
-        ["cargo", "build", "--release"],
-        cwd=repo_root,
-        timeout=600,
-    )
+    print("[build] cargo build --release ...")
+    result = subprocess.run(["cargo", "build", "--release"], cwd=repo_root, timeout=600)
     if result.returncode != 0:
         print("[build] FAILED — aborting.", file=sys.stderr)
         sys.exit(1)
@@ -64,29 +64,32 @@ def rebuild(repo_root: Path) -> None:
 def capture_demo(
     binary: Path,
     demo_dir: Path,
-    delay: float,
+    frames: int,
     timeout: float,
     overwrite: bool,
     dry_run: bool,
-) -> str:
+    log_dir,
+) -> tuple:
     """
     Run the demo and capture screen.png.
-    Returns 'ok', 'skip', 'timeout', or 'error'.
+    Returns (status, error_detail) where status is 'ok', 'skip', 'timeout', or 'error'.
     """
     screen_path = demo_dir / "screen.png"
     if screen_path.exists() and not overwrite:
-        return "skip"
+        return "skip", ""
 
     cmd = [
         str(binary),
-        str(demo_dir),
-        f"--screenshot={screen_path.resolve()}",
-        f"--screenshot-delay={delay}",
+        str(demo_dir.resolve()),
+        "--screenshot=" + str(screen_path.resolve()),
+        "--screenshot-frames=" + str(frames),
     ]
 
     if dry_run:
         print(f"[dry-run] {' '.join(cmd)}")
-        return "ok"
+        return "ok", ""
+
+    env = {**os.environ, "RUST_LOG": "luna2d=debug"}
 
     try:
         result = subprocess.run(
@@ -94,35 +97,49 @@ def capture_demo(
             timeout=timeout,
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
+            env=env,
         )
-    except subprocess.TimeoutExpired:
-        return "timeout"
+    except subprocess.TimeoutExpired as exc:
+        # Save whatever output was produced before the timeout.
+        combined = (exc.stdout or b"") + (exc.stderr or b"")
+        log_text = combined.decode(errors="replace")
+        if log_dir is not None:
+            log_dir.mkdir(parents=True, exist_ok=True)
+            (log_dir / "{}.log".format(demo_dir.name)).write_text(log_text, encoding="utf-8")
+        return "timeout", "Process did not exit within {}s".format(timeout)
     except Exception as exc:
-        print(f"  [exception] {exc}")
-        return "error"
+        return "error", str(exc)
+
+    combined = (result.stdout or b"") + (result.stderr or b"")
+    log_text = combined.decode(errors="replace")
+    if log_dir is not None:
+        log_dir.mkdir(parents=True, exist_ok=True)
+        (log_dir / "{}.log".format(demo_dir.name)).write_text(log_text, encoding="utf-8")
 
     if screen_path.exists():
-        return "ok"
+        return "ok", ""
 
-    # Process exited but no file — log stderr hint
-    stderr_tail = (result.stderr or b"").decode(errors="replace")[-300:]
-    if stderr_tail:
-        print(f"  [stderr] {stderr_tail.strip()}")
-    return "error"
+    error_lines = [
+        line for line in log_text.splitlines()
+        if any(kw in line.lower() for kw in ("error", "panic", "lua", "failed", "not found"))
+    ]
+    detail = "\n".join(error_lines[-8:]) if error_lines else log_text[-400:].strip()
+    return "error", detail
 
 
-def main() -> None:
+def main():
     parser = argparse.ArgumentParser(description="Capture screen.png for every Luna2D demo.")
-    parser.add_argument("--binary", default=None, help="Path to the luna2d binary")
-    parser.add_argument("--delay", type=float, default=1.5, help="Screenshot delay in seconds")
-    parser.add_argument("--demo", action="append", dest="demos", metavar="NAME",
-                        help="Only process this demo (can repeat)")
-    parser.add_argument("--overwrite", action="store_true", help="Overwrite existing screen.png")
-    parser.add_argument("--timeout", type=float, default=15.0,
-                        help="Kill the process after this many seconds")
-    parser.add_argument("--demos-dir", default=None, help="Path to the demos directory")
-    parser.add_argument("--rebuild", action="store_true", help="cargo build --release before capturing")
-    parser.add_argument("--dry-run", action="store_true", help="Print commands without running")
+    parser.add_argument("--binary",    default=None)
+    parser.add_argument("--frames",    type=int, default=3,
+                        help="Rendered frames before screenshot (default: 3)")
+    parser.add_argument("--demo",      action="append", dest="demos", metavar="NAME")
+    parser.add_argument("--overwrite", action="store_true")
+    parser.add_argument("--timeout",   type=float, default=20.0)
+    parser.add_argument("--demos-dir", default=None)
+    parser.add_argument("--rebuild",   action="store_true")
+    parser.add_argument("--dry-run",   action="store_true")
+    parser.add_argument("--log", default=str(REPO_ROOT / "work" / "demo-screenshots" / "logs"))
+    parser.add_argument("--no-log",    action="store_true")
     args = parser.parse_args()
 
     repo_root = REPO_ROOT
@@ -132,16 +149,15 @@ def main() -> None:
 
     binary = Path(args.binary) if args.binary else find_binary(repo_root)
     if not binary.exists():
-        print(f"ERROR: Binary not found: {binary}", file=sys.stderr)
+        print("ERROR: Binary not found: {}".format(binary), file=sys.stderr)
         sys.exit(1)
-    print(f"[binary] {binary}")
+    print("[binary] {}".format(binary))
 
     demos_root = Path(args.demos_dir) if args.demos_dir else repo_root / "demos"
     if not demos_root.is_dir():
-        print(f"ERROR: demos directory not found: {demos_root}", file=sys.stderr)
+        print("ERROR: demos directory not found: {}".format(demos_root), file=sys.stderr)
         sys.exit(1)
 
-    # Collect demo directories that have a main.lua
     all_demos = sorted(
         d for d in demos_root.iterdir()
         if d.is_dir() and (d / "main.lua").exists()
@@ -152,58 +168,74 @@ def main() -> None:
         all_demos = [d for d in all_demos if d.name in requested]
         missing = requested - {d.name for d in all_demos}
         if missing:
-            print(f"WARNING: Demos not found: {', '.join(sorted(missing))}", file=sys.stderr)
+            print("WARNING: Demos not found: {}".format(", ".join(sorted(missing))), file=sys.stderr)
 
     if not all_demos:
         print("No demos to process.", file=sys.stderr)
         sys.exit(1)
 
-    print(f"[demos] {len(all_demos)} demos to process")
+    log_dir = None
+    if not args.no_log and not args.dry_run:
+        log_dir = Path(args.log)
+        log_dir.mkdir(parents=True, exist_ok=True)
+
+    print("[demos]  {} to process  |  frames={}  |  timeout={}s".format(
+        len(all_demos), args.frames, args.timeout))
     print()
 
     stats = {"ok": 0, "skip": 0, "timeout": 0, "error": 0}
-    errors = []
+    failures = []
 
     for i, demo_dir in enumerate(all_demos, 1):
         label = demo_dir.name
-        prefix = f"[{i:3d}/{len(all_demos)}] {label:<30}"
+        prefix = "[{:3d}/{}] {:<32}".format(i, len(all_demos), label)
         t0 = time.monotonic()
-        status = capture_demo(
+        status, detail = capture_demo(
             binary=binary,
             demo_dir=demo_dir,
-            delay=args.delay,
+            frames=args.frames,
             timeout=args.timeout,
             overwrite=args.overwrite,
             dry_run=args.dry_run,
+            log_dir=log_dir,
         )
         elapsed = time.monotonic() - t0
         stats[status] += 1
 
         if status == "ok":
-            size_kb = ""
             screen = demo_dir / "screen.png"
-            if screen.exists():
-                size_kb = f"  {screen.stat().st_size // 1024}KB"
-            print(f"{prefix}  OK   ({elapsed:.1f}s){size_kb}")
+            size_str = "  {}KB".format(screen.stat().st_size // 1024) if screen.exists() else ""
+            print("{}  OK      ({:.1f}s){}".format(prefix, elapsed, size_str))
         elif status == "skip":
-            print(f"{prefix}  SKIP (screen.png exists, use --overwrite)")
+            print("{}  SKIP    (exists, use --overwrite)".format(prefix))
         elif status == "timeout":
-            print(f"{prefix}  TIMEOUT ({elapsed:.0f}s)")
-            errors.append(label)
+            print("{}  TIMEOUT ({:.0f}s)".format(prefix, elapsed))
+            failures.append({"name": label, "status": "timeout", "detail": detail})
         else:
-            print(f"{prefix}  ERROR")
-            errors.append(label)
+            first_err = (detail.split("\n")[0][:100] if detail else "")
+            print("{}  ERROR   {}".format(prefix, first_err))
+            failures.append({"name": label, "status": "error", "detail": detail})
 
     print()
-    print(f"Results: {stats['ok']} ok  |  {stats['skip']} skipped  |  "
-          f"{stats['timeout']} timeout  |  {stats['error']} error")
+    print("Results: {} ok  |  {} skipped  |  {} timeout  |  {} error".format(
+        stats["ok"], stats["skip"], stats["timeout"], stats["error"]))
 
-    if errors:
-        print(f"\nFailed demos ({len(errors)}):")
-        for name in errors:
-            print(f"  {name}")
+    if failures:
+        summary_path = (log_dir or Path(".")) / "failures.json"
+        summary_path.write_text(
+            json.dumps({"timestamp": datetime.utcnow().isoformat(), "failures": failures}, indent=2),
+            encoding="utf-8",
+        )
+        print("\nFailure summary written to: {}".format(summary_path))
+        print("\nFailed demos ({}):\n".format(len(failures)))
+        for f in failures:
+            print("  [{}] {}".format(f["status"], f["name"]))
+            if f["detail"]:
+                for line in f["detail"].split("\n")[:4]:
+                    print("         {}".format(line))
         sys.exit(1)
 
 
 if __name__ == "__main__":
     main()
+

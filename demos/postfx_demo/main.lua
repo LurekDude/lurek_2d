@@ -1,3 +1,12 @@
+-- Module availability guard (added by fix_nil_module_demos.py)
+if not luna.postfx then
+    function luna.load()
+        luna.graphics.setBackgroundColor(0.08, 0.08, 0.12)
+        luna.graphics.print("luna.postfx is not available - use luna.fx instead", 180, 270)
+    end
+    return
+end
+
 -- PostFX Demo — Luna2D post-processing effects demonstration
 -- Shows how to create effects, add them to a stack, toggle them,
 -- and tweak parameters at runtime using keyboard controls.

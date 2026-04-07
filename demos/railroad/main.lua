@@ -24,15 +24,16 @@ local TRACK_NAMES = {"Horizontal", "Vertical", "Curve NE", "Curve SE", "Curve SW
 local DX = {1, 0, -1, 0}
 local DY = {0, 1, 0, -1}
 
--- Track connections: which directions connect for each track type
--- 1=right,2=down,3=left,4=up
+-- Track connections: maps each track-type number to the two grid directions
+-- (1=right, 2=down, 3=left, 4=up) that a train can pass through.
+-- When routing trains, the engine enters from one end and exits via the other.
 local TRACK_DIRS = {
-    [1] = {1, 3},       -- horizontal: left-right
-    [2] = {2, 4},       -- vertical: up-down
-    [3] = {1, 4},       -- curve NE: right-up
-    [4] = {1, 2},       -- curve SE: right-down
-    [5] = {3, 2},       -- curve SW: left-down
-    [6] = {3, 4},       -- curve NW: left-up
+    [1] = {1, 3},       -- horizontal straight: enters/exits left or right
+    [2] = {2, 4},       -- vertical straight:   enters/exits up or down
+    [3] = {1, 4},       -- curve NE: connects right ↔ up   (╗ shape facing south-west)
+    [4] = {1, 2},       -- curve SE: connects right ↔ down  (╔ shape facing north-west)
+    [5] = {3, 2},       -- curve SW: connects left  ↔ down  (╗ shape facing north-east)
+    [6] = {3, 4},       -- curve NW: connects left  ↔ up    (╔ shape facing south-east)
 }
 
 local CARGO_COLORS = {
@@ -70,6 +71,12 @@ end
 
 local function oppositeDir(d) return ((d + 1) % 4) + 1 end
 
+-- nextTrackPos: given a train's current cell and the direction it arrived FROM,
+-- returns the next cell (nc, nr) and outgoing direction d.
+-- The key invariant: a train must NOT exit through the direction it entered.
+-- oppositeDir maps the incoming direction to the "entry face" of this tile so
+-- we can skip it and use only the other connector in TRACK_DIRS.
+-- Returns nil if the cell is empty or has no valid exit (dead end).
 local function nextTrackPos(col, row, fromDir)
     local t = grid[row] and grid[row][col]
     if not t or t <= 0 then return nil end

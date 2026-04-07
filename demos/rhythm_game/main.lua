@@ -136,6 +136,9 @@ end
 
 local function tryHit(laneIdx)
     if not started then return end
+    -- Find the closest unhit, non-missed note in this lane.
+    -- We search all notes rather than just the head because overlapping notes
+    -- are possible at high BPM; always snapping to the closest gives fair results.
     local bestNote = nil
     local bestDist = 999
     for _, n in ipairs(notes) do
@@ -153,7 +156,11 @@ local function tryHit(laneIdx)
         hitNotes = hitNotes + 1
         combo = combo + 1
         if combo > maxCombo then maxCombo = combo end
+        -- Combo multiplier caps at 4× after 30 consecutive hits.
+        -- This rewards consistency without making early multipliers irrelevant.
         local multiplier = clamp(math.floor(combo / 10) + 1, 1, 4)
+        -- Three timing tiers: Perfect (<25 px ≈ 40 ms), Good (<50 px ≈ 85 ms), OK (<80 px ≈ 135 ms).
+        -- Pixel distance maps directly to time because notes move at a fixed scrollSpeed.
         if bestDist < 25 then
             score = score + 300 * multiplier
             perfectHits = perfectHits + 1
@@ -169,6 +176,7 @@ local function tryHit(laneIdx)
         end
         addFlash(laneIdx, c[1], c[2], c[3])
     else
+        -- No note in range — pressing the key on an empty beat breaks the combo.
         combo = 0
         addFeedback(lanes[laneIdx].x + laneWidth / 2, "MISS", 1, 0.2, 0.2)
     end

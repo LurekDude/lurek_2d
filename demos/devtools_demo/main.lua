@@ -1,3 +1,12 @@
+-- Module availability guard (added by fix_nil_module_demos.py)
+if not luna.devtools then
+    function luna.load()
+        luna.graphics.setBackgroundColor(0.08, 0.08, 0.12)
+        luna.graphics.print("luna.devtools is not available in this build", 180, 270)
+    end
+    return
+end
+
 -- Devtools Demo
 -- Demonstrates the luna.devtools runtime diagnostics API
 

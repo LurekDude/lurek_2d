@@ -6,6 +6,7 @@ luna = {}
 ---@class luna.ai
 luna.ai = {}
 
+--- Lua-side wrapper around an [`AIWorld`].
 ---@class AIWorld
 local AIWorld = {}
 
@@ -37,6 +38,7 @@ function AIWorld:removeAgent(agent) end
 ---@return nil
 function AIWorld:update(dt) end
 
+--- Lua-side wrapper for an agent accessed by name through the owning world.
 ---@class Agent
 local Agent = {}
 
@@ -119,6 +121,7 @@ function Agent:setPriority(p) end
 ---@return nil
 function Agent:setVelocity(x, y) end
 
+--- Lua-side wrapper around a [`BTNode`].
 ---@class BTNode
 local BTNode = {}
 
@@ -163,6 +166,7 @@ function BTNode:setFailurePolicy(policy) end
 ---@return nil
 function BTNode:setSuccessPolicy(policy) end
 
+--- Lua-side wrapper around a [`BehaviorTree`].
 ---@class BehaviorTree
 local BehaviorTree = {}
 
@@ -175,6 +179,7 @@ function BehaviorTree:getLastStatus() end
 ---@return nil
 function BehaviorTree:setRoot(node_ud) end
 
+--- Lua-side wrapper around a [`Blackboard`].
 ---@class Blackboard
 local Blackboard = {}
 
@@ -218,6 +223,7 @@ function Blackboard:setNumber(key, value) end
 ---@return nil
 function Blackboard:setString(key, value) end
 
+--- Lua-side wrapper around a [`CommandQueue`].
 ---@class CommandQueue
 local CommandQueue = {}
 
@@ -245,6 +251,7 @@ function CommandQueue:getCurrentType() end
 ---@return boolean
 function CommandQueue:isEmpty() end
 
+--- Lua-side wrapper around a [`GOAPPlanner`].
 ---@class GOAPPlanner
 local GOAPPlanner = {}
 
@@ -256,6 +263,7 @@ function GOAPPlanner:getActionCount() end
 ---@return integer
 function GOAPPlanner:getGoalCount() end
 
+--- Lua-side wrapper around an [`InfluenceMap`].
 ---@class InfluenceMap
 local InfluenceMap = {}
 
@@ -306,6 +314,7 @@ function InfluenceMap:getWidth() end
 ---@return boolean
 function InfluenceMap:hasLayer(name) end
 
+--- Lua-side wrapper around a [`QLearner`].
 ---@class QLearner
 local QLearner = {}
 
@@ -386,6 +395,7 @@ function QLearner:setExplorationRate(v) end
 ---@return nil
 function QLearner:setLearningRate(v) end
 
+--- Lua-side wrapper around a [`Squad`].
 ---@class Squad
 local Squad = {}
 
@@ -432,6 +442,7 @@ function Squad:removeMember(name) end
 ---@return nil
 function Squad:setLeader(name) end
 
+--- Lua-side wrapper around a [`StateMachine`].
 ---@class StateMachine
 local StateMachine = {}
 
@@ -459,6 +470,7 @@ function StateMachine:getTimeInState() end
 ---@return nil
 function StateMachine:setInitialState(name) end
 
+--- Lua-side wrapper around a [`SteeringManager`].
 ---@class SteeringManager
 local SteeringManager = {}
 
@@ -479,6 +491,7 @@ function SteeringManager:getLastSteering() end
 ---@return nil
 function SteeringManager:setCombineMode(mode) end
 
+--- Lua-side wrapper around a [`UtilityAI`].
 ---@class UtilityAI
 local UtilityAI = {}
 
@@ -2827,13 +2840,53 @@ local Overlay = {}
 ---@return nil
 function Overlay:clear() end
 
+--- No-op placeholder; the overlay is rendered by the engine's draw pass.
+---@return nil
+function Overlay:draw() end
+
+--- Returns the current ambient tint as r, g, b, a components.
+---@return number
+function Overlay:getAmbientColor() end
+
+--- Returns the current cloud shadow instance count.
+---@return integer
+function Overlay:getCloudCount() end
+
+--- Returns the current cloud shadow opacity.
+---@return number
+function Overlay:getCloudOpacity() end
+
+--- Returns the current cloud shadow scale.
+---@return number
+function Overlay:getCloudScale() end
+
+--- Returns the current cloud shadow scroll speed.
+---@return number
+function Overlay:getCloudSpeed() end
+
 --- Returns the overlay width and height.
 ---@return integer
 function Overlay:getDimensions() end
 
+--- Returns the current film-grain intensity.
+---@return number
+function Overlay:getFilmGrainIntensity() end
+
 --- Returns the current flash overlay alpha value.
 ---@return number
 function Overlay:getFlashAlpha() end
+
+--- Returns the current fog tint as r, g, b, a components.
+---@return number
+function Overlay:getFogColor() end
+
+--- Returns the current fog density.
+---@return number
+function Overlay:getFogDensity() end
+
+--- Returns the current heat-haze distortion intensity.
+---@return number
+function Overlay:getHeatHazeIntensity() end
 
 --- Returns the overlay height.
 ---@return integer
@@ -2843,17 +2896,85 @@ function Overlay:getHeight() end
 ---@return number
 function Overlay:getLightningAlpha() end
 
+--- Returns the lightning flash tint as r, g, b, a components.
+---@return number
+function Overlay:getLightningColor() end
+
 --- Returns the current shake displacement as x, y.
 ---@return number
 function Overlay:getShakeOffset() end
+
+--- Returns the current simulated time-of-day (0–24).
+---@return number
+function Overlay:getTimeOfDay() end
+
+--- Returns the current vignette strength.
+---@return number
+function Overlay:getVignetteStrength() end
+
+--- Returns the name of the current weather type.
+---@return string
+function Overlay:getWeather() end
+
+--- Returns the current weather intensity.
+---@return number
+function Overlay:getWeatherIntensity() end
 
 --- Returns the overlay width.
 ---@return integer
 function Overlay:getWidth() end
 
+--- Returns the current wind direction in radians.
+---@return number
+function Overlay:getWindDirection() end
+
+--- Returns the current wind speed.
+---@return number
+function Overlay:getWindSpeed() end
+
 --- Returns true if any overlay subsystem is currently active.
 ---@return boolean
 function Overlay:isActive() end
+
+--- Returns whether the ambient light layer is active.
+---@return boolean
+function Overlay:isAmbientEnabled() end
+
+--- Returns whether cloud shadows are active.
+---@return boolean
+function Overlay:isCloudShadowsEnabled() end
+
+--- Returns true while a fade effect is in progress.
+---@return boolean
+function Overlay:isFading() end
+
+--- Returns whether the film-grain layer is active.
+---@return boolean
+function Overlay:isFilmGrainEnabled() end
+
+--- Returns true while a flash effect is in progress.
+---@return boolean
+function Overlay:isFlashing() end
+
+--- Returns whether the fog layer is active.
+---@return boolean
+function Overlay:isFogEnabled() end
+
+--- Returns whether the heat-haze layer is active.
+---@return boolean
+function Overlay:isHeatHazeEnabled() end
+
+--- Returns true while a shake effect is in progress.
+---@return boolean
+function Overlay:isShaking() end
+
+--- Returns whether the vignette layer is active.
+---@return boolean
+function Overlay:isVignetteEnabled() end
+
+--- Returns whether the weather particle system is active.
+---@return boolean
+function Overlay:isWeatherEnabled() end
 
 --- Resizes the overlay to match new window dimensions.
 ---@param w any
@@ -2861,9 +2982,118 @@ function Overlay:isActive() end
 ---@return nil
 function Overlay:resize(w, h) end
 
+--- Enables or disables the ambient light layer.
+---@param v any
+---@return nil
+function Overlay:setAmbientEnabled(v) end
+
+--- Sets the number of cloud shadow instances to render.
+---@param v any
+---@return nil
+function Overlay:setCloudCount(v) end
+
+--- Sets the opacity of cloud shadows (0.0 = invisible, 1.0 = fully dark).
+---@param v any
+---@return nil
+function Overlay:setCloudOpacity(v) end
+
+--- Sets the scale multiplier applied to each cloud shadow.
+---@param v any
+---@return nil
+function Overlay:setCloudScale(v) end
+
+--- Enables or disables scrolling cloud-shadow projection.
+---@param v any
+---@return nil
+function Overlay:setCloudShadows(v) end
+
+--- Sets the horizontal scroll speed of cloud shadows in pixels per second.
+---@param v any
+---@return nil
+function Overlay:setCloudSpeed(v) end
+
+--- Enables or disables the film-grain noise layer.
+---@param v any
+---@return nil
+function Overlay:setFilmGrainEnabled(v) end
+
+--- Sets the film-grain noise intensity (0.0–1.0).
+---@param v any
+---@return nil
+function Overlay:setFilmGrainIntensity(v) end
+
+--- Sets the fog density (0.0 = clear, 1.0 = fully opaque).
+---@param v any
+---@return nil
+function Overlay:setFogDensity(v) end
+
+--- Enables or disables the fog layer.
+---@param v any
+---@return nil
+function Overlay:setFogEnabled(v) end
+
+--- Enables or disables the heat-haze distortion layer.
+---@param v any
+---@return nil
+function Overlay:setHeatHazeEnabled(v) end
+
+--- Sets the heat-haze distortion intensity (0.0–1.0).
+---@param v any
+---@return nil
+function Overlay:setHeatHazeIntensity(v) end
+
+--- Sets the simulated time-of-day (0–24) which drives ambient colour.
+---@param v any
+---@return nil
+function Overlay:setTimeOfDay(v) end
+
+--- Enables or disables the screen-edge vignette layer.
+---@param v any
+---@return nil
+function Overlay:setVignetteEnabled(v) end
+
+--- Sets the vignette darkening strength (0.0–1.0).
+---@param v any
+---@return nil
+function Overlay:setVignetteStrength(v) end
+
+--- Sets the active weather type by name ("none", "rain", "snow", "hail", "dust", "leaves", "ash", "pollen").
+---@param name any
+---@return nil
+function Overlay:setWeather(name) end
+
+--- Enables or disables the weather particle system.
+---@param v any
+---@return nil
+function Overlay:setWeatherEnabled(v) end
+
+--- Sets the particle spawn rate multiplier (0.0–1.0).
+---@param v any
+---@return nil
+function Overlay:setWeatherIntensity(v) end
+
+--- Sets the wind direction in radians (0 = right, π/2 = down).
+---@param v any
+---@return nil
+function Overlay:setWindDirection(v) end
+
+--- Sets the wind speed applied to weather particles in units per second.
+---@param v any
+---@return nil
+function Overlay:setWindSpeed(v) end
+
 --- Triggers a lightning flash effect.
 ---@return nil
 function Overlay:triggerLightning() end
+
+--- Returns the type name of this object ("Overlay").
+---@return string
+function Overlay:type() end
+
+--- Returns true if this object is of the given type ("Object" or "Overlay").
+---@param name any
+---@return boolean
+function Overlay:typeOf(name) end
 
 --- Advances all overlay subsystems by the given delta time.
 ---@param dt any
@@ -2995,6 +3225,12 @@ function luna.fx.newImageEffect(name) end
 ---@return Overlay
 function luna.fx.newOverlay(w, h) end
 
+--- Creates a new screen overlay controller for weather, flash, shake, and fade effects.
+---@param w? any (optional)
+---@param h? any (optional)
+---@return Overlay
+function luna.fx.newOverlay(w, h) end
+
 --- Creates a new post-processing pipeline stack.
 ---@param w any
 ---@param h any
@@ -3004,6 +3240,7 @@ function luna.fx.newStack(w, h) end
 ---@class luna.graph
 luna.graph = {}
 
+--- Lua handle for an edge inside a `Graph`.
 ---@class Edge
 local Edge = {}
 
@@ -3123,6 +3360,7 @@ function Edge:setType(t) end
 ---@return nil
 function Edge:setWeight(w) end
 
+--- Lua wrapper around a directed `Graph` with event callback registry.
 ---@class Graph
 local Graph = {}
 
@@ -3214,6 +3452,7 @@ function Graph:topologicalSort() end
 ---@return nil
 function Graph:update(dt) end
 
+--- Lua handle for an item inside a `Graph`.
 ---@class GraphItem
 local GraphItem = {}
 
@@ -3260,6 +3499,7 @@ function GraphItem:setPriority(p) end
 ---@return nil
 function GraphItem:setType(t) end
 
+--- Lua handle for a node inside a `Graph`.
 ---@class Node
 local Node = {}
 
@@ -3616,14 +3856,6 @@ function Quad:getTextureDimensions() end
 ---@return number
 function Quad:getViewport() end
 
---- Sets the quad viewport rectangle.
----@param x any
----@param y any
----@param w any
----@param h any
----@return nil
-function Quad:setViewport(x, y, w, h) end
-
 --- Returns the type name of this object.
 ---@return string
 function Quad:type() end
@@ -3691,7 +3923,7 @@ function SpriteBatch:typeOf() end
 ---@param mat any
 function luna.graphics.applyTransform(mat) end
 
---- Draws an arc.
+--- Draws a partial circle arc at the given position with specified radius and angle range.
 ---@param mode string
 ---@param x number
 ---@param y number
@@ -4032,92 +4264,96 @@ function luna.graphics.triangle(mode, x1, y1, x2, y2, x3, y3) end
 ---@class luna.gui
 luna.gui = {}
 
+--- Adds Accordion-specific methods (1-based sections in Lua).
 ---@class Accordion
 local Accordion = {}
 
---- @return nil
+--- Adds a section entry to this Accordion widget.
 ---@param title any
 ---@param content_idx? any (optional)
 ---@return nil
 function Accordion:addSection(title, content_idx) end
 
---- @return nil
+--- Returns the section count of this Accordion widget.
 ---@return nil
 function Accordion:getSectionCount() end
 
---- @return nil
+--- Returns the section title of this Accordion widget.
 ---@param section_idx any
 ---@return nil
 function Accordion:getSectionTitle(section_idx) end
 
---- @return nil
+--- Returns true if exclusive is enabled for this Accordion widget.
 ---@return nil
 function Accordion:isExclusive() end
 
---- @return nil
+--- Returns true if section expanded is enabled for this Accordion widget.
 ---@param section_idx any
 ---@return nil
 function Accordion:isSectionExpanded(section_idx) end
 
---- @return nil
+--- Sets the exclusive for this Accordion widget.
 ---@param v any
 ---@return nil
 function Accordion:setExclusive(v) end
 
---- @return nil
+--- Toggles the section state of this Accordion widget.
 ---@param section_idx any
 ---@return nil
 function Accordion:toggleSection(section_idx) end
 
+--- Adds Button-specific methods to a widget table.
 ---@class Button
 local Button = {}
 
---- @return nil
+--- Returns the text of this Button widget.
 ---@return nil
 function Button:getText() end
 
---- @return nil
+--- Sets the text for this Button widget.
 ---@param text any
 ---@return nil
 function Button:setText(text) end
 
+--- Adds CheckBox-specific methods to a widget table.
 ---@class Checkbox
 local Checkbox = {}
 
---- @return nil
+--- Returns the text of this Checkbox widget.
 ---@return nil
 function Checkbox:getText() end
 
---- @return nil
+--- Returns true if checked is enabled for this Checkbox widget.
 ---@return nil
 function Checkbox:isChecked() end
 
---- @return nil
+--- Sets the checked for this Checkbox widget.
 ---@param checked any
 ---@return nil
 function Checkbox:setChecked(checked) end
 
---- @return nil
+--- Sets the text for this Checkbox widget.
 ---@param text any
 ---@return nil
 function Checkbox:setText(text) end
 
+--- Adds ColorPicker-specific methods.
 ---@class Color_Picker
 local Color_Picker = {}
 
---- @return nil
+--- Returns the color of this Color_Picker widget.
 ---@return nil
 function Color_Picker:getColor() end
 
---- @return nil
+--- Returns the color mode of this Color_Picker widget.
 ---@return nil
 function Color_Picker:getColorMode() end
 
---- @return nil
+--- Returns the show alpha of this Color_Picker widget.
 ---@return nil
 function Color_Picker:getShowAlpha() end
 
---- @return nil
+--- Sets the color for this Color_Picker widget.
 ---@param r any
 ---@param green any
 ---@param b any
@@ -4125,244 +4361,250 @@ function Color_Picker:getShowAlpha() end
 ---@return nil
 function Color_Picker:setColor(r, green, b, a) end
 
---- @return nil
+--- Sets the color mode for this Color_Picker widget.
 ---@param mode any
 ---@return nil
 function Color_Picker:setColorMode(mode) end
 
---- @return nil
+--- Registers a callback invoked when this widget's value changes.
 ---@param f any
 ---@return nil
 function Color_Picker:setOnChange(f) end
 
---- @return nil
+--- Sets the show alpha for this Color_Picker widget.
 ---@param v any
 ---@return nil
 function Color_Picker:setShowAlpha(v) end
 
+--- Adds ComboBox-specific methods (1-based indices in Lua).
 ---@class Combo_Box
 local Combo_Box = {}
 
---- @return nil
+--- Adds a item entry to this Combo_Box widget.
 ---@param text any
 ---@return nil
 function Combo_Box:addItem(text) end
 
---- @return nil
+--- Clears all items entries from this Combo_Box widget.
 ---@return nil
 function Combo_Box:clearItems() end
 
---- @return nil
+--- Returns the item of this Combo_Box widget.
 ---@param index any
 ---@return nil
 function Combo_Box:getItem(index) end
 
---- @return nil
+--- Returns the item count of this Combo_Box widget.
 ---@return nil
 function Combo_Box:getItemCount() end
 
---- @return nil
+--- Returns the selected index of this Combo_Box widget.
 ---@return nil
 function Combo_Box:getSelectedIndex() end
 
---- @return nil
+--- Returns the selected item of this Combo_Box widget.
 ---@return nil
 function Combo_Box:getSelectedItem() end
 
---- @return nil
+--- Removes the item from this Combo_Box widget.
 ---@param index any
 ---@return nil
 function Combo_Box:removeItem(index) end
 
---- @return nil
+--- Sets the selected index for this Combo_Box widget.
 ---@param index any
 ---@return nil
 function Combo_Box:setSelectedIndex(index) end
 
+--- Adds Dialog-specific methods.
 ---@class Dialog
 local Dialog = {}
 
---- @return nil
+--- Adds a button entry to this Dialog widget.
 ---@param text any
 ---@param cb? any (optional)
 ---@return nil
 function Dialog:addButton(text, cb) end
 
---- @return nil
+--- Closes and removes this dialog from the screen.
 ---@return nil
 function Dialog:close() end
 
---- @return nil
+--- Returns the content of this Dialog widget.
 ---@return nil
 function Dialog:getContent() end
 
---- @return nil
+--- Returns the title of this Dialog widget.
 ---@return nil
 function Dialog:getTitle() end
 
---- @return nil
+--- Returns true if modal is enabled for this Dialog widget.
 ---@return nil
 function Dialog:isModal() end
 
---- @return nil
+--- Returns true if open is enabled for this Dialog widget.
 ---@return nil
 function Dialog:isOpen() end
 
---- @return nil
+--- Performs the open operation on this Dialog widget.
 ---@return nil
 function Dialog:open() end
 
---- @return nil
+--- Sets the content for this Dialog widget.
 ---@param content_idx? any (optional)
 ---@return nil
 function Dialog:setContent(content_idx) end
 
---- @return nil
+--- Sets the modal for this Dialog widget.
 ---@param v any
 ---@return nil
 function Dialog:setModal(v) end
 
---- @return nil
+--- Registers a callback invoked when this dialog is closed.
 ---@param f any
 ---@return nil
 function Dialog:setOnClose(f) end
 
---- @return nil
+--- Sets the title for this Dialog widget.
 ---@param title any
 ---@return nil
 function Dialog:setTitle(title) end
 
+--- Adds DockPanel-specific methods.
 ---@class Dock_Panel
 local Dock_Panel = {}
 
---- @return nil
+--- Performs the dock operation on this Dock_Panel widget.
 ---@param child_idx any
 ---@param side any
 ---@return nil
 function Dock_Panel:dock(child_idx, side) end
 
---- @return nil
+--- Returns the docked count of this Dock_Panel widget.
 ---@return nil
 function Dock_Panel:getDockedCount() end
 
---- @return nil
+--- Returns the split size of this Dock_Panel widget.
 ---@param side any
 ---@return nil
 function Dock_Panel:getSplitSize(side) end
 
---- @return nil
+--- Sets the split size for this Dock_Panel widget.
 ---@param side any
 ---@param size any
 ---@return nil
 function Dock_Panel:setSplitSize(side, size) end
 
---- @return nil
+--- Performs the undock operation on this Dock_Panel widget.
 ---@param child_idx any
 ---@return nil
 function Dock_Panel:undock(child_idx) end
 
+--- Adds GUITable-specific methods (1-based rows/cols in Lua).
 ---@class Gui_Table
 local Gui_Table = {}
 
---- @return nil
+--- Adds a column entry to this Gui_Table widget.
 ---@param header any
 ---@param width? any (optional)
 ---@return nil
 function Gui_Table:addColumn(header, width) end
 
---- @return nil
+--- Adds a row entry to this Gui_Table widget.
 ---@param cells any
 ---@return nil
 function Gui_Table:addRow(cells) end
 
---- @return nil
+--- Returns the cell of this Gui_Table widget.
 ---@param row any
 ---@param col any
 ---@return nil
 function Gui_Table:getCell(row, col) end
 
---- @return nil
+--- Returns the column count of this Gui_Table widget.
 ---@return nil
 function Gui_Table:getColumnCount() end
 
---- @return nil
+--- Returns the row count of this Gui_Table widget.
 ---@return nil
 function Gui_Table:getRowCount() end
 
---- @return nil
+--- Returns the selected row of this Gui_Table widget.
 ---@return nil
 function Gui_Table:getSelectedRow() end
 
---- @return nil
+--- Returns true if sortable is enabled for this Gui_Table widget.
 ---@return nil
 function Gui_Table:isSortable() end
 
---- @return nil
+--- Sets the cell for this Gui_Table widget.
 ---@param row any
 ---@param col any
 ---@param text any
 ---@return nil
 function Gui_Table:setCell(row, col, text) end
 
---- @return nil
+--- Registers a callback invoked when a table row is selected.
 ---@param f any
 ---@return nil
 function Gui_Table:setOnSelect(f) end
 
---- @return nil
+--- Sets the selected row for this Gui_Table widget.
 ---@param row? any (optional)
 ---@return nil
 function Gui_Table:setSelectedRow(row) end
 
---- @return nil
+--- Sets the sortable for this Gui_Table widget.
 ---@param v any
 ---@return nil
 function Gui_Table:setSortable(v) end
 
+--- Adds GUIWindow-specific methods.
 ---@class Gui_Window
 local Gui_Window = {}
 
---- @return nil
+--- Returns the title of this Gui_Window widget.
 ---@return nil
 function Gui_Window:getTitle() end
 
---- @return nil
+--- Returns true if closeable is enabled for this Gui_Window widget.
 ---@return nil
 function Gui_Window:isCloseable() end
 
---- @return nil
+--- Returns true if draggable is enabled for this Gui_Window widget.
 ---@return nil
 function Gui_Window:isDraggable() end
 
---- @return nil
+--- Returns true if resizable is enabled for this Gui_Window widget.
 ---@return nil
 function Gui_Window:isResizable() end
 
---- @return nil
+--- Sets the closeable for this Gui_Window widget.
 ---@param v any
 ---@return nil
 function Gui_Window:setCloseable(v) end
 
---- @return nil
+--- Sets the draggable for this Gui_Window widget.
 ---@param v any
 ---@return nil
 function Gui_Window:setDraggable(v) end
 
---- @return nil
+--- Registers a callback invoked when this window is closed.
 ---@param f any
 ---@return nil
 function Gui_Window:setOnClose(f) end
 
---- @return nil
+--- Sets the resizable for this Gui_Window widget.
 ---@param v any
 ---@return nil
 function Gui_Window:setResizable(v) end
 
---- @return nil
+--- Sets the title for this Gui_Window widget.
 ---@param title any
 ---@return nil
 function Gui_Window:setTitle(title) end
 
+--- Adds ImageWidget-specific methods.
 ---@class Image_Widget
 local Image_Widget = {}
 
@@ -4391,7 +4633,7 @@ function Image_Widget:getFocus() end
 ---@return table
 function Image_Widget:getRoot() end
 
---- @return nil
+--- Returns the scale mode of this Image_Widget widget.
 ---@return nil
 function Image_Widget:getScaleMode() end
 
@@ -4399,7 +4641,7 @@ function Image_Widget:getScaleMode() end
 ---@return boolean
 function Image_Widget:getTheme() end
 
---- @return nil
+--- Returns the tint of this Image_Widget widget.
 ---@return nil
 function Image_Widget:getTint() end
 
@@ -4595,7 +4837,7 @@ function Image_Widget:newWindow(title) end
 ---@return nil
 function Image_Widget:setFocus(widget) end
 
---- @return nil
+--- Sets the scale mode for this Image_Widget widget.
 ---@param mode any
 ---@return nil
 function Image_Widget:setScaleMode(mode) end
@@ -4605,7 +4847,7 @@ function Image_Widget:setScaleMode(mode) end
 ---@return nil
 function Image_Widget:setTheme(theme_ud) end
 
---- @return nil
+--- Sets the tint for this Image_Widget widget.
 ---@param r any
 ---@param green any
 ---@param b any
@@ -4629,198 +4871,204 @@ function Image_Widget:update(dt) end
 ---@return boolean
 function Image_Widget:wheelmoved(x, y) end
 
+--- Adds Label-specific methods to a widget table.
 ---@class Label
 local Label = {}
 
---- @return nil
+--- Returns the text of this Label widget.
 ---@return nil
 function Label:getText() end
 
---- @return nil
+--- Sets the text for this Label widget.
 ---@param text any
 ---@return nil
 function Label:setText(text) end
 
+--- Adds Layout-specific methods.
 ---@class Layout
 local Layout = {}
 
---- @return nil
+--- Returns the align of this Layout widget.
 ---@return nil
 function Layout:getAlign() end
 
---- @return nil
+--- Returns the direction of this Layout widget.
 ---@return nil
 function Layout:getDirection() end
 
---- @return nil
+--- Returns the justify of this Layout widget.
 ---@return nil
 function Layout:getJustify() end
 
---- @return nil
+--- Returns the spacing of this Layout widget.
 ---@return nil
 function Layout:getSpacing() end
 
---- @return nil
+--- Returns the wrap of this Layout widget.
 ---@return nil
 function Layout:getWrap() end
 
---- @return nil
+--- Sets the align for this Layout widget.
 ---@param align any
 ---@return nil
 function Layout:setAlign(align) end
 
---- @return nil
+--- Sets the columns for this Layout widget.
 ---@param n any
 ---@return nil
 function Layout:setColumns(n) end
 
---- @return nil
+--- Sets the direction for this Layout widget.
 ---@param dir any
 ---@return nil
 function Layout:setDirection(dir) end
 
---- @return nil
+--- Sets the justify for this Layout widget.
 ---@param justify any
 ---@return nil
 function Layout:setJustify(justify) end
 
---- @return nil
+--- Sets the spacing for this Layout widget.
 ---@param spacing any
 ---@return nil
 function Layout:setSpacing(spacing) end
 
---- @return nil
+--- Sets the wrap for this Layout widget.
 ---@param wrap any
 ---@return nil
 function Layout:setWrap(wrap) end
 
+--- Adds ListBox-specific methods (1-based indices in Lua).
 ---@class List_Box
 local List_Box = {}
 
---- @return nil
+--- Adds a item entry to this List_Box widget.
 ---@param text any
 ---@return nil
 function List_Box:addItem(text) end
 
---- @return nil
+--- Clears all items entries from this List_Box widget.
 ---@return nil
 function List_Box:clearItems() end
 
---- @return nil
+--- Returns the item of this List_Box widget.
 ---@param index any
 ---@return nil
 function List_Box:getItem(index) end
 
---- @return nil
+--- Returns the item count of this List_Box widget.
 ---@return nil
 function List_Box:getItemCount() end
 
---- @return nil
+--- Returns the selected index of this List_Box widget.
 ---@return nil
 function List_Box:getSelectedIndex() end
 
---- @return nil
+--- Removes the item from this List_Box widget.
 ---@param index any
 ---@return nil
 function List_Box:removeItem(index) end
 
---- @return nil
+--- Sets the item height for this List_Box widget.
 ---@param h any
 ---@return nil
 function List_Box:setItemHeight(h) end
 
---- @return nil
+--- Sets the selected index for this List_Box widget.
 ---@param index any
 ---@return nil
 function List_Box:setSelectedIndex(index) end
 
+--- Adds MenuBar-specific methods.
 ---@class Menu_Bar
 local Menu_Bar = {}
 
---- @return nil
+--- Adds a menu entry to this Menu_Bar widget.
 ---@param menu_idx any
 ---@return nil
 function Menu_Bar:addMenu(menu_idx) end
 
---- @return nil
+--- Returns the menu count of this Menu_Bar widget.
 ---@return nil
 function Menu_Bar:getMenuCount() end
 
---- @return nil
+--- Returns the menus of this Menu_Bar widget.
 ---@return nil
 function Menu_Bar:getMenus() end
 
---- @return nil
+--- Removes the menu from this Menu_Bar widget.
 ---@param menu_idx any
 ---@return nil
 function Menu_Bar:removeMenu(menu_idx) end
 
+--- Adds MenuItem-specific methods.
 ---@class Menu_Item
 local Menu_Item = {}
 
---- @return nil
+--- Adds a sub item entry to this Menu_Item widget.
 ---@param child_idx any
 ---@return nil
 function Menu_Item:addSubItem(child_idx) end
 
---- @return nil
+--- Returns the shortcut of this Menu_Item widget.
 ---@return nil
 function Menu_Item:getShortcut() end
 
---- @return nil
+--- Returns the sub items of this Menu_Item widget.
 ---@return nil
 function Menu_Item:getSubItems() end
 
---- @return nil
+--- Returns the text of this Menu_Item widget.
 ---@return nil
 function Menu_Item:getText() end
 
---- @return nil
+--- Returns true if checked is enabled for this Menu_Item widget.
 ---@return nil
 function Menu_Item:isChecked() end
 
---- @return nil
+--- Sets the checked for this Menu_Item widget.
 ---@param v any
 ---@return nil
 function Menu_Item:setChecked(v) end
 
---- @return nil
+--- Registers a callback invoked when this menu item is clicked.
 ---@param f any
 ---@return nil
 function Menu_Item:setOnClick(f) end
 
---- @return nil
+--- Sets the shortcut for this Menu_Item widget.
 ---@param shortcut any
 ---@return nil
 function Menu_Item:setShortcut(shortcut) end
 
---- @return nil
+--- Sets the text for this Menu_Item widget.
 ---@param text any
 ---@return nil
 function Menu_Item:setText(text) end
 
+--- Adds NinePatch-specific methods.
 ---@class Nine_Patch
 local Nine_Patch = {}
 
---- @return nil
+--- Returns the image dimensions of this Nine_Patch widget.
 ---@return nil
 function Nine_Patch:getImageDimensions() end
 
---- @return nil
+--- Returns the insets of this Nine_Patch widget.
 ---@return nil
 function Nine_Patch:getInsets() end
 
---- @return nil
+--- Returns the slices of this Nine_Patch widget.
 ---@return nil
 function Nine_Patch:getSlices() end
 
---- @return nil
+--- Sets the image dimensions for this Nine_Patch widget.
 ---@param w any
 ---@param h any
 ---@return nil
 function Nine_Patch:setImageDimensions(w, h) end
 
---- @return nil
+--- Sets the insets for this Nine_Patch widget.
 ---@param left any
 ---@param top any
 ---@param right any
@@ -4828,543 +5076,558 @@ function Nine_Patch:setImageDimensions(w, h) end
 ---@return nil
 function Nine_Patch:setInsets(left, top, right, bottom) end
 
+--- Adds Panel-specific methods.
 ---@class Panel
 local Panel = {}
 
---- @return nil
+--- Returns the title of this Panel widget.
 ---@return nil
 function Panel:getTitle() end
 
---- @return nil
+--- Sets the scrollable for this Panel widget.
 ---@param scrollable any
 ---@return nil
 function Panel:setScrollable(scrollable) end
 
---- @return nil
+--- Sets the title for this Panel widget.
 ---@param title any
 ---@return nil
 function Panel:setTitle(title) end
 
+--- Adds ProgressBar-specific methods to a widget table.
 ---@class Progress_Bar
 local Progress_Bar = {}
 
---- @return nil
+--- Returns the max of this Progress_Bar widget.
 ---@return nil
 function Progress_Bar:getMax() end
 
---- @return nil
+--- Returns the min of this Progress_Bar widget.
 ---@return nil
 function Progress_Bar:getMin() end
 
---- @return nil
+--- Returns the progress of this Progress_Bar widget.
 ---@return nil
 function Progress_Bar:getProgress() end
 
---- @return nil
+--- Returns the value of this Progress_Bar widget.
 ---@return nil
 function Progress_Bar:getValue() end
 
---- @return nil
+--- Sets the range for this Progress_Bar widget.
 ---@param min any
 ---@param max any
 ---@return nil
 function Progress_Bar:setRange(min, max) end
 
---- @return nil
+--- Sets the value for this Progress_Bar widget.
 ---@param v any
 ---@return nil
 function Progress_Bar:setValue(v) end
 
+--- Adds RadioButton-specific methods.
 ---@class Radio_Button
 local Radio_Button = {}
 
---- @return nil
+--- Returns the group of this Radio_Button widget.
 ---@return nil
 function Radio_Button:getGroup() end
 
---- @return nil
+--- Returns the text of this Radio_Button widget.
 ---@return nil
 function Radio_Button:getText() end
 
---- @return nil
+--- Returns true if selected is enabled for this Radio_Button widget.
 ---@return nil
 function Radio_Button:isSelected() end
 
---- @return nil
+--- Sets the group for this Radio_Button widget.
 ---@param group any
 ---@return nil
 function Radio_Button:setGroup(group) end
 
---- @return nil
+--- Registers a callback invoked when this widget's value changes.
 ---@param f any
 ---@return nil
 function Radio_Button:setOnChange(f) end
 
---- @return nil
+--- Sets the selected for this Radio_Button widget.
 ---@param v any
 ---@return nil
 function Radio_Button:setSelected(v) end
 
---- @return nil
+--- Sets the text for this Radio_Button widget.
 ---@param text any
 ---@return nil
 function Radio_Button:setText(text) end
 
+--- Adds ScrollBar-specific methods.
 ---@class Scroll_Bar
 local Scroll_Bar = {}
 
---- @return nil
+--- Returns the content size of this Scroll_Bar widget.
 ---@return nil
 function Scroll_Bar:getContentSize() end
 
---- @return nil
+--- Returns the scroll position of this Scroll_Bar widget.
 ---@return nil
 function Scroll_Bar:getScrollPosition() end
 
---- @return nil
+--- Returns the view size of this Scroll_Bar widget.
 ---@return nil
 function Scroll_Bar:getViewSize() end
 
---- @return nil
+--- Returns true if vertical is enabled for this Scroll_Bar widget.
 ---@return nil
 function Scroll_Bar:isVertical() end
 
---- @return nil
+--- Sets the content size for this Scroll_Bar widget.
 ---@param v any
 ---@return nil
 function Scroll_Bar:setContentSize(v) end
 
---- @return nil
+--- Registers a callback invoked when this widget's value changes.
 ---@param f any
 ---@return nil
 function Scroll_Bar:setOnChange(f) end
 
---- @return nil
+--- Sets the scroll position for this Scroll_Bar widget.
 ---@param v any
 ---@return nil
 function Scroll_Bar:setScrollPosition(v) end
 
---- @return nil
+--- Sets the view size for this Scroll_Bar widget.
 ---@param v any
 ---@return nil
 function Scroll_Bar:setViewSize(v) end
 
+--- Adds ScrollPanel-specific methods.
 ---@class Scroll_Panel
 local Scroll_Panel = {}
 
---- @return nil
+--- Returns the content size of this Scroll_Panel widget.
 ---@return nil
 function Scroll_Panel:getContentSize() end
 
---- @return nil
+--- Returns the max scroll of this Scroll_Panel widget.
 ---@return nil
 function Scroll_Panel:getMaxScroll() end
 
---- @return nil
+--- Returns the scroll position of this Scroll_Panel widget.
 ---@return nil
 function Scroll_Panel:getScrollPosition() end
 
---- @return nil
+--- Returns the scroll speed of this Scroll_Panel widget.
 ---@return nil
 function Scroll_Panel:getScrollSpeed() end
 
---- @return nil
+--- Sets the content size for this Scroll_Panel widget.
 ---@param w any
 ---@param h any
 ---@return nil
 function Scroll_Panel:setContentSize(w, h) end
 
---- @return nil
+--- Sets the scroll position for this Scroll_Panel widget.
 ---@param x any
 ---@param y any
 ---@return nil
 function Scroll_Panel:setScrollPosition(x, y) end
 
---- @return nil
+--- Sets the scroll speed for this Scroll_Panel widget.
 ---@param speed any
 ---@return nil
 function Scroll_Panel:setScrollSpeed(speed) end
 
+--- Adds Separator-specific methods.
 ---@class Separator
 local Separator = {}
 
---- @return nil
+--- Returns the thickness of this Separator widget.
 ---@return nil
 function Separator:getThickness() end
 
---- @return nil
+--- Returns true if vertical is enabled for this Separator widget.
 ---@return nil
 function Separator:isVertical() end
 
---- @return nil
+--- Sets the thickness for this Separator widget.
 ---@param thickness any
 ---@return nil
 function Separator:setThickness(thickness) end
 
---- @return nil
+--- Sets the vertical for this Separator widget.
 ---@param v any
 ---@return nil
 function Separator:setVertical(v) end
 
+--- Adds Slider-specific methods to a widget table.
 ---@class Slider
 local Slider = {}
 
---- @return nil
+--- Returns the max of this Slider widget.
 ---@return nil
 function Slider:getMax() end
 
---- @return nil
+--- Returns the min of this Slider widget.
 ---@return nil
 function Slider:getMin() end
 
---- @return nil
+--- Returns the value of this Slider widget.
 ---@return nil
 function Slider:getValue() end
 
---- @return nil
+--- Sets the range for this Slider widget.
 ---@param min any
 ---@param max any
 ---@return nil
 function Slider:setRange(min, max) end
 
---- @return nil
+--- Sets the step for this Slider widget.
 ---@param step any
 ---@return nil
 function Slider:setStep(step) end
 
---- @return nil
+--- Sets the value for this Slider widget.
 ---@param v any
 ---@return nil
 function Slider:setValue(v) end
 
+--- Adds SplitPanel-specific methods.
 ---@class Split_Panel
 local Split_Panel = {}
 
---- @return nil
+--- Returns the first child of this Split_Panel widget.
 ---@return nil
 function Split_Panel:getFirstChild() end
 
---- @return nil
+--- Returns the min panel size of this Split_Panel widget.
 ---@return nil
 function Split_Panel:getMinPanelSize() end
 
---- @return nil
+--- Returns the orientation of this Split_Panel widget.
 ---@return nil
 function Split_Panel:getOrientation() end
 
---- @return nil
+--- Returns the second child of this Split_Panel widget.
 ---@return nil
 function Split_Panel:getSecondChild() end
 
---- @return nil
+--- Returns the split position of this Split_Panel widget.
 ---@return nil
 function Split_Panel:getSplitPosition() end
 
---- @return nil
+--- Sets the first child for this Split_Panel widget.
 ---@param child_idx any
 ---@return nil
 function Split_Panel:setFirstChild(child_idx) end
 
---- @return nil
+--- Sets the min panel size for this Split_Panel widget.
 ---@param v any
 ---@return nil
 function Split_Panel:setMinPanelSize(v) end
 
---- @return nil
+--- Sets the orientation for this Split_Panel widget.
 ---@param v any
 ---@return nil
 function Split_Panel:setOrientation(v) end
 
---- @return nil
+--- Sets the second child for this Split_Panel widget.
 ---@param child_idx any
 ---@return nil
 function Split_Panel:setSecondChild(child_idx) end
 
---- @return nil
+--- Sets the split position for this Split_Panel widget.
 ---@param v any
 ---@return nil
 function Split_Panel:setSplitPosition(v) end
 
+--- Adds StatusBar-specific methods.
 ---@class Status_Bar
 local Status_Bar = {}
 
---- @return nil
+--- Adds a section entry to this Status_Bar widget.
 ---@param text any
 ---@param width? any (optional)
 ---@return nil
 function Status_Bar:addSection(text, width) end
 
---- @return nil
+--- Returns the section count of this Status_Bar widget.
 ---@return nil
 function Status_Bar:getSectionCount() end
 
---- @return nil
+--- Returns the section text of this Status_Bar widget.
 ---@param section_idx any
 ---@return nil
 function Status_Bar:getSectionText(section_idx) end
 
---- @return nil
+--- Sets the section text for this Status_Bar widget.
 ---@param section_idx any
 ---@param text any
 ---@return nil
 function Status_Bar:setSectionText(section_idx, text) end
 
+--- Adds TabBar-specific methods (1-based indices in Lua).
 ---@class Tab_Bar
 local Tab_Bar = {}
 
---- @return nil
+--- Adds a tab entry to this Tab_Bar widget.
 ---@param label any
 ---@return nil
 function Tab_Bar:addTab(label) end
 
---- @return nil
+--- Returns the active tab of this Tab_Bar widget.
 ---@return nil
 function Tab_Bar:getActiveTab() end
 
---- @return nil
+--- Returns the tab of this Tab_Bar widget.
 ---@param index any
 ---@return nil
 function Tab_Bar:getTab(index) end
 
---- @return nil
+--- Returns the tab count of this Tab_Bar widget.
 ---@return nil
 function Tab_Bar:getTabCount() end
 
---- @return nil
+--- Removes the tab from this Tab_Bar widget.
 ---@param index any
 ---@return nil
 function Tab_Bar:removeTab(index) end
 
---- @return nil
+--- Sets the active tab for this Tab_Bar widget.
 ---@param index any
 ---@return nil
 function Tab_Bar:setActiveTab(index) end
 
+--- Adds TextInput-specific methods to a widget table.
 ---@class Text_Input
 local Text_Input = {}
 
---- @return nil
+--- Returns the cursor position of this Text_Input widget.
 ---@return nil
 function Text_Input:getCursorPosition() end
 
---- @return nil
+--- Returns the placeholder of this Text_Input widget.
 ---@return nil
 function Text_Input:getPlaceholder() end
 
---- @return nil
+--- Returns the text of this Text_Input widget.
 ---@return nil
 function Text_Input:getText() end
 
---- @return nil
+--- Returns true if focused is enabled for this Text_Input widget.
 ---@return nil
 function Text_Input:isFocused() end
 
---- @return nil
+--- Sets the max length for this Text_Input widget.
 ---@param n any
 ---@return nil
 function Text_Input:setMaxLength(n) end
 
---- @return nil
+--- Sets the placeholder for this Text_Input widget.
 ---@param text any
 ---@return nil
 function Text_Input:setPlaceholder(text) end
 
---- @return nil
+--- Sets the text for this Text_Input widget.
 ---@param text any
 ---@return nil
 function Text_Input:setText(text) end
 
+--- Adds Toast-specific methods.
 ---@class Toast
 local Toast = {}
 
---- @return nil
+--- Returns the duration of this Toast widget.
 ---@return nil
 function Toast:getDuration() end
 
---- @return nil
+--- Returns the message of this Toast widget.
 ---@return nil
 function Toast:getMessage() end
 
---- @return nil
+--- Returns the progress of this Toast widget.
 ---@return nil
 function Toast:getProgress() end
 
---- @return nil
+--- Returns true if expired is enabled for this Toast widget.
 ---@return nil
 function Toast:isExpired() end
 
---- @return nil
+--- Sets the duration for this Toast widget.
 ---@param d any
 ---@return nil
 function Toast:setDuration(d) end
 
---- @return nil
+--- Sets the message for this Toast widget.
 ---@param msg any
 ---@return nil
 function Toast:setMessage(msg) end
 
+--- Adds Toolbar-specific methods.
 ---@class Toolbar
 local Toolbar = {}
 
---- @return nil
+--- Adds a button entry to this Toolbar widget.
 ---@param id any
 ---@param tooltip? any (optional)
 ---@return nil
 function Toolbar:addButton(id, tooltip) end
 
---- @return nil
+--- Returns the button of this Toolbar widget.
 ---@param id any
 ---@return nil
 function Toolbar:getButton(id) end
 
---- @return nil
+--- Returns the orientation of this Toolbar widget.
 ---@return nil
 function Toolbar:getOrientation() end
 
---- @return nil
+--- Returns true if button toggled is enabled for this Toolbar widget.
 ---@param id any
 ---@return nil
 function Toolbar:isButtonToggled(id) end
 
---- @return nil
+--- Sets the button enabled for this Toolbar widget.
 ---@param id any
 ---@param enabled any
 ---@return nil
 function Toolbar:setButtonEnabled(id, enabled) end
 
---- @return nil
+--- Sets the button toggled for this Toolbar widget.
 ---@param id any
 ---@param toggled any
 ---@return nil
 function Toolbar:setButtonToggled(id, toggled) end
 
---- @return nil
+--- Sets the orientation for this Toolbar widget.
 ---@param v any
 ---@return nil
 function Toolbar:setOrientation(v) end
 
+--- Adds TooltipPanel-specific methods.
 ---@class Tooltip_Panel
 local Tooltip_Panel = {}
 
---- @return nil
+--- Returns the delay of this Tooltip_Panel widget.
 ---@return nil
 function Tooltip_Panel:getDelay() end
 
---- @return nil
+--- Returns the target of this Tooltip_Panel widget.
 ---@return nil
 function Tooltip_Panel:getTarget() end
 
---- @return nil
+--- Returns the text of this Tooltip_Panel widget.
 ---@return nil
 function Tooltip_Panel:getText() end
 
---- @return nil
+--- Sets the delay for this Tooltip_Panel widget.
 ---@param v any
 ---@return nil
 function Tooltip_Panel:setDelay(v) end
 
---- @return nil
+--- Sets the target for this Tooltip_Panel widget.
 ---@param target? any (optional)
 ---@return nil
 function Tooltip_Panel:setTarget(target) end
 
---- @return nil
+--- Sets the text for this Tooltip_Panel widget.
 ---@param text any
 ---@return nil
 function Tooltip_Panel:setText(text) end
 
+--- Adds TreeView-specific methods (1-based indices in Lua).
 ---@class Tree_View
 local Tree_View = {}
 
---- @return nil
+--- Adds a node entry to this Tree_View widget.
 ---@param text any
 ---@param parent_index? any (optional)
 ---@return nil
 function Tree_View:addNode(text, parent_index) end
 
---- @return nil
+--- Clears all nodes entries from this Tree_View widget.
 ---@return nil
 function Tree_View:clearNodes() end
 
---- @return nil
+--- Performs the collapse all operation on this Tree_View widget.
 ---@return nil
 function Tree_View:collapseAll() end
 
---- @return nil
+--- Performs the collapse node operation on this Tree_View widget.
 ---@param index any
 ---@return nil
 function Tree_View:collapseNode(index) end
 
---- @return nil
+--- Performs the expand all operation on this Tree_View widget.
 ---@return nil
 function Tree_View:expandAll() end
 
---- @return nil
+--- Performs the expand node operation on this Tree_View widget.
 ---@param index any
 ---@return nil
 function Tree_View:expandNode(index) end
 
---- @return nil
+--- Returns the child nodes of this Tree_View widget.
 ---@param index any
 ---@return nil
 function Tree_View:getChildNodes(index) end
 
---- @return nil
+--- Returns the node count of this Tree_View widget.
 ---@return nil
 function Tree_View:getNodeCount() end
 
---- @return nil
+--- Returns the node depth of this Tree_View widget.
 ---@param index any
 ---@return nil
 function Tree_View:getNodeDepth(index) end
 
---- @return nil
+--- Returns the node text of this Tree_View widget.
 ---@param index any
 ---@return nil
 function Tree_View:getNodeText(index) end
 
---- @return nil
+--- Returns the parent node of this Tree_View widget.
 ---@param index any
 ---@return nil
 function Tree_View:getParentNode(index) end
 
---- @return nil
+--- Returns the selected node of this Tree_View widget.
 ---@return nil
 function Tree_View:getSelectedNode() end
 
---- @return nil
+--- Returns true if expanded is enabled for this Tree_View widget.
 ---@param index any
 ---@return nil
 function Tree_View:isExpanded(index) end
 
---- @return nil
+--- Returns true if node expanded is enabled for this Tree_View widget.
 ---@param index any
 ---@return nil
 function Tree_View:isNodeExpanded(index) end
 
---- @return nil
+--- Removes the node from this Tree_View widget.
 ---@param index any
 ---@return nil
 function Tree_View:removeNode(index) end
 
---- @return nil
+--- Sets the node icon for this Tree_View widget.
 ---@param index any
 ---@param icon any
 ---@return nil
 function Tree_View:setNodeIcon(index, icon) end
 
---- @return nil
+--- Sets the node text for this Tree_View widget.
 ---@param index any
 ---@param text any
 ---@return nil
 function Tree_View:setNodeText(index, text) end
 
---- @return nil
+--- Sets the selected node for this Tree_View widget.
 ---@param index any
 ---@return nil
 function Tree_View:setSelectedNode(index) end
 
---- @return nil
+--- Toggles the node state of this Tree_View widget.
 ---@param index any
 ---@return nil
 function Tree_View:toggleNode(index) end
@@ -6552,7 +6815,7 @@ function luna.math.fbm(x, y, seed, octaves, lac, gain) end
 ---@return number
 function luna.math.gammaToLinear(c) end
 
---- Back ease-in.
+--- Back ease-in — overshoots slightly before settling at the target.
 ---@param t any
 ---@return number
 function luna.math.inBack(t) end
@@ -6562,7 +6825,7 @@ function luna.math.inBack(t) end
 ---@return number
 function luna.math.inBounce(t) end
 
---- Cubic ease-in.
+--- Cubic ease-in — acceleration starts slowly then increases sharply.
 ---@param t any
 ---@return number
 function luna.math.inCubic(t) end
@@ -6671,7 +6934,7 @@ function luna.math.newTransform(x, y, angle, sx, sy, ox, oy, kx, ky) end
 ---@return Tween
 function luna.math.newTween(duration, easing_name) end
 
---- Back ease-out.
+--- Back ease-out — overshoots the target then snaps back into place.
 ---@param t any
 ---@return number
 function luna.math.outBack(t) end
@@ -8746,6 +9009,7 @@ function luna.system.setLogLevel(level) end
 ---@class luna.terminal
 luna.terminal = {}
 
+--- Lua-side wrapper around a [`Terminal`] with widget binding management.
 ---@class Terminal
 local Terminal = {}
 
@@ -8815,6 +9079,7 @@ function Terminal:setFocus(value) end
 ---@return boolean
 function Terminal:textinput(text) end
 
+--- Lua-side wrapper around a [`Widget`] with attachment and callback state.
 ---@class Widget
 local Widget = {}
 

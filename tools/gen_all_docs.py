@@ -2,16 +2,16 @@
 """Convenience runner: regenerate the full Luna2D documentation pipeline in one command.
 
 Steps:
-    1. gen_rust_api_data.py     -> docs/API/rust_api_data.json    (Rust master JSON)
-    2. gen_lua_api_data.py      -> docs/API/lua_api_data.json     (Lua master JSON)
+    1. gen_rust_api_data.py     -> docs/logs/rust_api_data.json    (Rust master JSON)
+    2. gen_lua_api_data.py      -> docs/logs/lua_api_data.json     (Lua master JSON)
     3. gen_luadoc.py            -> docs/API/luna.lua              (LuaCATS stubs)
     4. gen_docs_lua.py          -> docs/API/lua-api.md            (compact Lua API reference)
     5. gen_docs_rust.py         -> docs/API/rust-api.md           (compact Rust API reference)
     6. gen_wiki_api.py          -> wiki/API-Reference.md          (game-developer cheatsheet)
     7. doc_coverage.py          -> docs/logs/doc_coverage.json    (docstring coverage analytics)
     8. test_coverage.py         -> docs/logs/test_coverage.json   (test coverage analytics)
-    9. gen_test_docs.py --mode rust  -> docs/API/test_docs_rust.md
-   10. gen_test_docs.py --mode lua   -> docs/API/test_docs_lua.md
+    9. gen_test_docs.py --mode rust  -> docs/tests/test_docs_rust.md
+   10. gen_test_docs.py --mode lua   -> docs/tests/test_docs_lua.md
    11. gen_coverage_gaps.py     -> docs/API/coverage_gaps.md      (API gap report)
 
 Usage:
@@ -24,8 +24,8 @@ import time
 from pathlib import Path
 
 SCRIPTS = [
-    ("docs/gen_rust_api_data.py", "Rust JSON (docs/API/rust_api_data.json)"),
-    ("docs/gen_lua_api_data.py",  "Lua JSON (docs/API/lua_api_data.json)"),
+    ("docs/gen_rust_api_data.py", "Rust JSON (docs/logs/rust_api_data.json)"),
+    ("docs/gen_lua_api_data.py",  "Lua JSON (docs/logs/lua_api_data.json)"),
     ("docs/gen_luadoc.py",        "LuaCATS Stubs (docs/API/luna.lua)"),
     ("docs/gen_docs_lua.py",      "Lua API reference (docs/API/lua-api.md)"),
     ("docs/gen_docs_rust.py",     "Rust API reference (docs/API/rust-api.md)"),
@@ -36,10 +36,10 @@ SCRIPTS = [
 
 # Scripts that need extra arguments (script_name, args_list, label)
 SCRIPTS_WITH_ARGS = [
-    ("docs/gen_test_docs.py", ["--mode", "rust", "--output", "docs/API/test_docs_rust.md"],
-     "Rust test docs (docs/API/test_docs_rust.md)"),
-    ("docs/gen_test_docs.py", ["--mode", "lua",  "--output", "docs/API/test_docs_lua.md"],
-     "Lua test docs (docs/API/test_docs_lua.md)"),
+    ("docs/gen_test_docs.py", ["--mode", "rust", "--output", "docs/tests/test_docs_rust.md"],
+     "Rust test docs (docs/tests/test_docs_rust.md)"),
+    ("docs/gen_test_docs.py", ["--mode", "lua",  "--output", "docs/tests/test_docs_lua.md"],
+     "Lua test docs (docs/tests/test_docs_lua.md)"),
     ("audit/gen_coverage_gaps.py", [],
      "Coverage gaps (docs/API/coverage_gaps.md)"),
 ]

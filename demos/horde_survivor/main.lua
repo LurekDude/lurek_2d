@@ -21,7 +21,7 @@ local function dist(ax, ay, bx, by)
     return math.sqrt(dx * dx + dy * dy)
 end
 
-local function clamp(v, lo, hi) return clamp(v, lo, hi) end
+local function clamp(v, lo, hi) return math.max(lo, math.min(hi, v)) end
 
 local function spawn_enemy()
     local side = math.random(1, 4)

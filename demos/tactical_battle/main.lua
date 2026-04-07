@@ -28,6 +28,11 @@ local function dist(a, b)
     return math.abs(a.gx - b.gx) + math.abs(a.gy - b.gy)
 end
 
+-- calcReachable: populates the `reachable` and `attackable` lists for the selected unit.
+-- Movement uses a Manhattan diamond (|dx|+|dy| ≤ moveRange) — equivalent to a flat BFS
+-- without terrain costs. Occupied cells are excluded so units cannot overlap.
+-- Attack range is computed separately: any enemy within atkRange after the move is marked.
+-- (Knights are melee range=1; archers have range=3 but lower HP and movement.)
 local function calcReachable(u)
     reachable = {}
     for dx = -u.moveRange, u.moveRange do
@@ -36,6 +41,7 @@ local function calcReachable(u)
                 local nx, ny = u.gx + dx, u.gy + dy
                 if nx >= 0 and nx < GRID and ny >= 0 and ny < GRID then
                     local _, occ = tileAt(nx, ny)
+                    -- Allow the unit's own current cell (it can stay in place)
                     if not occ or (occ.gx == u.gx and occ.gy == u.gy) then
                         table.insert(reachable, { x = nx, y = ny })
                     end
@@ -43,6 +49,8 @@ local function calcReachable(u)
             end
         end
     end
+    -- Attackable targets: enemies within attack range FROM the unit's current position.
+    -- The player must move first, then the attack range is re-evaluated from the new position.
     attackable = {}
     for _, other in ipairs(units) do
         if other.team ~= u.team and other.hp > 0 and dist(u, other) <= u.atkRange then

@@ -76,8 +76,7 @@ impl LuaUserData for LuaImage {
         methods.add_method("release", |_, this, ()| {
             let mut st = this.state.borrow_mut();
             if st.textures.remove(this.key).is_some() {
-                st.released_texture_handles
-                    .insert(this.key.data().as_ffi());
+                st.released_texture_handles.insert(this.key.data().as_ffi());
                 Ok(true)
             } else {
                 Ok(false)
@@ -350,9 +349,7 @@ impl LuaUserData for LuaSpriteBatch {
             )| {
                 let mut st = this.state.borrow_mut();
                 let batch = st.sprite_batches.get_mut(this.key).ok_or_else(|| {
-                    LuaError::RuntimeError(
-                        "SpriteBatch handle is not valid or was released".into(),
-                    )
+                    LuaError::RuntimeError("SpriteBatch handle is not valid or was released".into())
                 })?;
                 let entry = BatchEntry {
                     x,
@@ -388,9 +385,7 @@ impl LuaUserData for LuaSpriteBatch {
         methods.add_method("getCount", |_, this, ()| {
             let st = this.state.borrow();
             let batch = st.sprite_batches.get(this.key).ok_or_else(|| {
-                LuaError::RuntimeError(
-                    "SpriteBatch handle is not valid or was released".into(),
-                )
+                LuaError::RuntimeError("SpriteBatch handle is not valid or was released".into())
             })?;
             Ok(batch.len())
         });
@@ -401,9 +396,7 @@ impl LuaUserData for LuaSpriteBatch {
         methods.add_method("getBufferSize", |_, this, ()| {
             let st = this.state.borrow();
             let batch = st.sprite_batches.get(this.key).ok_or_else(|| {
-                LuaError::RuntimeError(
-                    "SpriteBatch handle is not valid or was released".into(),
-                )
+                LuaError::RuntimeError("SpriteBatch handle is not valid or was released".into())
             })?;
             Ok(batch.buffer_size())
         });
@@ -465,9 +458,9 @@ impl LuaUserData for LuaMesh {
             let mesh = st.meshes.get(this.key).ok_or_else(|| {
                 LuaError::RuntimeError("Mesh handle is not valid or was released".into())
             })?;
-            let v = mesh.get_vertex(index.wrapping_sub(1)).ok_or_else(|| {
-                LuaError::RuntimeError("Mesh vertex index out of bounds".into())
-            })?;
+            let v = mesh
+                .get_vertex(index.wrapping_sub(1))
+                .ok_or_else(|| LuaError::RuntimeError("Mesh vertex index out of bounds".into()))?;
             Ok((v.x, v.y, v.u, v.v, v.r, v.g, v.b, v.a))
         });
 
@@ -656,20 +649,21 @@ impl LuaUserData for LuaQuad {
         /// @param w : number
         /// @param h : number
         /// @return nil
-        methods.add_method_mut("setViewport", |_, this, (x, y, w, h): (f32, f32, f32, f32)| {
-            this.x = x;
-            this.y = y;
-            this.w = w;
-            this.h = h;
-            Ok(())
-        });
+        methods.add_method_mut(
+            "setViewport",
+            |_, this, (x, y, w, h): (f32, f32, f32, f32)| {
+                this.x = x;
+                this.y = y;
+                this.w = w;
+                this.h = h;
+                Ok(())
+            },
+        );
 
         // -- getTextureDimensions --
         /// Returns the reference texture dimensions.
         /// @return number, number
-        methods.add_method("getTextureDimensions", |_, this, ()| {
-            Ok((this.sw, this.sh))
-        });
+        methods.add_method("getTextureDimensions", |_, this, ()| Ok((this.sw, this.sh)));
 
         // -- typeOf --
         /// Returns the type name of this object.
@@ -860,15 +854,13 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
                             });
                     }
                     None => {
-                        s.borrow_mut()
-                            .draw_commands
-                            .push(DrawCommand::Rectangle {
-                                mode: dm,
-                                x,
-                                y,
-                                w,
-                                h,
-                            });
+                        s.borrow_mut().draw_commands.push(DrawCommand::Rectangle {
+                            mode: dm,
+                            x,
+                            y,
+                            w,
+                            h,
+                        });
                     }
                 }
                 Ok(())
@@ -886,14 +878,12 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
     graphics.set(
         "circle",
         lua.create_function(move |_, (mode, x, y, radius): (String, f32, f32, f32)| {
-            s.borrow_mut()
-                .draw_commands
-                .push(DrawCommand::Circle {
-                    mode: parse_draw_mode(&mode),
-                    x,
-                    y,
-                    r: radius,
-                });
+            s.borrow_mut().draw_commands.push(DrawCommand::Circle {
+                mode: parse_draw_mode(&mode),
+                x,
+                y,
+                r: radius,
+            });
             Ok(())
         })?,
     )?;
@@ -908,18 +898,18 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
     let s = state.clone();
     graphics.set(
         "ellipse",
-        lua.create_function(move |_, (mode, x, y, rx, ry): (String, f32, f32, f32, f32)| {
-            s.borrow_mut()
-                .draw_commands
-                .push(DrawCommand::Ellipse {
+        lua.create_function(
+            move |_, (mode, x, y, rx, ry): (String, f32, f32, f32, f32)| {
+                s.borrow_mut().draw_commands.push(DrawCommand::Ellipse {
                     mode: parse_draw_mode(&mode),
                     x,
                     y,
                     rx,
                     ry,
                 });
-            Ok(())
-        })?,
+                Ok(())
+            },
+        )?,
     )?;
 
     // -- triangle --
@@ -937,17 +927,15 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
         "triangle",
         lua.create_function(
             move |_, (mode, x1, y1, x2, y2, x3, y3): (String, f32, f32, f32, f32, f32, f32)| {
-                s.borrow_mut()
-                    .draw_commands
-                    .push(DrawCommand::Triangle {
-                        mode: parse_draw_mode(&mode),
-                        x1,
-                        y1,
-                        x2,
-                        y2,
-                        x3,
-                        y3,
-                    });
+                s.borrow_mut().draw_commands.push(DrawCommand::Triangle {
+                    mode: parse_draw_mode(&mode),
+                    x1,
+                    y1,
+                    x2,
+                    y2,
+                    x3,
+                    y3,
+                });
                 Ok(())
             },
         )?,
@@ -972,14 +960,12 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
                 })
                 .collect();
             if vals.len() == 4 {
-                s.borrow_mut()
-                    .draw_commands
-                    .push(DrawCommand::Line {
-                        x1: vals[0],
-                        y1: vals[1],
-                        x2: vals[2],
-                        y2: vals[3],
-                    });
+                s.borrow_mut().draw_commands.push(DrawCommand::Line {
+                    x1: vals[0],
+                    y1: vals[1],
+                    x2: vals[2],
+                    y2: vals[3],
+                });
             } else if vals.len() >= 4 {
                 s.borrow_mut()
                     .draw_commands
@@ -1015,18 +1001,16 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
                     _ => {}
                 }
             }
-            s.borrow_mut()
-                .draw_commands
-                .push(DrawCommand::Polygon {
-                    mode: parse_draw_mode(&mode_str),
-                    vertices,
-                });
+            s.borrow_mut().draw_commands.push(DrawCommand::Polygon {
+                mode: parse_draw_mode(&mode_str),
+                vertices,
+            });
             Ok(())
         })?,
     )?;
 
     // -- arc --
-    /// Draws an arc.
+    /// Draws a partial circle arc at the given position with specified radius and angle range.
     /// @param mode : string
     /// @param x : number
     /// @param y : number
@@ -1323,20 +1307,20 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
                 let x = x.unwrap_or(0.0);
                 let y = y.unwrap_or(0.0);
                 let scale = scale.unwrap_or(1.0);
-                let active_font = s.borrow().active_font;
-                match active_font {
+                // Use active_font, falling back to the built-in default (OpenSans).
+                let font_key = s.borrow().active_font.or(s.borrow().default_font);
+                match font_key {
                     Some(font_key) => {
-                        s.borrow_mut()
-                            .draw_commands
-                            .push(DrawCommand::PrintFont {
-                                font_key,
-                                text,
-                                x,
-                                y,
-                                scale,
-                            });
+                        s.borrow_mut().draw_commands.push(DrawCommand::PrintFont {
+                            font_key,
+                            text,
+                            x,
+                            y,
+                            scale,
+                        });
                     }
                     None => {
+                        // Bitmap fallback — only reached if OpenSans failed to load at startup.
                         s.borrow_mut()
                             .draw_commands
                             .push(DrawCommand::Print { text, x, y, scale });
@@ -1365,7 +1349,11 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
                     Some("justify") => TextAlign::Justify,
                     _ => TextAlign::Left,
                 };
-                let active_font = s.borrow().active_font;
+                let active_font = s
+                    .borrow()
+                    .active_font
+                    .or(s.borrow().default_font)
+                    .or(s.borrow().default_font);
                 if let Some(font_key) = active_font {
                     s.borrow_mut()
                         .draw_commands
@@ -1948,8 +1936,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
                         ));
                     }
                     st.active_shader = Some(key);
-                    st.draw_commands
-                        .push(DrawCommand::SetShader(Some(key)));
+                    st.draw_commands.push(DrawCommand::SetShader(Some(key)));
                 }
                 None => {
                     st.active_shader = None;
@@ -1994,14 +1981,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
         "newQuad",
         lua.create_function(
             move |_, (x, y, w, h, sw, sh): (f32, f32, f32, f32, f32, f32)| {
-                Ok(LuaQuad {
-                    x,
-                    y,
-                    w,
-                    h,
-                    sw,
-                    sh,
-                })
+                Ok(LuaQuad { x, y, w, h, sw, sh })
             },
         )?,
     )?;
@@ -2027,9 +2007,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
     graphics.set(
         "pop",
         lua.create_function(move |_, ()| {
-            s.borrow_mut()
-                .draw_commands
-                .push(DrawCommand::PopTransform);
+            s.borrow_mut().draw_commands.push(DrawCommand::PopTransform);
             Ok(())
         })?,
     )?;
@@ -2100,9 +2078,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
     graphics.set(
         "origin",
         lua.create_function(move |_, ()| {
-            s.borrow_mut()
-                .draw_commands
-                .push(DrawCommand::Origin);
+            s.borrow_mut().draw_commands.push(DrawCommand::Origin);
             Ok(())
         })?,
     )?;
@@ -2116,11 +2092,9 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
         lua.create_function(move |_, mat: LuaTable| {
             let mut m = [0.0f32; 9];
             for (i, item) in m.iter_mut().enumerate() {
-                *item = mat.get::<_, f32>(i + 1).unwrap_or(if i == 0 || i == 4 || i == 8 {
-                    1.0
-                } else {
-                    0.0
-                });
+                *item = mat
+                    .get::<_, f32>(i + 1)
+                    .unwrap_or(if i == 0 || i == 4 || i == 8 { 1.0 } else { 0.0 });
             }
             s.borrow_mut()
                 .draw_commands
@@ -2195,8 +2169,12 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
         lua.create_function(move |_, (x, y, w, h): (f32, f32, f32, f32)| {
             let mut st = s.borrow_mut();
             let new = Rect::new(x, y, w, h);
-            let result = st.scissor.map(|(cx, cy, cw, ch)| Rect::new(cx, cy, cw, ch).intersect(&new));
-            let tuple = result.map(|r| (r.x, r.y, r.width, r.height)).or(Some((x, y, w, h)));
+            let result = st
+                .scissor
+                .map(|(cx, cy, cw, ch)| Rect::new(cx, cy, cw, ch).intersect(&new));
+            let tuple = result
+                .map(|r| (r.x, r.y, r.width, r.height))
+                .or(Some((x, y, w, h)));
             st.scissor = tuple;
             st.draw_commands.push(DrawCommand::SetScissor(tuple));
             Ok(())
@@ -2289,8 +2267,10 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
             };
             let val = value.unwrap_or(1);
             let mut st = s.borrow_mut();
-            st.draw_commands
-                .push(DrawCommand::StencilBegin { action: act, value: val });
+            st.draw_commands.push(DrawCommand::StencilBegin {
+                action: act,
+                value: val,
+            });
             Ok(())
         })?,
     )?;
@@ -2317,12 +2297,13 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
                         "never" => CompareMode::Never,
                         _ => CompareMode::Always,
                     };
-                    st.draw_commands
-                        .push(DrawCommand::SetStencilTest(Some((mode, value.unwrap_or(1)))));
+                    st.draw_commands.push(DrawCommand::SetStencilTest(Some((
+                        mode,
+                        value.unwrap_or(1),
+                    ))));
                 }
                 None => {
-                    st.draw_commands
-                        .push(DrawCommand::SetStencilTest(None));
+                    st.draw_commands.push(DrawCommand::SetStencilTest(None));
                 }
             }
             Ok(())
