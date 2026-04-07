@@ -167,3 +167,76 @@ impl mlua::UserData for ByteData {
         });
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    // ── Construction ──────────────────────────────────────────────────────────
+
+    #[test]
+    fn new_zero_filled_correct_len() {
+        let bd = ByteData::new(8);
+        assert_eq!(bd.len(), 8);
+        assert_eq!(bd.get_byte(0), Some(0));
+        assert_eq!(bd.get_byte(7), Some(0));
+    }
+
+    #[test]
+    fn from_bytes_preserves_data() {
+        let bd = ByteData::from_bytes(vec![1, 2, 3]);
+        assert_eq!(bd.len(), 3);
+        assert_eq!(bd.get_byte(0), Some(1));
+        assert_eq!(bd.get_byte(2), Some(3));
+    }
+
+    #[test]
+    fn from_string_converts_correctly() {
+        let bd = ByteData::from_string("hi");
+        assert_eq!(bd.len(), 2);
+        assert_eq!(bd.get_byte(0), Some(b'h'));
+        assert_eq!(bd.get_byte(1), Some(b'i'));
+    }
+
+    // ── Get / Set ─────────────────────────────────────────────────────────────
+
+    #[test]
+    fn set_byte_roundtrip() {
+        let mut bd = ByteData::new(4);
+        let ok = bd.set_byte(2, 42);
+        assert!(ok);
+        assert_eq!(bd.get_byte(2), Some(42));
+    }
+
+    #[test]
+    fn set_byte_out_of_bounds_returns_false() {
+        let mut bd = ByteData::new(4);
+        assert!(!bd.set_byte(10, 1));
+    }
+
+    #[test]
+    fn get_byte_out_of_bounds_returns_none() {
+        let bd = ByteData::new(4);
+        assert!(bd.get_byte(99).is_none());
+    }
+
+    // ── Buffer ops ────────────────────────────────────────────────────────────
+
+    #[test]
+    fn is_empty_zero_size() {
+        let bd = ByteData::new(0);
+        assert!(bd.is_empty());
+    }
+
+    #[test]
+    fn as_bytes_matches_data() {
+        let bd = ByteData::from_bytes(vec![10, 20, 30]);
+        assert_eq!(bd.as_bytes(), &[10u8, 20, 30]);
+    }
+
+    #[test]
+    fn get_string_roundtrip() {
+        let bd = ByteData::from_string("hello");
+        assert_eq!(bd.get_string(), "hello");
+    }
+}

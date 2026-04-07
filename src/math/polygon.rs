@@ -156,3 +156,69 @@ fn point_in_triangle(p: Vec2, a: Vec2, b: Vec2, c: Vec2) -> bool {
 fn cross_sign(p1: Vec2, p2: Vec2, p3: Vec2) -> f32 {
     (p1.x - p3.x) * (p2.y - p3.y) - (p2.x - p3.x) * (p1.y - p3.y)
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::math::vec2::Vec2;
+
+    // ── Triangulate ─────────────────────────────────────────────────────────
+
+    #[test]
+    fn triangulate_triangle_gives_one_result() {
+        let pts = vec![
+            Vec2::new(0.0, 0.0),
+            Vec2::new(1.0, 0.0),
+            Vec2::new(0.0, 1.0),
+        ];
+        let tris = triangulate(&pts).unwrap();
+        assert_eq!(tris.len(), 1);
+    }
+
+    #[test]
+    fn triangulate_square_gives_two_triangles() {
+        let pts = vec![
+            Vec2::new(0.0, 0.0),
+            Vec2::new(1.0, 0.0),
+            Vec2::new(1.0, 1.0),
+            Vec2::new(0.0, 1.0),
+        ];
+        let tris = triangulate(&pts).unwrap();
+        assert_eq!(tris.len(), 2);
+    }
+
+    #[test]
+    fn triangulate_too_few_points_returns_err() {
+        let pts = vec![Vec2::new(0.0, 0.0), Vec2::new(1.0, 0.0)];
+        assert!(triangulate(&pts).is_err());
+    }
+
+    // ── Convexity ────────────────────────────────────────────────────────────
+
+    #[test]
+    fn is_convex_square_true() {
+        let pts = vec![
+            Vec2::new(0.0, 0.0),
+            Vec2::new(1.0, 0.0),
+            Vec2::new(1.0, 1.0),
+            Vec2::new(0.0, 1.0),
+        ];
+        assert!(is_convex(&pts));
+    }
+
+    #[test]
+    fn is_convex_triangle_true() {
+        let pts = vec![
+            Vec2::new(0.0, 0.0),
+            Vec2::new(2.0, 0.0),
+            Vec2::new(1.0, 2.0),
+        ];
+        assert!(is_convex(&pts));
+    }
+
+    #[test]
+    fn is_convex_less_than_three_false() {
+        let pts = vec![Vec2::new(0.0, 0.0), Vec2::new(1.0, 0.0)];
+        assert!(!is_convex(&pts));
+    }
+}

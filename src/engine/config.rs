@@ -716,3 +716,72 @@ impl Config {
         config
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    // ── Default values ─────────────────────────────────────────────────────────
+
+    #[test]
+    fn default_window_width_800() {
+        let c = Config::default();
+        assert_eq!(c.window.width, 800);
+    }
+
+    #[test]
+    fn default_window_height_600() {
+        let c = Config::default();
+        assert_eq!(c.window.height, 600);
+    }
+
+    #[test]
+    fn default_title_contains_luna2d() {
+        let c = Config::default();
+        assert!(c.window.title.contains("Luna2D"));
+    }
+
+    #[test]
+    fn default_vsync_enabled() {
+        let c = Config::default();
+        assert!(c.window.vsync);
+    }
+
+    #[test]
+    fn default_fps_cap_sixty() {
+        let c = Config::default();
+        assert_eq!(c.performance.target_fps, 60);
+    }
+
+    #[test]
+    fn default_modules_graphics_enabled() {
+        let c = Config::default();
+        assert!(c.modules.graphics);
+    }
+
+    #[test]
+    fn default_identity_none() {
+        let c = Config::default();
+        assert!(c.identity.is_none());
+    }
+
+    // ── Module validation ─────────────────────────────────────────────────────
+
+    #[test]
+    fn validate_disables_minimap_when_no_graphics() {
+        let mut c = Config::default();
+        c.modules.graphics = false;
+        c.modules.minimap = true;
+        c.modules.validate_and_fix();
+        assert!(!c.modules.minimap);
+    }
+
+    #[test]
+    fn validate_disables_particle_when_no_graphics() {
+        let mut c = Config::default();
+        c.modules.graphics = false;
+        c.modules.particle = true;
+        c.modules.validate_and_fix();
+        assert!(!c.modules.particle);
+    }
+}

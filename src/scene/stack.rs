@@ -360,3 +360,69 @@ impl Default for SceneStack {
         Self::new()
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::scene::transition::TransitionType;
+
+    // ── Initial state ─────────────────────────────────────────────────────────
+
+    #[test]
+    fn new_stack_is_empty() {
+        let s = SceneStack::new();
+        assert!(s.is_empty());
+        assert_eq!(s.get_stack_size(), 0);
+    }
+
+    // ── Scene IDs ─────────────────────────────────────────────────────────────
+
+    #[test]
+    fn next_scene_id_increments() {
+        let mut s = SceneStack::new();
+        let id1 = s.next_scene_id();
+        let id2 = s.next_scene_id();
+        assert!(id2 > id1);
+    }
+
+    // ── Push / Pop ────────────────────────────────────────────────────────────
+
+    #[test]
+    fn push_increases_stack_size() {
+        let mut s = SceneStack::new();
+        let id = s.next_scene_id();
+        s.push(id, TransitionType::None, 0.0);
+        assert_eq!(s.get_stack_size(), 1);
+    }
+
+    #[test]
+    fn pop_returns_pushed_id() {
+        let mut s = SceneStack::new();
+        let id = s.next_scene_id();
+        s.push(id, TransitionType::None, 0.0);
+        let (popped, _) = s.pop(TransitionType::None, 0.0).unwrap();
+        assert_eq!(popped, id);
+    }
+
+    #[test]
+    fn pop_empty_stack_returns_err() {
+        let mut s = SceneStack::new();
+        assert!(s.pop(TransitionType::None, 0.0).is_err());
+    }
+
+    // ── Registry ───────────────────────────────────────────────────────────────
+
+    #[test]
+    fn register_and_lookup_scene() {
+        let mut s = SceneStack::new();
+        let id = s.next_scene_id();
+        s.register_scene("main_menu".to_string(), id);
+        assert_eq!(s.get_registered("main_menu"), Some(id));
+    }
+
+    #[test]
+    fn unregistered_name_returns_none() {
+        let s = SceneStack::new();
+        assert!(s.get_registered("missing").is_none());
+    }
+}

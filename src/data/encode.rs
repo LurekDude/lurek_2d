@@ -74,3 +74,52 @@ pub fn decode(format: EncodeFormat, text: &str) -> Result<Vec<u8>, String> {
         EncodeFormat::Hex => hex::decode(text).map_err(|e| format!("Hex decode error: {}", e)),
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    // ── Parsing ────────────────────────────────────────────────────────────────
+
+    #[test]
+    fn parse_str_base64_valid() {
+        assert_eq!(
+            EncodeFormat::parse_str("base64").unwrap(),
+            EncodeFormat::Base64
+        );
+    }
+
+    #[test]
+    fn parse_str_hex_valid() {
+        assert_eq!(EncodeFormat::parse_str("hex").unwrap(), EncodeFormat::Hex);
+    }
+
+    #[test]
+    fn parse_str_invalid_returns_err() {
+        assert!(EncodeFormat::parse_str("binary").is_err());
+    }
+
+    // ── Round-trips ────────────────────────────────────────────────────────────
+
+    #[test]
+    fn base64_encode_decode_roundtrip() {
+        let data = b"Luna2D engine test";
+        let encoded = encode(EncodeFormat::Base64, data);
+        let decoded = decode(EncodeFormat::Base64, &encoded).unwrap();
+        assert_eq!(decoded.as_slice(), data.as_ref());
+    }
+
+    #[test]
+    fn hex_encode_decode_roundtrip() {
+        let data: &[u8] = &[0x00, 0xFF, 0x7F, 0x80];
+        let encoded = encode(EncodeFormat::Hex, data);
+        let decoded = decode(EncodeFormat::Hex, &encoded).unwrap();
+        assert_eq!(decoded, data);
+    }
+
+    #[test]
+    fn hex_encode_known_value() {
+        let encoded = encode(EncodeFormat::Hex, &[0xDE, 0xAD, 0xBE, 0xEF]);
+        assert_eq!(encoded, "deadbeef");
+    }
+}

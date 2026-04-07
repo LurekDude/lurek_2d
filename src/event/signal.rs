@@ -173,3 +173,74 @@ impl Default for Signal {
         Self::new()
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    // ── Subscribe ───────────────────────────────────────────────────────────
+
+    #[test]
+    fn subscribe_returns_incrementing_handles() {
+        let mut s = Signal::new();
+        let h1 = s.subscribe("click");
+        let h2 = s.subscribe("click");
+        assert!(h2 > h1);
+    }
+
+    #[test]
+    fn get_count_after_subscribe() {
+        let mut s = Signal::new();
+        s.subscribe("fire");
+        s.subscribe("fire");
+        assert_eq!(s.get_count("fire"), 2);
+    }
+
+    #[test]
+    fn subscribe_two_events_independent() {
+        let mut s = Signal::new();
+        s.subscribe("a");
+        s.subscribe("b");
+        s.subscribe("b");
+        assert_eq!(s.get_count("a"), 1);
+        assert_eq!(s.get_count("b"), 2);
+    }
+
+    // ── Remove ────────────────────────────────────────────────────────────────
+
+    #[test]
+    fn remove_decrements_count() {
+        let mut s = Signal::new();
+        let h = s.subscribe("update");
+        assert_eq!(s.get_count("update"), 1);
+        let removed = s.remove(h);
+        assert!(removed);
+        assert_eq!(s.get_count("update"), 0);
+    }
+
+    #[test]
+    fn remove_nonexistent_handle_returns_false() {
+        let mut s = Signal::new();
+        assert!(!s.remove(999));
+    }
+
+    // ── Clear ─────────────────────────────────────────────────────────────────
+
+    #[test]
+    fn clear_empties_named_event() {
+        let mut s = Signal::new();
+        s.subscribe("draw");
+        s.subscribe("draw");
+        s.clear("draw");
+        assert_eq!(s.get_count("draw"), 0);
+    }
+
+    #[test]
+    fn clear_all_removes_everything() {
+        let mut s = Signal::new();
+        s.subscribe("a");
+        s.subscribe("b");
+        s.clear_all();
+        assert_eq!(s.get_total_count(), 0);
+    }
+}

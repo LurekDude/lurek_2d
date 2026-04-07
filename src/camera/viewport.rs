@@ -185,3 +185,65 @@ impl Viewport {
         )
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    // ── Construction ──────────────────────────────────────────────────────────
+
+    #[test]
+    fn new_default_scale_one_no_offset() {
+        let vp = Viewport::new(800.0, 600.0, ScaleMode::Letterbox);
+        let (sx, sy) = vp.get_scale();
+        assert!((sx - 1.0).abs() < 1e-5);
+        assert!((sy - 1.0).abs() < 1e-5);
+        let (ox, oy) = vp.get_offset();
+        assert!((ox).abs() < 1e-5);
+        assert!((oy).abs() < 1e-5);
+    }
+
+    // ── Stretch mode ─────────────────────────────────────────────────────────
+
+    #[test]
+    fn stretch_resize_fills_window() {
+        let mut vp = Viewport::new(400.0, 300.0, ScaleMode::Stretch);
+        vp.resize(800.0, 600.0);
+        let (sx, sy) = vp.get_scale();
+        assert!((sx - 2.0).abs() < 1e-5);
+        assert!((sy - 2.0).abs() < 1e-5);
+    }
+
+    // ── Letterbox mode ───────────────────────────────────────────────────────
+
+    #[test]
+    fn letterbox_preserves_aspect_ratio() {
+        let mut vp = Viewport::new(400.0, 300.0, ScaleMode::Letterbox);
+        vp.resize(800.0, 300.0);
+        let (sx, sy) = vp.get_scale();
+        // uniform scale: min(800/400, 300/300) = min(2, 1) = 1 => sx == sy
+        assert!((sx - sy).abs() < 1e-5);
+    }
+
+    // ── Coordinate conversion ──────────────────────────────────────────────────
+
+    #[test]
+    fn to_game_to_screen_roundtrip() {
+        let mut vp = Viewport::new(800.0, 600.0, ScaleMode::Stretch);
+        vp.resize(1600.0, 1200.0);
+        let (gx, gy) = vp.to_game(400.0, 300.0);
+        let (sx, sy) = vp.to_screen(gx, gy);
+        assert!((sx - 400.0).abs() < 1e-5);
+        assert!((sy - 300.0).abs() < 1e-5);
+    }
+
+    // ── Pixel perfect mode ──────────────────────────────────────────────────
+
+    #[test]
+    fn pixel_perfect_gives_integer_scale() {
+        let mut vp = Viewport::new(200.0, 150.0, ScaleMode::PixelPerfect);
+        vp.resize(700.0, 600.0);
+        let (sx, _) = vp.get_scale();
+        assert_eq!(sx.fract(), 0.0);
+    }
+}

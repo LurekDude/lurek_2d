@@ -214,3 +214,65 @@ pub fn event_to_lua_multi<'lua>(lua: &'lua Lua, event: &Event) -> LuaResult<LuaM
     }
     Ok(LuaMultiValue::from_vec(values))
 }
+
+#[cfg(test)]
+mod tests {
+    use super::{Event, EventArg, EventQueue};
+
+    // ── Push / Len ────────────────────────────────────────────────────────────
+
+    #[test]
+    fn new_queue_is_empty() {
+        let q = EventQueue::new();
+        assert!(q.is_empty());
+        assert_eq!(q.len(), 0);
+    }
+
+    #[test]
+    fn push_event_increments_len() {
+        let mut q = EventQueue::new();
+        q.push_event("keypressed", vec![EventArg::Str("a".to_string())]);
+        assert_eq!(q.len(), 1);
+    }
+
+    // ── FIFO order ─────────────────────────────────────────────────────────────
+
+    #[test]
+    fn poll_fifo_order_preserved() {
+        let mut q = EventQueue::new();
+        q.push_event("first", vec![]);
+        q.push_event("second", vec![]);
+        let e1 = q.poll().unwrap();
+        let e2 = q.poll().unwrap();
+        assert_eq!(e1.name, "first");
+        assert_eq!(e2.name, "second");
+    }
+
+    #[test]
+    fn poll_empty_returns_none() {
+        let mut q = EventQueue::new();
+        assert!(q.poll().is_none());
+    }
+
+    // ── Clear ─────────────────────────────────────────────────────────────────
+
+    #[test]
+    fn clear_empties_queue() {
+        let mut q = EventQueue::new();
+        q.push_event("a", vec![]);
+        q.push_event("b", vec![]);
+        q.clear();
+        assert!(q.is_empty());
+    }
+
+    #[test]
+    fn push_direct_and_poll_roundtrip() {
+        let mut q = EventQueue::new();
+        q.push(Event {
+            name: "custom".to_string(),
+            args: vec![EventArg::Num(42.0)],
+        });
+        let evt = q.poll().unwrap();
+        assert_eq!(evt.name, "custom");
+    }
+}

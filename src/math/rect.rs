@@ -115,3 +115,97 @@ impl Rect {
         }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    // ── Construction ──────────────────────────────────────────────────────────
+
+    #[test]
+    fn new_fields_correct() {
+        let r = Rect::new(10.0, 20.0, 100.0, 50.0);
+        assert!((r.x - 10.0).abs() < 1e-5);
+        assert!((r.y - 20.0).abs() < 1e-5);
+        assert!((r.width - 100.0).abs() < 1e-5);
+        assert!((r.height - 50.0).abs() < 1e-5);
+    }
+
+    // ── Geometry ──────────────────────────────────────────────────────────────
+
+    #[test]
+    fn center_midpoint_correct() {
+        let r = Rect::new(10.0, 20.0, 100.0, 50.0);
+        let c = r.center();
+        assert!((c.x - 60.0).abs() < 1e-5);
+        assert!((c.y - 45.0).abs() < 1e-5);
+    }
+
+    #[test]
+    fn area_product_correct() {
+        let r = Rect::new(0.0, 0.0, 100.0, 50.0);
+        assert!((r.area() - 5000.0).abs() < 1e-5);
+    }
+
+    #[test]
+    fn zero_area_rect_area_zero() {
+        let r = Rect::new(5.0, 5.0, 0.0, 0.0);
+        assert!((r.area()).abs() < 1e-5);
+    }
+
+    // ── Contains ─────────────────────────────────────────────────────────────
+
+    #[test]
+    fn contains_inside_true() {
+        let r = Rect::new(0.0, 0.0, 100.0, 100.0);
+        assert!(r.contains(50.0, 50.0));
+    }
+
+    #[test]
+    fn contains_outside_false() {
+        let r = Rect::new(0.0, 0.0, 100.0, 100.0);
+        assert!(!r.contains(200.0, 200.0));
+    }
+
+    #[test]
+    fn contains_on_edge_true() {
+        let r = Rect::new(0.0, 0.0, 100.0, 100.0);
+        assert!(r.contains(0.0, 0.0));
+        assert!(r.contains(100.0, 100.0));
+    }
+
+    // ── Intersects ───────────────────────────────────────────────────────────
+
+    #[test]
+    fn intersects_overlapping_true() {
+        let a = Rect::new(0.0, 0.0, 10.0, 10.0);
+        let b = Rect::new(5.0, 5.0, 10.0, 10.0);
+        assert!(a.intersects(&b));
+    }
+
+    #[test]
+    fn intersects_non_overlapping_false() {
+        let a = Rect::new(0.0, 0.0, 10.0, 10.0);
+        let b = Rect::new(20.0, 20.0, 10.0, 10.0);
+        assert!(!a.intersects(&b));
+    }
+
+    #[test]
+    fn intersect_overlap_area_correct() {
+        let a = Rect::new(0.0, 0.0, 10.0, 10.0);
+        let b = Rect::new(5.0, 5.0, 10.0, 10.0);
+        let overlap = a.intersect(&b);
+        assert!((overlap.x - 5.0).abs() < 1e-5);
+        assert!((overlap.y - 5.0).abs() < 1e-5);
+        assert!((overlap.width - 5.0).abs() < 1e-5);
+        assert!((overlap.height - 5.0).abs() < 1e-5);
+    }
+
+    #[test]
+    fn intersect_non_overlapping_returns_zero_rect() {
+        let a = Rect::new(0.0, 0.0, 5.0, 5.0);
+        let b = Rect::new(10.0, 10.0, 5.0, 5.0);
+        let overlap = a.intersect(&b);
+        assert!((overlap.area()).abs() < 1e-5);
+    }
+}

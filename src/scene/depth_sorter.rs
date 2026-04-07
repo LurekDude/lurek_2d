@@ -109,3 +109,60 @@ impl Default for DepthSorter {
         Self::new()
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    // ── Sorting ───────────────────────────────────────────────────────────────
+
+    #[test]
+    fn sort_ascending_depth_order() {
+        let mut ds = DepthSorter::new();
+        ds.add(0, 3.0);
+        ds.add(1, 1.0);
+        ds.sort();
+        let entries = ds.sorted_entries();
+        assert!((entries[0].depth - 1.0).abs() < 1e-5);
+        assert!((entries[1].depth - 3.0).abs() < 1e-5);
+    }
+
+    #[test]
+    fn equal_depths_no_panic() {
+        let mut ds = DepthSorter::new();
+        ds.add(0, 1.0);
+        ds.add(1, 1.0);
+        ds.sort();
+        assert_eq!(ds.get_count(), 2);
+    }
+
+    // ── Mixed add / add_object ───────────────────────────────────────────────
+
+    #[test]
+    fn add_object_marks_is_object_true() {
+        let mut ds = DepthSorter::new();
+        ds.add_object(42, 2.0);
+        let entries = ds.sorted_entries();
+        assert!(entries[0].is_object);
+        assert_eq!(entries[0].callback_index, 42);
+    }
+
+    #[test]
+    fn add_marks_is_object_false() {
+        let mut ds = DepthSorter::new();
+        ds.add(7, 1.0);
+        let entries = ds.sorted_entries();
+        assert!(!entries[0].is_object);
+    }
+
+    // ── Clear ─────────────────────────────────────────────────────────────────
+
+    #[test]
+    fn clear_after_sort_empties() {
+        let mut ds = DepthSorter::new();
+        ds.add(0, 1.0);
+        ds.sort();
+        ds.clear();
+        assert_eq!(ds.get_count(), 0);
+    }
+}

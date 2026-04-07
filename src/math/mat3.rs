@@ -170,3 +170,89 @@ impl std::ops::Mul for Mat3 {
         result
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::math::vec2::Vec2;
+
+    // ── Identity ─────────────────────────────────────────────────────────────
+
+    #[test]
+    fn identity_diagonal_ones() {
+        let m = Mat3::identity();
+        assert!((m.m[0][0] - 1.0).abs() < 1e-5);
+        assert!((m.m[1][1] - 1.0).abs() < 1e-5);
+        assert!((m.m[2][2] - 1.0).abs() < 1e-5);
+        assert!((m.m[0][1]).abs() < 1e-5);
+        assert!((m.m[1][0]).abs() < 1e-5);
+    }
+
+    #[test]
+    fn identity_transforms_point_unchanged() {
+        let m = Mat3::identity();
+        let p = m.transform_point(Vec2::new(3.0, 7.0));
+        assert!((p.x - 3.0).abs() < 1e-5);
+        assert!((p.y - 7.0).abs() < 1e-5);
+    }
+
+    // ── Translation ─────────────────────────────────────────────────────────
+
+    #[test]
+    fn from_translation_offsets_point() {
+        let m = Mat3::from_translation(Vec2::new(5.0, 3.0));
+        let p = m.transform_point(Vec2::new(1.0, 2.0));
+        assert!((p.x - 6.0).abs() < 1e-5);
+        assert!((p.y - 5.0).abs() < 1e-5);
+    }
+
+    // ── Scale ─────────────────────────────────────────────────────────────────
+
+    #[test]
+    fn from_scale_scales_point() {
+        let m = Mat3::from_scale(Vec2::new(2.0, 3.0));
+        let p = m.transform_point(Vec2::new(4.0, 5.0));
+        assert!((p.x - 8.0).abs() < 1e-5);
+        assert!((p.y - 15.0).abs() < 1e-5);
+    }
+
+    // ── Rotation ───────────────────────────────────────────────────────────────
+
+    #[test]
+    fn from_rotation_90deg_right_becomes_down() {
+        let m = Mat3::from_rotation(std::f32::consts::FRAC_PI_2);
+        let p = m.transform_point(Vec2::new(1.0, 0.0));
+        assert!((p.x).abs() < 1e-5);
+        assert!((p.y - 1.0).abs() < 1e-5);
+    }
+
+    // ── Multiplication ───────────────────────────────────────────────────────────
+
+    #[test]
+    fn multiply_by_identity_unchanged() {
+        let m = Mat3::from_translation(Vec2::new(5.0, 3.0));
+        let result = m * Mat3::identity();
+        let p = result.transform_point(Vec2::new(1.0, 2.0));
+        assert!((p.x - 6.0).abs() < 1e-5);
+        assert!((p.y - 5.0).abs() < 1e-5);
+    }
+
+    // ── Inverse ────────────────────────────────────────────────────────────────
+
+    #[test]
+    fn inverse_of_identity_is_identity() {
+        let inv = Mat3::identity().inverse();
+        let p = inv.transform_point(Vec2::new(3.0, 4.0));
+        assert!((p.x - 3.0).abs() < 1e-5);
+        assert!((p.y - 4.0).abs() < 1e-5);
+    }
+
+    #[test]
+    fn inverse_undoes_translation() {
+        let m = Mat3::from_translation(Vec2::new(10.0, 5.0));
+        let inv = m.inverse();
+        let p = inv.transform_point(Vec2::new(15.0, 8.0));
+        assert!((p.x - 5.0).abs() < 1e-5);
+        assert!((p.y - 3.0).abs() < 1e-5);
+    }
+}

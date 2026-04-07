@@ -120,3 +120,79 @@ impl ActiveTransition {
         self.elapsed += dt;
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    // ── Construction ──────────────────────────────────────────────────────────
+
+    #[test]
+    fn new_starts_at_zero_elapsed() {
+        let t = ActiveTransition::new(TransitionType::Fade, 1.0);
+        assert!((t.elapsed).abs() < 1e-5);
+    }
+
+    #[test]
+    fn progress_at_start_is_zero() {
+        let t = ActiveTransition::new(TransitionType::Fade, 1.0);
+        assert!((t.progress()).abs() < 1e-5);
+    }
+
+    // ── Progress ─────────────────────────────────────────────────────────────
+
+    #[test]
+    fn progress_after_half_duration_is_half() {
+        let mut t = ActiveTransition::new(TransitionType::Fade, 2.0);
+        t.update(1.0);
+        assert!((t.progress() - 0.5).abs() < 1e-5);
+    }
+
+    #[test]
+    fn progress_clamped_at_one() {
+        let mut t = ActiveTransition::new(TransitionType::Fade, 1.0);
+        t.update(10.0);
+        assert!((t.progress() - 1.0).abs() < 1e-5);
+    }
+
+    #[test]
+    fn zero_duration_progress_is_one() {
+        let t = ActiveTransition::new(TransitionType::None, 0.0);
+        assert!((t.progress() - 1.0).abs() < 1e-5);
+    }
+
+    // ── Is complete ──────────────────────────────────────────────────────────
+
+    #[test]
+    fn is_complete_before_duration_false() {
+        let t = ActiveTransition::new(TransitionType::Fade, 1.0);
+        assert!(!t.is_complete());
+    }
+
+    #[test]
+    fn is_complete_after_full_update_true() {
+        let mut t = ActiveTransition::new(TransitionType::Fade, 0.5);
+        t.update(0.5);
+        assert!(t.is_complete());
+    }
+
+    // ── Type parsing ──────────────────────────────────────────────────────────
+
+    #[test]
+    fn from_lua_str_fade_correct() {
+        assert_eq!(TransitionType::from_lua_str("fade"), TransitionType::Fade);
+    }
+
+    #[test]
+    fn from_lua_str_unknown_returns_none_variant() {
+        assert_eq!(TransitionType::from_lua_str("xyz"), TransitionType::None);
+    }
+
+    #[test]
+    fn from_lua_str_slideleft() {
+        assert_eq!(
+            TransitionType::from_lua_str("slideleft"),
+            TransitionType::SlideLeft
+        );
+    }
+}

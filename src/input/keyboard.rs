@@ -500,3 +500,84 @@ pub fn winit_scancode_to_string(code: winit::keyboard::KeyCode) -> Option<&'stat
         _ => None,
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    // ── Initial state ─────────────────────────────────────────────────────────
+
+    #[test]
+    fn new_state_all_empty() {
+        let kb = KeyboardState::new();
+        assert!(!kb.is_down("a"));
+        assert!(kb.get_pressed().is_empty());
+        assert!(kb.get_released().is_empty());
+    }
+
+    // ── Key down / up ────────────────────────────────────────────────────────
+
+    #[test]
+    fn set_key_down_reports_pressed() {
+        let mut kb = KeyboardState::new();
+        kb.set_key_down("space");
+        assert!(kb.is_down("space"));
+        assert_eq!(kb.get_pressed(), &["space"]);
+    }
+
+    #[test]
+    fn set_key_down_twice_not_double_pressed() {
+        let mut kb = KeyboardState::new();
+        kb.set_key_down("a");
+        kb.set_key_down("a");
+        assert_eq!(kb.get_pressed().len(), 1);
+    }
+
+    #[test]
+    fn set_key_up_clears_down() {
+        let mut kb = KeyboardState::new();
+        kb.set_key_down("enter");
+        kb.set_key_up("enter");
+        assert!(!kb.is_down("enter"));
+        assert_eq!(kb.get_released(), &["enter"]);
+    }
+
+    // ── Frame boundary ───────────────────────────────────────────────────────
+
+    #[test]
+    fn begin_frame_clears_transient_state() {
+        let mut kb = KeyboardState::new();
+        kb.set_key_down("a");
+        kb.set_key_up("a");
+        kb.begin_frame();
+        assert!(kb.get_pressed().is_empty());
+        assert!(kb.get_released().is_empty());
+    }
+
+    // ── Any down ──────────────────────────────────────────────────────────────
+
+    #[test]
+    fn is_any_down_returns_true_if_one_matches() {
+        let mut kb = KeyboardState::new();
+        kb.set_key_down("left");
+        let keys = vec!["left".to_string(), "right".to_string()];
+        assert!(kb.is_any_down(&keys));
+    }
+
+    #[test]
+    fn is_any_down_false_when_none_pressed() {
+        let kb = KeyboardState::new();
+        let keys = vec!["left".to_string(), "right".to_string()];
+        assert!(!kb.is_any_down(&keys));
+    }
+
+    // ── Modifiers ─────────────────────────────────────────────────────────────
+
+    #[test]
+    fn set_shift_modifier_reports_active() {
+        let mut kb = KeyboardState::new();
+        kb.set_modifiers(true, false, false, false);
+        assert!(kb.is_modifier_active("shift"));
+        assert!(!kb.is_modifier_active("ctrl"));
+    }
+}

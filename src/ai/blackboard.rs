@@ -247,3 +247,98 @@ impl Default for Blackboard {
         Self::new()
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    // ── Number ─────────────────────────────────────────────────────────────────
+
+    #[test]
+    fn set_get_number_roundtrip() {
+        let mut bb = Blackboard::new();
+        bb.set_number("hp", 100.0);
+        let v = bb.get_number("hp", 0.0);
+        assert!((v - 100.0).abs() < 1e-10);
+    }
+
+    #[test]
+    fn missing_number_returns_default() {
+        let bb = Blackboard::new();
+        assert!((bb.get_number("missing", 42.0) - 42.0).abs() < 1e-10);
+    }
+
+    // ── Bool ──────────────────────────────────────────────────────────────────
+
+    #[test]
+    fn set_get_bool_roundtrip() {
+        let mut bb = Blackboard::new();
+        bb.set_bool("alert", true);
+        assert!(bb.get_bool("alert", false));
+    }
+
+    #[test]
+    fn missing_bool_returns_default() {
+        let bb = Blackboard::new();
+        assert!(!bb.get_bool("missing", false));
+    }
+
+    // ── String ────────────────────────────────────────────────────────────────
+
+    #[test]
+    fn set_get_string_roundtrip() {
+        let mut bb = Blackboard::new();
+        bb.set_string("state", "attack");
+        assert_eq!(bb.get_string("state", ""), "attack");
+    }
+
+    #[test]
+    fn missing_string_returns_default() {
+        let bb = Blackboard::new();
+        assert_eq!(bb.get_string("missing", "default"), "default");
+    }
+
+    // ── Has / Remove / Clear ─────────────────────────────────────────────────
+
+    #[test]
+    fn has_existing_key_true() {
+        let mut bb = Blackboard::new();
+        bb.set_number("x", 1.0);
+        assert!(bb.has("x"));
+    }
+
+    #[test]
+    fn has_missing_key_false() {
+        let bb = Blackboard::new();
+        assert!(!bb.has("none"));
+    }
+
+    #[test]
+    fn remove_clears_key() {
+        let mut bb = Blackboard::new();
+        bb.set_number("y", 5.0);
+        bb.remove("y");
+        assert!(!bb.has("y"));
+    }
+
+    #[test]
+    fn clear_empties_local_store() {
+        let mut bb = Blackboard::new();
+        bb.set_number("a", 1.0);
+        bb.set_bool("b", true);
+        bb.clear();
+        assert_eq!(bb.size(), 0);
+    }
+
+    // ── Parent lookup ────────────────────────────────────────────────────────
+
+    #[test]
+    fn parent_lookup_reads_parent_value() {
+        let mut parent = Blackboard::new();
+        parent.set_number("shared", 99.0);
+        let mut child = Blackboard::new();
+        child.set_parent(parent);
+        let v = child.get_number("shared", 0.0);
+        assert!((v - 99.0).abs() < 1e-10);
+    }
+}

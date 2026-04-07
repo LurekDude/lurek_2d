@@ -80,3 +80,53 @@ pub fn hash(algorithm: HashAlgorithm, data: &[u8]) -> String {
         }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    // ── Parsing ────────────────────────────────────────────────────────────────
+
+    #[test]
+    fn parse_str_md5_valid() {
+        assert_eq!(HashAlgorithm::parse_str("md5").unwrap(), HashAlgorithm::Md5);
+    }
+
+    #[test]
+    fn parse_str_sha256_valid() {
+        assert_eq!(
+            HashAlgorithm::parse_str("sha256").unwrap(),
+            HashAlgorithm::Sha256
+        );
+    }
+
+    #[test]
+    fn parse_str_invalid_returns_err() {
+        assert!(HashAlgorithm::parse_str("blake2").is_err());
+    }
+
+    // ── Hashing ────────────────────────────────────────────────────────────────
+
+    #[test]
+    fn md5_same_input_same_output() {
+        let h1 = hash(HashAlgorithm::Md5, b"hello");
+        let h2 = hash(HashAlgorithm::Md5, b"hello");
+        assert_eq!(h1, h2);
+    }
+
+    #[test]
+    fn md5_different_inputs_different_hashes() {
+        let h1 = hash(HashAlgorithm::Md5, b"hello");
+        let h2 = hash(HashAlgorithm::Md5, b"world");
+        assert_ne!(h1, h2);
+    }
+
+    #[test]
+    fn sha256_empty_known_value() {
+        let h = hash(HashAlgorithm::Sha256, b"");
+        assert_eq!(
+            h,
+            "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        );
+    }
+}
