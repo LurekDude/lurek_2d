@@ -1,0 +1,9 @@
+# conf.toml — engine configuration for the Horde Survivor demo
+
+[window]
+title = "Horde Survivor"
+width = 800
+height = 600
+
+[performance]
+target_fps = 60

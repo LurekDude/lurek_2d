@@ -1,7 +1,0 @@
-return {
-    window = {
-        title = "Luna2D — Particles Demo",
-        width = 900,
-        height = 600,
-    },
-}

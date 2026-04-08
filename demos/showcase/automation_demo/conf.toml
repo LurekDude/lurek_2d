@@ -1,0 +1,12 @@
+# conf.toml — engine configuration for automation_demo
+
+[window]
+title = "Automation Demo"
+width = 800
+height = 600
+
+[performance]
+target_fps = 30
+
+[modules]
+debug = true

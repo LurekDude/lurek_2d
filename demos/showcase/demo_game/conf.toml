@@ -1,0 +1,9 @@
+# conf.toml — engine configuration for demo_game
+
+[window]
+title = "Luna2D Demo Game"
+width = 800
+height = 600
+
+[performance]
+target_fps = 60

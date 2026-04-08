@@ -1,0 +1,9 @@
+# conf.toml — engine configuration for the Medical Simulation demo
+
+[window]
+title = "Medical Simulation"
+width = 800
+height = 600
+
+[performance]
+target_fps = 60

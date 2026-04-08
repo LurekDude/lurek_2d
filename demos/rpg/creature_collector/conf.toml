@@ -1,0 +1,9 @@
+# conf.toml — engine configuration for the Creature Collector demo
+
+[window]
+title = "Creature Collector"
+width = 800
+height = 600
+
+[performance]
+target_fps = 60

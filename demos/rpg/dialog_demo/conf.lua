@@ -1,7 +1,0 @@
-return {
-    window = {
-        title = "Dialog Demo",
-        width = 800,
-        height = 600,
-    },
-}
