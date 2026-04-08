@@ -19,7 +19,13 @@ since game start, rolling FPS computed over a 1-second sliding window, and a
 60-frame rolling average delta useful for smooth HUD display of frame time.
 `Clock` is stored inside `SharedState` and ticked once per engine frame by the
 main loop in `src/engine/app.rs`; the `dt` that `luna.update(dt)` receives is
-the `Clock`'s last-tick delta. The module also exposes a free function
+the `Clock`'s last-tick delta.
+
+> **`Clock` is the canonical source for fps, delta, and average frame delta in Luna2D.**
+> Use `luna.time.getDelta()`, `luna.time.getFps()`, and `luna.time.getAverageDelta()` for all
+> basic frame-timing needs — no setup required. Other modules (`debugbridge`, `devtools.FrameStats`)
+> maintain derivative buffers for specialized purposes (TCP delivery and percentile analysis
+> respectively), but `luna.time` should always be the first-choice API for game scripts. The module also exposes a free function
 `sleep(seconds)` that blocks the calling thread — a convenience for loading
 screens or startup delays that should never be called in the hot loop.
 

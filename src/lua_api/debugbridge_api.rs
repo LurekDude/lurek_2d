@@ -117,11 +117,26 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
     )?;
 
     /// Poll for pending Lua-dependent requests from TCP clients.
-    /// Must be called each frame from luna.update().
+    /// Must be called each frame from luna.update(). Automatically records
+    /// the current frame delta from `luna.time.getDelta()` into the performance
+    /// buffer — no manual `recordFrame()` call is needed.
     let sh = shared.clone();
     db.set(
         "poll",
         lua.create_function(move |lua, ()| {
+            // Auto-record frame time from luna.time.getDelta — no manual call needed.
+            if let Ok(luna_tbl) = lua.globals().get::<_, LuaTable>("luna") {
+                if let Ok(time_tbl) = luna_tbl.get::<_, LuaTable>("time") {
+                    if let Ok(get_delta) = time_tbl.get::<_, LuaFunction>("getDelta") {
+                        let dt: f64 = get_delta.call(()).unwrap_or(0.0);
+                        if dt > 0.0 {
+                            if let Ok(mut s) = sh.lock() {
+                                s.record_frame(dt);
+                            }
+                        }
+                    }
+                }
+            }
             let requests: Vec<PendingRequest> = {
                 let mut s = sh
                     .lock()
@@ -351,20 +366,6 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
     )?;
 
     // ----- Performance -----
-
-    /// Records a frame time sample.
-    let sh = shared.clone();
-    /// @param dt : number
-    db.set(
-        "recordFrame",
-        lua.create_function(move |_, dt: f64| {
-            let mut s = sh
-                .lock()
-                .map_err(|e| LuaError::RuntimeError(e.to_string()))?;
-            s.record_frame(dt);
-            Ok(())
-        })?,
-    )?;
 
     /// Returns performance statistics.
     let sh = shared.clone();

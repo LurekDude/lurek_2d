@@ -279,3 +279,10 @@ end
 - **No persistence**: Scripts exist only in memory. There is no built-in save/load to disk — scripts are constructed from Lua tables each time.
 - **Thread safety**: `Simulator` is not `Send` or `Sync`. It must remain on the main thread.
 - **Breaking change surface**: Renaming step action strings (`"keypress"`, `"mousemove"`, etc.) or the `luna.simulator.*` function names would break all existing automation scripts.
+
+## See Also
+
+| Module | Relationship |
+|---|---|
+| `timer::Scheduler` | For timed Lua callbacks (`after(delay)` / `every(interval)`), use `luna.time.newScheduler()`. `automation.Simulator` is for replaying **recorded input scripts**, not general timed callbacks. |
+| `patterns::StateMachine` | `Simulator` contains an internal 4-state FSM (`Idle/Running/Paused/Complete`). For **game-level** FSM needs (menus, NPC states, combat phases), use `luna.patterns.newStateMachine()` instead. |

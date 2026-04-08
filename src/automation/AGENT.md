@@ -14,6 +14,8 @@
 
 The `automation` module provides automated input simulation through timed step scripts. It is a Tier 2 Engine Extension that depends on `crate::engine` (Baseline) and `crate::event` (Tier 1). It does not depend on `crate::math`.
 
+**Scope boundaries**: `automation.Simulator` replays recorded input scripts — it is not a general timed-callback system (use `luna.time.newScheduler()` for that) and not a game FSM (use `luna.patterns.newStateMachine()` for that). The Simulator's internal `PlaybackState` FSM (Idle/Running/Paused/Complete) is private and is not a substitute for `patterns::StateMachine`.
+
 ## Source Files
 
 | File           | Purpose                                                                                |

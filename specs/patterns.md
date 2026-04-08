@@ -18,15 +18,21 @@ The six patterns are:
 
 1. **EventBus** — A publish/subscribe event bus. Listeners can be registered with a numeric priority (higher fires first) and optionally as one-shot (`once`). `emit(event)` fires all listeners sorted by priority. One-shot listeners are automatically removed after firing. Useful for decoupled game systems (UI reacting to player events, sound reacting to physics events).
 
+   > **When to use**: Prefer `luna.signal.newSignal()` for simple event wiring with no ordering requirement. Use `EventBus` when you need **priority-ordered firing** or **automatic one-shot removal** after the first call.
+
 2. **ObjectPool** — A capacity-bounded ID-pool that tracks idle and active objects as integers. `acquire()` moves an ID from idle to active (or creates a new one if below capacity). `release(id)` returns an ID to the idle pool. `prewarm(n)` pre-populates the idle pool. Useful for bullets, particles, and other short-lived game objects.
 
 3. **CommandStack** — An undo/redo command history. Each command entry stores execute/undo Lua function references via `LuaRegistryKey`. `push(name, exec, undo?)` executes the command and pushes it onto the stack. `undo()` calls the top entry's undo function; `redo()` re-executes it. `beginBatch()`/`endBatch()` groups multiple commands into a single undoable unit.
 
 4. **ServiceLocator** — A named Lua-value registry. `provide(name, value)` registers any Lua value (table, function, userdata) under a string key. `locate(name)` retrieves it. Useful for registering game subsystems (audio manager, dialogue controller) that arbitrary scripts can access without direct references.
 
+   > **When to use**: Prefer plain Lua module tables for static registries known at init time. Use `ServiceLocator` when you need **runtime discovery** (`locate(name)` from scripts that do not hold a direct reference), **hot-swap** of implementations, or **introspection** (`names()` to list all registered services).
+
 5. **Factory** — A named constructor registry. `register(typeName, fn)` stores a constructor function. `create(typeName, ...)` calls it with additional arguments. Useful for entity templates, projectile factories, and action creators.
 
 6. **StateMachine** — A finite state machine with guard-validated transitions, enter/exit/update callbacks, and a history ring. `addState(name, {enter,exit,update})` registers a state. `addTransition(from, to, guard?)` defines a valid edge (optional guard function). `transitionTo(name)` fires exit on the current state, calls the optional guard, fires enter on the new state, and records the transition in history. `update(dt)` calls the current state's `update` callback.
+
+   > **See also**: `automation.Simulator` has an internal 4-state playback FSM (Idle/Running/Paused/Complete). That FSM is private and controls input replay — it is not a general-purpose game state machine. For game-level state sequencing (menus, combat phases, NPC behaviour) use `luna.patterns.newStateMachine()` which provides guard-validated transitions, history, and enter/exit/update callbacks.
 
 All six domain types are **pure Rust** with no mlua dependency. All Lua plumbing (registry keys for callbacks, Lua UserData implementations) lives in `src/lua_api/patterns_api.rs`. The patterns API is gated by `modules.pipeline = true` in `conf.lua`.
 

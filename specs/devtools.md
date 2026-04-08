@@ -16,6 +16,8 @@ The `devtools` module provides the developer diagnostics toolkit for Luna2D game
 
 The module contains four orthogonal components:
 
+> **Ownership Rule — frame statistics**: Use `luna.time.getDelta()`, `luna.time.getFps()`, and `luna.time.getAverageDelta()` for basic per-frame timing (zero setup — `timer::Clock` is auto-ticked by the engine). Use `luna.devtools.frameStats:record(dt)` + `frameStats:snapshot()` only when p50/p95/p99 **percentile analysis** is needed.
+
 1. **Logger** — A ring-buffer log history with `LogLevel` (Trace/Debug/Info/Warn/Error/Fatal) filtering, optional per-entry category tags, and source file/line capture. Entries are stored in memory for in-game display panels and can be filtered or cleared at runtime. The logger does NOT write to files itself; it delegates physical output to the Rust `log` facade.
 
 2. **Profiler** — A hierarchical push/pop zone profiler that records start/end timestamps for named CPU regions. Each frame's zones form a tree (via nested push calls). The last N frames are retained for rolling display in an in-game profiler panel. It gracefully handles unbalanced push/pop by producing zero-duration zones.
@@ -31,6 +33,7 @@ This module intentionally does **not** provide:
 - Visual profiler rendering (render the data with `luna.gfx` in game code)
 - Filesystem events (OS-level inotify/FSEvents — polling only)
 - Network inspection or memory allocation tracking
+- Frame-timing basics — those come from `timer::Clock` via `luna.time` (auto-ticked, no setup)
 
 ## Architecture
 

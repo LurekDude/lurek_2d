@@ -18,6 +18,23 @@ Always update this file **in the same commit** as the change. Use the commit typ
 
 ---
 
+## [0.6.0] — 2026-04-18
+
+### Removed
+- **`luna.debugbridge.recordFrame(dt)`** — removed from the public Lua API. Frame timing is now automatic.
+
+### Changed
+- **`luna.debugbridge.poll()` auto-records frame delta** — `poll()` now reads `luna.time.getDelta()` each frame and feeds the result into `BridgeShared.frame_times`. `getPerformance()` continues to work unchanged; game scripts no longer need a manual `recordFrame(dt)` call alongside `poll()`. Scripts that called `recordFrame` must remove that call.
+- **Scope separation documented** — `specs/debugbridge.md` now includes an Ownership Rule section distinguishing `luna.log` (engine stdout), `devtools.Logger` (in-game UI), and `debugbridge.print_history` (TCP external tools). `specs/devtools.md` now documents the frame-timing ownership rule: use `luna.time` for basic fps/delta; use `devtools.frameStats` only for p50/p95/p99 percentile analysis.
+- **`specs/timer.md`** — `Clock` is now documented as the canonical source for fps/delta in Luna2D.
+- **`specs/event.md`** — Namespace Note added clarifying that `luna.signal.push/poll` (FIFO EventQueue) and `luna.signal.newSignal()` (pub-sub Signal) are independent primitives under the same namespace.
+- **`specs/patterns.md`** — When-to-use guidance added for `EventBus` vs `Signal`, `ServiceLocator` vs Lua tables, and `StateMachine` vs `automation.Simulator`.
+- **`specs/automation.md`** — See Also section added cross-referencing `timer::Scheduler` and `patterns::StateMachine`.
+- **`specs/log.md`** — Ownership boundary note added to References table.
+- **AGENT.md files** updated for `debugbridge`, `devtools`, `event`, `patterns`, and `automation`.
+
+---
+
 ## [0.5.5] — 2026-04-17
 
 ### Changed

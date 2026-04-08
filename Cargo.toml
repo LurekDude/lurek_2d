@@ -1,6 +1,6 @@
 [package]
 name = "luna2d"
-version = "0.5.0"
+version = "0.6.0"
 edition = "2021"
 description = "Luna2D — A cross-platform 2D game engine powered by Rust and Lua"
 license = "MIT"

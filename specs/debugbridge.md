@@ -22,7 +22,7 @@ Key features:
 - **`getLocals`** — enumerate local variables at a specific stack level via `debug.getlocal`
 - **`getGlobals`** — capture up to 200 primitive global variables
 - **Print capture** — game scripts call `luna.debugbridge.capturePrint` to feed a circular history buffer; the server broadcasts each entry as a `"print"` event to all clients
-- **Performance sampling** — `luna.debugbridge.recordFrame(dt)` accumulates recent frame deltas; `getPerformance()` returns fps, dt, avgDt, minDt, maxDt
+- **Performance sampling** — `poll()` automatically records the current frame delta from `luna.time.getDelta()` each call; `getPerformance()` returns fps, dt, avgDt, minDt, maxDt for connected external tools
 - **Screenshot request** — tools set `screenshot_requested` via `requestScreenshot(scale?)`; the render loop checks `isScreenshotRequested()` and clears the flag after capture
 - **Broadcast** — any game script can push a named JSON event to all connected clients with `broadcast(event, json_data)`
 
@@ -32,6 +32,20 @@ This module intentionally does **not** provide:
 - Encrypted or authenticated connections (loopback-only, trusted development environment)
 - A Lua-side coroutine or async model — `poll()` is a synchronous drain
 - Persistent session storage — all state is in-memory and resets when the server stops
+
+## Ownership Rule
+
+`debugbridge` manages **three distinct channels** — each has a separate purpose and must not be conflated:
+
+| Channel | Owner | Purpose |
+|---|---|---|
+| `luna.debugbridge.print_history` | `debugbridge` | TCP delivery feed for external tools (VS Code extension, MCP server). Push via `capturePrint()`. |
+| `luna.log.*` | `log` | Engine-level operational log — routes through the Rust `log` crate to stdout/stderr. |
+| `luna.devtools.logger` | `devtools` | In-game structured diagnostic history for in-game UI panels. |
+
+These three channels are independent by design. Emitting to one does not affect the others.
+
+For frame timing: `debugbridge.getPerformance()` reads from an internal sample buffer populated automatically by `poll()`. For basic fps/delta in game scripts, use `luna.time.getDelta()` and `luna.time.getFps()` directly (zero setup — the engine auto-ticks the clock).
 
 ## Architecture
 
@@ -52,7 +66,7 @@ src/lua_api/
                               Arc<Mutex<Option<JoinHandle<()>>>> thread_handle
 
 Thread model:
-  Main thread (Lua):  start(), stop(), poll(), capturePrint(), recordFrame(),
+  Main thread (Lua):  start(), stop(), poll(), capturePrint(),
                       getPerformance(), requestScreenshot(), isScreenshotRequested(),
                       broadcast(), getPort(), getClientCount(), isRunning(),
                       getPrintHistory(), clearPrintHistory(), setMaxPrintHistory()
@@ -143,7 +157,7 @@ The Lua API is registered in `src/lua_api/debugbridge_api.rs` under `luna.debugb
 
 | Function | Signature | Description |
 |---|---|---|
-| `luna.debugbridge.poll()` | — | Drain `pending_requests` and execute each on the Lua main thread. Must be called each frame. Supported methods: `eval`, `getCallStack`, `getLocals`, `getGlobals`. |
+| `luna.debugbridge.poll()` | — | Drain `pending_requests` and execute each on the Lua main thread. Must be called each frame. Also auto-records the current frame delta from `luna.time.getDelta()` into the performance buffer — no manual `recordFrame()` call is needed. Supported methods: `eval`, `getCallStack`, `getLocals`, `getGlobals`. |
 
 ### Print Capture
 
@@ -158,8 +172,7 @@ The Lua API is registered in `src/lua_api/debugbridge_api.rs` under `luna.debugb
 
 | Function | Signature | Description |
 |---|---|---|
-| `luna.debugbridge.recordFrame(dt)` | — | Append a frame dt sample. Oldest sample evicted when over capacity. |
-| `luna.debugbridge.getPerformance()` | `→ table` | Returns `{fps, dt, avgDt, minDt, maxDt}` computed from recent frame samples. |
+| `luna.debugbridge.getPerformance()` | `→ table` | Returns `{fps, dt, avgDt, minDt, maxDt}` computed from frame samples that `poll()` records automatically each call. |
 
 ### Screenshots
 
@@ -184,10 +197,9 @@ function luna.init()
     end
 end
 
--- Poll for debugger requests each frame
+-- Poll for debugger requests each frame (also auto-records frame time)
 function luna.process(dt)
     luna.debugbridge.poll()
-    luna.debugbridge.recordFrame(dt)
 end
 
 -- Forward print calls to connected tools
@@ -220,8 +232,8 @@ end
 |-----------|-------|
 | `struct`  | 4     |
 | `enum`    | 0     |
-| `fn`      | 15    |
-| **Total** | **19** |
+| `fn`      | 14    |
+| **Total** | **18** |
 
 ## References
 
@@ -235,7 +247,7 @@ end
 
 ## Notes
 
-- `poll()` must be called from the Lua main thread (typically in `luna.process`). Forgetting `poll()` means all `eval` / inspect requests from the VS Code extension will silently queue forever.
+- `poll()` must be called from the Lua main thread (typically in `luna.process`). Forgetting `poll()` means all `eval` / inspect requests from the VS Code extension will silently queue forever. `poll()` also auto-records the current frame delta from `luna.time.getDelta()` — so `getPerformance()` will always reflect the current frame rate as long as `poll()` is called each frame.
 - The bridge blocks on `running.store(false)` and then `handle.join()` during `stop()`. If the server thread is stuck on a blocking operation, `stop()` may hang briefly. This should not occur in practice because the listener is set non-blocking.
 - `requestScreenshot` only sets the flag — actually capturing and delivering the screenshot is the responsibility of the engine render loop or game code that checks `isScreenshotRequested()`.
 - Ports below 1024 are rejected with a `LuaError::RuntimeError`. On some systems, even ports above 1024 may require firewall adjustment; however, since the bridge binds to 127.0.0.1 only, external network access is never possible.

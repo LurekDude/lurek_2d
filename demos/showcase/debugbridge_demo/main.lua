@@ -35,11 +35,9 @@ end
 function luna.process(dt)
     frame_count = frame_count + 1
 
-    -- Poll for pending TCP requests (required each frame)
+    -- Poll for pending TCP requests (required each frame).
+    -- poll() automatically records frame time via luna.time.getDelta().
     db.poll()
-
-    -- Record frame time for performance tracking
-    db.recordFrame(dt)
 
     -- Log a message every 60 frames
     if frame_count % 60 == 0 then

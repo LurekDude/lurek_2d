@@ -2519,11 +2519,8 @@ function luna.debugbridge.isRunning() end
 function luna.debugbridge.isScreenshotRequested() end
 
 --- Poll for pending Lua-dependent requests from TCP clients.
+--- Also auto-records the current frame delta from luna.time.getDelta().
 function luna.debugbridge.poll() end
-
---- Records a frame time sample.
----@param dt any
-function luna.debugbridge.recordFrame(dt) end
 
 --- Flags a screenshot request for the next frame.
 ---@param scale? any (optional)

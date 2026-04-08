@@ -14,6 +14,8 @@
 
 The `patterns` module provides pure-Rust implementations of six classic game-programming design patterns for use in Lua scripts via `luna.patterns.*`. The six patterns are: `EventBus` (observer/publish-subscribe with priorities and one-shot listeners), `ObjectPool` (capacity-bounded ID-based pool with prewarm), `CommandStack` (undo/redo stack with batching), `ServiceLocator` (named service registry), `Factory` (named constructor registry with aliases), and `StateMachine` (FSM with guard-validated transitions and history). This module is **pure Rust** with no mlua dependency; all Lua plumbing (registry keys for callbacks) lives in `src/lua_api/patterns_api.rs`. It is gated by `modules.pipeline = true` in `conf.lua`.
 
+**Disambiguation**: Use `luna.signal.newSignal()` for simple pub-sub with no ordering. Use `luna.patterns.newEventBus()` when priority ordering or one-shot callbacks are required. Use `luna.patterns.newServiceLocator()` for runtime service discovery; prefer plain Lua module tables for static registries known at init time. Use `luna.patterns.newStateMachine()` for game FSMs — not `automation.Simulator`'s internal 4-state playback FSM.
+
 ## Source Files
 
 | File                | Purpose                                                                          |

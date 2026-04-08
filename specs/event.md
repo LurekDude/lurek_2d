@@ -14,6 +14,11 @@
 
 The event module provides two complementary messaging primitives for Luna2D games: a FIFO **EventQueue** for pollable named events, and a handle-based **Signal** pub-sub dispatcher for callback-driven event handling. Together they give game scripts full control over inter-system communication without tight coupling.
 
+> **Namespace Note**: `luna.signal` combines two independent primitives under one namespace:
+> - `luna.signal.push / poll / clear / wait` — the **FIFO `EventQueue`** that receives system input events and custom game events; consuming via `poll()` does **not** interact with `Signal` instances.
+> - `luna.signal.newSignal()` — a factory that creates handle-based **pub-sub `Signal`** dispatchers; emitting on a `Signal` does **not** affect the `EventQueue`.
+> These are independent. When you need priority-ordered listeners or automatic one-shot removal, use `luna.patterns.newEventBus()` instead of `newSignal()`.
+
 The `EventQueue` stores `Event` values consisting of a string name and a list of typed `EventArg` arguments (`Str`, `Num`, `Bool`, `Nil`). The engine pushes system events (input, window lifecycle) into the queue automatically; game scripts can also push custom events with `luna.signal.push()`. Consumption is explicit via `luna.signal.poll()`, which returns a Lua iterator that pops events one at a time. The queue also supports `pump()` (a no-op sync point, since Luna2D uses a push model) and `wait(timeout)` for blocking until an event arrives or a timeout elapses.
 
 The `Signal` type is an independent pub-sub dispatcher. Subscribers call `Signal:register(name, callback)` and receive a monotonically increasing handle ID. When `Signal:emit(name, ...)` fires, all callbacks registered for that name execute in registration order with the extra arguments forwarded. Handles can be removed individually via `Signal:remove(handle)`, per-event via `Signal:clear(name)`, or wholesale via `Signal:clearAll()`. Callback functions are stored in the Lua registry; the Rust-side `Signal` struct tracks only subscription metadata (handle→name mappings).
@@ -198,6 +203,7 @@ end
 | `math`    | Imports from | Only indirectly (leaf module); no direct type imports            |
 | `input`   | Related      | `input` manages hardware-level key/mouse/gamepad state; `event` provides a user-programmable message queue and pub-sub layer |
 | `scene`   | Related      | Scene transitions may push events; scenes can subscribe via `Signal` |
+| `patterns` | Related | `patterns::EventBus` provides priority-ordered and one-shot callbacks; use `luna.patterns.newEventBus()` when ordering or auto-removal is needed over the simpler `Signal` |
 | `lua_api`  | Imported by  | `src/lua_api/event_api.rs` registers `luna.signal.*` and wraps `Signal` as `LuaSignal` UserData |
 
 ## Notes

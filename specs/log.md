@@ -115,6 +115,7 @@ print("Active log level:", luna.log.getLevel())
 | `engine`        | Imports from | `set_level` and `get_level` delegate to `engine::log_messages`           |
 | `lua_api`       | Imported by  | `log_api.rs` registers the `luna.log.*` surface                          |
 | `debugbridge`   | Related      | `debugbridge.capturePrint` captures Lua print output; `luna.log` emits via the Rust `log` crate — two separate channels |
+| `devtools`      | Related      | `devtools.Logger` is a structured in-game history buffer with level filter for in-game UI display; `luna.log` is the engine-level operational log to stdout. **Boundary**: `luna.log` = engine ops stdout; `devtools.Logger` = in-game diagnostic panel; `debugbridge.print_history` = TCP feed for external tools. These are three separate channels by design. |
 
 ## Notes
 

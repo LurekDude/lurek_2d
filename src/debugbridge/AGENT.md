@@ -12,7 +12,7 @@
 
 ## Purpose
 
-The `debugbridge` module embeds a JSON-over-TCP server (bound to 127.0.0.1 only) inside the running game. External tools — the Luna2D VS Code extension and the MCP server — connect to the bridge to inspect global variables, evaluate Lua code, walk the call stack, capture print output, record frame-time samples, and request screenshots. All TCP I/O runs on a background Rust thread via `std::net::TcpListener`; methods that require Lua access (`eval`, `getCallStack`, `getLocals`, `getGlobals`) are queued through `BridgeShared` and dispatched each frame by calling `luna.debugbridge.poll()` on the main thread. The bridge depends on `serde_json` for newline-delimited JSON framing and does not require any Lua-side heartbeat beyond the poll call.
+The `debugbridge` module embeds a JSON-over-TCP server (bound to 127.0.0.1 only) inside the running game. External tools — the Luna2D VS Code extension and the MCP server — connect to the bridge to inspect global variables, evaluate Lua code, walk the call stack, capture print output, and request screenshots. All TCP I/O runs on a background Rust thread via `std::net::TcpListener`; methods that require Lua access (`eval`, `getCallStack`, `getLocals`, `getGlobals`) are queued through `BridgeShared` and dispatched each frame by calling `luna.debugbridge.poll()` on the main thread. `poll()` also automatically records the current frame delta from `luna.time.getDelta()` into `BridgeShared.frame_times` each call — so `getPerformance()` tracks live fps/dt without any manual `recordFrame()` call in game scripts.
 
 ## Source Files
 

@@ -2504,8 +2504,7 @@ luna.debugbridge.getPort() -> integer  -- Returns the server port (0 if not runn
 luna.debugbridge.getPrintHistory( count : integer? ) -> table  -- Returns the print history
 luna.debugbridge.isRunning() -> bool  -- Returns whether the server is currently running
 luna.debugbridge.isScreenshotRequested() -> bool  -- Returns whether a screenshot is currently requested
-luna.debugbridge.poll()  -- Poll for pending Lua-dependent requests from TCP clients
-luna.debugbridge.recordFrame( dt : number )  -- Records a frame time sample
+luna.debugbridge.poll()  -- Poll for pending requests; also auto-records frame delta from luna.time.getDelta()
 luna.debugbridge.requestScreenshot( scale : integer? )  -- Flags a screenshot request for the next frame
 luna.debugbridge.setMaxPrintHistory( max : integer )  -- Sets the maximum print history size
 luna.debugbridge.start( port : u16? ) -> boolean  -- Start the TCP debug server on 127.0.0.1:port

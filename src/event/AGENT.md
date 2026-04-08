@@ -14,6 +14,8 @@
 
 The event module provides two complementary messaging primitives for Luna2D games: a FIFO **EventQueue** for pollable named events, and a handle-based **Signal** pub-sub dispatcher for callback-driven event handling. Together they give game scripts full control over inter-system communication without tight coupling.
 
+**Namespace Note**: `luna.signal` combines two independent primitives: `push/poll/clear/wait` operate on the FIFO `EventQueue`; `newSignal()` creates pub-sub `Signal` dispatchers. These are independent — polling the queue does not affect Signal instances and vice versa. When priority-ordered listeners or one-shot auto-removal are needed, use `luna.patterns.newEventBus()` instead.
+
 ## Source Files
 
 | File        | Purpose                                                         |
