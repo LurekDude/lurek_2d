@@ -157,12 +157,36 @@ Log entry format: `{"timestamp":"ISO8601","agent":"Name","session":"...","phase"
 
 Completed session folders move to `work/archive/` — never delete.
 
+### Changelog (docs/CHANGELOG.md) — MANDATORY FOR ALL AGENTS
+
+`docs/CHANGELOG.md` is the canonical version history. **Every agent** must update it in the same commit as any code, API, or tooling change. This is not optional.
+
+**Versioning scheme — `MAJOR.MINOR.PATCH`**
+
+| Segment | Increment when… |
+|---|---|
+| **MAJOR** | Breaking API changes — Lua scripts or engine config must be ported |
+| **MINOR** | New backwards-compatible features — new `luna.*` APIs, new modules, new defaults |
+| **PATCH** | Bug fixes, internal refactors, doc/tooling changes that do not affect the public API |
+
+Format for a new entry:
+```markdown
+## [X.Y.Z] — YYYY-MM-DD
+### Added / Changed / Fixed / Removed
+- Describe the change in one line.
+```
+
+- Current version lives in `Cargo.toml` → `[package] version`.
+- When bumping MAJOR or MINOR: also update `Cargo.toml` version and any `!define APP_VERSION` in `tools/dist/installer.nsi` + `$Version` in `tools/dist/dist.ps1`.
+- PATCH fixes: update CHANGELOG only (Cargo.toml version is optional unless publishing).
+
 ### Git Rules
 
 - Never `git add .` — stage only files directly changed by the current task
 - Commit format: `type(scope): description` — types: `feat` `fix` `refactor` `test` `docs` `chore`
 - One logical change per commit — one accepted phase = one commit
 - Confirm branch before committing: `git rev-parse --abbrev-ref HEAD`
+- **Update `docs/CHANGELOG.md` before every commit** — add or extend the entry for the current version
 
 ### CLI Tools (tools/)
 
@@ -174,7 +198,7 @@ All permanent tools live in `tools/` organised by category. See `tools/README.md
 | `tools/audit/` | Quality auditing & coverage analytics (`audit_module.py`, `doc_coverage.py`, `test_coverage.py` …) |
 | `tools/fix/` | Code fixers & docstring improvers (`add_lua_docstrings.py`, `fix_docstrings.py` …) |
 | `tools/validate/` | Schema & structure validators (`cag_validate.py`, `validate_lua_api.py` …) |
-| `tools/assets/` | Asset generators (`gen_splash.py`, `gen_icon.py` …) |
+| `tools/assets/` | Artwork source files — edit directly; all assets are maintained manually |
 | `tools/dist/` | Build, package & install (`dist.ps1`, `dist.sh`, `install.ps1`, `install.sh` …) |
 | `tools/github/` | GitHub automation (`ideas_to_github_issues.py` …) |
 
@@ -186,7 +210,7 @@ Key invocations:
 - **Lua API**: `python tools/docs/gen_lua_api_skeleton.py [--all|--module <name>|--list]`
 - **API refs**: `docs/API/lua-api.md` (Lua) · `docs/API/rust-api.md` (Rust) · run `gen_all_docs.py` to regenerate
 - **API refs**: `docs/API/lua-api.md` (Lua) · `docs/API/rust-api.md` (Rust) · run `gen_all_docs.py` to regenerate
-- **Assets**: `python tools/assets/gen_splash.py` · `python tools/assets/gen_icon.py`
+- **Assets**: All artwork in `assets/` is maintained manually. Do not run Python generators.
 - **Distribution**: `powershell tools/dist/dist.ps1` / `bash tools/dist/dist.sh`
 
 ### Logging
@@ -252,3 +276,5 @@ Every time you add a feature, fix a bug, or change the API, you **must** update 
 | New module created | New `src/<module>/AGENT.md` (short) · new `specs/<module>.md` (full) · entry in `specs/README.md` |
 
 This list is the canonical sync requirement. Never commit a code change without checking every row.
+
+| Any change at all | `docs/CHANGELOG.md` — add entry under current version |

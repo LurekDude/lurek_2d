@@ -324,28 +324,6 @@
             "dependsOn": ["Build: Release", "Run Release: Splash (drag-drop ready)"],
             "problemMatcher": []
         },
-        // ─── 🎨 ASSETS ────────────────────────────────────────────────────────
-        {
-            "label": "Assets: Generate Splash",
-            "detail": "🎨 Run tools/assets/gen_splash.py to (re)generate assets/splash.png (800×600 moon/space theme). Requires: pip install Pillow.",
-            "type": "shell",
-            "command": "python tools/assets/gen_splash.py",
-            "problemMatcher": []
-        },
-        {
-            "label": "Assets: Generate Icon",
-            "detail": "🎨 Run tools/assets/gen_icon.py to (re)generate assets/icon.ico (multi-size) and assets/icon.png (256×256). Requires Pillow.",
-            "type": "shell",
-            "command": "python tools/assets/gen_icon.py",
-            "problemMatcher": []
-        },
-        {
-            "label": "Assets: Generate All",
-            "detail": "🎨 Regenerate both the splash PNG and the icon files in one step. Re-build afterwards to embed them.",
-            "dependsOrder": "sequence",
-            "dependsOn": ["Assets: Generate Splash", "Assets: Generate Icon"],
-            "problemMatcher": []
-        },
         // ─── 🚀 DISTRIBUTION ──────────────────────────────────────────────────
         {
             "label": "Dist: Package Windows",
@@ -370,7 +348,7 @@
         },
         {
             "label": "Dist: NSIS Installer (Windows)",
-            "detail": "📦 Build a Windows installer from tools/dist/installer.nsi → dist/luna2d-0.4.0-setup.exe. Requires NSIS 3.x on PATH.",
+            "detail": "📦 Build a Windows installer from tools/dist/installer.nsi → dist/luna2d-0.5.0-setup.exe. Requires NSIS 3.x on PATH.",
             "type": "shell",
             "command": "makensis tools/dist/installer.nsi",
             "problemMatcher": []

@@ -185,14 +185,12 @@ overflow-checks = false
 debug = false
 
 # Size-optimised distribution profile: cargo build --profile dist
-# Trades some runtime speed for a smaller binary (~30–40% smaller than release).
-# Use for packaging / installer builds where download size matters.
-# Build time is longer than release (fat LTO link), but that is acceptable for
-# a one-shot packaging step.
+# Trades some runtime speed for a smaller binary (~20–30% smaller than release).
+# Build time is shorter than fat-LTO; thin LTO is a good balance.
 [profile.dist]
 inherits = "release"
-opt-level = "z"         # optimise for size instead of speed (avoids vectorisation, limits inlining)
-lto = true              # fat LTO: full cross-crate dead-code elimination (better than thin for size)
+opt-level = "s"         # optimise for size (avoids excessive inlining)
+lto = "thin"            # thin LTO: fast cross-crate dead-code elimination
 
 [[test]]
 name = "compute_stress_tests"

@@ -15,7 +15,7 @@
 ; =============================================================================
 
 !define APP_NAME     "Luna2D"
-!define APP_VERSION  "0.4.0"
+!define APP_VERSION  "0.5.0"
 !define APP_PUBLISHER "Luna2D Project"
 !define APP_URL      "https://github.com/yourname/luna2d"
 !define APP_EXE      "luna2d.exe"
@@ -71,18 +71,24 @@ Section "Engine (required)" SecEngine
     SetOutPath "$INSTDIR"
 
     ; Core binary
-    File "..\..\build\dist\luna2d.exe"
+    File "..\..\build\release\luna2d.exe"
 
     ; Engine assets
     SetOutPath "$INSTDIR\assets"
     File /nonfatal "..\..\assets\splash.png"
+    File /nonfatal "..\..\assets\favicon.ico"
     File /nonfatal "..\..\assets\icon.png"
-    File /nonfatal "..\..\assets\icon.ico"
+    File /nonfatal "..\..\assets\icon-large.png"
+    File /nonfatal "..\..\assets\banner.png"
 
     ; API example scripts
     SetOutPath "$INSTDIR\examples"
     File "..\..\examples\*.lua"
     File /nonfatal "..\..\examples\README.md"
+
+    ; Demos (playable game demos)
+    SetOutPath "$INSTDIR"
+    File /r "..\..\demos"
 
     ; Docs
     SetOutPath "$INSTDIR"
@@ -117,10 +123,9 @@ Section "Engine (required)" SecEngine
     SetOutPath "$INSTDIR\library\stats"
     File "..\..\library\stats\*.lua"
 
-    ; API docs (Markdown reference + LuaCATS stubs for IDE autocompletion)
+    ; API docs (full docs/API/ folder: Markdown reference + LuaCATS stubs)
     SetOutPath "$INSTDIR\docs"
-    File /nonfatal "..\..\docs\API\lua-api.md"
-    File /nonfatal "..\..\docs\API\luna.lua"
+    File /r "..\..\docs\API"
     WriteRegStr   HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APP_NAME}" "DisplayName"          "${APP_NAME} ${APP_VERSION}"
     WriteRegStr   HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APP_NAME}" "DisplayVersion"       "${APP_VERSION}"
     WriteRegStr   HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APP_NAME}" "Publisher"            "${APP_PUBLISHER}"
@@ -201,6 +206,7 @@ Section "Uninstall"
     RMDir /r "$INSTDIR\assets"
     RMDir /r "$INSTDIR\examples"
     RMDir /r "$INSTDIR\library"
+    RMDir /r "$INSTDIR\demos"
     RMDir /r "$INSTDIR\docs"
     RMDir    "$INSTDIR"
 

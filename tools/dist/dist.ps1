@@ -41,12 +41,12 @@ $ErrorActionPreference = 'Stop'
 $WorkspaceRoot = Split-Path (Split-Path $PSScriptRoot -Parent) -Parent
 if (-not $OutDir) { $OutDir = Join-Path $WorkspaceRoot 'dist' }
 
-$Version       = "0.4.0"
+$Version       = "0.5.0"
 $ArchName      = "luna2d-windows-x86_64"
 $PackageDir    = Join-Path $OutDir $ArchName
 $ZipPath       = Join-Path $OutDir "$ArchName.zip"
-# dist profile (opt-level=z + fat LTO) lives in build/dist/ not build/release/
-$BinarySource  = Join-Path $WorkspaceRoot 'build\dist\luna2d.exe'
+# Release binary lives in build/release/
+$BinarySource  = Join-Path $WorkspaceRoot 'build\release\luna2d.exe'
 
 # -- Helpers -------------------------------------------------------------------
 function Write-Step([string]$Msg) { Write-Host "[dist] $Msg" -ForegroundColor Cyan }
@@ -61,17 +61,13 @@ if (-not (Test-Path (Join-Path $WorkspaceRoot 'Cargo.toml'))) {
 # -- 1. Verify branding assets ------------------------------------------------
 Write-Step "Checking branding assets ..."
 $SplashPng = Join-Path $WorkspaceRoot 'assets\splash.png'
-$IconPng   = Join-Path $WorkspaceRoot 'assets\icon.png'
-$IconIco   = Join-Path $WorkspaceRoot 'assets\icon.ico'
+$FaviconIco = Join-Path $WorkspaceRoot 'assets\favicon.ico'
 
 if (-not (Test-Path $SplashPng)) {
-    Write-Fail "Missing assets\splash.png. Restore the prebuilt raster asset or rebuild it from assets\svg\large_icon.png and assets\svg\banner.png."
+    Write-Host "[warn] Missing assets\splash.png." -ForegroundColor Yellow
 }
-if (-not (Test-Path $IconPng)) {
-    Write-Fail "Missing assets\icon.png. Restore the prebuilt raster asset or rebuild it from assets\svg\col_icon.png."
-}
-if (-not (Test-Path $IconIco)) {
-    Write-Fail "Missing assets\icon.ico. Restore the prebuilt raster asset or rebuild it from assets\svg\col_icon.png."
+if (-not (Test-Path $FaviconIco)) {
+    Write-Host "[warn] Missing assets\favicon.ico." -ForegroundColor Yellow
 }
 
 # -- 2. Release build ----------------------------------------------------------
@@ -79,10 +75,8 @@ if (-not $SkipBuild) {
     Write-Step "Building Luna2D (dist -- size-optimised) -- this may take several minutes ..."
     Push-Location $WorkspaceRoot
     try {
-        # --profile dist uses opt-level=z + fat LTO for the smallest possible binary.
-        # Expect 15-30% smaller than --release at the cost of a longer link step.
-        cargo build --profile dist 2>&1 | ForEach-Object { Write-Host "    $_" }
-        if ($LASTEXITCODE -ne 0) { Write-Fail "cargo build --profile dist failed." }
+        cargo build --release 2>&1 | ForEach-Object { Write-Host "    $_" }
+        if ($LASTEXITCODE -ne 0) { Write-Fail "cargo build --release failed." }
     } finally { Pop-Location }
     Write-OK "Build succeeded."
 } else {
@@ -145,6 +139,15 @@ if (Test-Path $ExamplesSource) {
     if (Test-Path $ExamplesDest) { Remove-Item $ExamplesDest -Recurse -Force }
     Copy-Item $ExamplesSource -Destination $ExamplesDest -Recurse -Force
     Write-OK "Copied examples/"
+}
+
+# Copy demos (playable game demos)
+$DemosSource = Join-Path $WorkspaceRoot 'demos'
+if (Test-Path $DemosSource) {
+    $DemosDest = Join-Path $PackageDir 'demos'
+    if (Test-Path $DemosDest) { Remove-Item $DemosDest -Recurse -Force }
+    Copy-Item $DemosSource -Destination $DemosDest -Recurse -Force
+    Write-OK "Copied demos/"
 }
 
 # Copy library (Lunasome pure-Lua standard libraries)
@@ -227,7 +230,10 @@ Set-Content -Path (Join-Path $PackageDir 'HOW-TO-RUN.txt') -Value $HowTo -Encodi
 Write-OK "Written HOW-TO-RUN.txt"
 
 # -- 3b. Create lunec.lnk shortcut with Luna2D icon ---------------------------
-$IcoPath = Join-Path $PackageDir 'assets\icon.ico'
+$IcoPath = Join-Path $PackageDir 'assets\favicon.ico'
+if (-not (Test-Path $IcoPath)) {
+    $IcoPath = Join-Path $PackageDir 'assets\icon.png'  # fallback: no icon in shortcut
+}
 if (Test-Path $IcoPath) {
     Write-Step "Creating lunec.lnk shortcut with Luna2D icon ..."
     $ws  = New-Object -ComObject WScript.Shell

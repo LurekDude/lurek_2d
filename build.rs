@@ -24,12 +24,12 @@ fn main() {
     }
 
     // ── 2. Always rerun if icon changes ─────────────────────────────────────
-    println!("cargo:rerun-if-changed=assets/icon.ico");
+    println!("cargo:rerun-if-changed=assets/favicon.ico");
 
     // ── 3. Windows icon embedding ───────────────────────────────────────────
     #[cfg(target_os = "windows")]
     {
-        let icon = Path::new(&manifest).join("assets").join("icon.ico");
+        let icon = Path::new(&manifest).join("assets").join("favicon.ico");
         if icon.exists() {
             let mut res = winresource::WindowsResource::new();
             res.set_icon(icon.to_str().unwrap());
@@ -44,7 +44,7 @@ fn main() {
             }
         } else {
             eprintln!(
-                "cargo:warning=assets/icon.ico not found — restore the prebuilt raster asset or rebuild it from assets/svg/col_icon.png"
+                "cargo:warning=assets/favicon.ico not found — place your ICO file at assets/favicon.ico"
             );
         }
     }
