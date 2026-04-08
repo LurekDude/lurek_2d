@@ -18,7 +18,7 @@
 !define APP_VERSION  "0.4.0"
 !define APP_PUBLISHER "Luna2D Project"
 !define APP_URL      "https://github.com/yourname/luna2d"
-!define APP_EXE      "luna.exe"
+!define APP_EXE      "luna2d.exe"
 !define APP_ICON     "..\assets\icon.ico"
 
 ; Output installer filename
@@ -71,7 +71,7 @@ Section "Engine (required)" SecEngine
     SetOutPath "$INSTDIR"
 
     ; Core binary
-    File "..\build\release\luna.exe"
+    File "..\build\dist\luna2d.exe"
 
     ; Engine assets
     SetOutPath "$INSTDIR\assets"
@@ -146,21 +146,26 @@ Section "Engine (required)" SecEngine
 
 SectionEnd
 
-; ── .lunar File Association ──────────────────────────────────────────────────
-; Registers the .lunar extension so double-clicking a game package opens it
-; with the Luna2D engine automatically.
-Section ".lunar File Association" SecFileAssoc
-    ; Map .lunar extension → ProgID
-    WriteRegStr HKCR ".lunar"                         ""           "Luna2DGame"
-    WriteRegStr HKCR ".lunar"                         "Content Type" "application/x-lunar-game"
+; ── .lua File Association ───────────────────────────────────────────────────
+; Registers .lua so double-clicking a Lua script runs it with Luna2D.
+; Note: only steals the association if no existing handler is registered,
+; so it won't break a user's existing Lua installation (LuaRocks, etc.).
+Section ".lua File Association" SecFileAssoc
+    ; Map .lua extension → ProgID
+    WriteRegStr HKCR ".lua"                           ""            "Luna2DScript"
+    WriteRegStr HKCR ".lua"                           "Content Type" "text/x-lua"
 
     ; ProgID display name and icon
-    WriteRegStr HKCR "Luna2DGame"                    ""            "Luna2D Game"
-    WriteRegStr HKCR "Luna2DGame\DefaultIcon"        ""            "$INSTDIR\${APP_EXE},0"
+    WriteRegStr HKCR "Luna2DScript"                  ""            "Luna2D Script"
+    WriteRegStr HKCR "Luna2DScript\DefaultIcon"      ""            "$INSTDIR\${APP_EXE},0"
 
-    ; Open verb: pass the .lunar file as the first argument to luna.exe
-    WriteRegStr HKCR "Luna2DGame\shell\open"         ""            "Open with Luna2D"
-    WriteRegStr HKCR "Luna2DGame\shell\open\command" ""            '"$INSTDIR\${APP_EXE}" "%1"'
+    ; Open verb: luna2d.exe treats a .lua file path as its game argument
+    WriteRegStr HKCR "Luna2DScript\shell\open"       ""            "Run with Luna2D"
+    WriteRegStr HKCR "Luna2DScript\shell\open\command" ""          '"$INSTDIR\${APP_EXE}" "%1"'
+
+    ; Edit verb: open the script in the default text editor
+    WriteRegStr HKCR "Luna2DScript\shell\edit"       ""            "Edit"
+    WriteRegStr HKCR "Luna2DScript\shell\edit\command" ""          'notepad.exe "%1"'
 
     ; Notify Windows that file associations have changed
     System::Call 'Shell32::SHChangeNotify(i 0x8000000, i 0, i 0, i 0)'
@@ -184,7 +189,7 @@ Section "Uninstall"
     EnVar::DeleteValue "PATH" "$INSTDIR"
 
     ; Remove files
-    Delete "$INSTDIR\luna.exe"
+    Delete "$INSTDIR\luna2d.exe"
     Delete "$INSTDIR\uninstall.exe"
     Delete "$INSTDIR\README.md"
     Delete "$INSTDIR\LICENSE"
@@ -200,9 +205,9 @@ Section "Uninstall"
     RMDir  "$SMPROGRAMS\${APP_NAME}"
     Delete "$DESKTOP\${APP_NAME}.lnk"
 
-    ; Remove .lunar file association
-    DeleteRegKey HKCR ".lunar"
-    DeleteRegKey HKCR "Luna2DGame"
+    ; Remove .lua file association
+    DeleteRegKey HKCR ".lua"
+    DeleteRegKey HKCR "Luna2DScript"
 
     ; Remove registry keys
     DeleteRegKey HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APP_NAME}"
