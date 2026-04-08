@@ -18,6 +18,24 @@ Always update this file **in the same commit** as the change. Use the commit typ
 
 ---
 
+## [0.6.1] — 2026-04-08
+
+### Fixed
+- **`src/lua_api/log_api.rs` now calls through the domain module** — `log_api.rs` previously bypassed `src/log/mod.rs` and called `engine::log_messages` directly, leaving the domain module as unreachable dead code. `setLevel` and `getLevel` now call `crate::log::set_level()` / `crate::log::get_level()` so the architecture matches the intended `lua_api → domain → engine` layering.
+- **`tests/lua/harness.rs`: removed incorrect `#[ignore]` on `lua_test_log` and `lua_test_debugbridge`** — both `luna.log` and `luna.debugbridge` are registered in the test VM; the ignore attributes were wrong. Tests now run: 14/14 (`log`) and 18/18 (`debugbridge`) pass.
+- **`tests/lua/harness.rs`: updated `lua_test_docs` ignore reason** — the `docs` test is skipped because the quality-score baseline test fails, not because `luna.docs` is unregistered.
+- **Generated API docs namespace corrections** — `luna.timer`, `luna.event`, and `luna.automation` are internal module-folder key names; the actual registered Lua namespaces are `luna.time`, `luna.signal`, and `luna.simulator`. Fixed in:
+  - `docs/API/lua-api.md` (regenerated)
+  - `docs/API/luna.lua` LuaCATS stubs (regenerated)
+  - `docs/logs/lua_api_data.json` (`lua_name` values)
+  - `wiki/API-Reference.md` (section headers, TOC, function signatures)
+  - `tools/docs/gen_docs_lua.py` — `_LUA_NAMESPACE` override dict added
+  - `tools/docs/gen_luadoc.py` — `_LUA_NAMESPACE` override dict + `lua_name` prefix remap added
+
+### Changed
+- **`specs/log.md` Architecture section** — updated to show `log_api.rs → crate::log → engine::log_messages` call chain; added architecture note explaining why `set_level`/`get_level` logic belongs in the domain module.
+- **`src/log/AGENT.md`** — Purpose section rewritten with correct call chain, explicit `[Lua]` prefix note, and the devtools separation rule.
+
 ## [0.6.0] — 2026-04-18
 
 ### Removed

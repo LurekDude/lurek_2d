@@ -6,7 +6,7 @@
 
 use mlua::prelude::*;
 
-use crate::engine::log_messages;
+use crate::log as log_domain;
 
 /// Registers the `luna.log.*` namespace into the shared `luna` table.
 ///
@@ -91,7 +91,7 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
     log_table.set(
         "setLevel",
         lua.create_function(|_, level: String| {
-            log_messages::set_log_level(&level);
+            log_domain::set_level(&level);
             Ok(())
         })?,
     )?;
@@ -101,7 +101,7 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
     /// @return string
     log_table.set(
         "getLevel",
-        lua.create_function(|_, ()| Ok(log_messages::get_log_level().to_string()))?,
+        lua.create_function(|_, ()| Ok(log_domain::get_level()))?,
     )?;
 
     luna.set("log", log_table)?;

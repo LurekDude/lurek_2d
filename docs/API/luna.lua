@@ -1624,84 +1624,84 @@ function luna.audio.stopQueueable(qsource_id) end
 ---@return number
 function luna.audio.tell(id_val) end
 
----@class luna.automation
-luna.automation = {}
+---@class luna.simulator
+luna.simulator = {}
 
 --- Returns the name of the active script, or nil if idle.
 ---@return string?
-function luna.automation.getCurrentScript() end
+function luna.simulator.getCurrentScript() end
 
 --- Returns the index of the next step to be dispatched.
 ---@return integer
-function luna.automation.getCurrentStep() end
+function luna.simulator.getCurrentStep() end
 
 --- Returns seconds elapsed since playback started.
 ---@return number
-function luna.automation.getElapsedTime() end
+function luna.simulator.getElapsedTime() end
 
 --- Returns an array of all registered script names.
 ---@return table
-function luna.automation.getScripts() end
+function luna.simulator.getScripts() end
 
 --- Returns the total number of steps in the active script.
 ---@return integer
-function luna.automation.getStepCount() end
+function luna.simulator.getStepCount() end
 
 --- Returns true if a script with the given name is registered.
 ---@param name any
 ---@return boolean
-function luna.automation.hasScript(name) end
+function luna.simulator.hasScript(name) end
 
 --- Returns true if all steps in the active script have been dispatched.
 ---@return boolean
-function luna.automation.isComplete() end
+function luna.simulator.isComplete() end
 
 --- Returns true if playback is currently paused.
 ---@return boolean
-function luna.automation.isPaused() end
+function luna.simulator.isPaused() end
 
 --- Returns true if the simulator is actively playing a script.
 ---@return boolean
-function luna.automation.isRunning() end
+function luna.simulator.isRunning() end
 
 --- Loads a named script from a Lua data table containing a steps array.
 ---@param name any
 ---@param data any
 ---@return nil
-function luna.automation.load(name, data) end
+function luna.simulator.load(name, data) end
 
 --- Parses a TOML string and registers it as a named script.
 ---@param name any
 ---@param toml_str any
 ---@return nil
-function luna.automation.loadFromToml(name, toml_str) end
+function luna.simulator.loadFromToml(name, toml_str) end
 
 --- Pauses playback at the current step position.
 ---@return nil
-function luna.automation.pause() end
+function luna.simulator.pause() end
 
 --- Resumes playback from a paused position.
 ---@return nil
-function luna.automation.resume() end
+function luna.simulator.resume() end
 
 --- Starts playback of the named script from the beginning.
 ---@param name any
 ---@return nil
-function luna.automation.start(name) end
+function luna.simulator.start(name) end
 
 --- Stops playback and resets the simulator to idle.
 ---@return nil
-function luna.automation.stop() end
+function luna.simulator.stop() end
 
 --- Removes a loaded script by name, returning true if it existed.
 ---@param name any
 ---@return boolean
-function luna.automation.unload(name) end
+function luna.simulator.unload(name) end
 
 --- Advances the playback clock by dt seconds, dispatching due steps.
 ---@param dt any
 ---@return nil
-function luna.automation.update(dt) end
+function luna.simulator.update(dt) end
 
 ---@class luna.camera
 luna.camera = {}
@@ -2519,7 +2519,6 @@ function luna.debugbridge.isRunning() end
 function luna.debugbridge.isScreenshotRequested() end
 
 --- Poll for pending Lua-dependent requests from TCP clients.
---- Also auto-records the current frame delta from luna.time.getDelta().
 function luna.debugbridge.poll() end
 
 --- Flags a screenshot request for the next frame.
@@ -3226,8 +3225,8 @@ function Universe:update(dt) end
 ---@return Universe
 function luna.entity.newUniverse() end
 
----@class luna.event
-luna.event = {}
+---@class luna.signal
+luna.signal = {}
 
 --- Lua-side wrapper around a [`Signal`] with registry-stored callbacks.
 ---@class Signal
@@ -3272,42 +3271,42 @@ function Signal:typeOf(name) end
 
 --- Discards all pending events in the queue.
 ---@return nil
-function luna.event.clear() end
+function luna.signal.clear() end
 
 --- Pushes an exit event, requesting the engine to stop.
 ---@param code? any (optional)
 ---@return nil
-function luna.event.exit(code) end
+function luna.signal.exit(code) end
 
 --- Creates a new pub-sub Signal dispatcher.
 ---@return Signal
-function luna.event.newSignal() end
+function luna.signal.newSignal() end
 
 --- Returns an iterator function that pops events from the queue.
 ---@return function
-function luna.event.poll() end
+function luna.signal.poll() end
 
 --- Syncs OS-level events into the queue (no-op in Luna2D push model).
 ---@return nil
-function luna.event.pump() end
+function luna.signal.pump() end
 
 --- Pushes a custom event onto the event queue.
 ---@param args any
 ---@return nil
-function luna.event.push(args) end
+function luna.signal.push(args) end
 
 --- Alias for `exit()` — requests the engine to stop at the end of the current frame.
 ---@return nil
-function luna.event.quit() end
+function luna.signal.quit() end
 
 --- Requests that the engine restart at the beginning of the next frame.
 ---@return nil
-function luna.event.restart() end
+function luna.signal.restart() end
 
 --- Blocks until the next event arrives or the optional timeout elapses.
 ---@param timeout? any (optional)
 ---@return string?
-function luna.event.wait(timeout) end
+function luna.signal.wait(timeout) end
 
 ---@class luna.filesystem
 luna.filesystem = {}
@@ -11980,8 +11979,8 @@ function luna.tilemap.toScreenHex(q, r, size) end
 ---@return number
 function luna.tilemap.toScreenIso(tx, ty, tw, th) end
 
----@class luna.timer
-luna.timer = {}
+---@class luna.time
+luna.time = {}
 
 --- Lua-side wrapper around a [`Scheduler`] with per-event callback storage.
 ---@class Scheduler
@@ -12072,45 +12071,45 @@ function Scheduler:update(dt) end
 
 --- Returns the rolling-average frame delta time in seconds.
 ---@return number
-function luna.timer.getAverageDelta() end
+function luna.time.getAverageDelta() end
 
 --- Returns the delta time in seconds for the current frame.
 ---@return number
-function luna.timer.getDelta() end
+function luna.time.getDelta() end
 
 --- Returns the current frames-per-second measurement.
 ---@return number
-function luna.timer.getFPS() end
+function luna.time.getFPS() end
 
 --- Returns the high-resolution elapsed time since engine start in seconds.
 ---@return number
-function luna.timer.getMicroTime() end
+function luna.time.getMicroTime() end
 
 --- Returns the fixed timestep used by `process_physics` callbacks (seconds).
 ---@return number
-function luna.timer.getPhysicsDelta() end
+function luna.time.getPhysicsDelta() end
 
 --- Returns the total elapsed time since engine start in seconds.
 ---@return number
-function luna.timer.getTime() end
+function luna.time.getTime() end
 
 --- Creates a new independent Scheduler for managing timed callbacks.
 ---@return Scheduler
-function luna.timer.newScheduler() end
+function luna.time.newScheduler() end
 
 --- Sets the fixed timestep for `process_physics` callbacks (seconds).
 ---@param dt any
 ---@return nil
-function luna.timer.setPhysicsDelta(dt) end
+function luna.time.setPhysicsDelta(dt) end
 
 --- Suspends execution for the given number of seconds.
 ---@param seconds any
 ---@return nil
-function luna.timer.sleep(seconds) end
+function luna.time.sleep(seconds) end
 
 --- Advances the timer by one frame, returning the delta time.
 ---@return number
-function luna.timer.step() end
+function luna.time.step() end
 
 ---@class luna.window
 luna.window = {}

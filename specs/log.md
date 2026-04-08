@@ -27,14 +27,16 @@ This module intentionally does **not** provide:
 
 ```
 src/log/
-└── mod.rs    set_level(), get_level(), enabled_for() — thin delegates to engine
+└── mod.rs    set_level(), get_level(), enabled_for() — domain layer over engine::log_messages
 
 src/engine/
 └── log_messages.rs    set_log_level(level), get_log_level() → &'static str
 
 src/lua_api/
 └── log_api.rs    Registers luna.log.* functions:
-                  debug, info, warn, error, print, setLevel, getLevel
+                  debug, info, warn, error, trace, print → emit via log crate macros
+                  setLevel → crate::log::set_level()
+                  getLevel → crate::log::get_level()
 ```
 
 ## Source Files
@@ -49,7 +51,9 @@ src/lua_api/
 
 - `set_level(level: &str)` — pass-through to `log_messages::set_log_level`; unrecognised values are silently ignored
 - `get_level() → String` — returns the current level name (e.g., `"info"`)
-- `enabled_for(level: &str) → bool` — compares against `log::max_level()`; accepts `"error"`, `"warn"`, `"warning"`, `"info"`, `"debug"`, `"trace"`; returns `false` for `"off"` and unrecognised values
+- `enabled_for(level: &str) → bool` — compares against `log::max_level()`; accepts `"error"`, `"warn"`, `"warning"`, `"info"`, `"debug"`, `"trace"`; returns `false` for `"off"` and unrecognised values. Available for Rust callers that want to guard an expensive formatting step.
+
+> **Architecture note**: `src/lua_api/log_api.rs` calls `crate::log::set_level()` and `crate::log::get_level()` so that the `lua_api` layer uses the domain module as intended. Level-set and level-query logic is therefore centralised in `src/log/mod.rs`, not duplicated in the API layer.
 
 ## Key Types
 

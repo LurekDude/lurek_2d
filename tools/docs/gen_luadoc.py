@@ -205,6 +205,13 @@ def main():
 
     lua_api = data.get("lua_api", {}).get("modules", {})
 
+    # Maps internal json key → actual Lua namespace (for modules that register under a different name)
+    _LUA_NAMESPACE = {
+        "timer":      "time",
+        "event":      "signal",
+        "automation": "simulator",
+    }
+
     out = []
     out.append("---@meta")
     out.append("--- Auto-generated Luna2D API documentation for LuaCATS.")
@@ -213,9 +220,10 @@ def main():
     out.append("")
 
     for mod_name in sorted(lua_api.keys()):
+        lua_ns = _LUA_NAMESPACE.get(mod_name, mod_name)
         mod_data = lua_api[mod_name]
-        out.append(f"---@class luna.{mod_name}")
-        out.append(f"luna.{mod_name} = {{}}")
+        out.append(f"---@class luna.{lua_ns}")
+        out.append(f"luna.{lua_ns} = {{}}")
         out.append("")
 
         classes = mod_data.get("classes", {})
@@ -243,9 +251,12 @@ def main():
         functions.sort(key=lambda x: (x.get("kind", "function"), x.get("name", "")))
 
         for func in functions:
-            name = func.get("lua_name", f"luna.{mod_name}.{func['name']}")
+            name = func.get("lua_name", f"luna.{lua_ns}.{func['name']}")
             if ":" in name:
                 continue
+            # Remap stored lua_name if it uses the old module-folder namespace
+            if name.startswith(f"luna.{mod_name}."):
+                name = f"luna.{lua_ns}.{func['name']}"
             write_function_doc(out, func, name)
 
     with open(OUTPUT_FILE, "w", encoding="utf-8") as f:

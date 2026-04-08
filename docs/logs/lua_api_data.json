@@ -1,17 +1,17 @@
 {
   "meta": {
-    "generated": "2026-04-08T14:05:58.191906+00:00",
+    "generated": "2026-04-08T16:16:23.466304+00:00",
     "generator": "tools/gen_lua_api_data.py",
-    "version": "0.5.0",
+    "version": "0.6.0",
     "stats": {
-      "lua_functions": 2462,
+      "lua_functions": 2461,
       "lua_modules": 44
     }
   },
   "lua_api": {
     "summary": {
-      "total_functions": 2462,
-      "documented": 2432,
+      "total_functions": 2461,
+      "documented": 2431,
       "coverage_pct": 98.8,
       "modules": 44
     },
@@ -6355,7 +6355,7 @@
         "functions": [
           {
             "name": "load",
-            "lua_name": "luna.automation.load",
+            "lua_name": "luna.simulator.load",
             "kind": "function",
             "owner_type": "",
             "description": "Loads a named script from a Lua data table containing a steps array.",
@@ -6381,7 +6381,7 @@
           },
           {
             "name": "unload",
-            "lua_name": "luna.automation.unload",
+            "lua_name": "luna.simulator.unload",
             "kind": "function",
             "owner_type": "",
             "description": "Removes a loaded script by name, returning true if it existed.",
@@ -6402,7 +6402,7 @@
           },
           {
             "name": "hasScript",
-            "lua_name": "luna.automation.hasScript",
+            "lua_name": "luna.simulator.hasScript",
             "kind": "function",
             "owner_type": "",
             "description": "Returns true if a script with the given name is registered.",
@@ -6423,7 +6423,7 @@
           },
           {
             "name": "getScripts",
-            "lua_name": "luna.automation.getScripts",
+            "lua_name": "luna.simulator.getScripts",
             "kind": "function",
             "owner_type": "",
             "description": "Returns an array of all registered script names.",
@@ -6438,7 +6438,7 @@
           },
           {
             "name": "start",
-            "lua_name": "luna.automation.start",
+            "lua_name": "luna.simulator.start",
             "kind": "function",
             "owner_type": "",
             "description": "Starts playback of the named script from the beginning.",
@@ -6459,7 +6459,7 @@
           },
           {
             "name": "stop",
-            "lua_name": "luna.automation.stop",
+            "lua_name": "luna.simulator.stop",
             "kind": "function",
             "owner_type": "",
             "description": "Stops playback and resets the simulator to idle.",
@@ -6474,7 +6474,7 @@
           },
           {
             "name": "pause",
-            "lua_name": "luna.automation.pause",
+            "lua_name": "luna.simulator.pause",
             "kind": "function",
             "owner_type": "",
             "description": "Pauses playback at the current step position.",
@@ -6489,7 +6489,7 @@
           },
           {
             "name": "resume",
-            "lua_name": "luna.automation.resume",
+            "lua_name": "luna.simulator.resume",
             "kind": "function",
             "owner_type": "",
             "description": "Resumes playback from a paused position.",
@@ -6504,7 +6504,7 @@
           },
           {
             "name": "update",
-            "lua_name": "luna.automation.update",
+            "lua_name": "luna.simulator.update",
             "kind": "function",
             "owner_type": "",
             "description": "Advances the playback clock by dt seconds, dispatching due steps.",
@@ -6525,7 +6525,7 @@
           },
           {
             "name": "isRunning",
-            "lua_name": "luna.automation.isRunning",
+            "lua_name": "luna.simulator.isRunning",
             "kind": "function",
             "owner_type": "",
             "description": "Returns true if the simulator is actively playing a script.",
@@ -6540,7 +6540,7 @@
           },
           {
             "name": "isPaused",
-            "lua_name": "luna.automation.isPaused",
+            "lua_name": "luna.simulator.isPaused",
             "kind": "function",
             "owner_type": "",
             "description": "Returns true if playback is currently paused.",
@@ -6555,7 +6555,7 @@
           },
           {
             "name": "isComplete",
-            "lua_name": "luna.automation.isComplete",
+            "lua_name": "luna.simulator.isComplete",
             "kind": "function",
             "owner_type": "",
             "description": "Returns true if all steps in the active script have been dispatched.",
@@ -6570,7 +6570,7 @@
           },
           {
             "name": "getCurrentStep",
-            "lua_name": "luna.automation.getCurrentStep",
+            "lua_name": "luna.simulator.getCurrentStep",
             "kind": "function",
             "owner_type": "",
             "description": "Returns the index of the next step to be dispatched.",
@@ -6585,7 +6585,7 @@
           },
           {
             "name": "getStepCount",
-            "lua_name": "luna.automation.getStepCount",
+            "lua_name": "luna.simulator.getStepCount",
             "kind": "function",
             "owner_type": "",
             "description": "Returns the total number of steps in the active script.",
@@ -6600,7 +6600,7 @@
           },
           {
             "name": "getCurrentScript",
-            "lua_name": "luna.automation.getCurrentScript",
+            "lua_name": "luna.simulator.getCurrentScript",
             "kind": "function",
             "owner_type": "",
             "description": "Returns the name of the active script, or nil if idle.",
@@ -6615,7 +6615,7 @@
           },
           {
             "name": "getElapsedTime",
-            "lua_name": "luna.automation.getElapsedTime",
+            "lua_name": "luna.simulator.getElapsedTime",
             "kind": "function",
             "owner_type": "",
             "description": "Returns seconds elapsed since playback started.",
@@ -6630,7 +6630,7 @@
           },
           {
             "name": "loadFromToml",
-            "lua_name": "luna.automation.loadFromToml",
+            "lua_name": "luna.simulator.loadFromToml",
             "kind": "function",
             "owner_type": "",
             "description": "Parses a TOML string and registers it as a named script.",
@@ -9879,13 +9879,13 @@
             "kind": "function",
             "owner_type": "",
             "description": "Poll for pending Lua-dependent requests from TCP clients.",
-            "full_doc": "Poll for pending Lua-dependent requests from TCP clients.\nMust be called each frame from luna.update().",
+            "full_doc": "Poll for pending Lua-dependent requests from TCP clients.\nMust be called each frame from luna.update(). Automatically records\nthe current frame delta from `luna.time.getDelta()` into the performance\nbuffer — no manual `recordFrame()` call is needed.",
             "params_doc": "",
             "returns_doc": "",
             "inferred_sig": "()",
             "typed_params": [],
             "inferred_return": "",
-            "line": 122,
+            "line": 124,
             "file": "src/lua_api/debugbridge_api.rs"
           },
           {
@@ -9916,7 +9916,7 @@
               ]
             ],
             "inferred_return": "",
-            "line": 283,
+            "line": 298,
             "file": "src/lua_api/debugbridge_api.rs"
           },
           {
@@ -9937,7 +9937,7 @@
               ]
             ],
             "inferred_return": "table",
-            "line": 300,
+            "line": 315,
             "file": "src/lua_api/debugbridge_api.rs"
           },
           {
@@ -9952,7 +9952,7 @@
             "inferred_sig": "()",
             "typed_params": [],
             "inferred_return": "",
-            "line": 328,
+            "line": 343,
             "file": "src/lua_api/debugbridge_api.rs"
           },
           {
@@ -9973,7 +9973,7 @@
               ]
             ],
             "inferred_return": "",
-            "line": 342,
+            "line": 357,
             "file": "src/lua_api/debugbridge_api.rs"
           },
           {
@@ -9988,7 +9988,7 @@
             "inferred_sig": "()",
             "typed_params": [],
             "inferred_return": "table",
-            "line": 372,
+            "line": 373,
             "file": "src/lua_api/debugbridge_api.rs"
           },
           {
@@ -10009,7 +10009,7 @@
               ]
             ],
             "inferred_return": "",
-            "line": 396,
+            "line": 397,
             "file": "src/lua_api/debugbridge_api.rs"
           },
           {
@@ -10024,7 +10024,7 @@
             "inferred_sig": "()",
             "typed_params": [],
             "inferred_return": "bool",
-            "line": 411,
+            "line": 412,
             "file": "src/lua_api/debugbridge_api.rs"
           },
           {
@@ -10050,7 +10050,7 @@
               ]
             ],
             "inferred_return": "",
-            "line": 427,
+            "line": 428,
             "file": "src/lua_api/debugbridge_api.rs"
           }
         ],
@@ -12906,7 +12906,7 @@
         "functions": [
           {
             "name": "exit",
-            "lua_name": "luna.event.exit",
+            "lua_name": "luna.signal.exit",
             "kind": "function",
             "owner_type": "",
             "description": "Pushes an exit event, requesting the engine to stop.",
@@ -12927,7 +12927,7 @@
           },
           {
             "name": "push",
-            "lua_name": "luna.event.push",
+            "lua_name": "luna.signal.push",
             "kind": "function",
             "owner_type": "",
             "description": "Pushes a custom event onto the event queue.",
@@ -12948,7 +12948,7 @@
           },
           {
             "name": "poll",
-            "lua_name": "luna.event.poll",
+            "lua_name": "luna.signal.poll",
             "kind": "function",
             "owner_type": "",
             "description": "Returns an iterator function that pops events from the queue.",
@@ -12963,7 +12963,7 @@
           },
           {
             "name": "clear",
-            "lua_name": "luna.event.clear",
+            "lua_name": "luna.signal.clear",
             "kind": "function",
             "owner_type": "",
             "description": "Discards all pending events in the queue.",
@@ -12978,7 +12978,7 @@
           },
           {
             "name": "newSignal",
-            "lua_name": "luna.event.newSignal",
+            "lua_name": "luna.signal.newSignal",
             "kind": "function",
             "owner_type": "",
             "description": "Creates a new pub-sub Signal dispatcher.",
@@ -12993,7 +12993,7 @@
           },
           {
             "name": "pump",
-            "lua_name": "luna.event.pump",
+            "lua_name": "luna.signal.pump",
             "kind": "function",
             "owner_type": "",
             "description": "Syncs OS-level events into the queue (no-op in Luna2D push model).",
@@ -13008,7 +13008,7 @@
           },
           {
             "name": "wait",
-            "lua_name": "luna.event.wait",
+            "lua_name": "luna.signal.wait",
             "kind": "function",
             "owner_type": "",
             "description": "Blocks until the next event arrives or the optional timeout elapses.",
@@ -13029,7 +13029,7 @@
           },
           {
             "name": "restart",
-            "lua_name": "luna.event.restart",
+            "lua_name": "luna.signal.restart",
             "kind": "function",
             "owner_type": "",
             "description": "Requests that the engine restart at the beginning of the next frame.",
@@ -13044,7 +13044,7 @@
           },
           {
             "name": "quit",
-            "lua_name": "luna.event.quit",
+            "lua_name": "luna.signal.quit",
             "kind": "function",
             "owner_type": "",
             "description": "Alias for `exit()` — requests the engine to stop at the end of the current frame.",
@@ -47187,7 +47187,7 @@
         "functions": [
           {
             "name": "getDelta",
-            "lua_name": "luna.timer.getDelta",
+            "lua_name": "luna.time.getDelta",
             "kind": "function",
             "owner_type": "",
             "description": "Returns the delta time in seconds for the current frame.",
@@ -47202,7 +47202,7 @@
           },
           {
             "name": "getFPS",
-            "lua_name": "luna.timer.getFPS",
+            "lua_name": "luna.time.getFPS",
             "kind": "function",
             "owner_type": "",
             "description": "Returns the current frames-per-second measurement.",
@@ -47217,7 +47217,7 @@
           },
           {
             "name": "getTime",
-            "lua_name": "luna.timer.getTime",
+            "lua_name": "luna.time.getTime",
             "kind": "function",
             "owner_type": "",
             "description": "Returns the total elapsed time since engine start in seconds.",
@@ -47232,7 +47232,7 @@
           },
           {
             "name": "getAverageDelta",
-            "lua_name": "luna.timer.getAverageDelta",
+            "lua_name": "luna.time.getAverageDelta",
             "kind": "function",
             "owner_type": "",
             "description": "Returns the rolling-average frame delta time in seconds.",
@@ -47247,7 +47247,7 @@
           },
           {
             "name": "step",
-            "lua_name": "luna.timer.step",
+            "lua_name": "luna.time.step",
             "kind": "function",
             "owner_type": "",
             "description": "Advances the timer by one frame, returning the delta time.",
@@ -47262,7 +47262,7 @@
           },
           {
             "name": "getMicroTime",
-            "lua_name": "luna.timer.getMicroTime",
+            "lua_name": "luna.time.getMicroTime",
             "kind": "function",
             "owner_type": "",
             "description": "Returns the high-resolution elapsed time since engine start in seconds.",
@@ -47277,7 +47277,7 @@
           },
           {
             "name": "getPhysicsDelta",
-            "lua_name": "luna.timer.getPhysicsDelta",
+            "lua_name": "luna.time.getPhysicsDelta",
             "kind": "function",
             "owner_type": "",
             "description": "Returns the fixed timestep used by `process_physics` callbacks (seconds).",
@@ -47292,7 +47292,7 @@
           },
           {
             "name": "setPhysicsDelta",
-            "lua_name": "luna.timer.setPhysicsDelta",
+            "lua_name": "luna.time.setPhysicsDelta",
             "kind": "function",
             "owner_type": "",
             "description": "Sets the fixed timestep for `process_physics` callbacks (seconds).",
@@ -47313,7 +47313,7 @@
           },
           {
             "name": "sleep",
-            "lua_name": "luna.timer.sleep",
+            "lua_name": "luna.time.sleep",
             "kind": "function",
             "owner_type": "",
             "description": "Suspends execution for the given number of seconds.",
@@ -47334,7 +47334,7 @@
           },
           {
             "name": "newScheduler",
-            "lua_name": "luna.timer.newScheduler",
+            "lua_name": "luna.time.newScheduler",
             "kind": "function",
             "owner_type": "",
             "description": "Creates a new independent Scheduler for managing timed callbacks.",

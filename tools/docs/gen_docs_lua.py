@@ -27,6 +27,14 @@ _MODULE_ORDER = [
     "log","debug","battle","debugbridge","docs","item","patterns","quest","resource",
 ]
 
+# Maps the internal json/module key → actual registered Lua namespace.
+# These modules register under a different name than their source folder.
+_LUA_NAMESPACE = {
+    "timer":      "time",       # luna.time.* (registered as "time" in timer_api.rs)
+    "event":      "signal",     # luna.signal.* (registered as "signal" in event_api.rs)
+    "automation": "simulator",  # luna.simulator.* (registered as "simulator" in automation_api.rs)
+}
+
 
 def _parse_params(params_doc, inferred_sig):
     """Return list of (name, type, is_optional) from params_doc + inferred_sig."""
@@ -162,9 +170,10 @@ def _callbacks():
 
 
 def _render_module(mod_name, mod_data):
+    lua_ns = _LUA_NAMESPACE.get(mod_name, mod_name)
     out = []
     anchor = mod_name.replace("_","-")
-    out.append(f"## `luna.{mod_name}` {{#{anchor}}}")
+    out.append(f"## `luna.{lua_ns}` {{#{anchor}}}")
     out.append("")
     desc = (mod_data.get("description","") or "").strip()
     if desc:
@@ -189,7 +198,7 @@ def _render_module(mod_name, mod_data):
         out.append("")
 
     if fns:
-        entries = [_build_call(fn, f"luna.{mod_name}.{fn['name']}") for fn in sorted(fns, key=lambda f:f["name"])]
+        entries = [_build_call(fn, f"luna.{lua_ns}.{fn['name']}") for fn in sorted(fns, key=lambda f:f["name"])]
         out += _code_block(entries)
         out.append("")
 
@@ -237,11 +246,12 @@ def generate(data):
 
     for m in ordered:
         anchor = m.replace("_","-")
+        lua_ns = _LUA_NAMESPACE.get(m, m)
         n_fns = len(mods[m].get("functions",[]))
         n_cls = len(mods[m].get("classes",{}))
         parts = ([f"{n_fns} fn"] if n_fns else []) + ([f"{n_cls} class{'es' if n_cls!=1 else ''}"] if n_cls else [])
         suffix = " \u2014 " + ", ".join(parts) if parts else ""
-        out.append(f"- [`luna.{m}`](#{anchor}){suffix}")
+        out.append(f"- [`luna.{lua_ns}`](#{anchor}){suffix}")
 
     out += ["","---",""]
     out += _callbacks()

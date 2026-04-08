@@ -218,13 +218,12 @@ fn lua_test_devtools() {
 }
 
 #[test]
-#[ignore = "luna.debugbridge not yet registered in Lua VM"]
 fn lua_test_debugbridge() {
     run_lua_test("unit/test_debugbridge.lua");
 }
 
 #[test]
-#[ignore = "luna.docs not yet registered in Lua VM"]
+#[ignore = "docs quality tests fail on incomplete coverage baseline — requires docs pipeline pass"]
 fn lua_test_docs() {
     run_lua_test("unit/test_docs.lua");
 }
@@ -232,7 +231,6 @@ fn lua_test_docs() {
 // === luna.log tests ===
 
 #[test]
-#[ignore = "luna.log not yet registered in Lua VM"]
 fn lua_test_log() {
     run_lua_test("unit/test_log.lua");
 }
