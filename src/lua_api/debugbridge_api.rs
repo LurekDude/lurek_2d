@@ -288,15 +288,7 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
                 .map_err(|e| LuaError::RuntimeError(e.to_string()))?;
             let src = source.unwrap_or_else(|| "?".to_string());
             let ln = line.unwrap_or(0);
-            s.push_print(&msg, &src, ln);
-
-            // Broadcast print event
-            let ts = s.elapsed();
-            let event = serde_json::json!({
-                "event": "print",
-                "data": {"timestamp": ts, "message": msg, "source": src, "line": ln}
-            });
-            s.broadcast_queue.push_back(event.to_string());
+            s.capture_print_with_broadcast(&msg, &src, ln);
             Ok(())
         })?,
     )?;
@@ -353,10 +345,7 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
             let mut s = sh
                 .lock()
                 .map_err(|e| LuaError::RuntimeError(e.to_string()))?;
-            s.max_print_history = max.clamp(1, 100000);
-            while s.print_history.len() > s.max_print_history {
-                s.print_history.remove(0);
-            }
+            s.set_max_print_history(max);
             Ok(())
         })?,
     )?;
@@ -372,10 +361,7 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
             let mut s = sh
                 .lock()
                 .map_err(|e| LuaError::RuntimeError(e.to_string()))?;
-            s.frame_times.push(dt);
-            if s.frame_times.len() > s.max_frame_times {
-                s.frame_times.remove(0);
-            }
+            s.record_frame(dt);
             Ok(())
         })?,
     )?;

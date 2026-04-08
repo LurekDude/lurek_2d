@@ -133,6 +133,55 @@ impl BridgeShared {
             self.print_history.remove(0);
         }
     }
+
+    /// Appends a delta-time sample to the frame-time ring buffer.
+    ///
+    /// Evicts the oldest sample when the buffer exceeds `max_frame_times`.
+    ///
+    /// # Parameters
+    /// - `dt` — `f64`.
+    pub fn record_frame(&mut self, dt: f64) {
+        self.frame_times.push(dt);
+        if self.frame_times.len() > self.max_frame_times {
+            self.frame_times.remove(0);
+        }
+    }
+
+    /// Sets the maximum print-history capacity and trims excess entries.
+    ///
+    /// `max` is clamped to `[1, 100000]`.
+    ///
+    /// # Parameters
+    /// - `max` — `usize`.
+    pub fn set_max_print_history(&mut self, max: usize) {
+        self.max_print_history = max.clamp(1, 100_000);
+        while self.print_history.len() > self.max_print_history {
+            self.print_history.remove(0);
+        }
+    }
+
+    /// Appends a print entry and queues a broadcast event for all connected clients.
+    ///
+    /// The broadcast JSON has the form `{"event":"print","data":{...}}`.
+    ///
+    /// # Parameters
+    /// - `msg` — `&str`.
+    /// - `source` — `&str`.
+    /// - `line` — `u32`.
+    pub fn capture_print_with_broadcast(&mut self, msg: &str, source: &str, line: u32) {
+        self.push_print(msg, source, line);
+        let ts = self.elapsed();
+        let event = serde_json::json!({
+            "event": "print",
+            "data": {
+                "timestamp": ts,
+                "message": msg,
+                "source": source,
+                "line": line
+            }
+        });
+        self.broadcast_queue.push_back(event.to_string());
+    }
 }
 
 impl Default for BridgeShared {
