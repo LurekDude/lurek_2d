@@ -534,6 +534,7 @@ end
 - **Lua tests**: `tests/lua/unit/test_gui.lua` — BDD tests for `luna.ui.*` API surface
 - **GUI demo**: `demos/devtools_demo/` — developer tools panel demonstrating the GUI system
 - **Architecture doc**: `docs/architecture/engine-architecture.md` § Tier 2
+- **`terminal`**: The `terminal` module also has widget types named `Button`, `Label`, `TextBox`, `Panel`. The shared names are **intentional design** — `gui` renders them as pixel-space graphics; `terminal` renders them as character-cell text. Same conceptual interface, different renderers. They share no types.
 
 ## Notes
 

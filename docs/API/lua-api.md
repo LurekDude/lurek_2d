@@ -1666,13 +1666,11 @@ luna.data.compress( format : string, data : string, level : integer? ) -> string
 luna.data.decode( format : string, encoded : string ) -> string  -- Decodes encoded text back to binary (base64, hex)
 luna.data.decompress( format : string, data : string ) -> string  -- Decompresses data using the given algorithm (deflate, gzip, lz4)
 luna.data.encode( format : string, data : string ) -> string  -- Encodes binary data using the given format (base64, hex)
-luna.data.encodeToml( input : table ) -> string  -- Encodes a Lua table as a TOML string
 luna.data.getPackedSize( format : string ) -> integer  -- Returns the number of bytes the given format and values would occupy
 luna.data.hash( algorithm : string, data : string ) -> string  -- Returns the cryptographic hash of the input (md5, sha1, sha256, sha512)
 luna.data.newByteData( value : integer|string ) -> ByteData  -- Creates a new mutable byte buffer from a size or string
 luna.data.newDataView( data : string, offset : integer?, size : integer? ) -> DataView  -- Creates a read-only windowed view into a byte string
 luna.data.pack( format : string ) -> string  -- Packs values into a binary byte string using the format string
-luna.data.parseToml( input : string ) -> table  -- Parses a TOML string and returns a Lua table
 luna.data.read( format : string, data : string, offset : integer? )  -- Reads values using the Luna2D Binary Pack Format
 luna.data.size( format : string ) -> integer  -- Returns the byte size of a Luna2D Binary Pack Format string
 luna.data.unpack( format : string, data : string, offset : integer? )  -- Unpacks values from a binary byte string, returning values followed by next offset

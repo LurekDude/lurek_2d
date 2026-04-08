@@ -350,7 +350,7 @@ end
 
 **Similar modules and differentiation:**
 
-- **`gui`** (Tier 2): Retained-mode widget UI with pixel-level layout; `terminal` uses character-cell grid addressing and is oriented towards text-mode interfaces (roguelikes, consoles, REPL). They share no types.
+- **`gui`** (Tier 2): Retained-mode widget UI with pixel-level layout; `terminal` uses character-cell grid addressing and is oriented towards text-mode interfaces (roguelikes, consoles, REPL). They share no types. Both have widget types named `Button`, `Label`, `TextBox`, `Panel` — this is **intentional design**: `gui` renders them as pixel graphics; `terminal` renders them as character-cell text. Same conceptual interface, different renderers.
 - **`graphics`**: Owns GPU resources, font rasterisation, and the render pipeline. `terminal` produces `DrawCommand` values but never touches GPU textures or surfaces directly.
 
 ## Notes

@@ -12,7 +12,9 @@
 
 ## Summary
 
-The `devtools` module provides the developer diagnostics toolkit for Luna2D games. It is a **Tier 1 Core Engine Subsystem** that gives Lua game scripts structured introspection and runtime monitoring capabilities without requiring external tools.
+The `devtools` module is the **engine and game diagnostics toolkit** for engine developers and advanced game developers who need deep runtime visibility. It gives Lua scripts access to structured runtime monitoring and performance analysis capabilities that go beyond simple logging — without requiring any external profiling tools or IDE debugger.
+
+This module is gated by `modules.debug = true` in `conf.lua` and is NOT available in release builds where that flag is false. It is intended for development and profiling workflows, not for production game logic.
 
 The module contains four orthogonal components:
 
@@ -26,7 +28,7 @@ The module contains four orthogonal components:
 
 4. **FileWatcher** — A polling-based path watcher that compares `std::fs::metadata` modification timestamps between polls. It produces a list of changed paths on each `poll()` call, enabling hot-reload patterns. The polling interval is controlled entirely by the caller; the module provides no background threads.
 
-All four types are **pure Rust** with no mlua dependency. All Lua plumbing lives in `src/lua_api/devtools_api.rs`. The devtools API is gated by `modules.debug = true` in `conf.lua` and is NOT available in release builds where that flag is false.
+All four types are **pure Rust** with no mlua dependency. All Lua plumbing lives in `src/lua_api/devtools_api.rs`.
 
 This module intentionally does **not** provide:
 - Physical file logging (use the `log` crate with `env_logger`)

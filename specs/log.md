@@ -12,7 +12,9 @@
 
 ## Summary
 
-The `log` module provides structured log level management for Lua game scripts. It is a thin adapter over `crate::engine::log_messages` that exposes `set_level()`, `get_level()`, and `enabled_for()` as Rust functions, and binds them — along with per-severity emit functions — to the `luna.log.*` Lua namespace.
+The `log` module is the **game developer's logging tool** for Lua scripts. It lets Lua game code emit structured messages at configurable severity levels, so developers can trace game logic, fire debug output, and monitor runtime state without touching Rust code or engine internals.
+
+Internally, `log` is a thin adapter over `crate::engine::log_messages` that exposes `set_level()`, `get_level()`, and `enabled_for()` as Rust functions, and binds them — along with per-severity emit functions — to the `luna.log.*` Lua namespace.
 
 The Lua API exposes five severity levels: `debug`, `info`, `warn`, `error`, and `trace`. Game scripts can emit at a fixed level (`luna.log.debug`, `luna.log.info`, etc.) or at a caller-specified level (`luna.log.print(level, message)`). The active minimum level can be read and changed at runtime with `luna.log.getLevel()` and `luna.log.setLevel(level)`.
 

@@ -128,7 +128,7 @@ The Lua API is registered in `src/lua_api/docs_api.rs` under `luna.docs.*`. All 
 |---|---|---|
 | `luna.docs.scan(opts?)` | `→ ApiCatalog` | Scan all live `luna.*` bindings by table reflection |
 | `luna.docs.scanModule(module_name)` | `→ ApiCatalog` | Scan one module's bindings |
-| `luna.docs.loadToml(path)` | `→ ApiCatalog` | Load a TOML doc file via `luna.data.parseToml` |
+| `luna.docs.loadToml(path)` | `→ ApiCatalog` | Load a TOML doc file via `luna.codec.fromToml` |
 | `luna.docs.loadAll(directory)` | `→ ApiCatalog` | Load all `.toml` files in a directory and merge |
 | `luna.docs.describe(qualified_name, description)` | — | Inject or update a description in the internal catalog |
 | `luna.docs.setParamInfo(qualified_name, params)` | — | Set parameter metadata for an entry (`{name,type,description,optional,default?}[]`) |
@@ -270,14 +270,14 @@ end
 | Module       | Relationship | Notes                                                           |
 |--------------|--------------|-----------------------------------------------------------------|
 | `engine`     | —            | `docs_api.rs` receives no `SharedState`; uses only Lua globals  |
-| `data`       | Uses (Lua)   | `loadToml` delegates to `luna.data.parseToml` at runtime        |
+| `serial`     | Uses (Lua)   | `loadToml` delegates to `luna.codec.fromToml` at runtime        |
 | `lua_api`    | Imported by  | `docs_api.rs` registers the `luna.docs.*` surface               |
 | `vscode-extension` | Consumer | Consumes `exportAll` JSON for completions, hover, and signatures |
 
 ## Notes
 
 - `scan()` and `validate()` work by traversing the `luna.*` Lua table at call time — they reflect the current registered bindings, not a compile-time list.
-- `loadToml` requires `luna.data` to be registered (it calls `luna.data.parseToml` internally). Do not call it before the Lua VM is fully initialised.
+- `loadToml` requires `luna.codec` (`serial` module) to be registered (it calls `luna.codec.fromToml` internally). Do not call it before the Lua VM is fully initialised.
 - The internal catalog (used by `describe`, `setParamInfo`, `setReturnInfo`, `getCatalog`, `resetCatalog`) is per-VM state stored in a `Rc<RefCell<DocsState>>`. It is independent of exported `ApiCatalog` userdata objects.
 - `quality_score` checks five conditions. A `"value"` kind skips the params/returns check (only 4 conditions apply), so a fully described value entry scores 4/4 = 1.0 even without parameters.
 - `exportAll` creates the output directory with `fs::create_dir_all` — it is safe to target a non-existent path.

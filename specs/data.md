@@ -13,7 +13,7 @@
 ## Summary
 
 The `data` module is Luna2D's pure-CPU data processing layer. It provides binary data
-manipulation, compression, hashing, encoding, TOML conversion, and two independent binary
+manipulation, compression, hashing, encoding, and two independent binary
 pack/unpack systems — all exposed to Lua scripts through the `luna.data` namespace.
 
 **ByteData** wraps a `Vec<u8>` with indexed get/set operations and string conversion, serving
@@ -31,9 +31,6 @@ format strings compatible with LÖVE2D's `data.pack` API (`<`, `>`, `b`, `B`, `h
 `l`, `L`, `f`, `d`, `s`, `z`, `x`). The second (`bin_pack.rs`) uses space-separated named type
 tokens (`u8`, `u16`, `f32`, `str`, `cstr`, `pad`, `le`, `be`) with a cleaner, more readable syntax.
 Both systems produce and consume `ByteData` buffers.
-
-**TOML conversion** parses TOML strings into `toml::Value` and encodes them back, enabling the
-Lua API to round-trip TOML configuration between strings and Lua tables.
 
 **Scope boundary**: This module is a pure CPU data-processing layer. It has no GPU, audio, window,
 filesystem, or physics dependencies. It depends only on `math` and `engine` (Baseline). The
@@ -67,9 +64,6 @@ src/data/mod.rs  (re-exports all submodules)
     │
     ├── bin_pack.rs ─── BinValue enum + write()/read()/measure_size()
     │                   └── Luna2D named-token format strings
-    │
-    └── toml_convert.rs ── parse_toml()/encode_toml()
-                           └── toml crate
 ```
 
 ## Source Files
@@ -83,7 +77,7 @@ src/data/mod.rs  (re-exports all submodules)
 | `encode.rs` | Base64 (RFC 4648) and hexadecimal encoding/decoding for data serialization. |
 | `hash.rs` | Cryptographic hash functions — MD5, SHA-1, SHA-256, SHA-512 — returning hex-string digests. |
 | `pack.rs` | LÖVE2D-compatible binary pack/unpack with single-character format strings (`<`, `>`, `b`/`B`, `h`/`H`, `i`/`I`, `l`/`L`, `f`, `d`, `s`, `z`, `x`). |
-| `toml_convert.rs` | TOML parsing (`str → toml::Value`) and encoding (`toml::Value → str`) via the `toml` crate. |
+| `bin_pack.rs` | Luna2D Binary Pack Format — space-separated named-token binary serialization. |
 
 ## Submodules
 
@@ -214,8 +208,6 @@ functions plus two UserData types with their own methods.
 | `luna.data.hash(algorithm, data)` | Computes a cryptographic hash (`"md5"`, `"sha1"`, `"sha256"`, `"sha512"`). Returns a hex string. |
 | `luna.data.newByteData(value)` | Creates a mutable byte buffer from a size (integer) or string. |
 | `luna.data.newDataView(data, offset?, size?)` | Creates a read-only windowed view into a byte string. |
-| `luna.data.parseToml(input)` | Parses a TOML string and returns a Lua table. |
-| `luna.data.encodeToml(input)` | Encodes a Lua table as a TOML string. |
 | `luna.data.write(format, ...)` | Writes values using the Luna2D Binary Pack Format (space-separated named tokens). |
 | `luna.data.read(format, data, offset?)` | Reads values using the Luna2D Binary Pack Format. Returns decoded values. |
 | `luna.data.size(format)` | Returns the byte size of a Luna2D Binary Pack Format string (fixed-width tokens only). |
@@ -283,12 +275,6 @@ function luna.init()
     local buf = luna.data.write("u32 f32 str", 42, 3.14, "hello")
     local a, b, c = luna.data.read("u32 f32 str", buf)
     print(a, b, c) -- 42, 3.14..., "hello"
-
-    -- TOML round-trip
-    local tbl = luna.data.parseToml('title = "My Game"\nversion = 1')
-    print(tbl.title)   -- "My Game"
-    local toml_str = luna.data.encodeToml({ name = "Luna2D", debug = true })
-    print(toml_str)
 end
 ```
 
@@ -315,14 +301,14 @@ end
 |--------|-----------------|
 | `image` | `ImageData` is a pixel buffer (RGBA8) for graphics; `ByteData` is raw bytes with no pixel semantics |
 | `sound` | `SoundData` is interleaved PCM audio samples; `ByteData` is format-agnostic binary data |
-| `filesystem` | Filesystem handles file I/O on disk; `data` processes in-memory byte buffers || `serial` | Both expose TOML ↔ Lua table conversion. Use `luna.data.parseToml` / `encodeToml` for simple one-off TOML access inside a binary data pipeline. Use `luna.codec.fromToml` / `toToml` when writing format-agnostic code that needs to handle JSON, TOML, or CSV interchangeably on the same code path. |
+| `filesystem` | Filesystem handles file I/O on disk; `data` processes in-memory byte buffers |
+| `serial` | Text format I/O (JSON, TOML, CSV) is the sole responsibility of `serial` (`luna.codec`). `data` handles binary buffers only — use `luna.codec.fromToml` / `luna.codec.toToml` for TOML conversion. |
 ## Notes
 
 - **Two pack systems**: The module deliberately ships two binary pack APIs. `pack.rs` (LÖVE2D-compatible) uses terse single-character format strings for familiarity with existing Lua game code. `bin_pack.rs` (Luna2D-native) uses space-separated named tokens for readability. Both produce `ByteData` output.
-- **External crate versions**: flate2 1.x (deflate/gzip/zlib), lz4_flex 0.11 (LZ4), sha2 0.10, md-5 0.10, sha1 (latest), base64 (latest), hex (latest), toml (latest). These are all pure-Rust crates with no native C dependencies.
+- **External crate versions**: flate2 1.x (deflate/gzip/zlib), lz4_flex 0.11 (LZ4), sha2 0.10, md-5 0.10, sha1 (latest), base64 (latest), hex (latest). These are all pure-Rust crates with no native C dependencies.
 - **DataView uses `Arc`**: `DataView` wraps `Arc<Vec<u8>>` (not `Rc`) because it may be shared across multiple Lua userdata references. The Lua API creates a fresh `Arc` from the input string bytes.
 - **No streaming**: All compression, hashing, and encoding operations work on complete in-memory buffers. There is no streaming/chunked API. This is intentional — Lua scripts operate on finite data.
 - **Hash algorithms for integrity, not security**: MD5 and SHA-1 are included for compatibility (save file checksums, asset verification) but should not be used for cryptographic security. The docstrings document this.
 - **Endianness defaults**: `pack.rs` defaults to little-endian (`<`); `bin_pack.rs` also defaults to little-endian (`le`). `DataView` reads are always little-endian with no endian-switch option.
-- **TOML encode requires table root**: `encode_toml()` returns an error if the root value is not a `toml::Value::Table`. This matches the TOML specification where the root document is always a table.
 - **Breaking change surface**: Renaming or removing any `luna.data.*` function breaks game scripts. The pack format strings (`<If`, `"u32 f32 str"`) are part of the API contract — changing token meanings would silently corrupt saved binary data.

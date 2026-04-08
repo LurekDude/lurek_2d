@@ -12,7 +12,7 @@
 
 ## Summary
 
-The `spine` module implements skeletal 2D animation through bone hierarchies, slots, and world-transform propagation. It is a Tier 2 Engine Extension that provides the data model for hierarchical bone rigs without any GPU, audio, or windowing dependency. The module is purely computational — it owns bone graph construction, local-to-world transform propagation, and slot-based attachment binding but delegates all rendering to the `lua_api` bridge layer.
+The `spine` module implements **skeletal 2D animation** — bone hierarchies, slots, and world-transform propagation. It is a Tier 2 Engine Extension that provides the data model for hierarchical bone rigs without any GPU, audio, or windowing dependency. This is a **completely separate system** from the `animation` module: `animation` advances frame indices through a sprite-sheet (like an animated GIF); `spine` propagates affine transforms through a parent-child bone tree (like a rigged character). Use one, the other, or both independently.
 
 A `Skeleton` owns a flat `Vec<Bone>` array where parent-child relationships are encoded with `parent_index` pointers into earlier array entries. This means bones must be added in topological order (parent before child). Calling `Skeleton::update_world_transforms()` walks the array linearly (O(n)), composing each bone's local translation, rotation, and scale with its parent's world transform using standard 2D affine math (cos/sin rotation, multiplicative scaling). Root bones (those with no parent) are transformed by the skeleton's own root position and scale.
 

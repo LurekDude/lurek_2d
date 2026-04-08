@@ -187,77 +187,6 @@ fn bin_values_to_lua(lua: &Lua, vals: Vec<BinValue>) -> LuaResult<Vec<LuaValue<'
 }
 
 // -------------------------------------------------------------------------------
-// TOML conversion helpers
-// -------------------------------------------------------------------------------
-
-/// Converts a `toml::Value` into a Lua value.
-fn toml_value_to_lua(lua: &Lua, val: toml::Value) -> LuaResult<LuaValue<'_>> {
-    match val {
-        toml::Value::String(s) => lua.create_string(s.as_bytes()).map(LuaValue::String),
-        toml::Value::Integer(n) => Ok(LuaValue::Integer(n)),
-        toml::Value::Float(f) => Ok(LuaValue::Number(f)),
-        toml::Value::Boolean(b) => Ok(LuaValue::Boolean(b)),
-        toml::Value::Datetime(dt) => lua
-            .create_string(dt.to_string().as_bytes())
-            .map(LuaValue::String),
-        toml::Value::Array(arr) => {
-            let t = lua.create_table()?;
-            for (i, v) in arr.into_iter().enumerate() {
-                t.raw_set(i + 1, toml_value_to_lua(lua, v)?)?;
-            }
-            Ok(LuaValue::Table(t))
-        }
-        toml::Value::Table(map) => {
-            let t = lua.create_table()?;
-            for (k, v) in map {
-                t.raw_set(k, toml_value_to_lua(lua, v)?)?;
-            }
-            Ok(LuaValue::Table(t))
-        }
-    }
-}
-
-/// Converts a Lua table to a `toml::Value::Table` for encoding.
-fn lua_table_to_toml(lua: &Lua, tbl: LuaTable<'_>) -> LuaResult<toml::Value> {
-    let mut map = toml::map::Map::new();
-    for pair in tbl.pairs::<LuaValue, LuaValue>() {
-        let (k, v) = pair?;
-        let key = match k {
-            LuaValue::String(s) => s
-                .to_str()
-                .map_err(|e| LuaError::RuntimeError(e.to_string()))?
-                .to_string(),
-            LuaValue::Integer(n) => n.to_string(),
-            _ => continue,
-        };
-        let tv = lua_value_to_toml(lua, v)?;
-        map.insert(key, tv);
-    }
-    Ok(toml::Value::Table(map))
-}
-
-/// Converts a single Lua value to a `toml::Value` for encoding.
-fn lua_value_to_toml(lua: &Lua, val: LuaValue<'_>) -> LuaResult<toml::Value> {
-    match val {
-        LuaValue::String(s) => Ok(toml::Value::String(
-            s.to_str()
-                .map_err(|e| LuaError::RuntimeError(e.to_string()))?
-                .to_string(),
-        )),
-        LuaValue::Integer(n) => Ok(toml::Value::Integer(n)),
-        LuaValue::Number(f) => Ok(toml::Value::Float(f)),
-        LuaValue::Boolean(b) => Ok(toml::Value::Boolean(b)),
-        LuaValue::Table(t) => lua_table_to_toml(lua, t),
-        LuaValue::Nil => Err(LuaError::RuntimeError(
-            "cannot encode nil as TOML value".to_string(),
-        )),
-        _ => Err(LuaError::RuntimeError(
-            "unsupported value type for TOML encoding".to_string(),
-        )),
-    }
-}
-
-// -------------------------------------------------------------------------------
 // Register
 // -------------------------------------------------------------------------------
 
@@ -438,31 +367,6 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
                 lua.create_userdata(LuaDataView { inner: dv })
             },
         )?,
-    )?;
-
-    // -- parseToml --
-    /// Parses a TOML string and returns a Lua table.
-    /// @param input : string
-    /// @return table
-    tbl.set(
-        "parseToml",
-        lua.create_function(|lua, input: String| {
-            let val =
-                data::toml_convert::parse_toml(&input).map_err(LuaError::RuntimeError)?;
-            toml_value_to_lua(lua, val)
-        })?,
-    )?;
-
-    // -- encodeToml --
-    /// Encodes a Lua table as a TOML string.
-    /// @param input : table
-    /// @return string
-    tbl.set(
-        "encodeToml",
-        lua.create_function(|lua, input: LuaTable| {
-            let val = lua_table_to_toml(lua, input)?;
-            data::toml_convert::encode_toml(&val).map_err(LuaError::RuntimeError)
-        })?,
     )?;
 
     // -- write --

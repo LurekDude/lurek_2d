@@ -12,7 +12,7 @@
 
 ## Summary
 
-The `debugbridge` module embeds a JSON-over-TCP server (bound to 127.0.0.1 only) inside the running Luna2D game. External tools — the Luna2D VS Code extension and the MCP server — connect to the bridge port to inspect and control the game at runtime without requiring any embed or plugin in the game script.
+The `debugbridge` module embeds a JSON-over-TCP server (bound to 127.0.0.1 only) inside the running Luna2D game. It serves **both audiences**: game developers debugging game logic via the VS Code extension, and engine developers inspecting engine internals via the MCP server. Neither audience requires any embed or plugin in the game script.
 
 The server accepts newline-delimited JSON messages from multiple concurrent TCP clients. Requests fall into two categories: **background-safe** (methods the server thread handles directly using cached data) and **main-thread** (methods that require Lua execution — `eval`, `getCallStack`, `getLocals`, `getGlobals`). Main-thread methods are placed in `BridgeShared::pending_requests` and dispatched by calling `luna.debugbridge.poll()` from the game's update loop each frame. Responses queue into `BridgeShared::pending_responses` and are written back to the originating client by the server thread.
 

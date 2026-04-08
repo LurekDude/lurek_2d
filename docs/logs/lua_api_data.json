@@ -8340,48 +8340,6 @@
             "file": "src/lua_api/data_api.rs"
           },
           {
-            "name": "parseToml",
-            "lua_name": "luna.data.parseToml",
-            "kind": "function",
-            "owner_type": "",
-            "description": "Parses a TOML string and returns a Lua table.",
-            "full_doc": "Parses a TOML string and returns a Lua table.\n@param input : string\n@return table",
-            "params_doc": "",
-            "returns_doc": "",
-            "inferred_sig": "(input)",
-            "typed_params": [
-              [
-                "input",
-                "string",
-                false
-              ]
-            ],
-            "inferred_return": "table",
-            "line": 447,
-            "file": "src/lua_api/data_api.rs"
-          },
-          {
-            "name": "encodeToml",
-            "lua_name": "luna.data.encodeToml",
-            "kind": "function",
-            "owner_type": "",
-            "description": "Encodes a Lua table as a TOML string.",
-            "full_doc": "Encodes a Lua table as a TOML string.\n@param input : table\n@return string",
-            "params_doc": "",
-            "returns_doc": "",
-            "inferred_sig": "(input)",
-            "typed_params": [
-              [
-                "input",
-                "table",
-                false
-              ]
-            ],
-            "inferred_return": "string",
-            "line": 460,
-            "file": "src/lua_api/data_api.rs"
-          },
-          {
             "name": "write",
             "lua_name": "luna.data.write",
             "kind": "function",

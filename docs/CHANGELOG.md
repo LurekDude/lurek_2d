@@ -18,6 +18,24 @@ Always update this file **in the same commit** as the change. Use the commit typ
 
 ---
 
+## [0.6.3] — 2026-04-13
+
+### Removed
+- **`luna.data.parseToml` / `luna.data.encodeToml` removed** — `data` is a binary-only module. These functions have been moved to `luna.codec` (`serial` module) which already provides `luna.codec.fromToml` / `luna.codec.toToml`. Lua scripts using `luna.data.parseToml` or `luna.data.encodeToml` must be updated to use `luna.codec.fromToml` / `luna.codec.toToml`.
+- **`src/data/toml_convert.rs` removed from `pub mod` list** — the `data` module no longer exports TOML helpers. The equivalent functionality lives in `src/serial/toml.rs`.
+
+### Changed
+- **`specs/data.md`** — removed all TOML references from Summary, architecture diagram, Source Files table, Lua API table, and Notes. The `serial` cross-reference entry now correctly states TOML is `serial`'s sole responsibility via `luna.codec`.
+- **`specs/log.md`** — clarified purpose as the **game developer's Lua logging tool** (not an engine-internal mechanism).
+- **`specs/devtools.md`** — clarified purpose as the **engine and game diagnostics toolkit for engine developers and advanced game developers**; reinforced `modules.debug = true` gate and non-production intent.
+- **`specs/debugbridge.md`** — clarified that it serves **both audiences**: game developers (via VS Code extension) and engine developers (via MCP server).
+- **`specs/animation.md`** — strengthened framing as **frame-based GIF-style sprite animation**; added explicit boundary note that it is not related to `spine`.
+- **`specs/spine.md`** — strengthened framing as an **independent skeletal/bone-hierarchy system**, explicitly distinct from `animation`.
+- **`specs/gui.md`** — added note that shared widget type names (`Button`, `Label`, `TextBox`) with `terminal` are **intentional design** — same conceptual interface, different renderers.
+- **`specs/terminal.md`** — added matching note that shared widget type names with `gui` are intentional.
+- **`specs/docs.md`** — `loadToml` dependency corrected from `luna.data.parseToml` to `luna.codec.fromToml`.
+- **Generated docs** (`docs/API/lua-api.md`, `docs/API/luna.lua`, `wiki/API-Reference.md`, `docs/logs/lua_api_data.json`) — `parseToml`/`encodeToml` entries removed from the `luna.data` section.
+
 ## [0.6.2] — 2026-04-08
 
 ### Fixed
@@ -25,8 +43,6 @@ Always update this file **in the same commit** as the change. Use the commit typ
 - **`src/debugbridge/AGENT.md` missing Ownership Rule** — the three-channel logging table (`debugbridge` / `log` / `devtools`) that lives in `specs/debugbridge.md` was absent from the AGENT.md. Now added so developers reading the short module overview see the ownership boundary without having to open the full spec.
 
 ### Changed
-- **`specs/data.md` References** — added `serial` row clarifying the TOML duplication: `luna.data.parseToml` is for lightweight TOML access inside a binary data pipeline; `luna.codec.fromToml` is the canonical entry point for format-agnostic code.
-- **`specs/serial.md` References** — updated `data` row to explain the TOML overlap and when to choose each API.
 - **`specs/animation.md` Similar modules** — added `spine` reference explaining the frame-based vs skeletal-animation distinction; previously only mentioned `particle` and `graphics::sprite`.
 
 ## [0.6.1] — 2026-04-08

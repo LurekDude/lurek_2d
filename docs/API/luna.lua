@@ -2128,11 +2128,6 @@ function luna.data.decompress(format_str, compressed) end
 ---@return string
 function luna.data.encode(format_str, raw_data) end
 
---- Encodes a Lua table as a TOML string.
----@param input any
----@return string
-function luna.data.encodeToml(input) end
-
 --- Returns the number of bytes the given format and values would occupy.
 ---@param fmt any
 ---@param vals any
@@ -2162,11 +2157,6 @@ function luna.data.newDataView(raw, offset, size) end
 ---@param vals any
 ---@return string
 function luna.data.pack(fmt, vals) end
-
---- Parses a TOML string and returns a Lua table.
----@param input any
----@return table
-function luna.data.parseToml(input) end
 
 --- Reads values using the Luna2D Binary Pack Format.
 ---@param fmt any

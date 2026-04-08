@@ -1,8 +1,10 @@
 //! Binary data manipulation, compression, hashing, encoding, and pack/unpack.
 //!
 //! Provides `ByteData` for raw byte buffers, plus compression (deflate/gzip/lz4/zlib),
-//! cryptographic hashing (MD5/SHA family), encoding (base64/hex), TOML parsing,
+//! cryptographic hashing (MD5/SHA family), encoding (base64/hex),
 //! binary pack/unpack (`pack` module), and a windowed byte-buffer view (`dataview` module).
+//!
+//! Text format parsing (JSON, TOML, CSV) is the responsibility of the `serial` module — see `luna.codec`.
 
 /// Luna2D Binary Pack Format — space-separated type-token serialization.
 pub mod bin_pack;
@@ -18,9 +20,6 @@ pub mod encode;
 pub mod hash;
 /// Binary pack/unpack utilities compatible with the LÖVE2D `data.pack` API.
 pub mod pack;
-/// TOML parsing and encoding.
-pub mod toml_convert;
-
 pub use bin_pack::{
     measure_size as bin_measure_size, read as bin_read, write as bin_write, BinValue,
 };
