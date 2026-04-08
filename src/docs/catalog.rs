@@ -13,6 +13,23 @@ impl Catalog {
         Self { entries: Vec::new() }
     }
 
+    /// Creates a catalog pre-populated from a slice of entries.
+    ///
+    /// Each entry is cloned into the catalog.
+    ///
+    /// # Parameters
+    /// - `entries` — `&[DocEntry]`.
+    ///
+    /// # Returns
+    /// `Catalog`.
+    pub fn from_entries(entries: &[DocEntry]) -> Self {
+        let mut cat = Self::new();
+        for e in entries {
+            cat.add(e.clone());
+        }
+        cat
+    }
+
     /// Inserts a doc entry into the catalog.
     pub fn add(&mut self, entry: DocEntry) {
         self.entries.push(entry);

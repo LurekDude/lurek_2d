@@ -14,8 +14,10 @@
 
 pub mod catalog;
 pub mod entry;
+pub mod export;
 pub mod report;
 
 pub use catalog::Catalog;
 pub use entry::{DocEntry, ParamInfo, ReturnInfo};
+pub use export::{export_all, export_completions, export_hover, export_signatures};
 pub use report::{quality_grade, quality_score, QualityReport, ValidationReport};

@@ -5,7 +5,6 @@
 //! and exporting structured data for VS Code extension IntelliSense.
 
 use std::cell::RefCell;
-use std::collections::HashMap;
 use std::rc::Rc;
 
 use mlua::prelude::*;
@@ -579,19 +578,9 @@ impl DocsState {
     }
 }
 
-/// Builds a temporary `Catalog` from a slice of entries (clones each entry).
-fn build_catalog(entries: &[docs::DocEntry]) -> docs::Catalog {
-    let mut cat = docs::Catalog::new();
-    for e in entries {
-        cat.add(e.clone());
-    }
-    cat
-}
-
 /// Computes a `QualityReport` for the given entry slice.
 fn compute_quality(entries: &[docs::DocEntry]) -> QualityReport {
-    let cat = build_catalog(entries);
-    QualityReport(docs::QualityReport::compute(&cat))
+    QualityReport(docs::QualityReport::from_entries(entries))
 }
 
 // ---------------------------------------------------------------------------
@@ -1109,27 +1098,7 @@ pub fn register(lua: &Lua, luna_table: &LuaTable) -> LuaResult<()> {
         "exportCompletions",
         lua.create_function(|_, (catalog_ud, path): (LuaAnyUserData, String)| {
             let catalog = catalog_ud.borrow::<ApiCatalog>()?;
-            let completions: Vec<serde_json::Value> = catalog
-                .0
-                .iter()
-                .map(|e| {
-                    serde_json::json!({
-                        "label": e.name,
-                        "kind": match e.kind.as_str() {
-                            "function" | "method" => "Function",
-                            "type" => "Class",
-                            "enum" => "Enum",
-                            _ => "Variable"
-                        },
-                        "detail": e.qualified_name,
-                        "documentation": e.description
-                    })
-                })
-                .collect();
-            let json = serde_json::to_string_pretty(&completions).unwrap_or_default();
-            std::fs::write(&path, json)
-                .map_err(|e| LuaError::RuntimeError(format!("write error: {}", e)))?;
-            Ok(())
+            docs::export_completions(&catalog.0, &path).map_err(LuaError::RuntimeError)
         })?,
     )?;
 
@@ -1141,34 +1110,7 @@ pub fn register(lua: &Lua, luna_table: &LuaTable) -> LuaResult<()> {
         "exportHover",
         lua.create_function(|_, (catalog_ud, path): (LuaAnyUserData, String)| {
             let catalog = catalog_ud.borrow::<ApiCatalog>()?;
-            let mut hover: HashMap<String, serde_json::Value> = HashMap::new();
-            for e in &catalog.0 {
-                hover.insert(
-                    e.qualified_name.clone(),
-                    serde_json::json!({
-                        "name": e.qualified_name,
-                        "description": e.description,
-                        "kind": e.kind,
-                        "parameters": e.parameters.iter().map(|p| {
-                            serde_json::json!({
-                                "name": p.name,
-                                "type": p.type_name,
-                                "description": p.description
-                            })
-                        }).collect::<Vec<_>>(),
-                        "returns": e.returns.iter().map(|r| {
-                            serde_json::json!({
-                                "type": r.type_name,
-                                "description": r.description
-                            })
-                        }).collect::<Vec<_>>()
-                    }),
-                );
-            }
-            let json = serde_json::to_string_pretty(&hover).unwrap_or_default();
-            std::fs::write(&path, json)
-                .map_err(|e| LuaError::RuntimeError(format!("write error: {}", e)))?;
-            Ok(())
+            docs::export_hover(&catalog.0, &path).map_err(LuaError::RuntimeError)
         })?,
     )?;
 
@@ -1180,36 +1122,7 @@ pub fn register(lua: &Lua, luna_table: &LuaTable) -> LuaResult<()> {
         "exportSignatures",
         lua.create_function(|_, (catalog_ud, path): (LuaAnyUserData, String)| {
             let catalog = catalog_ud.borrow::<ApiCatalog>()?;
-            let mut sigs: HashMap<String, serde_json::Value> = HashMap::new();
-            for e in &catalog.0 {
-                if !e.parameters.is_empty() {
-                    let params: Vec<serde_json::Value> = e
-                        .parameters
-                        .iter()
-                        .map(|p| {
-                            serde_json::json!({
-                                "label": if p.optional {
-                                    format!("{}?: {}", p.name, p.type_name)
-                                } else {
-                                    format!("{}: {}", p.name, p.type_name)
-                                },
-                                "documentation": p.description
-                            })
-                        })
-                        .collect();
-                    sigs.insert(
-                        e.qualified_name.clone(),
-                        serde_json::json!({
-                            "label": e.qualified_name,
-                            "parameters": params
-                        }),
-                    );
-                }
-            }
-            let json = serde_json::to_string_pretty(&sigs).unwrap_or_default();
-            std::fs::write(&path, json)
-                .map_err(|e| LuaError::RuntimeError(format!("write error: {}", e)))?;
-            Ok(())
+            docs::export_signatures(&catalog.0, &path).map_err(LuaError::RuntimeError)
         })?,
     )?;
 
@@ -1221,79 +1134,7 @@ pub fn register(lua: &Lua, luna_table: &LuaTable) -> LuaResult<()> {
         "exportAll",
         lua.create_function(|_, (catalog_ud, output_dir): (LuaAnyUserData, String)| {
             let catalog = catalog_ud.borrow::<ApiCatalog>()?;
-            std::fs::create_dir_all(&output_dir)
-                .map_err(|e| LuaError::RuntimeError(format!("mkdir error: {}", e)))?;
-            // completions.json
-            let completions: Vec<serde_json::Value> = catalog
-                .0
-                .iter()
-                .map(|e| {
-                    serde_json::json!({
-                        "label": e.name,
-                        "kind": match e.kind.as_str() {
-                            "function" | "method" => "Function",
-                            "type" => "Class",
-                            _ => "Variable"
-                        },
-                        "detail": e.qualified_name,
-                        "documentation": e.description
-                    })
-                })
-                .collect();
-            let path = format!("{}/completions.json", output_dir);
-            std::fs::write(
-                &path,
-                serde_json::to_string_pretty(&completions).unwrap_or_default(),
-            )
-            .map_err(|e| LuaError::RuntimeError(format!("write error: {}", e)))?;
-            // hover.json
-            let mut hover: HashMap<String, serde_json::Value> = HashMap::new();
-            for e in &catalog.0 {
-                hover.insert(
-                    e.qualified_name.clone(),
-                    serde_json::json!({
-                        "name": e.qualified_name,
-                        "description": e.description,
-                        "kind": e.kind
-                    }),
-                );
-            }
-            let path = format!("{}/hover.json", output_dir);
-            std::fs::write(
-                &path,
-                serde_json::to_string_pretty(&hover).unwrap_or_default(),
-            )
-            .map_err(|e| LuaError::RuntimeError(format!("write error: {}", e)))?;
-            // signatures.json
-            let mut sigs: HashMap<String, serde_json::Value> = HashMap::new();
-            for e in &catalog.0 {
-                if !e.parameters.is_empty() {
-                    let params: Vec<serde_json::Value> = e
-                        .parameters
-                        .iter()
-                        .map(|p| {
-                            serde_json::json!({
-                                "label": p.name,
-                                "documentation": p.description
-                            })
-                        })
-                        .collect();
-                    sigs.insert(
-                        e.qualified_name.clone(),
-                        serde_json::json!({
-                            "label": e.qualified_name,
-                            "parameters": params
-                        }),
-                    );
-                }
-            }
-            let path = format!("{}/signatures.json", output_dir);
-            std::fs::write(
-                &path,
-                serde_json::to_string_pretty(&sigs).unwrap_or_default(),
-            )
-            .map_err(|e| LuaError::RuntimeError(format!("write error: {}", e)))?;
-            Ok(())
+            docs::export_all(&catalog.0, &output_dir).map_err(LuaError::RuntimeError)
         })?,
     )?;
 

@@ -120,4 +120,16 @@ impl QualityReport {
     pub fn module_grade(&self, module: &str) -> &'static str {
         quality_grade(self.module_scores.get(module).copied().unwrap_or(0.0))
     }
+
+    /// Convenience constructor: builds a temporary [`Catalog`] from `entries` then calls [`Self::compute`].
+    ///
+    /// # Parameters
+    /// - `entries` — `&[DocEntry]`.
+    ///
+    /// # Returns
+    /// `QualityReport`.
+    pub fn from_entries(entries: &[DocEntry]) -> Self {
+        let catalog = Catalog::from_entries(entries);
+        Self::compute(&catalog)
+    }
 }
