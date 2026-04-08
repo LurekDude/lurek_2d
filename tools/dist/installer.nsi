@@ -19,10 +19,10 @@
 !define APP_PUBLISHER "Luna2D Project"
 !define APP_URL      "https://github.com/yourname/luna2d"
 !define APP_EXE      "luna2d.exe"
-!define APP_ICON     "..\assets\icon.ico"
+!define APP_ICON     "..\..\assets\icon.ico"
 
 ; Output installer filename
-!define OUT_FILE     "..\dist\luna2d-${APP_VERSION}-setup.exe"
+!define OUT_FILE     "..\..\dist\luna2d-${APP_VERSION}-setup.exe"
 
 ; ── NSIS Settings ────────────────────────────────────────────────────────────
 Name                "${APP_NAME} ${APP_VERSION}"
@@ -71,59 +71,56 @@ Section "Engine (required)" SecEngine
     SetOutPath "$INSTDIR"
 
     ; Core binary
-    File "..\build\dist\luna2d.exe"
+    File "..\..\build\dist\luna2d.exe"
 
     ; Engine assets
     SetOutPath "$INSTDIR\assets"
-    File /nonfatal "..\assets\splash.png"
-    File /nonfatal "..\assets\icon.png"
-    File /nonfatal "..\assets\icon.ico"
+    File /nonfatal "..\..\assets\splash.png"
+    File /nonfatal "..\..\assets\icon.png"
+    File /nonfatal "..\..\assets\icon.ico"
 
-    ; Example games
-    SetOutPath "$INSTDIR\examples\hello_world"
-    File "..\examples\hello_world\main.lua"
-    SetOutPath "$INSTDIR\examples\physics_demo"
-    File "..\examples\physics_demo\main.lua"
-    SetOutPath "$INSTDIR\examples\sprites"
-    File "..\examples\sprites\main.lua"
+    ; API example scripts
+    SetOutPath "$INSTDIR\examples"
+    File "..\..\examples\*.lua"
+    File /nonfatal "..\..\examples\README.md"
 
     ; Docs
     SetOutPath "$INSTDIR"
-    File "..\README.md"
-    File "..\LICENSE"
+    File "..\..\README.md"
+    File "..\..\LICENSE"
 
     ; Lunasome standard libraries — install each module subdirectory
     SetOutPath "$INSTDIR\library"
-    File /nonfatal "..\library\README.md"
+    File /nonfatal "..\..\library\README.md"
     SetOutPath "$INSTDIR\library\battle"       ; File /r recurses into subdirs when given a dir path
-    File "..\library\battle\*.lua"
+    File "..\..\library\battle\*.lua"
     SetOutPath "$INSTDIR\library\cardgame"
-    File "..\library\cardgame\*.lua"
+    File "..\..\library\cardgame\*.lua"
     SetOutPath "$INSTDIR\library\combat"
-    File "..\library\combat\*.lua"
+    File "..\..\library\combat\*.lua"
     SetOutPath "$INSTDIR\library\crafting"
-    File "..\library\crafting\*.lua"
+    File "..\..\library\crafting\*.lua"
     SetOutPath "$INSTDIR\library\dialog"
-    File "..\library\dialog\*.lua"
+    File "..\..\library\dialog\*.lua"
     SetOutPath "$INSTDIR\library\doll"
-    File "..\library\doll\*.lua"
+    File "..\..\library\doll\*.lua"
     SetOutPath "$INSTDIR\library\economy"
-    File "..\library\economy\*.lua"
+    File "..\..\library\economy\*.lua"
     SetOutPath "$INSTDIR\library\inventory"
-    File "..\library\inventory\*.lua"
+    File "..\..\library\inventory\*.lua"
     SetOutPath "$INSTDIR\library\item"
-    File "..\library\item\*.lua"
+    File "..\..\library\item\*.lua"
     SetOutPath "$INSTDIR\library\province_map"
-    File "..\library\province_map\*.lua"
+    File "..\..\library\province_map\*.lua"
     SetOutPath "$INSTDIR\library\quest"
-    File "..\library\quest\*.lua"
+    File "..\..\library\quest\*.lua"
     SetOutPath "$INSTDIR\library\stats"
-    File "..\library\stats\*.lua"
+    File "..\..\library\stats\*.lua"
 
     ; API docs (Markdown reference + LuaCATS stubs for IDE autocompletion)
     SetOutPath "$INSTDIR\docs"
-    File /nonfatal "..\docs\API\lua-api.md"
-    File /nonfatal "..\docs\API\luna.lua"
+    File /nonfatal "..\..\docs\API\lua-api.md"
+    File /nonfatal "..\..\docs\API\luna.lua"
     WriteRegStr   HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APP_NAME}" "DisplayName"          "${APP_NAME} ${APP_VERSION}"
     WriteRegStr   HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APP_NAME}" "DisplayVersion"       "${APP_VERSION}"
     WriteRegStr   HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APP_NAME}" "Publisher"            "${APP_PUBLISHER}"
@@ -140,9 +137,16 @@ Section "Engine (required)" SecEngine
     ; Write uninstaller
     WriteUninstaller "$INSTDIR\uninstall.exe"
 
-    ; Add to PATH (current user)
-    EnVar::SetHKCU
-    EnVar::AddValue "PATH" "$INSTDIR"
+    ; Add $INSTDIR to user PATH via registry (append only if not already present)
+    !include "LogicLib.nsh"
+    ReadRegStr $1 HKCU "Environment" "Path"
+    ${If} $1 == ""
+        WriteRegStr HKCU "Environment" "Path" "$INSTDIR"
+    ${Else}
+        WriteRegStr HKCU "Environment" "Path" "$1;$INSTDIR"
+    ${EndIf}
+    ; Broadcast WM_SETTINGCHANGE so running shells pick up the new PATH
+    SendMessage ${HWND_BROADCAST} ${WM_SETTINGCHANGE} 0 "STR:Environment" /TIMEOUT=5000
 
 SectionEnd
 
@@ -185,8 +189,8 @@ SectionEnd
 ; ── Uninstall Section ─────────────────────────────────────────────────────────
 Section "Uninstall"
     ; Remove from PATH
-    EnVar::SetHKCU
-    EnVar::DeleteValue "PATH" "$INSTDIR"
+    ; Remove $INSTDIR from user PATH via PowerShell
+    nsExec::ExecToLog 'powershell -WindowStyle Hidden -Command "[Environment]::SetEnvironmentVariable(\"Path\",([Environment]::GetEnvironmentVariable(\"Path\",\"User\") -split \";\" | Where-Object {$$_ -ne \"$INSTDIR\"}) -join \";\",\"User\")"'
 
     ; Remove files
     Delete "$INSTDIR\luna2d.exe"

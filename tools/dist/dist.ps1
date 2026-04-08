@@ -1,4 +1,4 @@
-#Requires -Version 5.1
+﻿#Requires -Version 5.1
 <#
 .SYNOPSIS
     Build and package Luna2D for Windows distribution.
@@ -38,7 +38,7 @@ param(
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
-$WorkspaceRoot = Split-Path $PSScriptRoot -Parent
+$WorkspaceRoot = Split-Path (Split-Path $PSScriptRoot -Parent) -Parent
 if (-not $OutDir) { $OutDir = Join-Path $WorkspaceRoot 'dist' }
 
 $Version       = "0.4.0"
@@ -48,18 +48,18 @@ $ZipPath       = Join-Path $OutDir "$ArchName.zip"
 # dist profile (opt-level=z + fat LTO) lives in build/dist/ not build/release/
 $BinarySource  = Join-Path $WorkspaceRoot 'build\dist\luna2d.exe'
 
-# ── Helpers ───────────────────────────────────────────────────────────────────
+# -- Helpers -------------------------------------------------------------------
 function Write-Step([string]$Msg) { Write-Host "[dist] $Msg" -ForegroundColor Cyan }
 function Write-OK  ([string]$Msg) { Write-Host "[ OK ] $Msg" -ForegroundColor Green }
 function Write-Fail([string]$Msg) { Write-Host "[FAIL] $Msg" -ForegroundColor Red; exit 1 }
 
-# ── 0. Verify workspace ───────────────────────────────────────────────────────
+# -- 0. Verify workspace -------------------------------------------------------
 if (-not (Test-Path (Join-Path $WorkspaceRoot 'Cargo.toml'))) {
     Write-Fail "Must be run from the luna2d workspace root."
 }
 
-# ── 1. Verify branding assets ────────────────────────────────────────────────
-Write-Step "Checking branding assets …"
+# -- 1. Verify branding assets ------------------------------------------------
+Write-Step "Checking branding assets ..."
 $SplashPng = Join-Path $WorkspaceRoot 'assets\splash.png'
 $IconPng   = Join-Path $WorkspaceRoot 'assets\icon.png'
 $IconIco   = Join-Path $WorkspaceRoot 'assets\icon.ico'
@@ -74,13 +74,13 @@ if (-not (Test-Path $IconIco)) {
     Write-Fail "Missing assets\icon.ico. Restore the prebuilt raster asset or rebuild it from assets\svg\col_icon.png."
 }
 
-# ── 2. Release build ──────────────────────────────────────────────────────────
+# -- 2. Release build ----------------------------------------------------------
 if (-not $SkipBuild) {
-    Write-Step "Building Luna2D (dist — size-optimised) — this may take several minutes …"
+    Write-Step "Building Luna2D (dist -- size-optimised) -- this may take several minutes ..."
     Push-Location $WorkspaceRoot
     try {
         # --profile dist uses opt-level=z + fat LTO for the smallest possible binary.
-        # Expect 15–30% smaller than --release at the cost of a longer link step.
+        # Expect 15-30% smaller than --release at the cost of a longer link step.
         cargo build --profile dist 2>&1 | ForEach-Object { Write-Host "    $_" }
         if ($LASTEXITCODE -ne 0) { Write-Fail "cargo build --profile dist failed." }
     } finally { Pop-Location }
@@ -93,8 +93,8 @@ if (-not (Test-Path $BinarySource)) {
     Write-Fail "Binary not found at '$BinarySource'. Run without -SkipBuild."
 }
 
-# ── 3. Assemble package directory ────────────────────────────────────────────
-Write-Step "Assembling distribution package at '$PackageDir' …"
+# -- 3. Assemble package directory --------------------------------------------
+Write-Step "Assembling distribution package at '$PackageDir' ..."
 if (Test-Path $PackageDir) { Remove-Item $PackageDir -Recurse -Force }
 New-Item -ItemType Directory -Path $PackageDir -Force | Out-Null
 
@@ -104,13 +104,13 @@ Copy-Item $BinarySource -Destination $DestBinary -Force
 $SizeBefore = [math]::Round((Get-Item $DestBinary).Length / 1MB, 2)
 Write-OK "Copied luna2d.exe ($SizeBefore MB)"
 
-# ── Optional UPX compression ──────────────────────────────────────────────────
-# UPX packs the executable using LZMA; typical result: 40–55% of original size.
+# -- Optional UPX compression --------------------------------------------------
+# UPX packs the executable using LZMA; typical result: 40-55% of original size.
 # Install: https://upx.github.io/  (place upx.exe anywhere on PATH)
 # Caveats: adds ~100 ms startup decompression; some AV scanners flag UPX'd bins.
 $upx = Get-Command upx -ErrorAction SilentlyContinue
 if ($upx) {
-    Write-Step "UPX found — compressing luna2d.exe …"
+    Write-Step "UPX found -- compressing luna2d.exe ..."
     & upx --best --lzma $DestBinary 2>&1 | ForEach-Object { Write-Host "    $_" }
     if ($LASTEXITCODE -eq 0) {
         $SizeAfter = [math]::Round((Get-Item $DestBinary).Length / 1MB, 2)
@@ -119,7 +119,7 @@ if ($upx) {
         Write-Host "[warn] UPX returned non-zero; binary unchanged." -ForegroundColor Yellow
     }
 } else {
-    Write-Host "[dist] UPX not found on PATH — skipping compression (add upx to PATH to enable)." -ForegroundColor DarkGray
+    Write-Host "[dist] UPX not found on PATH -- skipping compression (add upx to PATH to enable)." -ForegroundColor DarkGray
 }
 
 # Copy lunec.bat launcher (no-console shortcut)
@@ -177,14 +177,14 @@ foreach ($f in @('README.md', 'LICENSE')) {
 
 # Write how-to-run
 $HowTo = @"
-LUNA2D $Version — Windows Portable Distribution
+LUNA2D $Version -- Windows Portable Distribution
 =================================================
 
 How to run a game
 -----------------
-  luna2d.exe  my_game\     (with console window — for developers)
-  lunec.bat   my_game\     (no console window  — for end users)
-  lunec.lnk                (shortcut with Luna2D icon — drag-drop a game folder)
+  luna2d.exe  my_game\     (with console window -- for developers)
+  lunec.bat   my_game\     (no console window  -- for end users)
+  lunec.lnk                (shortcut with Luna2D icon -- drag-drop a game folder)
 
 How to show the splash screen (no game)
 ----------------------------------------
@@ -193,7 +193,7 @@ How to show the splash screen (no game)
 
 Bundled examples
 ----------------
-  examples\   — single-file API usage scripts (one per luna.* module)
+  examples\   -- single-file API usage scripts (one per luna.* module)
 
   Use any example as a starting point:
     lunec.bat examples\physics
@@ -210,8 +210,8 @@ Lunasome standard libraries (library\)
 
 API Reference (docs\)
 ----------------------
-  docs\lua-api.md   — luna.* Lua API reference (Markdown)
-  docs\luna.lua     — LuaCATS type stubs for IDE autocompletion
+  docs\lua-api.md   -- luna.* Lua API reference (Markdown)
+  docs\luna.lua     -- LuaCATS type stubs for IDE autocompletion
                       (copy to your project root or configure in .luarc.json)
 
 Writing your own game
@@ -226,23 +226,23 @@ Full docs & source:  https://github.com/yourname/luna2d
 Set-Content -Path (Join-Path $PackageDir 'HOW-TO-RUN.txt') -Value $HowTo -Encoding UTF8
 Write-OK "Written HOW-TO-RUN.txt"
 
-# ── 3b. Create lunec.lnk shortcut with Luna2D icon ───────────────────────────
+# -- 3b. Create lunec.lnk shortcut with Luna2D icon ---------------------------
 $IcoPath = Join-Path $PackageDir 'assets\icon.ico'
 if (Test-Path $IcoPath) {
-    Write-Step "Creating lunec.lnk shortcut with Luna2D icon …"
+    Write-Step "Creating lunec.lnk shortcut with Luna2D icon ..."
     $ws  = New-Object -ComObject WScript.Shell
     $lnk = $ws.CreateShortcut((Join-Path $PackageDir 'lunec.lnk'))
     $lnk.TargetPath       = Join-Path $PackageDir 'lunec.bat'
     $lnk.WorkingDirectory = $PackageDir
     $lnk.IconLocation     = "$IcoPath,0"
-    $lnk.Description      = "Luna2D — launch game without console window"
+    $lnk.Description      = "Luna2D -- launch game without console window"
     $lnk.WindowStyle      = 1
     $lnk.Save()
     Write-OK "Created lunec.lnk (double-click to run a game, drag-and-drop supported)"
 }
 
-# ── 4. Create ZIP ─────────────────────────────────────────────────────────────
-Write-Step "Creating ZIP archive at '$ZipPath' …"
+# -- 4. Create ZIP -------------------------------------------------------------
+Write-Step "Creating ZIP archive at '$ZipPath' ..."
 if (Test-Path $ZipPath) { Remove-Item $ZipPath -Force }
 
 # Compress-Archive requires PowerShell 5+
@@ -250,7 +250,7 @@ Compress-Archive -Path $PackageDir -DestinationPath $ZipPath -CompressionLevel O
 $ZipSizeKB = [math]::Round((Get-Item $ZipPath).Length / 1024)
 Write-OK "ZIP created ($ZipSizeKB KB) → $ZipPath"
 
-# ── 5. Summary ────────────────────────────────────────────────────────────────
+# -- 5. Summary ----------------------------------------------------------------
 Write-Host ""
 Write-OK "Distribution package ready:"
 Write-Host "  Folder : $PackageDir" -ForegroundColor White
