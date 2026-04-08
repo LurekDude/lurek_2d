@@ -196,7 +196,7 @@ Note: counts reflect the active (compiled) surface only. The disabled `yaml.rs` 
 |--------------|--------------|------------------------------------------------------------------|
 | `math`       | Imports from | Baseline leaf — `serial` has no direct math dependency.          |
 | `engine`     | Imports from | Uses `log_messages` constants (`SR01_JSON_OK`, `SR03_JSON_ENC`). |
-| `data`       | Similar      | `data` owns binary formats (pack/unpack, compression, hashing). `serial` owns text formats (JSON, TOML, CSV). |
+| `data`       | Similar      | `data` owns binary formats (pack/unpack, compression, hashing) and exposes `parseToml`/`encodeToml` for lightweight TOML conversion in binary pipelines. `serial` (`luna.codec`) is the canonical text-format entry point — use it for format-agnostic code that may need JSON, TOML, or CSV interchangeably on the same code path. |
 | `savegame`   | Related      | `savegame` orchestrates save/load; may use `serial` for structured data persistence. |
 | `filesystem` | Related      | `filesystem` provides file I/O; `serial` provides string parsing. Combine them for file-based config. |
 | `lua_api`    | Imported by  | `serial_api.rs` binds the public API to `luna.codec.*`.         |

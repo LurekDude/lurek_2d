@@ -18,6 +18,17 @@ Always update this file **in the same commit** as the change. Use the commit typ
 
 ---
 
+## [0.6.2] — 2026-04-08
+
+### Fixed
+- **`src/lua_api/log_api.rs` `pub fn register` docstring** — mixed `# Errors` + `@param`/`@return` inline tags replaced with the gold-standard `# Parameters` format used by `timer_api.rs`, `devtools_api.rs`, and `automation_api.rs`.
+- **`src/debugbridge/AGENT.md` missing Ownership Rule** — the three-channel logging table (`debugbridge` / `log` / `devtools`) that lives in `specs/debugbridge.md` was absent from the AGENT.md. Now added so developers reading the short module overview see the ownership boundary without having to open the full spec.
+
+### Changed
+- **`specs/data.md` References** — added `serial` row clarifying the TOML duplication: `luna.data.parseToml` is for lightweight TOML access inside a binary data pipeline; `luna.codec.fromToml` is the canonical entry point for format-agnostic code.
+- **`specs/serial.md` References** — updated `data` row to explain the TOML overlap and when to choose each API.
+- **`specs/animation.md` Similar modules** — added `spine` reference explaining the frame-based vs skeletal-animation distinction; previously only mentioned `particle` and `graphics::sprite`.
+
 ## [0.6.1] — 2026-04-08
 
 ### Fixed

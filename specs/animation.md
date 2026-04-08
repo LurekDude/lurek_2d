@@ -257,7 +257,7 @@ end
 | `lua_api`  | Imported by  | `animation_api.rs` wraps `Animation` as `LuaAnimation` UserData.     |
 | `graphics` | Related      | Not a code dependency. Scripts use animation quads with `luna.gfx.draw()` / `drawq()`. |
 
-**Similar modules**: `animation` is the only sprite animation module. It is distinct from `particle` (which handles emitter-based particle effects, not frame-based sprite animation) and from `graphics::sprite` (which stores sprite draw state but has no timeline or clip logic).
+**Similar modules**: `animation` handles frame-based sprite animation (sequences of source-rect quads). For skeletal/bone-hierarchy animation — where joints are driven by transforms rather than discrete sprite frames — use `spine` instead. `animation` is also distinct from `particle` (emitter-based particle effects) and from `graphics::sprite` (sprite draw state without timeline or clip logic).
 
 ## Notes
 

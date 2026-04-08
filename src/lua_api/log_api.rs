@@ -10,11 +10,9 @@ use crate::log as log_domain;
 
 /// Registers the `luna.log.*` namespace into the shared `luna` table.
 ///
-/// # Errors
-/// Returns a `LuaError` if any function or table registration fails.
-/// @param lua : &Lua
-/// @param luna : &LuaTable
-/// @return LuaResult<()>
+/// # Parameters
+/// - `lua` — `&Lua`.
+/// - `luna` — `&LuaTable`.
 pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
     let log_table = lua.create_table()?;
 

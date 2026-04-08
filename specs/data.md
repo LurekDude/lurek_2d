@@ -315,8 +315,7 @@ end
 |--------|-----------------|
 | `image` | `ImageData` is a pixel buffer (RGBA8) for graphics; `ByteData` is raw bytes with no pixel semantics |
 | `sound` | `SoundData` is interleaved PCM audio samples; `ByteData` is format-agnostic binary data |
-| `filesystem` | Filesystem handles file I/O on disk; `data` processes in-memory byte buffers |
-
+| `filesystem` | Filesystem handles file I/O on disk; `data` processes in-memory byte buffers || `serial` | Both expose TOML ↔ Lua table conversion. Use `luna.data.parseToml` / `encodeToml` for simple one-off TOML access inside a binary data pipeline. Use `luna.codec.fromToml` / `toToml` when writing format-agnostic code that needs to handle JSON, TOML, or CSV interchangeably on the same code path. |
 ## Notes
 
 - **Two pack systems**: The module deliberately ships two binary pack APIs. `pack.rs` (LÖVE2D-compatible) uses terse single-character format strings for familiarity with existing Lua game code. `bin_pack.rs` (Luna2D-native) uses space-separated named tokens for readability. Both produce `ByteData` output.
