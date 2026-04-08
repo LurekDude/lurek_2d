@@ -18,6 +18,47 @@ Always update this file **in the same commit** as the change. Use the commit typ
 
 ---
 
+## [0.6.12] — 2026-04-08
+
+### Fixed
+- **`src/lua_api/data_api.rs`** — removed prohibited `# Parameters` rustdoc section from `register()` (D-08 audit finding); removed `LuaDataView` struct definition and `impl LuaUserData` block (B-02/B-03 audit findings) — both now live in `src/data/dataview.rs`.
+- **`src/lua_api/dataframe_api.rs`** — removed prohibited `# Parameters` section from `register()` (D-08 audit finding).
+- **`src/lua_api/devtools_api.rs`** — removed prohibited `# Parameters` and `# Returns` sections from `register()` (D-08 audit finding).
+- **`src/data/dataview.rs`** — added `LuaDataView` struct and `impl LuaUserData` (moved from `src/lua_api/data_api.rs`; domain now owns its own Lua userdata binding).
+- **`src/data/mod.rs`** — exported `LuaDataView` from the domain module.
+- **`src/data/AGENT.md`** — added missing `mod.rs` row to Source Files table (A-04 audit finding).
+- **`src/debugbridge/AGENT.md`** — corrected stale `Rust Tests: —` to `tests/rust/unit/debugbridge_tests.rs` (A-02 audit finding); removed non-canonical `## Ownership Rule` section — detail moved to specs (A-06 audit finding).
+- **`src/devtools/AGENT.md`** — removed non-canonical `## New Lua API (v0.5.x)` section — detail belongs in specs (A-06 audit finding).
+- **`src/docs/AGENT.md`** — corrected stale `Rust Tests: —` to `tests/rust/unit/docs_tests.rs` (A-02 audit finding); removed non-canonical `## Key Lua API (additions)` section (A-06 audit finding).
+
+### Added
+- **`wiki/Data-API.md`** — new wiki page for `luna.data` (W-05 audit finding).
+- **`wiki/Dataframe-API.md`** — new wiki page for `luna.dataframe` (W-05 audit finding).
+- **`wiki/Debugbridge-API.md`** — new wiki page for `luna.debugbridge` (W-05 audit finding).
+- **`wiki/Devtools-API.md`** — new wiki page for `luna.devtools` (W-05 audit finding).
+- **`wiki/Docs-API.md`** — new wiki page for `luna.docs` (W-05 audit finding).
+
+---
+
+## [0.6.11] — 2026-04-08
+
+### Fixed
+- **`src/lua_api/animation_api.rs`** — `register()` docstring changed from stale `luna.tween` to correct `luna.animation`; removed prohibited `# Parameters` rustdoc section (D-06, D-08 audit findings).
+- **`src/lua_api/compute_api.rs`** — module-level `//!` header and `register()` docstring updated from stale `luna.gpu` to correct `luna.compute`; removed prohibited `# Parameters` section from `register()` (D-06, D-08 audit findings).
+- **`src/lib.rs`** — two stale `(luna.gpu)` references updated to `(luna.compute)` in crate-level docs (D-06 finding).
+- **`src/compute/array.rs`** — four production-code `.unwrap()` calls in `get_f64()` and `get_i32()` replaced with `.expect("byte slice invariant: offset validated by flat_index")` (Q-04 audit finding).
+- **`src/audio/AGENT.md`** — added missing `mod.rs` entry to Source Files table (A-04 audit finding).
+- **`src/camera/AGENT.md`** — added missing `mod.rs` entry to Source Files table (A-04 audit finding).
+- **`src/ai/AGENT.md`** — Rust Tests row updated from deprecated `tests/rust/game/ai_tests.rs` to canonical `tests/rust/unit/ai_tests.rs` (T-01 audit finding).
+- **`tests/rust/unit/ai_tests.rs`** — ai integration tests migrated from `tests/rust/game/` to canonical `tests/rust/unit/` location (T-01 audit finding).
+- **`Cargo.toml`** — `ai_tests` `[[test]]` entry moved to unit test section with updated path `tests/rust/unit/ai_tests.rs`.
+
+### Added
+- **`wiki/Compute-API.md`** — new wiki page for the `luna.compute` module with overview, full API reference table, dtype table, and a procedural terrain example (W-05 audit finding).
+
+### Changed
+- **`.github/prompts/audit-module.prompt.md`** — Fix Workflow section updated: the fix pass now runs automatically after every audit without requiring a separate user request; post-fix `cargo check` and final summary are now mandatory.
+
 ## [0.6.10] — 2026-04-08
 
 ### Changed

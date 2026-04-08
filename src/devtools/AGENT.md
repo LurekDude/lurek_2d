@@ -34,15 +34,6 @@ This module is **pure Rust** with no mlua dependency; all Lua plumbing lives in 
 | `watcher.rs`      | `FileWatcher` — path modification time polling for hot-reload detection         |
 | `mod.rs`          | Re-exports all public types                                                     |
 
-## New Lua API (v0.5.x)
-
-| Function | Signature | Description |
-|---|---|---|
-| `exposeWatch` | `(name, getter, category?) → id` | Registers a named getter function |
-| `removeWatch` | `(id) → bool` | Removes a watch by id |
-| `getWatches` | `() → table` | Samples all watches → `{name,category,value}[]` |
-| `snapshot` | `() → table` | Full diagnostic snapshot (watches + frameStats + profile + log) |
-
 ## Full Specification
 
 See [`specs/devtools.md`](../../../specs/devtools.md) for full architecture, type details, Lua API, examples, and notes.

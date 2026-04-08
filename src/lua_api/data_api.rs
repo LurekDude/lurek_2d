@@ -7,115 +7,8 @@ use std::rc::Rc;
 use std::sync::Arc;
 
 use crate::data::{
-    self, BinValue, ByteData, CompressFormat, DataView, EncodeFormat, HashAlgorithm, PackValue,
+    self, BinValue, ByteData, CompressFormat, DataView, EncodeFormat, HashAlgorithm, LuaDataView, PackValue,
 };
-
-// -------------------------------------------------------------------------------
-// LuaDataView UserData
-// -------------------------------------------------------------------------------
-
-/// Lua-side wrapper around [`DataView`].
-pub struct LuaDataView {
-    inner: DataView,
-}
-
-impl LuaUserData for LuaDataView {
-    fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
-
-        // -- getUInt8 --
-        /// Reads an unsigned 8-bit integer at the given offset.
-        /// @param offset : integer
-        /// @return integer
-        methods.add_method("getUInt8", |_, this, offset: usize| {
-            this.inner
-                .get_u8(offset)
-                .map(|v| v as i64)
-                .map_err(LuaError::RuntimeError)
-        });
-
-        // -- getInt8 --
-        /// Reads a signed 8-bit integer at the given offset.
-        /// @param offset : integer
-        /// @return integer
-        methods.add_method("getInt8", |_, this, offset: usize| {
-            this.inner
-                .get_i8(offset)
-                .map(|v| v as i64)
-                .map_err(LuaError::RuntimeError)
-        });
-
-        // -- getInt16 --
-        /// Reads a signed 16-bit integer at the given offset.
-        /// @param offset : integer
-        /// @return integer
-        methods.add_method("getInt16", |_, this, offset: usize| {
-            this.inner
-                .get_i16(offset)
-                .map(|v| v as i64)
-                .map_err(LuaError::RuntimeError)
-        });
-
-        // -- getUInt16 --
-        /// Reads an unsigned 16-bit integer at the given offset.
-        /// @param offset : integer
-        /// @return integer
-        methods.add_method("getUInt16", |_, this, offset: usize| {
-            this.inner
-                .get_u16(offset)
-                .map(|v| v as i64)
-                .map_err(LuaError::RuntimeError)
-        });
-
-        // -- getInt32 --
-        /// Reads a signed 32-bit integer at the given offset.
-        /// @param offset : integer
-        /// @return integer
-        methods.add_method("getInt32", |_, this, offset: usize| {
-            this.inner
-                .get_i32(offset)
-                .map(|v| v as i64)
-                .map_err(LuaError::RuntimeError)
-        });
-
-        // -- getUInt32 --
-        /// Reads an unsigned 32-bit integer at the given offset.
-        /// @param offset : integer
-        /// @return integer
-        methods.add_method("getUInt32", |_, this, offset: usize| {
-            this.inner
-                .get_u32(offset)
-                .map(|v| v as i64)
-                .map_err(LuaError::RuntimeError)
-        });
-
-        // -- getFloat --
-        /// Reads a 32-bit float at the given offset.
-        /// @param offset : integer
-        /// @return number
-        methods.add_method("getFloat", |_, this, offset: usize| {
-            this.inner
-                .get_f32(offset)
-                .map(|v| v as f64)
-                .map_err(LuaError::RuntimeError)
-        });
-
-        // -- getDouble --
-        /// Reads a 64-bit float at the given offset.
-        /// @param offset : integer
-        /// @return number
-        methods.add_method("getDouble", |_, this, offset: usize| {
-            this.inner.get_f64(offset).map_err(LuaError::RuntimeError)
-        });
-
-        // -- getSize --
-        /// Returns the size of this view in bytes.
-        /// @return integer
-        methods.add_method("getSize", |_, this, ()| {
-            Ok(this.inner.get_size() as i64)
-        });
-
-    }
-}
 
 // -------------------------------------------------------------------------------
 // Pack conversion helpers
@@ -191,11 +84,6 @@ fn bin_values_to_lua(lua: &Lua, vals: Vec<BinValue>) -> LuaResult<Vec<LuaValue<'
 // -------------------------------------------------------------------------------
 
 /// Registers the `luna.data` API table with the Lua VM.
-///
-/// # Parameters
-/// - `lua` — `&Lua`.
-/// - `luna` — `&LuaTable`.
-/// - `_state` — `Rc<RefCell<SharedState>>`.
 pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) -> LuaResult<()> {
     let tbl = lua.create_table()?;
 
@@ -364,7 +252,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
                 let sz = size.unwrap_or_else(|| total.saturating_sub(off));
                 let dv =
                     DataView::new_slice(bytes, off, sz).map_err(LuaError::RuntimeError)?;
-                lua.create_userdata(LuaDataView { inner: dv })
+                lua.create_userdata(LuaDataView::new(dv))
             },
         )?,
     )?;

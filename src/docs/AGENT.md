@@ -6,7 +6,7 @@
 | **Status**       | Implemented — Full                                     |
 | **Lua API**      | `luna.docs`                                            |
 | **Source**       | `src/docs/`                                            |
-| **Rust Tests**   | —                                                      |
+| **Rust Tests**   | `tests/rust/unit/docs_tests.rs`                        |
 | **Lua Tests**    | `tests/lua/unit/test_docs.lua`                         |
 | **Architecture** | —                                                      |
 
@@ -28,17 +28,6 @@ The `docs` module provides API documentation management, runtime reflection, and
 | `schema.rs`    | `Schema`, `FieldRule`, `FieldType`, `SchemaError`, `SchemaResult` — data validation |
 | `export.rs`    | `export_all`, `export_completions`, `export_hover`, `export_signatures`          |
 | `mod.rs`       | Re-exports all public types                                                       |
-
-## Key Lua API (additions)
-
-| Function | Signature | Description |
-|---|---|---|
-| `schema` | `(rules, name?) → Schema` | Creates a data-validation schema |
-| `Schema:validate` | `(data) → ok, errors` | Validates a table; returns bool + error list |
-| `Schema:check` | `(data) → bool` | Boolean validation    |
-| `Schema:assert` | `(data)` | Throws on failure |
-| `reflectLive` | `(ns?) → table` | Walks live `luna.*` table |
-| `reflectTable` | `(tbl, name?) → table` | Reflects any Lua table |
 
 ## Full Specification
 

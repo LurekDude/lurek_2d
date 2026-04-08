@@ -28,6 +28,7 @@ pack/unpack systems — all exposed to Lua scripts through the `luna.data` names
 | `hash.rs` | Cryptographic hash functions — MD5, SHA-1, SHA-256, SHA-512 — returning hex-string digests. |
 | `pack.rs` | LÖVE2D-compatible binary pack/unpack with single-character format strings (`<`, `>`, `b`/`B`, `h`/`H`, `i`/`I`, `l`/`L`, `f`, `d`, `s`, `z`, `x`). |
 | `toml_convert.rs` | TOML parsing (`str → toml::Value`) and encoding (`toml::Value → str`) via the `toml` crate. |
+| `mod.rs` | Re-exports all public types. |
 
 ## Full Specification
 

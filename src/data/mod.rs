@@ -25,7 +25,7 @@ pub use bin_pack::{
 };
 pub use byte_data::ByteData;
 pub use compress::{compress, decompress, CompressFormat};
-pub use dataview::DataView;
+pub use dataview::{DataView, LuaDataView};
 pub use encode::{decode, encode, EncodeFormat};
 pub use hash::{hash, HashAlgorithm};
 pub use pack::{get_packed_size, pack, unpack, PackValue};

@@ -78,14 +78,6 @@ fn zone_to_table<'a>(lua: &'a Lua, zone: &ProfileZone) -> LuaResult<LuaTable<'a>
 // ---------------------------------------------------------------------------
 
 /// Registers `luna.devtools.*`.
-///
-/// # Parameters
-/// - `lua` — `&Lua`.
-/// - `luna` — `&LuaTable`.
-/// - `_state` — `Rc<RefCell<SharedState>>`.
-///
-/// # Returns
-/// `LuaResult<()>`.
 pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) -> LuaResult<()> {
     let dt = lua.create_table()?;
     let shared = Rc::new(RefCell::new(DevtoolsShared::new()));
