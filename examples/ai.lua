@@ -2,6 +2,7 @@
 -- luna.ai — Game AI subsystems: AIWorld, FSM, Behavior Trees, Steering,
 -- Q-Learning, Utility AI, GOAP, Influence Maps, Squads, and Command Queues.
 -- All luna.ai API methods demonstrated with code and comments.
+-- This file is documentation code, not a runnable game.
 
 -- ── AIWorld ───────────────────────────────────────────────────────────────────
 
@@ -322,3 +323,285 @@ local busy = cmdq:hasCommands()
 
 -- clearCommands()
 cmdq:clearCommands()
+
+-- ─── AIWorld ──────────────────────────────────────────────────────────────────────────
+-- Type-identity methods on AIWorld — use when a shared function receives any AI
+-- container object and needs to branch on type at runtime.
+
+local world_type = world:type()          -- "AIWorld"
+local world_is   = world:typeOf("AIWorld")  -- true
+
+-- ─── Agent ────────────────────────────────────────────────────────────────────────────
+-- Type-identity methods on Agent — complement getName/getPosition; use when an
+-- event callback receives an unknown AI object and must guard on type.
+
+local a_type = a:type()         -- "Agent"
+local a_is   = a:typeOf("Agent")  -- true
+
+-- ─── BTNode ───────────────────────────────────────────────────────────────────────────
+-- Low-level BTNode introspection and mutation — build custom composite wrappers
+-- and hot-edit tree structure without rebuilding from scratch each frame.
+
+local child_count = btnode:getChildCount()   -- integer: number of direct children
+local rep_count   = btnode:getCount()        -- integer: repeat budget (0 = infinite)
+local node_kind   = btnode:getNodeType()     -- "Repeater" | "Sequence" | "Leaf" | …
+
+-- reset() clears all running-child bookmarks and repeater iteration counters;
+-- call before re-ticking a cached tree at the start of a new decision cycle.
+btnode:reset()
+
+-- setChild(node) replaces the single wrapped child of a decorator node
+-- (Invert / Repeat / Delay).  Pass btroot (the root Sequence defined above) to
+-- make this decorator wrap the entire subtree.
+btnode:setChild(btroot)      -- decorator now wraps the root Sequence
+
+-- setCount(n) changes the repeat budget on an existing Repeater node.
+btnode:setCount(3)           -- repeat up to 3 times, then propagate failure
+
+-- Parallel policy — set BOTH axes explicitly; they are independent of each other.
+-- setFailurePolicy: "any" → abort as soon as one child fails
+--                  "all" → only fail once ALL children have failed
+-- setSuccessPolicy: "all" → require every child to succeed before succeeding
+--                  "any" → succeed the moment any one child succeeds
+btnode:setFailurePolicy("any")    -- early abort on first child failure
+btnode:setSuccessPolicy("all")    -- unanimous success required
+
+local btnode_type = btnode:type()            -- "BTNode"
+local btnode_is   = btnode:typeOf("BTNode")  -- true
+
+-- ─── BehaviorTree ─────────────────────────────────────────────────────────────────
+-- Read the result of the last tick without re-ticking — lets a StateMachine
+-- transition condition poll the tree status each frame at zero cost.
+
+local last_status = behaviortree:getLastStatus()  -- "success" | "failure" | "running"
+
+local bt_type = behaviortree:type()               -- "BehaviorTree"
+local bt_is   = behaviortree:typeOf("BehaviorTree")  -- true
+
+-- ─── Blackboard ───────────────────────────────────────────────────────────────────────
+-- Key-management and introspection for the per-agent Blackboard — complement
+-- setNumber/getString/setBool; guard optional reads with has() to avoid nil.
+
+local has_last_x = blackboard:has("last_known_x")  -- bool: true if key was written
+local keys = blackboard:getKeys()   -- { "enemy_visible", "last_known_x", … }
+local sz   = blackboard:getSize()   -- integer: total key count
+
+-- Surgically erase one key without wiping the rest of the board.
+blackboard:clear("enemy_visible")
+
+local bb_type = blackboard:type()               -- "Blackboard"
+local bb_is   = blackboard:typeOf("Blackboard") -- true
+
+-- ─── CommandQueue ─────────────────────────────────────────────────────────────────
+-- Queue-inspection and mid-flight cancellation — the core primitive for RTS
+-- interrupt patterns (e.g. a new attack order cancels an ongoing patrol leg).
+
+local q_count = cmdq:getCount()    -- integer: commands still queued
+local q_empty = cmdq:isEmpty()     -- true when no commands remain
+
+-- getCurrentType and getCurrentTarget peek at the front command without
+-- consuming it; both return nil when the queue is empty.
+local cur_type   = cmdq:getCurrentType()    -- "moveTo" | "attack" | … | nil
+local cx, cy     = cmdq:getCurrentTarget()  -- world-space (x, y) or nil
+
+-- cancelCurrent() aborts the front command only if it was pushed as
+-- interruptible — non-interruptible commands (e.g. "attack") are left intact.
+cmdq:cancelCurrent()
+
+-- clear() discards ALL pending commands — use on agent death or when the
+-- player issues a "halt all units" order.
+cmdq:clear()
+
+local cq_type = cmdq:type()                -- "CommandQueue"
+local cq_is   = cmdq:typeOf("CommandQueue")  -- true
+
+-- ─── GOAPPlanner ──────────────────────────────────────────────────────────────────
+-- Supplemental count accessors — useful in debug UI panels that list the full
+-- goal and action inventory, and in unit-test assertions.
+
+local n_actions = goapplanner:getActionCount()  -- integer: registered action count
+local n_goals   = goapplanner:getGoalCount()    -- integer: registered goal count
+
+local goap_type = goapplanner:type()                 -- "GOAPPlanner"
+local goap_is   = goapplanner:typeOf("GOAPPlanner")  -- true
+
+-- ─── InfluenceMap ─────────────────────────────────────────────────────────────────
+-- Bulk-clear, per-frame decay, and grid-dimension accessors — building blocks
+-- for dynamic threat maps that reset at wave boundaries and fade over time.
+
+-- Zero all layers simultaneously — use at wave-start or level-load.
+influencemap:clearAll()
+
+-- Zero a single named layer while leaving all others intact.
+influencemap:clearLayer("threat")
+
+-- Multiply every cell by the decay factor each frame so that stale influence
+-- fades naturally rather than persisting until it is explicitly cleared.
+influencemap:decay("threat", 0.95)
+
+-- Grid dimensions for overlay rendering or manual cell-iteration loops.
+local cell_sz = influencemap:getCellSize()  -- world units per cell (e.g. 20)
+local grid_w  = influencemap:getWidth()     -- column count
+local grid_h  = influencemap:getHeight()    -- row count
+
+-- Locate the hottest and coldest cells; useful for directing units toward the
+-- highest-threat position or placing spawn points at the safest location.
+local max_xy = influencemap:getMaxPosition("threat")  -- {x, y} world pos of highest-influence cell
+local min_xy = influencemap:getMinPosition("threat")  -- {x, y} world pos of lowest-influence cell
+
+-- Guard before accessing a layer whose existence is not guaranteed.
+local has_threat = influencemap:hasLayer("threat")  -- bool
+
+local im_type = influencemap:type()                -- "InfluenceMap"
+local im_is   = influencemap:typeOf("InfluenceMap")  -- true
+
+-- ─── QLearner ─────────────────────────────────────────────────────────────────────────
+-- Hyperparameter accessors, episode lifecycle, Q-value inspection, and JSON
+-- serialisation — together they enable saving and restoring a trained agent.
+
+-- Read back current hyperparameters.
+local alpha   = qlearner:getLearningRate()      -- number (e.g. 0.1)
+local gamma   = qlearner:getDiscountFactor()    -- number (e.g. 0.95)
+local epsilon = qlearner:getExplorationRate()   -- current ε
+local e_decay = qlearner:getExplorationDecay()  -- ε multiplier applied per episode
+
+-- Override hyperparameters at runtime (curriculum schedules, annealing).
+qlearner:setDiscountFactor(0.99)
+qlearner:setExplorationRate(0.05)
+qlearner:setExplorationDecay(0.999)
+
+-- Space dimensions.
+local n_states = qlearner:getStateCount()   -- integer: discrete state count
+local n_act    = qlearner:getActionCount()  -- integer: discrete action count
+
+-- Inspect a single Q-value; indices are 1-based.
+local qv = qlearner:getQValue(1, 2)  -- Q(state=1, action=2) → number
+
+-- bestAction() returns the greedy-best action with NO exploration roll — use it
+-- when evaluation mode is active (ε = 0) or for a deterministic final policy.
+local best = qlearner:bestAction(1)   -- integer: greedy-best action index for state 1 (1-based)
+
+-- endEpisode() applies epsilon decay and increments the episode counter.
+qlearner:endEpisode()
+local episodes = qlearner:getEpisodeCount()  -- integer: completed episodes to date
+
+-- Serialize the full Q-table to JSON and restore it from a saved string —
+-- integrate with luna.savegame to persist learned behaviour across play sessions.
+local saved_json = qlearner:serialize()      -- JSON string
+qlearner:deserialize(saved_json)             -- restore Q-table from a prior save
+
+local ql_type = qlearner:type()              -- "QLearner"
+local ql_is   = qlearner:typeOf("QLearner")  -- true
+
+-- ─── Squad ────────────────────────────────────────────────────────────────────────────
+-- Member-roster management and formation inspection — implement dynamic rosters
+-- (unit deaths, reinforcements) and populate HUD squad-status panels.
+
+local formation = squad:getFormation()         -- "wedge" | "line" | "circle" | …
+local spacing   = squad:getFormationSpacing()  -- world units between formation slots
+
+-- Promote a new leader; the leader occupies slot 0 in the formation.
+squad:setLeader("commander")
+local leader = squad:getLeader()               -- "commander" | nil
+
+-- Remove a casualty from the roster without dissolving the squad.
+squad:removeMember("scout_02")
+
+local n_members = squad:getMemberCount()  -- integer: current roster size
+local names     = squad:getMembers()      -- { "commander", "rifleman_01", … }
+
+local sq_type = squad:type()              -- "Squad"
+local sq_is   = squad:typeOf("Squad")     -- true
+
+-- ─── StateMachine ─────────────────────────────────────────────────────────────────
+-- Override transitions and query dwell time — essential for hit-stun, death,
+-- and timeout transitions that must bypass configured guard conditions.
+
+-- forceState() ignores ALL transition guards — use for external triggers such
+-- as a "hit" event or a global stun that must interrupt the current state.
+statemachine:forceState("stunned")
+
+-- getTimeInState() returns seconds elapsed since the last state entry; use to
+-- implement "patrol for N seconds then return to idle" timeout patterns.
+local dwell = statemachine:getTimeInState()  -- number (seconds)
+
+local fsm_type = statemachine:type()                  -- "StateMachine"
+local fsm_is   = statemachine:typeOf("StateMachine")  -- true
+
+-- ─── SteeringManager ─────────────────────────────────────────────────────────────
+-- Manager-level tuning: inspect the last computed force vector and control how
+-- multiple behavior outputs are blended without touching individual weights.
+
+local n_beh            = steeringmanager:getBehaviorCount()   -- integer: active behaviors
+local last_fx, last_fy = steeringmanager:getLastSteering()    -- (vx, vy) last output force
+
+-- getCombineMode() returns the active blend strategy (default: "weighted").
+local mode = steeringmanager:getCombineMode()  -- "weighted" | "priority" | "blended"
+
+-- setCombineMode(strategy) — three strategies:
+--   "weighted"  → weighted sum of all forces (smooth; all behaviors contribute)
+--   "priority"  → highest-weight behavior wins outright (decisive switching)
+--   "blended"   → forces are normalised then averaged (equal-magnitude blend)
+steeringmanager:setCombineMode("priority")  -- one winner per frame
+
+local stm_type = steeringmanager:type()                      -- "SteeringManager"
+local stm_is   = steeringmanager:typeOf("SteeringManager")   -- true
+
+-- ─── UtilityAI ─────────────────────────────────────────────────────────────────────────
+-- Score all actions and inspect the winner without triggering side effects — use
+-- in debug overlays and unit tests that must not execute game logic.
+
+-- evaluate() scores every action and returns the winner's name — identical to
+-- update() but does NOT invoke the executor callback.
+local best_action = utilityai:evaluate()       -- "attack" | "flee" | … | nil
+
+local n_uai_act  = utilityai:getActionCount()  -- integer: registered action count
+local last_taken = utilityai:getLastAction()   -- last-executed action name or nil
+
+local uai_type = utilityai:type()               -- "UtilityAI"
+local uai_is   = utilityai:typeOf("UtilityAI")  -- true
+
+-- ─────────────────────────────────────────────────────────────────────────────
+-- Blackboard
+-- A shared key-value store for AI agents to communicate decisions and state.
+-- Use with luna.ai.newWorld() and agent:setBlackboard().
+-- ─────────────────────────────────────────────────────────────────────────────
+
+local bb = luna.ai.newBlackboard("shared")
+
+-- Write facts (boolean, number, or string values)
+bb:set("enemy_visible", true)
+bb:set("last_seen_x",   320.0)
+bb:set("target_name",   "player")
+
+-- Read facts back; returns nil if the key has never been set
+local visible  = bb:get("enemy_visible")   -- true
+local x        = bb:get("last_seen_x")     -- 320.0
+
+-- All currently set fact keys
+local all_keys = bb:keys()   -- { "enemy_visible", "last_seen_x", "target_name" }
+
+-- Snapshot copies all facts into a plain Lua table (useful for serialising AI state)
+local snap = bb:snapshot()   -- { enemy_visible=true, last_seen_x=320.0, target_name="player" }
+
+-- Revision counter increments on every write (use to detect stale reads)
+local rev = bb:getRevision()   -- 3 (one per set() call above)
+
+-- Watch a specific key for changes (returns a subscription id)
+local id1 = bb:watch("enemy_visible", function(key, val, old)
+    luna.log.info(string.format("[BB] %s changed: %s -> %s", key, tostring(old), tostring(val)))
+end)
+
+-- Watch ALL keys with the wildcard "*"
+local id2 = bb:watch("*", function(key, val, old)
+    luna.log.debug(string.format("[BB] any write: %s = %s", key, tostring(val)))
+end)
+
+-- Trigger callbacks
+bb:set("enemy_visible", false)
+
+-- Unsubscribe a specific watcher by id
+bb:unwatch(id1)
+bb:unwatch(id2)
+
+luna.log.info("[ai.lua] Blackboard example complete")

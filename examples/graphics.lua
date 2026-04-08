@@ -1,6 +1,7 @@
 -- examples/graphics.lua
 -- 2D drawing, images, fonts, canvases, meshes, shaders and sprite batches
 -- API: luna.gfx
+-- This file is documentation code, not a runnable game.
 
 --------------------------------------------------------------------------------
 -- Drawing mode values
@@ -372,9 +373,11 @@ luna.gfx.saveScreenshot("save/screenshot.png")
 -- Typical game loop pattern
 --------------------------------------------------------------------------------
 
-local playerImg  -- assumed loaded in luna.load()
+local playerImg  -- assumed loaded in luna.init()
 
-luna.draw = function()
+-- luna.render is called every frame to issue draw commands.
+-- The engine processes the queued DrawCommands after this returns.
+luna.render = function()
     luna.gfx.clear()
 
     -- Background
@@ -391,3 +394,92 @@ luna.draw = function()
     luna.gfx.setColor(1, 1, 0)
     luna.gfx.print("Press ESC to quit", 10, 10)
 end
+
+-- ─── Canvas ────────────────────────────────────────────────────────────────────
+-- Runtime-type detection: useful when a receiving function accepts Canvas or Image.
+local ctype  = canvas:type()               -- "Canvas"
+local isCvs  = canvas:typeOf("Canvas")     -- true
+local isImg2 = canvas:typeOf("Image")      -- false
+
+-- ─── DrawLayer ─────────────────────────────────────────────────────────────────
+-- DrawLayer accumulates z-sorted callbacks; inspect or discard them between frames.
+drawlayer:queue(10, function() luna.gfx.print("HUD", 0, 0) end)  -- enqueue at depth 10
+local dlCount = drawlayer:getCount()            -- 1  (number of queued callbacks)
+drawlayer:flush()                               -- sort, execute, then empty the queue
+drawlayer:clear()                               -- discard all pending callbacks without executing
+local dlType  = drawlayer:type()                -- "DrawLayer"
+local isDL    = drawlayer:typeOf("DrawLayer")   -- true
+
+-- ─── Font ──────────────────────────────────────────────────────────────────────
+-- typeOf lets you guard shared-object parameters before calling font metrics.
+local ftType  = font:type()               -- "Font"
+local isFont  = font:typeOf("Font")       -- true
+
+-- ─── Image ─────────────────────────────────────────────────────────────────────
+local imgType  = image:type()             -- "Image"
+local isImage  = image:typeOf("Image")    -- true
+
+-- ─── ImageData ─────────────────────────────────────────────────────────────────
+-- ImageData holds a CPU-side pixel buffer useful for procedural texture generation.
+local idW    = imagedata:getWidth()           -- pixel buffer width in pixels
+local idH    = imagedata:getHeight()          -- pixel buffer height in pixels
+local idType = imagedata:type()               -- "ImageData"
+local isID   = imagedata:typeOf("ImageData")  -- true
+
+-- ─── Mesh ──────────────────────────────────────────────────────────────────────
+local meshType = mesh:type()            -- "Mesh"
+local isMesh   = mesh:typeOf("Mesh")    -- true
+
+-- ─── NineSlice ─────────────────────────────────────────────────────────────────
+-- getInsets / getTextureSize let you adjust layout when scaling a UI panel at runtime.
+local nsTop, nsRight, nsBottom, nsLeft = nineslice:getInsets()   -- inset sizes in pixels
+local nsW, nsH = nineslice:getTextureSize()                       -- source texture dimensions
+local nsType   = nineslice:type()                                 -- "NineSlice"
+local isNS     = nineslice:typeOf("NineSlice")                    -- true
+
+-- ─── Quad ──────────────────────────────────────────────────────────────────────
+local qx, qy, qw, qh = q1:getViewport()          -- (x, y, w, h) region within texture
+local qtw, qth        = q1:getTextureDimensions() -- full source texture size (tw, th)
+local qType           = q1:type()                 -- "Quad"
+local isQuad          = q1:typeOf("Quad")         -- true
+
+-- ─── Shader ────────────────────────────────────────────────────────────────────
+-- Use hasUniform as a guard before sending per-frame values to avoid silent errors.
+if shader:hasUniform("u_time") then
+    shader:send("u_time", 0.0)          -- safe: only executes when uniform exists
+end
+local shType = shader:type()             -- "Shader"
+local isShad = shader:typeOf("Shader")   -- true
+
+-- ─── Shape ─────────────────────────────────────────────────────────────────────
+-- clear() resets the command list so you can rebuild the shape each frame cheaply.
+shape:clear()                             -- discard all previously queued commands
+local cmdN = shape:getCommandCount()      -- 0  (count after clear)
+shape:setLineWidth(2.0)                   -- stroke width for subsequent outline commands
+shape:line(0, 0, 100, 100)               -- queue a line segment command
+shape:polyline(0, 0, 50, 50, 100, 0)    -- queue a multi-point connected polyline
+local shpType = shape:type()             -- "Shape"
+local isShape = shape:typeOf("Shape")    -- true
+
+-- ─── SpriteBatch ───────────────────────────────────────────────────────────────
+local sbType = spritebatch:type()              -- "SpriteBatch"
+local isSB   = spritebatch:typeOf("SpriteBatch")  -- true
+
+-- ─── luna.graphics ─────────────────────────────────────────────────────────────
+-- captureScreenshot delivers its ImageData asynchronously after the frame completes.
+luna.graphics.captureScreenshot(function(imgdata) end)
+-- clearStencil resets the stencil buffer to defaults — call before overwriting an old mask.
+luna.graphics.clearStencil()
+-- drawNineSlice must be called inside luna.render or luna.render_ui.
+luna.graphics.drawNineSlice(nineslice, 50, 50, 320, 240)  -- x, y, w, h
+local cw2, ch2 = luna.graphics.getCanvasSize(canvas)          -- canvas dimensions in pixels
+local depthMode, depthWrite = luna.graphics.getDepthMode()    -- e.g. "lequal", true
+local lh = luna.graphics.getFontLineHeight(font)              -- current line height multiplier
+local stAction, stCompare, stValue = luna.graphics.getStencilMode()  -- active stencil state
+local dl2  = luna.graphics.newDrawLayer()                     -- new z-ordered draw-call queue
+local ns2  = luna.graphics.newNineSlice(image, 8, 8, 8, 8)  -- 8 px uniform insets
+local isNS2 = ns2:typeOf("NineSlice")                        -- true
+local shape2 = luna.graphics.newShape()                       -- new empty CompoundShape
+luna.graphics.setDepthMode("lequal")         -- "lequal", "less", "greater", "always", "never"
+luna.graphics.setFontLineHeight(font, 1.2)   -- line spacing multiplier
+luna.graphics.setStencilMode("none")         -- "none", "write", "test"

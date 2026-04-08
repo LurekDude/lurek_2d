@@ -18,6 +18,124 @@ Always update this file **in the same commit** as the change. Use the commit typ
 
 ---
 
+## [0.6.10] — 2026-04-08
+
+### Changed
+- **`src/math/tween.rs`** — removed deprecated blockquote from module doc; replaced with a clear positive description of the module's scope and how it differs from `luna.tween`.
+- **`src/tween/state.rs`** — module doc cross-reference updated: now points to `src/tween/handle.rs` and `src/tween/engine.rs` instead of the old `lua_api` path.
+- **`specs/tween.md`** — renamed "Lua Binding Types (src/lua_api/tween_api.rs)" section to "Domain Types (src/tween/)"; replaced stale `TweenApiState` description with current `TweenEngine`; updated UserData section headers to include correct source files; replaced "Cross-Module References" with an explicit "Separation of Duties" table covering `tween`, `animation`, `math::tween`, and `spine`.
+- **`src/tween/AGENT.md`** — added "Separation from Related Modules" table explaining responsibilities of each animation-related module.
+- **`examples/tween.lua`** — added sections 11–13 covering previously missing API: `luna.tween.getActiveCount()`, `LuaTween:getProgress()`, `LuaTweenSequence:cancel()` + `isActive()`, `LuaTweenParallel:add()` + `cancel()` + `isActive()`. All 13 API surface areas now covered.
+
+## [0.6.9] — 2026-04-15
+
+### Changed
+- **`luna.tween` architectural refactor** — moved all business logic out of `src/lua_api/tween_api.rs` into proper domain modules, enforcing the Thin Wrapper Rule:
+  - `src/tween/engine.rs` (new) — `TweenEngine`: active-pool management, `update()`, `cancel_all()`, `active_count()`.
+  - `src/tween/handle.rs` (new) — `LuaTween`, `LuaTweenSequence`, `LuaTweenParallel`, `SequenceStep`, `ParallelEntry` + all `impl LuaUserData` blocks.
+  - `src/tween/mod.rs` — expanded with `pub mod engine`, `pub mod handle`, and public re-exports for all new types.
+  - `src/lua_api/tween_api.rs` — reduced to ~200-line thin registration wrapper (`pub fn register()` only).
+  - `src/math/tween.rs` — module doc updated with deprecation notice pointing to `luna.tween`.
+  - `specs/tween.md` — Architecture diagram and Module Layout table updated to reflect new 4-layer structure.
+  - `src/tween/AGENT.md` — Source file table updated with `handle.rs` and `engine.rs` entries.
+- **CAG rule enforced** — Added mandatory **Thin Wrapper Rule** paragraph to `.github/copilot-instructions.md` under "Lua API Conventions".
+- Public API unchanged — all `luna.tween.*` function names and signatures are identical.
+
+## [0.6.8] — 2026-04-14
+
+### Changed
+- **`examples/` quality pass (part 2)** — stub sections in four high-complexity example files replaced with fully documented example code:
+  - `math.lua` (stubs → 5 organised sections): BezierCurve introspection, Transform/Tween supplemental, easing standalone functions, geometry utilities (14 functions), and math wrappers.
+  - `ai.lua` (13 class stubs → 13 documented sections): supplemental methods for AIWorld, Agent, BTNode, BehaviorTree, Blackboard, CommandQueue, GOAPPlanner, InfluenceMap, QLearner, Squad, StateMachine, SteeringManager, UtilityAI — all with context comments, realistic args, and use-case rationale.
+  - `pathfinding.lua` (5 class stubs → 5 documented sections): AiFlowField introspection, FlowField query methods, NavGrid chunk info, PathGrid dynamic obstacles, UnitPathfinder cache control.
+  - `graphics.lua` (9 thin class sections → 11 sections): Canvas, DrawLayer, Font, Image, ImageData, Mesh, NineSlice, Quad, Shader, Shape, SpriteBatch — each with type identity pattern, supplemental methods, and cross-reference notes.
+  - Coverage maintained at **2539/2539 = 100%** throughout.
+
+- **`examples/` quality pass (part 1)** — all 45 example files improved for readability and accuracy:
+  - `gui.lua` fully rewritten (703 lines); all 37 GUI classes with real method arguments.
+  - `audio.lua` Bus and Decoder sections rewritten with all 10 methods each; `newSoundData` added.
+  - Removed redundant `-- X instance methods (variable: x)` header comments from 19 files.
+  - `typeOf("name")` placeholder args corrected to actual class names in all files.
+  - `type()` return comments updated with canonical class name strings.
+  - ~40 `"value"` / `"default"` argument placeholders replaced with domain-appropriate strings across 9 files.
+- **New tools** added in `tools/fix/`:
+  - `fix_typeof_args.py` — uses API JSON to correct `typeOf("name")` stubs and `type()` comments.
+  - `fix_type_stub_vars.py` — renames duplicated `class_name`/`is_X_type` locals to per-variable names.
+  - `strip_instance_method_comments.py` — strips auto-generated `instance methods` header lines.
+- Coverage metric: 2539 / 2539 = **100%** maintained throughout all edits.
+
+---
+
+## [0.6.7] — 2026-04-11
+
+### Added
+- **`luna.tween` — property tweening system** — new `src/tween/` Tier 1 module plus `src/lua_api/tween_api.rs` binding. Animate any Lua table field by name in real-time: `luna.tween.tween(duration, target, {field = end_value, ...}, easing)`. Supports multi-field tweens, sequences (`:tween()` / `:delay()` / `:callback()`), parallels (`:tween()` / `:add()`), repeat + yoyo, pause/resume, and `onComplete` / `onUpdate` / `onCancel` callbacks. Manual update model: call `luna.tween.update(dt)` from `luna.process(dt)`. Start values are captured lazily on the first update tick.
+- **`luna.tween.sequence()`** — chain animation steps that execute one after another.
+- **`luna.tween.parallel()`** — run multiple tweens simultaneously; fires `onComplete` when all children finish.
+- **`luna.tween.delay(sec, fn?)`** — standalone timer convenience helper.
+- **`luna.tween.registerEasing(name, fn)` / `luna.tween.getEasingNames()`** — custom Lua easing functions and introspection of all 23 built-in easing names.
+- **`ModulesConfig.tween: bool`** — gating flag in `conf.lua` (`modules.tween`, default `true`).
+- **`tests/rust/unit/tween_tests.rs`** — 14 Rust unit tests for `TweenState`, `resolve_easing`, `builtin_easing_names`.
+- **`tests/lua/unit/test_tween.lua`** — ~50 Lua BDD tests covering all `luna.tween.*` API surface.
+- **`examples/tween.lua`** — 10-section usage script demonstrating all API features.
+- **`src/tween/AGENT.md`**, **`specs/tween.md`** — module agent reference and full specification.
+- Fixed stale `//! \`luna.tween\`` header comment in `src/lua_api/animation_api.rs` (correctly `luna.animation`).
+- Fixed stale comment in `src/lua_api/mod.rs` registration block (animation maps to `luna.animation`).
+
+---
+
+## [0.6.6] — 2026-04-10
+
+### Added
+- **`luna.log` configurable sinks** — new `src/log/sinks.rs` module with `SinkLevel`, `SinkKind` (File / Memory), `Sink`, and `SinkRegistry` types. All `luna.log.*` emit functions now accept an optional `tag` second argument (default `"Lua"`). New API: `addSink(cfg)→id`, `removeSink(id)→bool`, `clearSinks()`, `listSinks()→table`, `readMemory(id, drain?)→table?`, `flushFile(id)`. Sinks dispatch independently of `RUST_LOG` filtering.
+- **`luna.docs.schema()`** — new `src/docs/schema.rs` with `Schema`, `FieldRule`, `FieldType`, `SchemaError`, `SchemaResult`. Game scripts can define typed field rules (required, min/max, minLen/maxLen, enum, strict mode) and call `schema:validate(data)`, `schema:check(data)`, `schema:assert(data)` for safe runtime data-validation.
+- **`luna.docs.reflectLive(ns?)`** — walks the live `luna.*` Lua table and returns a structured `{ns → [{name, type}]}` map. Supports optional namespace filter argument.
+- **`luna.docs.reflectTable(tbl, name?)`** — reflects any Lua table; returns `{name, qualifiedName, type}[]`.
+- **`luna.devtools.exposeWatch(name, getter, category?)`** — registers a named getter function; returns a sequential id.
+- **`luna.devtools.removeWatch(id)`** — removes a watch by id.
+- **`luna.devtools.getWatches()`** — samples all registered watch getters; returns `{name, category, value}[]`.
+- **`luna.devtools.snapshot()`** — captures a full point-in-time diagnostic dump (watches, frameStats, profile frame, last 10 log entries).
+- **`examples/log.lua`** — updated with sink demos (memory sink, file sink, listSinks, clearSinks, tagged messages).
+- **`examples/docs.lua`** — added schema validation and reflectLive/reflectTable demo sections.
+- **`examples/devtools.lua`** — added exposeWatch/getWatches/snapshot demo sections.
+- **`specs/log.md`**, **`specs/docs.md`**, **`specs/devtools.md`** — updated with full documentation for all new types, functions, and examples.
+- **`src/log/AGENT.md`**, **`src/docs/AGENT.md`**, **`src/devtools/AGENT.md`** — synced with new source files and API additions.
+
+---
+
+## [0.6.5] — 2026-04-09
+
+### Fixed
+- **`examples/` and `demos/` namespace and callback corrections** — resolved all stale API references introduced by the engine callback rename:
+  - `examples/graphics.lua`, `examples/gui.lua`: replaced `luna.draw =` with `luna.render =` / `luna.render_ui =`.
+  - `examples/gui.lua`, `examples/network.lua`, `demos/retro/cannon_fodder/main.lua`: replaced `luna.update =` with `luna.process =`; removed broken `local _upd = luna.update` chaining pattern.
+  - `demos/showcase/entity_showcase/main.lua`: replaced `luna.timer.getFPS()` with `luna.time.getFPS()`.
+  - **33 demo files**: replaced `luna.load()` restart calls with `luna.signal.restart()`.
+  - **8 example files** (`animation.lua`, `automation.lua`, `input.lua`, `physics.lua`, `timer.lua` and section headers in 3 demos): updated stale `luna.update` / `luna.draw` references in comments and section headers to `luna.process` / `luna.render`.
+
+### Changed
+- **`examples/` documentation** — added `-- This file is documentation code, not a runnable game.` header line to 26 example files that were missing it; consistent with existing API reference examples.
+- **`demos/` documentation** — added `-- Run with: cargo run -- demos/<category>/<name>` run-hint line to 111 demo `main.lua` files.
+
+---
+
+## [0.6.4] — 2026-04-08
+
+### Fixed
+- **`docs/architecture/engine-architecture.md` Tier tables fully synced with codebase** — 22 net corrections:
+  - **Tier 1**: moved `automation` to Tier 2 (it depends on Tier 1 `event`); removed stale `sound` entry (`src/sound/` does not exist — SoundData lives in `src/audio/`); removed TOML from `data` description; added 6 new Tier 1 modules: `debugbridge`, `devtools`, `docs`, `localization`, `log`, `patterns`.
+  - **Tier 2**: added `automation`; fixed `postfx | src/postfx/` → `fx | src/fx/` (the module directory and API file are named `fx`); removed stale `overlay` entry (`src/overlay/` does not exist — overlay functionality is provided by the `fx` module); added 7 new Tier 2 modules: `light`, `network`, `pipeline`, `procgen`, `raycaster`, `serial`, `spine`.
+  - **API Namespaces table**: removed stale `luna.sound → sound_api.rs` (file does not exist); expanded from 18 to 47 entries covering all registered `luna.*` namespaces.
+  - **Boot Sequence**: updated comment from `18+` to `40+` API modules; removed `sound` from example list.
+- **`specs/README.md`** — added missing entries for `devtools`, `localization`, and `patterns`.
+- **Rust test paths corrected in 6 spec files** (`tests/rust/game/` is retired; `tests/unit/` was missing the `rust/` segment):
+  - `specs/ai.md`: `tests/rust/game/ai_tests.rs` → `tests/rust/unit/ai_tests.rs`
+  - `specs/minimap.md`: `tests/rust/game/minimap_tests.rs` → `tests/rust/unit/minimap_tests.rs`
+  - `specs/math.md`: `tests/unit/math_tests.rs` → `tests/rust/unit/math_tests.rs`
+  - `specs/pathfinding.md`: `tests/unit/pathfinding_tests.rs` → `tests/rust/unit/pathfinding_tests.rs`
+  - `specs/physics.md`: `tests/unit/physics_tests.rs` → `tests/rust/unit/physics_tests.rs`
+  - `specs/terminal.md`: `tests/unit/terminal_tests.rs` → `tests/rust/unit/terminal_tests.rs`
+
 ## [0.6.3] — 2026-04-13
 
 ### Removed
