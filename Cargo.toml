@@ -378,6 +378,14 @@ name = "window_tests"
 path = "tests/rust/unit/window_tests.rs"
 
 [[test]]
+name = "debugbridge_tests"
+path = "tests/rust/unit/debugbridge_tests.rs"
+
+[[test]]
+name = "docs_tests"
+path = "tests/rust/unit/docs_tests.rs"
+
+[[test]]
 name = "animation_tests"
 path = "tests/rust/unit/animation_tests.rs"
 harness = true

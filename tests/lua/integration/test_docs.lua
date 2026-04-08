@@ -211,10 +211,10 @@ describe("luna.docs", function()
         local quality = luna.docs.quality(cat)
         expect_not_nil(quality, "quality() should return a report")
         local score = quality:getOverallScore()
-        -- desc(0.4) + params(0.25) + returns(0.2) = 0.85
-        expect_true(math.abs(score - 0.85) < 0.01, "score should be 0.85, got " .. score)
+        -- domain scoring: desc(1/5) + qualified_name(1/5) + params_or_returns(1/5) = 3/5 = 0.6
+        expect_true(math.abs(score - 0.6) < 0.01, "score should be 0.6, got " .. score)
         local grade = quality:getGrade()
-        expect_equal("B", grade)
+        expect_equal("C", grade)
         luna.docs.resetCatalog()
     end)
 

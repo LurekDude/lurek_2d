@@ -1,0 +1,27 @@
+# `debugbridge` — Agent Reference
+
+| Property         | Value                                                  |
+|------------------|--------------------------------------------------------|
+| **Tier**         | Tier 1 — Core Engine Subsystems                        |
+| **Status**       | Implemented — Full                                     |
+| **Lua API**      | `luna.debugbridge`                                     |
+| **Source**       | `src/debugbridge/`                                     |
+| **Rust Tests**   | —                                                      |
+| **Lua Tests**    | `tests/lua/unit/test_debugbridge.lua`                  |
+| **Architecture** | —                                                      |
+
+## Purpose
+
+The `debugbridge` module embeds a JSON-over-TCP server (bound to 127.0.0.1 only) inside the running game. External tools — the Luna2D VS Code extension and the MCP server — connect to the bridge to inspect global variables, evaluate Lua code, walk the call stack, capture print output, record frame-time samples, and request screenshots. All TCP I/O runs on a background Rust thread via `std::net::TcpListener`; methods that require Lua access (`eval`, `getCallStack`, `getLocals`, `getGlobals`) are queued through `BridgeShared` and dispatched each frame by calling `luna.debugbridge.poll()` on the main thread. The bridge depends on `serde_json` for newline-delimited JSON framing and does not require any Lua-side heartbeat beyond the poll call.
+
+## Source Files
+
+| File        | Purpose                                                                                                         |
+|-------------|-----------------------------------------------------------------------------------------------------------------|
+| `bridge.rs` | `BridgeShared`, `PendingRequest`, `PendingResponse`, `PrintEntry`, `SharedBridge` — shared state exchanged between the TCP thread and the Lua main thread |
+| `server.rs` | `server_thread()`, `handle_client_message()` — non-blocking TCP accept loop and client message dispatch         |
+| `mod.rs`    | Re-exports all public types                                                                                     |
+
+## Full Specification
+
+See [`specs/debugbridge.md`](../../../specs/debugbridge.md) for full architecture, type details, Lua API, examples, and notes.

@@ -12,22 +12,15 @@ use crate::engine::log_messages;
 ///
 /// # Errors
 /// Returns a `LuaError` if any function or table registration fails.
-///
-/// # Parameters
-/// - `lua` — `&Lua`.
-/// - `luna` — `&LuaTable`.
-///
-/// # Returns
-/// `LuaResult<()>`.
+/// @param lua : &Lua
+/// @param luna : &LuaTable
+/// @return LuaResult<()>
 pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
     let log_table = lua.create_table()?;
 
     #[allow(unused_doc_comments)]
     /// Emit a debug-severity log message from Lua.
     /// @param message : string
-    ///
-    /// # Parameters
-    /// - `message` — The message string to log.
     log_table.set(
         "debug",
         lua.create_function(|_, message: String| {
@@ -39,9 +32,6 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
     #[allow(unused_doc_comments)]
     /// Emit an info-severity log message from Lua.
     /// @param message : string
-    ///
-    /// # Parameters
-    /// - `message` — The message string to log.
     log_table.set(
         "info",
         lua.create_function(|_, message: String| {
@@ -53,9 +43,6 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
     #[allow(unused_doc_comments)]
     /// Emit a warn-severity log message from Lua.
     /// @param message : string
-    ///
-    /// # Parameters
-    /// - `message` — The message string to log.
     log_table.set(
         "warn",
         lua.create_function(|_, message: String| {
@@ -67,9 +54,6 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
     #[allow(unused_doc_comments)]
     /// Emit an error-severity log message from Lua.
     /// @param message : string
-    ///
-    /// # Parameters
-    /// - `message` — The message string to log.
     log_table.set(
         "error",
         lua.create_function(|_, message: String| {
@@ -86,10 +70,6 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
     /// Accepts the same level strings as `luna.log.setLevel`:
     /// `"debug"`, `"info"`, `"warn"`, `"error"`, `"trace"`.
     /// Unknown levels fall back to `info`.
-    ///
-    /// # Parameters
-    /// - `level` — Severity level string.
-    /// - `message` — The message string to log.
     log_table.set(
         "print",
         lua.create_function(|_, (level, message): (String, String)| {
@@ -108,9 +88,6 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
     #[allow(unused_doc_comments)]
     /// Set the minimum severity level for runtime log messages.
     /// @param level : string
-    ///
-    /// # Parameters
-    /// - `level` — One of `"off"`, `"error"`, `"warn"`, `"info"`, `"debug"`, `"trace"`.
     log_table.set(
         "setLevel",
         lua.create_function(|_, level: String| {
@@ -121,18 +98,12 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
 
     #[allow(unused_doc_comments)]
     /// Return the name of the currently active minimum log level.
-    ///
-    /// # Returns
-    /// One of `"off"`, `"error"`, `"warn"`, `"info"`, `"debug"`, `"trace"`.
+    /// @return string
     log_table.set(
         "getLevel",
         lua.create_function(|_, ()| Ok(log_messages::get_log_level().to_string()))?,
     )?;
 
-    /// Log on this Object.
-    ///
-    /// # Returns
-    /// The result.
     luna.set("log", log_table)?;
     Ok(())
 }

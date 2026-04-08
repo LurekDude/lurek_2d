@@ -97,6 +97,10 @@ pub mod engine;
 pub mod entity;
 /// Event queue for polling system and custom events.
 pub mod event;
+/// TCP debug bridge for connecting external tools to a running Luna2D game.
+pub mod debugbridge;
+/// API documentation catalog and quality reporting for the luna.* API surface.
+pub mod docs;
 /// Sandboxed game filesystem (GameFS).
 pub mod filesystem;
 /// Directed graph with item flow simulation, pathfinding, and supply/demand.
@@ -111,6 +115,8 @@ pub mod image;
 pub mod input;
 /// 2D point-light data container for dynamic lighting systems.
 pub mod light;
+/// Script log-level management — delegates to the `log` crate via `engine::log_messages`.
+pub mod log;
 /// Multi-locale string catalog, variable interpolation, and CLDR plural rules.
 pub mod localization;
 // migration-state: pub mod inventory; — now library/inventory/init.lua

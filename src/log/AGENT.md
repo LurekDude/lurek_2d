@@ -1,0 +1,25 @@
+# `log` — Agent Reference
+
+| Property         | Value                                                  |
+|------------------|--------------------------------------------------------|
+| **Tier**         | Tier 1 — Core Engine Subsystems                        |
+| **Status**       | Implemented — Full                                     |
+| **Lua API**      | `luna.log`                                             |
+| **Source**       | `src/log/`                                             |
+| **Rust Tests**   | —                                                      |
+| **Lua Tests**    | `tests/lua/unit/test_log.lua`                          |
+| **Architecture** | —                                                      |
+
+## Purpose
+
+The `log` module provides structured log level management for Lua game scripts. It exposes `set_level()`, `get_level()`, and `enabled_for()` on the Rust side, delegating to `crate::engine::log_messages`. The Lua API at `luna.log.*` allows scripts to emit messages at specific severity levels (`debug`, `info`, `warn`, `error`, `trace`), to emit at a caller-specified level via `log.print(level, message)`, and to query or change the active minimum log level at runtime. All log output flows through the Rust `log` crate and appears alongside engine messages under the `RUST_LOG` environment variable filter. Messages are prefixed with `[Lua]` to distinguish them from engine-originated output.
+
+## Source Files
+
+| File     | Purpose                                                                                 |
+|----------|-----------------------------------------------------------------------------------------|
+| `mod.rs` | `set_level()`, `get_level()`, `enabled_for()` — delegates to `engine::log_messages`     |
+
+## Full Specification
+
+See [`specs/log.md`](../../../specs/log.md) for full architecture, type details, Lua API, examples, and notes.

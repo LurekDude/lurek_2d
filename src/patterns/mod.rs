@@ -31,6 +31,7 @@ pub mod event_bus;
 pub mod factory;
 pub mod object_pool;
 pub mod service_locator;
+pub mod simple_state;
 pub mod state_machine;
 
 pub use command_stack::{CommandEntry, CommandStack};
@@ -38,4 +39,5 @@ pub use event_bus::{EventBus, Subscription};
 pub use factory::Factory;
 pub use object_pool::ObjectPool;
 pub use service_locator::ServiceLocator;
+pub use simple_state::SimpleState;
 pub use state_machine::{StateMachine, TransitionRule};

@@ -21,6 +21,8 @@ struct LocalizationShared {
     catalog: Catalog,
     /// Callbacks invoked when the active language changes.
     on_change: Vec<LuaRegistryKey>,
+    /// Base/fallback language code.
+    base: String,
 }
 
 impl LocalizationShared {
@@ -28,6 +30,7 @@ impl LocalizationShared {
         Self {
             catalog: Catalog::new(),
             on_change: Vec::new(),
+            base: String::new(),
         }
     }
 }
@@ -120,11 +123,16 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
         Ok(())
     })?)?;
 
-    /// Returns the currently active locale code.
-    /// @return string
+    /// Returns the currently active locale code, or nil if unset.
+    /// @return string?
     let s = shared.clone();
-    loc.set("getLanguage", lua.create_function(move |_, ()| {
-        Ok(s.borrow().catalog.locale.clone())
+    loc.set("getLanguage", lua.create_function(move |lua, ()| {
+        let locale = s.borrow().catalog.locale.clone();
+        if locale.is_empty() {
+            Ok(LuaValue::Nil)
+        } else {
+            Ok(LuaValue::String(lua.create_string(&locale)?))
+        }
     })?)?;
 
     /// Returns all loaded locale codes.
@@ -146,9 +154,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
     let s = shared.clone();
     loc.set("setFallbacks", lua.create_function(move |_, locales: LuaTable| {
         let mut fbs = Vec::new();
-        for pair in locales.pairs::<LuaValue, String>() {
-            if let Ok((_, v)) = pair { fbs.push(v); }
-        }
+        for (_, v) in locales.pairs::<LuaValue, String>().flatten() { fbs.push(v); }
         s.borrow_mut().catalog.fallbacks = fbs;
         Ok(())
     })?)?;
@@ -195,9 +201,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
         // Variable substitution
         let result = if let Some(tbl) = vars {
             let mut map = HashMap::new();
-            for pair in tbl.pairs::<String, String>() {
-                if let Ok((k, v)) = pair { map.insert(k, v); }
-            }
+            for (k, v) in tbl.pairs::<String, String>().flatten() { map.insert(k, v); }
             if let Some(n) = count { map.entry("count".to_string()).or_insert_with(|| format!("{n}")); }
             interpolate(&raw, &map)
         } else {
@@ -246,9 +250,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
     /// @return string
     loc.set("interpolate", lua.create_function(|_, (template, vars): (String, LuaTable)| {
         let mut map = HashMap::new();
-        for pair in vars.pairs::<String, String>() {
-            if let Ok((k, v)) = pair { map.insert(k, v); }
-        }
+        for (k, v) in vars.pairs::<String, String>().flatten() { map.insert(k, v); }
         Ok(interpolate(&template, &map))
     })?)?;
 
@@ -268,6 +270,64 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
     loc.set("onLanguageChange", lua.create_function(move |lua, cb: LuaFunction| {
         let key = lua.create_registry_value(cb)?;
         s.borrow_mut().on_change.push(key);
+        Ok(())
+    })?)?;
+
+    // -- Aliases and missing functions --
+
+    /// Returns whether a locale has been loaded.
+    /// @param locale : string
+    /// @return boolean
+    let s = shared.clone();
+    loc.set("hasLanguage", lua.create_function(move |_, locale: String| {
+        Ok(s.borrow().catalog.has_locale(&locale))
+    })?)?;
+
+    /// Returns all loaded locale codes (alias for getLanguages).
+    /// @return table
+    let s = shared.clone();
+    loc.set("getAvailableLanguages", lua.create_function(move |lua, ()| {
+        let st = s.borrow();
+        let mut locales = st.catalog.locales();
+        locales.sort();
+        let tbl = lua.create_table()?;
+        for (i, name) in locales.iter().enumerate() {
+            tbl.set(i + 1, *name)?;
+        }
+        Ok(tbl)
+    })?)?;
+
+    /// Sets the base/fallback language (adds it as first fallback).
+    /// @param locale : string
+    let s = shared.clone();
+    loc.set("setBase", lua.create_function(move |_, locale: String| {
+        s.borrow_mut().base = locale.clone();
+        Ok(())
+    })?)?;
+
+    /// Returns the base/fallback language.
+    /// @return string
+    let s = shared.clone();
+    loc.set("getBase", lua.create_function(move |_, ()| {
+        Ok(s.borrow().base.clone())
+    })?)?;
+
+    /// Registers a callback invoked when setLanguage() is called (alias: onChange).
+    /// @param cb : function
+    let s = shared.clone();
+    loc.set("onChange", lua.create_function(move |lua, cb: LuaFunction| {
+        let key = lua.create_registry_value(cb)?;
+        s.borrow_mut().on_change.push(key);
+        Ok(())
+    })?)?;
+
+    /// Unregisters all onChange callbacks.
+    let s = shared.clone();
+    loc.set("offChange", lua.create_function(move |lua, ()| {
+        let keys: Vec<_> = s.borrow_mut().on_change.drain(..).collect();
+        for k in keys {
+            lua.remove_registry_value(k)?;
+        }
         Ok(())
     })?)?;
 

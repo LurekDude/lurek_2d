@@ -192,35 +192,35 @@ pub const L032_BATCH_STATS: &str = "L032";
 macro_rules! log_msg {
     // ---- no dynamic args: emit catalog text only ----
     (error, $id:expr) => {
-        log::error!("[{}] {}", $id, $crate::engine::messages::get_message($id))
+        ::log::error!("[{}] {}", $id, $crate::engine::messages::get_message($id))
     };
     (warn, $id:expr) => {
-        log::warn!("[{}] {}", $id, $crate::engine::messages::get_message($id))
+        ::log::warn!("[{}] {}", $id, $crate::engine::messages::get_message($id))
     };
     (info, $id:expr) => {
-        log::info!("[{}] {}", $id, $crate::engine::messages::get_message($id))
+        ::log::info!("[{}] {}", $id, $crate::engine::messages::get_message($id))
     };
     (debug, $id:expr) => {
-        log::debug!("[{}] {}", $id, $crate::engine::messages::get_message($id))
+        ::log::debug!("[{}] {}", $id, $crate::engine::messages::get_message($id))
     };
     (trace, $id:expr) => {
-        log::trace!("[{}] {}", $id, $crate::engine::messages::get_message($id))
+        ::log::trace!("[{}] {}", $id, $crate::engine::messages::get_message($id))
     };
     // ---- with dynamic detail args ----
     (error, $id:expr, $($arg:tt)+) => {
-        log::error!("[{}] {}: {}", $id, $crate::engine::messages::get_message($id), format_args!($($arg)+))
+        ::log::error!("[{}] {}: {}", $id, $crate::engine::messages::get_message($id), format_args!($($arg)+))
     };
     (warn, $id:expr, $($arg:tt)+) => {
-        log::warn!("[{}] {}: {}", $id, $crate::engine::messages::get_message($id), format_args!($($arg)+))
+        ::log::warn!("[{}] {}: {}", $id, $crate::engine::messages::get_message($id), format_args!($($arg)+))
     };
     (info, $id:expr, $($arg:tt)+) => {
-        log::info!("[{}] {}: {}", $id, $crate::engine::messages::get_message($id), format_args!($($arg)+))
+        ::log::info!("[{}] {}: {}", $id, $crate::engine::messages::get_message($id), format_args!($($arg)+))
     };
     (debug, $id:expr, $($arg:tt)+) => {
-        log::debug!("[{}] {}: {}", $id, $crate::engine::messages::get_message($id), format_args!($($arg)+))
+        ::log::debug!("[{}] {}: {}", $id, $crate::engine::messages::get_message($id), format_args!($($arg)+))
     };
     (trace, $id:expr, $($arg:tt)+) => {
-        log::trace!("[{}] {}: {}", $id, $crate::engine::messages::get_message($id), format_args!($($arg)+))
+        ::log::trace!("[{}] {}: {}", $id, $crate::engine::messages::get_message($id), format_args!($($arg)+))
     };
 }
 

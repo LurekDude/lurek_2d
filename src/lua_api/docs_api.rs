@@ -10,90 +10,127 @@ use std::rc::Rc;
 
 use mlua::prelude::*;
 
+use crate::docs;
+
 // ---------------------------------------------------------------------------
-// Data types
+// UserData: DocEntry
 // ---------------------------------------------------------------------------
 
-/// A single documented API entry.
-#[derive(Clone, Debug)]
-struct DocEntryData {
-    name: String,
-    qualified_name: String,
-    module: String,
-    kind: String,
-    description: String,
-    parameters: Vec<ParamInfo>,
-    returns: Vec<ReturnInfo>,
-    example: Option<String>,
-    since: Option<String>,
-    deprecated: Option<String>,
-}
+/// Wraps a single doc entry for Lua access.
+#[derive(Clone)]
+struct DocEntry(docs::DocEntry);
 
-#[derive(Clone, Debug)]
-struct ParamInfo {
-    name: String,
-    type_name: String,
-    description: String,
-    optional: bool,
-    default: Option<String>,
-}
+impl LuaUserData for DocEntry {
+    fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
+        /// Returns the name.
+        /// @return string
+        methods.add_method("getName", |_, this, ()| Ok(this.0.name.clone()));
 
-#[derive(Clone, Debug)]
-struct ReturnInfo {
-    type_name: String,
-    description: String,
-}
+        /// Returns the qualified name.
+        /// @return string
+        methods.add_method("getQualifiedName", |_, this, ()| {
+            Ok(this.0.qualified_name.clone())
+        });
 
-impl DocEntryData {
-    /// Quality score: description(40%) + params(25%) + returns(20%) + example(15%).
-    fn score(&self) -> f64 {
-        let mut s = 0.0;
-        if !self.description.is_empty() {
-            s += 0.40;
-        }
-        if !self.parameters.is_empty() {
-            s += 0.25;
-        }
-        if !self.returns.is_empty() {
-            s += 0.20;
-        }
-        if self.example.is_some() {
-            s += 0.15;
-        }
-        s
+        /// Returns the module.
+        /// @return string
+        methods.add_method("getModule", |_, this, ()| Ok(this.0.module.clone()));
+
+        /// Returns the kind.
+        /// @return string
+        methods.add_method("getKind", |_, this, ()| Ok(this.0.kind.clone()));
+
+        /// Returns the description.
+        /// @return string
+        methods.add_method("getDescription", |_, this, ()| {
+            Ok(this.0.description.clone())
+        });
+
+        /// Returns the parameters as a table of `{name, type, description, optional, default?}` records.
+        /// @return table
+        methods.add_method("getParameters", |lua, this, ()| {
+            let tbl = lua.create_table()?;
+            for (i, p) in this.0.parameters.iter().enumerate() {
+                let pt = lua.create_table()?;
+                pt.set("name", p.name.clone())?;
+                pt.set("type", p.type_name.clone())?;
+                pt.set("description", p.description.clone())?;
+                pt.set("optional", p.optional)?;
+                if let Some(ref d) = p.default {
+                    pt.set("default", d.clone())?;
+                }
+                tbl.set(i + 1, pt)?;
+            }
+            Ok(tbl)
+        });
+
+        /// Returns the return values as a table of `{type, description}` records.
+        /// @return table
+        methods.add_method("getReturns", |lua, this, ()| {
+            let tbl = lua.create_table()?;
+            for (i, r) in this.0.returns.iter().enumerate() {
+                let rt = lua.create_table()?;
+                rt.set("type", r.type_name.clone())?;
+                rt.set("description", r.description.clone())?;
+                tbl.set(i + 1, rt)?;
+            }
+            Ok(tbl)
+        });
+
+        /// Returns the example snippet, or nil.
+        /// @return string?
+        methods.add_method("getExample", |_, this, ()| Ok(this.0.example.clone()));
+
+        /// Returns the since version string, or nil.
+        /// @return string?
+        methods.add_method("getSince", |_, this, ()| Ok(this.0.since.clone()));
+
+        /// Returns the deprecation message, or nil.
+        /// @return string?
+        methods.add_method("getDeprecated", |_, this, ()| {
+            Ok(this.0.deprecated.clone())
+        });
+
+        /// Returns the quality score in [0,1].
+        /// @return number
+        methods.add_method("getScore", |_, this, ()| Ok(docs::quality_score(&this.0)));
+
+        /// Returns true when the entry has a non-empty description.
+        /// @return boolean
+        methods.add_method("hasDescription", |_, this, ()| {
+            Ok(!this.0.description.is_empty())
+        });
+
+        /// Returns true when the entry has at least one parameter.
+        /// @return boolean
+        methods.add_method("hasParameters", |_, this, ()| {
+            Ok(!this.0.parameters.is_empty())
+        });
+
+        /// Returns true when the entry declares at least one return type.
+        /// @return boolean
+        methods.add_method("hasReturnType", |_, this, ()| {
+            Ok(!this.0.returns.is_empty())
+        });
+
+        /// Returns true when the entry has an example snippet.
+        /// @return boolean
+        methods.add_method("hasExample", |_, this, ()| Ok(this.0.example.is_some()));
     }
-
-    fn grade(score: f64) -> &'static str {
-        if score >= 0.9 {
-            "A"
-        } else if score >= 0.75 {
-            "B"
-        } else if score >= 0.6 {
-            "C"
-        } else if score >= 0.4 {
-            "D"
-        } else {
-            "F"
-        }
-    }
 }
 
-/// A structured registry of documented API entries.
-#[derive(Clone, Debug)]
-struct ApiCatalogData {
-    entries: Vec<DocEntryData>,
-}
+// ---------------------------------------------------------------------------
+// UserData: ApiCatalog
+// ---------------------------------------------------------------------------
 
-impl ApiCatalogData {
-    fn new() -> Self {
-        Self {
-            entries: Vec::new(),
-        }
-    }
+/// Wraps a catalog snapshot of API entries for Lua access.
+#[derive(Clone)]
+struct ApiCatalog(Vec<docs::DocEntry>);
 
+impl ApiCatalog {
     fn modules(&self) -> Vec<String> {
         let mut mods: Vec<String> = self
-            .entries
+            .0
             .iter()
             .map(|e| e.module.clone())
             .collect::<std::collections::HashSet<_>>()
@@ -103,220 +140,35 @@ impl ApiCatalogData {
         mods
     }
 
-    fn entries_for_module(&self, module: &str) -> Vec<&DocEntryData> {
-        self.entries
-            .iter()
-            .filter(|e| e.module == module)
-            .collect()
+    fn entries_for_module(&self, module: &str) -> Vec<&docs::DocEntry> {
+        self.0.iter().filter(|e| e.module == module).collect()
     }
 
-    fn get_entry(&self, qualified_name: &str) -> Option<&DocEntryData> {
-        self.entries.iter().find(|e| e.qualified_name == qualified_name)
-    }
-
-    fn entry_count(&self, module: Option<&str>) -> usize {
-        match module {
-            Some(m) => self.entries.iter().filter(|e| e.module == m).count(),
-            None => self.entries.len(),
-        }
+    fn get_entry(&self, qualified_name: &str) -> Option<&docs::DocEntry> {
+        self.0.iter().find(|e| e.qualified_name == qualified_name)
     }
 }
-
-// ---------------------------------------------------------------------------
-// UserData: DocEntry
-// ---------------------------------------------------------------------------
-
-/// Wraps a single doc entry for Lua access.
-#[derive(Clone)]
-struct DocEntry(DocEntryData);
-
-impl LuaUserData for DocEntry {
-    fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
-        /// Returns the name.
-        /// @return any
-        ///
-        /// # Returns
-        /// The current name.
-        methods.add_method("getName", |_, this, ()| Ok(this.0.name.clone()));
-        /// Returns the qualified name.
-        /// @return any
-        ///
-        /// # Returns
-        /// The current qualified name.
-        methods.add_method("getQualifiedName", |_, this, ()| {
-            Ok(this.0.qualified_name.clone())
-        });
-        /// Returns the module.
-        /// @return any
-        ///
-        /// # Returns
-        /// The current module.
-        methods.add_method("getModule", |_, this, ()| Ok(this.0.module.clone()));
-        /// Returns the kind.
-        /// @return any
-        ///
-        /// # Returns
-        /// The current kind.
-        methods.add_method("getKind", |_, this, ()| Ok(this.0.kind.clone()));
-        /// Returns the description.
-        /// @return any
-        ///
-        /// # Returns
-        /// The current description.
-        methods.add_method("getDescription", |_, this, ()| {
-            Ok(this.0.description.clone())
-        });
-        /// Returns the parameters.
-        /// @return table
-        ///
-        /// # Returns
-        /// The current parameters.
-        methods.add_method("getParameters", |lua, this, ()| {
-            let tbl = lua.create_table()?;
-            for (i, p) in this.0.parameters.iter().enumerate() {
-                let pt = lua.create_table()?;
-                /// Name on this Object.
-                ///
-                /// # Returns
-                /// The result.
-                pt.set("name", p.name.clone())?;
-                pt.set("type", p.type_name.clone())?;
-                /// Description on this Object.
-                ///
-                /// # Returns
-                /// The result.
-                pt.set("description", p.description.clone())?;
-                /// Optional on this Object.
-                ///
-                /// # Returns
-                /// The result.
-                pt.set("optional", p.optional)?;
-                if let Some(ref d) = p.default {
-                    /// Default on this Object.
-                    ///
-                    /// # Returns
-                    /// The result.
-                    pt.set("default", d.clone())?;
-                }
-                tbl.set(i + 1, pt)?;
-            }
-            Ok(tbl)
-        });
-        /// Returns the returns.
-        /// @return table
-        ///
-        /// # Returns
-        /// The current returns.
-        methods.add_method("getReturns", |lua, this, ()| {
-            let tbl = lua.create_table()?;
-            for (i, r) in this.0.returns.iter().enumerate() {
-                let rt = lua.create_table()?;
-                rt.set("type", r.type_name.clone())?;
-                /// Description on this Object.
-                ///
-                /// # Returns
-                /// The result.
-                rt.set("description", r.description.clone())?;
-                tbl.set(i + 1, rt)?;
-            }
-            Ok(tbl)
-        });
-        /// Returns the example.
-        /// @return any
-        ///
-        /// # Returns
-        /// The current example.
-        methods.add_method("getExample", |_, this, ()| Ok(this.0.example.clone()));
-        /// Returns the since.
-        /// @return any
-        ///
-        /// # Returns
-        /// The current since.
-        methods.add_method("getSince", |_, this, ()| Ok(this.0.since.clone()));
-        /// Returns the deprecated.
-        /// @return any
-        ///
-        /// # Returns
-        /// The current deprecated.
-        methods.add_method("getDeprecated", |_, this, ()| {
-            Ok(this.0.deprecated.clone())
-        });
-        /// Returns the score.
-        /// @return any
-        ///
-        /// # Returns
-        /// The current score.
-        methods.add_method("getScore", |_, this, ()| Ok(this.0.score()));
-        /// Returns `true` if description.
-        /// @return boolean
-        ///
-        /// # Returns
-        /// `boolean`.
-        methods.add_method("hasDescription", |_, this, ()| {
-            Ok(!this.0.description.is_empty())
-        });
-        /// Returns `true` if parameters.
-        /// @return boolean
-        ///
-        /// # Returns
-        /// `boolean`.
-        methods.add_method("hasParameters", |_, this, ()| {
-            Ok(!this.0.parameters.is_empty())
-        });
-        /// Returns `true` if return type.
-        /// @return boolean
-        ///
-        /// # Returns
-        /// `boolean`.
-        methods.add_method("hasReturnType", |_, this, ()| {
-            Ok(!this.0.returns.is_empty())
-        });
-        /// Returns `true` if example.
-        /// @return boolean
-        ///
-        /// # Returns
-        /// `boolean`.
-        methods.add_method("hasExample", |_, this, ()| Ok(this.0.example.is_some()));
-    }
-}
-
-// ---------------------------------------------------------------------------
-// UserData: ApiCatalog
-// ---------------------------------------------------------------------------
-
-/// Wraps a catalog of API entries for Lua access.
-#[derive(Clone)]
-struct ApiCatalog(ApiCatalogData);
 
 impl LuaUserData for ApiCatalog {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
-        /// Returns the modules.
+        /// Returns a sorted list of module names present in the catalog.
         /// @return table
-        ///
-        /// # Returns
-        /// The current modules.
         methods.add_method("getModules", |lua, this, ()| {
             let tbl = lua.create_table()?;
-            for (i, m) in this.0.modules().iter().enumerate() {
+            for (i, m) in this.modules().iter().enumerate() {
                 tbl.set(i + 1, m.clone())?;
             }
             Ok(tbl)
         });
 
-        /// Returns the entries.
+        /// Returns all entries, optionally filtered to a single module.
         /// @param module : string?
         /// @return table
-        ///
-        /// # Parameters
-        /// - `module` — `string` optional.
-        ///
-        /// # Returns
-        /// The current entries.
         methods.add_method("getEntries", |lua, this, module: Option<String>| {
             let tbl = lua.create_table()?;
-            let entries: Vec<&DocEntryData> = match module.as_deref() {
-                Some(m) => this.0.entries_for_module(m),
-                None => this.0.entries.iter().collect(),
+            let entries: Vec<&docs::DocEntry> = match module.as_deref() {
+                Some(m) => this.entries_for_module(m),
+                None => this.0.iter().collect(),
             };
             for (i, e) in entries.iter().enumerate() {
                 tbl.set(i + 1, DocEntry((*e).clone()))?;
@@ -324,32 +176,20 @@ impl LuaUserData for ApiCatalog {
             Ok(tbl)
         });
 
-        /// Returns the entry.
+        /// Returns a single entry by qualified name, or nil.
         /// @param qualified_name : string
         /// @return any
-        ///
-        /// # Parameters
-        /// - `qualified_name` — `string`.
-        ///
-        /// # Returns
-        /// The current entry.
         methods.add_method("getEntry", |_, this, qualified_name: String| {
-            Ok(this.0.get_entry(&qualified_name).map(|e| DocEntry(e.clone())))
+            Ok(this.get_entry(&qualified_name).map(|e| DocEntry(e.clone())))
         });
 
-        /// Returns the types.
+        /// Returns the names of all entries with kind "type" in the given module.
         /// @param module_name : string
         /// @return table
-        ///
-        /// # Parameters
-        /// - `module_name` — `string`.
-        ///
-        /// # Returns
-        /// The current types.
         methods.add_method("getTypes", |lua, this, module_name: String| {
             let tbl = lua.create_table()?;
             let mut idx = 1;
-            for e in &this.0.entries {
+            for e in &this.0 {
                 if e.module == module_name && e.kind == "type" {
                     tbl.set(idx, e.name.clone())?;
                     idx += 1;
@@ -358,21 +198,17 @@ impl LuaUserData for ApiCatalog {
             Ok(tbl)
         });
 
-        /// Returns the type methods.
+        /// Returns entries that are methods of the given type qualified name.
         /// @param qualified_name : string
         /// @return table
-        ///
-        /// # Parameters
-        /// - `qualified_name` — `string`.
-        ///
-        /// # Returns
-        /// The current type methods.
         methods.add_method("getTypeMethods", |lua, this, qualified_name: String| {
             let tbl = lua.create_table()?;
             let prefix = format!("{}:", qualified_name);
             let mut idx = 1;
-            for e in &this.0.entries {
-                if e.qualified_name.starts_with(&prefix) || e.kind == "method" && e.qualified_name.starts_with(&qualified_name) {
+            for e in &this.0 {
+                if e.qualified_name.starts_with(&prefix)
+                    || (e.kind == "method" && e.qualified_name.starts_with(&qualified_name))
+                {
                     tbl.set(idx, DocEntry(e.clone()))?;
                     idx += 1;
                 }
@@ -380,71 +216,58 @@ impl LuaUserData for ApiCatalog {
             Ok(tbl)
         });
 
-        /// Entry count on this Object.
+        /// Returns the number of entries, optionally scoped to a module.
         /// @param module : string?
-        /// @return any
-        ///
-        /// # Parameters
-        /// - `module` — `string` optional.
+        /// @return integer
         methods.add_method("entryCount", |_, this, module: Option<String>| {
-            Ok(this.0.entry_count(module.as_deref()))
+            Ok(match module.as_deref() {
+                Some(m) => this.0.iter().filter(|e| e.module == m).count(),
+                None => this.0.len(),
+            })
         });
 
-        /// Merge on this Object.
+        /// Returns a new catalog that is the union of this and another catalog, with other overriding duplicates.
         /// @param other : userdata
         /// @return any
-        ///
-        /// # Parameters
-        /// - `other` — `userdata`.
         methods.add_method("merge", |_, this, other: LuaAnyUserData| {
             let other = other.borrow::<ApiCatalog>()?;
             let mut merged = this.0.clone();
-            for e in &other.0.entries {
-                if merged.get_entry(&e.qualified_name).is_none() {
-                    merged.entries.push(e.clone());
+            for e in &other.0 {
+                if let Some(existing) = merged
+                    .iter_mut()
+                    .find(|x| x.qualified_name == e.qualified_name)
+                {
+                    *existing = e.clone();
                 } else {
-                    // Override existing
-                    if let Some(existing) = merged
-                        .entries
-                        .iter_mut()
-                        .find(|x| x.qualified_name == e.qualified_name)
-                    {
-                        *existing = e.clone();
-                    }
+                    merged.push(e.clone());
                 }
             }
             Ok(ApiCatalog(merged))
         });
 
-        /// Returns a filtered subset.
+        /// Returns a new catalog containing only entries for which predicate returns true.
         /// @param predicate : function
         /// @return any
-        ///
-        /// # Parameters
-        /// - `predicate` — `function`.
         methods.add_method("filter", |_lua, this, predicate: LuaFunction| {
-            let mut filtered = ApiCatalogData::new();
-            for e in &this.0.entries {
+            let mut filtered = Vec::new();
+            for e in &this.0 {
                 let entry = DocEntry(e.clone());
                 let keep: bool = predicate.call(entry)?;
                 if keep {
-                    filtered.entries.push(e.clone());
+                    filtered.push(e.clone());
                 }
             }
             Ok(ApiCatalog(filtered))
         });
 
-        /// Search on this Object.
+        /// Returns a table of entries whose name, qualified name, or description contains query.
         /// @param query : string
         /// @return table
-        ///
-        /// # Parameters
-        /// - `query` — `string`.
         methods.add_method("search", |lua, this, query: String| {
             let query_lower = query.to_lowercase();
             let tbl = lua.create_table()?;
             let mut idx = 1;
-            for e in &this.0.entries {
+            for e in &this.0 {
                 if e.name.to_lowercase().contains(&query_lower)
                     || e.qualified_name.to_lowercase().contains(&query_lower)
                     || e.description.to_lowercase().contains(&query_lower)
@@ -456,65 +279,35 @@ impl LuaUserData for ApiCatalog {
             Ok(tbl)
         });
 
-        /// To table on this Object.
+        /// Converts the catalog to a plain Lua table array.
         /// @return table
-        ///
-        /// # Returns
-        /// The result.
         methods.add_method("toTable", |lua, this, ()| {
             let tbl = lua.create_table()?;
-            for (i, e) in this.0.entries.iter().enumerate() {
+            for (i, e) in this.0.iter().enumerate() {
                 let et = lua.create_table()?;
-                /// Name on this Object.
-                ///
-                /// # Returns
-                /// The result.
                 et.set("name", e.name.clone())?;
-                /// Qualified name on this Object.
-                ///
-                /// # Returns
-                /// The result.
                 et.set("qualifiedName", e.qualified_name.clone())?;
-                /// Module on this Object.
-                ///
-                /// # Returns
-                /// The result.
                 et.set("module", e.module.clone())?;
-                /// Kind on this Object.
-                ///
-                /// # Returns
-                /// The result.
                 et.set("kind", e.kind.clone())?;
-                /// Description on this Object.
-                ///
-                /// # Returns
-                /// The result.
                 et.set("description", e.description.clone())?;
-                /// Score on this Object.
-                ///
-                /// # Returns
-                /// The result.
-                et.set("score", e.score())?;
+                et.set("score", docs::quality_score(e))?;
                 tbl.set(i + 1, et)?;
             }
             Ok(tbl)
         });
 
-        /// To j s o n on this Object.
-        /// @return any
-        ///
-        /// # Returns
-        /// The result.
+        /// Serialises the catalog to a pretty-printed JSON string.
+        /// @return string
         methods.add_method("toJSON", |_, this, ()| {
             let mut entries = Vec::new();
-            for e in &this.0.entries {
+            for e in &this.0 {
                 let mut map = serde_json::Map::new();
                 map.insert("name".into(), serde_json::json!(e.name));
                 map.insert("qualifiedName".into(), serde_json::json!(e.qualified_name));
                 map.insert("module".into(), serde_json::json!(e.module));
                 map.insert("kind".into(), serde_json::json!(e.kind));
                 map.insert("description".into(), serde_json::json!(e.description));
-                map.insert("score".into(), serde_json::json!(e.score()));
+                map.insert("score".into(), serde_json::json!(docs::quality_score(e)));
                 let params: Vec<serde_json::Value> = e
                     .parameters
                     .iter()
@@ -550,136 +343,98 @@ impl LuaUserData for ApiCatalog {
 // UserData: ValidationReport
 // ---------------------------------------------------------------------------
 
-/// Results of validating catalog completeness.
-#[derive(Clone)]
-struct ValidationReport {
-    missing: Vec<String>,
-    phantom: Vec<String>,
-    incomplete: Vec<String>,
-}
+/// Wraps a validation report for Lua access.
+struct ValidationReport(docs::ValidationReport);
 
 impl LuaUserData for ValidationReport {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
-        /// Returns `true` if valid.
+        /// Returns true when the report has no missing entries.
         /// @return boolean
-        ///
-        /// # Returns
-        /// `boolean`.
-        methods.add_method("isValid", |_, this, ()| Ok(this.missing.is_empty()));
-        /// Returns the missing.
+        methods.add_method("isValid", |_, this, ()| Ok(this.0.missing.is_empty()));
+
+        /// Returns the list of qualified names present in the live API but missing from the catalog.
         /// @return table
-        ///
-        /// # Returns
-        /// The current missing.
         methods.add_method("getMissing", |lua, this, ()| {
             let tbl = lua.create_table()?;
-            for (i, m) in this.missing.iter().enumerate() {
+            for (i, m) in this.0.missing.iter().enumerate() {
                 tbl.set(i + 1, m.clone())?;
             }
             Ok(tbl)
         });
-        /// Returns the phantom.
+
+        /// Returns the list of qualified names in the catalog that are not present in the live API.
         /// @return table
-        ///
-        /// # Returns
-        /// The current phantom.
         methods.add_method("getPhantom", |lua, this, ()| {
             let tbl = lua.create_table()?;
-            for (i, p) in this.phantom.iter().enumerate() {
+            for (i, p) in this.0.phantom.iter().enumerate() {
                 tbl.set(i + 1, p.clone())?;
             }
             Ok(tbl)
         });
-        /// Returns the incomplete.
+
+        /// Returns the list of qualified names whose catalog entry is incomplete.
         /// @return table
-        ///
-        /// # Returns
-        /// The current incomplete.
         methods.add_method("getIncomplete", |lua, this, ()| {
             let tbl = lua.create_table()?;
-            for (i, inc) in this.incomplete.iter().enumerate() {
+            for (i, inc) in this.0.incomplete.iter().enumerate() {
                 tbl.set(i + 1, inc.clone())?;
             }
             Ok(tbl)
         });
-        /// Missing count on this Object.
+
+        /// Returns the count of missing entries.
         /// @return integer
-        ///
-        /// # Returns
-        /// The result.
-        methods.add_method("missingCount", |_, this, ()| Ok(this.missing.len()));
-        /// Phantom count on this Object.
+        methods.add_method("missingCount", |_, this, ()| Ok(this.0.missing.len()));
+
+        /// Returns the count of phantom entries.
         /// @return integer
-        ///
-        /// # Returns
-        /// The result.
-        methods.add_method("phantomCount", |_, this, ()| Ok(this.phantom.len()));
-        /// Incomplete count on this Object.
+        methods.add_method("phantomCount", |_, this, ()| Ok(this.0.phantom.len()));
+
+        /// Returns the count of incomplete entries.
         /// @return integer
-        ///
-        /// # Returns
-        /// The result.
-        methods.add_method("incompleteCount", |_, this, ()| Ok(this.incomplete.len()));
-        /// Returns the summary.
-        /// @return any
-        ///
-        /// # Returns
-        /// The current summary.
+        methods.add_method("incompleteCount", |_, this, ()| Ok(this.0.incomplete.len()));
+
+        /// Returns a single-line summary of the validation results.
+        /// @return string
         methods.add_method("getSummary", |_, this, ()| {
             Ok(format!(
                 "Missing: {}, Phantom: {}, Incomplete: {}",
-                this.missing.len(),
-                this.phantom.len(),
-                this.incomplete.len()
+                this.0.missing.len(),
+                this.0.phantom.len(),
+                this.0.incomplete.len()
             ))
         });
-        /// To table on this Object.
+
+        /// Converts the report to a plain Lua table.
         /// @return table
-        ///
-        /// # Returns
-        /// The result.
         methods.add_method("toTable", |lua, this, ()| {
             let tbl = lua.create_table()?;
             let missing = lua.create_table()?;
-            for (i, m) in this.missing.iter().enumerate() {
+            for (i, m) in this.0.missing.iter().enumerate() {
                 missing.set(i + 1, m.clone())?;
             }
-            /// Missing on this Object.
-            ///
-            /// # Returns
-            /// The result.
             tbl.set("missing", missing)?;
             let phantom = lua.create_table()?;
-            for (i, p) in this.phantom.iter().enumerate() {
+            for (i, p) in this.0.phantom.iter().enumerate() {
                 phantom.set(i + 1, p.clone())?;
             }
-            /// Phantom on this Object.
-            ///
-            /// # Returns
-            /// The result.
             tbl.set("phantom", phantom)?;
             let incomplete = lua.create_table()?;
-            for (i, inc) in this.incomplete.iter().enumerate() {
+            for (i, inc) in this.0.incomplete.iter().enumerate() {
                 incomplete.set(i + 1, inc.clone())?;
             }
-            /// Incomplete on this Object.
-            ///
-            /// # Returns
-            /// The result.
             tbl.set("incomplete", incomplete)?;
             Ok(tbl)
         });
-        /// To j s o n on this Object.
-        /// @return any
-        ///
-        /// # Returns
-        /// The result.
+
+        /// Serialises the report to a pretty-printed JSON string.
+        /// @return string
         methods.add_method("toJSON", |_, this, ()| {
             let val = serde_json::json!({
-                "missing": this.missing,
-                "phantom": this.phantom,
-                "incomplete": this.incomplete,
-                "isValid": this.missing.is_empty()
+                "missing": this.0.missing,
+                "phantom": this.0.phantom,
+                "incomplete": this.0.incomplete,
+                "isValid": this.0.missing.is_empty()
             });
             Ok(serde_json::to_string_pretty(&val).unwrap_or_default())
         });
@@ -690,159 +445,119 @@ impl LuaUserData for ValidationReport {
 // UserData: QualityReport
 // ---------------------------------------------------------------------------
 
-/// Quality metrics for API documentation.
-#[derive(Clone)]
-struct QualityReport {
-    entries: Vec<DocEntryData>,
-    module_scores: HashMap<String, f64>,
-    overall_score: f64,
-}
+/// Wraps documentation quality metrics for Lua access.
+struct QualityReport(docs::QualityReport);
 
 impl LuaUserData for QualityReport {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
-        /// Returns the overall score.
-        /// @return any
-        ///
-        /// # Returns
-        /// The current overall score.
-        methods.add_method("getOverallScore", |_, this, ()| Ok(this.overall_score));
-        /// Returns the grade.
-        /// @return any
-        ///
-        /// # Returns
-        /// The current grade.
+        /// Returns the overall quality score in [0,1].
+        /// @return number
+        methods.add_method("getOverallScore", |_, this, ()| Ok(this.0.overall_score));
+
+        /// Returns the letter grade for the overall score.
+        /// @return string
         methods.add_method("getGrade", |_, this, ()| {
-            Ok(DocEntryData::grade(this.overall_score).to_string())
+            Ok(docs::quality_grade(this.0.overall_score).to_string())
         });
-        /// Returns the module scores.
+
+        /// Returns a table mapping module name to its average quality score.
         /// @return table
-        ///
-        /// # Parameters
-        /// - `count` — `integer` optional.
-        ///
-        /// # Returns
-        /// The current module scores.
         methods.add_method("getModuleScores", |lua, this, ()| {
             let tbl = lua.create_table()?;
-            for (k, v) in &this.module_scores {
+            for (k, v) in &this.0.module_scores {
                 tbl.set(k.clone(), *v)?;
             }
             Ok(tbl)
         });
-        /// Returns the worst.
+
+        /// Returns up to count entries with the lowest quality scores.
         /// @param count : integer?
         /// @return table
-        ///
-        /// # Parameters
-        /// - `count` — `integer` optional.
-        ///
-        /// # Returns
-        /// The current worst.
         methods.add_method("getWorst", |lua, this, count: Option<usize>| {
             let n = count.unwrap_or(10);
-            let mut sorted = this.entries.clone();
-            sorted.sort_by(|a, b| a.score().partial_cmp(&b.score()).unwrap_or(std::cmp::Ordering::Equal));
+            let mut sorted = this.0.entries.clone();
+            sorted.sort_by(|a, b| {
+                docs::quality_score(a)
+                    .partial_cmp(&docs::quality_score(b))
+                    .unwrap_or(std::cmp::Ordering::Equal)
+            });
             let tbl = lua.create_table()?;
             for (i, e) in sorted.iter().take(n).enumerate() {
                 tbl.set(i + 1, DocEntry(e.clone()))?;
             }
             Ok(tbl)
         });
-        /// Returns the best.
+
+        /// Returns up to count entries with the highest quality scores.
         /// @param count : integer?
         /// @return table
-        ///
-        /// # Parameters
-        /// - `count` — `integer` optional.
-        ///
-        /// # Returns
-        /// The current best.
         methods.add_method("getBest", |lua, this, count: Option<usize>| {
             let n = count.unwrap_or(10);
-            let mut sorted = this.entries.clone();
-            sorted.sort_by(|a, b| b.score().partial_cmp(&a.score()).unwrap_or(std::cmp::Ordering::Equal));
+            let mut sorted = this.0.entries.clone();
+            sorted.sort_by(|a, b| {
+                docs::quality_score(b)
+                    .partial_cmp(&docs::quality_score(a))
+                    .unwrap_or(std::cmp::Ordering::Equal)
+            });
             let tbl = lua.create_table()?;
             for (i, e) in sorted.iter().take(n).enumerate() {
                 tbl.set(i + 1, DocEntry(e.clone()))?;
             }
             Ok(tbl)
         });
-        /// Returns the by grade.
+
+        /// Returns entries whose grade exactly matches the given letter grade.
         /// @param grade : string
         /// @return table
-        ///
-        /// # Parameters
-        /// - `grade` — `string`.
-        ///
-        /// # Returns
-        /// The current by grade.
         methods.add_method("getByGrade", |lua, this, grade: String| {
             let tbl = lua.create_table()?;
             let mut idx = 1;
-            for e in &this.entries {
-                if DocEntryData::grade(e.score()) == grade {
+            for e in &this.0.entries {
+                if docs::quality_grade(docs::quality_score(e)) == grade {
                     tbl.set(idx, DocEntry(e.clone()))?;
                     idx += 1;
                 }
             }
             Ok(tbl)
         });
-        /// Returns the summary.
-        /// @return any
-        ///
-        /// # Returns
-        /// The current summary.
+
+        /// Returns a multi-line human-readable summary of quality by module.
+        /// @return string
         methods.add_method("getSummary", |_, this, ()| {
             let mut lines = vec![format!(
                 "Overall: {} ({:.0}%)",
-                DocEntryData::grade(this.overall_score),
-                this.overall_score * 100.0
+                docs::quality_grade(this.0.overall_score),
+                this.0.overall_score * 100.0
             )];
-            let mut mods: Vec<(&String, &f64)> = this.module_scores.iter().collect();
+            let mut mods: Vec<(&String, &f64)> = this.0.module_scores.iter().collect();
             mods.sort_by_key(|(k, _)| *k);
             for (m, s) in mods {
                 lines.push(format!("  {}: {:.0}%", m, s * 100.0));
             }
             Ok(lines.join("\n"))
         });
-        /// To table on this Object.
+
+        /// Converts the quality report to a plain Lua table.
         /// @return table
-        ///
-        /// # Returns
-        /// The result.
         methods.add_method("toTable", |lua, this, ()| {
             let tbl = lua.create_table()?;
-            /// Overall score on this Object.
-            ///
-            /// # Returns
-            /// The result.
-            tbl.set("overallScore", this.overall_score)?;
-            /// Grade on this Object.
-            ///
-            /// # Returns
-            /// The result.
-            tbl.set("grade", DocEntryData::grade(this.overall_score))?;
+            tbl.set("overallScore", this.0.overall_score)?;
+            tbl.set("grade", docs::quality_grade(this.0.overall_score))?;
             let mods = lua.create_table()?;
-            for (k, v) in &this.module_scores {
+            for (k, v) in &this.0.module_scores {
                 mods.set(k.clone(), *v)?;
             }
-            /// Module scores on this Object.
-            ///
-            /// # Returns
-            /// The result.
             tbl.set("moduleScores", mods)?;
             Ok(tbl)
         });
-        /// To j s o n on this Object.
-        /// @return any
-        ///
-        /// # Returns
-        /// The result.
+
+        /// Serialises the quality report to a pretty-printed JSON string.
+        /// @return string
         methods.add_method("toJSON", |_, this, ()| {
             let val = serde_json::json!({
-                "overallScore": this.overall_score,
-                "grade": DocEntryData::grade(this.overall_score),
-                "moduleScores": this.module_scores
+                "overallScore": this.0.overall_score,
+                "grade": docs::quality_grade(this.0.overall_score),
+                "moduleScores": this.0.module_scores
             });
             Ok(serde_json::to_string_pretty(&val).unwrap_or_default())
         });
@@ -855,58 +570,42 @@ impl LuaUserData for QualityReport {
 
 /// State shared between all luna.docs closures via Rc<RefCell>.
 struct DocsState {
-    catalog: ApiCatalogData,
+    entries: Vec<docs::DocEntry>,
 }
 
 impl DocsState {
     fn new() -> Self {
-        Self {
-            catalog: ApiCatalogData::new(),
-        }
+        Self { entries: Vec::new() }
     }
+}
 
-    fn compute_quality(&self, entries: &[DocEntryData]) -> QualityReport {
-        if entries.is_empty() {
-            return QualityReport {
-                entries: vec![],
-                module_scores: HashMap::new(),
-                overall_score: 0.0,
-            };
-        }
-        let total: f64 = entries.iter().map(|e| e.score()).sum();
-        let overall = total / entries.len() as f64;
-
-        let mut module_totals: HashMap<String, (f64, usize)> = HashMap::new();
-        for e in entries {
-            let entry = module_totals.entry(e.module.clone()).or_insert((0.0, 0));
-            entry.0 += e.score();
-            entry.1 += 1;
-        }
-        let module_scores: HashMap<String, f64> = module_totals
-            .into_iter()
-            .map(|(k, (sum, count))| (k, sum / count as f64))
-            .collect();
-
-        QualityReport {
-            entries: entries.to_vec(),
-            module_scores,
-            overall_score: overall,
-        }
+/// Builds a temporary `Catalog` from a slice of entries (clones each entry).
+fn build_catalog(entries: &[docs::DocEntry]) -> docs::Catalog {
+    let mut cat = docs::Catalog::new();
+    for e in entries {
+        cat.add(e.clone());
     }
+    cat
+}
+
+/// Computes a `QualityReport` for the given entry slice.
+fn compute_quality(entries: &[docs::DocEntry]) -> QualityReport {
+    let cat = build_catalog(entries);
+    QualityReport(docs::QualityReport::compute(&cat))
 }
 
 // ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------
 
-/// Walk a Lua table recursively to discover bindings.
+/// Walk a Lua table recursively to discover function bindings.
 #[allow(clippy::only_used_in_recursion)]
 fn scan_table(
     lua: &Lua,
     table: &LuaTable,
     prefix: &str,
     module_name: &str,
-    entries: &mut Vec<DocEntryData>,
+    entries: &mut Vec<docs::DocEntry>,
     depth: usize,
 ) -> LuaResult<()> {
     if depth > 5 || entries.len() > 50000 {
@@ -919,24 +618,18 @@ fn scan_table(
         } else {
             format!("{}.{}", prefix, key)
         };
-
         match &value {
             LuaValue::Function(_) => {
-                entries.push(DocEntryData {
+                entries.push(docs::DocEntry {
                     name: key,
                     qualified_name: qualified,
                     module: module_name.to_string(),
                     kind: "function".to_string(),
-                    description: String::new(),
-                    parameters: vec![],
-                    returns: vec![],
-                    example: None,
-                    since: None,
-                    deprecated: None,
+                    ..Default::default()
                 });
             }
             LuaValue::Table(sub) => {
-                // Recurse into sub-tables (sub-modules)
+                // Recurse into sub-tables (sub-modules).
                 scan_table(lua, sub, &qualified, &key, entries, depth + 1)?;
             }
             _ => {}
@@ -949,38 +642,33 @@ fn scan_table(
 // Registration
 // ---------------------------------------------------------------------------
 
-/// Registers the `luna.docs` namespace. Panics in debug mode if the same entity is registered twice.
-///
-/// # Parameters
-/// - `lua` — `&Lua`.
-/// - `luna_table` — `&LuaTable`.
-///
-/// # Returns
-/// `LuaResult<()>`.
+/// Registers the `luna.docs` namespace.
 pub fn register(lua: &Lua, luna_table: &LuaTable) -> LuaResult<()> {
-    let docs = lua.create_table()?;
+    let docs_tbl = lua.create_table()?;
     let state = Rc::new(RefCell::new(DocsState::new()));
 
     // ===== Catalog Management =====
 
+    // -- scan --------------------------------------------------------------
     /// Scan the luna.* namespace to build an API catalog from live bindings.
     /// @param opts : table?
     /// @return any
-    docs.set(
+    docs_tbl.set(
         "scan",
         lua.create_function(|lua, _opts: Option<LuaTable>| {
             let globals = lua.globals();
             let luna_tbl: LuaTable = globals.get("luna")?;
             let mut entries = Vec::new();
             scan_table(lua, &luna_tbl, "luna", "luna", &mut entries, 0)?;
-            Ok(ApiCatalog(ApiCatalogData { entries }))
+            Ok(ApiCatalog(entries))
         })?,
     )?;
 
+    // -- scanModule --------------------------------------------------------
     /// Scan a single module's bindings.
     /// @param module_name : string
     /// @return any
-    docs.set(
+    docs_tbl.set(
         "scanModule",
         lua.create_function(|lua, module_name: String| {
             let globals = lua.globals();
@@ -989,68 +677,56 @@ pub fn register(lua: &Lua, luna_table: &LuaTable) -> LuaResult<()> {
             let prefix = format!("luna.{}", module_name);
             let mut entries = Vec::new();
             scan_table(lua, &sub, &prefix, &module_name, &mut entries, 0)?;
-            Ok(ApiCatalog(ApiCatalogData { entries }))
+            Ok(ApiCatalog(entries))
         })?,
     )?;
 
+    // -- loadToml ----------------------------------------------------------
     /// Load a TOML doc file into an ApiCatalog.
     /// @param path : string
     /// @return any
-    docs.set(
+    docs_tbl.set(
         "loadToml",
         lua.create_function(|lua, path: String| {
-            // Read file content
-            let content = std::fs::read_to_string(&path)
-                .map_err(|e| LuaError::RuntimeError(format!("failed to read {}: {}", path, e)))?;
-
-            // Parse TOML via luna.data.parseToml
+            let content = std::fs::read_to_string(&path).map_err(|e| {
+                LuaError::RuntimeError(format!("failed to read {}: {}", path, e))
+            })?;
             let globals = lua.globals();
             let luna_tbl: LuaTable = globals.get("luna")?;
             let data_tbl: LuaTable = luna_tbl.get("data")?;
             let parse_fn: LuaFunction = data_tbl.get("parseToml")?;
             let parsed: LuaTable = parse_fn.call(content)?;
-
-            // Convert TOML table to entries
             let mut entries = Vec::new();
             if let Ok(api_entries) = parsed.get::<_, LuaTable>("entries") {
-                for (_, entry_tbl) in api_entries.pairs::<i64, LuaTable>().flatten() {
-                    let name: String = entry_tbl.get("name").unwrap_or_default();
-                    let qname: String = entry_tbl.get("qualifiedName").unwrap_or_default();
-                    let module: String = entry_tbl.get("module").unwrap_or_default();
-                    let kind: String = entry_tbl.get("kind").unwrap_or("function".into());
-                    let desc: String = entry_tbl.get("description").unwrap_or_default();
-                    let example: Option<String> = entry_tbl.get("example").ok();
-                    let since: Option<String> = entry_tbl.get("since").ok();
-                    let deprecated: Option<String> = entry_tbl.get("deprecated").ok();
-
-                    entries.push(DocEntryData {
-                        name,
-                        qualified_name: qname,
-                        module,
-                        kind,
-                        description: desc,
-                        parameters: vec![],
-                        returns: vec![],
-                        example,
-                        since,
-                        deprecated,
+                for (_, et) in api_entries.pairs::<i64, LuaTable>().flatten() {
+                    entries.push(docs::DocEntry {
+                        name: et.get("name").unwrap_or_default(),
+                        qualified_name: et.get("qualifiedName").unwrap_or_default(),
+                        module: et.get("module").unwrap_or_default(),
+                        kind: et.get("kind").unwrap_or_else(|_| "function".into()),
+                        description: et.get("description").unwrap_or_default(),
+                        example: et.get("example").ok(),
+                        since: et.get("since").ok(),
+                        deprecated: et.get("deprecated").ok(),
+                        ..Default::default()
                     });
                 }
             }
-            Ok(ApiCatalog(ApiCatalogData { entries }))
+            Ok(ApiCatalog(entries))
         })?,
     )?;
 
-    /// Load all .toml files in a directory and merge.
+    // -- loadAll -----------------------------------------------------------
+    /// Load all .toml files in a directory and merge into a single ApiCatalog.
     /// @param directory : string
     /// @return any
-    docs.set(
+    docs_tbl.set(
         "loadAll",
         lua.create_function(|lua, directory: String| {
             let mut all_entries = Vec::new();
             if let Ok(read_dir) = std::fs::read_dir(&directory) {
-                for entry in read_dir.flatten() {
-                    let path = entry.path();
+                for item in read_dir.flatten() {
+                    let path = item.path();
                     if path.extension().is_some_and(|e| e == "toml") {
                         if let Ok(content) = std::fs::read_to_string(&path) {
                             let globals = lua.globals();
@@ -1058,9 +734,9 @@ pub fn register(lua: &Lua, luna_table: &LuaTable) -> LuaResult<()> {
                             let data_tbl: LuaTable = luna_tbl.get("data")?;
                             let parse_fn: LuaFunction = data_tbl.get("parseToml")?;
                             if let Ok(parsed) = parse_fn.call::<_, LuaTable>(content) {
-                                if let Ok(entries) = parsed.get::<_, LuaTable>("entries") {
-                                    for (_, et) in entries.pairs::<i64, LuaTable>().flatten() {
-                                        all_entries.push(DocEntryData {
+                                if let Ok(api_entries) = parsed.get::<_, LuaTable>("entries") {
+                                    for (_, et) in api_entries.pairs::<i64, LuaTable>().flatten() {
+                                        all_entries.push(docs::DocEntry {
                                             name: et.get("name").unwrap_or_default(),
                                             qualified_name: et
                                                 .get("qualifiedName")
@@ -1068,15 +744,14 @@ pub fn register(lua: &Lua, luna_table: &LuaTable) -> LuaResult<()> {
                                             module: et.get("module").unwrap_or_default(),
                                             kind: et
                                                 .get("kind")
-                                                .unwrap_or("function".into()),
+                                                .unwrap_or_else(|_| "function".into()),
                                             description: et
                                                 .get("description")
                                                 .unwrap_or_default(),
-                                            parameters: vec![],
-                                            returns: vec![],
                                             example: et.get("example").ok(),
                                             since: et.get("since").ok(),
                                             deprecated: et.get("deprecated").ok(),
+                                            ..Default::default()
                                         });
                                     }
                                 }
@@ -1085,29 +760,26 @@ pub fn register(lua: &Lua, luna_table: &LuaTable) -> LuaResult<()> {
                     }
                 }
             }
-            Ok(ApiCatalog(ApiCatalogData {
-                entries: all_entries,
-            }))
+            Ok(ApiCatalog(all_entries))
         })?,
     )?;
 
-    /// Inject a description for an API entry.
-    let s = state.clone();
+    // -- describe ----------------------------------------------------------
+    /// Inject or update a description for a named API entry.
     /// @param qualified_name : string
     /// @param description : string
-    docs.set(
+    let s = state.clone();
+    docs_tbl.set(
         "describe",
         lua.create_function(move |_, (qualified_name, description): (String, String)| {
             let mut st = s.borrow_mut();
             if let Some(entry) = st
-                .catalog
                 .entries
                 .iter_mut()
                 .find(|e| e.qualified_name == qualified_name)
             {
                 entry.description = description;
             } else {
-                // Create a new entry
                 let parts: Vec<&str> = qualified_name.rsplitn(2, '.').collect();
                 let name = parts[0].to_string();
                 let module = if parts.len() > 1 {
@@ -1115,278 +787,273 @@ pub fn register(lua: &Lua, luna_table: &LuaTable) -> LuaResult<()> {
                 } else {
                     String::new()
                 };
-                st.catalog.entries.push(DocEntryData {
+                st.entries.push(docs::DocEntry {
                     name,
                     qualified_name,
                     module,
                     kind: "function".to_string(),
                     description,
-                    parameters: vec![],
-                    returns: vec![],
-                    example: None,
-                    since: None,
-                    deprecated: None,
+                    ..Default::default()
                 });
             }
             Ok(())
         })?,
     )?;
 
-    /// Set parameter info for an entry.
-    let s = state.clone();
+    // -- setParamInfo ------------------------------------------------------
+    /// Set the parameter metadata for a catalog entry.
     /// @param qualified_name : string
     /// @param params : table
-    docs.set(
+    let s = state.clone();
+    docs_tbl.set(
         "setParamInfo",
-        lua.create_function(move |_, (qualified_name, params): (String, LuaTable)| {
-            let mut st = s.borrow_mut();
-            let mut param_list = Vec::new();
-            for (_, pt) in params.pairs::<i64, LuaTable>().flatten() {
-                param_list.push(ParamInfo {
-                    name: pt.get("name").unwrap_or_default(),
-                    type_name: pt.get("type").unwrap_or_default(),
-                    description: pt.get("description").unwrap_or_default(),
-                    optional: pt.get("optional").unwrap_or(false),
-                    default: pt.get("default").ok(),
-                });
-            }
-            if let Some(entry) = st
-                .catalog
-                .entries
-                .iter_mut()
-                .find(|e| e.qualified_name == qualified_name)
-            {
-                entry.parameters = param_list;
-            }
-            Ok(())
-        })?,
+        lua.create_function(
+            move |_, (qualified_name, params): (String, LuaTable)| {
+                let mut st = s.borrow_mut();
+                let mut param_list = Vec::new();
+                for (_, pt) in params.pairs::<i64, LuaTable>().flatten() {
+                    param_list.push(docs::ParamInfo {
+                        name: pt.get("name").unwrap_or_default(),
+                        type_name: pt.get("type").unwrap_or_default(),
+                        description: pt.get("description").unwrap_or_default(),
+                        optional: pt.get("optional").unwrap_or(false),
+                        default: pt.get("default").ok(),
+                    });
+                }
+                if let Some(entry) = st
+                    .entries
+                    .iter_mut()
+                    .find(|e| e.qualified_name == qualified_name)
+                {
+                    entry.parameters = param_list;
+                }
+                Ok(())
+            },
+        )?,
     )?;
 
-    /// Set return type info for an entry.
-    let s = state.clone();
+    // -- setReturnInfo -----------------------------------------------------
+    /// Set the return type metadata for a catalog entry.
     /// @param qualified_name : string
     /// @param returns : table
-    docs.set(
+    let s = state.clone();
+    docs_tbl.set(
         "setReturnInfo",
-        lua.create_function(move |_, (qualified_name, returns): (String, LuaTable)| {
-            let mut st = s.borrow_mut();
-            let mut return_list = Vec::new();
-            for (_, rt) in returns.pairs::<i64, LuaTable>().flatten() {
-                return_list.push(ReturnInfo {
-                    type_name: rt.get("type").unwrap_or_default(),
-                    description: rt.get("description").unwrap_or_default(),
-                });
-            }
-            if let Some(entry) = st
-                .catalog
-                .entries
-                .iter_mut()
-                .find(|e| e.qualified_name == qualified_name)
-            {
-                entry.returns = return_list;
-            }
-            Ok(())
-        })?,
+        lua.create_function(
+            move |_, (qualified_name, returns): (String, LuaTable)| {
+                let mut st = s.borrow_mut();
+                let mut return_list = Vec::new();
+                for (_, rt) in returns.pairs::<i64, LuaTable>().flatten() {
+                    return_list.push(docs::ReturnInfo {
+                        type_name: rt.get("type").unwrap_or_default(),
+                        description: rt.get("description").unwrap_or_default(),
+                    });
+                }
+                if let Some(entry) = st
+                    .entries
+                    .iter_mut()
+                    .find(|e| e.qualified_name == qualified_name)
+                {
+                    entry.returns = return_list;
+                }
+                Ok(())
+            },
+        )?,
     )?;
 
-    /// Get the current internal catalog.
+    // -- getCatalog --------------------------------------------------------
+    /// Return the current internal catalog as an ApiCatalog userdata.
     let s = state.clone();
-    docs.set(
+    docs_tbl.set(
         "getCatalog",
-        lua.create_function(move |_, ()| Ok(ApiCatalog(s.borrow().catalog.clone())))?,
+        lua.create_function(move |_, ()| Ok(ApiCatalog(s.borrow().entries.clone())))?,
     )?;
 
-    /// Reset the internal catalog.
+    // -- resetCatalog ------------------------------------------------------
+    /// Clear all entries from the internal catalog.
     let s = state.clone();
-    docs.set(
+    docs_tbl.set(
         "resetCatalog",
         lua.create_function(move |_, ()| {
-            s.borrow_mut().catalog = ApiCatalogData::new();
+            s.borrow_mut().entries.clear();
             Ok(())
         })?,
     )?;
 
     // ===== Validation =====
 
-    /// Validate catalog completeness against live bindings.
+    // -- validate ----------------------------------------------------------
+    /// Validate catalog completeness against the live luna.* bindings.
     /// @param catalog_ud : userdata?
     /// @return any
-    docs.set(
+    docs_tbl.set(
         "validate",
         lua.create_function(|lua, catalog_ud: Option<LuaAnyUserData>| {
-            let catalog = catalog_ud.map(|ud| ud.borrow::<ApiCatalog>().map(|c| c.clone())).transpose()?;
-            // Scan live bindings
+            let doc_entries = catalog_ud
+                .map(|ud| ud.borrow::<ApiCatalog>().map(|c| c.0.clone()))
+                .transpose()?
+                .unwrap_or_default();
             let globals = lua.globals();
             let luna_tbl: LuaTable = globals.get("luna")?;
             let mut live_entries = Vec::new();
             scan_table(lua, &luna_tbl, "luna", "luna", &mut live_entries, 0)?;
-
             let live_names: std::collections::HashSet<String> =
                 live_entries.iter().map(|e| e.qualified_name.clone()).collect();
-
-            let cat = match catalog {
-                Some(c) => c.0.clone(),
-                None => ApiCatalogData::new(),
-            };
             let doc_names: std::collections::HashSet<String> =
-                cat.entries.iter().map(|e| e.qualified_name.clone()).collect();
-
-            let missing: Vec<String> = live_names
-                .difference(&doc_names)
-                .cloned()
-                .collect();
-            let phantom: Vec<String> = doc_names
-                .difference(&live_names)
-                .cloned()
-                .collect();
-            let incomplete: Vec<String> = cat
-                .entries
+                doc_entries.iter().map(|e| e.qualified_name.clone()).collect();
+            let mut missing: Vec<String> =
+                live_names.difference(&doc_names).cloned().collect();
+            missing.sort();
+            let mut phantom: Vec<String> =
+                doc_names.difference(&live_names).cloned().collect();
+            phantom.sort();
+            let mut incomplete: Vec<String> = doc_entries
                 .iter()
-                .filter(|e| e.description.is_empty() || e.parameters.is_empty() || e.returns.is_empty())
+                .filter(|e| {
+                    e.description.is_empty()
+                        || (e.kind != "value"
+                            && e.parameters.is_empty()
+                            && e.returns.is_empty())
+                })
                 .map(|e| e.qualified_name.clone())
                 .collect();
-
-            Ok(ValidationReport {
+            incomplete.sort();
+            Ok(ValidationReport(docs::ValidationReport {
                 missing,
                 phantom,
                 incomplete,
-            })
+            }))
         })?,
     )?;
 
-    /// Validate a single module.
+    // -- validateModule ----------------------------------------------------
+    /// Validate a single module against the live luna.<module>.* bindings.
     /// @param module_name : string
     /// @param catalog_ud : userdata?
     /// @return any
-    docs.set(
+    docs_tbl.set(
         "validateModule",
-        lua.create_function(|lua, (module_name, catalog_ud): (String, Option<LuaAnyUserData>)| {
-            let catalog = catalog_ud.map(|ud| ud.borrow::<ApiCatalog>().map(|c| c.clone())).transpose()?;
-            let globals = lua.globals();
-            let luna_tbl: LuaTable = globals.get("luna")?;
-            let sub: LuaTable = luna_tbl.get(module_name.clone())?;
-            let prefix = format!("luna.{}", module_name);
-            let mut live_entries = Vec::new();
-            scan_table(lua, &sub, &prefix, &module_name, &mut live_entries, 0)?;
-
-            let live_names: std::collections::HashSet<String> =
-                live_entries.iter().map(|e| e.qualified_name.clone()).collect();
-
-            let cat = match catalog {
-                Some(c) => c.0.clone(),
-                None => ApiCatalogData::new(),
-            };
-            let doc_names: std::collections::HashSet<String> = cat
-                .entries
-                .iter()
-                .filter(|e| e.module == module_name)
-                .map(|e| e.qualified_name.clone())
-                .collect();
-
-            let missing: Vec<String> = live_names.difference(&doc_names).cloned().collect();
-            let phantom: Vec<String> = doc_names.difference(&live_names).cloned().collect();
-            let incomplete: Vec<String> = cat
-                .entries
-                .iter()
-                .filter(|e| e.module == module_name)
-                .filter(|e| e.description.is_empty() || e.parameters.is_empty() || e.returns.is_empty())
-                .map(|e| e.qualified_name.clone())
-                .collect();
-
-            Ok(ValidationReport {
-                missing,
-                phantom,
-                incomplete,
-            })
-        })?,
+        lua.create_function(
+            |lua, (module_name, catalog_ud): (String, Option<LuaAnyUserData>)| {
+                let doc_entries = catalog_ud
+                    .map(|ud| ud.borrow::<ApiCatalog>().map(|c| c.0.clone()))
+                    .transpose()?
+                    .unwrap_or_default();
+                let globals = lua.globals();
+                let luna_tbl: LuaTable = globals.get("luna")?;
+                let sub: LuaTable = luna_tbl.get(module_name.clone())?;
+                let prefix = format!("luna.{}", module_name);
+                let mut live_entries = Vec::new();
+                scan_table(lua, &sub, &prefix, &module_name, &mut live_entries, 0)?;
+                let live_names: std::collections::HashSet<String> =
+                    live_entries.iter().map(|e| e.qualified_name.clone()).collect();
+                let doc_names: std::collections::HashSet<String> = doc_entries
+                    .iter()
+                    .filter(|e| e.module == module_name)
+                    .map(|e| e.qualified_name.clone())
+                    .collect();
+                let mut missing: Vec<String> =
+                    live_names.difference(&doc_names).cloned().collect();
+                missing.sort();
+                let mut phantom: Vec<String> =
+                    doc_names.difference(&live_names).cloned().collect();
+                phantom.sort();
+                let mut incomplete: Vec<String> = doc_entries
+                    .iter()
+                    .filter(|e| e.module == module_name)
+                    .filter(|e| {
+                        e.description.is_empty()
+                            || (e.kind != "value"
+                                && e.parameters.is_empty()
+                                && e.returns.is_empty())
+                    })
+                    .map(|e| e.qualified_name.clone())
+                    .collect();
+                incomplete.sort();
+                Ok(ValidationReport(docs::ValidationReport {
+                    missing,
+                    phantom,
+                    incomplete,
+                }))
+            },
+        )?,
     )?;
 
-    /// Compare catalog timestamps against source files.
+    // -- checkStaleness ----------------------------------------------------
+    /// Compare catalog entries against source files in a directory for staleness.
     /// @param catalog_ud : userdata
     /// @param source_dir : string
     /// @return table
-    docs.set(
+    docs_tbl.set(
         "checkStaleness",
-        lua.create_function(|lua, (_catalog_ud, source_dir): (LuaAnyUserData, String)| {
-            let tbl = lua.create_table()?;
-            let stale = lua.create_table()?;
-            let current = lua.create_table()?;
-            let missing_tbl = lua.create_table()?;
-            // Basic implementation — check if source files exist
-            if let Ok(read_dir) = std::fs::read_dir(&source_dir) {
-                let mut idx = 1;
-                for entry in read_dir.flatten() {
-                    let path = entry.path();
-                    if path.extension().is_some_and(|e| e == "rs" || e == "lua") {
-                        current.set(idx, path.to_string_lossy().to_string())?;
-                        idx += 1;
+        lua.create_function(
+            |lua, (_catalog_ud, source_dir): (LuaAnyUserData, String)| {
+                let tbl = lua.create_table()?;
+                let stale = lua.create_table()?;
+                let current = lua.create_table()?;
+                let missing_tbl = lua.create_table()?;
+                if let Ok(read_dir) = std::fs::read_dir(&source_dir) {
+                    let mut idx = 1;
+                    for item in read_dir.flatten() {
+                        let path = item.path();
+                        if path.extension().is_some_and(|e| e == "rs" || e == "lua") {
+                            current.set(idx, path.to_string_lossy().to_string())?;
+                            idx += 1;
+                        }
                     }
                 }
-            }
-            /// Stale on this Object.
-            ///
-            /// # Returns
-            /// The result.
-            tbl.set("stale", stale)?;
-            /// Current on this Object.
-            ///
-            /// # Returns
-            /// The result.
-            tbl.set("current", current)?;
-            /// Missing on this Object.
-            ///
-            /// # Returns
-            /// The result.
-            tbl.set("missing", missing_tbl)?;
-            Ok(tbl)
-        })?,
+                tbl.set("stale", stale)?;
+                tbl.set("current", current)?;
+                tbl.set("missing", missing_tbl)?;
+                Ok(tbl)
+            },
+        )?,
     )?;
 
     // ===== Metrics =====
 
-    /// Calculate quality metrics for a catalog.
-    let s = state.clone();
+    // -- quality -----------------------------------------------------------
+    /// Calculate quality metrics for a catalog or the internal catalog.
     /// @param catalog_ud : userdata?
     /// @return any
-    docs.set(
+    let s = state.clone();
+    docs_tbl.set(
         "quality",
         lua.create_function(move |_, catalog_ud: Option<LuaAnyUserData>| {
-            let st = s.borrow();
-            let catalog = catalog_ud.map(|ud| ud.borrow::<ApiCatalog>().map(|c| c.clone())).transpose()?;
-            let entries = match catalog {
-                Some(c) => c.0.entries,
-                None => st.catalog.entries.clone(),
+            let entries = match catalog_ud {
+                Some(ud) => ud.borrow::<ApiCatalog>()?.0.clone(),
+                None => s.borrow().entries.clone(),
             };
-            Ok(st.compute_quality(&entries))
+            Ok(compute_quality(&entries))
         })?,
     )?;
 
-    /// Quality for a single module.
-    let s = state.clone();
+    // -- qualityModule -----------------------------------------------------
+    /// Calculate quality metrics for a single module.
     /// @param module_name : string
     /// @param catalog_ud : userdata?
     /// @return any
-    docs.set(
+    let s = state.clone();
+    docs_tbl.set(
         "qualityModule",
-        lua.create_function(move |_, (module_name, catalog_ud): (String, Option<LuaAnyUserData>)| {
-            let st = s.borrow();
-            let catalog = catalog_ud.map(|ud| ud.borrow::<ApiCatalog>().map(|c| c.clone())).transpose()?;
-            let all = match catalog {
-                Some(c) => c.0.entries,
-                None => st.catalog.entries.clone(),
-            };
-            let filtered: Vec<DocEntryData> = all
-                .into_iter()
-                .filter(|e| e.module == module_name)
-                .collect();
-            Ok(st.compute_quality(&filtered))
-        })?,
+        lua.create_function(
+            move |_, (module_name, catalog_ud): (String, Option<LuaAnyUserData>)| {
+                let all = match catalog_ud {
+                    Some(ud) => ud.borrow::<ApiCatalog>()?.0.clone(),
+                    None => s.borrow().entries.clone(),
+                };
+                let filtered: Vec<docs::DocEntry> =
+                    all.into_iter().filter(|e| e.module == module_name).collect();
+                Ok(compute_quality(&filtered))
+            },
+        )?,
     )?;
 
-    /// Coverage: (documented, total).
+    // -- coverage ----------------------------------------------------------
+    /// Return (documented_count, total_live_count) coverage tuple.
     /// @param catalog_ud : userdata?
     /// @return any
-    docs.set(
+    docs_tbl.set(
         "coverage",
         lua.create_function(|lua, catalog_ud: Option<LuaAnyUserData>| {
             let globals = lua.globals();
@@ -1394,52 +1061,56 @@ pub fn register(lua: &Lua, luna_table: &LuaTable) -> LuaResult<()> {
             let mut live = Vec::new();
             scan_table(lua, &luna_tbl, "luna", "luna", &mut live, 0)?;
             let total = live.len();
-
-            let catalog = catalog_ud.map(|ud| ud.borrow::<ApiCatalog>().map(|c| c.clone())).transpose()?;
-            let documented = match catalog {
-                Some(c) => c.0.entries.len(),
+            let documented = match catalog_ud {
+                Some(ud) => ud.borrow::<ApiCatalog>()?.0.len(),
                 None => 0,
             };
             Ok((documented, total))
         })?,
     )?;
 
-    /// Module-level coverage.
+    // -- coverageModule ----------------------------------------------------
+    /// Return (documented_count, total_live_count) for a single module.
     /// @param module_name : string
     /// @param catalog_ud : userdata?
     /// @return any
-    docs.set(
+    docs_tbl.set(
         "coverageModule",
-        lua.create_function(|lua, (module_name, catalog_ud): (String, Option<LuaAnyUserData>)| {
-            let globals = lua.globals();
-            let luna_tbl: LuaTable = globals.get("luna")?;
-            let sub: LuaTable = luna_tbl.get(module_name.clone())?;
-            let prefix = format!("luna.{}", module_name);
-            let mut live = Vec::new();
-            scan_table(lua, &sub, &prefix, &module_name, &mut live, 0)?;
-            let total = live.len();
-
-            let catalog = catalog_ud.map(|ud| ud.borrow::<ApiCatalog>().map(|c| c.clone())).transpose()?;
-            let documented = match catalog {
-                Some(c) => c.0.entries.iter().filter(|e| e.module == module_name).count(),
-                None => 0,
-            };
-            Ok((documented, total))
-        })?,
+        lua.create_function(
+            |lua, (module_name, catalog_ud): (String, Option<LuaAnyUserData>)| {
+                let globals = lua.globals();
+                let luna_tbl: LuaTable = globals.get("luna")?;
+                let sub: LuaTable = luna_tbl.get(module_name.clone())?;
+                let prefix = format!("luna.{}", module_name);
+                let mut live = Vec::new();
+                scan_table(lua, &sub, &prefix, &module_name, &mut live, 0)?;
+                let total = live.len();
+                let documented = match catalog_ud {
+                    Some(ud) => ud
+                        .borrow::<ApiCatalog>()?
+                        .0
+                        .iter()
+                        .filter(|e| e.module == module_name)
+                        .count(),
+                    None => 0,
+                };
+                Ok((documented, total))
+            },
+        )?,
     )?;
 
     // ===== Export =====
 
-    /// Export completions JSON for VS Code IntelliSense.
+    // -- exportCompletions -------------------------------------------------
+    /// Export VS Code IntelliSense completions JSON to a file.
     /// @param catalog_ud : userdata
     /// @param path : string
-    docs.set(
+    docs_tbl.set(
         "exportCompletions",
         lua.create_function(|_, (catalog_ud, path): (LuaAnyUserData, String)| {
             let catalog = catalog_ud.borrow::<ApiCatalog>()?;
             let completions: Vec<serde_json::Value> = catalog
                 .0
-                .entries
                 .iter()
                 .map(|e| {
                     serde_json::json!({
@@ -1462,15 +1133,16 @@ pub fn register(lua: &Lua, luna_table: &LuaTable) -> LuaResult<()> {
         })?,
     )?;
 
-    /// Export hover JSON.
+    // -- exportHover -------------------------------------------------------
+    /// Export VS Code hover JSON to a file.
     /// @param catalog_ud : userdata
     /// @param path : string
-    docs.set(
+    docs_tbl.set(
         "exportHover",
         lua.create_function(|_, (catalog_ud, path): (LuaAnyUserData, String)| {
             let catalog = catalog_ud.borrow::<ApiCatalog>()?;
             let mut hover: HashMap<String, serde_json::Value> = HashMap::new();
-            for e in &catalog.0.entries {
+            for e in &catalog.0 {
                 hover.insert(
                     e.qualified_name.clone(),
                     serde_json::json!({
@@ -1478,10 +1150,17 @@ pub fn register(lua: &Lua, luna_table: &LuaTable) -> LuaResult<()> {
                         "description": e.description,
                         "kind": e.kind,
                         "parameters": e.parameters.iter().map(|p| {
-                            serde_json::json!({"name": p.name, "type": p.type_name, "description": p.description})
+                            serde_json::json!({
+                                "name": p.name,
+                                "type": p.type_name,
+                                "description": p.description
+                            })
                         }).collect::<Vec<_>>(),
                         "returns": e.returns.iter().map(|r| {
-                            serde_json::json!({"type": r.type_name, "description": r.description})
+                            serde_json::json!({
+                                "type": r.type_name,
+                                "description": r.description
+                            })
                         }).collect::<Vec<_>>()
                     }),
                 );
@@ -1493,15 +1172,16 @@ pub fn register(lua: &Lua, luna_table: &LuaTable) -> LuaResult<()> {
         })?,
     )?;
 
-    /// Export signatures JSON.
+    // -- exportSignatures --------------------------------------------------
+    /// Export VS Code signature-help JSON to a file.
     /// @param catalog_ud : userdata
     /// @param path : string
-    docs.set(
+    docs_tbl.set(
         "exportSignatures",
         lua.create_function(|_, (catalog_ud, path): (LuaAnyUserData, String)| {
             let catalog = catalog_ud.borrow::<ApiCatalog>()?;
             let mut sigs: HashMap<String, serde_json::Value> = HashMap::new();
-            for e in &catalog.0.entries {
+            for e in &catalog.0 {
                 if !e.parameters.is_empty() {
                     let params: Vec<serde_json::Value> = e
                         .parameters
@@ -1533,20 +1213,19 @@ pub fn register(lua: &Lua, luna_table: &LuaTable) -> LuaResult<()> {
         })?,
     )?;
 
-    /// Export all three files to a directory.
+    // -- exportAll ---------------------------------------------------------
+    /// Export completions.json, hover.json, and signatures.json to a directory.
     /// @param catalog_ud : userdata
     /// @param output_dir : string
-    docs.set(
+    docs_tbl.set(
         "exportAll",
         lua.create_function(|_, (catalog_ud, output_dir): (LuaAnyUserData, String)| {
             let catalog = catalog_ud.borrow::<ApiCatalog>()?;
             std::fs::create_dir_all(&output_dir)
                 .map_err(|e| LuaError::RuntimeError(format!("mkdir error: {}", e)))?;
-
-            // Completions
+            // completions.json
             let completions: Vec<serde_json::Value> = catalog
                 .0
-                .entries
                 .iter()
                 .map(|e| {
                     serde_json::json!({
@@ -1562,12 +1241,14 @@ pub fn register(lua: &Lua, luna_table: &LuaTable) -> LuaResult<()> {
                 })
                 .collect();
             let path = format!("{}/completions.json", output_dir);
-            std::fs::write(&path, serde_json::to_string_pretty(&completions).unwrap_or_default())
-                .map_err(|e| LuaError::RuntimeError(format!("write error: {}", e)))?;
-
-            // Hover
+            std::fs::write(
+                &path,
+                serde_json::to_string_pretty(&completions).unwrap_or_default(),
+            )
+            .map_err(|e| LuaError::RuntimeError(format!("write error: {}", e)))?;
+            // hover.json
             let mut hover: HashMap<String, serde_json::Value> = HashMap::new();
-            for e in &catalog.0.entries {
+            for e in &catalog.0 {
                 hover.insert(
                     e.qualified_name.clone(),
                     serde_json::json!({
@@ -1578,44 +1259,57 @@ pub fn register(lua: &Lua, luna_table: &LuaTable) -> LuaResult<()> {
                 );
             }
             let path = format!("{}/hover.json", output_dir);
-            std::fs::write(&path, serde_json::to_string_pretty(&hover).unwrap_or_default())
-                .map_err(|e| LuaError::RuntimeError(format!("write error: {}", e)))?;
-
-            // Signatures
+            std::fs::write(
+                &path,
+                serde_json::to_string_pretty(&hover).unwrap_or_default(),
+            )
+            .map_err(|e| LuaError::RuntimeError(format!("write error: {}", e)))?;
+            // signatures.json
             let mut sigs: HashMap<String, serde_json::Value> = HashMap::new();
-            for e in &catalog.0.entries {
+            for e in &catalog.0 {
                 if !e.parameters.is_empty() {
                     let params: Vec<serde_json::Value> = e
                         .parameters
                         .iter()
-                        .map(|p| serde_json::json!({"label": p.name, "documentation": p.description}))
+                        .map(|p| {
+                            serde_json::json!({
+                                "label": p.name,
+                                "documentation": p.description
+                            })
+                        })
                         .collect();
                     sigs.insert(
                         e.qualified_name.clone(),
-                        serde_json::json!({"label": e.qualified_name, "parameters": params}),
+                        serde_json::json!({
+                            "label": e.qualified_name,
+                            "parameters": params
+                        }),
                     );
                 }
             }
             let path = format!("{}/signatures.json", output_dir);
-            std::fs::write(&path, serde_json::to_string_pretty(&sigs).unwrap_or_default())
-                .map_err(|e| LuaError::RuntimeError(format!("write error: {}", e)))?;
-
+            std::fs::write(
+                &path,
+                serde_json::to_string_pretty(&sigs).unwrap_or_default(),
+            )
+            .map_err(|e| LuaError::RuntimeError(format!("write error: {}", e)))?;
             Ok(())
         })?,
     )?;
 
-    /// Export markdown API reference.
+    // -- exportMarkdown ----------------------------------------------------
+    /// Export a Markdown API reference file.
     /// @param catalog_ud : userdata
     /// @param path : string
-    docs.set(
+    docs_tbl.set(
         "exportMarkdown",
         lua.create_function(|_, (catalog_ud, path): (LuaAnyUserData, String)| {
             let catalog = catalog_ud.borrow::<ApiCatalog>()?;
             let mut md = String::from("# API Reference\n\n");
-            let mods = catalog.0.modules();
+            let mods = catalog.modules();
             for module in &mods {
                 md.push_str(&format!("## {}\n\n", module));
-                for e in catalog.0.entries_for_module(module) {
+                for e in catalog.entries_for_module(module) {
                     md.push_str(&format!("### `{}`\n\n", e.qualified_name));
                     if !e.description.is_empty() {
                         md.push_str(&format!("{}\n\n", e.description));
@@ -1627,7 +1321,7 @@ pub fn register(lua: &Lua, luna_table: &LuaTable) -> LuaResult<()> {
                                 "- `{}` ({}){}\n",
                                 p.name,
                                 p.type_name,
-                                if p.optional { " — optional" } else { "" }
+                                if p.optional { " -- optional" } else { "" }
                             ));
                         }
                         md.push('\n');
@@ -1651,28 +1345,30 @@ pub fn register(lua: &Lua, luna_table: &LuaTable) -> LuaResult<()> {
         })?,
     )?;
 
-    /// Export one-line-per-function cheatsheet.
+    // -- exportCheatsheet --------------------------------------------------
+    /// Export a one-line-per-function plain-text cheatsheet.
     /// @param catalog_ud : userdata
     /// @param path : string
-    docs.set(
+    docs_tbl.set(
         "exportCheatsheet",
         lua.create_function(|_, (catalog_ud, path): (LuaAnyUserData, String)| {
             let catalog = catalog_ud.borrow::<ApiCatalog>()?;
             let mut lines = Vec::new();
-            let mods = catalog.0.modules();
+            let mods = catalog.modules();
             for module in &mods {
                 lines.push(format!("# {}", module));
-                for e in catalog.0.entries_for_module(module) {
-                    let params: Vec<String> = e.parameters.iter().map(|p| p.name.clone()).collect();
-                    let sig = if params.is_empty() {
+                for e in catalog.entries_for_module(module) {
+                    let param_names: Vec<String> =
+                        e.parameters.iter().map(|p| p.name.clone()).collect();
+                    let sig = if param_names.is_empty() {
                         format!("{}()", e.qualified_name)
                     } else {
-                        format!("{}({})", e.qualified_name, params.join(", "))
+                        format!("{}({})", e.qualified_name, param_names.join(", "))
                     };
                     let desc = if e.description.is_empty() {
                         String::new()
                     } else {
-                        format!(" — {}", e.description)
+                        format!(" -- {}", e.description)
                     };
                     lines.push(format!("  {}{}", sig, desc));
                 }
@@ -1684,10 +1380,6 @@ pub fn register(lua: &Lua, luna_table: &LuaTable) -> LuaResult<()> {
         })?,
     )?;
 
-    /// Docs on this Object.
-    ///
-    /// # Returns
-    /// The result.
-    luna_table.set("docs", docs)?;
+    luna_table.set("docs", docs_tbl)?;
     Ok(())
 }

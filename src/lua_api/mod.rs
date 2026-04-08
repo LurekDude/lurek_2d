@@ -133,8 +133,14 @@ pub mod system_api;
 /// Registers the `luna.devtools.*` developer diagnostics API.
 pub mod devtools_api;
 
+/// Registers the `luna.debugbridge.*` TCP debug server API.
+pub mod debugbridge_api;
+
 /// Registers the `luna.localization.*` multi-locale string catalog API.
 pub mod localization_api;
+
+/// Registers the `luna.log.*` structured log level API.
+pub mod log_api;
 
 /// Registers the `luna.docs.*` documentation management API.
 pub mod docs_api;
@@ -203,6 +209,11 @@ pub fn create_lua_vm(state: Rc<RefCell<SharedState>>, modules: &ModulesConfig) -
         devtools_api::register(&lua, &luna, state.clone())?;
     }
 
+    // debugbridge: luna.debugbridge
+    if modules.debug {
+        debugbridge_api::register(&lua, &luna)?;
+    }
+
     // localization: luna.localization
     if modules.localization {
         localization_api::register(&lua, &luna, state.clone())?;
@@ -218,6 +229,9 @@ pub fn create_lua_vm(state: Rc<RefCell<SharedState>>, modules: &ModulesConfig) -
 
     // docs: luna.docs (always registered — no config flag)
     docs_api::register(&lua, &luna)?;
+
+    // log: luna.log (always registered — no config flag)
+    log_api::register(&lua, &luna)?;
 
     // data: luna.data (always registered — no config flag)
     data_api::register(&lua, &luna, state.clone())?;
