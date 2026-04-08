@@ -9,7 +9,7 @@
 //! from large or adversarially constructed input scripts (CSF-010 allocation
 //! guard).
 
-use super::Step;
+use super::{Action, Step};
 
 /// Maximum number of steps permitted per script.
 ///
@@ -114,5 +114,85 @@ impl Script {
     /// `usize`.
     pub fn step_count(&self) -> usize {
         self.steps.len()
+    }
+
+    /// Parse a Script from a TOML string.
+    ///
+    /// Expects a top-level `[meta]` table with an optional `description` key,
+    /// and a `[[steps]]` array where each step has at minimum an `action`
+    /// string field. Recognised step fields: `action`, `time`, `key`,
+    /// `scancode`, `x`, `y`, `dx`, `dy`, `button`, `text`, `isRepeat`,
+    /// `clicks`.
+    ///
+    /// Returns `Err(String)` if the TOML is malformed, if any `action` value
+    /// is unrecognised, or if a step is missing the required `action` field.
+    ///
+    /// # Parameters
+    /// - `name` — `impl Into<String>`.
+    /// - `toml_str` — `&str`.
+    ///
+    /// # Returns
+    /// `Result<Script, String>`.
+    pub fn from_toml(name: impl Into<String>, toml_str: &str) -> Result<Self, String> {
+        let doc: toml::Value =
+            toml::from_str(toml_str).map_err(|e| format!("invalid TOML: {e}"))?;
+
+        let description = doc
+            .get("meta")
+            .and_then(|m| m.get("description"))
+            .and_then(|d| d.as_str())
+            .map(|s| s.to_string());
+
+        let steps_values = doc
+            .get("steps")
+            .and_then(|s| s.as_array())
+            .cloned()
+            .unwrap_or_default();
+
+        let mut steps = Vec::with_capacity(steps_values.len());
+        for sv in &steps_values {
+            let action_str = sv
+                .get("action")
+                .and_then(|a| a.as_str())
+                .ok_or_else(|| "each step needs 'action'".to_string())?;
+            let action = Action::parse_action(action_str)
+                .ok_or_else(|| format!("unknown action '{action_str}'"))?;
+            let time = sv
+                .get("time")
+                .and_then(|t| t.as_float())
+                .unwrap_or(0.0) as f32;
+            let mut step = Step::new(time, action);
+            step.key = sv.get("key").and_then(|v| v.as_str()).map(str::to_string);
+            step.scancode = sv
+                .get("scancode")
+                .and_then(|v| v.as_str())
+                .map(str::to_string);
+            step.x = sv.get("x").and_then(|v| v.as_float());
+            step.y = sv.get("y").and_then(|v| v.as_float());
+            step.dx = sv.get("dx").and_then(|v| v.as_float());
+            step.dy = sv.get("dy").and_then(|v| v.as_float());
+            step.button = sv
+                .get("button")
+                .and_then(|v| v.as_integer())
+                .map(|n| n as u32);
+            step.text = sv
+                .get("text")
+                .and_then(|v| v.as_str())
+                .map(str::to_string);
+            step.is_repeat = sv
+                .get("isRepeat")
+                .and_then(|v| v.as_bool())
+                .unwrap_or(false);
+            step.clicks = sv
+                .get("clicks")
+                .and_then(|v| v.as_integer())
+                .map(|n| n as u32);
+            steps.push(step);
+        }
+
+        Ok(match description {
+            Some(desc) => Self::with_description(name, desc, steps),
+            None => Self::new(name, steps),
+        })
     }
 }

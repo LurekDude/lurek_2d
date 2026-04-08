@@ -559,3 +559,61 @@ fn simulator_default_trait() {
     let sim = Simulator::default();
     assert!(!sim.is_running());
 }
+
+// ── Script::from_toml tests ───────────────────────────────────────────
+
+#[test]
+fn script_from_toml_minimal_steps() {
+    let toml = r#"
+        [[steps]]
+        action = "keypress"
+        time = 0.1
+    "#;
+    let script = Script::from_toml("test", toml).unwrap();
+    assert_eq!(script.name, "test");
+    assert_eq!(script.step_count(), 1);
+    assert!(script.description.is_none());
+}
+
+#[test]
+fn script_from_toml_with_meta() {
+    let toml = r#"
+        [meta]
+        description = "My script"
+        [[steps]]
+        action = "mousemove"
+        x = 1.0
+        y = 2.0
+    "#;
+    let script = Script::from_toml("s", toml).unwrap();
+    assert_eq!(script.description, Some("My script".to_string()));
+    assert_eq!(script.step_count(), 1);
+}
+
+#[test]
+fn script_from_toml_invalid_toml_returns_error() {
+    let result = Script::from_toml("x", "not { valid toml ===");
+    assert!(result.is_err());
+}
+
+#[test]
+fn script_from_toml_unknown_action_returns_error() {
+    let toml = "[[steps]]\naction = \"notanaction\"\n";
+    let result = Script::from_toml("x", toml);
+    assert!(result.is_err());
+    assert!(result.unwrap_err().contains("unknown action"));
+}
+
+#[test]
+fn script_from_toml_missing_action_returns_error() {
+    let toml = "[[steps]]\ntime = 0.5\n";
+    let result = Script::from_toml("x", toml);
+    assert!(result.is_err());
+}
+
+#[test]
+fn script_from_toml_empty_steps_creates_empty_script() {
+    let toml = "[meta]\ndescription = \"empty\"\n";
+    let script = Script::from_toml("empty", toml).unwrap();
+    assert_eq!(script.step_count(), 0);
+}

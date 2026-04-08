@@ -207,6 +207,22 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
         lua.create_function(move |_, ()| Ok(sim.borrow().elapsed_time()))?,
     )?;
 
+    // -- loadFromToml --
+    /// Parses a TOML string and registers it as a named script.
+    /// @param name : string
+    /// @param toml_str : string
+    /// @return nil
+    let sim = simulator.clone();
+    tbl.set(
+        "loadFromToml",
+        lua.create_function(move |_, (name, toml_str): (String, String)| {
+            let script = Script::from_toml(&name, &toml_str)
+                .map_err(|e| LuaError::external(format!("loadFromToml: {e}")))?;
+            sim.borrow_mut().load(script);
+            Ok(())
+        })?,
+    )?;
+
     luna.set("simulator", tbl)?;
     Ok(())
 }
