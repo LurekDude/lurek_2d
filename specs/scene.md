@@ -14,18 +14,22 @@
 The scene module implements a push-down automaton for game state management — the
 industry-standard pattern for navigating between a game's distinct modes (title
 screen, main gameplay, pause menu, inventory screen, game-over). Scenes are
-pushed onto a LIFO stack; the top scene receives `update(dt)` calls each frame;
-`draw()` dispatches to every scene bottom-to-top so that overlay scenes (pause
+pushed onto a LIFO stack; the top scene receives `process(dt)` calls each frame;
+`render()` dispatches to every scene bottom-to-top so that overlay scenes (pause
 menus, HUDs) render on top of their parent. Popping a scene returns control to
 the one below it, with its full state intact.
 
-Six lifecycle callbacks are supported per scene table: `enter`, `leave`, `pause`,
-`resume`, `update`, and `draw`. The stack automatically calls `pause` on the
+Ten lifecycle callbacks are supported per scene table: `enter`, `leave`, `pause`,
+`resume`, `ready`, `update` (legacy), `draw` (legacy), `process`, `process_physics`,
+`process_late`, `render`, and `render_ui`. `ready` fires exactly once after `enter`,
+on the first `luna.scene.process()` tick — tracked per-scene by
+`SceneState.scene_ready_pending`. The stack automatically calls `pause` on the
 outgoing top scene when a new scene is pushed, and `resume` when it is revealed
 again by a pop. `enter` and `leave` bookend the entire lifetime of a scene on the
 stack. Both `push` and `switchTo` accept an optional `params` argument that is
 forwarded to the incoming scene's `enter(self, params)` callback, enabling
-data flow between scenes without globals.
+data flow between scenes without globals. All callbacks are optional — scenes
+may implement only the methods they need; missing methods are silently skipped.
 
 Animated visual transitions (fade, slide-left, slide-right, slide-up, slide-down)
 bridge between states so scene changes feel intentional. Transition progress is
@@ -55,8 +59,10 @@ luna.scene (Lua API — scene_api.rs)
   │     ├── stack: SceneStack          ← Rust-side LIFO stack
   │     ├── scene_refs: HashMap<SceneId, RegistryKey>
   │     │     └── maps Rust IDs → Lua tables stored in registry
-  │     └── data_refs: HashMap<String, RegistryKey>
-  │           └── maps data keys → Lua values in registry
+  │     ├── data_refs: HashMap<String, RegistryKey>
+  │     │     └── maps data keys → Lua values in registry
+  │     └── scene_ready_pending: HashSet<SceneId>
+  │           └── scenes whose `ready` callback has not yet fired
   │
   ├── SceneStack (src/scene/stack.rs)
   │     ├── stack: Vec<SceneId>        ← ordered bottom-to-top
@@ -85,7 +91,25 @@ push(scene_b)           pop()                   switchTo(scene_c)
   │                       │                       │
   ├─ prev.pause()         ├─ top.leave()          ├─ top.leave()
   ├─ stack.push(b)        ├─ stack.pop()          ├─ stack.pop() + push(c)
-  └─ b.enter(params)      └─ revealed.resume()    └─ c.enter(params)
+  ├─ b.enter(params)      └─ revealed.resume()    └─ c.enter(params)
+  └─ b added to ready_pending
+
+First luna.scene.process(dt) after enter:
+  ready_pending.remove(b) → b:ready()   [only once per push]
+  → b:process(dt)
+
+Subsequent luna.scene.process(dt) calls:
+  → b:process(dt)          [ready is NOT called again]
+```
+
+### Per-Frame Pipeline Callbacks
+
+```
+luna.scene.processPhysics(fixed_dt)  → top scene:process_physics(fixed_dt)
+luna.scene.process(dt)               → [first tick: ready()] then top scene:process(dt)
+luna.scene.processLate(dt)           → top scene:process_late(dt)
+luna.scene.render()                  → ALL scenes (bottom→top): scene:render()
+luna.scene.renderUi()                → ALL scenes (bottom→top): scene:render_ui()
 ```
 
 ## Source Files
@@ -189,13 +213,23 @@ wraps a `DepthSorter` plus a `Vec<LuaRegistryKey>` for callback storage.
 
 | Function | Signature | Description |
 |----------|-----------|-------------|
-| `luna.scene.push` | `(scene, transition?, duration?, params?)` | Push a scene table; calls `prev:pause()` then `scene:enter(params)` |
+| `luna.scene.push` | `(scene, transition?, duration?, params?)` | Push a scene table; calls `prev:pause()` then `scene:enter(params)`; marks scene for `ready` on next `process` |
 | `luna.scene.pop` | `(transition?, duration?)` | Pop top scene; calls `top:leave()` then `revealed:resume()` |
-| `luna.scene.switchTo` | `(scene, transition?, duration?, params?)` | Replace top scene; calls `old:leave()` then `scene:enter(params)` |
+| `luna.scene.switchTo` | `(scene, transition?, duration?, params?)` | Replace top scene; calls `old:leave()` then `scene:enter(params)`; marks new scene for `ready` |
 | `luna.scene.clear` | `()` | Remove all scenes, calling `leave()` on each |
 | `luna.scene.popTo` | `(name) → boolean` | Pop until named registered scene is on top; returns false if not found |
-| `luna.scene.update` | `(dt)` | Update transition timer and call `top:update(dt)` |
-| `luna.scene.draw` | `()` | Call `draw()` on every scene bottom-to-top |
+| `luna.scene.update` | `(dt)` | Update transition timer and call `top:update(dt)` *(legacy — prefer `process`)* |
+| `luna.scene.draw` | `()` | Call `draw()` on every scene bottom-to-top *(legacy — prefer `render`)* |
+
+### Pipeline Dispatch
+
+| Function | Signature | Description |
+|----------|-----------|-------------|
+| `luna.scene.process` | `(dt: number)` | Fire `scene:ready(self)` once on first tick after push/switchTo, then call `scene:process(dt)` on the top scene |
+| `luna.scene.processPhysics` | `(dt: number)` | Call `scene:process_physics(dt)` on the top scene (fixed timestep) |
+| `luna.scene.processLate` | `(dt: number)` | Call `scene:process_late(dt)` on the top scene (after `process`, before `render`) |
+| `luna.scene.render` | `()` | Call `scene:render(self)` on **all** scenes bottom-to-top |
+| `luna.scene.renderUi` | `()` | Call `scene:render_ui(self)` on **all** scenes bottom-to-top (UI/HUD overlay) |
 
 ### Stack Query
 
@@ -231,13 +265,31 @@ wraps a `DepthSorter` plus a `Vec<LuaRegistryKey>` for callback storage.
 | `luna.scene.hasData` | `(key) → boolean` | Check if a key exists |
 | `luna.scene.removeData` | `(key)` | Delete a key-value pair |
 
+### Scene Callback Contract
+
+A scene is any Lua table. All methods below are **optional** — missing methods
+are silently skipped. Implement only what your scene needs.
+
+| Method | Called when |
+|--------|-------------|
+| `scene:enter(params)` | Scene is pushed or switched to (params may be nil) |
+| `scene:leave()` | Scene is popped or replaced by switchTo |
+| `scene:pause()` | A new scene is pushed on top of this one |
+| `scene:resume()` | The scene above this one is popped |
+| `scene:ready()` | First `luna.scene.process()` tick after enter (once per push) |
+| `scene:process(dt)` | Every frame via `luna.scene.process(dt)` |
+| `scene:process_physics(dt)` | Fixed timestep via `luna.scene.processPhysics(dt)` |
+| `scene:process_late(dt)` | After process, before render via `luna.scene.processLate(dt)` |
+| `scene:render()` | Every frame via `luna.scene.render()` — all scenes |
+| `scene:render_ui()` | Every frame via `luna.scene.renderUi()` — UI overlay, all scenes |
+| `scene:update(dt)` | Legacy; via `luna.scene.update(dt)` — top scene only |
+| `scene:draw()` | Legacy; via `luna.scene.draw()` — all scenes |
+
 ### Factory
 
 | Function | Signature | Description |
-|----------|-----------|-------------|
+|--------|-----------|-------------|
 | `luna.scene.newDepthSorter` | `() → DepthSorter` | Create a new depth-sorted draw batcher |
-
-### DepthSorter Methods (UserData)
 
 | Method | Signature | Description |
 |--------|-----------|-------------|
@@ -258,9 +310,13 @@ local menu = {
         print("Menu entered")
     end,
     leave  = function(self) print("Menu left") end,
-    update = function(self, dt) end,
-    draw   = function(self)
+    ready  = function(self) print("Menu ready — one-time setup") end,
+    process = function(self, dt) end,
+    render  = function(self)
         luna.gfx.print("Main Menu - Press Enter", 100, 100)
+    end,
+    render_ui = function(self)
+        luna.gfx.print("[Press Enter to start]", 100, 130)
     end,
 }
 
@@ -271,9 +327,18 @@ local game = {
     pause  = function(self) print("Game paused") end,
     resume = function(self) print("Game resumed") end,
     leave  = function(self) print("Game over") end,
-    update = function(self, dt) end,
-    draw   = function(self)
+    ready  = function(self)
+        -- called once after enter, before first process tick
+        print("Game ready — spawning entities")
+    end,
+    process            = function(self, dt) end,
+    process_physics    = function(self, dt) end,
+    process_late       = function(self, dt) end,
+    render             = function(self)
         luna.gfx.print("Level " .. self.level, 100, 100)
+    end,
+    render_ui          = function(self)
+        luna.gfx.print("HUD", 10, 10)
     end,
 }
 
@@ -281,12 +346,24 @@ function luna.init()
     luna.scene.push(menu)
 end
 
+function luna.process_physics(dt)
+    luna.scene.processPhysics(dt)
+end
+
 function luna.process(dt)
-    luna.scene.update(dt)
+    luna.scene.process(dt)
+end
+
+function luna.process_late(dt)
+    luna.scene.processLate(dt)
 end
 
 function luna.render()
-    luna.scene.draw()
+    luna.scene.render()
+end
+
+function luna.render_ui()
+    luna.scene.renderUi()
 end
 
 function luna.keypressed(key)

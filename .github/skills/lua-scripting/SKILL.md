@@ -35,7 +35,7 @@ description: "Load this skill when writing or reviewing Lua game scripts for Lun
 ## Decision Rules
 
 - **Entry point**: Every game has a `main.lua` in its directory
-- **Callbacks**: Define `luna.load()`, `luna.update(dt)`, `luna.draw()` as the game structure
+- **Callbacks**: Define `luna.init()`, `luna.ready()`, `luna.process(dt)`, `luna.process_physics(dt)`, `luna.process_late(dt)`, `luna.render()`, `luna.render_ui()` as the game structure (all optional — see engine-architecture.md § Callback Contract)
 - **API prefix**: Always `luna.*` — never external engine prefixes or globals
 - **Local variables**: Use `local` for all variables — avoid globals except luna callbacks
 - **Table patterns**: Use tables for game objects: `local player = {x = 100, y = 200, speed = 150}`

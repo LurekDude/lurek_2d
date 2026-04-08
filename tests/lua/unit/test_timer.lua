@@ -115,4 +115,51 @@ describe("luna.time functions", function()
     end)
 end)
 
+describe("luna.time physics delta", function()
+    it("getPhysicsDelta is a function", function()
+        expect_type("function", luna.time.getPhysicsDelta)
+    end)
+
+    it("setPhysicsDelta is a function", function()
+        expect_type("function", luna.time.setPhysicsDelta)
+    end)
+
+    it("getPhysicsDelta returns default 1/60", function()
+        local dt = luna.time.getPhysicsDelta()
+        expect_near(1.0 / 60.0, dt, 1e-9)
+    end)
+
+    it("setPhysicsDelta changes the value", function()
+        local original = luna.time.getPhysicsDelta()
+        luna.time.setPhysicsDelta(1.0 / 30.0)
+        local after = luna.time.getPhysicsDelta()
+        expect_near(1.0 / 30.0, after, 1e-9)
+        -- restore
+        luna.time.setPhysicsDelta(original)
+    end)
+
+    it("setPhysicsDelta clamps to minimum 1/240", function()
+        luna.time.setPhysicsDelta(0.001) -- ~1000 Hz, too fast
+        local dt = luna.time.getPhysicsDelta()
+        expect_near(1.0 / 240.0, dt, 1e-9)
+        -- restore
+        luna.time.setPhysicsDelta(1.0 / 60.0)
+    end)
+
+    it("setPhysicsDelta clamps to maximum 1/10", function()
+        luna.time.setPhysicsDelta(1.0) -- 1 Hz, too slow
+        local dt = luna.time.getPhysicsDelta()
+        expect_near(1.0 / 10.0, dt, 1e-9)
+        -- restore
+        luna.time.setPhysicsDelta(1.0 / 60.0)
+    end)
+
+    it("default physics tick rate is consistent with 60 Hz", function()
+        -- Restore to default first, then verify it is near 1/60.
+        luna.time.setPhysicsDelta(1.0 / 60.0)
+        local dt = luna.time.getPhysicsDelta()
+        expect_near(1.0 / 60.0, dt, 1e-6)
+    end)
+end)
+
 test_summary()

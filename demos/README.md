@@ -1,6 +1,6 @@
 # Luna2D Demos
 
-111 fully playable demo games, organized by category.
+111 fully playable demo games, organized by category. Plus 1 pipeline showcase.
 Every demo is self-contained: run with `cargo run -- demos/<category>/<name>`.
 
 For API reference code (not runnable games), see [`examples/`](../examples/).
@@ -148,6 +148,7 @@ luna demos/<category>/<name>                  # installed binary
 | <img src="showcase/demo_game/screen.png" width="160" height="120" alt="Demo Game"> | [Demo Game](showcase/demo_game) | Complete shooting gallery game |
 | <img src="showcase/particles_demo/screen.png" width="160" height="120" alt="Particles Demo"> | [Particles Demo](showcase/particles_demo) | Particle emitter systems showcase |
 | <img src="showcase/scene_demo/screen.png" width="160" height="120" alt="Scene Demo"> | [Scene Demo](showcase/scene_demo) | Multi-screen state machine demo |
+| <img src="showcase/pipeline_showcase/screen.png" width="160" height="120" alt="Pipeline Showcase"> | [Pipeline Showcase](showcase/pipeline_showcase) | Full pipeline: ready · process · process_physics · process_late · render · render_ui — with scene stack, ECS entities and GUI |
 | <img src="showcase/tween_demo/screen.png" width="160" height="120" alt="Tween Demo"> | [Tween Demo](showcase/tween_demo) | All easing curves side-by-side |
 | <img src="showcase/signal_demo/screen.png" width="160" height="120" alt="Signal Demo"> | [Signal Demo](showcase/signal_demo) | Pub-sub event bus demo |
 | <img src="showcase/patterns_demo/screen.png" width="160" height="120" alt="Patterns Demo"> | [Patterns Demo](showcase/patterns_demo) | 6 game design patterns in Lua |

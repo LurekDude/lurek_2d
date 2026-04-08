@@ -207,16 +207,18 @@ automatically unregistered from the Lua registry after each `update()` call.
 
 ### `luna.time` table functions
 
-| Function                       | Signature                 | Description                                                  |
-|--------------------------------|---------------------------|--------------------------------------------------------------|
-| `luna.time.getDelta()`        | `() → number`            | Frame delta time in seconds from `SharedState.delta_time`    |
-| `luna.time.getFPS()`          | `() → number`            | Current FPS from `SharedState.fps`                           |
-| `luna.time.getTime()`         | `() → number`            | Total elapsed time from `SharedState.total_time`             |
-| `luna.time.getAverageDelta()` | `() → number`            | Rolling 60-frame average delta from `Clock.average_delta()`  |
-| `luna.time.step()`            | `() → number`            | Advance clock one tick; returns delta. Calls `SharedState.step_timer()` |
-| `luna.time.getMicroTime()`    | `() → number`            | High-resolution elapsed time from `Clock.elapsed()`          |
-| `luna.time.sleep(seconds)`    | `(number) → nil`         | Block the main thread for `seconds` (≤ 0 is ignored)        |
-| `luna.time.newScheduler()`    | `() → Scheduler`         | Create a new independent `LuaScheduler` UserData             |
+| Function                          | Signature                 | Description                                                                      |
+|-----------------------------------|---------------------------|----------------------------------------------------------------------------------|
+| `luna.time.getDelta()`           | `() → number`            | Frame delta time in seconds from `SharedState.delta_time`                        |
+| `luna.time.getFPS()`             | `() → number`            | Current FPS from `SharedState.fps`                                               |
+| `luna.time.getTime()`            | `() → number`            | Total elapsed time from `SharedState.total_time`                                 |
+| `luna.time.getAverageDelta()`    | `() → number`            | Rolling 60-frame average delta from `Clock.average_delta()`                      |
+| `luna.time.step()`               | `() → number`            | Advance clock one tick; returns delta. Calls `SharedState.step_timer()`          |
+| `luna.time.getMicroTime()`       | `() → number`            | High-resolution elapsed time from `Clock.elapsed()`                              |
+| `luna.time.sleep(seconds)`       | `(number) → nil`         | Block the main thread for `seconds` (≤ 0 is ignored)                            |
+| `luna.time.newScheduler()`       | `() → Scheduler`         | Create a new independent `LuaScheduler` UserData                                 |
+| `luna.time.getPhysicsDelta()`    | `() → number`            | Returns the current fixed physics timestep in seconds (default `1/60`)           |
+| `luna.time.setPhysicsDelta(dt)`  | `(number) → nil`         | Sets the physics timestep; clamped to [1/240, 1/10]. See also `performance.physics_tick_rate` in `conf.lua` |
 
 ### `Scheduler` UserData methods
 

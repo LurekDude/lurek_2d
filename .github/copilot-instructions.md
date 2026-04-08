@@ -62,11 +62,11 @@ Luna2D uses a strictly layered architecture enforced by Rust's module visibility
 
 **Tier 3 — Lunasome** (`library/`) — Pure-Lua standard libraries that consume only the public `luna.*` API. No Rust engine internals. Includes `battle`, `cardgame`, `combat`, `crafting`, `dialog`, `doll`, `economy`, `inventory`, `item`, `province_map`, `quest`, `stats`.
 
-**Rendering**: `DrawCommand` variants are pushed into a queue during `luna.draw()`. After the callback returns, `GpuRenderer::render_frame()` processes the queue in wgpu render passes. No GPU calls inside Lua closures.
+**Rendering**: `DrawCommand` variants are pushed into a queue during `luna.render()` and `luna.render_ui()`. After each callback returns, `GpuRenderer::render_frame()` processes the queue in wgpu render passes. No GPU calls inside Lua closures.
 
 **State**: `Rc<RefCell<SharedState>>` is shared between Lua closures and the engine loop. All resources (textures, fonts, meshes, etc.) live in typed `SlotMap<TypedKey, Resource>` pools — see `src/engine/resource_keys.rs`.
 
-**Boot**: CLI args → `Config::load_from_conf_lua()` (conf.lua via temp Lua VM) → `App::new()` (winit, wgpu, rodio, GameFS) → `create_lua_vm()` (LuaJIT, 35+ API modules) → `main.lua` → `luna.load()` → winit event loop.
+**Boot**: CLI args → `Config::load_from_conf_lua()` (conf.lua via temp Lua VM) → `App::new()` (winit, wgpu, rodio, GameFS) → `create_lua_vm()` (LuaJIT, 35+ API modules) → `main.lua` → `luna.init()` / `luna.ready()` → winit event loop.
 
 ## CAG Routing
 
@@ -118,7 +118,7 @@ Luna2D-specific rules only — common Rust idioms apply without repetition:
 - Every API file signature: `pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> LuaResult<()>`
 - Clone `Rc` before moving into closures: `let state = state.clone();` then `move |...| { let s = state.borrow(); ... }`
 - Sensible defaults — never require a parameter a beginner would always pass the same value
-- All callbacks (`luna.load`, `luna.update`, `luna.draw`, and all event callbacks) are optional — blank `main.lua` is valid
+- All callbacks (`luna.init`, `luna.ready`, `luna.process`, `luna.process_physics`, `luna.process_late`, `luna.render`, `luna.render_ui`, and all event callbacks) are optional — blank `main.lua` is valid
 - Lua API is synchronous from the script's perspective — async work in Rust threads via `Channel`
 - Validate inputs at the Lua boundary — return descriptive `LuaError`, never panic
 - Full callback reference: `docs/architecture/engine-architecture.md` § Callback Contract

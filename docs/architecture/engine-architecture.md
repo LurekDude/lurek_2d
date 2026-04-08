@@ -339,9 +339,12 @@ The game loop runs inside `App::run()` using winit's `ApplicationHandler` trait.
 │                                   touchreleased                 │
 │ 4. Fire window callbacks       → focus, visible, resize         │
 │ 5. Fire gamepad hotplug        → joystickadded, joystickremoved │
-│ 6. Call luna.update(dt)        → game logic                     │
-│ 7. Clear draw command queue                                     │
-│ 8. Call luna.draw()            → game pushes DrawCommands       │
+│ 6a. Call luna.process_physics(fixed_dt) [0–N fixed steps]       │
+│ 6b. Call luna.process(dt)      → game logic                     │
+│ 6c. Call luna.process_late(dt) → post-logic update              │
+│ 7.  Clear draw command queue                                    │
+│ 8a. Call luna.render()         → game pushes DrawCommands       │
+│ 8b. Call luna.render_ui()      → UI/HUD overlay DrawCommands    │
 │ 9. GpuRenderer::render_frame()                                 │
 │    ├── Flush pending resource removals (deferred destruction)   │
 │    ├── Update auto-uniforms (time, screen size)                 │
@@ -802,7 +805,7 @@ Operations: `push`, `pop`, `demand` (blocking), `peek`, `getCount`, `clear`.
 ### Error Flow
 
 ```
-Lua runtime error during luna.update()/luna.draw()
+Lua runtime error during luna.process()/luna.render()/luna.render_ui()
   │
   ├── luna.errorhandler(msg) defined? → call it → use returned message
   │
@@ -853,12 +856,31 @@ The engine creates a temporary Lua VM, builds a defaults table, executes `conf.l
 
 All callbacks are optional — the engine checks if the function exists before calling it. See [philosophy.md](philosophy.md) for the "blank main.lua" principle.
 
+### Lifecycle Callbacks
+
 | Callback | Arguments | When Fired |
 |---|---|---|
 | `luna.conf(t)` | config table | During conf.lua processing |
-| `luna.load()` | — | Once after main.lua loads |
-| `luna.update(dt)` | delta time (seconds) | Every frame |
-| `luna.draw()` | — | Every frame (push DrawCommands here) |
+| `luna.init()` | — | Once after main.lua loads |
+| `luna.ready()` | — | Once before the first `process` frame (after init, after window is fully set up) |
+| `luna.exit()` | — | Engine shutdown |
+| `luna.quit()` | — | Close requested (return `true` to cancel) |
+| `luna.errorhandler(msg)` | error message | Uncaught Lua error |
+
+### Frame Pipeline Callbacks (per-frame order)
+
+| Callback | Arguments | When Fired |
+|---|---|---|
+| `luna.process_physics(dt)` | fixed delta (seconds) | 0–N times per frame at fixed timestep (default 1/60s) |
+| `luna.process(dt)` | delta time (seconds) | Once per frame (variable timestep) |
+| `luna.process_late(dt)` | delta time (seconds) | Once per frame, after `process`, before `render` |
+| `luna.render()` | — | Once per frame (push DrawCommands here) |
+| `luna.render_ui()` | — | Once per frame, after `render` (UI/HUD overlay) |
+
+### Input Callbacks
+
+| Callback | Arguments | When Fired |
+|---|---|---|
 | `luna.keypressed(key, scancode, isrepeat)` | key name, scancode, repeat flag | Key press |
 | `luna.keyreleased(key, scancode)` | key name, scancode | Key release |
 | `luna.textinput(text)` | Unicode text | Character input |
@@ -877,8 +899,21 @@ All callbacks are optional — the engine checks if the function exists before c
 | `luna.focus(focused)` | boolean | Window focus change |
 | `luna.visible(visible)` | boolean | Window visibility change |
 | `luna.resize(w, h)` | new dimensions | Window resize |
-| `luna.quit()` | — | Close requested (return `true` to cancel) |
-| `luna.errorhandler(msg)` | error message | Uncaught Lua error |
+
+### Frame Pipeline Execution Order
+
+```
+ready()                         -- once, first frame only
+loop:
+    process_physics(fixed_dt)   -- 0..N times (fixed 1/60s default)
+    process(dt)                 -- once (variable dt)
+    process_late(dt)            -- once (variable dt)
+    [draw_commands cleared]
+    render()                    -- once (push DrawCommands)
+    render_ui()                 -- once (UI overlay DrawCommands)
+    [debug overlay appended]
+    [GPU render pass]
+```
 
 ---
 

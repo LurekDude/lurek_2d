@@ -37,7 +37,7 @@ This is the David vs. Goliath promise: a 20 MB engine competing with multi-gigab
 
 The engine is a runtime. The game is Lua. Everything the game creator touches is `.lua` — logic, configuration, scene definitions, dialogue trees, UI layouts. Rust owns the GPU, the physics solver, and the OS layer. Lua owns everything the player experiences.
 
-The `conf.lua` → `main.lua` → `luna.load()` → `luna.update(dt)` → `luna.draw()` pipeline is the only contract between engine and game. It is deliberately simple so that someone — human or AI — can look at it for ten seconds and know where to start.
+The `conf.lua` → `main.lua` → `luna.init()` → `luna.ready()` → main-loop pipeline is the only contract between engine and game. The pipeline ( `luna.process_physics` → `luna.process` → `luna.process_late` → `luna.render` → `luna.render_ui` ) is deliberately structured so that someone — human or AI — can look at it for ten seconds and know where to start.
 
 → See [engine-architecture.md](engine-architecture.md) § Callback Contract.
 
@@ -125,7 +125,7 @@ Each worker thread gets its own Lua VM. Lua VMs cannot share state. This elimina
 
 Luna2D is the engine for people who think game engines have become too complicated.
 
-A game is a `main.lua` file. The engine runs it. You write Lua; the engine owns the GPU, the physics solver, the audio mixer, and the threading model. You never see a `.dll`, a `.framework`, or a build system. You see `luna.update(dt)` and `luna.draw()`.
+A game is a `main.lua` file. The engine runs it. You write Lua; the engine owns the GPU, the physics solver, the audio mixer, and the threading model. You never see a `.dll`, a `.framework`, or a build system. You see `luna.process(dt)` and `luna.render()`.
 
 The competitive landscape is dominated by multi-gigabyte engines with visual editors, plugin marketplaces, and months-long learning curves. Luna2D is the opposite: one binary, one scripting language, one afternoon to learn.
 
@@ -213,7 +213,7 @@ These constraints formalize the [layer model](engine-architecture.md#active-laye
 | **C-01** | Active | All Lua-facing APIs live under the `luna.*` namespace. No bare globals, no engine-prefixed names, no alternative top-level tables. |
 | **C-02** | Active | Every `lua_api` sub-module exposes exactly one `pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> LuaResult<()>`. |
 | **C-03** | Active | API functions must have **sensible defaults** — never require parameters a beginner would always pass as the same value. Overloaded param counts are preferred over config tables for simple APIs. |
-| **C-04** | Active | Every callback (`luna.load`, `luna.update`, `luna.draw`, `luna.keypressed`, etc.) is **optional**. An empty `main.lua` is a valid game. |
+| **C-04** | Active | Every callback (`luna.init`, `luna.ready`, `luna.process`, `luna.process_physics`, `luna.process_late`, `luna.render`, `luna.render_ui`, `luna.keypressed`, etc.) is **optional**. An empty `main.lua` is a valid game. |
 | **C-05** | Active | Lua API is **synchronous from the script's perspective**. Any asynchronous work happens in Rust threads and communicates results via `Channel`. The Lua VM never blocks on I/O or network. |
 
 ---
