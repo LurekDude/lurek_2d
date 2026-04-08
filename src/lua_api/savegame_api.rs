@@ -1,11 +1,11 @@
-//! `luna.savegame` — Slot-based save/load system with collectors, schema versioning, and auto-save.
+﻿//! `luna.savegame` - Slot-based save/load system with collectors, schema versioning, and auto-save.
 
 use super::SharedState;
 use mlua::prelude::*;
 use std::cell::RefCell;
-use std::collections::HashMap;
 use std::rc::Rc;
 
+use std::collections::HashMap;
 use crate::filesystem::vfs::GameFS;
 use crate::savegame::{serialize_table, SaveManager, SaveValue};
 
@@ -13,7 +13,7 @@ use crate::savegame::{serialize_table, SaveManager, SaveValue};
 // Helpers
 // -------------------------------------------------------------------------------
 
-/// Extracts a slot name from a save filename (e.g. `"slot_quick.sav"` → `"quick"`)..
+/// Extracts a slot name from a save filename (e.g. `"slot_quick.sav"` → `"quick"`).
 fn slot_name_from_filename(filename: &str) -> Option<&str> {
     filename
         .strip_prefix("slot_")
@@ -41,7 +41,7 @@ pub struct LuaSaveManager {
 
 impl LuaSaveManager {
     /// Creates a new empty save manager wrapper.
-    fn new(state: Rc<RefCell<SharedState>>) -> Self {
+    pub fn new(state: Rc<RefCell<SharedState>>) -> Self {
         Self {
             manager: SaveManager::new(),
             state,
@@ -467,9 +467,9 @@ impl LuaUserData for LuaSaveManager {
 /// Registers the `luna.savegame` API table with the Lua VM.
 ///
 /// # Parameters
-/// - `lua` — `&Lua`. The Lua VM.
-/// - `luna` — `&LuaTable`. The top-level `luna` table to register into.
-/// - `state` — `Rc<RefCell<SharedState>>`. Shared engine state.
+/// - `lua` - `&Lua`. The Lua VM.
+/// - `luna` - `&LuaTable`. The top-level `luna` table to register into.
+/// - `state` - `Rc<RefCell<SharedState>>`. Shared engine state.
 ///
 /// # Returns
 /// `LuaResult<()>`.

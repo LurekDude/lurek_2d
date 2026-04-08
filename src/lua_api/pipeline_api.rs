@@ -17,15 +17,25 @@ use crate::pipeline::{ErrorMode, Pipeline, PipelineScheduler, PipelineStep, Step
 /// Lua-side wrapper around a single [`PipelineStep`], plus Lua callback registry keys.
 #[derive(Clone)]
 pub struct LuaStep {
-    inner: Rc<RefCell<PipelineStep>>,
-    callback_key: Rc<RefCell<Option<LuaRegistryKey>>>,
-    condition_key: Rc<RefCell<Option<LuaRegistryKey>>>,
-    on_error_key: Rc<RefCell<Option<LuaRegistryKey>>>,
+    pub(crate) inner: Rc<RefCell<PipelineStep>>,
+    pub(crate) callback_key: Rc<RefCell<Option<LuaRegistryKey>>>,
+    pub(crate) condition_key: Rc<RefCell<Option<LuaRegistryKey>>>,
+    pub(crate) on_error_key: Rc<RefCell<Option<LuaRegistryKey>>>,
 }
 
 impl LuaStep {
+    /// Creates a new [`LuaStep`] wrapping the given [`PipelineStep`].
+    pub fn new(step: PipelineStep) -> Self {
+        Self {
+            inner: Rc::new(RefCell::new(step)),
+            callback_key: Rc::new(RefCell::new(None)),
+            condition_key: Rc::new(RefCell::new(None)),
+            on_error_key: Rc::new(RefCell::new(None)),
+        }
+    }
+
     /// Executes this step's callback synchronously, handling retries and status transitions.
-    fn execute_sync<'lua>(&self, lua: &'lua Lua, ctx: &LuaTable<'lua>, abort_on_fail: bool) -> LuaResult<bool> {
+    pub(crate) fn execute_sync<'lua>(&self, lua: &'lua Lua, ctx: &LuaTable<'lua>, abort_on_fail: bool) -> LuaResult<bool> {
         let name = self.inner.borrow().name.clone();
         let retry_count = self.inner.borrow().retry_count;
 
@@ -324,6 +334,11 @@ impl LuaUserData for LuaStep {
             Ok(format!("PipelineStep(\"{}\")", inner.name))
         });
 
+        // -- type --
+        methods.add_method("type", |_, _, ()| Ok("PipelineStep"));
+        // -- typeOf --
+        methods.add_method("typeOf", |_, _, name: String| Ok(name == "PipelineStep" || name == "Object"));
+
     }
 }
 
@@ -334,14 +349,47 @@ impl LuaUserData for LuaStep {
 /// Lua-side wrapper around a [`Pipeline`] DAG with scheduler and Lua callback registry.
 #[derive(Clone)]
 pub struct LuaPipeline {
-    inner: Rc<RefCell<Pipeline>>,
-    scheduler: Rc<RefCell<PipelineScheduler>>,
-    step_wrappers: Rc<RefCell<HashMap<String, LuaStep>>>,
-    on_complete_key: Rc<RefCell<Option<LuaRegistryKey>>>,
-    on_step_complete_key: Rc<RefCell<Option<LuaRegistryKey>>>,
-    on_step_error_key: Rc<RefCell<Option<LuaRegistryKey>>>,
-    context_key: Rc<RefCell<Option<LuaRegistryKey>>>,
-    is_async: Rc<RefCell<bool>>,
+    pub(crate) inner: Rc<RefCell<Pipeline>>,
+    pub(crate) scheduler: Rc<RefCell<PipelineScheduler>>,
+    pub(crate) step_wrappers: Rc<RefCell<HashMap<String, LuaStep>>>,
+    pub(crate) on_complete_key: Rc<RefCell<Option<LuaRegistryKey>>>,
+    pub(crate) on_step_complete_key: Rc<RefCell<Option<LuaRegistryKey>>>,
+    pub(crate) on_step_error_key: Rc<RefCell<Option<LuaRegistryKey>>>,
+    pub(crate) context_key: Rc<RefCell<Option<LuaRegistryKey>>>,
+    pub(crate) is_async: Rc<RefCell<bool>>,
+}
+
+impl LuaPipeline {
+    /// Creates a new [`LuaPipeline`] wrapping the given [`Pipeline`].
+    pub fn new(pipeline: Pipeline) -> Self {
+        Self {
+            inner: Rc::new(RefCell::new(pipeline)),
+            scheduler: Rc::new(RefCell::new(PipelineScheduler::new())),
+            step_wrappers: Rc::new(RefCell::new(HashMap::new())),
+            on_complete_key: Rc::new(RefCell::new(None)),
+            on_step_complete_key: Rc::new(RefCell::new(None)),
+            on_step_error_key: Rc::new(RefCell::new(None)),
+            context_key: Rc::new(RefCell::new(None)),
+            is_async: Rc::new(RefCell::new(false)),
+        }
+    }
+
+    /// Creates a [`LuaPipeline`] from pre-built pipeline and wrapper maps (used by deserialisers).
+    pub fn from_parts(
+        pipeline_rc: Rc<RefCell<Pipeline>>,
+        wrappers_rc: Rc<RefCell<HashMap<String, LuaStep>>>,
+    ) -> Self {
+        Self {
+            inner: pipeline_rc,
+            scheduler: Rc::new(RefCell::new(PipelineScheduler::new())),
+            step_wrappers: wrappers_rc,
+            on_complete_key: Rc::new(RefCell::new(None)),
+            on_step_complete_key: Rc::new(RefCell::new(None)),
+            on_step_error_key: Rc::new(RefCell::new(None)),
+            context_key: Rc::new(RefCell::new(None)),
+            is_async: Rc::new(RefCell::new(false)),
+        }
+    }
 }
 
 // -------------------------------------------------------------------------------
@@ -349,7 +397,7 @@ pub struct LuaPipeline {
 // -------------------------------------------------------------------------------
 
 /// Converts a `PipelineResult` to a Lua result table for the `run` return value.
-fn pipeline_result_to_lua<'lua>(
+pub(crate) fn pipeline_result_to_lua<'lua>(
     lua: &'lua Lua,
     result: &crate::pipeline::PipelineResult,
 ) -> LuaResult<LuaTable<'lua>> {
@@ -388,7 +436,7 @@ fn pipeline_result_to_lua<'lua>(
 }
 
 /// Cancels all steps in `order` that are still pending.
-fn cancel_remaining_steps(wrappers: &HashMap<String, LuaStep>, order: &[String]) {
+pub(crate) fn cancel_remaining_steps(wrappers: &HashMap<String, LuaStep>, order: &[String]) {
     for name in order {
         if let Some(w) = wrappers.get(name) {
             if w.inner.borrow().status == StepStatus::Pending {
@@ -399,7 +447,7 @@ fn cancel_remaining_steps(wrappers: &HashMap<String, LuaStep>, order: &[String])
 }
 
 /// Fires the per-step pipeline callbacks based on the step's terminal status.
-fn fire_step_callbacks<'lua>(
+pub(crate) fn fire_step_callbacks<'lua>(
     lua: &'lua Lua,
     this: &LuaPipeline,
     step_name: &str,
@@ -428,7 +476,7 @@ fn fire_step_callbacks<'lua>(
 
 /// Finalises a pipeline run: collects the `PipelineResult`, converts it to a Lua table,
 /// and fires the `on_complete` callback if registered.
-fn finalize_pipeline_result<'lua>(
+pub(crate) fn finalize_pipeline_result<'lua>(
     lua: &'lua Lua,
     this: &LuaPipeline,
     elapsed: f32,
@@ -454,7 +502,7 @@ fn finalize_pipeline_result<'lua>(
 }
 
 // -------------------------------------------------------------------------------
-// LuaPipeline UserData
+// LuaPipeline impl LuaUserData
 // -------------------------------------------------------------------------------
 
 impl LuaUserData for LuaPipeline {
@@ -908,6 +956,17 @@ impl LuaUserData for LuaPipeline {
             ))
         });
 
+        // -- type --
+        /// Returns the type name of this object.
+        /// @return string
+        methods.add_method("type", |_, _, ()| Ok("Pipeline"));
+
+        // -- typeOf --
+        /// Returns true if this object is of the given type.
+        /// @param name : string
+        /// @return boolean
+        methods.add_method("typeOf", |_, _, name: String| Ok(name == "Pipeline" || name == "Object"));
+
     }
 }
 
@@ -920,7 +979,7 @@ impl LuaUserData for LuaPipeline {
 /// # Parameters
 /// - `lua` — `&Lua`. The Lua VM.
 /// - `luna` — `&LuaTable`. The top-level `luna` table to register into.
-/// - `state` — `Rc<RefCell<SharedState>>`. Shared engine state.
+/// - `_state` — `Rc<RefCell<SharedState>>`. Shared engine state.
 ///
 /// # Returns
 /// `LuaResult<()>`.
@@ -936,12 +995,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
         "newStep",
         lua.create_function(|lua, (name, callback): (String, Option<LuaFunction>)| {
             let step = PipelineStep::new(name);
-            let wrapper = LuaStep {
-                inner: Rc::new(RefCell::new(step)),
-                callback_key: Rc::new(RefCell::new(None)),
-                condition_key: Rc::new(RefCell::new(None)),
-                on_error_key: Rc::new(RefCell::new(None)),
-            };
+            let wrapper = LuaStep::new(step);
             if let Some(cb) = callback {
                 *wrapper.callback_key.borrow_mut() = Some(lua.create_registry_value(cb)?);
             }
@@ -957,16 +1011,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
         "newPipeline",
         lua.create_function(|_, name: Option<String>| {
             let pipeline = Pipeline::new(name.unwrap_or_else(|| "pipeline".to_string()));
-            Ok(LuaPipeline {
-                inner: Rc::new(RefCell::new(pipeline)),
-                scheduler: Rc::new(RefCell::new(PipelineScheduler::new())),
-                step_wrappers: Rc::new(RefCell::new(HashMap::new())),
-                on_complete_key: Rc::new(RefCell::new(None)),
-                on_step_complete_key: Rc::new(RefCell::new(None)),
-                on_step_error_key: Rc::new(RefCell::new(None)),
-                context_key: Rc::new(RefCell::new(None)),
-                is_async: Rc::new(RefCell::new(false)),
-            })
+            Ok(LuaPipeline::new(pipeline))
         })?,
     )?;
 
@@ -988,10 +1033,9 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
                 };
             }
 
-            let step_wrappers: HashMap<String, LuaStep> = HashMap::new();
             let pipeline_rc = Rc::new(RefCell::new(pipeline));
             let wrappers_rc: Rc<RefCell<HashMap<String, LuaStep>>> =
-                Rc::new(RefCell::new(step_wrappers));
+                Rc::new(RefCell::new(HashMap::new()));
 
             if let Ok(steps_t) = def.get::<_, LuaTable<'_>>("steps") {
                 for pair in steps_t.sequence_values::<LuaTable<'_>>() {
@@ -1020,12 +1064,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
                         step.tag = Some(tag);
                     }
 
-                    let wrapper = LuaStep {
-                        inner: Rc::new(RefCell::new(step.clone())),
-                        callback_key: Rc::new(RefCell::new(None)),
-                        condition_key: Rc::new(RefCell::new(None)),
-                        on_error_key: Rc::new(RefCell::new(None)),
-                    };
+                    let wrapper = LuaStep::new(step.clone());
 
                     if let Ok(cb) = st.get::<_, LuaFunction<'_>>("fn") {
                         *wrapper.callback_key.borrow_mut() =
@@ -1040,16 +1079,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
                 }
             }
 
-            Ok(LuaPipeline {
-                inner: pipeline_rc,
-                scheduler: Rc::new(RefCell::new(PipelineScheduler::new())),
-                step_wrappers: wrappers_rc,
-                on_complete_key: Rc::new(RefCell::new(None)),
-                on_step_complete_key: Rc::new(RefCell::new(None)),
-                on_step_error_key: Rc::new(RefCell::new(None)),
-                context_key: Rc::new(RefCell::new(None)),
-                is_async: Rc::new(RefCell::new(false)),
-            })
+            Ok(LuaPipeline::from_parts(pipeline_rc, wrappers_rc))
         })?,
     )?;
 

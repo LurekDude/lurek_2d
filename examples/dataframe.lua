@@ -1,6 +1,7 @@
 -- examples/dataframe.lua
 -- Columnar data tables with SQL-style operations
 -- API: luna.dataframe
+-- This file is documentation code, not a runnable game.
 
 --------------------------------------------------------------------------------
 -- Constructors
@@ -212,3 +213,15 @@ db:removeTable("extras")
 
 -- Clear all tables
 db:clear()
+
+-- ─── DataFrame ─────────────────────────────────────────────────────────────────
+
+local clone = dataframe:clone()  -- Returns a deep copy of this DataFrame
+local to_string = dataframe:toString()  -- Returns a formatted string table representation
+local dataframe_type = dataframe:type()  -- "DataFrame"
+local dataframe_is_type = dataframe:typeOf("DataFrame")  -- Returns true if this object is of the given type
+
+-- ─── Database ──────────────────────────────────────────────────────────────────
+
+local database_type = database:type()  -- "Database"
+local database_is_type = database:typeOf("Database")  -- Returns true if this object is of the given type

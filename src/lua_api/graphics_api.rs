@@ -11,8 +11,8 @@ use crate::engine::ScreenshotRequest;
 use crate::graphics::shape::{CompoundShape, ShapeCommand};
 use crate::graphics::sprite_batch::BatchEntry;
 use crate::graphics::{
-    BlendMode, Canvas, CompareMode, DrawCommand, DrawMode, Font, Mesh, MeshDrawMode, MeshVertex,
-    Shader, SpriteBatch, StencilAction, TextAlign, Texture, UniformValue,
+    BlendMode, Canvas, CompareMode, DepthMode, DrawCommand, DrawMode, Font, Mesh, MeshDrawMode,
+    MeshVertex, Shader, SpriteBatch, StencilAction, StencilMode, TextAlign, Texture, UniformValue,
 };
 use crate::image::ImageData;
 use crate::math::Rect;
@@ -27,6 +27,22 @@ use crate::math::Rect;
 
 /// Lua-side handle to a loaded texture stored in SharedState.
 ///
+/// Lua-side wrapper around a raw [`ImageData`] pixel buffer (e.g. from `captureScreenshot`).
+pub struct LuaImageData {
+    inner: ImageData,
+}
+
+impl LuaUserData for LuaImageData {
+    fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
+        methods.add_method("getWidth", |_, this, ()| Ok(this.inner.width()));
+        methods.add_method("getHeight", |_, this, ()| Ok(this.inner.height()));
+        methods.add_method("type", |_, _, ()| Ok("ImageData"));
+        methods.add_method("typeOf", |_, _, name: String| {
+            Ok(name == "ImageData" || name == "Object")
+        });
+    }
+}
+
 /// # Fields
 /// - `state` — `Rc<RefCell<SharedState>>`. Shared engine state.
 /// - `key` — `TextureKey`. Slot key for the backing GPU texture.
@@ -34,6 +50,46 @@ use crate::math::Rect;
 pub struct LuaImage {
     pub(crate) state: Rc<RefCell<SharedState>>,
     pub(crate) key: TextureKey,
+}
+
+/// Lua-side 9-slice descriptor.
+///
+/// Stores the texture key and four inset distances (top, right, bottom, left).
+#[derive(Clone)]
+pub struct LuaNineSlice {
+    key: TextureKey,
+    tex_w: u32,
+    tex_h: u32,
+    top: f32,
+    right: f32,
+    bottom: f32,
+    left: f32,
+}
+
+impl LuaUserData for LuaNineSlice {
+    fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
+        // -- getInsets --
+        /// Returns the four inset values as (top, right, bottom, left).
+        /// @return number, number, number, number
+        methods.add_method("getInsets", |_, this, ()| {
+            Ok((this.top, this.right, this.bottom, this.left))
+        });
+        // -- getTextureSize --
+        /// Returns the width and height of the source texture.
+        /// @return integer, integer
+        methods.add_method("getTextureSize", |_, this, ()| Ok((this.tex_w, this.tex_h)));
+        // -- draw --
+        /// Compatibility stub: queuing handled by luna.gfx.drawNineSlice.
+        /// @return nil
+        methods.add_method(
+            "draw",
+            |_, _, (_x, _y, _w, _h): (f32, f32, f32, f32)| Ok(()),
+        );
+        methods.add_method("type", |_, _, ()| Ok("NineSlice"));
+        methods.add_method("typeOf", |_, _, name: String| {
+            Ok(name == "NineSlice" || name == "Object")
+        });
+    }
 }
 
 impl LuaUserData for LuaImage {
@@ -1097,6 +1153,65 @@ impl LuaUserData for LuaShape {
     }
 }
 
+// -------------------------------------------------------------------------------
+// LuaDrawLayer UserData
+// -------------------------------------------------------------------------------
+
+/// Lua-side z-ordered draw queue. Callbacks are sorted by z and called on `flush()`.
+struct LuaDrawLayer {
+    entries: Vec<(f64, LuaRegistryKey)>,
+}
+
+impl LuaUserData for LuaDrawLayer {
+    fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
+        /// Queues a draw callback at the given z-order.
+        /// @param z : number
+        /// @param fn : function
+        methods.add_method_mut("queue", |lua, this, (z, f): (f64, LuaFunction)| {
+            let key = lua.create_registry_value(f)?;
+            this.entries.push((z, key));
+            Ok(())
+        });
+
+        /// Sorts and calls all queued callbacks, then empties the queue.
+        methods.add_method_mut("flush", |lua, this, ()| {
+            this.entries
+                .sort_by(|a, b| a.0.partial_cmp(&b.0).unwrap_or(std::cmp::Ordering::Equal));
+            let entries: Vec<_> = this.entries.drain(..).collect();
+            for (_, key) in entries {
+                let f = lua.registry_value::<LuaFunction>(&key)?;
+                lua.remove_registry_value(key)?;
+                f.call::<_, ()>(())?;
+            }
+            Ok(())
+        });
+
+        /// Removes all queued callbacks without calling them.
+        /// @return void
+        methods.add_method_mut("clear", |lua, this, ()| {
+            for (_, key) in this.entries.drain(..) {
+                lua.remove_registry_value(key)?;
+            }
+            Ok(())
+        });
+
+        /// Returns the number of queued callbacks.
+        /// @return number
+        methods.add_method("getCount", |_, this, ()| Ok(this.entries.len() as i64));
+
+        /// Returns the type name.
+        /// @return string
+        methods.add_method("type", |_, _, ()| Ok("DrawLayer"));
+
+        /// Returns true if this object is an instance of the given type name.
+        /// @param name : string
+        /// @return boolean
+        methods.add_method("typeOf", |_, _, name: String| {
+            Ok(name == "DrawLayer" || name == "Object")
+        });
+    }
+}
+
 // ===============================================================================
 // Registration
 // ===============================================================================
@@ -1957,6 +2072,37 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
         })?,
     )?;
 
+    // -- getFontLineHeight --
+    /// Returns the line height of the given font (alias for getFontHeight).
+    /// @param font : Font
+    /// @return number
+    let s = state.clone();
+    graphics.set(
+        "getFontLineHeight",
+        lua.create_function(move |_, ud: LuaAnyUserData| {
+            let font = ud.borrow::<LuaFont>()?;
+            let key = font.key;
+            drop(font);
+            let st = s.borrow();
+            let f = st.fonts.get(key).ok_or_else(|| {
+                LuaError::RuntimeError(
+                    "luna.gfx.getFontLineHeight: font handle is not valid".into(),
+                )
+            })?;
+            Ok(f.line_height())
+        })?,
+    )?;
+
+    // -- setFontLineHeight --
+    /// Sets the line height of the given font (stub — returns nil; fonts are immutable in headless mode).
+    /// @param font : Font
+    /// @param line_height : number
+    /// @return nil
+    graphics.set(
+        "setFontLineHeight",
+        lua.create_function(|_, (_font, _lh): (LuaAnyUserData, f32)| Ok(()))?,
+    )?;
+
     // -- getFontAscent --
     /// Returns the ascent of the given font.
     /// @param font : Font
@@ -2670,6 +2816,150 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
 
     // ── Window Dimensions ────────────────────────────────────────────────────
 
+    // -- setStencilMode --
+    /// Sets the stencil buffer write/test mode.
+    /// @param action : string   — "keep"|"zero"|"replace"|"increment"|"decrement"|"invert"
+    /// @param compare : string? — "always"|"equal"|"notequal"|"less"|"lequal"|"greater"|"gequal"
+    /// @param value : integer?  — reference value (0–255)
+    let s = state.clone();
+    graphics.set(
+        "setStencilMode",
+        lua.create_function(
+            move |_, (action, compare, value): (String, Option<String>, Option<u8>)| {
+                let sa = match action.as_str() {
+                    "keep" => StencilAction::Keep,
+                    "zero" => StencilAction::Zero,
+                    "replace" => StencilAction::Replace,
+                    "increment" => StencilAction::Increment,
+                    "decrement" => StencilAction::Decrement,
+                    "incrementwrap" => StencilAction::IncrementWrap,
+                    "decrementwrap" => StencilAction::DecrementWrap,
+                    "invert" => StencilAction::Invert,
+                    other => {
+                        return Err(LuaError::RuntimeError(format!(
+                            "unknown stencil action: {other}"
+                        )))
+                    }
+                };
+                let cmp = match compare.as_deref().unwrap_or("always") {
+                    "always" => CompareMode::Always,
+                    "never" => CompareMode::Never,
+                    "equal" => CompareMode::Equal,
+                    "notequal" => CompareMode::NotEqual,
+                    "less" => CompareMode::Less,
+                    "lequal" | "lessequal" => CompareMode::LessEqual,
+                    "greater" => CompareMode::Greater,
+                    "gequal" | "greaterequal" => CompareMode::GreaterEqual,
+                    _ => CompareMode::Always,
+                };
+                s.borrow_mut().stencil_mode = StencilMode {
+                    action: sa,
+                    compare: cmp,
+                    value: value.unwrap_or(0),
+                };
+                Ok(())
+            },
+        )?,
+    )?;
+
+    // -- getStencilMode --
+    /// Returns the current stencil mode as (action, compare, value).
+    /// @return string, string, integer
+    let s = state.clone();
+    graphics.set(
+        "getStencilMode",
+        lua.create_function(move |_, ()| {
+            let st = s.borrow();
+            let sm = st.stencil_mode;
+            let action = match sm.action {
+                StencilAction::Keep => "keep",
+                StencilAction::Zero => "zero",
+                StencilAction::Replace => "replace",
+                StencilAction::Increment => "increment",
+                StencilAction::Decrement => "decrement",
+                StencilAction::IncrementWrap => "incrementwrap",
+                StencilAction::DecrementWrap => "decrementwrap",
+                StencilAction::Invert => "invert",
+            };
+            let compare = match sm.compare {
+                CompareMode::Always => "always",
+                CompareMode::Never => "never",
+                CompareMode::Equal => "equal",
+                CompareMode::NotEqual => "notequal",
+                CompareMode::Less => "less",
+                CompareMode::LessEqual => "lequal",
+                CompareMode::Greater => "greater",
+                CompareMode::GreaterEqual => "gequal",
+            };
+            Ok((action, compare, sm.value as i64))
+        })?,
+    )?;
+
+    // -- clearStencil --
+    /// Resets the stencil mode to the default (keep / always / 0).
+    /// @return nil
+    let s = state.clone();
+    graphics.set(
+        "clearStencil",
+        lua.create_function(move |_, ()| {
+            s.borrow_mut().stencil_mode = StencilMode::default();
+            Ok(())
+        })?,
+    )?;
+
+    // -- setDepthMode --
+    /// Sets the depth test comparison and write enable.
+    /// @param mode : string  — "always"|"never"|"less"|"lequal"|"equal"|"notequal"|"greater"|"gequal"
+    /// @param write : boolean? — default false
+    let s = state.clone();
+    graphics.set(
+        "setDepthMode",
+        lua.create_function(move |_, (mode, write): (String, Option<bool>)| {
+            let dm = match mode.as_str() {
+                "always" => DepthMode::Always,
+                "never" => DepthMode::Never,
+                "less" => DepthMode::Less,
+                "lequal" | "lessequal" => DepthMode::LessEqual,
+                "equal" => DepthMode::Equal,
+                "notequal" => DepthMode::NotEqual,
+                "greater" => DepthMode::Greater,
+                "gequal" | "greaterequal" => DepthMode::GreaterEqual,
+                other => {
+                    return Err(LuaError::RuntimeError(format!(
+                        "unknown depth mode: {other}"
+                    )))
+                }
+            };
+            s.borrow_mut().depth_mode = (dm, write.unwrap_or(false));
+            Ok(())
+        })?,
+    )?;
+
+    // -- getDepthMode --
+    /// Returns the current depth mode as (mode, write).
+    /// @return string, boolean
+    let s = state.clone();
+    graphics.set(
+        "getDepthMode",
+        lua.create_function(move |_, ()| {
+            let st = s.borrow();
+            let (dm, write) = st.depth_mode;
+            let mode = match dm {
+                DepthMode::Always => "always",
+                DepthMode::Never => "never",
+                DepthMode::Less => "less",
+                DepthMode::LessEqual => "lequal",
+                DepthMode::Equal => "equal",
+                DepthMode::NotEqual => "notequal",
+                DepthMode::Greater => "greater",
+                DepthMode::GreaterEqual => "gequal",
+            };
+            Ok((mode, write))
+        })?,
+    )?;
+
+    // ── Window Dimensions ────────────────────────────────────────────────────
+
     // -- getWidth --
     /// Returns the window width in pixels.
     /// @return integer
@@ -2759,14 +3049,113 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
 
     // -- saveScreenshot --
     /// Queues a screenshot to be saved after the current frame.
+    /// The path must start with "save/".
     /// @param path : string
     let s = state.clone();
     graphics.set(
         "saveScreenshot",
         lua.create_function(move |_, path: String| {
+            if !path.starts_with("save/") {
+                return Err(LuaError::RuntimeError(format!(
+                    "saveScreenshot: path must start with \"save/\" (got \"{}\")",
+                    path
+                )));
+            }
             s.borrow_mut().pending_screenshot = Some(ScreenshotRequest { path });
             Ok(())
         })?,
+    )?;
+
+    // -- captureScreenshot --
+    /// Calls the given callback with an ImageData captured from the current frame (stub: creates blank).
+    /// @param callback : function(ImageData)
+    /// @return nil
+    graphics.set(
+        "captureScreenshot",
+        lua.create_function(|lua, callback: LuaFunction| {
+            let img = ImageData::new(1, 1);
+            let ud = lua.create_userdata(LuaImageData { inner: img })?;
+            callback.call::<_, ()>(ud)?;
+            Ok(())
+        })?,
+    )?;
+
+    // -- newNineSlice --
+    /// Creates a 9-slice descriptor from a texture and inset values.
+    /// @param image : Image
+    /// @param top : number
+    /// @param right : number
+    /// @param bottom : number
+    /// @param left : number
+    /// @return NineSlice
+    graphics.set(
+        "newNineSlice",
+        lua.create_function(
+            |_, (image, top, right, bottom, left): (LuaAnyUserData, f32, f32, f32, f32)| {
+                if top < 0.0 || right < 0.0 || bottom < 0.0 || left < 0.0 {
+                    return Err(LuaError::RuntimeError(
+                        "newNineSlice: border insets must be non-negative".into(),
+                    ));
+                }
+                let img = image.borrow::<LuaImage>()?;
+                let state = img.state.borrow();
+                let (tex_w, tex_h) = state
+                    .textures
+                    .get(img.key)
+                    .map(|t| (t.width, t.height))
+                    .unwrap_or((0, 0));
+                Ok(LuaNineSlice {
+                    key: img.key,
+                    tex_w,
+                    tex_h,
+                    top,
+                    right,
+                    bottom,
+                    left,
+                })
+            },
+        )?,
+    )?;
+
+    // -- drawNineSlice --
+    /// Queues a 9-slice draw call inside luna.render / luna.render_ui.
+    /// @param slice : NineSlice
+    /// @param x : number
+    /// @param y : number
+    /// @param width : number
+    /// @param height : number
+    /// @return nil
+    let s = state.clone();
+    graphics.set(
+        "drawNineSlice",
+        lua.create_function(
+            move |_, (slice, x, y, w, h): (LuaAnyUserData, f32, f32, f32, f32)| {
+                let ns = slice.borrow::<LuaNineSlice>()?;
+                let key = ns.key;
+                let (top, right, bottom, left) = (ns.top, ns.right, ns.bottom, ns.left);
+                drop(ns);
+                let mut st = s.borrow_mut();
+                let (tex_w, tex_h) = st
+                    .textures
+                    .get(key)
+                    .map(|t| (t.width as f32, t.height as f32))
+                    .unwrap_or((1.0, 1.0));
+                st.draw_commands.push(DrawCommand::DrawNineSlice {
+                    texture_key: key,
+                    tex_w,
+                    tex_h,
+                    top,
+                    right,
+                    bottom,
+                    left,
+                    x,
+                    y,
+                    w,
+                    h,
+                });
+                Ok(())
+            },
+        )?,
     )?;
 
     // -- newShape --
@@ -2785,6 +3174,18 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
             Ok(LuaShape {
                 state: s.clone(),
                 key,
+            })
+        })?,
+    )?;
+
+    // -- newDrawLayer --
+    /// Creates a new z-ordered draw-call queue.
+    /// @return DrawLayer
+    graphics.set(
+        "newDrawLayer",
+        lua.create_function(|_, ()| {
+            Ok(LuaDrawLayer {
+                entries: Vec::new(),
             })
         })?,
     )?;

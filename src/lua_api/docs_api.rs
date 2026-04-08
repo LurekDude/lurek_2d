@@ -2,7 +2,8 @@
 //!
 //! Provides engine-integrated documentation management: scanning runtime bindings,
 //! loading TOML doc catalogs, validating completeness, computing quality metrics,
-//! and exporting structured data for VS Code extension IntelliSense.
+//! exporting structured data for VS Code extension IntelliSense, and
+//! a lightweight schema validator for game-developer data validation.
 
 use std::cell::RefCell;
 use std::rc::Rc;
@@ -10,6 +11,116 @@ use std::rc::Rc;
 use mlua::prelude::*;
 
 use crate::docs;
+
+// ---------------------------------------------------------------------------
+// UserData: LuaSchema  (game-data validation)
+// ---------------------------------------------------------------------------
+
+/// Lua wrapper for a runtime data-validation schema.
+struct LuaSchema(docs::Schema);
+
+impl LuaUserData for LuaSchema {
+    fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
+        /// Validates a Lua table against the schema.
+        /// Returns (ok: boolean, errors: {field, message}[]).
+        /// @param data : table
+        /// @return boolean, table
+        methods.add_method("validate", |lua, this, data: LuaTable| {
+            // Serialise table fields to (name, type_str, value_str) tuples.
+            let mut fields: Vec<(String, &'static str, String)> = Vec::new();
+            for pair in data.clone().pairs::<String, LuaValue>() {
+                let (k, v) = pair?;
+                let (type_name, value_str): (&'static str, String) = match &v {
+                    LuaValue::String(s) => ("string", s.to_str().unwrap_or("").to_string()),
+                    LuaValue::Integer(n) => ("integer", n.to_string()),
+                    LuaValue::Number(n) => ("number", n.to_string()),
+                    LuaValue::Boolean(b) => ("boolean", b.to_string()),
+                    LuaValue::Table(_) => ("table", "(table)".into()),
+                    LuaValue::Function(_) => ("function", "(function)".into()),
+                    LuaValue::UserData(_) => ("userdata", "(userdata)".into()),
+                    _ => ("nil", "(nil)".into()),
+                };
+                fields.push((k, type_name, value_str));
+            }
+            let result = this.0.validate_pairs(&fields);
+            let errors_tbl = lua.create_table()?;
+            for (i, e) in result.errors.iter().enumerate() {
+                let et = lua.create_table()?;
+                et.set("field", e.field.clone())?;
+                et.set("message", e.message.clone())?;
+                errors_tbl.set(i + 1, et)?;
+            }
+            Ok((result.ok, errors_tbl))
+        });
+
+        /// Returns true when the data passes all schema rules.
+        /// @param data : table
+        /// @return boolean
+        methods.add_method("check", |_, this, data: LuaTable| {
+            let mut fields: Vec<(String, &'static str, String)> = Vec::new();
+            for pair in data.clone().pairs::<String, LuaValue>() {
+                let (k, v) = pair?;
+                let (type_name, value_str): (&'static str, String) = match &v {
+                    LuaValue::String(s) => ("string", s.to_str().unwrap_or("").to_string()),
+                    LuaValue::Integer(n) => ("integer", n.to_string()),
+                    LuaValue::Number(n) => ("number", n.to_string()),
+                    LuaValue::Boolean(b) => ("boolean", b.to_string()),
+                    LuaValue::Table(_) => ("table", "(table)".into()),
+                    LuaValue::Function(_) => ("function", "(function)".into()),
+                    _ => ("nil", "(nil)".into()),
+                };
+                fields.push((k, type_name, value_str));
+            }
+            Ok(this.0.validate_pairs(&fields).ok)
+        });
+
+        /// Validates data and throws a Lua error on failure with all error messages joined.
+        /// @param data : table
+        methods.add_method("assert", |_, this, data: LuaTable| {
+            let mut fields: Vec<(String, &'static str, String)> = Vec::new();
+            for pair in data.clone().pairs::<String, LuaValue>() {
+                let (k, v) = pair?;
+                let (type_name, value_str): (&'static str, String) = match &v {
+                    LuaValue::String(s) => ("string", s.to_str().unwrap_or("").to_string()),
+                    LuaValue::Integer(n) => ("integer", n.to_string()),
+                    LuaValue::Number(n) => ("number", n.to_string()),
+                    LuaValue::Boolean(b) => ("boolean", b.to_string()),
+                    LuaValue::Table(_) => ("table", "(table)".into()),
+                    LuaValue::Function(_) => ("function", "(function)".into()),
+                    _ => ("nil", "(nil)".into()),
+                };
+                fields.push((k, type_name, value_str));
+            }
+            let result = this.0.validate_pairs(&fields);
+            if !result.ok {
+                let msg = result
+                    .errors
+                    .iter()
+                    .map(|e| e.message.clone())
+                    .collect::<Vec<_>>()
+                    .join("; ");
+                return Err(LuaError::external(format!("schema validation failed: {msg}")));
+            }
+            Ok(())
+        });
+
+        /// Returns the schema name.
+        /// @return string
+        methods.add_method("getName", |_, this, ()| Ok(this.0.name.clone()));
+
+        /// Returns a table of declared field names.
+        /// @return table
+        methods.add_method("getFields", |lua, this, ()| {
+            let tbl = lua.create_table()?;
+            let mut names: Vec<&String> = this.0.rules.keys().collect();
+            names.sort();
+            for (i, n) in names.iter().enumerate() {
+                tbl.set(i + 1, n.as_str())?;
+            }
+            Ok(tbl)
+        });
+    }
+}
 
 // ---------------------------------------------------------------------------
 // UserData: DocEntry
@@ -1220,6 +1331,160 @@ pub fn register(lua: &Lua, luna_table: &LuaTable) -> LuaResult<()> {
             Ok(())
         })?,
     )?;
+
+    // ── schema ────────────────────────────────────────────────────────────
+    /// Creates a Schema validator from a rules table.
+    ///
+    /// Each key is a field name; the value is a rule table with keys:
+    ///   type        : string  ("string","number","integer","boolean","table","function","any")
+    ///   required    : boolean (default false)
+    ///   min         : number  (for number/integer fields)
+    ///   max         : number  (for number/integer fields)
+    ///   minLen      : integer (for string fields)
+    ///   maxLen      : integer (for string fields)
+    ///   enum        : table   (array of allowed string values)
+    ///   description : string  (human-readable field doc)
+    ///   strict      : boolean (on root table: reject undeclared fields, default false)
+    ///
+    /// @param rules : table
+    /// @param name : string?
+    /// @return userdata
+    docs_tbl.set("schema", lua.create_function(|_, (rules, name): (LuaTable, Option<String>)| {
+        use crate::docs::{FieldRule, FieldType, Schema};
+        let schema_name = name.unwrap_or_else(|| "schema".to_string());
+        let mut schema = Schema::new(&schema_name);
+        let strict: bool = rules.get("__strict").unwrap_or(false);
+        schema.strict = strict;
+        for pair in rules.clone().pairs::<String, LuaValue>() {
+            let (field, rule_val) = pair?;
+            if field.starts_with('_') { continue; }
+            let mut rule = FieldRule::default();
+            if let LuaValue::Table(rt) = rule_val {
+                let type_str: String = rt.get("type").unwrap_or_else(|_| "any".to_string());
+                rule.field_type = FieldType::from_str(&type_str);
+                rule.required = rt.get("required").unwrap_or(false);
+                rule.min = rt.get::<_, f64>("min").ok();
+                rule.max = rt.get::<_, f64>("max").ok();
+                rule.min_len = rt.get::<_, usize>("minLen").ok();
+                rule.max_len = rt.get::<_, usize>("maxLen").ok();
+                rule.description = rt.get("description").unwrap_or_default();
+                if let Ok(enum_tbl) = rt.get::<_, LuaTable>("enum") {
+                    for v in enum_tbl.clone().sequence_values::<String>().flatten() {
+                        rule.enum_values.push(v);
+                    }
+                }
+            } else if let LuaValue::String(s) = rule_val {
+                // Shorthand: field = "type"
+                rule.field_type = FieldType::from_str(s.to_str().unwrap_or("any"));
+            }
+            schema.add_rule(&field, rule);
+        }
+        Ok(LuaSchema(schema))
+    })?)?;
+
+    // ── reflectLive ───────────────────────────────────────────────────────
+    /// Walks the live luna.* Lua table and returns a structured reflection of all
+    /// registered namespaces, function names, arity, and value types.
+    ///
+    /// Returns a table: { [ns]: { name, type, arity? }[] }
+    ///
+    /// @param ns : string?  (if provided, reflects only luna.<ns>)
+    /// @return table
+    docs_tbl.set("reflectLive", lua.create_function(|lua, ns: Option<String>| {
+        let globals = lua.globals();
+        let luna_tbl: LuaTable = globals.get("luna")?;
+        let result = lua.create_table()?;
+
+        // Helper: build an items table from a sub-table.
+        fn reflect_sub<'a>(lua: &'a Lua, tbl: LuaTable<'a>) -> LuaResult<LuaTable<'a>> {
+            let items = lua.create_table()?;
+            let mut idx = 1usize;
+            for pair in tbl.pairs::<String, LuaValue>() {
+                let (key, val) = pair?;
+                let item = lua.create_table()?;
+                item.set("name", key.clone())?;
+                let type_name = match &val {
+                    LuaValue::Function(_) => "function",
+                    LuaValue::Table(_)    => "table",
+                    LuaValue::Boolean(_)  => "boolean",
+                    LuaValue::Integer(_)  => "integer",
+                    LuaValue::Number(_)   => "number",
+                    LuaValue::String(_)   => "string",
+                    LuaValue::UserData(_) => "userdata",
+                    _                     => "other",
+                };
+                item.set("type", type_name)?;
+                items.set(idx, item)?;
+                idx += 1;
+            }
+            Ok(items)
+        }
+
+        match ns {
+            Some(ref ns_name) => {
+                if let Ok(sub) = luna_tbl.get::<_, LuaTable>(ns_name.clone()) {
+                    let items = reflect_sub(lua, sub)?;
+                    result.set(ns_name.clone(), items)?;
+                }
+            }
+            None => {
+                for pair in luna_tbl.pairs::<String, LuaValue>() {
+                    let (key, val) = pair?;
+                    if let LuaValue::Table(sub) = val {
+                        let items = reflect_sub(lua, sub)?;
+                        result.set(key, items)?;
+                    }
+                }
+            }
+        }
+        Ok(result)
+    })?)?;
+
+    // ── reflectTable ──────────────────────────────────────────────────────
+    /// Reflects any Lua table, returning a structure describing its keys,
+    /// value types, and arity for functions.
+    ///
+    /// Returns an array: { name, type, arity?, isVariadic? }[]
+    ///
+    /// @param tbl : table
+    /// @param name : string?  (prefix for qualified names, optional)
+    /// @return table
+    docs_tbl.set("reflectTable", lua.create_function(|lua, (tbl, name): (LuaTable, Option<String>)| {
+        let prefix = name.unwrap_or_default();
+        let items = lua.create_table()?;
+        let mut idx = 1usize;
+        for pair in tbl.clone().pairs::<LuaValue, LuaValue>() {
+            let (k, v) = pair?;
+            let key_str = match &k {
+                LuaValue::String(s) => s.to_str().unwrap_or("?").to_string(),
+                LuaValue::Integer(n) => n.to_string(),
+                LuaValue::Number(n) => n.to_string(),
+                _ => "(other)".to_string(),
+            };
+            let qualified = if prefix.is_empty() { key_str.clone() } else {
+                format!("{}.{}", prefix, key_str)
+            };
+            let item = lua.create_table()?;
+            item.set("name", key_str)?;
+            item.set("qualifiedName", qualified)?;
+            match &v {
+                LuaValue::Function(_) => {
+                    item.set("type", "function")?;
+                }
+                LuaValue::Table(_) => { item.set("type", "table")?; }
+                LuaValue::Boolean(_) => { item.set("type", "boolean")?; }
+                LuaValue::Integer(_) => { item.set("type", "integer")?; }
+                LuaValue::Number(_) => { item.set("type", "number")?; }
+                LuaValue::String(_) => { item.set("type", "string")?; }
+                LuaValue::UserData(_) => { item.set("type", "userdata")?; }
+                LuaValue::Nil => { item.set("type", "nil")?; }
+                _ => { item.set("type", "other")?; }
+            }
+            items.set(idx, item)?;
+            idx += 1;
+        }
+        Ok(items)
+    })?)?;
 
     luna_table.set("docs", docs_tbl)?;
     Ok(())

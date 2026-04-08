@@ -1,5 +1,6 @@
 -- Colony Simulation — Top-down colony builder with colonist AI
 -- Click to place buildings (1=Farm, 2=Bed, 3=Rec), right-click to assign colonist
+-- Run with: cargo run -- demos/simulation/colony_sim
 
 local function clamp(v, mn, mx) return math.max(mn, math.min(mx, v)) end
 

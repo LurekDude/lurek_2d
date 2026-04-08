@@ -1,6 +1,7 @@
 -- Snake — Classic Arcade (Luna2D demo)
 -- Guide the snake to eat food and grow. Avoid walls and your own tail.
 -- Arrow keys to change direction, game speeds up as score increases.
+-- Run with: cargo run -- demos/arcade/snake
 
 -- ── Constants ────────────────────────────────────────────────────────────
 

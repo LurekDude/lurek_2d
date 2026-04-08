@@ -1,6 +1,7 @@
 -- Centipede — Classic Arcade (Luna2D demo)
 -- Shoot the descending centipede. Mushrooms block bullets and redirect the worm.
 -- Mouse/WASD to move, Space to shoot. Centipede splits when hit.
+-- Run with: cargo run -- demos/arcade/centipede
 
 -- ── Constants ────────────────────────────────────────────────────────────
 

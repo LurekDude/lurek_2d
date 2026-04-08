@@ -1,6 +1,7 @@
 -- Golf Classic — Sport Game (Luna2D demo)
 -- 9 holes of top-down golf. Aim with A/D, hold Space to build power, release to putt.
 -- Wind affects each shot. Par 3–5 per hole. Beat par to earn an eagle!
+-- Run with: cargo run -- demos/sports/golf_classic
 
 -- ── Constants ────────────────────────────────────────────────────────────
 
@@ -310,7 +311,7 @@ end
 
 function luna.keypressed(key)
     if key == "escape" then luna.signal.quit() end
-    if key == "r" then luna.load() end
+    if key == "r" then luna.signal.restart() end
 
     if game_state == "holed" and key == "space" then
         hole_idx = hole_idx + 1; load_hole(); return

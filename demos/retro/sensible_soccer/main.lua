@@ -1,6 +1,7 @@
 -- Sensible Soccer — Amiga 500 Classic (Luna2D demo)
 -- Fast-paced top-down football inspired by Sensible Software's 1992 Amiga classic.
 -- Score more goals than the CPU in 3 minutes to win.
+-- Run with: cargo run -- demos/retro/sensible_soccer
 
 -- ── Constants ────────────────────────────────────────────────────────────
 
@@ -300,7 +301,7 @@ end
 
 function luna.keypressed(key)
     if key == "escape" then luna.signal.quit() end
-    if key == "r" then luna.load() end
+    if key == "r" then luna.signal.restart() end
     if game_state ~= "playing" or kickoff_timer > 0 then return end
     local p = team[controlled]
     if key == "space" then

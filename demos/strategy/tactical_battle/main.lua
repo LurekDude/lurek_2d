@@ -1,6 +1,7 @@
 -- Tactical Turn-Based Battle
 -- Controls: Click unit to select, click tile to move/attack, Enter to end turn, Escape to quit
 -- Defeat all enemy units to win!
+-- Run with: cargo run -- demos/strategy/tactical_battle
 
 local function clamp(v, mn, mx) return math.max(mn, math.min(mx, v)) end
 

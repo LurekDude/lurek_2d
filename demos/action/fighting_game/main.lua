@@ -1,5 +1,6 @@
 -- 2D Fighting Game Demo — Player vs AI with rounds, combos, and super meter
 -- P1: WASD move, F punch, G kick, H block | Escape to quit
+-- Run with: cargo run -- demos/action/fighting_game
 
 local function clamp(v, mn, mx) return math.max(mn, math.min(mx, v)) end
 

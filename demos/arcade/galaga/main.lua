@@ -1,6 +1,7 @@
 -- Galaga — Classic Arcade (Luna2D demo)
 -- Destroy the insect fleet as they swoop down in diving attack patterns.
 -- Left/Right to move, Space to shoot. Each cleared wave increases speed.
+-- Run with: cargo run -- demos/arcade/galaga
 
 -- ── Constants ────────────────────────────────────────────────────────────
 

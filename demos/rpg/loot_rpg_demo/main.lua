@@ -1,4 +1,5 @@
 -- Loot RPG Demo -- Luna2D item + inventory integration
+-- Run with: cargo run -- demos/rpg/loot_rpg_demo
 
 local item      = require("library.item")
 local inventory = require("library.inventory")
@@ -169,7 +170,7 @@ local function use_potion()
     return true
 end
 
--- ── luna.load ─────────────────────────────────────────────────────────────
+-- ── luna.init ─────────────────────────────────────────────────────────────
 function luna.init()
     load_starter()
     luna.window.setTitle("Loot RPG Demo — item + inventory integration")
@@ -188,7 +189,7 @@ function luna.keypressed(key)
     end
 end
 
--- ── luna.draw ─────────────────────────────────────────────────────────────
+-- ── luna.render ─────────────────────────────────────────────────────────────
 local function draw_panel(x, y, w, h, title)
     luna.gfx.setColor(0.15, 0.12, 0.30, 0.9)
     luna.gfx.rectangle("fill", x, y, w, h)

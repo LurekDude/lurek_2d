@@ -1,5 +1,6 @@
 -- 2D Souls-like Precision Combat
 -- WASD move, J=light attack, K=heavy attack, L=dodge, Space=block
+-- Run with: cargo run -- demos/action/soulslike
 
 local W, H = 800, 600
 local player, boss, particles, shake
@@ -318,7 +319,7 @@ end
 
 function luna.keypressed(key)
     if key == "escape" then luna.signal.quit() end
-    if key == "r" then luna.load(); return end
+    if key == "r" then luna.signal.restart(); return end
     if state ~= "play" then return end
     if player.dodging or player.attacking then return end
 

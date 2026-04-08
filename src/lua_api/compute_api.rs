@@ -597,6 +597,11 @@ impl LuaUserData for LuaArray {
             Ok(this.inner.display_string())
         });
 
+        // -- type --
+        methods.add_method("type", |_, _, ()| Ok("Array"));
+        // -- typeOf --
+        methods.add_method("typeOf", |_, _, name: String| Ok(name == "Array" || name == "Object"));
+
     }
 }
 

@@ -1,5 +1,6 @@
 -- Social Deduction — Among Us style with AI players
 -- Complete tasks or vote out the traitor to win
+-- Run with: cargo run -- demos/rpg/social_deduction
 
 local function clamp(v, mn, mx) return math.max(mn, math.min(mx, v)) end
 

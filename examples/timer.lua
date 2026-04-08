@@ -4,7 +4,7 @@
 -- Every luna.time function is demonstrated with inline comments.
 
 -- ─────────────────────────────────────────────────────────────────────────────
--- Frame Timing (call from luna.update / luna.draw)
+-- Frame Timing (call from luna.process / luna.render)
 -- ─────────────────────────────────────────────────────────────────────────────
 
 -- Seconds since last frame (kept below 0.1 to avoid physics tunnelling)
@@ -111,7 +111,14 @@ local scale = sched:getTimeScale()
 
 -- ── Drive the scheduler each frame ───────────────────────────────────────────
 
--- This is mandatory — put it inside luna.update:
+-- This is mandatory — put it inside luna.process:
 function luna.process(dt)
     sched:update(dt)
 end
+
+
+-- ─── luna.time ─────────────────────────────────────────────────────────────────
+local micro_time = luna.time.getMicroTime()  -- Returns the high-resolution elapsed time since engine start in seconds
+local physics_delta = luna.time.getPhysicsDelta()  -- Returns the fixed timestep used by `process_physics` callbacks (seconds)
+luna.time.setPhysicsDelta(1.0)  -- Sets the fixed timestep for `process_physics` callbacks (seconds)
+local step = luna.time.step()  -- Advances the timer by one frame, returning the delta time

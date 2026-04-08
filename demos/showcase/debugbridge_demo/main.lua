@@ -3,6 +3,7 @@
 -- Connect with: telnet 127.0.0.1 19740
 -- or netcat: nc 127.0.0.1 19740
 -- Then send: {"id":1,"method":"ping"}
+-- Run with: cargo run -- demos/showcase/debugbridge_demo
 
 if not luna.debugbridge then
     function luna.init()

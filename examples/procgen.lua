@@ -2,6 +2,7 @@
 -- luna.procgen — Stateless procedural generation utilities.
 -- Cave maps, flood fill, Perlin noise, Poisson-disk sampling, Voronoi diagrams.
 -- All luna.procgen API methods demonstrated with code and comments.
+-- This file is documentation code, not a runnable game.
 
 -- ── Cellular Automata ─────────────────────────────────────────────────────────
 

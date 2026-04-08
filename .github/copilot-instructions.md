@@ -123,6 +123,8 @@ Luna2D-specific rules only — common Rust idioms apply without repetition:
 - Validate inputs at the Lua boundary — return descriptive `LuaError`, never panic
 - Full callback reference: `docs/architecture/engine-architecture.md` § Callback Contract
 
+**MANDATORY — Thin Wrapper Rule**: `src/lua_api/<module>_api.rs` files are **registration-only** wrappers. All structs, enums, business logic, tick/update methods, state machines, and algorithms MUST live in `src/<module>/`. The Lua API file may only contain: `pub fn register()`, closure bodies that delegate immediately to domain methods, and at most simple parameter extraction/conversion. Violating this rule is a blocking code review defect. Every `impl` block for a domain type — including `impl LuaUserData` — belongs in `src/<module>/`, not in `src/lua_api/`.
+
 ### Testing Framework
 
 Luna2D has a two-layer test system. Both layers run **headless** — no window, GPU, or audio device required.

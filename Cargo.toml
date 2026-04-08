@@ -391,6 +391,11 @@ path = "tests/rust/unit/animation_tests.rs"
 harness = true
 
 [[test]]
+name = "tween_tests"
+path = "tests/rust/unit/tween_tests.rs"
+harness = true
+
+[[test]]
 name = "camera_tests"
 path = "tests/rust/unit/camera_tests.rs"
 harness = true

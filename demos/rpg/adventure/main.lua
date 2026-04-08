@@ -1,5 +1,6 @@
 -- Point-and-Click Adventure Demo — explore rooms, collect items, solve puzzles
 -- Mouse click to interact | Escape to quit
+-- Run with: cargo run -- demos/rpg/adventure
 
 -- ── State ────────────────────────────────────────────────────────
 -- Game state: rooms table built in defineRooms(), currentRoom is the active

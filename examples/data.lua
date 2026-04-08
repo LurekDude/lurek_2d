@@ -2,6 +2,7 @@
 -- luna.data — Binary data manipulation: pack/unpack, compress, hash, encode,
 -- TOML parsing, ByteData, and DataView.
 -- All luna.data API methods demonstrated with code and comments.
+-- This file is documentation code, not a runnable game.
 
 -- ── Binary Pack / Unpack ──────────────────────────────────────────────────────
 -- Format string characters (same as Python struct):

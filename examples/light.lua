@@ -1,6 +1,7 @@
 -- examples/light.lua
 -- luna.light — 2D lighting, shadow occluders, and ambient control.
 -- All luna.light API methods demonstrated with code and comments.
+-- This file is documentation code, not a runnable game.
 
 -- ── System-level controls ─────────────────────────────────────────────────────
 
@@ -179,3 +180,51 @@ function luna.render()
     luna.gfx.rectangle("fill", 200, 200, 80, 80)
 end
 ]]
+
+-- ─── Light ─────────────────────────────────────────────────────────────────────
+
+local attenuation = light:getAttenuation()  -- Returns the custom attenuation coefficients as (constant, linear, quadratic)
+local direction = light:getDirection()  -- Returns the direction angle in radians
+local energy = light:getEnergy()  -- Returns the energy scaling factor
+local flicker = light:getFlicker()  -- Returns the flicker effect speed and strength
+local group_id = light:getGroupId()  -- Returns the group identifier
+local inner_angle = light:getInnerAngle()  -- Returns the inner cone angle in radians
+local light_mask = light:getLightMask()  -- Returns the light interaction bitmask
+local light_type = light:getLightType()  -- Returns the geometric light type as a string
+local outer_angle = light:getOuterAngle()  -- Returns the outer cone angle in radians
+local shadow_color = light:getShadowColor()  -- Returns the shadow region color as (r, g, b, a)
+local shadow_filter = light:getShadowFilter()  -- Returns the shadow edge filter as a string
+local shadow_mask = light:getShadowMask()  -- Returns the shadow casting bitmask
+local shadow_smooth = light:getShadowSmooth()  -- Returns the shadow edge smoothing factor
+local is_flicker_enabled = light:isFlickerEnabled()  -- Returns whether the flicker effect is active
+local is_shadow_enabled = light:isShadowEnabled()  -- Returns whether this light casts shadows
+local is_valid = light:isValid()  -- Returns whether this light handle is still valid
+local is_volumetric = light:isVolumetric()  -- Returns whether this light hints at volumetric scattering
+light:setAttenuation(1.0, 1.0, 1.0)  -- Sets the custom attenuation coefficients (constant, linear, quadratic)
+light:setEnergy(1.0)  -- Sets the energy scaling factor
+light:setFlicker(1.0, 1.0)  -- Sets the flicker effect speed and strength (enables flicker)
+light:setFlickerEnabled(false)  -- Sets whether the flicker effect is active
+light:setGroupId(1)  -- Sets the group identifier for batch operations
+light:setLightType("point")  -- "point", "directional", or "spot"
+light:setShadowMask(1)  -- Sets the shadow casting bitmask
+light:setVolumetric(false)  -- Sets whether this light hints at volumetric scattering
+
+-- ─── Occluder ──────────────────────────────────────────────────────────────────
+
+local light_mask = occluder:getLightMask()  -- Returns the light interaction bitmask
+local opacity = occluder:getOpacity()  -- Returns the shadow opacity
+local vertices = occluder:getVertices()  -- Returns the polygon vertices as a flat table {x1,y1,x2,y2,...}
+local is_valid = occluder:isValid()  -- Returns whether this occluder handle is still valid
+occluder:setVertices({})  -- Replaces the polygon vertices from a flat table {x1,y1,x2,y2,...}
+
+-- ─── luna.light ────────────────────────────────────────────────────────────────
+luna.light.advanceFlickers(1.0)  -- Advances flicker phase for all lights with flicker enabled
+luna.light.clear()  -- Removes all lights and occluders, resets ambient to default
+local group_count = luna.light.getGroupCount(1)  -- Returns the number of lights in the given group
+local light_count = luna.light.getLightCount()  -- Returns the number of lights in the world
+local max_lights = luna.light.getMaxLights()  -- Returns the maximum number of lights processed per frame
+local occluder_count = luna.light.getOccluderCount()  -- Returns the number of occluders in the world
+luna.light.setGroupColor(1, 1.0, 1.0, 1.0)  -- Sets the color for all lights in the given group
+luna.light.setGroupEnabled(1, false)  -- Sets the enabled state for all lights in the given group
+luna.light.setGroupIntensity(1, 1.0)  -- Sets the intensity for all lights in the given group
+luna.light.setMaxLights(1)  -- Sets the maximum number of lights processed per frame (clamped 1–256)

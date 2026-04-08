@@ -1,6 +1,7 @@
 -- examples/animation.lua
 -- luna.animation � Sprite animation: frame pools, named clips, speed control, events.
 -- All luna.animation API methods demonstrated with code and comments.
+-- This file is documentation code, not a runnable game.
 
 -- �� Construction �������������������������������������������������������������
 
@@ -59,7 +60,7 @@ anim:resume()
 anim:stop()
 
 -- update(dt) � call every frame to advance animation time.
--- Typically called in luna.update(dt).
+-- Typically called in luna.process(dt).
 anim:update(1/60)
 
 -- �� State Queries �������������������������������������������������������������
@@ -118,7 +119,7 @@ for _, ev in ipairs(events) do
     end
 end
 
--- �� Sprite Sheet Pattern (typical luna.update/luna.draw usage) ����������������
+-- �� Sprite Sheet Pattern (typical luna.process/luna.render usage) ����������������
 
 --[[
 function luna.init()

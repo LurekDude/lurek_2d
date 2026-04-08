@@ -2,6 +2,7 @@
 -- Real-time room-based combat with perks and boss fights
 -- Controls: WASD to move, Left Click to attack, Shift to dash
 -- Clear rooms, pick perks, fight bosses every 5 rooms
+-- Run with: cargo run -- demos/action/roguelite
 
 local function clamp(v, mn, mx) return math.max(mn, math.min(mx, v)) end
 

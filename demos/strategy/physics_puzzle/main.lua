@@ -1,5 +1,6 @@
 -- Physics Puzzle Demo -- drop shapes to guide a ball to the goal
 -- Click to place shapes | 1/2: toggle circle/rect | R: reset | Escape: quit
+-- Run with: cargo run -- demos/strategy/physics_puzzle
 
 local world = nil
 local ball = nil

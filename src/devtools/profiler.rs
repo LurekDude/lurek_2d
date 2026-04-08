@@ -110,14 +110,18 @@ impl Profiler {
     /// # Parameters
     /// - `name` — `&str`.
     pub fn push(&mut self, name: &str) {
-        if !self.enabled { return; }
+        if !self.enabled {
+            return;
+        }
         let now = self.elapsed();
         self.zone_stack.push((name.to_string(), now, Vec::new()));
     }
 
     /// Closes the most recent open zone.
     pub fn pop(&mut self) {
-        if !self.enabled { return; }
+        if !self.enabled {
+            return;
+        }
         if let Some((name, start, children)) = self.zone_stack.pop() {
             let zone = ProfileZone {
                 name,
@@ -136,7 +140,9 @@ impl Profiler {
 
     /// Seals the current frame and stores the collected zones.
     pub fn end_frame(&mut self) {
-        if !self.enabled { return; }
+        if !self.enabled {
+            return;
+        }
         let mut frame_zones: Vec<ProfileZone> = Vec::new();
         while let Some((name, start, children)) = self.zone_stack.pop() {
             if name.is_empty() && start == 0.0 {
@@ -165,7 +171,9 @@ impl Profiler {
     /// `Option<&Vec<ProfileZone>>`.
     pub fn get_frame(&self, idx: i64) -> Option<&Vec<ProfileZone>> {
         let n = self.frames.len();
-        if n == 0 { return None; }
+        if n == 0 {
+            return None;
+        }
         let pos = if idx <= 0 {
             let abs = (-idx) as usize;
             n.saturating_sub(abs + 1).min(n - 1)
@@ -183,5 +191,7 @@ impl Profiler {
 }
 
 impl Default for Profiler {
-    fn default() -> Self { Self::new() }
+    fn default() -> Self {
+        Self::new()
+    }
 }

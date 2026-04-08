@@ -12,9 +12,17 @@
 
 ## Purpose
 
-The `devtools` module provides the developer diagnostics toolkit for Luna2D, exposed to Lua games via `luna.devtools.*`. It contains four components: a structured logger with level filtering and category tagging, a hierarchical profiler for tracking named CPU-time zones across frames, a frame-time stats counter with percentile reporting, and a file watcher for hot-reload triggers. This module is **pure Rust** with no mlua dependency; all Lua plumbing lives in `src/lua_api/devtools_api.rs`. It is gated by `modules.debug = true` in `conf.lua`.
+The `devtools` module provides the developer diagnostics toolkit for Luna2D, exposed to Lua games via `luna.devtools.*`. It contains four core components plus a live watch/snapshot system:
 
-**Ownership Rule — frame timing**: Use `luna.time.getDelta()` / `luna.time.getFps()` / `luna.time.getAverageDelta()` for basic per-frame timing (zero setup). Use `luna.devtools.frameStats:record(dt)` + `frameStats:snapshot()` only when p50/p95/p99 **percentile analysis** is needed.
+1. **Logger** — structured logger with level filtering and category tagging
+2. **Profiler** — hierarchical CPU-time zones across frames
+3. **FrameStats** — rolling frame-time buffer with p50/p95/p99 percentiles
+4. **FileWatcher** — hot-reload trigger via mtime polling
+5. **Live watches** — named getter functions exposed via `exposeWatch()`; sampled via `getWatches()` or `snapshot()`
+
+This module is **pure Rust** with no mlua dependency; all Lua plumbing lives in `src/lua_api/devtools_api.rs`. It is gated by `modules.debug = true` in `conf.lua`.
+
+**Ownership Rule — frame timing**: Use `luna.time.getDelta()` / `luna.time.getFps()` for basic timing. Use `luna.devtools.frameStats:record(dt)` + `frameStats:snapshot()` only when **percentile analysis** is needed.
 
 ## Source Files
 
@@ -25,6 +33,15 @@ The `devtools` module provides the developer diagnostics toolkit for Luna2D, exp
 | `frame_stats.rs`  | `FrameStats`, `FrameSnapshot` — circular frame-time buffer with percentile stats |
 | `watcher.rs`      | `FileWatcher` — path modification time polling for hot-reload detection         |
 | `mod.rs`          | Re-exports all public types                                                     |
+
+## New Lua API (v0.5.x)
+
+| Function | Signature | Description |
+|---|---|---|
+| `exposeWatch` | `(name, getter, category?) → id` | Registers a named getter function |
+| `removeWatch` | `(id) → bool` | Removes a watch by id |
+| `getWatches` | `() → table` | Samples all watches → `{name,category,value}[]` |
+| `snapshot` | `() → table` | Full diagnostic snapshot (watches + frameStats + profile + log) |
 
 ## Full Specification
 

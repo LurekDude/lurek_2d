@@ -1,4 +1,5 @@
 -- Module availability guard (added by fix script)
+-- Run with: cargo run -- demos/showcase/nine_slice_demo
 if not luna.gfx.newNineSlice then
     function luna.init()
         luna.gfx.setBackgroundColor(0.15, 0.15, 0.25)

@@ -1,6 +1,7 @@
 -- Real-Time Strategy
 -- Controls: Left-click to select units, Right-click to move/attack, B to build worker, S to build soldier, Escape to quit
 -- Gather gold, build an army, destroy the enemy base!
+-- Run with: cargo run -- demos/strategy/rts
 
 local function clamp(v, mn, mx) return math.max(mn, math.min(mx, v)) end
 

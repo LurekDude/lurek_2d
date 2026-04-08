@@ -2,6 +2,7 @@
 -- luna.savegame — Slot-based persistent save-file manager with schema
 -- versioning, automatic migration, dirty-tracking, and auto-save.
 -- All luna.savegame API methods demonstrated with code and comments.
+-- This file is documentation code, not a runnable game.
 
 -- ── SaveManager ───────────────────────────────────────────────────────────────
 

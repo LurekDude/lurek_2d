@@ -8,7 +8,7 @@
 | **Depends on**     | `fastrand` (external); `crate::engine::log_messages` (log constants in `spatial_hash.rs` only) |
 | **Depended on by** | Every other Luna2D module |
 | **Lua API**        | `luna.math` via `src/lua_api/math_api.rs` |
-| **Tests — Rust**   | `tests/unit/math_tests.rs` (~60 tests, 857 lines) |
+| **Tests — Rust**   | `tests/rust/unit/math_tests.rs` (~60 tests, 857 lines) |
 | **Tests — Lua**    | `tests/lua/unit/test_math.lua` (~20 tests, 128 lines) |
 | **Inline tests**   | `easing.rs`, `tween.rs`, `spatial_hash.rs`, `geometry.rs`, `noise_generator.rs` |
 

@@ -2,6 +2,7 @@
 -- luna.raycaster — DDA-based grid raycasting for retro FPS and dungeon-crawler games.
 -- Cast rays through a cell grid, project wall columns, check line of sight.
 -- All luna.raycaster API methods and utilities demonstrated with code and comments.
+-- This file is documentation code, not a runnable game.
 
 -- ── Creating the Raycaster ────────────────────────────────────────────────────
 

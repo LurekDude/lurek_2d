@@ -1,5 +1,6 @@
 -- Platform Fighter — Smash Bros style 2-player arena
 -- Player 1: WASD + F(punch) + G(smash)  |  Player 2: Arrows + K(punch) + L(smash)
+-- Run with: cargo run -- demos/action/platform_fighter
 
 local function clamp(v, mn, mx) return math.max(mn, math.min(mx, v)) end
 

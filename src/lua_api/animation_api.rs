@@ -1,4 +1,4 @@
-//! `luna.tween` — Sprite animation: frame pools, named clips, speed control, and playback events.
+//! `luna.animation` — Sprite animation: frame pools, named clips, speed control, and playback events.
 
 use super::SharedState;
 use mlua::prelude::*;

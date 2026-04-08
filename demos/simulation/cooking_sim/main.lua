@@ -1,5 +1,6 @@
 -- Culinary / Cooking Simulation Demo
 -- Pick up ingredients, chop/cook them, assemble orders for customers
+-- Run with: cargo run -- demos/simulation/cooking_sim
 
 local function clamp(v, mn, mx) return math.max(mn, math.min(mx, v)) end
 

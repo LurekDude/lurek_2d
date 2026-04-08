@@ -1,6 +1,7 @@
 -- Bullet Hell Shooter
 -- Controls: Arrow keys to move, Space to shoot, Escape to quit
 -- Survive waves of enemies and their bullet patterns!
+-- Run with: cargo run -- demos/action/bullet_hell
 
 local function clamp(v, mn, mx) return math.max(mn, math.min(mx, v)) end
 

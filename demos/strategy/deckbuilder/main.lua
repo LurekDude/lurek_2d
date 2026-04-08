@@ -1,6 +1,7 @@
 -- Strategic Deckbuilder (Slay the Spire style)
 -- Turn-based combat with cards. Click cards to play them.
 -- 3 floors with different monsters, card rewards between fights.
+-- Run with: cargo run -- demos/strategy/deckbuilder
 
 local function clamp(v, mn, mx) return math.max(mn, math.min(mx, v)) end
 
@@ -259,7 +260,7 @@ end
 
 function luna.keypressed(key)
     if key == "escape" then luna.signal.quit() end
-    if key == "r" then luna.load() end
+    if key == "r" then luna.signal.restart() end
     if key == "e" and state.phase == "combat" and state.turn == "player" then
         discard_hand()
         enemy_turn()

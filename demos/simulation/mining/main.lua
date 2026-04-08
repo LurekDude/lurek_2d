@@ -1,5 +1,6 @@
 -- Mining Demo: Side-view destructible mining world
 -- WASD to move, click adjacent tiles to mine, L to place ladders
+-- Run with: cargo run -- demos/simulation/mining
 
 local function clamp(v, mn, mx) return math.max(mn, math.min(mx, v)) end
 local function lerp(a, b, t) return a + (b - a) * t end

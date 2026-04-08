@@ -33,6 +33,7 @@ pub mod animation_api;
 
 /// Registers the `luna.thread.*` background threading API.
 pub mod thread_api;
+pub mod tween_api;
 
 /// Registers the `luna.simulator.*` automated input simulation API.
 pub mod automation_api;
@@ -189,9 +190,14 @@ pub fn create_lua_vm(state: Rc<RefCell<SharedState>>, modules: &ModulesConfig) -
         camera_api::register(&lua, &luna, state.clone())?;
     }
 
-    // animation: luna.tween
+    // animation: luna.animation
     if modules.animation {
         animation_api::register(&lua, &luna, state.clone())?;
+    }
+
+    // tween: luna.tween
+    if modules.tween {
+        tween_api::register(&lua, &luna, state.clone())?;
     }
 
     // thread: luna.thread

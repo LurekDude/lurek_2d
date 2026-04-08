@@ -1,5 +1,6 @@
 -- Creature Collector — Luna2D Demo
 -- WASD to walk, random encounters, catch creatures
+-- Run with: cargo run -- demos/rpg/creature_collector
 
 local function clamp(v, mn, mx) return math.max(mn, math.min(mx, v)) end
 

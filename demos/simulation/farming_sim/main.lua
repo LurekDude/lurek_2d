@@ -2,6 +2,7 @@
 -- Top-down farming with crops, seasons, day/night cycle, and economy
 -- Controls: WASD to move, Click soil to plant/harvest, N to advance day
 -- Number keys 1-3 to select crop, B to buy seeds, S to sell harvest
+-- Run with: cargo run -- demos/simulation/farming_sim
 
 local function clamp(v, mn, mx) return math.max(mn, math.min(mx, v)) end
 local function lerp(a, b, t) return a + (b - a) * t end

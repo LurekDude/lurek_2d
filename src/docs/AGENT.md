@@ -12,7 +12,11 @@
 
 ## Purpose
 
-The `docs` module provides a structured API documentation catalog for the `luna.*` Lua API surface. It defines `DocEntry`, `ParamInfo`, and `ReturnInfo` data types to describe individual API entries, an in-memory `Catalog` for aggregating and querying those entries, and a `ValidationReport` / `QualityReport` pipeline for measuring documentation coverage and completeness. The Lua API at `luna.docs.*` can scan live bindings at runtime, load entries from TOML files, validate catalog coverage against the live API surface, compute per-module quality scores, and export VS Code IntelliSense JSON. This module is consumed by the VS Code extension and the MCP server for IntelliSense completions and hover documentation.
+The `docs` module provides API documentation management, runtime reflection, and game-data validation:
+
+1. **Catalog / Validation** — `DocEntry`, `Catalog`, `ValidationReport`, `QualityReport` — scan live bindings, load TOML annotations, validate coverage and quality.
+2. **Schema validation** — `Schema`, `FieldRule`, `SchemaResult` — lightweight runtime data-validator for game config, save-state, and mod manifests. Defined in `src/docs/schema.rs`.
+3. **Live reflection** — `luna.docs.reflectLive(ns?)` walks the live `luna.*` Lua table and returns a structured name/type description; `luna.docs.reflectTable(t, name?)` reflects any arbitrary Lua table.
 
 ## Source Files
 
@@ -21,7 +25,20 @@ The `docs` module provides a structured API documentation catalog for the `luna.
 | `entry.rs`     | `DocEntry`, `ParamInfo`, `ReturnInfo` — data types for a single API entry        |
 | `catalog.rs`   | `Catalog` — in-memory registry with search, filter, and query helpers            |
 | `report.rs`    | `ValidationReport`, `QualityReport`, `quality_score()`, `quality_grade()`        |
+| `schema.rs`    | `Schema`, `FieldRule`, `FieldType`, `SchemaError`, `SchemaResult` — data validation |
+| `export.rs`    | `export_all`, `export_completions`, `export_hover`, `export_signatures`          |
 | `mod.rs`       | Re-exports all public types                                                       |
+
+## Key Lua API (additions)
+
+| Function | Signature | Description |
+|---|---|---|
+| `schema` | `(rules, name?) → Schema` | Creates a data-validation schema |
+| `Schema:validate` | `(data) → ok, errors` | Validates a table; returns bool + error list |
+| `Schema:check` | `(data) → bool` | Boolean validation    |
+| `Schema:assert` | `(data)` | Throws on failure |
+| `reflectLive` | `(ns?) → table` | Walks live `luna.*` table |
+| `reflectTable` | `(tbl, name?) → table` | Reflects any Lua table |
 
 ## Full Specification
 

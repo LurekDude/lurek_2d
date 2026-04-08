@@ -1,5 +1,6 @@
 -- Dialog Demo – Luna2D dialog sequencer example
 -- Demonstrates typewriter text, choices, events, and call nodes.
+-- Run with: cargo run -- demos/rpg/dialog_demo
 
 local dialog = require("library.dialog")
 
@@ -127,7 +128,7 @@ function luna.keypressed(key)
     elseif key == "s" then
         seq:skip()
     elseif key == "r" then
-        luna.load() -- restart
+        luna.signal.restart() -- restart
     elseif seq:isWaitingForChoice() then
         local n = tonumber(key)
         if n and n >= 1 then

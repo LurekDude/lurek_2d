@@ -46,6 +46,8 @@ luna demos/<category>/<name>                  # installed binary
 | <img src="retro/sensible_soccer/screen.png" width="160" height="120" alt="Sensible Soccer"> | [Sensible Soccer](retro/sensible_soccer) | 5v5 top-down football with CPU team AI |
 | <img src="retro/another_world/screen.png" width="160" height="120" alt="Another World"> | [Another World](retro/another_world) | 3-scene cinematic platformer with shield deflection |
 | <img src="retro/shadow_beast/screen.png" width="160" height="120" alt="Shadow Beast"> | [Shadow Beast](retro/shadow_beast) | Atmospheric parallax side-scroller — 3 stages |
+| <img src="retro/raycaster_fps/screen.png" width="160" height="120" alt="Raycaster FPS"> | [Raycaster FPS](retro/raycaster_fps) | Wolfenstein-style FPS: textured walls, fog, items, weather |
+| <img src="retro/dungeon_crawler/screen.png" width="160" height="120" alt="Dungeon Crawler"> | [Dungeon Crawler](retro/dungeon_crawler) | Eye of Beholder grid-step dungeon: torches, orbs, minimap |
 
 ## Sports
 

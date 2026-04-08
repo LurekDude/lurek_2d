@@ -1,6 +1,7 @@
 -- examples/camera.lua
 -- luna.camera — Camera2D: viewport, position, zoom, follow, shake, coordinate transforms.
 -- All luna.camera API methods demonstrated with code and comments.
+-- This file is documentation code, not a runnable game.
 
 -- ── Construction ─────────────────────────────────────────────────────────────
 

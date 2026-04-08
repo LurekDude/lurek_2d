@@ -1,5 +1,6 @@
 -- Signal Demo — Luna2D example
 -- Demonstrates the pub-sub Signal system for decoupled event handling.
+-- Run with: cargo run -- demos/showcase/signal_demo
 
 local events = luna.signal.newSignal()
 local log = {}

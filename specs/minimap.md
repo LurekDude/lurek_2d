@@ -6,7 +6,7 @@
 | **Status**     | Implemented — Full                                   |
 | **Lua API**    | `luna.minimap`                                       |
 | **Source**     | `src/minimap/`                                       |
-| **Rust Tests** | `tests/rust/game/minimap_tests.rs`                   |
+| **Rust Tests** | `tests/rust/unit/minimap_tests.rs`                   |
 | **Lua Tests**  | `tests/lua/unit/test_minimap.lua`                    |
 | **Architecture** | —                                                  |
 

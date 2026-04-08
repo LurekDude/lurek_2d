@@ -1,6 +1,7 @@
 -- Modding Demo for Luna2D
 -- Demonstrates luna.fs.mount / unmount and load via luna.fs.load.
 -- Mounts a local "mods" folder and loads a Lua chunk from it.
+-- Run with: cargo run -- demos/showcase/modding_demo
 
 local mod_greeting = "No mod loaded."
 local mod_init_ran = false

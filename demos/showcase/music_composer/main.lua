@@ -1,5 +1,6 @@
 -- Music Composer / DAW Simulation
 -- Piano roll grid, multi-track, BPM, playback, note placement
+-- Run with: cargo run -- demos/showcase/music_composer
 
 local function clamp(v, mn, mx) return math.max(mn, math.min(mx, v)) end
 

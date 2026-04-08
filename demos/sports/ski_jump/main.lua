@@ -1,6 +1,7 @@
 -- Ski Jump — Sport Game (Luna2D demo)
 -- Three phases: crouch (hold Space) → in-air lean (A/D) → land (Space).
 -- Your distance depends on all three phases perfectly timed.
+-- Run with: cargo run -- demos/sports/ski_jump
 
 -- ── Constants ────────────────────────────────────────────────────────────
 
@@ -281,7 +282,7 @@ end
 
 function luna.keypressed(key)
     if key == "escape" then luna.signal.quit() end
-    if key == "r" then luna.load() end
+    if key == "r" then luna.signal.restart() end
 
     if phase == "score" then
         if key == "space" then

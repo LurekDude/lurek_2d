@@ -1,4 +1,5 @@
 -- Module availability guard (added by fix_nil_module_demos.py)
+-- Run with: cargo run -- demos/showcase/localization_demo
 if not luna.localization then
     function luna.init()
         luna.gfx.setBackgroundColor(0.08, 0.08, 0.12)

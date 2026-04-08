@@ -1,6 +1,7 @@
 -- examples/image.lua
 -- luna.img — CPU-side pixel buffer manipulation (ImageData and CompressedImageData).
 -- All luna.img API methods demonstrated with code and comments.
+-- This file is documentation code, not a runnable game.
 
 -- ── ImageData ────────────────────────────────────────────────────────────────
 

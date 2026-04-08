@@ -1,6 +1,7 @@
 -- Light Showcase — A multi-screen demo of Luna2D's 2D lighting system
 -- Press number keys 1-8 to switch screens.  WASD moves the player light.
 -- Each screen demonstrates a different lighting feature.
+-- Run with: cargo run -- demos/showcase/light_showcase
 
 local W, H = 1024, 768
 local screen = 1        -- current screen index

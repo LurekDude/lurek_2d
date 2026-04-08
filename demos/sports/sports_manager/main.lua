@@ -1,5 +1,6 @@
 -- Sports Manager — 2D Data-Driven Football Management
 -- Manage roster, tactics, training, transfers, play a 10-match season
+-- Run with: cargo run -- demos/sports/sports_manager
 
 local function clamp(v, mn, mx) return math.max(mn, math.min(mx, v)) end
 

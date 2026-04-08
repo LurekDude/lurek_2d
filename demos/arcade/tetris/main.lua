@@ -1,6 +1,7 @@
 -- Tetris — Classic Arcade (Luna2D demo)
 -- Rotate and place falling tetrominoes, clear lines to score points.
 -- Arrow keys to move/rotate, Down to soft-drop, Space to hard-drop.
+-- Run with: cargo run -- demos/arcade/tetris
 
 -- ── Constants ────────────────────────────────────────────────────────────
 
@@ -238,7 +239,7 @@ end
 
 function luna.keypressed(key)
     if key == "escape" then luna.signal.quit() end
-    if key == "r" and game_over then luna.load() end
+    if key == "r" and game_over then luna.signal.restart() end
     if game_over then return end
 
     if key == "left" then

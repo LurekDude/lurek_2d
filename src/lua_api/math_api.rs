@@ -1752,6 +1752,24 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
     /// Positive infinity (math.huge equivalent).
     tbl.set("huge", f64::INFINITY)?;
 
+    // -- rad --
+    /// Converts degrees to radians.
+    /// @param deg : number
+    /// @return number
+    tbl.set(
+        "rad",
+        lua.create_function(|_, deg: f64| Ok(deg.to_radians()))?,
+    )?;
+
+    // -- deg --
+    /// Converts radians to degrees.
+    /// @param rad : number
+    /// @return number
+    tbl.set(
+        "deg",
+        lua.create_function(|_, rad: f64| Ok(rad.to_degrees()))?,
+    )?;
+
     // -- sin --
     /// Returns the sine of x (radians).
     /// @param x : number
@@ -2019,6 +2037,23 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
             let f: mlua::Function = math.get("random")?;
             let v: i64 = f.call((lo, hi))?;
             Ok(v)
+        })?,
+    )?;
+
+    // -- simplexNoise --
+    /// Returns a simplex noise value in [-1, 1] for 2D or 3D coordinates.
+    /// @param x : number
+    /// @param y : number
+    /// @param z : number?
+    /// @return number
+    tbl.set(
+        "simplexNoise",
+        lua.create_function(|_, (x, y, z): (f64, f64, Option<f64>)| {
+            let v = match z {
+                Some(zv) => noise_functions::simplex_noise_3d(x as f32, y as f32, zv as f32),
+                None => noise_functions::simplex_noise_2d(x as f32, y as f32),
+            };
+            Ok(v as f64)
         })?,
     )?;
 

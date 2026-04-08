@@ -1,5 +1,6 @@
 -- Atmospheric / Psychological Horror Demo
 -- Dark environment, flashlight, sanity meter, find keys and escape
+-- Run with: cargo run -- demos/rpg/horror
 
 local function clamp(v, mn, mx) return math.max(mn, math.min(mx, v)) end
 

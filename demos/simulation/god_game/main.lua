@@ -1,5 +1,6 @@
 -- God Game / Ecosystem Simulator — Luna2D Demo
 -- Top-down world: guide tribes, perform miracles, balance ecosystem
+-- Run with: cargo run -- demos/simulation/god_game
 
 local function clamp(v, mn, mx) return math.max(mn, math.min(mx, v)) end
 
@@ -231,7 +232,7 @@ end
 
 function luna.keypressed(key)
     if key == "escape" then luna.signal.quit() end
-    if key == "r" then luna.load() end
+    if key == "r" then luna.signal.restart() end
     if key == "1" then selected_miracle = 1 end
     if key == "2" then selected_miracle = 2 end
     if key == "3" then selected_miracle = 3 end

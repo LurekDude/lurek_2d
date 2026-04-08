@@ -1,5 +1,6 @@
 -- Marine / Fishing Simulation Demo
 -- Cast line, catch fish with tension mini-game, sell at end of day
+-- Run with: cargo run -- demos/sports/fishing
 
 local function clamp(v, mn, mx) return math.max(mn, math.min(mx, v)) end
 

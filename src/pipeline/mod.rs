@@ -4,7 +4,6 @@
 //! as pure-Rust types. The Lua binding lives in `crate::lua_api::pipeline_api`.
 //!
 //! Architecture: Tier 2. Depends only on `crate::math` and `crate::engine`.
-//! Does not import `mlua` or any other Tier-2 crate module.
 
 /// DAG node and edge types; the `Pipeline` container and its `run` / `run_async` entry points.
 pub mod dag;

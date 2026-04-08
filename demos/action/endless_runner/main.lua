@@ -1,5 +1,6 @@
 -- Endless Runner — Luna2D Demo
 -- Space to jump, Down to slide, dodge obstacles, collect coins
+-- Run with: cargo run -- demos/action/endless_runner
 
 local player, obstacles, coins, particles
 local speed, score, highScore, distance

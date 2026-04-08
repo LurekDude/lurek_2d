@@ -498,6 +498,18 @@ impl LuaUserData for LuaBus {
             let st = this.state.borrow();
             Ok(st.mixer.get_bus(this.key).is_some_and(|b| b.is_paused()))
         });
+
+        // -- type --
+        /// Returns the type name of this object.
+        /// @return string
+        methods.add_method("type", |_, _, ()| Ok("Bus"));
+
+        // -- typeOf --
+        /// Returns true if this object is of the given type.
+        /// @param name : string
+        /// @return boolean
+        methods.add_method("typeOf", |_, _, name: String| Ok(name == "Bus" || name == "Object"));
+
     }
 }
 
@@ -937,6 +949,18 @@ impl LuaUserData for LuaMidiPlayer {
             log_msg!(debug, LA01_API_STUB, "MidiPlayer:setOnEnd");
             Ok(())
         });
+
+        // -- type --
+        /// Returns the type name of this object.
+        /// @return string
+        methods.add_method("type", |_, _, ()| Ok("MidiPlayer"));
+
+        // -- typeOf --
+        /// Returns true if this object is of the given type.
+        /// @param name : string
+        /// @return boolean
+        methods.add_method("typeOf", |_, _, name: String| Ok(name == "MidiPlayer" || name == "Object"));
+
     }
 }
 

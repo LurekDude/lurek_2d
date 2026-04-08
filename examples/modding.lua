@@ -2,6 +2,7 @@
 -- luna.modding — Mod metadata containers and managers for game modding support.
 -- Discover, validate, hot-reload, and hook into game logic from external mods.
 -- All luna.modding API methods demonstrated with code and comments.
+-- This file is documentation code, not a runnable game.
 
 -- ── Mod Object ────────────────────────────────────────────────────────────────
 

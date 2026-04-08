@@ -224,3 +224,123 @@ player:unsoloAll()      -- restore all channels
 local tracks = player:getTrackCount()
 player:setTrackMuted(2, true)    -- mute track 2 (0-based)
 local track_muted = player:isTrackMuted(2)
+
+-- ─── Bus ────────────────────────────────────────────────────────────────────────
+-- Bus objects are returned by luna.audio.newBus() and represent a named audio
+-- routing channel with independent volume and pitch controls.
+local bus_name    = bus:getName()       -- "Music"
+bus:setVolume(0.8)
+local bus_vol     = bus:getVolume()     -- 0.8
+bus:setPitch(1.0)
+local bus_pitch   = bus:getPitch()      -- 1.0
+bus:pause()
+local bus_paused  = bus:isPaused()      -- true
+bus:resume()
+local bus_type = bus:type()  -- "Bus"
+local bus_is_type = bus:typeOf("Bus")   -- true
+
+-- ─── Decoder ────────────────────────────────────────────────────────────────────
+-- Decoder objects are returned by luna.audio.newDecoder() and provide
+-- streaming read access to an audio file.
+local channels  = decoder:getChannelCount()  -- 2 (stereo)
+local bits      = decoder:getBitDepth()      -- 16
+local rate      = decoder:getSampleRate()    -- 44100
+local dur       = decoder:getDuration()      -- 183.4
+local can_seek  = decoder:isSeekable()       -- true
+decoder:seek(30.0)                           -- jump to 30 s
+local pos       = decoder:tell()             -- 30.0
+local buf       = decoder:decode()           -- decode next chunk  
+decoder:rewind()
+decoder:release()
+local decoder_type = decoder:type()  -- "Decoder"
+local decoder_is_type = decoder:typeOf("Decoder") -- true
+
+local midi_bus = midiplayer:getBus()  -- Returns the assigned bus, or nil
+local channel_instrument = midiplayer:getChannelInstrument(1)  -- Returns the GM instrument for a MIDI channel (1-indexed)
+local file_path = midiplayer:getFilePath()  -- Returns the file path of the loaded MIDI, or nil
+local note_count = midiplayer:getNoteCount()  -- Returns the total note count in the MIDI sequence
+local sound_font_path = midiplayer:getSoundFontPath()  -- Returns the SoundFont file path, or nil (stub)
+local tempo = midiplayer:getTempo()  -- Returns the current tempo in BPM
+local tempo_scale = midiplayer:getTempoScale()  -- Returns the current tempo scale factor
+local ticks_per_beat = midiplayer:getTicksPerBeat()  -- Returns the PPQ resolution from the MIDI header
+local track_name = midiplayer:getTrackName(1)  -- Returns the name of a MIDI track (1-indexed), or nil
+midiplayer:setBus(bus)  -- Routes MIDI output through a bus (or nil to clear)
+midiplayer:setOnEnd(function() end)  -- Registers a playback-end callback (stub)
+midiplayer:setOnNoteOff(function() end)  -- Registers a note-off callback (stub)
+midiplayer:setOnNoteOn(function() end)  -- Registers a note-on callback (stub)
+local midiplayer_type = midiplayer:type()  -- "MidiPlayer"
+local midiplayer_is_type = midiplayer:typeOf("MidiPlayer")  -- Returns true if this object is of the given type
+midiplayer:useDefaultSoundFont()  -- Reverts to the built-in default SoundFont (stub)
+
+-- ─── luna.audio ────────────────────────────────────────────────────────────────
+local add_effect = luna.audio.add_effect("name", "type", {})  -- Adds a DSP effect to a bus
+luna.audio.clearFilter(source)  -- Removes any active filter from a source
+luna.audio.clearMidiSoundFont()  -- Unloads the active SoundFont
+local clone = luna.audio.clone(source)  -- Creates an independent copy of a source
+luna.audio.create_bus("name", "name")  -- Creates a bus by name (functional style)
+luna.audio.fadeIn(source, 1.0)  -- Fades a source in from silence over the given duration
+local active_source_count = luna.audio.getActiveSourceCount()  -- Returns the number of currently playing sources
+local distance_model = luna.audio.getDistanceModel()  -- Returns the current distance model name
+local doppler_scale = luna.audio.getDopplerScale()  -- Returns the current Doppler scale
+local duration = luna.audio.getDuration(source)  -- Returns the total duration of a source in seconds
+local fade_in = luna.audio.getFadeIn(source)  -- Returns the fade-in duration of a source
+local free_buffer_count = luna.audio.getFreeBufferCount(1)  -- Returns the free buffer slots in a queueable source
+local highpass = luna.audio.getHighpass(source)  -- Returns the high-pass filter cutoff of a source
+local listener = luna.audio.getListener()  -- Returns the 3D listener position (x, y, z)
+local listener2_d = luna.audio.getListener2D()  -- Returns the 2D listener position (x, y)
+local lowpass = luna.audio.getLowpass(source)  -- Returns the low-pass filter cutoff of a source
+local max_sources = luna.audio.getMaxSources()  -- Returns the maximum number of simultaneous sources
+local meter = luna.audio.getMeter()  -- Returns the current peak level (stub)
+local orientation = luna.audio.getOrientation(source)  -- Returns the 6-component orientation of a source
+local pan = luna.audio.getPan(source)  -- Returns the source stereo panning
+local pitch = luna.audio.getPitch(source)  -- Returns the source pitch multiplier
+local playback_device = luna.audio.getPlaybackDevice()  -- Returns the current audio output device name
+local playback_devices = luna.audio.getPlaybackDevices()  -- Returns a table of available audio output device names
+local position = luna.audio.getPosition(source)  -- Returns the 3D position of a source (x, y, z)
+local source_bus = luna.audio.getSourceBus(source)  -- Returns the bus a source is assigned to, or nil
+local source_count = luna.audio.getSourceCount()  -- Returns the total number of registered sources
+local source_type = luna.audio.getSourceType(source)  -- Returns the type string ("static" or "stream") of a source
+local velocity = luna.audio.getVelocity(source)  -- Returns the velocity of a source (x, y, z)
+local volume = luna.audio.getVolume(source)  -- Returns the source volume
+local has_midi_sound_font = luna.audio.hasMidiSoundFont()  -- Returns true if a SoundFont is loaded
+local is_looping = luna.audio.isLooping(source)  -- Returns true if looping is enabled
+local is_paused = luna.audio.isPaused(source)  -- Returns true if the source is paused
+local is_playing = luna.audio.isPlaying(source)  -- Returns true if the source is playing
+local is_stopped = luna.audio.isStopped(source)  -- Returns true if the source is stopped
+local decoder = luna.audio.newDecoder("music/intro.ogg", 4096)  -- Creates a streaming audio decoder
+local queueable_source = luna.audio.newQueueableSource(1, 1, 1, 1)  -- Creates a queueable source for manual PCM buffering
+local sounddata = luna.audio.newSoundData("effects/laser.wav")  -- Creates a SoundData from a file, or a silent buffer if nil
+luna.audio.pause(source)  -- Pauses playback at the current position
+luna.audio.pauseAll()  -- Pauses all currently playing sources
+local play = luna.audio.play(source, {})  -- Plays a source, with optional bus routing via options table
+luna.audio.playLooping(source)  -- Plays the source in a continuous loop
+luna.audio.playQueueable(1)  -- Starts playback of a queueable source
+luna.audio.queueSource(1, sounddata)  -- Pushes a SoundData buffer into a queueable source
+local release = luna.audio.release(source)  -- Releases a source and frees its memory
+local remove_effect = luna.audio.remove_effect("name", 1)  -- Removes a DSP effect from a bus
+luna.audio.resume(source)  -- Resumes playback from pause
+luna.audio.resumeAll()  -- Resumes all paused sources
+luna.audio.seek(source, 1.0)  -- Seeks to a time position in seconds
+luna.audio.setDistanceModel("inverse")  -- "none", "inverse", "linear", "exponent"
+luna.audio.setDopplerScale(1.0)  -- Sets the global Doppler effect scale
+luna.audio.setHighpass(source, 1)  -- Applies a high-pass filter to a source
+luna.audio.setListener(1.0, 1.0, 1.0)  -- Sets the 3D listener position
+luna.audio.setListener2D(1.0, 1.0)  -- Sets the 2D listener position for spatial audio
+luna.audio.setLooping(source, false)  -- Enables or disables looping
+luna.audio.setLowpass(source, 1)  -- Applies a low-pass filter to a source
+luna.audio.setMeter(1.0)  -- Sets the metering scale (stub)
+luna.audio.setMidiSoundFont("path/to/file")  -- Sets the global SoundFont for MIDI synthesis
+luna.audio.setOrientation(source, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0)  -- Sets the 6-component orientation of a source
+luna.audio.setPan(source, 1.0)  -- Sets stereo panning (-1.0 left to 1.0 right)
+luna.audio.setPitch(source, 1.0)  -- Sets source pitch multiplier
+luna.audio.setPlaybackDevice("name")  -- Selects an audio output device by name
+luna.audio.setPosition(source, 1.0, 1.0, 1.0)  -- Sets the 3D position of a source
+luna.audio.setSourceBus(source, bus)  -- Assigns a source to a bus
+luna.audio.setVelocity(source, 1.0, 1.0, 1.0)  -- Sets the velocity of a source for Doppler
+luna.audio.setVolume(source, 1.0)  -- Sets source playback volume
+luna.audio.set_bus_volume("name", 1.0)  -- Sets a bus volume by name
+local set_effect_param = luna.audio.set_effect_param("name", 1, "name", 1.0)  -- Sets a parameter on a DSP effect
+luna.audio.stop(source)  -- Stops playback and resets seek position
+luna.audio.stopAll()  -- Stops all currently playing sources
+luna.audio.stopQueueable(1)  -- Stops a queueable source and drains its buffers
+local tell = luna.audio.tell(source)  -- Returns the current playback position in seconds

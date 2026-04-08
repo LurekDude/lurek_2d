@@ -1,5 +1,6 @@
 -- Pinball -- Physics-based pinball table
 -- Left/Right arrows or Z/slash for flippers, Space to launch
+-- Run with: cargo run -- demos/sports/pinball
 
 local function clamp(v, mn, mx) return math.max(mn, math.min(mx, v)) end
 

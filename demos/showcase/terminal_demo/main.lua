@@ -1,6 +1,7 @@
 -- Terminal Demo for Luna2D
 -- Demonstrates the luna.terminal widget system with a "Character Creator" UI.
 -- Features: grid manipulation, borders, labels, textbox, list, button, focus, callbacks.
+-- Run with: cargo run -- demos/showcase/terminal_demo
 
 local term
 local border

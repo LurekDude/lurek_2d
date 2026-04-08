@@ -1,5 +1,6 @@
 -- Maze Defense — Tower Defense with Player-Built Mazing
 -- Place walls to redirect enemies, build towers to shoot them
+-- Run with: cargo run -- demos/strategy/maze_defense
 
 local GRID_W, GRID_H = 20, 15
 local CELL = 38
@@ -231,7 +232,7 @@ function luna.keypressed(key)
         wave = 1
         enemies = {}
         bullets = {}
-        luna.load()
+        luna.signal.restart()
     end
 end
 

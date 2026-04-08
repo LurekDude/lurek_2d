@@ -200,8 +200,10 @@ pub struct ModulesConfig {
     pub system: bool,
     pub localization: bool,
     pub debug: bool,
-    /// Enable luna.tween sprite animation API.
+    /// Enable luna.animation sprite animation API (frame clips, named animations).
     pub animation: bool,
+    /// Enable luna.tween property tweening API (animate any Lua table field).
+    pub tween: bool,
     /// Enable luna.camera Camera2D API.
     pub camera: bool,
     /// Enable luna.network UDP networking API.
@@ -320,6 +322,7 @@ impl Default for Config {
                 localization: true,
                 debug: cfg!(debug_assertions),
                 animation: true,
+                tween: true,
                 camera: true,
                 network: true,
                 procgen: true,
@@ -626,6 +629,9 @@ impl Config {
             }
             if let Ok(v) = modules.get::<_, bool>("animation") {
                 config.modules.animation = v;
+            }
+            if let Ok(v) = modules.get::<_, bool>("tween") {
+                config.modules.tween = v;
             }
             if let Ok(v) = modules.get::<_, bool>("camera") {
                 config.modules.camera = v;

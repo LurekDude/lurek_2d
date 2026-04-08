@@ -260,10 +260,101 @@ end
 
 | Kind      | Count |
 |-----------|-------|
-| `struct`  | 5     |
-| `enum`    | 0     |
-| `fn`      | 22+   |
-| **Total** | **27+** |
+| `struct`  | 8     |
+| `enum`    | 1     |
+| `fn`      | 28+   |
+| **Total** | **37+** |
+
+## Schema Validation — `luna.docs.schema()`
+
+`src/docs/schema.rs` provides a lightweight data-validator for game save files, mod manifests, and configuration tables. It is intentionally simpler than a JSON-Schema library — no cross-references, no `$ref`, no recursive schemas — while covering the common cases a game dev needs.
+
+### Key types
+
+| Type | Description |
+|---|---|
+| `FieldType` | `Any \| String \| Number \| Integer \| Boolean \| Table \| Function` |
+| `FieldRule` | `{ field_type, required, min, max, min_len, max_len, enum_values, pattern, description }` |
+| `SchemaError` | `{ field: String, message: String }` — one validation failure |
+| `SchemaResult` | `{ ok: bool, errors: Vec<SchemaError> }` |
+| `Schema` | `{ name: String, rules: HashMap<String, FieldRule>, strict: bool }` |
+
+### Rule table keys (Lua)
+
+| Key | Type | Description |
+|---|---|---|
+| `type` | string | `"any"` `"string"` `"number"` `"integer"` `"boolean"` `"table"` `"function"` |
+| `required` | bool | Whether field must be present |
+| `min` / `max` | number | Numeric range (number and integer fields) |
+| `minLen` / `maxLen` | integer | String length bounds |
+| `enum` | table | Array of allowed string values |
+| `description` | string | Human-readable field description |
+
+Shorthand: `field_name = "type_string"` is equivalent to `{ type = "type_string" }`.
+
+Set `__strict = true` on the rules table to fail on any extra field not declared in the schema.
+
+### `LuaSchema` methods
+
+| Method | Signature | Description |
+|---|---|---|
+| `validate(data)` | `(table) → bool, errors[]` | Full validation; returns ok flag + `{field,message}` array |
+| `check(data)` | `(table) → bool` | Boolean-only shorthand |
+| `assert(data)` | `(table)` | Throws Lua error (all messages joined) on failure |
+| `getName()` | `→ string` | Schema name |
+| `getFields()` | `→ string[]` | Declared field names |
+
+### Example
+
+```lua
+local schema = luna.docs.schema({
+    name  = { type = "string", required = true, minLen = 1, maxLen = 64 },
+    level = { type = "integer", required = true, min = 1, max = 100 },
+    class = { type = "string", enum = { "warrior", "mage", "rogue" } },
+}, "PlayerData")
+
+local ok, errors = schema:validate(save_data)
+if not ok then
+    for _, e in ipairs(errors) do
+        luna.log.warn(e.field .. ": " .. e.message)
+    end
+end
+```
+
+## Live Reflection — `reflectLive()` and `reflectTable()`
+
+`reflectLive(ns?)` walks the live `luna.*` Lua table and returns a map from namespace name to an array of `{name: string, type: string}` entries. Useful for runtime IntelliSense, debug overlays, and verifying that expected modules are loaded.
+
+`reflectTable(tbl, name?)` reflects any arbitrary Lua table — not just `luna.*`. Returns an array of `{name, qualifiedName, type}` items. Useful for inspecting mod API surfaces or unknown data blobs.
+
+### Signatures
+
+| Function | Signature | Description |
+|---|---|---|
+| `reflectLive(ns?)` | `(string?) → table` | Walk `luna.*`; returns `{[ns]: [{name,type}]}`. If `ns` given, returns only that namespace. |
+| `reflectTable(tbl, name?)` | `(table, string?) → table` | Reflect any table. `name` sets the `qualifiedName` prefix. |
+
+### Example
+
+```lua
+-- All namespaces
+local all = luna.docs.reflectLive()
+for ns, items in pairs(all) do
+    print(ns .. " has " .. #items .. " members")
+end
+
+-- One namespace
+local log_reflection = luna.docs.reflectLive("log")
+for _, item in ipairs(log_reflection.log or {}) do
+    print(item.name, item.type)   -- e.g. "info", "function"
+end
+
+-- Reflect any table
+local items = luna.docs.reflectTable(my_mod_api, "my_mod")
+for _, item in ipairs(items) do
+    print(item.qualifiedName, item.type)
+end
+```
 
 ## References
 

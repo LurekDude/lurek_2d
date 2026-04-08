@@ -1,6 +1,7 @@
 -- examples/scene.lua
 -- luna.scene — Scene stack, transitions, registry, data store, depth-sorted rendering.
 -- All luna.scene API methods demonstrated with code and comments.
+-- This file is documentation code, not a runnable game.
 
 -- ── Scene Factory (recommended) ───────────────────────────────────────────────
 
@@ -204,3 +205,11 @@ function luna.render()
     luna.scene.draw()
 end
 ]]
+
+
+-- ─── luna.scene ────────────────────────────────────────────────────────────────
+luna.scene.process(1.0)  -- Calls `scene:ready(self)` on the top scene if not yet fired, then `scene:process(dt)`
+luna.scene.processLate(1.0)  -- Calls `scene:process_late(dt)` on the topmost scene (after process, before render)
+luna.scene.processPhysics(1.0)  -- Calls `scene:process_physics(dt)` on the topmost scene (fixed timestep)
+luna.scene.render()  -- Draws all scenes in the stack from bottom to top
+luna.scene.renderUi()  -- Draws UI overlay for all scenes in the stack from bottom to top

@@ -1,6 +1,7 @@
 -- Shooting Gallery -- Luna2D demo game
 -- Physics shooter: aim with the mouse, click to fire balls at targets.
 -- Demonstrates: physics, raycast, collision events, shapes, input, text rendering.
+-- Run with: cargo run -- demos/showcase/demo_game
 
 local W, H = 800, 600
 local CANNON_X, CANNON_Y = 60, 300

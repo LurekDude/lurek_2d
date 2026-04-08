@@ -1,5 +1,6 @@
 -- Zoo Tycoon — Top-down zoo management
 -- Build enclosures, place animals, attract guests, earn revenue
+-- Run with: cargo run -- demos/simulation/zoo_tycoon
 
 local function clamp(v, mn, mx) return math.max(mn, math.min(mx, v)) end
 

@@ -1,6 +1,7 @@
-﻿-- examples/serial.lua
+-- examples/serial.lua
 -- luna.codec — Serialization and deserialization: JSON, TOML, CSV.
 -- All luna.codec API methods demonstrated with code and comments.
+-- This file is documentation code, not a runnable game.
 
 -- ── JSON ──────────────────────────────────────────────────────────────────────
 

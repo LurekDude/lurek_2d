@@ -1,5 +1,6 @@
 -- Idle Game: Incremental clicker with generators, upgrades, and prestige
 -- Click to earn, buy generators, prestige for multipliers
+-- Run with: cargo run -- demos/simulation/idle_game
 
 local SCREEN_W, SCREEN_H = 800, 600
 

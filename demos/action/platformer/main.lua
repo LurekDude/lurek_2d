@@ -1,6 +1,7 @@
 -- Platformer Demo for Luna2D
 -- A simple platformer showcasing physics, input, easing, and scene management.
 -- Arrow keys / WASD to move, SPACE to jump.
+-- Run with: cargo run -- demos/action/platformer
 
 -- ── Game state ───────────────────────────────────────────────────────────
 

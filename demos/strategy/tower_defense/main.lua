@@ -1,6 +1,7 @@
 -- Tower Defense
 -- Controls: Click grid to place tower, 1 for basic tower, 2 for cannon tower, N for next wave, Escape to quit
 -- Stop enemies from reaching the right side!
+-- Run with: cargo run -- demos/strategy/tower_defense
 
 local function clamp(v, mn, mx) return math.max(mn, math.min(mx, v)) end
 local function lerp(a, b, t) return a + (b - a) * t end

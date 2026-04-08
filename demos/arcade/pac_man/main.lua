@@ -1,6 +1,7 @@
 -- Pac-Man — Classic Arcade (Luna2D demo)
 -- Navigate the maze, eat all dots, avoid the 4 ghosts.
 -- Power pellets let you eat ghosts for 8 seconds.
+-- Run with: cargo run -- demos/arcade/pac_man
 
 -- ── Constants ────────────────────────────────────────────────────────────
 
@@ -277,6 +278,6 @@ end
 function luna.keypressed(key)
     if key == "escape" then luna.signal.quit() end
     if key == "r" and (game_state == "win" or game_state == "gameover") then
-        luna.load()
+        luna.signal.restart()
     end
 end

@@ -6,6 +6,7 @@
 --   LEFT/RIGHT arrow keys — cycle presets
 --   SPACE      burst-fire at mouse position
 --   G          toggle gravity on/off for current preset
+-- Run with: cargo run -- demos/showcase/particles_demo
 
 local W = 900
 local H = 600
@@ -202,7 +203,7 @@ local preset_defs = {
     { name = "Snow",      shape = "circle",   make = make_snow,      gx = 0, gy = 25   },
 }
 
--- ── luna.load ──────────────────────────────────────────────────────────────
+-- ── luna.init ──────────────────────────────────────────────────────────────
 function luna.init()
     luna.window.setTitle("Luna2D — Particles Demo")
     luna.gfx.setBackgroundColor(0.05, 0.05, 0.08)
@@ -241,7 +242,7 @@ local function activate(idx)
     end
 end
 
--- ── luna.update ────────────────────────────────────────────────────────────
+-- ── luna.process ────────────────────────────────────────────────────────────
 function luna.process(dt)
     local ps = presets[active]
     -- Non-snow presets follow the mouse
@@ -251,7 +252,7 @@ function luna.process(dt)
     ps:update(dt)
 end
 
--- ── luna.draw ──────────────────────────────────────────────────────────────
+-- ── luna.render ──────────────────────────────────────────────────────────────
 function luna.render()
     local ps  = presets[active]
     local def = preset_defs[active]

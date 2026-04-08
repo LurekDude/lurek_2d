@@ -249,6 +249,18 @@ impl LuaUserData for LuaNavGrid {
                 .to_lua_str()
                 .to_string())
         });
+
+        // -- type --
+        /// Returns the type name of this object.
+        /// @return string
+        methods.add_method("type", |_, _, ()| Ok("NavGrid"));
+
+        // -- typeOf --
+        /// Returns true if this object is of the given type.
+        /// @param name : string
+        /// @return boolean
+        methods.add_method("typeOf", |_, _, name: String| Ok(name == "NavGrid" || name == "Object"));
+
     }
 }
 
@@ -486,6 +498,18 @@ impl LuaUserData for LuaUnitPathfinder {
             this.inner.borrow_mut().set_cache_max_size(n);
             Ok(())
         });
+
+        // -- type --
+        /// Returns the type name of this object.
+        /// @return string
+        methods.add_method("type", |_, _, ()| Ok("UnitPathfinder"));
+
+        // -- typeOf --
+        /// Returns true if this object is of the given type.
+        /// @param name : string
+        /// @return boolean
+        methods.add_method("typeOf", |_, _, name: String| Ok(name == "UnitPathfinder" || name == "Object"));
+
     }
 }
 
@@ -601,6 +625,18 @@ impl LuaUserData for LuaFlowField {
                 Ok(this.inner.borrow().steer(wx, wy, speed, tw, th))
             },
         );
+
+        // -- type --
+        /// Returns the type name of this object.
+        /// @return string
+        methods.add_method("type", |_, _, ()| Ok("FlowField"));
+
+        // -- typeOf --
+        /// Returns true if this object is of the given type.
+        /// @param name : string
+        /// @return boolean
+        methods.add_method("typeOf", |_, _, name: String| Ok(name == "FlowField" || name == "Object"));
+
     }
 }
 
@@ -735,6 +771,18 @@ impl LuaUserData for LuaPathGrid {
                 }
             },
         );
+
+        // -- type --
+        /// Returns the type name of this object.
+        /// @return string
+        methods.add_method("type", |_, _, ()| Ok("PathGrid"));
+
+        // -- typeOf --
+        /// Returns true if this object is of the given type.
+        /// @param name : string
+        /// @return boolean
+        methods.add_method("typeOf", |_, _, name: String| Ok(name == "PathGrid" || name == "Object"));
+
     }
 }
 
@@ -813,6 +861,18 @@ impl LuaUserData for LuaAiFlowField {
         methods.add_method("getDistance", |_, this, (x, y): (usize, usize)| {
             Ok(this.inner.borrow().get_distance(x - 1, y - 1))
         });
+
+        // -- type --
+        /// Returns the type name of this object.
+        /// @return string
+        methods.add_method("type", |_, _, ()| Ok("FlowField"));
+
+        // -- typeOf --
+        /// Returns true if this object is of the given type.
+        /// @param name : string
+        /// @return boolean
+        methods.add_method("typeOf", |_, _, name: String| Ok(name == "FlowField" || name == "Object"));
+
     }
 }
 

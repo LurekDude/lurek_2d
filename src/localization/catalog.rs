@@ -170,4 +170,127 @@ impl Catalog {
     pub fn export(&self, locale: &str) -> Option<HashMap<String, String>> {
         self.tables.get(locale).cloned()
     }
+
+    /// Merges key-value pairs into an existing locale without replacing the whole table.
+    ///
+    /// # Parameters
+    /// - `locale` — `&str`.
+    /// - `entries` — `HashMap<String, String>`.
+    pub fn merge(&mut self, locale: &str, entries: HashMap<String, String>) {
+        let table = self.tables.entry(locale.to_string()).or_default();
+        for (k, v) in entries {
+            table.insert(k, v);
+        }
+    }
+
+    /// Returns the number of keys in the active locale.
+    ///
+    /// # Returns
+    /// `usize`.
+    pub fn key_count(&self) -> usize {
+        self.tables
+            .get(&self.locale)
+            .map(|t| t.len())
+            .unwrap_or(0)
+    }
+
+    /// Returns the unique first path-segments of all keys in the active locale.
+    ///
+    /// For example keys `"ui.ok"`, `"ui.cancel"`, `"item.sword"` yield `["ui", "item"]`.
+    ///
+    /// # Returns
+    /// `Vec<String>`.
+    pub fn categories(&self) -> Vec<String> {
+        let Some(table) = self.tables.get(&self.locale) else {
+            return Vec::new();
+        };
+        let mut cats: std::collections::HashSet<String> = std::collections::HashSet::new();
+        for key in table.keys() {
+            let prefix = key.split('.').next().unwrap_or(key.as_str());
+            cats.insert(prefix.to_string());
+        }
+        let mut result: Vec<String> = cats.into_iter().collect();
+        result.sort();
+        result
+    }
+
+    /// Returns all keys in the active locale that start with the given category prefix.
+    ///
+    /// # Parameters
+    /// - `category` — `&str`.
+    ///
+    /// # Returns
+    /// `Vec<&str>`.
+    pub fn keys_in_category<'a>(&'a self, category: &str) -> Vec<&'a str> {
+        let Some(table) = self.tables.get(&self.locale) else {
+            return Vec::new();
+        };
+        let prefix = format!("{category}.");
+        let mut result: Vec<&str> = table
+            .keys()
+            .filter(|k| k.starts_with(&prefix) || k.as_str() == category)
+            .map(String::as_str)
+            .collect();
+        result.sort();
+        result
+    }
+
+    /// Simple substring search over values in the active locale.
+    ///
+    /// Returns up to `limit` `(key, value)` pairs where the value contains `query`
+    /// (case-insensitive). `limit = 0` returns all matches.
+    ///
+    /// # Parameters
+    /// - `query` — `&str`.
+    /// - `limit` — `usize`.
+    ///
+    /// # Returns
+    /// `Vec<(&str, &str)>`.
+    pub fn search<'a>(&'a self, query: &str, limit: usize) -> Vec<(&'a str, &'a str)> {
+        let Some(table) = self.tables.get(&self.locale) else {
+            return Vec::new();
+        };
+        let lower = query.to_lowercase();
+        let mut results: Vec<(&str, &str)> = table
+            .iter()
+            .filter(|(_, v)| v.to_lowercase().contains(&lower))
+            .map(|(k, v)| (k.as_str(), v.as_str()))
+            .collect();
+        results.sort_by_key(|(k, _)| *k);
+        if limit > 0 && results.len() > limit {
+            results.truncate(limit);
+        }
+        results
+    }
+
+    /// Builds an inverted word index for the active locale.
+    ///
+    /// Returns a map from lowercase words to sorted lists of keys whose values
+    /// contain that word. Useful as a pre-built cache for repeated `search_indexed` calls
+    /// on large datasets (10k+ entries).
+    ///
+    /// # Returns
+    /// `HashMap<String, Vec<String>>`.
+    pub fn build_index(&self) -> HashMap<String, Vec<String>> {
+        let Some(table) = self.tables.get(&self.locale) else {
+            return HashMap::new();
+        };
+        let mut index: HashMap<String, Vec<String>> = HashMap::new();
+        for (key, value) in table {
+            for word in value.split_whitespace() {
+                let word_lower = word
+                    .to_lowercase()
+                    .trim_matches(|c: char| !c.is_alphanumeric())
+                    .to_string();
+                if !word_lower.is_empty() {
+                    index.entry(word_lower).or_default().push(key.clone());
+                }
+            }
+        }
+        for entries in index.values_mut() {
+            entries.sort();
+            entries.dedup();
+        }
+        index
+    }
 }

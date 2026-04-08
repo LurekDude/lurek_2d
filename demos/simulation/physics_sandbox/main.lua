@@ -1,6 +1,7 @@
 -- Physics Sandbox: Spawn, drag, and connect 2D physics objects
 -- C=circle R=rect, right-click=delete, drag=move, G=gravity,
 -- Space=pause, Delete=clear, J+click two=joint, B=bounce, +/-=size
+-- Run with: cargo run -- demos/simulation/physics_sandbox
 
 local function clamp(v, mn, mx) return math.max(mn, math.min(mx, v)) end
 

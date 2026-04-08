@@ -1,5 +1,6 @@
 -- examples/docs_demo/main.lua
 -- Demonstrates the luna.docs.* documentation management API
+-- Run with: cargo run -- demos/showcase/docs_demo
 
 -- luna.docs is not yet implemented in this build
 if not luna.docs then

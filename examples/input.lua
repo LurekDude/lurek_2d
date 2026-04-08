@@ -1,13 +1,13 @@
 ﻿-- examples/input.lua
 -- Luna2D luna.keyboard / luna.mouse / luna.gamepad / luna.touch API Reference
 -- This file is documentation code, not a runnable game.
--- Call these from luna.update, luna.keypressed, luna.mousepressed, etc.
+-- Call these from luna.process, luna.keypressed, luna.mousepressed, etc.
 
 -- ─────────────────────────────────────────────────────────────────────────────
 -- Keyboard — luna.keyboard
 -- ─────────────────────────────────────────────────────────────────────────────
 
--- Check if a key is currently held (polling, call from luna.update)
+-- Check if a key is currently held (polling, call from luna.process)
 -- Key names are lowercase strings: "a"–"z", "0"–"9", "space", "return", "escape",
 -- "backspace", "tab", "left", "right", "up", "down", "lshift", "rshift",
 -- "lctrl", "rctrl", "lalt", "ralt", "f1"–"f12", etc.
@@ -86,7 +86,7 @@ local rel = luna.mouse.getRelativeMode()
 -- Warp the cursor to a position
 luna.mouse.setPosition(400, 300)
 
--- Scroll wheel delta since last frame (use inside luna.update or in luna.wheelmoved)
+-- Scroll wheel delta since last frame (use inside luna.process or in luna.wheelmoved)
 local sx, sy = luna.mouse.getWheelDelta()  -- sy > 0 = scrolled up
 
 -- ── Custom cursors ────────────────────────────────────────────────────────────
@@ -223,3 +223,26 @@ end
 function luna.touchreleased(id, x, y, dx, dy, pressure)
     print("finger up:", id)
 end
+
+-- ─── Cursor ────────────────────────────────────────────────────────────────────
+
+local type_val = cursor:getType()  -- Returns the cursor type as "system" or "custom"
+cursor:release()  -- Releases the cursor resource (no-op on desktop)
+
+-- ─── luna.input ────────────────────────────────────────────────────────────────
+local axis_count = luna.input.getAxisCount(1)  -- Returns the total number of analog axes on the gamepad
+local background_events = luna.input.getBackgroundEvents()  -- Returns whether background gamepad events are enabled
+local button_count = luna.input.getButtonCount(1)  -- Returns the total number of buttons on the gamepad
+local g_u_i_d = luna.input.getGUID(1)  -- Returns the hardware GUID string of the gamepad
+local gamepad_mapping_string = luna.input.getGamepadMappingString("01000000...")  -- Returns stored mappingpping string for the given GUID, or nil
+local hat = luna.input.getHat(1, 1)  -- Returns the direction string of a hat switch on the gamepad
+local joystick_count = luna.input.getJoystickCount()  -- Returns the number of tracked gamepad slots
+local pressure = luna.input.getPressure(1)  -- Returns the pressure (0-1) of the touch with the given ID
+local touch_count = luna.input.getTouchCount()  -- Returns the number of currently active touch points
+local is_gamepad = luna.input.isGamepad(1)  -- Returns whether the joystick at the given slot is a recognized gamepad
+local is_vibration_supported = luna.input.isVibrationSupported(1)  -- Returns whether the gamepad supports haptic vibration
+local load_gamepad_mappings = luna.input.loadGamepadMappings("path/to/file")  -- Loads SDL2 GameControllerDB-format mappings from a file
+luna.input.saveGamepadMappings("path/to/file")  -- Saves all stored gamepad mappings to a plain-text file
+luna.input.setBackgroundEvents(false)  -- Enable or disable receiving gamepad events when the window is not focused
+luna.input.setGamepadMapping("gamepad_guid", sdl_mapping_string)  -- Stores or replaces a GameControllerDB mappinging string for the given GUID
+local set_vibration = luna.input.setVibration(any)  -- Triggers haptic rumble (currently a no-op stub)

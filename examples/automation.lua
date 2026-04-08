@@ -3,6 +3,7 @@
 -- Load named automation scripts, play them back step by step, and integrate with
 -- the game loop for deterministic testing or demo playback.
 -- All luna.simulator API methods demonstrated with code and comments.
+-- This file is documentation code, not a runnable game.
 
 -- ── Script Format ─────────────────────────────────────────────────────────────
 -- An automation script is a Lua table with:
@@ -70,7 +71,7 @@ luna.simulator.start("menu_demo")
 -- ── Advancing Playback ────────────────────────────────────────────────────────
 
 -- luna.simulator.update(dt)
--- Must be called once per frame inside luna.update(dt).
+-- Must be called once per frame inside luna.process(dt).
 -- Advances time-based steps and issues synthesized input events.
 
 local function run_once_each_frame(dt)
@@ -98,7 +99,7 @@ local elapsed = luna.simulator.getElapsedTime()
 print(("Step %d / %d  [%s]  elapsed: %.2fs")
     :format(step_idx, total, active or "none", elapsed))
 
--- ── Typical Usage Inside luna.update ─────────────────────────────────────────
+-- ── Typical Usage Inside luna.process ─────────────────────────────────────────
 
 --[[
 function luna.init()
@@ -120,3 +121,7 @@ function luna.process(dt)
     end
 end
 ]]
+
+
+-- ─── luna.simulator ────────────────────────────────────────────────────────────
+luna.simulator.loadFromToml("physics_config", raw_toml_string)  -- Parses a TOML string and registers it as a named script

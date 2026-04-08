@@ -51,6 +51,12 @@ They are not runnable games � they are meant to be read, searched, and copy-pa
 | [tilemap.lua](tilemap.lua) | `luna.tilemap` | Tilemaps, tilesets, autotiling, map generation, and coordinate helpers |
 | [timer.lua](timer.lua) | `luna.time` | Frame timing, delta time, FPS tracking, and scheduled callbacks |
 | [window.lua](window.lua) | `luna.window` | Window title, size, fullscreen, VSync, DPI scaling, clipboard, and display info |
+| [log.lua](log.lua) | `luna.log` | Structured log level control and severity-filtered message output |
+| [devtools.lua](devtools.lua) | `luna.devtools` | In-game logger, CPU profiler, frame-time stats, and hot-reload file watcher |
+| [debugbridge.lua](debugbridge.lua) | `luna.debugbridge` | TCP remote debug server for VS Code and external tooling |
+| [docs.lua](docs.lua) | `luna.docs` | API catalog scanning, validation, quality metrics, and docstring annotation |
+| [patterns.lua](patterns.lua) | `luna.patterns` | EventBus, ObjectPool, CommandStack, ServiceLocator, Factory, and SimpleState |
+| [localization.lua](localization.lua) | `luna.localization` | Multi-locale string catalog, variable interpolation, plural forms, and fallback chains |
 
 ## Notes
 

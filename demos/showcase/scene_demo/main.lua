@@ -2,6 +2,7 @@
 -- Demonstrates a Lua-side scene state machine:
 --   Title Screen -> Gameplay -> Game Over
 -- Press ENTER to advance scenes, ESC to go back.
+-- Run with: cargo run -- demos/showcase/scene_demo
 
 -- ── Scene system ──────────────────────────────────────────────────────────
 

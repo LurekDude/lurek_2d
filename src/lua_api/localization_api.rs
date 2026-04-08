@@ -331,6 +331,125 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
         Ok(())
     })?)?;
 
+    // ── Large-dataset helpers ─────────────────────────────────────────────
+
+    /// Returns the number of keys loaded in the active locale.
+    /// @return integer
+    let s = shared.clone();
+    loc.set("keyCount", lua.create_function(move |_, ()| {
+        Ok(s.borrow().catalog.key_count())
+    })?)?;
+
+    /// Returns unique first-path-segment category prefixes for all active locale keys.
+    /// @return table
+    let s = shared.clone();
+    loc.set("categories", lua.create_function(move |lua, ()| {
+        let cats = s.borrow().catalog.categories();
+        let tbl = lua.create_table()?;
+        for (i, c) in cats.iter().enumerate() { tbl.set(i + 1, c.as_str())?; }
+        Ok(tbl)
+    })?)?;
+
+    /// Returns all keys in the active locale whose first path segment matches category.
+    /// @param category : string
+    /// @return table
+    let s = shared.clone();
+    loc.set("keysInCategory", lua.create_function(move |lua, category: String| {
+        let keys = s.borrow().catalog.keys_in_category(&category).iter().map(|s| s.to_string()).collect::<Vec<_>>();
+        let tbl = lua.create_table()?;
+        for (i, k) in keys.iter().enumerate() { tbl.set(i + 1, k.as_str())?; }
+        Ok(tbl)
+    })?)?;
+
+    /// Searches active locale values for a substring query (case-insensitive). Returns {key, value} pairs.
+    /// @param query : string
+    /// @param limit : integer?
+    /// @return table
+    let s = shared.clone();
+    loc.set("search", lua.create_function(move |lua, (query, limit): (String, Option<usize>)| {
+        let results = s.borrow().catalog.search(&query, limit.unwrap_or(0)).iter()
+            .map(|(k, v)| (k.to_string(), v.to_string()))
+            .collect::<Vec<_>>();
+        let tbl = lua.create_table()?;
+        for (i, (k, v)) in results.iter().enumerate() {
+            let row = lua.create_table()?;
+            row.set("key", k.as_str())?;
+            row.set("value", v.as_str())?;
+            tbl.set(i + 1, row)?;
+        }
+        Ok(tbl)
+    })?)?;
+
+    /// Builds an inverted word index for the active locale. Returns index as {word → {keys}}.
+    /// Cache the result and pass to searchIndexed for fast repeated queries on large datasets.
+    /// @return table
+    let s = shared.clone();
+    loc.set("buildIndex", lua.create_function(move |lua, ()| {
+        let index = s.borrow().catalog.build_index();
+        let tbl = lua.create_table()?;
+        for (word, keys) in &index {
+            let kt = lua.create_table()?;
+            for (i, k) in keys.iter().enumerate() { kt.set(i + 1, k.as_str())?; }
+            tbl.set(word.as_str(), kt)?;
+        }
+        Ok(tbl)
+    })?)?;
+
+    /// Searches the provided pre-built index for entries matching all words in query.
+    /// @param index : table
+    /// @param query : string
+    /// @param limit : integer?
+    /// @return table
+    loc.set("searchIndexed", lua.create_function(move |lua, (index, query, limit): (LuaTable, String, Option<usize>)| {
+        let words: Vec<String> = query
+            .split_whitespace()
+            .map(|w| w.to_lowercase().trim_matches(|c: char| !c.is_alphanumeric()).to_string())
+            .filter(|w| !w.is_empty())
+            .collect();
+        if words.is_empty() {
+            return Ok(lua.create_table()?);
+        }
+        // Intersect key lists for each word
+        let mut candidate_sets: Vec<std::collections::HashSet<String>> = Vec::new();
+        for word in &words {
+            let keys_tbl: Option<LuaTable> = index.get(word.as_str())?;
+            let mut set = std::collections::HashSet::new();
+            if let Some(kt) = keys_tbl {
+                for pair in kt.sequence_values::<String>() {
+                    set.insert(pair?);
+                }
+            }
+            candidate_sets.push(set);
+        }
+        let intersection = candidate_sets.iter().skip(1).fold(
+            candidate_sets.first().cloned().unwrap_or_default(),
+            |acc, set| acc.intersection(set).cloned().collect(),
+        );
+        let mut keys: Vec<String> = intersection.into_iter().collect();
+        keys.sort();
+        let lim = limit.unwrap_or(0);
+        if lim > 0 && keys.len() > lim {
+            keys.truncate(lim);
+        }
+        let tbl = lua.create_table()?;
+        for (i, k) in keys.iter().enumerate() { tbl.set(i + 1, k.as_str())?; }
+        Ok(tbl)
+    })?)?;
+
+    /// Merges a flat key→value table into an existing locale without replacing the whole table.
+    /// @param locale : string
+    /// @param entries : table
+    let s = shared.clone();
+    loc.set("mergeLocale", lua.create_function(move |_, (locale, entries): (String, LuaTable)| {
+        let mut map = std::collections::HashMap::new();
+        for pair in entries.pairs::<String, String>() {
+            let (k, v) = pair?;
+            map.insert(k, v);
+        }
+        s.borrow_mut().catalog.merge(&locale, map);
+        Ok(())
+    })?)?;
+
     luna.set("localization", loc)?;
     Ok(())
 }

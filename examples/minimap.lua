@@ -2,6 +2,7 @@
 -- luna.minimap — Mini-map renderer: terrain colors, fog of war, tracked
 -- objects, owner/faction tinting, zoom, and viewport indicator.
 -- All luna.minimap API methods demonstrated with code and comments.
+-- This file is documentation code, not a runnable game.
 
 -- ── Minimap Creation ──────────────────────────────────────────────────────────
 
@@ -178,3 +179,23 @@ function luna.render()
     luna.gfx.draw(mm:getImageData(), SCREEN_W - 210, 10)
 end
 ]]
+
+-- ─── Minimap ───────────────────────────────────────────────────────────────────
+
+local color_mode = minimap:getColorMode()  -- Returns the current color mode as a string
+local marker_count = minimap:getMarkerCount()  -- Returns the number of markers
+local marker_description = minimap:getMarkerDescription(1)  -- Returns the description of a marker, or nil
+local ping_count = minimap:getPingCount()  -- Returns the number of active pings
+local viewport_color = minimap:getViewportColor()  -- Returns the viewport rectangle color as r, g, b, a
+local has_marker = minimap:hasMarker(1)  -- Returns whether a marker with the given ID exists
+local is_anti_alias = minimap:isAntiAlias()  -- Returns whether anti-aliasing is enabled
+local is_clickable = minimap:isClickable()  -- Returns whether this minimap responds to click hit-testing
+local is_fog_enabled = minimap:isFogEnabled()  -- Returns whether fog of war is enabled
+local is_viewport_visible = minimap:isViewportVisible()  -- Returns whether the viewport rectangle is visible
+local remove_marker = minimap:removeMarker(1)  -- Removes a marker by ID
+minimap:setAntiAlias(false)  -- Sets whether anti-aliasing is enabled
+minimap:setClickable(false)  -- Sets whether this minimap responds to click hit-testing
+minimap:setViewportVisible(false)  -- Sets whether the viewport rectangle is visible
+local minimap_type = minimap:type()  -- "Minimap"
+local minimap_is_type = minimap:typeOf("Minimap")  -- Returns true if this object is of the given type
+minimap:update(1.0)  -- Advances time-based effects by dt seconds (expires pings)

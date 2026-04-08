@@ -1,6 +1,7 @@
 -- examples/particle.lua
 -- luna.particles — Emitter-based 2D particle systems and trail ribbons.
 -- All luna.particles API methods demonstrated with code and comments.
+-- This file is documentation code, not a runnable game.
 
 -- ── Creating a Particle System ────────────────────────────────────────────────
 
@@ -225,3 +226,58 @@ function luna.render()
     luna.gfx.draw(fire, 0, 0)
 end
 ]]
+
+-- ─── ParticleSystem ────────────────────────────────────────────────────────────
+
+local clone = particlesystem:clone()  -- Creates a copy of this particle system (config only, no live particles)
+local buffer_size = particlesystem:getBufferSize()  -- Returns the maximum particle count
+local colors = particlesystem:getColors()  -- Returns color keyframes as a table of {r,g,b,a} tables
+local count = particlesystem:getCount()  -- Returns the number of living particles (alias for count)
+local direction = particlesystem:getDirection()  -- Returns emission direction in radians
+local emission_area = particlesystem:getEmissionArea()  -- Returns emission area: dist-string, w, h
+local emission_rate = particlesystem:getEmissionRate()  -- Returns particles emitted per second
+local emitter_lifetime = particlesystem:getEmitterLifetime()  -- Returns the emitter lifetime
+local gravity = particlesystem:getGravity()  -- Returns gravity (x, y)
+local insert_mode = particlesystem:getInsertMode()  -- Returns the insert mode as a string
+local linear_acceleration = particlesystem:getLinearAcceleration()  -- Returns linear acceleration range
+local linear_damping = particlesystem:getLinearDamping()  -- Returns linear damping range
+local offset = particlesystem:getOffset()  -- Returns the render origin offset
+local particle_lifetime = particlesystem:getParticleLifetime()  -- Returns min and max particle lifetime
+local position = particlesystem:getPosition()  -- Returns the emitter world position
+local radial_acceleration = particlesystem:getRadialAcceleration()  -- Returns radial acceleration range
+local rotation = particlesystem:getRotation()  -- Returns initial rotation range
+local shape = particlesystem:getShape()  -- Returns the particle draw shape as a string
+local size_variation = particlesystem:getSizeVariation()  -- Returns size variation
+local sizes = particlesystem:getSizes()  -- Returns size keyframes as a Lua table
+local speed = particlesystem:getSpeed()  -- Returns min/max initial speed
+local spin = particlesystem:getSpin()  -- Returns angular velocity range
+local spin_variation = particlesystem:getSpinVariation()  -- Returns spin variation
+local spread = particlesystem:getSpread()  -- Returns emission spread
+local tangential_acceleration = particlesystem:getTangentialAcceleration()  -- Returns tangential acceleration range
+local has_relative_rotation = particlesystem:hasRelativeRotation()  -- Returns whether relative rotation is enabled
+particlesystem:setBufferSize(1)  -- Sets the maximum number of particles (resizes the pool)
+particlesystem:setColors({r=0.8, g=0.4, b=0.2, a=1.0})  -- Sets color keyframes. Each arg is a table {r, g, b, a}
+particlesystem:setDirection(1.0)  -- Sets emission direction in radians
+particlesystem:setEmissionArea("uniform", 20, 20)  -- width/height for uniform/normal distributionsize
+particlesystem:setEmissionRate(1.0)  -- Sets particles emitted per second
+particlesystem:setEmitterLifetime(1.0)  -- Sets how long the emitter runs before auto-stopping. Negative = infinite
+particlesystem:setGravity(1.0, 1.0)  -- Sets gravity (x, y)
+particlesystem:setInsertMode("top")  -- Insert new particles at the front ("top", "bottom", "random")dom"
+particlesystem:setLinearAcceleration(1.0, 1.0, 1.0, 1.0)  -- Sets linear acceleration range
+particlesystem:setLinearDamping(1.0, 1.0)  -- Sets linear damping range
+particlesystem:setOffset(1.0, 1.0)  -- Sets the render origin offset
+particlesystem:setParticleLifetime(1.0, 1.0)  -- Sets min and max particle lifetime in seconds
+particlesystem:setPosition(1.0, 1.0)  -- Sets the emitter world position
+particlesystem:setRadialAcceleration(1.0, 1.0)  -- Sets radial acceleration range
+particlesystem:setRelativeRotation(false)  -- Sets whether particle rotation follows velocity direction
+particlesystem:setRotation(1.0, 1.0)  -- Sets initial rotation range in radians
+particlesystem:setShape("circle")  -- "circle", "square", "triangle", "star"
+particlesystem:setSizeVariation(1.0)  -- Sets size variation (0–1)
+particlesystem:setSizes(8, 16, 8)  -- Size keyframes: start=8, mid=16, end=8rame)
+particlesystem:setSpeed(1.0, 1.0)  -- Sets min/max initial speed
+particlesystem:setSpin(1.0, 1.0)  -- Sets angular velocity range
+particlesystem:setSpinVariation(1.0)  -- Sets spin variation (0–1)
+particlesystem:setSpread(1.0)  -- Sets emission spread (half-angle cone) in radians
+particlesystem:setTangentialAcceleration(1.0, 1.0)  -- Sets tangential acceleration range
+local particlesystem_type = particlesystem:type()  -- "ParticleSystem"
+local particlesystem_is_type = particlesystem:typeOf("ParticleSystem")  -- Returns true if this matches the given type name

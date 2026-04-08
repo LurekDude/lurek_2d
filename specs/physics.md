@@ -6,7 +6,7 @@
 | **Status**     | Implemented — Full                                   |
 | **Lua API**    | `luna.physics`                                       |
 | **Source**      | `src/physics/`                                       |
-| **Rust Tests** | `tests/unit/physics_tests.rs`                        |
+| **Rust Tests** | `tests/rust/unit/physics_tests.rs`                        |
 | **Lua Tests**  | `tests/lua/unit/test_physics.lua`                    |
 | **Architecture** | —                                                  |
 

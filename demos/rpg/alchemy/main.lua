@@ -1,5 +1,6 @@
 -- Alchemy / Potion Mixing Demo
 -- Drag ingredients, grind, heat, brew potions, discover recipes, sell for gold
+-- Run with: cargo run -- demos/rpg/alchemy
 
 local function clamp(v, mn, mx) return math.max(mn, math.min(mx, v)) end
 

@@ -1,19 +1,19 @@
-//! `luna.modding` — Mod discovery, dependency resolution, load ordering, and hot-reload.
+﻿//! `luna.modding` - Mod discovery, dependency resolution, load ordering, and hot-reload.
 
 use super::SharedState;
 use mlua::prelude::*;
 use std::cell::RefCell;
-use std::collections::HashMap;
 use std::rc::Rc;
 
 use crate::modding::{ModInfo, ModManager};
+use std::collections::HashMap;
 
 // -------------------------------------------------------------------------------
 // Helpers
 // -------------------------------------------------------------------------------
 
 /// Reads a Lua info table into a [`ModInfo`].
-fn mod_info_from_table(tbl: &LuaTable) -> LuaResult<ModInfo> {
+pub fn mod_info_from_table(tbl: &LuaTable) -> LuaResult<ModInfo> {
     let id: String = tbl
         .get::<_, String>("id")
         .map_err(|_| LuaError::RuntimeError("newMod requires 'id' field".into()))?;
@@ -44,11 +44,11 @@ fn mod_info_to_table<'a>(lua: &'a Lua, info: &ModInfo) -> LuaResult<LuaTable<'a>
     t.set("enabled", info.enabled)?;
     t.set("loaded", info.loaded)?;
     if let Some(ref p) = info.path {
-        t.set("path", p.as_str())?;
+        t.set("path", p.as_str() as &str)?;
     }
     let deps = lua.create_table()?;
     for (i, dep) in info.dependencies.iter().enumerate() {
-        deps.set(i + 1, dep.as_str())?;
+        deps.set(i + 1, dep.as_str() as &str)?;
     }
     t.set("dependencies", deps)?;
     Ok(t)
@@ -81,14 +81,24 @@ fn string_slice_to_table<'a>(lua: &'a Lua, items: &[String]) -> LuaResult<LuaTab
 
 /// Lua-side wrapper around [`ModInfo`] with per-mod hook and config storage.
 pub struct LuaMod {
-    inner: ModInfo,
+    pub(super) inner: ModInfo,
     hooks: HashMap<String, LuaRegistryKey>,
     config: Option<LuaRegistryKey>,
 }
 
+impl LuaMod {
+    /// Creates a new [`LuaMod`] from a [`ModInfo`].
+    pub fn new(inner: ModInfo) -> Self {
+        Self {
+            inner,
+            hooks: HashMap::new(),
+            config: None,
+        }
+    }
+}
+
 impl LuaUserData for LuaMod {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
-
         // -- getId --
         /// Returns the unique mod identifier.
         /// @return string
@@ -239,7 +249,6 @@ impl LuaUserData for LuaMod {
         methods.add_meta_method(LuaMetaMethod::ToString, |_, this, ()| {
             Ok(format!("Mod({})", this.inner.id))
         });
-
     }
 }
 
@@ -252,9 +261,23 @@ pub struct LuaModManager {
     inner: ModManager,
 }
 
+impl LuaModManager {
+    /// Creates a new empty [`LuaModManager`].
+    pub fn new() -> Self {
+        Self {
+            inner: ModManager::new(),
+        }
+    }
+}
+
+impl Default for LuaModManager {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl LuaUserData for LuaModManager {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
-
         // -- registerMod --
         /// Registers a mod from its Mod userdata.
         /// @param mod_ud : Mod
@@ -379,7 +402,6 @@ impl LuaUserData for LuaModManager {
         methods.add_meta_method(LuaMetaMethod::ToString, |_, this, ()| {
             Ok(format!("ModManager({} mods)", this.inner.mod_count()))
         });
-
     }
 }
 
@@ -390,9 +412,9 @@ impl LuaUserData for LuaModManager {
 /// Registers the `luna.modding` API table with the Lua VM.
 ///
 /// # Parameters
-/// - `lua` — `&Lua`.
-/// - `luna` — `&LuaTable`.
-/// - `_state` — `Rc<RefCell<SharedState>>`.
+/// - `lua` - `&Lua`.
+/// - `luna` - `&LuaTable`.
+/// - `_state` - `Rc<RefCell<SharedState>>`.
 pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) -> LuaResult<()> {
     let tbl = lua.create_table()?;
 
@@ -404,11 +426,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
         "newMod",
         lua.create_function(|lua, info: LuaTable| {
             let mod_info = mod_info_from_table(&info)?;
-            lua.create_userdata(LuaMod {
-                inner: mod_info,
-                hooks: HashMap::new(),
-                config: None,
-            })
+            lua.create_userdata(LuaMod::new(mod_info))
         })?,
     )?;
 
@@ -417,11 +435,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
     /// @return ModManager
     tbl.set(
         "newModManager",
-        lua.create_function(|lua, ()| {
-            lua.create_userdata(LuaModManager {
-                inner: ModManager::new(),
-            })
-        })?,
+        lua.create_function(|lua, ()| lua.create_userdata(LuaModManager::new()))?,
     )?;
 
     luna.set("modding", tbl)?;

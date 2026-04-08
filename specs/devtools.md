@@ -53,10 +53,10 @@ src/lua_api/
 
 Data flow:
 ```
-Lua: luna.devtools.logger:push(level, msg) 
+Lua: luna.devtools.logger:push(level, msg)
   → DevtoolsShared.logger.push()
   → Logger.history Vec<LogEntry>
-  
+
 Lua: luna.devtools.profiler:push("zone_name")
   → DevtoolsShared.profiler.push()
   → Profiler.current_stack Vec<ProfileZone>
@@ -240,10 +240,51 @@ end
 
 | Kind      | Count |
 |-----------|-------|
-| `struct`  | 6     |
+| `struct`  | 8     |
 | `enum`    | 1     |
-| `fn`      | 20+   |
-| **Total** | **27+** |
+| `fn`      | 24+   |
+| **Total** | **33+** |
+
+## Live Watches — `exposeWatch` / `getWatches`
+
+Live watches let scripts register named getter functions that can be sampled on demand by an in-game overlay, the VS Code extension, or a `snapshot()` call. Each getter is stored as a `LuaRegistryKey` in `devtools_api.rs`.
+
+| Function | Signature | Description |
+|---|---|---|
+| `exposeWatch(name, fn, category?)` | `(string, function, string?) → integer` | Registers a getter; returns a sequential id. |
+| `removeWatch(id)` | `(integer) → boolean` | Removes the watch with the given id. |
+| `getWatches()` | `() → table` | Samples all getters. Returns `{name, category, value}[]`. |
+
+### `WatchEntry` (internal, `devtools_api.rs`)
+
+```rust
+struct WatchEntry {
+    name:     String,
+    getter:   LuaRegistryKey,
+    category: String,
+}
+```
+
+Stored as `Vec<WatchEntry>` in `DevtoolsShared`. The `next_watch_id: u64` field is incremented on each `exposeWatch` call. Removal uses the offset from `(next_watch_id - watches.len())`.
+
+## Snapshot — `snapshot()`
+
+`snapshot()` captures a point-in-time diagnostic dump as a plain Lua table. All fields are present even if empty.
+
+| Field | Type | Description |
+|---|---|---|
+| `watches` | `{name, category, value}[]` | All registered watches sampled at call time |
+| `frameStats` | `{fps, dt, avg, p95, p99}` | Last `FrameStats` snapshot |
+| `profile` | `table` | Last profiler frame zones (may be empty) |
+| `log` | `{level, message, source}[]` | Last 10 devtools log entries |
+| `watchCount` | integer | Total registered watch count |
+
+The snapshot table is a plain Lua value — easily serialised with `luna.data.encode("json", snap)` for crash reports or external tools.
+
+```lua
+local snap = luna.devtools.snapshot()
+luna.log.info(string.format("snapshot: %d watches, fps=%.1f", snap.watchCount, snap.frameStats.fps))
+```
 
 ## References
 
@@ -252,11 +293,13 @@ end
 | `engine`     | Imports from | `SharedState` used in `devtools_api.rs` only |
 | `lua_api`    | Imported by  | `devtools_api.rs` registers the Lua surface |
 | `graphics`   | —            | Rendering profiler data is left to game scripts |
+| `vscode-extension` | Consumer | `snapshot()` output compatible with extension devtools panel |
 
 ## Notes
 
 - `Profiler::push`/`pop` must be balanced per frame; unbalanced calls produce zero-duration zones rather than panics.
 - `FileWatcher::poll()` uses `std::fs::metadata` which is blocking — avoid watching hundreds of paths on a slow filesystem.
 - `Logger` is not thread-safe; it is owned by the main Lua VM thread only.
+- Watch getter functions must not error — errors are silently turned into `nil` values in `getWatches()` output.
 - All four types are deliberately independent — you can use `FrameStats` without `Logger` etc.
 - The module is gated by `modules.debug`; ship builds should set this to `false`.

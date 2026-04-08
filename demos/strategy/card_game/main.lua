@@ -1,6 +1,7 @@
 -- Card Game (CCG)
 -- Controls: Click card in hand to play it, Enter to end turn, Escape to quit
 -- Defeat the AI opponent by reducing their HP to 0!
+-- Run with: cargo run -- demos/strategy/card_game
 
 local function clamp(v, mn, mx) return math.max(mn, math.min(mx, v)) end
 

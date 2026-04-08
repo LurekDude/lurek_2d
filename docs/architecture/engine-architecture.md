@@ -26,7 +26,7 @@
 17. [Audio Pipeline](#audio-pipeline)
 18. [Physics Pipeline](#physics-pipeline)
 19. [Particle System](#particle-system)
-20. [Data, Image, and Sound Modules](#data-image-and-sound-modules)
+20. [Data and Image Modules](#data-and-image-modules)
 21. [Filesystem and Virtual FS](#filesystem-and-virtual-fs)
 22. [Window Management](#window-management)
 23. [Threading Model](#threading-model)
@@ -199,8 +199,37 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
 | `luna.particles` | `particle_api.rs` | Particle emitters, configuration, rendering |
 | `luna.data` | `data_api.rs` | Binary data, compression, hashing, encoding |
 | `luna.img` | `image_api.rs` | CPU pixel buffers, pixel manipulation |
-| `luna.sound` | `sound_api.rs` | Decoded PCM audio samples |
 | `luna.thread` | `thread_api.rs` | Worker threads, channels |
+| `luna.tween` | `animation_api.rs` | Frame-based sprite animation, named clips, speed control |
+| `luna.camera` | `camera_api.rs` | Camera2D, viewport transforms |
+| `luna.simulator` | `automation_api.rs` | Automated input simulation and replay |
+| `luna.entity` | `entity_api.rs` | Lightweight ECS primitives |
+| `luna.scene` | `scene_api.rs` | Scene stack management and transitions |
+| `luna.gpu` | `compute_api.rs` | Dense numerical arrays, CPU-side compute |
+| `luna.savegame` | `savegame_api.rs` | Slot-based save/load, schema versioning |
+| `luna.codec` | `serial_api.rs` | JSON, TOML, MessagePack serialization |
+| `luna.dataframe` | `dataframe_api.rs` | Column-major tabular data structures |
+| `luna.light` | `light_api.rs` | 2D dynamic lighting and shadow casting |
+| `luna.modding` | `modding_api.rs` | Mod discovery, dependency resolution, load ordering |
+| `luna.raycaster` | `raycaster_api.rs` | DDA grid raycasting for retro rendering |
+| `luna.spine` | `spine_api.rs` | Spine 2D skeletal animation runtime |
+| `luna.procgen` | `procgen_api.rs` | Procedural content generation algorithms |
+| `luna.network` | `network_api.rs` | UDP networking, packet framing |
+| `luna.minimap` | `minimap_api.rs` | Grid-based minimap extraction and FOV masking |
+| `luna.pathfinding` | `pathfinding_api.rs` | Navigation grids, A★, HPA★, flow fields |
+| `luna.terminal` | `terminal_api.rs` | In-game developer terminal / REPL |
+| `luna.pipeline` | `pipeline_api.rs` | DAG pipeline orchestration and caching |
+| `luna.patterns` | `patterns_api.rs` | Game programming design patterns toolkit |
+| `luna.graph` | `graph_api.rs` | Directed graphs, flow simulation |
+| `luna.ai` | `ai_api.rs` | FSMs, behaviour trees, GOAP, steering |
+| `luna.postfx` | `fx_api.rs` | Post-processing effects, screen overlays |
+| `luna.ui` | `gui_api.rs` | Retained-mode widget UI |
+| `luna.tilemap` | `tilemap_api.rs` | Tilemaps, tilesets, coordinate helpers |
+| `luna.devtools` | `devtools_api.rs` | Developer diagnostics and runtime profiling |
+| `luna.debugbridge` | `debugbridge_api.rs` | JSON-over-TCP debug server for remote inspection |
+| `luna.localization` | `localization_api.rs` | Multi-locale string catalogs with plural rules |
+| `luna.log` | `log_api.rs` | Structured game-script logging |
+| `luna.docs` | `docs_api.rs` | API documentation reference management |
 
 ---
 
@@ -212,18 +241,22 @@ Tier 1 modules are engine-owned capabilities that sit directly on Baseline. **Im
 |---|---|---|
 | `animation` | `src/animation/` | Sprite animation: named clips, frame pools, speed control, frame-level events |
 | `audio` | `src/audio/` | Audio playback via rodio: mixer, buses, static/stream sources, volume, pitch, pan |
-| `automation` | `src/automation/` | Automated input / replay helpers |
 | `camera` | `src/camera/` | Camera, Camera2D, Viewport, ViewportScale types |
 | `compute` | `src/compute/` | Dense numerical arrays (NdArray) and CPU-side compute helpers |
-| `data` | `src/data/` | Binary data (ByteData), compression, hashing, encoding, TOML helpers |
+| `data` | `src/data/` | Binary data (ByteData), compression, hashing, encoding |
+| `debugbridge` | `src/debugbridge/` | JSON-over-TCP debug server for VS Code extension and MCP remote inspection |
+| `devtools` | `src/devtools/` | Engine and game diagnostics: structured runtime monitoring and performance analysis |
+| `docs` | `src/docs/` | API documentation catalog powering IntelliSense, MCP tools, and doc generators |
 | `entity` | `src/entity/` | Lightweight ECS primitives and entity helpers |
 | `event` | `src/event/` | Event queue and polling primitives |
 | `filesystem` | `src/filesystem/` | Sandboxed game filesystem (GameFS), VirtualFS, archive mounting |
 | `graphics` | `src/graphics/` | GPU rendering pipeline, draw commands, textures, fonts, batching, shaders |
 | `image` | `src/image/` | CPU-side image manipulation (ImageData) |
 | `input` | `src/input/` | Keyboard, mouse, gamepad, and touch state management |
+| `localization` | `src/localization/` | Multi-locale string catalog with variable substitution and plural form selection |
+| `log` | `src/log/` | Structured Lua-script logging at configurable severity levels |
+| `patterns` | `src/patterns/` | Pure-Rust game-programming design patterns (FSM, observer, service locator, etc.) |
 | `physics` | `src/physics/` | Rigid bodies, shapes, collisions, joints, raycasting via rapier2d |
-| `sound` | `src/sound/` | Decoded PCM audio sample data (SoundData) |
 | `thread` | `src/thread/` | Background Rust threads and Channel communication |
 | `timer` | `src/timer/` | Frame timing (Clock), FPS tracking, scheduled callbacks |
 | `window` | `src/window/` | Window lifecycle and state abstraction |
@@ -237,17 +270,24 @@ Tier 2 modules build on Baseline + Tier 1 and remain broadly useful across many 
 | Module | Path | Responsibility |
 |---|---|---|
 | `ai` | `src/ai/` | Generic AI: FSMs, behaviour trees, GOAP, steering behaviours |
+| `automation` | `src/automation/` | Automated input simulation and replay scripts (debug-gated) |
 | `dataframe` | `src/dataframe/` | Column-major tabular data structures |
+| `fx` | `src/fx/` | Composable post-processing visual effects pipeline |
 | `graph` | `src/graph/` | Directed graphs, flow simulation, graph algorithms |
 | `gui` | `src/gui/` | Retained-mode widget UI primitives |
+| `light` | `src/light/` | CPU-side 2D dynamic lighting data model (point, spot, directional) |
 | `minimap` | `src/minimap/` | Minimap extraction, FOV masking, tile sampling |
 | `modding` | `src/modding/` | Mod discovery, dependency resolution, load ordering |
-| `overlay` | `src/overlay/` | Per-frame overlays (weather, ambient layers) |
+| `network` | `src/network/` | UDP networking via ENet: peer-to-peer and client-server multiplayer |
 | `particle` | `src/particle/` | Emitter-based 2D particle systems |
 | `pathfinding` | `src/pathfinding/` | Navigation grids, A★, HPA★, flow fields |
-| `postfx` | `src/postfx/` | Post-processing effect data models |
+| `pipeline` | `src/pipeline/` | DAG-based data pipeline orchestration and caching |
+| `procgen` | `src/procgen/` | Procedural content generation: dungeons, terrain, noise, L-systems |
+| `raycaster` | `src/raycaster/` | DDA grid raycasting for Wolfenstein-style retro rendering |
 | `savegame` | `src/savegame/` | Save/load orchestration and schema versioning |
 | `scene` | `src/scene/` | Scene stack management and transitions |
+| `serial` | `src/serial/` | Format-agnostic serialization: JSON, TOML, MessagePack |
+| `spine` | `src/spine/` | Spine 2D skeletal animation: bone hierarchies, slots, world transforms |
 | `terminal` | `src/terminal/` | In-game developer terminal / REPL with widget toolkit |
 | `tilemap` | `src/tilemap/` | Tilemaps, tilesets, map generation, coordinate helpers |
 
@@ -298,9 +338,10 @@ main.rs
   ├── create_lua_vm()
   │     ├── Create mlua::Lua VM (StdLib subset — no os, io, loadfile, dofile)
   │     ├── Create `luna` global table
-  │     ├── Register 18+ API modules (graphics, input, audio, timer, math, physics,
+  │     ├── Register 40+ API modules (graphics, input, audio, timer, math, physics,
   │     │                             filesystem, window, event, system, particle,
-  │     │                             data, image, sound, thread, terminal, ...)
+  │     │                             data, image, thread, terminal, ai, animation,
+  │     │                             camera, compute, scene, tilemap, gui, ...)
   │     └── Each module: register(lua, luna_table, Rc<RefCell<SharedState>>)
   │
   ├── Load game_dir/main.lua (or display splash screen if no game directory)
@@ -604,7 +645,7 @@ source:setLooping(true)
 | BezierCurve | `LuaBezierCurve` | — (owned) | math |
 | ByteData | `LuaByteData` | — (owned) | data |
 | ImageData | `LuaImageData` | — (owned) | image |
-| SoundData | `LuaSoundData` | — (owned) | sound |
+| SoundData | `LuaSoundData` | — (owned) | audio |
 | FileHandle | `LuaFileHandle` | — (owned) | filesystem |
 | Channel | `LuaChannel` | — (shared) | thread |
 
@@ -716,7 +757,7 @@ pub struct ParticleSystem {
 
 ---
 
-## Data, Image, and Sound Modules
+## Data and Image Modules
 
 ### luna.data — Binary Data Processing
 
@@ -729,9 +770,7 @@ pub struct ParticleSystem {
 
 `ImageData`: RGBA8 pixel buffer with `getPixel`, `setPixel`, `mapPixel`, `paste`, `encode("png")`. Can be uploaded to GPU: `luna.gfx.newImage(imageData)`.
 
-### luna.sound — Decoded Audio Samples
-
-`SoundData`: Interleaved PCM `Vec<f32>` with per-sample access and metadata queries.
+> **Note**: `SoundData` (interleaved PCM `Vec<f32>`) previously lived in a separate `sound` module. It has been merged into `src/audio/` and is accessible through `luna.audio`.
 
 ---
 
@@ -1023,9 +1062,6 @@ src/
 ├── image/                           Tier 1: CPU pixel manipulation
 │   ├── mod.rs, image_data.rs
 │
-├── sound/                           Tier 1: decoded audio samples
-│   ├── mod.rs, sound_data.rs
-│
 ├── particle/                        Tier 2: particle systems
 │   └── mod.rs
 │
@@ -1040,7 +1076,7 @@ src/
     ├── graphics_api.rs, audio_api.rs, input_api.rs, timer_api.rs,
     ├── math_api.rs, physics_api.rs, filesystem_api.rs, window_api.rs,
     ├── event_api.rs, system_api.rs, particle_api.rs, data_api.rs,
-    ├── image_api.rs, sound_api.rs, thread_api.rs, terminal_api.rs,
+    ├── image_api.rs, thread_api.rs, terminal_api.rs,
     ├── thread_channel.rs, thread_worker.rs
 
 library/                             Tier 3: Lunasome (pure Lua)

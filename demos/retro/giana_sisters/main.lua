@@ -1,6 +1,7 @@
 -- The Great Giana Sisters — C-64 Classic (Luna2D demo)
 -- Side-scrolling platformer inspired by the infamous 1987 C-64 game.
 -- Collect gems and reach the exit on each level. Jump on enemies to defeat them.
+-- Run with: cargo run -- demos/retro/giana_sisters
 
 -- ── Constants ────────────────────────────────────────────────────────────
 
@@ -274,7 +275,7 @@ end
 
 function luna.keypressed(key)
     if key == "escape" then luna.signal.quit() end
-    if key == "r" then luna.load() end
+    if key == "r" then luna.signal.restart() end
     if game_state ~= "playing" then return end
     if (key == "space" or key == "up" or key == "w") and player.on_ground then
         player.vy = JUMP_VEL

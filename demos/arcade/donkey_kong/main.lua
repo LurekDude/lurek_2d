@@ -1,6 +1,7 @@
 -- Donkey Kong — Classic Arcade (Luna2D demo)
 -- Climb ladders and jump over barrels to rescue Pauline at the top.
 -- WASD or Arrow keys to move, Space to jump.
+-- Run with: cargo run -- demos/arcade/donkey_kong
 
 -- ── Constants ────────────────────────────────────────────────────────────
 
@@ -342,7 +343,7 @@ end
 
 function luna.keypressed(key)
     if key == "escape" then luna.signal.quit() end
-    if key == "r" then luna.load() end
+    if key == "r" then luna.signal.restart() end
     if game_state ~= "playing" then return end
     if (key == "space" or key == "up" or key == "w") and player.on_ground and not player.on_ladder then
         player.vy = JUMP_VEL

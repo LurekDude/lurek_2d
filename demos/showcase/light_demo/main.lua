@@ -8,6 +8,7 @@
 --   F/G/H          switch falloff (linear/smooth/constant)
 --   +/-            adjust ambient brightness
 --   SPACE          toggle shadows on player light
+-- Run with: cargo run -- demos/showcase/light_demo
 --   T              toggle torch lights on/off
 --   C              clear all lights and recreate
 

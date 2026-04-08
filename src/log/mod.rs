@@ -1,8 +1,16 @@
-//! Structured log level management for Luna2D scripts.
+//! Structured log level management and configurable log sinks for Luna2D scripts.
 //!
-//! Delegates to Rust's `log` crate via `crate::engine::log_messages`.  Log
+//! Delegates to Rust's `log` crate via `crate::engine::log_messages`. Log
 //! output from game scripts appears alongside engine log output and is
 //! controlled by the `RUST_LOG` environment variable.
+//!
+//! In addition to the default stderr output, Lua scripts can register extra
+//! [`crate::log::sinks::Sink`] destinations (files, in-memory ring buffers)
+//! via the `luna.log.*` API.
+
+pub mod sinks;
+
+pub use sinks::{MemoryEntry, Sink, SinkLevel, SinkRegistry};
 
 use crate::engine::log_messages;
 

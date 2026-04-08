@@ -23,7 +23,7 @@ local m  = world:toPhysics(96)    -- 96 pixels  → metres
 world:setGravity(0, 0)
 local gx, gy = world:getGravity()
 
--- Step the simulation (call once per frame from luna.update)
+-- Step the simulation (call once per frame from luna.process)
 function luna.process(dt)
     world:step(dt)
 end
@@ -349,3 +349,43 @@ player:setFilterData(0x0002, 0x0001 | 0x0004)
 
 -- Enemy: category=4, collide with player (2) and terrain (1)
 -- ball:setFilterData(0x0004, 0x0002 | 0x0001)
+
+-- ─── Body ──────────────────────────────────────────────────────────────────────
+
+body:destroy()  -- Removes this body from the world
+local angular_damping = body:getAngularDamping()  -- Returns the angular damping coefficient
+local height = body:getHeight()  -- Returns the body height
+local layer = body:getLayer()  -- Returns the collision layer bitmask
+local linear_damping = body:getLinearDamping()  -- Returns the linear damping coefficient
+local mask = body:getMask()  -- Returns the collision mask bitmask
+local type_val = body:getType()  -- Returns the body type as a string
+local width = body:getWidth()  -- Returns the body width
+local is_bullet = body:isBullet()  -- Returns whether CCD is enabled
+local is_fixed_rotation = body:isFixedRotation()  -- Returns whether rotation is locked
+local is_sleeping_allowed = body:isSleepingAllowed()  -- Returns whether the body can sleep
+body:setLayer(1)  -- Sets the collision layer bitmask
+body:setMask(1)  -- Sets the collision mask bitmask
+body:setType("type")  -- Sets the body type
+
+-- ─── PhysicsShape ──────────────────────────────────────────────────────────────
+
+physicsshape:destroy()  -- Releases this shape handle (GC handles cleanup)
+local bounding_box = physicsshape:getBoundingBox()  -- Returns the axis-aligned bounding box (x1, y1, x2, y2)
+local radius = physicsshape:getRadius()  -- Returns the radius. Only valid for circle shapes
+local type_val = physicsshape:getType()  -- Returns the shape type string: "circle", "rectangle", "polygon", "edge", or "chain"
+
+-- ─── luna.physics ──────────────────────────────────────────────────────────────
+luna.physics.attachShape(body, shape)  -- Attaches a standalone shape to a body as an additional fixture
+luna.physics.destroyWorld(world)  -- Marks a physics world for destruction. Subsequent operations on the world
+local body = luna.physics.getBody(world, body)  -- Returns the position and velocity of a body (x, y, vx, vy)
+local collisions = luna.physics.getCollisions(world)  -- Returns all collision events from the last simulation step
+local is_sleeping_allowed = luna.physics.isSleepingAllowed(world, body)  -- Returns whether the body is allowed to sleep
+local body = luna.physics.newBody(world, 1.0, 1.0, "type")  -- Creates a new rectangular body in the given world
+local chain_shape = luna.physics.newChainShape(false)  -- Creates a chain shape userdata from flat variadic vertex pairs
+local circle_shape = luna.physics.newCircleShape(1.0)  -- Creates a circle shape userdata
+local edge_shape = luna.physics.newEdgeShape(1.0, 1.0, 1.0, 1.0)  -- Creates an edge (line segment) shape userdata
+local polygon_shape = luna.physics.newPolygonShape()  -- Creates a convex polygon shape userdata from flat variadic vertex pairs
+local rectangle_shape = luna.physics.newRectangleShape(1.0, 1.0)  -- Creates a rectangle shape userdata
+luna.physics.setBodyVelocity(world, body, 1.0, 1.0)  -- Sets the velocity of a body
+luna.physics.setSleepingAllowed(world, body, false)  -- Sets whether the body is allowed to sleep
+luna.physics.step(world, 1.0)  -- Advances the physics world by dt seconds

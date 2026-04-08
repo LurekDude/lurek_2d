@@ -2,6 +2,7 @@
 -- Demonstrates luna.overlay for composable screen effects.
 -- Press F to flash, S to shake, L for lightning, D to fade, C to clear.
 -- Press 1-8 to cycle weather types, V to toggle vignette, G to toggle fog.
+-- Run with: cargo run -- demos/showcase/overlay_demo
 
 local overlay
 local time_speed = 1.0  -- hours per second for time-of-day cycling

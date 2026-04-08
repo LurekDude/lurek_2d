@@ -1,5 +1,6 @@
 -- Vertical Climber: Doodle Jump-style procedural platformer
 -- A/D to move, auto-bounce on platforms, avoid enemies
+-- Run with: cargo run -- demos/action/vertical_climber
 
 local function lerp(a, b, t) return a + (b - a) * t end
 

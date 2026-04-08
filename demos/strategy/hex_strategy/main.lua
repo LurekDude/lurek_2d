@@ -1,6 +1,7 @@
 -- Hex Strategy Game
 -- Controls: Click hex to select, C to place city on selected hex, N for next turn, Escape to quit
 -- Gather resources and expand your territory!
+-- Run with: cargo run -- demos/strategy/hex_strategy
 
 local HEX_SIZE = 36
 local OX, OY = 400, 300

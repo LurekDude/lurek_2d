@@ -1,6 +1,7 @@
 -- examples/fx.lua
 -- luna.postfx — Post-processing effects: stacking, per-image chains, screen overlays.
 -- All luna.postfx API methods demonstrated with code and comments.
+-- This file is documentation code, not a runnable game.
 
 -- ── Effect Types ──────────────────────────────────────────────────────────────
 -- Use one of these string names with luna.postfx.newEffect(type_name):
@@ -195,3 +196,91 @@ function luna.render()
     end
 end
 ]]
+
+-- ─── ImageEffect ───────────────────────────────────────────────────────────────
+
+imageeffect:clearEffects()  -- Removes all effects from the chain
+local clone = imageeffect:clone()  -- Returns a deep copy of this ImageEffect chain
+local effect_count = imageeffect:effectCount()  -- Returns the number of effects in the chain
+local remove_effect = imageeffect:removeEffect(1)  -- Removes the effect at the given 1-based index or with the given type name
+local save = imageeffect:save()  -- Stub: no-op serialisation placeholder
+imageeffect:type()
+imageeffect:typeOf("myName")
+
+-- ─── Overlay ───────────────────────────────────────────────────────────────────
+
+overlay:draw()  -- No-op placeholder; the overlay is rendered by the engine's draw pass
+local ambient_color = overlay:getAmbientColor()  -- Returns the current ambient tint as r, g, b, a components
+local cloud_count = overlay:getCloudCount()  -- Returns the current cloud shadow instance count
+local cloud_opacity = overlay:getCloudOpacity()  -- Returns the current cloud shadow opacity
+local cloud_scale = overlay:getCloudScale()  -- Returns the current cloud shadow scale
+local cloud_speed = overlay:getCloudSpeed()  -- Returns the current cloud shadow scroll speed
+local film_grain_intensity = overlay:getFilmGrainIntensity()  -- Returns the current film-grain intensity
+local fog_color = overlay:getFogColor()  -- Returns the current fog tint as r, g, b, a components
+local fog_density = overlay:getFogDensity()  -- Returns the current fog density
+local heat_haze_intensity = overlay:getHeatHazeIntensity()  -- Returns the current heat-haze distortion intensity
+local lightning_color = overlay:getLightningColor()  -- Returns the lightning flash tint as r, g, b, a components
+local time_of_day = overlay:getTimeOfDay()  -- Returns the current simulated time-of-day (0–24)
+local vignette_strength = overlay:getVignetteStrength()  -- Returns the current vignette strength
+local weather = overlay:getWeather()  -- Returns the name of the current weather type
+local weather_intensity = overlay:getWeatherIntensity()  -- Returns the current weather intensity
+local wind_direction = overlay:getWindDirection()  -- Returns the current wind direction in radians
+local wind_speed = overlay:getWindSpeed()  -- Returns the current wind speed
+local is_ambient_enabled = overlay:isAmbientEnabled()  -- Returns whether the ambient light layer is active
+local is_cloud_shadows_enabled = overlay:isCloudShadowsEnabled()  -- Returns whether cloud shadows are active
+local is_fading = overlay:isFading()  -- Returns true while a fade effect is in progress
+local is_film_grain_enabled = overlay:isFilmGrainEnabled()  -- Returns whether the film-grain layer is active
+local is_flashing = overlay:isFlashing()  -- Returns true while a flash effect is in progress
+local is_fog_enabled = overlay:isFogEnabled()  -- Returns whether the fog layer is active
+local is_heat_haze_enabled = overlay:isHeatHazeEnabled()  -- Returns whether the heat-haze layer is active
+local is_shaking = overlay:isShaking()  -- Returns true while a shake effect is in progress
+local is_vignette_enabled = overlay:isVignetteEnabled()  -- Returns whether the vignette layer is active
+local is_weather_enabled = overlay:isWeatherEnabled()  -- Returns whether the weather particle system is active
+overlay:setAmbientEnabled(false)  -- Enables or disables the ambient light layer
+overlay:setCloudCount(1)  -- Sets the number of cloud shadow instances to render
+overlay:setCloudOpacity(1.0)  -- Sets the opacity of cloud shadows (0.0 = invisible, 1.0 = fully dark)
+overlay:setCloudScale(1.0)  -- Sets the scale multiplier applied to each cloud shadow
+overlay:setCloudShadows(false)  -- Enables or disables scrolling cloud-shadow projection
+overlay:setCloudSpeed(1.0)  -- Sets the horizontal scroll speed of cloud shadows in pixels per second
+overlay:setFilmGrainEnabled(false)  -- Enables or disables the film-grain noise layer
+overlay:setFilmGrainIntensity(1.0)  -- Sets the film-grain noise intensity (0.0–1.0)
+overlay:setFogDensity(1.0)  -- Sets the fog density (0.0 = clear, 1.0 = fully opaque)
+overlay:setFogEnabled(false)  -- Enables or disables the fog layer
+overlay:setHeatHazeEnabled(false)  -- Enables or disables the heat-haze distortion layer
+overlay:setHeatHazeIntensity(1.0)  -- Sets the heat-haze distortion intensity (0.0–1.0)
+overlay:setTimeOfDay(1.0)  -- Sets the simulated time-of-day (0–24) which drives ambient colour
+overlay:setVignetteEnabled(false)  -- Enables or disables the screen-edge vignette layer
+overlay:setVignetteStrength(1.0)  -- Sets the vignette darkening strength (0.0–1.0)
+overlay:setWeather("name")  -- Sets the active weather type by name ("none", "rain", "snow", "hail", "dust", "leaves", "ash", "pollen")
+overlay:setWeatherEnabled(false)  -- Enables or disables the weather particle system
+overlay:setWeatherIntensity(1.0)  -- Sets the particle spawn rate multiplier (0.0–1.0)
+overlay:setWindDirection(1.0)  -- Sets the wind direction in radians (0 = right, π/2 = down)
+overlay:setWindSpeed(1.0)  -- Sets the wind speed applied to weather particles in units per second
+local overlay_type = overlay:type()  -- "Overlay"
+local overlay_is_type = overlay:typeOf("Overlay")  -- Returns true if this object is of the given type ("Object" or "Overlay")
+
+-- ─── PostFxEffect ──────────────────────────────────────────────────────────────
+
+local effect_type = postfxeffect:getEffectType()  -- Returns the type name of this effect (alias for getTypeName)
+local type_val = postfxeffect:getType()  -- Returns the type name of this effect (alias for getTypeName)
+postfxeffect:setBrightness(true)
+postfxeffect:setContrast(true)
+postfxeffect:setIntensity(true)
+postfxeffect:setOffset(true)
+postfxeffect:setRadius(true)
+postfxeffect:setSaturation(true)
+postfxeffect:setScanlineStrength(true)
+postfxeffect:setStrength(true)
+postfxeffect:setThreshold(true)
+postfxeffect:type()
+postfxeffect:typeOf("myName")
+
+-- ─── PostFxStack ───────────────────────────────────────────────────────────────
+
+local is_capturing = postfxstack:isCapturing()  -- Returns whether the stack is currently capturing the scene
+postfxstack:type()
+postfxstack:typeOf("myName")
+
+-- ─── luna.fx ───────────────────────────────────────────────────────────────────
+local effect_types = luna.fx.getEffectTypes()  -- Returns the list of all built-in effect type names
+local pass = luna.fx.newPass(1)  -- Creates a custom-shader post-processing effect (alias for newCustomEffect)

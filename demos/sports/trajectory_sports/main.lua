@@ -1,6 +1,7 @@
 -- Trajectory Sports (Golf / Artillery)
 -- Aim with mouse, hold Space to charge power, release to shoot.
 -- 3 holes of increasing difficulty with wind.
+-- Run with: cargo run -- demos/sports/trajectory_sports
 
 local function clamp(v, mn, mx) return math.max(mn, math.min(mx, v)) end
 local function lerp(a, b, t) return a + (b - a) * t end
@@ -162,7 +163,7 @@ end
 
 function luna.keypressed(key)
     if key == "escape" then luna.signal.quit() end
-    if key == "r" then luna.load() end
+    if key == "r" then luna.signal.restart() end
 end
 
 function luna.keyreleased(key)

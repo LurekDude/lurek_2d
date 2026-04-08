@@ -2,6 +2,7 @@
 -- Demonstrates the luna.simulator input automation system.
 -- The simulator replays scripted input events (key presses, mouse moves, etc.)
 -- into the engine's event queue, useful for testing, replays, and tutorials.
+-- Run with: cargo run -- demos/showcase/automation_demo
 
 local status = "idle"
 local log = {}

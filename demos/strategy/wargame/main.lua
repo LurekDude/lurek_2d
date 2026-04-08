@@ -1,5 +1,6 @@
 -- Wargame — Tactical Tabletop with Two Armies
 -- Turn-based combat on a grid with terrain, morale, and command points
+-- Run with: cargo run -- demos/strategy/wargame
 
 local GRID = 40
 local MAP_W, MAP_H = 16, 12
@@ -259,7 +260,7 @@ function luna.keypressed(key)
         gameOver = false
         units = {}
         combatLog = {}
-        luna.load()
+        luna.signal.restart()
     end
 end
 

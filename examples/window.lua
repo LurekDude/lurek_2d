@@ -147,3 +147,53 @@ function luna.exit()
     -- Return nil / false to allow the close (default behaviour).
     return false  -- allow quit
 end
+
+
+-- ─── luna.system ───────────────────────────────────────────────────────────────
+luna.system.getArch()  -- Returns the CPU architecture string for the current machine
+local args = luna.system.getArgs()  -- Returns the command-line arguments as a table
+luna.system.getBatchResults({})  -- Returns the output table from the most recently completed runBatch call
+luna.system.getClipboardText()  -- Returns the current contents of the system clipboard
+luna.system.getDebugOverlay()  -- Returns whether the debug overlay is currently visible
+luna.system.getEnv("name")  -- Returns the value of the named OS environment variable, or nil if not set
+luna.system.getInfo()  -- Returns a table of system information including OS name, CPU model, and installed RAM
+luna.system.getLastError()  -- Returns the last unhandled error message, or nil
+luna.system.getLogLevel()  -- Returns the name of the current minimum log level for runtime messages
+luna.system.getMemorySize()  -- Returns the total amount of installed system RAM in megabytes
+luna.system.getOS()  -- Returns the host operating system name ('Windows', 'Linux', 'macOS')
+luna.system.getPowerInfo()  -- Returns battery state, percentage charged, and estimated time remaining
+luna.system.getPreferredLocales()  -- Returns an ordered list of the user's preferred locale strings (e.g. 'en-US')
+luna.system.getProcessorCount()  -- Returns the number of logical CPU cores available
+luna.system.getVersion()  -- Returns the Luna2D engine version string
+luna.system.log("info", "Game initialized")  -- Emit a log message at a specified level
+luna.system.openURL("https://luna2d.io")  -- Opens URL in the system default browser
+luna.system.parseArgs()  -- Parses a command-line argument string and returns a structured key/value table
+luna.system.runBatch({})  -- Runs a list of shell commands in parallel and returns immediately without blocking
+luna.system.setClipboardText("Copied text")  -- Replaces the system clipboard contentsgiven string
+luna.system.setDebugOverlay(false)  -- Shows or hides the FPS/draw-call debug overlay
+luna.system.setLogLevel("warn")  -- Minimum log level: "debug", "info", "warn", "error"ges
+
+-- ─── luna.window ───────────────────────────────────────────────────────────────
+luna.window.close()  -- Requests the window to close
+luna.window.focus()  -- Requests the window manager to bring the window to the foreground
+local d_p_i_scale = luna.window.getDPIScale()  -- Returns the DPI scaling factor for the window
+local display_name = luna.window.getDisplayName()  -- Returns the name of the current display
+local display_orientation = luna.window.getDisplayOrientation()  -- Returns the current display orientation
+local fullscreen_modes = luna.window.getFullscreenModes()  -- Returns all available fullscreen video modes
+local game_height = luna.window.getGameHeight()  -- Returns the logical game height in virtual pixels
+local game_width = luna.window.getGameWidth()  -- Returns the logical game width in virtual pixels
+local mode = luna.window.getMode()  -- Returns the window dimensions and mode flags as width, height, flags
+local native_d_p_i_scale = luna.window.getNativeDPIScale()  -- Returns the native DPI scale factor
+local pixel_dimensions = luna.window.getPixelDimensions()  -- Returns the window dimensions in physical pixels
+local safe_area = luna.window.getSafeArea()  -- Returns the safe display area as x, y, w, h
+local scale_info = luna.window.getScaleInfo()  -- Returns viewport scale and offset information as a table
+local scale_mode = luna.window.getScaleMode()  -- Returns the current viewport scale mode string
+local system_theme = luna.window.getSystemTheme()  -- Returns the OS color theme preference
+local is_fullscreen = luna.window.isFullscreen()  -- Returns whether the window is in fullscreen mode
+local is_high_d_p_i_allowed = luna.window.isHighDPIAllowed()  -- Returns whether high-DPI rendering is allowed
+local is_resizable = luna.window.isResizable()  -- Returns whether the window can be resized by the user
+luna.window.requestAttention()  -- Flashes the window in the taskbar to request user attention
+luna.window.restore()  -- Restores the window from minimized or maximized state
+luna.window.setMode(1, 1)  -- Resizes the window and optionally changes fullscreen and vsync
+luna.window.setScaleMode("letterbox")  -- "stretch", "letterbox", "integer", "none"
+local show_message_box = luna.window.showMessageBox("Error", "File not found.")  -- Shows a platform-native message box dialog

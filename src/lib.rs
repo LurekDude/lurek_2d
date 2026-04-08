@@ -69,6 +69,8 @@
 pub mod ai;
 /// Sprite animation system: named clips, frame pools, speed control, and frame-level events.
 pub mod animation;
+/// Property tween system: animate any Lua table field with easing, sequences, and parallels.
+pub mod tween;
 /// Audio playback system backed by rodio.
 pub mod audio;
 /// Automated input simulation via timed step scripts for testing and replay.

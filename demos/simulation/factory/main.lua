@@ -1,5 +1,6 @@
 -- Factory Automation — Grid-based logistics demo
 -- Click to place, 1-4 select type, R rotate, right-click delete
+-- Run with: cargo run -- demos/simulation/factory
 
 local TILE = 32
 local COLS, ROWS = 25, 18

@@ -1,0 +1,9 @@
+# conf.toml — Dungeon Crawler demo
+
+[window]
+title = "Dungeon Crawler"
+width = 800
+height = 600
+
+[performance]
+target_fps = 60

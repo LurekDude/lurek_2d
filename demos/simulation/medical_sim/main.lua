@@ -1,5 +1,6 @@
 -- Medical Simulation — Luna2D Demo
 -- Perform surgery on patients: clean, cut layers, repair, suture
+-- Run with: cargo run -- demos/simulation/medical_sim
 
 local function clamp(v, mn, mx) return math.max(mn, math.min(mx, v)) end
 
@@ -100,7 +101,7 @@ function luna.process(dt)
 end
 
 function luna.mousepressed(mx, my, btn)
-    if game_over then luna.load(); return end
+    if game_over then luna.signal.restart(); return end
     if btn ~= 1 then return end
 
     -- tool palette
@@ -121,7 +122,7 @@ end
 
 function luna.keypressed(key)
     if key == "escape" then luna.signal.quit() end
-    if key == "r" then luna.load() end
+    if key == "r" then luna.signal.restart() end
 end
 
 local function draw_vitals(p)

@@ -73,21 +73,23 @@ impl FrameStats {
             sorted[idx.min(n - 1)]
         };
         FrameSnapshot {
-            fps:     if avg > 0.0 { 1.0 / avg } else { 0.0 },
-            dt:      *sorted.last().unwrap_or(&0.0),
+            fps: if avg > 0.0 { 1.0 / avg } else { 0.0 },
+            dt: *sorted.last().unwrap_or(&0.0),
             avg,
-            min:     sorted[0],
-            max:     sorted[n - 1],
-            p50:     pct(50.0),
-            p95:     pct(95.0),
-            p99:     pct(99.0),
+            min: sorted[0],
+            max: sorted[n - 1],
+            p50: pct(50.0),
+            p95: pct(95.0),
+            p99: pct(99.0),
             samples: n,
         }
     }
 }
 
 impl Default for FrameStats {
-    fn default() -> Self { Self::new(300) }
+    fn default() -> Self {
+        Self::new(300)
+    }
 }
 
 // ── FrameSnapshot ─────────────────────────────────────────────────────────
@@ -128,6 +130,16 @@ pub struct FrameSnapshot {
 
 impl FrameSnapshot {
     fn zero() -> Self {
-        Self { fps: 0.0, dt: 0.0, avg: 0.0, min: 0.0, max: 0.0, p50: 0.0, p95: 0.0, p99: 0.0, samples: 0 }
+        Self {
+            fps: 0.0,
+            dt: 0.0,
+            avg: 0.0,
+            min: 0.0,
+            max: 0.0,
+            p50: 0.0,
+            p95: 0.0,
+            p99: 0.0,
+            samples: 0,
+        }
     }
 }

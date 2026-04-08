@@ -271,6 +271,18 @@ impl LuaUserData for LuaGraphItem {
                 ItemPosition::Unplaced => Ok(LuaMultiValue::from_vec(vec![])),
             }
         });
+
+        // -- type --
+        /// Returns the type name of this object.
+        /// @return string
+        methods.add_method("type", |_, _, ()| Ok("GraphItem"));
+
+        // -- typeOf --
+        /// Returns true if this object is of the given type.
+        /// @param name : string
+        /// @return boolean
+        methods.add_method("typeOf", |_, _, name: String| Ok(name == "GraphItem" || name == "Object"));
+
     }
 }
 
@@ -532,6 +544,12 @@ impl LuaUserData for LuaEdge {
         methods.add_method("isItemTypeAllowed", |_, this, t: String| {
             with_edge!(this, g, edge, Ok(edge.is_item_type_allowed(&t)))
         });
+
+        // -- type --
+        methods.add_method("type", |_, _, ()| Ok("GraphEdge"));
+        // -- typeOf --
+        methods.add_method("typeOf", |_, _, name: String| Ok(name == "GraphEdge" || name == "Object"));
+
     }
 }
 
@@ -1027,6 +1045,12 @@ impl LuaUserData for LuaNode {
                 None => Ok(None),
             }
         });
+
+        // -- type --
+        methods.add_method("type", |_, _, ()| Ok("GraphNode"));
+        // -- typeOf --
+        methods.add_method("typeOf", |_, _, name: String| Ok(name == "GraphNode" || name == "Object"));
+
     }
 }
 
@@ -1528,6 +1552,18 @@ impl LuaUserData for LuaGraph {
                 Ok(())
             },
         );
+
+        // -- type --
+        /// Returns the type name of this object.
+        /// @return string
+        methods.add_method("type", |_, _, ()| Ok("Graph"));
+
+        // -- typeOf --
+        /// Returns true if this object is of the given type.
+        /// @param name : string
+        /// @return boolean
+        methods.add_method("typeOf", |_, _, name: String| Ok(name == "Graph" || name == "Object"));
+
     }
 }
 

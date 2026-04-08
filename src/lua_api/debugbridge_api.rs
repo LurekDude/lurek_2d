@@ -11,7 +11,7 @@ use std::sync::{Arc, Mutex};
 
 use mlua::prelude::*;
 
-use crate::debugbridge::{BridgeShared, PendingRequest, PendingResponse, server_thread};
+use crate::debugbridge::{server_thread, BridgeShared, PendingRequest, PendingResponse};
 
 // ---------------------------------------------------------------------------
 // Registration
@@ -28,8 +28,7 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
     let shared: Arc<Mutex<BridgeShared>> = Arc::new(Mutex::new(BridgeShared::new()));
     let running: Arc<AtomicBool> = Arc::new(AtomicBool::new(false));
     // Store thread join handle
-    let thread_handle: Arc<Mutex<Option<std::thread::JoinHandle<()>>>> =
-        Arc::new(Mutex::new(None));
+    let thread_handle: Arc<Mutex<Option<std::thread::JoinHandle<()>>>> = Arc::new(Mutex::new(None));
 
     // ----- Lifecycle -----
 
@@ -47,14 +46,11 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
             }
             let port = port.unwrap_or(19740);
             if port < 1024 {
-                return Err(LuaError::RuntimeError(
-                    "port must be >= 1024".to_string(),
-                ));
+                return Err(LuaError::RuntimeError("port must be >= 1024".to_string()));
             }
             let addr = format!("127.0.0.1:{}", port);
-            let listener = TcpListener::bind(&addr).map_err(|e| {
-                LuaError::RuntimeError(format!("failed to bind {}: {}", addr, e))
-            })?;
+            let listener = TcpListener::bind(&addr)
+                .map_err(|e| LuaError::RuntimeError(format!("failed to bind {}: {}", addr, e)))?;
             if let Ok(mut s) = sh.lock() {
                 s.port = port;
             }
@@ -101,9 +97,7 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
     /// @return integer
     db.set(
         "getPort",
-        lua.create_function(move |_, ()| {
-            Ok(sh.lock().map(|s| s.port).unwrap_or(0))
-        })?,
+        lua.create_function(move |_, ()| Ok(sh.lock().map(|s| s.port).unwrap_or(0)))?,
     )?;
 
     /// Returns the number of connected TCP clients.
@@ -111,9 +105,7 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
     /// @return integer
     db.set(
         "getClientCount",
-        lua.create_function(move |_, ()| {
-            Ok(sh.lock().map(|s| s.client_count).unwrap_or(0))
-        })?,
+        lua.create_function(move |_, ()| Ok(sh.lock().map(|s| s.client_count).unwrap_or(0)))?,
     )?;
 
     /// Poll for pending Lua-dependent requests from TCP clients.
@@ -297,15 +289,17 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
     /// @param line : integer?
     db.set(
         "capturePrint",
-        lua.create_function(move |_, (msg, source, line): (String, Option<String>, Option<u32>)| {
-            let mut s = sh
-                .lock()
-                .map_err(|e| LuaError::RuntimeError(e.to_string()))?;
-            let src = source.unwrap_or_else(|| "?".to_string());
-            let ln = line.unwrap_or(0);
-            s.capture_print_with_broadcast(&msg, &src, ln);
-            Ok(())
-        })?,
+        lua.create_function(
+            move |_, (msg, source, line): (String, Option<String>, Option<u32>)| {
+                let mut s = sh
+                    .lock()
+                    .map_err(|e| LuaError::RuntimeError(e.to_string()))?;
+                let src = source.unwrap_or_else(|| "?".to_string());
+                let ln = line.unwrap_or(0);
+                s.capture_print_with_broadcast(&msg, &src, ln);
+                Ok(())
+            },
+        )?,
     )?;
 
     /// Returns the print history.
@@ -412,10 +406,7 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
     db.set(
         "isScreenshotRequested",
         lua.create_function(move |_, ()| {
-            Ok(sh
-                .lock()
-                .map(|s| s.screenshot_requested)
-                .unwrap_or(false))
+            Ok(sh.lock().map(|s| s.screenshot_requested).unwrap_or(false))
         })?,
     )?;
 
@@ -452,9 +443,7 @@ fn lua_value_to_json(val: &LuaValue) -> serde_json::Value {
         LuaValue::Boolean(b) => serde_json::Value::Bool(*b),
         LuaValue::Integer(n) => serde_json::json!(*n),
         LuaValue::Number(n) => serde_json::json!(*n),
-        LuaValue::String(s) => {
-            serde_json::Value::String(s.to_str().unwrap_or("").to_string())
-        }
+        LuaValue::String(s) => serde_json::Value::String(s.to_str().unwrap_or("").to_string()),
         _ => serde_json::Value::String(format!("<{}>", val.type_name())),
     }
 }

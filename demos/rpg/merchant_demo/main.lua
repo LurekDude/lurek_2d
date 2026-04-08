@@ -1,4 +1,5 @@
 --[[
+-- Run with: cargo run -- demos/rpg/merchant_demo
   merchant_demo — Item System + Inventory: Shop / Trading Game
   ─────────────────────────────────────────────────────────────
   Demonstrates how luna.item and luna.inventory model a merchant's
@@ -151,7 +152,7 @@ local function auto_buy()
     end
 end
 
--- ── luna.load ─────────────────────────────────────────────────────────────
+-- ── luna.init ─────────────────────────────────────────────────────────────
 function luna.init()
     restock()
     luna.window.setTitle("Merchant Demo — item + inventory shop system")
@@ -171,14 +172,14 @@ function luna.keypressed(key)
     end
 end
 
--- ── luna.update ───────────────────────────────────────────────────────────
+-- ── luna.process ───────────────────────────────────────────────────────────
 function luna.process(dt)
     if message_timer > 0 then
         message_timer = message_timer - dt
     end
 end
 
--- ── luna.draw ─────────────────────────────────────────────────────────────
+-- ── luna.render ─────────────────────────────────────────────────────────────
 local function panel(x, y, w, h, title)
     luna.gfx.setColor(0.10, 0.08, 0.20, 0.92)
     luna.gfx.rectangle("fill", x, y, w, h)

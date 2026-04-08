@@ -1,5 +1,6 @@
 -- Rhythm Game Demo — 4-lane note highway with timing windows
 -- Keys: D, F, J, K to hit notes | Space to start/restart | Escape to quit
+-- Run with: cargo run -- demos/sports/rhythm_game
 
 local function clamp(v, mn, mx) return math.max(mn, math.min(mx, v)) end
 

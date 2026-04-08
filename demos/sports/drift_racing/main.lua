@@ -1,6 +1,7 @@
 -- Top-Down Drift Racing
 -- W=accelerate, S=brake, A/D=steer. Drift around an oval track.
 -- 3 laps to win. AI cars follow the track. Boost zones on track.
+-- Run with: cargo run -- demos/sports/drift_racing
 
 local function clamp(v, mn, mx) return math.max(mn, math.min(mx, v)) end
 local function lerp(a, b, t) return a + (b - a) * t end
@@ -250,7 +251,7 @@ end
 
 function luna.keypressed(key)
     if key == "escape" then luna.signal.quit() end
-    if key == "r" then luna.load() end
+    if key == "r" then luna.signal.restart() end
 end
 
 local function draw_car(c)

@@ -1,5 +1,6 @@
 -- Wildlife Photography — Luna2D Demo
 -- Explore a nature reserve, photograph animals, fill your encyclopedia
+-- Run with: cargo run -- demos/simulation/wildlife_photo
 
 local function clamp(v, mn, mx) return math.max(mn, math.min(mx, v)) end
 local function lerp(a, b, t) return a + (b - a) * t end
@@ -201,7 +202,7 @@ end
 
 function luna.keypressed(key)
     if key == "escape" then luna.signal.quit() end
-    if key == "r" then luna.load() end
+    if key == "r" then luna.signal.restart() end
     if key == "c" then camera_mode = not camera_mode end
     if key == "space" and camera_mode then take_photo() end
     if key == "lshift" or key == "rshift" then player.crouching = not player.crouching end

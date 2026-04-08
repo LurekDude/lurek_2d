@@ -30,9 +30,11 @@ The six patterns are:
 
 5. **Factory** — A named constructor registry. `register(typeName, fn)` stores a constructor function. `create(typeName, ...)` calls it with additional arguments. Useful for entity templates, projectile factories, and action creators.
 
-6. **StateMachine** — A finite state machine with guard-validated transitions, enter/exit/update callbacks, and a history ring. `addState(name, {enter,exit,update})` registers a state. `addTransition(from, to, guard?)` defines a valid edge (optional guard function). `transitionTo(name)` fires exit on the current state, calls the optional guard, fires enter on the new state, and records the transition in history. `update(dt)` calls the current state's `update` callback.
+6. **SimpleState** — A simple named-state tracker with enter/exit/update callbacks per state. `addState(name, {enter?,exit?,update?})` registers a state with optional callbacks. `transitionTo(name)` fires exit on the current state then enter on the new one. `update(dt)` delegates to the current state's update callback. No guard-validated transition rules — any registered state can be entered at any time. Exposed in Lua as `luna.patterns.newSimpleState()`.
 
-   > **See also**: `automation.Simulator` has an internal 4-state playback FSM (Idle/Running/Paused/Complete). That FSM is private and controls input replay — it is not a general-purpose game state machine. For game-level state sequencing (menus, combat phases, NPC behaviour) use `luna.patterns.newStateMachine()` which provides guard-validated transitions, history, and enter/exit/update callbacks.
+   > **See also**: `automation.Simulator` has an internal 4-state playback FSM (Idle/Running/Paused/Complete). That FSM is private and controls input replay — it is not a general-purpose game state machine. For game-level state sequencing (menus, combat phases, NPC behaviour) use `luna.patterns.newSimpleState()`.
+
+   > **Note**: The domain `StateMachine` type in `src/patterns/state_machine.rs` provides guard-validated transitions and a history ring accessible from Rust. It is not currently wired to the Lua API.
 
 All six domain types are **pure Rust** with no mlua dependency. All Lua plumbing (registry keys for callbacks, Lua UserData implementations) lives in `src/lua_api/patterns_api.rs`. The patterns API is gated by `modules.pipeline = true` in `conf.lua`.
 
@@ -148,21 +150,23 @@ Each factory function returns a new Lua UserData object. All callback-holding in
 | Function | Signature | Description |
 |---|---|---|
 | `luna.patterns.newEventBus()` | `→ EventBus` | Create a new publish/subscribe bus |
-| `bus:on(event, cb, priority?, once?)` | `→ id` | Subscribe to an event |
-| `bus:off(id)` | — | Unsubscribe by ID |
+| `bus:on(event, cb, priority?)` | `→ id` | Subscribe; returns subscription ID |
+| `bus:off(id)` | — | Unsubscribe by subscription ID |
 | `bus:emit(event, ...)` | — | Fire all listeners for an event |
-| `bus:clear(event?)` | — | Clear listeners for one event or all |
-| `bus:listenerCount(event)` | `→ int` | Count subscribers for an event |
+| `bus:clear(event)` | — | Remove all listeners for one event |
+| `bus:clearAll()` | — | Remove all listeners on all events |
+| `bus:getListenerCount(event)` | `→ int` | Count subscribers for an event |
+| `bus:getEvents()` | `→ table` | Array of registered event names |
 | `luna.patterns.newObjectPool()` | `→ ObjectPool` | Create a new object pool |
-| `pool:setCapacity(n)` | — | Set max pool size |
-| `pool:acquire()` | `→ int\|nil` | Get an idle ID |
-| `pool:release(id)` | — | Return an active ID to idle |
-| `pool:prewarm(n)` | — | Pre-create N idle entries |
-| `pool:isActive(id)` | `→ boolean` | Check if an ID is active |
-| `pool:idleCount()` | `→ int` | Number of idle slots |
-| `pool:activeCount()` | `→ int` | Number of active slots |
-| `luna.patterns.newCommandStack()` | `→ CommandStack` | Create a new undo/redo stack |
-| `stack:push(name, exec, undo?)` | — | Execute and record a command |
+| `pool:add(value)` | — | Add a pre-built Lua value to the pool |
+| `pool:acquire()` | `→ any\|nil` | Borrow an available value (nil if empty) |
+| `pool:release(value)` | — | Return a borrowed value to the pool |
+| `pool:getActiveCount()` | `→ int` | Number of currently borrowed values |
+| `pool:getAvailableCount()` | `→ int` | Number of idle (available) values |
+| `pool:getTotalCount()` | `→ int` | Total tracked values (active + available) |
+| `pool:clearAll()` | — | Empty the pool and release all registry values |
+| `luna.patterns.newCommandStack(maxSize?)` | `→ CommandStack` | Create a new undo/redo stack |
+| `stack:execute(name, exec_fn, undo_fn?)` | — | Call exec_fn immediately and push to history |
 | `stack:undo()` | `→ boolean` | Execute undo on top command |
 | `stack:redo()` | `→ boolean` | Re-execute last undone command |
 | `stack:canUndo()` | `→ boolean` | Whether undo is available |

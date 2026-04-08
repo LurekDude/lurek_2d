@@ -1,20 +1,20 @@
 {
   "meta": {
-    "generated": "2026-04-08T11:01:54.328305+00:00",
+    "generated": "2026-04-08T16:16:23.197296+00:00",
     "generator": "tools/gen_rust_api_data.py",
-    "version": "0.5.0",
+    "version": "0.6.0",
     "stats": {
-      "rust_items": 1173,
-      "rust_modules": 275,
+      "rust_items": 1203,
+      "rust_modules": 285,
       "rust_tests": 0,
       "lua_tests": 104
     }
   },
   "rust_api": {
     "summary": {
-      "total_items": 1173,
-      "documented": 1160,
-      "modules": 275
+      "total_items": 1203,
+      "documented": 1183,
+      "modules": 285
     },
     "modules": {
       "ai::agent": {
@@ -1690,6 +1690,87 @@
           }
         ]
       },
+      "debugbridge::bridge": {
+        "module_doc": "Shared state types for the Luna2D TCP debug bridge.  These types are exchanged between the TCP server thread and the Lua main thread without any Lua dependency.  All fields are intentionally `pub` so both threads can read and write them through the shared `Arc<Mutex<BridgeShared>>`.",
+        "source_file": "src/debugbridge/bridge.rs",
+        "items": [
+          {
+            "name": "PendingRequest",
+            "kind": "struct",
+            "description": "A request from a TCP client that requires main-thread (Lua) execution.",
+            "file": "src/debugbridge/bridge.rs",
+            "line": 13
+          },
+          {
+            "name": "PendingResponse",
+            "kind": "struct",
+            "description": "A response produced on the main thread for delivery back to a TCP client.",
+            "file": "src/debugbridge/bridge.rs",
+            "line": 26
+          },
+          {
+            "name": "PrintEntry",
+            "kind": "struct",
+            "description": "A single structured print log entry captured from `luna.print`.",
+            "file": "src/debugbridge/bridge.rs",
+            "line": 37
+          },
+          {
+            "name": "BridgeShared",
+            "kind": "struct",
+            "description": "State shared between the TCP server background thread and the Lua main thread.",
+            "file": "src/debugbridge/bridge.rs",
+            "line": 49
+          },
+          {
+            "name": "SharedBridge",
+            "kind": "type",
+            "description": "Type alias for the shared state handle passed between threads.",
+            "file": "src/debugbridge/bridge.rs",
+            "line": 194
+          }
+        ]
+      },
+      "debugbridge": {
+        "module_doc": "TCP debug bridge for connecting external tools to a running Luna2D game.  Exposes a JSON-over-TCP server (127.0.0.1 only) that external tools such as the VS Code extension and MCP server can connect to for runtime inspection and control.  Network I/O runs on a background thread; methods that require Lua access are queued for dispatch on the main thread via `poll()`.  # Sub-modules | Module | Purpose | |---|---| | [`bridge`] | [`BridgeShared`] and related data types | | [`server`] | TCP accept loop and client message dispatch |",
+        "source_file": "src/debugbridge/mod.rs",
+        "items": [
+          {
+            "name": "bridge",
+            "kind": "mod",
+            "description": "",
+            "file": "src/debugbridge/mod.rs",
+            "line": 14
+          },
+          {
+            "name": "server",
+            "kind": "mod",
+            "description": "",
+            "file": "src/debugbridge/mod.rs",
+            "line": 15
+          }
+        ]
+      },
+      "debugbridge::server": {
+        "module_doc": "TCP server thread for the Luna2D debug bridge.  Runs a non-blocking accept loop that multiplexes reads from all connected clients, dispatches background-safe methods immediately, and queues main-thread methods for later execution via `poll()`.",
+        "source_file": "src/debugbridge/server.rs",
+        "items": [
+          {
+            "name": "server_thread",
+            "kind": "fn",
+            "description": "Accept loop: runs on a background thread and handles all TCP I/O.  Accepts new connections, reads newline-delimited JSON messages from each client, and writes pending responses back.  Stops when `running` is set to `false`.",
+            "file": "src/debugbridge/server.rs",
+            "line": 19
+          },
+          {
+            "name": "handle_client_message",
+            "kind": "fn",
+            "description": "Parses a newline-terminated JSON message from a client and either responds immediately (background-safe methods) or queues a [`PendingRequest`] for the main thread.",
+            "file": "src/debugbridge/server.rs",
+            "line": 110
+          }
+        ]
+      },
       "devtools::frame_stats": {
         "module_doc": "Rolling frame-time statistics: averages, percentiles, and FPS.  [`FrameStats`] maintains a fixed-capacity ring of frame durations and derives aggregate statistics on demand without allocating per query.",
         "source_file": "src/devtools/frame_stats.rs",
@@ -1801,6 +1882,148 @@
             "description": "Polling-based file-modification watcher.  # Fields - `paths` — `HashMap<PathBuf, Option<SystemTime>>`.",
             "file": "src/devtools/watcher.rs",
             "line": 19
+          }
+        ]
+      },
+      "docs::catalog": {
+        "module_doc": "API catalog for querying and filtering doc entries.",
+        "source_file": "src/docs/catalog.rs",
+        "items": [
+          {
+            "name": "Catalog",
+            "kind": "struct",
+            "description": "In-memory registry of all documented Luna2D API entries.",
+            "file": "src/docs/catalog.rs",
+            "line": 6
+          }
+        ]
+      },
+      "docs::entry": {
+        "module_doc": "Doc entry types for the Luna2D API catalog.",
+        "source_file": "src/docs/entry.rs",
+        "items": [
+          {
+            "name": "ParamInfo",
+            "kind": "struct",
+            "description": "Metadata about a single parameter in an API function.",
+            "file": "src/docs/entry.rs",
+            "line": 7
+          },
+          {
+            "name": "ReturnInfo",
+            "kind": "struct",
+            "description": "Metadata about a single return value.",
+            "file": "src/docs/entry.rs",
+            "line": 22
+          },
+          {
+            "name": "DocEntry",
+            "kind": "struct",
+            "description": "A single documented API entry (function, method, value, or type).",
+            "file": "src/docs/entry.rs",
+            "line": 31
+          }
+        ]
+      },
+      "docs::export": {
+        "module_doc": "VS Code IntelliSense export helpers for the Luna2D docs catalog.  Converts [`DocEntry`] slices into JSON files consumed by the VS Code extension for completions, hover documentation, and signature help.",
+        "source_file": "src/docs/export.rs",
+        "items": [
+          {
+            "name": "export_completions",
+            "kind": "fn",
+            "description": "Writes a VS Code completions JSON array to `path`.  Each item contains `label`, `kind`, `detail`, and `documentation` fields matching the VS Code `CompletionItem` format.  # Parameters - `entries` — `&[DocEntry]`. - `path` — `&str`.  # Returns `Result<(), String>`.",
+            "file": "src/docs/export.rs",
+            "line": 21
+          },
+          {
+            "name": "export_hover",
+            "kind": "fn",
+            "description": "Writes a VS Code hover JSON map to `path`.  Keys are qualified names. Values contain `name`, `description`, `kind`, `parameters`, and `returns` fields.  # Parameters - `entries` — `&[DocEntry]`. - `path` — `&str`.  # Returns `Result<(), String>`.",
+            "file": "src/docs/export.rs",
+            "line": 53
+          },
+          {
+            "name": "export_signatures",
+            "kind": "fn",
+            "description": "Writes a VS Code signature-help JSON map to `path`.  Only entries that have at least one parameter are included. Keys are qualified names; values contain `label` and `parameters`.  # Parameters - `entries` — `&[DocEntry]`. - `path` — `&str`.  # Returns `Result<(), String>`.",
+            "file": "src/docs/export.rs",
+            "line": 93
+          },
+          {
+            "name": "export_all",
+            "kind": "fn",
+            "description": "Writes `completions.json`, `hover.json`, and `signatures.json` to `output_dir`.  The directory is created if it does not already exist. The hover JSON written by this function is a compact variant (only `name`, `description`, and `kind`); use [`export_hover`] for the full-parameter variant.  # Parameters - `entries` — `&[DocEntry]`. - `output_dir` — `&str`.  # Returns `Result<(), String>`.",
+            "file": "src/docs/export.rs",
+            "line": 136
+          }
+        ]
+      },
+      "docs": {
+        "module_doc": "API documentation catalog and quality reporting for Luna2D.  This module provides a structured way to describe, store, and validate documentation for the `luna.*` Lua API surface.  Tools and tests can populate a [`Catalog`] at runtime and use [`QualityReport`] to surface incomplete or missing entries.  # Sub-modules | Module | Purpose | |---|---| | [`entry`] | [`DocEntry`], [`ParamInfo`], [`ReturnInfo`] data types | | [`catalog`] | In-memory [`Catalog`] with search and filter helpers | | [`report`] | [`quality_score`], [`quality_grade`], [`ValidationReport`], [`QualityReport`] |",
+        "source_file": "src/docs/mod.rs",
+        "items": [
+          {
+            "name": "catalog",
+            "kind": "mod",
+            "description": "",
+            "file": "src/docs/mod.rs",
+            "line": 15
+          },
+          {
+            "name": "entry",
+            "kind": "mod",
+            "description": "",
+            "file": "src/docs/mod.rs",
+            "line": 16
+          },
+          {
+            "name": "export",
+            "kind": "mod",
+            "description": "",
+            "file": "src/docs/mod.rs",
+            "line": 17
+          },
+          {
+            "name": "report",
+            "kind": "mod",
+            "description": "",
+            "file": "src/docs/mod.rs",
+            "line": 18
+          }
+        ]
+      },
+      "docs::report": {
+        "module_doc": "Validation and quality reports for doc entries.",
+        "source_file": "src/docs/report.rs",
+        "items": [
+          {
+            "name": "quality_score",
+            "kind": "fn",
+            "description": "Computes a quality score in `[0.0, 1.0]` for a single doc entry.  Scores one point each for: non-empty description, non-empty qualified_name, at least one parameter or return (for non-value kinds), an example, and a since field.  The final score is the fraction of applicable checks that pass.",
+            "file": "src/docs/report.rs",
+            "line": 13
+          },
+          {
+            "name": "quality_grade",
+            "kind": "fn",
+            "description": "Converts a quality score into a letter grade.  A ≥ 0.9, B ≥ 0.7, C ≥ 0.5, D ≥ 0.3, F < 0.3.",
+            "file": "src/docs/report.rs",
+            "line": 46
+          },
+          {
+            "name": "ValidationReport",
+            "kind": "struct",
+            "description": "A report comparing a known API surface against catalog coverage.",
+            "file": "src/docs/report.rs",
+            "line": 56
+          },
+          {
+            "name": "QualityReport",
+            "kind": "struct",
+            "description": "A quality report computed from all entries in a catalog.",
+            "file": "src/docs/report.rs",
+            "line": 83
           }
         ]
       },
@@ -6130,6 +6353,33 @@
           }
         ]
       },
+      "log": {
+        "module_doc": "Structured log level management for Luna2D scripts.  Delegates to Rust's `log` crate via `crate::engine::log_messages`.  Log output from game scripts appears alongside engine log output and is controlled by the `RUST_LOG` environment variable.",
+        "source_file": "src/log/mod.rs",
+        "items": [
+          {
+            "name": "set_level",
+            "kind": "fn",
+            "description": "Sets the active log level to the named value.  `level` must be one of `\"off\"`, `\"error\"`, `\"warn\"`, `\"info\"`, `\"debug\"`, or `\"trace\"`. Unrecognised values are silently ignored.",
+            "file": "src/log/mod.rs",
+            "line": 13
+          },
+          {
+            "name": "get_level",
+            "kind": "fn",
+            "description": "Returns the current log level name as a static string (e.g. `\"info\"`).",
+            "file": "src/log/mod.rs",
+            "line": 18
+          },
+          {
+            "name": "enabled_for",
+            "kind": "fn",
+            "description": "Returns `true` when messages at `level` would be emitted under the current filter.  This uses the `log` crate's `max_level()` for the check.",
+            "file": "src/log/mod.rs",
+            "line": 25
+          }
+        ]
+      },
       "math::bezier": {
         "module_doc": "Bezier curve evaluation using De Casteljau's algorithm.  Supports arbitrary-degree curves with control point manipulation, rendering to polylines, derivative computation, and geometric transforms.  This module is part of Luna2D's `math` subsystem and provides the implementation details for bezier-related operations and data management. Key types exported from this module: `BezierCurve`. Primary functions: `new()`, `evaluate()`, `render()`, `render_segment()`.  All public items are documented. See the parent module for architectural context and the `luna.*` Lua API for the scripting interface.",
         "source_file": "src/math/bezier.rs",
@@ -7635,11 +7885,18 @@
             "line": 33
           },
           {
-            "name": "state_machine",
+            "name": "simple_state",
             "kind": "mod",
             "description": "",
             "file": "src/patterns/mod.rs",
             "line": 34
+          },
+          {
+            "name": "state_machine",
+            "kind": "mod",
+            "description": "",
+            "file": "src/patterns/mod.rs",
+            "line": 35
           }
         ]
       },
@@ -7666,6 +7923,19 @@
             "description": "Named-service registry (metadata only; values stored in lua_api layer).  # Fields - `services` — `HashSet<String>`.",
             "file": "src/patterns/service_locator.rs",
             "line": 13
+          }
+        ]
+      },
+      "patterns::simple_state": {
+        "module_doc": "Simple string-keyed finite state machine.  Tracks a set of named states and an optional current state.  Transitions and callbacks are managed by the Lua API layer; this type holds only the pure-Rust state bookkeeping.",
+        "source_file": "src/patterns/simple_state.rs",
+        "items": [
+          {
+            "name": "SimpleState",
+            "kind": "struct",
+            "description": "Finite state machine that tracks a set of named states and the current one.",
+            "file": "src/patterns/simple_state.rs",
+            "line": 10
           }
         ]
       },

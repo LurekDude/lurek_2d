@@ -1,4 +1,5 @@
 -- Bridge Builder — Place nodes and beams, then test with physics
+-- Run with: cargo run -- demos/strategy/bridge_builder
 
 local function clamp(v, mn, mx) return math.max(mn, math.min(mx, v)) end
 local function lerp(a, b, t) return a + (b - a) * t end

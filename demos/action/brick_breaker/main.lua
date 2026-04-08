@@ -1,6 +1,7 @@
 -- Brick Breaker (Arkanoid)
 -- Mouse to move paddle. Ball bounces off bricks, walls, paddle.
 -- Power-ups: wider paddle, multi-ball, slow ball. 3 lives.
+-- Run with: cargo run -- demos/action/brick_breaker
 
 local function clamp(v, mn, mx) return math.max(mn, math.min(mx, v)) end
 
@@ -247,7 +248,7 @@ end
 
 function luna.keypressed(key)
     if key == "escape" then luna.signal.quit() end
-    if key == "r" then luna.load() end
+    if key == "r" then luna.signal.restart() end
     if key == "space" and state.serving then state.serving = false end
 end
 

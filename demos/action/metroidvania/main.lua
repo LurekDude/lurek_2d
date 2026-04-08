@@ -2,6 +2,7 @@
 -- Side-scrolling platformer with multiple rooms, abilities, and enemies
 -- Controls: WASD/Arrows to move, Space to jump, Shift to dash (when unlocked)
 -- Collect items to unlock abilities. Explore all rooms!
+-- Run with: cargo run -- demos/action/metroidvania
 
 local function clamp(v, mn, mx) return math.max(mn, math.min(mx, v)) end
 

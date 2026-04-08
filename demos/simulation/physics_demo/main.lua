@@ -1,5 +1,6 @@
 -- Physics demo for Luna2D
 -- Demonstrates: circle bodies, rect bodies, sensors, collision events, layer filtering
+-- Run with: cargo run -- demos/simulation/physics_demo
 
 local world_id
 local ground_id

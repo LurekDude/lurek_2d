@@ -1,6 +1,7 @@
 -- examples/entity.lua
 -- luna.entity — Lightweight ECS with entity lifecycle, components, tags, layers, and blueprints.
 -- All luna.entity API methods demonstrated with code and comments.
+-- This file is documentation code, not a runnable game.
 
 -- ── Creating a Universe ───────────────────────────────────────────────────────
 

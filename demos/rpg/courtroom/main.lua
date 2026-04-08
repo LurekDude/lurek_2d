@@ -1,5 +1,6 @@
 -- Courtroom Drama / Debate Simulation
 -- Present evidence, cross-examine witnesses, win cases!
+-- Run with: cargo run -- demos/rpg/courtroom
 
 local function clamp(v, mn, mx) return math.max(mn, math.min(mx, v)) end
 

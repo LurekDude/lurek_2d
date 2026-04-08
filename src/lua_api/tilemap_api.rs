@@ -10,7 +10,9 @@ use crate::tilemap::autotile_sheet::{AutoTileLayout, AutoTileSheet};
 use crate::tilemap::chunk::ChunkMap;
 use crate::tilemap::coords;
 use crate::tilemap::isomap::IsoMap;
-use crate::tilemap::mapgen::{Edge, MapBlock, MapGen, MapGroup, MapOrientation, MapScript, MapSize, ScriptStep, StepType};
+use crate::tilemap::mapgen::{
+    Edge, MapBlock, MapGen, MapGroup, MapOrientation, MapScript, MapSize, ScriptStep, StepType,
+};
 use crate::tilemap::tilemap::TileMap;
 use crate::tilemap::tileset::{TileAnimFrame, TileSet};
 
@@ -107,30 +109,35 @@ impl LuaUserData for LuaTileSet {
         /// @param tileId : integer
         /// @param frames : table
         /// @return nil
-        methods.add_method("setAnimation", |_, this, (tile_id, frames): (u32, LuaTable)| {
-            if tile_id == 0 {
-                return Err(LuaError::RuntimeError(
-                    "setAnimation: tile_id must be >= 1".to_string(),
-                ));
-            }
-            let mut anim_frames = Vec::new();
-            for pair in frames.sequence_values::<LuaTable>() {
-                let frame_tbl = pair?;
-                let fid: u32 = frame_tbl.get("tileid")?;
-                let dur: f32 = frame_tbl.get("duration")?;
-                if fid == 0 {
+        methods.add_method(
+            "setAnimation",
+            |_, this, (tile_id, frames): (u32, LuaTable)| {
+                if tile_id == 0 {
                     return Err(LuaError::RuntimeError(
-                        "setAnimation: frame tileid must be >= 1".to_string(),
+                        "setAnimation: tile_id must be >= 1".to_string(),
                     ));
                 }
-                anim_frames.push(TileAnimFrame {
-                    tile_id: fid - 1,
-                    duration_ms: dur,
-                });
-            }
-            this.inner.borrow_mut().set_animation(tile_id - 1, anim_frames);
-            Ok(())
-        });
+                let mut anim_frames = Vec::new();
+                for pair in frames.sequence_values::<LuaTable>() {
+                    let frame_tbl = pair?;
+                    let fid: u32 = frame_tbl.get("tileid")?;
+                    let dur: f32 = frame_tbl.get("duration")?;
+                    if fid == 0 {
+                        return Err(LuaError::RuntimeError(
+                            "setAnimation: frame tileid must be >= 1".to_string(),
+                        ));
+                    }
+                    anim_frames.push(TileAnimFrame {
+                        tile_id: fid - 1,
+                        duration_ms: dur,
+                    });
+                }
+                this.inner
+                    .borrow_mut()
+                    .set_animation(tile_id - 1, anim_frames);
+                Ok(())
+            },
+        );
 
         // -- getAnimation --
         /// Returns the animation frames for a 1-based local tile ID as a table of {tileid, duration}, or nil.
@@ -459,13 +466,10 @@ impl LuaUserData for LuaTileMap {
         /// @param layer : integer
         /// @param x : integer
         /// @param y : integer
-        methods.add_method(
-            "clearTile",
-            |_, this, (layer, x, y): (usize, u32, u32)| {
-                this.inner.borrow_mut().clear_tile(layer - 1, x - 1, y - 1);
-                Ok(())
-            },
-        );
+        methods.add_method("clearTile", |_, this, (layer, x, y): (usize, u32, u32)| {
+            this.inner.borrow_mut().clear_tile(layer - 1, x - 1, y - 1);
+            Ok(())
+        });
 
         // -- fill --
         /// Fills an entire layer with the given GID (1-based layer).
@@ -576,7 +580,9 @@ impl LuaUserData for LuaTileMap {
         methods.add_method(
             "applyAutoTile",
             |_, this, (layer, type_name): (usize, String)| {
-                this.inner.borrow_mut().apply_autotile(layer - 1, &type_name);
+                this.inner
+                    .borrow_mut()
+                    .apply_autotile(layer - 1, &type_name);
                 Ok(())
             },
         );
@@ -659,22 +665,20 @@ impl LuaUserData for LuaTileMap {
         /// @return number, number, number, number, number, number
         methods.add_method(
             "sweepRect",
-            |_, this, (layer, x, y, w, h, dx, dy): (usize, f32, f32, f32, f32, f32, f32)| {
-                match this
-                    .inner
-                    .borrow()
-                    .sweep_rect(layer - 1, Rect::new(x, y, w, h), dx, dy)
-                {
-                    Some(result) => Ok((
-                        result.contact_point.x,
-                        result.contact_point.y,
-                        result.normal.x,
-                        result.normal.y,
-                        (result.tile_x + 1) as f32,
-                        (result.tile_y + 1) as f32,
-                    )),
-                    None => Ok((x + dx, y + dy, 0.0f32, 0.0f32, 0.0f32, 0.0f32)),
-                }
+            |_, this, (layer, x, y, w, h, dx, dy): (usize, f32, f32, f32, f32, f32, f32)| match this
+                .inner
+                .borrow()
+                .sweep_rect(layer - 1, Rect::new(x, y, w, h), dx, dy)
+            {
+                Some(result) => Ok((
+                    result.contact_point.x,
+                    result.contact_point.y,
+                    result.normal.x,
+                    result.normal.y,
+                    (result.tile_x + 1) as f32,
+                    (result.tile_y + 1) as f32,
+                )),
+                None => Ok((x + dx, y + dy, 0.0f32, 0.0f32, 0.0f32, 0.0f32)),
             },
         );
 
@@ -777,9 +781,11 @@ impl LuaUserData for LuaAutoTileSheet {
             "applyToTileSet",
             |_, this, (ts_ud, type_name, start_gid): (LuaAnyUserData, String, Option<u32>)| {
                 let ts = ts_ud.borrow::<LuaTileSet>()?;
-                this.inner
-                    .borrow()
-                    .apply_to_tileset(&mut ts.inner.borrow_mut(), &type_name, start_gid);
+                this.inner.borrow().apply_to_tileset(
+                    &mut ts.inner.borrow_mut(),
+                    &type_name,
+                    start_gid,
+                );
                 Ok(())
             },
         );
@@ -936,7 +942,10 @@ impl LuaUserData for LuaChunkMap {
         methods.add_method(
             "getChunksInView",
             |lua, this, (vx, vy, vw, vh, tw, th): (f32, f32, f32, f32, f32, f32)| {
-                let chunks = this.inner.borrow().get_chunks_in_view(vx, vy, vw, vh, tw, th);
+                let chunks = this
+                    .inner
+                    .borrow()
+                    .get_chunks_in_view(vx, vy, vw, vh, tw, th);
                 let tbl = lua.create_table()?;
                 for (i, (cx, cy)) in chunks.iter().enumerate() {
                     let entry = lua.create_table()?;
@@ -991,13 +1000,10 @@ impl LuaUserData for LuaIsoMap {
         /// Sets the visibility of a level (1-based z).
         /// @param z : integer
         /// @param visible : boolean
-        methods.add_method(
-            "setLevelVisible",
-            |_, this, (z, visible): (usize, bool)| {
-                this.inner.borrow_mut().set_level_visible(z - 1, visible);
-                Ok(())
-            },
-        );
+        methods.add_method("setLevelVisible", |_, this, (z, visible): (usize, bool)| {
+            this.inner.borrow_mut().set_level_visible(z - 1, visible);
+            Ok(())
+        });
 
         // -- isLevelVisible --
         /// Returns the visibility of a level (1-based z).
@@ -1159,9 +1165,7 @@ impl LuaUserData for LuaMapBlock {
             |_, this, (edge_str, segment, side_id): (String, u32, u32)| {
                 let edge = Edge::from_str(&edge_str)
                     .ok_or_else(|| LuaError::external("invalid edge: use north/east/south/west"))?;
-                this.inner
-                    .borrow_mut()
-                    .set_side(edge, segment - 1, side_id);
+                this.inner.borrow_mut().set_side(edge, segment - 1, side_id);
                 Ok(())
             },
         );
@@ -1927,9 +1931,12 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
                     let seg = match &args[2] {
                         LuaValue::Integer(n) => *n as u32,
                         LuaValue::Number(n) => *n as u32,
-                        _ => return Err(LuaError::RuntimeError(
-                            "newMapGen: third argument (segmentSize) must be integer".to_string(),
-                        )),
+                        _ => {
+                            return Err(LuaError::RuntimeError(
+                                "newMapGen: third argument (segmentSize) must be integer"
+                                    .to_string(),
+                            ))
+                        }
                     };
                     (size, seg)
                 }
@@ -1939,9 +1946,11 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
                     let h = match &args[2] {
                         LuaValue::Integer(n) => *n as u32,
                         LuaValue::Number(n) => *n as u32,
-                        _ => return Err(LuaError::RuntimeError(
-                            "newMapGen: third argument must be integer h".to_string(),
-                        )),
+                        _ => {
+                            return Err(LuaError::RuntimeError(
+                                "newMapGen: third argument must be integer h".to_string(),
+                            ))
+                        }
                     };
                     let seg = if args.len() >= 4 {
                         match &args[3] {
@@ -1965,9 +1974,11 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
                     let h = match &args[2] {
                         LuaValue::Integer(n) => *n as u32,
                         LuaValue::Number(n) => *n as u32,
-                        _ => return Err(LuaError::RuntimeError(
-                            "newMapGen: third argument must be integer h".to_string(),
-                        )),
+                        _ => {
+                            return Err(LuaError::RuntimeError(
+                                "newMapGen: third argument must be integer h".to_string(),
+                            ))
+                        }
                     };
                     let seg = if args.len() >= 4 {
                         match &args[3] {
@@ -1985,9 +1996,12 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
                         inner: Rc::new(RefCell::new(gen)),
                     });
                 }
-                _ => return Err(LuaError::RuntimeError(
-                    "newMapGen: second argument must be preset string or integer width".to_string(),
-                )),
+                _ => {
+                    return Err(LuaError::RuntimeError(
+                        "newMapGen: second argument must be preset string or integer width"
+                            .to_string(),
+                    ))
+                }
             };
             let gen = MapGen::new(size, segment_size);
             Ok(LuaMapGen {
@@ -2004,8 +2018,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
     tbl.set(
         "loadTMX",
         lua.create_function(|lua, xml: String| {
-            let tmx = crate::tilemap::tmx::load_tmx(&xml)
-                .map_err(LuaError::RuntimeError)?;
+            let tmx = crate::tilemap::tmx::load_tmx(&xml).map_err(LuaError::RuntimeError)?;
             let result = lua.create_table()?;
             result.set("width", tmx.width)?;
             result.set("height", tmx.height)?;

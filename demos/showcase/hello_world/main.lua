@@ -1,5 +1,6 @@
 -- Hello World example for Luna2D
 -- Phase 12: simplex noise available via luna.math.simplex2d(x, y) or luna.math.simplex2d(x, y, z)
+-- Run with: cargo run -- demos/showcase/hello_world
 
 function luna.init()
     luna.window.setTitle("Hello World - Luna2D")

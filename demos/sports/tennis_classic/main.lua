@@ -1,6 +1,7 @@
 -- Tennis Classic — Sport Game (Luna2D demo)
 -- Top-down tennis with serve, topspin, and slice mechanics.
 -- Play against CPU. First to 6 games wins the set.
+-- Run with: cargo run -- demos/sports/tennis_classic
 
 -- ── Constants ────────────────────────────────────────────────────────────
 
@@ -259,6 +260,6 @@ end
 
 function luna.keypressed(key)
     if key == "escape" then luna.signal.quit() end
-    if key == "r" then luna.load() end
+    if key == "r" then luna.signal.restart() end
     if key == "space" and game_state == "serve_prep" then serve() end
 end

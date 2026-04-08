@@ -1,5 +1,6 @@
 -- Hacking Game — Luna2D Demo
 -- Terminal-based hacking: crack passwords, explore filesystems, download targets
+-- Run with: cargo run -- demos/showcase/hacking_game
 
 local function clamp(v, mn, mx) return math.max(mn, math.min(mx, v)) end
 
@@ -191,7 +192,7 @@ end
 
 function luna.keypressed(key)
     if game_over or game_won then
-        if key == "r" then luna.load() end
+        if key == "r" then luna.signal.restart() end
         if key == "escape" then luna.signal.quit() end
         return
     end

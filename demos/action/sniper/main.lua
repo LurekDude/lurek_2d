@@ -1,6 +1,7 @@
 -- 2D Sniper / Ballistics Puzzle
 -- Side-view long-distance shooting. Scope sways, wind drifts bullets.
 -- Click to shoot. Hold Shift to steady aim. 5 shots per round, 3 rounds.
+-- Run with: cargo run -- demos/action/sniper
 
 local function clamp(v, mn, mx) return math.max(mn, math.min(mx, v)) end
 local function lerp(a, b, t) return a + (b - a) * t end
@@ -204,14 +205,14 @@ end
 
 function luna.keypressed(key)
     if key == "escape" then luna.signal.quit() end
-    if key == "r" then luna.load() end
+    if key == "r" then luna.signal.restart() end
     if key == "return" or key == "space" then
         if state.phase == "round_end" then
             setup_round(state.round + 1)
             state.phase = "aiming"
         end
         if state.phase == "game_over" then
-            luna.load()
+            luna.signal.restart()
         end
     end
 end

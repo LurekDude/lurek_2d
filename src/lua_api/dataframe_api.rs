@@ -621,6 +621,17 @@ impl LuaUserData for LuaDataFrame {
             Ok(LuaDataFrame::new(this.inner.borrow().clone_df()))
         });
 
+        // -- type --
+        /// Returns the type name of this object.
+        /// @return string
+        methods.add_method("type", |_, _, ()| Ok("DataFrame"));
+
+        // -- typeOf --
+        /// Returns true if this object is of the given type.
+        /// @param name : string
+        /// @return boolean
+        methods.add_method("typeOf", |_, _, name: String| Ok(name == "DataFrame" || name == "Object"));
+
     }
 }
 
@@ -738,6 +749,17 @@ impl LuaUserData for LuaDatabase {
                 sql::query_sql_database(&db, &sql_str).map_err(LuaError::RuntimeError)?;
             Ok(LuaDataFrame::new(result))
         });
+
+        // -- type --
+        /// Returns the type name of this object.
+        /// @return string
+        methods.add_method("type", |_, _, ()| Ok("Database"));
+
+        // -- typeOf --
+        /// Returns true if this object is of the given type.
+        /// @param name : string
+        /// @return boolean
+        methods.add_method("typeOf", |_, _, name: String| Ok(name == "Database" || name == "Object"));
 
     }
 }

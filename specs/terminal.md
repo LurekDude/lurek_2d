@@ -6,7 +6,7 @@
 | **Status**     | Implemented — Full                                   |
 | **Lua API**    | `luna.terminal`                                      |
 | **Source**      | `src/terminal/`                                      |
-| **Rust Tests** | `tests/unit/terminal_tests.rs`                       |
+| **Rust Tests** | `tests/rust/unit/terminal_tests.rs`                       |
 | **Lua Tests**  | `tests/lua/unit/test_terminal.lua`                   |
 | **Architecture** | `docs/API/terminal-design.md`                      |
 

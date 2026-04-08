@@ -2,6 +2,7 @@
 -- luna.graph — Directed item-flow graph simulation: nodes, edges,
 -- GraphItems travelling between nodes, conversion rules, events.
 -- All luna.graph API methods demonstrated with code and comments.
+-- This file is documentation code, not a runnable game.
 
 -- ── Graph Creation ────────────────────────────────────────────────────────────
 
@@ -307,3 +308,50 @@ end
 
 -- findPath(fromNode, toNode) → {node1, node2, ...}? — shortest path by weight
 -- local path_nodes = graph:findPath(mine, warehouse)
+
+-- ─── Edge ──────────────────────────────────────────────────────────────────────
+
+local cooldown = edge:getCooldown()  -- Returns the cooldown duration in seconds
+local speed_modifier = edge:getSpeedModifier()  -- Returns the speed modifier applied to items in transit
+local throughput = edge:getThroughput()  -- Returns items per second this edge can transfer
+local travel_time = edge:getTravelTime()  -- Returns the travel time in seconds for items on this edge
+local weight = edge:getWeight()  -- Returns the pathfinding weight of this edge
+local is_active = edge:isActive()  -- Returns true if the edge is active
+local is_bidirectional = edge:isBidirectional()  -- Returns true if items can travel the edge in either direction
+edge:type()
+edge:typeOf("myName")
+
+-- ─── Graph ─────────────────────────────────────────────────────────────────────
+
+local components = graph:getComponents()  -- Returns weakly connected components as a table of tables of Node handles
+local neighbors = graph:getNeighbors(node)  -- Returns a table of direct neighbor Node handles
+local stats = graph:getStats()  -- Returns a statistics snapshot table
+local has_cycle = graph:hasCycle()  -- Returns true if the graph contains a directed cycle
+local has_item = graph:hasItem(graphitem)  -- Returns true if the item exists in the graph
+graph:processDemand()  -- Processes all supply/demand declarations and fires event callbacks
+graph:step()  -- Runs one discrete simulation step and fires event callbacks
+local topological_sort = graph:topologicalSort()  -- Returns a topologically sorted table of Node handles, or nil if a cycle exists
+local graph_type = graph:type()  -- "Graph"
+local graph_is_type = graph:typeOf("Graph")  -- Returns true if this object is of the given type
+
+-- ─── GraphItem ─────────────────────────────────────────────────────────────────
+
+local graphitem_type = graphitem:type()  -- "GraphItem"
+local graphitem_is_type = graphitem:typeOf("GraphItem")  -- Returns true if this object is of the given type
+
+-- ─── Node ──────────────────────────────────────────────────────────────────────
+
+node:clearTags()  -- Removes all tags from this node
+local dequeue = node:dequeue()  -- Pops the next item from the node queue, or nil if empty
+local enqueue = node:enqueue(graphitem)  -- Pushes an item into the node queue
+local process_time = node:getProcessTime()  -- Returns the processing time in seconds
+local pull_filter = node:getPullFilter()  -- Returns the pull filter string, or nil if unset
+local pull_rate = node:getPullRate()  -- Returns items per second this node pulls
+local push_filter = node:getPushFilter()  -- Returns the push filter string, or nil if unset
+local push_rate = node:getPushRate()  -- Returns items per second this node pushes
+local queue_capacity = node:getQueueCapacity()  -- Returns the queue capacity (-1 = unlimited)
+local is_active = node:isActive()  -- Returns true if the node is active
+local is_queue_enabled = node:isQueueEnabled()  -- Returns true if the node queue is enabled
+local remove_tag = node:removeTag("visited")  -- Removes a tag from this node
+node:type()
+node:typeOf("myName")

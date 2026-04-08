@@ -1,6 +1,7 @@
 -- Space Invaders — Classic Arcade (Luna2D demo)
 -- Defend Earth! Shoot the alien invasion fleet before they reach the ground.
 -- Arrow/AD to move, Space to fire. Barriers absorb shots.
+-- Run with: cargo run -- demos/arcade/space_invaders
 
 -- ── Constants ────────────────────────────────────────────────────────────
 

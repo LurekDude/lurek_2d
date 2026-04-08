@@ -16,12 +16,27 @@ use crate::engine::SharedState;
 // Bridge state
 // ---------------------------------------------------------------------------
 
+/// A named live watch — calls a getter function to sample a value at any time.
+struct WatchEntry {
+    /// Display name for this watch.
+    name: String,
+    /// Lua getter function stored in the registry.
+    getter: LuaRegistryKey,
+    /// Optional category tag.
+    category: String,
+}
+
 struct DevtoolsShared {
     logger: Logger,
     profiler: Profiler,
     frame_stats: FrameStats,
     watcher: FileWatcher,
     console_open: bool,
+    watch_interval: f32,
+    /// Named live watches registered via `exposeWatch`.
+    watches: Vec<WatchEntry>,
+    /// Incrementing id counter for watch entries.
+    next_watch_id: u64,
 }
 
 impl DevtoolsShared {
@@ -32,6 +47,9 @@ impl DevtoolsShared {
             frame_stats: FrameStats::default(),
             watcher: FileWatcher::new(),
             console_open: false,
+            watch_interval: 0.5,
+            watches: Vec::new(),
+            next_watch_id: 1,
         }
     }
 }
@@ -353,6 +371,21 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
         Ok(())
     })?)?;
 
+    /// Returns the file watch poll interval in seconds.
+    /// @return number
+    let s = shared.clone();
+    dt.set("getWatchInterval", lua.create_function(move |_, ()| {
+        Ok(s.borrow().watch_interval)
+    })?)?;
+
+    /// Sets the file watch poll interval in seconds.
+    /// @param interval : number
+    let s = shared.clone();
+    dt.set("setWatchInterval", lua.create_function(move |_, interval: f32| {
+        s.borrow_mut().watch_interval = interval.max(0.01);
+        Ok(())
+    })?)?;
+
     // ── Lua Debug Bridge ─────────────────────────────────────────────────────
 
     /// Returns the Lua call stack as a table of frames.
@@ -410,6 +443,122 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
     let s = shared.clone();
     dt.set("isConsoleOpen", lua.create_function(move |_, ()| {
         Ok(s.borrow().console_open)
+    })?)?;
+
+    // ── Live Watch / Snapshot ─────────────────────────────────────────────
+
+    /// Registers a named live watch. The getter function is called on demand to sample a value.
+    /// Returns an integer id that can be passed to removeWatch.
+    /// @param name : string
+    /// @param getter : function
+    /// @param category : string?
+    /// @return integer
+    let s = shared.clone();
+    dt.set("exposeWatch", lua.create_function(move |lua, (name, getter, category): (String, LuaFunction, Option<String>)| {
+        let key = lua.create_registry_value(getter)?;
+        let mut st = s.borrow_mut();
+        let id = st.next_watch_id;
+        st.next_watch_id += 1;
+        st.watches.push(WatchEntry {
+            name,
+            getter: key,
+            category: category.unwrap_or_default(),
+        });
+        Ok(id)
+    })?)?;
+
+    /// Removes a watch by the id returned from exposeWatch. Returns true if removed.
+    /// @param id : integer
+    /// @return boolean
+    let s = shared.clone();
+    dt.set("removeWatch", lua.create_function(move |_, id: u64| {
+        let mut st = s.borrow_mut();
+        let start_id = st.next_watch_id - st.watches.len() as u64;
+        let idx = id.checked_sub(start_id) as Option<u64>;
+        if let Some(i) = idx {
+            if (i as usize) < st.watches.len() {
+                st.watches.remove(i as usize);
+                return Ok(true);
+            }
+        }
+        Ok(false)
+    })?)?;
+
+    /// Calls all registered watch getters and returns a table of {name, category, value} records.
+    /// @return table
+    let s = shared.clone();
+    dt.set("getWatches", lua.create_function(move |lua, ()| {
+        let st = s.borrow();
+        let tbl = lua.create_table()?;
+        for (i, entry) in st.watches.iter().enumerate() {
+            let row = lua.create_table()?;
+            row.set("name", entry.name.clone())?;
+            row.set("category", entry.category.clone())?;
+            let getter: LuaFunction = lua.registry_value(&entry.getter)?;
+            match getter.call::<_, LuaValue>(()) {
+                Ok(v) => { row.set("value", v)?; }
+                Err(e) => { row.set("value", format!("(error: {})", e))?; }
+            }
+            tbl.set(i + 1, row)?;
+        }
+        Ok(tbl)
+    })?)?;
+
+    /// Takes a structured snapshot of all watches + frame stats + last profile frame.
+    /// Returns a single table suitable for logging or sending to the VS Code extension.
+    /// @return table
+    let s = shared.clone();
+    dt.set("snapshot", lua.create_function(move |lua, ()| {
+        let st = s.borrow();
+        let snap = lua.create_table()?;
+
+        // Frame stats.
+        let fs = st.frame_stats.snapshot();
+        let fst = lua.create_table()?;
+        fst.set("fps", fs.fps)?;
+        fst.set("dt", fs.dt)?;
+        fst.set("avg", fs.avg)?;
+        fst.set("p95", fs.p95)?;
+        fst.set("p99", fs.p99)?;
+        snap.set("frameStats", fst)?;
+
+        // Watches.
+        let watches_tbl = lua.create_table()?;
+        for (i, entry) in st.watches.iter().enumerate() {
+            let row = lua.create_table()?;
+            row.set("name", entry.name.clone())?;
+            row.set("category", entry.category.clone())?;
+            let getter: LuaFunction = lua.registry_value(&entry.getter)?;
+            match getter.call::<_, LuaValue>(()) {
+                Ok(v) => { row.set("value", v)?; }
+                Err(e) => { row.set("value", format!("(error: {})", e))?; }
+            }
+            watches_tbl.set(i + 1, row)?;
+        }
+        snap.set("watches", watches_tbl)?;
+
+        // Last profiler frame summary.
+        let profile_tbl = lua.create_table()?;
+        if let Some(zones) = st.profiler.get_frame(0) {
+            for (i, zone) in zones.iter().enumerate() {
+                profile_tbl.set(i + 1, zone_to_table(lua, zone)?)?;
+            }
+        }
+        snap.set("profile", profile_tbl)?;
+
+        // Recent log tail (last 10 entries).
+        let log_tbl = lua.create_table()?;
+        for (i, entry) in st.logger.tail(Some(10)).iter().enumerate() {
+            let et = lua.create_table()?;
+            et.set("level", entry.level.clone())?;
+            et.set("message", entry.message.clone())?;
+            et.set("source", entry.source.clone())?;
+            log_tbl.set(i + 1, et)?;
+        }
+        snap.set("log", log_tbl)?;
+
+        snap.set("watchCount", st.watches.len())?;
+        Ok(snap)
     })?)?;
 
     luna.set("devtools", dt)?;

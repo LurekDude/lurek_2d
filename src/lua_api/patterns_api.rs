@@ -758,6 +758,681 @@ impl LuaUserData for LuaSimpleState {
 // ===========================================================================
 
 /// Registers `luna.patterns.*` factory functions.
+// ===========================================================================
+// Blackboard
+// ===========================================================================
+
+/// Lua wrapper for the Blackboard pattern.
+#[derive(Clone)]
+struct LuaBlackboard {
+    board: Rc<RefCell<crate::patterns::Blackboard>>,
+    /// on_change watchers: subscription id → callback key
+    watchers: Rc<RefCell<HashMap<u64, LuaRegistryKey>>>,
+    /// watcher key → watched key (for lookup)
+    watcher_keys: Rc<RefCell<HashMap<u64, String>>>,
+    next_watcher_id: Rc<RefCell<u64>>,
+}
+
+impl LunaType for LuaBlackboard {
+    const TYPE_NAME: &'static str = "Blackboard";
+    const TYPE_HIERARCHY: &'static [&'static str] = &["Blackboard", "Object"];
+}
+
+impl LuaUserData for LuaBlackboard {
+    fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
+        add_type_methods(methods);
+
+        // -- set -------------------------------------------------------------
+        /// Sets a fact on the blackboard. Accepts boolean, number, or string values.
+        /// @param key : string
+        /// @param value : any
+        methods.add_method("set", |lua, this, (key, value): (String, LuaValue)| {
+            let prev_rev = this.board.borrow().revision;
+            match &value {
+                LuaValue::Boolean(b) => this.board.borrow_mut().set_bool(&key, *b),
+                LuaValue::Integer(n) => this.board.borrow_mut().set_number(&key, *n as f64),
+                LuaValue::Number(n) => this.board.borrow_mut().set_number(&key, *n),
+                LuaValue::String(s) => this.board.borrow_mut().set_text(&key, s.to_str()?.to_string()),
+                LuaValue::Nil => this.board.borrow_mut().clear(&key),
+                _ => return Err(LuaError::external("Blackboard only supports bool/number/string/nil values")),
+            }
+            let new_rev = this.board.borrow().revision;
+            if new_rev != prev_rev {
+                // fire watchers for this key and wildcard
+                let sub_ids: Vec<u64> = {
+                    let wk = this.watcher_keys.borrow();
+                    wk.iter()
+                        .filter(|(_, k)| k == &&key || k.as_str() == "*")
+                        .map(|(id, _)| *id)
+                        .collect()
+                };
+                for id in sub_ids {
+                    let cb = this.watchers.borrow();
+                    if let Some(rk) = cb.get(&id) {
+                        let func: LuaFunction = lua.registry_value(rk)?;
+                        drop(cb);
+                        func.call::<_, ()>((key.clone(), value.clone()))?;
+                    }
+                }
+            }
+            Ok(())
+        });
+
+        // -- get -------------------------------------------------------------
+        /// Gets a fact from the blackboard. Returns nil if not set.
+        /// @param key : string
+        /// @return any
+        methods.add_method("get", |lua, this, key: String| {
+            match this.board.borrow().get(&key) {
+                Some(crate::patterns::BlackboardValue::Bool(b)) => Ok(LuaValue::Boolean(*b)),
+                Some(crate::patterns::BlackboardValue::Number(n)) => Ok(LuaValue::Number(*n)),
+                Some(crate::patterns::BlackboardValue::Text(s)) => Ok(LuaValue::String(lua.create_string(s)?)),
+                Some(crate::patterns::BlackboardValue::Nil) | None => Ok(LuaValue::Nil),
+            }
+        });
+
+        // -- has -------------------------------------------------------------
+        /// Returns true when the key has a non-nil value.
+        /// @param key : string
+        /// @return boolean
+        methods.add_method("has", |_, this, key: String| {
+            Ok(this.board.borrow().has(&key))
+        });
+
+        // -- clear -----------------------------------------------------------
+        /// Removes a fact from the blackboard.
+        /// @param key : string
+        methods.add_method("clear", |_, this, key: String| {
+            this.board.borrow_mut().clear(&key);
+            Ok(())
+        });
+
+        // -- keys ------------------------------------------------------------
+        /// Returns all set fact keys as a table.
+        /// @return table
+        methods.add_method("keys", |lua, this, ()| {
+            let keys: Vec<String> = this.board.borrow().keys().iter().map(|s| s.to_string()).collect();
+            let tbl = lua.create_table()?;
+            for (i, k) in keys.iter().enumerate() { tbl.set(i + 1, k.as_str())?; }
+            Ok(tbl)
+        });
+
+        // -- watch -----------------------------------------------------------
+        /// Subscribes to changes on a specific key (or "*" for all changes).
+        /// @param key : string
+        /// @param callback : function
+        /// @return integer
+        methods.add_method("watch", |lua, this, (key, callback): (String, LuaFunction)| {
+            let id = {
+                let mut nid = this.next_watcher_id.borrow_mut();
+                let id = *nid;
+                *nid += 1;
+                id
+            };
+            let rk = lua.create_registry_value(callback)?;
+            this.watchers.borrow_mut().insert(id, rk);
+            this.watcher_keys.borrow_mut().insert(id, key);
+            Ok(id)
+        });
+
+        // -- unwatch ---------------------------------------------------------
+        /// Removes a watcher subscription by id.
+        /// @param id : integer
+        methods.add_method("unwatch", |lua, this, id: u64| {
+            if let Some(rk) = this.watchers.borrow_mut().remove(&id) {
+                lua.remove_registry_value(rk)?;
+            }
+            this.watcher_keys.borrow_mut().remove(&id);
+            Ok(())
+        });
+
+        // -- getRevision -----------------------------------------------------
+        /// Returns the monotonic revision counter (incremented on every write).
+        /// @return integer
+        methods.add_method("getRevision", |_, this, ()| {
+            Ok(this.board.borrow().revision)
+        });
+
+        // -- snapshot --------------------------------------------------------
+        /// Returns all facts as a flat key→value table.
+        /// @return table
+        methods.add_method("snapshot", |lua, this, ()| {
+            let tbl = lua.create_table()?;
+            for (k, v) in this.board.borrow().snapshot() {
+                match v {
+                    crate::patterns::BlackboardValue::Bool(b) => tbl.set(k, *b)?,
+                    crate::patterns::BlackboardValue::Number(n) => tbl.set(k, *n)?,
+                    crate::patterns::BlackboardValue::Text(s) => tbl.set(k, s.as_str())?,
+                    crate::patterns::BlackboardValue::Nil => {}
+                }
+            }
+            Ok(tbl)
+        });
+
+        // -- clearAll --------------------------------------------------------
+        /// Clears all facts from the blackboard.
+        methods.add_method("clearAll", |_, this, ()| {
+            this.board.borrow_mut().clear_all();
+            Ok(())
+        });
+    }
+}
+
+// ===========================================================================
+// Observer
+// ===========================================================================
+
+/// Lua wrapper for the Observer pattern.
+#[derive(Clone)]
+struct LuaObserver {
+    observer: Rc<RefCell<crate::patterns::Observer>>,
+    values: Rc<RefCell<HashMap<String, LuaRegistryKey>>>,
+    callbacks: Rc<RefCell<HashMap<u64, LuaRegistryKey>>>,
+}
+
+impl LunaType for LuaObserver {
+    const TYPE_NAME: &'static str = "Observer";
+    const TYPE_HIERARCHY: &'static [&'static str] = &["Observer", "Object"];
+}
+
+impl LuaUserData for LuaObserver {
+    fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
+        add_type_methods(methods);
+
+        // -- set -------------------------------------------------------------
+        /// Sets a property value and fires subscribed watchers.
+        /// @param key : string
+        /// @param value : any
+        methods.add_method("set", |lua, this, (key, new_val): (String, LuaValue)| {
+            let rk = lua.create_registry_value(new_val.clone())?;
+            if let Some(old_k) = this.values.borrow_mut().insert(key.clone(), rk) {
+                lua.remove_registry_value(old_k)?;
+            }
+            let ids = this.observer.borrow_mut().watchers_for(&key);
+            for id in ids {
+                let cb = this.callbacks.borrow();
+                if let Some(rk) = cb.get(&id) {
+                    let func: LuaFunction = lua.registry_value(rk)?;
+                    drop(cb);
+                    func.call::<_, ()>((key.clone(), new_val.clone()))?;
+                }
+            }
+            Ok(())
+        });
+
+        // -- get -------------------------------------------------------------
+        /// Gets a property value, or nil if not set.
+        /// @param key : string
+        /// @return any
+        methods.add_method("get", |lua, this, key: String| {
+            match this.values.borrow().get(&key) {
+                Some(rk) => Ok(lua.registry_value::<LuaValue>(rk)?),
+                None => Ok(LuaValue::Nil),
+            }
+        });
+
+        // -- subscribe -------------------------------------------------------
+        /// Subscribes to changes on a property key (or "*" for all).
+        /// @param key : string
+        /// @param callback : function
+        /// @param once : boolean?
+        /// @return integer
+        methods.add_method("subscribe", |lua, this, (key, callback, once): (String, LuaFunction, Option<bool>)| {
+            let id = this.observer.borrow_mut().subscribe(&key, once.unwrap_or(false));
+            let rk = lua.create_registry_value(callback)?;
+            this.callbacks.borrow_mut().insert(id, rk);
+            Ok(id)
+        });
+
+        // -- unsubscribe -----------------------------------------------------
+        /// Removes a subscription by id.
+        /// @param id : integer
+        methods.add_method("unsubscribe", |lua, this, id: u64| {
+            this.observer.borrow_mut().unsubscribe(id);
+            if let Some(rk) = this.callbacks.borrow_mut().remove(&id) {
+                lua.remove_registry_value(rk)?;
+            }
+            Ok(())
+        });
+
+        // -- getCount --------------------------------------------------------
+        /// Returns the total number of active subscriptions.
+        /// @return integer
+        methods.add_method("getCount", |_, this, ()| {
+            Ok(this.observer.borrow().subscription_count())
+        });
+    }
+}
+
+// ===========================================================================
+// Throttle / Debounce
+// ===========================================================================
+
+/// Lua wrapper for the Throttle pattern.
+#[derive(Clone)]
+struct LuaThrottle {
+    throttle: Rc<RefCell<crate::patterns::Throttle>>,
+    callback: Rc<RefCell<Option<LuaRegistryKey>>>,
+}
+
+impl LunaType for LuaThrottle {
+    const TYPE_NAME: &'static str = "Throttle";
+    const TYPE_HIERARCHY: &'static [&'static str] = &["Throttle", "Object"];
+}
+
+impl LuaUserData for LuaThrottle {
+    fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
+        add_type_methods(methods);
+
+        // -- onFire ----------------------------------------------------------
+        /// Sets the callback invoked when the throttle fires.
+        /// @param fn : function
+        methods.add_method("onFire", |lua, this, f: LuaFunction| {
+            let rk = lua.create_registry_value(f)?;
+            if let Some(old) = this.callback.borrow_mut().replace(rk) {
+                lua.remove_registry_value(old)?;
+            }
+            Ok(())
+        });
+
+        // -- update ----------------------------------------------------------
+        /// Advances the timer by dt seconds; fires the callback if the interval elapsed.
+        /// @param dt : number
+        /// @return boolean
+        methods.add_method("update", |lua, this, dt: f64| {
+            let fired = this.throttle.borrow_mut().update(dt);
+            if fired {
+                if let Some(rk) = &*this.callback.borrow() {
+                    let func: LuaFunction = lua.registry_value(rk)?;
+                    func.call::<_, ()>(())?;
+                }
+            }
+            Ok(fired)
+        });
+
+        // -- reset -----------------------------------------------------------
+        /// Resets the elapsed counter without firing.
+        methods.add_method("reset", |_, this, ()| {
+            this.throttle.borrow_mut().reset();
+            Ok(())
+        });
+
+        // -- getProgress -----------------------------------------------------
+        /// Returns the normalised progress through the current interval [0, 1].
+        /// @return number
+        methods.add_method("getProgress", |_, this, ()| Ok(this.throttle.borrow().progress()));
+
+        // -- getFireCount ----------------------------------------------------
+        /// Returns the total number of times this throttle has fired.
+        /// @return integer
+        methods.add_method("getFireCount", |_, this, ()| Ok(this.throttle.borrow().fire_count));
+
+        // -- setEnabled ------------------------------------------------------
+        /// Enables or disables the throttle.
+        /// @param enabled : boolean
+        methods.add_method("setEnabled", |_, this, v: bool| {
+            this.throttle.borrow_mut().enabled = v;
+            Ok(())
+        });
+    }
+}
+
+/// Lua wrapper for the Debounce pattern.
+#[derive(Clone)]
+struct LuaDebounce {
+    debounce: Rc<RefCell<crate::patterns::Debounce>>,
+    callback: Rc<RefCell<Option<LuaRegistryKey>>>,
+}
+
+impl LunaType for LuaDebounce {
+    const TYPE_NAME: &'static str = "Debounce";
+    const TYPE_HIERARCHY: &'static [&'static str] = &["Debounce", "Object"];
+}
+
+impl LuaUserData for LuaDebounce {
+    fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
+        add_type_methods(methods);
+
+        // -- onFire ----------------------------------------------------------
+        /// Sets the callback invoked when the debounce fires.
+        /// @param fn : function
+        methods.add_method("onFire", |lua, this, f: LuaFunction| {
+            let rk = lua.create_registry_value(f)?;
+            if let Some(old) = this.callback.borrow_mut().replace(rk) {
+                lua.remove_registry_value(old)?;
+            }
+            Ok(())
+        });
+
+        // -- trigger ---------------------------------------------------------
+        /// Records an input event, resetting the idle timer.
+        methods.add_method("trigger", |_, this, ()| {
+            this.debounce.borrow_mut().trigger();
+            Ok(())
+        });
+
+        // -- update ----------------------------------------------------------
+        /// Advances the idle timer by dt seconds; fires the callback if idle wait expired.
+        /// @param dt : number
+        /// @return boolean
+        methods.add_method("update", |lua, this, dt: f64| {
+            let fired = this.debounce.borrow_mut().update(dt);
+            if fired {
+                if let Some(rk) = &*this.callback.borrow() {
+                    let func: LuaFunction = lua.registry_value(rk)?;
+                    func.call::<_, ()>(())?;
+                }
+            }
+            Ok(fired)
+        });
+
+        // -- cancel ----------------------------------------------------------
+        /// Cancels the pending trigger without firing.
+        methods.add_method("cancel", |_, this, ()| {
+            this.debounce.borrow_mut().cancel();
+            Ok(())
+        });
+
+        // -- isPending -------------------------------------------------------
+        /// Returns true when a trigger is pending.
+        /// @return boolean
+        methods.add_method("isPending", |_, this, ()| Ok(this.debounce.borrow().pending));
+
+        // -- getFireCount ----------------------------------------------------
+        /// Returns the total number of times this debounce has fired.
+        /// @return integer
+        methods.add_method("getFireCount", |_, this, ()| Ok(this.debounce.borrow().fire_count));
+    }
+}
+
+// ===========================================================================
+// PriorityQueue
+// ===========================================================================
+
+/// Lua wrapper for the PriorityQueue pattern.
+#[derive(Clone)]
+struct LuaPriorityQueue {
+    queue: Rc<RefCell<crate::patterns::PriorityQueue>>,
+    payloads: Rc<RefCell<HashMap<u64, LuaRegistryKey>>>,
+}
+
+impl LunaType for LuaPriorityQueue {
+    const TYPE_NAME: &'static str = "PriorityQueue";
+    const TYPE_HIERARCHY: &'static [&'static str] = &["PriorityQueue", "Object"];
+}
+
+impl LuaUserData for LuaPriorityQueue {
+    fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
+        add_type_methods(methods);
+
+        // -- push ------------------------------------------------------------
+        /// Inserts an item with a priority. Higher priorities are dequeued first.
+        /// @param priority : integer
+        /// @param value : any
+        /// @param label : string?
+        /// @return integer
+        methods.add_method("push", |lua, this, (priority, value, label): (i64, LuaValue, Option<String>)| {
+            let id = this.queue.borrow_mut().push(priority, label.as_deref().unwrap_or(""));
+            let rk = lua.create_registry_value(value)?;
+            this.payloads.borrow_mut().insert(id, rk);
+            Ok(id)
+        });
+
+        // -- pop -------------------------------------------------------------
+        /// Removes and returns the highest-priority item, or nil if empty.
+        /// @return any
+        methods.add_method("pop", |lua, this, ()| {
+            match this.queue.borrow_mut().pop() {
+                Some((id, _priority)) => {
+                    if let Some(rk) = this.payloads.borrow_mut().remove(&id) {
+                        let val: LuaValue = lua.registry_value(&rk)?;
+                        lua.remove_registry_value(rk)?;
+                        Ok(val)
+                    } else {
+                        Ok(LuaValue::Nil)
+                    }
+                }
+                None => Ok(LuaValue::Nil),
+            }
+        });
+
+        // -- peek ------------------------------------------------------------
+        /// Returns the highest-priority item without removing it, or nil if empty.
+        /// @return any
+        methods.add_method("peek", |lua, this, ()| {
+            match this.queue.borrow().peek() {
+                Some(item) => {
+                    let id = item.id;
+                    let payloads = this.payloads.borrow();
+                    if let Some(rk) = payloads.get(&id) {
+                        Ok(lua.registry_value::<LuaValue>(rk)?)
+                    } else {
+                        Ok(LuaValue::Nil)
+                    }
+                }
+                None => Ok(LuaValue::Nil),
+            }
+        });
+
+        // -- len -------------------------------------------------------------
+        /// Returns the number of items in the queue.
+        /// @return integer
+        methods.add_method("len", |_, this, ()| Ok(this.queue.borrow().len()));
+
+        // -- isEmpty ---------------------------------------------------------
+        /// Returns true when the queue has no items.
+        /// @return boolean
+        methods.add_method("isEmpty", |_, this, ()| Ok(this.queue.borrow().is_empty()));
+
+        // -- clearAll --------------------------------------------------------
+        /// Removes all items from the queue.
+        methods.add_method("clearAll", |lua, this, ()| {
+            this.queue.borrow_mut().clear();
+            let drained: Vec<(u64, LuaRegistryKey)> = this.payloads.borrow_mut().drain().collect();
+            for (_, rk) in drained { lua.remove_registry_value(rk)?; }
+            Ok(())
+        });
+    }
+}
+
+// ===========================================================================
+// Ring
+// ===========================================================================
+
+/// Lua wrapper for the Ring (circular buffer) pattern.
+#[derive(Clone)]
+struct LuaRing {
+    ring: Rc<RefCell<crate::patterns::Ring>>,
+}
+
+impl LunaType for LuaRing {
+    const TYPE_NAME: &'static str = "Ring";
+    const TYPE_HIERARCHY: &'static [&'static str] = &["Ring", "Object"];
+}
+
+impl LuaUserData for LuaRing {
+    fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
+        add_type_methods(methods);
+
+        // -- push ------------------------------------------------------------
+        /// Pushes a value (number or string) with an optional tag. Overwrites oldest on overflow.
+        /// @param value : any
+        /// @param tag : string?
+        /// @return integer
+        methods.add_method("push", |_, this, (value, tag): (LuaValue, Option<String>)| {
+            let tag = tag.as_deref().unwrap_or("");
+            let id = match &value {
+                LuaValue::Integer(n) => this.ring.borrow_mut().push_number(*n as f64, tag),
+                LuaValue::Number(n) => this.ring.borrow_mut().push_number(*n, tag),
+                LuaValue::String(s) => this.ring.borrow_mut().push_string(s.to_str()?.to_string(), tag),
+                _ => return Err(LuaError::external("Ring only accepts number or string values")),
+            };
+            Ok(id)
+        });
+
+        // -- latest ----------------------------------------------------------
+        /// Returns the most recently pushed entry, or nil.
+        /// @return table?
+        methods.add_method("latest", |lua, this, ()| {
+            match this.ring.borrow().latest() {
+                Some(e) => {
+                    let t = lua.create_table()?;
+                    t.set("id", e.id)?;
+                    t.set("tag", e.tag.as_str())?;
+                    if let Some(n) = e.value_f64 { t.set("value", n)?; }
+                    if let Some(s) = &e.value_str { t.set("text", s.as_str())?; }
+                    Ok(LuaValue::Table(t))
+                }
+                None => Ok(LuaValue::Nil),
+            }
+        });
+
+        // -- toArray ---------------------------------------------------------
+        /// Returns all entries (oldest first) as an array of {id, tag, value?, text?} tables.
+        /// @return table
+        methods.add_method("toArray", |lua, this, ()| {
+            let tbl = lua.create_table()?;
+            for (i, e) in this.ring.borrow().iter().enumerate() {
+                let t = lua.create_table()?;
+                t.set("id", e.id)?;
+                t.set("tag", e.tag.as_str())?;
+                if let Some(n) = e.value_f64 { t.set("value", n)?; }
+                if let Some(s) = &e.value_str { t.set("text", s.as_str())?; }
+                tbl.set(i + 1, t)?;
+            }
+            Ok(tbl)
+        });
+
+        // -- sum -------------------------------------------------------------
+        /// Returns the sum of all numeric values in the ring.
+        /// @return number
+        methods.add_method("sum", |_, this, ()| Ok(this.ring.borrow().sum()));
+
+        // -- average ---------------------------------------------------------
+        /// Returns the average of all numeric values, or 0 if empty.
+        /// @return number
+        methods.add_method("average", |_, this, ()| Ok(this.ring.borrow().average()));
+
+        // -- len -------------------------------------------------------------
+        /// Returns the number of entries currently in the ring.
+        /// @return integer
+        methods.add_method("len", |_, this, ()| Ok(this.ring.borrow().len()));
+
+        // -- isFull ----------------------------------------------------------
+        /// Returns true when the ring is at capacity.
+        /// @return boolean
+        methods.add_method("isFull", |_, this, ()| Ok(this.ring.borrow().is_full()));
+
+        // -- clear -----------------------------------------------------------
+        /// Removes all entries from the ring.
+        methods.add_method("clear", |_, this, ()| { this.ring.borrow_mut().clear(); Ok(()) });
+    }
+}
+
+// ===========================================================================
+// Funnel
+// ===========================================================================
+
+/// Lua wrapper for the Funnel (event aggregator) pattern.
+#[derive(Clone)]
+struct LuaFunnel {
+    funnel: Rc<RefCell<crate::patterns::Funnel>>,
+    on_flush: Rc<RefCell<Option<LuaRegistryKey>>>,
+}
+
+impl LunaType for LuaFunnel {
+    const TYPE_NAME: &'static str = "Funnel";
+    const TYPE_HIERARCHY: &'static [&'static str] = &["Funnel", "Object"];
+}
+
+impl LuaUserData for LuaFunnel {
+    fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
+        add_type_methods(methods);
+
+        // -- onFlush ---------------------------------------------------------
+        /// Sets a callback invoked when the funnel flushes. Receives a table of {tag, value} entries.
+        /// @param fn : function
+        methods.add_method("onFlush", |lua, this, f: LuaFunction| {
+            let rk = lua.create_registry_value(f)?;
+            if let Some(old) = this.on_flush.borrow_mut().replace(rk) {
+                lua.remove_registry_value(old)?;
+            }
+            Ok(())
+        });
+
+        // -- push ------------------------------------------------------------
+        /// Adds an event to the funnel. Immediately flushes if max_entries reached or window is 0.
+        /// @param tag : string
+        /// @param value : number?
+        methods.add_method("push", |lua, this, (tag, value): (String, Option<f64>)| {
+            let (_, should_flush) = this.funnel.borrow_mut().push(&tag, value.unwrap_or(0.0));
+            if should_flush {
+                Self::do_flush(lua, this)?;
+            }
+            Ok(())
+        });
+
+        // -- update ----------------------------------------------------------
+        /// Advances the window timer by dt seconds; flushes when window expires.
+        /// @param dt : number
+        /// @return boolean
+        methods.add_method("update", |lua, this, dt: f64| {
+            let should_flush = this.funnel.borrow_mut().update(dt);
+            if should_flush {
+                Self::do_flush(lua, this)?;
+                return Ok(true);
+            }
+            Ok(false)
+        });
+
+        // -- flush -----------------------------------------------------------
+        /// Manually flushes all pending entries, invoking the onFlush callback.
+        methods.add_method("flush", |lua, this, ()| {
+            Self::do_flush(lua, this)
+        });
+
+        // -- discard ---------------------------------------------------------
+        /// Discards all buffered entries without flushing.
+        methods.add_method("discard", |_, this, ()| {
+            this.funnel.borrow_mut().discard();
+            Ok(())
+        });
+
+        // -- pendingCount ----------------------------------------------------
+        /// Returns the number of buffered entries not yet flushed.
+        /// @return integer
+        methods.add_method("pendingCount", |_, this, ()| Ok(this.funnel.borrow().pending_count()));
+
+        // -- getFlushCount ---------------------------------------------------
+        /// Returns the total number of flushes performed.
+        /// @return integer
+        methods.add_method("getFlushCount", |_, this, ()| Ok(this.funnel.borrow().flush_count));
+    }
+}
+
+impl LuaFunnel {
+    fn do_flush(lua: &Lua, this: &LuaFunnel) -> LuaResult<()> {
+        let entries = this.funnel.borrow_mut().flush();
+        if entries.is_empty() { return Ok(()); }
+        if let Some(rk) = &*this.on_flush.borrow() {
+            let func: LuaFunction = lua.registry_value(rk)?;
+            let tbl = lua.create_table()?;
+            for (i, e) in entries.iter().enumerate() {
+                let et = lua.create_table()?;
+                et.set("tag", e.tag.as_str())?;
+                et.set("value", e.value)?;
+                tbl.set(i + 1, et)?;
+            }
+            func.call::<_, ()>(tbl)?;
+        }
+        Ok(())
+    }
+}
+
+// ===========================================================================
+// Registration
+// ===========================================================================
+
 pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) -> LuaResult<()> {
     let patterns = lua.create_table()?;
 
@@ -844,6 +1519,122 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
                 enter_keys: Rc::new(RefCell::new(HashMap::new())),
                 exit_keys: Rc::new(RefCell::new(HashMap::new())),
                 update_keys: Rc::new(RefCell::new(HashMap::new())),
+            })
+        })?,
+    )?;
+
+    // luna.patterns.newBlackboard(name?) -> Blackboard
+    /// Creates a new Blackboard shared key-value store.
+    /// @param name : string?
+    /// @return any
+    patterns.set(
+        "newBlackboard",
+        lua.create_function(|_lua, name: Option<String>| {
+            Ok(LuaBlackboard {
+                board: Rc::new(RefCell::new(crate::patterns::Blackboard::new(
+                    name.as_deref().unwrap_or(""),
+                ))),
+                watchers: Rc::new(RefCell::new(HashMap::new())),
+                watcher_keys: Rc::new(RefCell::new(HashMap::new())),
+                next_watcher_id: Rc::new(RefCell::new(0)),
+            })
+        })?,
+    )?;
+
+    // luna.patterns.newObserver(name?) -> Observer
+    /// Creates a new reactive property Observer.
+    /// @param name : string?
+    /// @return any
+    patterns.set(
+        "newObserver",
+        lua.create_function(|_lua, name: Option<String>| {
+            Ok(LuaObserver {
+                observer: Rc::new(RefCell::new(crate::patterns::Observer::new(
+                    name.as_deref().unwrap_or(""),
+                ))),
+                values: Rc::new(RefCell::new(HashMap::new())),
+                callbacks: Rc::new(RefCell::new(HashMap::new())),
+            })
+        })?,
+    )?;
+
+    // luna.patterns.newThrottle(interval) -> Throttle
+    /// Creates a leading-edge rate limiter that fires at most once per interval seconds.
+    /// @param interval : number
+    /// @return any
+    patterns.set(
+        "newThrottle",
+        lua.create_function(|_lua, interval: f64| {
+            Ok(LuaThrottle {
+                throttle: Rc::new(RefCell::new(crate::patterns::Throttle::new(interval))),
+                callback: Rc::new(RefCell::new(None)),
+            })
+        })?,
+    )?;
+
+    // luna.patterns.newDebounce(wait) -> Debounce
+    /// Creates a trailing-edge debounce that fires after the input stream is idle for wait seconds.
+    /// @param wait : number
+    /// @return any
+    patterns.set(
+        "newDebounce",
+        lua.create_function(|_lua, wait: f64| {
+            Ok(LuaDebounce {
+                debounce: Rc::new(RefCell::new(crate::patterns::Debounce::new(wait))),
+                callback: Rc::new(RefCell::new(None)),
+            })
+        })?,
+    )?;
+
+    // luna.patterns.newPriorityQueue(name?) -> PriorityQueue
+    /// Creates a stable priority-ordered task queue.
+    /// @param name : string?
+    /// @return any
+    patterns.set(
+        "newPriorityQueue",
+        lua.create_function(|_lua, name: Option<String>| {
+            Ok(LuaPriorityQueue {
+                queue: Rc::new(RefCell::new(crate::patterns::PriorityQueue::new(
+                    name.as_deref().unwrap_or(""),
+                ))),
+                payloads: Rc::new(RefCell::new(HashMap::new())),
+            })
+        })?,
+    )?;
+
+    // luna.patterns.newRing(capacity, name?) -> Ring
+    /// Creates a fixed-capacity circular history buffer.
+    /// @param capacity : integer
+    /// @param name : string?
+    /// @return any
+    patterns.set(
+        "newRing",
+        lua.create_function(|_lua, (capacity, name): (usize, Option<String>)| {
+            Ok(LuaRing {
+                ring: Rc::new(RefCell::new(crate::patterns::Ring::new(
+                    name.as_deref().unwrap_or(""),
+                    capacity,
+                ))),
+            })
+        })?,
+    )?;
+
+    // luna.patterns.newFunnel(window, maxEntries?, name?) -> Funnel
+    /// Creates a time-windowed event aggregator. window=0 means flush on every push.
+    /// @param window : number
+    /// @param max_entries : integer?
+    /// @param name : string?
+    /// @return any
+    patterns.set(
+        "newFunnel",
+        lua.create_function(|_lua, (window, max_entries, name): (f64, Option<usize>, Option<String>)| {
+            Ok(LuaFunnel {
+                funnel: Rc::new(RefCell::new(crate::patterns::Funnel::new(
+                    name.as_deref().unwrap_or(""),
+                    window,
+                    max_entries.unwrap_or(0),
+                ))),
+                on_flush: Rc::new(RefCell::new(None)),
             })
         })?,
     )?;

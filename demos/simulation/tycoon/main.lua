@@ -1,5 +1,6 @@
 -- Tycoon — Luna2D Demo
 -- Build a restaurant, serve customers, earn profit
+-- Run with: cargo run -- demos/simulation/tycoon
 
 local function clamp(v, mn, mx) return math.max(mn, math.min(mx, v)) end
 

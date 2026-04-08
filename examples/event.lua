@@ -119,3 +119,14 @@ luna.signal.clear()
 
 -- Request exit with a specific process exit code
 -- luna.signal.quit(1)  -- non-zero = error exit
+
+-- ─── Signal ────────────────────────────────────────────────────────────────────
+
+local signal_type = signal:type()  -- "Signal"
+local signal_is_type = signal:typeOf("Signal")  -- Returns true if the given type name matches this object's type or any parent type
+
+-- ─── luna.signal ───────────────────────────────────────────────────────────────
+luna.signal.exit()  -- Pushes an exit event, requesting the engine to stop
+luna.signal.pump()  -- Syncs OS-level events into the queue (no-op in Luna2D push model)
+luna.signal.restart()  -- Requests that the engine restart at the beginning of the next frame
+local wait = luna.signal.wait()  -- Blocks until the next event arrives or the optional timeout elapses

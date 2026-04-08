@@ -1,6 +1,7 @@
 -- Pong — Classic Arcade (Luna2D demo)
 -- Two-player Pong: Player 1 = W/S, Player 2 = Up/Down arrow keys.
 -- First to 7 points wins.
+-- Run with: cargo run -- demos/arcade/pong
 
 -- ── State ────────────────────────────────────────────────────────────────
 

@@ -1,6 +1,7 @@
 -- examples/tween_demo/main.lua
 -- Demonstrates luna.math.newTween() with multiple easing curves.
 -- Press R to reset all tweens. Press SPACE to pause/resume.
+-- Run with: cargo run -- demos/showcase/tween_demo
 
 local tweens = {}
 local paused = false

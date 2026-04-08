@@ -2,6 +2,7 @@
 -- Turn-based dungeon crawler with fog of war, combat, and permadeath
 -- Controls: Arrow keys to move (one step per press), R to restart on death
 -- Bump into enemies to attack. Find stairs (>) to descend.
+-- Run with: cargo run -- demos/rpg/roguelike
 
 local function clamp(v, mn, mx) return math.max(mn, math.min(mx, v)) end
 

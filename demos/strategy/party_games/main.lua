@@ -1,5 +1,6 @@
 -- Party Games — Luna2D Demo
 -- Menu selects mini-game, M returns to menu
+-- Run with: cargo run -- demos/strategy/party_games
 
 local function clamp(v, mn, mx) return math.max(mn, math.min(mx, v)) end
 

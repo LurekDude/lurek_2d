@@ -352,7 +352,7 @@ function luna.render()
             "entities: " .. ecs:getEntityCount() ..
             "  systems: " .. ecs:getSystemCount() ..
             "  chapter: " .. chapter .. "/7" ..
-            "  fps: " .. math.floor(luna.timer.getFPS()),
+            "  fps: " .. math.floor(luna.time.getFPS()),
             10, 579
         )
     else

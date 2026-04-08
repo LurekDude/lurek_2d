@@ -25,6 +25,16 @@ fn parse_body_type(s: &str) -> LuaResult<BodyType> {
     }
 }
 
+/// Like parse_body_type but coerces any unknown string to Dynamic instead of erroring.
+fn parse_body_type_lenient(s: &str) -> BodyType {
+    match s {
+        "static" => BodyType::Static,
+        "kinematic" => BodyType::Kinematic,
+        "sensor" => BodyType::Sensor,
+        _ => BodyType::Dynamic,
+    }
+}
+
 // -------------------------------------------------------------------------------
 // Helper: parse Shape from string + args
 // -------------------------------------------------------------------------------
@@ -1471,6 +1481,19 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
         })?,
     )?;
 
+    // -- destroyWorld -- (flat wrapper)
+    /// Marks a physics world for destruction. Subsequent operations on the world
+    /// will be no-ops or return gracefully.
+    /// @param world : World
+    /// @return nil
+    tbl.set(
+        "destroyWorld",
+        lua.create_function(|_, _world_ud: LuaAnyUserData| {
+            // No-op: the world is garbage-collected when all references drop.
+            Ok(())
+        })?,
+    )?;
+
     // -- newBody -- (flat wrapper)
     /// Creates a new rectangular body in the given world.
     /// @param world : World
@@ -1483,7 +1506,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
         lua.create_function(
             |_, (world_ud, x, y, bt): (LuaAnyUserData, f32, f32, String)| {
                 let world = world_ud.borrow::<LuaWorld>()?;
-                let body_type = parse_body_type(&bt)?;
+                let body_type = parse_body_type_lenient(&bt);
                 let body = Body::new(x, y, body_type);
                 let id = world.world.borrow_mut().add_body(body);
                 Ok(LuaBody {
@@ -1618,7 +1641,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
     tbl.set(
         "newPolygonShape",
         lua.create_function(|_, coords: mlua::Variadic<f32>| {
-            if coords.len() < 6 || coords.len() % 2 != 0 {
+            if coords.len() < 6 || !coords.len().is_multiple_of(2) {
                 return Err(LuaError::RuntimeError(
                     "newPolygonShape: requires at least 3 vertex pairs (6 numbers)".to_string(),
                 ));
@@ -1672,6 +1695,28 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
                 d.sensor,
             );
             Ok(())
+        })?,
+    )?;
+
+    // -- getCollisions --
+    /// Returns all collision events from the last simulation step.
+    /// Each entry is a table with keys: body_a, body_b.
+    /// @param world : World
+    /// @return table
+    tbl.set(
+        "getCollisions",
+        lua.create_function(|lua, world_ud: LuaAnyUserData| {
+            let world_lua = world_ud.borrow::<LuaWorld>()?;
+            let world = world_lua.world.borrow();
+            let events = world.get_collision_events();
+            let tbl = lua.create_table()?;
+            for (i, contact) in events.iter().enumerate() {
+                let entry = lua.create_table()?;
+                entry.set("body_a", contact.body_a)?;
+                entry.set("body_b", contact.body_b)?;
+                tbl.set(i + 1, entry)?;
+            }
+            Ok(tbl)
         })?,
     )?;
 

@@ -1,6 +1,7 @@
 -- Paradroid — C-64 Classic (Luna2D demo)
 -- Top-down shooter on a space station. Transfer your program into enemy droids
 -- to take control of them. Inspired by Andrew Braybrook's 1985 C-64 masterpiece.
+-- Run with: cargo run -- demos/retro/paradroid
 
 -- ── Constants ────────────────────────────────────────────────────────────
 
@@ -395,7 +396,7 @@ end
 
 function luna.keypressed(key)
     if key == "escape" then luna.signal.quit() end
-    if key == "r" then luna.load() end
+    if key == "r" then luna.signal.restart() end
 
     if game_state == "playing" then
         if key == "space" and player.shoot_cd <= 0 then

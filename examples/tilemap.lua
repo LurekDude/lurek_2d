@@ -2,6 +2,7 @@
 -- luna.tilemap — Tile-based map authoring: TileMap, TileSet, AutoTileSheet,
 -- ChunkMap, IsoMap, MapBlock/MapGroup, and coordinate helper functions.
 -- All luna.tilemap API methods demonstrated with code and comments.
+-- This file is documentation code, not a runnable game.
 
 -- ── TileSet ────────────────────────────────────────────────────────────────────
 
@@ -324,3 +325,32 @@ local ring = luna.tilemap.hexRing(0, 0, 2)  -- 12 cells at distance 2
 -- Returns cells center outward, ring by ring.
 -- (Available if defined in your build.)
 -- local spiral = luna.tilemap.hexSpiral(0, 0, 2)
+
+-- ─── MapBlock ──────────────────────────────────────────────────────────────────
+
+local side = mapblock:getSide("right", 1)  -- Returns the side connection ID for a segment on a given edge
+
+-- ─── MapGroup ──────────────────────────────────────────────────────────────────
+
+mapgroup:addScript(mapscript)  -- Adds a MapScript to this group
+local script_count = mapgroup:getScriptCount()  -- Returns the number of scripts in this group
+
+-- ─── MapScript ─────────────────────────────────────────────────────────────────
+
+mapscript:addStep({})  -- Appends a generation step from a step-definition table
+local step_count = mapscript:getStepCount()  -- Returns the number of steps in this script
+
+-- ─── TileMap ───────────────────────────────────────────────────────────────────
+
+local tile_set = tilemap:getTileSet(1)  -- Returns a tileset by 1-based index, or nil if out of range
+
+-- ─── luna.tilemap ──────────────────────────────────────────────────────────────
+local hex_area = luna.tilemap.hexArea(1, 1, 1)  -- Returns all hex cells within radius distance (filled hex circle) as a table
+local hex_reflect = luna.tilemap.hexReflect(0, 0, 3, 2, "q")  -- Reflects hex coordinates across an axis through the center
+local hex_rotate = luna.tilemap.hexRotate(1, 1, 1, 1, 1)  -- Rotates hex coordinates around a center by steps x 60 degrees clockwise
+local iso_direction_from_angle = luna.tilemap.isoDirectionFromAngle(1.0)  -- Snaps an angle (in radians) to the nearest isometric direction (1-4)
+local iso_direction_name = luna.tilemap.isoDirectionName(1)  -- Returns the name of an isometric direction (1-4)
+local iso_rotate = luna.tilemap.isoRotate(1, 1)  -- Rotates an isometric direction (1-4) clockwise by steps
+local load_t_m_x = luna.tilemap.loadTMX(tmx_xml_string)  -- Parses a TMX XML string and returns a table with map metadata and layers
+local map_gen = luna.tilemap.newMapGen(mapgroup, "rooms", 1)  -- Creates a MapGen from a MapGroup, a preset name or dimensions, and a segment size
+local map_script = luna.tilemap.newMapScript()  -- Creates a new empty MapScript procedural generation script

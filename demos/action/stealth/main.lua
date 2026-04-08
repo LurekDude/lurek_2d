@@ -1,5 +1,6 @@
 -- Stealth Action Demo — top-down sneaking with guard vision cones
 -- WASD to move, LShift to crouch, Escape to quit
+-- Run with: cargo run -- demos/action/stealth
 
 local function clamp(v, mn, mx) return math.max(mn, math.min(mx, v)) end
 

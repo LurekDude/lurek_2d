@@ -1,5 +1,6 @@
 -- System Infiltration / Gadget Puzzle Demo
 -- Navigate rooms, avoid cameras, use gadgets, hack terminals, steal data
+-- Run with: cargo run -- demos/action/infiltration
 
 local function clamp(v, mn, mx) return math.max(mn, math.min(mx, v)) end
 local function lerp(a, b, t) return a + (b - a) * t end

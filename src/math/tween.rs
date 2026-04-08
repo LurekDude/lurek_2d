@@ -1,15 +1,15 @@
-//! Value interpolator with easing curves.
+//! Low-level numeric value interpolator with easing curves.
 //!
-//! Uses easing functions from `crate::math::easing` to smoothly interpolate
-//! between start and target values over a duration.
+//! Provides `Tween` — a standalone multi-value interpolator that advances its own
+//! clock and applies an easing function to a set of start-to-target value pairs.
+//! Script code accesses this through `luna.math.newTween()`.
 //!
-//! This module is part of Luna2D's `math` subsystem and provides the implementation
-//! details for tween-related operations and data management.
-//! Key types exported from this module: `TweenValue`, `Tween`.
+//! **Scope**: pure numeric interpolation; no Lua tables, no callbacks, no
+//! auto-registration. For frame-by-frame property animation of Lua table fields
+//! with callbacks, sequences, and parallels, use `luna.tween` (`src/tween/`).
+//!
+//! Key types: `TweenValue`, `Tween`.
 //! Primary functions: `new()`, `add_value()`, `update()`, `get_value()`.
-//!
-//! All public items are documented. See the parent module for architectural context
-//! and the `luna.*` Lua API for the scripting interface.
 
 use crate::math::easing;
 

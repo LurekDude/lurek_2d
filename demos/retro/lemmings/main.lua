@@ -1,6 +1,7 @@
 -- Lemmings — Amiga 500 Classic (Luna2D demo)
 -- Guide lemmings to the exit by assigning them jobs: blocker, digger, builder, basher.
 -- Inspired by DMA Design's 1991 classic puzzle game.
+-- Run with: cargo run -- demos/retro/lemmings
 
 -- ── Constants ────────────────────────────────────────────────────────────
 
@@ -342,7 +343,7 @@ end
 
 function luna.keypressed(key)
     if key == "escape" then luna.signal.quit() end
-    if key == "r" then luna.load() end
+    if key == "r" then luna.signal.restart() end
     -- Job cycle: 1-4 keys
     if key == "1" then selected_job = "blocker" end
     if key == "2" then selected_job = "digger" end

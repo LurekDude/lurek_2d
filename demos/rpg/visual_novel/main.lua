@@ -1,4 +1,5 @@
 -- Visual Novel — Narrative branching with typewriter text, choices, and multiple endings
+-- Run with: cargo run -- demos/rpg/visual_novel
 
 local function clamp(v, mn, mx) return math.max(mn, math.min(mx, v)) end
 

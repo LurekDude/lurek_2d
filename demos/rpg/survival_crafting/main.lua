@@ -1,5 +1,6 @@
 -- Survival Crafting — Luna2D Demo
 -- WASD to move, click to mine, C to craft, P to place wall
+-- Run with: cargo run -- demos/rpg/survival_crafting
 
 local function clamp(v, mn, mx) return math.max(mn, math.min(mx, v)) end
 

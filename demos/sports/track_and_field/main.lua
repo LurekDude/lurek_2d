@@ -1,6 +1,7 @@
 -- Track & Field — Sport Game (Luna2D demo)
 -- Alternate A and D (or Left/Right) keys rapidly to run.  
 -- Four events: 100m Sprint, Long Jump, Hurdles, and Hammer Throw.
+-- Run with: cargo run -- demos/sports/track_and_field
 
 -- ── Constants ────────────────────────────────────────────────────────────
 
@@ -361,7 +362,7 @@ end
 
 function luna.keypressed(key)
     if key == "escape" then luna.signal.quit() end
-    if key == "r" then luna.load() end
+    if key == "r" then luna.signal.restart() end
     if game_state ~= "ready" and game_state ~= "running" and game_state ~= "airborne" then return end
 
     if key == "a" or key == "left" or key == "d" or key == "right" then

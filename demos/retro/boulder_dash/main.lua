@@ -1,6 +1,7 @@
 -- Boulder Dash — C-64 Classic (Luna2D demo)
 -- Dig through caves, collect diamonds, and escape before time runs out.
 -- Avoid boulders that fall if their support is dug away.
+-- Run with: cargo run -- demos/retro/boulder_dash
 
 -- ── Constants ────────────────────────────────────────────────────────────
 
@@ -226,5 +227,5 @@ end
 
 function luna.keypressed(key)
     if key == "escape" then luna.signal.quit() end
-    if key == "r" then luna.load() end
+    if key == "r" then luna.signal.restart() end
 end

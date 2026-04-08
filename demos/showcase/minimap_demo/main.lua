@@ -1,5 +1,6 @@
 -- Minimap Demo
 -- Demonstrates luna.minimap: terrain, fog, objects, pings, markers, viewport
+-- Run with: cargo run -- demos/showcase/minimap_demo
 
 local minimap
 local playerX, playerY = 50, 50

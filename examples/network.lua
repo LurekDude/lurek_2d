@@ -1,4 +1,4 @@
-﻿-- examples/network.lua
+-- examples/network.lua
 -- UDP networking via ENet for multiplayer games
 -- API: luna.network
 --
@@ -6,6 +6,7 @@
 -- client/server topologies, multiple channels, bandwidth throttling,
 -- and both reliable and unreliable packet delivery.
 --
+-- This file is documentation code, not a runnable game.
 -- NOTE: luna.network requires the network module enabled in conf.lua
 --   function luna.conf(t)
 --     t.modules.network = true
@@ -42,9 +43,9 @@ local peer_id = client:connect("127.0.0.1:27015", 2, 0)
 --------------------------------------------------------------------------------
 
 -- service() → event table or nil (non-blocking poll for ONE event)
--- Call per-frame inside luna.update(dt)
+-- Call per-frame inside luna.process(dt)
 
-luna.update = function(dt)
+luna.process = function(dt)
     -- Server event pump
     local ev = server:service()
     while ev ~= nil do
@@ -233,7 +234,7 @@ local function pumpClient()
     end
 end
 
-luna.update = function(dt)
+luna.process = function(dt)
     pumpServer()
     pumpClient()
 end

@@ -1,5 +1,6 @@
 -- Vehicle Builder — Physics-Based Construction & Test Track
 -- Build a vehicle from parts, then test it on a track with physics
+-- Run with: cargo run -- demos/simulation/vehicle_builder
 
 local mode = "build"  -- "build" or "test"
 local GRID = 20

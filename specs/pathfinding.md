@@ -6,7 +6,7 @@
 | **Status**     | Implemented — Full                                   |
 | **Lua API**    | `luna.pathfinding`                                   |
 | **Source**      | `src/pathfinding/`                                   |
-| **Rust Tests** | `tests/unit/pathfinding_tests.rs`                    |
+| **Rust Tests** | `tests/rust/unit/pathfinding_tests.rs`                    |
 | **Lua Tests**  | `tests/lua/unit/test_pathfinding.lua`                |
 | **Architecture** | —                                                  |
 

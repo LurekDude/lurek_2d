@@ -1,6 +1,7 @@
 -- Another World — Amiga 500 Classic (Luna2D demo)
 -- Cinematic puzzle-platformer inspired by Eric Chahi's 1991 masterpiece.
 -- Survive an alien planet using your energy gun: fire, shield, and super-shot.
+-- Run with: cargo run -- demos/retro/another_world
 
 -- ── Constants ────────────────────────────────────────────────────────────
 
@@ -325,7 +326,7 @@ end
 
 function luna.keypressed(key)
     if key == "escape" then luna.signal.quit() end
-    if key == "r" then luna.load() end
+    if key == "r" then luna.signal.restart() end
     if game_state ~= "playing" then return end
     if (key == "space" or key == "up" or key == "w") and player.on_ground then
         player.vy = JUMP_VEL

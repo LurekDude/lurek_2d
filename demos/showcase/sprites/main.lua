@@ -1,6 +1,7 @@
 -- Sprites example for Luna2D
 -- Move a rectangle with arrow keys
 -- Demonstrates luna.gfx.draw() polymorphic dispatch
+-- Run with: cargo run -- demos/showcase/sprites
 
 local x, y = 400, 300
 local speed = 200

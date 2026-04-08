@@ -1,6 +1,7 @@
 -- Asteroids — Classic Arcade (Luna2D demo)
 -- Pilot your ship through an asteroid belt. Shoot or dodge to survive.
 -- Rotate with Left/Right, thrust with Up, shoot with Space. Screen wraps.
+-- Run with: cargo run -- demos/arcade/asteroids
 
 -- ── Constants ────────────────────────────────────────────────────────────
 
@@ -302,7 +303,7 @@ end
 
 function luna.keypressed(key)
     if key == "escape" then luna.signal.quit() end
-    if key == "r" then luna.load() end
+    if key == "r" then luna.signal.restart() end
     if game_state ~= "playing" then return end
     if (key == "space" or key == "z") and shoot_cd <= 0 and #bullets < MAX_BULLETS then
         local rad = deg2rad(ship.angle)

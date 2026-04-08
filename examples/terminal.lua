@@ -3,6 +3,7 @@
 -- Draw text in a fixed-size cell grid, place interactive widgets (labels, buttons,
 -- text boxes, lists, borders, panels), and forward OS input events to focused widgets.
 -- All luna.terminal API methods demonstrated with code and comments.
+-- This file is documentation code, not a runnable game.
 
 -- ── Creating a Terminal ───────────────────────────────────────────────────────
 

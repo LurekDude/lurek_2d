@@ -1,4 +1,5 @@
 -- Logic / Programming Puzzle — Program a robot to reach the flag
+-- Run with: cargo run -- demos/strategy/logic_game
 
 local function lerp(a, b, t) return a + (b - a) * t end
 

@@ -1,5 +1,6 @@
 -- Tower Sim — Idle Stacking Tower
 -- Time your clicks to stack blocks; misaligned blocks get trimmed
+-- Run with: cargo run -- demos/simulation/tower_sim
 
 local function clamp(v, mn, mx) return math.max(mn, math.min(mx, v)) end
 local function lerp(a, b, t) return a + (b - a) * t end

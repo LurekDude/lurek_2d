@@ -1,6 +1,7 @@
 -- Frogger — Classic Arcade (Luna2D demo)
 -- Guide the frog across a busy road and floating river logs to reach the lily pads.
 -- WASD or Arrow keys to hop. One hit = one life lost.
+-- Run with: cargo run -- demos/arcade/frogger
 
 -- ── Constants ────────────────────────────────────────────────────────────
 

@@ -1,5 +1,6 @@
 -- Horde Survivor — Vampire Survivors style bullet heaven
 -- WASD to move, auto-attack orbiting projectiles, collect XP, level up
+-- Run with: cargo run -- demos/action/horde_survivor
 
 local player, enemies, projectiles, xp_gems, particles
 local spawn_timer, spawn_rate, game_time, kills, score
@@ -279,5 +280,5 @@ function luna.keypressed(key)
             apply_upgrade(upgrade_choices[n])
         end
     end
-    if paused and not upgrade_choices and key == "r" then luna.load() end
+    if paused and not upgrade_choices and key == "r" then luna.signal.restart() end
 end

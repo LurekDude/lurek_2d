@@ -1,5 +1,6 @@
 -- Match-3 Puzzle: Swap adjacent gems, match 3+, cascade combos
 -- Click two adjacent gems to swap, score points, special gems
+-- Run with: cargo run -- demos/strategy/match3
 
 local function lerp(a, b, t) return a + (b - a) * t end
 

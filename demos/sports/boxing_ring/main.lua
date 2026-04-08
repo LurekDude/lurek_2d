@@ -1,6 +1,7 @@
 -- Boxing Ring — Sport Game (Luna2D demo)
 -- Classic two-fighter boxing. Dodge, block, jab, and hook your way to a TKO.
 -- A / D move, W = dodge back, Space = jab, Z = hook, X = block.
+-- Run with: cargo run -- demos/sports/boxing_ring
 
 -- ── Constants ────────────────────────────────────────────────────────────
 
@@ -316,7 +317,7 @@ end
 
 function luna.keypressed(key)
     if key == "escape" then luna.signal.quit() end
-    if key == "r" then luna.load() end
+    if key == "r" then luna.signal.restart() end
     if game_state ~= "playing" then return end
 
     if key == "space" and pl.stun <= 0 and pl.jab_cd <= 0 then

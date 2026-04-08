@@ -140,3 +140,8 @@ function luna.render()
     luna.gfx.print(result_text, 10, 10)
 end
 ]]
+
+-- ─── ThreadHandle ──────────────────────────────────────────────────────────────
+
+local threadhandle_type = threadhandle:type()  -- "ThreadHandle"
+local threadhandle_is_type = threadhandle:typeOf("ThreadHandle")  -- Returns whether this object is of the given type

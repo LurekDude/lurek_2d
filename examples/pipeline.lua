@@ -203,3 +203,29 @@ pipeline:setName("game_init_v2")
 
 local running  = pipeline:isRunning()     -- true during async execution
 local complete = pipeline:isComplete()    -- true when all steps are terminal
+
+-- ─── Pipeline ──────────────────────────────────────────────────────────────────
+
+pipeline:cancel()  -- Cancels all pending and waiting steps
+pipeline:clear()  -- Clears all steps from the pipeline
+local context = pipeline:getContext()  -- Returns the stored async context table, or nil
+pipeline:removeStep("name")  -- Removes a step from the pipeline by name
+pipeline:reset()  -- Resets all step states and clears the async context
+pipeline:setOnStepError()  -- Sets the callback to invoke each time a step fails
+local pipeline_type = pipeline:type()  -- "Pipeline"
+local pipeline_is_type = pipeline:typeOf("Pipeline")  -- Returns true if this object is of the given type
+
+-- ─── Step ──────────────────────────────────────────────────────────────────────
+
+local attempt = step:getAttempt()  -- Returns the number of execution attempts so far
+local delay = step:getDelay()  -- Returns the configured delay in seconds
+local duration = step:getDuration()  -- Returns total seconds spent executing this step
+local error = step:getError()  -- Returns the error message from the last failed attempt, or nil
+local status = step:getStatus()  -- Returns the current execution status as a string
+local timeout = step:getTimeout()  -- Returns the timeout stored in metadata, or 0.0 if unset
+local is_optional = step:isOptional()  -- Returns whether this step is marked as optional
+step:type()
+step:typeOf("myName")
+
+-- ─── luna.pipeline ─────────────────────────────────────────────────────────────
+local from_table = luna.pipeline.fromTable({})  -- Deserialises a pipeline from a definition table

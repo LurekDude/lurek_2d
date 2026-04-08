@@ -22,8 +22,8 @@ use std::time::Instant;
 pub enum LogLevel {
     Trace = 0,
     Debug = 1,
-    Info  = 2,
-    Warn  = 3,
+    Info = 2,
+    Warn = 3,
     Error = 4,
     Fatal = 5,
 }
@@ -40,8 +40,8 @@ impl LogLevel {
         match s.to_ascii_lowercase().as_str() {
             "trace" => Some(Self::Trace),
             "debug" => Some(Self::Debug),
-            "info"  => Some(Self::Info),
-            "warn"  => Some(Self::Warn),
+            "info" => Some(Self::Info),
+            "warn" => Some(Self::Warn),
             "error" => Some(Self::Error),
             "fatal" => Some(Self::Fatal),
             _ => None,
@@ -56,8 +56,8 @@ impl LogLevel {
         match self {
             Self::Trace => "trace",
             Self::Debug => "debug",
-            Self::Info  => "info",
-            Self::Warn  => "warn",
+            Self::Info => "info",
+            Self::Warn => "warn",
             Self::Error => "error",
             Self::Fatal => "fatal",
         }
@@ -173,9 +173,9 @@ impl Logger {
             eprintln!(
                 "[{level}] {msg}  ({src}:{ln})",
                 level = entry.level,
-                msg   = entry.message,
-                src   = entry.source,
-                ln    = entry.line
+                msg = entry.message,
+                src = entry.source,
+                ln = entry.line
             );
         }
         if !self.log_file.is_empty() {

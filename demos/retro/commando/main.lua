@@ -1,6 +1,7 @@
 -- Commando — C-64 Classic (Luna2D demo)
 -- Vertical-scrolling top-down shooter inspired by Capcom's 1985 arcade classic.
 -- Shoot enemies, rescue POWs, and advance through the jungle level.
+-- Run with: cargo run -- demos/retro/commando
 
 -- ── Constants ────────────────────────────────────────────────────────────
 
@@ -324,7 +325,7 @@ end
 
 function luna.keypressed(key)
     if key == "escape" then luna.signal.quit() end
-    if key == "r" then luna.load() end
+    if key == "r" then luna.signal.restart() end
     if game_state ~= "playing" then return end
     if key == "space" and shoot_cd <= 0 then
         bullets[#bullets+1] = { x = player.x + player.w/2, y = player.y - 10, enemy = false }

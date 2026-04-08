@@ -1,6 +1,7 @@
 -- Cannon Fodder — Amiga 500 Classic (Luna2D demo)
 -- Point-and-click squad-based top-down shooter inspired by Sensible Software's 1993 title.
 -- Lead your three soldiers through the jungle, eliminate all enemies, and reach the flag.
+-- Run with: cargo run -- demos/retro/cannon_fodder
 
 -- ── Constants ────────────────────────────────────────────────────────────
 
@@ -310,19 +311,13 @@ end
 
 function luna.keypressed(key)
     if key == "escape" then luna.signal.quit() end
-    if key == "r" then luna.load() end
+    if key == "r" then luna.signal.restart() end
 end
 
-function luna.update_extra(dt)
-    -- Directional target movement via held keys (called from update)
-end
-
--- Override update to also handle held-key target movement
-local _upd = luna.update
-luna.update = function(dt)
+-- luna.process is called every frame; handle held-key target movement here
+function luna.process(dt)
     if luna.input.isKeyDown("a") or luna.input.isKeyDown("left")  then mouse_target.x = math.max(20, mouse_target.x - 150 * dt) end
     if luna.input.isKeyDown("d") or luna.input.isKeyDown("right") then mouse_target.x = math.min(W-20, mouse_target.x + 150 * dt) end
     if luna.input.isKeyDown("w") or luna.input.isKeyDown("up")    then mouse_target.y = math.max(20, mouse_target.y - 150 * dt) end
     if luna.input.isKeyDown("s") or luna.input.isKeyDown("down")  then mouse_target.y = math.min(H-60, mouse_target.y + 150 * dt) end
-    _upd(dt)
 end

@@ -1,5 +1,6 @@
 -- Hotel Manager — Skyscraper Management Sim
 -- Build floors, place rooms, earn revenue from guests
+-- Run with: cargo run -- demos/simulation/hotel_manager
 
 local function clamp(v, mn, mx) return math.max(mn, math.min(mx, v)) end
 

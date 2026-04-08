@@ -1,5 +1,6 @@
 -- Railroad / Transport Logistics Demo
 -- Place tracks, route trains between stations, earn revenue from deliveries
+-- Run with: cargo run -- demos/simulation/railroad
 
 local TILE = 32
 local COLS, ROWS = 25, 19
