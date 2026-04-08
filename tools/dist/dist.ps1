@@ -144,7 +144,27 @@ if (Test-Path $ExamplesSource) {
     $ExamplesDest = Join-Path $PackageDir 'examples'
     if (Test-Path $ExamplesDest) { Remove-Item $ExamplesDest -Recurse -Force }
     Copy-Item $ExamplesSource -Destination $ExamplesDest -Recurse -Force
-    Write-OK "Copied demos/"
+    Write-OK "Copied examples/"
+}
+
+# Copy library (Lunasome pure-Lua standard libraries)
+$LibrarySource = Join-Path $WorkspaceRoot 'library'
+if (Test-Path $LibrarySource) {
+    $LibraryDest = Join-Path $PackageDir 'library'
+    if (Test-Path $LibraryDest) { Remove-Item $LibraryDest -Recurse -Force }
+    Copy-Item $LibrarySource -Destination $LibraryDest -Recurse -Force
+    Write-OK "Copied library/"
+}
+
+# Copy API docs  (lua-api.md, luna.lua LuaCATS stubs)
+$ApiDocsDest = Join-Path $PackageDir 'docs'
+New-Item -ItemType Directory -Path $ApiDocsDest -Force | Out-Null
+foreach ($apiFile in @('lua-api.md', 'luna.lua')) {
+    $src = Join-Path $WorkspaceRoot "docs\API\$apiFile"
+    if (Test-Path $src) {
+        Copy-Item $src -Destination (Join-Path $ApiDocsDest $apiFile) -Force
+        Write-OK "Copied docs/$apiFile"
+    }
 }
 
 # Copy docs
@@ -162,9 +182,9 @@ LUNA2D $Version — Windows Portable Distribution
 
 How to run a game
 -----------------
-  luna2d.exe  examples\hello_world     (with console window — for developers)
-  lunec.bat   examples\hello_world     (no console window  — for end users)
-  lunec.lnk                            (shortcut with Luna2D icon — drag-drop a game folder)
+  luna2d.exe  my_game\     (with console window — for developers)
+  lunec.bat   my_game\     (no console window  — for end users)
+  lunec.lnk                (shortcut with Luna2D icon — drag-drop a game folder)
 
 How to show the splash screen (no game)
 ----------------------------------------
@@ -173,17 +193,35 @@ How to show the splash screen (no game)
 
 Bundled examples
 ----------------
-  examples\hello_world   — shapes, text, FPS counter
-  examples\physics_demo  — falling ball with AABB physics
-  examples\sprites       — keyboard-controlled sprite
+  examples\   — single-file API usage scripts (one per luna.* module)
+
+  Use any example as a starting point:
+    lunec.bat examples\physics
+
+Lunasome standard libraries (library\)
+----------------------------------------
+  Pure-Lua game modules you can require from your game scripts.
+  Available: battle, cardgame, combat, crafting, dialog, economy,
+             inventory, item, quest, stats, and more.
+
+  Usage in your game:
+    local inventory = require("library/inventory")
+    local quest     = require("library/quest")
+
+API Reference (docs\)
+----------------------
+  docs\lua-api.md   — luna.* Lua API reference (Markdown)
+  docs\luna.lua     — LuaCATS type stubs for IDE autocompletion
+                      (copy to your project root or configure in .luarc.json)
 
 Writing your own game
 ---------------------
   1. Create a folder, e.g. my_game\
-  2. Add a main.lua with luna.load() / luna.update(dt) / luna.draw()
-  3. Run:  lunec.bat my_game   (or drag the folder onto lunec.lnk)
+  2. Add a main.lua with luna.init / luna.process(dt) / luna.render()
+  3. Optionally add a conf.toml for [window] title, width, height
+  4. Run:  lunec.bat my_game   (or drag the folder onto lunec.lnk)
 
-API reference:  see README.md or https://github.com/yourname/luna2d
+Full docs & source:  https://github.com/yourname/luna2d
 "@
 Set-Content -Path (Join-Path $PackageDir 'HOW-TO-RUN.txt') -Value $HowTo -Encoding UTF8
 Write-OK "Written HOW-TO-RUN.txt"

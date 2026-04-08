@@ -92,7 +92,38 @@ Section "Engine (required)" SecEngine
     File "..\README.md"
     File "..\LICENSE"
 
-    ; Write registry uninstall entry
+    ; Lunasome standard libraries — install each module subdirectory
+    SetOutPath "$INSTDIR\library"
+    File /nonfatal "..\library\README.md"
+    SetOutPath "$INSTDIR\library\battle"       ; File /r recurses into subdirs when given a dir path
+    File "..\library\battle\*.lua"
+    SetOutPath "$INSTDIR\library\cardgame"
+    File "..\library\cardgame\*.lua"
+    SetOutPath "$INSTDIR\library\combat"
+    File "..\library\combat\*.lua"
+    SetOutPath "$INSTDIR\library\crafting"
+    File "..\library\crafting\*.lua"
+    SetOutPath "$INSTDIR\library\dialog"
+    File "..\library\dialog\*.lua"
+    SetOutPath "$INSTDIR\library\doll"
+    File "..\library\doll\*.lua"
+    SetOutPath "$INSTDIR\library\economy"
+    File "..\library\economy\*.lua"
+    SetOutPath "$INSTDIR\library\inventory"
+    File "..\library\inventory\*.lua"
+    SetOutPath "$INSTDIR\library\item"
+    File "..\library\item\*.lua"
+    SetOutPath "$INSTDIR\library\province_map"
+    File "..\library\province_map\*.lua"
+    SetOutPath "$INSTDIR\library\quest"
+    File "..\library\quest\*.lua"
+    SetOutPath "$INSTDIR\library\stats"
+    File "..\library\stats\*.lua"
+
+    ; API docs (Markdown reference + LuaCATS stubs for IDE autocompletion)
+    SetOutPath "$INSTDIR\docs"
+    File /nonfatal "..\docs\API\lua-api.md"
+    File /nonfatal "..\docs\API\luna.lua"
     WriteRegStr   HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APP_NAME}" "DisplayName"          "${APP_NAME} ${APP_VERSION}"
     WriteRegStr   HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APP_NAME}" "DisplayVersion"       "${APP_VERSION}"
     WriteRegStr   HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APP_NAME}" "Publisher"            "${APP_PUBLISHER}"
@@ -137,10 +168,9 @@ SectionEnd
 
 Section "Start Menu Shortcuts" SecStartMenu
     CreateDirectory "$SMPROGRAMS\${APP_NAME}"
-    CreateShortcut  "$SMPROGRAMS\${APP_NAME}\${APP_NAME}.lnk"       "$INSTDIR\${APP_EXE}" "" "$INSTDIR\${APP_EXE}"
-    CreateShortcut  "$SMPROGRAMS\${APP_NAME}\Hello World.lnk"        "$INSTDIR\${APP_EXE}" "$\"$INSTDIR\examples\hello_world$\"" "$INSTDIR\${APP_EXE}"
-    CreateShortcut  "$SMPROGRAMS\${APP_NAME}\Physics Demo.lnk"       "$INSTDIR\${APP_EXE}" "$\"$INSTDIR\examples\physics_demo$\"" "$INSTDIR\${APP_EXE}"
-    CreateShortcut  "$SMPROGRAMS\${APP_NAME}\Uninstall ${APP_NAME}.lnk" "$INSTDIR\uninstall.exe"
+    CreateShortcut  "$SMPROGRAMS\${APP_NAME}\${APP_NAME}.lnk"             "$INSTDIR\${APP_EXE}"  ""                                      "$INSTDIR\${APP_EXE}"
+    CreateShortcut  "$SMPROGRAMS\${APP_NAME}\API Reference.lnk"           "$INSTDIR\docs\lua-api.md"
+    CreateShortcut  "$SMPROGRAMS\${APP_NAME}\Uninstall ${APP_NAME}.lnk"   "$INSTDIR\uninstall.exe"
 SectionEnd
 
 Section "Desktop Shortcut" SecDesktop
@@ -161,6 +191,8 @@ Section "Uninstall"
 
     RMDir /r "$INSTDIR\assets"
     RMDir /r "$INSTDIR\examples"
+    RMDir /r "$INSTDIR\library"
+    RMDir /r "$INSTDIR\docs"
     RMDir    "$INSTDIR"
 
     ; Remove shortcuts
