@@ -855,12 +855,13 @@ impl MapGen {
     /// - `group` — `&MapGroup`.
     /// - `script_index` — `Option<usize>`.
     /// - `seed` — `Option<u64>`.
+    /// - `layer_name` — `&str` — name for the generated layer (e.g. `"main"`).
     ///
     /// # Returns
     /// `TileMap`.
     ///
     /// The map width = `grid_w * segment_size`, height = `grid_h * segment_size`.
-    /// Creates one layer and applies script steps. Currently implements:
+    /// Creates one layer named `layer_name` and applies script steps. Currently implements:
     /// - [`StepType::FillRandom`]: fills tiles with random GIDs from available blocks.
     /// - [`StepType::PlaceBlock`]: stamps a specific block's tiles into the map.
     /// - [`StepType::FillRect`]: fills a rectangle with `tile_id`.
@@ -870,6 +871,7 @@ impl MapGen {
         group: &MapGroup,
         script_index: Option<usize>,
         seed: Option<u64>,
+        layer_name: &str,
     ) -> TileMap {
         let actual_seed = seed.unwrap_or(self.seed);
         self.seed = actual_seed;
@@ -879,7 +881,7 @@ impl MapGen {
         let map_h = self.grid_h * self.segment_size;
 
         let mut tilemap = TileMap::new(self.tile_pixel_w, self.tile_pixel_h, 16);
-        tilemap.add_layer("generated", map_w, map_h);
+        tilemap.add_layer(layer_name, map_w, map_h);
 
         // Add a default empty tileset
         let ts = TileSet::new(1, 256, 16, self.tile_pixel_w, self.tile_pixel_h, 0, 0);
@@ -950,6 +952,7 @@ impl MapGen {
     /// - `rows` — `u32`.
     /// - `script_index` — `Option<usize>`.
     /// - `seed` — `Option<u64>`.
+    /// - `layer_name` — `&str` — name for the generated layer (e.g. `"main"`).
     ///
     /// # Returns
     /// `TileMap`.
@@ -960,6 +963,7 @@ impl MapGen {
         rows: u32,
         script_index: Option<usize>,
         seed: Option<u64>,
+        layer_name: &str,
     ) -> TileMap {
         let actual_seed = seed.unwrap_or(self.seed);
         let region_w = self.grid_w * self.segment_size;
@@ -968,7 +972,7 @@ impl MapGen {
         let total_h = region_h * rows;
 
         let mut tilemap = TileMap::new(self.tile_pixel_w, self.tile_pixel_h, 16);
-        tilemap.add_layer("world", total_w, total_h);
+        tilemap.add_layer(layer_name, total_w, total_h);
 
         let ts = TileSet::new(1, 256, 16, self.tile_pixel_w, self.tile_pixel_h, 0, 0);
         tilemap.add_tileset(ts);
@@ -978,7 +982,7 @@ impl MapGen {
         for row in 0..rows {
             for col in 0..columns {
                 let region_seed = actual_seed.wrapping_add((row * columns + col) as u64);
-                let region = self.generate(group, script_index, Some(region_seed));
+                let region = self.generate(group, script_index, Some(region_seed), "region");
 
                 // Copy region tiles into the world map
                 let ox = col * region_w;
@@ -1029,6 +1033,16 @@ impl MapGen {
     /// `u32`.
     pub fn get_segment_size(&self) -> u32 {
         self.segment_size
+    }
+
+    /// Sets the grid dimensions (width and height in segments).
+    ///
+    /// # Parameters
+    /// - `w` — `u32`.
+    /// - `h` — `u32`.
+    pub fn set_grid_dimensions(&mut self, w: u32, h: u32) {
+        self.grid_w = w;
+        self.grid_h = h;
     }
 
     /// Sets the tile pixel dimensions. Replaces the current tile size value; callers hold responsibility for maintaining consistency with related fields.
@@ -1452,7 +1466,7 @@ mod tests {
     fn map_gen_generate_empty_group() {
         let mut gen = MapGen::new(MapSize::Small, 4);
         let group = MapGroup::new("empty");
-        let tilemap = gen.generate(&group, None, Some(42));
+        let tilemap = gen.generate(&group, None, Some(42), "main");
         // Map should exist with correct dimensions: 3*4 = 12 x 12
         assert_eq!(tilemap.get_layer_count(), 1);
     }
@@ -1473,7 +1487,7 @@ mod tests {
         });
         group.add_script(script);
 
-        let tilemap = gen.generate(&group, Some(0), Some(42));
+        let tilemap = gen.generate(&group, Some(0), Some(42), "main");
         // Tile at (0,0) should be 5
         assert_eq!(tilemap.get_tile(0, 0, 0), 5);
         // Tile at (2,2) should be 5
@@ -1504,7 +1518,7 @@ mod tests {
         });
         group.add_script(script);
 
-        let tilemap = gen.generate(&group, Some(0), Some(42));
+        let tilemap = gen.generate(&group, Some(0), Some(42), "main");
         assert_eq!(tilemap.get_tile(0, 1, 1), 10);
         assert_eq!(tilemap.get_tile(0, 2, 1), 11);
         assert_eq!(tilemap.get_tile(0, 1, 2), 12);
@@ -1515,7 +1529,7 @@ mod tests {
     fn map_gen_placement_count() {
         let mut gen = MapGen::new(MapSize::Small, 4);
         let group = MapGroup::new("empty");
-        gen.generate(&group, None, Some(1));
+        gen.generate(&group, None, Some(1), "main");
         assert_eq!(gen.get_placement_count(), 0);
     }
 
@@ -1535,7 +1549,7 @@ mod tests {
         });
         group.add_script(script);
 
-        let tilemap = gen.generate_world(&group, 2, 2, Some(0), Some(99));
+        let tilemap = gen.generate_world(&group, 2, 2, Some(0), Some(99), "main");
         // World should be 2 columns × 2 rows of 3*2=6 tile regions → 12×12 tiles
         assert_eq!(tilemap.get_layer_count(), 1);
         // Tile (0,0) should be filled

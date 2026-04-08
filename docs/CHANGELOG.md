@@ -18,6 +18,13 @@ Always update this file **in the same commit** as the change. Use the commit typ
 
 ---
 
+## [0.5.4] — 2026-04-16
+
+### Changed
+- **`mapgen.rs` generic layer names** — `MapGen::generate()` and `MapGen::generate_world()` now accept an explicit `layer_name: &str` parameter instead of hardcoding game-semantic names (`"generated"`, `"world"`). The Lua binding `mapgen:generate(scriptIndex?, seed?, layerName?)` exposes this as an optional third argument defaulting to `"main"`. All internal call sites and tests updated.
+
+---
+
 ## [0.5.3] — 2026-04-15
 
 ### Added

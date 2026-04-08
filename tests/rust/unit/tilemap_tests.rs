@@ -1211,7 +1211,7 @@ fn mapgen_set_get_layer_mode() {
 fn mapgen_generate_produces_tilemap_with_correct_structure() {
     let mut gen = MapGen::new(MapSize::Small, 4);
     let group = MapGroup::new("empty");
-    let tilemap = gen.generate(&group, None, Some(42));
+    let tilemap = gen.generate(&group, None, Some(42), "main");
     assert_eq!(tilemap.get_layer_count(), 1);
     assert_eq!(tilemap.get_tileset_count(), 1);
     assert_eq!(tilemap.get_tile_dimensions(), (32, 32));
@@ -1236,7 +1236,7 @@ fn mapgen_generate_with_fill_random_script() {
     });
     group.add_script(script);
 
-    let tilemap = gen.generate(&group, Some(0), Some(123));
+    let tilemap = gen.generate(&group, Some(0), Some(123), "main");
     // Should have some non-zero tiles from fill_random
     let map_size = 3 * 4; // grid_w * segment_size
     let mut has_nonzero = false;
@@ -1255,7 +1255,7 @@ fn mapgen_generate_with_fill_random_script() {
 fn mapgen_generate_world_produces_tilemap() {
     let mut gen = MapGen::new(MapSize::Small, 4);
     let group = MapGroup::new("test");
-    let world = gen.generate_world(&group, 2, 2, None, Some(99));
+    let world = gen.generate_world(&group, 2, 2, None, Some(99), "main");
     assert_eq!(world.get_layer_count(), 1);
     assert_eq!(world.get_tile_dimensions(), (32, 32));
 }
@@ -1264,7 +1264,7 @@ fn mapgen_generate_world_produces_tilemap() {
 fn mapgen_placement_count_zero_without_script() {
     let mut gen = MapGen::new(MapSize::Small, 4);
     let group = MapGroup::new("empty");
-    let _tilemap = gen.generate(&group, None, Some(1));
+    let _tilemap = gen.generate(&group, None, Some(1), "main");
     assert_eq!(gen.get_placement_count(), 0);
 }
 
@@ -1295,7 +1295,7 @@ fn mapgen_generate_with_fill_rect_script() {
     });
     group.add_script(script);
 
-    let tilemap = gen.generate(&group, Some(0), Some(0));
+    let tilemap = gen.generate(&group, Some(0), Some(0), "main");
     // Tiles in the filled rect should be 42
     assert_eq!(tilemap.get_tile(0, 1, 1), 42);
     assert_eq!(tilemap.get_tile(0, 2, 2), 42);

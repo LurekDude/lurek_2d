@@ -502,7 +502,7 @@ end
 
 - **Index convention**: All Lua-facing layer/tile indices are 1-based; Rust internals are 0-based. The `tilemap_api.rs` boundary performs `idx - 1` on inputs and `idx + 1` on outputs.
 - **Rust-only types**: `LargeMapRenderer`, `MapChunk`, `PolygonMap`, `PolygonRegion`, `TileWalker`, and `Facing` are exported from the Rust module but have no Lua UserData wrappers in `tilemap_api.rs`.
-- **MapGen not exposed to Lua**: The `MapGen` struct (procedural generation) has no Lua binding; only `MapBlock` and `MapGroup` are exposed. Generation must happen Rust-side or via a future Lua API extension.
+- **MapGen Lua binding**: `MapGen` is exposed to Lua via `LuaMapGen` (UserData). `mapgen:generate(scriptIndex?, seed?, layerName?)` returns a `TileMap`; `layerName` defaults to `"main"`. `MapBlock` and `MapGroup` are also exposed.
 - **TMX parser limitations**: `load_tmx()` does not support zstd compression, infinite maps, or embedded TSX references. Only external `.tsx` references are parsed inline. The parser is also not exposed to Lua.
 - **Autotile step stubs**: `StepType::PlaceRandom`, `PlaceLine`, `FloodFill`, `FillArea`, and `DrawPath` are declared in `mapgen.rs` but not yet implemented in `MapGen::generate()`.
 - **TileWalker collision**: `can_move_to()` always returns `true`; actual collision checking is deferred to the Lua layer.

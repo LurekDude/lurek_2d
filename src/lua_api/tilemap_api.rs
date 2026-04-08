@@ -10,7 +10,7 @@ use crate::tilemap::autotile_sheet::{AutoTileLayout, AutoTileSheet};
 use crate::tilemap::chunk::ChunkMap;
 use crate::tilemap::coords;
 use crate::tilemap::isomap::IsoMap;
-use crate::tilemap::mapgen::{Edge, MapBlock, MapGroup, MapOrientation};
+use crate::tilemap::mapgen::{Edge, MapBlock, MapGen, MapGroup, MapOrientation, MapScript, MapSize, ScriptStep, StepType};
 use crate::tilemap::tilemap::TileMap;
 use crate::tilemap::tileset::{TileAnimFrame, TileSet};
 
@@ -187,56 +187,74 @@ impl LuaUserData for LuaTileSet {
         });
 
         // -- setAutoTileRule --
-        /// Registers a 4-bit cardinal autotile rule.
+        /// Registers a 4-bit cardinal autotile rule. tileId is 1-based.
         /// @param typeName : string
         /// @param bitmask : integer
         /// @param tileId : integer
         methods.add_method(
             "setAutoTileRule",
             |_, this, (type_name, bitmask, tile_id): (String, u8, u32)| {
+                if tile_id == 0 {
+                    return Err(LuaError::RuntimeError(
+                        "setAutoTileRule: tileId must be >= 1".to_string(),
+                    ));
+                }
                 this.inner
                     .borrow_mut()
-                    .set_auto_tile_rule(&type_name, bitmask, tile_id);
+                    .set_auto_tile_rule(&type_name, bitmask, tile_id - 1);
                 Ok(())
             },
         );
 
         // -- getAutoTileId --
-        /// Looks up the local tile ID for a 4-bit cardinal autotile bitmask.
+        /// Looks up the 1-based local tile ID for a 4-bit cardinal autotile bitmask, or nil.
         /// @param typeName : string
         /// @param bitmask : integer
         /// @return integer?
         methods.add_method(
             "getAutoTileId",
             |_, this, (type_name, bitmask): (String, u8)| {
-                Ok(this.inner.borrow().get_auto_tile_id(&type_name, bitmask))
+                Ok(this
+                    .inner
+                    .borrow()
+                    .get_auto_tile_id(&type_name, bitmask)
+                    .map(|id| id + 1))
             },
         );
 
         // -- setAutoTileRule8 --
-        /// Registers an 8-bit directional autotile rule.
+        /// Registers an 8-bit directional autotile rule. tileId is 1-based.
         /// @param typeName : string
         /// @param bitmask : integer
         /// @param tileId : integer
         methods.add_method(
             "setAutoTileRule8",
             |_, this, (type_name, bitmask, tile_id): (String, u16, u32)| {
+                if tile_id == 0 {
+                    return Err(LuaError::RuntimeError(
+                        "setAutoTileRule8: tileId must be >= 1".to_string(),
+                    ));
+                }
                 this.inner
                     .borrow_mut()
-                    .set_auto_tile_rule_8(&type_name, bitmask, tile_id);
+                    .set_auto_tile_rule_8(&type_name, bitmask, tile_id - 1);
                 Ok(())
             },
         );
 
         // -- getAutoTileId8 --
-        /// Looks up the local tile ID for an 8-bit directional autotile bitmask.
+        /// Looks up the 1-based local tile ID for an 8-bit directional autotile bitmask, or nil.
         /// @param typeName : string
         /// @param bitmask : integer
         /// @return integer?
         methods.add_method(
             "getAutoTileId8",
             |_, this, (type_name, bitmask): (String, u16)| {
-                Ok(this.inner.borrow().get_auto_tile_id_8(&type_name, bitmask))
+                Ok(this
+                    .inner
+                    .borrow()
+                    .get_auto_tile_id_8(&type_name, bitmask)
+                    .map(|id| id + 1))
             },
         );
     }
@@ -629,6 +647,8 @@ impl LuaUserData for LuaTileMap {
 
         // -- sweepRect --
         /// Performs a swept AABB collision test against solid tiles on layer (1-based).
+        /// Returns (ox, oy, nx, ny, hx, hy) — final position, normal, and hit tile coords.
+        /// When no obstacle is hit, ox = x+dx, oy = y+dy and normal/hit are zero.
         /// @param layer : integer
         /// @param x : number
         /// @param y : number
@@ -636,27 +656,24 @@ impl LuaUserData for LuaTileMap {
         /// @param h : number
         /// @param dx : number
         /// @param dy : number
-        /// @return table?
+        /// @return number, number, number, number, number, number
         methods.add_method(
             "sweepRect",
-            |lua, this, (layer, x, y, w, h, dx, dy): (usize, f32, f32, f32, f32, f32, f32)| {
+            |_, this, (layer, x, y, w, h, dx, dy): (usize, f32, f32, f32, f32, f32, f32)| {
                 match this
                     .inner
                     .borrow()
                     .sweep_rect(layer - 1, Rect::new(x, y, w, h), dx, dy)
                 {
-                    Some(result) => {
-                        let tbl = lua.create_table()?;
-                        tbl.set("contactX", result.contact_point.x)?;
-                        tbl.set("contactY", result.contact_point.y)?;
-                        tbl.set("normalX", result.normal.x)?;
-                        tbl.set("normalY", result.normal.y)?;
-                        tbl.set("tileX", result.tile_x + 1)?;
-                        tbl.set("tileY", result.tile_y + 1)?;
-                        tbl.set("t", result.t)?;
-                        Ok(LuaValue::Table(tbl))
-                    }
-                    None => Ok(LuaValue::Nil),
+                    Some(result) => Ok((
+                        result.contact_point.x,
+                        result.contact_point.y,
+                        result.normal.x,
+                        result.normal.y,
+                        (result.tile_x + 1) as f32,
+                        (result.tile_y + 1) as f32,
+                    )),
+                    None => Ok((x + dx, y + dy, 0.0f32, 0.0f32, 0.0f32, 0.0f32)),
                 }
             },
         );
@@ -768,27 +785,41 @@ impl LuaUserData for LuaAutoTileSheet {
         );
 
         // -- getBitmaskForTile --
-        /// Returns the bitmask value associated with a tile index.
-        /// @param idx : integer
+        /// Returns the bitmask value associated with a 1-based local tile ID.
+        /// @param tileId : integer
         /// @return integer
-        methods.add_method("getBitmaskForTile", |_, this, idx: u32| {
-            Ok(this.inner.borrow().get_bitmask_for_tile(idx))
+        methods.add_method("getBitmaskForTile", |_, this, tile_id: u32| {
+            if tile_id == 0 {
+                return Err(LuaError::RuntimeError(
+                    "getBitmaskForTile: tile_id must be >= 1".to_string(),
+                ));
+            }
+            Ok(this.inner.borrow().get_bitmask_for_tile(tile_id - 1))
         });
 
         // -- getTileForBitmask --
-        /// Returns the tile index for a given bitmask, or nil.
+        /// Returns the 1-based tile ID for a given bitmask, or nil.
         /// @param bitmask : integer
         /// @return integer?
         methods.add_method("getTileForBitmask", |_, this, bitmask: u16| {
-            Ok(this.inner.borrow().get_tile_for_bitmask(bitmask))
+            Ok(this
+                .inner
+                .borrow()
+                .get_tile_for_bitmask(bitmask)
+                .map(|idx| idx + 1))
         });
 
         // -- getQuad --
-        /// Returns the atlas region rectangle for the tile at the given index.
-        /// @param idx : integer
+        /// Returns the atlas region rectangle for the 1-based tile ID.
+        /// @param tileId : integer
         /// @return number, number, number, number
-        methods.add_method("getQuad", |_, this, idx: u32| {
-            let r = this.inner.borrow().get_quad(idx);
+        methods.add_method("getQuad", |_, this, tile_id: u32| {
+            if tile_id == 0 {
+                return Err(LuaError::RuntimeError(
+                    "getQuad: tile_id must be >= 1".to_string(),
+                ));
+            }
+            let r = this.inner.borrow().get_quad(tile_id - 1);
             Ok((r.x, r.y, r.width, r.height))
         });
     }
@@ -1276,6 +1307,128 @@ impl LuaUserData for LuaMapGroup {
         methods.add_method("getName", |_, this, ()| {
             Ok(this.inner.borrow().get_name().to_string())
         });
+
+        // -- addScript --
+        /// Adds a MapScript to this group.
+        /// @param script : MapScript
+        /// @return nil
+        methods.add_method("addScript", |_, this, script_ud: LuaAnyUserData| {
+            let script = script_ud.borrow::<LuaMapScript>()?;
+            this.inner
+                .borrow_mut()
+                .add_script(script.inner.borrow().clone());
+            Ok(())
+        });
+
+        // -- getScriptCount --
+        /// Returns the number of scripts in this group.
+        /// @return integer
+        methods.add_method("getScriptCount", |_, this, ()| {
+            Ok(this.inner.borrow().get_script_count())
+        });
+    }
+}
+
+// -------------------------------------------------------------------------------
+// LuaMapScript UserData
+// -------------------------------------------------------------------------------
+
+/// Lua-side wrapper around a [`MapScript`] procedural generation script.
+#[derive(Clone)]
+pub struct LuaMapScript {
+    inner: Rc<RefCell<MapScript>>,
+}
+
+impl LuaUserData for LuaMapScript {
+    fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
+        // -- getStepCount --
+        /// Returns the number of steps in this script.
+        /// @return integer
+        methods.add_method("getStepCount", |_, this, ()| {
+            Ok(this.inner.borrow().get_step_count())
+        });
+
+        // -- addStep --
+        /// Appends a generation step from a step-definition table.
+        /// Accepted type strings: "fillRandom", "placeBlock", "fillArea".
+        /// @param stepDef : table  {type, x?, y?, w?, h?, gid?, chance?}
+        /// @return nil
+        methods.add_method("addStep", |_, this, step_def: LuaTable| {
+            let step_type_str: String = step_def.get("type")?;
+            let st = match step_type_str.as_str() {
+                "fillRandom" => StepType::FillRandom,
+                "placeBlock" => StepType::PlaceBlock,
+                "fillArea" => StepType::FillArea,
+                other => {
+                    return Err(LuaError::RuntimeError(format!(
+                        "addStep: unknown step type '{}'",
+                        other
+                    )))
+                }
+            };
+            let get_u32_field = |tbl: &LuaTable, key: &str| -> u32 {
+                match tbl.get::<_, LuaValue>(key) {
+                    Ok(LuaValue::Integer(n)) => n as u32,
+                    Ok(LuaValue::Number(n)) => n as u32,
+                    _ => 0,
+                }
+            };
+            let get_f32_field = |tbl: &LuaTable, key: &str| -> f32 {
+                match tbl.get::<_, LuaValue>(key) {
+                    Ok(LuaValue::Number(n)) => n as f32,
+                    Ok(LuaValue::Integer(n)) => n as f32,
+                    _ => 1.0,
+                }
+            };
+            let step = ScriptStep {
+                step_type: st,
+                x: get_u32_field(&step_def, "x"),
+                y: get_u32_field(&step_def, "y"),
+                width: get_u32_field(&step_def, "w"),
+                height: get_u32_field(&step_def, "h"),
+                tile_id: get_u32_field(&step_def, "gid"),
+                chance: get_f32_field(&step_def, "chance"),
+                ..Default::default()
+            };
+            this.inner.borrow_mut().add_step(step);
+            Ok(())
+        });
+    }
+}
+
+// -------------------------------------------------------------------------------
+// LuaMapGen UserData
+// -------------------------------------------------------------------------------
+
+/// Lua-side wrapper for a map generator (size preset or explicit dimensions).
+#[derive(Clone)]
+pub struct LuaMapGen {
+    group: Rc<RefCell<MapGroup>>,
+    inner: Rc<RefCell<crate::tilemap::mapgen::MapGen>>,
+}
+
+impl LuaUserData for LuaMapGen {
+    fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
+        // -- generate --
+        /// Generates a TileMap using the group's blocks and an optional script index, seed, and layer name.
+        /// @param scriptIndex : integer?
+        /// @param seed : integer?
+        /// @param layerName : string?
+        /// @return TileMap
+        methods.add_method(
+            "generate",
+            |_, this, (script_idx, seed, layer_name): (Option<usize>, Option<u64>, Option<String>)| {
+                let script_index = script_idx.map(|i| if i == 0 { 0 } else { i - 1 });
+                let name = layer_name.as_deref().unwrap_or("main");
+                let tm = this
+                    .inner
+                    .borrow_mut()
+                    .generate(&this.group.borrow(), script_index, seed, name);
+                Ok(LuaTileMap {
+                    inner: Rc::new(RefCell::new(tm)),
+                })
+            },
+        );
     }
 }
 
@@ -1362,12 +1515,17 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
     tbl.set(
         "newAutoTileSheet",
         lua.create_function(
-            |lua, (tile_w, tile_h, layout_str): (u32, u32, Option<String>)| {
-                let layout = match layout_str.as_deref() {
-                    Some("blob47") => AutoTileLayout::Blob47,
-                    Some("composite48") => AutoTileLayout::Composite48,
-                    Some("minimal16") => AutoTileLayout::Minimal16,
-                    _ => AutoTileLayout::Blob47,
+            |lua, (tile_w, tile_h, layout_str): (u32, u32, String)| {
+                let layout = match layout_str.as_str() {
+                    "blob47" => AutoTileLayout::Blob47,
+                    "composite48" => AutoTileLayout::Composite48,
+                    "minimal16" => AutoTileLayout::Minimal16,
+                    other => {
+                        return Err(LuaError::RuntimeError(format!(
+                            "newAutoTileSheet: unknown layout '{}', use 'blob47', 'composite48', or 'minimal16'",
+                            other
+                        )))
+                    }
                 };
                 lua.create_userdata(LuaAutoTileSheet {
                     inner: Rc::new(RefCell::new(AutoTileSheet::new(tile_w, tile_h, layout))),
@@ -1706,6 +1864,182 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
     tbl.set(
         "isoDirectionFromAngle",
         lua.create_function(|_, angle: f32| Ok(coords::iso_direction_from_angle(angle)))?,
+    )?;
+
+    // -- IsoMap layer constants --
+    tbl.set("FLOOR", 1u32)?;
+    tbl.set("NORTH_WALL", 2u32)?;
+    tbl.set("WEST_WALL", 3u32)?;
+    tbl.set("OBJECT", 4u32)?;
+
+    // -- newMapScript --
+    /// Creates a new empty MapScript procedural generation script.
+    /// @return MapScript
+    tbl.set(
+        "newMapScript",
+        lua.create_function(|_, ()| {
+            Ok(LuaMapScript {
+                inner: Rc::new(RefCell::new(MapScript::new("lua_script"))),
+            })
+        })?,
+    )?;
+
+    // -- newMapGen --
+    /// Creates a MapGen from a MapGroup, a preset name or dimensions, and a segment size.
+    /// @param group : MapGroup
+    /// @param preset : string  OR  w : integer
+    /// @param segmentSize : integer  OR  h : integer
+    /// @param segmentSize : integer?   (only used when w,h form)
+    /// @return MapGen
+    tbl.set(
+        "newMapGen",
+        lua.create_function(|_, args: mlua::Variadic<LuaValue>| {
+            if args.len() < 3 {
+                return Err(LuaError::RuntimeError(
+                    "newMapGen: expected (group, preset, segmentSize) or (group, w, h, segmentSize)"
+                        .to_string(),
+                ));
+            }
+            // arg[0]: MapGroup userdata
+            let group_rc = if let LuaValue::UserData(ud) = &args[0] {
+                let g = ud.borrow::<LuaMapGroup>()?;
+                g.inner.clone()
+            } else {
+                return Err(LuaError::RuntimeError(
+                    "newMapGen: first argument must be a MapGroup".to_string(),
+                ));
+            };
+
+            // arg[1]: preset string OR width integer; arg[2]: segmentSize OR height
+            let (size, segment_size) = match &args[1] {
+                LuaValue::String(s) => {
+                    let size = match s.to_str()? {
+                        "small" => MapSize::Small,
+                        "medium" => MapSize::Medium,
+                        "large" => MapSize::Large,
+                        other => {
+                            return Err(LuaError::RuntimeError(format!(
+                                "newMapGen: unknown preset '{}', use 'small', 'medium', or 'large'",
+                                other
+                            )))
+                        }
+                    };
+                    let seg = match &args[2] {
+                        LuaValue::Integer(n) => *n as u32,
+                        LuaValue::Number(n) => *n as u32,
+                        _ => return Err(LuaError::RuntimeError(
+                            "newMapGen: third argument (segmentSize) must be integer".to_string(),
+                        )),
+                    };
+                    (size, seg)
+                }
+                LuaValue::Integer(w) => {
+                    let w = *w as u32;
+                    // numeric form: (group, w, h, segmentSize)
+                    let h = match &args[2] {
+                        LuaValue::Integer(n) => *n as u32,
+                        LuaValue::Number(n) => *n as u32,
+                        _ => return Err(LuaError::RuntimeError(
+                            "newMapGen: third argument must be integer h".to_string(),
+                        )),
+                    };
+                    let seg = if args.len() >= 4 {
+                        match &args[3] {
+                            LuaValue::Integer(n) => *n as u32,
+                            LuaValue::Number(n) => *n as u32,
+                            _ => 1,
+                        }
+                    } else {
+                        1
+                    };
+                    // Use a Custom variant by creating MapGen directly with w×h
+                    let mut gen = MapGen::new(MapSize::Small, seg);
+                    gen.set_grid_dimensions(w, h);
+                    return Ok(LuaMapGen {
+                        group: group_rc,
+                        inner: Rc::new(RefCell::new(gen)),
+                    });
+                }
+                LuaValue::Number(w) => {
+                    let w = *w as u32;
+                    let h = match &args[2] {
+                        LuaValue::Integer(n) => *n as u32,
+                        LuaValue::Number(n) => *n as u32,
+                        _ => return Err(LuaError::RuntimeError(
+                            "newMapGen: third argument must be integer h".to_string(),
+                        )),
+                    };
+                    let seg = if args.len() >= 4 {
+                        match &args[3] {
+                            LuaValue::Integer(n) => *n as u32,
+                            LuaValue::Number(n) => *n as u32,
+                            _ => 1,
+                        }
+                    } else {
+                        1
+                    };
+                    let mut gen = MapGen::new(MapSize::Small, seg);
+                    gen.set_grid_dimensions(w, h);
+                    return Ok(LuaMapGen {
+                        group: group_rc,
+                        inner: Rc::new(RefCell::new(gen)),
+                    });
+                }
+                _ => return Err(LuaError::RuntimeError(
+                    "newMapGen: second argument must be preset string or integer width".to_string(),
+                )),
+            };
+            let gen = MapGen::new(size, segment_size);
+            Ok(LuaMapGen {
+                group: group_rc,
+                inner: Rc::new(RefCell::new(gen)),
+            })
+        })?,
+    )?;
+
+    // -- loadTMX --
+    /// Parses a TMX XML string and returns a table with map metadata and layers.
+    /// @param xml : string
+    /// @return table, string?  — (result_table, nil) on success; (nil, error_message) on failure
+    tbl.set(
+        "loadTMX",
+        lua.create_function(|lua, xml: String| {
+            let tmx = crate::tilemap::tmx::load_tmx(&xml)
+                .map_err(LuaError::RuntimeError)?;
+            let result = lua.create_table()?;
+            result.set("width", tmx.width)?;
+            result.set("height", tmx.height)?;
+            result.set("tileWidth", tmx.tile_width)?;
+            result.set("tileHeight", tmx.tile_height)?;
+            let orient_str = match tmx.orientation {
+                crate::tilemap::tmx::TmxOrientation::Orthogonal => "orthogonal",
+                crate::tilemap::tmx::TmxOrientation::Isometric => "isometric",
+                crate::tilemap::tmx::TmxOrientation::Staggered => "staggered",
+                crate::tilemap::tmx::TmxOrientation::Hexagonal => "hexagonal",
+            };
+            result.set("orientation", orient_str)?;
+            let layers_tbl = lua.create_table()?;
+            let mut layer_idx = 1usize;
+            for layer in &tmx.layers {
+                let entry = lua.create_table()?;
+                match layer {
+                    crate::tilemap::tmx::TmxLayer::Tile(t) => {
+                        entry.set("type", "tile")?;
+                        entry.set("name", t.name.as_str())?;
+                        entry.set("width", t.width)?;
+                        entry.set("height", t.height)?;
+                    }
+                    crate::tilemap::tmx::TmxLayer::Object(o) => {
+                        entry.set("type", "object")?;
+                        entry.set("name", o.name.as_str())?;
+                    }
+                }
+                layers_tbl.set(layer_idx, entry)?;
+                layer_idx += 1;
+            }
+            result.set("layers", layers_tbl)?;
+            Ok(result)
+        })?,
     )?;
 
     luna.set("tilemap", tbl)?;
