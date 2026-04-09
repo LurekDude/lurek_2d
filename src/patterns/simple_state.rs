@@ -7,6 +7,14 @@
 use std::collections::HashSet;
 
 /// Finite state machine that tracks a set of named states and the current one.
+///
+/// Transitions and callbacks are managed by the Lua API layer; this struct
+/// holds only the pure-Rust state bookkeeping — registered state names and
+/// the currently active state key.
+///
+/// # Fields
+/// - `states` — `HashSet<String>` — All registered state names.
+/// - `current` — `Option<String>` — The active state name, or `None` if no state is set.
 pub struct SimpleState {
     states: HashSet<String>,
     current: Option<String>,

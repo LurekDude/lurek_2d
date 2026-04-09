@@ -8,7 +8,7 @@
 //! All public items are documented. See the parent module for architectural context
 //! and the `lurek.*` Lua API for the scripting interface.
 //!
-/// Standard system cursor shapes. Consult the module-level documentation for the broader usage context and preconditions.
+/// Standard OS cursor icon variants supported by the window backend.
 ///
 /// # Variants
 /// - `Arrow` — Arrow variant.
@@ -177,7 +177,7 @@ impl MouseState {
         self.scroll_y = 0.0;
     }
 
-    /// Updates the cursor position. Consult the module-level documentation for the broader usage context and preconditions.
+    /// Records the latest cursor position reported by the OS move event.
     ///
     /// # Parameters
     /// - `x` — `f32`.

@@ -1,6 +1,6 @@
 # Module Quality Report: `savegame`
 
-> **Status**: 🔴 FAIL  |  **Date**: 2026-04-09  |  **Score**: 42 ✅ / 4 ⚠️ / 2 ❌ / 19 🔵
+> **Status**: 🔴 FAIL  |  **Date**: 2026-04-09  |  **Score**: 44 ✅ / 2 ⚠️ / 2 ❌ / 19 🔵
 
 ---
 
@@ -13,8 +13,6 @@
 
 ### 🟡 Warnings — Should Fix
 
-- [ ] **SP-03** — Summary quality: Summary very long (2005 chars)
-- [ ] **D-04** — Doc quality: Stub/placeholder docs found: save_data:16, save_data:85, save_data:109, save_data:171, save_data:236
 - [ ] **T-03** — Test naming: test_ prefix found — use <subject>_<scenario>_<expected>: test_lua_new_save_manager, test_lua_register_collect, test_lua_collect_restore_roundtrip, test_lua_dirty_tracking, test_lua_schema_version (+5 more)
 - [ ] **Q-04** — Error handling: .unwrap() calls: save_data:331, save_data:358, save_manager:410, save_manager:437
 
@@ -49,7 +47,7 @@
 |-------|---------|---------|
 | **SP-01** Spec file exists | ✅ PASS | docs/specs/savegame.md exists |
 | **SP-02** Required spec sections | ✅ PASS | All required sections present |
-| **SP-03** Summary quality | ⚠️ WARNING | Summary very long (2005 chars) |
+| **SP-03** Summary quality | ✅ PASS | Summary is 1620 chars |
 | **SP-04** Lua API completeness | ✅ PASS | All 1 bound functions in spec |
 | **SP-05** Key Types accuracy | ✅ PASS | 3 types — spec Key Types in sync |
 | **SP-06** Spec quality | ✅ PASS | No stub content |
@@ -61,7 +59,7 @@
 | **D-01** Module-level docs | ✅ PASS | All files have //! doc comments |
 | **D-02** Public item docs | ✅ PASS | All pub items have /// docs |
 | **D-03** Structured doc sections | ✅ PASS | All pub structs/enums have structured doc sections |
-| **D-04** Doc quality | ⚠️ WARNING | Stub/placeholder docs found: save_data:16, save_data:85, save_data:109, save_data:171, save_data:236 |
+| **D-04** Doc quality | ✅ PASS | No stub docs found |
 | **D-05** Validation tool | 🔵 MANUAL | Run: python tools/docs/collect_docs.py --report-missing \| grep src/<module> |
 | **D-06** Lua API file docs | ✅ PASS | //! doc comment present |
 | **D-07** @param/@return annotations | ✅ PASS | All bindings have @param/@return annotations |

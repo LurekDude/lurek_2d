@@ -1,6 +1,6 @@
 # Module Quality Report: `patterns`
 
-> **Status**: 🔴 FAIL  |  **Date**: 2026-04-09  |  **Score**: 43 ✅ / 4 ⚠️ / 1 ❌ / 19 🔵
+> **Status**: 🔴 FAIL  |  **Date**: 2026-04-09  |  **Score**: 45 ✅ / 2 ⚠️ / 1 ❌ / 19 🔵
 
 ---
 
@@ -12,9 +12,7 @@
 
 ### 🟡 Warnings — Should Fix
 
-- [ ] **SP-03** — Summary quality: Summary very long (3953 chars)
-- [ ] **SP-05** — Key Types accuracy: Types not in spec: Blackboard, BlackboardValue, CommandEntry, Debounce, Funnel
-- [ ] **D-03** — Structured doc sections: Missing structured sections: simple_state::SimpleState (# Fields)
+- [ ] **SP-05** — Key Types accuracy: Types not in spec: Observer, ObserverEntry, PriorityItem, PriorityQueue, Ring
 - [ ] **T-05** — Test adequacy: 34 tests / 121 pub methods (28%) — low coverage
 
 ## Full Check Results
@@ -48,9 +46,9 @@
 |-------|---------|---------|
 | **SP-01** Spec file exists | ✅ PASS | docs/specs/patterns.md exists |
 | **SP-02** Required spec sections | ✅ PASS | All required sections present |
-| **SP-03** Summary quality | ⚠️ WARNING | Summary very long (3953 chars) |
+| **SP-03** Summary quality | ✅ PASS | Summary is 1560 chars |
 | **SP-04** Lua API completeness | ✅ PASS | No tbl.set() bindings found |
-| **SP-05** Key Types accuracy | ⚠️ WARNING | Types not in spec: Blackboard, BlackboardValue, CommandEntry, Debounce, Funnel |
+| **SP-05** Key Types accuracy | ⚠️ WARNING | Types not in spec: Observer, ObserverEntry, PriorityItem, PriorityQueue, Ring |
 | **SP-06** Spec quality | ✅ PASS | No stub content |
 
 ### Phase 4 — Docstrings
@@ -59,7 +57,7 @@
 |-------|---------|---------|
 | **D-01** Module-level docs | ✅ PASS | All files have //! doc comments |
 | **D-02** Public item docs | ✅ PASS | All pub items have /// docs |
-| **D-03** Structured doc sections | ⚠️ WARNING | Missing structured sections: simple_state::SimpleState (# Fields) |
+| **D-03** Structured doc sections | ✅ PASS | All pub structs/enums have structured doc sections |
 | **D-04** Doc quality | ✅ PASS | No stub docs found |
 | **D-05** Validation tool | 🔵 MANUAL | Run: python tools/docs/collect_docs.py --report-missing \| grep src/<module> |
 | **D-06** Lua API file docs | ✅ PASS | //! doc comment present |

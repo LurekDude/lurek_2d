@@ -10,7 +10,7 @@
 
 use std::collections::HashMap;
 
-/// Information about a single touch point. Consult the module-level documentation for the broader usage context and preconditions.
+/// Snapshot of one active touch point with its screen-space position and pressure.
 ///
 /// # Fields
 /// - `id` — `u64`.
@@ -29,7 +29,7 @@ pub struct TouchPoint {
     pub pressure: f64,
 }
 
-/// Tracks active touch points. Consult the module-level documentation for the broader usage context and preconditions.
+/// Tracks all active touch points by their winit-assigned finger ID.
 ///
 /// # Fields
 /// - `touches` — `HashMap<u64`.
@@ -48,7 +48,7 @@ impl TouchState {
         Self::default()
     }
 
-    /// Registers or updates a touch point. Consult the module-level documentation for the broader usage context and preconditions.
+    /// Inserts a new touch start or updates the position and pressure of an ongoing touch.
     ///
     /// # Parameters
     /// - `id` — `u64`.
@@ -74,7 +74,7 @@ impl TouchState {
         }
     }
 
-    /// Removes a touch point. Consult the module-level documentation for the broader usage context and preconditions.
+    /// Removes a touch point when the finger is lifted (touch-end event).
     ///
     /// # Parameters
     /// - `id` — `u64`.

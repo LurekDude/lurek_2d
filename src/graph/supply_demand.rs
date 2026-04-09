@@ -12,7 +12,7 @@ use super::item::ItemPosition;
 use super::simulation::GraphEvent;
 
 impl Graph {
-    /// Process all demand/supply declarations. Consult the module-level documentation for the broader usage context and preconditions.
+    /// Processes all demand/supply declarations, routing items from supply nodes to demand nodes.
     ///
     /// # Returns
     /// `Vec<GraphEvent>`.

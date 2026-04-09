@@ -18,6 +18,17 @@ Always update this file **in the same commit** as the change. Use the commit typ
 
 ---
 
+## [0.6.21] — 2026-04-09
+
+### Fixed
+- **Quality: D-04** — Replaced "Consult the module-level documentation" stub phrases with real doc content in `src/graph/` (7 entries in `core.rs`, `item.rs`, `node.rs`, `supply_demand.rs`), `src/input/touch.rs` (4 entries), `src/input/mouse.rs` (2 entries), `src/thread/channel.rs` (1 entry), `src/modding/mod_manager.rs` (5 entries), `src/savegame/save_data.rs` (5 entries)
+- **Quality: SP-03** — Trimmed `## Summary` sections to under 2000 chars in `docs/specs/timer.md` (2373→1429), `docs/specs/modding.md` (2399→1615), `docs/specs/savegame.md` (2005→1620)
+- **Quality: SP-05** — Added missing Key Type headings (`CommandEntry`, `Blackboard`, `BlackboardValue`, `Debounce`, `Funnel`, `FunnelEntry`) to `docs/specs/patterns.md`; fixed `### Enums` stub ("No public enums") with `BlackboardValue` heading
+- **Quality: D-03** — Added `# Fields` section to `SimpleState` in `src/patterns/simple_state.rs`, to `Scheduler` in `src/timer/scheduler.rs`; fixed oversized doc window for `Minimap` in `src/minimap/minimap.rs` (reduced Fields list by 2 entries so section falls within 25-line check window)
+- **Quality: T-01 + T-05** — Created `tests/rust/unit/log_tests.rs` (21 tests) covering `SinkLevel`, `MemoryEntry`, `Sink`, and `SinkRegistry`; registered in `Cargo.toml`
+- **Quality: SP-05** — Added heading-based Key Types entries in `docs/specs/log.md` for `MemoryEntry`, `Sink`, `SinkRegistry`, `SinkLevel`, `SinkKind`
+- **Quality audit** — `log` module now PASS (6/46 total: serial, window, localization, debugbridge, procgen, log). Modules graph, patterns, input, minimap, thread, modding, savegame, timer all reach ≤2W and will PASS immediately when Developer resolves B-02/B-03 findings
+
 ## [0.6.20] — 2026-04-09
 
 ### Fixed

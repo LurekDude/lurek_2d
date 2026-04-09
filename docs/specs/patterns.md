@@ -12,36 +12,18 @@
 
 ## Summary
 
-The `patterns` module provides pure-Rust implementations of six classic game-programming design patterns. These patterns are exposed to Lua games via `lurek.patterns.*` factory functions. Each factory returns a Lua UserData object that wraps the corresponding domain type.
+The `patterns` module provides pure-Rust implementations of classic game-programming design patterns, exposed via `lurek.patterns.*` factory functions. Each factory returns a Lua UserData object wrapping the corresponding domain type. All six domain types are pure Rust with no mlua dependency; Lua plumbing (registry keys, UserData) lives in `src/lua_api/patterns_api.rs`. The API is gated by `modules.pipeline = true` in `conf.lua`.
 
-The six patterns are:
+The patterns are:
 
-1. **EventBus** — A publish/subscribe event bus. Listeners can be registered with a numeric priority (higher fires first) and optionally as one-shot (`once`). `emit(event)` fires all listeners sorted by priority. One-shot listeners are automatically removed after firing. Useful for decoupled game systems (UI reacting to player events, sound reacting to physics events).
+1. **EventBus** — Priority-ordered publish/subscribe bus. Listeners fire sorted by numeric priority; `once` listeners auto-remove after the first call.
+2. **ObjectPool** — Capacity-bounded ID-pool. `acquire()` moves an ID from idle to active; `release(id)` returns it. `prewarm(n)` pre-populates the idle pool.
+3. **CommandStack** — Undo/redo history. Each command stores execute/undo Lua callbacks. `beginBatch()`/`endBatch()` groups commands into one undoable unit.
+4. **ServiceLocator** — Named Lua-value registry. `provide(name, value)` registers any value; `locate(name)` retrieves it at runtime without direct references.
+5. **Factory** — Named constructor registry. `register(typeName, fn)` stores a constructor; `create(typeName, ...)` calls it.
+6. **SimpleState** — Named-state tracker with enter/exit/update callbacks per state. Any registered state can be entered at any time; no guard-validated transitions.
 
-   > **When to use**: Prefer `lurek.signal.newSignal()` for simple event wiring with no ordering requirement. Use `EventBus` when you need **priority-ordered firing** or **automatic one-shot removal** after the first call.
-
-2. **ObjectPool** — A capacity-bounded ID-pool that tracks idle and active objects as integers. `acquire()` moves an ID from idle to active (or creates a new one if below capacity). `release(id)` returns an ID to the idle pool. `prewarm(n)` pre-populates the idle pool. Useful for bullets, particles, and other short-lived game objects.
-
-3. **CommandStack** — An undo/redo command history. Each command entry stores execute/undo Lua function references via `LuaRegistryKey`. `push(name, exec, undo?)` executes the command and pushes it onto the stack. `undo()` calls the top entry's undo function; `redo()` re-executes it. `beginBatch()`/`endBatch()` groups multiple commands into a single undoable unit.
-
-4. **ServiceLocator** — A named Lua-value registry. `provide(name, value)` registers any Lua value (table, function, userdata) under a string key. `locate(name)` retrieves it. Useful for registering game subsystems (audio manager, dialogue controller) that arbitrary scripts can access without direct references.
-
-   > **When to use**: Prefer plain Lua module tables for static registries known at init time. Use `ServiceLocator` when you need **runtime discovery** (`locate(name)` from scripts that do not hold a direct reference), **hot-swap** of implementations, or **introspection** (`names()` to list all registered services).
-
-5. **Factory** — A named constructor registry. `register(typeName, fn)` stores a constructor function. `create(typeName, ...)` calls it with additional arguments. Useful for entity templates, projectile factories, and action creators.
-
-6. **SimpleState** — A simple named-state tracker with enter/exit/update callbacks per state. `addState(name, {enter?,exit?,update?})` registers a state with optional callbacks. `transitionTo(name)` fires exit on the current state then enter on the new one. `update(dt)` delegates to the current state's update callback. No guard-validated transition rules — any registered state can be entered at any time. Exposed in Lua as `lurek.patterns.newSimpleState()`.
-
-   > **See also**: `automation.Simulator` has an internal 4-state playback FSM (Idle/Running/Paused/Complete). That FSM is private and controls input replay — it is not a general-purpose game state machine. For game-level state sequencing (menus, combat phases, NPC behaviour) use `lurek.patterns.newSimpleState()`.
-
-   > **Note**: The domain `StateMachine` type in `src/patterns/state_machine.rs` provides guard-validated transitions and a history ring accessible from Rust. It is not currently wired to the Lua API.
-
-All six domain types are **pure Rust** with no mlua dependency. All Lua plumbing (registry keys for callbacks, Lua UserData implementations) lives in `src/lua_api/patterns_api.rs`. The patterns API is gated by `modules.pipeline = true` in `conf.lua`.
-
-This module intentionally does **not** provide:
-- Networked event busses (use `lurek.thread.Channel`)
-- Persistent undo across sessions (serialize command data in game code)
-- Hierarchical state machines (HSM) — use nested `SimpleState` objects in Lua
+Also includes: **Blackboard** (shared key-value store), **Debounce/Throttle** (rate-limiting wrappers), **Funnel** (data-pipeline combiner), and **PriorityQueue** / **Ring** utilities.
 
 ## Architecture
 
@@ -137,9 +119,27 @@ Named type registry with alias resolution. `resolve(name)` follows the alias cha
 #### `patterns::state_machine::StateMachine`
 Validated FSM. Transitions are only allowed along pre-registered edges. `can_transition(to)→bool` checks without side effects. `transition_to(to)→bool` performs the transition, fires enter/exit callbacks (via `patterns_api.rs`), and appends to history. History is a ring capped at `history_cap` (default 64).
 
+#### `patterns::command_stack::CommandEntry`
+A single entry in the undo/redo history. Fields: `id: u64`, `name: String`, `has_undo: bool`. Read via `CommandStack::peek_undo()` / `peek_redo()`.
+
+#### `patterns::blackboard::Blackboard`
+Shared key-value store. `set(key, value)` inserts a `BlackboardValue`; `get(key)` returns `Option<&BlackboardValue>`; `remove(key)` deletes an entry; `clear()` empties the board; `keys()` returns all stored keys.
+
+#### `patterns::throttle::Debounce`
+Rate-limiting wrapper. `update(dt)→bool` returns `true` once the debounce interval has elapsed since the last trigger. `reset()` restarts the timer.
+
+#### `patterns::funnel::Funnel`
+Data-pipeline aggregator. Collects values from multiple sources via `push(value)`, then `flush()` processes the batch. `is_ready()→bool` returns `true` when the funnel has reached its drain threshold.
+
+#### `patterns::funnel::FunnelEntry`
+A single item held inside a [`Funnel`] pending the next flush. Fields: `value: LuaRegistryKey` (Lua API wrapper value).
+
 ### Enums
 
-No public enums. `PluralForm` belongs to the `localization` module.
+#### `patterns::blackboard::BlackboardValue`
+Typed variant stored inside a [`Blackboard`]. Variants: `Boolean(bool)`, `Integer(i64)`, `Float(f64)`, `Text(String)`, `Nil`.
+
+No other public enums in this module.
 
 ## Lua API
 

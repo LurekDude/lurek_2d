@@ -13,7 +13,7 @@ use std::collections::HashMap;
 use crate::engine::log_messages::{SV01_SAVE_INIT};
 use crate::log_msg;
 
-/// Metadata extracted from a save slot. Consult the module-level documentation for the broader usage context and preconditions.
+/// Metadata extracted from a save-slot header without loading the full save data.
 ///
 /// # Fields
 /// - `slot` — `String`.
@@ -82,7 +82,7 @@ impl SaveManager {
         }
     }
 
-    /// Unregister a collector by name. Consult the module-level documentation for the broader usage context and preconditions.
+    /// Removes a previously registered data collector from the save/restore cycle.
     ///
     /// # Parameters
     /// - `name` — `&str`.
@@ -106,7 +106,7 @@ impl SaveManager {
         self.schema_version = version;
     }
 
-    /// Get the current schema version. Consult the module-level documentation for the broader usage context and preconditions.
+    /// Returns the schema version number used to detect save-file format upgrades.
     ///
     /// # Returns
     /// `i32`.
@@ -168,7 +168,7 @@ impl SaveManager {
         self.auto_save_elapsed = 0.0;
     }
 
-    /// Disable auto-save. Consult the module-level documentation for the broader usage context and preconditions.
+    /// Disables the automatic save timer, preventing any further background saves.
     pub fn disable_auto_save(&mut self) {
         self.auto_save = None;
         self.auto_save_elapsed = 0.0;
@@ -233,7 +233,7 @@ pub fn serialize_table(data: &HashMap<String, SaveValue>, depth: u32) -> Result<
     Ok(out)
 }
 
-/// Serialize a single value. Consult the module-level documentation for the broader usage context and preconditions.
+/// Serializes a single Lua value into the TOML-compatible wire format.
 ///
 /// # Parameters
 /// - `value` — `&SaveValue`.

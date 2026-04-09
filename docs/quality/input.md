@@ -1,6 +1,6 @@
 # Module Quality Report: `input`
 
-> **Status**: 🔴 FAIL  |  **Date**: 2026-04-09  |  **Score**: 43 ✅ / 3 ⚠️ / 2 ❌ / 19 🔵
+> **Status**: 🔴 FAIL  |  **Date**: 2026-04-09  |  **Score**: 44 ✅ / 2 ⚠️ / 2 ❌ / 19 🔵
 
 ---
 
@@ -14,7 +14,6 @@
 ### 🟡 Warnings — Should Fix
 
 - [ ] **A-04b** — Source Files completeness (incl. subdirs): Nested .rs files not listed in AGENT.md: mod.rs
-- [ ] **D-04** — Doc quality: Stub/placeholder docs found: mouse:11, mouse:180, touch:13, touch:32, touch:51 (+1 more)
 - [ ] **B-04** — No business logic in closures: '<closure@289>' (25 LOC, line 289) — extract body to src/input/ | '<closure@419>' has if/match/for — extract to src/input/ | '<closure@672>' has if/match/for — extract to src/input/
 
 ## Full Check Results
@@ -60,7 +59,7 @@
 | **D-01** Module-level docs | ✅ PASS | All files have //! doc comments |
 | **D-02** Public item docs | ✅ PASS | All pub items have /// docs |
 | **D-03** Structured doc sections | ✅ PASS | All pub structs/enums have structured doc sections |
-| **D-04** Doc quality | ⚠️ WARNING | Stub/placeholder docs found: mouse:11, mouse:180, touch:13, touch:32, touch:51 (+1 more) |
+| **D-04** Doc quality | ✅ PASS | No stub docs found |
 | **D-05** Validation tool | 🔵 MANUAL | Run: python tools/docs/collect_docs.py --report-missing \| grep src/<module> |
 | **D-06** Lua API file docs | ✅ PASS | //! doc comment present |
 | **D-07** @param/@return annotations | ✅ PASS | All bindings have @param/@return annotations |

@@ -11,36 +11,28 @@
 
 ## Summary
 
-The savegame module provides a pure-data save manager for slot-based game save/load
-with schema versioning, dirty-state tracking, auto-save timers, and Lua-literal
-serialisation.  `SaveManager` is the central struct that tracks named collector
-modules, migration version chains, and an auto-save timer that only fires when
-the in-memory state is dirty.  The serialisation subsystem converts a `HashMap<String,
-SaveValue>` tree into a `return { key = value, ... }` Lua-literal string that
-`loadfile()` can deserialise without any custom parser — no JSON, no MessagePack,
-just valid Lua source.
+The `savegame` module provides a pure-data save manager for slot-based game save/load with schema
+versioning, dirty-state tracking, auto-save timers, and Lua-literal serialisation. `SaveManager`
+tracks named collector modules, migration version chains, and an auto-save timer that only fires
+when in-memory state is dirty. The serialisation subsystem converts a `HashMap<String, SaveValue>`
+tree into a `return { key = value, ... }` Lua-literal string that `loadfile()` can deserialise
+without a custom parser — no JSON, no MessagePack, just valid Lua source.
 
-The module deliberately separates concerns: `SaveManager` owns the bookkeeping
-(registration, versioning, dirty flag, auto-save timer), while actual filesystem
-I/O is delegated to the `GameFS` subsystem and invoked from the Lua API layer.
-This makes the Rust core fully unit-testable without touching the filesystem.
+`SaveManager` owns bookkeeping (registration, versioning, dirty flag, auto-save timer); actual
+filesystem I/O is delegated to `GameFS` and invoked from the Lua API layer, keeping the Rust core
+fully unit-testable without touching the filesystem.
 
-Save files live under `save/slot_<name>.sav` inside the game directory.  Each file
-embeds metadata fields (`__schema_version`, `__timestamp`, `__summary`) alongside
-the game data so that `getSlotInfo` and `getSlots` can read metadata without a full
-restore.  Schema versioning lets games register migration callbacks keyed by
-version number; when a save from version N is loaded against schema version M > N,
-all registered migrations in [N, M) are applied in ascending order.
+Save files live under `save/slot_<name>.sav` inside the game directory. Each file embeds metadata
+fields (`__schema_version`, `__timestamp`, `__summary`) alongside game data so that `getSlotInfo`
+and `getSlots` can read metadata without a full restore. Schema migrations are registered as
+callbacks keyed by version number; when a version-N save is loaded against schema version M > N,
+all migrations in [N, M) are applied in ascending order.
 
-The Lua API exposes `SaveManager` as a UserData object created via
-`lurek.savegame.newSaveManager()`.  Games register per-module collector/restorer
-callback pairs, then call `save(slot)` and `load(slot)` for full round-trip
-persistence.  The auto-save timer is advanced by calling `update(dt)` each frame;
-it returns the slot name when a save should trigger, but only if data is dirty.
+The Lua API exposes `SaveManager` as a `lurek.savegame.newSaveManager()` UserData. Games register
+collector/restorer callback pairs, then call `save(slot)` and `load(slot)`. The auto-save timer
+is advanced via `update(dt)`; it returns the slot name when a save should trigger.
 
-Scope boundaries: this module does NOT provide binary serialisation (see `data`),
-save-file encryption, cloud save synchronisation, or undo/redo history.  It is a
-pure-Lua-literal persistence layer with schema migration support.
+Scope: no binary serialisation (see `data`), encryption, cloud sync, or undo/redo history.
 
 ## Architecture
 

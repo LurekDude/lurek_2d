@@ -1,6 +1,6 @@
 # Module Quality Report: `timer`
 
-> **Status**: 🔴 FAIL  |  **Date**: 2026-04-09  |  **Score**: 42 ✅ / 4 ⚠️ / 2 ❌ / 19 🔵
+> **Status**: 🔴 FAIL  |  **Date**: 2026-04-09  |  **Score**: 44 ✅ / 2 ⚠️ / 2 ❌ / 19 🔵
 
 ---
 
@@ -13,10 +13,8 @@
 
 ### 🟡 Warnings — Should Fix
 
-- [ ] **SP-03** — Summary quality: Summary very long (2373 chars)
-- [ ] **D-03** — Structured doc sections: Missing structured sections: scheduler::Scheduler (# Fields)
 - [ ] **T-03** — Test naming: test_ prefix found — use <subject>_<scenario>_<expected>: test_lua_new_scheduler, test_lua_scheduler_after, test_lua_scheduler_every, test_lua_scheduler_cancel, test_lua_scheduler_cancel_all
-- [ ] **Q-04** — Error handling: .unwrap() calls: scheduler:578, scheduler:593
+- [ ] **Q-04** — Error handling: .unwrap() calls: scheduler:583, scheduler:598
 
 ## Full Check Results
 
@@ -49,7 +47,7 @@
 |-------|---------|---------|
 | **SP-01** Spec file exists | ✅ PASS | docs/specs/timer.md exists |
 | **SP-02** Required spec sections | ✅ PASS | All required sections present |
-| **SP-03** Summary quality | ⚠️ WARNING | Summary very long (2373 chars) |
+| **SP-03** Summary quality | ✅ PASS | Summary is 1429 chars |
 | **SP-04** Lua API completeness | ✅ PASS | All 10 bound functions in spec |
 | **SP-05** Key Types accuracy | ✅ PASS | 3 types — spec Key Types in sync |
 | **SP-06** Spec quality | ✅ PASS | No stub content |
@@ -60,7 +58,7 @@
 |-------|---------|---------|
 | **D-01** Module-level docs | ✅ PASS | All files have //! doc comments |
 | **D-02** Public item docs | ✅ PASS | All pub items have /// docs |
-| **D-03** Structured doc sections | ⚠️ WARNING | Missing structured sections: scheduler::Scheduler (# Fields) |
+| **D-03** Structured doc sections | ✅ PASS | All pub structs/enums have structured doc sections |
 | **D-04** Doc quality | ✅ PASS | No stub docs found |
 | **D-05** Validation tool | 🔵 MANUAL | Run: python tools/docs/collect_docs.py --report-missing \| grep src/<module> |
 | **D-06** Lua API file docs | ✅ PASS | //! doc comment present |
@@ -119,7 +117,7 @@
 | **Q-01** No println! | ✅ PASS | No println!/eprintln! calls |
 | **Q-02** Logger levels | 🔵 MANUAL | Verify log severity levels are appropriate (debug/info/warn/error) |
 | **Q-03** No unsafe | ✅ PASS | No undocumented unsafe blocks |
-| **Q-04** Error handling | ⚠️ WARNING | .unwrap() calls: scheduler:578, scheduler:593 |
+| **Q-04** Error handling | ⚠️ WARNING | .unwrap() calls: scheduler:583, scheduler:598 |
 | **Q-07** Log prefix | ✅ PASS | All log calls use log:: prefix |
 | **Q-05** Rust best practices | 🔵 MANUAL | Review for anti-patterns: unnecessary clones, redundant allocs |
 | **Q-06** Clippy clean | 🔵 MANUAL | Run: cargo clippy --lib -- -D warnings |

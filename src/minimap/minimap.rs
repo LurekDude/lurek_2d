@@ -17,7 +17,6 @@ use super::types::{
 /// - `display_height` — `u32`.
 /// - `terrain` — `Vec<u32>`.
 /// - `terrain_colors` — `HashMap<u32, [f32; 4]>`.
-/// - `tile_descriptions` — `HashMap<u32, String>`.
 /// - `fog` — `Vec<u8>`.
 /// - `fog_enabled` — `bool`.
 /// - `fog_color` — `[f32; 4]`.
@@ -33,7 +32,6 @@ use super::types::{
 /// - `viewport_color` — `[f32; 4]`.
 /// - `pings` — `Vec<MinimapPing>`.
 /// - `markers` — `HashMap<u32, MinimapMarker>`.
-/// - `next_marker_id` — `u32`.
 /// - `anti_alias` — `bool`.
 /// - `clickable` — `bool`.
 #[derive(Debug, Clone)]

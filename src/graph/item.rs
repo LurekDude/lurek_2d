@@ -8,7 +8,7 @@
 //! All public items are documented. See the parent module for architectural context
 //! and the `lurek.*` Lua API for the scripting interface.
 
-/// Where a `GraphItem` currently resides. Consult the module-level documentation for the broader usage context and preconditions.
+/// The current location of a [`GraphItem`] within the simulation graph.
 ///
 /// # Variants
 /// - `AtNode` — AtNode variant.
@@ -79,7 +79,7 @@ impl GraphItem {
         }
     }
 
-    /// Mark the item as dead. Consult the module-level documentation for the broader usage context and preconditions.
+    /// Marks this item as dead; it will be removed from the graph on the next tick.
     pub fn kill(&mut self) {
         self.alive = false;
     }

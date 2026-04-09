@@ -72,7 +72,7 @@ impl Channel {
         })
     }
 
-    /// Create a named channel. Consult the module-level documentation for the broader usage context and preconditions.
+    /// Creates a named bidirectional channel pair, binding the channel name in the global registry.
     ///
     /// # Parameters
     /// - `name` — `String`.

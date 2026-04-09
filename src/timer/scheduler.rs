@@ -53,6 +53,11 @@ pub struct ScheduledEvent {
 /// The global `time_scale` multiplier compresses or stretches all timers.
 /// A scale of `0.5` makes everything run at half speed; `2.0` doubles speed.
 /// Individual events can be paused with [`Scheduler::pause`].
+///
+/// # Fields
+/// - `events` — `Vec<ScheduledEvent>`.
+/// - `next_id` — `u32`.
+/// - `time_scale` — `f64`.
 #[derive(Debug, Clone)]
 pub struct Scheduler {
     events: Vec<ScheduledEvent>,

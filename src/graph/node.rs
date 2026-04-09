@@ -121,7 +121,7 @@ pub struct ConversionRule {
     pub out_count: u32,
 }
 
-/// A supply declaration on a node. Consult the module-level documentation for the broader usage context and preconditions.
+/// Declares that a node can produce items of a given type up to a specified quantity.
 ///
 /// # Fields
 /// - `item_type` — `String`.
@@ -134,7 +134,7 @@ pub struct Supply {
     pub quantity: i32,
 }
 
-/// A demand declaration on a node. Consult the module-level documentation for the broader usage context and preconditions.
+/// Declares that a node needs items of a given type, with a priority for fulfillment ordering.
 ///
 /// # Fields
 /// - `item_type` — `String`.
@@ -303,7 +303,7 @@ impl Node {
         }
     }
 
-    /// Number of items currently at this node. Consult the module-level documentation for the broader usage context and preconditions.
+    /// Returns the number of items currently sitting at this node.
     ///
     /// # Returns
     /// `usize`.

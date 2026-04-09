@@ -17,7 +17,7 @@ use super::edge::Edge;
 use super::item::{GraphItem, ItemPosition};
 use super::node::{Node, OverflowPolicy};
 
-/// Statistics snapshot of the graph state. Consult the module-level documentation for the broader usage context and preconditions.
+/// A read-only statistics snapshot captured from a [`Graph`] at a point in time.
 ///
 /// # Fields
 /// - `nodes` — `usize`.

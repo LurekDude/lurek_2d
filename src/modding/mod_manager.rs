@@ -15,7 +15,7 @@ use crate::engine::log_messages::{MD01_MGR_INIT, MD02_MOD_REG, MD04_ORDER_OK};
 use crate::log_msg;
 use std::collections::{HashMap, HashSet};
 
-/// Metadata describing a mod. Consult the module-level documentation for the broader usage context and preconditions.
+/// Metadata record describing one registered game mod.
 ///
 /// # Fields
 /// - `id` — `String`.
@@ -168,7 +168,7 @@ impl ModManager {
         }
     }
 
-    /// Remove a mod by ID. Consult the module-level documentation for the broader usage context and preconditions.
+    /// Removes a mod from the registry by its assigned ID.
     ///
     /// # Parameters
     /// - `id` — `&str`.
@@ -221,7 +221,7 @@ impl ModManager {
         self.mods.iter().any(|m| m.id == id)
     }
 
-    /// Get the number of registered mods. Consult the module-level documentation for the broader usage context and preconditions.
+    /// Returns the count of all currently registered mods.
     ///
     /// # Returns
     /// `usize`.
@@ -229,7 +229,7 @@ impl ModManager {
         self.mods.len()
     }
 
-    /// Get all registered mods. Consult the module-level documentation for the broader usage context and preconditions.
+    /// Returns a slice of all registered mod metadata records.
     ///
     /// # Returns
     /// `&[ModInfo]`.
@@ -391,7 +391,7 @@ impl ModManager {
 
     // ── Hot-reload Queue ──────────────────────────────────────────────────
 
-    /// Mark a registered mod for hot-reload. Consult the module-level documentation for the broader usage context and preconditions.
+    /// Marks a registered mod as requiring hot-reload on the next update tick.
     ///
     /// # Parameters
     /// - `id` — `&str`.

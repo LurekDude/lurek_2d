@@ -1,6 +1,6 @@
 # Module Quality Report: `graph`
 
-> **Status**: 🔴 FAIL  |  **Date**: 2026-04-09  |  **Score**: 44 ✅ / 3 ⚠️ / 1 ❌ / 19 🔵
+> **Status**: 🔴 FAIL  |  **Date**: 2026-04-09  |  **Score**: 45 ✅ / 2 ⚠️ / 1 ❌ / 19 🔵
 
 ---
 
@@ -12,7 +12,6 @@
 
 ### 🟡 Warnings — Should Fix
 
-- [ ] **D-04** — Doc quality: Stub/placeholder docs found: core:20, item:11, item:82, node:124, node:137 (+2 more)
 - [ ] **T-03** — Test naming: test_ prefix found — use <subject>_<scenario>_<expected>: test_graph_new_is_empty, test_node_add_increments_count_and_returns_unique_ids, test_node_remove_cleans_connected_edges, test_node_remove_nonexistent_returns_false, test_node_get_ids_matches_count (+43 more)
 - [ ] **Q-04** — Error handling: .unwrap() calls: algorithms:186, algorithms:200, algorithms:201, algorithms:222, algorithms:223 (+122 more)
 
@@ -59,7 +58,7 @@
 | **D-01** Module-level docs | ✅ PASS | All files have //! doc comments |
 | **D-02** Public item docs | ✅ PASS | All pub items have /// docs |
 | **D-03** Structured doc sections | ✅ PASS | All pub structs/enums have structured doc sections |
-| **D-04** Doc quality | ⚠️ WARNING | Stub/placeholder docs found: core:20, item:11, item:82, node:124, node:137 (+2 more) |
+| **D-04** Doc quality | ✅ PASS | No stub docs found |
 | **D-05** Validation tool | 🔵 MANUAL | Run: python tools/docs/collect_docs.py --report-missing \| grep src/<module> |
 | **D-06** Lua API file docs | ✅ PASS | //! doc comment present |
 | **D-07** @param/@return annotations | ✅ PASS | All bindings have @param/@return annotations |

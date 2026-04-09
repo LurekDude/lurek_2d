@@ -12,39 +12,26 @@
 
 ## Summary
 
-The timer module provides two orthogonal timing mechanisms that together cover
-all time-related needs in a game loop. `Clock` measures wall-clock time: it
-tracks frame delta (elapsed seconds since the last tick), total elapsed time
-since game start, rolling FPS computed over a 1-second sliding window, and a
-60-frame rolling average delta useful for smooth HUD display of frame time.
-`Clock` is stored inside `SharedState` and ticked once per engine frame by the
-main loop in `src/engine/app.rs`; the `dt` that `lurek.update(dt)` receives is
-the `Clock`'s last-tick delta.
+The `timer` module provides two orthogonal timing mechanisms covering all time-related needs in a
+game loop. `Clock` measures wall-clock time: frame delta, total elapsed time, rolling FPS over a
+1-second window, and a 60-frame average delta. `Clock` lives inside `SharedState` and is ticked
+once per engine frame by `src/engine/app.rs`; the `dt` passed to `lurek.update(dt)` is its
+last-tick delta.
 
-> **`Clock` is the canonical source for fps, delta, and average frame delta in Lurek2D.**
-> Use `lurek.time.getDelta()`, `lurek.time.getFps()`, and `lurek.time.getAverageDelta()` for all
-> basic frame-timing needs — no setup required. Other modules (`debugbridge`, `devtools.FrameStats`)
-> maintain derivative buffers for specialized purposes (TCP delivery and percentile analysis
-> respectively), but `lurek.time` should always be the first-choice API for game scripts. The module also exposes a free function
-`sleep(seconds)` that blocks the calling thread — a convenience for loading
-screens or startup delays that should never be called in the hot loop.
+> **`Clock` is the canonical FPS and delta source.** Use `lurek.time.getDelta()`,
+> `lurek.time.getFps()`, and `lurek.time.getAverageDelta()` — no setup required.
 
-`Scheduler` handles game-logic timing — "execute something after 3 seconds"
-and "repeat something every 0.5 seconds for 10 iterations". Unlike the raw
-clock, the Scheduler's perceived time is affected by a `time_scale` multiplier
-that the game controls: set it to 0.0 for a full pause, 0.5 for slow-motion
-bullet-time, or 2.0 for fast-forward (clamped to 0.0–100.0). Named events
-replace existing events with the same name, preventing timer accumulation when
-setup code runs repeatedly on scene re-entry. Per-event pause and resume allow
-individual timers to be suspended without stopping the entire scheduler.
-Schedulers are created on the Lua side via `lurek.time.newScheduler()` and
-wrapped in a `LuaScheduler` UserData that pairs the Rust `Scheduler` with a
-`HashMap<u32, LuaRegistryKey>` for callback storage. Expired callbacks are
-automatically unregistered from the Lua registry after each `update()` call.
+`Scheduler` handles game-logic timing: "run after N seconds" and "repeat every N seconds".
+Its perceived time is scaled by a `time_scale` multiplier (0.0 = pause, 0.5 = slow-motion, 2.0 =
+fast-forward, clamped to 0–100). Named events replace same-named events, preventing accumulation
+on scene re-entry. Per-event pause and resume allow individual timers to be suspended. Schedulers
+are created via `lurek.time.newScheduler()` and wrapped in `LuaScheduler` UserData pairing the
+Rust `Scheduler` with a `HashMap` of Lua registry callbacks. Expired callbacks are unregistered
+after each `update()` call. A convenience `sleep(seconds)` free function blocks the calling
+thread — only for loading screens, never in the hot loop.
 
-The module intentionally does not include tweening or interpolation — those
-live in `src/animation/`. It also does not own the engine's fixed-timestep
-accumulator; frame stepping is the responsibility of `src/engine/app.rs`.
+The module does not include tweening (see `src/animation/`) or own the engine's fixed-timestep
+accumulator (handled by `src/engine/app.rs`).
 
 ## Architecture
 

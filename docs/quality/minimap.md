@@ -1,6 +1,6 @@
 # Module Quality Report: `minimap`
 
-> **Status**: 🔴 FAIL  |  **Date**: 2026-04-09  |  **Score**: 43 ✅ / 3 ⚠️ / 2 ❌ / 19 🔵
+> **Status**: 🔴 FAIL  |  **Date**: 2026-04-09  |  **Score**: 44 ✅ / 2 ⚠️ / 2 ❌ / 19 🔵
 
 ---
 
@@ -14,7 +14,6 @@
 ### 🟡 Warnings — Should Fix
 
 - [ ] **A-04b** — Source Files completeness (incl. subdirs): Nested .rs files not listed in AGENT.md: mod.rs
-- [ ] **D-03** — Structured doc sections: Missing structured sections: minimap::Minimap (# Fields)
 - [ ] **T-05** — Test adequacy: 63 pub methods, 0 Rust tests — create test file
 
 ## Full Check Results
@@ -59,7 +58,7 @@
 |-------|---------|---------|
 | **D-01** Module-level docs | ✅ PASS | All files have //! doc comments |
 | **D-02** Public item docs | ✅ PASS | All pub items have /// docs |
-| **D-03** Structured doc sections | ⚠️ WARNING | Missing structured sections: minimap::Minimap (# Fields) |
+| **D-03** Structured doc sections | ✅ PASS | All pub structs/enums have structured doc sections |
 | **D-04** Doc quality | ✅ PASS | No stub docs found |
 | **D-05** Validation tool | 🔵 MANUAL | Run: python tools/docs/collect_docs.py --report-missing \| grep src/<module> |
 | **D-06** Lua API file docs | ✅ PASS | //! doc comment present |

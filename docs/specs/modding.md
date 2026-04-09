@@ -12,47 +12,29 @@
 
 ## Summary
 
-The modding module provides infrastructure for player-created mods — the
-ability for end users to add, replace, or extend game content without modifying
-the original game files. It is a Tier 2 engine extension that depends only on
-Baseline (`engine`, `math`) and uses the `toml` crate for manifest parsing and
-`std::fs` for directory scanning. No Tier 1 runtime modules are imported.
+The `modding` module provides infrastructure for player-created mods: discovering, registering,
+ordering, and validating game mods without modifying original game files. It is a Tier 2 engine
+extension that depends only on Baseline (`engine`, `math`), using the `toml` crate for manifest
+parsing and `std::fs` for directory scanning.
 
-The module centres on two types: `ModInfo` (per-mod metadata record) and
-`ModManager` (centralised registry). `ModManager` handles mod registration,
-lookup, priority-based load ordering with optional custom overrides, dependency
-validation (missing and circular), filesystem folder scanning with `mod.toml`
-parsing, and a hot-reload queue for marking mods that need re-execution at
-runtime.
+The module centres on `ModInfo` (per-mod metadata) and `ModManager` (centralised registry).
+`ModManager` handles registration, lookup, priority-based load ordering with optional custom
+overrides, dependency validation (missing and circular), filesystem folder scanning with
+`mod.toml` parsing, and a hot-reload queue.
 
-Mods are discovered by scanning a designated directory (typically `mods/`).
-Each immediate subdirectory that contains a `mod.toml` file is parsed into a
-`ModInfo` and registered automatically. The `mod.toml` format uses TOML with
-fields: `id` (required), `name`, `version`, `author`, `description`,
-`priority`, and `dependencies`. Subdirectories without `mod.toml` are silently
-skipped.
+Mods are discovered by scanning a designated directory (typically `mods/`). Each subdirectory
+containing a `mod.toml` is parsed into a `ModInfo`. The TOML format fields are: `id` (required),
+`name`, `version`, `author`, `description`, `priority`, and `dependencies`. Load ordering is
+deterministic: ascending `priority` value with alphabetical ID as tiebreaker. A custom explicit
+load order via `set_load_order()` places those mods first.
 
-Load ordering is deterministic: mods are sorted by ascending `priority` value
-(lower loads first), with alphabetical ID as a tiebreaker. A custom explicit
-load order can override this via `set_load_order()`, in which case custom-
-ordered mods appear first, followed by any remaining mods in priority order.
+Circular dependency detection uses iterative DFS. `validate_dependencies()` reports unregistered
+declared dependencies before load. The Lua API exposes `LuaMod` (wrapping `ModInfo` with hook
+callbacks and config) and `LuaModManager` (wrapping `ModManager`) via
+`lurek.modding.newMod(info)` and `lurek.modding.newModManager()`.
 
-Circular dependency detection uses iterative DFS with a visiting/visited set
-model. `validate_dependencies()` reports mod IDs whose declared dependencies
-are not registered, enabling pre-load validation.
-
-The Lua API is exposed via two UserData types: `LuaMod` (wrapping `ModInfo`
-with hook and config storage) and `LuaModManager` (wrapping `ModManager`).
-Factory functions `lurek.modding.newMod(info)` and `lurek.modding.newModManager()`
-create these objects. `LuaMod` supports per-mod named hook callbacks stored in
-the Lua registry and an arbitrary config value, both releasable via
-`releaseRefs()`.
-
-Scope boundary: this module handles mod discovery, metadata, ordering, and
-dependency validation. It does **not** execute mod Lua scripts, mount mod
-assets into `GameFS` / `VirtualFS`, or provide a mod sandboxing layer — those
-responsibilities belong to the game's `lurek.load()` orchestration and the
-`filesystem` module.
+Scope boundary: this module handles discovery, metadata, ordering, and dependency validation. It
+does **not** execute mod Lua scripts, mount mod assets into `GameFS`, or provide mod sandboxing.
 
 ## Architecture
 

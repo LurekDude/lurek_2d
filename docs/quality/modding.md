@@ -1,6 +1,6 @@
 # Module Quality Report: `modding`
 
-> **Status**: 🔴 FAIL  |  **Date**: 2026-04-09  |  **Score**: 42 ✅ / 4 ⚠️ / 2 ❌ / 19 🔵
+> **Status**: 🔴 FAIL  |  **Date**: 2026-04-09  |  **Score**: 44 ✅ / 2 ⚠️ / 2 ❌ / 19 🔵
 
 ---
 
@@ -13,8 +13,6 @@
 
 ### 🟡 Warnings — Should Fix
 
-- [ ] **SP-03** — Summary quality: Summary very long (2399 chars)
-- [ ] **D-04** — Doc quality: Stub/placeholder docs found: mod_manager:18, mod_manager:171, mod_manager:224, mod_manager:232, mod_manager:394
 - [ ] **T-03** — Test naming: test_ prefix found — use <subject>_<scenario>_<expected>: test_lua_new_mod_basic, test_lua_new_mod_with_fields, test_lua_mod_enable_disable, test_lua_mod_hooks, test_lua_mod_config (+7 more)
 - [ ] **Q-04** — Error handling: .unwrap() calls: mod_manager:678, mod_manager:680, mod_manager:681, mod_manager:682, mod_manager:683 (+2 more)
 
@@ -49,7 +47,7 @@
 |-------|---------|---------|
 | **SP-01** Spec file exists | ✅ PASS | docs/specs/modding.md exists |
 | **SP-02** Required spec sections | ✅ PASS | All required sections present |
-| **SP-03** Summary quality | ⚠️ WARNING | Summary very long (2399 chars) |
+| **SP-03** Summary quality | ✅ PASS | Summary is 1615 chars |
 | **SP-04** Lua API completeness | ✅ PASS | All 2 bound functions in spec |
 | **SP-05** Key Types accuracy | ✅ PASS | 2 types — spec Key Types in sync |
 | **SP-06** Spec quality | ✅ PASS | No stub content |
@@ -61,7 +59,7 @@
 | **D-01** Module-level docs | ✅ PASS | All files have //! doc comments |
 | **D-02** Public item docs | ✅ PASS | All pub items have /// docs |
 | **D-03** Structured doc sections | ✅ PASS | All pub structs/enums have structured doc sections |
-| **D-04** Doc quality | ⚠️ WARNING | Stub/placeholder docs found: mod_manager:18, mod_manager:171, mod_manager:224, mod_manager:232, mod_manager:394 |
+| **D-04** Doc quality | ✅ PASS | No stub docs found |
 | **D-05** Validation tool | 🔵 MANUAL | Run: python tools/docs/collect_docs.py --report-missing \| grep src/<module> |
 | **D-06** Lua API file docs | ✅ PASS | //! doc comment present |
 | **D-07** @param/@return annotations | ✅ PASS | All bindings have @param/@return annotations |
