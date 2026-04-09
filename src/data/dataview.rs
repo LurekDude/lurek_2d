@@ -218,6 +218,9 @@ impl DataView {
 // -------------------------------------------------------------------------------
 
 /// Lua-side wrapper around [`DataView`].
+///
+/// # Fields
+/// - `inner` — `DataView`.
 pub struct LuaDataView {
     pub(crate) inner: DataView,
 }

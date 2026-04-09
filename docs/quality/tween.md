@@ -1,20 +1,14 @@
 # Module Quality Report: `tween`
 
-> **Status**: 🔴 FAIL  |  **Date**: 2026-04-09  |  **Score**: 43 ✅ / 3 ⚠️ / 2 ❌ / 19 🔵
+> **Status**: 🟢 PASS  |  **Date**: 2026-04-09  |  **Score**: 46 ✅ / 2 ⚠️ / 0 ❌ / 19 🔵
 
 ---
 
 ## Action Items
 
-### 🔴 Errors — Must Fix Before Merge
-
-- [ ] **SP-02** — Required spec sections: Missing sections: Summary, Source Files, Key Types
-- [ ] **SP-03** — Summary quality: No ## Summary section
-
 ### 🟡 Warnings — Should Fix
 
 - [ ] **A-04b** — Source Files completeness (incl. subdirs): Nested .rs files not listed in AGENT.md: mod.rs
-- [ ] **D-09** — Section separators: 9 bindings but no // ─── separator comments
 - [ ] **B-04** — No business logic in closures: '<closure@131>' (20 LOC, line 131) — extract body to src/tween/ | '<closure@181>' has if/match/for — extract to src/tween/ | '<closure@198>' has if/match/for — extract to src/tween/
 
 ## Full Check Results
@@ -47,10 +41,10 @@
 | Check | Verdict | Details |
 |-------|---------|---------|
 | **SP-01** Spec file exists | ✅ PASS | docs/specs/tween.md exists |
-| **SP-02** Required spec sections | ❌ ERROR | Missing sections: Summary, Source Files, Key Types |
-| **SP-03** Summary quality | ❌ ERROR | No ## Summary section |
+| **SP-02** Required spec sections | ✅ PASS | All required sections present |
+| **SP-03** Summary quality | ✅ PASS | Summary is 937 chars |
 | **SP-04** Lua API completeness | ✅ PASS | All 9 bound functions in spec |
-| **SP-05** Key Types accuracy | ✅ PASS | No Key Types section or no public types — skip |
+| **SP-05** Key Types accuracy | ✅ PASS | 7 types — spec Key Types in sync |
 | **SP-06** Spec quality | ✅ PASS | No stub content |
 
 ### Phase 4 — Docstrings
@@ -65,7 +59,7 @@
 | **D-06** Lua API file docs | ✅ PASS | //! doc comment present |
 | **D-07** @param/@return annotations | ✅ PASS | All bindings have @param/@return annotations |
 | **D-08** No rustdoc in lua_api | ✅ PASS | No rustdoc sections in Lua API file |
-| **D-09** Section separators | ⚠️ WARNING | 9 bindings but no // ─── separator comments |
+| **D-09** Section separators | ✅ PASS | Separators present |
 
 ### Phase 5 — Lua↔Rust Bridge
 

@@ -111,7 +111,7 @@ impl ByteData {
         String::from_utf8_lossy(&self.data).to_string()
     }
 
-    /// Get a reference to the raw bytes. Consult the module-level documentation for the broader usage context and preconditions.
+    /// Returns a reference to the raw byte slice.
     ///
     /// # Returns
     /// `&[u8]`.
@@ -127,7 +127,7 @@ impl ByteData {
         &mut self.data
     }
 
-    /// Clone the data into a new ByteData. Consult the module-level documentation for the broader usage context and preconditions.
+    /// Clones the internal byte buffer into a new standalone `ByteData` instance.
     ///
     /// # Returns
     /// `Self`.

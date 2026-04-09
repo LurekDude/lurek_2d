@@ -11,7 +11,7 @@
 use md5::Digest;
 use sha1;
 
-/// Supported hash algorithms. Consult the module-level documentation for the broader usage context and preconditions.
+/// Supported cryptographic hash algorithms for `lurek.data.hash()`.
 ///
 /// # Variants
 /// - `Md5` — Md5 variant.

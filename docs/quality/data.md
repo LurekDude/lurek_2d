@@ -1,6 +1,6 @@
 # Module Quality Report: `data`
 
-> **Status**: 🔴 FAIL  |  **Date**: 2026-04-09  |  **Score**: 42 ✅ / 6 ⚠️ / 0 ❌ / 19 🔵
+> **Status**: 🟢 PASS  |  **Date**: 2026-04-09  |  **Score**: 46 ✅ / 2 ⚠️ / 0 ❌ / 19 🔵
 
 ---
 
@@ -8,11 +8,7 @@
 
 ### 🟡 Warnings — Should Fix
 
-- [ ] **SP-05** — Key Types accuracy: Types not in spec: LuaDataView
-- [ ] **D-03** — Structured doc sections: Missing structured sections: dataview::LuaDataView (# Fields)
-- [ ] **D-04** — Doc quality: Stub/placeholder docs found: byte_data:114, byte_data:130, compress:13, encode:13, hash:14
 - [ ] **B-04** — No business logic in closures: '<closure@221>' (16 LOC, line 221) — extract body to src/data/
-- [ ] **T-03** — Test naming: test_ prefix found — use <subject>_<scenario>_<expected>: test_lua_parse_toml_basic, test_lua_parse_toml_nested, test_lua_parse_toml_array, test_lua_encode_toml_basic, test_lua_toml_roundtrip (+1 more)
 - [ ] **Q-04** — Error handling: .unwrap() calls: encode:87, encode:94, encode:108, encode:116, hash:92 (+1 more)
 
 ## Full Check Results
@@ -48,7 +44,7 @@
 | **SP-02** Required spec sections | ✅ PASS | All required sections present |
 | **SP-03** Summary quality | ✅ PASS | Summary is 1642 chars |
 | **SP-04** Lua API completeness | ✅ PASS | All 13 bound functions in spec |
-| **SP-05** Key Types accuracy | ⚠️ WARNING | Types not in spec: LuaDataView |
+| **SP-05** Key Types accuracy | ✅ PASS | 8 types — spec Key Types in sync |
 | **SP-06** Spec quality | ✅ PASS | No stub content |
 
 ### Phase 4 — Docstrings
@@ -57,8 +53,8 @@
 |-------|---------|---------|
 | **D-01** Module-level docs | ✅ PASS | All files have //! doc comments |
 | **D-02** Public item docs | ✅ PASS | All pub items have /// docs |
-| **D-03** Structured doc sections | ⚠️ WARNING | Missing structured sections: dataview::LuaDataView (# Fields) |
-| **D-04** Doc quality | ⚠️ WARNING | Stub/placeholder docs found: byte_data:114, byte_data:130, compress:13, encode:13, hash:14 |
+| **D-03** Structured doc sections | ✅ PASS | All pub structs/enums have structured doc sections |
+| **D-04** Doc quality | ✅ PASS | No stub docs found |
 | **D-05** Validation tool | 🔵 MANUAL | Run: python tools/docs/collect_docs.py --report-missing \| grep src/<module> |
 | **D-06** Lua API file docs | ✅ PASS | //! doc comment present |
 | **D-07** @param/@return annotations | ✅ PASS | All bindings have @param/@return annotations |
@@ -92,7 +88,7 @@
 |-------|---------|---------|
 | **T-01** Rust test file | ✅ PASS | Found: tests\rust\unit\data_tests.rs |
 | **T-02** Lua test file | ✅ PASS | tests/lua/unit/test_data.lua registered in harness |
-| **T-03** Test naming | ⚠️ WARNING | test_ prefix found — use <subject>_<scenario>_<expected>: test_lua_parse_toml_basic, test_lua_parse_toml_nested, test_lua_parse_toml_array, test_lua_encode_toml_basic, test_lua_toml_roundtrip (+1 more) |
+| **T-03** Test naming | ✅ PASS | Test names follow convention |
 | **T-04** Float comparisons | ✅ PASS | No float assert_eq! found |
 | **T-05** Test adequacy | ✅ PASS | 54 tests / 26 pub methods (208%) |
 | **T-06** Golden tests | 🔵 MANUAL | Check if module qualifies for golden/snapshot tests |

@@ -10,7 +10,7 @@
 
 use std::io::{Read, Write};
 
-/// Supported compression formats. Consult the module-level documentation for the broader usage context and preconditions.
+/// Supported compression algorithms available through `lurek.data.compress()` and `lurek.data.decompress()`.
 ///
 /// # Variants
 /// - `Deflate` — Deflate variant.

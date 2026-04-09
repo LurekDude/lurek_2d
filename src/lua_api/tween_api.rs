@@ -37,19 +37,19 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
     let tbl = lua.create_table()?;
     let engine = Rc::new(RefCell::new(TweenEngine::new()));
 
-    // ── update ───────────────────────────────────────────────────────────
+    // ─── update ───────────────────────────────────────────────────────────
     /// Advances all active tweens, sequences, and parallels by `dt` seconds.
     /// Call this once per frame from `lurek.process(dt)`.
     /// @param dt : number
     /// @return nil
     let s = engine.clone();
-    // ── Bindings ─────────────────────────────────────────────────────────────────
+    // ─── Bindings ─────────────────────────────────────────────────────────────────
     tbl.set(
         "update",
         lua.create_function(move |lua, dt: f64| TweenEngine::update(&s, lua, dt))?,
     )?;
 
-    // ── tween ────────────────────────────────────────────────────────────
+    // ─── tween ────────────────────────────────────────────────────────────
     /// Creates a new property tween and registers it for automatic updating.
     /// `target` is any Lua table; `fields` maps field names to their end values.
     /// Start values are captured lazily on the first `update()` call.
@@ -86,7 +86,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
         )?,
     )?;
 
-    // ── sequence ─────────────────────────────────────────────────────────
+    // ─── sequence ─────────────────────────────────────────────────────────
     /// Creates an empty TweenSequence. Add steps with :tween(), :delay(), :callback(),
     /// then call :start() to begin and register it for updating.
     /// @return TweenSequence
@@ -103,7 +103,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
         })?,
     )?;
 
-    // ── parallel ─────────────────────────────────────────────────────────
+    // ─── parallel ─────────────────────────────────────────────────────────
     /// Creates an empty TweenParallel. Add entries with :tween() or :add(tween),
     /// then call :start() to begin execution.
     /// @return TweenParallel
@@ -119,7 +119,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
         })?,
     )?;
 
-    // ── delay ────────────────────────────────────────────────────────────
+    // ─── delay ────────────────────────────────────────────────────────────
     /// Creates a no-op tween that waits `seconds`, then optionally calls `callback`.
     /// Convenience wrapper around `sequence():delay():start()`.
     /// @param seconds : number
@@ -151,7 +151,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
         )?,
     )?;
 
-    // ── cancelAll ────────────────────────────────────────────────────────
+    // ─── cancelAll ────────────────────────────────────────────────────────
     /// Cancels all active tweens, sequences, and parallels immediately.
     /// @return nil
     let s = engine.clone();
@@ -160,7 +160,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
         lua.create_function(move |lua, ()| TweenEngine::cancel_all(&s, lua))?,
     )?;
 
-    // ── getActiveCount ───────────────────────────────────────────────────
+    // ─── getActiveCount ───────────────────────────────────────────────────
     /// Returns the number of currently active tween objects (tweens + seqs + pars).
     /// @return integer
     let s = engine.clone();
@@ -169,7 +169,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
         lua.create_function(move |_, ()| Ok(s.borrow().active_count()))?,
     )?;
 
-    // ── registerEasing ───────────────────────────────────────────────────
+    // ─── registerEasing ───────────────────────────────────────────────────
     /// Registers a custom easing function under `name`. `fn(t)` receives 0..1, returns 0..1.
     /// Overwrites any previous function registered under the same name.
     /// @param name : string
@@ -189,7 +189,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
         })?,
     )?;
 
-    // ── getEasingNames ───────────────────────────────────────────────────
+    // ─── getEasingNames ───────────────────────────────────────────────────
     /// Returns a list of all available easing names (built-in + custom).
     /// @return table
     let s = engine.clone();

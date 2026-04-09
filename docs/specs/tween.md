@@ -1,6 +1,72 @@
 # `lurek.tween` — Property Tweening System
 
-## Purpose
+## Summary
+
+The `tween` module provides runtime property animation for Lua table fields. Unlike the math-module
+primitives in `src/math/tween.rs` that interpolate a single value on demand, this system owns the
+timing loop: it accepts a target table, a field name, start/end values, a duration, and an easing
+function name, then writes updated values directly into the Lua table each frame.
+
+Active tweens are tracked by `TweenEngine` and advanced via `tick(dt)`. Sequenced tweens
+(`LuaTweenSequence`) run steps in order; parallel groups (`LuaTweenParallel`) run all arms
+simultaneously. `TweenEngine` also maintains a registry of named custom easing callbacks. The Lua
+API is exposed under `lurek.tween.*` and registered in `src/lua_api/tween_api.rs`.
+
+Scope: this module handles timed property interpolation only — it does not own the engine clock or
+the fixed-timestep accumulator. For complex multi-property animation graphs see `src/animation/`.
+
+## Source Files
+
+| File | Purpose |
+|---|---|
+| `src/tween/mod.rs` | Module root; re-exports `TweenEngine`, `TweenState`, `SequenceStep`, `ParallelEntry` |
+| `src/tween/engine.rs` | `TweenEngine` — manages active tweens; `tick(dt)` advances and removes completed tweens |
+| `src/tween/tween_state.rs` | `TweenState` — per-tween runtime state: target, property, progress, easing fn |
+| `src/tween/sequence.rs` | `SequenceStep` — one step in a chained tween sequence |
+| `src/tween/parallel.rs` | `ParallelEntry` — one arm in a simultaneous tween group |
+| `src/lua_api/tween_api.rs` | Registers `lurek.tween.*`; wraps engine as `LuaTween`, sequences as `LuaTweenSequence`, parallel as `LuaTweenParallel` |
+
+## Key Types
+
+### Structs
+
+#### `tween::engine::TweenEngine`
+
+Central manager for active tween animations. Holds a `Vec<TweenState>` of running tweens plus a
+`HashMap` of named custom easing closures. `tick(dt)` advances all running tweens, applies easing,
+and writes interpolated values into target Lua tables. Completed tweens are removed automatically.
+
+#### `tween::tween_state::TweenState`
+
+Runtime state for one active tween. Tracks: target-table registry key, property name, from/to
+values, elapsed and total duration, easing function, repeat count, and yoyo flag.
+
+#### `tween::sequence::SequenceStep`
+
+A single step in a sequential animation chain. Holds a `TweenState` and an optional on-complete
+Lua callback. The chain advances to the next step when the current step finishes.
+
+#### `tween::parallel::ParallelEntry`
+
+A single arm in a parallel animation group. Holds a `TweenState`. All arms run simultaneously; the
+group completes when every arm finishes.
+
+#### `tween_api::LuaTween`
+
+Lua UserData wrapping `TweenEngine`. Created via `lurek.tween.newEngine()`. Exposes `tween(...)`,
+`sequence(...)`, `parallel(...)`, `update(dt)`, `stop(id)`, and custom easing registration.
+
+#### `tween_api::LuaTweenSequence`
+
+Lua UserData for a sequential chain of `SequenceStep` entries. Created by
+`lurek.tween.sequence(steps)`. Advances steps in order; on-complete callbacks fire per step.
+
+#### `tween_api::LuaTweenParallel`
+
+Lua UserData for a simultaneous group of `ParallelEntry` arms. Created by
+`lurek.tween.parallel(tweens)`. Completes when all arms finish.
+
+## Architecture
 
 `lurek.tween` provides **runtime property animation** for any Lua table field. Unlike
 the math-level `src/math/tween.rs` primitive (which interpolates between two numeric

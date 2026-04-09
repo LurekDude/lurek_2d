@@ -409,7 +409,7 @@ fn toml_parse_error() {
 }
 
 #[test]
-fn test_lua_parse_toml_basic() {
+fn lua_parse_toml_basic_returns_table() {
     let lua = make_vm();
     lua.load(
         r#"
@@ -424,7 +424,7 @@ fn test_lua_parse_toml_basic() {
 }
 
 #[test]
-fn test_lua_parse_toml_nested() {
+fn lua_parse_toml_nested_returns_table() {
     let lua = make_vm();
     lua.load(
         r#"
@@ -440,7 +440,7 @@ fn test_lua_parse_toml_nested() {
 }
 
 #[test]
-fn test_lua_parse_toml_array() {
+fn lua_parse_toml_array_returns_seq() {
     let lua = make_vm();
     lua.load(
         r#"
@@ -456,7 +456,7 @@ fn test_lua_parse_toml_array() {
 }
 
 #[test]
-fn test_lua_encode_toml_basic() {
+fn lua_encode_toml_basic_returns_string() {
     let lua = make_vm();
     lua.load(
         r#"
@@ -471,7 +471,7 @@ fn test_lua_encode_toml_basic() {
 }
 
 #[test]
-fn test_lua_toml_roundtrip() {
+fn lua_toml_roundtrip_preserves_values() {
     let lua = make_vm();
     lua.load(
         r#"
@@ -487,7 +487,7 @@ fn test_lua_toml_roundtrip() {
 }
 
 #[test]
-fn test_lua_parse_toml_error() {
+fn lua_parse_toml_error_returns_lua_error() {
     let lua = make_vm();
     let result = lua
         .load(

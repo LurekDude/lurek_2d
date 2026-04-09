@@ -161,6 +161,11 @@ the whole buffer, `new_slice(data, offset, size)` for a sub-range. Typed little-
 `get_u8`, `get_i8`, `get_u16`, `get_i16`, `get_u32`, `get_i32`, `get_f32`, `get_f64`. All reads
 are bounds-checked. Fields: `data` (Arc), `offset`, `size`.
 
+#### `data::dataview::LuaDataView`
+
+Lua-side UserData wrapper around [`DataView`]. Exposes the full `DataView` accessor API to Lua
+scripts via `lurek.data.newView(byteData)`. Fields: `inner` (`DataView`).
+
 ### Enums
 
 #### `data::bin_pack::BinValue`

@@ -10,7 +10,7 @@
 
 use base64::Engine;
 
-/// Supported encoding formats. Consult the module-level documentation for the broader usage context and preconditions.
+/// Supported binary-to-text encoding formats for `lurek.data.encode()` and `lurek.data.decode()`.
 ///
 /// # Variants
 /// - `Base64` — Base64 variant.

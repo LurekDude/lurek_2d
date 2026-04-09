@@ -18,6 +18,11 @@ Always update this file **in the same commit** as the change. Use the commit typ
 
 ---
 
+## [0.6.22] — 2026-04-09
+### Fixed
+- **data** module audit: D-04 stubs (byte_data×2, compress, encode, hash), D-03 LuaDataView # Fields, SP-05 LuaDataView heading, T-03 six test_ prefixes removed → PASS (8th)
+- **tween** module audit: D-09 separators (3+ box chars via Python), SP-02/SP-03 added Summary/Source Files/Key Types sections, SP-05 LuaTween/LuaTweenSequence/LuaTweenParallel headings → PASS (9th)
+
 ## [0.6.21] — 2026-04-09
 
 ### Fixed
