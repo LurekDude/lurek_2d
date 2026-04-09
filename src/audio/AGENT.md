@@ -18,6 +18,7 @@ The audio module wraps the `rodio` cross-platform audio library into a game-orie
 
 | File             | Purpose                                                                              |
 |------------------|--------------------------------------------------------------------------------------|
+| `mod.rs`         | Module root — declares submodules and re-exports Mixer, Bus, AudioSource, SoundData, MidiPlayer, MidiState, Decoder, DSP types |
 | `bus.rs`         | Named audio bus with shared volume, pitch, pause, and DSP effect chain               |
 | `decoder.rs`     | Streaming audio decoder for chunked PCM reading from disk                            |
 | `dsp.rs`         | DSP effect chain: AtomicParam, EffectType, EffectParams, ActiveEffect, DynamicEffectSource |

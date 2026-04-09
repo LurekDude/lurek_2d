@@ -24,7 +24,7 @@
 //! | [`battle`] | Turn-based battle engine: combatants, actions, statuses, turn order |
 //! | [`cardgame`] | Card game backend: cards, decks (stacks), zones, card pools, history |
 //! | [`combat`] | Vehicle combat: chassis, turrets, weapons, projectiles |
-//! | [`compute`] | N-dimensional numerical arrays (luna.gpu) |
+//! | [`compute`] | N-dimensional numerical arrays (luna.compute) |
 //! | [`crafting`] | Recipe-based crafting queues and upgrade trees |
 //! | [`data`] | LÖVE2D-compatible binary data: ByteData, compress, hash, encode, LÖVE2D pack format |
 //! | [`dataframe`] | In-memory column-major tabular data |
@@ -69,40 +69,40 @@
 pub mod ai;
 /// Sprite animation system: named clips, frame pools, speed control, and frame-level events.
 pub mod animation;
-/// Property tween system: animate any Lua table field with easing, sequences, and parallels.
-pub mod tween;
 /// Audio playback system backed by rodio.
 pub mod audio;
 /// Automated input simulation via timed step scripts for testing and replay.
 pub mod automation;
 /// Camera and viewport types for 2D rendering.
 pub mod camera;
+/// Property tween system: animate any Lua table field with easing, sequences, and parallels.
+pub mod tween;
 // migration-state: pub mod battle; — now library/battle/init.lua
 // migration-state: pub mod cardgame; — now library/cardgame/init.lua
 // migration-state: pub mod combat; — now library/combat/init.lua
-/// Dense N-dimensional numerical arrays (luna.gpu).
+/// Dense N-dimensional numerical arrays (luna.compute).
 pub mod compute;
 // migration-state: pub mod crafting; — now library/crafting/init.lua
 /// LÖVE2D-compatible binary data API: ByteData, compress, hash, encode, and LÖVE2D pack format.
 pub mod data;
-/// Structured logger, hierarchical profiler, frame stats counter, and filesystem watcher for in-engine developer diagnostics.
-pub mod devtools;
 /// In-memory column-major tabular data (luna.dataframe).
 pub mod dataframe;
+/// Structured logger, hierarchical profiler, frame stats counter, and filesystem watcher for in-engine developer diagnostics.
+pub mod devtools;
 /// Format-agnostic serialization: JSON, TOML, CSV, and YAML via shared SerialValue.
 pub mod serial;
 // migration-state: pub mod dialog; — now library/dialog/init.lua
 // migration-state: pub mod economy; — now library/economy/init.lua
+/// TCP debug bridge for connecting external tools to a running Luna2D game.
+pub mod debugbridge;
+/// API documentation catalog and quality reporting for the luna.* API surface.
+pub mod docs;
 /// Core engine lifecycle, configuration, and error types.
 pub mod engine;
 /// Lightweight entity-component-system with ID recycling, bitmap tags, layers, blueprints, and systems.
 pub mod entity;
 /// Event queue for polling system and custom events.
 pub mod event;
-/// TCP debug bridge for connecting external tools to a running Luna2D game.
-pub mod debugbridge;
-/// API documentation catalog and quality reporting for the luna.* API surface.
-pub mod docs;
 /// Sandboxed game filesystem (GameFS).
 pub mod filesystem;
 /// Directed graph with item flow simulation, pathfinding, and supply/demand.
@@ -117,10 +117,10 @@ pub mod image;
 pub mod input;
 /// 2D point-light data container for dynamic lighting systems.
 pub mod light;
-/// Script log-level management — delegates to the `log` crate via `engine::log_messages`.
-pub mod log;
 /// Multi-locale string catalog, variable interpolation, and CLDR plural rules.
 pub mod localization;
+/// Script log-level management — delegates to the `log` crate via `engine::log_messages`.
+pub mod log;
 // migration-state: pub mod inventory; — now library/inventory/init.lua
 // migration-state: pub mod item; — now library/item/init.lua
 /// Composable visual effects layer: post-processing pipeline (bloom, blur, CRT, color grading) and screen overlays (weather, ambient, shake, fog).
@@ -137,10 +137,10 @@ pub mod network;
 // pub mod overlay; — superseded by fx::screen
 /// Emitter-based 2D particle effects.
 pub mod particle;
-/// Game programming patterns: EventBus, ObjectPool, CommandStack, ServiceLocator, Factory, and StateMachine.
-pub mod patterns;
 /// Grid pathfinding: A★, HPA★, flow fields, and NavGrid unit-size navigation.
 pub mod pathfinding;
+/// Game programming patterns: EventBus, ObjectPool, CommandStack, ServiceLocator, Factory, and StateMachine.
+pub mod patterns;
 /// Physics simulation with rigid bodies (rect and circle shapes), collision events, sensors, and layer filtering.
 pub mod physics;
 /// DAG-based pipeline orchestrator for composing multi-step workflows.

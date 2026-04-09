@@ -14,6 +14,8 @@ They are not runnable games � they are meant to be read, searched, and copy-pa
 
 | File | API | Description |
 |------|-----|-------------|
+| [core-engine/main.lua](core-engine/main.lua) | All core callbacks | **Runnable tour**: every callback (`init`, `ready`, `process`, `process_physics`, `process_late`, `render`, `render_ui`), Lua OOP table methods, for-loops, and physics running at its own fixed timestep |
+|------|-----|-------------|
 | [ai.lua](ai.lua) | `luna.ai` | Finite-state machines, behaviour trees, GOAP planners, and steering behaviours |
 | [animation.lua](animation.lua) | `luna.animation` | Sprite animation clips, frame pools, playback control, and frame-level events |
 | [audio.lua](audio.lua) | `luna.audio` | Sound sources, streaming music, volume/pitch/pan, buses, and audio effects |

@@ -1,4 +1,4 @@
-//! `luna.gpu` — Dense N-dimensional numerical arrays with NumPy-style operations.
+//! `luna.compute` — Dense N-dimensional numerical arrays with NumPy-style operations.
 
 use super::SharedState;
 use mlua::prelude::*;
@@ -97,7 +97,6 @@ pub struct LuaArray {
 
 impl LuaUserData for LuaArray {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
-
         // -- getShape --
         /// Returns the shape as a table of dimension sizes.
         /// @return table
@@ -112,16 +111,12 @@ impl LuaUserData for LuaArray {
         // -- getDimensions --
         /// Returns the number of dimensions.
         /// @return integer
-        methods.add_method("getDimensions", |_, this, ()| {
-            Ok(this.inner.ndim())
-        });
+        methods.add_method("getDimensions", |_, this, ()| Ok(this.inner.ndim()));
 
         // -- getSize --
         /// Returns the total number of elements.
         /// @return integer
-        methods.add_method("getSize", |_, this, ()| {
-            Ok(this.inner.size())
-        });
+        methods.add_method("getSize", |_, this, ()| Ok(this.inner.size()));
 
         // -- getDataType --
         /// Returns the element data type name.
@@ -133,9 +128,7 @@ impl LuaUserData for LuaArray {
         // -- isOnGPU --
         /// Returns false (CPU arrays only).
         /// @return boolean
-        methods.add_method("isOnGPU", |_, _this, ()| {
-            Ok(false)
-        });
+        methods.add_method("isOnGPU", |_, _this, ()| Ok(false));
 
         // -- get --
         /// Returns the element at the given 1-based indices.
@@ -143,7 +136,9 @@ impl LuaUserData for LuaArray {
         /// @return number
         methods.add_method("get", |_, this, args: LuaMultiValue| {
             let indices = parse_lua_indices(&args.into_vec())?;
-            this.inner.get_by_indices(&indices).map_err(LuaError::RuntimeError)
+            this.inner
+                .get_by_indices(&indices)
+                .map_err(LuaError::RuntimeError)
         });
 
         // -- set --
@@ -198,7 +193,9 @@ impl LuaUserData for LuaArray {
         /// Returns a deep copy of this array.
         /// @return Array
         methods.add_method("clone", |lua, this, ()| {
-            lua.create_userdata(LuaArray { inner: this.inner.clone() })
+            lua.create_userdata(LuaArray {
+                inner: this.inner.clone(),
+            })
         });
 
         // -- transpose --
@@ -222,25 +219,49 @@ impl LuaUserData for LuaArray {
         /// Element-wise addition with an Array or scalar.
         /// @param other : Array|number
         /// @return Array
-        dispatch_arith!(methods, "add", "Element-wise add.", ops::add, ops::add_scalar);
+        dispatch_arith!(
+            methods,
+            "add",
+            "Element-wise add.",
+            ops::add,
+            ops::add_scalar
+        );
 
         // -- sub --
         /// Element-wise subtraction with an Array or scalar.
         /// @param other : Array|number
         /// @return Array
-        dispatch_arith!(methods, "sub", "Element-wise sub.", ops::sub, ops::sub_scalar);
+        dispatch_arith!(
+            methods,
+            "sub",
+            "Element-wise sub.",
+            ops::sub,
+            ops::sub_scalar
+        );
 
         // -- mul --
         /// Element-wise multiplication with an Array or scalar.
         /// @param other : Array|number
         /// @return Array
-        dispatch_arith!(methods, "mul", "Element-wise mul.", ops::mul, ops::mul_scalar);
+        dispatch_arith!(
+            methods,
+            "mul",
+            "Element-wise mul.",
+            ops::mul,
+            ops::mul_scalar
+        );
 
         // -- div --
         /// Element-wise division with an Array or scalar.
         /// @param other : Array|number
         /// @return Array
-        dispatch_arith!(methods, "div", "Element-wise div.", ops::div, ops::div_scalar);
+        dispatch_arith!(
+            methods,
+            "div",
+            "Element-wise div.",
+            ops::div,
+            ops::div_scalar
+        );
 
         // -- pow --
         /// Raises each element to a scalar exponent.
@@ -295,7 +316,13 @@ impl LuaUserData for LuaArray {
         /// Element-wise not-equal with an Array or scalar.
         /// @param other : Array|number
         /// @return Array
-        dispatch_arith!(methods, "neq", "Element-wise neq.", ops::neq, ops::neq_scalar);
+        dispatch_arith!(
+            methods,
+            "neq",
+            "Element-wise neq.",
+            ops::neq,
+            ops::neq_scalar
+        );
 
         // -- gt --
         /// Element-wise greater-than with an Array or scalar.
@@ -313,13 +340,25 @@ impl LuaUserData for LuaArray {
         /// Element-wise greater-or-equal with an Array or scalar.
         /// @param other : Array|number
         /// @return Array
-        dispatch_arith!(methods, "gte", "Element-wise gte.", ops::gte, ops::gte_scalar);
+        dispatch_arith!(
+            methods,
+            "gte",
+            "Element-wise gte.",
+            ops::gte,
+            ops::gte_scalar
+        );
 
         // -- lte --
         /// Element-wise less-or-equal with an Array or scalar.
         /// @param other : Array|number
         /// @return Array
-        dispatch_arith!(methods, "lte", "Element-wise lte.", ops::lte, ops::lte_scalar);
+        dispatch_arith!(
+            methods,
+            "lte",
+            "Element-wise lte.",
+            ops::lte,
+            ops::lte_scalar
+        );
 
         // -- threshold --
         /// Returns a mask array with 1.0 where elements >= val, else 0.0.
@@ -356,30 +395,22 @@ impl LuaUserData for LuaArray {
         // -- argmin --
         /// Returns the 1-based flat index of the minimum element.
         /// @return integer
-        methods.add_method("argmin", |_, this, ()| {
-            Ok(ops::argmin(&this.inner) + 1)
-        });
+        methods.add_method("argmin", |_, this, ()| Ok(ops::argmin(&this.inner) + 1));
 
         // -- argmax --
         /// Returns the 1-based flat index of the maximum element.
         /// @return integer
-        methods.add_method("argmax", |_, this, ()| {
-            Ok(ops::argmax(&this.inner) + 1)
-        });
+        methods.add_method("argmax", |_, this, ()| Ok(ops::argmax(&this.inner) + 1));
 
         // -- any --
         /// Returns true if any element is nonzero.
         /// @return boolean
-        methods.add_method("any", |_, this, ()| {
-            Ok(ops::any(&this.inner))
-        });
+        methods.add_method("any", |_, this, ()| Ok(ops::any(&this.inner)));
 
         // -- all --
         /// Returns true if all elements are nonzero.
         /// @return boolean
-        methods.add_method("all", |_, this, ()| {
-            Ok(ops::all(&this.inner))
-        });
+        methods.add_method("all", |_, this, ()| Ok(ops::all(&this.inner)));
 
         // -- sum --
         /// Sum of all elements, or along an axis (1-based).
@@ -388,9 +419,11 @@ impl LuaUserData for LuaArray {
         methods.add_method("sum", |lua, this, axis: Option<i64>| match axis {
             None => Ok(LuaValue::Number(ops::sum(&this.inner))),
             Some(a) => {
-                let arr = ops::sum_axis(&this.inner, (a - 1) as usize)
-                    .map_err(LuaError::RuntimeError)?;
-                Ok(LuaValue::UserData(lua.create_userdata(LuaArray { inner: arr })?))
+                let arr =
+                    ops::sum_axis(&this.inner, (a - 1) as usize).map_err(LuaError::RuntimeError)?;
+                Ok(LuaValue::UserData(
+                    lua.create_userdata(LuaArray { inner: arr })?,
+                ))
             }
         });
 
@@ -403,7 +436,9 @@ impl LuaUserData for LuaArray {
             Some(a) => {
                 let arr = ops::mean_axis(&this.inner, (a - 1) as usize)
                     .map_err(LuaError::RuntimeError)?;
-                Ok(LuaValue::UserData(lua.create_userdata(LuaArray { inner: arr })?))
+                Ok(LuaValue::UserData(
+                    lua.create_userdata(LuaArray { inner: arr })?,
+                ))
             }
         });
 
@@ -414,9 +449,11 @@ impl LuaUserData for LuaArray {
         methods.add_method("min", |lua, this, axis: Option<i64>| match axis {
             None => Ok(LuaValue::Number(ops::min_val(&this.inner))),
             Some(a) => {
-                let arr = ops::min_axis(&this.inner, (a - 1) as usize)
-                    .map_err(LuaError::RuntimeError)?;
-                Ok(LuaValue::UserData(lua.create_userdata(LuaArray { inner: arr })?))
+                let arr =
+                    ops::min_axis(&this.inner, (a - 1) as usize).map_err(LuaError::RuntimeError)?;
+                Ok(LuaValue::UserData(
+                    lua.create_userdata(LuaArray { inner: arr })?,
+                ))
             }
         });
 
@@ -427,9 +464,11 @@ impl LuaUserData for LuaArray {
         methods.add_method("max", |lua, this, axis: Option<i64>| match axis {
             None => Ok(LuaValue::Number(ops::max_val(&this.inner))),
             Some(a) => {
-                let arr = ops::max_axis(&this.inner, (a - 1) as usize)
-                    .map_err(LuaError::RuntimeError)?;
-                Ok(LuaValue::UserData(lua.create_userdata(LuaArray { inner: arr })?))
+                let arr =
+                    ops::max_axis(&this.inner, (a - 1) as usize).map_err(LuaError::RuntimeError)?;
+                Ok(LuaValue::UserData(
+                    lua.create_userdata(LuaArray { inner: arr })?,
+                ))
             }
         });
 
@@ -439,8 +478,8 @@ impl LuaUserData for LuaArray {
         /// @return Array
         methods.add_method("matmul", |lua, this, other: LuaAnyUserData| {
             let other_arr = other.borrow::<LuaArray>()?;
-            let result = spatial::matmul(&this.inner, &other_arr.inner)
-                .map_err(LuaError::RuntimeError)?;
+            let result =
+                spatial::matmul(&this.inner, &other_arr.inner).map_err(LuaError::RuntimeError)?;
             lua.create_userdata(LuaArray { inner: result })
         });
 
@@ -459,8 +498,8 @@ impl LuaUserData for LuaArray {
         /// @return Array
         methods.add_method("bitwiseAnd", |lua, this, other: LuaAnyUserData| {
             let other_arr = other.borrow::<LuaArray>()?;
-            let result = ops::bitwise_and(&this.inner, &other_arr.inner)
-                .map_err(LuaError::RuntimeError)?;
+            let result =
+                ops::bitwise_and(&this.inner, &other_arr.inner).map_err(LuaError::RuntimeError)?;
             lua.create_userdata(LuaArray { inner: result })
         });
 
@@ -470,8 +509,8 @@ impl LuaUserData for LuaArray {
         /// @return Array
         methods.add_method("bitwiseOr", |lua, this, other: LuaAnyUserData| {
             let other_arr = other.borrow::<LuaArray>()?;
-            let result = ops::bitwise_or(&this.inner, &other_arr.inner)
-                .map_err(LuaError::RuntimeError)?;
+            let result =
+                ops::bitwise_or(&this.inner, &other_arr.inner).map_err(LuaError::RuntimeError)?;
             lua.create_userdata(LuaArray { inner: result })
         });
 
@@ -481,8 +520,8 @@ impl LuaUserData for LuaArray {
         /// @return Array
         methods.add_method("bitwiseXor", |lua, this, other: LuaAnyUserData| {
             let other_arr = other.borrow::<LuaArray>()?;
-            let result = ops::bitwise_xor(&this.inner, &other_arr.inner)
-                .map_err(LuaError::RuntimeError)?;
+            let result =
+                ops::bitwise_xor(&this.inner, &other_arr.inner).map_err(LuaError::RuntimeError)?;
             lua.create_userdata(LuaArray { inner: result })
         });
 
@@ -600,8 +639,9 @@ impl LuaUserData for LuaArray {
         // -- type --
         methods.add_method("type", |_, _, ()| Ok("Array"));
         // -- typeOf --
-        methods.add_method("typeOf", |_, _, name: String| Ok(name == "Array" || name == "Object"));
-
+        methods.add_method("typeOf", |_, _, name: String| {
+            Ok(name == "Array" || name == "Object")
+        });
     }
 }
 
@@ -609,12 +649,7 @@ impl LuaUserData for LuaArray {
 // Register
 // -------------------------------------------------------------------------------
 
-/// Registers the `luna.gpu` API table with the Lua VM.
-///
-/// # Parameters
-/// - `lua` — `&Lua`.
-/// - `luna` — `&LuaTable`.
-/// - `_state` — `Rc<RefCell<SharedState>>`.
+/// Registers the `luna.compute` API table with the Lua VM.
 pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) -> LuaResult<()> {
     let tbl = lua.create_table()?;
 
@@ -702,8 +737,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
                     Some(sv) => parse_shape(sv)?,
                     None => vec![values.len()],
                 };
-                let arr =
-                    NdArray::from_slice(&values, &s, dt).map_err(LuaError::RuntimeError)?;
+                let arr = NdArray::from_slice(&values, &s, dt).map_err(LuaError::RuntimeError)?;
                 lua.create_userdata(LuaArray { inner: arr })
             },
         )?,

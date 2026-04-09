@@ -6,7 +6,7 @@
 | **Status**     | Implemented — Full                                   |
 | **Lua API**    | `luna.ai`                                            |
 | **Source**      | `src/ai/`                                            |
-| **Rust Tests** | `tests/rust/game/ai_tests.rs`                        |
+| **Rust Tests** | `tests/rust/unit/ai_tests.rs`                        |
 | **Lua Tests**  | `tests/lua/unit/test_ai.lua`                         |
 | **Architecture** | —                                                  |
 

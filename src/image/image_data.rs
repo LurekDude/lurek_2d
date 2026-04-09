@@ -336,10 +336,13 @@ impl mlua::UserData for ImageData {
             Ok(())
         });
         // -- tint --
-        methods.add_method_mut("tint", |_, this, (tr, tg, tb, factor): (u8, u8, u8, f32)| {
-            this.tint(tr, tg, tb, factor);
-            Ok(())
-        });
+        methods.add_method_mut(
+            "tint",
+            |_, this, (tr, tg, tb, factor): (u8, u8, u8, f32)| {
+                this.tint(tr, tg, tb, factor);
+                Ok(())
+            },
+        );
         // -- grayscale --
         methods.add_method_mut("grayscale", |_, this, ()| {
             this.grayscale();
@@ -400,7 +403,12 @@ impl mlua::UserData for ImageData {
                 .ok_or_else(|| {
                     LuaError::RuntimeError(format!(
                         "crop ({},{},{},{}) out of bounds ({}x{})",
-                        x, y, w, h, this.width(), this.height()
+                        x,
+                        y,
+                        w,
+                        h,
+                        this.width(),
+                        this.height()
                     ))
                 })
                 .and_then(|img| lua.create_userdata(img))

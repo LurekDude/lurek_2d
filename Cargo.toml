@@ -386,6 +386,10 @@ name = "docs_tests"
 path = "tests/rust/unit/docs_tests.rs"
 
 [[test]]
+name = "ai_tests"
+path = "tests/rust/unit/ai_tests.rs"
+
+[[test]]
 name = "animation_tests"
 path = "tests/rust/unit/animation_tests.rs"
 harness = true
@@ -423,9 +427,7 @@ name = "graphics_runtime_smoke_tests"
 path = "tests/rust/ext/graphics_runtime_smoke_tests.rs"
 
 # === Game-system tests ===
-[[test]]
-name = "ai_tests"
-path = "tests/rust/game/ai_tests.rs"
+# migration-state: ai_tests migrated from tests/rust/game/ to tests/rust/unit/
 
 # migration-state: lua_api/combat_api.rs deleted; test disabled until Lua migration is complete
 # [[test]]

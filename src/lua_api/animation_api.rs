@@ -19,7 +19,6 @@ pub struct LuaAnimation {
 
 impl LuaUserData for LuaAnimation {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
-
         // -- addFrame --
         /// Adds a single frame to the frame pool by source rectangle.
         /// @param x : number
@@ -43,7 +42,9 @@ impl LuaUserData for LuaAnimation {
         methods.add_method_mut(
             "addFramesFromGrid",
             |_, this, (tw, th, fw, fh, start, count): (u32, u32, u32, u32, usize, usize)| {
-                Ok(this.inner.add_frames_from_grid(tw, th, fw, fh, start, count))
+                Ok(this
+                    .inner
+                    .add_frames_from_grid(tw, th, fw, fh, start, count))
             },
         );
 
@@ -103,9 +104,7 @@ impl LuaUserData for LuaAnimation {
         /// Starts playback of the named clip.
         /// @param name : string
         /// @return boolean
-        methods.add_method_mut("play", |_, this, name: String| {
-            Ok(this.inner.play(&name))
-        });
+        methods.add_method_mut("play", |_, this, name: String| Ok(this.inner.play(&name)));
 
         // -- stop --
         /// Stops playback and resets to frame 0.
@@ -176,16 +175,12 @@ impl LuaUserData for LuaAnimation {
         // -- isPlaying --
         /// Returns true if a clip is currently playing.
         /// @return boolean
-        methods.add_method("isPlaying", |_, this, ()| {
-            Ok(this.inner.is_playing())
-        });
+        methods.add_method("isPlaying", |_, this, ()| Ok(this.inner.is_playing()));
 
         // -- isLooping --
         /// Returns true if the current clip is set to loop.
         /// @return boolean
-        methods.add_method("isLooping", |_, this, ()| {
-            Ok(this.inner.is_looping())
-        });
+        methods.add_method("isLooping", |_, this, ()| Ok(this.inner.is_looping()));
 
         // -- getClip --
         /// Returns the name of the currently playing clip, or nil.
@@ -197,9 +192,7 @@ impl LuaUserData for LuaAnimation {
         // -- getSpeed --
         /// Returns the playback speed multiplier.
         /// @return number
-        methods.add_method("getSpeed", |_, this, ()| {
-            Ok(this.inner.get_speed())
-        });
+        methods.add_method("getSpeed", |_, this, ()| Ok(this.inner.get_speed()));
 
         // -- setSpeed --
         /// Sets the playback speed multiplier.
@@ -239,7 +232,6 @@ impl LuaUserData for LuaAnimation {
             this.inner.set_frame(index);
             Ok(())
         });
-
     }
 }
 
@@ -247,12 +239,7 @@ impl LuaUserData for LuaAnimation {
 // Register
 // -------------------------------------------------------------------------------
 
-/// Registers the `luna.tween` API table with the Lua VM.
-///
-/// # Parameters
-/// - `lua` — `&Lua`.
-/// - `luna` — `&LuaTable`.
-/// - `_state` — `Rc<RefCell<SharedState>>`.
+/// Registers the `luna.animation` API table with the Lua VM.
 pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) -> LuaResult<()> {
     let tbl = lua.create_table()?;
 
