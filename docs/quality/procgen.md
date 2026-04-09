@@ -1,20 +1,13 @@
 # Module Quality Report: `procgen`
 
-> **Status**: 🔴 FAIL  |  **Date**: 2026-04-09  |  **Score**: 43 ✅ / 4 ⚠️ / 1 ❌ / 19 🔵
+> **Status**: 🟢 PASS  |  **Date**: 2026-04-09  |  **Score**: 47 ✅ / 1 ⚠️ / 0 ❌ / 19 🔵
 
 ---
 
 ## Action Items
 
-### 🔴 Errors — Must Fix Before Merge
-
-- [ ] **B-06** — Flat registration body: tbl.set() inside {} block (anti-pattern): line 130
-
 ### 🟡 Warnings — Should Fix
 
-- [ ] **SP-03** — Summary quality: Summary very long (2324 chars)
-- [ ] **SP-05** — Key Types accuracy: Stale in spec: Lcg
-- [ ] **D-04** — Doc quality: Stub/placeholder docs found: flood_fill:6, voronoi:11, voronoi:54
 - [ ] **B-04** — No business logic in closures: '<closure@129>' (21 LOC, line 129) — extract body to src/procgen/ | '<closure@33>' has if/match/for — extract to src/procgen/ | '<closure@105>' has if/match/for — extract to src/procgen/
 
 ## Full Check Results
@@ -48,9 +41,9 @@
 |-------|---------|---------|
 | **SP-01** Spec file exists | ✅ PASS | docs/specs/procgen.md exists |
 | **SP-02** Required spec sections | ✅ PASS | All required sections present |
-| **SP-03** Summary quality | ⚠️ WARNING | Summary very long (2324 chars) |
+| **SP-03** Summary quality | ✅ PASS | Summary is 1983 chars |
 | **SP-04** Lua API completeness | ✅ PASS | All 5 bound functions in spec |
-| **SP-05** Key Types accuracy | ⚠️ WARNING | Stale in spec: Lcg |
+| **SP-05** Key Types accuracy | ✅ PASS | 2 types — spec Key Types in sync |
 | **SP-06** Spec quality | ✅ PASS | No stub content |
 
 ### Phase 4 — Docstrings
@@ -60,7 +53,7 @@
 | **D-01** Module-level docs | ✅ PASS | All files have //! doc comments |
 | **D-02** Public item docs | ✅ PASS | All pub items have /// docs |
 | **D-03** Structured doc sections | ✅ PASS | All pub structs/enums have structured doc sections |
-| **D-04** Doc quality | ⚠️ WARNING | Stub/placeholder docs found: flood_fill:6, voronoi:11, voronoi:54 |
+| **D-04** Doc quality | ✅ PASS | No stub docs found |
 | **D-05** Validation tool | 🔵 MANUAL | Run: python tools/docs/collect_docs.py --report-missing \| grep src/<module> |
 | **D-06** Lua API file docs | ✅ PASS | //! doc comment present |
 | **D-07** @param/@return annotations | ✅ PASS | All bindings have @param/@return annotations |
@@ -76,7 +69,7 @@
 | **B-03** impl LuaUserData placement | ✅ PASS | No LuaUserData impl in lua_api file |
 | **B-04** No business logic in closures | ⚠️ WARNING | '<closure@129>' (21 LOC, line 129) — extract body to src/procgen/ \| '<closure@33>' has if/match/for — extract to src/procgen/ \| '<closure@105>' has if/match/for — extract to src/procgen/ |
 | **B-05** Rc clone pattern | ✅ PASS | Rc clone pattern looks correct |
-| **B-06** Flat registration body | ❌ ERROR | tbl.set() inside {} block (anti-pattern): line 130 |
+| **B-06** Flat registration body | ✅ PASS | All tbl.set() calls are flat statements |
 
 ### Phase 6 — Architecture Compliance
 

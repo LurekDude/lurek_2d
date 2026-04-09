@@ -1,6 +1,6 @@
 # Module Quality Report: `tilemap`
 
-> **Status**: 🔴 FAIL  |  **Date**: 2026-04-09  |  **Score**: 36 ✅ / 7 ⚠️ / 5 ❌ / 19 🔵
+> **Status**: 🔴 FAIL  |  **Date**: 2026-04-09  |  **Score**: 37 ✅ / 7 ⚠️ / 4 ❌ / 19 🔵
 
 ---
 
@@ -11,7 +11,6 @@
 - [ ] **SP-04** — Lua API completeness: Missing from spec: FLOOR, NORTH_WALL, WEST_WALL, OBJECT, newMapScript (+2 more) — add to ## Lua API in docs/specs/tilemap.md
 - [ ] **B-02** — Registration-only: struct definitions (move to src/tilemap/): LuaTileSet, LuaTileMap, LuaAutoTileSheet, LuaChunkMap, LuaIsoMap, LuaMapBlock, LuaMapGroup, LuaMapScript, LuaMapGen
 - [ ] **B-03** — impl LuaUserData placement: Move impl LuaUserData for LuaTileSet, LuaTileMap, LuaAutoTileSheet, LuaChunkMap, LuaIsoMap, LuaMapBlock, LuaMapGroup, LuaMapScript, LuaMapGen from lua_api/tilemap_api.rs → src/tilemap/
-- [ ] **B-06** — Flat registration body: tbl.set() inside {} block (anti-pattern): line 30, line 845, line 1680
 - [ ] **T-04** — Float comparisons: assert_eq! with float literals (use abs()<epsilon): line 1384, line 1385, line 1387, line 1455, line 1456
 
 ### 🟡 Warnings — Should Fix
@@ -83,7 +82,7 @@
 | **B-03** impl LuaUserData placement | ❌ ERROR | Move impl LuaUserData for LuaTileSet, LuaTileMap, LuaAutoTileSheet, LuaChunkMap, LuaIsoMap, LuaMapBlock, LuaMapGroup, LuaMapScript, LuaMapGen from lua_api/tilemap_api.rs → src/tilemap/ |
 | **B-04** No business logic in closures | ⚠️ WARNING | '<closure@1519>' (17 LOC, line 1519) — extract body to src/tilemap/ \| '<closure@1898>' (112 LOC, line 1898) — extract body to src/tilemap/ \| '<closure@2018>' (36 LOC, line 2018) — extract body to src/tilemap/ \| '<closure@1680>' has if/match/for — extract to src/tilemap/ \| '<closure@1729>' has if/match/for — extract to src/tilemap/ |
 | **B-05** Rc clone pattern | ✅ PASS | Rc clone pattern looks correct |
-| **B-06** Flat registration body | ❌ ERROR | tbl.set() inside {} block (anti-pattern): line 30, line 845, line 1680 |
+| **B-06** Flat registration body | ✅ PASS | All tbl.set() calls are flat statements |
 
 ### Phase 6 — Architecture Compliance
 

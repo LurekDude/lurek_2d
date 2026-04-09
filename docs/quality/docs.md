@@ -1,6 +1,6 @@
 # Module Quality Report: `docs`
 
-> **Status**: 🔴 FAIL  |  **Date**: 2026-04-09  |  **Score**: 41 ✅ / 4 ⚠️ / 3 ❌ / 19 🔵
+> **Status**: 🔴 FAIL  |  **Date**: 2026-04-09  |  **Score**: 42 ✅ / 4 ⚠️ / 2 ❌ / 19 🔵
 
 ---
 
@@ -9,7 +9,6 @@
 ### 🔴 Errors — Must Fix Before Merge
 
 - [ ] **B-03** — impl LuaUserData placement: Move impl LuaUserData for LuaSchema, DocEntry, ApiCatalog, ValidationReport, QualityReport from lua_api/docs_api.rs → src/docs/
-- [ ] **B-06** — Flat registration body: tbl.set() inside {} block (anti-pattern): line 23, line 135, line 265
 - [ ] **T-04** — Float comparisons: assert_eq! with float literals (use abs()<epsilon): line 232, line 237, line 242, line 247, line 252
 
 ### 🟡 Warnings — Should Fix
@@ -78,7 +77,7 @@
 | **B-03** impl LuaUserData placement | ❌ ERROR | Move impl LuaUserData for LuaSchema, DocEntry, ApiCatalog, ValidationReport, QualityReport from lua_api/docs_api.rs → src/docs/ |
 | **B-04** No business logic in closures | ⚠️ WARNING | '<closure@794>' (27 LOC, line 794) — extract body to src/docs/ \| '<closure@829>' (40 LOC, line 829) — extract body to src/docs/ \| '<closure@878>' (27 LOC, line 878) — extract body to src/docs/ \| '<closure@914>' (22 LOC, line 914) — extract body to src/docs/ \| '<closure@1126>' has if/match/for — extract to src/docs/ \| '<closure@1143>' has if/match/for — extract to src/docs/ |
 | **B-05** Rc clone pattern | ✅ PASS | Rc clone pattern looks correct |
-| **B-06** Flat registration body | ❌ ERROR | tbl.set() inside {} block (anti-pattern): line 23, line 135, line 265 |
+| **B-06** Flat registration body | ✅ PASS | All tbl.set() calls are flat statements |
 
 ### Phase 6 — Architecture Compliance
 

@@ -1,6 +1,6 @@
 # Module Quality Report: `particle`
 
-> **Status**: 🔴 FAIL  |  **Date**: 2026-04-09  |  **Score**: 40 ✅ / 5 ⚠️ / 3 ❌ / 19 🔵
+> **Status**: 🔴 FAIL  |  **Date**: 2026-04-09  |  **Score**: 41 ✅ / 5 ⚠️ / 2 ❌ / 19 🔵
 
 ---
 
@@ -10,7 +10,6 @@
 
 - [ ] **B-02** — Registration-only: struct definitions (move to src/particle/): LuaParticleSystem, LuaTrail
 - [ ] **B-03** — impl LuaUserData placement: Move impl LuaUserData for LuaParticleSystem, LuaTrail from lua_api/particle_api.rs → src/particle/
-- [ ] **B-06** — Flat registration body: tbl.set() inside {} block (anti-pattern): line 29, line 1005
 
 ### 🟡 Warnings — Should Fix
 
@@ -79,7 +78,7 @@
 | **B-03** impl LuaUserData placement | ❌ ERROR | Move impl LuaUserData for LuaParticleSystem, LuaTrail from lua_api/particle_api.rs → src/particle/ |
 | **B-04** No business logic in closures | ⚠️ WARNING | '<closure@958>' has if/match/for — extract to src/particle/ \| '<closure@1007>' has if/match/for — extract to src/particle/ |
 | **B-05** Rc clone pattern | ✅ PASS | Rc clone pattern looks correct |
-| **B-06** Flat registration body | ❌ ERROR | tbl.set() inside {} block (anti-pattern): line 29, line 1005 |
+| **B-06** Flat registration body | ✅ PASS | All tbl.set() calls are flat statements |
 
 ### Phase 6 — Architecture Compliance
 

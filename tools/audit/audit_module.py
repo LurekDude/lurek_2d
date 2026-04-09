@@ -888,20 +888,32 @@ def check_lua_bridge(module: str) -> List[Check]:
                               "Rc clone pattern looks correct"))
 
     # B-06: No tbl.set inside nested { } block
+    # Scope the check to inside the pub fn register() function only to avoid
+    # flagging legitimate tbl.set() on local tables inside impl LuaUserData closures.
     block_wrapped: List[str] = []
     brace_depth = 0
     block_line = None
+    in_register = False
     for i, line in enumerate(lines):
+        if "pub fn register(" in line:
+            in_register = True
+            brace_depth = 0  # reset for function-body tracking
+        stripped = line.strip()
         for ch in line:
             if ch == "{":
                 brace_depth += 1
-                if brace_depth == 2 and block_line is None:
-                    block_line = i
+                if in_register and brace_depth == 2 and block_line is None:
+                    # Only flag BARE blocks like `{` on their own line.
+                    # Closure bodies (`move |...| {`) and control-flow blocks
+                    # (`if cond {`) are NOT the anti-pattern and must be skipped.
+                    if stripped == "{":
+                        block_line = i
             elif ch == "}":
                 brace_depth = max(0, brace_depth - 1)
                 if brace_depth < 2:
                     block_line = None
-        if block_line is not None and "tbl.set(" in line:
+        # Use \b word-boundary so `r_tbl.set(` or `d_tbl.set(` do not match.
+        if block_line is not None and re.search(r"\btbl\.set\(", line):
             block_wrapped.append(f"line {block_line + 1}")
             block_line = None
     if block_wrapped:

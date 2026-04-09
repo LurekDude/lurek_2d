@@ -1,6 +1,6 @@
 # Module Quality Report: `log`
 
-> **Status**: 🔴 FAIL  |  **Date**: 2026-04-09  |  **Score**: 43 ✅ / 3 ⚠️ / 2 ❌ / 19 🔵
+> **Status**: 🔴 FAIL  |  **Date**: 2026-04-09  |  **Score**: 44 ✅ / 3 ⚠️ / 1 ❌ / 19 🔵
 
 ---
 
@@ -8,7 +8,6 @@
 
 ### 🔴 Errors — Must Fix Before Merge
 
-- [ ] **B-06** — Flat registration body: tbl.set() inside {} block (anti-pattern): line 164, line 184
 - [ ] **T-01** — Rust test file: No test file found for module 'log'
 
 ### 🟡 Warnings — Should Fix
@@ -76,7 +75,7 @@
 | **B-03** impl LuaUserData placement | ✅ PASS | No LuaUserData impl in lua_api file |
 | **B-04** No business logic in closures | ⚠️ WARNING | '<closure@123>' (19 LOC, line 123) — extract body to src/log/ \| '<closure@184>' (20 LOC, line 184) — extract body to src/log/ \| '<closure@85>' has if/match/for — extract to src/log/ \| '<closure@164>' has if/match/for — extract to src/log/ |
 | **B-05** Rc clone pattern | ✅ PASS | Rc clone pattern looks correct |
-| **B-06** Flat registration body | ❌ ERROR | tbl.set() inside {} block (anti-pattern): line 164, line 184 |
+| **B-06** Flat registration body | ✅ PASS | All tbl.set() calls are flat statements |
 
 ### Phase 6 — Architecture Compliance
 

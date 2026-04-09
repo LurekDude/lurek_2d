@@ -1,6 +1,6 @@
 # Module Quality Report: `physics`
 
-> **Status**: 🔴 FAIL  |  **Date**: 2026-04-09  |  **Score**: 35 ✅ / 8 ⚠️ / 5 ❌ / 19 🔵
+> **Status**: 🔴 FAIL  |  **Date**: 2026-04-09  |  **Score**: 36 ✅ / 8 ⚠️ / 4 ❌ / 19 🔵
 
 ---
 
@@ -12,7 +12,6 @@
 - [ ] **SP-04** — Lua API completeness: Missing from spec: normalX, normalY, normalX, normalY, isTouching (+9 more) — add to ## Lua API in docs/specs/physics.md
 - [ ] **B-02** — Registration-only: struct definitions (move to src/physics/): LuaWorld, LuaBody, LuaPhysicsShape
 - [ ] **B-03** — impl LuaUserData placement: Move impl LuaUserData for LuaWorld, LuaBody, LuaPhysicsShape from lua_api/physics_api.rs → src/physics/
-- [ ] **B-06** — Flat registration body: tbl.set() inside {} block (anti-pattern): line 98, line 1704
 
 ### 🟡 Warnings — Should Fix
 
@@ -84,7 +83,7 @@
 | **B-03** impl LuaUserData placement | ❌ ERROR | Move impl LuaUserData for LuaWorld, LuaBody, LuaPhysicsShape from lua_api/physics_api.rs → src/physics/ |
 | **B-04** No business logic in closures | ⚠️ WARNING | '<closure@1545>' has if/match/for — extract to src/physics/ \| '<closure@1639>' has if/match/for — extract to src/physics/ |
 | **B-05** Rc clone pattern | ✅ PASS | Rc clone pattern looks correct |
-| **B-06** Flat registration body | ❌ ERROR | tbl.set() inside {} block (anti-pattern): line 98, line 1704 |
+| **B-06** Flat registration body | ✅ PASS | All tbl.set() calls are flat statements |
 
 ### Phase 6 — Architecture Compliance
 

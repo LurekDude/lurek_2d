@@ -1,6 +1,6 @@
 # Module Quality Report: `light`
 
-> **Status**: 🔴 FAIL  |  **Date**: 2026-04-09  |  **Score**: 43 ✅ / 2 ⚠️ / 3 ❌ / 19 🔵
+> **Status**: 🔴 FAIL  |  **Date**: 2026-04-09  |  **Score**: 44 ✅ / 2 ⚠️ / 2 ❌ / 19 🔵
 
 ---
 
@@ -10,7 +10,6 @@
 
 - [ ] **B-02** — Registration-only: struct definitions (move to src/light/): LuaLight, LuaOccluder
 - [ ] **B-03** — impl LuaUserData placement: Move impl LuaUserData for LuaLight, LuaOccluder from lua_api/light_api.rs → src/light/
-- [ ] **B-06** — Flat registration body: tbl.set() inside {} block (anti-pattern): line 722
 
 ### 🟡 Warnings — Should Fix
 
@@ -76,7 +75,7 @@
 | **B-03** impl LuaUserData placement | ❌ ERROR | Move impl LuaUserData for LuaLight, LuaOccluder from lua_api/light_api.rs → src/light/ |
 | **B-04** No business logic in closures | ⚠️ WARNING | '<closure@894>' has if/match/for — extract to src/light/ \| '<closure@917>' has if/match/for — extract to src/light/ |
 | **B-05** Rc clone pattern | ✅ PASS | Rc clone pattern looks correct |
-| **B-06** Flat registration body | ❌ ERROR | tbl.set() inside {} block (anti-pattern): line 722 |
+| **B-06** Flat registration body | ✅ PASS | All tbl.set() calls are flat statements |
 
 ### Phase 6 — Architecture Compliance
 

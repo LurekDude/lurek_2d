@@ -1,6 +1,6 @@
 # Module Quality Report: `animation`
 
-> **Status**: 🔴 FAIL  |  **Date**: 2026-04-09  |  **Score**: 44 ✅ / 1 ⚠️ / 3 ❌ / 19 🔵
+> **Status**: 🔴 FAIL  |  **Date**: 2026-04-09  |  **Score**: 45 ✅ / 1 ⚠️ / 2 ❌ / 19 🔵
 
 ---
 
@@ -10,7 +10,6 @@
 
 - [ ] **B-02** — Registration-only: struct definitions (move to src/animation/): LuaAnimation
 - [ ] **B-03** — impl LuaUserData placement: Move impl LuaUserData for LuaAnimation from lua_api/animation_api.rs → src/animation/
-- [ ] **B-06** — Flat registration body: tbl.set() inside {} block (anti-pattern): line 21
 
 ### 🟡 Warnings — Should Fix
 
@@ -75,7 +74,7 @@
 | **B-03** impl LuaUserData placement | ❌ ERROR | Move impl LuaUserData for LuaAnimation from lua_api/animation_api.rs → src/animation/ |
 | **B-04** No business logic in closures | ✅ PASS | Closures appear thin (≤15 LOC, no control flow) |
 | **B-05** Rc clone pattern | ✅ PASS | Rc clone pattern looks correct |
-| **B-06** Flat registration body | ❌ ERROR | tbl.set() inside {} block (anti-pattern): line 21 |
+| **B-06** Flat registration body | ✅ PASS | All tbl.set() calls are flat statements |
 
 ### Phase 6 — Architecture Compliance
 

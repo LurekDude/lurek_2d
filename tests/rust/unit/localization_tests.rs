@@ -140,14 +140,18 @@ fn interpolate_pairs_convenience() {
 
 #[test]
 fn plural_form_english_one() {
-    assert_eq!(PluralForm::english(1.0), PluralForm::One);
+    let form = PluralForm::english(1.0);
+    assert_eq!(form, PluralForm::One);
 }
 
 #[test]
 fn plural_form_english_other() {
-    assert_eq!(PluralForm::english(0.0), PluralForm::Other);
-    assert_eq!(PluralForm::english(2.0), PluralForm::Other);
-    assert_eq!(PluralForm::english(100.0), PluralForm::Other);
+    let form_0 = PluralForm::english(0.0);
+    let form_2 = PluralForm::english(2.0);
+    let form_100 = PluralForm::english(100.0);
+    assert_eq!(form_0, PluralForm::Other);
+    assert_eq!(form_2, PluralForm::Other);
+    assert_eq!(form_100, PluralForm::Other);
 }
 
 #[test]
@@ -176,7 +180,8 @@ fn pluralize_selects_one_form() {
     let mut forms = HashMap::new();
     forms.insert("one".to_string(), "1 item".to_string());
     forms.insert("other".to_string(), "{n} items".to_string());
-    assert_eq!(pluralize(1.0, &forms), "1 item");
+    let result = pluralize(1.0, &forms);
+    assert_eq!(result, "1 item");
 }
 
 #[test]
@@ -184,14 +189,16 @@ fn pluralize_selects_other_form() {
     let mut forms = HashMap::new();
     forms.insert("one".to_string(), "1 item".to_string());
     forms.insert("other".to_string(), "{n} items".to_string());
-    assert_eq!(pluralize(5.0, &forms), "{n} items");
+    let result = pluralize(5.0, &forms);
+    assert_eq!(result, "{n} items");
 }
 
 #[test]
 fn pluralize_falls_back_to_other_when_no_match() {
     let mut forms = HashMap::new();
     forms.insert("other".to_string(), "fallback".to_string());
-    assert_eq!(pluralize(1.0, &forms), "fallback");
+    let result = pluralize(1.0, &forms);
+    assert_eq!(result, "fallback");
 }
 
 #[test]

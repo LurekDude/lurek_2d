@@ -1,6 +1,6 @@
 # Module Quality Report: `patterns`
 
-> **Status**: 🔴 FAIL  |  **Date**: 2026-04-09  |  **Score**: 42 ✅ / 4 ⚠️ / 2 ❌ / 19 🔵
+> **Status**: 🔴 FAIL  |  **Date**: 2026-04-09  |  **Score**: 43 ✅ / 4 ⚠️ / 1 ❌ / 19 🔵
 
 ---
 
@@ -9,7 +9,6 @@
 ### 🔴 Errors — Must Fix Before Merge
 
 - [ ] **B-03** — impl LuaUserData placement: Move impl LuaUserData for LuaEventBus, LuaObjectPool, LuaCommandStack, LuaServiceLocator, LuaFactory, LuaSimpleState, LuaBlackboard, LuaObserver, LuaThrottle, LuaDebounce, LuaPriorityQueue, LuaRing, LuaFunnel from lua_api/patterns_api.rs → src/patterns/
-- [ ] **B-06** — Flat registration body: tbl.set() inside {} block (anti-pattern): line 782, line 1255, line 1415
 
 ### 🟡 Warnings — Should Fix
 
@@ -77,7 +76,7 @@
 | **B-03** impl LuaUserData placement | ❌ ERROR | Move impl LuaUserData for LuaEventBus, LuaObjectPool, LuaCommandStack, LuaServiceLocator, LuaFactory, LuaSimpleState, LuaBlackboard, LuaObserver, LuaThrottle, LuaDebounce, LuaPriorityQueue, LuaRing, LuaFunnel from lua_api/patterns_api.rs → src/patterns/ |
 | **B-04** No business logic in closures | ✅ PASS | Closures appear thin (≤15 LOC, no control flow) |
 | **B-05** Rc clone pattern | ✅ PASS | Rc clone pattern looks correct |
-| **B-06** Flat registration body | ❌ ERROR | tbl.set() inside {} block (anti-pattern): line 782, line 1255, line 1415 |
+| **B-06** Flat registration body | ✅ PASS | All tbl.set() calls are flat statements |
 
 ### Phase 6 — Architecture Compliance
 

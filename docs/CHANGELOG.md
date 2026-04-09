@@ -18,6 +18,16 @@ Always update this file **in the same commit** as the change. Use the commit typ
 
 ---
 
+## [0.6.20] — 2026-04-09
+
+### Fixed
+- **Quality: B-06** — Audit check now only flags genuinely bare `{}` blocks (not closure bodies or control-flow blocks). Added word-boundary constraint so `r_tbl.set(` and `d_tbl.set(` patterns no longer match. Eliminates false positives in `debugbridge_api.rs` and `procgen_api.rs`.
+- **Quality: SP-03** — Trimmed `## Summary` sections to under 2000 chars in `docs/specs/debugbridge.md` (2370→1951) and `docs/specs/procgen.md` (2324→1983)
+- **Quality: SP-05** — Removed internal `pub(crate) struct Lcg` from `## Key Types` section of `docs/specs/procgen.md`; it is documented in `## Submodules` instead
+- **Quality: D-04** — Replaced "Consult the module-level documentation" stub phrases with real doc content in `src/procgen/flood_fill.rs` and `src/procgen/voronoi.rs` (3 entries)
+- **Quality: T-04** — Fixed float-literal assertions in `tests/rust/unit/localization_tests.rs` by separating `PluralForm::english(1.0)` calls to their own `let` binding before the `assert_eq!` comparison
+- **Quality audit** — `localization`, `debugbridge`, and `procgen` modules now PASS (5/46 total: serial, window, localization, debugbridge, procgen)
+
 ## [0.6.19] — 2026-04-09
 
 ### Fixed

@@ -1,6 +1,6 @@
 # Module Quality Report: `pathfinding`
 
-> **Status**: 🔴 FAIL  |  **Date**: 2026-04-09  |  **Score**: 37 ✅ / 7 ⚠️ / 4 ❌ / 19 🔵
+> **Status**: 🔴 FAIL  |  **Date**: 2026-04-09  |  **Score**: 38 ✅ / 7 ⚠️ / 3 ❌ / 19 🔵
 
 ---
 
@@ -11,7 +11,6 @@
 - [ ] **SP-04** — Lua API completeness: Missing from spec: newNavGridFromTileMap — add to ## Lua API in docs/specs/pathfinding.md
 - [ ] **B-02** — Registration-only: struct definitions (move to src/pathfinding/): LuaNavGrid, LuaUnitPathfinder, LuaFlowField, LuaPathGrid, LuaAiFlowField
 - [ ] **B-03** — impl LuaUserData placement: Move impl LuaUserData for LuaNavGrid, LuaUnitPathfinder, LuaFlowField, LuaPathGrid, LuaAiFlowField from lua_api/pathfinding_api.rs → src/pathfinding/
-- [ ] **B-06** — Flat registration body: tbl.set() inside {} block (anti-pattern): line 23, line 526, line 653
 
 ### 🟡 Warnings — Should Fix
 
@@ -82,7 +81,7 @@
 | **B-03** impl LuaUserData placement | ❌ ERROR | Move impl LuaUserData for LuaNavGrid, LuaUnitPathfinder, LuaFlowField, LuaPathGrid, LuaAiFlowField from lua_api/pathfinding_api.rs → src/pathfinding/ |
 | **B-04** No business logic in closures | ⚠️ WARNING | '<closure@1001>' (30 LOC, line 1001) — extract body to src/pathfinding/ |
 | **B-05** Rc clone pattern | ✅ PASS | Rc clone pattern looks correct |
-| **B-06** Flat registration body | ❌ ERROR | tbl.set() inside {} block (anti-pattern): line 23, line 526, line 653 |
+| **B-06** Flat registration body | ✅ PASS | All tbl.set() calls are flat statements |
 
 ### Phase 6 — Architecture Compliance
 

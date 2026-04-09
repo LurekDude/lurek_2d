@@ -22,16 +22,11 @@ Key features:
 - **`getLocals`** — enumerate local variables at a specific stack level via `debug.getlocal`
 - **`getGlobals`** — capture up to 200 primitive global variables
 - **Print capture** — game scripts call `lurek.debugbridge.capturePrint` to feed a circular history buffer; the server broadcasts each entry as a `"print"` event to all clients
-- **Performance sampling** — `poll()` automatically records the current frame delta from `lurek.time.getDelta()` each call; `getPerformance()` returns fps, dt, avgDt, minDt, maxDt for connected external tools
-- **Screenshot request** — tools set `screenshot_requested` via `requestScreenshot(scale?)`; the render loop checks `isScreenshotRequested()` and clears the flag after capture
+- **Performance sampling** — `poll()` records frame delta each call; `getPerformance()` returns fps, dt, avgDt, minDt, maxDt
+- **Screenshot request** — tools set `screenshot_requested` via `requestScreenshot(scale?)`; the render loop checks the flag after capture
 - **Broadcast** — any game script can push a named JSON event to all connected clients with `broadcast(event, json_data)`
 
 The server binds to 127.0.0.1 only. Ports below 1024 are rejected with a Lua error. The default port is 19740.
-
-This module intentionally does **not** provide:
-- Encrypted or authenticated connections (loopback-only, trusted development environment)
-- A Lua-side coroutine or async model — `poll()` is a synchronous drain
-- Persistent session storage — all state is in-memory and resets when the server stops
 
 ## Ownership Rule
 

@@ -1,6 +1,6 @@
 # Module Quality Report: `ai`
 
-> **Status**: 🔴 FAIL  |  **Date**: 2026-04-09  |  **Score**: 43 ✅ / 2 ⚠️ / 3 ❌ / 19 🔵
+> **Status**: 🔴 FAIL  |  **Date**: 2026-04-09  |  **Score**: 44 ✅ / 2 ⚠️ / 2 ❌ / 19 🔵
 
 ---
 
@@ -9,7 +9,6 @@
 ### 🔴 Errors — Must Fix Before Merge
 
 - [ ] **B-03** — impl LuaUserData placement: Move impl LuaUserData for LuaAIWorld, LuaAgent, LuaBlackboard, LuaStateMachine, LuaBehaviorTree, LuaBTNode, LuaSteeringManager, LuaQLearner, LuaUtilityAI, LuaGOAPPlanner, LuaInfluenceMap, LuaSquad, LuaCommandQueue from lua_api/ai_api.rs → src/ai/
-- [ ] **B-06** — Flat registration body: tbl.set() inside {} block (anti-pattern): line 354, line 1283, line 1649
 - [ ] **R-02** — Dependency direction: mod: Tier2 imports pathfinding(tier2); mod: Tier2 imports pathfinding(tier2); mod: Tier2 imports pathfinding(tier2)
 
 ### 🟡 Warnings — Should Fix
@@ -76,7 +75,7 @@
 | **B-03** impl LuaUserData placement | ❌ ERROR | Move impl LuaUserData for LuaAIWorld, LuaAgent, LuaBlackboard, LuaStateMachine, LuaBehaviorTree, LuaBTNode, LuaSteeringManager, LuaQLearner, LuaUtilityAI, LuaGOAPPlanner, LuaInfluenceMap, LuaSquad, LuaCommandQueue from lua_api/ai_api.rs → src/ai/ |
 | **B-04** No business logic in closures | ✅ PASS | Closures appear thin (≤15 LOC, no control flow) |
 | **B-05** Rc clone pattern | ✅ PASS | Rc clone pattern looks correct |
-| **B-06** Flat registration body | ❌ ERROR | tbl.set() inside {} block (anti-pattern): line 354, line 1283, line 1649 |
+| **B-06** Flat registration body | ✅ PASS | All tbl.set() calls are flat statements |
 
 ### Phase 6 — Architecture Compliance
 

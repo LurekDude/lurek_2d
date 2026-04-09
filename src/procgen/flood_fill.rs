@@ -3,7 +3,9 @@
 //! Fills connected cells that match a threshold condition starting from a seed
 //! coordinate, returning a binary mask.
 
-/// BFS flood fill on a grid. Consult the module-level documentation for the broader usage context and preconditions.
+/// BFS flood fill on a flat grid, returning a binary mask of all cells reachable from a
+/// seed position whose values satisfy `threshold`. Cells with value `> threshold` are
+/// considered walls and are excluded from the fill.
 ///
 /// # Parameters
 /// - `data` — `&[u8]`.

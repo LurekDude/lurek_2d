@@ -1,6 +1,6 @@
 # Module Quality Report: `dataframe`
 
-> **Status**: 🔴 FAIL  |  **Date**: 2026-04-09  |  **Score**: 40 ✅ / 4 ⚠️ / 4 ❌ / 19 🔵
+> **Status**: 🔴 FAIL  |  **Date**: 2026-04-09  |  **Score**: 41 ✅ / 4 ⚠️ / 3 ❌ / 19 🔵
 
 ---
 
@@ -10,7 +10,6 @@
 
 - [ ] **B-02** — Registration-only: struct definitions (move to src/dataframe/): LuaDataFrame, LuaDatabase
 - [ ] **B-03** — impl LuaUserData placement: Move impl LuaUserData for LuaDataFrame, LuaDatabase from lua_api/dataframe_api.rs → src/dataframe/
-- [ ] **B-06** — Flat registration body: tbl.set() inside {} block (anti-pattern): line 77, line 648
 - [ ] **T-04** — Float comparisons: assert_eq! with float literals (use abs()<epsilon): line 64, line 69, line 209, line 273, line 290
 
 ### 🟡 Warnings — Should Fix
@@ -79,7 +78,7 @@
 | **B-03** impl LuaUserData placement | ❌ ERROR | Move impl LuaUserData for LuaDataFrame, LuaDatabase from lua_api/dataframe_api.rs → src/dataframe/ |
 | **B-04** No business logic in closures | ⚠️ WARNING | '<closure@801>' (21 LOC, line 801) — extract body to src/dataframe/ \| '<closure@868>' has if/match/for — extract to src/dataframe/ |
 | **B-05** Rc clone pattern | ✅ PASS | Rc clone pattern looks correct |
-| **B-06** Flat registration body | ❌ ERROR | tbl.set() inside {} block (anti-pattern): line 77, line 648 |
+| **B-06** Flat registration body | ✅ PASS | All tbl.set() calls are flat statements |
 
 ### Phase 6 — Architecture Compliance
 

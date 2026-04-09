@@ -1,6 +1,6 @@
 # Module Quality Report: `devtools`
 
-> **Status**: 🔴 FAIL  |  **Date**: 2026-04-09  |  **Score**: 40 ✅ / 5 ⚠️ / 3 ❌ / 19 🔵
+> **Status**: 🔴 FAIL  |  **Date**: 2026-04-09  |  **Score**: 41 ✅ / 5 ⚠️ / 2 ❌ / 19 🔵
 
 ---
 
@@ -9,7 +9,6 @@
 ### 🔴 Errors — Must Fix Before Merge
 
 - [ ] **SP-04** — Lua API completeness: Missing from spec: selfTime, startTime — add to ## Lua API in docs/specs/devtools.md
-- [ ] **B-06** — Flat registration body: tbl.set() inside {} block (anti-pattern): line 159, line 235, line 267
 - [ ] **T-04** — Float comparisons: assert_eq! with float literals (use abs()<epsilon): line 148
 
 ### 🟡 Warnings — Should Fix
@@ -79,7 +78,7 @@
 | **B-03** impl LuaUserData placement | ✅ PASS | No LuaUserData impl in lua_api file |
 | **B-04** No business logic in closures | ⚠️ WARNING | '<closure@159>' (18 LOC, line 159) — extract body to src/devtools/ \| '<closure@386>' (19 LOC, line 386) — extract body to src/devtools/ \| '<closure@482>' (16 LOC, line 482) — extract body to src/devtools/ \| '<closure@503>' (52 LOC, line 503) — extract body to src/devtools/ \| '<closure@110>' has if/match/for — extract to src/devtools/ \| '<closure@235>' has if/match/for — extract to src/devtools/ |
 | **B-05** Rc clone pattern | ⚠️ WARNING | Possible missing state.clone() before move: line 428 |
-| **B-06** Flat registration body | ❌ ERROR | tbl.set() inside {} block (anti-pattern): line 159, line 235, line 267 |
+| **B-06** Flat registration body | ✅ PASS | All tbl.set() calls are flat statements |
 
 ### Phase 6 — Architecture Compliance
 

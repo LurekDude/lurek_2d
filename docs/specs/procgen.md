@@ -17,14 +17,14 @@ The `procgen` module provides five stateless procedural-generation algorithms fo
 The five algorithms are:
 
 * **Cellular automata** (`cellular.rs`) — iterative birth/survive rules on a seeded random binary grid to produce cave-like or room-like structures. The user configures fill probability, birth/survive neighbor thresholds, iteration count, and RNG seed via a `CellularOpts` struct with sensible defaults.
-* **Flood fill** (`flood_fill.rs`) — BFS region discovery on a flat grid, returning a binary mask of all cells reachable from a seed coordinate that satisfy a threshold condition (above or below). Useful for isolating rooms, tagging connected regions after a cellular pass, or detecting unreachable areas.
-* **Periodic Perlin noise** (`noise_ext.rs`) — tileable gradient noise that wraps seamlessly over configurable X/Y periods. Uses a hash-based permutation scheme with a quintic fade curve. Useful for scrolling backgrounds, terrain heightmaps, and texture generation.
-* **Poisson-disk sampling** (`poisson.rs`) — Bridson's fast algorithm for placing points in a 2D area with a guaranteed minimum inter-point distance. Useful for object placement (trees, enemies, pickups) that avoids clumping while looking natural.
-* **Voronoi diagram** (`voronoi.rs`) — nearest-point assignment of every grid cell to its closest seed point, returning region IDs, distances, and second-closest distances. Supports optional domain warping via hash-based noise for organic, irregular region boundaries.
+* **Flood fill** (`flood_fill.rs`) — BFS region discovery on a flat grid, returning a binary mask of all cells reachable from a seed coordinate that satisfy a threshold condition. Useful for isolating rooms and detecting unreachable areas after a cellular pass.
+* **Periodic Perlin noise** (`noise_ext.rs`) — tileable gradient noise that wraps seamlessly over configurable X/Y periods, using a hash-based permutation scheme with quintic fade. Useful for scrolling backgrounds and terrain heightmaps.
+* **Poisson-disk sampling** (`poisson.rs`) — Bridson's fast algorithm for placing points in a 2D area with a guaranteed minimum inter-point distance; ideal for natural-looking object placement.
+* **Voronoi diagram** (`voronoi.rs`) — nearest-point assignment of every grid cell to its closest seed point, returning region IDs, distances, and second-closest distances. Supports optional domain warping for organic region boundaries.
 
-All algorithms share an internal `Lcg` (linear congruential generator) struct (`pub(crate)`) for fast deterministic randomness. The `Lcg` is not exposed to Lua or to other modules.
+All algorithms share an internal `Lcg` (linear congruential generator, `pub(crate)`) for fast deterministic randomness; it is not exposed to Lua.
 
-The module depends only on Baseline (`engine` for log messages). It does **not** import from `math`, any Tier 1 module, or any other Tier 2 module. All five algorithms are exposed to Lua under `lurek.procgen.*` by `src/lua_api/procgen_api.rs`.
+All five algorithms are exposed to Lua under `lurek.procgen.*` by `src/lua_api/procgen_api.rs`.
 
 ## Architecture
 
@@ -134,14 +134,6 @@ Configuration for Voronoi domain warping. Implements `Default` and `Clone`.
 | `warp_scale`     | `f32` | `0.1`   | Noise frequency used for domain warp             |
 | `warp_strength`  | `f32` | `0.0`   | Warp displacement magnitude (0 = no warp)        |
 | `seed`           | `u64` | `0`     | RNG seed for warp noise                          |
-
-#### `procgen::lcg::Lcg` (pub(crate))
-
-Internal linear congruential generator. Not public.
-
-| Field   | Type  | Description        |
-|---------|-------|--------------------|
-| `state` | `u64` | Current RNG state  |
 
 ### Enums
 

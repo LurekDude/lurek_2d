@@ -1,6 +1,6 @@
 # Module Quality Report: `graphics`
 
-> **Status**: 🔴 FAIL  |  **Date**: 2026-04-09  |  **Score**: 35 ✅ / 8 ⚠️ / 5 ❌ / 19 🔵
+> **Status**: 🔴 FAIL  |  **Date**: 2026-04-09  |  **Score**: 36 ✅ / 8 ⚠️ / 4 ❌ / 19 🔵
 
 ---
 
@@ -11,7 +11,6 @@
 - [ ] **S-03** — File size limits: Files >2000 LOC: graphics/gpu_renderer.rs (4172 LOC)
 - [ ] **B-02** — Registration-only: struct definitions (move to src/graphics/): LuaImageData, LuaImage, LuaNineSlice, LuaFont, LuaCanvas, LuaSpriteBatch, LuaMesh, LuaShader, LuaQuad, LuaShape
 - [ ] **B-03** — impl LuaUserData placement: Move impl LuaUserData for LuaImageData, LuaNineSlice, LuaImage, LuaFont, LuaCanvas, LuaSpriteBatch, LuaMesh, LuaShader, LuaQuad, LuaShape, LuaDrawLayer from lua_api/graphics_api.rs → src/graphics/
-- [ ] **B-06** — Flat registration body: tbl.set() inside {} block (anti-pattern): line 181, line 2139
 - [ ] **T-04** — Float comparisons: assert_eq! with float literals (use abs()<epsilon): line 1563, line 1564, line 1565
 
 ### 🟡 Warnings — Should Fix
@@ -84,7 +83,7 @@
 | **B-03** impl LuaUserData placement | ❌ ERROR | Move impl LuaUserData for LuaImageData, LuaNineSlice, LuaImage, LuaFont, LuaCanvas, LuaSpriteBatch, LuaMesh, LuaShader, LuaQuad, LuaShape, LuaDrawLayer from lua_api/graphics_api.rs → src/graphics/ |
 | **B-04** No business logic in closures | ⚠️ WARNING | '<closure@1424>' (23 LOC, line 1424) — extract body to src/graphics/ \| '<closure@1456>' (25 LOC, line 1456) — extract body to src/graphics/ \| '<closure@1527>' (31 LOC, line 1527) — extract body to src/graphics/ \| '<closure@1576>' (119 LOC, line 1576) — extract body to src/graphics/ \| '<closure@1920>' has if/match/for — extract to src/graphics/ \| '<closure@1941>' has if/match/for — extract to src/graphics/ |
 | **B-05** Rc clone pattern | ✅ PASS | Rc clone pattern looks correct |
-| **B-06** Flat registration body | ❌ ERROR | tbl.set() inside {} block (anti-pattern): line 181, line 2139 |
+| **B-06** Flat registration body | ✅ PASS | All tbl.set() calls are flat statements |
 
 ### Phase 6 — Architecture Compliance
 

@@ -8,7 +8,8 @@ use super::lcg::Lcg;
 use crate::engine::log_messages::{VR01, VR02};
 use crate::log_msg;
 
-/// Options for Voronoi diagram generation. Consult the module-level documentation for the broader usage context and preconditions.
+/// Options for Voronoi diagram generation. Controls seed points, grid dimensions,
+/// and optional domain-warp parameters for organic region shapes.
 ///
 /// # Fields
 /// - `warp_scale` — `f32`.
@@ -51,7 +52,8 @@ impl VoronoiOpts {
     }
 }
 
-/// Generates a Voronoi diagram. Consult the module-level documentation for the broader usage context and preconditions.
+/// Generates a Voronoi diagram over a `width × height` grid for the given seed points.
+/// Returns region IDs, nearest-point distances, and second-closest distances for each cell.
 ///
 /// # Parameters
 /// - `width` — `u32`.
