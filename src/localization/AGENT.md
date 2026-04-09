@@ -23,6 +23,18 @@ The `localization` module provides the internationalization (i18n) backend for L
 | `plural.rs`        | `PluralForm`, `pluralize`, `pluralize_slavic` — CLDR plural category selection      |
 | `mod.rs`           | Re-exports all public types                                                          |
 
+## Key Types
+
+| Type | Description |
+|------|-------------|
+| `CatalogError` | Principal type for the `localization` module. |
+| `Catalog` | Principal type for the `localization` module. |
+| `PluralForm` | Principal type for the `localization` module. |
+
+## Lua API Summary
+
+_No `lurek.*` bindings registered for this module._
+
 ## Full Specification
 
 See [`docs/specs/localization.md`](../../../docs/specs/localization.md) for full architecture, type details, Lua API, examples, and notes.

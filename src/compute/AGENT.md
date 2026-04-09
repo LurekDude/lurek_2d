@@ -27,6 +27,23 @@ and `get_i32`/`set_i32` accessors that handle byte-level serialisation internall
 | `ops.rs`     | Element-wise arithmetic, comparison, reduction, shape, bitwise ops |
 | `spatial.rs` | 2D convolution, morphology, flood fill, regions, matmul, dot   |
 
+## Key Types
+
+| Type | Description |
+|------|-------------|
+| `DataType` | Principal type for the `compute` module. |
+| `NdArray` | Principal type for the `compute` module. |
+
+## Lua API Summary
+
+| Function | Description |
+|----------|-------------|
+| `lurek.compute.newArray()` | See `docs/specs/compute.md`. |
+| `lurek.compute.zeros()` | See `docs/specs/compute.md`. |
+| `lurek.compute.ones()` | See `docs/specs/compute.md`. |
+| `lurek.compute.range()` | See `docs/specs/compute.md`. |
+| `lurek.compute.fromTable()` | See `docs/specs/compute.md`. |
+
 ## Full Specification
 
 All architecture diagrams, detailed type documentation, Lua API reference, examples, and cross-module references live in the consolidated spec:

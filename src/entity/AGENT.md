@@ -22,6 +22,21 @@ The entity module provides Lurek2D's lightweight entity-component-system (ECS) b
 | `universe.rs`      | `Universe` struct — entity lifecycle, components, string/bitmap tags, layers, blueprints, parent-child, systems, `deep_copy_table` helper |
 | `relationships.rs` | `RelationType`, `Relationship`, `RelationshipManager` — symmetric pair-based relations with numeric values and named-state levels |
 
+## Key Types
+
+| Type | Description |
+|------|-------------|
+| `RelationType` | Principal type for the `entity` module. |
+| `Relationship` | Principal type for the `entity` module. |
+| `RelationshipManager` | Principal type for the `entity` module. |
+| `Universe` | Principal type for the `entity` module. |
+
+## Lua API Summary
+
+| Function | Description |
+|----------|-------------|
+| `lurek.entity.newUniverse()` | See `docs/specs/entity.md`. |
+
 ## Full Specification
 
 All architecture diagrams, detailed type documentation, Lua API reference, examples, and cross-module references live in the consolidated spec:

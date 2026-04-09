@@ -36,6 +36,27 @@ The graphics module owns the entire GPU rendering pipeline for Lurek2D — from 
 | `texture.rs`       | Texture loading (PNG/JPEG/BMP), premultiplied-alpha conversion, and `TextureKey` handle |
 | `texture_atlas.rs` | CPU-side bin-packing texture atlas using shelf algorithm              |
 
+## Key Types
+
+| Type | Description |
+|------|-------------|
+| `Canvas` | Principal type for the `graphics` module. |
+| `Color` | Principal type for the `graphics` module. |
+| `DecalSurface` | Principal type for the `graphics` module. |
+| `LayerEntry` | Principal type for the `graphics` module. |
+| `DrawLayer` | Principal type for the `graphics` module. |
+| `Font` | Principal type for the `graphics` module. |
+| `GlyphInfo` | Principal type for the `graphics` module. |
+| `RenderStats` | Principal type for the `graphics` module. |
+| `GpuRenderer` | Principal type for the `graphics` module. |
+| `ShaderPassDescriptor` | Principal type for the `graphics` module. |
+| `MeshDrawMode` | Principal type for the `graphics` module. |
+| `MeshVertex` | Principal type for the `graphics` module. |
+
+## Lua API Summary
+
+_No `lurek.*` bindings registered for this module._
+
 ## Full Specification
 
 All architecture diagrams, detailed type documentation, Lua API reference, examples, and cross-module references live in the consolidated spec:

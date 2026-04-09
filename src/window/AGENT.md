@@ -23,6 +23,38 @@ The `window` module is a Tier 1 core engine subsystem that manages all window li
 | `management.rs`  | Window chrome operations — title, fullscreen, VSync, position, size, minimize, maximize, restore, close, icon, focus, visibility, DPI scale, native message box. All functions take `&WindowState` or `&mut WindowState`; deferred writes go to `pending_*` fields. |
 | `viewport.rs`    | Viewport coordinate-space utilities — logical game dimensions, scale mode (`none`/`letterbox`/`stretch`/`pixel`), and bidirectional pixel ↔ game-space coordinate conversion using pre-computed scale and offset values. |
 
+## Key Types
+
+| Type | Description |
+|------|-------------|
+| `ModeInfo` | Principal type for the `window` module. |
+| `ScaleInfo` | Principal type for the `window` module. |
+
+## Lua API Summary
+
+| Function | Description |
+|----------|-------------|
+| `lurek.window.setTitle()` | See `docs/specs/window.md`. |
+| `lurek.window.getTitle()` | See `docs/specs/window.md`. |
+| `lurek.window.getWidth()` | See `docs/specs/window.md`. |
+| `lurek.window.getHeight()` | See `docs/specs/window.md`. |
+| `lurek.window.getDimensions()` | See `docs/specs/window.md`. |
+| `lurek.window.setFullscreen()` | See `docs/specs/window.md`. |
+| `lurek.window.getFullscreen()` | See `docs/specs/window.md`. |
+| `lurek.window.isOpen()` | See `docs/specs/window.md`. |
+| `lurek.window.setVSync()` | See `docs/specs/window.md`. |
+| `lurek.window.getVSync()` | See `docs/specs/window.md`. |
+| `lurek.window.hasFocus()` | See `docs/specs/window.md`. |
+| `lurek.window.hasMouseFocus()` | See `docs/specs/window.md`. |
+| `lurek.window.isMinimized()` | See `docs/specs/window.md`. |
+| `lurek.window.isMaximized()` | See `docs/specs/window.md`. |
+| `lurek.window.isVisible()` | See `docs/specs/window.md`. |
+| `lurek.window.minimize()` | See `docs/specs/window.md`. |
+| `lurek.window.maximize()` | See `docs/specs/window.md`. |
+| `lurek.window.restore()` | See `docs/specs/window.md`. |
+| `lurek.window.getPosition()` | See `docs/specs/window.md`. |
+| `lurek.window.setPosition()` | See `docs/specs/window.md`. |
+
 ## Full Specification
 
 All architecture diagrams, detailed type documentation, Lua API reference, examples, and cross-module references live in the consolidated spec:

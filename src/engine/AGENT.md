@@ -37,6 +37,27 @@ engine is the only upward-facing dependency root.
 | `temp_test.rs` | Placeholder file — contains only the text `testing`, not compiled |
 | `cfg/messages.toml` | TOML catalog of human-readable log message strings, embedded at compile time |
 
+## Key Types
+
+| Type | Description |
+|------|-------------|
+| `App` | Principal type for the `engine` module. |
+| `Config` | Principal type for the `engine` module. |
+| `GraphicsConfig` | Principal type for the `engine` module. |
+| `WindowConfig` | Principal type for the `engine` module. |
+| `ModulesConfig` | Principal type for the `engine` module. |
+| `PerformanceConfig` | Principal type for the `engine` module. |
+| `DebugOverlay` | Principal type for the `engine` module. |
+| `ErrorCategory` | Principal type for the `engine` module. |
+| `EngineError` | Principal type for the `engine` module. |
+| `ErrorScreen` | Principal type for the `engine` module. |
+| `MessageCatalog` | Principal type for the `engine` module. |
+| `FullscreenType` | Principal type for the `engine` module. |
+
+## Lua API Summary
+
+_No `lurek.*` bindings registered for this module._
+
 ## Full Specification
 
 All architecture diagrams, detailed type documentation, Lua API reference, examples, and cross-module references live in the consolidated spec:

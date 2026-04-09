@@ -28,6 +28,20 @@ just valid Lua source.
 | `save_data.rs`      | Alternate copy of save data types (orphaned — not declared via `mod save_data;` in `mod.rs`) |
 | `save_manager.rs`   | `SaveManager` implementation — slot management, load/save lifecycle, and file I/O |
 
+## Key Types
+
+| Type | Description |
+|------|-------------|
+| `SlotMeta` | Principal type for the `savegame` module. |
+| `SaveManager` | Principal type for the `savegame` module. |
+| `SaveValue` | Principal type for the `savegame` module. |
+
+## Lua API Summary
+
+| Function | Description |
+|----------|-------------|
+| `lurek.savegame.newSaveManager()` | See `docs/specs/savegame.md`. |
+
 ## Full Specification
 
 All architecture diagrams, detailed type documentation, Lua API reference, examples, and cross-module references live in the consolidated spec:

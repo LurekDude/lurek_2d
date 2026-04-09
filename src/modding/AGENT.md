@@ -25,6 +25,20 @@ Baseline (`engine`, `math`) and uses the `toml` crate for manifest parsing and
 | `mod.rs`          | Module root — re-exports `mod_manager` submodule              |
 | `mod_manager.rs`  | `ModInfo` struct and `ModManager` registry with all operations |
 
+## Key Types
+
+| Type | Description |
+|------|-------------|
+| `ModInfo` | Principal type for the `modding` module. |
+| `ModManager` | Principal type for the `modding` module. |
+
+## Lua API Summary
+
+| Function | Description |
+|----------|-------------|
+| `lurek.modding.newMod()` | See `docs/specs/modding.md`. |
+| `lurek.modding.newModManager()` | See `docs/specs/modding.md`. |
+
 ## Full Specification
 
 All architecture diagrams, detailed type documentation, Lua API reference, examples, and cross-module references live in the consolidated spec:

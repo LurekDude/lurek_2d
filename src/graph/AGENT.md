@@ -30,6 +30,29 @@ The graph module provides a general-purpose directed weighted graph with item fl
 | `graph.rs`         | Legacy duplicate of `core.rs` — not declared in `mod.rs`, dead code          |
 | `traversal.rs`     | Legacy duplicate of `pathfinding.rs` — not declared in `mod.rs`, dead code   |
 
+## Key Types
+
+| Type | Description |
+|------|-------------|
+| `GraphStats` | Principal type for the `graph` module. |
+| `Graph` | Principal type for the `graph` module. |
+| `Edge` | Principal type for the `graph` module. |
+| `ItemPosition` | Principal type for the `graph` module. |
+| `GraphItem` | Principal type for the `graph` module. |
+| `OverflowPolicy` | Principal type for the `graph` module. |
+| `FlowMode` | Principal type for the `graph` module. |
+| `ConversionRule` | Principal type for the `graph` module. |
+| `Supply` | Principal type for the `graph` module. |
+| `Demand` | Principal type for the `graph` module. |
+| `Node` | Principal type for the `graph` module. |
+| `PathResult` | Principal type for the `graph` module. |
+
+## Lua API Summary
+
+| Function | Description |
+|----------|-------------|
+| `lurek.graph.newGraph()` | See `docs/specs/graph.md`. |
+
 ## Full Specification
 
 All architecture diagrams, detailed type documentation, Lua API reference, examples, and cross-module references live in the consolidated spec:

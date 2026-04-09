@@ -34,6 +34,38 @@ This module is **pure Rust** with no mlua dependency; all Lua plumbing lives in 
 | `watcher.rs`      | `FileWatcher` — path modification time polling for hot-reload detection         |
 | `mod.rs`          | Re-exports all public types                                                     |
 
+## Key Types
+
+| Type | Description |
+|------|-------------|
+| `FrameStats` | Principal type for the `devtools` module. |
+| `FrameSnapshot` | Principal type for the `devtools` module. |
+| `LogLevel` | Principal type for the `devtools` module. |
+| `LogEntry` | Principal type for the `devtools` module. |
+| `Logger` | Principal type for the `devtools` module. |
+| `ProfileZone` | Principal type for the `devtools` module. |
+| `Profiler` | Principal type for the `devtools` module. |
+| `FileWatcher` | Principal type for the `devtools` module. |
+
+## Lua API Summary
+
+| Function | Description |
+|----------|-------------|
+| `lurek.devtools.name()` | See `docs/specs/devtools.md`. |
+| `lurek.devtools.time()` | See `docs/specs/devtools.md`. |
+| `lurek.devtools.selfTime()` | See `docs/specs/devtools.md`. |
+| `lurek.devtools.startTime()` | See `docs/specs/devtools.md`. |
+| `lurek.devtools.children()` | See `docs/specs/devtools.md`. |
+| `lurek.devtools.fps()` | See `docs/specs/devtools.md`. |
+| `lurek.devtools.dt()` | See `docs/specs/devtools.md`. |
+| `lurek.devtools.avg()` | See `docs/specs/devtools.md`. |
+| `lurek.devtools.min()` | See `docs/specs/devtools.md`. |
+| `lurek.devtools.max()` | See `docs/specs/devtools.md`. |
+| `lurek.devtools.p50()` | See `docs/specs/devtools.md`. |
+| `lurek.devtools.p95()` | See `docs/specs/devtools.md`. |
+| `lurek.devtools.p99()` | See `docs/specs/devtools.md`. |
+| `lurek.devtools.samples()` | See `docs/specs/devtools.md`. |
+
 ## Full Specification
 
 See [`docs/specs/devtools.md`](../../../docs/specs/devtools.md) for full architecture, type details, Lua API, examples, and notes.

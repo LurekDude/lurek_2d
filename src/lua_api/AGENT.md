@@ -40,6 +40,27 @@ translation layer — business logic stays in the domain modules below.
 | `thread_api/` | `lurek.thread.*` — worker threads, channels |
 | `terminal_api.rs` | `lurek.terminal.*` — in-game developer terminal |
 
+## Key Types
+
+| Type | Description |
+|------|-------------|
+| `LuaAnimation` | Principal type for the `lua_api` module. |
+| `LuaSource` | Principal type for the `lua_api` module. |
+| `LuaBus` | Principal type for the `lua_api` module. |
+| `LuaMidiPlayer` | Principal type for the `lua_api` module. |
+| `LuaDecoder` | Principal type for the `lua_api` module. |
+| `LuaCamera2D` | Principal type for the `lua_api` module. |
+| `LuaArray` | Principal type for the `lua_api` module. |
+| `LuaDataFrame` | Principal type for the `lua_api` module. |
+| `LuaDatabase` | Principal type for the `lua_api` module. |
+| `LuaUniverse` | Principal type for the `lua_api` module. |
+| `LuaSignal` | Principal type for the `lua_api` module. |
+| `LuaFileData` | Principal type for the `lua_api` module. |
+
+## Lua API Summary
+
+_No `lurek.*` bindings registered for this module._
+
 ## Full Specification
 
 All architecture diagrams, detailed type documentation, Lua API reference, examples, and cross-module references live in the consolidated spec:

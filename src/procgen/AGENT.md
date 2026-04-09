@@ -26,6 +26,23 @@ The `procgen` module provides five stateless procedural-generation algorithms fo
 | `voronoi.rs`     | Voronoi region assignment + distance fields with optional domain warping |
 | `lcg.rs`         | Internal linear congruential generator (`pub(crate)`, not public)     |
 
+## Key Types
+
+| Type | Description |
+|------|-------------|
+| `CellularOpts` | Principal type for the `procgen` module. |
+| `VoronoiOpts` | Principal type for the `procgen` module. |
+
+## Lua API Summary
+
+| Function | Description |
+|----------|-------------|
+| `lurek.procgen.cellularAutomata()` | See `docs/specs/procgen.md`. |
+| `lurek.procgen.floodFill()` | See `docs/specs/procgen.md`. |
+| `lurek.procgen.perlinNoise()` | See `docs/specs/procgen.md`. |
+| `lurek.procgen.poissonDisk()` | See `docs/specs/procgen.md`. |
+| `lurek.procgen.voronoi()` | See `docs/specs/procgen.md`. |
+
 ## Full Specification
 
 All architecture diagrams, detailed type documentation, Lua API reference, examples, and cross-module references live in the consolidated spec:

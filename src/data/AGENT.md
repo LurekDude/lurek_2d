@@ -30,6 +30,37 @@ pack/unpack systems — all exposed to Lua scripts through the `lurek.data` name
 | `toml_convert.rs` | TOML parsing (`str → toml::Value`) and encoding (`toml::Value → str`) via the `toml` crate. |
 | `mod.rs` | Re-exports all public types. |
 
+## Key Types
+
+| Type | Description |
+|------|-------------|
+| `BinValue` | Principal type for the `data` module. |
+| `ByteData` | Principal type for the `data` module. |
+| `CompressFormat` | Principal type for the `data` module. |
+| `DataView` | Principal type for the `data` module. |
+| `LuaDataView` | Principal type for the `data` module. |
+| `EncodeFormat` | Principal type for the `data` module. |
+| `HashAlgorithm` | Principal type for the `data` module. |
+| `PackValue` | Principal type for the `data` module. |
+
+## Lua API Summary
+
+| Function | Description |
+|----------|-------------|
+| `lurek.data.pack()` | See `docs/specs/data.md`. |
+| `lurek.data.unpack()` | See `docs/specs/data.md`. |
+| `lurek.data.getPackedSize()` | See `docs/specs/data.md`. |
+| `lurek.data.compress()` | See `docs/specs/data.md`. |
+| `lurek.data.decompress()` | See `docs/specs/data.md`. |
+| `lurek.data.encode()` | See `docs/specs/data.md`. |
+| `lurek.data.decode()` | See `docs/specs/data.md`. |
+| `lurek.data.hash()` | See `docs/specs/data.md`. |
+| `lurek.data.newByteData()` | See `docs/specs/data.md`. |
+| `lurek.data.newDataView()` | See `docs/specs/data.md`. |
+| `lurek.data.write()` | See `docs/specs/data.md`. |
+| `lurek.data.read()` | See `docs/specs/data.md`. |
+| `lurek.data.size()` | See `docs/specs/data.md`. |
+
 ## Full Specification
 
 All architecture diagrams, detailed type documentation, Lua API reference, examples, and cross-module references live in the consolidated spec:

@@ -24,6 +24,27 @@ The `dataframe` module provides an in-memory, column-major tabular data engine w
 | `serial.rs` | Serialization: `from_csv`/`to_csv` (RFC 4180), `from_json`/`to_json`, `from_binary`/`to_binary` (LVDF v1), `to_string_table` (ASCII debug), `Database::to_json` |
 | `sql.rs`    | SQL tokenizer, recursive-descent parser, and executor for `query_sql` (single DataFrame) and `query_sql_database` (multi-table Database with JOIN) |
 
+## Key Types
+
+| Type | Description |
+|------|-------------|
+| `CellValue` | Principal type for the `dataframe` module. |
+| `ColRef` | Principal type for the `dataframe` module. |
+| `DataFrame` | Principal type for the `dataframe` module. |
+| `Database` | Principal type for the `dataframe` module. |
+
+## Lua API Summary
+
+| Function | Description |
+|----------|-------------|
+| `lurek.dataframe.newDataFrame()` | See `docs/specs/dataframe.md`. |
+| `lurek.dataframe.newDatabase()` | See `docs/specs/dataframe.md`. |
+| `lurek.dataframe.fromTable()` | See `docs/specs/dataframe.md`. |
+| `lurek.dataframe.fromCSV()` | See `docs/specs/dataframe.md`. |
+| `lurek.dataframe.fromJSON()` | See `docs/specs/dataframe.md`. |
+| `lurek.dataframe.fromBinary()` | See `docs/specs/dataframe.md`. |
+| `lurek.dataframe.random()` | See `docs/specs/dataframe.md`. |
+
 ## Full Specification
 
 All architecture diagrams, detailed type documentation, Lua API reference, examples, and cross-module references live in the consolidated spec:

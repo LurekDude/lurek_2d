@@ -28,6 +28,41 @@ the one below it, with its full state intact.
 | `transition.rs`   | `TransitionType` enum with Lua string parsing, `ActiveTransition` timer with progress tracking |
 | `depth_sorter.rs` | Per-frame depth-sorted draw batcher with function and object callback support |
 
+## Key Types
+
+| Type | Description |
+|------|-------------|
+| `DepthEntry` | Principal type for the `scene` module. |
+| `DepthSorter` | Principal type for the `scene` module. |
+| `SceneStack` | Principal type for the `scene` module. |
+| `TransitionType` | Principal type for the `scene` module. |
+| `ActiveTransition` | Principal type for the `scene` module. |
+
+## Lua API Summary
+
+| Function | Description |
+|----------|-------------|
+| `lurek.scene.push()` | See `docs/specs/scene.md`. |
+| `lurek.scene.pop()` | See `docs/specs/scene.md`. |
+| `lurek.scene.switchTo()` | See `docs/specs/scene.md`. |
+| `lurek.scene.clear()` | See `docs/specs/scene.md`. |
+| `lurek.scene.popTo()` | See `docs/specs/scene.md`. |
+| `lurek.scene.update()` | See `docs/specs/scene.md`. |
+| `lurek.scene.process()` | See `docs/specs/scene.md`. |
+| `lurek.scene.processPhysics()` | See `docs/specs/scene.md`. |
+| `lurek.scene.processLate()` | See `docs/specs/scene.md`. |
+| `lurek.scene.draw()` | See `docs/specs/scene.md`. |
+| `lurek.scene.render()` | See `docs/specs/scene.md`. |
+| `lurek.scene.renderUi()` | See `docs/specs/scene.md`. |
+| `lurek.scene.getStackSize()` | See `docs/specs/scene.md`. |
+| `lurek.scene.isEmpty()` | See `docs/specs/scene.md`. |
+| `lurek.scene.getCurrent()` | See `docs/specs/scene.md`. |
+| `lurek.scene.isTransitioning()` | See `docs/specs/scene.md`. |
+| `lurek.scene.getTransitionProgress()` | See `docs/specs/scene.md`. |
+| `lurek.scene.registerScene()` | See `docs/specs/scene.md`. |
+| `lurek.scene.getRegistered()` | See `docs/specs/scene.md`. |
+| `lurek.scene.hasRegistered()` | See `docs/specs/scene.md`. |
+
 ## Full Specification
 
 All architecture diagrams, detailed type documentation, Lua API reference, examples, and cross-module references live in the consolidated spec:

@@ -31,6 +31,36 @@ The pathfinding module provides a comprehensive multi-layer grid pathfinding sta
 | `pathgrid.rs`       | Weighted f32-cost grid with Cell type, A★, and string-pulling (moved from `ai/pathgrid`) |
 | `unit_pathfinder.rs`| Unit-size-aware pathfinder with LRU caching, partial paths, BFS nearest-walkable |
 
+## Key Types
+
+| Type | Description |
+|------|-------------|
+| `FlowField` | Principal type for the `pathfinding` module. |
+| `PathThreadPool` | Principal type for the `pathfinding` module. |
+| `ProvincePath` | Principal type for the `pathfinding` module. |
+| `ProvinceCostFn` | Principal type for the `pathfinding` module. |
+| `Grid` | Principal type for the `pathfinding` module. |
+| `AbstractEdge` | Principal type for the `pathfinding` module. |
+| `AbstractNode` | Principal type for the `pathfinding` module. |
+| `Chunk` | Principal type for the `pathfinding` module. |
+| `AbstractGraph` | Principal type for the `pathfinding` module. |
+| `InfluenceMap` | Principal type for the `pathfinding` module. |
+| `DiagonalMode` | Principal type for the `pathfinding` module. |
+| `NavGrid` | Principal type for the `pathfinding` module. |
+
+## Lua API Summary
+
+| Function | Description |
+|----------|-------------|
+| `lurek.pathfinding.newNavGrid()` | See `docs/specs/pathfinding.md`. |
+| `lurek.pathfinding.newPathfinder()` | See `docs/specs/pathfinding.md`. |
+| `lurek.pathfinding.newFlowField()` | See `docs/specs/pathfinding.md`. |
+| `lurek.pathfinding.newPathGrid()` | See `docs/specs/pathfinding.md`. |
+| `lurek.pathfinding.newPathFlowField()` | See `docs/specs/pathfinding.md`. |
+| `lurek.pathfinding.setThreadCount()` | See `docs/specs/pathfinding.md`. |
+| `lurek.pathfinding.getThreadCount()` | See `docs/specs/pathfinding.md`. |
+| `lurek.pathfinding.newNavGridFromTileMap()` | See `docs/specs/pathfinding.md`. |
+
 ## Full Specification
 
 All architecture diagrams, detailed type documentation, Lua API reference, examples, and cross-module references live in the consolidated spec:

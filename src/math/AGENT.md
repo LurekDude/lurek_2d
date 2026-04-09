@@ -36,6 +36,48 @@
 | `transform.rs` | `Transform` — `Mat3` wrapper with fluent translate/rotate/scale/shear/reset API |
 | `tween.rs` | `Tween`, `TweenValue` — multi-value interpolation with named easing resolution |
 
+## Key Types
+
+| Type | Description |
+|------|-------------|
+| `BezierCurve` | Principal type for the `math` module. |
+| `Color` | Principal type for the `math` module. |
+| `Mat3` | Principal type for the `math` module. |
+| `DistType` | Principal type for the `math` module. |
+| `NoiseKind` | Principal type for the `math` module. |
+| `FractalType` | Principal type for the `math` module. |
+| `MapGenOptions` | Principal type for the `math` module. |
+| `NoiseGenerator` | Principal type for the `math` module. |
+| `RandomGenerator` | Principal type for the `math` module. |
+| `Rect` | Principal type for the `math` module. |
+| `SpatialItem` | Principal type for the `math` module. |
+| `SpatialHash` | Principal type for the `math` module. |
+
+## Lua API Summary
+
+| Function | Description |
+|----------|-------------|
+| `lurek.math.newRandomGenerator()` | See `docs/specs/math.md`. |
+| `lurek.math.newTransform()` | See `docs/specs/math.md`. |
+| `lurek.math.newBezierCurve()` | See `docs/specs/math.md`. |
+| `lurek.math.newTween()` | See `docs/specs/math.md`. |
+| `lurek.math.newSpatialHash()` | See `docs/specs/math.md`. |
+| `lurek.math.newNoiseGenerator()` | See `docs/specs/math.md`. |
+| `lurek.math.perlin2d()` | See `docs/specs/math.md`. |
+| `lurek.math.perlin3d()` | See `docs/specs/math.md`. |
+| `lurek.math.simplex2d()` | See `docs/specs/math.md`. |
+| `lurek.math.fbm()` | See `docs/specs/math.md`. |
+| `lurek.math.applyEasing()` | See `docs/specs/math.md`. |
+| `lurek.math.linear()` | See `docs/specs/math.md`. |
+| `lurek.math.inQuad()` | See `docs/specs/math.md`. |
+| `lurek.math.outQuad()` | See `docs/specs/math.md`. |
+| `lurek.math.inOutQuad()` | See `docs/specs/math.md`. |
+| `lurek.math.inCubic()` | See `docs/specs/math.md`. |
+| `lurek.math.outCubic()` | See `docs/specs/math.md`. |
+| `lurek.math.inOutCubic()` | See `docs/specs/math.md`. |
+| `lurek.math.inQuart()` | See `docs/specs/math.md`. |
+| `lurek.math.outQuart()` | See `docs/specs/math.md`. |
+
 ## Full Specification
 
 All architecture diagrams, detailed type documentation, Lua API reference, examples, and cross-module references live in the consolidated spec:

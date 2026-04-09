@@ -31,6 +31,29 @@ screens or startup delays that should never be called in the hot loop.
 | `clock.rs`     | `Clock` struct � frame delta, total time, FPS, and rolling average   |
 | `scheduler.rs` | `Scheduler` and `ScheduledEvent` � delayed and repeating events      |
 
+## Key Types
+
+| Type | Description |
+|------|-------------|
+| `Clock` | Principal type for the `timer` module. |
+| `ScheduledEvent` | Principal type for the `timer` module. |
+| `Scheduler` | Principal type for the `timer` module. |
+
+## Lua API Summary
+
+| Function | Description |
+|----------|-------------|
+| `lurek.timer.getDelta()` | See `docs/specs/timer.md`. |
+| `lurek.timer.getFPS()` | See `docs/specs/timer.md`. |
+| `lurek.timer.getTime()` | See `docs/specs/timer.md`. |
+| `lurek.timer.getAverageDelta()` | See `docs/specs/timer.md`. |
+| `lurek.timer.step()` | See `docs/specs/timer.md`. |
+| `lurek.timer.getMicroTime()` | See `docs/specs/timer.md`. |
+| `lurek.timer.getPhysicsDelta()` | See `docs/specs/timer.md`. |
+| `lurek.timer.setPhysicsDelta()` | See `docs/specs/timer.md`. |
+| `lurek.timer.sleep()` | See `docs/specs/timer.md`. |
+| `lurek.timer.newScheduler()` | See `docs/specs/timer.md`. |
+
 ## Full Specification
 
 All architecture diagrams, detailed type documentation, Lua API reference, examples, and cross-module references live in the consolidated spec:

@@ -29,6 +29,41 @@ The `light` module provides a CPU-side 2D dynamic lighting data model for Lurek2
 | `occluder.rs`     | `Occluder` struct — polygon shadow caster definition           |
 | `shadow.rs`       | `ShadowFilter` enum — shadow edge quality (none / PCF5 / PCF13)|
 
+## Key Types
+
+| Type | Description |
+|------|-------------|
+| `Attenuation` | Principal type for the `light` module. |
+| `LightBlendMode` | Principal type for the `light` module. |
+| `FalloffMode` | Principal type for the `light` module. |
+| `FlickerConfig` | Principal type for the `light` module. |
+| `Light2D` | Principal type for the `light` module. |
+| `LightType` | Principal type for the `light` module. |
+| `LightWorld` | Principal type for the `light` module. |
+| `Occluder` | Principal type for the `light` module. |
+| `ShadowFilter` | Principal type for the `light` module. |
+
+## Lua API Summary
+
+| Function | Description |
+|----------|-------------|
+| `lurek.light.newLight()` | See `docs/specs/light.md`. |
+| `lurek.light.newOccluder()` | See `docs/specs/light.md`. |
+| `lurek.light.setAmbient()` | See `docs/specs/light.md`. |
+| `lurek.light.getAmbient()` | See `docs/specs/light.md`. |
+| `lurek.light.setEnabled()` | See `docs/specs/light.md`. |
+| `lurek.light.isEnabled()` | See `docs/specs/light.md`. |
+| `lurek.light.getLightCount()` | See `docs/specs/light.md`. |
+| `lurek.light.getOccluderCount()` | See `docs/specs/light.md`. |
+| `lurek.light.getMaxLights()` | See `docs/specs/light.md`. |
+| `lurek.light.setMaxLights()` | See `docs/specs/light.md`. |
+| `lurek.light.clear()` | See `docs/specs/light.md`. |
+| `lurek.light.setGroupEnabled()` | See `docs/specs/light.md`. |
+| `lurek.light.setGroupIntensity()` | See `docs/specs/light.md`. |
+| `lurek.light.setGroupColor()` | See `docs/specs/light.md`. |
+| `lurek.light.getGroupCount()` | See `docs/specs/light.md`. |
+| `lurek.light.advanceFlickers()` | See `docs/specs/light.md`. |
+
 ## Full Specification
 
 All architecture diagrams, detailed type documentation, Lua API reference, examples, and cross-module references live in the consolidated spec:

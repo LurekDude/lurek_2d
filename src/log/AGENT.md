@@ -42,6 +42,20 @@ The Lua API at `lurek.log.*` allows scripts to emit messages at specific severit
 | `readMemory` | `(id, drain?) → table?` | Reads entries from a memory sink |
 | `flushFile` | `(id)` | Flushes OS buffer for a file sink |
 
+## Key Types
+
+| Type | Description |
+|------|-------------|
+| `SinkLevel` | Principal type for the `log` module. |
+| `MemoryEntry` | Principal type for the `log` module. |
+| `SinkKind` | Principal type for the `log` module. |
+| `Sink` | Principal type for the `log` module. |
+| `SinkRegistry` | Principal type for the `log` module. |
+
+## Lua API Summary
+
+_No `lurek.*` bindings registered for this module._
+
 ## Full Specification
 
 See [`docs/specs/log.md`](../../../docs/specs/log.md) for full architecture, type details, Lua API, examples, and notes.

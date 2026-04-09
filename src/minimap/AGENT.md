@@ -21,6 +21,24 @@ The `minimap` module provides a self-contained, grid-based minimap data model fo
 | `minimap.rs` | Core `Minimap` data model: terrain grid, fog of war, objects, pings, markers, zoom/pan, coordinate conversion, and time-based update. |
 | `types.rs`   | Supporting type definitions: `ColorMode` and `FogLevel` enums, `MinimapObjectType`, `MinimapObject`, `MinimapPing`, and `MinimapMarker` plain data structs. |
 
+## Key Types
+
+| Type | Description |
+|------|-------------|
+| `Minimap` | Principal type for the `minimap` module. |
+| `ColorMode` | Principal type for the `minimap` module. |
+| `FogLevel` | Principal type for the `minimap` module. |
+| `MinimapObjectType` | Principal type for the `minimap` module. |
+| `MinimapObject` | Principal type for the `minimap` module. |
+| `MinimapPing` | Principal type for the `minimap` module. |
+| `MinimapMarker` | Principal type for the `minimap` module. |
+
+## Lua API Summary
+
+| Function | Description |
+|----------|-------------|
+| `lurek.minimap.newMinimap()` | See `docs/specs/minimap.md`. |
+
 ## Full Specification
 
 All architecture diagrams, detailed type documentation, Lua API reference, examples, and cross-module references live in the consolidated spec:

@@ -32,6 +32,31 @@ The `raycaster` module implements a DDA-based 2D grid raycaster designed for Wol
 | `lighting.rs`            | `PointLight`, `compute_lighting`, `apply_lit_shade`            |
 | `minimap_overlay.rs`     | `extract_minimap` (RGBA crop) and `draw_player_arrow`          |
 
+## Key Types
+
+| Type | Description |
+|------|-------------|
+| `ColumnData` | Principal type for the `raycaster` module. |
+| `ColumnBatch` | Principal type for the `raycaster` module. |
+| `Raycaster2D` | Principal type for the `raycaster` module. |
+| `DepthBuffer` | Principal type for the `raycaster` module. |
+| `DoorDirection` | Principal type for the `raycaster` module. |
+| `DoorState` | Principal type for the `raycaster` module. |
+| `Door` | Principal type for the `raycaster` module. |
+| `DoorManager` | Principal type for the `raycaster` module. |
+| `HeightMap` | Principal type for the `raycaster` module. |
+| `PointLight` | Principal type for the `raycaster` module. |
+| `RayHit` | Principal type for the `raycaster` module. |
+| `Segment` | Principal type for the `raycaster` module. |
+
+## Lua API Summary
+
+| Function | Description |
+|----------|-------------|
+| `lurek.raycaster.new()` | See `docs/specs/raycaster.md`. |
+| `lurek.raycaster.projectColumn()` | See `docs/specs/raycaster.md`. |
+| `lurek.raycaster.distanceShade()` | See `docs/specs/raycaster.md`. |
+
 ## Full Specification
 
 All architecture diagrams, detailed type documentation, Lua API reference, examples, and cross-module references live in the consolidated spec:

@@ -29,6 +29,48 @@ that depends only on `math` and `engine` (Baseline).
 | `context.rs` | Central coordinator: `GuiContext` (widget pool, child management, focus cycling, toast queue, input routing), `WidgetKind` (type-erased enum wrapping all 32 widget types) |
 | `data_graph_renderer.rs` | Data visualization: `GraphRenderer` for line/scatter/bar charts with viewport - world mapping, `GraphSeries` enum |
 
+## Key Types
+
+| Type | Description |
+|------|-------------|
+| `Panel` | Principal type for the `gui` module. |
+| `LayoutDirection` | Principal type for the `gui` module. |
+| `Layout` | Principal type for the `gui` module. |
+| `ScrollPanel` | Principal type for the `gui` module. |
+| `NinePatch` | Principal type for the `gui` module. |
+| `GUIWindow` | Principal type for the `gui` module. |
+| `SplitPanel` | Principal type for the `gui` module. |
+| `DockPanel` | Principal type for the `gui` module. |
+| `GuiEvent` | Principal type for the `gui` module. |
+| `WidgetKind` | Principal type for the `gui` module. |
+| `GuiContext` | Principal type for the `gui` module. |
+| `Button` | Principal type for the `gui` module. |
+
+## Lua API Summary
+
+| Function | Description |
+|----------|-------------|
+| `lurek.gui.newButton()` | See `docs/specs/gui.md`. |
+| `lurek.gui.newLabel()` | See `docs/specs/gui.md`. |
+| `lurek.gui.newTextInput()` | See `docs/specs/gui.md`. |
+| `lurek.gui.newCheckbox()` | See `docs/specs/gui.md`. |
+| `lurek.gui.newSlider()` | See `docs/specs/gui.md`. |
+| `lurek.gui.newProgressBar()` | See `docs/specs/gui.md`. |
+| `lurek.gui.newComboBox()` | See `docs/specs/gui.md`. |
+| `lurek.gui.newList()` | See `docs/specs/gui.md`. |
+| `lurek.gui.newPanel()` | See `docs/specs/gui.md`. |
+| `lurek.gui.newLayout()` | See `docs/specs/gui.md`. |
+| `lurek.gui.newScrollPanel()` | See `docs/specs/gui.md`. |
+| `lurek.gui.newNinePatch()` | See `docs/specs/gui.md`. |
+| `lurek.gui.newTabBar()` | See `docs/specs/gui.md`. |
+| `lurek.gui.newSeparator()` | See `docs/specs/gui.md`. |
+| `lurek.gui.newSpacer()` | See `docs/specs/gui.md`. |
+| `lurek.gui.newToast()` | See `docs/specs/gui.md`. |
+| `lurek.gui.newTreeView()` | See `docs/specs/gui.md`. |
+| `lurek.gui.newRadioButton()` | See `docs/specs/gui.md`. |
+| `lurek.gui.newScrollBar()` | See `docs/specs/gui.md`. |
+| `lurek.gui.newWindow()` | See `docs/specs/gui.md`. |
+
 ## Full Specification
 
 All architecture diagrams, detailed type documentation, Lua API reference, examples, and cross-module references live in the consolidated spec:

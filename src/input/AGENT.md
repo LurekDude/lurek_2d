@@ -23,6 +23,24 @@ The input module is Lurek2D's Tier 1 device-state tracking layer. It converts ra
 | `gamepad.rs`  | `GamepadState` — per-controller button/axis state, hat/d-pad, GUID; `GamepadMappings` — SDL2 GameControllerDB persistence; gilrs conversion helpers |
 | `touch.rs`    | `TouchPoint`, `TouchState` — multitouch tracking by OS-assigned touch ID |
 
+## Key Types
+
+| Type | Description |
+|------|-------------|
+| `GamepadState` | Principal type for the `input` module. |
+| `GamepadMappings` | Principal type for the `input` module. |
+| `KeyboardState` | Principal type for the `input` module. |
+| `SystemCursor` | Principal type for the `input` module. |
+| `MouseState` | Principal type for the `input` module. |
+| `CursorKind` | Principal type for the `input` module. |
+| `CursorHandle` | Principal type for the `input` module. |
+| `TouchPoint` | Principal type for the `input` module. |
+| `TouchState` | Principal type for the `input` module. |
+
+## Lua API Summary
+
+_No `lurek.*` bindings registered for this module._
+
 ## Full Specification
 
 All architecture diagrams, detailed type documentation, Lua API reference, examples, and cross-module references live in the consolidated spec:

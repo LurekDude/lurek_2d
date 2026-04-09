@@ -24,6 +24,30 @@ The event module provides two complementary messaging primitives for Lurek2D gam
 | `event_queue.rs`  | `EventQueue` FIFO queue — push, drain, and clear operations     |
 | `signal.rs`       | `Subscription` struct, `Signal` handle-based pub-sub dispatcher |
 
+## Key Types
+
+| Type | Description |
+|------|-------------|
+| `EventArg` | Principal type for the `event` module. |
+| `Event` | Principal type for the `event` module. |
+| `EventQueue` | Principal type for the `event` module. |
+| `Subscription` | Principal type for the `event` module. |
+| `Signal` | Principal type for the `event` module. |
+
+## Lua API Summary
+
+| Function | Description |
+|----------|-------------|
+| `lurek.event.exit()` | See `docs/specs/event.md`. |
+| `lurek.event.push()` | See `docs/specs/event.md`. |
+| `lurek.event.poll()` | See `docs/specs/event.md`. |
+| `lurek.event.clear()` | See `docs/specs/event.md`. |
+| `lurek.event.newSignal()` | See `docs/specs/event.md`. |
+| `lurek.event.pump()` | See `docs/specs/event.md`. |
+| `lurek.event.wait()` | See `docs/specs/event.md`. |
+| `lurek.event.restart()` | See `docs/specs/event.md`. |
+| `lurek.event.quit()` | See `docs/specs/event.md`. |
+
 ## Full Specification
 
 All architecture diagrams, detailed type documentation, Lua API reference, examples, and cross-module references live in the consolidated spec:

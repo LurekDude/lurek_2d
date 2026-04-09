@@ -29,6 +29,47 @@ The `docs` module provides API documentation management, runtime reflection, and
 | `export.rs`    | `export_all`, `export_completions`, `export_hover`, `export_signatures`          |
 | `mod.rs`       | Re-exports all public types                                                       |
 
+## Key Types
+
+| Type | Description |
+|------|-------------|
+| `Catalog` | Principal type for the `docs` module. |
+| `ParamInfo` | Principal type for the `docs` module. |
+| `ReturnInfo` | Principal type for the `docs` module. |
+| `DocEntry` | Principal type for the `docs` module. |
+| `ValidationReport` | Principal type for the `docs` module. |
+| `QualityReport` | Principal type for the `docs` module. |
+| `FieldType` | Principal type for the `docs` module. |
+| `FieldRule` | Principal type for the `docs` module. |
+| `SchemaError` | Principal type for the `docs` module. |
+| `SchemaResult` | Principal type for the `docs` module. |
+| `Schema` | Principal type for the `docs` module. |
+
+## Lua API Summary
+
+| Function | Description |
+|----------|-------------|
+| `lurek.docs.missing()` | See `docs/specs/docs.md`. |
+| `lurek.docs.phantom()` | See `docs/specs/docs.md`. |
+| `lurek.docs.incomplete()` | See `docs/specs/docs.md`. |
+| `lurek.docs.overallScore()` | See `docs/specs/docs.md`. |
+| `lurek.docs.grade()` | See `docs/specs/docs.md`. |
+| `lurek.docs.moduleScores()` | See `docs/specs/docs.md`. |
+| `lurek.docs.scan()` | See `docs/specs/docs.md`. |
+| `lurek.docs.scanModule()` | See `docs/specs/docs.md`. |
+| `lurek.docs.loadToml()` | See `docs/specs/docs.md`. |
+| `lurek.docs.loadAll()` | See `docs/specs/docs.md`. |
+| `lurek.docs.describe()` | See `docs/specs/docs.md`. |
+| `lurek.docs.setParamInfo()` | See `docs/specs/docs.md`. |
+| `lurek.docs.setReturnInfo()` | See `docs/specs/docs.md`. |
+| `lurek.docs.getCatalog()` | See `docs/specs/docs.md`. |
+| `lurek.docs.resetCatalog()` | See `docs/specs/docs.md`. |
+| `lurek.docs.validate()` | See `docs/specs/docs.md`. |
+| `lurek.docs.validateModule()` | See `docs/specs/docs.md`. |
+| `lurek.docs.checkStaleness()` | See `docs/specs/docs.md`. |
+| `lurek.docs.stale()` | See `docs/specs/docs.md`. |
+| `lurek.docs.current()` | See `docs/specs/docs.md`. |
+
 ## Full Specification
 
 See [`docs/specs/docs.md`](../../../docs/specs/docs.md) for full architecture, type details, Lua API, examples, and notes.

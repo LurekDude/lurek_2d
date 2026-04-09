@@ -30,6 +30,35 @@ is performed by the `lua_api` bridge layer, which reads the data models each fra
 | `stack.rs` | `PostFxStack` � ordered chain of effect indices with parallel `enabled` flags. Manages ping-pong canvas dimensions. 1-based position insertion, per-index enable/disable, and `enabled_effects()` for the GPU layer. |
 | `weather.rs` | `WeatherType` enum (8 variants: None, Rain, Snow, Hail, Dust, Leaves, Ash, Pollen), `WeatherParticle` (position, velocity, size, alpha), and `WeatherState` (spawn timer, wind, intensity, live particle pool). |
 
+## Key Types
+
+| Type | Description |
+|------|-------------|
+| `AmbientState` | Principal type for the `fx` module. |
+| `CloudState` | Principal type for the `fx` module. |
+| `FogState` | Principal type for the `fx` module. |
+| `HeatHazeState` | Principal type for the `fx` module. |
+| `VignetteState` | Principal type for the `fx` module. |
+| `FilmGrainState` | Principal type for the `fx` module. |
+| `LightningState` | Principal type for the `fx` module. |
+| `PostFxEffect` | Principal type for the `fx` module. |
+| `PostFxEffectType` | Principal type for the `fx` module. |
+| `ImageEffect` | Principal type for the `fx` module. |
+| `Overlay` | Principal type for the `fx` module. |
+| `FlashState` | Principal type for the `fx` module. |
+
+## Lua API Summary
+
+| Function | Description |
+|----------|-------------|
+| `lurek.fx.newEffect()` | See `docs/specs/fx.md`. |
+| `lurek.fx.newCustomEffect()` | See `docs/specs/fx.md`. |
+| `lurek.fx.newStack()` | See `docs/specs/fx.md`. |
+| `lurek.fx.newPass()` | See `docs/specs/fx.md`. |
+| `lurek.fx.getEffectTypes()` | See `docs/specs/fx.md`. |
+| `lurek.fx.newImageEffect()` | See `docs/specs/fx.md`. |
+| `lurek.fx.newOverlay()` | See `docs/specs/fx.md`. |
+
 ## Full Specification
 
 All architecture diagrams, detailed type documentation, Lua API reference, examples, and cross-module references live in the consolidated spec:

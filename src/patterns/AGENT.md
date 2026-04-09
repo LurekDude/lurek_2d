@@ -35,6 +35,27 @@ The `patterns` module provides pure-Rust implementations of six classic game-pro
 | `throttle.rs`       | `Throttle` — rate-limiter with configurable cooldown and burst capacity          |
 | `mod.rs`            | Re-exports all public types                                                      |
 
+## Key Types
+
+| Type | Description |
+|------|-------------|
+| `BlackboardValue` | Principal type for the `patterns` module. |
+| `Blackboard` | Principal type for the `patterns` module. |
+| `CommandEntry` | Principal type for the `patterns` module. |
+| `CommandStack` | Principal type for the `patterns` module. |
+| `Subscription` | Principal type for the `patterns` module. |
+| `EventBus` | Principal type for the `patterns` module. |
+| `Factory` | Principal type for the `patterns` module. |
+| `FunnelEntry` | Principal type for the `patterns` module. |
+| `Funnel` | Principal type for the `patterns` module. |
+| `ObjectPool` | Principal type for the `patterns` module. |
+| `ObserverEntry` | Principal type for the `patterns` module. |
+| `Observer` | Principal type for the `patterns` module. |
+
+## Lua API Summary
+
+_No `lurek.*` bindings registered for this module._
+
 ## Full Specification
 
 See [`docs/specs/patterns.md`](../../../docs/specs/patterns.md) for full architecture, type details, Lua API, examples, and notes.

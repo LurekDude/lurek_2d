@@ -32,6 +32,48 @@ The `tilemap` module provides a comprehensive tilemap toolkit for 2D game develo
 | `polygon_map.rs` | ~280 | `PolygonMap` — named polygon regions with point-in-polygon hit detection, highlighting, labels, and bounding box queries |
 | `tile_walker.rs` | ~380 | `TileWalker` — tile-based first-person movement controller with cardinal Facing, smooth interpolation, and relative direction |
 
+## Key Types
+
+| Type | Description |
+|------|-------------|
+| `AutoTileLayout` | Principal type for the `tilemap` module. |
+| `AutoTileSheet` | Principal type for the `tilemap` module. |
+| `ChunkMap` | Principal type for the `tilemap` module. |
+| `IsoTilePart` | Principal type for the `tilemap` module. |
+| `IsoTile` | Principal type for the `tilemap` module. |
+| `IsoLevel` | Principal type for the `tilemap` module. |
+| `IsoDrawItem` | Principal type for the `tilemap` module. |
+| `IsoMap` | Principal type for the `tilemap` module. |
+| `MapChunk` | Principal type for the `tilemap` module. |
+| `LargeMapRenderer` | Principal type for the `tilemap` module. |
+| `Edge` | Principal type for the `tilemap` module. |
+| `MapBlock` | Principal type for the `tilemap` module. |
+
+## Lua API Summary
+
+| Function | Description |
+|----------|-------------|
+| `lurek.tilemap.x()` | See `docs/specs/tilemap.md`. |
+| `lurek.tilemap.y()` | See `docs/specs/tilemap.md`. |
+| `lurek.tilemap.width()` | See `docs/specs/tilemap.md`. |
+| `lurek.tilemap.height()` | See `docs/specs/tilemap.md`. |
+| `lurek.tilemap.newTileSet()` | See `docs/specs/tilemap.md`. |
+| `lurek.tilemap.newTileMap()` | See `docs/specs/tilemap.md`. |
+| `lurek.tilemap.newAutoTileSheet()` | See `docs/specs/tilemap.md`. |
+| `lurek.tilemap.newChunkMap()` | See `docs/specs/tilemap.md`. |
+| `lurek.tilemap.newIsoMap()` | See `docs/specs/tilemap.md`. |
+| `lurek.tilemap.newMapBlock()` | See `docs/specs/tilemap.md`. |
+| `lurek.tilemap.newMapGroup()` | See `docs/specs/tilemap.md`. |
+| `lurek.tilemap.toScreenIso()` | See `docs/specs/tilemap.md`. |
+| `lurek.tilemap.fromScreenIso()` | See `docs/specs/tilemap.md`. |
+| `lurek.tilemap.toScreenHex()` | See `docs/specs/tilemap.md`. |
+| `lurek.tilemap.fromScreenHex()` | See `docs/specs/tilemap.md`. |
+| `lurek.tilemap.hexNeighbors()` | See `docs/specs/tilemap.md`. |
+| `lurek.tilemap.hexDistance()` | See `docs/specs/tilemap.md`. |
+| `lurek.tilemap.hexRound()` | See `docs/specs/tilemap.md`. |
+| `lurek.tilemap.hexLine()` | See `docs/specs/tilemap.md`. |
+| `lurek.tilemap.hexRing()` | See `docs/specs/tilemap.md`. |
+
 ## Full Specification
 
 All architecture diagrams, detailed type documentation, Lua API reference, examples, and cross-module references live in the consolidated spec:

@@ -22,6 +22,24 @@ The `thread` module provides Lurek2D's only concurrency primitive: background Lu
 | `channel.rs` | `ChannelValue` enum, `Channel` MPMC queue, `LuaChannel` UserData, conversion functions |
 | `worker.rs`  | `ThreadState` enum, `LuaThread` struct, worker VM registration  |
 
+## Key Types
+
+| Type | Description |
+|------|-------------|
+| `ChannelValue` | Principal type for the `thread` module. |
+| `Channel` | Principal type for the `thread` module. |
+| `LuaChannel` | Principal type for the `thread` module. |
+| `ThreadState` | Principal type for the `thread` module. |
+| `LuaThread` | Principal type for the `thread` module. |
+
+## Lua API Summary
+
+| Function | Description |
+|----------|-------------|
+| `lurek.thread.newThread()` | See `docs/specs/thread.md`. |
+| `lurek.thread.newChannel()` | See `docs/specs/thread.md`. |
+| `lurek.thread.getChannel()` | See `docs/specs/thread.md`. |
+
 ## Full Specification
 
 All architecture diagrams, detailed type documentation, Lua API reference, examples, and cross-module references live in the consolidated spec:

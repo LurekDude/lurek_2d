@@ -22,6 +22,21 @@ The `network` module provides UDP networking for peer-to-peer and client-server 
 | `error.rs`     | `NetworkError` enum with six variants for Lua-friendly error messages |
 | `host.rs`      | `NetworkHost` wrapper around `rusty_enet::Host<UdpSocket>`, `NetworkEvent` enum, `PeerStats` struct |
 
+## Key Types
+
+| Type | Description |
+|------|-------------|
+| `NetworkError` | Principal type for the `network` module. |
+| `NetworkHost` | Principal type for the `network` module. |
+| `NetworkEvent` | Principal type for the `network` module. |
+| `PeerStats` | Principal type for the `network` module. |
+
+## Lua API Summary
+
+| Function | Description |
+|----------|-------------|
+| `lurek.network.newHost()` | See `docs/specs/network.md`. |
+
 ## Full Specification
 
 All architecture diagrams, detailed type documentation, Lua API reference, examples, and cross-module references live in the consolidated spec:

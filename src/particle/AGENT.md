@@ -27,6 +27,29 @@ The particle module implements a CPU-side emitter-based 2D particle system with 
 | `emission.rs` | Spawn-offset calculators for area distribution (`emission_offset`) and emission shapes (`emission_shape_offset`) |
 | `trail.rs`    | `Trail` and `TrailPoint` � time-fading ribbon effect with width taper and color gradient |
 
+## Key Types
+
+| Type | Description |
+|------|-------------|
+| `AreaDistribution` | Principal type for the `particle` module. |
+| `InsertMode` | Principal type for the `particle` module. |
+| `EmitterState` | Principal type for the `particle` module. |
+| `EmissionShape` | Principal type for the `particle` module. |
+| `RelativeMode` | Principal type for the `particle` module. |
+| `ParticleConfig` | Principal type for the `particle` module. |
+| `ParticleSystem` | Principal type for the `particle` module. |
+| `Particle` | Principal type for the `particle` module. |
+| `ParticleShape` | Principal type for the `particle` module. |
+| `TrailPoint` | Principal type for the `particle` module. |
+| `Trail` | Principal type for the `particle` module. |
+
+## Lua API Summary
+
+| Function | Description |
+|----------|-------------|
+| `lurek.particle.newSystem()` | See `docs/specs/particle.md`. |
+| `lurek.particle.newTrail()` | See `docs/specs/particle.md`. |
+
 ## Full Specification
 
 All architecture diagrams, detailed type documentation, Lua API reference, examples, and cross-module references live in the consolidated spec:

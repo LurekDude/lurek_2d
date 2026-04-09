@@ -22,6 +22,19 @@ The `debugbridge` module embeds a JSON-over-TCP server (bound to 127.0.0.1 only)
 | `server.rs` | `server_thread()`, `handle_client_message()` — non-blocking TCP accept loop and client message dispatch         |
 | `mod.rs`    | Re-exports all public types                                                                                     |
 
+## Key Types
+
+| Type | Description |
+|------|-------------|
+| `PendingRequest` | Principal type for the `debugbridge` module. |
+| `PendingResponse` | Principal type for the `debugbridge` module. |
+| `PrintEntry` | Principal type for the `debugbridge` module. |
+| `BridgeShared` | Principal type for the `debugbridge` module. |
+
+## Lua API Summary
+
+_No `lurek.*` bindings registered for this module._
+
 ## Full Specification
 
 See [`docs/specs/debugbridge.md`](../../../docs/specs/debugbridge.md) for full architecture, type details, Lua API, examples, and notes.
