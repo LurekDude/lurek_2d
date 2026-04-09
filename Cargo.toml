@@ -261,6 +261,10 @@ name = "devtools_tests"
 path = "tests/rust/unit/devtools_tests.rs"
 
 [[test]]
+name = "log_tests"
+path = "tests/rust/unit/log_tests.rs"
+
+[[test]]
 name = "localization_tests"
 path = "tests/rust/unit/localization_tests.rs"
 

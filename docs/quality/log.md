@@ -1,20 +1,14 @@
 # Module Quality Report: `log`
 
-> **Status**: 🔴 FAIL  |  **Date**: 2026-04-09  |  **Score**: 44 ✅ / 3 ⚠️ / 1 ❌ / 19 🔵
+> **Status**: 🟢 PASS  |  **Date**: 2026-04-09  |  **Score**: 47 ✅ / 1 ⚠️ / 0 ❌ / 19 🔵
 
 ---
 
 ## Action Items
 
-### 🔴 Errors — Must Fix Before Merge
-
-- [ ] **T-01** — Rust test file: No test file found for module 'log'
-
 ### 🟡 Warnings — Should Fix
 
-- [ ] **SP-05** — Key Types accuracy: Types not in spec: MemoryEntry, Sink, SinkKind, SinkLevel, SinkRegistry
 - [ ] **B-04** — No business logic in closures: '<closure@123>' (19 LOC, line 123) — extract body to src/log/ | '<closure@184>' (20 LOC, line 184) — extract body to src/log/ | '<closure@85>' has if/match/for — extract to src/log/ | '<closure@164>' has if/match/for — extract to src/log/
-- [ ] **T-05** — Test adequacy: 15 pub methods, 0 Rust tests — create test file
 
 ## Full Check Results
 
@@ -49,7 +43,7 @@
 | **SP-02** Required spec sections | ✅ PASS | All required sections present |
 | **SP-03** Summary quality | ✅ PASS | Summary is 1486 chars |
 | **SP-04** Lua API completeness | ✅ PASS | No tbl.set() bindings found |
-| **SP-05** Key Types accuracy | ⚠️ WARNING | Types not in spec: MemoryEntry, Sink, SinkKind, SinkLevel, SinkRegistry |
+| **SP-05** Key Types accuracy | ✅ PASS | 5 types — spec Key Types in sync |
 | **SP-06** Spec quality | ✅ PASS | No stub content |
 
 ### Phase 4 — Docstrings
@@ -91,11 +85,11 @@
 
 | Check | Verdict | Details |
 |-------|---------|---------|
-| **T-01** Rust test file | ❌ ERROR | No test file found for module 'log' |
+| **T-01** Rust test file | ✅ PASS | Found: tests\rust\unit\log_tests.rs |
 | **T-02** Lua test file | ✅ PASS | tests/lua/unit/test_log.lua registered in harness |
-| **T-03** Test naming | ✅ PASS | No Rust test file — skip |
-| **T-04** Float comparisons | ✅ PASS | No Rust test file — skip |
-| **T-05** Test adequacy | ⚠️ WARNING | 15 pub methods, 0 Rust tests — create test file |
+| **T-03** Test naming | ✅ PASS | Test names follow convention |
+| **T-04** Float comparisons | ✅ PASS | No float assert_eq! found |
+| **T-05** Test adequacy | ✅ PASS | 21 tests / 15 pub methods (140%) |
 | **T-06** Golden tests | 🔵 MANUAL | Check if module qualifies for golden/snapshot tests |
 | **T-07** Tests pass | 🔵 MANUAL | Run: cargo test --test log_tests -- --nocapture |
 

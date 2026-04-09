@@ -77,18 +77,50 @@ src/lua_api/
 
 ### Structs
 
-| Type | Location | Description |
+#### `log::sinks::MemoryEntry`
+
+A single log entry retained by a `SinkKind::Memory` sink. Fields: `level: SinkLevel`, `message: String`, `tag: String`. Implements `Debug`, `Clone`.
+
+#### `log::sinks::Sink`
+
+A configured log output destination. Fields: `id: u64`, `min_level: SinkLevel`, `kind: SinkKind`. Constructed via `Sink::memory(id, capacity, min_level)` or `Sink::file(id, path, min_level)`.
+
+| Method | Signature | Description |
 |---|---|---|
-| `MemoryEntry` | `sinks.rs` | A single ring-buffer log record |
-| `Sink` | `sinks.rs` | A configured output destination |
-| `SinkRegistry` | `sinks.rs` | Ordered collection of active sinks |
+| `write` | `(level, tag, message)` | Dispatch one entry; silently drops entries below `min_level` |
+| `read_memory` | `(drain: bool) → Option<Vec<MemoryEntry>>` | Read ring-buffer entries; returns `None` for file sinks |
+| `type_name` | `() → &'static str` | Returns `"file"` or `"memory"` |
+| `path` | `() → Option<&str>` | Returns filesystem path for file sinks |
+| `flush` | `()` | Flush file OS write buffers |
+
+#### `log::sinks::SinkRegistry`
+
+Ordered collection of active [`Sink`] instances. Fields: `sinks: Vec<Sink>`, `next_id: u64` (private). Constructed via `SinkRegistry::new()`.
+
+| Method | Signature | Description |
+|---|---|---|
+| `add` | `(sink: Sink) → u64` | Add a sink; returns assigned id |
+| `remove` | `(id: u64) → bool` | Remove sink by id; returns `true` if found |
+| `clear` | `()` | Remove all sinks |
+| `dispatch` | `(level, tag, message)` | Fan-out to all sinks |
+| `get` | `(id: u64) → Option<&Sink>` | Return a sink by id |
 
 ### Enums
 
-| Type | Location | Description |
-|---|---|---|
-| `SinkLevel` | `sinks.rs` | Min-level filter for a sink |
-| `SinkKind` | `sinks.rs` | File vs memory dispatch variant |
+#### `log::sinks::SinkLevel`
+
+Minimum log level that a sink will accept. Variants: `Debug < Info < Warn < Error`. Implements `PartialOrd` for level comparison.
+
+| Method | Description |
+|---|---|
+| `from_str(s)` | Parse `"debug"/"info"/"warn"/"warning"/"error"/"err"` |
+| `as_str()` | Returns uppercase static strings: `"DEBUG"`, `"INFO"`, `"WARN"`, `"ERROR"` |
+
+#### `log::sinks::SinkKind`
+
+The dispatch strategy for a [`Sink`]. Variants:
+- `File { file: Mutex<File>, path: String }` — writes to a UTF-8 append-mode file
+- `Memory { entries: Mutex<VecDeque<MemoryEntry>>, capacity: usize }` — bounded ring buffer
 
 ## Lua API
 
