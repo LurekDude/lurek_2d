@@ -388,3 +388,11 @@ local rectangle_shape = lurek.physics.newRectangleShape(1.0, 1.0)  -- Creates a 
 lurek.physics.setBodyVelocity(world, body, 1.0, 1.0)  -- Sets the velocity of a body
 lurek.physics.setSleepingAllowed(world, body, false)  -- Sets whether the body is allowed to sleep
 lurek.physics.step(world, 1.0)  -- Advances the physics world by dt seconds
+
+-- Raycast result table fields (returned from lurek.physics.raycast)
+-- result.normalX   -- X component of surface normal at hit point
+-- result.normalY   -- Y component of surface normal at hit point
+-- result.toi       -- Time of impact [0,1] along the ray origin-to-endpoint
+
+-- Contact table fields (from world:getContacts() and world:getBodyContacts(bodyId))
+-- contact.isTouching  -- true when bodies are in touching contact this frame

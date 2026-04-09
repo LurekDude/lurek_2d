@@ -1,6 +1,6 @@
 # Module Quality Report: `minimap`
 
-> **Status**: 🔴 FAIL  |  **Date**: 2026-04-09  |  **Score**: 38 ✅ / 6 ⚠️ / 4 ❌ / 19 🔵
+> **Status**: 🔴 FAIL  |  **Date**: 2026-04-09  |  **Score**: 41 ✅ / 5 ⚠️ / 2 ❌ / 19 🔵
 
 ---
 
@@ -8,19 +8,16 @@
 
 ### 🔴 Errors — Must Fix Before Merge
 
-- [ ] **D-08** — No rustdoc in lua_api: Rustdoc sections found (use @param/@return): # Parameters
 - [ ] **B-02** — Registration-only: struct definitions (move to src/minimap/): LuaMinimap
 - [ ] **B-03** — impl LuaUserData placement: Move impl LuaUserData for LuaMinimap from lua_api/minimap_api.rs → src/minimap/
-- [ ] **R-02** — Dependency direction: minimap: Tier2 imports log_msg(unassigned)
 
 ### 🟡 Warnings — Should Fix
 
 - [ ] **A-02** — Template structure: Missing recommended sections: Key Types, Lua API Summary
 - [ ] **A-04b** — Source Files completeness (incl. subdirs): Nested .rs files not listed in AGENT.md: mod.rs
-- [ ] **SP-05** — Key Types accuracy: Types not in spec: ColorMode, FogLevel, Minimap, MinimapMarker, MinimapObject | Stale in spec: Enums, Structs, minimap
 - [ ] **D-03** — Structured doc sections: Missing structured sections: minimap::Minimap (# Fields)
 - [ ] **T-05** — Test adequacy: 63 pub methods, 0 Rust tests — create test file
-- [ ] **W-05** — Wiki page: No wiki page found (expected wiki/Minimap-API.md)
+- [ ] **W-05** — Wiki page: No wiki page found (expected docs/wiki/Minimap-API.md)
 
 ## Full Check Results
 
@@ -43,7 +40,7 @@
 | **A-02** Template structure | ⚠️ WARNING | Missing recommended sections: Key Types, Lua API Summary |
 | **A-03** Purpose quality | ✅ PASS | Purpose section is 433 chars |
 | **A-04** Content sync | ✅ PASS | All .rs files listed |
-| **A-05** Spec pointer | ✅ PASS | specs/minimap.md exists |
+| **A-05** Spec pointer | ✅ PASS | docs/specs/minimap.md exists |
 | **A-06** Tier label | ✅ PASS | Tier label present (expected: tier2) |
 | **A-04b** Source Files completeness (incl. subdirs) | ⚠️ WARNING | Nested .rs files not listed in AGENT.md: mod.rs |
 
@@ -51,11 +48,11 @@
 
 | Check | Verdict | Details |
 |-------|---------|---------|
-| **SP-01** Spec file exists | ✅ PASS | specs/minimap.md exists |
+| **SP-01** Spec file exists | ✅ PASS | docs/specs/minimap.md exists |
 | **SP-02** Required spec sections | ✅ PASS | All required sections present |
-| **SP-03** Summary quality | ✅ PASS | Summary is 1910 chars |
+| **SP-03** Summary quality | ✅ PASS | Summary is 1911 chars |
 | **SP-04** Lua API completeness | ✅ PASS | All 1 bound functions in spec |
-| **SP-05** Key Types accuracy | ⚠️ WARNING | Types not in spec: ColorMode, FogLevel, Minimap, MinimapMarker, MinimapObject \| Stale in spec: Enums, Structs, minimap |
+| **SP-05** Key Types accuracy | ✅ PASS | 7 types — spec Key Types in sync |
 | **SP-06** Spec quality | ✅ PASS | No stub content |
 
 ### Phase 4 — Docstrings
@@ -69,7 +66,7 @@
 | **D-05** Validation tool | 🔵 MANUAL | Run: python tools/docs/collect_docs.py --report-missing \| grep src/<module> |
 | **D-06** Lua API file docs | ✅ PASS | //! doc comment present |
 | **D-07** @param/@return annotations | ✅ PASS | All bindings have @param/@return annotations |
-| **D-08** No rustdoc in lua_api | ❌ ERROR | Rustdoc sections found (use @param/@return): # Parameters |
+| **D-08** No rustdoc in lua_api | ✅ PASS | No rustdoc sections in Lua API file |
 | **D-09** Section separators | ✅ PASS | Separators present |
 
 ### Phase 5 — Lua↔Rust Bridge
@@ -88,7 +85,7 @@
 | Check | Verdict | Details |
 |-------|---------|---------|
 | **R-01** Tier placement | ✅ PASS | Tier label matches: tier2 |
-| **R-02** Dependency direction | ❌ ERROR | minimap: Tier2 imports log_msg(unassigned) |
+| **R-02** Dependency direction | ✅ PASS | All imports follow tier2 rules |
 | **R-03** No lua_api import | ✅ PASS | No lua_api imports found |
 | **R-04** Design assumptions | 🔵 MANUAL | Verify against docs/architecture/philosophy.md |
 | **R-05** Module overlap | 🔵 MANUAL | Check for scope duplication with other modules |
@@ -112,8 +109,8 @@
 | **W-01** Example file exists | ✅ PASS | content/examples/minimap.lua present |
 | **W-02** API surface coverage | ✅ PASS | All 1 bound functions in example |
 | **W-03** Example comments | 🔵 MANUAL | Verify content/examples/minimap.lua has realistic one-line comments per call |
-| **W-04** Example–spec sync | ✅ PASS | All 1 functions consistent across spec and example |
-| **W-05** Wiki page | ⚠️ WARNING | No wiki page found (expected wiki/Minimap-API.md) |
+| **W-04** Example–spec sync | ✅ PASS | Missing spec or example — other checks cover this |
+| **W-05** Wiki page | ⚠️ WARNING | No wiki page found (expected docs/wiki/Minimap-API.md) |
 | **W-06** Changelog entry | 🔵 MANUAL | Verify recent API changes have docs/CHANGELOG.md entries |
 
 ### Phase 9 — Code Quality

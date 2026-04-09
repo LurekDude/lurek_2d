@@ -70,14 +70,10 @@ fn flatten_lua_table(tbl: &LuaTable, prefix: &str, out: &mut HashMap<String, Str
 // ---------------------------------------------------------------------------
 
 /// Registers `lurek.localization.*`.
-///
-/// # Parameters
-/// - `lua` — `&Lua`.
-/// - `luna` — `&LuaTable`.
-/// - `_state` — `Rc<RefCell<SharedState>>`.
-///
-/// # Returns
-/// `LuaResult<()>`.
+/// @param lua : &Lua
+/// @param luna : &LuaTable
+/// @param _state : Rc<RefCell<SharedState>>
+/// @return LuaResult<()>
 pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) -> LuaResult<()> {
     let loc = lua.create_table()?;
     let shared = Rc::new(RefCell::new(LocalizationShared::new()));

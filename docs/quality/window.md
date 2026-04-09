@@ -1,23 +1,18 @@
 # Module Quality Report: `window`
 
-> **Status**: 🔴 FAIL  |  **Date**: 2026-04-09  |  **Score**: 41 ✅ / 6 ⚠️ / 1 ❌ / 19 🔵
+> **Status**: 🔴 FAIL  |  **Date**: 2026-04-09  |  **Score**: 43 ✅ / 5 ⚠️ / 0 ❌ / 19 🔵
 
 ---
 
 ## Action Items
 
-### 🔴 Errors — Must Fix Before Merge
-
-- [ ] **D-08** — No rustdoc in lua_api: Rustdoc sections found (use @param/@return): # Parameters
-
 ### 🟡 Warnings — Should Fix
 
 - [ ] **A-02** — Template structure: Missing recommended sections: Key Types, Lua API Summary
-- [ ] **SP-03** — Summary quality: Summary very long (2175 chars)
-- [ ] **SP-05** — Key Types accuracy: Types not in spec: ModeInfo, ScaleInfo | Stale in spec: Enums, Structs, window
+- [ ] **SP-03** — Summary quality: Summary very long (2176 chars)
 - [ ] **SP-06** — Spec quality: Stub content found: PLACEHOLDER
 - [ ] **D-09** — Section separators: 47 bindings but no // ─── separator comments
-- [ ] **B-04** — No business logic in closures: '<closure@334>' (16 LOC, line 334) — extract body to src/window/ | '<closure@399>' (19 LOC, line 399) — extract body to src/window/ | '<closure@265>' has if/match/for — extract to src/window/ | '<closure@427>' has if/match/for — extract to src/window/
+- [ ] **B-04** — No business logic in closures: '<closure@332>' (16 LOC, line 332) — extract body to src/window/ | '<closure@397>' (19 LOC, line 397) — extract body to src/window/ | '<closure@263>' has if/match/for — extract to src/window/ | '<closure@425>' has if/match/for — extract to src/window/
 
 ## Full Check Results
 
@@ -40,7 +35,7 @@
 | **A-02** Template structure | ⚠️ WARNING | Missing recommended sections: Key Types, Lua API Summary |
 | **A-03** Purpose quality | ✅ PASS | Purpose section is 828 chars |
 | **A-04** Content sync | ✅ PASS | All .rs files listed |
-| **A-05** Spec pointer | ✅ PASS | specs/window.md exists |
+| **A-05** Spec pointer | ✅ PASS | docs/specs/window.md exists |
 | **A-06** Tier label | ✅ PASS | Tier label present (expected: tier1) |
 | **A-04b** Source Files completeness (incl. subdirs) | ✅ PASS | All nested .rs files listed in AGENT.md |
 
@@ -48,11 +43,11 @@
 
 | Check | Verdict | Details |
 |-------|---------|---------|
-| **SP-01** Spec file exists | ✅ PASS | specs/window.md exists |
+| **SP-01** Spec file exists | ✅ PASS | docs/specs/window.md exists |
 | **SP-02** Required spec sections | ✅ PASS | All required sections present |
-| **SP-03** Summary quality | ⚠️ WARNING | Summary very long (2175 chars) |
+| **SP-03** Summary quality | ⚠️ WARNING | Summary very long (2176 chars) |
 | **SP-04** Lua API completeness | ✅ PASS | All 47 bound functions in spec |
-| **SP-05** Key Types accuracy | ⚠️ WARNING | Types not in spec: ModeInfo, ScaleInfo \| Stale in spec: Enums, Structs, window |
+| **SP-05** Key Types accuracy | ✅ PASS | 2 types — spec Key Types in sync |
 | **SP-06** Spec quality | ⚠️ WARNING | Stub content found: PLACEHOLDER |
 
 ### Phase 4 — Docstrings
@@ -66,7 +61,7 @@
 | **D-05** Validation tool | 🔵 MANUAL | Run: python tools/docs/collect_docs.py --report-missing \| grep src/<module> |
 | **D-06** Lua API file docs | ✅ PASS | //! doc comment present |
 | **D-07** @param/@return annotations | ✅ PASS | All bindings have @param/@return annotations |
-| **D-08** No rustdoc in lua_api | ❌ ERROR | Rustdoc sections found (use @param/@return): # Parameters |
+| **D-08** No rustdoc in lua_api | ✅ PASS | No rustdoc sections in Lua API file |
 | **D-09** Section separators | ⚠️ WARNING | 47 bindings but no // ─── separator comments |
 
 ### Phase 5 — Lua↔Rust Bridge
@@ -76,7 +71,7 @@
 | **B-01** Dedicated API file | ✅ PASS | lua_api/window_api.rs present |
 | **B-02** Registration-only | ✅ PASS | Only register() is pub fn |
 | **B-03** impl LuaUserData placement | ✅ PASS | No LuaUserData impl in lua_api file |
-| **B-04** No business logic in closures | ⚠️ WARNING | '<closure@334>' (16 LOC, line 334) — extract body to src/window/ \| '<closure@399>' (19 LOC, line 399) — extract body to src/window/ \| '<closure@265>' has if/match/for — extract to src/window/ \| '<closure@427>' has if/match/for — extract to src/window/ |
+| **B-04** No business logic in closures | ⚠️ WARNING | '<closure@332>' (16 LOC, line 332) — extract body to src/window/ \| '<closure@397>' (19 LOC, line 397) — extract body to src/window/ \| '<closure@263>' has if/match/for — extract to src/window/ \| '<closure@425>' has if/match/for — extract to src/window/ |
 | **B-05** Rc clone pattern | ✅ PASS | Rc clone pattern looks correct |
 | **B-06** Flat registration body | ✅ PASS | All tbl.set() calls are flat statements |
 
@@ -109,8 +104,8 @@
 | **W-01** Example file exists | ✅ PASS | content/examples/window.lua present |
 | **W-02** API surface coverage | ✅ PASS | All 47 bound functions in example |
 | **W-03** Example comments | 🔵 MANUAL | Verify content/examples/window.lua has realistic one-line comments per call |
-| **W-04** Example–spec sync | ✅ PASS | All 47 functions consistent across spec and example |
-| **W-05** Wiki page | ✅ PASS | wiki\Window-API.md |
+| **W-04** Example–spec sync | ✅ PASS | Missing spec or example — other checks cover this |
+| **W-05** Wiki page | ✅ PASS | docs\wiki\Window-API.md |
 | **W-06** Changelog entry | 🔵 MANUAL | Verify recent API changes have docs/CHANGELOG.md entries |
 
 ### Phase 9 — Code Quality

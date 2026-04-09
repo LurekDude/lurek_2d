@@ -15,14 +15,10 @@ use crate::procgen::{
 // -------------------------------------------------------------------------------
 
 /// Registers the `lurek.procgen` API table with the Lua VM.
-///
-/// # Parameters
-/// - `lua` — `&Lua`. The Lua VM.
-/// - `luna` — `&LuaTable`. The top-level `luna` table to register into.
-/// - `state` — `Rc<RefCell<SharedState>>`. Shared engine state.
-///
-/// # Returns
-/// `LuaResult<()>`.
+/// @param lua : &Lua
+/// @param luna : &LuaTable
+/// @param state : Rc<RefCell<SharedState>>
+/// @return LuaResult<()>
 pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) -> LuaResult<()> {
     let tbl = lua.create_table()?;
 

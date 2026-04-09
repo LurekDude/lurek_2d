@@ -1,6 +1,6 @@
 # Module Quality Report: `docs`
 
-> **Status**: 🔴 FAIL  |  **Date**: 2026-04-09  |  **Score**: 37 ✅ / 7 ⚠️ / 4 ❌ / 19 🔵
+> **Status**: 🔴 FAIL  |  **Date**: 2026-04-09  |  **Score**: 39 ✅ / 6 ⚠️ / 3 ❌ / 19 🔵
 
 ---
 
@@ -9,19 +9,17 @@
 ### 🔴 Errors — Must Fix Before Merge
 
 - [ ] **B-03** — impl LuaUserData placement: Move impl LuaUserData for LuaSchema, DocEntry, ApiCatalog, ValidationReport, QualityReport from lua_api/docs_api.rs → src/docs/
-- [ ] **B-06** — Flat registration body: tbl.set() inside {} block (anti-pattern): line 23, line 134, line 263
+- [ ] **B-06** — Flat registration body: tbl.set() inside {} block (anti-pattern): line 23, line 135, line 265
 - [ ] **T-04** — Float comparisons: assert_eq! with float literals (use abs()<epsilon): line 232, line 237, line 242, line 247, line 252
-- [ ] **W-02** — API surface coverage: Functions absent from content/examples/docs.lua: overallScore, moduleScores
 
 ### 🟡 Warnings — Should Fix
 
 - [ ] **A-02** — Template structure: Missing recommended sections: Key Types, Lua API Summary
-- [ ] **SP-05** — Key Types accuracy: Types not in spec: Catalog, DocEntry, FieldRule, FieldType, ParamInfo | Stale in spec: Enums, Structs, docs
+- [ ] **SP-05** — Key Types accuracy: Types not in spec: FieldRule, FieldType, Schema, SchemaError, SchemaResult
 - [ ] **D-03** — Structured doc sections: Missing structured sections: catalog::Catalog (# Fields), entry::ParamInfo (# Fields), entry::ReturnInfo (# Fields), entry::DocEntry (# Fields), report::ValidationReport (# Fields), report::QualityReport (# Fields)
 - [ ] **D-07** — @param/@return annotations: Missing @param/@return before: phantom, incomplete, stale, current, missing
-- [ ] **B-04** — No business logic in closures: '<closure@790>' (27 LOC, line 790) — extract body to src/docs/ | '<closure@825>' (40 LOC, line 825) — extract body to src/docs/ | '<closure@874>' (27 LOC, line 874) — extract body to src/docs/ | '<closure@910>' (22 LOC, line 910) — extract body to src/docs/ | '<closure@1122>' has if/match/for — extract to src/docs/ | '<closure@1139>' has if/match/for — extract to src/docs/
+- [ ] **B-04** — No business logic in closures: '<closure@794>' (27 LOC, line 794) — extract body to src/docs/ | '<closure@829>' (40 LOC, line 829) — extract body to src/docs/ | '<closure@878>' (27 LOC, line 878) — extract body to src/docs/ | '<closure@914>' (22 LOC, line 914) — extract body to src/docs/ | '<closure@1126>' has if/match/for — extract to src/docs/ | '<closure@1143>' has if/match/for — extract to src/docs/
 - [ ] **R-01** — Tier placement: Module not in tier registry — verify placement
-- [ ] **W-04** — Example–spec sync: In spec but not example: moduleScores, overallScore — add to content/examples/docs.lua
 
 ## Full Check Results
 
@@ -42,9 +40,9 @@
 |-------|---------|---------|
 | **A-01** AGENT.md exists | ✅ PASS | src\docs\AGENT.md |
 | **A-02** Template structure | ⚠️ WARNING | Missing recommended sections: Key Types, Lua API Summary |
-| **A-03** Purpose quality | ✅ PASS | Purpose section is 656 chars |
+| **A-03** Purpose quality | ✅ PASS | Purpose section is 659 chars |
 | **A-04** Content sync | ✅ PASS | All .rs files listed |
-| **A-05** Spec pointer | ✅ PASS | specs/docs.md exists |
+| **A-05** Spec pointer | ✅ PASS | docs/specs/docs.md exists |
 | **A-06** Tier label | ✅ PASS | Tier label present (expected: unassigned) |
 | **A-04b** Source Files completeness (incl. subdirs) | ✅ PASS | All nested .rs files listed in AGENT.md |
 
@@ -52,11 +50,11 @@
 
 | Check | Verdict | Details |
 |-------|---------|---------|
-| **SP-01** Spec file exists | ✅ PASS | specs/docs.md exists |
+| **SP-01** Spec file exists | ✅ PASS | docs/specs/docs.md exists |
 | **SP-02** Required spec sections | ✅ PASS | All required sections present |
-| **SP-03** Summary quality | ✅ PASS | Summary is 1768 chars |
+| **SP-03** Summary quality | ✅ PASS | Summary is 1772 chars |
 | **SP-04** Lua API completeness | ✅ PASS | All 34 bound functions in spec |
-| **SP-05** Key Types accuracy | ⚠️ WARNING | Types not in spec: Catalog, DocEntry, FieldRule, FieldType, ParamInfo \| Stale in spec: Enums, Structs, docs |
+| **SP-05** Key Types accuracy | ⚠️ WARNING | Types not in spec: FieldRule, FieldType, Schema, SchemaError, SchemaResult |
 | **SP-06** Spec quality | ✅ PASS | No stub content |
 
 ### Phase 4 — Docstrings
@@ -80,9 +78,9 @@
 | **B-01** Dedicated API file | ✅ PASS | lua_api/docs_api.rs present |
 | **B-02** Registration-only | ✅ PASS | Only register() is pub fn |
 | **B-03** impl LuaUserData placement | ❌ ERROR | Move impl LuaUserData for LuaSchema, DocEntry, ApiCatalog, ValidationReport, QualityReport from lua_api/docs_api.rs → src/docs/ |
-| **B-04** No business logic in closures | ⚠️ WARNING | '<closure@790>' (27 LOC, line 790) — extract body to src/docs/ \| '<closure@825>' (40 LOC, line 825) — extract body to src/docs/ \| '<closure@874>' (27 LOC, line 874) — extract body to src/docs/ \| '<closure@910>' (22 LOC, line 910) — extract body to src/docs/ \| '<closure@1122>' has if/match/for — extract to src/docs/ \| '<closure@1139>' has if/match/for — extract to src/docs/ |
+| **B-04** No business logic in closures | ⚠️ WARNING | '<closure@794>' (27 LOC, line 794) — extract body to src/docs/ \| '<closure@829>' (40 LOC, line 829) — extract body to src/docs/ \| '<closure@878>' (27 LOC, line 878) — extract body to src/docs/ \| '<closure@914>' (22 LOC, line 914) — extract body to src/docs/ \| '<closure@1126>' has if/match/for — extract to src/docs/ \| '<closure@1143>' has if/match/for — extract to src/docs/ |
 | **B-05** Rc clone pattern | ✅ PASS | Rc clone pattern looks correct |
-| **B-06** Flat registration body | ❌ ERROR | tbl.set() inside {} block (anti-pattern): line 23, line 134, line 263 |
+| **B-06** Flat registration body | ❌ ERROR | tbl.set() inside {} block (anti-pattern): line 23, line 135, line 265 |
 
 ### Phase 6 — Architecture Compliance
 
@@ -111,10 +109,10 @@
 | Check | Verdict | Details |
 |-------|---------|---------|
 | **W-01** Example file exists | ✅ PASS | content/examples/docs.lua present |
-| **W-02** API surface coverage | ❌ ERROR | Functions absent from content/examples/docs.lua: overallScore, moduleScores |
+| **W-02** API surface coverage | ✅ PASS | All 34 bound functions in example |
 | **W-03** Example comments | 🔵 MANUAL | Verify content/examples/docs.lua has realistic one-line comments per call |
-| **W-04** Example–spec sync | ⚠️ WARNING | In spec but not example: moduleScores, overallScore — add to content/examples/docs.lua |
-| **W-05** Wiki page | ✅ PASS | wiki\Docs-API.md |
+| **W-04** Example–spec sync | ✅ PASS | Missing spec or example — other checks cover this |
+| **W-05** Wiki page | ✅ PASS | docs\wiki\Docs-API.md |
 | **W-06** Changelog entry | 🔵 MANUAL | Verify recent API changes have docs/CHANGELOG.md entries |
 
 ### Phase 9 — Code Quality

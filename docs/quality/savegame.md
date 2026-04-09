@@ -1,6 +1,6 @@
 # Module Quality Report: `savegame`
 
-> **Status**: 🔴 FAIL  |  **Date**: 2026-04-09  |  **Score**: 35 ✅ / 7 ⚠️ / 6 ❌ / 19 🔵
+> **Status**: 🔴 FAIL  |  **Date**: 2026-04-09  |  **Score**: 41 ✅ / 5 ⚠️ / 2 ❌ / 19 🔵
 
 ---
 
@@ -8,19 +8,13 @@
 
 ### 🔴 Errors — Must Fix Before Merge
 
-- [ ] **A-04** — Content sync: Files not in Source Files table: save_manager.rs
-- [ ] **D-06** — Lua API file docs: lua_api/savegame_api.rs missing //! module-level doc
-- [ ] **D-08** — No rustdoc in lua_api: Rustdoc sections found (use @param/@return): # Parameters, # Returns
 - [ ] **B-02** — Registration-only: struct definitions (move to src/savegame/): LuaSaveManager
 - [ ] **B-03** — impl LuaUserData placement: Move impl LuaUserData for LuaSaveManager from lua_api/savegame_api.rs → src/savegame/
-- [ ] **R-02** — Dependency direction: save_data: Tier2 imports log_msg(unassigned); save_manager: Tier2 imports log_msg(unassigned)
 
 ### 🟡 Warnings — Should Fix
 
 - [ ] **A-02** — Template structure: Missing recommended sections: Key Types, Lua API Summary
-- [ ] **A-04b** — Source Files completeness (incl. subdirs): Nested .rs files not listed in AGENT.md: save_manager.rs
-- [ ] **SP-03** — Summary quality: Summary very long (2004 chars)
-- [ ] **SP-05** — Key Types accuracy: Types not in spec: SaveManager, SaveValue, SlotMeta | Stale in spec: Enums, Structs, savegame
+- [ ] **SP-03** — Summary quality: Summary very long (2005 chars)
 - [ ] **D-04** — Doc quality: Stub/placeholder docs found: save_data:16, save_data:85, save_data:109, save_data:171, save_data:236
 - [ ] **T-03** — Test naming: test_ prefix found — use <subject>_<scenario>_<expected>: test_lua_new_save_manager, test_lua_register_collect, test_lua_collect_restore_roundtrip, test_lua_dirty_tracking, test_lua_schema_version (+5 more)
 - [ ] **Q-04** — Error handling: .unwrap() calls: save_data:331, save_data:358, save_manager:410, save_manager:437
@@ -45,20 +39,20 @@
 | **A-01** AGENT.md exists | ✅ PASS | src\savegame\AGENT.md |
 | **A-02** Template structure | ⚠️ WARNING | Missing recommended sections: Key Types, Lua API Summary |
 | **A-03** Purpose quality | ✅ PASS | Purpose section is 592 chars |
-| **A-04** Content sync | ❌ ERROR | Files not in Source Files table: save_manager.rs |
-| **A-05** Spec pointer | ✅ PASS | specs/savegame.md exists |
+| **A-04** Content sync | ✅ PASS | All .rs files listed |
+| **A-05** Spec pointer | ✅ PASS | docs/specs/savegame.md exists |
 | **A-06** Tier label | ✅ PASS | Tier label present (expected: tier2) |
-| **A-04b** Source Files completeness (incl. subdirs) | ⚠️ WARNING | Nested .rs files not listed in AGENT.md: save_manager.rs |
+| **A-04b** Source Files completeness (incl. subdirs) | ✅ PASS | All nested .rs files listed in AGENT.md |
 
 ### Phase 3 — Technical Specification
 
 | Check | Verdict | Details |
 |-------|---------|---------|
-| **SP-01** Spec file exists | ✅ PASS | specs/savegame.md exists |
+| **SP-01** Spec file exists | ✅ PASS | docs/specs/savegame.md exists |
 | **SP-02** Required spec sections | ✅ PASS | All required sections present |
-| **SP-03** Summary quality | ⚠️ WARNING | Summary very long (2004 chars) |
+| **SP-03** Summary quality | ⚠️ WARNING | Summary very long (2005 chars) |
 | **SP-04** Lua API completeness | ✅ PASS | All 1 bound functions in spec |
-| **SP-05** Key Types accuracy | ⚠️ WARNING | Types not in spec: SaveManager, SaveValue, SlotMeta \| Stale in spec: Enums, Structs, savegame |
+| **SP-05** Key Types accuracy | ✅ PASS | 3 types — spec Key Types in sync |
 | **SP-06** Spec quality | ✅ PASS | No stub content |
 
 ### Phase 4 — Docstrings
@@ -70,9 +64,9 @@
 | **D-03** Structured doc sections | ✅ PASS | All pub structs/enums have structured doc sections |
 | **D-04** Doc quality | ⚠️ WARNING | Stub/placeholder docs found: save_data:16, save_data:85, save_data:109, save_data:171, save_data:236 |
 | **D-05** Validation tool | 🔵 MANUAL | Run: python tools/docs/collect_docs.py --report-missing \| grep src/<module> |
-| **D-06** Lua API file docs | ❌ ERROR | lua_api/savegame_api.rs missing //! module-level doc |
+| **D-06** Lua API file docs | ✅ PASS | //! doc comment present |
 | **D-07** @param/@return annotations | ✅ PASS | All bindings have @param/@return annotations |
-| **D-08** No rustdoc in lua_api | ❌ ERROR | Rustdoc sections found (use @param/@return): # Parameters, # Returns |
+| **D-08** No rustdoc in lua_api | ✅ PASS | No rustdoc sections in Lua API file |
 | **D-09** Section separators | ✅ PASS | < 3 bindings — skip |
 
 ### Phase 5 — Lua↔Rust Bridge
@@ -91,7 +85,7 @@
 | Check | Verdict | Details |
 |-------|---------|---------|
 | **R-01** Tier placement | ✅ PASS | Tier label matches: tier2 |
-| **R-02** Dependency direction | ❌ ERROR | save_data: Tier2 imports log_msg(unassigned); save_manager: Tier2 imports log_msg(unassigned) |
+| **R-02** Dependency direction | ✅ PASS | All imports follow tier2 rules |
 | **R-03** No lua_api import | ✅ PASS | No lua_api imports found |
 | **R-04** Design assumptions | 🔵 MANUAL | Verify against docs/architecture/philosophy.md |
 | **R-05** Module overlap | 🔵 MANUAL | Check for scope duplication with other modules |
@@ -115,8 +109,8 @@
 | **W-01** Example file exists | ✅ PASS | content/examples/savegame.lua present |
 | **W-02** API surface coverage | ✅ PASS | All 1 bound functions in example |
 | **W-03** Example comments | 🔵 MANUAL | Verify content/examples/savegame.lua has realistic one-line comments per call |
-| **W-04** Example–spec sync | ✅ PASS | All 1 functions consistent across spec and example |
-| **W-05** Wiki page | ✅ PASS | wiki\Savegame-API.md |
+| **W-04** Example–spec sync | ✅ PASS | Missing spec or example — other checks cover this |
+| **W-05** Wiki page | ✅ PASS | docs\wiki\Savegame-API.md |
 | **W-06** Changelog entry | 🔵 MANUAL | Verify recent API changes have docs/CHANGELOG.md entries |
 
 ### Phase 9 — Code Quality

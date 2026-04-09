@@ -1,19 +1,15 @@
 # Module Quality Report: `data`
 
-> **Status**: 🔴 FAIL  |  **Date**: 2026-04-09  |  **Score**: 39 ✅ / 8 ⚠️ / 1 ❌ / 19 🔵
+> **Status**: 🔴 FAIL  |  **Date**: 2026-04-09  |  **Score**: 40 ✅ / 8 ⚠️ / 0 ❌ / 19 🔵
 
 ---
 
 ## Action Items
 
-### 🔴 Errors — Must Fix Before Merge
-
-- [ ] **T-04** — Float comparisons: assert_eq! with float literals (use abs()<epsilon): line 190, line 361, line 363
-
 ### 🟡 Warnings — Should Fix
 
 - [ ] **A-02** — Template structure: Missing recommended sections: Key Types, Lua API Summary
-- [ ] **SP-05** — Key Types accuracy: Types not in spec: BinValue, ByteData, CompressFormat, DataView, EncodeFormat | Stale in spec: Enums, Structs, data
+- [ ] **SP-05** — Key Types accuracy: Types not in spec: LuaDataView
 - [ ] **D-03** — Structured doc sections: Missing structured sections: dataview::LuaDataView (# Fields)
 - [ ] **D-04** — Doc quality: Stub/placeholder docs found: byte_data:114, byte_data:130, compress:13, encode:13, hash:14
 - [ ] **D-09** — Section separators: 13 bindings but no // ─── separator comments
@@ -40,9 +36,9 @@
 |-------|---------|---------|
 | **A-01** AGENT.md exists | ✅ PASS | src\data\AGENT.md |
 | **A-02** Template structure | ⚠️ WARNING | Missing recommended sections: Key Types, Lua API Summary |
-| **A-03** Purpose quality | ✅ PASS | Purpose section is 259 chars |
+| **A-03** Purpose quality | ✅ PASS | Purpose section is 261 chars |
 | **A-04** Content sync | ✅ PASS | All .rs files listed |
-| **A-05** Spec pointer | ✅ PASS | specs/data.md exists |
+| **A-05** Spec pointer | ✅ PASS | docs/specs/data.md exists |
 | **A-06** Tier label | ✅ PASS | Tier label present (expected: tier1) |
 | **A-04b** Source Files completeness (incl. subdirs) | ✅ PASS | All nested .rs files listed in AGENT.md |
 
@@ -50,11 +46,11 @@
 
 | Check | Verdict | Details |
 |-------|---------|---------|
-| **SP-01** Spec file exists | ✅ PASS | specs/data.md exists |
+| **SP-01** Spec file exists | ✅ PASS | docs/specs/data.md exists |
 | **SP-02** Required spec sections | ✅ PASS | All required sections present |
-| **SP-03** Summary quality | ✅ PASS | Summary is 1640 chars |
+| **SP-03** Summary quality | ✅ PASS | Summary is 1642 chars |
 | **SP-04** Lua API completeness | ✅ PASS | All 13 bound functions in spec |
-| **SP-05** Key Types accuracy | ⚠️ WARNING | Types not in spec: BinValue, ByteData, CompressFormat, DataView, EncodeFormat \| Stale in spec: Enums, Structs, data |
+| **SP-05** Key Types accuracy | ⚠️ WARNING | Types not in spec: LuaDataView |
 | **SP-06** Spec quality | ✅ PASS | No stub content |
 
 ### Phase 4 — Docstrings
@@ -99,7 +95,7 @@
 | **T-01** Rust test file | ✅ PASS | Found: tests\rust\unit\data_tests.rs |
 | **T-02** Lua test file | ✅ PASS | tests/lua/unit/test_data.lua registered in harness |
 | **T-03** Test naming | ⚠️ WARNING | test_ prefix found — use <subject>_<scenario>_<expected>: test_lua_parse_toml_basic, test_lua_parse_toml_nested, test_lua_parse_toml_array, test_lua_encode_toml_basic, test_lua_toml_roundtrip (+1 more) |
-| **T-04** Float comparisons | ❌ ERROR | assert_eq! with float literals (use abs()<epsilon): line 190, line 361, line 363 |
+| **T-04** Float comparisons | ✅ PASS | No float assert_eq! found |
 | **T-05** Test adequacy | ✅ PASS | 54 tests / 26 pub methods (208%) |
 | **T-06** Golden tests | 🔵 MANUAL | Check if module qualifies for golden/snapshot tests |
 | **T-07** Tests pass | 🔵 MANUAL | Run: cargo test --test data_tests -- --nocapture |
@@ -111,8 +107,8 @@
 | **W-01** Example file exists | ✅ PASS | content/examples/data.lua present |
 | **W-02** API surface coverage | ✅ PASS | All 13 bound functions in example |
 | **W-03** Example comments | 🔵 MANUAL | Verify content/examples/data.lua has realistic one-line comments per call |
-| **W-04** Example–spec sync | ✅ PASS | All 13 functions consistent across spec and example |
-| **W-05** Wiki page | ✅ PASS | wiki\Data-API.md |
+| **W-04** Example–spec sync | ✅ PASS | Missing spec or example — other checks cover this |
+| **W-05** Wiki page | ✅ PASS | docs\wiki\Data-API.md |
 | **W-06** Changelog entry | 🔵 MANUAL | Verify recent API changes have docs/CHANGELOG.md entries |
 
 ### Phase 9 — Code Quality

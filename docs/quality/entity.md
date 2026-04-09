@@ -1,6 +1,6 @@
 # Module Quality Report: `entity`
 
-> **Status**: 🔴 FAIL  |  **Date**: 2026-04-09  |  **Score**: 40 ✅ / 4 ⚠️ / 4 ❌ / 19 🔵
+> **Status**: 🔴 FAIL  |  **Date**: 2026-04-09  |  **Score**: 43 ✅ / 3 ⚠️ / 2 ❌ / 19 🔵
 
 ---
 
@@ -8,15 +8,12 @@
 
 ### 🔴 Errors — Must Fix Before Merge
 
-- [ ] **D-08** — No rustdoc in lua_api: Rustdoc sections found (use @param/@return): # Parameters
 - [ ] **B-02** — Registration-only: struct definitions (move to src/entity/): LuaUniverse
 - [ ] **B-03** — impl LuaUserData placement: Move impl LuaUserData for LuaUniverse from lua_api/entity_api.rs → src/entity/
-- [ ] **R-02** — Dependency direction: relationships: Tier1 imports log_msg(unassigned); universe: Tier1 imports log_msg(unassigned)
 
 ### 🟡 Warnings — Should Fix
 
 - [ ] **A-02** — Template structure: Missing recommended sections: Key Types, Lua API Summary
-- [ ] **SP-05** — Key Types accuracy: Types not in spec: RelationType, Relationship, RelationshipManager, Universe | Stale in spec: Enums, Structs, entity
 - [ ] **D-04** — Doc quality: Stub/placeholder docs found: relationships:335, universe:19, universe:693, universe:1017, universe:1171
 - [ ] **T-03** — Test naming: test_ prefix found — use <subject>_<scenario>_<expected>: test_spawn_sequential_ids, test_spawn_recycled_lifo, test_is_alive, test_entity_count, test_get_entities_returns_alive_ids (+50 more)
 
@@ -39,9 +36,9 @@
 |-------|---------|---------|
 | **A-01** AGENT.md exists | ✅ PASS | src\entity\AGENT.md |
 | **A-02** Template structure | ⚠️ WARNING | Missing recommended sections: Key Types, Lua API Summary |
-| **A-03** Purpose quality | ✅ PASS | Purpose section is 616 chars |
+| **A-03** Purpose quality | ✅ PASS | Purpose section is 617 chars |
 | **A-04** Content sync | ✅ PASS | All .rs files listed |
-| **A-05** Spec pointer | ✅ PASS | specs/entity.md exists |
+| **A-05** Spec pointer | ✅ PASS | docs/specs/entity.md exists |
 | **A-06** Tier label | ✅ PASS | Tier label present (expected: tier1) |
 | **A-04b** Source Files completeness (incl. subdirs) | ✅ PASS | All nested .rs files listed in AGENT.md |
 
@@ -49,11 +46,11 @@
 
 | Check | Verdict | Details |
 |-------|---------|---------|
-| **SP-01** Spec file exists | ✅ PASS | specs/entity.md exists |
+| **SP-01** Spec file exists | ✅ PASS | docs/specs/entity.md exists |
 | **SP-02** Required spec sections | ✅ PASS | All required sections present |
-| **SP-03** Summary quality | ✅ PASS | Summary is 1692 chars |
+| **SP-03** Summary quality | ✅ PASS | Summary is 1693 chars |
 | **SP-04** Lua API completeness | ✅ PASS | All 1 bound functions in spec |
-| **SP-05** Key Types accuracy | ⚠️ WARNING | Types not in spec: RelationType, Relationship, RelationshipManager, Universe \| Stale in spec: Enums, Structs, entity |
+| **SP-05** Key Types accuracy | ✅ PASS | 4 types — spec Key Types in sync |
 | **SP-06** Spec quality | ✅ PASS | No stub content |
 
 ### Phase 4 — Docstrings
@@ -67,7 +64,7 @@
 | **D-05** Validation tool | 🔵 MANUAL | Run: python tools/docs/collect_docs.py --report-missing \| grep src/<module> |
 | **D-06** Lua API file docs | ✅ PASS | //! doc comment present |
 | **D-07** @param/@return annotations | ✅ PASS | All bindings have @param/@return annotations |
-| **D-08** No rustdoc in lua_api | ❌ ERROR | Rustdoc sections found (use @param/@return): # Parameters |
+| **D-08** No rustdoc in lua_api | ✅ PASS | No rustdoc sections in Lua API file |
 | **D-09** Section separators | ✅ PASS | < 3 bindings — skip |
 
 ### Phase 5 — Lua↔Rust Bridge
@@ -86,7 +83,7 @@
 | Check | Verdict | Details |
 |-------|---------|---------|
 | **R-01** Tier placement | ✅ PASS | Tier label matches: tier1 |
-| **R-02** Dependency direction | ❌ ERROR | relationships: Tier1 imports log_msg(unassigned); universe: Tier1 imports log_msg(unassigned) |
+| **R-02** Dependency direction | ✅ PASS | All imports follow tier1 rules |
 | **R-03** No lua_api import | ✅ PASS | No lua_api imports found |
 | **R-04** Design assumptions | 🔵 MANUAL | Verify against docs/architecture/philosophy.md |
 | **R-05** Module overlap | 🔵 MANUAL | Check for scope duplication with other modules |
@@ -110,8 +107,8 @@
 | **W-01** Example file exists | ✅ PASS | content/examples/entity.lua present |
 | **W-02** API surface coverage | ✅ PASS | All 1 bound functions in example |
 | **W-03** Example comments | 🔵 MANUAL | Verify content/examples/entity.lua has realistic one-line comments per call |
-| **W-04** Example–spec sync | ✅ PASS | All 1 functions consistent across spec and example |
-| **W-05** Wiki page | ✅ PASS | wiki\Entity-API.md |
+| **W-04** Example–spec sync | ✅ PASS | Missing spec or example — other checks cover this |
+| **W-05** Wiki page | ✅ PASS | docs\wiki\Entity-API.md |
 | **W-06** Changelog entry | 🔵 MANUAL | Verify recent API changes have docs/CHANGELOG.md entries |
 
 ### Phase 9 — Code Quality

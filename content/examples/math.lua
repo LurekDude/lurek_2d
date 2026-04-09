@@ -549,3 +549,7 @@ local snz = lurek.math.simplexNoise(0.5, 0.3)        -- → aliased form of simp
 -- Random shortcuts — use RandomGenerator for reproducible, seeded sequences.
 local r  = lurek.math.random()                 -- → float in [0, 1)
 local ri = lurek.math.randomInt(1, 6)          -- → integer in [1, 6] inclusive; e.g. a die roll
+
+-- Math constants
+local tau_const = lurek.math.tau   -- 2*pi (6.2831...) � full circle in radians
+local inf = lurek.math.huge         -- positive infinity (equivalent to math.huge)

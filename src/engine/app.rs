@@ -2147,7 +2147,7 @@ impl ApplicationHandler for LunaApp {
             }
 
             WindowEvent::DroppedFile(path) => {
-                eprintln!("[luna2d drag-drop] DroppedFile: {}", path.display());
+                log::debug!("[luna2d drag-drop] DroppedFile: {}", path.display());
                 log_msg!(info, L043_DROP_FILE, "{}", path.display());
                 if self.drag_hover {
                     self.drag_hover = false;

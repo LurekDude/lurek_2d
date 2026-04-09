@@ -1,6 +1,6 @@
 # Module Quality Report: `debugbridge`
 
-> **Status**: 🔴 FAIL  |  **Date**: 2026-04-09  |  **Score**: 41 ✅ / 6 ⚠️ / 1 ❌ / 19 🔵
+> **Status**: 🔴 FAIL  |  **Date**: 2026-04-09  |  **Score**: 42 ✅ / 5 ⚠️ / 1 ❌ / 19 🔵
 
 ---
 
@@ -13,8 +13,7 @@
 ### 🟡 Warnings — Should Fix
 
 - [ ] **A-02** — Template structure: Missing recommended sections: Key Types, Lua API Summary
-- [ ] **SP-03** — Summary quality: Summary very long (2366 chars)
-- [ ] **SP-05** — Key Types accuracy: Types not in spec: BridgeShared, PendingRequest, PendingResponse, PrintEntry | Stale in spec: Enums, Structs, debugbridge
+- [ ] **SP-03** — Summary quality: Summary very long (2370 chars)
 - [ ] **D-03** — Structured doc sections: Missing structured sections: bridge::PendingRequest (# Fields), bridge::PendingResponse (# Fields), bridge::PrintEntry (# Fields), bridge::BridgeShared (# Fields)
 - [ ] **B-04** — No business logic in closures: '<closure@43>' (25 LOC, line 43) — extract body to src/debugbridge/ | '<closure@118>' (163 LOC, line 118) — extract body to src/debugbridge/ | '<closure@311>' (22 LOC, line 311) — extract body to src/debugbridge/ | '<closure@75>' has if/match/for — extract to src/debugbridge/ | '<closure@369>' has if/match/for — extract to src/debugbridge/
 - [ ] **R-01** — Tier placement: Module not in tier registry — verify placement
@@ -38,9 +37,9 @@
 |-------|---------|---------|
 | **A-01** AGENT.md exists | ✅ PASS | src\debugbridge\AGENT.md |
 | **A-02** Template structure | ⚠️ WARNING | Missing recommended sections: Key Types, Lua API Summary |
-| **A-03** Purpose quality | ✅ PASS | Purpose section is 815 chars |
+| **A-03** Purpose quality | ✅ PASS | Purpose section is 818 chars |
 | **A-04** Content sync | ✅ PASS | All .rs files listed |
-| **A-05** Spec pointer | ✅ PASS | specs/debugbridge.md exists |
+| **A-05** Spec pointer | ✅ PASS | docs/specs/debugbridge.md exists |
 | **A-06** Tier label | ✅ PASS | Tier label present (expected: unassigned) |
 | **A-04b** Source Files completeness (incl. subdirs) | ✅ PASS | All nested .rs files listed in AGENT.md |
 
@@ -48,11 +47,11 @@
 
 | Check | Verdict | Details |
 |-------|---------|---------|
-| **SP-01** Spec file exists | ✅ PASS | specs/debugbridge.md exists |
+| **SP-01** Spec file exists | ✅ PASS | docs/specs/debugbridge.md exists |
 | **SP-02** Required spec sections | ✅ PASS | All required sections present |
-| **SP-03** Summary quality | ⚠️ WARNING | Summary very long (2366 chars) |
+| **SP-03** Summary quality | ⚠️ WARNING | Summary very long (2370 chars) |
 | **SP-04** Lua API completeness | ✅ PASS | No tbl.set() bindings found |
-| **SP-05** Key Types accuracy | ⚠️ WARNING | Types not in spec: BridgeShared, PendingRequest, PendingResponse, PrintEntry \| Stale in spec: Enums, Structs, debugbridge |
+| **SP-05** Key Types accuracy | ✅ PASS | 4 types — spec Key Types in sync |
 | **SP-06** Spec quality | ✅ PASS | No stub content |
 
 ### Phase 4 — Docstrings
@@ -109,8 +108,8 @@
 | **W-01** Example file exists | ✅ PASS | content/examples/debugbridge.lua present |
 | **W-02** API surface coverage | ✅ PASS | All 0 bound functions in example |
 | **W-03** Example comments | 🔵 MANUAL | Verify content/examples/debugbridge.lua has realistic one-line comments per call |
-| **W-04** Example–spec sync | ✅ PASS | No bound functions |
-| **W-05** Wiki page | ✅ PASS | wiki\Debugbridge-API.md |
+| **W-04** Example–spec sync | ✅ PASS | Missing spec or example — other checks cover this |
+| **W-05** Wiki page | ✅ PASS | docs\wiki\Debugbridge-API.md |
 | **W-06** Changelog entry | 🔵 MANUAL | Verify recent API changes have docs/CHANGELOG.md entries |
 
 ### Phase 9 — Code Quality

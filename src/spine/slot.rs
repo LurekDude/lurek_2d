@@ -1,3 +1,4 @@
+//! Slot binding a visual attachment to a bone in the skeleton.
 /// A slot binding a visual attachment to a bone in the skeleton.
 ///
 /// Slots determine which bone drives an attachment's position and define

@@ -18,10 +18,11 @@ The event module provides two complementary messaging primitives for Lurek2D gam
 
 ## Source Files
 
-| File        | Purpose                                                         |
-|-------------|-----------------------------------------------------------------|
-| `mod.rs`    | `EventArg` enum, `Event` struct, `EventQueue` FIFO queue       |
-| `signal.rs` | `Subscription` struct, `Signal` handle-based pub-sub dispatcher |
+| File              | Purpose                                                         |
+|-------------------|-----------------------------------------------------------------|
+| `mod.rs`          | `EventArg` enum, `Event` struct — module root and re-exports   |
+| `event_queue.rs`  | `EventQueue` FIFO queue — push, drain, and clear operations     |
+| `signal.rs`       | `Subscription` struct, `Signal` handle-based pub-sub dispatcher |
 
 ## Full Specification
 

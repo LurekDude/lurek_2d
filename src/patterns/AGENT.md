@@ -20,12 +20,19 @@ The `patterns` module provides pure-Rust implementations of six classic game-pro
 
 | File                | Purpose                                                                          |
 |---------------------|----------------------------------------------------------------------------------|
-| `event_bus.rs`      | `EventBus`, `Subscription` — pub/sub event bus with priority and once semantics  |
-| `object_pool.rs`    | `ObjectPool` — capacity-bounded ID-based idle/active object pool                |
+| `blackboard.rs`     | `Blackboard` — typed key-value store for shared AI / scene state                 |
 | `command_stack.rs`  | `CommandStack`, `CommandEntry` — undo/redo stack with batch grouping             |
-| `service_locator.rs`| `ServiceLocator` — named string-keyed service registry                           |
+| `event_bus.rs`      | `EventBus`, `Subscription` — pub/sub event bus with priority and once semantics  |
 | `factory.rs`        | `Factory` — named type registry with alias resolution                            |
+| `funnel.rs`         | `Funnel` — bounded single-consumer channel with backpressure                     |
+| `object_pool.rs`    | `ObjectPool` — capacity-bounded ID-based idle/active object pool                |
+| `observer.rs`       | `Observer`, `Observable` — typed observer pattern with weak-ref listeners        |
+| `priority_queue.rs` | `PriorityQueue` — max-heap with stable ordering for timed/scored entries         |
+| `ring.rs`           | `RingBuffer` — fixed-capacity circular buffer                                    |
+| `service_locator.rs`| `ServiceLocator` — named string-keyed service registry                           |
+| `simple_state.rs`   | `SimpleState` — lightweight two-state toggle with callbacks                      |
 | `state_machine.rs`  | `StateMachine`, `TransitionRule`, `StateInfo` — validated FSM with history       |
+| `throttle.rs`       | `Throttle` — rate-limiter with configurable cooldown and burst capacity          |
 | `mod.rs`            | Re-exports all public types                                                      |
 
 ## Full Specification

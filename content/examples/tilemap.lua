@@ -352,3 +352,9 @@ local iso_rotate = lurek.tilemap.isoRotate(1, 1)  -- Rotates an isometric direct
 local load_t_m_x = lurek.tilemap.loadTMX(tmx_xml_string)  -- Parses a TMX XML string and returns a table with map metadata and layers
 local map_gen = lurek.tilemap.newMapGen(mapgroup, "rooms", 1)  -- Creates a MapGen from a MapGroup, a preset name or dimensions, and a segment size
 local map_script = lurek.tilemap.newMapScript()  -- Creates a new empty MapScript procedural generation script
+
+-- MapGen tile type constants (used with MapScript and dungeon generators)
+local t_floor      = lurek.tilemap.FLOOR       -- Tile type: walkable floor (1)
+local t_north_wall = lurek.tilemap.NORTH_WALL  -- Tile type: north-facing wall (2)
+local t_west_wall  = lurek.tilemap.WEST_WALL   -- Tile type: west-facing wall (3)
+local t_object     = lurek.tilemap.OBJECT      -- Tile type: object/decoration cell (4)

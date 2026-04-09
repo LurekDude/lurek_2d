@@ -1,4 +1,4 @@
-﻿//! System Api implementation for the `lua_api` subsystem.
+//! System Api implementation for the `lua_api` subsystem.
 //!
 //! This module is part of Lurek2D's `lua_api` subsystem and provides the implementation
 //! details for system api-related operations and data management.
@@ -17,8 +17,6 @@ use crate::engine::log_messages::{self, LA03_OPEN_URL_REJECTED, LA04_CLIPBOARD_W
 use crate::log_msg;
 
 /// Returns the number of logical processors available.
-///
-/// # Returns
 /// Logical CPU count; at least 1.
 pub fn get_processor_count() -> usize {
     std::thread::available_parallelism()
@@ -27,8 +25,6 @@ pub fn get_processor_count() -> usize {
 }
 
 /// Returns total system RAM in MiB using the `sysinfo` crate.
-///
-/// # Returns
 /// Physical memory in MiB (e.g. 16384 for 16┬áGB).
 pub fn get_memory_size() -> u64 {
     use sysinfo::System;
@@ -41,12 +37,8 @@ pub fn get_memory_size() -> u64 {
 /// Opens a URL in the default browser/application.
 ///
 /// Only `http://`, `https://`, and `mailto:` schemes are allowed.
-///
-/// # Parameters
 /// - `url` ÔÇö the URL string to open
-///
-/// # Returns
-/// `true` if the command was spawned successfully; `false` if the scheme is
+/// @return true
 /// rejected or the spawn failed.
 pub fn open_url(url: &str) -> bool {
     let url_lower = url.to_lowercase();
@@ -84,8 +76,6 @@ pub fn open_url(url: &str) -> bool {
 }
 
 /// Returns the user's preferred locale strings.
-///
-/// # Returns
 /// A `Vec<String>` with at least one locale tag (e.g. `"en_US"`).
 pub fn get_preferred_locales() -> Vec<String> {
     let locales: Vec<String> = sys_locale::get_locales().map(|l| l.to_string()).collect();
@@ -124,8 +114,6 @@ pub enum PowerState {
 
 impl PowerState {
     /// Returns the string representation used in Lua.
-    ///
-    /// # Returns
     /// One of `"unknown"`, `"battery"`, `"nobattery"`, `"charging"`, or `"charged"`.
     pub fn as_str(&self) -> &'static str {
         match self {
@@ -141,8 +129,6 @@ impl PowerState {
 /// Returns power/battery information: (state, percent, seconds).
 ///
 /// On desktop platforms this returns `(Unknown, None, None)`.
-///
-/// # Returns
 /// A tuple of `(PowerState, Option<u32>, Option<u32>)` ÔÇö the power state,
 /// remaining battery percentage (0ÔÇô100), and remaining seconds on battery.
 pub fn get_power_info() -> (PowerState, Option<u32>, Option<u32>) {
@@ -150,13 +136,9 @@ pub fn get_power_info() -> (PowerState, Option<u32>, Option<u32>) {
 }
 
 /// Registers `lurek.platform.*` platform query functions into the Lua VM.
-///
-/// # Parameters
 /// - `lua` ÔÇö The active Lua VM instance.
 /// - `luna` ÔÇö The `luna` global table to attach functions to.
-///
-/// # Returns
-/// `LuaResult<()>` ÔÇö Ok if all functions were registered successfully; Lua error otherwise.
+/// @return LuaResult<()>
 pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> LuaResult<()> {
     let system = lua.create_table()?;
 
@@ -201,8 +183,6 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
     // lurek.platform.getMemorySize() -> integer (MiB)
     /// Returns the total amount of installed system RAM in megabytes.
     /// @return any
-    ///
-    /// # Returns
     /// RAM size in megabytes as an integer.
     system.set(
         "getMemorySize",
@@ -221,8 +201,6 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
     // lurek.platform.getPreferredLocales() -> table of strings
     /// Returns an ordered list of the user's preferred locale strings (e.g. 'en-US').
     /// @return any
-    ///
-    /// # Returns
     /// Table of locale strings ordered from most to least preferred.
     system.set(
         "getPreferredLocales",
@@ -232,8 +210,6 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
     // lurek.platform.getPowerInfo() -> state, percent_or_nil, seconds_or_nil
     /// Returns battery state, percentage charged, and estimated time remaining.
     /// @return any
-    ///
-    /// # Returns
     /// Table with fields state ('battery','charging','charged','unknown'), percent, and seconds.
     system.set(
         "getPowerInfo",
@@ -246,8 +222,6 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
     // lurek.platform.getInfo() -> table { engine, version, lua_version, renderer, os, processors, memory }
     /// Returns a table of system information including OS name, CPU model, and installed RAM.
     /// @return any
-    ///
-    /// # Returns
     /// Table with fields os, cpu, cores, and ram.
     system.set(
         "getInfo",
@@ -351,8 +325,6 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
 
     #[allow(unused_doc_comments)]
     /// Sets the minimum severity level for runtime log messages.
-    ///
-    /// # Parameters
     /// - `level` ÔÇö One of 'debug', 'info', 'warn', or 'error'.
     // lurek.platform.setLogLevel(level)
     /// @param level : string
@@ -366,8 +338,6 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
 
     #[allow(unused_doc_comments)]
     /// Returns the name of the current minimum log level for runtime messages.
-    ///
-    /// # Returns
     /// One of 'debug', 'info', 'warn', or 'error'.
     // lurek.platform.getLogLevel()
     system.set(
@@ -429,8 +399,6 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
     // lurek.platform.getArch() -> string
     /// Returns the CPU architecture string for the current machine.
     /// @return any
-    ///
-    /// # Returns
     /// One of 'x86_64', 'aarch64', 'arm', etc.
     system.set(
         "getArch",
@@ -441,11 +409,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
     /// Returns the value of the named OS environment variable, or nil if not set.
     /// @param name : string
     /// @return any
-    ///
-    /// # Parameters
     /// - `name` ÔÇö Environment variable name (case-sensitive on Linux/macOS).
-    ///
-    /// # Returns
     /// String value of the variable, or nil if it is not set.
     system.set(
         "getEnv",
@@ -474,11 +438,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
     /// Parses a command-line argument string and returns a structured key/value table.
     /// @param args : table?
     /// @return any
-    ///
-    /// # Parameters
     /// - `args` ÔÇö Argument string or table (e.g. '--flag=value --bool').
-    ///
-    /// # Returns
     /// Table mapping flag names to their values or true for boolean flags.
     system.set(
         "parseArgs",
@@ -547,11 +507,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
     /// @param tasks : table
     /// @param opts : table?
     /// @return any
-    ///
-    /// # Parameters
     /// - `commands` ÔÇö Table of command strings to execute concurrently.
-    ///
-    /// # Returns
     /// A batch handle ID used to retrieve results with getBatchResults.
     system.set(
         "runBatch",
@@ -604,11 +560,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
     /// Returns the output table from the most recently completed runBatch call.
     /// @param results : table
     /// @return any
-    ///
-    /// # Parameters
     /// - `handle` ÔÇö Batch handle returned by runBatch.
-    ///
-    /// # Returns
     /// Table mapping each command to its stdout string, or nil if not yet done.
     system.set(
         "getBatchResults",

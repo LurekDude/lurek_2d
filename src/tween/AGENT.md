@@ -1,6 +1,15 @@
-# `src/tween/` — Property Tween Module
+# `tween` — Agent Reference
 
-## Overview
+| Property       | Value                                                |
+|----------------|------------------------------------------------------|
+| **Tier**       | Tier 1 — Core Subsystems                             |
+| **Status**     | Implemented — Full                                   |
+| **Lua API**    | `lurek.tween`                                        |
+| **Source**     | `src/tween/`                                         |
+| **Rust Tests** | `tests/rust/unit/tween_tests.rs`                     |
+| **Lua Tests**  | `tests/lua/unit/test_tween.lua`                      |
+
+## Purpose
 
 Tier 1 Engine Subsystem that provides all Rust domain logic for the `lurek.tween`
 property animation system: pure timing/easing state, handle types for tweens and
@@ -8,15 +17,7 @@ composite objects, and the active-pool engine that drives frame-tick orchestrati
 
 The Lua binding (`src/lua_api/tween_api.rs`) is a **thin registration-only wrapper**
 that contains no business logic — all structs, `impl` blocks, and algorithms live here.
-
-## Status
-
-`Implemented — Full`
-
-## Tier
-
-**Tier 1** (Core Subsystem — depends on `src/math/` only at the pure-Rust level;
-`handle.rs` and `engine.rs` import `mlua` because they own Lua registry keys directly)
+`handle.rs` and `engine.rs` import `mlua` because they own Lua registry keys directly.
 
 ## Source Files
 

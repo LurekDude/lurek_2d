@@ -1,6 +1,6 @@
 # Module Quality Report: `tween`
 
-> **Status**: 🔴 FAIL  |  **Date**: 2026-04-09  |  **Score**: 37 ✅ / 4 ⚠️ / 7 ❌ / 19 🔵
+> **Status**: 🔴 FAIL  |  **Date**: 2026-04-09  |  **Score**: 42 ✅ / 4 ⚠️ / 2 ❌ / 19 🔵
 
 ---
 
@@ -8,20 +8,15 @@
 
 ### 🔴 Errors — Must Fix Before Merge
 
-- [ ] **A-02** — Template structure: Missing required sections: Purpose
-- [ ] **A-03** — Purpose quality: No ## Purpose section found
-- [ ] **A-06** — Tier label: No Tier property in AGENT.md header
 - [ ] **SP-02** — Required spec sections: Missing sections: Summary, Source Files, Key Types
 - [ ] **SP-03** — Summary quality: No ## Summary section
-- [ ] **D-08** — No rustdoc in lua_api: Rustdoc sections found (use @param/@return): # Parameters, # Returns
-- [ ] **B-06** — Flat registration body: tbl.set() inside {} block (anti-pattern): line 201
 
 ### 🟡 Warnings — Should Fix
 
 - [ ] **A-04b** — Source Files completeness (incl. subdirs): Nested .rs files not listed in AGENT.md: mod.rs
-- [ ] **B-04** — No business logic in closures: '<closure@134>' (20 LOC, line 134) — extract body to src/tween/ | '<closure@184>' has if/match/for — extract to src/tween/ | '<closure@201>' has if/match/for — extract to src/tween/
-- [ ] **R-01** — Tier placement: No **Tier** row in AGENT.md; expected unassigned
-- [ ] **W-05** — Wiki page: No wiki page found (expected wiki/Tween-API.md)
+- [ ] **B-04** — No business logic in closures: '<closure@130>' (20 LOC, line 130) — extract body to src/tween/ | '<closure@180>' has if/match/for — extract to src/tween/ | '<closure@197>' has if/match/for — extract to src/tween/
+- [ ] **R-01** — Tier placement: Module not in tier registry — verify placement
+- [ ] **W-05** — Wiki page: No wiki page found (expected docs/wiki/Tween-API.md)
 
 ## Full Check Results
 
@@ -41,18 +36,18 @@
 | Check | Verdict | Details |
 |-------|---------|---------|
 | **A-01** AGENT.md exists | ✅ PASS | src\tween\AGENT.md |
-| **A-02** Template structure | ❌ ERROR | Missing required sections: Purpose |
-| **A-03** Purpose quality | ❌ ERROR | No ## Purpose section found |
+| **A-02** Template structure | ✅ PASS | All sections present |
+| **A-03** Purpose quality | ✅ PASS | Purpose section is 507 chars |
 | **A-04** Content sync | ✅ PASS | All .rs files listed |
-| **A-05** Spec pointer | ✅ PASS | specs/tween.md exists |
-| **A-06** Tier label | ❌ ERROR | No Tier property in AGENT.md header |
+| **A-05** Spec pointer | ✅ PASS | docs/specs/tween.md exists |
+| **A-06** Tier label | ✅ PASS | Tier label present (expected: unassigned) |
 | **A-04b** Source Files completeness (incl. subdirs) | ⚠️ WARNING | Nested .rs files not listed in AGENT.md: mod.rs |
 
 ### Phase 3 — Technical Specification
 
 | Check | Verdict | Details |
 |-------|---------|---------|
-| **SP-01** Spec file exists | ✅ PASS | specs/tween.md exists |
+| **SP-01** Spec file exists | ✅ PASS | docs/specs/tween.md exists |
 | **SP-02** Required spec sections | ❌ ERROR | Missing sections: Summary, Source Files, Key Types |
 | **SP-03** Summary quality | ❌ ERROR | No ## Summary section |
 | **SP-04** Lua API completeness | ✅ PASS | All 9 bound functions in spec |
@@ -70,7 +65,7 @@
 | **D-05** Validation tool | 🔵 MANUAL | Run: python tools/docs/collect_docs.py --report-missing \| grep src/<module> |
 | **D-06** Lua API file docs | ✅ PASS | //! doc comment present |
 | **D-07** @param/@return annotations | ✅ PASS | All bindings have @param/@return annotations |
-| **D-08** No rustdoc in lua_api | ❌ ERROR | Rustdoc sections found (use @param/@return): # Parameters, # Returns |
+| **D-08** No rustdoc in lua_api | ✅ PASS | No rustdoc sections in Lua API file |
 | **D-09** Section separators | ✅ PASS | Separators present |
 
 ### Phase 5 — Lua↔Rust Bridge
@@ -80,15 +75,15 @@
 | **B-01** Dedicated API file | ✅ PASS | lua_api/tween_api.rs present |
 | **B-02** Registration-only | ✅ PASS | Only register() is pub fn |
 | **B-03** impl LuaUserData placement | ✅ PASS | No LuaUserData impl in lua_api file |
-| **B-04** No business logic in closures | ⚠️ WARNING | '<closure@134>' (20 LOC, line 134) — extract body to src/tween/ \| '<closure@184>' has if/match/for — extract to src/tween/ \| '<closure@201>' has if/match/for — extract to src/tween/ |
+| **B-04** No business logic in closures | ⚠️ WARNING | '<closure@130>' (20 LOC, line 130) — extract body to src/tween/ \| '<closure@180>' has if/match/for — extract to src/tween/ \| '<closure@197>' has if/match/for — extract to src/tween/ |
 | **B-05** Rc clone pattern | ✅ PASS | Rc clone pattern looks correct |
-| **B-06** Flat registration body | ❌ ERROR | tbl.set() inside {} block (anti-pattern): line 201 |
+| **B-06** Flat registration body | ✅ PASS | All tbl.set() calls are flat statements |
 
 ### Phase 6 — Architecture Compliance
 
 | Check | Verdict | Details |
 |-------|---------|---------|
-| **R-01** Tier placement | ⚠️ WARNING | No **Tier** row in AGENT.md; expected unassigned |
+| **R-01** Tier placement | ⚠️ WARNING | Module not in tier registry — verify placement |
 | **R-02** Dependency direction | ✅ PASS | All imports follow unassigned rules |
 | **R-03** No lua_api import | ✅ PASS | No lua_api imports found |
 | **R-04** Design assumptions | 🔵 MANUAL | Verify against docs/architecture/philosophy.md |
@@ -113,8 +108,8 @@
 | **W-01** Example file exists | ✅ PASS | content/examples/tween.lua present |
 | **W-02** API surface coverage | ✅ PASS | All 9 bound functions in example |
 | **W-03** Example comments | 🔵 MANUAL | Verify content/examples/tween.lua has realistic one-line comments per call |
-| **W-04** Example–spec sync | ✅ PASS | All 9 functions consistent across spec and example |
-| **W-05** Wiki page | ⚠️ WARNING | No wiki page found (expected wiki/Tween-API.md) |
+| **W-04** Example–spec sync | ✅ PASS | Missing spec or example — other checks cover this |
+| **W-05** Wiki page | ⚠️ WARNING | No wiki page found (expected docs/wiki/Tween-API.md) |
 | **W-06** Changelog entry | 🔵 MANUAL | Verify recent API changes have docs/CHANGELOG.md entries |
 
 ### Phase 9 — Code Quality

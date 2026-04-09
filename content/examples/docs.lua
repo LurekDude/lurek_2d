@@ -479,3 +479,7 @@ lurek.docs.exportSignatures(userdata, "path/to/file")  -- Export VS Code signatu
 lurek.docs.quality()  -- Calculate quality metrics for a catalog or the internal catalog
 lurek.docs.qualityModule("name")  -- Calculate quality metrics for a single module
 lurek.docs.validateModule("name")  -- Validate a single module against the live lurek.<module>.* bindings
+
+local quality_snap = lurek.docs.quality():toTable()  -- Converts quality report to plain table
+local overall_score_raw = quality_snap.overallScore  -- Overall quality score [0,1]; equivalent to getOverallScore()
+local per_module = quality_snap.moduleScores  -- Table mapping module name to its quality score [0,1]

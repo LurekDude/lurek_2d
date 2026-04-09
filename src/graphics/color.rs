@@ -1,3 +1,4 @@
+//! RGBA color type stored as f32 components in [0.0, 1.0].
 /// RGBA color stored as `f32` components in the range `[0.0, 1.0]`.
 ///
 /// Used everywhere the API accepts a color: `lurek.gfx.setColor`, sprite tints,

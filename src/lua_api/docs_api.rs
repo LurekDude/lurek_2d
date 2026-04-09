@@ -130,6 +130,7 @@ impl LuaUserData for LuaSchema {
 #[derive(Clone)]
 struct DocEntry(docs::DocEntry);
 
+/// Wraps a single doc entry for Lua access.
 impl LuaUserData for DocEntry {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
         /// Returns the name.
@@ -259,6 +260,7 @@ impl ApiCatalog {
     }
 }
 
+/// Wraps a catalog snapshot of API entries for Lua access.
 impl LuaUserData for ApiCatalog {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
         /// Returns a sorted list of module names present in the catalog.
@@ -456,6 +458,7 @@ impl LuaUserData for ApiCatalog {
 /// Wraps a validation report for Lua access.
 struct ValidationReport(docs::ValidationReport);
 
+/// Wraps a validation report for Lua access.
 impl LuaUserData for ValidationReport {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
         /// Returns true when the report has no missing entries.
@@ -558,6 +561,7 @@ impl LuaUserData for ValidationReport {
 /// Wraps documentation quality metrics for Lua access.
 struct QualityReport(docs::QualityReport);
 
+/// Wraps documentation quality metrics for Lua access.
 impl LuaUserData for QualityReport {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
         /// Returns the overall quality score in [0,1].

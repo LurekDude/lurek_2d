@@ -1,6 +1,6 @@
 # Module Quality Report: `modding`
 
-> **Status**: 🔴 FAIL  |  **Date**: 2026-04-09  |  **Score**: 36 ✅ / 6 ⚠️ / 6 ❌ / 19 🔵
+> **Status**: 🔴 FAIL  |  **Date**: 2026-04-09  |  **Score**: 41 ✅ / 5 ⚠️ / 2 ❌ / 19 🔵
 
 ---
 
@@ -8,18 +8,13 @@
 
 ### 🔴 Errors — Must Fix Before Merge
 
-- [ ] **D-06** — Lua API file docs: lua_api/modding_api.rs missing //! module-level doc
-- [ ] **D-08** — No rustdoc in lua_api: Rustdoc sections found (use @param/@return): # Parameters
 - [ ] **B-02** — Registration-only: extra pub fn (move to src/modding/): mod_info_from_table | struct definitions (move to src/modding/): LuaMod, LuaModManager
 - [ ] **B-03** — impl LuaUserData placement: Move impl LuaUserData for LuaMod, LuaModManager from lua_api/modding_api.rs → src/modding/
-- [ ] **R-02** — Dependency direction: mod_manager: Tier2 imports log_msg(unassigned)
-- [ ] **T-04** — Float comparisons: assert_eq! with float literals (use abs()<epsilon): line 17, line 18, line 19, line 20, line 33
 
 ### 🟡 Warnings — Should Fix
 
 - [ ] **A-02** — Template structure: Missing recommended sections: Key Types, Lua API Summary
-- [ ] **SP-03** — Summary quality: Summary very long (2396 chars)
-- [ ] **SP-05** — Key Types accuracy: Types not in spec: ModInfo, ModManager | Stale in spec: Enums, Structs, modding
+- [ ] **SP-03** — Summary quality: Summary very long (2399 chars)
 - [ ] **D-04** — Doc quality: Stub/placeholder docs found: mod_manager:18, mod_manager:171, mod_manager:224, mod_manager:232, mod_manager:394
 - [ ] **T-03** — Test naming: test_ prefix found — use <subject>_<scenario>_<expected>: test_lua_new_mod_basic, test_lua_new_mod_with_fields, test_lua_mod_enable_disable, test_lua_mod_hooks, test_lua_mod_config (+7 more)
 - [ ] **Q-04** — Error handling: .unwrap() calls: mod_manager:678, mod_manager:680, mod_manager:681, mod_manager:682, mod_manager:683 (+2 more)
@@ -45,7 +40,7 @@
 | **A-02** Template structure | ⚠️ WARNING | Missing recommended sections: Key Types, Lua API Summary |
 | **A-03** Purpose quality | ✅ PASS | Purpose section is 383 chars |
 | **A-04** Content sync | ✅ PASS | All .rs files listed |
-| **A-05** Spec pointer | ✅ PASS | specs/modding.md exists |
+| **A-05** Spec pointer | ✅ PASS | docs/specs/modding.md exists |
 | **A-06** Tier label | ✅ PASS | Tier label present (expected: tier2) |
 | **A-04b** Source Files completeness (incl. subdirs) | ✅ PASS | All nested .rs files listed in AGENT.md |
 
@@ -53,11 +48,11 @@
 
 | Check | Verdict | Details |
 |-------|---------|---------|
-| **SP-01** Spec file exists | ✅ PASS | specs/modding.md exists |
+| **SP-01** Spec file exists | ✅ PASS | docs/specs/modding.md exists |
 | **SP-02** Required spec sections | ✅ PASS | All required sections present |
-| **SP-03** Summary quality | ⚠️ WARNING | Summary very long (2396 chars) |
+| **SP-03** Summary quality | ⚠️ WARNING | Summary very long (2399 chars) |
 | **SP-04** Lua API completeness | ✅ PASS | All 2 bound functions in spec |
-| **SP-05** Key Types accuracy | ⚠️ WARNING | Types not in spec: ModInfo, ModManager \| Stale in spec: Enums, Structs, modding |
+| **SP-05** Key Types accuracy | ✅ PASS | 2 types — spec Key Types in sync |
 | **SP-06** Spec quality | ✅ PASS | No stub content |
 
 ### Phase 4 — Docstrings
@@ -69,9 +64,9 @@
 | **D-03** Structured doc sections | ✅ PASS | All pub structs/enums have structured doc sections |
 | **D-04** Doc quality | ⚠️ WARNING | Stub/placeholder docs found: mod_manager:18, mod_manager:171, mod_manager:224, mod_manager:232, mod_manager:394 |
 | **D-05** Validation tool | 🔵 MANUAL | Run: python tools/docs/collect_docs.py --report-missing \| grep src/<module> |
-| **D-06** Lua API file docs | ❌ ERROR | lua_api/modding_api.rs missing //! module-level doc |
+| **D-06** Lua API file docs | ✅ PASS | //! doc comment present |
 | **D-07** @param/@return annotations | ✅ PASS | All bindings have @param/@return annotations |
-| **D-08** No rustdoc in lua_api | ❌ ERROR | Rustdoc sections found (use @param/@return): # Parameters |
+| **D-08** No rustdoc in lua_api | ✅ PASS | No rustdoc sections in Lua API file |
 | **D-09** Section separators | ✅ PASS | < 3 bindings — skip |
 
 ### Phase 5 — Lua↔Rust Bridge
@@ -90,7 +85,7 @@
 | Check | Verdict | Details |
 |-------|---------|---------|
 | **R-01** Tier placement | ✅ PASS | Tier label matches: tier2 |
-| **R-02** Dependency direction | ❌ ERROR | mod_manager: Tier2 imports log_msg(unassigned) |
+| **R-02** Dependency direction | ✅ PASS | All imports follow tier2 rules |
 | **R-03** No lua_api import | ✅ PASS | No lua_api imports found |
 | **R-04** Design assumptions | 🔵 MANUAL | Verify against docs/architecture/philosophy.md |
 | **R-05** Module overlap | 🔵 MANUAL | Check for scope duplication with other modules |
@@ -102,7 +97,7 @@
 | **T-01** Rust test file | ✅ PASS | Found: tests\rust\unit\modding_tests.rs |
 | **T-02** Lua test file | ✅ PASS | tests/lua/unit/test_modding.lua registered in harness |
 | **T-03** Test naming | ⚠️ WARNING | test_ prefix found — use <subject>_<scenario>_<expected>: test_lua_new_mod_basic, test_lua_new_mod_with_fields, test_lua_mod_enable_disable, test_lua_mod_hooks, test_lua_mod_config (+7 more) |
-| **T-04** Float comparisons | ❌ ERROR | assert_eq! with float literals (use abs()<epsilon): line 17, line 18, line 19, line 20, line 33 |
+| **T-04** Float comparisons | ✅ PASS | No float assert_eq! found |
 | **T-05** Test adequacy | ✅ PASS | 17 tests / 20 pub methods (85%) |
 | **T-06** Golden tests | 🔵 MANUAL | Check if module qualifies for golden/snapshot tests |
 | **T-07** Tests pass | 🔵 MANUAL | Run: cargo test --test modding_tests -- --nocapture |
@@ -114,8 +109,8 @@
 | **W-01** Example file exists | ✅ PASS | content/examples/modding.lua present |
 | **W-02** API surface coverage | ✅ PASS | All 2 bound functions in example |
 | **W-03** Example comments | 🔵 MANUAL | Verify content/examples/modding.lua has realistic one-line comments per call |
-| **W-04** Example–spec sync | ✅ PASS | All 2 functions consistent across spec and example |
-| **W-05** Wiki page | ✅ PASS | wiki\Modding-API.md |
+| **W-04** Example–spec sync | ✅ PASS | Missing spec or example — other checks cover this |
+| **W-05** Wiki page | ✅ PASS | docs\wiki\Modding-API.md |
 | **W-06** Changelog entry | 🔵 MANUAL | Verify recent API changes have docs/CHANGELOG.md entries |
 
 ### Phase 9 — Code Quality

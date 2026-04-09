@@ -1,6 +1,6 @@
 # Module Quality Report: `patterns`
 
-> **Status**: 🔴 FAIL  |  **Date**: 2026-04-09  |  **Score**: 37 ✅ / 8 ⚠️ / 3 ❌ / 19 🔵
+> **Status**: 🔴 FAIL  |  **Date**: 2026-04-09  |  **Score**: 39 ✅ / 7 ⚠️ / 2 ❌ / 19 🔵
 
 ---
 
@@ -8,20 +8,18 @@
 
 ### 🔴 Errors — Must Fix Before Merge
 
-- [ ] **A-04** — Content sync: Files not in Source Files table: blackboard.rs, funnel.rs, observer.rs, priority_queue.rs, ring.rs, simple_state.rs, throttle.rs
 - [ ] **B-03** — impl LuaUserData placement: Move impl LuaUserData for LuaEventBus, LuaObjectPool, LuaCommandStack, LuaServiceLocator, LuaFactory, LuaSimpleState, LuaBlackboard, LuaObserver, LuaThrottle, LuaDebounce, LuaPriorityQueue, LuaRing, LuaFunnel from lua_api/patterns_api.rs → src/patterns/
 - [ ] **B-06** — Flat registration body: tbl.set() inside {} block (anti-pattern): line 782, line 1254, line 1414
 
 ### 🟡 Warnings — Should Fix
 
 - [ ] **A-02** — Template structure: Missing recommended sections: Key Types, Lua API Summary
-- [ ] **A-04b** — Source Files completeness (incl. subdirs): Nested .rs files not listed in AGENT.md: blackboard.rs, funnel.rs, observer.rs, priority_queue.rs, ring.rs, simple_state.rs
-- [ ] **SP-03** — Summary quality: Summary very long (3948 chars)
-- [ ] **SP-05** — Key Types accuracy: Types not in spec: Blackboard, BlackboardValue, CommandEntry, CommandStack, Debounce | Stale in spec: Enums, Structs, patterns
+- [ ] **SP-03** — Summary quality: Summary very long (3953 chars)
+- [ ] **SP-05** — Key Types accuracy: Types not in spec: Blackboard, BlackboardValue, CommandEntry, Debounce, Funnel
 - [ ] **D-03** — Structured doc sections: Missing structured sections: simple_state::SimpleState (# Fields)
 - [ ] **R-01** — Tier placement: Module not in tier registry — verify placement
 - [ ] **T-05** — Test adequacy: 34 tests / 121 pub methods (28%) — low coverage
-- [ ] **W-05** — Wiki page: No wiki page found (expected wiki/Patterns-API.md)
+- [ ] **W-05** — Wiki page: No wiki page found (expected docs/wiki/Patterns-API.md)
 
 ## Full Check Results
 
@@ -42,21 +40,21 @@
 |-------|---------|---------|
 | **A-01** AGENT.md exists | ✅ PASS | src\patterns\AGENT.md |
 | **A-02** Template structure | ⚠️ WARNING | Missing recommended sections: Key Types, Lua API Summary |
-| **A-03** Purpose quality | ✅ PASS | Purpose section is 1327 chars |
-| **A-04** Content sync | ❌ ERROR | Files not in Source Files table: blackboard.rs, funnel.rs, observer.rs, priority_queue.rs, ring.rs, simple_state.rs, throttle.rs |
-| **A-05** Spec pointer | ✅ PASS | specs/patterns.md exists |
+| **A-03** Purpose quality | ✅ PASS | Purpose section is 1333 chars |
+| **A-04** Content sync | ✅ PASS | All .rs files listed |
+| **A-05** Spec pointer | ✅ PASS | docs/specs/patterns.md exists |
 | **A-06** Tier label | ✅ PASS | Tier label present (expected: unassigned) |
-| **A-04b** Source Files completeness (incl. subdirs) | ⚠️ WARNING | Nested .rs files not listed in AGENT.md: blackboard.rs, funnel.rs, observer.rs, priority_queue.rs, ring.rs, simple_state.rs |
+| **A-04b** Source Files completeness (incl. subdirs) | ✅ PASS | All nested .rs files listed in AGENT.md |
 
 ### Phase 3 — Technical Specification
 
 | Check | Verdict | Details |
 |-------|---------|---------|
-| **SP-01** Spec file exists | ✅ PASS | specs/patterns.md exists |
+| **SP-01** Spec file exists | ✅ PASS | docs/specs/patterns.md exists |
 | **SP-02** Required spec sections | ✅ PASS | All required sections present |
-| **SP-03** Summary quality | ⚠️ WARNING | Summary very long (3948 chars) |
+| **SP-03** Summary quality | ⚠️ WARNING | Summary very long (3953 chars) |
 | **SP-04** Lua API completeness | ✅ PASS | No tbl.set() bindings found |
-| **SP-05** Key Types accuracy | ⚠️ WARNING | Types not in spec: Blackboard, BlackboardValue, CommandEntry, CommandStack, Debounce \| Stale in spec: Enums, Structs, patterns |
+| **SP-05** Key Types accuracy | ⚠️ WARNING | Types not in spec: Blackboard, BlackboardValue, CommandEntry, Debounce, Funnel |
 | **SP-06** Spec quality | ✅ PASS | No stub content |
 
 ### Phase 4 — Docstrings
@@ -113,8 +111,8 @@
 | **W-01** Example file exists | ✅ PASS | content/examples/patterns.lua present |
 | **W-02** API surface coverage | ✅ PASS | All 0 bound functions in example |
 | **W-03** Example comments | 🔵 MANUAL | Verify content/examples/patterns.lua has realistic one-line comments per call |
-| **W-04** Example–spec sync | ✅ PASS | No bound functions |
-| **W-05** Wiki page | ⚠️ WARNING | No wiki page found (expected wiki/Patterns-API.md) |
+| **W-04** Example–spec sync | ✅ PASS | Missing spec or example — other checks cover this |
+| **W-05** Wiki page | ⚠️ WARNING | No wiki page found (expected docs/wiki/Patterns-API.md) |
 | **W-06** Changelog entry | 🔵 MANUAL | Verify recent API changes have docs/CHANGELOG.md entries |
 
 ### Phase 9 — Code Quality

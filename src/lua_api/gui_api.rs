@@ -1,4 +1,4 @@
-﻿//! `luna.ui` — Retained-mode widget UI system.
+//! `luna.ui` — Retained-mode widget UI system.
 
 use mlua::prelude::*;
 use std::cell::RefCell;
@@ -17,13 +17,7 @@ use crate::gui::widget::{WidgetState, WidgetType};
 // -------------------------------------------------------------------------------
 
 /// Stores registered Lua callbacks keyed by widget index.
-///
-/// # Fields
-/// - `on_click` — `HashMap<usize, RegistryKey>`. Per-widget click callbacks.
-/// - `on_change` — `HashMap<usize, RegistryKey>`. Per-widget change callbacks.
-/// - `on_close` — `HashMap<usize, RegistryKey>`. Per-widget close callbacks.
-/// - `on_select` — `HashMap<usize, RegistryKey>`. Per-widget select callbacks.
-/// - `on_draw` — `HashMap<usize, RegistryKey>`. Per-widget custom draw callbacks.
+/// Fields: on_click (HashMap<usize, RegistryKey>), on_change (HashMap<usize, RegistryKey>), on_close (HashMap<usize, RegistryKey>), on_select (HashMap<usize, RegistryKey>), on_draw (HashMap<usize, RegistryKey>).
 #[derive(Default)]
 struct GuiCallbacks {
     /// Per-widget click callbacks (Button, RadioButton, MenuItem).
@@ -4085,14 +4079,10 @@ fn parse_widget_style(t: &LuaTable) -> LuaResult<WidgetStyle> {
 // -------------------------------------------------------------------------------
 
 /// Registers the `lurek.ui` API table.
-///
-/// # Parameters
-/// - `lua` — `&Lua`. The Lua VM.
-/// - `luna` — `&LuaTable`. The top-level `luna` table to register into.
-/// - `state` — `Rc<RefCell<SharedState>>`. Shared engine state.
-///
-/// # Returns
-/// `LuaResult<()>`.
+/// @param lua : &Lua
+/// @param luna : &LuaTable
+/// @param state : Rc<RefCell<SharedState>>
+/// @return LuaResult<()>
 pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) -> LuaResult<()> {
     let tbl = lua.create_table()?;
     let ctx = Rc::new(RefCell::new(GuiContext::new()));

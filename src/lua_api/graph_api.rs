@@ -546,8 +546,13 @@ impl LuaUserData for LuaEdge {
         });
 
         // -- type --
+        /// Returns the type name "GraphEdge".
+        /// @return string
         methods.add_method("type", |_, _, ()| Ok("GraphEdge"));
         // -- typeOf --
+        /// Returns true when the given name matches "GraphEdge" or a parent type.
+        /// @param name : string
+        /// @return boolean
         methods.add_method("typeOf", |_, _, name: String| Ok(name == "GraphEdge" || name == "Object"));
 
     }
@@ -1047,8 +1052,13 @@ impl LuaUserData for LuaNode {
         });
 
         // -- type --
+        /// Returns the type name "GraphNode".
+        /// @return string
         methods.add_method("type", |_, _, ()| Ok("GraphNode"));
         // -- typeOf --
+        /// Returns true when the given name matches "GraphNode" or a parent type.
+        /// @param name : string
+        /// @return boolean
         methods.add_method("typeOf", |_, _, name: String| Ok(name == "GraphNode" || name == "Object"));
 
     }
@@ -1753,14 +1763,10 @@ fn dispatch_events(
 // ── Registration ────────────────────────────────────────────────────────
 
 /// Registers the `lurek.graph` API namespace.
-///
-/// # Parameters
-/// - `lua` — `&Lua`. The Lua VM.
-/// - `luna` — `&LuaTable`. The top-level `luna` table to register into.
-/// - `state` — `Rc<RefCell<SharedState>>`. Shared engine state.
-///
-/// # Returns
-/// `LuaResult<()>`.
+/// @param lua : &Lua
+/// @param luna : &LuaTable
+/// @param state : Rc<RefCell<SharedState>>
+/// @return LuaResult<()>
 pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) -> LuaResult<()> {
     let tbl = lua.create_table()?;
 

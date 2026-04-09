@@ -8,6 +8,7 @@
 //! [`crate::log::sinks::Sink`] destinations (files, in-memory ring buffers)
 //! via the `lurek.log.*` API.
 
+/// Configurable log sink registry for file and in-memory log destinations.
 pub mod sinks;
 
 pub use sinks::{MemoryEntry, Sink, SinkLevel, SinkRegistry};

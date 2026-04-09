@@ -1,4 +1,4 @@
-﻿//! `luna.particles` — Emitter-based 2D particle systems and trail ribbons.
+//! `luna.particles` — Emitter-based 2D particle systems and trail ribbons.
 
 use super::SharedState;
 use mlua::prelude::*;
@@ -18,10 +18,7 @@ use crate::particle::{ParticleConfig, ParticleSystem, Trail};
 // -------------------------------------------------------------------------------
 
 /// Lua-side handle to a particle system stored in SharedState.
-///
-/// # Fields
-/// - `state` — `Rc<RefCell<SharedState>>`. Shared engine state.
-/// - `key` — `ParticleKey`. Slot key for the backing particle system.
+/// Fields: state (Rc<RefCell<SharedState>>), key (ParticleKey).
 #[derive(Clone)]
 pub struct LuaParticleSystem {
     pub(crate) state: Rc<RefCell<SharedState>>,
@@ -944,14 +941,10 @@ impl LuaUserData for LuaTrail {
 // -------------------------------------------------------------------------------
 
 /// Registers the `lurek.particles` API table with the Lua VM.
-///
-/// # Parameters
-/// - `lua` — `&Lua`. The Lua VM.
-/// - `luna` — `&LuaTable`. The top-level `luna` table to register into.
-/// - `state` — `Rc<RefCell<SharedState>>`. Shared engine state.
-///
-/// # Returns
-/// `LuaResult<()>`.
+/// @param lua : &Lua
+/// @param luna : &LuaTable
+/// @param state : Rc<RefCell<SharedState>>
+/// @return LuaResult<()>
 pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> LuaResult<()> {
     let tbl = lua.create_table()?;
 

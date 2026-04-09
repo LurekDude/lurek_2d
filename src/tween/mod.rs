@@ -28,8 +28,11 @@
 //! 3. Use `lerp(start, end)` to compute the current interpolated value for each field.
 //! 4. On complete: call `reset()` if repeating, or release the state entirely.
 
+/// Per-tween driver: tick loop, completion callbacks, and repeat logic.
 pub mod engine;
+/// Lua-side handle types for individual tweens, parallels, and sequences.
 pub mod handle;
+/// Core tween state: timing, easing, and numeric interpolation.
 pub mod state;
 
 pub use engine::TweenEngine;

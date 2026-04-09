@@ -1,6 +1,6 @@
 # Module Quality Report: `timer`
 
-> **Status**: 🔴 FAIL  |  **Date**: 2026-04-09  |  **Score**: 35 ✅ / 7 ⚠️ / 6 ❌ / 19 🔵
+> **Status**: 🔴 FAIL  |  **Date**: 2026-04-09  |  **Score**: 40 ✅ / 6 ⚠️ / 2 ❌ / 19 🔵
 
 ---
 
@@ -8,18 +8,13 @@
 
 ### 🔴 Errors — Must Fix Before Merge
 
-- [ ] **D-06** — Lua API file docs: lua_api/timer_api.rs missing //! module-level doc
-- [ ] **D-08** — No rustdoc in lua_api: Rustdoc sections found (use @param/@return): # Parameters
 - [ ] **B-02** — Registration-only: struct definitions (move to src/timer/): LuaScheduler
 - [ ] **B-03** — impl LuaUserData placement: Move impl LuaUserData for LuaScheduler from lua_api/timer_api.rs → src/timer/
-- [ ] **R-02** — Dependency direction: scheduler: Tier1 imports log_msg(unassigned)
-- [ ] **T-04** — Float comparisons: assert_eq! with float literals (use abs()<epsilon): line 117, line 119, line 120, line 128, line 129
 
 ### 🟡 Warnings — Should Fix
 
 - [ ] **A-02** — Template structure: Missing recommended sections: Key Types, Lua API Summary
-- [ ] **SP-03** — Summary quality: Summary very long (2366 chars)
-- [ ] **SP-05** — Key Types accuracy: Types not in spec: Clock, ScheduledEvent, Scheduler | Stale in spec: Enums, Structs, timer
+- [ ] **SP-03** — Summary quality: Summary very long (2373 chars)
 - [ ] **D-03** — Structured doc sections: Missing structured sections: scheduler::Scheduler (# Fields)
 - [ ] **D-09** — Section separators: 10 bindings but no // ─── separator comments
 - [ ] **T-03** — Test naming: test_ prefix found — use <subject>_<scenario>_<expected>: test_lua_new_scheduler, test_lua_scheduler_after, test_lua_scheduler_every, test_lua_scheduler_cancel, test_lua_scheduler_cancel_all
@@ -44,9 +39,9 @@
 |-------|---------|---------|
 | **A-01** AGENT.md exists | ✅ PASS | src\timer\AGENT.md |
 | **A-02** Template structure | ⚠️ WARNING | Missing recommended sections: Key Types, Lua API Summary |
-| **A-03** Purpose quality | ✅ PASS | Purpose section is 759 chars |
+| **A-03** Purpose quality | ✅ PASS | Purpose section is 760 chars |
 | **A-04** Content sync | ✅ PASS | All .rs files listed |
-| **A-05** Spec pointer | ✅ PASS | specs/timer.md exists |
+| **A-05** Spec pointer | ✅ PASS | docs/specs/timer.md exists |
 | **A-06** Tier label | ✅ PASS | Tier label present (expected: tier1) |
 | **A-04b** Source Files completeness (incl. subdirs) | ✅ PASS | All nested .rs files listed in AGENT.md |
 
@@ -54,11 +49,11 @@
 
 | Check | Verdict | Details |
 |-------|---------|---------|
-| **SP-01** Spec file exists | ✅ PASS | specs/timer.md exists |
+| **SP-01** Spec file exists | ✅ PASS | docs/specs/timer.md exists |
 | **SP-02** Required spec sections | ✅ PASS | All required sections present |
-| **SP-03** Summary quality | ⚠️ WARNING | Summary very long (2366 chars) |
+| **SP-03** Summary quality | ⚠️ WARNING | Summary very long (2373 chars) |
 | **SP-04** Lua API completeness | ✅ PASS | All 10 bound functions in spec |
-| **SP-05** Key Types accuracy | ⚠️ WARNING | Types not in spec: Clock, ScheduledEvent, Scheduler \| Stale in spec: Enums, Structs, timer |
+| **SP-05** Key Types accuracy | ✅ PASS | 3 types — spec Key Types in sync |
 | **SP-06** Spec quality | ✅ PASS | No stub content |
 
 ### Phase 4 — Docstrings
@@ -70,9 +65,9 @@
 | **D-03** Structured doc sections | ⚠️ WARNING | Missing structured sections: scheduler::Scheduler (# Fields) |
 | **D-04** Doc quality | ✅ PASS | No stub docs found |
 | **D-05** Validation tool | 🔵 MANUAL | Run: python tools/docs/collect_docs.py --report-missing \| grep src/<module> |
-| **D-06** Lua API file docs | ❌ ERROR | lua_api/timer_api.rs missing //! module-level doc |
+| **D-06** Lua API file docs | ✅ PASS | //! doc comment present |
 | **D-07** @param/@return annotations | ✅ PASS | All bindings have @param/@return annotations |
-| **D-08** No rustdoc in lua_api | ❌ ERROR | Rustdoc sections found (use @param/@return): # Parameters |
+| **D-08** No rustdoc in lua_api | ✅ PASS | No rustdoc sections in Lua API file |
 | **D-09** Section separators | ⚠️ WARNING | 10 bindings but no // ─── separator comments |
 
 ### Phase 5 — Lua↔Rust Bridge
@@ -91,7 +86,7 @@
 | Check | Verdict | Details |
 |-------|---------|---------|
 | **R-01** Tier placement | ✅ PASS | Tier label matches: tier1 |
-| **R-02** Dependency direction | ❌ ERROR | scheduler: Tier1 imports log_msg(unassigned) |
+| **R-02** Dependency direction | ✅ PASS | All imports follow tier1 rules |
 | **R-03** No lua_api import | ✅ PASS | No lua_api imports found |
 | **R-04** Design assumptions | 🔵 MANUAL | Verify against docs/architecture/philosophy.md |
 | **R-05** Module overlap | 🔵 MANUAL | Check for scope duplication with other modules |
@@ -103,7 +98,7 @@
 | **T-01** Rust test file | ✅ PASS | Found: tests\rust\unit\timer_tests.rs |
 | **T-02** Lua test file | ✅ PASS | tests/lua/unit/test_timer.lua registered in harness |
 | **T-03** Test naming | ⚠️ WARNING | test_ prefix found — use <subject>_<scenario>_<expected>: test_lua_new_scheduler, test_lua_scheduler_after, test_lua_scheduler_every, test_lua_scheduler_cancel, test_lua_scheduler_cancel_all |
-| **T-04** Float comparisons | ❌ ERROR | assert_eq! with float literals (use abs()<epsilon): line 117, line 119, line 120, line 128, line 129 |
+| **T-04** Float comparisons | ✅ PASS | No float assert_eq! found |
 | **T-05** Test adequacy | ✅ PASS | 34 tests / 30 pub methods (113%) |
 | **T-06** Golden tests | 🔵 MANUAL | Check if module qualifies for golden/snapshot tests |
 | **T-07** Tests pass | 🔵 MANUAL | Run: cargo test --test timer_tests -- --nocapture |
@@ -115,8 +110,8 @@
 | **W-01** Example file exists | ✅ PASS | content/examples/timer.lua present |
 | **W-02** API surface coverage | ✅ PASS | All 10 bound functions in example |
 | **W-03** Example comments | 🔵 MANUAL | Verify content/examples/timer.lua has realistic one-line comments per call |
-| **W-04** Example–spec sync | ✅ PASS | All 10 functions consistent across spec and example |
-| **W-05** Wiki page | ✅ PASS | wiki\Timer-API.md |
+| **W-04** Example–spec sync | ✅ PASS | Missing spec or example — other checks cover this |
+| **W-05** Wiki page | ✅ PASS | docs\wiki\Timer-API.md |
 | **W-06** Changelog entry | 🔵 MANUAL | Verify recent API changes have docs/CHANGELOG.md entries |
 
 ### Phase 9 — Code Quality

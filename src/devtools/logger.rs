@@ -170,7 +170,9 @@ impl Logger {
             category: category.map(|s| s.to_string()),
         };
         if self.console_enabled {
-            eprintln!(
+            use std::io::Write;
+            let _ = writeln!(
+                std::io::stderr(),
                 "[{level}] {msg}  ({src}:{ln})",
                 level = entry.level,
                 msg = entry.message,

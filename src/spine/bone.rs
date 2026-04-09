@@ -1,3 +1,4 @@
+//! Bone transform for skeletal animation hierarchy.
 /// A single bone in a skeletal hierarchy.
 ///
 /// Each bone stores a local transform relative to its parent (or to the skeleton

@@ -1,3 +1,5 @@
+//! Skeleton container holding bones, slots, and Atlas data.
+
 use super::bone::Bone;
 use super::slot::Slot;
 use crate::engine::log_messages::SP01_SKEL_LOADED;

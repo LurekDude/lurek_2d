@@ -1,25 +1,19 @@
 # Module Quality Report: `serial`
 
-> **Status**: 🔴 FAIL  |  **Date**: 2026-04-09  |  **Score**: 39 ✅ / 7 ⚠️ / 2 ❌ / 19 🔵
+> **Status**: 🔴 FAIL  |  **Date**: 2026-04-09  |  **Score**: 42 ✅ / 6 ⚠️ / 0 ❌ / 19 🔵
 
 ---
 
 ## Action Items
 
-### 🔴 Errors — Must Fix Before Merge
-
-- [ ] **D-06** — Lua API file docs: lua_api/serial_api.rs missing //! module-level doc
-- [ ] **D-08** — No rustdoc in lua_api: Rustdoc sections found (use @param/@return): # Parameters, # Returns
-
 ### 🟡 Warnings — Should Fix
 
 - [ ] **A-02** — Template structure: Missing recommended sections: Key Types, Lua API Summary
-- [ ] **SP-05** — Key Types accuracy: Types not in spec: CsvOptions, SerialValue | Stale in spec: Enums, Structs, serial
 - [ ] **SP-06** — Spec quality: Stub content found: TODO
 - [ ] **D-09** — Section separators: 6 bindings but no // ─── separator comments
 - [ ] **R-01** — Tier placement: Module not in tier registry — verify placement
 - [ ] **T-03** — Test naming: test_ prefix found — use <subject>_<scenario>_<expected>: test_lua_serial_fromjson_basic, test_lua_serial_tojson_basic, test_lua_serial_fromtoml_basic, test_lua_serial_totoml_basic, test_lua_serial_fromjson_error
-- [ ] **W-05** — Wiki page: No wiki page found (expected wiki/Serial-API.md)
+- [ ] **W-05** — Wiki page: No wiki page found (expected docs/wiki/Serial-API.md)
 
 ## Full Check Results
 
@@ -40,9 +34,9 @@
 |-------|---------|---------|
 | **A-01** AGENT.md exists | ✅ PASS | src\serial\AGENT.md |
 | **A-02** Template structure | ⚠️ WARNING | Missing recommended sections: Key Types, Lua API Summary |
-| **A-03** Purpose quality | ✅ PASS | Purpose section is 468 chars |
+| **A-03** Purpose quality | ✅ PASS | Purpose section is 469 chars |
 | **A-04** Content sync | ✅ PASS | All .rs files listed |
-| **A-05** Spec pointer | ✅ PASS | specs/serial.md exists |
+| **A-05** Spec pointer | ✅ PASS | docs/specs/serial.md exists |
 | **A-06** Tier label | ✅ PASS | Tier label present (expected: unassigned) |
 | **A-04b** Source Files completeness (incl. subdirs) | ✅ PASS | All nested .rs files listed in AGENT.md |
 
@@ -50,11 +44,11 @@
 
 | Check | Verdict | Details |
 |-------|---------|---------|
-| **SP-01** Spec file exists | ✅ PASS | specs/serial.md exists |
+| **SP-01** Spec file exists | ✅ PASS | docs/specs/serial.md exists |
 | **SP-02** Required spec sections | ✅ PASS | All required sections present |
-| **SP-03** Summary quality | ✅ PASS | Summary is 1884 chars |
+| **SP-03** Summary quality | ✅ PASS | Summary is 1887 chars |
 | **SP-04** Lua API completeness | ✅ PASS | All 6 bound functions in spec |
-| **SP-05** Key Types accuracy | ⚠️ WARNING | Types not in spec: CsvOptions, SerialValue \| Stale in spec: Enums, Structs, serial |
+| **SP-05** Key Types accuracy | ✅ PASS | 2 types — spec Key Types in sync |
 | **SP-06** Spec quality | ⚠️ WARNING | Stub content found: TODO |
 
 ### Phase 4 — Docstrings
@@ -66,9 +60,9 @@
 | **D-03** Structured doc sections | ✅ PASS | All pub structs/enums have structured doc sections |
 | **D-04** Doc quality | ✅ PASS | No stub docs found |
 | **D-05** Validation tool | 🔵 MANUAL | Run: python tools/docs/collect_docs.py --report-missing \| grep src/<module> |
-| **D-06** Lua API file docs | ❌ ERROR | lua_api/serial_api.rs missing //! module-level doc |
+| **D-06** Lua API file docs | ✅ PASS | //! doc comment present |
 | **D-07** @param/@return annotations | ✅ PASS | All bindings have @param/@return annotations |
-| **D-08** No rustdoc in lua_api | ❌ ERROR | Rustdoc sections found (use @param/@return): # Parameters, # Returns |
+| **D-08** No rustdoc in lua_api | ✅ PASS | No rustdoc sections in Lua API file |
 | **D-09** Section separators | ⚠️ WARNING | 6 bindings but no // ─── separator comments |
 
 ### Phase 5 — Lua↔Rust Bridge
@@ -111,8 +105,8 @@
 | **W-01** Example file exists | ✅ PASS | content/examples/serial.lua present |
 | **W-02** API surface coverage | ✅ PASS | All 6 bound functions in example |
 | **W-03** Example comments | 🔵 MANUAL | Verify content/examples/serial.lua has realistic one-line comments per call |
-| **W-04** Example–spec sync | ✅ PASS | All 6 functions consistent across spec and example |
-| **W-05** Wiki page | ⚠️ WARNING | No wiki page found (expected wiki/Serial-API.md) |
+| **W-04** Example–spec sync | ✅ PASS | Missing spec or example — other checks cover this |
+| **W-05** Wiki page | ⚠️ WARNING | No wiki page found (expected docs/wiki/Serial-API.md) |
 | **W-06** Changelog entry | 🔵 MANUAL | Verify recent API changes have docs/CHANGELOG.md entries |
 
 ### Phase 9 — Code Quality

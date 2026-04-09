@@ -1,6 +1,6 @@
 # Module Quality Report: `tilemap`
 
-> **Status**: 🔴 FAIL  |  **Date**: 2026-04-09  |  **Score**: 31 ✅ / 9 ⚠️ / 8 ❌ / 19 🔵
+> **Status**: 🔴 FAIL  |  **Date**: 2026-04-09  |  **Score**: 35 ✅ / 8 ⚠️ / 5 ❌ / 19 🔵
 
 ---
 
@@ -8,25 +8,21 @@
 
 ### 🔴 Errors — Must Fix Before Merge
 
-- [ ] **SP-04** — Lua API completeness: Missing from spec: FLOOR, NORTH_WALL, WEST_WALL, OBJECT, newMapScript (+2 more) — add to ## Lua API in specs/tilemap.md
-- [ ] **D-08** — No rustdoc in lua_api: Rustdoc sections found (use @param/@return): # Parameters
+- [ ] **SP-04** — Lua API completeness: Missing from spec: FLOOR, NORTH_WALL, WEST_WALL, OBJECT, newMapScript (+2 more) — add to ## Lua API in docs/specs/tilemap.md
 - [ ] **B-02** — Registration-only: struct definitions (move to src/tilemap/): LuaTileSet, LuaTileMap, LuaAutoTileSheet, LuaChunkMap, LuaIsoMap, LuaMapBlock, LuaMapGroup, LuaMapScript, LuaMapGen
 - [ ] **B-03** — impl LuaUserData placement: Move impl LuaUserData for LuaTileSet, LuaTileMap, LuaAutoTileSheet, LuaChunkMap, LuaIsoMap, LuaMapBlock, LuaMapGroup, LuaMapScript, LuaMapGen from lua_api/tilemap_api.rs → src/tilemap/
-- [ ] **B-06** — Flat registration body: tbl.set() inside {} block (anti-pattern): line 30, line 845, line 1682
-- [ ] **R-02** — Dependency direction: chunk: Tier2 imports log_msg(unassigned); mapgen: Tier2 imports log_msg(unassigned); tilemap: Tier2 imports log_msg(unassigned); tileset: Tier2 imports log_msg(unassigned); tmx: Tier2 imports log_msg(unassigned)
-- [ ] **T-04** — Float comparisons: assert_eq! with float literals (use abs()<epsilon): line 152, line 154, line 383, line 384, line 388
-- [ ] **W-02** — API surface coverage: Functions absent from content/examples/tilemap.lua: FLOOR, NORTH_WALL, WEST_WALL, OBJECT
+- [ ] **B-06** — Flat registration body: tbl.set() inside {} block (anti-pattern): line 30, line 845, line 1680
+- [ ] **T-04** — Float comparisons: assert_eq! with float literals (use abs()<epsilon): line 1384, line 1385, line 1387, line 1455, line 1456
 
 ### 🟡 Warnings — Should Fix
 
 - [ ] **S-03** — File size limits: Files >1500 LOC: tilemap/mapgen.rs (1570 LOC)
 - [ ] **A-02** — Template structure: Missing recommended sections: Key Types, Lua API Summary
-- [ ] **SP-05** — Key Types accuracy: Types not in spec: AutoTileLayout, AutoTileSheet, ChunkMap, Edge, Facing | Stale in spec: Enums, Standalone, Structs
+- [ ] **SP-05** — Key Types accuracy: Types not in spec: AutoTileLayout, AutoTileSheet, ChunkMap, Edge, Facing | Stale in spec: Standalone
 - [ ] **D-03** — Structured doc sections: Missing structured sections: autotile_sheet::AutoTileSheet (# Fields), isomap::IsoMap (# Fields), mapgen::ScriptStep (# Fields)
 - [ ] **D-04** — Doc quality: Stub/placeholder docs found: isomap:51, large_map_renderer:213, mapgen:795, polygon_map:18, polygon_map:289 (+10 more)
 - [ ] **D-07** — @param/@return annotations: Missing @param/@return before: width, height
-- [ ] **B-04** — No business logic in closures: '<closure@1521>' (17 LOC, line 1521) — extract body to src/tilemap/ | '<closure@1900>' (112 LOC, line 1900) — extract body to src/tilemap/ | '<closure@2020>' (36 LOC, line 2020) — extract body to src/tilemap/ | '<closure@1682>' has if/match/for — extract to src/tilemap/ | '<closure@1731>' has if/match/for — extract to src/tilemap/
-- [ ] **W-04** — Example–spec sync: In example but not spec: loadTMX, newMapGen, newMapScript — add to ## Lua API in specs/tilemap.md
+- [ ] **B-04** — No business logic in closures: '<closure@1519>' (17 LOC, line 1519) — extract body to src/tilemap/ | '<closure@1898>' (112 LOC, line 1898) — extract body to src/tilemap/ | '<closure@2018>' (36 LOC, line 2018) — extract body to src/tilemap/ | '<closure@1680>' has if/match/for — extract to src/tilemap/ | '<closure@1729>' has if/match/for — extract to src/tilemap/
 - [ ] **Q-04** — Error handling: .unwrap() calls: chunk:398, mapgen:1324, mapgen:1377, mapgen:1378, mapgen:1382 (+16 more)
 
 ## Full Check Results
@@ -50,7 +46,7 @@
 | **A-02** Template structure | ⚠️ WARNING | Missing recommended sections: Key Types, Lua API Summary |
 | **A-03** Purpose quality | ✅ PASS | Purpose section is 1252 chars |
 | **A-04** Content sync | ✅ PASS | All .rs files listed |
-| **A-05** Spec pointer | ✅ PASS | specs/tilemap.md exists |
+| **A-05** Spec pointer | ✅ PASS | docs/specs/tilemap.md exists |
 | **A-06** Tier label | ✅ PASS | Tier label present (expected: tier2) |
 | **A-04b** Source Files completeness (incl. subdirs) | ✅ PASS | All nested .rs files listed in AGENT.md |
 
@@ -58,11 +54,11 @@
 
 | Check | Verdict | Details |
 |-------|---------|---------|
-| **SP-01** Spec file exists | ✅ PASS | specs/tilemap.md exists |
+| **SP-01** Spec file exists | ✅ PASS | docs/specs/tilemap.md exists |
 | **SP-02** Required spec sections | ✅ PASS | All required sections present |
 | **SP-03** Summary quality | ✅ PASS | Summary is 1257 chars |
-| **SP-04** Lua API completeness | ❌ ERROR | Missing from spec: FLOOR, NORTH_WALL, WEST_WALL, OBJECT, newMapScript (+2 more) — add to ## Lua API in specs/tilemap.md |
-| **SP-05** Key Types accuracy | ⚠️ WARNING | Types not in spec: AutoTileLayout, AutoTileSheet, ChunkMap, Edge, Facing \| Stale in spec: Enums, Standalone, Structs |
+| **SP-04** Lua API completeness | ❌ ERROR | Missing from spec: FLOOR, NORTH_WALL, WEST_WALL, OBJECT, newMapScript (+2 more) — add to ## Lua API in docs/specs/tilemap.md |
+| **SP-05** Key Types accuracy | ⚠️ WARNING | Types not in spec: AutoTileLayout, AutoTileSheet, ChunkMap, Edge, Facing \| Stale in spec: Standalone |
 | **SP-06** Spec quality | ✅ PASS | No stub content |
 
 ### Phase 4 — Docstrings
@@ -76,7 +72,7 @@
 | **D-05** Validation tool | 🔵 MANUAL | Run: python tools/docs/collect_docs.py --report-missing \| grep src/<module> |
 | **D-06** Lua API file docs | ✅ PASS | //! doc comment present |
 | **D-07** @param/@return annotations | ⚠️ WARNING | Missing @param/@return before: width, height |
-| **D-08** No rustdoc in lua_api | ❌ ERROR | Rustdoc sections found (use @param/@return): # Parameters |
+| **D-08** No rustdoc in lua_api | ✅ PASS | No rustdoc sections in Lua API file |
 | **D-09** Section separators | ✅ PASS | Separators present |
 
 ### Phase 5 — Lua↔Rust Bridge
@@ -86,16 +82,16 @@
 | **B-01** Dedicated API file | ✅ PASS | lua_api/tilemap_api.rs present |
 | **B-02** Registration-only | ❌ ERROR | struct definitions (move to src/tilemap/): LuaTileSet, LuaTileMap, LuaAutoTileSheet, LuaChunkMap, LuaIsoMap, LuaMapBlock, LuaMapGroup, LuaMapScript, LuaMapGen |
 | **B-03** impl LuaUserData placement | ❌ ERROR | Move impl LuaUserData for LuaTileSet, LuaTileMap, LuaAutoTileSheet, LuaChunkMap, LuaIsoMap, LuaMapBlock, LuaMapGroup, LuaMapScript, LuaMapGen from lua_api/tilemap_api.rs → src/tilemap/ |
-| **B-04** No business logic in closures | ⚠️ WARNING | '<closure@1521>' (17 LOC, line 1521) — extract body to src/tilemap/ \| '<closure@1900>' (112 LOC, line 1900) — extract body to src/tilemap/ \| '<closure@2020>' (36 LOC, line 2020) — extract body to src/tilemap/ \| '<closure@1682>' has if/match/for — extract to src/tilemap/ \| '<closure@1731>' has if/match/for — extract to src/tilemap/ |
+| **B-04** No business logic in closures | ⚠️ WARNING | '<closure@1519>' (17 LOC, line 1519) — extract body to src/tilemap/ \| '<closure@1898>' (112 LOC, line 1898) — extract body to src/tilemap/ \| '<closure@2018>' (36 LOC, line 2018) — extract body to src/tilemap/ \| '<closure@1680>' has if/match/for — extract to src/tilemap/ \| '<closure@1729>' has if/match/for — extract to src/tilemap/ |
 | **B-05** Rc clone pattern | ✅ PASS | Rc clone pattern looks correct |
-| **B-06** Flat registration body | ❌ ERROR | tbl.set() inside {} block (anti-pattern): line 30, line 845, line 1682 |
+| **B-06** Flat registration body | ❌ ERROR | tbl.set() inside {} block (anti-pattern): line 30, line 845, line 1680 |
 
 ### Phase 6 — Architecture Compliance
 
 | Check | Verdict | Details |
 |-------|---------|---------|
 | **R-01** Tier placement | ✅ PASS | Tier label matches: tier2 |
-| **R-02** Dependency direction | ❌ ERROR | chunk: Tier2 imports log_msg(unassigned); mapgen: Tier2 imports log_msg(unassigned); tilemap: Tier2 imports log_msg(unassigned); tileset: Tier2 imports log_msg(unassigned); tmx: Tier2 imports log_msg(unassigned) |
+| **R-02** Dependency direction | ✅ PASS | All imports follow tier2 rules |
 | **R-03** No lua_api import | ✅ PASS | No lua_api imports found |
 | **R-04** Design assumptions | 🔵 MANUAL | Verify against docs/architecture/philosophy.md |
 | **R-05** Module overlap | 🔵 MANUAL | Check for scope duplication with other modules |
@@ -107,7 +103,7 @@
 | **T-01** Rust test file | ✅ PASS | Found: tests\rust\unit\tilemap_tests.rs |
 | **T-02** Lua test file | ✅ PASS | tests/lua/unit/test_tilemap.lua registered in harness |
 | **T-03** Test naming | ✅ PASS | Test names follow convention |
-| **T-04** Float comparisons | ❌ ERROR | assert_eq! with float literals (use abs()<epsilon): line 152, line 154, line 383, line 384, line 388 |
+| **T-04** Float comparisons | ❌ ERROR | assert_eq! with float literals (use abs()<epsilon): line 1384, line 1385, line 1387, line 1455, line 1456 |
 | **T-05** Test adequacy | ✅ PASS | 159 tests / 228 pub methods (70%) |
 | **T-06** Golden tests | 🔵 MANUAL | Check if module qualifies for golden/snapshot tests |
 | **T-07** Tests pass | 🔵 MANUAL | Run: cargo test --test tilemap_tests -- --nocapture |
@@ -117,10 +113,10 @@
 | Check | Verdict | Details |
 |-------|---------|---------|
 | **W-01** Example file exists | ✅ PASS | content/examples/tilemap.lua present |
-| **W-02** API surface coverage | ❌ ERROR | Functions absent from content/examples/tilemap.lua: FLOOR, NORTH_WALL, WEST_WALL, OBJECT |
+| **W-02** API surface coverage | ✅ PASS | All 34 bound functions in example |
 | **W-03** Example comments | 🔵 MANUAL | Verify content/examples/tilemap.lua has realistic one-line comments per call |
-| **W-04** Example–spec sync | ⚠️ WARNING | In example but not spec: loadTMX, newMapGen, newMapScript — add to ## Lua API in specs/tilemap.md |
-| **W-05** Wiki page | ✅ PASS | wiki\Tilemap-API.md |
+| **W-04** Example–spec sync | ✅ PASS | Missing spec or example — other checks cover this |
+| **W-05** Wiki page | ✅ PASS | docs\wiki\Tilemap-API.md |
 | **W-06** Changelog entry | 🔵 MANUAL | Verify recent API changes have docs/CHANGELOG.md entries |
 
 ### Phase 9 — Code Quality

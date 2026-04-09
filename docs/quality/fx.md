@@ -1,6 +1,6 @@
 # Module Quality Report: `fx`
 
-> **Status**: 🔴 FAIL  |  **Date**: 2026-04-09  |  **Score**: 34 ✅ / 7 ⚠️ / 7 ❌ / 19 🔵
+> **Status**: 🔴 FAIL  |  **Date**: 2026-04-09  |  **Score**: 39 ✅ / 5 ⚠️ / 4 ❌ / 19 🔵
 
 ---
 
@@ -8,12 +8,9 @@
 
 ### 🔴 Errors — Must Fix Before Merge
 
-- [ ] **SP-04** — Lua API completeness: Missing from spec: newPass, getEffectTypes — add to ## Lua API in specs/fx.md
-- [ ] **D-06** — Lua API file docs: lua_api/fx_api.rs missing //! module-level doc
-- [ ] **D-08** — No rustdoc in lua_api: Rustdoc sections found (use @param/@return): # Parameters
+- [ ] **SP-04** — Lua API completeness: Missing from spec: newPass, getEffectTypes — add to ## Lua API in docs/specs/fx.md
 - [ ] **B-02** — Registration-only: struct definitions (move to src/fx/): LuaPostFxEffect, LuaPostFxStack, LuaImageEffect, LuaOverlay
 - [ ] **B-03** — impl LuaUserData placement: Move impl LuaUserData for LuaPostFxEffect, LuaPostFxStack, LuaImageEffect, LuaOverlay from lua_api/fx_api.rs → src/fx/
-- [ ] **B-06** — Flat registration body: tbl.set() inside {} block (anti-pattern): line 1119
 - [ ] **T-02** — Lua test file: Module has Lua API but no tests/lua/unit/test_fx.lua
 
 ### 🟡 Warnings — Should Fix
@@ -21,10 +18,8 @@
 - [ ] **A-02** — Template structure: Missing recommended sections: Key Types, Lua API Summary
 - [ ] **A-04b** — Source Files completeness (incl. subdirs): Nested .rs files not listed in AGENT.md: mod.rs
 - [ ] **SP-03** — Summary quality: Summary very long (2118 chars)
-- [ ] **SP-05** — Key Types accuracy: Types not in spec: AmbientState, CloudState, FadeState, FilmGrainState, FlashState | Stale in spec: Enums, Structs
-- [ ] **B-04** — No business logic in closures: '<closure@1154>' (19 LOC, line 1154) — extract body to src/fx/ | '<closure@1184>' (45 LOC, line 1184) — extract body to src/fx/
+- [ ] **B-04** — No business logic in closures: '<closure@1192>' (19 LOC, line 1192) — extract body to src/fx/ | '<closure@1222>' (45 LOC, line 1222) — extract body to src/fx/
 - [ ] **R-01** — Tier placement: Module not in tier registry — verify placement
-- [ ] **W-04** — Example–spec sync: In example but not spec: getEffectTypes, newPass — add to ## Lua API in specs/fx.md
 
 ## Full Check Results
 
@@ -47,7 +42,7 @@
 | **A-02** Template structure | ⚠️ WARNING | Missing recommended sections: Key Types, Lua API Summary |
 | **A-03** Purpose quality | ✅ PASS | Purpose section is 262 chars |
 | **A-04** Content sync | ✅ PASS | All .rs files listed |
-| **A-05** Spec pointer | ✅ PASS | specs/fx.md exists |
+| **A-05** Spec pointer | ✅ PASS | docs/specs/fx.md exists |
 | **A-06** Tier label | ✅ PASS | Tier label present (expected: unassigned) |
 | **A-04b** Source Files completeness (incl. subdirs) | ⚠️ WARNING | Nested .rs files not listed in AGENT.md: mod.rs |
 
@@ -55,11 +50,11 @@
 
 | Check | Verdict | Details |
 |-------|---------|---------|
-| **SP-01** Spec file exists | ✅ PASS | specs/fx.md exists |
+| **SP-01** Spec file exists | ✅ PASS | docs/specs/fx.md exists |
 | **SP-02** Required spec sections | ✅ PASS | All required sections present |
 | **SP-03** Summary quality | ⚠️ WARNING | Summary very long (2118 chars) |
-| **SP-04** Lua API completeness | ❌ ERROR | Missing from spec: newPass, getEffectTypes — add to ## Lua API in specs/fx.md |
-| **SP-05** Key Types accuracy | ⚠️ WARNING | Types not in spec: AmbientState, CloudState, FadeState, FilmGrainState, FlashState \| Stale in spec: Enums, Structs |
+| **SP-04** Lua API completeness | ❌ ERROR | Missing from spec: newPass, getEffectTypes — add to ## Lua API in docs/specs/fx.md |
+| **SP-05** Key Types accuracy | ✅ PASS | 18 types — spec Key Types in sync |
 | **SP-06** Spec quality | ✅ PASS | No stub content |
 
 ### Phase 4 — Docstrings
@@ -71,9 +66,9 @@
 | **D-03** Structured doc sections | ✅ PASS | All pub structs/enums have structured doc sections |
 | **D-04** Doc quality | ✅ PASS | No stub docs found |
 | **D-05** Validation tool | 🔵 MANUAL | Run: python tools/docs/collect_docs.py --report-missing \| grep src/<module> |
-| **D-06** Lua API file docs | ❌ ERROR | lua_api/fx_api.rs missing //! module-level doc |
+| **D-06** Lua API file docs | ✅ PASS | //! doc comment present |
 | **D-07** @param/@return annotations | ✅ PASS | All bindings have @param/@return annotations |
-| **D-08** No rustdoc in lua_api | ❌ ERROR | Rustdoc sections found (use @param/@return): # Parameters |
+| **D-08** No rustdoc in lua_api | ✅ PASS | No rustdoc sections in Lua API file |
 | **D-09** Section separators | ✅ PASS | Separators present |
 
 ### Phase 5 — Lua↔Rust Bridge
@@ -83,9 +78,9 @@
 | **B-01** Dedicated API file | ✅ PASS | lua_api/fx_api.rs present |
 | **B-02** Registration-only | ❌ ERROR | struct definitions (move to src/fx/): LuaPostFxEffect, LuaPostFxStack, LuaImageEffect, LuaOverlay |
 | **B-03** impl LuaUserData placement | ❌ ERROR | Move impl LuaUserData for LuaPostFxEffect, LuaPostFxStack, LuaImageEffect, LuaOverlay from lua_api/fx_api.rs → src/fx/ |
-| **B-04** No business logic in closures | ⚠️ WARNING | '<closure@1154>' (19 LOC, line 1154) — extract body to src/fx/ \| '<closure@1184>' (45 LOC, line 1184) — extract body to src/fx/ |
+| **B-04** No business logic in closures | ⚠️ WARNING | '<closure@1192>' (19 LOC, line 1192) — extract body to src/fx/ \| '<closure@1222>' (45 LOC, line 1222) — extract body to src/fx/ |
 | **B-05** Rc clone pattern | ✅ PASS | Rc clone pattern looks correct |
-| **B-06** Flat registration body | ❌ ERROR | tbl.set() inside {} block (anti-pattern): line 1119 |
+| **B-06** Flat registration body | ✅ PASS | All tbl.set() calls are flat statements |
 
 ### Phase 6 — Architecture Compliance
 
@@ -116,8 +111,8 @@
 | **W-01** Example file exists | ✅ PASS | content/examples/fx.lua present |
 | **W-02** API surface coverage | ✅ PASS | All 8 bound functions in example |
 | **W-03** Example comments | 🔵 MANUAL | Verify content/examples/fx.lua has realistic one-line comments per call |
-| **W-04** Example–spec sync | ⚠️ WARNING | In example but not spec: getEffectTypes, newPass — add to ## Lua API in specs/fx.md |
-| **W-05** Wiki page | ✅ PASS | wiki\Fx-API.md |
+| **W-04** Example–spec sync | ✅ PASS | Missing spec or example — other checks cover this |
+| **W-05** Wiki page | ✅ PASS | docs\wiki\Fx-API.md |
 | **W-06** Changelog entry | 🔵 MANUAL | Verify recent API changes have docs/CHANGELOG.md entries |
 
 ### Phase 9 — Code Quality

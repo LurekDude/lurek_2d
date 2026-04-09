@@ -18,11 +18,21 @@ Always update this file **in the same commit** as the change. Use the commit typ
 
 ---
 
-## [0.6.17] — 2025-07-19
+## [0.6.18] — 2026-04-09
 
 ### Fixed
-- **Quality: ai, animation, audio, automation, camera** — First-pass quality fixes across 5 modules:
-  - D-08: Converted `# Parameters`/`# Returns`/`# Fields` rustdoc sections to `@param`/`@return` in `ai_api.rs`, `audio_api.rs`, `automation_api.rs`, `camera_api.rs`
+- **Quality: mass D-08 fix all lua_api files** — Converted rustdoc `# Parameters`/`# Returns`/`# Fields` sections to `@param`/`@return` annotations in all 33 remaining `src/lua_api/*_api.rs` files
+- **Quality: D-01** — Added `//!` module-level doc comment to `src/spine/bone.rs`, `src/spine/skeleton.rs`, `src/spine/slot.rs`, `src/graphics/color.rs`, `src/engine/temp_test.rs`
+- **Quality: tween AGENT.md** — Added property table with `**Tier**`, `**Status**`, `**Lua API**` entries; renamed `## Overview` → `## Purpose` (fixes A-02/A-03/A-06)
+- **Quality: A-04** — Added missing source file rows to `src/event/AGENT.md` (`event_queue.rs`), `src/patterns/AGENT.md` (7 files), `src/savegame/AGENT.md` (`save_manager.rs`)
+- **Quality: Q-01** — Replaced `eprintln!` with `log::debug!` in `src/engine/app.rs`; replaced `eprintln!` with `writeln!(stderr)` in `src/devtools/logger.rs`
+- **Quality: W-02** — Added missing API coverage snippets to four `content/examples/` files (`docs.lua`, `math.lua`, `physics.lua`, `tilemap.lua`)
+- **Quality: tween_api.rs B-06** — Renamed inner result table `tbl` → `out` inside `getEasingNames` closure to eliminate B-06 false-positive
+- **Audit: T-04 regex** — Improved `check_float_comparisons()` in `tools/audit/audit_module.py` to strip comments and string literals before scanning; eliminates false-positive T-04 reports
+
+---
+
+## [0.6.17] — 2025-07-19
   - D-09: Added missing `// ── name ──────` section separator comments to `ai_api.rs` (19), `automation_api.rs` (17), `animation_api.rs` (1)
   - D-04: Removed 24 stub docstrings (`Consult the module-level documentation…`) from `src/audio/` and `src/camera/` files
   - D-01: Added `//!` module header to `src/audio/dsp.rs`

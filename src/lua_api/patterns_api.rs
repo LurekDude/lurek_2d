@@ -1,4 +1,4 @@
-﻿//! Registers the `luna.patterns.*` software design patterns API.
+//! Registers the `luna.patterns.*` software design patterns API.
 //!
 //! Provides factory functions and UserData wrappers for reusable patterns:
 //! EventBus (prioritized pub-sub), ObjectPool (object reuse), CommandStack

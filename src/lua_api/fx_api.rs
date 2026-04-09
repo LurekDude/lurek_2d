@@ -1,4 +1,4 @@
-﻿//! `luna.postfx` — Composable visual effects: post-processing pipeline and screen overlays.
+//! `luna.postfx` — Composable visual effects: post-processing pipeline and screen overlays.
 
 use super::SharedState;
 use mlua::prelude::*;
@@ -105,34 +105,66 @@ impl LuaUserData for LuaPostFxEffect {
         });
 
         // -- type -- (Lurek2D typeOf protocol)
+        /// Returns the type name "PostFxEffect".
+        /// @return string
         methods.add_method("type", |_, _, ()| Ok("PostFxEffect"));
+        /// Returns true when the given name matches "PostFxEffect" or a parent type.
+        /// @param name : string
+        /// @return boolean
         methods.add_method("typeOf", |_, _, name: String| Ok(name == "PostFxEffect" || name == "Object"));
 
         // -- convenience setters --
+        /// Sets the threshold parameter of this effect.
+        /// @param value : number
+        /// @return nil
         methods.add_method_mut("setThreshold", |_, this, v: f32| {
             this.inner.borrow_mut().set_parameter("threshold", v); Ok(())
         });
+        /// Sets the intensity parameter of this effect.
+        /// @param value : number
+        /// @return nil
         methods.add_method_mut("setIntensity", |_, this, v: f32| {
             this.inner.borrow_mut().set_parameter("intensity", v); Ok(())
         });
+        /// Sets the radius parameter of this effect.
+        /// @param value : number
+        /// @return nil
         methods.add_method_mut("setRadius", |_, this, v: f32| {
             this.inner.borrow_mut().set_parameter("radius", v); Ok(())
         });
+        /// Sets the strength parameter of this effect.
+        /// @param value : number
+        /// @return nil
         methods.add_method_mut("setStrength", |_, this, v: f32| {
             this.inner.borrow_mut().set_parameter("strength", v); Ok(())
         });
+        /// Sets the scanline strength parameter of this effect.
+        /// @param value : number
+        /// @return nil
         methods.add_method_mut("setScanlineStrength", |_, this, v: f32| {
             this.inner.borrow_mut().set_parameter("scanline_strength", v); Ok(())
         });
+        /// Sets the offset parameter of this effect.
+        /// @param value : number
+        /// @return nil
         methods.add_method_mut("setOffset", |_, this, v: f32| {
             this.inner.borrow_mut().set_parameter("offset", v); Ok(())
         });
+        /// Sets the brightness parameter of this effect.
+        /// @param value : number
+        /// @return nil
         methods.add_method_mut("setBrightness", |_, this, v: f32| {
             this.inner.borrow_mut().set_parameter("brightness", v); Ok(())
         });
+        /// Sets the contrast parameter of this effect.
+        /// @param value : number
+        /// @return nil
         methods.add_method_mut("setContrast", |_, this, v: f32| {
             this.inner.borrow_mut().set_parameter("contrast", v); Ok(())
         });
+        /// Sets the saturation parameter of this effect.
+        /// @param value : number
+        /// @return nil
         methods.add_method_mut("setSaturation", |_, this, v: f32| {
             this.inner.borrow_mut().set_parameter("saturation", v); Ok(())
         });
@@ -316,8 +348,13 @@ impl LuaUserData for LuaPostFxStack {
         methods.add_method("isCapturing", |_, this, ()| Ok(this.inner.capturing));
 
         // -- type --
+        /// Returns the type name "PostFxStack".
+        /// @return string
         methods.add_method("type", |_, _, ()| Ok("PostFxStack"));
         // -- typeOf --
+        /// Returns true when the given name matches "PostFxStack" or a parent type.
+        /// @param name : string
+        /// @return boolean
         methods.add_method("typeOf", |_, _, name: String| {
             Ok(name == "PostFxStack" || name == "Object")
         });
@@ -429,8 +466,13 @@ impl LuaUserData for LuaImageEffect {
         methods.add_method("save", |_, _, ()| Ok(true));
 
         // -- type --
+        /// Returns the type name "ImageEffect".
+        /// @return string
         methods.add_method("type", |_, _, ()| Ok("ImageEffect"));
         // -- typeOf --
+        /// Returns true when the given name matches "ImageEffect" or a parent type.
+        /// @param name : string
+        /// @return boolean
         methods.add_method("typeOf", |_, _, name: String| {
             Ok(name == "ImageEffect" || name == "Object")
         });
@@ -1077,11 +1119,9 @@ impl LuaUserData for LuaOverlay {
 // -------------------------------------------------------------------------------
 
 /// Registers the `lurek.postfx` API table with the Lua VM.
-///
-/// # Parameters
-/// - `lua` — `&Lua`.
-/// - `luna` — `&LuaTable`.
-/// - `_state` — `Rc<RefCell<SharedState>>`.
+/// @param lua : &Lua
+/// @param luna : &LuaTable
+/// @param _state : Rc<RefCell<SharedState>>
 pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> LuaResult<()> {
     let tbl = lua.create_table()?;
 
@@ -1116,24 +1156,22 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
     /// @param width : integer?
     /// @param height : integer?
     /// @return PostFxStack
-    {
-        let state = state.clone();
-        tbl.set(
-            "newStack",
-            lua.create_function(move |lua, (w, h): (Option<u32>, Option<u32>)| {
-                let (default_w, default_h) = {
-                    let s = state.borrow();
-                    (s.window_width, s.window_height)
-                };
-                let w = w.unwrap_or(default_w);
-                let h = h.unwrap_or(default_h);
-                lua.create_userdata(LuaPostFxStack {
-                    inner: PostFxStack::new(w, h),
-                    effects: Vec::new(),
-                })
-            })?,
-        )?;
-    }
+    let s = state.clone();
+    tbl.set(
+        "newStack",
+        lua.create_function(move |lua, (w, h): (Option<u32>, Option<u32>)| {
+            let (default_w, default_h) = {
+                let s = s.borrow();
+                (s.window_width, s.window_height)
+            };
+            let w = w.unwrap_or(default_w);
+            let h = h.unwrap_or(default_h);
+            lua.create_userdata(LuaPostFxStack {
+                inner: PostFxStack::new(w, h),
+                effects: Vec::new(),
+            })
+        })?,
+    )?;
 
     // -- newPass --
     /// Creates a custom-shader post-processing effect (alias for newCustomEffect).

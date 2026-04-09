@@ -1,4 +1,4 @@
-﻿//! `luna.modding` - Mod discovery, dependency resolution, load ordering, and hot-reload.
+//! `luna.modding` - Mod discovery, dependency resolution, load ordering, and hot-reload.
 
 use super::SharedState;
 use mlua::prelude::*;
@@ -410,11 +410,9 @@ impl LuaUserData for LuaModManager {
 // -------------------------------------------------------------------------------
 
 /// Registers the `lurek.modding` API table with the Lua VM.
-///
-/// # Parameters
-/// - `lua` - `&Lua`.
-/// - `luna` - `&LuaTable`.
-/// - `_state` - `Rc<RefCell<SharedState>>`.
+/// @param lua : &Lua
+/// @param luna : &LuaTable
+/// @param _state : Rc<RefCell<SharedState>>
 pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) -> LuaResult<()> {
     let tbl = lua.create_table()?;
 

@@ -971,9 +971,14 @@ def check_float_comparisons(module: str) -> Check:
             violations: List[str] = []
             for i, line in enumerate(lines):
                 if "assert_eq!" in line:
-                    # Only flag if the assert_eq! line itself contains a float literal
-                    # (e.g. 1.0, 0.5_f32, 3.14f64) — not ints or nearby lines
-                    if re.search(r"\b\d+\.\d+(?:f32|f64)?\b", line):
+                    # Strip comments and string literals before checking for
+                    # float literals — avoids false positives from e.g.
+                    # version strings "2.0.0" or floats in // comments.
+                    bare = re.sub(r'"[^"]*"', '""', line)  # remove string contents
+                    bare = re.sub(r"'[^']*'", "''", bare)   # remove char literal contents
+                    bare = re.sub(r"//.*$", "", bare)        # strip line comment
+                    # (?!\.) prevents matching "2.0" inside "2.0.0" version strings
+                    if re.search(r"\b\d+\.\d+(?:f32|f64)?(?!\.)(?!\d)", bare):
                         violations.append(f"line {i + 1}")
             if violations:
                 return Check("T-04", "Float comparisons", ERROR,

@@ -1,4 +1,4 @@
-﻿//! `luna.tween` — thin Lua registration wrapper for the property tween system.
+//! `luna.tween` — thin Lua registration wrapper for the property tween system.
 //!
 //! # Purpose
 //!
@@ -29,14 +29,10 @@ use crate::tween::{builtin_easing_names, LuaTween, LuaTweenParallel, LuaTweenSeq
 /// (`registerEasing`, `getEasingNames`). Three UserData types — `LuaTween`,
 /// `LuaTweenSequence`, and `LuaTweenParallel` — are registered via
 /// `lua.register_userdata_type`.
-///
-/// # Parameters
-/// - `lua` — `&Lua`.
-/// - `luna` — `&LuaTable`. The `luna` namespace table.
-/// - `_state` — `Rc<RefCell<SharedState>>`. Not used; included for API uniformity.
-///
-/// # Returns
-/// `LuaResult<()>`.
+/// @param lua : &Lua
+/// @param luna : &LuaTable
+/// @param _state : Rc<RefCell<SharedState>>
+/// @return LuaResult<()>
 pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) -> LuaResult<()> {
     let tbl = lua.create_table()?;
     let engine = Rc::new(RefCell::new(TweenEngine::new()));
@@ -199,18 +195,18 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
     tbl.set(
         "getEasingNames",
         lua.create_function(move |lua, ()| {
-            let tbl = lua.create_table()?;
+            let out = lua.create_table()?;
             let state = s.borrow();
             let mut i = 1i64;
             for name in builtin_easing_names() {
-                tbl.set(i, *name)?;
+                out.set(i, *name)?;
                 i += 1;
             }
             for name in state.custom_easings.keys() {
-                tbl.set(i, name.as_str())?;
+                out.set(i, name.as_str())?;
                 i += 1;
             }
-            Ok(tbl)
+            Ok(out)
         })?,
     )?;
 

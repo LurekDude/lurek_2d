@@ -335,8 +335,13 @@ impl LuaUserData for LuaStep {
         });
 
         // -- type --
+        /// Returns the type name "PipelineStep".
+        /// @return string
         methods.add_method("type", |_, _, ()| Ok("PipelineStep"));
         // -- typeOf --
+        /// Returns true when the given name matches "PipelineStep" or a parent type.
+        /// @param name : string
+        /// @return boolean
         methods.add_method("typeOf", |_, _, name: String| Ok(name == "PipelineStep" || name == "Object"));
 
     }
@@ -975,14 +980,10 @@ impl LuaUserData for LuaPipeline {
 // -------------------------------------------------------------------------------
 
 /// Registers the `lurek.pipeline` API table with the Lua VM.
-///
-/// # Parameters
-/// - `lua` — `&Lua`. The Lua VM.
-/// - `luna` — `&LuaTable`. The top-level `luna` table to register into.
-/// - `_state` — `Rc<RefCell<SharedState>>`. Shared engine state.
-///
-/// # Returns
-/// `LuaResult<()>`.
+/// @param lua : &Lua
+/// @param luna : &LuaTable
+/// @param _state : Rc<RefCell<SharedState>>
+/// @return LuaResult<()>
 pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) -> LuaResult<()> {
     let tbl = lua.create_table()?;
 

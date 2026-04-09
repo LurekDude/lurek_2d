@@ -1,6 +1,6 @@
 # Module Quality Report: `spine`
 
-> **Status**: 🔴 FAIL  |  **Date**: 2026-04-09  |  **Score**: 37 ✅ / 6 ⚠️ / 5 ❌ / 19 🔵
+> **Status**: 🔴 FAIL  |  **Date**: 2026-04-09  |  **Score**: 41 ✅ / 5 ⚠️ / 2 ❌ / 19 🔵
 
 ---
 
@@ -8,20 +8,16 @@
 
 ### 🔴 Errors — Must Fix Before Merge
 
-- [ ] **D-01** — Module-level docs: Missing //! doc in: spine/bone.rs, spine/skeleton.rs, spine/slot.rs
-- [ ] **D-08** — No rustdoc in lua_api: Rustdoc sections found (use @param/@return): # Parameters
 - [ ] **B-02** — Registration-only: struct definitions (move to src/spine/): LuaSkeleton
 - [ ] **B-03** — impl LuaUserData placement: Move impl LuaUserData for LuaSkeleton from lua_api/spine_api.rs → src/spine/
-- [ ] **T-04** — Float comparisons: assert_eq! with float literals (use abs()<epsilon): line 20, line 21, line 32, line 38, line 60
 
 ### 🟡 Warnings — Should Fix
 
 - [ ] **A-02** — Template structure: Missing recommended sections: Key Types, Lua API Summary
 - [ ] **A-04b** — Source Files completeness (incl. subdirs): Nested .rs files not listed in AGENT.md: mod.rs
 - [ ] **SP-03** — Summary quality: Summary very long (2143 chars)
-- [ ] **SP-05** — Key Types accuracy: Types not in spec: Bone, BoneParams, Skeleton, Slot | Stale in spec: Enums, Structs, spine
 - [ ] **R-01** — Tier placement: Module not in tier registry — verify placement
-- [ ] **W-05** — Wiki page: No wiki page found (expected wiki/Spine-API.md)
+- [ ] **W-05** — Wiki page: No wiki page found (expected docs/wiki/Spine-API.md)
 
 ## Full Check Results
 
@@ -44,7 +40,7 @@
 | **A-02** Template structure | ⚠️ WARNING | Missing recommended sections: Key Types, Lua API Summary |
 | **A-03** Purpose quality | ✅ PASS | Purpose section is 455 chars |
 | **A-04** Content sync | ✅ PASS | All .rs files listed |
-| **A-05** Spec pointer | ✅ PASS | specs/spine.md exists |
+| **A-05** Spec pointer | ✅ PASS | docs/specs/spine.md exists |
 | **A-06** Tier label | ✅ PASS | Tier label present (expected: unassigned) |
 | **A-04b** Source Files completeness (incl. subdirs) | ⚠️ WARNING | Nested .rs files not listed in AGENT.md: mod.rs |
 
@@ -52,25 +48,25 @@
 
 | Check | Verdict | Details |
 |-------|---------|---------|
-| **SP-01** Spec file exists | ✅ PASS | specs/spine.md exists |
+| **SP-01** Spec file exists | ✅ PASS | docs/specs/spine.md exists |
 | **SP-02** Required spec sections | ✅ PASS | All required sections present |
 | **SP-03** Summary quality | ⚠️ WARNING | Summary very long (2143 chars) |
 | **SP-04** Lua API completeness | ✅ PASS | All 1 bound functions in spec |
-| **SP-05** Key Types accuracy | ⚠️ WARNING | Types not in spec: Bone, BoneParams, Skeleton, Slot \| Stale in spec: Enums, Structs, spine |
+| **SP-05** Key Types accuracy | ✅ PASS | 4 types — spec Key Types in sync |
 | **SP-06** Spec quality | ✅ PASS | No stub content |
 
 ### Phase 4 — Docstrings
 
 | Check | Verdict | Details |
 |-------|---------|---------|
-| **D-01** Module-level docs | ❌ ERROR | Missing //! doc in: spine/bone.rs, spine/skeleton.rs, spine/slot.rs |
+| **D-01** Module-level docs | ✅ PASS | All files have //! doc comments |
 | **D-02** Public item docs | ✅ PASS | All pub items have /// docs |
 | **D-03** Structured doc sections | ✅ PASS | All pub structs/enums have structured doc sections |
 | **D-04** Doc quality | ✅ PASS | No stub docs found |
 | **D-05** Validation tool | 🔵 MANUAL | Run: python tools/docs/collect_docs.py --report-missing \| grep src/<module> |
 | **D-06** Lua API file docs | ✅ PASS | //! doc comment present |
 | **D-07** @param/@return annotations | ✅ PASS | All bindings have @param/@return annotations |
-| **D-08** No rustdoc in lua_api | ❌ ERROR | Rustdoc sections found (use @param/@return): # Parameters |
+| **D-08** No rustdoc in lua_api | ✅ PASS | No rustdoc sections in Lua API file |
 | **D-09** Section separators | ✅ PASS | < 3 bindings — skip |
 
 ### Phase 5 — Lua↔Rust Bridge
@@ -101,7 +97,7 @@
 | **T-01** Rust test file | ✅ PASS | Found: tests\rust\unit\spine_tests.rs |
 | **T-02** Lua test file | ✅ PASS | tests/lua/unit/test_spine.lua registered in harness |
 | **T-03** Test naming | ✅ PASS | Test names follow convention |
-| **T-04** Float comparisons | ❌ ERROR | assert_eq! with float literals (use abs()<epsilon): line 20, line 21, line 32, line 38, line 60 |
+| **T-04** Float comparisons | ✅ PASS | No float assert_eq! found |
 | **T-05** Test adequacy | ✅ PASS | 13 tests / 15 pub methods (87%) |
 | **T-06** Golden tests | 🔵 MANUAL | Check if module qualifies for golden/snapshot tests |
 | **T-07** Tests pass | 🔵 MANUAL | Run: cargo test --test spine_tests -- --nocapture |
@@ -113,8 +109,8 @@
 | **W-01** Example file exists | ✅ PASS | content/examples/spine.lua present |
 | **W-02** API surface coverage | ✅ PASS | All 1 bound functions in example |
 | **W-03** Example comments | 🔵 MANUAL | Verify content/examples/spine.lua has realistic one-line comments per call |
-| **W-04** Example–spec sync | ✅ PASS | All 1 functions consistent across spec and example |
-| **W-05** Wiki page | ⚠️ WARNING | No wiki page found (expected wiki/Spine-API.md) |
+| **W-04** Example–spec sync | ✅ PASS | Missing spec or example — other checks cover this |
+| **W-05** Wiki page | ⚠️ WARNING | No wiki page found (expected docs/wiki/Spine-API.md) |
 | **W-06** Changelog entry | 🔵 MANUAL | Verify recent API changes have docs/CHANGELOG.md entries |
 
 ### Phase 9 — Code Quality

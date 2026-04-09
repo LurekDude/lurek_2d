@@ -24,8 +24,9 @@ just valid Lua source.
 
 | File           | Purpose                                                                                 |
 |----------------|-----------------------------------------------------------------------------------------|
-| `mod.rs`       | Module root: `SlotMeta`, `SaveManager`, `SaveValue` enum, `serialize_table`/`serialize_value` functions, private Lua-string helpers, inline unit tests |
-| `save_data.rs` | Alternate copy of save data types (orphaned — not declared via `mod save_data;` in `mod.rs`) |
+| `mod.rs`            | Module root: `SlotMeta`, `SaveManager`, `SaveValue` enum, `serialize_table`/`serialize_value` functions, private Lua-string helpers, inline unit tests |
+| `save_data.rs`      | Alternate copy of save data types (orphaned — not declared via `mod save_data;` in `mod.rs`) |
+| `save_manager.rs`   | `SaveManager` implementation — slot management, load/save lifecycle, and file I/O |
 
 ## Full Specification
 

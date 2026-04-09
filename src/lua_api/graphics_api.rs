@@ -34,18 +34,26 @@ pub struct LuaImageData {
 
 impl LuaUserData for LuaImageData {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
+        /// Returns the pixel width of this image buffer.
+        /// @return integer
         methods.add_method("getWidth", |_, this, ()| Ok(this.inner.width()));
+        /// Returns the pixel height of this image buffer.
+        /// @return integer
         methods.add_method("getHeight", |_, this, ()| Ok(this.inner.height()));
+        /// Returns the type name "ImageData".
+        /// @return string
         methods.add_method("type", |_, _, ()| Ok("ImageData"));
+        /// Returns true when the given name matches "ImageData" or a parent type.
+        /// @param name : string
+        /// @return boolean
         methods.add_method("typeOf", |_, _, name: String| {
             Ok(name == "ImageData" || name == "Object")
         });
     }
 }
 
-/// # Fields
-/// - `state` — `Rc<RefCell<SharedState>>`. Shared engine state.
-/// - `key` — `TextureKey`. Slot key for the backing GPU texture.
+/// Lua-side handle to a loaded GPU texture stored in the engine's texture pool.
+/// Fields: state (Rc<RefCell<SharedState>>), key (TextureKey).
 #[derive(Clone)]
 pub struct LuaImage {
     pub(crate) state: Rc<RefCell<SharedState>>,
@@ -85,7 +93,12 @@ impl LuaUserData for LuaNineSlice {
             "draw",
             |_, _, (_x, _y, _w, _h): (f32, f32, f32, f32)| Ok(()),
         );
+        /// Returns the type name "NineSlice".
+        /// @return string
         methods.add_method("type", |_, _, ()| Ok("NineSlice"));
+        /// Returns true when the given name matches "NineSlice" or a parent type.
+        /// @param name : string
+        /// @return boolean
         methods.add_method("typeOf", |_, _, name: String| {
             Ok(name == "NineSlice" || name == "Object")
         });
@@ -157,10 +170,7 @@ impl LuaUserData for LuaImage {
 // -------------------------------------------------------------------------------
 
 /// Lua-side handle to a loaded font stored in SharedState.
-///
-/// # Fields
-/// - `state` — `Rc<RefCell<SharedState>>`. Shared engine state.
-/// - `key` — `FontKey`. Slot key for the backing rasterised font.
+/// Fields: state (Rc<RefCell<SharedState>>), key (FontKey).
 #[derive(Clone)]
 pub struct LuaFont {
     pub(crate) state: Rc<RefCell<SharedState>>,
@@ -295,10 +305,7 @@ impl LuaUserData for LuaFont {
 // -------------------------------------------------------------------------------
 
 /// Lua-side handle to an off-screen render target stored in SharedState.
-///
-/// # Fields
-/// - `state` — `Rc<RefCell<SharedState>>`. Shared engine state.
-/// - `key` — `CanvasKey`. Slot key for the backing framebuffer canvas.
+/// Fields: state (Rc<RefCell<SharedState>>), key (CanvasKey).
 #[derive(Clone)]
 pub struct LuaCanvas {
     pub(crate) state: Rc<RefCell<SharedState>>,
@@ -373,10 +380,7 @@ impl LuaUserData for LuaCanvas {
 // -------------------------------------------------------------------------------
 
 /// Lua-side handle to a sprite batch stored in SharedState.
-///
-/// # Fields
-/// - `state` — `Rc<RefCell<SharedState>>`. Shared engine state.
-/// - `key` — `SpriteBatchKey`. Slot key for the backing sprite batch.
+/// Fields: state (Rc<RefCell<SharedState>>), key (SpriteBatchKey).
 #[derive(Clone)]
 pub struct LuaSpriteBatch {
     pub(crate) state: Rc<RefCell<SharedState>>,
@@ -483,10 +487,7 @@ impl LuaUserData for LuaSpriteBatch {
 // -------------------------------------------------------------------------------
 
 /// Lua-side handle to a mesh stored in SharedState.
-///
-/// # Fields
-/// - `state` — `Rc<RefCell<SharedState>>`. Shared engine state.
-/// - `key` — `MeshKey`. Slot key for the backing GPU mesh.
+/// Fields: state (Rc<RefCell<SharedState>>), key (MeshKey).
 #[derive(Clone)]
 pub struct LuaMesh {
     pub(crate) state: Rc<RefCell<SharedState>>,
@@ -595,10 +596,7 @@ impl LuaUserData for LuaMesh {
 // -------------------------------------------------------------------------------
 
 /// Lua-side handle to a compiled shader stored in SharedState.
-///
-/// # Fields
-/// - `state` — `Rc<RefCell<SharedState>>`. Shared engine state.
-/// - `key` — `ShaderKey`. Slot key for the backing shader program.
+/// Fields: state (Rc<RefCell<SharedState>>), key (ShaderKey).
 #[derive(Clone)]
 pub struct LuaShader {
     pub(crate) state: Rc<RefCell<SharedState>>,
@@ -666,14 +664,7 @@ impl LuaUserData for LuaShader {
 // -------------------------------------------------------------------------------
 
 /// Lua-side quad viewport into a texture.
-///
-/// # Fields
-/// - `x` — `f32`. Source rectangle left edge.
-/// - `y` — `f32`. Source rectangle top edge.
-/// - `w` — `f32`. Source rectangle width.
-/// - `h` — `f32`. Source rectangle height.
-/// - `sw` — `f32`. Reference texture width.
-/// - `sh` — `f32`. Reference texture height.
+/// Fields: x (f32), y (f32), w (f32), h (f32), sw (f32), sh (f32).
 #[derive(Clone)]
 pub struct LuaQuad {
     /// Source rectangle x.
@@ -1217,14 +1208,10 @@ impl LuaUserData for LuaDrawLayer {
 // ===============================================================================
 
 /// Registers the `lurek.gfx` namespace on the given Lua table.
-///
-/// # Parameters
-/// - `lua` — `&Lua`. The Lua VM.
-/// - `luna` — `&LuaTable`. The top-level `luna` table to register into.
-/// - `state` — `Rc<RefCell<SharedState>>`. Shared engine state.
-///
-/// # Returns
-/// `LuaResult<()>`.
+/// @param lua : &Lua
+/// @param luna : &LuaTable
+/// @param state : Rc<RefCell<SharedState>>
+/// @return LuaResult<()>
 pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> LuaResult<()> {
     let graphics = lua.create_table()?;
 

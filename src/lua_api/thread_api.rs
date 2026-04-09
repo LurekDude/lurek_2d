@@ -82,11 +82,9 @@ impl LuaUserData for LuaThreadHandle {
 // -------------------------------------------------------------------------------
 
 /// Registers the `lurek.thread` API table with the Lua VM.
-///
-/// # Parameters
-/// - `lua` — `&Lua`.
-/// - `luna` — `&LuaTable`.
-/// - `_state` — `Rc<RefCell<SharedState>>`.
+/// @param lua : &Lua
+/// @param luna : &LuaTable
+/// @param _state : Rc<RefCell<SharedState>>
 pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) -> LuaResult<()> {
     let tbl = lua.create_table()?;
     let named_channels: Arc<Mutex<HashMap<String, Arc<Channel>>>> =
