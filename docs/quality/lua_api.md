@@ -1,6 +1,6 @@
 # Module Quality Report: `lua_api`
 
-> **Status**: 🔴 FAIL  |  **Date**: 2026-04-09  |  **Score**: 35 ✅ / 5 ⚠️ / 8 ❌ / 19 🔵
+> **Status**: 🔴 FAIL  |  **Date**: 2026-04-09  |  **Score**: 36 ✅ / 5 ⚠️ / 7 ❌ / 19 🔵
 
 ---
 
@@ -9,10 +9,9 @@
 ### 🔴 Errors — Must Fix Before Merge
 
 - [ ] **S-02** — mod.rs simplicity: mod.rs has 144 logic lines — extract to named files
-- [ ] **S-03** — File size limits: Files >2000 LOC: lua_api/ai_api.rs (2200 LOC); lua_api/audio_api.rs (2279 LOC); lua_api/graphics_api.rs (3182 LOC); lua_api/gui_api.rs (4990 LOC); lua_api/math_api.rs (2058 LOC); lua_api/tilemap_api.rs (2058 LOC)
+- [ ] **S-03** — File size limits: Files >3000 LOC: lua_api/graphics_api.rs (3182 LOC); lua_api/gui_api.rs (4990 LOC)
 - [ ] **A-04** — Content sync: Files not in Source Files table: ai_api.rs, animation_api.rs, automation_api.rs, camera_api.rs, compute_api.rs, dataframe_api.rs, debugbridge_api.rs, devtools_api.rs, docs_api.rs, entity_api.rs, fx_api.rs, graph_api.rs, graphics_api.rs, gui_api.rs, light_api.rs, localization_api.rs, log_api.rs, lua_types.rs, minimap_api.rs, modding_api.rs, network_api.rs, pathfinding_api.rs, patterns_api.rs, pipeline_api.rs, procgen_api.rs, raycaster_api.rs, savegame_api.rs, scene_api.rs, serial_api.rs, spine_api.rs, thread_api.rs, tilemap_api.rs, tween_api.rs
 - [ ] **SP-02** — Required spec sections: Missing sections: Key Types
-- [ ] **D-02** — Public item docs: Undocumented pub items: patterns_api::register
 - [ ] **T-01** — Rust test file: No test file found for module 'lua_api'
 - [ ] **W-01** — Example file exists: content/examples/lua_api.lua not found — create it
 - [ ] **W-02** — API surface coverage: Skipped — no example file
@@ -20,7 +19,7 @@
 ### 🟡 Warnings — Should Fix
 
 - [ ] **A-04b** — Source Files completeness (incl. subdirs): Nested .rs files not listed in AGENT.md: ai_api.rs, animation_api.rs, automation_api.rs, camera_api.rs, compute_api.rs, dataframe_api.rs
-- [ ] **D-04** — Doc quality: Stub/placeholder docs found: fx_api:464, fx_api:1098, gui_api:813, gui_api:826, localization_api:243 (+1 more)
+- [ ] **D-04** — Doc quality: Stub/placeholder docs found: fx_api:488, fx_api:1118, gui_api:813, gui_api:826, localization_api:243 (+1 more)
 - [ ] **R-01** — Tier placement: No **Tier** row in AGENT.md; expected unassigned
 - [ ] **T-05** — Test adequacy: 7 pub methods, 0 Rust tests — create test file
 - [ ] **Q-04** — Error handling: .unwrap() calls: audio_api:2269, thread_api:49, thread_api:59, thread_api:67, thread_api:74 (+1 more)
@@ -33,7 +32,7 @@
 |-------|---------|---------|
 | **S-01** lib.rs registration | ✅ PASS | Registered in lib.rs |
 | **S-02** mod.rs simplicity | ❌ ERROR | mod.rs has 144 logic lines — extract to named files |
-| **S-03** File size limits | ❌ ERROR | Files >2000 LOC: lua_api/ai_api.rs (2200 LOC); lua_api/audio_api.rs (2279 LOC); lua_api/graphics_api.rs (3182 LOC); lua_api/gui_api.rs (4990 LOC); lua_api/math_api.rs (2058 LOC); lua_api/tilemap_api.rs (2058 LOC) |
+| **S-03** File size limits | ❌ ERROR | Files >3000 LOC: lua_api/graphics_api.rs (3182 LOC); lua_api/gui_api.rs (4990 LOC) |
 | **S-04** File naming | ✅ PASS | File names follow conventions |
 | **S-05** Module necessity | 🔵 MANUAL | Requires manual review — could this be pure Lua? |
 | **S-06** Large crate deps | 🔵 MANUAL | Requires manual review — check Cargo.toml for heavy crates |
@@ -66,9 +65,9 @@
 | Check | Verdict | Details |
 |-------|---------|---------|
 | **D-01** Module-level docs | ✅ PASS | All files have //! doc comments |
-| **D-02** Public item docs | ❌ ERROR | Undocumented pub items: patterns_api::register |
+| **D-02** Public item docs | ✅ PASS | All pub items have /// docs |
 | **D-03** Structured doc sections | ✅ PASS | All pub structs/enums have structured doc sections |
-| **D-04** Doc quality | ⚠️ WARNING | Stub/placeholder docs found: fx_api:464, fx_api:1098, gui_api:813, gui_api:826, localization_api:243 (+1 more) |
+| **D-04** Doc quality | ⚠️ WARNING | Stub/placeholder docs found: fx_api:488, fx_api:1118, gui_api:813, gui_api:826, localization_api:243 (+1 more) |
 | **D-05** Validation tool | 🔵 MANUAL | Run: python tools/docs/collect_docs.py --report-missing \| grep src/<module> |
 | **D-06** Lua API file docs | ✅ PASS | No Lua API file — skip |
 | **D-07** @param/@return annotations | ✅ PASS | No Lua API file — skip |

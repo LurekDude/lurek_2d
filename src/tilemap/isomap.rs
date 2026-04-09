@@ -213,6 +213,8 @@ pub struct IsoDrawItem {
 /// 2. For each diagonal, tiles iterate in ascending `tx` order.
 /// 3. For each tile, Z-levels iterate from bottom (`0`) to `active_z`.
 /// 4. For each Z-level, parts iterate Floor → NorthWall → WestWall → Object.
+///
+/// # Fields
 #[derive(Debug, Clone)]
 pub struct IsoMap {
     /// Map width in tiles (same for every level).

@@ -220,7 +220,7 @@ fn collides_with_layer_helper() {
 // ===========================================================================
 
 #[test]
-fn test_friction_slows_body() {
+fn friction_slows_body() {
     // Compare two worlds: high friction vs zero friction.
     // A dynamic body slides laterally on a static floor pushed against it by gravity.
     // Low friction should retain more x velocity than high friction.
@@ -264,7 +264,7 @@ fn test_friction_slows_body() {
 }
 
 #[test]
-fn test_angle_changes_under_torque() {
+fn angle_changes_under_torque() {
     // No torque applied: angle set via get_body_mut should be preserved after one step.
     let mut world = World::new(0.0, 0.0);
     world.add_body(Body::new(0.0, 0.0, BodyType::Dynamic));
@@ -279,7 +279,7 @@ fn test_angle_changes_under_torque() {
 }
 
 #[test]
-fn test_apply_impulse_changes_velocity() {
+fn apply_impulse_changes_velocity() {
     // apply_impulse writes to the rapier body; step() also syncs body.velocity
     // into rapier each frame. We reflect the impulse in body.velocity as well
     // so it survives the sync push and produces a readable result.
@@ -297,7 +297,7 @@ fn test_apply_impulse_changes_velocity() {
 }
 
 #[test]
-fn test_raycast_hits_body() {
+fn raycast_hits_body() {
     let mut world = World::new(0.0, 0.0);
     let mut body = Body::new(50.0, 50.0, BodyType::Static);
     body.shape = BodyShape::Rect {
@@ -319,14 +319,14 @@ fn test_raycast_hits_body() {
 }
 
 #[test]
-fn test_raycast_misses_empty_world() {
+fn raycast_misses_empty_world() {
     let world = World::new(0.0, 0.0);
     let hit = world.raycast(0.0, 0.0, 100.0, 0.0);
     assert!(hit.is_none(), "Expected no hit in an empty world");
 }
 
 #[test]
-fn test_joint_creation() {
+fn joint_creation() {
     let mut world = World::new(0.0, 0.0);
     world.add_body(Body::new(0.0, 0.0, BodyType::Dynamic));
     world.add_body(Body::new(50.0, 0.0, BodyType::Dynamic));
@@ -335,7 +335,7 @@ fn test_joint_creation() {
 }
 
 #[test]
-fn test_world_gravity_zero() {
+fn world_gravity_zero() {
     let mut world = World::new(0.0, 0.0);
     world.add_body(Body::new(0.0, 0.0, BodyType::Dynamic));
     for _ in 0..60 {
@@ -355,7 +355,7 @@ fn test_world_gravity_zero() {
 }
 
 #[test]
-fn test_collision_events_rapier() {
+fn collision_events_rapier() {
     // Dynamic body overlaps a static body immediately; collision event fires within 100 steps.
     let mut world = World::new(0.0, 100.0);
     // Both bodies are 32×32. Dynamic at y=-10 (y range [-26, 6]),
@@ -377,7 +377,7 @@ fn test_collision_events_rapier() {
 }
 
 #[test]
-fn test_body_count() {
+fn body_count() {
     let mut world = World::new(0.0, 0.0);
     for i in 0..5 {
         world.add_body(Body::new(i as f32 * 50.0, 0.0, BodyType::Static));
@@ -386,7 +386,7 @@ fn test_body_count() {
 }
 
 #[test]
-fn test_multiple_worlds() {
+fn multiple_worlds() {
     // Two independent worlds must not share physics state.
     let mut world1 = World::new(0.0, 100.0); // gravity down
     let mut world2 = World::new(0.0, 0.0); // no gravity
@@ -1538,7 +1538,7 @@ fn destroy_body_with_fixtures_removes_cleanly() {
 }
 
 #[test]
-fn test_sleeping_allowed_toggle() {
+fn sleeping_allowed_toggle() {
     let mut world = World::new(0.0, 9.8);
     let id = world.add_body(Body::new(0.0, 0.0, BodyType::Dynamic));
 

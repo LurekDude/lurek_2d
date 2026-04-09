@@ -735,7 +735,7 @@ mod tests {
 
     #[test]
     fn parse_tileset() {
-        let map = load_tmx(SIMPLE_TMX).unwrap();
+        let map = load_tmx(SIMPLE_TMX).expect("valid TMX parses");
         assert_eq!(map.tilesets.len(), 1);
         let ts = &map.tilesets[0];
         assert_eq!(ts.first_gid, 1);
@@ -746,7 +746,7 @@ mod tests {
 
     #[test]
     fn parse_csv_tile_layer() {
-        let map = load_tmx(SIMPLE_TMX).unwrap();
+        let map = load_tmx(SIMPLE_TMX).expect("valid TMX parses");
         let layers: Vec<_> = map.tile_layers().collect();
         assert_eq!(layers.len(), 1);
         let layer = &layers[0];
@@ -766,8 +766,8 @@ mod tests {
     <data encoding="csv">0,0,0,0</data>
   </layer>
 </map>"#;
-        let map = load_tmx(xml).unwrap();
-        let layer = map.tile_layers().next().unwrap();
+        let map = load_tmx(xml).expect("valid TMX string parses");
+        let layer = map.tile_layers().next().expect("at least one tile layer");
         assert!(!layer.visible);
         assert!((layer.opacity - 0.5).abs() < 1e-5);
     }
@@ -781,7 +781,7 @@ mod tests {
     <object id="2" name="Enemy" type="hostile" x="128" y="64" width="16" height="16"/>
   </objectgroup>
 </map>"#;
-        let map = load_tmx(xml).unwrap();
+        let map = load_tmx(xml).expect("valid TMX string parses");
         assert_eq!(map.tile_layers().count(), 0);
         let objs: Vec<_> = map.object_layers().collect();
         assert_eq!(objs.len(), 1);
@@ -796,7 +796,7 @@ mod tests {
         let xml = r#"<?xml version="1.0"?>
 <map version="1.9" orientation="isometric" width="4" height="4" tilewidth="64" tileheight="32">
 </map>"#;
-        let map = load_tmx(xml).unwrap();
+        let map = load_tmx(xml).expect("valid TMX string parses");
         assert_eq!(map.orientation, TmxOrientation::Isometric);
     }
 
@@ -806,7 +806,7 @@ mod tests {
 <map version="1.9" orientation="orthogonal" width="2" height="2" tilewidth="32" tileheight="32">
   <tileset firstgid="1" source="tiles.tsx"/>
 </map>"#;
-        let map = load_tmx(xml).unwrap();
+        let map = load_tmx(xml).expect("valid TMX string parses");
         assert_eq!(map.tilesets.len(), 1);
         assert_eq!(map.tilesets[0].source.as_deref(), Some("tiles.tsx"));
         assert_eq!(map.tilesets[0].first_gid, 1);
@@ -818,8 +818,8 @@ mod tests {
 <map version="1.9" orientation="orthogonal" width="2" height="2" tilewidth="16" tileheight="16"
      backgroundcolor="#ff3366">
 </map>"##;
-        let map = load_tmx(xml).unwrap();
-        let [a, r, g, b] = map.background_color.unwrap();
+        let map = load_tmx(xml).expect("valid TMX string parses");
+        let [a, r, g, b] = map.background_color.expect("background color is set in this TMX");
         assert_eq!(a, 255);
         assert_eq!(r, 0xff);
         assert_eq!(g, 0x33);
@@ -839,8 +839,8 @@ mod tests {
     </data>
   </layer>
 </map>"#;
-        let map = load_tmx(xml).unwrap();
-        let layer = map.tile_layers().next().unwrap();
+        let map = load_tmx(xml).expect("valid TMX string parses");
+        let layer = map.tile_layers().next().expect("at least one tile layer");
         assert_eq!(layer.tiles, vec![5, 3, 0, 2]);
     }
 }

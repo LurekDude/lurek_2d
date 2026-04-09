@@ -1,15 +1,10 @@
 # Module Quality Report: `image`
 
-> **Status**: 🔴 FAIL  |  **Date**: 2026-04-09  |  **Score**: 44 ✅ / 2 ⚠️ / 2 ❌ / 19 🔵
+> **Status**: 🟢 PASS  |  **Date**: 2026-04-09  |  **Score**: 46 ✅ / 2 ⚠️ / 0 ❌ / 19 🔵
 
 ---
 
 ## Action Items
-
-### 🔴 Errors — Must Fix Before Merge
-
-- [ ] **B-02** — Registration-only: struct definitions (move to src/image/): LuaLayeredImage, LuaCompressedImageData
-- [ ] **B-03** — impl LuaUserData placement: Move impl LuaUserData for LuaLayeredImage, LuaCompressedImageData from lua_api/image_api.rs → src/image/
 
 ### 🟡 Warnings — Should Fix
 
@@ -71,8 +66,8 @@
 | Check | Verdict | Details |
 |-------|---------|---------|
 | **B-01** Dedicated API file | ✅ PASS | lua_api/image_api.rs present |
-| **B-02** Registration-only | ❌ ERROR | struct definitions (move to src/image/): LuaLayeredImage, LuaCompressedImageData |
-| **B-03** impl LuaUserData placement | ❌ ERROR | Move impl LuaUserData for LuaLayeredImage, LuaCompressedImageData from lua_api/image_api.rs → src/image/ |
+| **B-02** Registration-only | ✅ PASS | Only register() is pub fn (Lua<X> wrapper structs allowed) |
+| **B-03** impl LuaUserData placement | ✅ PASS | All impl LuaUserData blocks are in lua_api (correct) |
 | **B-04** No business logic in closures | ⚠️ WARNING | '<closure@288>' (36 LOC, line 288) — extract body to src/image/ |
 | **B-05** Rc clone pattern | ✅ PASS | Rc clone pattern looks correct |
 | **B-06** Flat registration body | ✅ PASS | All tbl.set() calls are flat statements |

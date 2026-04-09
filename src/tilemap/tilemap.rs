@@ -665,7 +665,7 @@ impl TileMap {
                 let tile_rect = Rect::new(tx as f32 * tw, ty as f32 * th, tw, th);
 
                 if let Some(result) = sweep_aabb_vs_aabb(rect, dx, dy, tile_rect, tx, ty) {
-                    if best.is_none() || result.t < best.as_ref().unwrap().t {
+                    if best.is_none() || result.t < best.as_ref().expect("best is Some when not is_none").t {
                         best = Some(result);
                     }
                 }
@@ -1032,7 +1032,7 @@ mod tests {
         let mut map = make_test_map();
         assert!(map.get_viewport().is_none());
         map.set_viewport(10.0, 20.0, 640.0, 480.0);
-        let vp = map.get_viewport().unwrap();
+        let vp = map.get_viewport().expect("viewport set before use");
         assert!((vp.0 - 10.0).abs() < 1e-5);
         assert!((vp.1 - 20.0).abs() < 1e-5);
         assert!((vp.2 - 640.0).abs() < 1e-5);
@@ -1081,7 +1081,7 @@ mod tests {
         // Moving right from x=0 toward solid tile
         let result = map.sweep_rect(0, Rect::new(0.0, 0.0, 16.0, 16.0), 200.0, 0.0);
         assert!(result.is_some());
-        let r = result.unwrap();
+        let r = result.expect("sweep result is Some");
         assert!(r.t > 0.0 && r.t < 1.0);
         assert!((r.normal.x - (-1.0)).abs() < 1e-5);
         assert_eq!(r.tile_x, 5);

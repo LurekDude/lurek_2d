@@ -430,16 +430,16 @@ mod tests {
 
     #[test]
     fn test_apply_lookup() {
-        assert!(approx(apply("inQuad", 0.5).unwrap(), ease_in_quad(0.5)));
-        assert!(approx(apply("outCubic", 0.5).unwrap(), ease_out_cubic(0.5)));
-        assert!(approx(apply("linear", 1.0).unwrap(), 1.0));
+        assert!(approx(apply("inQuad", 0.5).expect("inQuad is a known easing name"), ease_in_quad(0.5)));
+        assert!(approx(apply("outCubic", 0.5).expect("outCubic is a known easing name"), ease_out_cubic(0.5)));
+        assert!(approx(apply("linear", 1.0).expect("linear is a known easing name"), 1.0));
         assert!(apply("nonexistent", 0.5).is_none());
     }
 
     #[test]
     fn test_apply_case_insensitive() {
-        assert!(approx(apply("INQUAD", 0.5).unwrap(), ease_in_quad(0.5)));
-        assert!(approx(apply("OutBounce", 1.0).unwrap(), 1.0));
+        assert!(approx(apply("INQUAD", 0.5).expect("INQUAD matched case-insensitively"), ease_in_quad(0.5)));
+        assert!(approx(apply("OutBounce", 1.0).expect("OutBounce matched case-insensitively"), 1.0));
     }
 
     #[test]

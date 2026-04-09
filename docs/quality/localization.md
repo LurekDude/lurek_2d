@@ -66,8 +66,8 @@
 | Check | Verdict | Details |
 |-------|---------|---------|
 | **B-01** Dedicated API file | ✅ PASS | lua_api/localization_api.rs present |
-| **B-02** Registration-only | ✅ PASS | Only register() is pub fn |
-| **B-03** impl LuaUserData placement | ✅ PASS | No LuaUserData impl in lua_api file |
+| **B-02** Registration-only | ✅ PASS | Only register() is pub fn (Lua<X> wrapper structs allowed) |
+| **B-03** impl LuaUserData placement | ✅ PASS | All impl LuaUserData blocks are in lua_api (correct) |
 | **B-04** No business logic in closures | ⚠️ WARNING | '<closure@105>' (16 LOC, line 105) — extract body to src/localization/ \| '<closure@179>' (29 LOC, line 179) — extract body to src/localization/ \| '<closure@399>' (35 LOC, line 399) — extract body to src/localization/ \| '<closure@125>' has if/match/for — extract to src/localization/ \| '<closure@137>' has if/match/for — extract to src/localization/ |
 | **B-05** Rc clone pattern | ✅ PASS | Rc clone pattern looks correct |
 | **B-06** Flat registration body | ✅ PASS | All tbl.set() calls are flat statements |

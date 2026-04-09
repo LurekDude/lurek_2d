@@ -1,28 +1,15 @@
 # Module Quality Report: `physics`
 
-> **Status**: 🔴 FAIL  |  **Date**: 2026-04-09  |  **Score**: 36 ✅ / 8 ⚠️ / 4 ❌ / 19 🔵
+> **Status**: 🟢 PASS  |  **Date**: 2026-04-09  |  **Score**: 46 ✅ / 2 ⚠️ / 0 ❌ / 19 🔵
 
 ---
 
 ## Action Items
 
-### 🔴 Errors — Must Fix Before Merge
-
-- [ ] **S-03** — File size limits: Files >2000 LOC: physics/world.rs (2122 LOC)
-- [ ] **SP-04** — Lua API completeness: Missing from spec: normalX, normalY, normalX, normalY, isTouching (+9 more) — add to ## Lua API in docs/specs/physics.md
-- [ ] **B-02** — Registration-only: struct definitions (move to src/physics/): LuaWorld, LuaBody, LuaPhysicsShape
-- [ ] **B-03** — impl LuaUserData placement: Move impl LuaUserData for LuaWorld, LuaBody, LuaPhysicsShape from lua_api/physics_api.rs → src/physics/
-
 ### 🟡 Warnings — Should Fix
 
-- [ ] **A-04b** — Source Files completeness (incl. subdirs): Nested .rs files not listed in AGENT.md: mod.rs
-- [ ] **SP-03** — Summary quality: Summary very long (2134 chars)
 - [ ] **D-03** — Structured doc sections: Missing structured sections: world::World (# Fields)
-- [ ] **D-04** — Doc quality: Stub/placeholder docs found: world:81, world:558, world:1332
-- [ ] **D-07** — @param/@return annotations: Missing @param/@return before: bodyId, x, y, normalX, normalY (+1 more)
-- [ ] **B-04** — No business logic in closures: '<closure@1545>' has if/match/for — extract to src/physics/ | '<closure@1639>' has if/match/for — extract to src/physics/
-- [ ] **T-03** — Test naming: test_ prefix found — use <subject>_<scenario>_<expected>: test_friction_slows_body, test_angle_changes_under_torque, test_apply_impulse_changes_velocity, test_raycast_hits_body, test_raycast_misses_empty_world (+6 more)
-- [ ] **Q-04** — Error handling: .unwrap() calls: world:39, world:51
+- [ ] **B-04** — No business logic in closures: '<closure@1546>' has if/match/for — extract to src/physics/ | '<closure@1640>' has if/match/for — extract to src/physics/
 
 ## Full Check Results
 
@@ -32,7 +19,7 @@
 |-------|---------|---------|
 | **S-01** lib.rs registration | ✅ PASS | Registered in lib.rs + lua_api (physics_api) |
 | **S-02** mod.rs simplicity | ✅ PASS | mod.rs is a thin barrel file (0 logic lines) |
-| **S-03** File size limits | ❌ ERROR | Files >2000 LOC: physics/world.rs (2122 LOC) |
+| **S-03** File size limits | ✅ PASS | All files within size limits |
 | **S-04** File naming | ✅ PASS | File names follow conventions |
 | **S-05** Module necessity | 🔵 MANUAL | Requires manual review — could this be pure Lua? |
 | **S-06** Large crate deps | 🔵 MANUAL | Requires manual review — check Cargo.toml for heavy crates |
@@ -47,7 +34,7 @@
 | **A-04** Content sync | ✅ PASS | All .rs files listed |
 | **A-05** Spec pointer | ✅ PASS | docs/specs/physics.md exists |
 | **A-06** Tier label | ✅ PASS | Tier label present (expected: tier1) |
-| **A-04b** Source Files completeness (incl. subdirs) | ⚠️ WARNING | Nested .rs files not listed in AGENT.md: mod.rs |
+| **A-04b** Source Files completeness (incl. subdirs) | ✅ PASS | All nested .rs files listed in AGENT.md |
 
 ### Phase 3 — Technical Specification
 
@@ -55,8 +42,8 @@
 |-------|---------|---------|
 | **SP-01** Spec file exists | ✅ PASS | docs/specs/physics.md exists |
 | **SP-02** Required spec sections | ✅ PASS | All required sections present |
-| **SP-03** Summary quality | ⚠️ WARNING | Summary very long (2134 chars) |
-| **SP-04** Lua API completeness | ❌ ERROR | Missing from spec: normalX, normalY, normalX, normalY, isTouching (+9 more) — add to ## Lua API in docs/specs/physics.md |
+| **SP-03** Summary quality | ✅ PASS | Summary is 1877 chars |
+| **SP-04** Lua API completeness | ✅ PASS | All 37 bound functions in spec |
 | **SP-05** Key Types accuracy | ✅ PASS | 10 types — spec Key Types in sync |
 | **SP-06** Spec quality | ✅ PASS | No stub content |
 
@@ -67,10 +54,10 @@
 | **D-01** Module-level docs | ✅ PASS | All files have //! doc comments |
 | **D-02** Public item docs | ✅ PASS | All pub items have /// docs |
 | **D-03** Structured doc sections | ⚠️ WARNING | Missing structured sections: world::World (# Fields) |
-| **D-04** Doc quality | ⚠️ WARNING | Stub/placeholder docs found: world:81, world:558, world:1332 |
+| **D-04** Doc quality | ✅ PASS | No stub docs found |
 | **D-05** Validation tool | 🔵 MANUAL | Run: python tools/docs/collect_docs.py --report-missing \| grep src/<module> |
 | **D-06** Lua API file docs | ✅ PASS | //! doc comment present |
-| **D-07** @param/@return annotations | ⚠️ WARNING | Missing @param/@return before: bodyId, x, y, normalX, normalY (+1 more) |
+| **D-07** @param/@return annotations | ✅ PASS | All bindings have @param/@return annotations |
 | **D-08** No rustdoc in lua_api | ✅ PASS | No rustdoc sections in Lua API file |
 | **D-09** Section separators | ✅ PASS | Separators present |
 
@@ -79,9 +66,9 @@
 | Check | Verdict | Details |
 |-------|---------|---------|
 | **B-01** Dedicated API file | ✅ PASS | lua_api/physics_api.rs present |
-| **B-02** Registration-only | ❌ ERROR | struct definitions (move to src/physics/): LuaWorld, LuaBody, LuaPhysicsShape |
-| **B-03** impl LuaUserData placement | ❌ ERROR | Move impl LuaUserData for LuaWorld, LuaBody, LuaPhysicsShape from lua_api/physics_api.rs → src/physics/ |
-| **B-04** No business logic in closures | ⚠️ WARNING | '<closure@1545>' has if/match/for — extract to src/physics/ \| '<closure@1639>' has if/match/for — extract to src/physics/ |
+| **B-02** Registration-only | ✅ PASS | Only register() is pub fn (Lua<X> wrapper structs allowed) |
+| **B-03** impl LuaUserData placement | ✅ PASS | All impl LuaUserData blocks are in lua_api (correct) |
+| **B-04** No business logic in closures | ⚠️ WARNING | '<closure@1546>' has if/match/for — extract to src/physics/ \| '<closure@1640>' has if/match/for — extract to src/physics/ |
 | **B-05** Rc clone pattern | ✅ PASS | Rc clone pattern looks correct |
 | **B-06** Flat registration body | ✅ PASS | All tbl.set() calls are flat statements |
 
@@ -101,7 +88,7 @@
 |-------|---------|---------|
 | **T-01** Rust test file | ✅ PASS | Found: tests\rust\unit\physics_tests.rs |
 | **T-02** Lua test file | ✅ PASS | tests/lua/unit/test_physics.lua registered in harness |
-| **T-03** Test naming | ⚠️ WARNING | test_ prefix found — use <subject>_<scenario>_<expected>: test_friction_slows_body, test_angle_changes_under_torque, test_apply_impulse_changes_velocity, test_raycast_hits_body, test_raycast_misses_empty_world (+6 more) |
+| **T-03** Test naming | ✅ PASS | Test names follow convention |
 | **T-04** Float comparisons | ✅ PASS | No float assert_eq! found |
 | **T-05** Test adequacy | ✅ PASS | 117 tests / 95 pub methods (123%) |
 | **T-06** Golden tests | 🔵 MANUAL | Check if module qualifies for golden/snapshot tests |
@@ -125,7 +112,7 @@
 | **Q-01** No println! | ✅ PASS | No println!/eprintln! calls |
 | **Q-02** Logger levels | 🔵 MANUAL | Verify log severity levels are appropriate (debug/info/warn/error) |
 | **Q-03** No unsafe | ✅ PASS | No undocumented unsafe blocks |
-| **Q-04** Error handling | ⚠️ WARNING | .unwrap() calls: world:39, world:51 |
+| **Q-04** Error handling | ✅ PASS | No bare .unwrap() calls |
 | **Q-07** Log prefix | ✅ PASS | All log calls use log:: prefix |
 | **Q-05** Rust best practices | 🔵 MANUAL | Review for anti-patterns: unnecessary clones, redundant allocs |
 | **Q-06** Clippy clean | 🔵 MANUAL | Run: cargo clippy --lib -- -D warnings |

@@ -1434,6 +1434,10 @@ impl LuaFunnel {
 // Registration
 // ===========================================================================
 
+/// Registers the `lurek.patterns.*` Lua API namespace.
+/// @param lua : &Lua
+/// @param luna : &LuaTable
+/// @param _state : Rc<RefCell<SharedState>>
 pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) -> LuaResult<()> {
     let patterns = lua.create_table()?;
 
@@ -1640,6 +1644,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
         })?,
     )?;
 
+    // -- patterns namespace --
     luna.set("patterns", patterns)?;
     Ok(())
 }

@@ -1,15 +1,10 @@
 # Module Quality Report: `camera`
 
-> **Status**: 🔴 FAIL  |  **Date**: 2026-04-09  |  **Score**: 45 ✅ / 1 ⚠️ / 2 ❌ / 19 🔵
+> **Status**: 🟢 PASS  |  **Date**: 2026-04-09  |  **Score**: 47 ✅ / 1 ⚠️ / 0 ❌ / 19 🔵
 
 ---
 
 ## Action Items
-
-### 🔴 Errors — Must Fix Before Merge
-
-- [ ] **B-02** — Registration-only: struct definitions (move to src/camera/): LuaCamera2D
-- [ ] **B-03** — impl LuaUserData placement: Move impl LuaUserData for LuaCamera2D from lua_api/camera_api.rs → src/camera/
 
 ### 🟡 Warnings — Should Fix
 
@@ -70,8 +65,8 @@
 | Check | Verdict | Details |
 |-------|---------|---------|
 | **B-01** Dedicated API file | ✅ PASS | lua_api/camera_api.rs present |
-| **B-02** Registration-only | ❌ ERROR | struct definitions (move to src/camera/): LuaCamera2D |
-| **B-03** impl LuaUserData placement | ❌ ERROR | Move impl LuaUserData for LuaCamera2D from lua_api/camera_api.rs → src/camera/ |
+| **B-02** Registration-only | ✅ PASS | Only register() is pub fn (Lua<X> wrapper structs allowed) |
+| **B-03** impl LuaUserData placement | ✅ PASS | All impl LuaUserData blocks are in lua_api (correct) |
 | **B-04** No business logic in closures | ✅ PASS | Closures appear thin (≤15 LOC, no control flow) |
 | **B-05** Rc clone pattern | ✅ PASS | Rc clone pattern looks correct |
 | **B-06** Flat registration body | ✅ PASS | All tbl.set() calls are flat statements |

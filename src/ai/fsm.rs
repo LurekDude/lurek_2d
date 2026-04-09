@@ -144,7 +144,7 @@ impl StateMachine {
         self.transitions.sort_by(|a, b| b.priority.cmp(&a.priority));
     }
 
-    /// Returns the current state name, if any. Consult the module-level documentation for the broader usage context and preconditions.
+    /// Returns the current state name, if any.
     ///
     /// # Returns
     /// `Option<&str>`.

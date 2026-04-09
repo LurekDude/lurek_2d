@@ -13,7 +13,7 @@ use std::collections::HashMap;
 // -------------------------------------------------------------------------------
 
 /// Reads a Lua info table into a [`ModInfo`].
-pub fn mod_info_from_table(tbl: &LuaTable) -> LuaResult<ModInfo> {
+fn mod_info_from_table(tbl: &LuaTable) -> LuaResult<ModInfo> {
     let id: String = tbl
         .get::<_, String>("id")
         .map_err(|_| LuaError::RuntimeError("newMod requires 'id' field".into()))?;

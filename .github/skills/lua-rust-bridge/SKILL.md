@@ -72,9 +72,12 @@ pub fn register(
 
 ## UserData Pattern
 
-Wrap resource handles (not raw resources) as Lua UserData:
+**All `impl LuaUserData` blocks belong in `src/lua_api/<module>_api.rs` — never in domain modules.**
+
+Wrapper structs (`Lua<X>`) and their `impl LuaUserData` live together in the api file, not in `src/<module>/`:
 
 ```rust
+// src/lua_api/image_api.rs  ← CORRECT place for BOTH the struct and impl
 pub struct LuaImage {
     pub key: TextureKey,
     pub width: u32,
@@ -85,16 +88,22 @@ impl LuaUserData for LuaImage {
     fn add_methods<M: LuaUserDataMethods<Self>>(methods: &mut M) {
         methods.add_method("getWidth", |_, this, ()| Ok(this.width));
         methods.add_method("release", |_, this, ()| {
-            // queue deferred GPU destruction
             Ok(())
         });
     }
 }
 ```
 
+**WRONG — never put `impl LuaUserData` in a domain module:**
+```rust
+// src/image/mod.rs  ← FORBIDDEN
+impl LuaUserData for LuaImage { ... } // compile error: mlua not in domain deps
+```
+
 - UserData holds only: typed resource key + cached read-only metadata
 - GPU resources live in `SharedState`; never store `wgpu` objects in UserData
 - Implement `LunaType` trait for consistent `type()`, `typeOf()`, `__tostring` across all types
+- The audit tool (B-03) will flag any `impl LuaUserData` found in `src/<module>/` files as ERROR
 
 ## Lua↔Rust Data Conversion
 

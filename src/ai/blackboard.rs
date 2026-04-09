@@ -209,7 +209,7 @@ impl Blackboard {
         log_msg!(debug, BB03, "{}", count);
     }
 
-    /// Returns all local key names. Consult the module-level documentation for the broader usage context and preconditions.
+    /// Returns all local key names.
     ///
     /// # Returns
     /// `Vec<String>`.

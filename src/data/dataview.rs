@@ -6,7 +6,6 @@
 
 use std::sync::Arc;
 
-use mlua::prelude::*;
 
 /// A windowed, read-only view into a shared byte buffer.
 ///
@@ -213,9 +212,6 @@ impl DataView {
     }
 }
 
-// -------------------------------------------------------------------------------
-// LuaDataView UserData
-// -------------------------------------------------------------------------------
 
 /// Lua-side wrapper around [`DataView`].
 ///
@@ -229,103 +225,5 @@ impl LuaDataView {
     /// Creates a new `LuaDataView` wrapping the given `DataView`.
     pub fn new(inner: DataView) -> Self {
         Self { inner }
-    }
-}
-
-impl LuaUserData for LuaDataView {
-    fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
-
-        // -- getUInt8 --
-        /// Reads an unsigned 8-bit integer at the given offset.
-        /// @param offset : integer
-        /// @return integer
-        methods.add_method("getUInt8", |_, this, offset: usize| {
-            this.inner
-                .get_u8(offset)
-                .map(|v| v as i64)
-                .map_err(LuaError::RuntimeError)
-        });
-
-        // -- getInt8 --
-        /// Reads a signed 8-bit integer at the given offset.
-        /// @param offset : integer
-        /// @return integer
-        methods.add_method("getInt8", |_, this, offset: usize| {
-            this.inner
-                .get_i8(offset)
-                .map(|v| v as i64)
-                .map_err(LuaError::RuntimeError)
-        });
-
-        // -- getInt16 --
-        /// Reads a signed 16-bit integer at the given offset.
-        /// @param offset : integer
-        /// @return integer
-        methods.add_method("getInt16", |_, this, offset: usize| {
-            this.inner
-                .get_i16(offset)
-                .map(|v| v as i64)
-                .map_err(LuaError::RuntimeError)
-        });
-
-        // -- getUInt16 --
-        /// Reads an unsigned 16-bit integer at the given offset.
-        /// @param offset : integer
-        /// @return integer
-        methods.add_method("getUInt16", |_, this, offset: usize| {
-            this.inner
-                .get_u16(offset)
-                .map(|v| v as i64)
-                .map_err(LuaError::RuntimeError)
-        });
-
-        // -- getInt32 --
-        /// Reads a signed 32-bit integer at the given offset.
-        /// @param offset : integer
-        /// @return integer
-        methods.add_method("getInt32", |_, this, offset: usize| {
-            this.inner
-                .get_i32(offset)
-                .map(|v| v as i64)
-                .map_err(LuaError::RuntimeError)
-        });
-
-        // -- getUInt32 --
-        /// Reads an unsigned 32-bit integer at the given offset.
-        /// @param offset : integer
-        /// @return integer
-        methods.add_method("getUInt32", |_, this, offset: usize| {
-            this.inner
-                .get_u32(offset)
-                .map(|v| v as i64)
-                .map_err(LuaError::RuntimeError)
-        });
-
-        // -- getFloat --
-        /// Reads a 32-bit float at the given offset.
-        /// @param offset : integer
-        /// @return number
-        methods.add_method("getFloat", |_, this, offset: usize| {
-            this.inner
-                .get_f32(offset)
-                .map(|v| v as f64)
-                .map_err(LuaError::RuntimeError)
-        });
-
-        // -- getDouble --
-        /// Reads a 64-bit float at the given offset.
-        /// @param offset : integer
-        /// @return number
-        methods.add_method("getDouble", |_, this, offset: usize| {
-            this.inner.get_f64(offset).map_err(LuaError::RuntimeError)
-        });
-
-        // -- getSize --
-        /// Returns the size of this view in bytes.
-        /// @return integer
-        methods.add_method("getSize", |_, this, ()| {
-            Ok(this.inner.get_size() as i64)
-        });
-
     }
 }

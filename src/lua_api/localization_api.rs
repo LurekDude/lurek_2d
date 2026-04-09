@@ -446,6 +446,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
         Ok(())
     })?)?;
 
+    // -- localization namespace --
     luna.set("localization", loc)?;
     Ok(())
 }

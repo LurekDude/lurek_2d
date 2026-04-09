@@ -428,6 +428,7 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
         })?,
     )?;
 
+    // -- debugbridge namespace --
     luna.set("debugbridge", db)?;
     Ok(())
 }

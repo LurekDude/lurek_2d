@@ -1,14 +1,10 @@
 # Module Quality Report: `devtools`
 
-> **Status**: 🔴 FAIL  |  **Date**: 2026-04-09  |  **Score**: 45 ✅ / 2 ⚠️ / 1 ❌ / 19 🔵
+> **Status**: 🟢 PASS  |  **Date**: 2026-04-09  |  **Score**: 46 ✅ / 2 ⚠️ / 0 ❌ / 19 🔵
 
 ---
 
 ## Action Items
-
-### 🔴 Errors — Must Fix Before Merge
-
-- [ ] **T-04** — Float comparisons: assert_eq! with float literals (use abs()<epsilon): line 148
 
 ### 🟡 Warnings — Should Fix
 
@@ -70,8 +66,8 @@
 | Check | Verdict | Details |
 |-------|---------|---------|
 | **B-01** Dedicated API file | ✅ PASS | lua_api/devtools_api.rs present |
-| **B-02** Registration-only | ✅ PASS | Only register() is pub fn |
-| **B-03** impl LuaUserData placement | ✅ PASS | No LuaUserData impl in lua_api file |
+| **B-02** Registration-only | ✅ PASS | Only register() is pub fn (Lua<X> wrapper structs allowed) |
+| **B-03** impl LuaUserData placement | ✅ PASS | All impl LuaUserData blocks are in lua_api (correct) |
 | **B-04** No business logic in closures | ⚠️ WARNING | '<closure@164>' (18 LOC, line 164) — extract body to src/devtools/ \| '<closure@272>' (17 LOC, line 272) — extract body to src/devtools/ \| '<closure@394>' (19 LOC, line 394) — extract body to src/devtools/ \| '<closure@490>' (16 LOC, line 490) — extract body to src/devtools/ \| '<closure@115>' has if/match/for — extract to src/devtools/ \| '<closure@240>' has if/match/for — extract to src/devtools/ |
 | **B-05** Rc clone pattern | ✅ PASS | Rc clone pattern looks correct |
 | **B-06** Flat registration body | ✅ PASS | All tbl.set() calls are flat statements |
@@ -93,7 +89,7 @@
 | **T-01** Rust test file | ✅ PASS | Found: tests\rust\unit\devtools_tests.rs |
 | **T-02** Lua test file | ✅ PASS | tests/lua/unit/test_devtools.lua registered in harness |
 | **T-03** Test naming | ✅ PASS | Test names follow convention |
-| **T-04** Float comparisons | ❌ ERROR | assert_eq! with float literals (use abs()<epsilon): line 148 |
+| **T-04** Float comparisons | ✅ PASS | No float assert_eq! found |
 | **T-05** Test adequacy | ✅ PASS | 25 tests / 28 pub methods (89%) |
 | **T-06** Golden tests | 🔵 MANUAL | Check if module qualifies for golden/snapshot tests |
 | **T-07** Tests pass | 🔵 MANUAL | Run: cargo test --test devtools_tests -- --nocapture |

@@ -12,17 +12,9 @@
 
 ## Summary
 
-The `animation` module provides **frame-based sprite animation** — the 2D equivalent of an animated GIF. It plays back sequences of still frames drawn from a sprite-sheet, advancing through them at a configurable FPS. This is distinct from `spine`, which is a completely separate skeletal/bone-hierarchy animation system.
+The `animation` module provides frame-based sprite animation for 2D sprite-sheets. It manages a pool of `AnimFrame` source-rectangles and named `AnimClip` sequences (FPS, looping flag, frame-index list). The `Animation` controller advances frames on `update(dt)`, emits events (`Finished`, `FrameChanged`, `Looped`) via `drain_events()`, and exposes `current_quad()` for the draw rectangle. Speed multiplier scales delta time globally; per-frame duration overrides override clip FPS.
 
-Internally it is a Tier 1 Engine Subsystem that depends only on `crate::math` (for `Rect`) and `crate::engine` (for structured log messages).
-
-The module is built around four data types working together: `AnimFrame` stores a source rectangle (quad) within a sprite-sheet texture plus an optional per-frame duration override. `AnimClip` names a sequence of frame indices into the parent animation's frame pool, along with an FPS rate and a looping flag. `Animation` is the central playback controller � it owns a frame pool (`Vec<AnimFrame>`), a clip registry (`HashMap<String, AnimClip>`), and manages playback state including the current clip, frame position, timer accumulator, speed multiplier, and a pending event queue. `AnimEvent` is an enum of playback notifications (`Finished`, `FrameChanged`, `Looped`) emitted during `update()` and retrieved by `drain_events()`.
-
-The typical workflow is: (1) create an `Animation`, (2) add frames individually or by slicing a sprite-sheet grid, (3) register named clips referencing those frames, (4) call `play("clipName")` to start, (5) call `update(dt)` each tick, (6) read `current_quad()` for the source rectangle to draw. Frame timing uses per-frame `duration` if set (> 0.0), otherwise falls back to `1.0 / clip.fps`. The speed multiplier scales delta time globally.
-
-Scripts interact via `lurek.animation.*` � the Lua API wraps `Animation` as a `LuaAnimation` UserData with 20 methods plus a constructor `lurek.animation.new()`. There is no resource key or SlotMap � each `LuaAnimation` owns its `Animation` value directly.
-
-**Scope boundary**: This module contains no GPU code. It produces source rectangles (`Rect`) that the game script passes to `lurek.gfx.draw()` or `lurek.gfx.drawq()`. Sound or physics triggered by animation events must be wired by user scripts. The module does not depend on `graphics`, `audio`, `physics`, or any other Tier 1 module. It is **not related** to the `spine` module — `animation` advances frame indices in a sprite-sheet; `spine` propagates transforms through a bone hierarchy. Use one, the other, or both independently.
+Scripts call `lurek.animation.new()` to create a `LuaAnimation` UserData with 20 methods. Depends only on `math` and `engine` — no GPU, audio, or physics code. Distinct from `spine` (bone-hierarchy animation); the two modules are independent.
 
 ## Architecture
 

@@ -123,7 +123,7 @@ Lurek2D-specific rules only — common Rust idioms apply without repetition:
 - Validate inputs at the Lua boundary — return descriptive `LuaError`, never panic
 - Full callback reference: `docs/architecture/engine-architecture.md` § Callback Contract
 
-**MANDATORY — Thin Wrapper Rule**: `src/lua_api/<module>_api.rs` files are **registration-only** wrappers. All structs, enums, business logic, tick/update methods, state machines, and algorithms MUST live in `src/<module>/`. The Lua API file may only contain: `pub fn register()`, closure bodies that delegate immediately to domain methods, and at most simple parameter extraction/conversion. Violating this rule is a blocking code review defect. Every `impl` block for a domain type — including `impl LuaUserData` — belongs in `src/<module>/`, not in `src/lua_api/`.
+**MANDATORY — Thin Wrapper Rule**: `src/lua_api/<module>_api.rs` owns ALL Lua-facing registration. This includes: `pub fn register()`, Lua wrapper structs (`Lua<X>`), `impl LuaUserData` blocks, and all `add_method` / `add_method_mut` calls. Domain modules (`src/<module>/`) contain ONLY pure-Rust business logic, algorithms, and data types — they must never contain `impl LuaUserData` or any mlua import. Violating this rule is a blocking code review defect. **`impl LuaUserData` in a domain module is always wrong — move it to `src/lua_api/<module>_api.rs`.**
 
 ### Testing Framework
 

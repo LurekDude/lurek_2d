@@ -1,27 +1,15 @@
 # Module Quality Report: `math`
 
-> **Status**: 🔴 FAIL  |  **Date**: 2026-04-09  |  **Score**: 37 ✅ / 7 ⚠️ / 4 ❌ / 19 🔵
+> **Status**: 🟢 PASS  |  **Date**: 2026-04-09  |  **Score**: 46 ✅ / 2 ⚠️ / 0 ❌ / 19 🔵
 
 ---
 
 ## Action Items
 
-### 🔴 Errors — Must Fix Before Merge
-
-- [ ] **SP-04** — Lua API completeness: Missing from spec: angleBetween, circleContainsPoint, circleIntersectsCircle, circleIntersectsLine, circleIntersectsSegment (+15 more) — add to ## Lua API in docs/specs/math.md
-- [ ] **B-02** — Registration-only: struct definitions (move to src/math/): LuaRandomGenerator, LuaTransform, LuaBezierCurve, LuaTween, LuaSpatialHash, LuaNoiseGenerator
-- [ ] **B-03** — impl LuaUserData placement: Move impl LuaUserData for LuaRandomGenerator, LuaTransform, LuaBezierCurve, LuaTween, LuaSpatialHash, LuaNoiseGenerator from lua_api/math_api.rs → src/math/
-- [ ] **W-02** — API surface coverage: Functions absent from content/examples/math.lua: newRandomGenerator, newTransform, newBezierCurve, newTween, newSpatialHash, newNoiseGenerator (+76 more)
-
 ### 🟡 Warnings — Should Fix
 
-- [ ] **SP-03** — Summary quality: Summary very long (2304 chars)
-- [ ] **SP-05** — Key Types accuracy: Types not in spec: DistType, FractalType, MapGenOptions, NoiseKind, SpatialItem | Stale in spec: Geometry, Polygon
 - [ ] **D-04** — Doc quality: Stub/placeholder docs found: easing:8, easing:79, easing:95, easing:106, geometry:44 (+24 more)
-- [ ] **D-07** — @param/@return annotations: Missing @param/@return before: pi, tau, huge
-- [ ] **B-04** — No business logic in closures: '<closure@1018>' (17 LOC, line 1018) — extract body to src/math/ | '<closure@1375>' (27 LOC, line 1375) — extract body to src/math/ | '<closure@1593>' (21 LOC, line 1593) — extract body to src/math/ | '<closure@2001>' (21 LOC, line 2001) — extract body to src/math/ | '<closure@955>' has if/match/for — extract to src/math/ | '<closure@1410>' has if/match/for — extract to src/math/
-- [ ] **Q-04** — Error handling: .unwrap() calls: bezier:357, easing:433, easing:434, easing:435, easing:441 (+9 more)
-- [ ] **I-03** — Config integration: Module not in src/engine/config.rs — add to ModulesConfig if toggleable
+- [ ] **B-04** — No business logic in closures: '<closure@1018>' (17 LOC, line 1018) — extract body to src/math/ | '<closure@1375>' (27 LOC, line 1375) — extract body to src/math/ | '<closure@1593>' (21 LOC, line 1593) — extract body to src/math/ | '<closure@2004>' (21 LOC, line 2004) — extract body to src/math/ | '<closure@955>' has if/match/for — extract to src/math/ | '<closure@1410>' has if/match/for — extract to src/math/
 
 ## Full Check Results
 
@@ -54,9 +42,9 @@
 |-------|---------|---------|
 | **SP-01** Spec file exists | ✅ PASS | docs/specs/math.md exists |
 | **SP-02** Required spec sections | ✅ PASS | All required sections present |
-| **SP-03** Summary quality | ⚠️ WARNING | Summary very long (2304 chars) |
-| **SP-04** Lua API completeness | ❌ ERROR | Missing from spec: angleBetween, circleContainsPoint, circleIntersectsCircle, circleIntersectsLine, circleIntersectsSegment (+15 more) — add to ## Lua API in docs/specs/math.md |
-| **SP-05** Key Types accuracy | ⚠️ WARNING | Types not in spec: DistType, FractalType, MapGenOptions, NoiseKind, SpatialItem \| Stale in spec: Geometry, Polygon |
+| **SP-03** Summary quality | ✅ PASS | Summary is 1982 chars |
+| **SP-04** Lua API completeness | ✅ PASS | All 82 bound functions in spec |
+| **SP-05** Key Types accuracy | ✅ PASS | 16 types — spec Key Types in sync |
 | **SP-06** Spec quality | ✅ PASS | No stub content |
 
 ### Phase 4 — Docstrings
@@ -69,7 +57,7 @@
 | **D-04** Doc quality | ⚠️ WARNING | Stub/placeholder docs found: easing:8, easing:79, easing:95, easing:106, geometry:44 (+24 more) |
 | **D-05** Validation tool | 🔵 MANUAL | Run: python tools/docs/collect_docs.py --report-missing \| grep src/<module> |
 | **D-06** Lua API file docs | ✅ PASS | //! doc comment present |
-| **D-07** @param/@return annotations | ⚠️ WARNING | Missing @param/@return before: pi, tau, huge |
+| **D-07** @param/@return annotations | ✅ PASS | All bindings have @param/@return annotations |
 | **D-08** No rustdoc in lua_api | ✅ PASS | No rustdoc sections in Lua API file |
 | **D-09** Section separators | ✅ PASS | Separators present |
 
@@ -78,9 +66,9 @@
 | Check | Verdict | Details |
 |-------|---------|---------|
 | **B-01** Dedicated API file | ✅ PASS | lua_api/math_api.rs present |
-| **B-02** Registration-only | ❌ ERROR | struct definitions (move to src/math/): LuaRandomGenerator, LuaTransform, LuaBezierCurve, LuaTween, LuaSpatialHash, LuaNoiseGenerator |
-| **B-03** impl LuaUserData placement | ❌ ERROR | Move impl LuaUserData for LuaRandomGenerator, LuaTransform, LuaBezierCurve, LuaTween, LuaSpatialHash, LuaNoiseGenerator from lua_api/math_api.rs → src/math/ |
-| **B-04** No business logic in closures | ⚠️ WARNING | '<closure@1018>' (17 LOC, line 1018) — extract body to src/math/ \| '<closure@1375>' (27 LOC, line 1375) — extract body to src/math/ \| '<closure@1593>' (21 LOC, line 1593) — extract body to src/math/ \| '<closure@2001>' (21 LOC, line 2001) — extract body to src/math/ \| '<closure@955>' has if/match/for — extract to src/math/ \| '<closure@1410>' has if/match/for — extract to src/math/ |
+| **B-02** Registration-only | ✅ PASS | Only register() is pub fn (Lua<X> wrapper structs allowed) |
+| **B-03** impl LuaUserData placement | ✅ PASS | All impl LuaUserData blocks are in lua_api (correct) |
+| **B-04** No business logic in closures | ⚠️ WARNING | '<closure@1018>' (17 LOC, line 1018) — extract body to src/math/ \| '<closure@1375>' (27 LOC, line 1375) — extract body to src/math/ \| '<closure@1593>' (21 LOC, line 1593) — extract body to src/math/ \| '<closure@2004>' (21 LOC, line 2004) — extract body to src/math/ \| '<closure@955>' has if/match/for — extract to src/math/ \| '<closure@1410>' has if/match/for — extract to src/math/ |
 | **B-05** Rc clone pattern | ✅ PASS | Rc clone pattern looks correct |
 | **B-06** Flat registration body | ✅ PASS | All tbl.set() calls are flat statements |
 
@@ -90,7 +78,7 @@
 |-------|---------|---------|
 | **R-01** Tier placement | ✅ PASS | Tier label matches: baseline |
 | **R-02** Dependency direction | ✅ PASS | All imports follow baseline rules |
-| **R-03** No lua_api import | ✅ PASS | No lua_api imports found |
+| **R-03** No lua_api import | ✅ PASS | Baseline module — may bootstrap the Lua VM |
 | **R-04** Design assumptions | 🔵 MANUAL | Verify against docs/architecture/philosophy.md |
 | **R-05** Module overlap | 🔵 MANUAL | Check for scope duplication with other modules |
 
@@ -111,7 +99,7 @@
 | Check | Verdict | Details |
 |-------|---------|---------|
 | **W-01** Example file exists | ✅ PASS | content/examples/math.lua present |
-| **W-02** API surface coverage | ❌ ERROR | Functions absent from content/examples/math.lua: newRandomGenerator, newTransform, newBezierCurve, newTween, newSpatialHash, newNoiseGenerator (+76 more) |
+| **W-02** API surface coverage | ✅ PASS | All 82 bound functions in example |
 | **W-03** Example comments | 🔵 MANUAL | Verify content/examples/math.lua has realistic one-line comments per call |
 | **W-04** Example–spec sync | ✅ PASS | Missing spec or example — other checks cover this |
 | **W-05** Wiki page | ✅ PASS | docs\wiki\Math-API.md |
@@ -124,7 +112,7 @@
 | **Q-01** No println! | ✅ PASS | No println!/eprintln! calls |
 | **Q-02** Logger levels | 🔵 MANUAL | Verify log severity levels are appropriate (debug/info/warn/error) |
 | **Q-03** No unsafe | ✅ PASS | No undocumented unsafe blocks |
-| **Q-04** Error handling | ⚠️ WARNING | .unwrap() calls: bezier:357, easing:433, easing:434, easing:435, easing:441 (+9 more) |
+| **Q-04** Error handling | ✅ PASS | No bare .unwrap() calls |
 | **Q-07** Log prefix | ✅ PASS | All log calls use log:: prefix |
 | **Q-05** Rust best practices | 🔵 MANUAL | Review for anti-patterns: unnecessary clones, redundant allocs |
 | **Q-06** Clippy clean | 🔵 MANUAL | Run: cargo clippy --lib -- -D warnings |
@@ -143,7 +131,7 @@
 |-------|---------|---------|
 | **I-01** Lua API usability | 🔵 MANUAL | Review lurek.* conventions compliance |
 | **I-02** Extension panel | 🔵 MANUAL | Check for structured data I/O for vscode-extension |
-| **I-03** Config integration | ⚠️ WARNING | Module not in src/engine/config.rs — add to ModulesConfig if toggleable |
+| **I-03** Config integration | ✅ PASS | Baseline module — always enabled, no config flag required |
 
 ### Phase 12 — Localization & Logging
 

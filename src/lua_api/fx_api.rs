@@ -21,7 +21,9 @@ pub struct LuaPostFxEffect {
 
 impl LuaPostFxEffect {
     fn from_owned(e: PostFxEffect) -> Self {
-        Self { inner: Rc::new(RefCell::new(e)) }
+        Self {
+            inner: Rc::new(RefCell::new(e)),
+        }
     }
     fn from_rc(rc: Rc<RefCell<PostFxEffect>>) -> Self {
         Self { inner: rc }
@@ -40,7 +42,9 @@ impl LuaUserData for LuaPostFxEffect {
         // -- isBuiltIn --
         /// Returns true if this is a built-in effect, false if custom.
         /// @return boolean
-        methods.add_method("isBuiltIn", |_, this, ()| Ok(this.inner.borrow().is_built_in()));
+        methods.add_method("isBuiltIn", |_, this, ()| {
+            Ok(this.inner.borrow().is_built_in())
+        });
 
         // -- isEnabled --
         /// Returns whether this effect is currently active.
@@ -71,9 +75,15 @@ impl LuaUserData for LuaPostFxEffect {
         /// @param name : string
         /// @param default : number
         /// @return number
-        methods.add_method("getParameter", |_, this, (name, default): (String, Option<f32>)| {
-            Ok(this.inner.borrow().get_parameter(&name, default.unwrap_or(0.0)))
-        });
+        methods.add_method(
+            "getParameter",
+            |_, this, (name, default): (String, Option<f32>)| {
+                Ok(this
+                    .inner
+                    .borrow()
+                    .get_parameter(&name, default.unwrap_or(0.0)))
+            },
+        );
 
         // -- hasParameter --
         /// Returns true if the named parameter exists on this effect.
@@ -111,62 +121,75 @@ impl LuaUserData for LuaPostFxEffect {
         /// Returns true when the given name matches "PostFxEffect" or a parent type.
         /// @param name : string
         /// @return boolean
-        methods.add_method("typeOf", |_, _, name: String| Ok(name == "PostFxEffect" || name == "Object"));
+        methods.add_method("typeOf", |_, _, name: String| {
+            Ok(name == "PostFxEffect" || name == "Object")
+        });
 
         // -- convenience setters --
         /// Sets the threshold parameter of this effect.
         /// @param value : number
         /// @return nil
         methods.add_method_mut("setThreshold", |_, this, v: f32| {
-            this.inner.borrow_mut().set_parameter("threshold", v); Ok(())
+            this.inner.borrow_mut().set_parameter("threshold", v);
+            Ok(())
         });
         /// Sets the intensity parameter of this effect.
         /// @param value : number
         /// @return nil
         methods.add_method_mut("setIntensity", |_, this, v: f32| {
-            this.inner.borrow_mut().set_parameter("intensity", v); Ok(())
+            this.inner.borrow_mut().set_parameter("intensity", v);
+            Ok(())
         });
         /// Sets the radius parameter of this effect.
         /// @param value : number
         /// @return nil
         methods.add_method_mut("setRadius", |_, this, v: f32| {
-            this.inner.borrow_mut().set_parameter("radius", v); Ok(())
+            this.inner.borrow_mut().set_parameter("radius", v);
+            Ok(())
         });
         /// Sets the strength parameter of this effect.
         /// @param value : number
         /// @return nil
         methods.add_method_mut("setStrength", |_, this, v: f32| {
-            this.inner.borrow_mut().set_parameter("strength", v); Ok(())
+            this.inner.borrow_mut().set_parameter("strength", v);
+            Ok(())
         });
         /// Sets the scanline strength parameter of this effect.
         /// @param value : number
         /// @return nil
         methods.add_method_mut("setScanlineStrength", |_, this, v: f32| {
-            this.inner.borrow_mut().set_parameter("scanline_strength", v); Ok(())
+            this.inner
+                .borrow_mut()
+                .set_parameter("scanline_strength", v);
+            Ok(())
         });
         /// Sets the offset parameter of this effect.
         /// @param value : number
         /// @return nil
         methods.add_method_mut("setOffset", |_, this, v: f32| {
-            this.inner.borrow_mut().set_parameter("offset", v); Ok(())
+            this.inner.borrow_mut().set_parameter("offset", v);
+            Ok(())
         });
         /// Sets the brightness parameter of this effect.
         /// @param value : number
         /// @return nil
         methods.add_method_mut("setBrightness", |_, this, v: f32| {
-            this.inner.borrow_mut().set_parameter("brightness", v); Ok(())
+            this.inner.borrow_mut().set_parameter("brightness", v);
+            Ok(())
         });
         /// Sets the contrast parameter of this effect.
         /// @param value : number
         /// @return nil
         methods.add_method_mut("setContrast", |_, this, v: f32| {
-            this.inner.borrow_mut().set_parameter("contrast", v); Ok(())
+            this.inner.borrow_mut().set_parameter("contrast", v);
+            Ok(())
         });
         /// Sets the saturation parameter of this effect.
         /// @param value : number
         /// @return nil
         methods.add_method_mut("setSaturation", |_, this, v: f32| {
-            this.inner.borrow_mut().set_parameter("saturation", v); Ok(())
+            this.inner.borrow_mut().set_parameter("saturation", v);
+            Ok(())
         });
     }
 }
@@ -263,9 +286,7 @@ impl LuaUserData for LuaPostFxStack {
         // -- getEffectCount --
         /// Returns the number of effects in the pipeline.
         /// @return integer
-        methods.add_method("getEffectCount", |_, this, ()| {
-            Ok(this.effects.len())
-        });
+        methods.add_method("getEffectCount", |_, this, ()| Ok(this.effects.len()));
 
         // -- getEffect --
         /// Returns the effect at the given 1-based position, or nil.
@@ -289,7 +310,10 @@ impl LuaUserData for LuaPostFxStack {
             let mut count = 1;
             for (i, rc) in this.effects.iter().enumerate() {
                 if this.inner.enabled.get(i).copied().unwrap_or(true) {
-                    t.set(count, lua.create_userdata(LuaPostFxEffect::from_rc(Rc::clone(rc)))?)?;
+                    t.set(
+                        count,
+                        lua.create_userdata(LuaPostFxEffect::from_rc(Rc::clone(rc)))?,
+                    )?;
                     count += 1;
                 }
             }
@@ -361,7 +385,6 @@ impl LuaUserData for LuaPostFxStack {
     }
 }
 
-
 // -------------------------------------------------------------------------------
 // LuaImageEffect UserData
 // -------------------------------------------------------------------------------
@@ -378,9 +401,8 @@ impl LuaUserData for LuaImageEffect {
         /// @param name : string
         /// @return PostFxEffect
         methods.add_method_mut("addEffect", |lua, this, name: String| {
-            let et = PostFxEffectType::from_name(&name).ok_or_else(|| {
-                LuaError::RuntimeError(format!("unknown effect type: {name}"))
-            })?;
+            let et = PostFxEffectType::from_name(&name)
+                .ok_or_else(|| LuaError::RuntimeError(format!("unknown effect type: {name}")))?;
             let rc = Rc::new(RefCell::new(PostFxEffect::new(et)));
             this.inner.add_effect_rc(Rc::clone(&rc));
             lua.create_userdata(LuaPostFxEffect::from_rc(rc))
@@ -392,13 +414,19 @@ impl LuaUserData for LuaImageEffect {
         /// @return PostFxEffect|nil
         methods.add_method("getEffect", |lua, this, key: LuaValue| {
             let rc_opt = match &key {
-                LuaValue::Integer(i) => this.inner.get_effect_by_index((*i as usize).saturating_sub(1)),
-                LuaValue::Number(n) => this.inner.get_effect_by_index((*n as usize).saturating_sub(1)),
+                LuaValue::Integer(i) => this
+                    .inner
+                    .get_effect_by_index((*i as usize).saturating_sub(1)),
+                LuaValue::Number(n) => this
+                    .inner
+                    .get_effect_by_index((*n as usize).saturating_sub(1)),
                 LuaValue::String(s) => this.inner.get_effect_by_name(s.to_str()?),
                 _ => None,
             };
             match rc_opt {
-                Some(rc) => Ok(LuaValue::UserData(lua.create_userdata(LuaPostFxEffect::from_rc(rc))?)),
+                Some(rc) => Ok(LuaValue::UserData(
+                    lua.create_userdata(LuaPostFxEffect::from_rc(rc))?,
+                )),
                 None => Ok(LuaValue::Nil),
             }
         });
@@ -407,13 +435,11 @@ impl LuaUserData for LuaImageEffect {
         /// Removes the effect at the given 1-based index or with the given type name.
         /// @param key : integer|string
         /// @return boolean
-        methods.add_method_mut("removeEffect", |_, this, key: LuaValue| {
-            match &key {
-                LuaValue::Integer(i) => Ok(this.inner.remove_by_index((*i as usize).saturating_sub(1))),
-                LuaValue::Number(n) => Ok(this.inner.remove_by_index((*n as usize).saturating_sub(1))),
-                LuaValue::String(s) => Ok(this.inner.remove_by_name(s.to_str()?)),
-                _ => Ok(false),
-            }
+        methods.add_method_mut("removeEffect", |_, this, key: LuaValue| match &key {
+            LuaValue::Integer(i) => Ok(this.inner.remove_by_index((*i as usize).saturating_sub(1))),
+            LuaValue::Number(n) => Ok(this.inner.remove_by_index((*n as usize).saturating_sub(1))),
+            LuaValue::String(s) => Ok(this.inner.remove_by_name(s.to_str()?)),
+            _ => Ok(false),
         });
 
         // -- clearEffects --
@@ -435,9 +461,7 @@ impl LuaUserData for LuaImageEffect {
         // -- effectCount --
         /// Returns the number of effects in the chain.
         /// @return integer
-        methods.add_method("effectCount", |_, this, ()| {
-            Ok(this.inner.effect_count())
-        });
+        methods.add_method("effectCount", |_, this, ()| Ok(this.inner.effect_count()));
 
         // -- getEffectCount --
         /// Returns the number of effects in the chain (alias for effectCount).
@@ -942,9 +966,8 @@ impl LuaUserData for LuaOverlay {
         /// @param name : string
         /// @return nil
         methods.add_method_mut("setWeather", |_, this, name: String| {
-            this.inner.weather.weather_type = WeatherType::from_name(&name).ok_or_else(|| {
-                LuaError::RuntimeError(format!("unknown weather type: {name}"))
-            })?;
+            this.inner.weather.weather_type = WeatherType::from_name(&name)
+                .ok_or_else(|| LuaError::RuntimeError(format!("unknown weather type: {name}")))?;
             Ok(())
         });
 
@@ -1057,13 +1080,10 @@ impl LuaUserData for LuaOverlay {
         /// @param intensity : number
         /// @param duration : number
         /// @return nil
-        methods.add_method_mut(
-            "shake",
-            |_, this, (intensity, dur): (f32, Option<f32>)| {
-                this.inner.trigger_shake(intensity, dur.unwrap_or(0.5));
-                Ok(())
-            },
-        );
+        methods.add_method_mut("shake", |_, this, (intensity, dur): (f32, Option<f32>)| {
+            this.inner.trigger_shake(intensity, dur.unwrap_or(0.5));
+            Ok(())
+        });
 
         // -- isShaking --
         /// Returns true while a shake effect is in progress.
@@ -1146,7 +1166,9 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
     tbl.set(
         "newCustomEffect",
         lua.create_function(|lua, shader_id: usize| {
-            lua.create_userdata(LuaPostFxEffect::from_owned(PostFxEffect::new_custom(shader_id)))
+            lua.create_userdata(LuaPostFxEffect::from_owned(PostFxEffect::new_custom(
+                shader_id,
+            )))
         })?,
     )?;
 
@@ -1180,7 +1202,9 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
     tbl.set(
         "newPass",
         lua.create_function(|lua, shader_id: usize| {
-            lua.create_userdata(LuaPostFxEffect::from_owned(PostFxEffect::new_custom(shader_id)))
+            lua.create_userdata(LuaPostFxEffect::from_owned(PostFxEffect::new_custom(
+                shader_id,
+            )))
         })?,
     )?;
 
@@ -1239,7 +1263,10 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
                 Some(LuaValue::Table(chain)) => {
                     for entry in chain.clone().sequence_values::<LuaTable>() {
                         let entry = entry?;
-                        let name: String = entry.get("type").or_else(|_| entry.get(1)).unwrap_or_default();
+                        let name: String = entry
+                            .get("type")
+                            .or_else(|_| entry.get(1))
+                            .unwrap_or_default();
                         let et = PostFxEffectType::from_name(&name).ok_or_else(|| {
                             LuaError::RuntimeError(format!("unknown effect type: {name}"))
                         })?;

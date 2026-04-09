@@ -74,6 +74,7 @@ fn shape_from_lua(lua: &Lua, shape_type: &str, args: LuaMultiValue) -> LuaResult
 // -------------------------------------------------------------------------------
 
 fn raycast_hit_to_table<'lua>(lua: &'lua Lua, hit: &RaycastHit) -> LuaResult<LuaTable<'lua>> {
+    // @return table — Raycast hit result: {bodyId, x, y, normalX, normalY, toi}
     let tbl = lua.create_table()?;
     tbl.set("bodyId", hit.body_id)?;
     tbl.set("x", hit.point.0)?;

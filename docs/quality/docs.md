@@ -1,20 +1,15 @@
 # Module Quality Report: `docs`
 
-> **Status**: 🔴 FAIL  |  **Date**: 2026-04-09  |  **Score**: 44 ✅ / 2 ⚠️ / 2 ❌ / 19 🔵
+> **Status**: 🟢 PASS  |  **Date**: 2026-04-09  |  **Score**: 46 ✅ / 2 ⚠️ / 0 ❌ / 19 🔵
 
 ---
 
 ## Action Items
 
-### 🔴 Errors — Must Fix Before Merge
-
-- [ ] **B-03** — impl LuaUserData placement: Move impl LuaUserData for LuaSchema, DocEntry, ApiCatalog, ValidationReport, QualityReport from lua_api/docs_api.rs → src/docs/
-- [ ] **T-04** — Float comparisons: assert_eq! with float literals (use abs()<epsilon): line 232, line 237, line 242, line 247, line 252
-
 ### 🟡 Warnings — Should Fix
 
-- [ ] **D-07** — @param/@return annotations: Missing @param/@return before: phantom, incomplete, stale, current, missing
-- [ ] **B-04** — No business logic in closures: '<closure@794>' (27 LOC, line 794) — extract body to src/docs/ | '<closure@829>' (40 LOC, line 829) — extract body to src/docs/ | '<closure@878>' (27 LOC, line 878) — extract body to src/docs/ | '<closure@914>' (22 LOC, line 914) — extract body to src/docs/ | '<closure@1126>' has if/match/for — extract to src/docs/ | '<closure@1143>' has if/match/for — extract to src/docs/
+- [ ] **D-07** — @param/@return annotations: Missing @param/@return before: phantom, incomplete, moduleScores, stale, current (+1 more)
+- [ ] **B-04** — No business logic in closures: '<closure@801>' (26 LOC, line 801) — extract body to src/docs/ | '<closure@835>' (38 LOC, line 835) — extract body to src/docs/ | '<closure@882>' (27 LOC, line 882) — extract body to src/docs/ | '<closure@918>' (21 LOC, line 918) — extract body to src/docs/ | '<closure@1127>' has if/match/for — extract to src/docs/ | '<closure@1144>' has if/match/for — extract to src/docs/
 
 ## Full Check Results
 
@@ -62,7 +57,7 @@
 | **D-04** Doc quality | ✅ PASS | No stub docs found |
 | **D-05** Validation tool | 🔵 MANUAL | Run: python tools/docs/collect_docs.py --report-missing \| grep src/<module> |
 | **D-06** Lua API file docs | ✅ PASS | //! doc comment present |
-| **D-07** @param/@return annotations | ⚠️ WARNING | Missing @param/@return before: phantom, incomplete, stale, current, missing |
+| **D-07** @param/@return annotations | ⚠️ WARNING | Missing @param/@return before: phantom, incomplete, moduleScores, stale, current (+1 more) |
 | **D-08** No rustdoc in lua_api | ✅ PASS | No rustdoc sections in Lua API file |
 | **D-09** Section separators | ✅ PASS | Separators present |
 
@@ -71,9 +66,9 @@
 | Check | Verdict | Details |
 |-------|---------|---------|
 | **B-01** Dedicated API file | ✅ PASS | lua_api/docs_api.rs present |
-| **B-02** Registration-only | ✅ PASS | Only register() is pub fn |
-| **B-03** impl LuaUserData placement | ❌ ERROR | Move impl LuaUserData for LuaSchema, DocEntry, ApiCatalog, ValidationReport, QualityReport from lua_api/docs_api.rs → src/docs/ |
-| **B-04** No business logic in closures | ⚠️ WARNING | '<closure@794>' (27 LOC, line 794) — extract body to src/docs/ \| '<closure@829>' (40 LOC, line 829) — extract body to src/docs/ \| '<closure@878>' (27 LOC, line 878) — extract body to src/docs/ \| '<closure@914>' (22 LOC, line 914) — extract body to src/docs/ \| '<closure@1126>' has if/match/for — extract to src/docs/ \| '<closure@1143>' has if/match/for — extract to src/docs/ |
+| **B-02** Registration-only | ✅ PASS | Only register() is pub fn (Lua<X> wrapper structs allowed) |
+| **B-03** impl LuaUserData placement | ✅ PASS | All impl LuaUserData blocks are in lua_api (correct) |
+| **B-04** No business logic in closures | ⚠️ WARNING | '<closure@801>' (26 LOC, line 801) — extract body to src/docs/ \| '<closure@835>' (38 LOC, line 835) — extract body to src/docs/ \| '<closure@882>' (27 LOC, line 882) — extract body to src/docs/ \| '<closure@918>' (21 LOC, line 918) — extract body to src/docs/ \| '<closure@1127>' has if/match/for — extract to src/docs/ \| '<closure@1144>' has if/match/for — extract to src/docs/ |
 | **B-05** Rc clone pattern | ✅ PASS | Rc clone pattern looks correct |
 | **B-06** Flat registration body | ✅ PASS | All tbl.set() calls are flat statements |
 
@@ -94,7 +89,7 @@
 | **T-01** Rust test file | ✅ PASS | Found: tests\rust\unit\docs_tests.rs |
 | **T-02** Lua test file | ✅ PASS | tests/lua/unit/test_docs.lua registered in harness |
 | **T-03** Test naming | ✅ PASS | Test names follow convention |
-| **T-04** Float comparisons | ❌ ERROR | assert_eq! with float literals (use abs()<epsilon): line 232, line 237, line 242, line 247, line 252 |
+| **T-04** Float comparisons | ✅ PASS | No float assert_eq! found |
 | **T-05** Test adequacy | ✅ PASS | 38 tests / 26 pub methods (146%) |
 | **T-06** Golden tests | 🔵 MANUAL | Check if module qualifies for golden/snapshot tests |
 | **T-07** Tests pass | 🔵 MANUAL | Run: cargo test --test docs_tests -- --nocapture |

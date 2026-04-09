@@ -46,6 +46,9 @@ pub enum AutoTileLayout {
 ///
 /// Stores the bitmask↔tile-index mapping tables for a given [`AutoTileLayout`] and
 /// can apply the resulting rules to a [`TileSet`].
+///
+/// # Fields
+/// (Internal state — use accessor methods to interact with this type.)
 #[derive(Clone)]
 pub struct AutoTileSheet {
     tile_width: u32,

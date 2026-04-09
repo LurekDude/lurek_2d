@@ -182,7 +182,7 @@ impl GOAPPlanner {
         self.plan_for_goal(&goal.state, world_state, max_depth)
     }
 
-    /// Plans for a specific goal index. Consult the module-level documentation for the broader usage context and preconditions.
+    /// Plans for a specific goal index.
     ///
     /// # Parameters
     /// - `goal_idx` — `usize`.

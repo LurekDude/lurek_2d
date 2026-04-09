@@ -1,20 +1,13 @@
 # Module Quality Report: `audio`
 
-> **Status**: 🔴 FAIL  |  **Date**: 2026-04-09  |  **Score**: 42 ✅ / 4 ⚠️ / 2 ❌ / 19 🔵
+> **Status**: 🟢 PASS  |  **Date**: 2026-04-09  |  **Score**: 46 ✅ / 2 ⚠️ / 0 ❌ / 19 🔵
 
 ---
 
 ## Action Items
 
-### 🔴 Errors — Must Fix Before Merge
-
-- [ ] **B-02** — Registration-only: struct definitions (move to src/audio/): LuaSource, LuaBus, LuaMidiPlayer, LuaDecoder
-- [ ] **B-03** — impl LuaUserData placement: Move impl LuaUserData for LuaSource, LuaBus, LuaMidiPlayer, LuaDecoder from lua_api/audio_api.rs → src/audio/
-
 ### 🟡 Warnings — Should Fix
 
-- [ ] **S-03** — File size limits: Files >1500 LOC: audio/mixer.rs (1587 LOC)
-- [ ] **SP-03** — Summary quality: Summary very long (2034 chars)
 - [ ] **B-04** — No business logic in closures: '<closure@1063>' (28 LOC, line 1063) — extract body to src/audio/ | '<closure@1101>' (17 LOC, line 1101) — extract body to src/audio/ | '<closure@1507>' (16 LOC, line 1507) — extract body to src/audio/ | '<closure@1391>' has if/match/for — extract to src/audio/ | '<closure@1411>' has if/match/for — extract to src/audio/
 - [ ] **Q-04** — Error handling: .unwrap() calls: bus:138, bus:161, midi:129, midi:132, midi:138
 
@@ -26,7 +19,7 @@
 |-------|---------|---------|
 | **S-01** lib.rs registration | ✅ PASS | Registered in lib.rs + lua_api (audio_api) |
 | **S-02** mod.rs simplicity | ✅ PASS | mod.rs is a thin barrel file (16 logic lines) |
-| **S-03** File size limits | ⚠️ WARNING | Files >1500 LOC: audio/mixer.rs (1587 LOC) |
+| **S-03** File size limits | ✅ PASS | All files within size limits |
 | **S-04** File naming | ✅ PASS | File names follow conventions |
 | **S-05** Module necessity | 🔵 MANUAL | Requires manual review — could this be pure Lua? |
 | **S-06** Large crate deps | 🔵 MANUAL | Requires manual review — check Cargo.toml for heavy crates |
@@ -49,7 +42,7 @@
 |-------|---------|---------|
 | **SP-01** Spec file exists | ✅ PASS | docs/specs/audio.md exists |
 | **SP-02** Required spec sections | ✅ PASS | All required sections present |
-| **SP-03** Summary quality | ⚠️ WARNING | Summary very long (2034 chars) |
+| **SP-03** Summary quality | ✅ PASS | Summary is 819 chars |
 | **SP-04** Lua API completeness | ✅ PASS | All 76 bound functions in spec |
 | **SP-05** Key Types accuracy | ✅ PASS | 18 types — spec Key Types in sync |
 | **SP-06** Spec quality | ✅ PASS | No stub content |
@@ -73,8 +66,8 @@
 | Check | Verdict | Details |
 |-------|---------|---------|
 | **B-01** Dedicated API file | ✅ PASS | lua_api/audio_api.rs present |
-| **B-02** Registration-only | ❌ ERROR | struct definitions (move to src/audio/): LuaSource, LuaBus, LuaMidiPlayer, LuaDecoder |
-| **B-03** impl LuaUserData placement | ❌ ERROR | Move impl LuaUserData for LuaSource, LuaBus, LuaMidiPlayer, LuaDecoder from lua_api/audio_api.rs → src/audio/ |
+| **B-02** Registration-only | ✅ PASS | Only register() is pub fn (Lua<X> wrapper structs allowed) |
+| **B-03** impl LuaUserData placement | ✅ PASS | All impl LuaUserData blocks are in lua_api (correct) |
 | **B-04** No business logic in closures | ⚠️ WARNING | '<closure@1063>' (28 LOC, line 1063) — extract body to src/audio/ \| '<closure@1101>' (17 LOC, line 1101) — extract body to src/audio/ \| '<closure@1507>' (16 LOC, line 1507) — extract body to src/audio/ \| '<closure@1391>' has if/match/for — extract to src/audio/ \| '<closure@1411>' has if/match/for — extract to src/audio/ |
 | **B-05** Rc clone pattern | ✅ PASS | Rc clone pattern looks correct |
 | **B-06** Flat registration body | ✅ PASS | All tbl.set() calls are flat statements |

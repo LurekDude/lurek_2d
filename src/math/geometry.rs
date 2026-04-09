@@ -440,8 +440,8 @@ pub fn convex_hull(points: &[f32]) -> Vec<f32> {
     let mut pts: Vec<(f32, f32)> = (0..n).map(|i| (points[i * 2], points[i * 2 + 1])).collect();
     pts.sort_by(|a, b| {
         a.0.partial_cmp(&b.0)
-            .unwrap()
-            .then(a.1.partial_cmp(&b.1).unwrap())
+            .expect("partial_cmp on finite f32")
+            .then(a.1.partial_cmp(&b.1).expect("partial_cmp on finite f32"))
     });
 
     let cross = |o: (f32, f32), a: (f32, f32), b: (f32, f32)| -> f32 {
@@ -639,7 +639,7 @@ mod tests {
     fn test_segment_intersection() {
         let (hit, pt) = segment_intersects_segment(0.0, 0.0, 2.0, 2.0, 0.0, 2.0, 2.0, 0.0);
         assert!(hit);
-        let (ix, iy) = pt.unwrap();
+        let (ix, iy) = pt.expect("intersection exists after hit=true");
         assert!((ix - 1.0).abs() < 1e-5);
         assert!((iy - 1.0).abs() < 1e-5);
     }
@@ -685,7 +685,7 @@ mod tests {
     fn test_line_intersect() {
         let pt = line_intersect(0.0, 0.0, 1.0, 1.0, 0.0, 1.0, 1.0, 0.0);
         assert!(pt.is_some());
-        let (x, y) = pt.unwrap();
+        let (x, y) = pt.expect("closest point exists");
         assert!((x - 0.5).abs() < 1e-5);
         assert!((y - 0.5).abs() < 1e-5);
     }
@@ -696,8 +696,8 @@ mod tests {
         assert!(hit);
         assert!(p1.is_some());
         assert!(p2.is_some());
-        let (x1, _) = p1.unwrap();
-        let (x2, _) = p2.unwrap();
+        let (x1, _) = p1.expect("intersection point exists");
+        let (x2, _) = p2.expect("intersection point exists");
         assert!((x1.abs() - 1.0).abs() < 1e-5);
         assert!((x2.abs() - 1.0).abs() < 1e-5);
     }

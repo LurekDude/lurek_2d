@@ -36,7 +36,7 @@ impl LocalEventCollector {
     }
 
     fn drain(&self) -> Vec<CollisionEvent> {
-        self.events.lock().unwrap().drain(..).collect()
+        self.events.lock().expect("event mutex not poisoned").drain(..).collect()
     }
 }
 
@@ -48,7 +48,7 @@ impl EventHandler for LocalEventCollector {
         event: CollisionEvent,
         _contact_pair: Option<&ContactPair>,
     ) {
-        self.events.lock().unwrap().push(event);
+        self.events.lock().expect("event mutex not poisoned").push(event);
     }
 
     fn handle_contact_force_event(
@@ -78,7 +78,7 @@ pub struct BodyContact {
     pub body_b: usize,
 }
 
-/// Result of a `World::raycast` query. Consult the module-level documentation for the broader usage context and preconditions.
+/// Result of a `World::raycast` query.
 ///
 /// # Fields
 /// - `body_id` — Integer body ID that was hit.
@@ -555,7 +555,7 @@ impl World {
         self.bodies.get_mut(id)
     }
 
-    /// Returns the total number of bodies. Consult the module-level documentation for the broader usage context and preconditions.
+    /// Returns the total number of bodies.
     ///
     /// # Returns
     /// The body count.
@@ -1329,7 +1329,7 @@ impl World {
 
     // ── Extended joint API ────────────────────────────────────────────────────
 
-    /// Returns the total number of joints. Consult the module-level documentation for the broader usage context and preconditions.
+    /// Returns the total number of joints.
     ///
     /// # Returns
     /// The joint count.

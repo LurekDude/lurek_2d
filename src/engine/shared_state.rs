@@ -461,7 +461,7 @@ impl SharedState {
         if self.async_loader.is_none() {
             self.async_loader = Some(crate::filesystem::AsyncLoader::new());
         }
-        let handle = self.async_loader.as_ref().unwrap().request_load(resolved);
+        let handle = self.async_loader.as_ref().expect("async_loader initialized above").request_load(resolved);
         Ok(handle.0)
     }
 

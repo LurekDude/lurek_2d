@@ -133,79 +133,198 @@ First-person tile-based movement controller for dungeon crawlers and grid-based 
 
 ---
 
+
 ## Key Types
 
-### Structs
+### AutoTileLayout
 
-| Type | File | Purpose |
-|---|---|---|
-| `TileMap` | `tilemap.rs` | Core tilemap: multi-layer, animation, autotile, collision |
-| `TileLayer` | `tilemap.rs` | Single named layer: GID grid, visibility, tint, offset, parallax, per-tile tints |
-| `SweepResult` | `tilemap.rs` | Swept AABB collision result: contact point (Vec2), normal (Vec2), tile coords, time-of-impact |
-| `TileSet` | `tileset.rs` | Atlas layout, quad computation, animation frames, solid flags, autotile rules |
-| `TileAnimFrame` | `tileset.rs` | Animation frame: tile_id + duration_ms |
-| `ChunkMap` | `chunk.rs` | Sparse chunk storage: `HashMap<(i32,i32), Vec<u32>>` with configurable chunk_size |
-| `IsoMap` | `isomap.rs` | Multi-level isometric map with diamond projection, draw ordering |
-| `IsoLevel` | `isomap.rs` | Single isometric Z-level: grid of `IsoTile`s, toggleable visibility |
-| `IsoTile` | `isomap.rs` | 4-slot tile: `parts: [u32; 4]` (Floor, NorthWall, WestWall, Object) |
-| `IsoDrawItem` | `isomap.rs` | Draw iteration item: level, tile coords, part index, GID, screen position |
-| `AutoTileSheet` | `autotile_sheet.rs` | Bitmask→tile lookup tables for blob-47, composite-48, minimal-16 layouts |
-| `MapGen` | `mapgen.rs` | Procedural map generator: grid size, tile size, orientation, zones, seed |
-| `MapBlock` | `mapgen.rs` | Multi-layer tile prefab with segment edges for constraint-based placement |
-| `MapGroup` | `mapgen.rs` | Collection of `MapBlock`s and `MapScript`s |
-| `MapScript` | `mapgen.rs` | Ordered sequence of `ScriptStep`s for procedural generation |
-| `ScriptStep` | `mapgen.rs` | Single generation operation with 27 config fields |
-| `MapZone` | `mapgen.rs` | Horizontal zone definition: name, start_row, height |
-| `TmxMap` | `tmx.rs` | Parsed Tiled map: dimensions, tilesets, layers, background color |
-| `TmxTileset` | `tmx.rs` | Parsed tileset: GID range, atlas dimensions, image source, solid tiles |
-| `TmxTileLayer` | `tmx.rs` | Parsed tile layer: name, dimensions, visibility, opacity, offset, GID array |
-| `TmxObjectLayer` | `tmx.rs` | Parsed object layer: name, visibility, objects |
-| `TmxObject` | `tmx.rs` | Parsed object: id, name, type, position, size, optional GID |
-| `LargeMapRenderer` | `large_map_renderer.rs` | Chunked renderer with LOD, dirty tracking, camera-based culling |
-| `MapChunk` | `large_map_renderer.rs` | Single chunk: coords, dirty flag, tile_ids array |
-| `PolygonMap` | `polygon_map.rs` | Named polygon region collection with hit detection and highlighting |
-| `PolygonRegion` | `polygon_map.rs` | Single polygon: vertices, color, label, font_size |
-| `TileWalker` | `tile_walker.rs` | Grid movement controller: position, facing, previous state for interpolation |
+`enum` defined in `autotile_sheet.rs`.
 
-### Enums
 
-| Type | File | Purpose |
-|---|---|---|
-| `IsoTilePart` | `isomap.rs` | Tile slot index: Floor, NorthWall, WestWall, Object |
-| `AutoTileLayout` | `autotile_sheet.rs` | Sheet layout variant: Blob47, Composite48, Minimal16 |
-| `Edge` | `mapgen.rs` | Block edge direction: North, East, South, West |
-| `StepType` | `mapgen.rs` | Generation operation: FillRandom, PlaceBlock, PlaceRandom, PlaceLine, FloodFill, FillArea, DrawPath, FillRect |
-| `MapOrientation` | `mapgen.rs` | Map view: TopDown, SideView |
-| `LayerMode` | `mapgen.rs` | Layer handling: Unified, Separate |
-| `MapSize` | `mapgen.rs` | Grid preset: Tiny, Small, Medium, Large, Huge, Custom(u32, u32) |
-| `TmxOrientation` | `tmx.rs` | Tiled map orientation: Orthogonal, Isometric, Staggered, Hexagonal |
-| `TmxStaggerAxis` | `tmx.rs` | Hex stagger axis: X, Y |
-| `TmxLayer` | `tmx.rs` | Layer variant: Tile(TmxTileLayer), Object(TmxObjectLayer) |
-| `Facing` | `tile_walker.rs` | Cardinal direction: North, East, South, West (with angle/delta methods) |
+### AutoTileSheet
 
-### Standalone Functions
+`struct` defined in `autotile_sheet.rs`.
 
-| Function | File | Purpose |
-|---|---|---|
-| `load_tmx(xml: &str) -> Result<TmxMap, String>` | `tmx.rs` | Parse a TMX XML string into a `TmxMap` |
-| `to_screen_iso(tx, ty, tw, th) -> Vec2` | `coords.rs` | Diamond iso tile→screen projection |
-| `from_screen_iso(sx, sy, tw, th) -> Vec2` | `coords.rs` | Diamond iso screen→tile conversion |
-| `iso_rotate(direction, steps) -> i32` | `coords.rs` | Rotate iso direction (1–4) by steps |
-| `iso_direction_name(direction) -> &str` | `coords.rs` | Direction integer to name string |
-| `iso_direction_from_angle(angle) -> i32` | `coords.rs` | Snap radians to iso direction |
-| `to_screen_hex(q, r, size) -> Vec2` | `coords.rs` | Axial hex → screen (pointy-top) |
-| `from_screen_hex(sx, sy, size) -> (i32, i32)` | `coords.rs` | Screen → axial hex |
-| `hex_neighbors(q, r) -> [(i32,i32); 6]` | `coords.rs` | Six hex neighbors |
-| `hex_distance(q1, r1, q2, r2) -> i32` | `coords.rs` | Manhattan hex distance |
-| `hex_round(q, r) -> (i32, i32)` | `coords.rs` | Fractional to nearest hex cell |
-| `hex_line(q1, r1, q2, r2) -> Vec<(i32,i32)>` | `coords.rs` | Bresenham hex line |
-| `hex_ring(q, r, radius) -> Vec<(i32,i32)>` | `coords.rs` | Cells at exact distance |
-| `hex_spiral(q, r, radius) -> Vec<(i32,i32)>` | `coords.rs` | Concentric ring spiral |
-| `hex_area(q, r, radius) -> Vec<(i32,i32)>` | `coords.rs` | Filled hex disk |
-| `hex_rotate(q, r, cq, cr, steps) -> (i32,i32)` | `coords.rs` | Cube rotation by 60° steps |
-| `hex_reflect(q, r, cq, cr, axis) -> (i32,i32)` | `coords.rs` | Cube reflection across q/r/s axis |
 
----
+### ChunkMap
+
+`struct` defined in `chunk.rs`.
+
+
+### Edge
+
+`enum` defined in `mapgen.rs`.
+
+
+### Facing
+
+`enum` defined in `tile_walker.rs`.
+
+
+### IsoDrawItem
+
+`struct` defined in `isomap.rs`.
+
+
+### IsoLevel
+
+`struct` defined in `isomap.rs`.
+
+
+### IsoMap
+
+`struct` defined in `isomap.rs`.
+
+
+### IsoTile
+
+`struct` defined in `isomap.rs`.
+
+
+### IsoTilePart
+
+`enum` defined in `isomap.rs`.
+
+
+### LargeMapRenderer
+
+`struct` defined in `large_map_renderer.rs`.
+
+
+### LayerMode
+
+`enum` defined in `mapgen.rs`.
+
+
+### MapBlock
+
+`struct` defined in `mapgen.rs`.
+
+
+### MapChunk
+
+`struct` defined in `large_map_renderer.rs`.
+
+
+### MapGen
+
+`struct` defined in `mapgen.rs`.
+
+
+### MapGroup
+
+`struct` defined in `mapgen.rs`.
+
+
+### MapOrientation
+
+`enum` defined in `mapgen.rs`.
+
+
+### MapScript
+
+`struct` defined in `mapgen.rs`.
+
+
+### MapSize
+
+`enum` defined in `mapgen.rs`.
+
+
+### MapZone
+
+`struct` defined in `mapgen.rs`.
+
+
+### PolygonMap
+
+`struct` defined in `polygon_map.rs`.
+
+
+### PolygonRegion
+
+`struct` defined in `polygon_map.rs`.
+
+
+### ScriptStep
+
+`struct` defined in `mapgen.rs`.
+
+
+### StepType
+
+`enum` defined in `mapgen.rs`.
+
+
+### SweepResult
+
+`struct` defined in `tilemap.rs`.
+
+
+### TileAnimFrame
+
+`struct` defined in `tileset.rs`.
+
+
+### TileLayer
+
+`struct` defined in `tilemap.rs`.
+
+
+### TileMap
+
+`struct` defined in `tilemap.rs`.
+
+
+### TileSet
+
+`struct` defined in `tileset.rs`.
+
+
+### TileWalker
+
+`struct` defined in `tile_walker.rs`.
+
+
+### TmxLayer
+
+`enum` defined in `tmx.rs`.
+
+
+### TmxMap
+
+`struct` defined in `tmx.rs`.
+
+
+### TmxObject
+
+`struct` defined in `tmx.rs`.
+
+
+### TmxObjectLayer
+
+`struct` defined in `tmx.rs`.
+
+
+### TmxOrientation
+
+`enum` defined in `tmx.rs`.
+
+
+### TmxStaggerAxis
+
+`enum` defined in `tmx.rs`.
+
+
+### TmxTileLayer
+
+`struct` defined in `tmx.rs`.
+
+
+### TmxTileset
+
+`struct` defined in `tmx.rs`.
+
 
 ## Lua API
 
@@ -385,6 +504,19 @@ Registered by `src/lua_api/tilemap_api.rs` under `lurek.tilemap`.
 | `:getName()` | `string` | Group name |
 
 ---
+
+
+### Additional API
+
+| Function | Description |
+|---|---|
+| `FLOOR` | Tile type constant: passable floor cell |
+| `NORTH_WALL` | Tile type constant: wall on north edge |
+| `OBJECT` | Tile type constant: object / obstacle cell |
+| `WEST_WALL` | Tile type constant: wall on west edge |
+| `loadTMX(path)` | Load a Tiled TMX map file |
+| `newMapGen(w, h, options)` | Create a procedural map generator |
+| `newMapScript(script)` | Create a map from a Lua script description |
 
 ## Lua Examples
 

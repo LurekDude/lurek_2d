@@ -354,7 +354,7 @@ mod tests {
         let new_pt = Vec2::new(9.0, 8.0);
         let ok = curve.set_control_point(0, new_pt);
         assert!(ok);
-        let got = curve.get_control_point(0).unwrap();
+        let got = curve.get_control_point(0).expect("get_control_point returns Some for a valid index");
         assert!((got.x - 9.0).abs() < 1e-5);
         assert!((got.y - 8.0).abs() < 1e-5);
     }

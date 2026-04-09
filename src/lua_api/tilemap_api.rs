@@ -96,6 +96,7 @@ impl LuaUserData for LuaTileSet {
                 ));
             }
             let r = this.inner.borrow().get_quad(tile_id - 1);
+            // @return table — Quad source rect: {x, y, width, height}
             let tbl = lua.create_table()?;
             tbl.set("x", r.x)?;
             tbl.set("y", r.y)?;
@@ -154,6 +155,7 @@ impl LuaUserData for LuaTileSet {
                 Some(frames) => {
                     let tbl = lua.create_table()?;
                     for (i, f) in frames.iter().enumerate() {
+                        // @return table — Animation frame: {tileid, duration}
                         let entry = lua.create_table()?;
                         entry.set("tileid", f.tile_id + 1)?;
                         entry.set("duration", f.duration_ms)?;
@@ -1869,9 +1871,14 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
     )?;
 
     // -- IsoMap layer constants --
+    // @return integer — IsoMap layer index constant
+    /// IsoMap floor layer index (1).
     tbl.set("FLOOR", 1u32)?;
+    /// IsoMap north-wall layer index (2).
     tbl.set("NORTH_WALL", 2u32)?;
+    /// IsoMap west-wall layer index (3).
     tbl.set("WEST_WALL", 3u32)?;
+    /// IsoMap object layer index (4).
     tbl.set("OBJECT", 4u32)?;
 
     // -- newMapScript --
@@ -2022,6 +2029,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
             result.set("height", tmx.height)?;
             result.set("tileWidth", tmx.tile_width)?;
             result.set("tileHeight", tmx.tile_height)?;
+            // @return table — TMX map data: {width, height, tileWidth, tileHeight, orientation, layers}
             let orient_str = match tmx.orientation {
                 crate::tilemap::tmx::TmxOrientation::Orthogonal => "orthogonal",
                 crate::tilemap::tmx::TmxOrientation::Isometric => "isometric",
@@ -2032,6 +2040,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
             let layers_tbl = lua.create_table()?;
             let mut layer_idx = 1usize;
             for layer in &tmx.layers {
+                // @return table — Layer entry: {type, name, width?, height?}
                 let entry = lua.create_table()?;
                 match layer {
                     crate::tilemap::tmx::TmxLayer::Tile(t) => {
@@ -2041,6 +2050,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
                         entry.set("height", t.height)?;
                     }
                     crate::tilemap::tmx::TmxLayer::Object(o) => {
+                        // @return table — Object layer entry: {type, name}
                         entry.set("type", "object")?;
                         entry.set("name", o.name.as_str())?;
                     }
@@ -2048,11 +2058,13 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
                 layers_tbl.set(layer_idx, entry)?;
                 layer_idx += 1;
             }
+            // @return table — full TMX result with layers list
             result.set("layers", layers_tbl)?;
             Ok(result)
         })?,
     )?;
 
+    // @param tbl : table — tilemap module registration
     luna.set("tilemap", tbl)?;
     Ok(())
 }

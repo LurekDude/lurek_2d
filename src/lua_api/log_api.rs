@@ -213,6 +213,7 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
         Ok(())
     })?)?;
 
+    // -- log namespace --
     luna.set("log", log_table)?;
     Ok(())
 }

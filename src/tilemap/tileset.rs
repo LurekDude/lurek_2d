@@ -368,7 +368,7 @@ mod tests {
             },
         ];
         ts.set_animation(0, frames);
-        let anim = ts.get_animation(0).unwrap();
+        let anim = ts.get_animation(0).expect("animation 0 exists");
         assert_eq!(anim.len(), 2);
         assert_eq!(anim[0].tile_id, 0);
         assert!((anim[1].duration_ms - 200.0).abs() < 1e-5);

@@ -21,8 +21,11 @@
 //! | `interpolation.rs` | [`interpolate`], [`interpolate_pairs`] |
 //! | `plural.rs` | [`PluralForm`], [`pluralize`], [`pluralize_slavic`] |
 
+/// Multi-locale string table with dot-path keys and fallback chains.
 pub mod catalog;
+/// Variable substitution in translation strings.
 pub mod interpolation;
+/// CLDR-style count-based plural form selection.
 pub mod plural;
 
 pub use catalog::{Catalog, CatalogError};

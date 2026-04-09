@@ -1738,14 +1738,17 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
 
     // -- pi --
     /// The mathematical constant π ≈ 3.14159265358979.
+    /// @return number
     tbl.set("pi", std::f64::consts::PI)?;
 
     // -- tau --
     /// The mathematical constant τ = 2π ≈ 6.28318530717959.
+    /// @return number
     tbl.set("tau", std::f64::consts::TAU)?;
 
     // -- huge --
     /// Positive infinity (math.huge equivalent).
+    /// @return number
     tbl.set("huge", f64::INFINITY)?;
 
     // -- rad --

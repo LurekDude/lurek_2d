@@ -38,18 +38,31 @@
 //! | `ring.rs` | [`Ring`], [`RingEntry`] |
 //! | `funnel.rs` | [`Funnel`], [`FunnelEntry`] |
 
+/// Shared typed key-value store for AI and game system coordination.
 pub mod blackboard;
+/// Undo/redo command history with batching support.
 pub mod command_stack;
+/// Named-event pub/sub bus with priority ordering.
 pub mod event_bus;
+/// Type-name constructor registry with aliasing.
 pub mod factory;
+/// Time-windowed event aggregator and batch collector.
 pub mod funnel;
+/// Slot-tracking pool to recycle Lua objects without GC pressure.
 pub mod object_pool;
+/// Reactive property subscriptions for per-key change watchers.
 pub mod observer;
+/// Priority-ordered task queue for turn-based and agenda systems.
 pub mod priority_queue;
+/// Fixed-capacity circular history buffer.
 pub mod ring;
+/// Singleton-like named service registry.
 pub mod service_locator;
+/// Simplified single-active-state machine for basic state tracking.
 pub mod simple_state;
+/// Finite-state machine with transition validation and history.
 pub mod state_machine;
+/// Rate-limiter (throttle) and trailing-edge delay (debounce) for callbacks.
 pub mod throttle;
 
 pub use blackboard::{Blackboard, BlackboardValue};

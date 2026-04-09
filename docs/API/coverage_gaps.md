@@ -10,164 +10,30 @@ This report identifies three categories of coverage issues:
 
 ---
 
-## 1. Rust→Lua Gaps (8 items)
+## 1. Rust→Lua Gaps (0 items)
 
 These public Rust functions are **not exposed** to the `lurek.*` Lua API.
 This may be intentional (engine internals) or an oversight.
 
-### `debugbridge::server`
-
-- `handle_client_message` — Parses a newline-terminated JSON message from a client and e `src/debugbridge/server.rs:110`
-- `server_thread` — Accept loop: runs on a background thread and handles all TCP `src/debugbridge/server.rs:19`
-
-### `docs::report`
-
-- `quality_grade` — Converts a quality score into a letter grade.  A ≥ 0.9, B ≥  `src/docs/report.rs:46`
-- `quality_score` — Computes a quality score in `[0.0, 1.0]` for a single doc en `src/docs/report.rs:13`
-
-### `localization::interpolation`
-
-- `interpolate_pairs` — Thin wrapper: accepts `&[(impl Display, impl Display)]` pair `src/localization/interpolation.rs:75`
-
-### `localization::plural`
-
-- `pluralize` — Selects the correct plural string from a form map for the gi `src/localization/plural.rs:111`
-- `pluralize_slavic` — Like [`pluralize`] but accepts integer counts and uses Slavi `src/localization/plural.rs:130`
-
-### `log`
-
-- `enabled_for` — Returns `true` when messages at `level` would be emitted und `src/log/mod.rs:25`
+*All public Rust functions appear to be exposed to Lua.*
 
 ---
 
-## 2. Rust Docstring Issues (20 items)
+## 2. Rust Docstring Issues (0 items)
 
 Public Rust items with missing or very short descriptions (< 15 chars).
 These appear as `// (undocumented)` in `docs/API/rust-api.md`.
 
-### `debugbridge`
-
-- `mod` **bridge** `src/debugbridge/mod.rs:14`
-- `mod` **server** `src/debugbridge/mod.rs:15`
-
-### `devtools`
-
-- `mod` **frame_stats** `src/devtools/mod.rs:24`
-- `mod` **logger** `src/devtools/mod.rs:25`
-- `mod` **profiler** `src/devtools/mod.rs:26`
-- `mod` **watcher** `src/devtools/mod.rs:27`
-
-### `docs`
-
-- `mod` **catalog** `src/docs/mod.rs:15`
-- `mod` **entry** `src/docs/mod.rs:16`
-- `mod` **export** `src/docs/mod.rs:17`
-- `mod` **report** `src/docs/mod.rs:18`
-
-### `localization`
-
-- `mod` **catalog** `src/localization/mod.rs:24`
-- `mod` **interpolation** `src/localization/mod.rs:25`
-- `mod` **plural** `src/localization/mod.rs:26`
-
-### `patterns`
-
-- `mod` **command_stack** `src/patterns/mod.rs:29`
-- `mod` **event_bus** `src/patterns/mod.rs:30`
-- `mod` **factory** `src/patterns/mod.rs:31`
-- `mod` **object_pool** `src/patterns/mod.rs:32`
-- `mod` **service_locator** `src/patterns/mod.rs:33`
-- `mod` **simple_state** `src/patterns/mod.rs:34`
-- `mod` **state_machine** `src/patterns/mod.rs:35`
+*All public Rust items have adequate docstrings.*
 
 ---
 
-## 3. Lua Docstring Issues (43 items)
+## 3. Lua Docstring Issues (0 items)
 
 Lua API items with missing or very short descriptions (< 15 chars).
 These appear without documentation in `docs/API/lua-api.md` and IntelliSense.
 
-### `compute`
-
-- `method` **`Array:type`** — *(no description)*
-- `method` **`Array:typeOf`** — *(no description)*
-
-### `docs`
-
-- `class` **`lurek.docs.ApiCatalog`** — *(no description)*
-- `class` **`lurek.docs.DocEntry`** — *(no description)*
-- `class` **`lurek.docs.QualityReport`** — *(no description)*
-- `class` **`lurek.docs.ValidationReport`** — *(no description)*
-
-### `event`
-
-- `module` **`lurek.event`** — *(no description)*
-
-### `filesystem`
-
-- `module` **`lurek.filesystem`** — *(no description)*
-
-### `fx`
-
-- `function` **`lurek.fx.newStack`** — *(no description)*
-- `method` **`ImageEffect:type`** — *(no description)*
-- `method` **`ImageEffect:typeOf`** — *(no description)*
-- `method` **`PostFxEffect:setBrightness`** — *(no description)*
-- `method` **`PostFxEffect:setContrast`** — *(no description)*
-- `method` **`PostFxEffect:setIntensity`** — *(no description)*
-- `method` **`PostFxEffect:setOffset`** — *(no description)*
-- `method` **`PostFxEffect:setRadius`** — *(no description)*
-- `method` **`PostFxEffect:setSaturation`** — *(no description)*
-- `method` **`PostFxEffect:setScanlineStrength`** — *(no description)*
-- `method` **`PostFxEffect:setStrength`** — *(no description)*
-- `method` **`PostFxEffect:setThreshold`** — *(no description)*
-- `method` **`PostFxEffect:type`** — *(no description)*
-- `method` **`PostFxEffect:typeOf`** — *(no description)*
-- `method` **`PostFxStack:type`** — *(no description)*
-- `method` **`PostFxStack:typeOf`** — *(no description)*
-- `module` **`lurek.fx`** — *(no description)*
-
-### `graph`
-
-- `method` **`Edge:type`** — *(no description)*
-- `method` **`Edge:typeOf`** — *(no description)*
-- `method` **`Node:type`** — *(no description)*
-- `method` **`Node:typeOf`** — *(no description)*
-
-### `graphics`
-
-- `class` **`lurek.graphics.Image`** — *"# Fields"* (too short)
-- `method` **`ImageData:getHeight`** — *(no description)*
-- `method` **`ImageData:getWidth`** — *(no description)*
-- `method` **`ImageData:type`** — *(no description)*
-- `method` **`ImageData:typeOf`** — *(no description)*
-- `method` **`NineSlice:type`** — *(no description)*
-- `method` **`NineSlice:typeOf`** — *(no description)*
-
-### `gui`
-
-- `module` **`lurek.gui`** — *(no description)*
-
-### `image`
-
-- `module` **`lurek.image`** — *(no description)*
-
-### `particle`
-
-- `module` **`lurek.particle`** — *(no description)*
-
-### `pipeline`
-
-- `method` **`Step:type`** — *(no description)*
-- `method` **`Step:typeOf`** — *(no description)*
-
-### `serial`
-
-- `module` **`lurek.serial`** — *(no description)*
-
-### `timer`
-
-- `module` **`lurek.timer`** — *(no description)*
+*All Lua API items have adequate descriptions.*
 
 ---
 

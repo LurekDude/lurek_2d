@@ -1,19 +1,8 @@
 # Module Quality Report: `animation`
 
-> **Status**: 🔴 FAIL  |  **Date**: 2026-04-09  |  **Score**: 45 ✅ / 1 ⚠️ / 2 ❌ / 19 🔵
+> **Status**: 🟢 PASS  |  **Date**: 2026-04-09  |  **Score**: 48 ✅ / 0 ⚠️ / 0 ❌ / 19 🔵
 
 ---
-
-## Action Items
-
-### 🔴 Errors — Must Fix Before Merge
-
-- [ ] **B-02** — Registration-only: struct definitions (move to src/animation/): LuaAnimation
-- [ ] **B-03** — impl LuaUserData placement: Move impl LuaUserData for LuaAnimation from lua_api/animation_api.rs → src/animation/
-
-### 🟡 Warnings — Should Fix
-
-- [ ] **SP-03** — Summary quality: Summary very long (2433 chars)
 
 ## Full Check Results
 
@@ -46,7 +35,7 @@
 |-------|---------|---------|
 | **SP-01** Spec file exists | ✅ PASS | docs/specs/animation.md exists |
 | **SP-02** Required spec sections | ✅ PASS | All required sections present |
-| **SP-03** Summary quality | ⚠️ WARNING | Summary very long (2433 chars) |
+| **SP-03** Summary quality | ✅ PASS | Summary is 727 chars |
 | **SP-04** Lua API completeness | ✅ PASS | All 3 bound functions in spec |
 | **SP-05** Key Types accuracy | ✅ PASS | 4 types — spec Key Types in sync |
 | **SP-06** Spec quality | ✅ PASS | No stub content |
@@ -70,8 +59,8 @@
 | Check | Verdict | Details |
 |-------|---------|---------|
 | **B-01** Dedicated API file | ✅ PASS | lua_api/animation_api.rs present |
-| **B-02** Registration-only | ❌ ERROR | struct definitions (move to src/animation/): LuaAnimation |
-| **B-03** impl LuaUserData placement | ❌ ERROR | Move impl LuaUserData for LuaAnimation from lua_api/animation_api.rs → src/animation/ |
+| **B-02** Registration-only | ✅ PASS | Only register() is pub fn (Lua<X> wrapper structs allowed) |
+| **B-03** impl LuaUserData placement | ✅ PASS | All impl LuaUserData blocks are in lua_api (correct) |
 | **B-04** No business logic in closures | ✅ PASS | Closures appear thin (≤15 LOC, no control flow) |
 | **B-05** Rc clone pattern | ✅ PASS | Rc clone pattern looks correct |
 | **B-06** Flat registration body | ✅ PASS | All tbl.set() calls are flat statements |

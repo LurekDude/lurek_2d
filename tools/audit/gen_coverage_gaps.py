@@ -76,6 +76,18 @@ _INTERNAL_MODULES = {
     # not as free lurek.compute.* functions — they are fully accessible to Lua via array:method()
     "compute::ops",
     "compute::spatial",
+    # Debug bridge internals (TCP server internals, not Lua-exposed)
+    "debugbridge::server", "debugbridge::bridge",
+    # Engine docs quality scoring (internal engine tooling)
+    "docs::report",
+    # Image serialization helper (internal; save is handled by lurek.image.save)
+    "image::serial",
+    # Localization internal helpers (wrapped by lurek.localization.*)
+    "localization::interpolation", "localization::plural",
+    # Log internal enabled_for check (not Lua-exposed)
+    "log",
+    # Tween state internal helpers (wrapped by lurek.tween.*)
+    "tween::state",
 }
 
 # Minimum description length to be considered "documented"

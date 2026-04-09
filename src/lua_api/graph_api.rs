@@ -7,8 +7,8 @@ use std::rc::Rc;
 use std::str::FromStr;
 
 use crate::engine::SharedState;
-use crate::graph::{ConversionRule, FlowMode, Graph, GraphEvent, ItemPosition, OverflowPolicy};
 use crate::graph::pathfinding::PathResult;
+use crate::graph::{ConversionRule, FlowMode, Graph, GraphEvent, ItemPosition, OverflowPolicy};
 
 // ── Constants ───────────────────────────────────────────────────────────
 
@@ -141,12 +141,24 @@ fn path_result_to_lua<'lua>(
     let table = lua.create_table()?;
     let nodes_table = lua.create_table()?;
     for (i, nid) in result.nodes.iter().enumerate() {
-        nodes_table.set(i + 1, LuaNode { graph: graph.clone(), id: *nid })?;
+        nodes_table.set(
+            i + 1,
+            LuaNode {
+                graph: graph.clone(),
+                id: *nid,
+            },
+        )?;
     }
     table.set("nodes", nodes_table)?;
     let edges_table = lua.create_table()?;
     for (i, eid) in result.edges.iter().enumerate() {
-        edges_table.set(i + 1, LuaEdge { graph: graph.clone(), id: *eid })?;
+        edges_table.set(
+            i + 1,
+            LuaEdge {
+                graph: graph.clone(),
+                id: *eid,
+            },
+        )?;
     }
     table.set("edges", edges_table)?;
     table.set("cost", result.cost)?;
@@ -253,21 +265,21 @@ impl LuaUserData for LuaGraphItem {
                 .get(&this.id)
                 .ok_or_else(|| LuaError::RuntimeError("item not found".into()))?;
             match &item.position {
-                ItemPosition::AtNode(node_id) => Ok(LuaMultiValue::from_vec(vec![
-                    LuaValue::UserData(lua.create_userdata(LuaNode {
-                        graph: this.graph.clone(),
-                        id: *node_id,
-                    })?),
-                ])),
-                ItemPosition::InTransit { edge_id, progress } => {
-                    Ok(LuaMultiValue::from_vec(vec![
-                        LuaValue::UserData(lua.create_userdata(LuaEdge {
+                ItemPosition::AtNode(node_id) => {
+                    Ok(LuaMultiValue::from_vec(vec![LuaValue::UserData(
+                        lua.create_userdata(LuaNode {
                             graph: this.graph.clone(),
-                            id: *edge_id,
-                        })?),
-                        LuaValue::Number(*progress),
-                    ]))
+                            id: *node_id,
+                        })?,
+                    )]))
                 }
+                ItemPosition::InTransit { edge_id, progress } => Ok(LuaMultiValue::from_vec(vec![
+                    LuaValue::UserData(lua.create_userdata(LuaEdge {
+                        graph: this.graph.clone(),
+                        id: *edge_id,
+                    })?),
+                    LuaValue::Number(*progress),
+                ])),
                 ItemPosition::Unplaced => Ok(LuaMultiValue::from_vec(vec![])),
             }
         });
@@ -281,8 +293,9 @@ impl LuaUserData for LuaGraphItem {
         /// Returns true if this object is of the given type.
         /// @param name : string
         /// @return boolean
-        methods.add_method("typeOf", |_, _, name: String| Ok(name == "GraphItem" || name == "Object"));
-
+        methods.add_method("typeOf", |_, _, name: String| {
+            Ok(name == "GraphItem" || name == "Object")
+        });
     }
 }
 
@@ -319,20 +332,30 @@ impl LuaUserData for LuaEdge {
         /// Returns the source node handle.
         /// @return Node
         methods.add_method("getFrom", |_, this, ()| {
-            with_edge!(this, g, edge, Ok(LuaNode {
-                graph: this.graph.clone(),
-                id: edge.from_node,
-            }))
+            with_edge!(
+                this,
+                g,
+                edge,
+                Ok(LuaNode {
+                    graph: this.graph.clone(),
+                    id: edge.from_node,
+                })
+            )
         });
 
         // -- getTo --
         /// Returns the destination node handle.
         /// @return Node
         methods.add_method("getTo", |_, this, ()| {
-            with_edge!(this, g, edge, Ok(LuaNode {
-                graph: this.graph.clone(),
-                id: edge.to_node,
-            }))
+            with_edge!(
+                this,
+                g,
+                edge,
+                Ok(LuaNode {
+                    graph: this.graph.clone(),
+                    id: edge.to_node,
+                })
+            )
         });
 
         // -- getCapacity --
@@ -553,8 +576,9 @@ impl LuaUserData for LuaEdge {
         /// Returns true when the given name matches "GraphEdge" or a parent type.
         /// @param name : string
         /// @return boolean
-        methods.add_method("typeOf", |_, _, name: String| Ok(name == "GraphEdge" || name == "Object"));
-
+        methods.add_method("typeOf", |_, _, name: String| {
+            Ok(name == "GraphEdge" || name == "Object")
+        });
     }
 }
 
@@ -848,12 +872,20 @@ impl LuaUserData for LuaNode {
         /// @return table
         methods.add_method("getEdges", |lua, this, dir: Option<String>| {
             let direction = dir.as_deref().unwrap_or("both");
-            let ids = this.graph.borrow()
+            let ids = this
+                .graph
+                .borrow()
                 .get_edges_by_direction(this.id, direction)
                 .map_err(LuaError::runtime)?;
             let table = lua.create_table()?;
             for (i, eid) in ids.iter().enumerate() {
-                table.set(i + 1, LuaEdge { graph: this.graph.clone(), id: *eid })?;
+                table.set(
+                    i + 1,
+                    LuaEdge {
+                        graph: this.graph.clone(),
+                        id: *eid,
+                    },
+                )?;
             }
             Ok(table)
         });
@@ -868,7 +900,14 @@ impl LuaUserData for LuaNode {
         /// @param out_count : integer?
         methods.add_method(
             "setConversion",
-            |_, this, (in_type, out_type, in_count, out_count): (String, String, Option<u32>, Option<u32>)| {
+            |_,
+             this,
+             (in_type, out_type, in_count, out_count): (
+                String,
+                String,
+                Option<u32>,
+                Option<u32>,
+            )| {
                 let rule = ConversionRule {
                     in_type,
                     out_type,
@@ -963,12 +1002,15 @@ impl LuaUserData for LuaNode {
         /// @param item_type : string
         /// @param quantity : integer
         /// @return nil
-        methods.add_method("addSupply", |_, this, (item_type, quantity): (String, i32)| {
-            with_node_mut!(this, g, node, {
-                node.add_supply(&item_type, quantity);
-                Ok(())
-            })
-        });
+        methods.add_method(
+            "addSupply",
+            |_, this, (item_type, quantity): (String, i32)| {
+                with_node_mut!(this, g, node, {
+                    node.add_supply(&item_type, quantity);
+                    Ok(())
+                })
+            },
+        );
 
         // -- removeSupply --
         /// Removes the supply declaration for the given item type.
@@ -1059,8 +1101,9 @@ impl LuaUserData for LuaNode {
         /// Returns true when the given name matches "GraphNode" or a parent type.
         /// @param name : string
         /// @return boolean
-        methods.add_method("typeOf", |_, _, name: String| Ok(name == "GraphNode" || name == "Object"));
-
+        methods.add_method("typeOf", |_, _, name: String| {
+            Ok(name == "GraphNode" || name == "Object")
+        });
     }
 }
 
@@ -1572,8 +1615,9 @@ impl LuaUserData for LuaGraph {
         /// Returns true if this object is of the given type.
         /// @param name : string
         /// @return boolean
-        methods.add_method("typeOf", |_, _, name: String| Ok(name == "Graph" || name == "Object"));
-
+        methods.add_method("typeOf", |_, _, name: String| {
+            Ok(name == "Graph" || name == "Object")
+        });
     }
 }
 

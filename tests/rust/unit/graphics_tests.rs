@@ -1560,9 +1560,9 @@ fn test_phase02_points_accept_table_pairs_and_queue_draw_command() {
     let st = state.borrow();
     if let Some(DrawCommand::Points { points }) = st.draw_commands.last() {
         assert_eq!(points.len(), 3);
-        assert_eq!(points[0], (1.0, 2.0));
-        assert_eq!(points[1], (3.0, 4.0));
-        assert_eq!(points[2], (5.0, 6.0));
+        assert!((points[0].0 - 1.0).abs() < 1e-5 && (points[0].1 - 2.0).abs() < 1e-5);
+        assert!((points[1].0 - 3.0).abs() < 1e-5 && (points[1].1 - 4.0).abs() < 1e-5);
+        assert!((points[2].0 - 5.0).abs() < 1e-5 && (points[2].1 - 6.0).abs() < 1e-5);
     } else {
         panic!("Expected DrawCommand::Points");
     }

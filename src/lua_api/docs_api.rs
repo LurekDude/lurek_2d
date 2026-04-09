@@ -99,7 +99,9 @@ impl LuaUserData for LuaSchema {
                     .map(|e| e.message.clone())
                     .collect::<Vec<_>>()
                     .join("; ");
-                return Err(LuaError::external(format!("schema validation failed: {msg}")));
+                return Err(LuaError::external(format!(
+                    "schema validation failed: {msg}"
+                )));
             }
             Ok(())
         });
@@ -198,9 +200,7 @@ impl LuaUserData for DocEntry {
 
         /// Returns the deprecation message, or nil.
         /// @return string?
-        methods.add_method("getDeprecated", |_, this, ()| {
-            Ok(this.0.deprecated.clone())
-        });
+        methods.add_method("getDeprecated", |_, this, ()| Ok(this.0.deprecated.clone()));
 
         /// Returns the quality score in [0,1].
         /// @return number
@@ -531,11 +531,13 @@ impl LuaUserData for ValidationReport {
             for (i, p) in this.0.phantom.iter().enumerate() {
                 phantom.set(i + 1, p.clone())?;
             }
+            // phantom: list of phantom (extra) API entries
             tbl.set("phantom", phantom)?;
             let incomplete = lua.create_table()?;
             for (i, inc) in this.0.incomplete.iter().enumerate() {
                 incomplete.set(i + 1, inc.clone())?;
             }
+            // incomplete: list of entries that exist but have partial docs
             tbl.set("incomplete", incomplete)?;
             Ok(tbl)
         });
@@ -655,12 +657,15 @@ impl LuaUserData for QualityReport {
         /// @return table
         methods.add_method("toTable", |lua, this, ()| {
             let tbl = lua.create_table()?;
+            // overallScore: quality score in [0,1]
             tbl.set("overallScore", this.0.overall_score)?;
+            // grade: letter grade for the overall score
             tbl.set("grade", docs::quality_grade(this.0.overall_score))?;
             let mods = lua.create_table()?;
             for (k, v) in &this.0.module_scores {
                 mods.set(k.clone(), *v)?;
             }
+            // moduleScores: table mapping module name to quality score
             tbl.set("moduleScores", mods)?;
             Ok(tbl)
         });
@@ -689,7 +694,9 @@ struct DocsState {
 
 impl DocsState {
     fn new() -> Self {
-        Self { entries: Vec::new() }
+        Self {
+            entries: Vec::new(),
+        }
     }
 }
 
@@ -792,9 +799,8 @@ pub fn register(lua: &Lua, luna_table: &LuaTable) -> LuaResult<()> {
     docs_tbl.set(
         "loadToml",
         lua.create_function(|lua, path: String| {
-            let content = std::fs::read_to_string(&path).map_err(|e| {
-                LuaError::RuntimeError(format!("failed to read {}: {}", path, e))
-            })?;
+            let content = std::fs::read_to_string(&path)
+                .map_err(|e| LuaError::RuntimeError(format!("failed to read {}: {}", path, e)))?;
             let globals = lua.globals();
             let luna_tbl: LuaTable = globals.get("lurek")?;
             let data_tbl: LuaTable = luna_tbl.get("data")?;
@@ -849,9 +855,7 @@ pub fn register(lua: &Lua, luna_table: &LuaTable) -> LuaResult<()> {
                                             kind: et
                                                 .get("kind")
                                                 .unwrap_or_else(|_| "function".into()),
-                                            description: et
-                                                .get("description")
-                                                .unwrap_or_default(),
+                                            description: et.get("description").unwrap_or_default(),
                                             example: et.get("example").ok(),
                                             since: et.get("since").ok(),
                                             deprecated: et.get("deprecated").ok(),
@@ -911,29 +915,27 @@ pub fn register(lua: &Lua, luna_table: &LuaTable) -> LuaResult<()> {
     let s = state.clone();
     docs_tbl.set(
         "setParamInfo",
-        lua.create_function(
-            move |_, (qualified_name, params): (String, LuaTable)| {
-                let mut st = s.borrow_mut();
-                let mut param_list = Vec::new();
-                for (_, pt) in params.pairs::<i64, LuaTable>().flatten() {
-                    param_list.push(docs::ParamInfo {
-                        name: pt.get("name").unwrap_or_default(),
-                        type_name: pt.get("type").unwrap_or_default(),
-                        description: pt.get("description").unwrap_or_default(),
-                        optional: pt.get("optional").unwrap_or(false),
-                        default: pt.get("default").ok(),
-                    });
-                }
-                if let Some(entry) = st
-                    .entries
-                    .iter_mut()
-                    .find(|e| e.qualified_name == qualified_name)
-                {
-                    entry.parameters = param_list;
-                }
-                Ok(())
-            },
-        )?,
+        lua.create_function(move |_, (qualified_name, params): (String, LuaTable)| {
+            let mut st = s.borrow_mut();
+            let mut param_list = Vec::new();
+            for (_, pt) in params.pairs::<i64, LuaTable>().flatten() {
+                param_list.push(docs::ParamInfo {
+                    name: pt.get("name").unwrap_or_default(),
+                    type_name: pt.get("type").unwrap_or_default(),
+                    description: pt.get("description").unwrap_or_default(),
+                    optional: pt.get("optional").unwrap_or(false),
+                    default: pt.get("default").ok(),
+                });
+            }
+            if let Some(entry) = st
+                .entries
+                .iter_mut()
+                .find(|e| e.qualified_name == qualified_name)
+            {
+                entry.parameters = param_list;
+            }
+            Ok(())
+        })?,
     )?;
 
     // -- setReturnInfo -----------------------------------------------------
@@ -943,26 +945,24 @@ pub fn register(lua: &Lua, luna_table: &LuaTable) -> LuaResult<()> {
     let s = state.clone();
     docs_tbl.set(
         "setReturnInfo",
-        lua.create_function(
-            move |_, (qualified_name, returns): (String, LuaTable)| {
-                let mut st = s.borrow_mut();
-                let mut return_list = Vec::new();
-                for (_, rt) in returns.pairs::<i64, LuaTable>().flatten() {
-                    return_list.push(docs::ReturnInfo {
-                        type_name: rt.get("type").unwrap_or_default(),
-                        description: rt.get("description").unwrap_or_default(),
-                    });
-                }
-                if let Some(entry) = st
-                    .entries
-                    .iter_mut()
-                    .find(|e| e.qualified_name == qualified_name)
-                {
-                    entry.returns = return_list;
-                }
-                Ok(())
-            },
-        )?,
+        lua.create_function(move |_, (qualified_name, returns): (String, LuaTable)| {
+            let mut st = s.borrow_mut();
+            let mut return_list = Vec::new();
+            for (_, rt) in returns.pairs::<i64, LuaTable>().flatten() {
+                return_list.push(docs::ReturnInfo {
+                    type_name: rt.get("type").unwrap_or_default(),
+                    description: rt.get("description").unwrap_or_default(),
+                });
+            }
+            if let Some(entry) = st
+                .entries
+                .iter_mut()
+                .find(|e| e.qualified_name == qualified_name)
+            {
+                entry.returns = return_list;
+            }
+            Ok(())
+        })?,
     )?;
 
     // -- getCatalog --------------------------------------------------------
@@ -1001,23 +1001,23 @@ pub fn register(lua: &Lua, luna_table: &LuaTable) -> LuaResult<()> {
             let luna_tbl: LuaTable = globals.get("lurek")?;
             let mut live_entries = Vec::new();
             scan_table(lua, &luna_tbl, "luna", "luna", &mut live_entries, 0)?;
-            let live_names: std::collections::HashSet<String> =
-                live_entries.iter().map(|e| e.qualified_name.clone()).collect();
-            let doc_names: std::collections::HashSet<String> =
-                doc_entries.iter().map(|e| e.qualified_name.clone()).collect();
-            let mut missing: Vec<String> =
-                live_names.difference(&doc_names).cloned().collect();
+            let live_names: std::collections::HashSet<String> = live_entries
+                .iter()
+                .map(|e| e.qualified_name.clone())
+                .collect();
+            let doc_names: std::collections::HashSet<String> = doc_entries
+                .iter()
+                .map(|e| e.qualified_name.clone())
+                .collect();
+            let mut missing: Vec<String> = live_names.difference(&doc_names).cloned().collect();
             missing.sort();
-            let mut phantom: Vec<String> =
-                doc_names.difference(&live_names).cloned().collect();
+            let mut phantom: Vec<String> = doc_names.difference(&live_names).cloned().collect();
             phantom.sort();
             let mut incomplete: Vec<String> = doc_entries
                 .iter()
                 .filter(|e| {
                     e.description.is_empty()
-                        || (e.kind != "value"
-                            && e.parameters.is_empty()
-                            && e.returns.is_empty())
+                        || (e.kind != "value" && e.parameters.is_empty() && e.returns.is_empty())
                 })
                 .map(|e| e.qualified_name.clone())
                 .collect();
@@ -1049,18 +1049,18 @@ pub fn register(lua: &Lua, luna_table: &LuaTable) -> LuaResult<()> {
                 let prefix = format!("lurek.{}", module_name);
                 let mut live_entries = Vec::new();
                 scan_table(lua, &sub, &prefix, &module_name, &mut live_entries, 0)?;
-                let live_names: std::collections::HashSet<String> =
-                    live_entries.iter().map(|e| e.qualified_name.clone()).collect();
+                let live_names: std::collections::HashSet<String> = live_entries
+                    .iter()
+                    .map(|e| e.qualified_name.clone())
+                    .collect();
                 let doc_names: std::collections::HashSet<String> = doc_entries
                     .iter()
                     .filter(|e| e.module == module_name)
                     .map(|e| e.qualified_name.clone())
                     .collect();
-                let mut missing: Vec<String> =
-                    live_names.difference(&doc_names).cloned().collect();
+                let mut missing: Vec<String> = live_names.difference(&doc_names).cloned().collect();
                 missing.sort();
-                let mut phantom: Vec<String> =
-                    doc_names.difference(&live_names).cloned().collect();
+                let mut phantom: Vec<String> = doc_names.difference(&live_names).cloned().collect();
                 phantom.sort();
                 let mut incomplete: Vec<String> = doc_entries
                     .iter()
@@ -1090,28 +1090,29 @@ pub fn register(lua: &Lua, luna_table: &LuaTable) -> LuaResult<()> {
     /// @return table
     docs_tbl.set(
         "checkStaleness",
-        lua.create_function(
-            |lua, (_catalog_ud, source_dir): (LuaAnyUserData, String)| {
-                let tbl = lua.create_table()?;
-                let stale = lua.create_table()?;
-                let current = lua.create_table()?;
-                let missing_tbl = lua.create_table()?;
-                if let Ok(read_dir) = std::fs::read_dir(&source_dir) {
-                    let mut idx = 1;
-                    for item in read_dir.flatten() {
-                        let path = item.path();
-                        if path.extension().is_some_and(|e| e == "rs" || e == "lua") {
-                            current.set(idx, path.to_string_lossy().to_string())?;
-                            idx += 1;
-                        }
+        lua.create_function(|lua, (_catalog_ud, source_dir): (LuaAnyUserData, String)| {
+            let tbl = lua.create_table()?;
+            let stale = lua.create_table()?;
+            let current = lua.create_table()?;
+            let missing_tbl = lua.create_table()?;
+            if let Ok(read_dir) = std::fs::read_dir(&source_dir) {
+                let mut idx = 1;
+                for item in read_dir.flatten() {
+                    let path = item.path();
+                    if path.extension().is_some_and(|e| e == "rs" || e == "lua") {
+                        current.set(idx, path.to_string_lossy().to_string())?;
+                        idx += 1;
                     }
                 }
-                tbl.set("stale", stale)?;
-                tbl.set("current", current)?;
-                tbl.set("missing", missing_tbl)?;
-                Ok(tbl)
-            },
-        )?,
+            }
+            // stale: files changed since catalog was generated
+            tbl.set("stale", stale)?;
+            // current: source files found in the directory
+            tbl.set("current", current)?;
+            // missing: entries in catalog not found on disk
+            tbl.set("missing", missing_tbl)?;
+            Ok(tbl)
+        })?,
     )?;
 
     // ===== Metrics =====
@@ -1146,8 +1147,10 @@ pub fn register(lua: &Lua, luna_table: &LuaTable) -> LuaResult<()> {
                     Some(ud) => ud.borrow::<ApiCatalog>()?.0.clone(),
                     None => s.borrow().entries.clone(),
                 };
-                let filtered: Vec<docs::DocEntry> =
-                    all.into_iter().filter(|e| e.module == module_name).collect();
+                let filtered: Vec<docs::DocEntry> = all
+                    .into_iter()
+                    .filter(|e| e.module == module_name)
+                    .collect();
                 Ok(compute_quality(&filtered))
             },
         )?,
@@ -1353,38 +1356,43 @@ pub fn register(lua: &Lua, luna_table: &LuaTable) -> LuaResult<()> {
     /// @param rules : table
     /// @param name : string?
     /// @return userdata
-    docs_tbl.set("schema", lua.create_function(|_, (rules, name): (LuaTable, Option<String>)| {
-        use crate::docs::{FieldRule, FieldType, Schema};
-        let schema_name = name.unwrap_or_else(|| "schema".to_string());
-        let mut schema = Schema::new(&schema_name);
-        let strict: bool = rules.get("__strict").unwrap_or(false);
-        schema.strict = strict;
-        for pair in rules.clone().pairs::<String, LuaValue>() {
-            let (field, rule_val) = pair?;
-            if field.starts_with('_') { continue; }
-            let mut rule = FieldRule::default();
-            if let LuaValue::Table(rt) = rule_val {
-                let type_str: String = rt.get("type").unwrap_or_else(|_| "any".to_string());
-                rule.field_type = FieldType::from_str(&type_str);
-                rule.required = rt.get("required").unwrap_or(false);
-                rule.min = rt.get::<_, f64>("min").ok();
-                rule.max = rt.get::<_, f64>("max").ok();
-                rule.min_len = rt.get::<_, usize>("minLen").ok();
-                rule.max_len = rt.get::<_, usize>("maxLen").ok();
-                rule.description = rt.get("description").unwrap_or_default();
-                if let Ok(enum_tbl) = rt.get::<_, LuaTable>("enum") {
-                    for v in enum_tbl.clone().sequence_values::<String>().flatten() {
-                        rule.enum_values.push(v);
-                    }
+    docs_tbl.set(
+        "schema",
+        lua.create_function(|_, (rules, name): (LuaTable, Option<String>)| {
+            use crate::docs::{FieldRule, FieldType, Schema};
+            let schema_name = name.unwrap_or_else(|| "schema".to_string());
+            let mut schema = Schema::new(&schema_name);
+            let strict: bool = rules.get("__strict").unwrap_or(false);
+            schema.strict = strict;
+            for pair in rules.clone().pairs::<String, LuaValue>() {
+                let (field, rule_val) = pair?;
+                if field.starts_with('_') {
+                    continue;
                 }
-            } else if let LuaValue::String(s) = rule_val {
-                // Shorthand: field = "type"
-                rule.field_type = FieldType::from_str(s.to_str().unwrap_or("any"));
+                let mut rule = FieldRule::default();
+                if let LuaValue::Table(rt) = rule_val {
+                    let type_str: String = rt.get("type").unwrap_or_else(|_| "any".to_string());
+                    rule.field_type = FieldType::from_str(&type_str);
+                    rule.required = rt.get("required").unwrap_or(false);
+                    rule.min = rt.get::<_, f64>("min").ok();
+                    rule.max = rt.get::<_, f64>("max").ok();
+                    rule.min_len = rt.get::<_, usize>("minLen").ok();
+                    rule.max_len = rt.get::<_, usize>("maxLen").ok();
+                    rule.description = rt.get("description").unwrap_or_default();
+                    if let Ok(enum_tbl) = rt.get::<_, LuaTable>("enum") {
+                        for v in enum_tbl.clone().sequence_values::<String>().flatten() {
+                            rule.enum_values.push(v);
+                        }
+                    }
+                } else if let LuaValue::String(s) = rule_val {
+                    // Shorthand: field = "type"
+                    rule.field_type = FieldType::from_str(s.to_str().unwrap_or("any"));
+                }
+                schema.add_rule(&field, rule);
             }
-            schema.add_rule(&field, rule);
-        }
-        Ok(LuaSchema(schema))
-    })?)?;
+            Ok(LuaSchema(schema))
+        })?,
+    )?;
 
     // ── reflectLive ───────────────────────────────────────────────────────
     /// Walks the live lurek.* Lua table and returns a structured reflection of all
@@ -1394,55 +1402,58 @@ pub fn register(lua: &Lua, luna_table: &LuaTable) -> LuaResult<()> {
     ///
     /// @param ns : string?  (if provided, reflects only lurek.<ns>)
     /// @return table
-    docs_tbl.set("reflectLive", lua.create_function(|lua, ns: Option<String>| {
-        let globals = lua.globals();
-        let luna_tbl: LuaTable = globals.get("lurek")?;
-        let result = lua.create_table()?;
+    docs_tbl.set(
+        "reflectLive",
+        lua.create_function(|lua, ns: Option<String>| {
+            let globals = lua.globals();
+            let luna_tbl: LuaTable = globals.get("lurek")?;
+            let result = lua.create_table()?;
 
-        // Helper: build an items table from a sub-table.
-        fn reflect_sub<'a>(lua: &'a Lua, tbl: LuaTable<'a>) -> LuaResult<LuaTable<'a>> {
-            let items = lua.create_table()?;
-            let mut idx = 1usize;
-            for pair in tbl.pairs::<String, LuaValue>() {
-                let (key, val) = pair?;
-                let item = lua.create_table()?;
-                item.set("name", key.clone())?;
-                let type_name = match &val {
-                    LuaValue::Function(_) => "function",
-                    LuaValue::Table(_)    => "table",
-                    LuaValue::Boolean(_)  => "boolean",
-                    LuaValue::Integer(_)  => "integer",
-                    LuaValue::Number(_)   => "number",
-                    LuaValue::String(_)   => "string",
-                    LuaValue::UserData(_) => "userdata",
-                    _                     => "other",
-                };
-                item.set("type", type_name)?;
-                items.set(idx, item)?;
-                idx += 1;
-            }
-            Ok(items)
-        }
-
-        match ns {
-            Some(ref ns_name) => {
-                if let Ok(sub) = luna_tbl.get::<_, LuaTable>(ns_name.clone()) {
-                    let items = reflect_sub(lua, sub)?;
-                    result.set(ns_name.clone(), items)?;
-                }
-            }
-            None => {
-                for pair in luna_tbl.pairs::<String, LuaValue>() {
+            // Helper: build an items table from a sub-table.
+            fn reflect_sub<'a>(lua: &'a Lua, tbl: LuaTable<'a>) -> LuaResult<LuaTable<'a>> {
+                let items = lua.create_table()?;
+                let mut idx = 1usize;
+                for pair in tbl.pairs::<String, LuaValue>() {
                     let (key, val) = pair?;
-                    if let LuaValue::Table(sub) = val {
+                    let item = lua.create_table()?;
+                    item.set("name", key.clone())?;
+                    let type_name = match &val {
+                        LuaValue::Function(_) => "function",
+                        LuaValue::Table(_) => "table",
+                        LuaValue::Boolean(_) => "boolean",
+                        LuaValue::Integer(_) => "integer",
+                        LuaValue::Number(_) => "number",
+                        LuaValue::String(_) => "string",
+                        LuaValue::UserData(_) => "userdata",
+                        _ => "other",
+                    };
+                    item.set("type", type_name)?;
+                    items.set(idx, item)?;
+                    idx += 1;
+                }
+                Ok(items)
+            }
+
+            match ns {
+                Some(ref ns_name) => {
+                    if let Ok(sub) = luna_tbl.get::<_, LuaTable>(ns_name.clone()) {
                         let items = reflect_sub(lua, sub)?;
-                        result.set(key, items)?;
+                        result.set(ns_name.clone(), items)?;
+                    }
+                }
+                None => {
+                    for pair in luna_tbl.pairs::<String, LuaValue>() {
+                        let (key, val) = pair?;
+                        if let LuaValue::Table(sub) = val {
+                            let items = reflect_sub(lua, sub)?;
+                            result.set(key, items)?;
+                        }
                     }
                 }
             }
-        }
-        Ok(result)
-    })?)?;
+            Ok(result)
+        })?,
+    )?;
 
     // ── reflectTable ──────────────────────────────────────────────────────
     /// Reflects any Lua table, returning a structure describing its keys,
@@ -1453,42 +1464,63 @@ pub fn register(lua: &Lua, luna_table: &LuaTable) -> LuaResult<()> {
     /// @param tbl : table
     /// @param name : string?  (prefix for qualified names, optional)
     /// @return table
-    docs_tbl.set("reflectTable", lua.create_function(|lua, (tbl, name): (LuaTable, Option<String>)| {
-        let prefix = name.unwrap_or_default();
-        let items = lua.create_table()?;
-        let mut idx = 1usize;
-        for pair in tbl.clone().pairs::<LuaValue, LuaValue>() {
-            let (k, v) = pair?;
-            let key_str = match &k {
-                LuaValue::String(s) => s.to_str().unwrap_or("?").to_string(),
-                LuaValue::Integer(n) => n.to_string(),
-                LuaValue::Number(n) => n.to_string(),
-                _ => "(other)".to_string(),
-            };
-            let qualified = if prefix.is_empty() { key_str.clone() } else {
-                format!("{}.{}", prefix, key_str)
-            };
-            let item = lua.create_table()?;
-            item.set("name", key_str)?;
-            item.set("qualifiedName", qualified)?;
-            match &v {
-                LuaValue::Function(_) => {
-                    item.set("type", "function")?;
+    docs_tbl.set(
+        "reflectTable",
+        lua.create_function(|lua, (tbl, name): (LuaTable, Option<String>)| {
+            let prefix = name.unwrap_or_default();
+            let items = lua.create_table()?;
+            let mut idx = 1usize;
+            for pair in tbl.clone().pairs::<LuaValue, LuaValue>() {
+                let (k, v) = pair?;
+                let key_str = match &k {
+                    LuaValue::String(s) => s.to_str().unwrap_or("?").to_string(),
+                    LuaValue::Integer(n) => n.to_string(),
+                    LuaValue::Number(n) => n.to_string(),
+                    _ => "(other)".to_string(),
+                };
+                let qualified = if prefix.is_empty() {
+                    key_str.clone()
+                } else {
+                    format!("{}.{}", prefix, key_str)
+                };
+                let item = lua.create_table()?;
+                item.set("name", key_str)?;
+                item.set("qualifiedName", qualified)?;
+                match &v {
+                    LuaValue::Function(_) => {
+                        item.set("type", "function")?;
+                    }
+                    LuaValue::Table(_) => {
+                        item.set("type", "table")?;
+                    }
+                    LuaValue::Boolean(_) => {
+                        item.set("type", "boolean")?;
+                    }
+                    LuaValue::Integer(_) => {
+                        item.set("type", "integer")?;
+                    }
+                    LuaValue::Number(_) => {
+                        item.set("type", "number")?;
+                    }
+                    LuaValue::String(_) => {
+                        item.set("type", "string")?;
+                    }
+                    LuaValue::UserData(_) => {
+                        item.set("type", "userdata")?;
+                    }
+                    LuaValue::Nil => {
+                        item.set("type", "nil")?;
+                    }
+                    _ => {
+                        item.set("type", "other")?;
+                    }
                 }
-                LuaValue::Table(_) => { item.set("type", "table")?; }
-                LuaValue::Boolean(_) => { item.set("type", "boolean")?; }
-                LuaValue::Integer(_) => { item.set("type", "integer")?; }
-                LuaValue::Number(_) => { item.set("type", "number")?; }
-                LuaValue::String(_) => { item.set("type", "string")?; }
-                LuaValue::UserData(_) => { item.set("type", "userdata")?; }
-                LuaValue::Nil => { item.set("type", "nil")?; }
-                _ => { item.set("type", "other")?; }
+                items.set(idx, item)?;
+                idx += 1;
             }
-            items.set(idx, item)?;
-            idx += 1;
-        }
-        Ok(items)
-    })?)?;
+            Ok(items)
+        })?,
+    )?;
 
     luna_table.set("docs", docs_tbl)?;
     Ok(())

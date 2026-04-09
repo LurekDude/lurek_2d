@@ -113,7 +113,7 @@ impl AIWorld {
         self.name_index.get(name).copied()
     }
 
-    /// Returns the number of agents. Consult the module-level documentation for the broader usage context and preconditions.
+    /// Returns the number of agents.
     ///
     /// # Returns
     /// `usize`.

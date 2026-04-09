@@ -228,9 +228,9 @@ def collect_class_descriptions(api_file: Path) -> Dict[str, str]:
         if desc:
             result[class_name] = desc
 
-    # Pass 2: impl LuaUserData for LuaXxx (fallback for types defined in other src/ files)
+    # Pass 2: impl LuaUserData for Xxx (fallback for types defined in other src/ files)
     for i, line in enumerate(lines):
-        m = re.search(r"impl\s+LuaUserData\s+for\s+(Lua\w+)", line)
+        m = re.search(r"impl\s+LuaUserData\s+for\s+(\w+)", line)
         if not m:
             continue
         struct_name = m.group(1)

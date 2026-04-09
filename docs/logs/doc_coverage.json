@@ -1,198 +1,26 @@
 {
-  "generated_at": "2026-04-08T16:16:24.001778+00:00",
+  "generated_at": "2026-04-09T15:12:01.219868+00:00",
   "summary": {
     "rust": {
-      "total": 3464,
-      "covered": 3464,
+      "total": 3653,
+      "covered": 3653,
       "missing": 0,
       "pct": 100.0
     },
     "lua_api": {
-      "total": 42,
-      "covered": 23,
-      "missing": 19,
-      "pct": 54.8
+      "total": 46,
+      "covered": 46,
+      "missing": 0,
+      "pct": 100.0
     },
     "total": {
-      "total": 3506,
-      "covered": 3487,
-      "missing": 19,
-      "pct": 99.5
+      "total": 3699,
+      "covered": 3699,
+      "missing": 0,
+      "pct": 100.0
     }
   },
-  "missing": [
-    {
-      "source": "lua_api",
-      "module": "debugbridge_api",
-      "file": "src/lua_api/debugbridge_api.rs",
-      "line": 440,
-      "kind": "fn",
-      "name": "debugbridge",
-      "has_doc": false
-    },
-    {
-      "source": "lua_api",
-      "module": "devtools_api",
-      "file": "src/lua_api/devtools_api.rs",
-      "line": 48,
-      "kind": "fn",
-      "name": "name",
-      "has_doc": false
-    },
-    {
-      "source": "lua_api",
-      "module": "devtools_api",
-      "file": "src/lua_api/devtools_api.rs",
-      "line": 49,
-      "kind": "fn",
-      "name": "time",
-      "has_doc": false
-    },
-    {
-      "source": "lua_api",
-      "module": "devtools_api",
-      "file": "src/lua_api/devtools_api.rs",
-      "line": 56,
-      "kind": "fn",
-      "name": "children",
-      "has_doc": false
-    },
-    {
-      "source": "lua_api",
-      "module": "devtools_api",
-      "file": "src/lua_api/devtools_api.rs",
-      "line": 270,
-      "kind": "fn",
-      "name": "samples",
-      "has_doc": false
-    },
-    {
-      "source": "lua_api",
-      "module": "devtools_api",
-      "file": "src/lua_api/devtools_api.rs",
-      "line": 432,
-      "kind": "fn",
-      "name": "devtools",
-      "has_doc": false
-    },
-    {
-      "source": "lua_api",
-      "module": "docs_api",
-      "file": "src/lua_api/docs_api.rs",
-      "line": 420,
-      "kind": "fn",
-      "name": "phantom",
-      "has_doc": false
-    },
-    {
-      "source": "lua_api",
-      "module": "docs_api",
-      "file": "src/lua_api/docs_api.rs",
-      "line": 425,
-      "kind": "fn",
-      "name": "incomplete",
-      "has_doc": false
-    },
-    {
-      "source": "lua_api",
-      "module": "docs_api",
-      "file": "src/lua_api/docs_api.rs",
-      "line": 543,
-      "kind": "fn",
-      "name": "overallScore",
-      "has_doc": false
-    },
-    {
-      "source": "lua_api",
-      "module": "docs_api",
-      "file": "src/lua_api/docs_api.rs",
-      "line": 544,
-      "kind": "fn",
-      "name": "grade",
-      "has_doc": false
-    },
-    {
-      "source": "lua_api",
-      "module": "docs_api",
-      "file": "src/lua_api/docs_api.rs",
-      "line": 994,
-      "kind": "fn",
-      "name": "stale",
-      "has_doc": false
-    },
-    {
-      "source": "lua_api",
-      "module": "docs_api",
-      "file": "src/lua_api/docs_api.rs",
-      "line": 995,
-      "kind": "fn",
-      "name": "current",
-      "has_doc": false
-    },
-    {
-      "source": "lua_api",
-      "module": "docs_api",
-      "file": "src/lua_api/docs_api.rs",
-      "line": 996,
-      "kind": "fn",
-      "name": "missing",
-      "has_doc": false
-    },
-    {
-      "source": "lua_api",
-      "module": "localization_api",
-      "file": "src/lua_api/localization_api.rs",
-      "line": 334,
-      "kind": "fn",
-      "name": "localization",
-      "has_doc": false
-    },
-    {
-      "source": "lua_api",
-      "module": "log_api",
-      "file": "src/lua_api/log_api.rs",
-      "line": 107,
-      "kind": "fn",
-      "name": "log",
-      "has_doc": false
-    },
-    {
-      "source": "lua_api",
-      "module": "patterns_api",
-      "file": "src/lua_api/patterns_api.rs",
-      "line": 851,
-      "kind": "fn",
-      "name": "patterns",
-      "has_doc": false
-    },
-    {
-      "source": "lua_api",
-      "module": "tilemap_api",
-      "file": "src/lua_api/tilemap_api.rs",
-      "line": 1871,
-      "kind": "fn",
-      "name": "NORTH_WALL",
-      "has_doc": false
-    },
-    {
-      "source": "lua_api",
-      "module": "tilemap_api",
-      "file": "src/lua_api/tilemap_api.rs",
-      "line": 1872,
-      "kind": "fn",
-      "name": "WEST_WALL",
-      "has_doc": false
-    },
-    {
-      "source": "lua_api",
-      "module": "tilemap_api",
-      "file": "src/lua_api/tilemap_api.rs",
-      "line": 1873,
-      "kind": "fn",
-      "name": "OBJECT",
-      "has_doc": false
-    }
-  ],
+  "missing": [],
   "items": [
     {
       "source": "rust",
@@ -1773,7 +1601,7 @@
       "source": "rust",
       "module": "audio",
       "file": "src/audio/dsp.rs",
-      "line": 16,
+      "line": 22,
       "kind": "struct",
       "name": "AtomicParam",
       "has_doc": true
@@ -1782,7 +1610,7 @@
       "source": "rust",
       "module": "audio",
       "file": "src/audio/dsp.rs",
-      "line": 28,
+      "line": 34,
       "kind": "fn",
       "name": "new",
       "has_doc": true
@@ -1791,7 +1619,7 @@
       "source": "rust",
       "module": "audio",
       "file": "src/audio/dsp.rs",
-      "line": 38,
+      "line": 44,
       "kind": "fn",
       "name": "get",
       "has_doc": true
@@ -1800,7 +1628,7 @@
       "source": "rust",
       "module": "audio",
       "file": "src/audio/dsp.rs",
-      "line": 46,
+      "line": 52,
       "kind": "fn",
       "name": "set",
       "has_doc": true
@@ -1809,7 +1637,7 @@
       "source": "rust",
       "module": "audio",
       "file": "src/audio/dsp.rs",
-      "line": 60,
+      "line": 66,
       "kind": "enum",
       "name": "EffectType",
       "has_doc": true
@@ -1818,7 +1646,7 @@
       "source": "rust",
       "module": "audio",
       "file": "src/audio/dsp.rs",
-      "line": 81,
+      "line": 87,
       "kind": "struct",
       "name": "EffectParams",
       "has_doc": true
@@ -1827,7 +1655,7 @@
       "source": "rust",
       "module": "audio",
       "file": "src/audio/dsp.rs",
-      "line": 98,
+      "line": 104,
       "kind": "fn",
       "name": "new",
       "has_doc": true
@@ -1836,7 +1664,7 @@
       "source": "rust",
       "module": "audio",
       "file": "src/audio/dsp.rs",
-      "line": 122,
+      "line": 128,
       "kind": "fn",
       "name": "set_param",
       "has_doc": true
@@ -1845,7 +1673,7 @@
       "source": "rust",
       "module": "audio",
       "file": "src/audio/dsp.rs",
-      "line": 186,
+      "line": 192,
       "kind": "struct",
       "name": "ActiveEffect",
       "has_doc": true
@@ -1854,7 +1682,7 @@
       "source": "rust",
       "module": "audio",
       "file": "src/audio/dsp.rs",
-      "line": 210,
+      "line": 216,
       "kind": "fn",
       "name": "new",
       "has_doc": true
@@ -1863,7 +1691,7 @@
       "source": "rust",
       "module": "audio",
       "file": "src/audio/dsp.rs",
-      "line": 245,
+      "line": 251,
       "kind": "fn",
       "name": "process",
       "has_doc": true
@@ -1872,7 +1700,7 @@
       "source": "rust",
       "module": "audio",
       "file": "src/audio/dsp.rs",
-      "line": 319,
+      "line": 325,
       "kind": "struct",
       "name": "SharedEffectGraph",
       "has_doc": true
@@ -1881,7 +1709,7 @@
       "source": "rust",
       "module": "audio",
       "file": "src/audio/dsp.rs",
-      "line": 328,
+      "line": 334,
       "kind": "fn",
       "name": "new",
       "has_doc": true
@@ -1890,7 +1718,7 @@
       "source": "rust",
       "module": "audio",
       "file": "src/audio/dsp.rs",
-      "line": 360,
+      "line": 366,
       "kind": "struct",
       "name": "DynamicEffectSource",
       "has_doc": true
@@ -1899,7 +1727,7 @@
       "source": "rust",
       "module": "audio",
       "file": "src/audio/dsp.rs",
-      "line": 378,
+      "line": 384,
       "kind": "fn",
       "name": "new",
       "has_doc": true
@@ -4995,7 +4823,7 @@
       "source": "rust",
       "module": "data",
       "file": "src/data/dataview.rs",
-      "line": 18,
+      "line": 20,
       "kind": "struct",
       "name": "DataView",
       "has_doc": true
@@ -5004,7 +4832,7 @@
       "source": "rust",
       "module": "data",
       "file": "src/data/dataview.rs",
-      "line": 35,
+      "line": 37,
       "kind": "fn",
       "name": "new",
       "has_doc": true
@@ -5013,7 +4841,7 @@
       "source": "rust",
       "module": "data",
       "file": "src/data/dataview.rs",
-      "line": 55,
+      "line": 57,
       "kind": "fn",
       "name": "new_slice",
       "has_doc": true
@@ -5022,7 +4850,7 @@
       "source": "rust",
       "module": "data",
       "file": "src/data/dataview.rs",
-      "line": 71,
+      "line": 73,
       "kind": "fn",
       "name": "get_size",
       "has_doc": true
@@ -5031,7 +4859,7 @@
       "source": "rust",
       "module": "data",
       "file": "src/data/dataview.rs",
-      "line": 82,
+      "line": 84,
       "kind": "fn",
       "name": "get_u8",
       "has_doc": true
@@ -5040,7 +4868,7 @@
       "source": "rust",
       "module": "data",
       "file": "src/data/dataview.rs",
-      "line": 94,
+      "line": 96,
       "kind": "fn",
       "name": "get_i8",
       "has_doc": true
@@ -5049,7 +4877,7 @@
       "source": "rust",
       "module": "data",
       "file": "src/data/dataview.rs",
-      "line": 106,
+      "line": 108,
       "kind": "fn",
       "name": "get_u16",
       "has_doc": true
@@ -5058,7 +4886,7 @@
       "source": "rust",
       "module": "data",
       "file": "src/data/dataview.rs",
-      "line": 119,
+      "line": 121,
       "kind": "fn",
       "name": "get_i16",
       "has_doc": true
@@ -5067,7 +4895,7 @@
       "source": "rust",
       "module": "data",
       "file": "src/data/dataview.rs",
-      "line": 132,
+      "line": 134,
       "kind": "fn",
       "name": "get_u32",
       "has_doc": true
@@ -5076,7 +4904,7 @@
       "source": "rust",
       "module": "data",
       "file": "src/data/dataview.rs",
-      "line": 150,
+      "line": 152,
       "kind": "fn",
       "name": "get_i32",
       "has_doc": true
@@ -5085,7 +4913,7 @@
       "source": "rust",
       "module": "data",
       "file": "src/data/dataview.rs",
-      "line": 168,
+      "line": 170,
       "kind": "fn",
       "name": "get_f32",
       "has_doc": true
@@ -5094,9 +4922,27 @@
       "source": "rust",
       "module": "data",
       "file": "src/data/dataview.rs",
-      "line": 186,
+      "line": 188,
       "kind": "fn",
       "name": "get_f64",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "data",
+      "file": "src/data/dataview.rs",
+      "line": 224,
+      "kind": "struct",
+      "name": "LuaDataView",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "data",
+      "file": "src/data/dataview.rs",
+      "line": 230,
+      "kind": "fn",
+      "name": "new",
       "has_doc": true
     },
     {
@@ -6039,7 +5885,7 @@
       "source": "rust",
       "module": "devtools",
       "file": "src/devtools/frame_stats.rs",
-      "line": 108,
+      "line": 110,
       "kind": "struct",
       "name": "FrameSnapshot",
       "has_doc": true
@@ -6120,7 +5966,7 @@
       "source": "rust",
       "module": "devtools",
       "file": "src/devtools/logger.rs",
-      "line": 208,
+      "line": 210,
       "kind": "fn",
       "name": "tail",
       "has_doc": true
@@ -6129,7 +5975,7 @@
       "source": "rust",
       "module": "devtools",
       "file": "src/devtools/logger.rs",
-      "line": 225,
+      "line": 227,
       "kind": "fn",
       "name": "filter_category",
       "has_doc": true
@@ -6138,7 +5984,7 @@
       "source": "rust",
       "module": "devtools",
       "file": "src/devtools/logger.rs",
-      "line": 239,
+      "line": 241,
       "kind": "fn",
       "name": "clear",
       "has_doc": true
@@ -6219,7 +6065,7 @@
       "source": "rust",
       "module": "devtools",
       "file": "src/devtools/profiler.rs",
-      "line": 119,
+      "line": 121,
       "kind": "fn",
       "name": "pop",
       "has_doc": true
@@ -6228,7 +6074,7 @@
       "source": "rust",
       "module": "devtools",
       "file": "src/devtools/profiler.rs",
-      "line": 138,
+      "line": 142,
       "kind": "fn",
       "name": "end_frame",
       "has_doc": true
@@ -6237,7 +6083,7 @@
       "source": "rust",
       "module": "devtools",
       "file": "src/devtools/profiler.rs",
-      "line": 166,
+      "line": 172,
       "kind": "fn",
       "name": "get_frame",
       "has_doc": true
@@ -6246,7 +6092,7 @@
       "source": "rust",
       "module": "devtools",
       "file": "src/devtools/profiler.rs",
-      "line": 179,
+      "line": 187,
       "kind": "fn",
       "name": "reset",
       "has_doc": true
@@ -6318,7 +6164,7 @@
       "source": "rust",
       "module": "docs",
       "file": "src/docs/catalog.rs",
-      "line": 6,
+      "line": 9,
       "kind": "struct",
       "name": "Catalog",
       "has_doc": true
@@ -6327,7 +6173,7 @@
       "source": "rust",
       "module": "docs",
       "file": "src/docs/catalog.rs",
-      "line": 12,
+      "line": 15,
       "kind": "fn",
       "name": "new",
       "has_doc": true
@@ -6336,7 +6182,7 @@
       "source": "rust",
       "module": "docs",
       "file": "src/docs/catalog.rs",
-      "line": 25,
+      "line": 28,
       "kind": "fn",
       "name": "from_entries",
       "has_doc": true
@@ -6345,7 +6191,7 @@
       "source": "rust",
       "module": "docs",
       "file": "src/docs/catalog.rs",
-      "line": 34,
+      "line": 37,
       "kind": "fn",
       "name": "add",
       "has_doc": true
@@ -6354,7 +6200,7 @@
       "source": "rust",
       "module": "docs",
       "file": "src/docs/catalog.rs",
-      "line": 39,
+      "line": 42,
       "kind": "fn",
       "name": "modules",
       "has_doc": true
@@ -6363,7 +6209,7 @@
       "source": "rust",
       "module": "docs",
       "file": "src/docs/catalog.rs",
-      "line": 47,
+      "line": 50,
       "kind": "fn",
       "name": "all_entries",
       "has_doc": true
@@ -6372,7 +6218,7 @@
       "source": "rust",
       "module": "docs",
       "file": "src/docs/catalog.rs",
-      "line": 52,
+      "line": 55,
       "kind": "fn",
       "name": "entries_for_module",
       "has_doc": true
@@ -6381,7 +6227,7 @@
       "source": "rust",
       "module": "docs",
       "file": "src/docs/catalog.rs",
-      "line": 57,
+      "line": 60,
       "kind": "fn",
       "name": "get_entry",
       "has_doc": true
@@ -6390,7 +6236,7 @@
       "source": "rust",
       "module": "docs",
       "file": "src/docs/catalog.rs",
-      "line": 62,
+      "line": 65,
       "kind": "fn",
       "name": "entry_count",
       "has_doc": true
@@ -6399,7 +6245,7 @@
       "source": "rust",
       "module": "docs",
       "file": "src/docs/catalog.rs",
-      "line": 67,
+      "line": 70,
       "kind": "fn",
       "name": "search",
       "has_doc": true
@@ -6408,7 +6254,7 @@
       "source": "rust",
       "module": "docs",
       "file": "src/docs/catalog.rs",
-      "line": 78,
+      "line": 81,
       "kind": "fn",
       "name": "filter_by_kind",
       "has_doc": true
@@ -6417,7 +6263,7 @@
       "source": "rust",
       "module": "docs",
       "file": "src/docs/catalog.rs",
-      "line": 83,
+      "line": 86,
       "kind": "fn",
       "name": "clear",
       "has_doc": true
@@ -6426,7 +6272,7 @@
       "source": "rust",
       "module": "docs",
       "file": "src/docs/entry.rs",
-      "line": 7,
+      "line": 12,
       "kind": "struct",
       "name": "ParamInfo",
       "has_doc": true
@@ -6435,7 +6281,7 @@
       "source": "rust",
       "module": "docs",
       "file": "src/docs/entry.rs",
-      "line": 22,
+      "line": 27,
       "kind": "struct",
       "name": "ReturnInfo",
       "has_doc": true
@@ -6444,7 +6290,7 @@
       "source": "rust",
       "module": "docs",
       "file": "src/docs/entry.rs",
-      "line": 31,
+      "line": 44,
       "kind": "struct",
       "name": "DocEntry",
       "has_doc": true
@@ -6453,7 +6299,7 @@
       "source": "rust",
       "module": "docs",
       "file": "src/docs/entry.rs",
-      "line": 60,
+      "line": 73,
       "kind": "fn",
       "name": "new",
       "has_doc": true
@@ -6462,7 +6308,7 @@
       "source": "rust",
       "module": "docs",
       "file": "src/docs/entry.rs",
-      "line": 75,
+      "line": 88,
       "kind": "fn",
       "name": "is_complete",
       "has_doc": true
@@ -6471,7 +6317,7 @@
       "source": "rust",
       "module": "docs",
       "file": "src/docs/entry.rs",
-      "line": 86,
+      "line": 99,
       "kind": "fn",
       "name": "missing_fields",
       "has_doc": true
@@ -6534,7 +6380,7 @@
       "source": "rust",
       "module": "docs",
       "file": "src/docs/report.rs",
-      "line": 56,
+      "line": 62,
       "kind": "struct",
       "name": "ValidationReport",
       "has_doc": true
@@ -6543,7 +6389,7 @@
       "source": "rust",
       "module": "docs",
       "file": "src/docs/report.rs",
-      "line": 67,
+      "line": 73,
       "kind": "fn",
       "name": "new",
       "has_doc": true
@@ -6552,7 +6398,7 @@
       "source": "rust",
       "module": "docs",
       "file": "src/docs/report.rs",
-      "line": 72,
+      "line": 78,
       "kind": "fn",
       "name": "is_clean",
       "has_doc": true
@@ -6561,7 +6407,7 @@
       "source": "rust",
       "module": "docs",
       "file": "src/docs/report.rs",
-      "line": 77,
+      "line": 83,
       "kind": "fn",
       "name": "total_issues",
       "has_doc": true
@@ -6570,7 +6416,7 @@
       "source": "rust",
       "module": "docs",
       "file": "src/docs/report.rs",
-      "line": 83,
+      "line": 94,
       "kind": "struct",
       "name": "QualityReport",
       "has_doc": true
@@ -6579,7 +6425,7 @@
       "source": "rust",
       "module": "docs",
       "file": "src/docs/report.rs",
-      "line": 94,
+      "line": 105,
       "kind": "fn",
       "name": "compute",
       "has_doc": true
@@ -6588,7 +6434,7 @@
       "source": "rust",
       "module": "docs",
       "file": "src/docs/report.rs",
-      "line": 120,
+      "line": 131,
       "kind": "fn",
       "name": "module_grade",
       "has_doc": true
@@ -6597,9 +6443,108 @@
       "source": "rust",
       "module": "docs",
       "file": "src/docs/report.rs",
-      "line": 131,
+      "line": 142,
       "kind": "fn",
       "name": "from_entries",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "docs",
+      "file": "src/docs/schema.rs",
+      "line": 32,
+      "kind": "enum",
+      "name": "FieldType",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "docs",
+      "file": "src/docs/schema.rs",
+      "line": 57,
+      "kind": "fn",
+      "name": "from_str",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "docs",
+      "file": "src/docs/schema.rs",
+      "line": 73,
+      "kind": "fn",
+      "name": "as_str",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "docs",
+      "file": "src/docs/schema.rs",
+      "line": 101,
+      "kind": "struct",
+      "name": "FieldRule",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "docs",
+      "file": "src/docs/schema.rs",
+      "line": 146,
+      "kind": "struct",
+      "name": "SchemaError",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "docs",
+      "file": "src/docs/schema.rs",
+      "line": 161,
+      "kind": "struct",
+      "name": "SchemaResult",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "docs",
+      "file": "src/docs/schema.rs",
+      "line": 173,
+      "kind": "fn",
+      "name": "pass",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "docs",
+      "file": "src/docs/schema.rs",
+      "line": 187,
+      "kind": "struct",
+      "name": "Schema",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "docs",
+      "file": "src/docs/schema.rs",
+      "line": 204,
+      "kind": "fn",
+      "name": "new",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "docs",
+      "file": "src/docs/schema.rs",
+      "line": 216,
+      "kind": "fn",
+      "name": "add_rule",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "docs",
+      "file": "src/docs/schema.rs",
+      "line": 230,
+      "kind": "fn",
+      "name": "validate_pairs",
       "has_doc": true
     },
     {
@@ -6633,7 +6578,7 @@
       "source": "rust",
       "module": "engine",
       "file": "src/engine/app_winit.rs",
-      "line": 454,
+      "line": 456,
       "kind": "struct",
       "name": "App",
       "has_doc": true
@@ -6642,7 +6587,7 @@
       "source": "rust",
       "module": "engine",
       "file": "src/engine/app_winit.rs",
-      "line": 466,
+      "line": 468,
       "kind": "fn",
       "name": "new",
       "has_doc": true
@@ -6651,7 +6596,7 @@
       "source": "rust",
       "module": "engine",
       "file": "src/engine/app_winit.rs",
-      "line": 474,
+      "line": 476,
       "kind": "fn",
       "name": "run",
       "has_doc": true
@@ -6687,7 +6632,7 @@
       "source": "rust",
       "module": "engine",
       "file": "src/engine/config.rs",
-      "line": 175,
+      "line": 184,
       "kind": "struct",
       "name": "ModulesConfig",
       "has_doc": true
@@ -6696,7 +6641,7 @@
       "source": "rust",
       "module": "engine",
       "file": "src/engine/config.rs",
-      "line": 228,
+      "line": 239,
       "kind": "fn",
       "name": "validate_and_fix",
       "has_doc": true
@@ -6705,7 +6650,7 @@
       "source": "rust",
       "module": "engine",
       "file": "src/engine/config.rs",
-      "line": 260,
+      "line": 271,
       "kind": "struct",
       "name": "PerformanceConfig",
       "has_doc": true
@@ -6714,7 +6659,7 @@
       "source": "rust",
       "module": "engine",
       "file": "src/engine/config.rs",
-      "line": 355,
+      "line": 367,
       "kind": "fn",
       "name": "load",
       "has_doc": true
@@ -6723,7 +6668,7 @@
       "source": "rust",
       "module": "engine",
       "file": "src/engine/config.rs",
-      "line": 376,
+      "line": 388,
       "kind": "fn",
       "name": "load_from_conf_toml",
       "has_doc": true
@@ -6732,7 +6677,7 @@
       "source": "rust",
       "module": "engine",
       "file": "src/engine/config.rs",
-      "line": 444,
+      "line": 456,
       "kind": "fn",
       "name": "load_from_conf_lua",
       "has_doc": true
@@ -6831,7 +6776,7 @@
       "source": "rust",
       "module": "engine",
       "file": "src/engine/error_screen.rs",
-      "line": 31,
+      "line": 34,
       "kind": "struct",
       "name": "ErrorScreen",
       "has_doc": true
@@ -6840,7 +6785,7 @@
       "source": "rust",
       "module": "engine",
       "file": "src/engine/error_screen.rs",
-      "line": 51,
+      "line": 54,
       "kind": "fn",
       "name": "from_error",
       "has_doc": true
@@ -6849,7 +6794,7 @@
       "source": "rust",
       "module": "engine",
       "file": "src/engine/error_screen.rs",
-      "line": 77,
+      "line": 80,
       "kind": "fn",
       "name": "from_lua_error",
       "has_doc": true
@@ -6858,7 +6803,7 @@
       "source": "rust",
       "module": "engine",
       "file": "src/engine/error_screen.rs",
-      "line": 110,
+      "line": 113,
       "kind": "fn",
       "name": "from_engine_error",
       "has_doc": true
@@ -6867,7 +6812,7 @@
       "source": "rust",
       "module": "engine",
       "file": "src/engine/error_screen.rs",
-      "line": 127,
+      "line": 130,
       "kind": "fn",
       "name": "draw_commands",
       "has_doc": true
@@ -6876,7 +6821,7 @@
       "source": "rust",
       "module": "engine",
       "file": "src/engine/error_screen.rs",
-      "line": 237,
+      "line": 240,
       "kind": "fn",
       "name": "as_text",
       "has_doc": true
@@ -6885,7 +6830,7 @@
       "source": "rust",
       "module": "engine",
       "file": "src/engine/error_screen.rs",
-      "line": 288,
+      "line": 291,
       "kind": "fn",
       "name": "wrap_text",
       "has_doc": true
@@ -6894,7 +6839,7 @@
       "source": "rust",
       "module": "engine",
       "file": "src/engine/error_screen.rs",
-      "line": 338,
+      "line": 341,
       "kind": "fn",
       "name": "format_traceback",
       "has_doc": true
@@ -9207,7 +9152,7 @@
       "source": "rust",
       "module": "engine",
       "file": "src/engine/messages.rs",
-      "line": 37,
+      "line": 39,
       "kind": "struct",
       "name": "MessageCatalog",
       "has_doc": true
@@ -9216,7 +9161,7 @@
       "source": "rust",
       "module": "engine",
       "file": "src/engine/messages.rs",
-      "line": 53,
+      "line": 55,
       "kind": "fn",
       "name": "from_toml",
       "has_doc": true
@@ -9225,7 +9170,7 @@
       "source": "rust",
       "module": "engine",
       "file": "src/engine/messages.rs",
-      "line": 75,
+      "line": 77,
       "kind": "fn",
       "name": "get",
       "has_doc": true
@@ -9234,7 +9179,7 @@
       "source": "rust",
       "module": "engine",
       "file": "src/engine/messages.rs",
-      "line": 83,
+      "line": 85,
       "kind": "fn",
       "name": "len",
       "has_doc": true
@@ -9243,7 +9188,7 @@
       "source": "rust",
       "module": "engine",
       "file": "src/engine/messages.rs",
-      "line": 91,
+      "line": 93,
       "kind": "fn",
       "name": "is_empty",
       "has_doc": true
@@ -9252,7 +9197,7 @@
       "source": "rust",
       "module": "engine",
       "file": "src/engine/messages.rs",
-      "line": 104,
+      "line": 106,
       "kind": "fn",
       "name": "init",
       "has_doc": true
@@ -9261,7 +9206,7 @@
       "source": "rust",
       "module": "engine",
       "file": "src/engine/messages.rs",
-      "line": 118,
+      "line": 120,
       "kind": "fn",
       "name": "get_message",
       "has_doc": true
@@ -9270,7 +9215,7 @@
       "source": "rust",
       "module": "engine",
       "file": "src/engine/messages.rs",
-      "line": 136,
+      "line": 138,
       "kind": "fn",
       "name": "catalog",
       "has_doc": true
@@ -9279,7 +9224,7 @@
       "source": "rust",
       "module": "engine",
       "file": "src/engine/resource_keys.rs",
-      "line": 17,
+      "line": 19,
       "kind": "struct",
       "name": "TextureKey",
       "has_doc": true
@@ -9288,7 +9233,7 @@
       "source": "rust",
       "module": "engine",
       "file": "src/engine/resource_keys.rs",
-      "line": 19,
+      "line": 23,
       "kind": "struct",
       "name": "FontKey",
       "has_doc": true
@@ -9297,7 +9242,7 @@
       "source": "rust",
       "module": "engine",
       "file": "src/engine/resource_keys.rs",
-      "line": 21,
+      "line": 27,
       "kind": "struct",
       "name": "CanvasKey",
       "has_doc": true
@@ -9306,7 +9251,7 @@
       "source": "rust",
       "module": "engine",
       "file": "src/engine/resource_keys.rs",
-      "line": 23,
+      "line": 31,
       "kind": "struct",
       "name": "SoundKey",
       "has_doc": true
@@ -9315,7 +9260,7 @@
       "source": "rust",
       "module": "engine",
       "file": "src/engine/resource_keys.rs",
-      "line": 25,
+      "line": 35,
       "kind": "struct",
       "name": "ParticleKey",
       "has_doc": true
@@ -9324,7 +9269,7 @@
       "source": "rust",
       "module": "engine",
       "file": "src/engine/resource_keys.rs",
-      "line": 27,
+      "line": 39,
       "kind": "struct",
       "name": "SpriteBatchKey",
       "has_doc": true
@@ -9333,7 +9278,7 @@
       "source": "rust",
       "module": "engine",
       "file": "src/engine/resource_keys.rs",
-      "line": 29,
+      "line": 43,
       "kind": "struct",
       "name": "ShaderKey",
       "has_doc": true
@@ -9342,7 +9287,7 @@
       "source": "rust",
       "module": "engine",
       "file": "src/engine/resource_keys.rs",
-      "line": 31,
+      "line": 47,
       "kind": "struct",
       "name": "MeshKey",
       "has_doc": true
@@ -9351,7 +9296,7 @@
       "source": "rust",
       "module": "engine",
       "file": "src/engine/resource_keys.rs",
-      "line": 33,
+      "line": 51,
       "kind": "struct",
       "name": "ShapeKey",
       "has_doc": true
@@ -9360,7 +9305,7 @@
       "source": "rust",
       "module": "engine",
       "file": "src/engine/resource_keys.rs",
-      "line": 35,
+      "line": 55,
       "kind": "struct",
       "name": "BusKey",
       "has_doc": true
@@ -9369,7 +9314,7 @@
       "source": "rust",
       "module": "engine",
       "file": "src/engine/resource_keys.rs",
-      "line": 37,
+      "line": 59,
       "kind": "struct",
       "name": "MidiPlayerKey",
       "has_doc": true
@@ -9378,7 +9323,7 @@
       "source": "rust",
       "module": "engine",
       "file": "src/engine/resource_keys.rs",
-      "line": 39,
+      "line": 63,
       "kind": "struct",
       "name": "QueueableKey",
       "has_doc": true
@@ -9387,7 +9332,7 @@
       "source": "rust",
       "module": "engine",
       "file": "src/engine/resource_keys.rs",
-      "line": 41,
+      "line": 67,
       "kind": "struct",
       "name": "LightKey",
       "has_doc": true
@@ -9396,7 +9341,7 @@
       "source": "rust",
       "module": "engine",
       "file": "src/engine/resource_keys.rs",
-      "line": 43,
+      "line": 71,
       "kind": "struct",
       "name": "OccluderKey",
       "has_doc": true
@@ -9414,7 +9359,7 @@
       "source": "rust",
       "module": "engine",
       "file": "src/engine/shared_state.rs",
-      "line": 84,
+      "line": 85,
       "kind": "struct",
       "name": "WindowState",
       "has_doc": true
@@ -9423,7 +9368,7 @@
       "source": "rust",
       "module": "engine",
       "file": "src/engine/shared_state.rs",
-      "line": 200,
+      "line": 201,
       "kind": "struct",
       "name": "ErrorInfo",
       "has_doc": true
@@ -9432,7 +9377,7 @@
       "source": "rust",
       "module": "engine",
       "file": "src/engine/shared_state.rs",
-      "line": 216,
+      "line": 217,
       "kind": "struct",
       "name": "ScreenshotRequest",
       "has_doc": true
@@ -9441,7 +9386,7 @@
       "source": "rust",
       "module": "engine",
       "file": "src/engine/shared_state.rs",
-      "line": 251,
+      "line": 253,
       "kind": "struct",
       "name": "SharedState",
       "has_doc": true
@@ -9450,7 +9395,7 @@
       "source": "rust",
       "module": "engine",
       "file": "src/engine/shared_state.rs",
-      "line": 373,
+      "line": 375,
       "kind": "fn",
       "name": "new",
       "has_doc": true
@@ -9459,7 +9404,7 @@
       "source": "rust",
       "module": "engine",
       "file": "src/engine/shared_state.rs",
-      "line": 442,
+      "line": 444,
       "kind": "fn",
       "name": "step_timer",
       "has_doc": true
@@ -9468,7 +9413,7 @@
       "source": "rust",
       "module": "engine",
       "file": "src/engine/shared_state.rs",
-      "line": 457,
+      "line": 459,
       "kind": "fn",
       "name": "request_async_load",
       "has_doc": true
@@ -9477,7 +9422,7 @@
       "source": "rust",
       "module": "engine",
       "file": "src/engine/shared_state.rs",
-      "line": 469,
+      "line": 471,
       "kind": "fn",
       "name": "load_default_font",
       "has_doc": true
@@ -9486,7 +9431,7 @@
       "source": "rust",
       "module": "engine",
       "file": "src/engine/shared_state.rs",
-      "line": 492,
+      "line": 494,
       "kind": "fn",
       "name": "poll_async_load",
       "has_doc": true
@@ -9495,7 +9440,7 @@
       "source": "rust",
       "module": "engine",
       "file": "src/engine/shared_state.rs",
-      "line": 517,
+      "line": 519,
       "kind": "struct",
       "name": "RendererStats",
       "has_doc": true
@@ -9504,7 +9449,7 @@
       "source": "rust",
       "module": "engine",
       "file": "src/engine/shared_state.rs",
-      "line": 535,
+      "line": 537,
       "kind": "fn",
       "name": "compute_stats",
       "has_doc": true
@@ -10368,7 +10313,7 @@
       "source": "rust",
       "module": "filesystem",
       "file": "src/filesystem/async_loader.rs",
-      "line": 15,
+      "line": 17,
       "kind": "struct",
       "name": "LoadHandle",
       "has_doc": true
@@ -10377,7 +10322,7 @@
       "source": "rust",
       "module": "filesystem",
       "file": "src/filesystem/async_loader.rs",
-      "line": 23,
+      "line": 25,
       "kind": "enum",
       "name": "LoadResult",
       "has_doc": true
@@ -10386,7 +10331,7 @@
       "source": "rust",
       "module": "filesystem",
       "file": "src/filesystem/async_loader.rs",
-      "line": 36,
+      "line": 38,
       "kind": "enum",
       "name": "LoadStatus",
       "has_doc": true
@@ -10395,7 +10340,7 @@
       "source": "rust",
       "module": "filesystem",
       "file": "src/filesystem/async_loader.rs",
-      "line": 62,
+      "line": 64,
       "kind": "struct",
       "name": "AsyncLoader",
       "has_doc": true
@@ -10404,7 +10349,7 @@
       "source": "rust",
       "module": "filesystem",
       "file": "src/filesystem/async_loader.rs",
-      "line": 74,
+      "line": 76,
       "kind": "fn",
       "name": "new",
       "has_doc": true
@@ -10413,7 +10358,7 @@
       "source": "rust",
       "module": "filesystem",
       "file": "src/filesystem/async_loader.rs",
-      "line": 107,
+      "line": 109,
       "kind": "fn",
       "name": "request_load",
       "has_doc": true
@@ -10422,7 +10367,7 @@
       "source": "rust",
       "module": "filesystem",
       "file": "src/filesystem/async_loader.rs",
-      "line": 139,
+      "line": 141,
       "kind": "fn",
       "name": "poll",
       "has_doc": true
@@ -10431,7 +10376,7 @@
       "source": "rust",
       "module": "filesystem",
       "file": "src/filesystem/async_loader.rs",
-      "line": 152,
+      "line": 154,
       "kind": "fn",
       "name": "pending_results",
       "has_doc": true
@@ -12798,7 +12743,7 @@
       "source": "rust",
       "module": "graphics",
       "file": "src/graphics/color.rs",
-      "line": 12,
+      "line": 13,
       "kind": "struct",
       "name": "Color",
       "has_doc": true
@@ -12807,7 +12752,7 @@
       "source": "rust",
       "module": "graphics",
       "file": "src/graphics/color.rs",
-      "line": 21,
+      "line": 22,
       "kind": "const",
       "name": "WHITE",
       "has_doc": true
@@ -12816,7 +12761,7 @@
       "source": "rust",
       "module": "graphics",
       "file": "src/graphics/color.rs",
-      "line": 28,
+      "line": 29,
       "kind": "const",
       "name": "BLACK",
       "has_doc": true
@@ -12825,7 +12770,7 @@
       "source": "rust",
       "module": "graphics",
       "file": "src/graphics/color.rs",
-      "line": 35,
+      "line": 36,
       "kind": "const",
       "name": "RED",
       "has_doc": true
@@ -12834,7 +12779,7 @@
       "source": "rust",
       "module": "graphics",
       "file": "src/graphics/color.rs",
-      "line": 42,
+      "line": 43,
       "kind": "const",
       "name": "GREEN",
       "has_doc": true
@@ -12843,7 +12788,7 @@
       "source": "rust",
       "module": "graphics",
       "file": "src/graphics/color.rs",
-      "line": 49,
+      "line": 50,
       "kind": "const",
       "name": "BLUE",
       "has_doc": true
@@ -12852,7 +12797,7 @@
       "source": "rust",
       "module": "graphics",
       "file": "src/graphics/color.rs",
-      "line": 56,
+      "line": 57,
       "kind": "const",
       "name": "LUNA_BG",
       "has_doc": true
@@ -12861,7 +12806,7 @@
       "source": "rust",
       "module": "graphics",
       "file": "src/graphics/color.rs",
-      "line": 63,
+      "line": 64,
       "kind": "const",
       "name": "LUNA_ACCENT",
       "has_doc": true
@@ -12870,7 +12815,7 @@
       "source": "rust",
       "module": "graphics",
       "file": "src/graphics/color.rs",
-      "line": 80,
+      "line": 81,
       "kind": "fn",
       "name": "new",
       "has_doc": true
@@ -12879,7 +12824,7 @@
       "source": "rust",
       "module": "graphics",
       "file": "src/graphics/color.rs",
-      "line": 94,
+      "line": 95,
       "kind": "fn",
       "name": "from_u8",
       "has_doc": true
@@ -12888,7 +12833,7 @@
       "source": "rust",
       "module": "graphics",
       "file": "src/graphics/color.rs",
-      "line": 107,
+      "line": 108,
       "kind": "fn",
       "name": "to_u8",
       "has_doc": true
@@ -12897,7 +12842,7 @@
       "source": "rust",
       "module": "graphics",
       "file": "src/graphics/color.rs",
-      "line": 122,
+      "line": 123,
       "kind": "fn",
       "name": "to_rgb_u32",
       "has_doc": true
@@ -14238,7 +14183,7 @@
       "source": "rust",
       "module": "gui",
       "file": "src/gui/context.rs",
-      "line": 93,
+      "line": 94,
       "kind": "enum",
       "name": "WidgetKind",
       "has_doc": true
@@ -14247,7 +14192,7 @@
       "source": "rust",
       "module": "gui",
       "file": "src/gui/context.rs",
-      "line": 165,
+      "line": 166,
       "kind": "fn",
       "name": "base",
       "has_doc": true
@@ -14256,7 +14201,7 @@
       "source": "rust",
       "module": "gui",
       "file": "src/gui/context.rs",
-      "line": 206,
+      "line": 207,
       "kind": "fn",
       "name": "base_mut",
       "has_doc": true
@@ -14265,7 +14210,7 @@
       "source": "rust",
       "module": "gui",
       "file": "src/gui/context.rs",
-      "line": 247,
+      "line": 248,
       "kind": "fn",
       "name": "children",
       "has_doc": true
@@ -14274,7 +14219,7 @@
       "source": "rust",
       "module": "gui",
       "file": "src/gui/context.rs",
-      "line": 262,
+      "line": 263,
       "kind": "fn",
       "name": "children_mut",
       "has_doc": true
@@ -14283,7 +14228,7 @@
       "source": "rust",
       "module": "gui",
       "file": "src/gui/context.rs",
-      "line": 290,
+      "line": 291,
       "kind": "struct",
       "name": "GuiContext",
       "has_doc": true
@@ -14292,7 +14237,7 @@
       "source": "rust",
       "module": "gui",
       "file": "src/gui/context.rs",
-      "line": 308,
+      "line": 309,
       "kind": "fn",
       "name": "new",
       "has_doc": true
@@ -14301,7 +14246,7 @@
       "source": "rust",
       "module": "gui",
       "file": "src/gui/context.rs",
-      "line": 324,
+      "line": 325,
       "kind": "fn",
       "name": "widget_count",
       "has_doc": true
@@ -14310,7 +14255,7 @@
       "source": "rust",
       "module": "gui",
       "file": "src/gui/context.rs",
-      "line": 334,
+      "line": 335,
       "kind": "fn",
       "name": "drain_events",
       "has_doc": true
@@ -14319,7 +14264,7 @@
       "source": "rust",
       "module": "gui",
       "file": "src/gui/context.rs",
-      "line": 347,
+      "line": 348,
       "kind": "fn",
       "name": "add_button",
       "has_doc": true
@@ -14328,7 +14273,7 @@
       "source": "rust",
       "module": "gui",
       "file": "src/gui/context.rs",
-      "line": 360,
+      "line": 361,
       "kind": "fn",
       "name": "add_label",
       "has_doc": true
@@ -14337,7 +14282,7 @@
       "source": "rust",
       "module": "gui",
       "file": "src/gui/context.rs",
-      "line": 370,
+      "line": 371,
       "kind": "fn",
       "name": "add_text_input",
       "has_doc": true
@@ -14346,7 +14291,7 @@
       "source": "rust",
       "module": "gui",
       "file": "src/gui/context.rs",
-      "line": 383,
+      "line": 384,
       "kind": "fn",
       "name": "add_checkbox",
       "has_doc": true
@@ -14355,7 +14300,7 @@
       "source": "rust",
       "module": "gui",
       "file": "src/gui/context.rs",
-      "line": 397,
+      "line": 398,
       "kind": "fn",
       "name": "add_slider",
       "has_doc": true
@@ -14364,7 +14309,7 @@
       "source": "rust",
       "module": "gui",
       "file": "src/gui/context.rs",
-      "line": 411,
+      "line": 412,
       "kind": "fn",
       "name": "add_progress_bar",
       "has_doc": true
@@ -14373,7 +14318,7 @@
       "source": "rust",
       "module": "gui",
       "file": "src/gui/context.rs",
-      "line": 422,
+      "line": 423,
       "kind": "fn",
       "name": "add_combo_box",
       "has_doc": true
@@ -14382,7 +14327,7 @@
       "source": "rust",
       "module": "gui",
       "file": "src/gui/context.rs",
-      "line": 432,
+      "line": 433,
       "kind": "fn",
       "name": "add_list_box",
       "has_doc": true
@@ -14391,7 +14336,7 @@
       "source": "rust",
       "module": "gui",
       "file": "src/gui/context.rs",
-      "line": 442,
+      "line": 443,
       "kind": "fn",
       "name": "add_panel",
       "has_doc": true
@@ -14400,7 +14345,7 @@
       "source": "rust",
       "module": "gui",
       "file": "src/gui/context.rs",
-      "line": 455,
+      "line": 456,
       "kind": "fn",
       "name": "add_layout",
       "has_doc": true
@@ -14409,7 +14354,7 @@
       "source": "rust",
       "module": "gui",
       "file": "src/gui/context.rs",
-      "line": 466,
+      "line": 467,
       "kind": "fn",
       "name": "add_scroll_panel",
       "has_doc": true
@@ -14418,7 +14363,7 @@
       "source": "rust",
       "module": "gui",
       "file": "src/gui/context.rs",
-      "line": 477,
+      "line": 478,
       "kind": "fn",
       "name": "add_nine_patch",
       "has_doc": true
@@ -14427,7 +14372,7 @@
       "source": "rust",
       "module": "gui",
       "file": "src/gui/context.rs",
-      "line": 487,
+      "line": 488,
       "kind": "fn",
       "name": "add_tab_bar",
       "has_doc": true
@@ -14436,7 +14381,7 @@
       "source": "rust",
       "module": "gui",
       "file": "src/gui/context.rs",
-      "line": 500,
+      "line": 501,
       "kind": "fn",
       "name": "add_separator",
       "has_doc": true
@@ -14445,7 +14390,7 @@
       "source": "rust",
       "module": "gui",
       "file": "src/gui/context.rs",
-      "line": 515,
+      "line": 516,
       "kind": "fn",
       "name": "add_spacer",
       "has_doc": true
@@ -14454,7 +14399,7 @@
       "source": "rust",
       "module": "gui",
       "file": "src/gui/context.rs",
-      "line": 526,
+      "line": 527,
       "kind": "fn",
       "name": "add_tree_view",
       "has_doc": true
@@ -14463,7 +14408,7 @@
       "source": "rust",
       "module": "gui",
       "file": "src/gui/context.rs",
-      "line": 540,
+      "line": 541,
       "kind": "fn",
       "name": "add_radio_button",
       "has_doc": true
@@ -14472,7 +14417,7 @@
       "source": "rust",
       "module": "gui",
       "file": "src/gui/context.rs",
-      "line": 554,
+      "line": 555,
       "kind": "fn",
       "name": "add_scroll_bar",
       "has_doc": true
@@ -14481,7 +14426,7 @@
       "source": "rust",
       "module": "gui",
       "file": "src/gui/context.rs",
-      "line": 568,
+      "line": 569,
       "kind": "fn",
       "name": "add_gui_window",
       "has_doc": true
@@ -14490,7 +14435,7 @@
       "source": "rust",
       "module": "gui",
       "file": "src/gui/context.rs",
-      "line": 582,
+      "line": 583,
       "kind": "fn",
       "name": "add_split_panel",
       "has_doc": true
@@ -14499,7 +14444,7 @@
       "source": "rust",
       "module": "gui",
       "file": "src/gui/context.rs",
-      "line": 593,
+      "line": 594,
       "kind": "fn",
       "name": "add_dock_panel",
       "has_doc": true
@@ -14508,7 +14453,7 @@
       "source": "rust",
       "module": "gui",
       "file": "src/gui/context.rs",
-      "line": 606,
+      "line": 607,
       "kind": "fn",
       "name": "add_toolbar",
       "has_doc": true
@@ -14517,7 +14462,7 @@
       "source": "rust",
       "module": "gui",
       "file": "src/gui/context.rs",
-      "line": 617,
+      "line": 618,
       "kind": "fn",
       "name": "add_menu_bar",
       "has_doc": true
@@ -14526,7 +14471,7 @@
       "source": "rust",
       "module": "gui",
       "file": "src/gui/context.rs",
-      "line": 630,
+      "line": 631,
       "kind": "fn",
       "name": "add_menu_item",
       "has_doc": true
@@ -14535,7 +14480,7 @@
       "source": "rust",
       "module": "gui",
       "file": "src/gui/context.rs",
-      "line": 643,
+      "line": 644,
       "kind": "fn",
       "name": "add_dialog",
       "has_doc": true
@@ -14544,7 +14489,7 @@
       "source": "rust",
       "module": "gui",
       "file": "src/gui/context.rs",
-      "line": 653,
+      "line": 654,
       "kind": "fn",
       "name": "add_status_bar",
       "has_doc": true
@@ -14553,7 +14498,7 @@
       "source": "rust",
       "module": "gui",
       "file": "src/gui/context.rs",
-      "line": 663,
+      "line": 664,
       "kind": "fn",
       "name": "add_accordion",
       "has_doc": true
@@ -14562,7 +14507,7 @@
       "source": "rust",
       "module": "gui",
       "file": "src/gui/context.rs",
-      "line": 676,
+      "line": 677,
       "kind": "fn",
       "name": "add_tooltip_panel",
       "has_doc": true
@@ -14571,7 +14516,7 @@
       "source": "rust",
       "module": "gui",
       "file": "src/gui/context.rs",
-      "line": 687,
+      "line": 688,
       "kind": "fn",
       "name": "add_color_picker",
       "has_doc": true
@@ -14580,7 +14525,7 @@
       "source": "rust",
       "module": "gui",
       "file": "src/gui/context.rs",
-      "line": 698,
+      "line": 699,
       "kind": "fn",
       "name": "add_gui_table",
       "has_doc": true
@@ -14589,7 +14534,7 @@
       "source": "rust",
       "module": "gui",
       "file": "src/gui/context.rs",
-      "line": 708,
+      "line": 709,
       "kind": "fn",
       "name": "add_image_widget",
       "has_doc": true
@@ -14598,7 +14543,7 @@
       "source": "rust",
       "module": "gui",
       "file": "src/gui/context.rs",
-      "line": 727,
+      "line": 728,
       "kind": "fn",
       "name": "add_child",
       "has_doc": true
@@ -14607,7 +14552,7 @@
       "source": "rust",
       "module": "gui",
       "file": "src/gui/context.rs",
-      "line": 750,
+      "line": 751,
       "kind": "fn",
       "name": "remove_child",
       "has_doc": true
@@ -14616,7 +14561,7 @@
       "source": "rust",
       "module": "gui",
       "file": "src/gui/context.rs",
-      "line": 770,
+      "line": 771,
       "kind": "fn",
       "name": "child_count",
       "has_doc": true
@@ -14625,7 +14570,7 @@
       "source": "rust",
       "module": "gui",
       "file": "src/gui/context.rs",
-      "line": 784,
+      "line": 785,
       "kind": "fn",
       "name": "set_focus",
       "has_doc": true
@@ -14634,7 +14579,7 @@
       "source": "rust",
       "module": "gui",
       "file": "src/gui/context.rs",
-      "line": 804,
+      "line": 805,
       "kind": "fn",
       "name": "focus_next",
       "has_doc": true
@@ -14643,7 +14588,7 @@
       "source": "rust",
       "module": "gui",
       "file": "src/gui/context.rs",
-      "line": 824,
+      "line": 825,
       "kind": "fn",
       "name": "focus_prev",
       "has_doc": true
@@ -14652,7 +14597,7 @@
       "source": "rust",
       "module": "gui",
       "file": "src/gui/context.rs",
-      "line": 851,
+      "line": 852,
       "kind": "fn",
       "name": "add_toast",
       "has_doc": true
@@ -14661,7 +14606,7 @@
       "source": "rust",
       "module": "gui",
       "file": "src/gui/context.rs",
-      "line": 859,
+      "line": 860,
       "kind": "fn",
       "name": "toast_count",
       "has_doc": true
@@ -14670,7 +14615,7 @@
       "source": "rust",
       "module": "gui",
       "file": "src/gui/context.rs",
-      "line": 869,
+      "line": 870,
       "kind": "fn",
       "name": "update",
       "has_doc": true
@@ -14679,7 +14624,7 @@
       "source": "rust",
       "module": "gui",
       "file": "src/gui/context.rs",
-      "line": 887,
+      "line": 888,
       "kind": "fn",
       "name": "find_by_id",
       "has_doc": true
@@ -14688,7 +14633,7 @@
       "source": "rust",
       "module": "gui",
       "file": "src/gui/context.rs",
-      "line": 918,
+      "line": 919,
       "kind": "fn",
       "name": "mouse_pressed",
       "has_doc": true
@@ -14697,7 +14642,7 @@
       "source": "rust",
       "module": "gui",
       "file": "src/gui/context.rs",
-      "line": 954,
+      "line": 955,
       "kind": "fn",
       "name": "mouse_released",
       "has_doc": true
@@ -14706,7 +14651,7 @@
       "source": "rust",
       "module": "gui",
       "file": "src/gui/context.rs",
-      "line": 990,
+      "line": 991,
       "kind": "fn",
       "name": "mouse_moved",
       "has_doc": true
@@ -14715,7 +14660,7 @@
       "source": "rust",
       "module": "gui",
       "file": "src/gui/context.rs",
-      "line": 1029,
+      "line": 1030,
       "kind": "fn",
       "name": "key_pressed",
       "has_doc": true
@@ -14724,7 +14669,7 @@
       "source": "rust",
       "module": "gui",
       "file": "src/gui/context.rs",
-      "line": 1055,
+      "line": 1056,
       "kind": "fn",
       "name": "text_input",
       "has_doc": true
@@ -14733,7 +14678,7 @@
       "source": "rust",
       "module": "gui",
       "file": "src/gui/context.rs",
-      "line": 1073,
+      "line": 1074,
       "kind": "fn",
       "name": "wheel_moved",
       "has_doc": true
@@ -14778,7 +14723,7 @@
       "source": "rust",
       "module": "gui",
       "file": "src/gui/controls.rs",
-      "line": 94,
+      "line": 93,
       "kind": "struct",
       "name": "TextInput",
       "has_doc": true
@@ -14787,7 +14732,7 @@
       "source": "rust",
       "module": "gui",
       "file": "src/gui/controls.rs",
-      "line": 114,
+      "line": 113,
       "kind": "fn",
       "name": "new",
       "has_doc": true
@@ -14796,7 +14741,7 @@
       "source": "rust",
       "module": "gui",
       "file": "src/gui/controls.rs",
-      "line": 132,
+      "line": 131,
       "kind": "fn",
       "name": "insert_text",
       "has_doc": true
@@ -14805,7 +14750,7 @@
       "source": "rust",
       "module": "gui",
       "file": "src/gui/controls.rs",
-      "line": 145,
+      "line": 144,
       "kind": "fn",
       "name": "backspace",
       "has_doc": true
@@ -14814,7 +14759,7 @@
       "source": "rust",
       "module": "gui",
       "file": "src/gui/controls.rs",
-      "line": 179,
+      "line": 178,
       "kind": "struct",
       "name": "CheckBox",
       "has_doc": true
@@ -14823,7 +14768,7 @@
       "source": "rust",
       "module": "gui",
       "file": "src/gui/controls.rs",
-      "line": 196,
+      "line": 195,
       "kind": "fn",
       "name": "new",
       "has_doc": true
@@ -14832,7 +14777,7 @@
       "source": "rust",
       "module": "gui",
       "file": "src/gui/controls.rs",
-      "line": 219,
+      "line": 218,
       "kind": "struct",
       "name": "Slider",
       "has_doc": true
@@ -14841,7 +14786,7 @@
       "source": "rust",
       "module": "gui",
       "file": "src/gui/controls.rs",
-      "line": 243,
+      "line": 242,
       "kind": "fn",
       "name": "new",
       "has_doc": true
@@ -14850,7 +14795,7 @@
       "source": "rust",
       "module": "gui",
       "file": "src/gui/controls.rs",
-      "line": 258,
+      "line": 257,
       "kind": "fn",
       "name": "set_value",
       "has_doc": true
@@ -14859,7 +14804,7 @@
       "source": "rust",
       "module": "gui",
       "file": "src/gui/controls.rs",
-      "line": 280,
+      "line": 279,
       "kind": "struct",
       "name": "ProgressBar",
       "has_doc": true
@@ -14868,7 +14813,7 @@
       "source": "rust",
       "module": "gui",
       "file": "src/gui/controls.rs",
-      "line": 300,
+      "line": 299,
       "kind": "fn",
       "name": "new",
       "has_doc": true
@@ -14877,7 +14822,7 @@
       "source": "rust",
       "module": "gui",
       "file": "src/gui/controls.rs",
-      "line": 313,
+      "line": 312,
       "kind": "fn",
       "name": "progress",
       "has_doc": true
@@ -14886,7 +14831,7 @@
       "source": "rust",
       "module": "gui",
       "file": "src/gui/controls.rs",
-      "line": 336,
+      "line": 335,
       "kind": "struct",
       "name": "ComboBox",
       "has_doc": true
@@ -14895,7 +14840,7 @@
       "source": "rust",
       "module": "gui",
       "file": "src/gui/controls.rs",
-      "line": 352,
+      "line": 351,
       "kind": "fn",
       "name": "new",
       "has_doc": true
@@ -14904,7 +14849,7 @@
       "source": "rust",
       "module": "gui",
       "file": "src/gui/controls.rs",
-      "line": 365,
+      "line": 364,
       "kind": "fn",
       "name": "add_item",
       "has_doc": true
@@ -14913,7 +14858,7 @@
       "source": "rust",
       "module": "gui",
       "file": "src/gui/controls.rs",
-      "line": 378,
+      "line": 377,
       "kind": "fn",
       "name": "remove_item",
       "has_doc": true
@@ -14922,7 +14867,7 @@
       "source": "rust",
       "module": "gui",
       "file": "src/gui/controls.rs",
-      "line": 398,
+      "line": 397,
       "kind": "fn",
       "name": "clear",
       "has_doc": true
@@ -14931,7 +14876,7 @@
       "source": "rust",
       "module": "gui",
       "file": "src/gui/controls.rs",
-      "line": 407,
+      "line": 406,
       "kind": "fn",
       "name": "selected_item",
       "has_doc": true
@@ -14940,7 +14885,7 @@
       "source": "rust",
       "module": "gui",
       "file": "src/gui/controls.rs",
-      "line": 432,
+      "line": 431,
       "kind": "struct",
       "name": "ListBox",
       "has_doc": true
@@ -14949,7 +14894,7 @@
       "source": "rust",
       "module": "gui",
       "file": "src/gui/controls.rs",
-      "line": 448,
+      "line": 447,
       "kind": "fn",
       "name": "new",
       "has_doc": true
@@ -14958,7 +14903,7 @@
       "source": "rust",
       "module": "gui",
       "file": "src/gui/controls.rs",
-      "line": 461,
+      "line": 460,
       "kind": "fn",
       "name": "add_item",
       "has_doc": true
@@ -14967,7 +14912,7 @@
       "source": "rust",
       "module": "gui",
       "file": "src/gui/controls.rs",
-      "line": 472,
+      "line": 471,
       "kind": "fn",
       "name": "remove_item",
       "has_doc": true
@@ -14976,7 +14921,7 @@
       "source": "rust",
       "module": "gui",
       "file": "src/gui/controls.rs",
-      "line": 491,
+      "line": 490,
       "kind": "fn",
       "name": "clear",
       "has_doc": true
@@ -14985,7 +14930,7 @@
       "source": "rust",
       "module": "gui",
       "file": "src/gui/controls.rs",
-      "line": 500,
+      "line": 499,
       "kind": "fn",
       "name": "selected_item",
       "has_doc": true
@@ -14994,7 +14939,7 @@
       "source": "rust",
       "module": "gui",
       "file": "src/gui/controls.rs",
-      "line": 524,
+      "line": 523,
       "kind": "struct",
       "name": "TabBar",
       "has_doc": true
@@ -15003,7 +14948,7 @@
       "source": "rust",
       "module": "gui",
       "file": "src/gui/controls.rs",
-      "line": 538,
+      "line": 537,
       "kind": "fn",
       "name": "new",
       "has_doc": true
@@ -15012,7 +14957,7 @@
       "source": "rust",
       "module": "gui",
       "file": "src/gui/controls.rs",
-      "line": 550,
+      "line": 549,
       "kind": "fn",
       "name": "add_tab",
       "has_doc": true
@@ -15021,7 +14966,7 @@
       "source": "rust",
       "module": "gui",
       "file": "src/gui/controls.rs",
-      "line": 561,
+      "line": 560,
       "kind": "fn",
       "name": "remove_tab",
       "has_doc": true
@@ -15030,7 +14975,7 @@
       "source": "rust",
       "module": "gui",
       "file": "src/gui/controls.rs",
-      "line": 590,
+      "line": 589,
       "kind": "struct",
       "name": "RadioButton",
       "has_doc": true
@@ -15039,7 +14984,7 @@
       "source": "rust",
       "module": "gui",
       "file": "src/gui/controls.rs",
-      "line": 610,
+      "line": 609,
       "kind": "fn",
       "name": "new",
       "has_doc": true
@@ -15048,7 +14993,7 @@
       "source": "rust",
       "module": "gui",
       "file": "src/gui/controls.rs",
-      "line": 631,
+      "line": 630,
       "kind": "struct",
       "name": "ScrollBar",
       "has_doc": true
@@ -15057,7 +15002,7 @@
       "source": "rust",
       "module": "gui",
       "file": "src/gui/controls.rs",
-      "line": 652,
+      "line": 651,
       "kind": "fn",
       "name": "new",
       "has_doc": true
@@ -15948,7 +15893,7 @@
       "source": "rust",
       "module": "gui",
       "file": "src/gui/widget.rs",
-      "line": 112,
+      "line": 113,
       "kind": "enum",
       "name": "WidgetType",
       "has_doc": true
@@ -15957,7 +15902,7 @@
       "source": "rust",
       "module": "gui",
       "file": "src/gui/widget.rs",
-      "line": 184,
+      "line": 185,
       "kind": "fn",
       "name": "as_str",
       "has_doc": true
@@ -15966,7 +15911,7 @@
       "source": "rust",
       "module": "gui",
       "file": "src/gui/widget.rs",
-      "line": 256,
+      "line": 258,
       "kind": "struct",
       "name": "WidgetBase",
       "has_doc": true
@@ -15975,7 +15920,7 @@
       "source": "rust",
       "module": "gui",
       "file": "src/gui/widget.rs",
-      "line": 321,
+      "line": 323,
       "kind": "fn",
       "name": "new",
       "has_doc": true
@@ -15984,7 +15929,7 @@
       "source": "rust",
       "module": "gui",
       "file": "src/gui/widget.rs",
-      "line": 360,
+      "line": 362,
       "kind": "fn",
       "name": "contains_point",
       "has_doc": true
@@ -15993,7 +15938,7 @@
       "source": "rust",
       "module": "gui",
       "file": "src/gui/widget.rs",
-      "line": 365,
+      "line": 367,
       "kind": "fn",
       "name": "clear_anchors",
       "has_doc": true
@@ -16091,6 +16036,186 @@
     {
       "source": "rust",
       "module": "image",
+      "file": "src/image/effects.rs",
+      "line": 29,
+      "kind": "fn",
+      "name": "brightness",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "image",
+      "file": "src/image/effects.rs",
+      "line": 47,
+      "kind": "fn",
+      "name": "contrast",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "image",
+      "file": "src/image/effects.rs",
+      "line": 63,
+      "kind": "fn",
+      "name": "saturation",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "image",
+      "file": "src/image/effects.rs",
+      "line": 80,
+      "kind": "fn",
+      "name": "gamma",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "image",
+      "file": "src/image/effects.rs",
+      "line": 99,
+      "kind": "fn",
+      "name": "tint",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "image",
+      "file": "src/image/effects.rs",
+      "line": 110,
+      "kind": "fn",
+      "name": "grayscale",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "image",
+      "file": "src/image/effects.rs",
+      "line": 125,
+      "kind": "fn",
+      "name": "sepia",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "image",
+      "file": "src/image/effects.rs",
+      "line": 138,
+      "kind": "fn",
+      "name": "invert",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "image",
+      "file": "src/image/effects.rs",
+      "line": 149,
+      "kind": "fn",
+      "name": "threshold",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "image",
+      "file": "src/image/effects.rs",
+      "line": 164,
+      "kind": "fn",
+      "name": "posterize",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "image",
+      "file": "src/image/effects.rs",
+      "line": 182,
+      "kind": "fn",
+      "name": "fill",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "image",
+      "file": "src/image/effects.rs",
+      "line": 194,
+      "kind": "fn",
+      "name": "noise",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "image",
+      "file": "src/image/effects.rs",
+      "line": 227,
+      "kind": "fn",
+      "name": "alpha_mask",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "image",
+      "file": "src/image/effects.rs",
+      "line": 240,
+      "kind": "fn",
+      "name": "flip_horizontal",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "image",
+      "file": "src/image/effects.rs",
+      "line": 260,
+      "kind": "fn",
+      "name": "flip_vertical",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "image",
+      "file": "src/image/effects.rs",
+      "line": 281,
+      "kind": "fn",
+      "name": "rotate_90_cw",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "image",
+      "file": "src/image/effects.rs",
+      "line": 313,
+      "kind": "fn",
+      "name": "crop",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "image",
+      "file": "src/image/effects.rs",
+      "line": 339,
+      "kind": "fn",
+      "name": "resize_nearest",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "image",
+      "file": "src/image/effects.rs",
+      "line": 371,
+      "kind": "fn",
+      "name": "blur",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "image",
+      "file": "src/image/effects.rs",
+      "line": 432,
+      "kind": "fn",
+      "name": "sharpen",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "image",
       "file": "src/image/image_data.rs",
       "line": 25,
       "kind": "struct",
@@ -16101,7 +16226,7 @@
       "source": "rust",
       "module": "image",
       "file": "src/image/image_data.rs",
-      "line": 40,
+      "line": 43,
       "kind": "fn",
       "name": "new",
       "has_doc": true
@@ -16110,7 +16235,7 @@
       "source": "rust",
       "module": "image",
       "file": "src/image/image_data.rs",
-      "line": 55,
+      "line": 58,
       "kind": "fn",
       "name": "from_file",
       "has_doc": true
@@ -16119,7 +16244,7 @@
       "source": "rust",
       "module": "image",
       "file": "src/image/image_data.rs",
-      "line": 77,
+      "line": 80,
       "kind": "fn",
       "name": "from_bytes",
       "has_doc": true
@@ -16128,7 +16253,7 @@
       "source": "rust",
       "module": "image",
       "file": "src/image/image_data.rs",
-      "line": 106,
+      "line": 109,
       "kind": "fn",
       "name": "width",
       "has_doc": true
@@ -16137,7 +16262,7 @@
       "source": "rust",
       "module": "image",
       "file": "src/image/image_data.rs",
-      "line": 114,
+      "line": 117,
       "kind": "fn",
       "name": "height",
       "has_doc": true
@@ -16146,7 +16271,7 @@
       "source": "rust",
       "module": "image",
       "file": "src/image/image_data.rs",
-      "line": 122,
+      "line": 125,
       "kind": "fn",
       "name": "dimensions",
       "has_doc": true
@@ -16155,7 +16280,7 @@
       "source": "rust",
       "module": "image",
       "file": "src/image/image_data.rs",
-      "line": 134,
+      "line": 137,
       "kind": "fn",
       "name": "get_pixel",
       "has_doc": true
@@ -16164,7 +16289,7 @@
       "source": "rust",
       "module": "image",
       "file": "src/image/image_data.rs",
-      "line": 159,
+      "line": 162,
       "kind": "fn",
       "name": "set_pixel",
       "has_doc": true
@@ -16173,7 +16298,7 @@
       "source": "rust",
       "module": "image",
       "file": "src/image/image_data.rs",
-      "line": 177,
+      "line": 180,
       "kind": "fn",
       "name": "paste",
       "has_doc": true
@@ -16182,7 +16307,7 @@
       "source": "rust",
       "module": "image",
       "file": "src/image/image_data.rs",
-      "line": 200,
+      "line": 203,
       "kind": "fn",
       "name": "map_pixel",
       "has_doc": true
@@ -16191,7 +16316,7 @@
       "source": "rust",
       "module": "image",
       "file": "src/image/image_data.rs",
-      "line": 224,
+      "line": 227,
       "kind": "fn",
       "name": "encode_png",
       "has_doc": true
@@ -16200,7 +16325,7 @@
       "source": "rust",
       "module": "image",
       "file": "src/image/image_data.rs",
-      "line": 241,
+      "line": 244,
       "kind": "fn",
       "name": "as_bytes",
       "has_doc": true
@@ -16209,9 +16334,171 @@
       "source": "rust",
       "module": "image",
       "file": "src/image/image_data.rs",
-      "line": 249,
+      "line": 252,
       "kind": "fn",
       "name": "get_string",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "image",
+      "file": "src/image/layers.rs",
+      "line": 36,
+      "kind": "struct",
+      "name": "ImageLayer",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "image",
+      "file": "src/image/layers.rs",
+      "line": 57,
+      "kind": "fn",
+      "name": "new",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "image",
+      "file": "src/image/layers.rs",
+      "line": 90,
+      "kind": "struct",
+      "name": "LayeredImage",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "image",
+      "file": "src/image/layers.rs",
+      "line": 108,
+      "kind": "fn",
+      "name": "new",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "image",
+      "file": "src/image/layers.rs",
+      "line": 120,
+      "kind": "fn",
+      "name": "width",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "image",
+      "file": "src/image/layers.rs",
+      "line": 128,
+      "kind": "fn",
+      "name": "height",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "image",
+      "file": "src/image/layers.rs",
+      "line": 136,
+      "kind": "fn",
+      "name": "layer_count",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "image",
+      "file": "src/image/layers.rs",
+      "line": 147,
+      "kind": "fn",
+      "name": "add_layer",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "image",
+      "file": "src/image/layers.rs",
+      "line": 161,
+      "kind": "fn",
+      "name": "remove_layer",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "image",
+      "file": "src/image/layers.rs",
+      "line": 176,
+      "kind": "fn",
+      "name": "get_layer",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "image",
+      "file": "src/image/layers.rs",
+      "line": 187,
+      "kind": "fn",
+      "name": "get_layer_mut",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "image",
+      "file": "src/image/layers.rs",
+      "line": 199,
+      "kind": "fn",
+      "name": "set_opacity",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "image",
+      "file": "src/image/layers.rs",
+      "line": 216,
+      "kind": "fn",
+      "name": "set_visible",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "image",
+      "file": "src/image/layers.rs",
+      "line": 233,
+      "kind": "fn",
+      "name": "set_name",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "image",
+      "file": "src/image/layers.rs",
+      "line": 252,
+      "kind": "fn",
+      "name": "set_layer_image",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "image",
+      "file": "src/image/layers.rs",
+      "line": 276,
+      "kind": "fn",
+      "name": "swap_layers",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "image",
+      "file": "src/image/layers.rs",
+      "line": 294,
+      "kind": "fn",
+      "name": "move_layer",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "image",
+      "file": "src/image/layers.rs",
+      "line": 314,
+      "kind": "fn",
+      "name": "merge",
       "has_doc": true
     },
     {
@@ -16275,6 +16562,42 @@
       "line": 93,
       "kind": "fn",
       "name": "clear",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "image",
+      "file": "src/image/serial.rs",
+      "line": 89,
+      "kind": "fn",
+      "name": "save_image",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "image",
+      "file": "src/image/serial.rs",
+      "line": 104,
+      "kind": "fn",
+      "name": "load_image",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "image",
+      "file": "src/image/serial.rs",
+      "line": 128,
+      "kind": "fn",
+      "name": "save_layered",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "image",
+      "file": "src/image/serial.rs",
+      "line": 143,
+      "kind": "fn",
+      "name": "load_layered",
       "has_doc": true
     },
     {
@@ -17037,9 +17360,9 @@
       "source": "rust",
       "module": "root",
       "file": "src/lib.rs",
-      "line": 182,
+      "line": 184,
       "kind": "fn",
-      "name": "luna_run",
+      "name": "lurek_run",
       "has_doc": true
     },
     {
@@ -17972,6 +18295,60 @@
     {
       "source": "rust",
       "module": "localization",
+      "file": "src/localization/catalog.rs",
+      "line": 179,
+      "kind": "fn",
+      "name": "merge",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "localization",
+      "file": "src/localization/catalog.rs",
+      "line": 190,
+      "kind": "fn",
+      "name": "key_count",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "localization",
+      "file": "src/localization/catalog.rs",
+      "line": 203,
+      "kind": "fn",
+      "name": "categories",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "localization",
+      "file": "src/localization/catalog.rs",
+      "line": 224,
+      "kind": "fn",
+      "name": "keys_in_category",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "localization",
+      "file": "src/localization/catalog.rs",
+      "line": 249,
+      "kind": "fn",
+      "name": "search",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "localization",
+      "file": "src/localization/catalog.rs",
+      "line": 274,
+      "kind": "fn",
+      "name": "build_index",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "localization",
       "file": "src/localization/interpolation.rs",
       "line": 21,
       "kind": "fn",
@@ -18054,7 +18431,7 @@
       "source": "rust",
       "module": "log",
       "file": "src/log/mod.rs",
-      "line": 13,
+      "line": 22,
       "kind": "fn",
       "name": "set_level",
       "has_doc": true
@@ -18063,7 +18440,7 @@
       "source": "rust",
       "module": "log",
       "file": "src/log/mod.rs",
-      "line": 18,
+      "line": 27,
       "kind": "fn",
       "name": "get_level",
       "has_doc": true
@@ -18072,16 +18449,196 @@
       "source": "rust",
       "module": "log",
       "file": "src/log/mod.rs",
-      "line": 25,
+      "line": 34,
       "kind": "fn",
       "name": "enabled_for",
       "has_doc": true
     },
     {
       "source": "rust",
+      "module": "log",
+      "file": "src/log/sinks.rs",
+      "line": 30,
+      "kind": "enum",
+      "name": "SinkLevel",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "log",
+      "file": "src/log/sinks.rs",
+      "line": 49,
+      "kind": "fn",
+      "name": "from_str",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "log",
+      "file": "src/log/sinks.rs",
+      "line": 62,
+      "kind": "fn",
+      "name": "as_str",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "log",
+      "file": "src/log/sinks.rs",
+      "line": 81,
+      "kind": "struct",
+      "name": "MemoryEntry",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "log",
+      "file": "src/log/sinks.rs",
+      "line": 97,
+      "kind": "enum",
+      "name": "SinkKind",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "log",
+      "file": "src/log/sinks.rs",
+      "line": 132,
+      "kind": "struct",
+      "name": "Sink",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "log",
+      "file": "src/log/sinks.rs",
+      "line": 151,
+      "kind": "fn",
+      "name": "file",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "log",
+      "file": "src/log/sinks.rs",
+      "line": 173,
+      "kind": "fn",
+      "name": "memory",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "log",
+      "file": "src/log/sinks.rs",
+      "line": 190,
+      "kind": "fn",
+      "name": "write",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "log",
+      "file": "src/log/sinks.rs",
+      "line": 221,
+      "kind": "fn",
+      "name": "type_name",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "log",
+      "file": "src/log/sinks.rs",
+      "line": 232,
+      "kind": "fn",
+      "name": "path",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "log",
+      "file": "src/log/sinks.rs",
+      "line": 248,
+      "kind": "fn",
+      "name": "read_memory",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "log",
+      "file": "src/log/sinks.rs",
+      "line": 266,
+      "kind": "fn",
+      "name": "flush",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "log",
+      "file": "src/log/sinks.rs",
+      "line": 285,
+      "kind": "struct",
+      "name": "SinkRegistry",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "log",
+      "file": "src/log/sinks.rs",
+      "line": 296,
+      "kind": "fn",
+      "name": "new",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "log",
+      "file": "src/log/sinks.rs",
+      "line": 307,
+      "kind": "fn",
+      "name": "add",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "log",
+      "file": "src/log/sinks.rs",
+      "line": 322,
+      "kind": "fn",
+      "name": "remove",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "log",
+      "file": "src/log/sinks.rs",
+      "line": 329,
+      "kind": "fn",
+      "name": "clear",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "log",
+      "file": "src/log/sinks.rs",
+      "line": 339,
+      "kind": "fn",
+      "name": "dispatch",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "log",
+      "file": "src/log/sinks.rs",
+      "line": 352,
+      "kind": "fn",
+      "name": "get",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
       "module": "lua_api",
       "file": "src/lua_api/ai_api.rs",
-      "line": 1927,
+      "line": 1923,
       "kind": "fn",
       "name": "register",
       "has_doc": true
@@ -18099,7 +18656,7 @@
       "source": "rust",
       "module": "lua_api",
       "file": "src/lua_api/animation_api.rs",
-      "line": 256,
+      "line": 243,
       "kind": "fn",
       "name": "register",
       "has_doc": true
@@ -18108,7 +18665,7 @@
       "source": "rust",
       "module": "lua_api",
       "file": "src/lua_api/audio_api.rs",
-      "line": 119,
+      "line": 116,
       "kind": "struct",
       "name": "LuaSource",
       "has_doc": true
@@ -18117,7 +18674,7 @@
       "source": "rust",
       "module": "lua_api",
       "file": "src/lua_api/audio_api.rs",
-      "line": 412,
+      "line": 406,
       "kind": "struct",
       "name": "LuaBus",
       "has_doc": true
@@ -18126,7 +18683,7 @@
       "source": "rust",
       "module": "lua_api",
       "file": "src/lua_api/audio_api.rs",
-      "line": 526,
+      "line": 517,
       "kind": "struct",
       "name": "LuaMidiPlayer",
       "has_doc": true
@@ -18135,7 +18692,7 @@
       "source": "rust",
       "module": "lua_api",
       "file": "src/lua_api/audio_api.rs",
-      "line": 972,
+      "line": 963,
       "kind": "struct",
       "name": "LuaDecoder",
       "has_doc": true
@@ -18144,7 +18701,7 @@
       "source": "rust",
       "module": "lua_api",
       "file": "src/lua_api/audio_api.rs",
-      "line": 1065,
+      "line": 1052,
       "kind": "fn",
       "name": "register",
       "has_doc": true
@@ -18153,7 +18710,7 @@
       "source": "rust",
       "module": "lua_api",
       "file": "src/lua_api/automation_api.rs",
-      "line": 24,
+      "line": 20,
       "kind": "fn",
       "name": "register",
       "has_doc": true
@@ -18171,7 +18728,7 @@
       "source": "rust",
       "module": "lua_api",
       "file": "src/lua_api/camera_api.rs",
-      "line": 233,
+      "line": 232,
       "kind": "fn",
       "name": "register",
       "has_doc": true
@@ -18189,7 +18746,7 @@
       "source": "rust",
       "module": "lua_api",
       "file": "src/lua_api/compute_api.rs",
-      "line": 618,
+      "line": 658,
       "kind": "fn",
       "name": "register",
       "has_doc": true
@@ -18198,16 +18755,7 @@
       "source": "rust",
       "module": "lua_api",
       "file": "src/lua_api/data_api.rs",
-      "line": 18,
-      "kind": "struct",
-      "name": "LuaDataView",
-      "has_doc": true
-    },
-    {
-      "source": "rust",
-      "module": "lua_api",
-      "file": "src/lua_api/data_api.rs",
-      "line": 270,
+      "line": 87,
       "kind": "fn",
       "name": "register",
       "has_doc": true
@@ -18234,7 +18782,7 @@
       "source": "rust",
       "module": "lua_api",
       "file": "src/lua_api/dataframe_api.rs",
-      "line": 777,
+      "line": 772,
       "kind": "fn",
       "name": "register",
       "has_doc": true
@@ -18252,7 +18800,7 @@
       "source": "rust",
       "module": "lua_api",
       "file": "src/lua_api/devtools_api.rs",
-      "line": 73,
+      "line": 86,
       "kind": "fn",
       "name": "register",
       "has_doc": true
@@ -18261,7 +18809,7 @@
       "source": "rust",
       "module": "lua_api",
       "file": "src/lua_api/docs_api.rs",
-      "line": 635,
+      "line": 755,
       "kind": "fn",
       "name": "register",
       "has_doc": true
@@ -18279,7 +18827,7 @@
       "source": "rust",
       "module": "lua_api",
       "file": "src/lua_api/entity_api.rs",
-      "line": 515,
+      "line": 513,
       "kind": "fn",
       "name": "register",
       "has_doc": true
@@ -18297,7 +18845,7 @@
       "source": "rust",
       "module": "lua_api",
       "file": "src/lua_api/event_api.rs",
-      "line": 157,
+      "line": 153,
       "kind": "fn",
       "name": "register",
       "has_doc": true
@@ -18324,7 +18872,7 @@
       "source": "rust",
       "module": "lua_api",
       "file": "src/lua_api/filesystem_api.rs",
-      "line": 144,
+      "line": 142,
       "kind": "fn",
       "name": "register",
       "has_doc": true
@@ -18342,7 +18890,7 @@
       "source": "rust",
       "module": "lua_api",
       "file": "src/lua_api/fx_api.rs",
-      "line": 148,
+      "line": 203,
       "kind": "struct",
       "name": "LuaPostFxStack",
       "has_doc": true
@@ -18351,7 +18899,7 @@
       "source": "rust",
       "module": "lua_api",
       "file": "src/lua_api/fx_api.rs",
-      "line": 333,
+      "line": 393,
       "kind": "struct",
       "name": "LuaImageEffect",
       "has_doc": true
@@ -18360,7 +18908,7 @@
       "source": "rust",
       "module": "lua_api",
       "file": "src/lua_api/fx_api.rs",
-      "line": 463,
+      "line": 529,
       "kind": "struct",
       "name": "LuaOverlay",
       "has_doc": true
@@ -18369,7 +18917,7 @@
       "source": "rust",
       "module": "lua_api",
       "file": "src/lua_api/fx_api.rs",
-      "line": 1085,
+      "line": 1145,
       "kind": "fn",
       "name": "register",
       "has_doc": true
@@ -18378,7 +18926,7 @@
       "source": "rust",
       "module": "lua_api",
       "file": "src/lua_api/graph_api.rs",
-      "line": 1764,
+      "line": 1814,
       "kind": "fn",
       "name": "register",
       "has_doc": true
@@ -18396,7 +18944,7 @@
       "source": "rust",
       "module": "lua_api",
       "file": "src/lua_api/graphics_api.rs",
-      "line": 50,
+      "line": 58,
       "kind": "struct",
       "name": "LuaImage",
       "has_doc": true
@@ -18405,7 +18953,7 @@
       "source": "rust",
       "module": "lua_api",
       "file": "src/lua_api/graphics_api.rs",
-      "line": 59,
+      "line": 67,
       "kind": "struct",
       "name": "LuaNineSlice",
       "has_doc": true
@@ -18414,7 +18962,7 @@
       "source": "rust",
       "module": "lua_api",
       "file": "src/lua_api/graphics_api.rs",
-      "line": 164,
+      "line": 175,
       "kind": "struct",
       "name": "LuaFont",
       "has_doc": true
@@ -18423,7 +18971,7 @@
       "source": "rust",
       "module": "lua_api",
       "file": "src/lua_api/graphics_api.rs",
-      "line": 302,
+      "line": 310,
       "kind": "struct",
       "name": "LuaCanvas",
       "has_doc": true
@@ -18432,7 +18980,7 @@
       "source": "rust",
       "module": "lua_api",
       "file": "src/lua_api/graphics_api.rs",
-      "line": 380,
+      "line": 385,
       "kind": "struct",
       "name": "LuaSpriteBatch",
       "has_doc": true
@@ -18441,7 +18989,7 @@
       "source": "rust",
       "module": "lua_api",
       "file": "src/lua_api/graphics_api.rs",
-      "line": 490,
+      "line": 492,
       "kind": "struct",
       "name": "LuaMesh",
       "has_doc": true
@@ -18450,7 +18998,7 @@
       "source": "rust",
       "module": "lua_api",
       "file": "src/lua_api/graphics_api.rs",
-      "line": 602,
+      "line": 601,
       "kind": "struct",
       "name": "LuaShader",
       "has_doc": true
@@ -18459,7 +19007,7 @@
       "source": "rust",
       "module": "lua_api",
       "file": "src/lua_api/graphics_api.rs",
-      "line": 677,
+      "line": 669,
       "kind": "struct",
       "name": "LuaQuad",
       "has_doc": true
@@ -18468,7 +19016,7 @@
       "source": "rust",
       "module": "lua_api",
       "file": "src/lua_api/graphics_api.rs",
-      "line": 796,
+      "line": 788,
       "kind": "struct",
       "name": "LuaShape",
       "has_doc": true
@@ -18477,7 +19025,7 @@
       "source": "rust",
       "module": "lua_api",
       "file": "src/lua_api/graphics_api.rs",
-      "line": 1227,
+      "line": 1215,
       "kind": "fn",
       "name": "register",
       "has_doc": true
@@ -18486,7 +19034,7 @@
       "source": "rust",
       "module": "lua_api",
       "file": "src/lua_api/gui_api.rs",
-      "line": 4096,
+      "line": 4086,
       "kind": "fn",
       "name": "register",
       "has_doc": true
@@ -18495,7 +19043,16 @@
       "source": "rust",
       "module": "lua_api",
       "file": "src/lua_api/image_api.rs",
-      "line": 15,
+      "line": 16,
+      "kind": "struct",
+      "name": "LuaLayeredImage",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "lua_api",
+      "file": "src/lua_api/image_api.rs",
+      "line": 224,
       "kind": "struct",
       "name": "LuaCompressedImageData",
       "has_doc": true
@@ -18504,7 +19061,7 @@
       "source": "rust",
       "module": "lua_api",
       "file": "src/lua_api/image_api.rs",
-      "line": 70,
+      "line": 277,
       "kind": "fn",
       "name": "register",
       "has_doc": true
@@ -18522,7 +19079,7 @@
       "source": "rust",
       "module": "lua_api",
       "file": "src/lua_api/input_api.rs",
-      "line": 52,
+      "line": 50,
       "kind": "fn",
       "name": "register",
       "has_doc": true
@@ -18549,7 +19106,7 @@
       "source": "rust",
       "module": "lua_api",
       "file": "src/lua_api/light_api.rs",
-      "line": 885,
+      "line": 881,
       "kind": "fn",
       "name": "register",
       "has_doc": true
@@ -18558,7 +19115,7 @@
       "source": "rust",
       "module": "lua_api",
       "file": "src/lua_api/localization_api.rs",
-      "line": 81,
+      "line": 77,
       "kind": "fn",
       "name": "register",
       "has_doc": true
@@ -18567,7 +19124,7 @@
       "source": "rust",
       "module": "lua_api",
       "file": "src/lua_api/log_api.rs",
-      "line": 18,
+      "line": 25,
       "kind": "fn",
       "name": "register",
       "has_doc": true
@@ -18648,7 +19205,7 @@
       "source": "rust",
       "module": "lua_api",
       "file": "src/lua_api/math_api.rs",
-      "line": 948,
+      "line": 944,
       "kind": "fn",
       "name": "register",
       "has_doc": true
@@ -18666,7 +19223,7 @@
       "source": "rust",
       "module": "lua_api",
       "file": "src/lua_api/minimap_api.rs",
-      "line": 747,
+      "line": 745,
       "kind": "fn",
       "name": "register",
       "has_doc": true
@@ -18675,7 +19232,7 @@
       "source": "rust",
       "module": "lua_api",
       "file": "src/lua_api/mod.rs",
-      "line": 165,
+      "line": 166,
       "kind": "fn",
       "name": "create_lua_vm",
       "has_doc": true
@@ -18684,9 +19241,18 @@
       "source": "rust",
       "module": "lua_api",
       "file": "src/lua_api/mod.rs",
-      "line": 403,
+      "line": 409,
       "kind": "fn",
       "name": "create_test_vm",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "lua_api",
+      "file": "src/lua_api/modding_api.rs",
+      "line": 16,
+      "kind": "fn",
+      "name": "mod_info_from_table",
       "has_doc": true
     },
     {
@@ -18702,7 +19268,16 @@
       "source": "rust",
       "module": "lua_api",
       "file": "src/lua_api/modding_api.rs",
-      "line": 251,
+      "line": 91,
+      "kind": "fn",
+      "name": "new",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "lua_api",
+      "file": "src/lua_api/modding_api.rs",
+      "line": 260,
       "kind": "struct",
       "name": "LuaModManager",
       "has_doc": true
@@ -18711,7 +19286,16 @@
       "source": "rust",
       "module": "lua_api",
       "file": "src/lua_api/modding_api.rs",
-      "line": 396,
+      "line": 266,
+      "kind": "fn",
+      "name": "new",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "lua_api",
+      "file": "src/lua_api/modding_api.rs",
+      "line": 416,
       "kind": "fn",
       "name": "register",
       "has_doc": true
@@ -18729,7 +19313,7 @@
       "source": "rust",
       "module": "lua_api",
       "file": "src/lua_api/network_api.rs",
-      "line": 370,
+      "line": 368,
       "kind": "fn",
       "name": "register",
       "has_doc": true
@@ -18738,7 +19322,7 @@
       "source": "rust",
       "module": "lua_api",
       "file": "src/lua_api/particle_api.rs",
-      "line": 26,
+      "line": 23,
       "kind": "struct",
       "name": "LuaParticleSystem",
       "has_doc": true
@@ -18747,7 +19331,7 @@
       "source": "rust",
       "module": "lua_api",
       "file": "src/lua_api/particle_api.rs",
-      "line": 830,
+      "line": 827,
       "kind": "struct",
       "name": "LuaTrail",
       "has_doc": true
@@ -18756,7 +19340,7 @@
       "source": "rust",
       "module": "lua_api",
       "file": "src/lua_api/particle_api.rs",
-      "line": 955,
+      "line": 948,
       "kind": "fn",
       "name": "register",
       "has_doc": true
@@ -18810,7 +19394,7 @@
       "source": "rust",
       "module": "lua_api",
       "file": "src/lua_api/pathfinding_api.rs",
-      "line": 892,
+      "line": 888,
       "kind": "fn",
       "name": "register",
       "has_doc": true
@@ -18819,7 +19403,7 @@
       "source": "rust",
       "module": "lua_api",
       "file": "src/lua_api/patterns_api.rs",
-      "line": 761,
+      "line": 1441,
       "kind": "fn",
       "name": "register",
       "has_doc": true
@@ -18855,7 +19439,7 @@
       "source": "rust",
       "module": "lua_api",
       "file": "src/lua_api/physics_api.rs",
-      "line": 1453,
+      "line": 1449,
       "kind": "fn",
       "name": "register",
       "has_doc": true
@@ -18873,7 +19457,25 @@
       "source": "rust",
       "module": "lua_api",
       "file": "src/lua_api/pipeline_api.rs",
-      "line": 341,
+      "line": 28,
+      "kind": "fn",
+      "name": "new",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "lua_api",
+      "file": "src/lua_api/pipeline_api.rs",
+      "line": 38,
+      "kind": "fn",
+      "name": "execute_sync",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "lua_api",
+      "file": "src/lua_api/pipeline_api.rs",
+      "line": 356,
       "kind": "struct",
       "name": "LuaPipeline",
       "has_doc": true
@@ -18882,7 +19484,61 @@
       "source": "rust",
       "module": "lua_api",
       "file": "src/lua_api/pipeline_api.rs",
-      "line": 943,
+      "line": 369,
+      "kind": "fn",
+      "name": "new",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "lua_api",
+      "file": "src/lua_api/pipeline_api.rs",
+      "line": 383,
+      "kind": "fn",
+      "name": "from_parts",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "lua_api",
+      "file": "src/lua_api/pipeline_api.rs",
+      "line": 405,
+      "kind": "fn",
+      "name": "pipeline_result_to_lua",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "lua_api",
+      "file": "src/lua_api/pipeline_api.rs",
+      "line": 444,
+      "kind": "fn",
+      "name": "cancel_remaining_steps",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "lua_api",
+      "file": "src/lua_api/pipeline_api.rs",
+      "line": 455,
+      "kind": "fn",
+      "name": "fire_step_callbacks",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "lua_api",
+      "file": "src/lua_api/pipeline_api.rs",
+      "line": 484,
+      "kind": "fn",
+      "name": "finalize_pipeline_result",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "lua_api",
+      "file": "src/lua_api/pipeline_api.rs",
+      "line": 987,
       "kind": "fn",
       "name": "register",
       "has_doc": true
@@ -18891,7 +19547,7 @@
       "source": "rust",
       "module": "lua_api",
       "file": "src/lua_api/procgen_api.rs",
-      "line": 26,
+      "line": 22,
       "kind": "fn",
       "name": "register",
       "has_doc": true
@@ -18909,7 +19565,7 @@
       "source": "rust",
       "module": "lua_api",
       "file": "src/lua_api/raycaster_api.rs",
-      "line": 211,
+      "line": 209,
       "kind": "fn",
       "name": "register",
       "has_doc": true
@@ -18927,7 +19583,16 @@
       "source": "rust",
       "module": "lua_api",
       "file": "src/lua_api/savegame_api.rs",
-      "line": 476,
+      "line": 44,
+      "kind": "fn",
+      "name": "new",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "lua_api",
+      "file": "src/lua_api/savegame_api.rs",
+      "line": 472,
       "kind": "fn",
       "name": "register",
       "has_doc": true
@@ -18945,7 +19610,7 @@
       "source": "rust",
       "module": "lua_api",
       "file": "src/lua_api/scene_api.rs",
-      "line": 157,
+      "line": 155,
       "kind": "fn",
       "name": "register",
       "has_doc": true
@@ -18954,7 +19619,7 @@
       "source": "rust",
       "module": "lua_api",
       "file": "src/lua_api/serial_api.rs",
-      "line": 34,
+      "line": 30,
       "kind": "fn",
       "name": "register",
       "has_doc": true
@@ -18972,7 +19637,7 @@
       "source": "rust",
       "module": "lua_api",
       "file": "src/lua_api/spine_api.rs",
-      "line": 156,
+      "line": 154,
       "kind": "fn",
       "name": "register",
       "has_doc": true
@@ -18981,7 +19646,7 @@
       "source": "rust",
       "module": "lua_api",
       "file": "src/lua_api/system_api.rs",
-      "line": 23,
+      "line": 21,
       "kind": "fn",
       "name": "get_processor_count",
       "has_doc": true
@@ -18990,7 +19655,7 @@
       "source": "rust",
       "module": "lua_api",
       "file": "src/lua_api/system_api.rs",
-      "line": 33,
+      "line": 29,
       "kind": "fn",
       "name": "get_memory_size",
       "has_doc": true
@@ -18999,7 +19664,7 @@
       "source": "rust",
       "module": "lua_api",
       "file": "src/lua_api/system_api.rs",
-      "line": 51,
+      "line": 43,
       "kind": "fn",
       "name": "open_url",
       "has_doc": true
@@ -19008,7 +19673,7 @@
       "source": "rust",
       "module": "lua_api",
       "file": "src/lua_api/system_api.rs",
-      "line": 90,
+      "line": 80,
       "kind": "fn",
       "name": "get_preferred_locales",
       "has_doc": true
@@ -19017,7 +19682,7 @@
       "source": "rust",
       "module": "lua_api",
       "file": "src/lua_api/system_api.rs",
-      "line": 112,
+      "line": 102,
       "kind": "enum",
       "name": "PowerState",
       "has_doc": true
@@ -19026,7 +19691,7 @@
       "source": "rust",
       "module": "lua_api",
       "file": "src/lua_api/system_api.rs",
-      "line": 130,
+      "line": 118,
       "kind": "fn",
       "name": "as_str",
       "has_doc": true
@@ -19035,7 +19700,7 @@
       "source": "rust",
       "module": "lua_api",
       "file": "src/lua_api/system_api.rs",
-      "line": 148,
+      "line": 134,
       "kind": "fn",
       "name": "get_power_info",
       "has_doc": true
@@ -19044,7 +19709,7 @@
       "source": "rust",
       "module": "lua_api",
       "file": "src/lua_api/system_api.rs",
-      "line": 160,
+      "line": 142,
       "kind": "fn",
       "name": "register",
       "has_doc": true
@@ -19053,7 +19718,7 @@
       "source": "rust",
       "module": "lua_api",
       "file": "src/lua_api/terminal_api.rs",
-      "line": 1186,
+      "line": 1184,
       "kind": "fn",
       "name": "register",
       "has_doc": true
@@ -19071,7 +19736,7 @@
       "source": "rust",
       "module": "lua_api",
       "file": "src/lua_api/thread_api.rs",
-      "line": 90,
+      "line": 88,
       "kind": "fn",
       "name": "register",
       "has_doc": true
@@ -19080,7 +19745,7 @@
       "source": "rust",
       "module": "lua_api",
       "file": "src/lua_api/tilemap_api.rs",
-      "line": 23,
+      "line": 25,
       "kind": "struct",
       "name": "LuaTileSet",
       "has_doc": true
@@ -19089,7 +19754,7 @@
       "source": "rust",
       "module": "lua_api",
       "file": "src/lua_api/tilemap_api.rs",
-      "line": 269,
+      "line": 276,
       "kind": "struct",
       "name": "LuaTileMap",
       "has_doc": true
@@ -19098,7 +19763,7 @@
       "source": "rust",
       "module": "lua_api",
       "file": "src/lua_api/tilemap_api.rs",
-      "line": 732,
+      "line": 736,
       "kind": "struct",
       "name": "LuaAutoTileSheet",
       "has_doc": true
@@ -19107,7 +19772,7 @@
       "source": "rust",
       "module": "lua_api",
       "file": "src/lua_api/tilemap_api.rs",
-      "line": 834,
+      "line": 840,
       "kind": "struct",
       "name": "LuaChunkMap",
       "has_doc": true
@@ -19116,7 +19781,7 @@
       "source": "rust",
       "module": "lua_api",
       "file": "src/lua_api/tilemap_api.rs",
-      "line": 969,
+      "line": 978,
       "kind": "struct",
       "name": "LuaIsoMap",
       "has_doc": true
@@ -19125,7 +19790,7 @@
       "source": "rust",
       "module": "lua_api",
       "file": "src/lua_api/tilemap_api.rs",
-      "line": 1120,
+      "line": 1126,
       "kind": "struct",
       "name": "LuaMapBlock",
       "has_doc": true
@@ -19134,7 +19799,7 @@
       "source": "rust",
       "module": "lua_api",
       "file": "src/lua_api/tilemap_api.rs",
-      "line": 1270,
+      "line": 1274,
       "kind": "struct",
       "name": "LuaMapGroup",
       "has_doc": true
@@ -19143,7 +19808,7 @@
       "source": "rust",
       "module": "lua_api",
       "file": "src/lua_api/tilemap_api.rs",
-      "line": 1338,
+      "line": 1342,
       "kind": "struct",
       "name": "LuaMapScript",
       "has_doc": true
@@ -19152,7 +19817,7 @@
       "source": "rust",
       "module": "lua_api",
       "file": "src/lua_api/tilemap_api.rs",
-      "line": 1405,
+      "line": 1409,
       "kind": "struct",
       "name": "LuaMapGen",
       "has_doc": true
@@ -19161,7 +19826,7 @@
       "source": "rust",
       "module": "lua_api",
       "file": "src/lua_api/tilemap_api.rs",
-      "line": 1445,
+      "line": 1447,
       "kind": "fn",
       "name": "register",
       "has_doc": true
@@ -19179,7 +19844,16 @@
       "source": "rust",
       "module": "lua_api",
       "file": "src/lua_api/timer_api.rs",
-      "line": 286,
+      "line": 284,
+      "kind": "fn",
+      "name": "register",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "lua_api",
+      "file": "src/lua_api/tween_api.rs",
+      "line": 36,
       "kind": "fn",
       "name": "register",
       "has_doc": true
@@ -19188,7 +19862,7 @@
       "source": "rust",
       "module": "lua_api",
       "file": "src/lua_api/window_api.rs",
-      "line": 20,
+      "line": 18,
       "kind": "fn",
       "name": "register",
       "has_doc": true
@@ -20862,7 +21536,7 @@
       "source": "rust",
       "module": "minimap",
       "file": "src/minimap/minimap.rs",
-      "line": 40,
+      "line": 38,
       "kind": "struct",
       "name": "Minimap",
       "has_doc": true
@@ -20871,7 +21545,7 @@
       "source": "rust",
       "module": "minimap",
       "file": "src/minimap/minimap.rs",
-      "line": 96,
+      "line": 94,
       "kind": "fn",
       "name": "new",
       "has_doc": true
@@ -20880,7 +21554,7 @@
       "source": "rust",
       "module": "minimap",
       "file": "src/minimap/minimap.rs",
-      "line": 140,
+      "line": 138,
       "kind": "fn",
       "name": "grid_width",
       "has_doc": true
@@ -20889,7 +21563,7 @@
       "source": "rust",
       "module": "minimap",
       "file": "src/minimap/minimap.rs",
-      "line": 148,
+      "line": 146,
       "kind": "fn",
       "name": "grid_height",
       "has_doc": true
@@ -20898,7 +21572,7 @@
       "source": "rust",
       "module": "minimap",
       "file": "src/minimap/minimap.rs",
-      "line": 156,
+      "line": 154,
       "kind": "fn",
       "name": "grid_size",
       "has_doc": true
@@ -20907,7 +21581,7 @@
       "source": "rust",
       "module": "minimap",
       "file": "src/minimap/minimap.rs",
-      "line": 166,
+      "line": 164,
       "kind": "fn",
       "name": "display_width",
       "has_doc": true
@@ -20916,7 +21590,7 @@
       "source": "rust",
       "module": "minimap",
       "file": "src/minimap/minimap.rs",
-      "line": 174,
+      "line": 172,
       "kind": "fn",
       "name": "display_height",
       "has_doc": true
@@ -20925,7 +21599,7 @@
       "source": "rust",
       "module": "minimap",
       "file": "src/minimap/minimap.rs",
-      "line": 183,
+      "line": 181,
       "kind": "fn",
       "name": "set_display_size",
       "has_doc": true
@@ -20934,7 +21608,7 @@
       "source": "rust",
       "module": "minimap",
       "file": "src/minimap/minimap.rs",
-      "line": 196,
+      "line": 194,
       "kind": "fn",
       "name": "set_terrain",
       "has_doc": true
@@ -20943,7 +21617,7 @@
       "source": "rust",
       "module": "minimap",
       "file": "src/minimap/minimap.rs",
-      "line": 211,
+      "line": 209,
       "kind": "fn",
       "name": "get_terrain",
       "has_doc": true
@@ -20952,7 +21626,7 @@
       "source": "rust",
       "module": "minimap",
       "file": "src/minimap/minimap.rs",
-      "line": 223,
+      "line": 221,
       "kind": "fn",
       "name": "set_terrain_data",
       "has_doc": true
@@ -20961,7 +21635,7 @@
       "source": "rust",
       "module": "minimap",
       "file": "src/minimap/minimap.rs",
-      "line": 235,
+      "line": 233,
       "kind": "fn",
       "name": "set_terrain_color",
       "has_doc": true
@@ -20970,7 +21644,7 @@
       "source": "rust",
       "module": "minimap",
       "file": "src/minimap/minimap.rs",
-      "line": 246,
+      "line": 244,
       "kind": "fn",
       "name": "get_terrain_color",
       "has_doc": true
@@ -20979,7 +21653,7 @@
       "source": "rust",
       "module": "minimap",
       "file": "src/minimap/minimap.rs",
-      "line": 260,
+      "line": 258,
       "kind": "fn",
       "name": "set_tile_description",
       "has_doc": true
@@ -20988,7 +21662,7 @@
       "source": "rust",
       "module": "minimap",
       "file": "src/minimap/minimap.rs",
-      "line": 271,
+      "line": 269,
       "kind": "fn",
       "name": "get_tile_description",
       "has_doc": true
@@ -20997,7 +21671,7 @@
       "source": "rust",
       "module": "minimap",
       "file": "src/minimap/minimap.rs",
-      "line": 281,
+      "line": 279,
       "kind": "fn",
       "name": "set_fog_enabled",
       "has_doc": true
@@ -21006,7 +21680,7 @@
       "source": "rust",
       "module": "minimap",
       "file": "src/minimap/minimap.rs",
-      "line": 289,
+      "line": 287,
       "kind": "fn",
       "name": "fog_enabled",
       "has_doc": true
@@ -21015,7 +21689,7 @@
       "source": "rust",
       "module": "minimap",
       "file": "src/minimap/minimap.rs",
-      "line": 299,
+      "line": 297,
       "kind": "fn",
       "name": "set_fog_level",
       "has_doc": true
@@ -21024,7 +21698,7 @@
       "source": "rust",
       "module": "minimap",
       "file": "src/minimap/minimap.rs",
-      "line": 314,
+      "line": 312,
       "kind": "fn",
       "name": "get_fog_level",
       "has_doc": true
@@ -21033,7 +21707,7 @@
       "source": "rust",
       "module": "minimap",
       "file": "src/minimap/minimap.rs",
-      "line": 326,
+      "line": 324,
       "kind": "fn",
       "name": "set_fog_color",
       "has_doc": true
@@ -21042,7 +21716,7 @@
       "source": "rust",
       "module": "minimap",
       "file": "src/minimap/minimap.rs",
-      "line": 334,
+      "line": 332,
       "kind": "fn",
       "name": "fog_color",
       "has_doc": true
@@ -21051,7 +21725,7 @@
       "source": "rust",
       "module": "minimap",
       "file": "src/minimap/minimap.rs",
-      "line": 342,
+      "line": 340,
       "kind": "fn",
       "name": "set_fog_data",
       "has_doc": true
@@ -21060,7 +21734,7 @@
       "source": "rust",
       "module": "minimap",
       "file": "src/minimap/minimap.rs",
-      "line": 359,
+      "line": 357,
       "kind": "fn",
       "name": "add_object_type",
       "has_doc": true
@@ -21069,7 +21743,7 @@
       "source": "rust",
       "module": "minimap",
       "file": "src/minimap/minimap.rs",
-      "line": 374,
+      "line": 372,
       "kind": "fn",
       "name": "set_object_type_visible",
       "has_doc": true
@@ -21078,7 +21752,7 @@
       "source": "rust",
       "module": "minimap",
       "file": "src/minimap/minimap.rs",
-      "line": 387,
+      "line": 385,
       "kind": "fn",
       "name": "is_object_type_visible",
       "has_doc": true
@@ -21087,7 +21761,7 @@
       "source": "rust",
       "module": "minimap",
       "file": "src/minimap/minimap.rs",
-      "line": 397,
+      "line": 395,
       "kind": "fn",
       "name": "object_type_count",
       "has_doc": true
@@ -21096,7 +21770,7 @@
       "source": "rust",
       "module": "minimap",
       "file": "src/minimap/minimap.rs",
-      "line": 411,
+      "line": 409,
       "kind": "fn",
       "name": "set_object",
       "has_doc": true
@@ -21105,7 +21779,7 @@
       "source": "rust",
       "module": "minimap",
       "file": "src/minimap/minimap.rs",
-      "line": 430,
+      "line": 428,
       "kind": "fn",
       "name": "remove_object",
       "has_doc": true
@@ -21114,7 +21788,7 @@
       "source": "rust",
       "module": "minimap",
       "file": "src/minimap/minimap.rs",
-      "line": 435,
+      "line": 433,
       "kind": "fn",
       "name": "clear_objects",
       "has_doc": true
@@ -21123,7 +21797,7 @@
       "source": "rust",
       "module": "minimap",
       "file": "src/minimap/minimap.rs",
-      "line": 443,
+      "line": 441,
       "kind": "fn",
       "name": "object_count",
       "has_doc": true
@@ -21132,7 +21806,7 @@
       "source": "rust",
       "module": "minimap",
       "file": "src/minimap/minimap.rs",
-      "line": 454,
+      "line": 452,
       "kind": "fn",
       "name": "set_owner_color",
       "has_doc": true
@@ -21141,7 +21815,7 @@
       "source": "rust",
       "module": "minimap",
       "file": "src/minimap/minimap.rs",
-      "line": 465,
+      "line": 463,
       "kind": "fn",
       "name": "get_owner_color",
       "has_doc": true
@@ -21150,7 +21824,7 @@
       "source": "rust",
       "module": "minimap",
       "file": "src/minimap/minimap.rs",
-      "line": 478,
+      "line": 476,
       "kind": "fn",
       "name": "set_color_mode",
       "has_doc": true
@@ -21159,7 +21833,7 @@
       "source": "rust",
       "module": "minimap",
       "file": "src/minimap/minimap.rs",
-      "line": 486,
+      "line": 484,
       "kind": "fn",
       "name": "color_mode",
       "has_doc": true
@@ -21168,7 +21842,7 @@
       "source": "rust",
       "module": "minimap",
       "file": "src/minimap/minimap.rs",
-      "line": 496,
+      "line": 494,
       "kind": "fn",
       "name": "set_zoom",
       "has_doc": true
@@ -21177,7 +21851,7 @@
       "source": "rust",
       "module": "minimap",
       "file": "src/minimap/minimap.rs",
-      "line": 504,
+      "line": 502,
       "kind": "fn",
       "name": "zoom",
       "has_doc": true
@@ -21186,7 +21860,7 @@
       "source": "rust",
       "module": "minimap",
       "file": "src/minimap/minimap.rs",
-      "line": 513,
+      "line": 511,
       "kind": "fn",
       "name": "set_center",
       "has_doc": true
@@ -21195,7 +21869,7 @@
       "source": "rust",
       "module": "minimap",
       "file": "src/minimap/minimap.rs",
-      "line": 522,
+      "line": 520,
       "kind": "fn",
       "name": "center_x",
       "has_doc": true
@@ -21204,7 +21878,7 @@
       "source": "rust",
       "module": "minimap",
       "file": "src/minimap/minimap.rs",
-      "line": 530,
+      "line": 528,
       "kind": "fn",
       "name": "center_y",
       "has_doc": true
@@ -21213,7 +21887,7 @@
       "source": "rust",
       "module": "minimap",
       "file": "src/minimap/minimap.rs",
-      "line": 543,
+      "line": 541,
       "kind": "fn",
       "name": "set_viewport_rect",
       "has_doc": true
@@ -21222,7 +21896,7 @@
       "source": "rust",
       "module": "minimap",
       "file": "src/minimap/minimap.rs",
-      "line": 548,
+      "line": 546,
       "kind": "fn",
       "name": "clear_viewport_rect",
       "has_doc": true
@@ -21231,7 +21905,7 @@
       "source": "rust",
       "module": "minimap",
       "file": "src/minimap/minimap.rs",
-      "line": 556,
+      "line": 554,
       "kind": "fn",
       "name": "viewport_rect",
       "has_doc": true
@@ -21240,7 +21914,7 @@
       "source": "rust",
       "module": "minimap",
       "file": "src/minimap/minimap.rs",
-      "line": 564,
+      "line": 562,
       "kind": "fn",
       "name": "set_viewport_visible",
       "has_doc": true
@@ -21249,7 +21923,7 @@
       "source": "rust",
       "module": "minimap",
       "file": "src/minimap/minimap.rs",
-      "line": 572,
+      "line": 570,
       "kind": "fn",
       "name": "viewport_visible",
       "has_doc": true
@@ -21258,7 +21932,7 @@
       "source": "rust",
       "module": "minimap",
       "file": "src/minimap/minimap.rs",
-      "line": 580,
+      "line": 578,
       "kind": "fn",
       "name": "set_viewport_color",
       "has_doc": true
@@ -21267,7 +21941,7 @@
       "source": "rust",
       "module": "minimap",
       "file": "src/minimap/minimap.rs",
-      "line": 588,
+      "line": 586,
       "kind": "fn",
       "name": "viewport_color",
       "has_doc": true
@@ -21276,7 +21950,7 @@
       "source": "rust",
       "module": "minimap",
       "file": "src/minimap/minimap.rs",
-      "line": 601,
+      "line": 599,
       "kind": "fn",
       "name": "add_ping",
       "has_doc": true
@@ -21285,7 +21959,7 @@
       "source": "rust",
       "module": "minimap",
       "file": "src/minimap/minimap.rs",
-      "line": 615,
+      "line": 613,
       "kind": "fn",
       "name": "ping_count",
       "has_doc": true
@@ -21294,7 +21968,7 @@
       "source": "rust",
       "module": "minimap",
       "file": "src/minimap/minimap.rs",
-      "line": 631,
+      "line": 629,
       "kind": "fn",
       "name": "add_marker",
       "has_doc": true
@@ -21303,7 +21977,7 @@
       "source": "rust",
       "module": "minimap",
       "file": "src/minimap/minimap.rs",
-      "line": 653,
+      "line": 651,
       "kind": "fn",
       "name": "remove_marker",
       "has_doc": true
@@ -21312,7 +21986,7 @@
       "source": "rust",
       "module": "minimap",
       "file": "src/minimap/minimap.rs",
-      "line": 664,
+      "line": 662,
       "kind": "fn",
       "name": "has_marker",
       "has_doc": true
@@ -21321,7 +21995,7 @@
       "source": "rust",
       "module": "minimap",
       "file": "src/minimap/minimap.rs",
-      "line": 675,
+      "line": 673,
       "kind": "fn",
       "name": "get_marker_description",
       "has_doc": true
@@ -21330,7 +22004,7 @@
       "source": "rust",
       "module": "minimap",
       "file": "src/minimap/minimap.rs",
-      "line": 683,
+      "line": 681,
       "kind": "fn",
       "name": "marker_count",
       "has_doc": true
@@ -21339,7 +22013,7 @@
       "source": "rust",
       "module": "minimap",
       "file": "src/minimap/minimap.rs",
-      "line": 693,
+      "line": 691,
       "kind": "fn",
       "name": "set_anti_alias",
       "has_doc": true
@@ -21348,7 +22022,7 @@
       "source": "rust",
       "module": "minimap",
       "file": "src/minimap/minimap.rs",
-      "line": 701,
+      "line": 699,
       "kind": "fn",
       "name": "anti_alias",
       "has_doc": true
@@ -21357,7 +22031,7 @@
       "source": "rust",
       "module": "minimap",
       "file": "src/minimap/minimap.rs",
-      "line": 709,
+      "line": 707,
       "kind": "fn",
       "name": "set_clickable",
       "has_doc": true
@@ -21366,7 +22040,7 @@
       "source": "rust",
       "module": "minimap",
       "file": "src/minimap/minimap.rs",
-      "line": 717,
+      "line": 715,
       "kind": "fn",
       "name": "is_clickable",
       "has_doc": true
@@ -21375,7 +22049,7 @@
       "source": "rust",
       "module": "minimap",
       "file": "src/minimap/minimap.rs",
-      "line": 733,
+      "line": 731,
       "kind": "fn",
       "name": "screen_to_grid",
       "has_doc": true
@@ -21384,7 +22058,7 @@
       "source": "rust",
       "module": "minimap",
       "file": "src/minimap/minimap.rs",
-      "line": 760,
+      "line": 758,
       "kind": "fn",
       "name": "grid_to_screen",
       "has_doc": true
@@ -21393,7 +22067,7 @@
       "source": "rust",
       "module": "minimap",
       "file": "src/minimap/minimap.rs",
-      "line": 787,
+      "line": 785,
       "kind": "fn",
       "name": "get_hover_info",
       "has_doc": true
@@ -21402,7 +22076,7 @@
       "source": "rust",
       "module": "minimap",
       "file": "src/minimap/minimap.rs",
-      "line": 816,
+      "line": 814,
       "kind": "fn",
       "name": "update",
       "has_doc": true
@@ -21735,7 +22409,7 @@
       "source": "rust",
       "module": "network",
       "file": "src/network/host.rs",
-      "line": 24,
+      "line": 28,
       "kind": "struct",
       "name": "NetworkHost",
       "has_doc": true
@@ -21744,7 +22418,7 @@
       "source": "rust",
       "module": "network",
       "file": "src/network/host.rs",
-      "line": 37,
+      "line": 41,
       "kind": "enum",
       "name": "NetworkEvent",
       "has_doc": true
@@ -21753,7 +22427,7 @@
       "source": "rust",
       "module": "network",
       "file": "src/network/host.rs",
-      "line": 75,
+      "line": 79,
       "kind": "fn",
       "name": "new",
       "has_doc": true
@@ -21762,7 +22436,7 @@
       "source": "rust",
       "module": "network",
       "file": "src/network/host.rs",
-      "line": 133,
+      "line": 137,
       "kind": "fn",
       "name": "service",
       "has_doc": true
@@ -21771,7 +22445,7 @@
       "source": "rust",
       "module": "network",
       "file": "src/network/host.rs",
-      "line": 172,
+      "line": 176,
       "kind": "fn",
       "name": "connect",
       "has_doc": true
@@ -21780,7 +22454,7 @@
       "source": "rust",
       "module": "network",
       "file": "src/network/host.rs",
-      "line": 194,
+      "line": 198,
       "kind": "fn",
       "name": "send",
       "has_doc": true
@@ -21789,7 +22463,7 @@
       "source": "rust",
       "module": "network",
       "file": "src/network/host.rs",
-      "line": 219,
+      "line": 223,
       "kind": "fn",
       "name": "send_bytes",
       "has_doc": true
@@ -21798,7 +22472,7 @@
       "source": "rust",
       "module": "network",
       "file": "src/network/host.rs",
-      "line": 242,
+      "line": 246,
       "kind": "fn",
       "name": "broadcast",
       "has_doc": true
@@ -21807,7 +22481,7 @@
       "source": "rust",
       "module": "network",
       "file": "src/network/host.rs",
-      "line": 260,
+      "line": 264,
       "kind": "fn",
       "name": "broadcast_bytes",
       "has_doc": true
@@ -21816,7 +22490,7 @@
       "source": "rust",
       "module": "network",
       "file": "src/network/host.rs",
-      "line": 279,
+      "line": 283,
       "kind": "fn",
       "name": "flush",
       "has_doc": true
@@ -21825,7 +22499,7 @@
       "source": "rust",
       "module": "network",
       "file": "src/network/host.rs",
-      "line": 293,
+      "line": 297,
       "kind": "fn",
       "name": "disconnect",
       "has_doc": true
@@ -21834,7 +22508,7 @@
       "source": "rust",
       "module": "network",
       "file": "src/network/host.rs",
-      "line": 307,
+      "line": 311,
       "kind": "fn",
       "name": "disconnect_now",
       "has_doc": true
@@ -21843,7 +22517,7 @@
       "source": "rust",
       "module": "network",
       "file": "src/network/host.rs",
-      "line": 321,
+      "line": 325,
       "kind": "fn",
       "name": "disconnect_later",
       "has_doc": true
@@ -21852,7 +22526,7 @@
       "source": "rust",
       "module": "network",
       "file": "src/network/host.rs",
-      "line": 334,
+      "line": 338,
       "kind": "fn",
       "name": "reset_peer",
       "has_doc": true
@@ -21861,7 +22535,7 @@
       "source": "rust",
       "module": "network",
       "file": "src/network/host.rs",
-      "line": 347,
+      "line": 351,
       "kind": "fn",
       "name": "ping",
       "has_doc": true
@@ -21870,7 +22544,7 @@
       "source": "rust",
       "module": "network",
       "file": "src/network/host.rs",
-      "line": 360,
+      "line": 364,
       "kind": "fn",
       "name": "round_trip_time",
       "has_doc": true
@@ -21879,7 +22553,7 @@
       "source": "rust",
       "module": "network",
       "file": "src/network/host.rs",
-      "line": 375,
+      "line": 379,
       "kind": "fn",
       "name": "peer_state",
       "has_doc": true
@@ -21888,7 +22562,7 @@
       "source": "rust",
       "module": "network",
       "file": "src/network/host.rs",
-      "line": 402,
+      "line": 406,
       "kind": "fn",
       "name": "peer_address",
       "has_doc": true
@@ -21897,7 +22571,7 @@
       "source": "rust",
       "module": "network",
       "file": "src/network/host.rs",
-      "line": 414,
+      "line": 418,
       "kind": "fn",
       "name": "local_address",
       "has_doc": true
@@ -21906,7 +22580,7 @@
       "source": "rust",
       "module": "network",
       "file": "src/network/host.rs",
-      "line": 422,
+      "line": 426,
       "kind": "fn",
       "name": "peer_limit",
       "has_doc": true
@@ -21915,7 +22589,7 @@
       "source": "rust",
       "module": "network",
       "file": "src/network/host.rs",
-      "line": 431,
+      "line": 435,
       "kind": "fn",
       "name": "channel_limit",
       "has_doc": true
@@ -21924,7 +22598,7 @@
       "source": "rust",
       "module": "network",
       "file": "src/network/host.rs",
-      "line": 443,
+      "line": 447,
       "kind": "fn",
       "name": "set_channel_limit",
       "has_doc": true
@@ -21933,7 +22607,7 @@
       "source": "rust",
       "module": "network",
       "file": "src/network/host.rs",
-      "line": 453,
+      "line": 457,
       "kind": "fn",
       "name": "bandwidth_limit",
       "has_doc": true
@@ -21942,7 +22616,7 @@
       "source": "rust",
       "module": "network",
       "file": "src/network/host.rs",
-      "line": 466,
+      "line": 470,
       "kind": "fn",
       "name": "set_bandwidth_limit",
       "has_doc": true
@@ -21951,7 +22625,7 @@
       "source": "rust",
       "module": "network",
       "file": "src/network/host.rs",
-      "line": 480,
+      "line": 484,
       "kind": "fn",
       "name": "connected_peer_count",
       "has_doc": true
@@ -21960,7 +22634,7 @@
       "source": "rust",
       "module": "network",
       "file": "src/network/host.rs",
-      "line": 488,
+      "line": 492,
       "kind": "fn",
       "name": "destroy",
       "has_doc": true
@@ -21969,7 +22643,7 @@
       "source": "rust",
       "module": "network",
       "file": "src/network/host.rs",
-      "line": 496,
+      "line": 500,
       "kind": "fn",
       "name": "is_destroyed",
       "has_doc": true
@@ -21978,7 +22652,7 @@
       "source": "rust",
       "module": "network",
       "file": "src/network/host.rs",
-      "line": 504,
+      "line": 508,
       "kind": "fn",
       "name": "connected_peer_ids",
       "has_doc": true
@@ -21987,7 +22661,7 @@
       "source": "rust",
       "module": "network",
       "file": "src/network/host.rs",
-      "line": 516,
+      "line": 520,
       "kind": "fn",
       "name": "peer_stats",
       "has_doc": true
@@ -21996,7 +22670,7 @@
       "source": "rust",
       "module": "network",
       "file": "src/network/host.rs",
-      "line": 547,
+      "line": 551,
       "kind": "struct",
       "name": "PeerStats",
       "has_doc": true
@@ -22050,7 +22724,7 @@
       "source": "rust",
       "module": "particle",
       "file": "src/particle/config.rs",
-      "line": 208,
+      "line": 169,
       "kind": "struct",
       "name": "ParticleConfig",
       "has_doc": true
@@ -22059,7 +22733,7 @@
       "source": "rust",
       "module": "particle",
       "file": "src/particle/config.rs",
-      "line": 393,
+      "line": 354,
       "kind": "fn",
       "name": "from_lua_opts",
       "has_doc": true
@@ -23543,6 +24217,141 @@
     {
       "source": "rust",
       "module": "patterns",
+      "file": "src/patterns/blackboard.rs",
+      "line": 20,
+      "kind": "enum",
+      "name": "BlackboardValue",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "patterns",
+      "file": "src/patterns/blackboard.rs",
+      "line": 54,
+      "kind": "struct",
+      "name": "Blackboard",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "patterns",
+      "file": "src/patterns/blackboard.rs",
+      "line": 72,
+      "kind": "fn",
+      "name": "new",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "patterns",
+      "file": "src/patterns/blackboard.rs",
+      "line": 86,
+      "kind": "fn",
+      "name": "set_bool",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "patterns",
+      "file": "src/patterns/blackboard.rs",
+      "line": 97,
+      "kind": "fn",
+      "name": "set_number",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "patterns",
+      "file": "src/patterns/blackboard.rs",
+      "line": 108,
+      "kind": "fn",
+      "name": "set_text",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "patterns",
+      "file": "src/patterns/blackboard.rs",
+      "line": 118,
+      "kind": "fn",
+      "name": "clear",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "patterns",
+      "file": "src/patterns/blackboard.rs",
+      "line": 131,
+      "kind": "fn",
+      "name": "get",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "patterns",
+      "file": "src/patterns/blackboard.rs",
+      "line": 139,
+      "kind": "fn",
+      "name": "keys",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "patterns",
+      "file": "src/patterns/blackboard.rs",
+      "line": 147,
+      "kind": "fn",
+      "name": "snapshot",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "patterns",
+      "file": "src/patterns/blackboard.rs",
+      "line": 158,
+      "kind": "fn",
+      "name": "has",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "patterns",
+      "file": "src/patterns/blackboard.rs",
+      "line": 169,
+      "kind": "fn",
+      "name": "key_revision",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "patterns",
+      "file": "src/patterns/blackboard.rs",
+      "line": 174,
+      "kind": "fn",
+      "name": "clear_all",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "patterns",
+      "file": "src/patterns/blackboard.rs",
+      "line": 184,
+      "kind": "fn",
+      "name": "len",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "patterns",
+      "file": "src/patterns/blackboard.rs",
+      "line": 192,
+      "kind": "fn",
+      "name": "is_empty",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "patterns",
       "file": "src/patterns/command_stack.rs",
       "line": 15,
       "kind": "struct",
@@ -23858,6 +24667,87 @@
     {
       "source": "rust",
       "module": "patterns",
+      "file": "src/patterns/funnel.rs",
+      "line": 17,
+      "kind": "struct",
+      "name": "FunnelEntry",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "patterns",
+      "file": "src/patterns/funnel.rs",
+      "line": 36,
+      "kind": "struct",
+      "name": "Funnel",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "patterns",
+      "file": "src/patterns/funnel.rs",
+      "line": 62,
+      "kind": "fn",
+      "name": "new",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "patterns",
+      "file": "src/patterns/funnel.rs",
+      "line": 84,
+      "kind": "fn",
+      "name": "push",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "patterns",
+      "file": "src/patterns/funnel.rs",
+      "line": 101,
+      "kind": "fn",
+      "name": "update",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "patterns",
+      "file": "src/patterns/funnel.rs",
+      "line": 113,
+      "kind": "fn",
+      "name": "flush",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "patterns",
+      "file": "src/patterns/funnel.rs",
+      "line": 123,
+      "kind": "fn",
+      "name": "pending",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "patterns",
+      "file": "src/patterns/funnel.rs",
+      "line": 131,
+      "kind": "fn",
+      "name": "pending_count",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "patterns",
+      "file": "src/patterns/funnel.rs",
+      "line": 136,
+      "kind": "fn",
+      "name": "discard",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "patterns",
       "file": "src/patterns/object_pool.rs",
       "line": 15,
       "kind": "struct",
@@ -23948,6 +24838,312 @@
     {
       "source": "rust",
       "module": "patterns",
+      "file": "src/patterns/observer.rs",
+      "line": 20,
+      "kind": "struct",
+      "name": "ObserverEntry",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "patterns",
+      "file": "src/patterns/observer.rs",
+      "line": 40,
+      "kind": "struct",
+      "name": "Observer",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "patterns",
+      "file": "src/patterns/observer.rs",
+      "line": 55,
+      "kind": "fn",
+      "name": "new",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "patterns",
+      "file": "src/patterns/observer.rs",
+      "line": 71,
+      "kind": "fn",
+      "name": "subscribe",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "patterns",
+      "file": "src/patterns/observer.rs",
+      "line": 86,
+      "kind": "fn",
+      "name": "unsubscribe",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "patterns",
+      "file": "src/patterns/observer.rs",
+      "line": 104,
+      "kind": "fn",
+      "name": "watchers_for",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "patterns",
+      "file": "src/patterns/observer.rs",
+      "line": 135,
+      "kind": "fn",
+      "name": "clear_key",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "patterns",
+      "file": "src/patterns/observer.rs",
+      "line": 140,
+      "kind": "fn",
+      "name": "clear_all",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "patterns",
+      "file": "src/patterns/observer.rs",
+      "line": 148,
+      "kind": "fn",
+      "name": "subscription_count",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "patterns",
+      "file": "src/patterns/priority_queue.rs",
+      "line": 18,
+      "kind": "struct",
+      "name": "PriorityItem",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "patterns",
+      "file": "src/patterns/priority_queue.rs",
+      "line": 39,
+      "kind": "struct",
+      "name": "PriorityQueue",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "patterns",
+      "file": "src/patterns/priority_queue.rs",
+      "line": 56,
+      "kind": "fn",
+      "name": "new",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "patterns",
+      "file": "src/patterns/priority_queue.rs",
+      "line": 73,
+      "kind": "fn",
+      "name": "push",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "patterns",
+      "file": "src/patterns/priority_queue.rs",
+      "line": 91,
+      "kind": "fn",
+      "name": "peek",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "patterns",
+      "file": "src/patterns/priority_queue.rs",
+      "line": 99,
+      "kind": "fn",
+      "name": "pop",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "patterns",
+      "file": "src/patterns/priority_queue.rs",
+      "line": 112,
+      "kind": "fn",
+      "name": "remove",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "patterns",
+      "file": "src/patterns/priority_queue.rs",
+      "line": 122,
+      "kind": "fn",
+      "name": "len",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "patterns",
+      "file": "src/patterns/priority_queue.rs",
+      "line": 130,
+      "kind": "fn",
+      "name": "is_empty",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "patterns",
+      "file": "src/patterns/priority_queue.rs",
+      "line": 138,
+      "kind": "fn",
+      "name": "items",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "patterns",
+      "file": "src/patterns/priority_queue.rs",
+      "line": 143,
+      "kind": "fn",
+      "name": "clear",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "patterns",
+      "file": "src/patterns/ring.rs",
+      "line": 21,
+      "kind": "struct",
+      "name": "Ring",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "patterns",
+      "file": "src/patterns/ring.rs",
+      "line": 40,
+      "kind": "struct",
+      "name": "RingEntry",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "patterns",
+      "file": "src/patterns/ring.rs",
+      "line": 60,
+      "kind": "fn",
+      "name": "new",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "patterns",
+      "file": "src/patterns/ring.rs",
+      "line": 78,
+      "kind": "fn",
+      "name": "push_number",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "patterns",
+      "file": "src/patterns/ring.rs",
+      "line": 90,
+      "kind": "fn",
+      "name": "push_string",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "patterns",
+      "file": "src/patterns/ring.rs",
+      "line": 109,
+      "kind": "fn",
+      "name": "iter",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "patterns",
+      "file": "src/patterns/ring.rs",
+      "line": 117,
+      "kind": "fn",
+      "name": "latest",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "patterns",
+      "file": "src/patterns/ring.rs",
+      "line": 125,
+      "kind": "fn",
+      "name": "oldest",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "patterns",
+      "file": "src/patterns/ring.rs",
+      "line": 133,
+      "kind": "fn",
+      "name": "len",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "patterns",
+      "file": "src/patterns/ring.rs",
+      "line": 141,
+      "kind": "fn",
+      "name": "is_empty",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "patterns",
+      "file": "src/patterns/ring.rs",
+      "line": 149,
+      "kind": "fn",
+      "name": "is_full",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "patterns",
+      "file": "src/patterns/ring.rs",
+      "line": 154,
+      "kind": "fn",
+      "name": "clear",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "patterns",
+      "file": "src/patterns/ring.rs",
+      "line": 162,
+      "kind": "fn",
+      "name": "sum",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "patterns",
+      "file": "src/patterns/ring.rs",
+      "line": 170,
+      "kind": "fn",
+      "name": "average",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "patterns",
       "file": "src/patterns/service_locator.rs",
       "line": 13,
       "kind": "struct",
@@ -24012,7 +25208,7 @@
       "source": "rust",
       "module": "patterns",
       "file": "src/patterns/simple_state.rs",
-      "line": 10,
+      "line": 18,
       "kind": "struct",
       "name": "SimpleState",
       "has_doc": true
@@ -24021,7 +25217,7 @@
       "source": "rust",
       "module": "patterns",
       "file": "src/patterns/simple_state.rs",
-      "line": 17,
+      "line": 25,
       "kind": "fn",
       "name": "new",
       "has_doc": true
@@ -24030,7 +25226,7 @@
       "source": "rust",
       "module": "patterns",
       "file": "src/patterns/simple_state.rs",
-      "line": 22,
+      "line": 30,
       "kind": "fn",
       "name": "add",
       "has_doc": true
@@ -24039,7 +25235,7 @@
       "source": "rust",
       "module": "patterns",
       "file": "src/patterns/simple_state.rs",
-      "line": 29,
+      "line": 37,
       "kind": "fn",
       "name": "remove",
       "has_doc": true
@@ -24048,7 +25244,7 @@
       "source": "rust",
       "module": "patterns",
       "file": "src/patterns/simple_state.rs",
-      "line": 38,
+      "line": 46,
       "kind": "fn",
       "name": "has",
       "has_doc": true
@@ -24057,7 +25253,7 @@
       "source": "rust",
       "module": "patterns",
       "file": "src/patterns/simple_state.rs",
-      "line": 43,
+      "line": 51,
       "kind": "fn",
       "name": "current",
       "has_doc": true
@@ -24066,7 +25262,7 @@
       "source": "rust",
       "module": "patterns",
       "file": "src/patterns/simple_state.rs",
-      "line": 48,
+      "line": 56,
       "kind": "fn",
       "name": "set_current",
       "has_doc": true
@@ -24075,7 +25271,7 @@
       "source": "rust",
       "module": "patterns",
       "file": "src/patterns/simple_state.rs",
-      "line": 57,
+      "line": 65,
       "kind": "fn",
       "name": "clear_current",
       "has_doc": true
@@ -24084,7 +25280,7 @@
       "source": "rust",
       "module": "patterns",
       "file": "src/patterns/simple_state.rs",
-      "line": 62,
+      "line": 70,
       "kind": "fn",
       "name": "states",
       "has_doc": true
@@ -24093,7 +25289,7 @@
       "source": "rust",
       "module": "patterns",
       "file": "src/patterns/simple_state.rs",
-      "line": 69,
+      "line": 77,
       "kind": "fn",
       "name": "state_count",
       "has_doc": true
@@ -24213,6 +25409,96 @@
       "line": 213,
       "kind": "fn",
       "name": "has_update_callback",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "patterns",
+      "file": "src/patterns/throttle.rs",
+      "line": 20,
+      "kind": "struct",
+      "name": "Throttle",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "patterns",
+      "file": "src/patterns/throttle.rs",
+      "line": 41,
+      "kind": "fn",
+      "name": "new",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "patterns",
+      "file": "src/patterns/throttle.rs",
+      "line": 59,
+      "kind": "fn",
+      "name": "update",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "patterns",
+      "file": "src/patterns/throttle.rs",
+      "line": 72,
+      "kind": "fn",
+      "name": "reset",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "patterns",
+      "file": "src/patterns/throttle.rs",
+      "line": 80,
+      "kind": "fn",
+      "name": "progress",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "patterns",
+      "file": "src/patterns/throttle.rs",
+      "line": 97,
+      "kind": "struct",
+      "name": "Debounce",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "patterns",
+      "file": "src/patterns/throttle.rs",
+      "line": 117,
+      "kind": "fn",
+      "name": "new",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "patterns",
+      "file": "src/patterns/throttle.rs",
+      "line": 128,
+      "kind": "fn",
+      "name": "trigger",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "patterns",
+      "file": "src/patterns/throttle.rs",
+      "line": 141,
+      "kind": "fn",
+      "name": "update",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "patterns",
+      "file": "src/patterns/throttle.rs",
+      "line": 154,
+      "kind": "fn",
+      "name": "cancel",
       "has_doc": true
     },
     {
@@ -25515,7 +26801,7 @@
       "source": "rust",
       "module": "procgen",
       "file": "src/procgen/flood_fill.rs",
-      "line": 25,
+      "line": 27,
       "kind": "fn",
       "name": "flood_fill",
       "has_doc": true
@@ -25578,7 +26864,7 @@
       "source": "rust",
       "module": "procgen",
       "file": "src/procgen/voronoi.rs",
-      "line": 18,
+      "line": 19,
       "kind": "struct",
       "name": "VoronoiOpts",
       "has_doc": true
@@ -25587,7 +26873,7 @@
       "source": "rust",
       "module": "procgen",
       "file": "src/procgen/voronoi.rs",
-      "line": 45,
+      "line": 46,
       "kind": "fn",
       "name": "from_lua_table",
       "has_doc": true
@@ -25596,7 +26882,7 @@
       "source": "rust",
       "module": "procgen",
       "file": "src/procgen/voronoi.rs",
-      "line": 69,
+      "line": 71,
       "kind": "fn",
       "name": "voronoi_diagram",
       "has_doc": true
@@ -25848,7 +27134,7 @@
       "source": "rust",
       "module": "raycaster",
       "file": "src/raycaster/depth_buffer.rs",
-      "line": 10,
+      "line": 14,
       "kind": "struct",
       "name": "DepthBuffer",
       "has_doc": true
@@ -25857,7 +27143,7 @@
       "source": "rust",
       "module": "raycaster",
       "file": "src/raycaster/depth_buffer.rs",
-      "line": 23,
+      "line": 27,
       "kind": "fn",
       "name": "new",
       "has_doc": true
@@ -25866,7 +27152,7 @@
       "source": "rust",
       "module": "raycaster",
       "file": "src/raycaster/depth_buffer.rs",
-      "line": 31,
+      "line": 35,
       "kind": "fn",
       "name": "clear",
       "has_doc": true
@@ -25875,7 +27161,7 @@
       "source": "rust",
       "module": "raycaster",
       "file": "src/raycaster/depth_buffer.rs",
-      "line": 40,
+      "line": 44,
       "kind": "fn",
       "name": "set",
       "has_doc": true
@@ -25884,7 +27170,7 @@
       "source": "rust",
       "module": "raycaster",
       "file": "src/raycaster/depth_buffer.rs",
-      "line": 53,
+      "line": 57,
       "kind": "fn",
       "name": "get",
       "has_doc": true
@@ -25893,7 +27179,7 @@
       "source": "rust",
       "module": "raycaster",
       "file": "src/raycaster/depth_buffer.rs",
-      "line": 69,
+      "line": 73,
       "kind": "fn",
       "name": "is_visible",
       "has_doc": true
@@ -25902,7 +27188,7 @@
       "source": "rust",
       "module": "raycaster",
       "file": "src/raycaster/depth_buffer.rs",
-      "line": 77,
+      "line": 81,
       "kind": "fn",
       "name": "width",
       "has_doc": true
@@ -25938,7 +27224,7 @@
       "source": "rust",
       "module": "raycaster",
       "file": "src/raycaster/doors.rs",
-      "line": 69,
+      "line": 72,
       "kind": "struct",
       "name": "DoorManager",
       "has_doc": true
@@ -25947,7 +27233,7 @@
       "source": "rust",
       "module": "raycaster",
       "file": "src/raycaster/doors.rs",
-      "line": 78,
+      "line": 81,
       "kind": "fn",
       "name": "new",
       "has_doc": true
@@ -25956,7 +27242,7 @@
       "source": "rust",
       "module": "raycaster",
       "file": "src/raycaster/doors.rs",
-      "line": 94,
+      "line": 97,
       "kind": "fn",
       "name": "add_door",
       "has_doc": true
@@ -25965,7 +27251,7 @@
       "source": "rust",
       "module": "raycaster",
       "file": "src/raycaster/doors.rs",
-      "line": 111,
+      "line": 114,
       "kind": "fn",
       "name": "open_door",
       "has_doc": true
@@ -25974,7 +27260,7 @@
       "source": "rust",
       "module": "raycaster",
       "file": "src/raycaster/doors.rs",
-      "line": 123,
+      "line": 126,
       "kind": "fn",
       "name": "close_door",
       "has_doc": true
@@ -25983,7 +27269,7 @@
       "source": "rust",
       "module": "raycaster",
       "file": "src/raycaster/doors.rs",
-      "line": 139,
+      "line": 142,
       "kind": "fn",
       "name": "update",
       "has_doc": true
@@ -25992,7 +27278,7 @@
       "source": "rust",
       "module": "raycaster",
       "file": "src/raycaster/doors.rs",
-      "line": 169,
+      "line": 172,
       "kind": "fn",
       "name": "get_door_at",
       "has_doc": true
@@ -26001,7 +27287,7 @@
       "source": "rust",
       "module": "raycaster",
       "file": "src/raycaster/doors.rs",
-      "line": 177,
+      "line": 180,
       "kind": "fn",
       "name": "doors",
       "has_doc": true
@@ -27081,7 +28367,7 @@
       "source": "rust",
       "module": "spine",
       "file": "src/spine/bone.rs",
-      "line": 21,
+      "line": 22,
       "kind": "struct",
       "name": "Bone",
       "has_doc": true
@@ -27090,7 +28376,7 @@
       "source": "rust",
       "module": "spine",
       "file": "src/spine/bone.rs",
-      "line": 44,
+      "line": 45,
       "kind": "fn",
       "name": "new",
       "has_doc": true
@@ -27099,7 +28385,7 @@
       "source": "rust",
       "module": "spine",
       "file": "src/spine/bone.rs",
-      "line": 71,
+      "line": 72,
       "kind": "fn",
       "name": "with_parent",
       "has_doc": true
@@ -27108,7 +28394,7 @@
       "source": "rust",
       "module": "spine",
       "file": "src/spine/skeleton.rs",
-      "line": 16,
+      "line": 18,
       "kind": "struct",
       "name": "BoneParams",
       "has_doc": true
@@ -27117,7 +28403,7 @@
       "source": "rust",
       "module": "spine",
       "file": "src/spine/skeleton.rs",
-      "line": 42,
+      "line": 44,
       "kind": "struct",
       "name": "Skeleton",
       "has_doc": true
@@ -27126,7 +28412,7 @@
       "source": "rust",
       "module": "spine",
       "file": "src/spine/skeleton.rs",
-      "line": 60,
+      "line": 62,
       "kind": "fn",
       "name": "new",
       "has_doc": true
@@ -27135,7 +28421,7 @@
       "source": "rust",
       "module": "spine",
       "file": "src/spine/skeleton.rs",
-      "line": 82,
+      "line": 84,
       "kind": "fn",
       "name": "add_bone",
       "has_doc": true
@@ -27144,7 +28430,7 @@
       "source": "rust",
       "module": "spine",
       "file": "src/spine/skeleton.rs",
-      "line": 95,
+      "line": 97,
       "kind": "fn",
       "name": "add_slot",
       "has_doc": true
@@ -27153,7 +28439,7 @@
       "source": "rust",
       "module": "spine",
       "file": "src/spine/skeleton.rs",
-      "line": 108,
+      "line": 110,
       "kind": "fn",
       "name": "find_bone",
       "has_doc": true
@@ -27162,7 +28448,7 @@
       "source": "rust",
       "module": "spine",
       "file": "src/spine/skeleton.rs",
-      "line": 119,
+      "line": 121,
       "kind": "fn",
       "name": "find_slot",
       "has_doc": true
@@ -27171,7 +28457,7 @@
       "source": "rust",
       "module": "spine",
       "file": "src/spine/skeleton.rs",
-      "line": 130,
+      "line": 132,
       "kind": "fn",
       "name": "add_bone_full",
       "has_doc": true
@@ -27180,7 +28466,7 @@
       "source": "rust",
       "module": "spine",
       "file": "src/spine/skeleton.rs",
-      "line": 152,
+      "line": 154,
       "kind": "fn",
       "name": "add_slot_full",
       "has_doc": true
@@ -27189,7 +28475,7 @@
       "source": "rust",
       "module": "spine",
       "file": "src/spine/skeleton.rs",
-      "line": 170,
+      "line": 172,
       "kind": "fn",
       "name": "bone_world_transform",
       "has_doc": true
@@ -27198,7 +28484,7 @@
       "source": "rust",
       "module": "spine",
       "file": "src/spine/skeleton.rs",
-      "line": 181,
+      "line": 183,
       "kind": "fn",
       "name": "set_root_position",
       "has_doc": true
@@ -27207,7 +28493,7 @@
       "source": "rust",
       "module": "spine",
       "file": "src/spine/skeleton.rs",
-      "line": 193,
+      "line": 195,
       "kind": "fn",
       "name": "bone_count",
       "has_doc": true
@@ -27216,7 +28502,7 @@
       "source": "rust",
       "module": "spine",
       "file": "src/spine/skeleton.rs",
-      "line": 201,
+      "line": 203,
       "kind": "fn",
       "name": "slot_count",
       "has_doc": true
@@ -27225,7 +28511,7 @@
       "source": "rust",
       "module": "spine",
       "file": "src/spine/skeleton.rs",
-      "line": 210,
+      "line": 212,
       "kind": "fn",
       "name": "update_world_transforms",
       "has_doc": true
@@ -27234,7 +28520,7 @@
       "source": "rust",
       "module": "spine",
       "file": "src/spine/slot.rs",
-      "line": 16,
+      "line": 17,
       "kind": "struct",
       "name": "Slot",
       "has_doc": true
@@ -27243,7 +28529,7 @@
       "source": "rust",
       "module": "spine",
       "file": "src/spine/slot.rs",
-      "line": 36,
+      "line": 37,
       "kind": "fn",
       "name": "new",
       "has_doc": true
@@ -30825,7 +32111,7 @@
       "source": "rust",
       "module": "timer",
       "file": "src/timer/scheduler.rs",
-      "line": 57,
+      "line": 62,
       "kind": "struct",
       "name": "Scheduler",
       "has_doc": true
@@ -30834,7 +32120,7 @@
       "source": "rust",
       "module": "timer",
       "file": "src/timer/scheduler.rs",
-      "line": 75,
+      "line": 80,
       "kind": "fn",
       "name": "new",
       "has_doc": true
@@ -30843,7 +32129,7 @@
       "source": "rust",
       "module": "timer",
       "file": "src/timer/scheduler.rs",
-      "line": 95,
+      "line": 100,
       "kind": "fn",
       "name": "after",
       "has_doc": true
@@ -30852,7 +32138,7 @@
       "source": "rust",
       "module": "timer",
       "file": "src/timer/scheduler.rs",
-      "line": 122,
+      "line": 127,
       "kind": "fn",
       "name": "after_named",
       "has_doc": true
@@ -30861,7 +32147,7 @@
       "source": "rust",
       "module": "timer",
       "file": "src/timer/scheduler.rs",
-      "line": 150,
+      "line": 155,
       "kind": "fn",
       "name": "every",
       "has_doc": true
@@ -30870,7 +32156,7 @@
       "source": "rust",
       "module": "timer",
       "file": "src/timer/scheduler.rs",
-      "line": 177,
+      "line": 182,
       "kind": "fn",
       "name": "every_named",
       "has_doc": true
@@ -30879,7 +32165,7 @@
       "source": "rust",
       "module": "timer",
       "file": "src/timer/scheduler.rs",
-      "line": 205,
+      "line": 210,
       "kind": "fn",
       "name": "cancel",
       "has_doc": true
@@ -30888,7 +32174,7 @@
       "source": "rust",
       "module": "timer",
       "file": "src/timer/scheduler.rs",
-      "line": 223,
+      "line": 228,
       "kind": "fn",
       "name": "cancel_named",
       "has_doc": true
@@ -30897,7 +32183,7 @@
       "source": "rust",
       "module": "timer",
       "file": "src/timer/scheduler.rs",
-      "line": 243,
+      "line": 248,
       "kind": "fn",
       "name": "cancel_all",
       "has_doc": true
@@ -30906,7 +32192,7 @@
       "source": "rust",
       "module": "timer",
       "file": "src/timer/scheduler.rs",
-      "line": 261,
+      "line": 266,
       "kind": "fn",
       "name": "pause",
       "has_doc": true
@@ -30915,7 +32201,7 @@
       "source": "rust",
       "module": "timer",
       "file": "src/timer/scheduler.rs",
-      "line": 279,
+      "line": 284,
       "kind": "fn",
       "name": "resume",
       "has_doc": true
@@ -30924,7 +32210,7 @@
       "source": "rust",
       "module": "timer",
       "file": "src/timer/scheduler.rs",
-      "line": 295,
+      "line": 300,
       "kind": "fn",
       "name": "is_paused",
       "has_doc": true
@@ -30933,7 +32219,7 @@
       "source": "rust",
       "module": "timer",
       "file": "src/timer/scheduler.rs",
-      "line": 312,
+      "line": 317,
       "kind": "fn",
       "name": "get_remaining",
       "has_doc": true
@@ -30942,7 +32228,7 @@
       "source": "rust",
       "module": "timer",
       "file": "src/timer/scheduler.rs",
-      "line": 323,
+      "line": 328,
       "kind": "fn",
       "name": "get_interval",
       "has_doc": true
@@ -30951,7 +32237,7 @@
       "source": "rust",
       "module": "timer",
       "file": "src/timer/scheduler.rs",
-      "line": 334,
+      "line": 339,
       "kind": "fn",
       "name": "get_repeat_count",
       "has_doc": true
@@ -30960,7 +32246,7 @@
       "source": "rust",
       "module": "timer",
       "file": "src/timer/scheduler.rs",
-      "line": 350,
+      "line": 355,
       "kind": "fn",
       "name": "set_interval",
       "has_doc": true
@@ -30969,7 +32255,7 @@
       "source": "rust",
       "module": "timer",
       "file": "src/timer/scheduler.rs",
-      "line": 370,
+      "line": 375,
       "kind": "fn",
       "name": "reset_event",
       "has_doc": true
@@ -30978,7 +32264,7 @@
       "source": "rust",
       "module": "timer",
       "file": "src/timer/scheduler.rs",
-      "line": 388,
+      "line": 393,
       "kind": "fn",
       "name": "set_time_scale",
       "has_doc": true
@@ -30987,7 +32273,7 @@
       "source": "rust",
       "module": "timer",
       "file": "src/timer/scheduler.rs",
-      "line": 396,
+      "line": 401,
       "kind": "fn",
       "name": "get_time_scale",
       "has_doc": true
@@ -30996,7 +32282,7 @@
       "source": "rust",
       "module": "timer",
       "file": "src/timer/scheduler.rs",
-      "line": 412,
+      "line": 417,
       "kind": "fn",
       "name": "update",
       "has_doc": true
@@ -31005,7 +32291,7 @@
       "source": "rust",
       "module": "timer",
       "file": "src/timer/scheduler.rs",
-      "line": 448,
+      "line": 453,
       "kind": "fn",
       "name": "count",
       "has_doc": true
@@ -31014,7 +32300,7 @@
       "source": "rust",
       "module": "timer",
       "file": "src/timer/scheduler.rs",
-      "line": 456,
+      "line": 461,
       "kind": "fn",
       "name": "active_ids",
       "has_doc": true
@@ -31023,9 +32309,252 @@
       "source": "rust",
       "module": "timer",
       "file": "src/timer/scheduler.rs",
-      "line": 464,
+      "line": 469,
       "kind": "fn",
       "name": "is_empty",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "tween",
+      "file": "src/tween/engine.rs",
+      "line": 40,
+      "kind": "struct",
+      "name": "TweenEngine",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "tween",
+      "file": "src/tween/engine.rs",
+      "line": 56,
+      "kind": "fn",
+      "name": "new",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "tween",
+      "file": "src/tween/engine.rs",
+      "line": 78,
+      "kind": "fn",
+      "name": "update",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "tween",
+      "file": "src/tween/engine.rs",
+      "line": 163,
+      "kind": "fn",
+      "name": "cancel_all",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "tween",
+      "file": "src/tween/engine.rs",
+      "line": 206,
+      "kind": "fn",
+      "name": "active_count",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "tween",
+      "file": "src/tween/handle.rs",
+      "line": 55,
+      "kind": "struct",
+      "name": "LuaTween",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "tween",
+      "file": "src/tween/handle.rs",
+      "line": 109,
+      "kind": "fn",
+      "name": "new",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "tween",
+      "file": "src/tween/handle.rs",
+      "line": 151,
+      "kind": "fn",
+      "name": "tick_with",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "tween",
+      "file": "src/tween/handle.rs",
+      "line": 245,
+      "kind": "fn",
+      "name": "fire_on_complete",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "tween",
+      "file": "src/tween/handle.rs",
+      "line": 372,
+      "kind": "enum",
+      "name": "SequenceStep",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "tween",
+      "file": "src/tween/handle.rs",
+      "line": 415,
+      "kind": "struct",
+      "name": "LuaTweenSequence",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "tween",
+      "file": "src/tween/handle.rs",
+      "line": 431,
+      "kind": "fn",
+      "name": "new",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "tween",
+      "file": "src/tween/handle.rs",
+      "line": 451,
+      "kind": "fn",
+      "name": "tick_with",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "tween",
+      "file": "src/tween/handle.rs",
+      "line": 688,
+      "kind": "struct",
+      "name": "ParallelEntry",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "tween",
+      "file": "src/tween/handle.rs",
+      "line": 718,
+      "kind": "struct",
+      "name": "LuaTweenParallel",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "tween",
+      "file": "src/tween/handle.rs",
+      "line": 732,
+      "kind": "fn",
+      "name": "new",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "tween",
+      "file": "src/tween/handle.rs",
+      "line": 749,
+      "kind": "fn",
+      "name": "tick_with",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "tween",
+      "file": "src/tween/state.rs",
+      "line": 22,
+      "kind": "struct",
+      "name": "TweenState",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "tween",
+      "file": "src/tween/state.rs",
+      "line": 46,
+      "kind": "fn",
+      "name": "new",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "tween",
+      "file": "src/tween/state.rs",
+      "line": 65,
+      "kind": "fn",
+      "name": "tick",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "tween",
+      "file": "src/tween/state.rs",
+      "line": 74,
+      "kind": "fn",
+      "name": "reset",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "tween",
+      "file": "src/tween/state.rs",
+      "line": 82,
+      "kind": "fn",
+      "name": "t_raw",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "tween",
+      "file": "src/tween/state.rs",
+      "line": 96,
+      "kind": "fn",
+      "name": "t_eased",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "tween",
+      "file": "src/tween/state.rs",
+      "line": 108,
+      "kind": "fn",
+      "name": "lerp",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "tween",
+      "file": "src/tween/state.rs",
+      "line": 116,
+      "kind": "fn",
+      "name": "is_complete",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "tween",
+      "file": "src/tween/state.rs",
+      "line": 131,
+      "kind": "fn",
+      "name": "resolve_easing",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "tween",
+      "file": "src/tween/state.rs",
+      "line": 163,
+      "kind": "fn",
+      "name": "builtin_easing_names",
       "has_doc": true
     },
     {
@@ -31374,142 +32903,178 @@
       "source": "lua_api",
       "module": "debugbridge_api",
       "file": "src/lua_api/debugbridge_api.rs",
-      "line": 440,
-      "kind": "fn",
-      "name": "debugbridge",
-      "has_doc": false
-    },
-    {
-      "source": "lua_api",
-      "module": "devtools_api",
-      "file": "src/lua_api/devtools_api.rs",
-      "line": 48,
-      "kind": "fn",
-      "name": "name",
-      "has_doc": false
-    },
-    {
-      "source": "lua_api",
-      "module": "devtools_api",
-      "file": "src/lua_api/devtools_api.rs",
-      "line": 49,
-      "kind": "fn",
-      "name": "time",
-      "has_doc": false
-    },
-    {
-      "source": "lua_api",
-      "module": "devtools_api",
-      "file": "src/lua_api/devtools_api.rs",
-      "line": 56,
-      "kind": "fn",
-      "name": "children",
-      "has_doc": false
-    },
-    {
-      "source": "lua_api",
-      "module": "devtools_api",
-      "file": "src/lua_api/devtools_api.rs",
-      "line": 270,
-      "kind": "fn",
-      "name": "samples",
-      "has_doc": false
-    },
-    {
-      "source": "lua_api",
-      "module": "devtools_api",
-      "file": "src/lua_api/devtools_api.rs",
       "line": 432,
       "kind": "fn",
+      "name": "debugbridge",
+      "has_doc": true
+    },
+    {
+      "source": "lua_api",
+      "module": "devtools_api",
+      "file": "src/lua_api/devtools_api.rs",
+      "line": 65,
+      "kind": "fn",
+      "name": "name",
+      "has_doc": true
+    },
+    {
+      "source": "lua_api",
+      "module": "devtools_api",
+      "file": "src/lua_api/devtools_api.rs",
+      "line": 67,
+      "kind": "fn",
+      "name": "time",
+      "has_doc": true
+    },
+    {
+      "source": "lua_api",
+      "module": "devtools_api",
+      "file": "src/lua_api/devtools_api.rs",
+      "line": 69,
+      "kind": "fn",
+      "name": "selfTime",
+      "has_doc": true
+    },
+    {
+      "source": "lua_api",
+      "module": "devtools_api",
+      "file": "src/lua_api/devtools_api.rs",
+      "line": 71,
+      "kind": "fn",
+      "name": "startTime",
+      "has_doc": true
+    },
+    {
+      "source": "lua_api",
+      "module": "devtools_api",
+      "file": "src/lua_api/devtools_api.rs",
+      "line": 77,
+      "kind": "fn",
+      "name": "children",
+      "has_doc": true
+    },
+    {
+      "source": "lua_api",
+      "module": "devtools_api",
+      "file": "src/lua_api/devtools_api.rs",
+      "line": 282,
+      "kind": "fn",
+      "name": "p95",
+      "has_doc": true
+    },
+    {
+      "source": "lua_api",
+      "module": "devtools_api",
+      "file": "src/lua_api/devtools_api.rs",
+      "line": 284,
+      "kind": "fn",
+      "name": "p99",
+      "has_doc": true
+    },
+    {
+      "source": "lua_api",
+      "module": "devtools_api",
+      "file": "src/lua_api/devtools_api.rs",
+      "line": 286,
+      "kind": "fn",
+      "name": "samples",
+      "has_doc": true
+    },
+    {
+      "source": "lua_api",
+      "module": "devtools_api",
+      "file": "src/lua_api/devtools_api.rs",
+      "line": 565,
+      "kind": "fn",
       "name": "devtools",
-      "has_doc": false
+      "has_doc": true
     },
     {
       "source": "lua_api",
       "module": "docs_api",
       "file": "src/lua_api/docs_api.rs",
-      "line": 420,
+      "line": 535,
       "kind": "fn",
       "name": "phantom",
-      "has_doc": false
+      "has_doc": true
     },
     {
       "source": "lua_api",
       "module": "docs_api",
       "file": "src/lua_api/docs_api.rs",
-      "line": 425,
+      "line": 541,
       "kind": "fn",
       "name": "incomplete",
-      "has_doc": false
+      "has_doc": true
     },
     {
       "source": "lua_api",
       "module": "docs_api",
       "file": "src/lua_api/docs_api.rs",
-      "line": 543,
+      "line": 661,
       "kind": "fn",
       "name": "overallScore",
-      "has_doc": false
+      "has_doc": true
     },
     {
       "source": "lua_api",
       "module": "docs_api",
       "file": "src/lua_api/docs_api.rs",
-      "line": 544,
+      "line": 669,
       "kind": "fn",
-      "name": "grade",
-      "has_doc": false
+      "name": "moduleScores",
+      "has_doc": true
     },
     {
       "source": "lua_api",
       "module": "docs_api",
       "file": "src/lua_api/docs_api.rs",
-      "line": 994,
+      "line": 1115,
       "kind": "fn",
       "name": "stale",
-      "has_doc": false
+      "has_doc": true
     },
     {
       "source": "lua_api",
       "module": "docs_api",
       "file": "src/lua_api/docs_api.rs",
-      "line": 995,
+      "line": 1117,
       "kind": "fn",
       "name": "current",
-      "has_doc": false
+      "has_doc": true
     },
     {
       "source": "lua_api",
       "module": "docs_api",
       "file": "src/lua_api/docs_api.rs",
-      "line": 996,
+      "line": 1119,
       "kind": "fn",
       "name": "missing",
-      "has_doc": false
+      "has_doc": true
     },
     {
       "source": "lua_api",
       "module": "localization_api",
       "file": "src/lua_api/localization_api.rs",
-      "line": 334,
+      "line": 450,
       "kind": "fn",
       "name": "localization",
-      "has_doc": false
+      "has_doc": true
     },
     {
       "source": "lua_api",
       "module": "log_api",
       "file": "src/lua_api/log_api.rs",
-      "line": 107,
+      "line": 217,
       "kind": "fn",
       "name": "log",
-      "has_doc": false
+      "has_doc": true
     },
     {
       "source": "lua_api",
       "module": "math_api",
       "file": "src/lua_api/math_api.rs",
-      "line": 1745,
+      "line": 1741,
       "kind": "fn",
       "name": "pi",
       "has_doc": true
@@ -31518,7 +33083,7 @@
       "source": "lua_api",
       "module": "math_api",
       "file": "src/lua_api/math_api.rs",
-      "line": 1749,
+      "line": 1745,
       "kind": "fn",
       "name": "tau",
       "has_doc": true
@@ -31527,7 +33092,7 @@
       "source": "lua_api",
       "module": "math_api",
       "file": "src/lua_api/math_api.rs",
-      "line": 1753,
+      "line": 1749,
       "kind": "fn",
       "name": "huge",
       "has_doc": true
@@ -31536,7 +33101,7 @@
       "source": "lua_api",
       "module": "math_api",
       "file": "src/lua_api/math_api.rs",
-      "line": 1777,
+      "line": 1773,
       "kind": "fn",
       "name": "sin",
       "has_doc": true
@@ -31545,7 +33110,7 @@
       "source": "lua_api",
       "module": "math_api",
       "file": "src/lua_api/math_api.rs",
-      "line": 1783,
+      "line": 1779,
       "kind": "fn",
       "name": "cos",
       "has_doc": true
@@ -31554,7 +33119,7 @@
       "source": "lua_api",
       "module": "math_api",
       "file": "src/lua_api/math_api.rs",
-      "line": 1789,
+      "line": 1785,
       "kind": "fn",
       "name": "tan",
       "has_doc": true
@@ -31563,7 +33128,7 @@
       "source": "lua_api",
       "module": "math_api",
       "file": "src/lua_api/math_api.rs",
-      "line": 1795,
+      "line": 1791,
       "kind": "fn",
       "name": "asin",
       "has_doc": true
@@ -31572,7 +33137,7 @@
       "source": "lua_api",
       "module": "math_api",
       "file": "src/lua_api/math_api.rs",
-      "line": 1801,
+      "line": 1797,
       "kind": "fn",
       "name": "acos",
       "has_doc": true
@@ -31581,7 +33146,7 @@
       "source": "lua_api",
       "module": "math_api",
       "file": "src/lua_api/math_api.rs",
-      "line": 1832,
+      "line": 1828,
       "kind": "fn",
       "name": "sqrt",
       "has_doc": true
@@ -31590,7 +33155,7 @@
       "source": "lua_api",
       "module": "math_api",
       "file": "src/lua_api/math_api.rs",
-      "line": 1838,
+      "line": 1834,
       "kind": "fn",
       "name": "abs",
       "has_doc": true
@@ -31599,7 +33164,7 @@
       "source": "lua_api",
       "module": "math_api",
       "file": "src/lua_api/math_api.rs",
-      "line": 1844,
+      "line": 1840,
       "kind": "fn",
       "name": "floor",
       "has_doc": true
@@ -31608,7 +33173,7 @@
       "source": "lua_api",
       "module": "math_api",
       "file": "src/lua_api/math_api.rs",
-      "line": 1850,
+      "line": 1846,
       "kind": "fn",
       "name": "ceil",
       "has_doc": true
@@ -31617,7 +33182,7 @@
       "source": "lua_api",
       "module": "math_api",
       "file": "src/lua_api/math_api.rs",
-      "line": 1856,
+      "line": 1852,
       "kind": "fn",
       "name": "round",
       "has_doc": true
@@ -31626,7 +33191,7 @@
       "source": "lua_api",
       "module": "math_api",
       "file": "src/lua_api/math_api.rs",
-      "line": 1862,
+      "line": 1858,
       "kind": "fn",
       "name": "exp",
       "has_doc": true
@@ -31635,7 +33200,7 @@
       "source": "lua_api",
       "module": "mod",
       "file": "src/lua_api/mod.rs",
-      "line": 376,
+      "line": 382,
       "kind": "fn",
       "name": "conf",
       "has_doc": true
@@ -31644,16 +33209,16 @@
       "source": "lua_api",
       "module": "patterns_api",
       "file": "src/lua_api/patterns_api.rs",
-      "line": 851,
+      "line": 1648,
       "kind": "fn",
       "name": "patterns",
-      "has_doc": false
+      "has_doc": true
     },
     {
       "source": "lua_api",
       "module": "scene_api",
       "file": "src/lua_api/scene_api.rs",
-      "line": 706,
+      "line": 704,
       "kind": "fn",
       "name": "scene",
       "has_doc": true
@@ -31662,7 +33227,7 @@
       "source": "lua_api",
       "module": "system_api",
       "file": "src/lua_api/system_api.rs",
-      "line": 412,
+      "line": 382,
       "kind": "fn",
       "name": "message",
       "has_doc": true
@@ -31671,7 +33236,7 @@
       "source": "lua_api",
       "module": "system_api",
       "file": "src/lua_api/system_api.rs",
-      "line": 414,
+      "line": 384,
       "kind": "fn",
       "name": "code",
       "has_doc": true
@@ -31680,7 +33245,7 @@
       "source": "lua_api",
       "module": "system_api",
       "file": "src/lua_api/system_api.rs",
-      "line": 416,
+      "line": 386,
       "kind": "fn",
       "name": "category",
       "has_doc": true
@@ -31689,7 +33254,7 @@
       "source": "lua_api",
       "module": "system_api",
       "file": "src/lua_api/system_api.rs",
-      "line": 419,
+      "line": 389,
       "kind": "fn",
       "name": "hint",
       "has_doc": true
@@ -31698,7 +33263,7 @@
       "source": "lua_api",
       "module": "tilemap_api",
       "file": "src/lua_api/tilemap_api.rs",
-      "line": 1870,
+      "line": 1873,
       "kind": "fn",
       "name": "FLOOR",
       "has_doc": true
@@ -31707,34 +33272,34 @@
       "source": "lua_api",
       "module": "tilemap_api",
       "file": "src/lua_api/tilemap_api.rs",
-      "line": 1871,
+      "line": 1875,
       "kind": "fn",
       "name": "NORTH_WALL",
-      "has_doc": false
+      "has_doc": true
     },
     {
       "source": "lua_api",
       "module": "tilemap_api",
       "file": "src/lua_api/tilemap_api.rs",
-      "line": 1872,
+      "line": 1877,
       "kind": "fn",
       "name": "WEST_WALL",
-      "has_doc": false
+      "has_doc": true
     },
     {
       "source": "lua_api",
       "module": "tilemap_api",
       "file": "src/lua_api/tilemap_api.rs",
-      "line": 1873,
+      "line": 1879,
       "kind": "fn",
       "name": "OBJECT",
-      "has_doc": false
+      "has_doc": true
     },
     {
       "source": "lua_api",
       "module": "window_api",
       "file": "src/lua_api/window_api.rs",
-      "line": 107,
+      "line": 105,
       "kind": "fn",
       "name": "isOpen",
       "has_doc": true
@@ -31743,7 +33308,7 @@
       "source": "lua_api",
       "module": "window_api",
       "file": "src/lua_api/window_api.rs",
-      "line": 486,
+      "line": 484,
       "kind": "fn",
       "name": "focus",
       "has_doc": true

@@ -81,9 +81,6 @@ pub mod utility_ai;
 /// holds the global blackboard, and ticks agents in priority order each frame.
 pub mod world;
 
-pub use crate::pathfinding::ai_flow_field::FlowField;
-pub use crate::pathfinding::pathgrid::{Cell, PathGrid};
-pub use crate::pathfinding::InfluenceMap;
 pub use agent::{Agent, DecisionModel};
 pub use behavior_tree::{BTNode, BTStatus, BehaviorTree, ParallelPolicy};
 pub use blackboard::{Blackboard, BlackboardValue};

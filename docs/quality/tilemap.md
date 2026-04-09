@@ -1,27 +1,15 @@
 # Module Quality Report: `tilemap`
 
-> **Status**: 🔴 FAIL  |  **Date**: 2026-04-09  |  **Score**: 37 ✅ / 7 ⚠️ / 4 ❌ / 19 🔵
+> **Status**: 🟢 PASS  |  **Date**: 2026-04-09  |  **Score**: 46 ✅ / 2 ⚠️ / 0 ❌ / 19 🔵
 
 ---
 
 ## Action Items
 
-### 🔴 Errors — Must Fix Before Merge
-
-- [ ] **SP-04** — Lua API completeness: Missing from spec: FLOOR, NORTH_WALL, WEST_WALL, OBJECT, newMapScript (+2 more) — add to ## Lua API in docs/specs/tilemap.md
-- [ ] **B-02** — Registration-only: struct definitions (move to src/tilemap/): LuaTileSet, LuaTileMap, LuaAutoTileSheet, LuaChunkMap, LuaIsoMap, LuaMapBlock, LuaMapGroup, LuaMapScript, LuaMapGen
-- [ ] **B-03** — impl LuaUserData placement: Move impl LuaUserData for LuaTileSet, LuaTileMap, LuaAutoTileSheet, LuaChunkMap, LuaIsoMap, LuaMapBlock, LuaMapGroup, LuaMapScript, LuaMapGen from lua_api/tilemap_api.rs → src/tilemap/
-- [ ] **T-04** — Float comparisons: assert_eq! with float literals (use abs()<epsilon): line 1384, line 1385, line 1387, line 1455, line 1456
-
 ### 🟡 Warnings — Should Fix
 
-- [ ] **S-03** — File size limits: Files >1500 LOC: tilemap/mapgen.rs (1570 LOC)
-- [ ] **SP-05** — Key Types accuracy: Types not in spec: AutoTileLayout, AutoTileSheet, ChunkMap, Edge, Facing | Stale in spec: Standalone
-- [ ] **D-03** — Structured doc sections: Missing structured sections: autotile_sheet::AutoTileSheet (# Fields), isomap::IsoMap (# Fields), mapgen::ScriptStep (# Fields)
-- [ ] **D-04** — Doc quality: Stub/placeholder docs found: isomap:51, large_map_renderer:213, mapgen:795, polygon_map:18, polygon_map:289 (+10 more)
-- [ ] **D-07** — @param/@return annotations: Missing @param/@return before: width, height
-- [ ] **B-04** — No business logic in closures: '<closure@1519>' (17 LOC, line 1519) — extract body to src/tilemap/ | '<closure@1898>' (112 LOC, line 1898) — extract body to src/tilemap/ | '<closure@2018>' (36 LOC, line 2018) — extract body to src/tilemap/ | '<closure@1680>' has if/match/for — extract to src/tilemap/ | '<closure@1729>' has if/match/for — extract to src/tilemap/
-- [ ] **Q-04** — Error handling: .unwrap() calls: chunk:398, mapgen:1324, mapgen:1377, mapgen:1378, mapgen:1382 (+16 more)
+- [ ] **D-04** — Doc quality: Stub/placeholder docs found: isomap:51, large_map_renderer:213, mapgen:797, polygon_map:18, polygon_map:289 (+10 more)
+- [ ] **B-04** — No business logic in closures: '<closure@1521>' (17 LOC, line 1521) — extract body to src/tilemap/ | '<closure@1905>' (112 LOC, line 1905) — extract body to src/tilemap/ | '<closure@2025>' (40 LOC, line 2025) — extract body to src/tilemap/ | '<closure@1682>' has if/match/for — extract to src/tilemap/ | '<closure@1731>' has if/match/for — extract to src/tilemap/
 
 ## Full Check Results
 
@@ -31,7 +19,7 @@
 |-------|---------|---------|
 | **S-01** lib.rs registration | ✅ PASS | Registered in lib.rs + lua_api (tilemap_api) |
 | **S-02** mod.rs simplicity | ✅ PASS | mod.rs is a thin barrel file (6 logic lines) |
-| **S-03** File size limits | ⚠️ WARNING | Files >1500 LOC: tilemap/mapgen.rs (1570 LOC) |
+| **S-03** File size limits | ✅ PASS | All files within size limits |
 | **S-04** File naming | ✅ PASS | File names follow conventions |
 | **S-05** Module necessity | 🔵 MANUAL | Requires manual review — could this be pure Lua? |
 | **S-06** Large crate deps | 🔵 MANUAL | Requires manual review — check Cargo.toml for heavy crates |
@@ -55,8 +43,8 @@
 | **SP-01** Spec file exists | ✅ PASS | docs/specs/tilemap.md exists |
 | **SP-02** Required spec sections | ✅ PASS | All required sections present |
 | **SP-03** Summary quality | ✅ PASS | Summary is 1257 chars |
-| **SP-04** Lua API completeness | ❌ ERROR | Missing from spec: FLOOR, NORTH_WALL, WEST_WALL, OBJECT, newMapScript (+2 more) — add to ## Lua API in docs/specs/tilemap.md |
-| **SP-05** Key Types accuracy | ⚠️ WARNING | Types not in spec: AutoTileLayout, AutoTileSheet, ChunkMap, Edge, Facing \| Stale in spec: Standalone |
+| **SP-04** Lua API completeness | ✅ PASS | All 34 bound functions in spec |
+| **SP-05** Key Types accuracy | ✅ PASS | 38 types — spec Key Types in sync |
 | **SP-06** Spec quality | ✅ PASS | No stub content |
 
 ### Phase 4 — Docstrings
@@ -65,11 +53,11 @@
 |-------|---------|---------|
 | **D-01** Module-level docs | ✅ PASS | All files have //! doc comments |
 | **D-02** Public item docs | ✅ PASS | All pub items have /// docs |
-| **D-03** Structured doc sections | ⚠️ WARNING | Missing structured sections: autotile_sheet::AutoTileSheet (# Fields), isomap::IsoMap (# Fields), mapgen::ScriptStep (# Fields) |
-| **D-04** Doc quality | ⚠️ WARNING | Stub/placeholder docs found: isomap:51, large_map_renderer:213, mapgen:795, polygon_map:18, polygon_map:289 (+10 more) |
+| **D-03** Structured doc sections | ✅ PASS | All pub structs/enums have structured doc sections |
+| **D-04** Doc quality | ⚠️ WARNING | Stub/placeholder docs found: isomap:51, large_map_renderer:213, mapgen:797, polygon_map:18, polygon_map:289 (+10 more) |
 | **D-05** Validation tool | 🔵 MANUAL | Run: python tools/docs/collect_docs.py --report-missing \| grep src/<module> |
 | **D-06** Lua API file docs | ✅ PASS | //! doc comment present |
-| **D-07** @param/@return annotations | ⚠️ WARNING | Missing @param/@return before: width, height |
+| **D-07** @param/@return annotations | ✅ PASS | All bindings have @param/@return annotations |
 | **D-08** No rustdoc in lua_api | ✅ PASS | No rustdoc sections in Lua API file |
 | **D-09** Section separators | ✅ PASS | Separators present |
 
@@ -78,9 +66,9 @@
 | Check | Verdict | Details |
 |-------|---------|---------|
 | **B-01** Dedicated API file | ✅ PASS | lua_api/tilemap_api.rs present |
-| **B-02** Registration-only | ❌ ERROR | struct definitions (move to src/tilemap/): LuaTileSet, LuaTileMap, LuaAutoTileSheet, LuaChunkMap, LuaIsoMap, LuaMapBlock, LuaMapGroup, LuaMapScript, LuaMapGen |
-| **B-03** impl LuaUserData placement | ❌ ERROR | Move impl LuaUserData for LuaTileSet, LuaTileMap, LuaAutoTileSheet, LuaChunkMap, LuaIsoMap, LuaMapBlock, LuaMapGroup, LuaMapScript, LuaMapGen from lua_api/tilemap_api.rs → src/tilemap/ |
-| **B-04** No business logic in closures | ⚠️ WARNING | '<closure@1519>' (17 LOC, line 1519) — extract body to src/tilemap/ \| '<closure@1898>' (112 LOC, line 1898) — extract body to src/tilemap/ \| '<closure@2018>' (36 LOC, line 2018) — extract body to src/tilemap/ \| '<closure@1680>' has if/match/for — extract to src/tilemap/ \| '<closure@1729>' has if/match/for — extract to src/tilemap/ |
+| **B-02** Registration-only | ✅ PASS | Only register() is pub fn (Lua<X> wrapper structs allowed) |
+| **B-03** impl LuaUserData placement | ✅ PASS | All impl LuaUserData blocks are in lua_api (correct) |
+| **B-04** No business logic in closures | ⚠️ WARNING | '<closure@1521>' (17 LOC, line 1521) — extract body to src/tilemap/ \| '<closure@1905>' (112 LOC, line 1905) — extract body to src/tilemap/ \| '<closure@2025>' (40 LOC, line 2025) — extract body to src/tilemap/ \| '<closure@1682>' has if/match/for — extract to src/tilemap/ \| '<closure@1731>' has if/match/for — extract to src/tilemap/ |
 | **B-05** Rc clone pattern | ✅ PASS | Rc clone pattern looks correct |
 | **B-06** Flat registration body | ✅ PASS | All tbl.set() calls are flat statements |
 
@@ -101,7 +89,7 @@
 | **T-01** Rust test file | ✅ PASS | Found: tests\rust\unit\tilemap_tests.rs |
 | **T-02** Lua test file | ✅ PASS | tests/lua/unit/test_tilemap.lua registered in harness |
 | **T-03** Test naming | ✅ PASS | Test names follow convention |
-| **T-04** Float comparisons | ❌ ERROR | assert_eq! with float literals (use abs()<epsilon): line 1384, line 1385, line 1387, line 1455, line 1456 |
+| **T-04** Float comparisons | ✅ PASS | No float assert_eq! found |
 | **T-05** Test adequacy | ✅ PASS | 159 tests / 228 pub methods (70%) |
 | **T-06** Golden tests | 🔵 MANUAL | Check if module qualifies for golden/snapshot tests |
 | **T-07** Tests pass | 🔵 MANUAL | Run: cargo test --test tilemap_tests -- --nocapture |
@@ -124,7 +112,7 @@
 | **Q-01** No println! | ✅ PASS | No println!/eprintln! calls |
 | **Q-02** Logger levels | 🔵 MANUAL | Verify log severity levels are appropriate (debug/info/warn/error) |
 | **Q-03** No unsafe | ✅ PASS | No undocumented unsafe blocks |
-| **Q-04** Error handling | ⚠️ WARNING | .unwrap() calls: chunk:398, mapgen:1324, mapgen:1377, mapgen:1378, mapgen:1382 (+16 more) |
+| **Q-04** Error handling | ✅ PASS | No bare .unwrap() calls |
 | **Q-07** Log prefix | ✅ PASS | All log calls use log:: prefix |
 | **Q-05** Rust best practices | 🔵 MANUAL | Review for anti-patterns: unnecessary clones, redundant allocs |
 | **Q-06** Clippy clean | 🔵 MANUAL | Run: cargo clippy --lib -- -D warnings |

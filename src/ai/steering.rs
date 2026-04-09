@@ -29,7 +29,7 @@
 //! - **Priority**: behaviors are evaluated in order; the first non-zero force
 //!   is used and remaining behaviors are skipped.
 
-/// 2D force vector (fx, fy). Consult the module-level documentation for the broader usage context and preconditions.
+/// 2D force vector (fx, fy).
 pub type Force = (f32, f32);
 
 /// Determines how multiple active steering behaviors are combined into a
@@ -70,7 +70,7 @@ impl CombineMode {
         }
     }
 
-    /// Returns the Lua string representation. Consult the module-level documentation for the broader usage context and preconditions.
+    /// Returns the Lua string representation.
     ///
     /// # Returns
     /// `&'static str`.

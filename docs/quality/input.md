@@ -1,15 +1,10 @@
 # Module Quality Report: `input`
 
-> **Status**: 🔴 FAIL  |  **Date**: 2026-04-09  |  **Score**: 44 ✅ / 2 ⚠️ / 2 ❌ / 19 🔵
+> **Status**: 🟢 PASS  |  **Date**: 2026-04-09  |  **Score**: 46 ✅ / 2 ⚠️ / 0 ❌ / 19 🔵
 
 ---
 
 ## Action Items
-
-### 🔴 Errors — Must Fix Before Merge
-
-- [ ] **B-02** — Registration-only: struct definitions (move to src/input/): LuaCursor
-- [ ] **B-03** — impl LuaUserData placement: Move impl LuaUserData for LuaCursor from lua_api/input_api.rs → src/input/
 
 ### 🟡 Warnings — Should Fix
 
@@ -71,8 +66,8 @@
 | Check | Verdict | Details |
 |-------|---------|---------|
 | **B-01** Dedicated API file | ✅ PASS | lua_api/input_api.rs present |
-| **B-02** Registration-only | ❌ ERROR | struct definitions (move to src/input/): LuaCursor |
-| **B-03** impl LuaUserData placement | ❌ ERROR | Move impl LuaUserData for LuaCursor from lua_api/input_api.rs → src/input/ |
+| **B-02** Registration-only | ✅ PASS | Only register() is pub fn (Lua<X> wrapper structs allowed) |
+| **B-03** impl LuaUserData placement | ✅ PASS | All impl LuaUserData blocks are in lua_api (correct) |
 | **B-04** No business logic in closures | ⚠️ WARNING | '<closure@289>' (25 LOC, line 289) — extract body to src/input/ \| '<closure@419>' has if/match/for — extract to src/input/ \| '<closure@672>' has if/match/for — extract to src/input/ |
 | **B-05** Rc clone pattern | ✅ PASS | Rc clone pattern looks correct |
 | **B-06** Flat registration body | ✅ PASS | All tbl.set() calls are flat statements |

@@ -1,14 +1,10 @@
 # Module Quality Report: `gui`
 
-> **Status**: 🔴 FAIL  |  **Date**: 2026-04-09  |  **Score**: 45 ✅ / 2 ⚠️ / 1 ❌ / 19 🔵
+> **Status**: 🟢 PASS  |  **Date**: 2026-04-09  |  **Score**: 46 ✅ / 2 ⚠️ / 0 ❌ / 19 🔵
 
 ---
 
 ## Action Items
-
-### 🔴 Errors — Must Fix Before Merge
-
-- [ ] **B-03** — impl LuaUserData placement: Move impl LuaUserData for LuaTheme from lua_api/gui_api.rs → src/gui/
 
 ### 🟡 Warnings — Should Fix
 
@@ -70,8 +66,8 @@
 | Check | Verdict | Details |
 |-------|---------|---------|
 | **B-01** Dedicated API file | ✅ PASS | lua_api/gui_api.rs present |
-| **B-02** Registration-only | ✅ PASS | Only register() is pub fn |
-| **B-03** impl LuaUserData placement | ❌ ERROR | Move impl LuaUserData for LuaTheme from lua_api/gui_api.rs → src/gui/ |
+| **B-02** Registration-only | ✅ PASS | Only register() is pub fn (Lua<X> wrapper structs allowed) |
+| **B-03** impl LuaUserData placement | ✅ PASS | All impl LuaUserData blocks are in lua_api (correct) |
 | **B-04** No business logic in closures | ⚠️ WARNING | '<closure@1849>' (23 LOC, line 1849) — extract body to src/gui/ \| '<closure@3459>' (16 LOC, line 3459) — extract body to src/gui/ \| '<closure@3801>' (17 LOC, line 3801) — extract body to src/gui/ \| '<closure@4942>' (33 LOC, line 4942) — extract body to src/gui/ \| '<closure@58>' has if/match/for — extract to src/gui/ \| '<closure@76>' has if/match/for — extract to src/gui/ |
 | **B-05** Rc clone pattern | ✅ PASS | Rc clone pattern looks correct |
 | **B-06** Flat registration body | ✅ PASS | All tbl.set() calls are flat statements |

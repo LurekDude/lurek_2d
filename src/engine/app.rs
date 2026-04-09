@@ -1114,7 +1114,7 @@ impl LunaApp {
             let small_key = fonts.insert(small_font);
             self.engine_fonts = Some((fonts, title_key, small_key));
         }
-        let (splash_fonts, _title_key, small_key) = self.engine_fonts.as_mut().unwrap();
+        let (splash_fonts, _title_key, small_key) = self.engine_fonts.as_mut().expect("engine_fonts initialized above");
 
         if self.splash_branding.is_none() && !self.splash_branding_failed {
             self.splash_branding = load_splash_branding();
@@ -1179,7 +1179,7 @@ impl LunaApp {
             let small_key = fonts.insert(small_font);
             self.engine_fonts = Some((fonts, title_key, small_key));
         }
-        let (error_fonts, heading_key, body_key) = self.engine_fonts.as_mut().unwrap();
+        let (error_fonts, heading_key, body_key) = self.engine_fonts.as_mut().expect("engine_fonts initialized above");
 
         let cmds = error_screen.draw_commands(
             renderer.width,

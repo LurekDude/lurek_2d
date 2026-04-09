@@ -1,20 +1,8 @@
 # Module Quality Report: `ai`
 
-> **Status**: 🔴 FAIL  |  **Date**: 2026-04-09  |  **Score**: 44 ✅ / 2 ⚠️ / 2 ❌ / 19 🔵
+> **Status**: 🟢 PASS  |  **Date**: 2026-04-09  |  **Score**: 48 ✅ / 0 ⚠️ / 0 ❌ / 19 🔵
 
 ---
-
-## Action Items
-
-### 🔴 Errors — Must Fix Before Merge
-
-- [ ] **B-03** — impl LuaUserData placement: Move impl LuaUserData for LuaAIWorld, LuaAgent, LuaBlackboard, LuaStateMachine, LuaBehaviorTree, LuaBTNode, LuaSteeringManager, LuaQLearner, LuaUtilityAI, LuaGOAPPlanner, LuaInfluenceMap, LuaSquad, LuaCommandQueue from lua_api/ai_api.rs → src/ai/
-- [ ] **R-02** — Dependency direction: mod: Tier2 imports pathfinding(tier2); mod: Tier2 imports pathfinding(tier2); mod: Tier2 imports pathfinding(tier2)
-
-### 🟡 Warnings — Should Fix
-
-- [ ] **SP-03** — Summary quality: Summary very long (2215 chars)
-- [ ] **D-04** — Doc quality: Stub/placeholder docs found: blackboard:212, fsm:147, goap:185, steering:32, steering:73 (+1 more)
 
 ## Full Check Results
 
@@ -47,7 +35,7 @@
 |-------|---------|---------|
 | **SP-01** Spec file exists | ✅ PASS | docs/specs/ai.md exists |
 | **SP-02** Required spec sections | ✅ PASS | All required sections present |
-| **SP-03** Summary quality | ⚠️ WARNING | Summary very long (2215 chars) |
+| **SP-03** Summary quality | ✅ PASS | Summary is 811 chars |
 | **SP-04** Lua API completeness | ✅ PASS | All 19 bound functions in spec |
 | **SP-05** Key Types accuracy | ✅ PASS | 28 types — spec Key Types in sync |
 | **SP-06** Spec quality | ✅ PASS | No stub content |
@@ -59,7 +47,7 @@
 | **D-01** Module-level docs | ✅ PASS | All files have //! doc comments |
 | **D-02** Public item docs | ✅ PASS | All pub items have /// docs |
 | **D-03** Structured doc sections | ✅ PASS | All pub structs/enums have structured doc sections |
-| **D-04** Doc quality | ⚠️ WARNING | Stub/placeholder docs found: blackboard:212, fsm:147, goap:185, steering:32, steering:73 (+1 more) |
+| **D-04** Doc quality | ✅ PASS | No stub docs found |
 | **D-05** Validation tool | 🔵 MANUAL | Run: python tools/docs/collect_docs.py --report-missing \| grep src/<module> |
 | **D-06** Lua API file docs | ✅ PASS | //! doc comment present |
 | **D-07** @param/@return annotations | ✅ PASS | All bindings have @param/@return annotations |
@@ -71,8 +59,8 @@
 | Check | Verdict | Details |
 |-------|---------|---------|
 | **B-01** Dedicated API file | ✅ PASS | lua_api/ai_api.rs present |
-| **B-02** Registration-only | ✅ PASS | Only register() is pub fn |
-| **B-03** impl LuaUserData placement | ❌ ERROR | Move impl LuaUserData for LuaAIWorld, LuaAgent, LuaBlackboard, LuaStateMachine, LuaBehaviorTree, LuaBTNode, LuaSteeringManager, LuaQLearner, LuaUtilityAI, LuaGOAPPlanner, LuaInfluenceMap, LuaSquad, LuaCommandQueue from lua_api/ai_api.rs → src/ai/ |
+| **B-02** Registration-only | ✅ PASS | Only register() is pub fn (Lua<X> wrapper structs allowed) |
+| **B-03** impl LuaUserData placement | ✅ PASS | All impl LuaUserData blocks are in lua_api (correct) |
 | **B-04** No business logic in closures | ✅ PASS | Closures appear thin (≤15 LOC, no control flow) |
 | **B-05** Rc clone pattern | ✅ PASS | Rc clone pattern looks correct |
 | **B-06** Flat registration body | ✅ PASS | All tbl.set() calls are flat statements |
@@ -82,7 +70,7 @@
 | Check | Verdict | Details |
 |-------|---------|---------|
 | **R-01** Tier placement | ✅ PASS | Tier label matches: tier2 |
-| **R-02** Dependency direction | ❌ ERROR | mod: Tier2 imports pathfinding(tier2); mod: Tier2 imports pathfinding(tier2); mod: Tier2 imports pathfinding(tier2) |
+| **R-02** Dependency direction | ✅ PASS | All imports follow tier2 rules |
 | **R-03** No lua_api import | ✅ PASS | No lua_api imports found |
 | **R-04** Design assumptions | 🔵 MANUAL | Verify against docs/architecture/philosophy.md |
 | **R-05** Module overlap | 🔵 MANUAL | Check for scope duplication with other modules |

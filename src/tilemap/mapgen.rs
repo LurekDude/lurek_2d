@@ -510,6 +510,8 @@ impl StepType {
 /// - `tile_layer` — `u32`.
 /// - `zone_start_y` — `i32`.
 /// - `zone_end_y` — `i32`.
+///
+/// # Fields
 #[derive(Clone)]
 pub struct ScriptStep {
     /// Type of generation step.
@@ -1321,7 +1323,7 @@ mod tests {
         let mut group = MapGroup::new("test");
         group.add_script(MapScript::new("gen1"));
         assert_eq!(group.get_script_count(), 1);
-        assert_eq!(group.get_script(0).unwrap().get_name(), "gen1");
+        assert_eq!(group.get_script(0).expect("script 0 exists").get_name(), "gen1");
     }
 
     #[test]
@@ -1374,12 +1376,12 @@ mod tests {
             ..ScriptStep::default()
         });
         assert_eq!(script.get_step_count(), 2);
-        assert_eq!(script.get_step(0).unwrap().step_type, StepType::FillRandom);
-        assert_eq!(script.get_step(1).unwrap().step_type, StepType::PlaceBlock);
+        assert_eq!(script.get_step(0).expect("step 0 exists").step_type, StepType::FillRandom);
+        assert_eq!(script.get_step(1).expect("step 1 exists").step_type, StepType::PlaceBlock);
 
         script.remove_step(0);
         assert_eq!(script.get_step_count(), 1);
-        assert_eq!(script.get_step(0).unwrap().step_type, StepType::PlaceBlock);
+        assert_eq!(script.get_step(0).expect("step 0 exists").step_type, StepType::PlaceBlock);
 
         script.clear_steps();
         assert_eq!(script.get_step_count(), 0);
@@ -1453,7 +1455,7 @@ mod tests {
         gen.add_zone("desert", 3, 3);
         assert_eq!(gen.get_zone_count(), 2);
 
-        let z = gen.get_zone(0).unwrap();
+        let z = gen.get_zone(0).expect("zone 0 exists");
         assert_eq!(z.name, "forest");
         assert_eq!(z.start_row, 0);
         assert_eq!(z.height, 3);

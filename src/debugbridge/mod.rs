@@ -11,7 +11,9 @@
 //! | [`bridge`] | [`BridgeShared`] and related data types |
 //! | [`server`] | TCP accept loop and client message dispatch |
 
+/// Data types shared between the TCP accept loop and the main thread.
 pub mod bridge;
+/// TCP accept loop and JSON message dispatch for the debug bridge.
 pub mod server;
 
 pub use bridge::{BridgeShared, PendingRequest, PendingResponse, PrintEntry, SharedBridge};

@@ -12,15 +12,9 @@
 
 ## Summary
 
-The AI module provides a comprehensive, modular game-intelligence toolkit that Lua scripts can assemble to match the needs of each actor in a scene. Rather than committing to a single AI paradigm it offers five interchangeable decision models — finite state machines for reactive logic, behaviour trees for conditional priority behaviour, steering behaviours for smooth movement, GOAP for goal-oriented NPC planning, utility AI for scored multi-axis action selection, and tabular Q-learning for reinforcement learning — all managed through a central `AIWorld` registry that tracks agents, blackboards, and shared spatial structures.
+The AI module provides a modular game-intelligence toolkit assembled from six interchangeable decision models: finite state machines, behaviour trees, steering behaviours (7 Reynolds behaviors), GOAP planning, utility AI, and tabular Q-learning. Agents and models are registered in a central `AIWorld`. A hierarchical `Blackboard` key-value store enables write-local/read-parent-chain shared memory between agents. `Squad` formations, a `CommandQueue`, and `InfluenceMap` cover collective intelligence.
 
-Beyond per-agent decision-making the module covers collective intelligence: `Squad` formations for group movement (line, wedge, circle, column), a `CommandQueue` for RTS-style ordered command buffering, and an `InfluenceMap` (re-exported from `crate::pathfinding`) for strategic spatial reasoning across named layers with stamp, propagate, and decay operations.
-
-The `Blackboard` is the shared-memory substrate: a hierarchical key-value store where agents and behaviour trees read and write facts. Parent-chain inheritance lets a global game blackboard propagate facts (player position, alert level) to all agent-local blackboards without imposing direct coupling between the systems that produce and consume those facts. Writes always target the local store while reads walk the chain upward until a match is found.
-
-All AI computation is **pure CPU math** — no GPU, audio, or window access required. This means every subsystem can run headlessly in tests without a graphics context. The module depends on `math`, `engine`, and Tier 1 `pathfinding` (for grid, flow-field, and influence-map re-exports). It must not import other Tier 2 modules. Lua callbacks are stored as `mlua::RegistryKey` references. No heap allocation happens per-frame in steady state; vectors are grown at agent/behavior creation time.
-
-Grid pathfinding (`PathGrid`, `Cell`) and flow-field (`FlowField`) types are re-exported from `crate::pathfinding` so that `lurek.ai.*` has a unified AI namespace without separate wrapper files. `InfluenceMap` is also re-exported from `crate::pathfinding::InfluenceMap`.
+All computation is pure CPU math — no GPU, audio, or window access. Depends on `math`, `engine`, and `pathfinding` (for `PathGrid`, `FlowField`, and `InfluenceMap` re-exports). Grid and flow-field types are re-exported into `lurek.ai.*` for a unified namespace. No per-frame heap allocation in steady state.
 
 ## Architecture
 

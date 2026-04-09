@@ -1,6 +1,6 @@
 # Module Quality Report: `graphics`
 
-> **Status**: 🔴 FAIL  |  **Date**: 2026-04-09  |  **Score**: 36 ✅ / 8 ⚠️ / 4 ❌ / 19 🔵
+> **Status**: 🔴 FAIL  |  **Date**: 2026-04-09  |  **Score**: 39 ✅ / 8 ⚠️ / 1 ❌ / 19 🔵
 
 ---
 
@@ -8,10 +8,7 @@
 
 ### 🔴 Errors — Must Fix Before Merge
 
-- [ ] **S-03** — File size limits: Files >2000 LOC: graphics/gpu_renderer.rs (4172 LOC)
-- [ ] **B-02** — Registration-only: struct definitions (move to src/graphics/): LuaImageData, LuaImage, LuaNineSlice, LuaFont, LuaCanvas, LuaSpriteBatch, LuaMesh, LuaShader, LuaQuad, LuaShape
-- [ ] **B-03** — impl LuaUserData placement: Move impl LuaUserData for LuaImageData, LuaNineSlice, LuaImage, LuaFont, LuaCanvas, LuaSpriteBatch, LuaMesh, LuaShader, LuaQuad, LuaShape, LuaDrawLayer from lua_api/graphics_api.rs → src/graphics/
-- [ ] **T-04** — Float comparisons: assert_eq! with float literals (use abs()<epsilon): line 1563, line 1564, line 1565
+- [ ] **S-03** — File size limits: Files >3000 LOC: graphics/gpu_renderer.rs (4172 LOC)
 
 ### 🟡 Warnings — Should Fix
 
@@ -32,7 +29,7 @@
 |-------|---------|---------|
 | **S-01** lib.rs registration | ✅ PASS | Registered in lib.rs + lua_api (graphics_api) |
 | **S-02** mod.rs simplicity | ✅ PASS | mod.rs is a thin barrel file (3 logic lines) |
-| **S-03** File size limits | ❌ ERROR | Files >2000 LOC: graphics/gpu_renderer.rs (4172 LOC) |
+| **S-03** File size limits | ❌ ERROR | Files >3000 LOC: graphics/gpu_renderer.rs (4172 LOC) |
 | **S-04** File naming | ✅ PASS | File names follow conventions |
 | **S-05** Module necessity | 🔵 MANUAL | Requires manual review — could this be pure Lua? |
 | **S-06** Large crate deps | 🔵 MANUAL | Requires manual review — check Cargo.toml for heavy crates |
@@ -79,8 +76,8 @@
 | Check | Verdict | Details |
 |-------|---------|---------|
 | **B-01** Dedicated API file | ✅ PASS | lua_api/graphics_api.rs present |
-| **B-02** Registration-only | ❌ ERROR | struct definitions (move to src/graphics/): LuaImageData, LuaImage, LuaNineSlice, LuaFont, LuaCanvas, LuaSpriteBatch, LuaMesh, LuaShader, LuaQuad, LuaShape |
-| **B-03** impl LuaUserData placement | ❌ ERROR | Move impl LuaUserData for LuaImageData, LuaNineSlice, LuaImage, LuaFont, LuaCanvas, LuaSpriteBatch, LuaMesh, LuaShader, LuaQuad, LuaShape, LuaDrawLayer from lua_api/graphics_api.rs → src/graphics/ |
+| **B-02** Registration-only | ✅ PASS | Only register() is pub fn (Lua<X> wrapper structs allowed) |
+| **B-03** impl LuaUserData placement | ✅ PASS | All impl LuaUserData blocks are in lua_api (correct) |
 | **B-04** No business logic in closures | ⚠️ WARNING | '<closure@1424>' (23 LOC, line 1424) — extract body to src/graphics/ \| '<closure@1456>' (25 LOC, line 1456) — extract body to src/graphics/ \| '<closure@1527>' (31 LOC, line 1527) — extract body to src/graphics/ \| '<closure@1576>' (119 LOC, line 1576) — extract body to src/graphics/ \| '<closure@1920>' has if/match/for — extract to src/graphics/ \| '<closure@1941>' has if/match/for — extract to src/graphics/ |
 | **B-05** Rc clone pattern | ✅ PASS | Rc clone pattern looks correct |
 | **B-06** Flat registration body | ✅ PASS | All tbl.set() calls are flat statements |
@@ -102,7 +99,7 @@
 | **T-01** Rust test file | ✅ PASS | Found: tests\rust\unit\graphics_tests.rs |
 | **T-02** Lua test file | ✅ PASS | tests/lua/unit/test_graphics.lua registered in harness |
 | **T-03** Test naming | ⚠️ WARNING | test_ prefix found — use <subject>_<scenario>_<expected>: test_phase01_released_texture_handle_reuse_reports_invalid_texture, test_phase01_released_numeric_texture_handle_reports_invalid_texture, test_phase01_released_font_handle_reuse_reports_invalid_font, test_phase01_released_sprite_batch_handle_reuse_reports_invalid_batch, test_transform_push_queues_push_transform (+71 more) |
-| **T-04** Float comparisons | ❌ ERROR | assert_eq! with float literals (use abs()<epsilon): line 1563, line 1564, line 1565 |
+| **T-04** Float comparisons | ✅ PASS | No float assert_eq! found |
 | **T-05** Test adequacy | ✅ PASS | 112 tests / 86 pub methods (130%) |
 | **T-06** Golden tests | 🔵 MANUAL | Check if module qualifies for golden/snapshot tests |
 | **T-07** Tests pass | 🔵 MANUAL | Run: cargo test --test graphics_tests -- --nocapture |

@@ -171,7 +171,7 @@ mod tests {
             Vec2::new(1.0, 0.0),
             Vec2::new(0.0, 1.0),
         ];
-        let tris = triangulate(&pts).unwrap();
+        let tris = triangulate(&pts).expect("valid polygon triangulates without error");
         assert_eq!(tris.len(), 1);
     }
 
@@ -183,7 +183,7 @@ mod tests {
             Vec2::new(1.0, 1.0),
             Vec2::new(0.0, 1.0),
         ];
-        let tris = triangulate(&pts).unwrap();
+        let tris = triangulate(&pts).expect("valid polygon triangulates without error");
         assert_eq!(tris.len(), 2);
     }
 

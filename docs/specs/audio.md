@@ -12,13 +12,9 @@
 
 ## Summary
 
-The audio module wraps the `rodio` cross-platform audio library into a game-oriented mixing layer, handling every stage of game audio from file loading to final output. It decodes sound files (WAV, OGG Vorbis, FLAC, MP3) into static in-memory sources or streaming sources, controls per-source playback state (volume, pitch, looping, fade in/out, seek), routes sources through named audio buses for grouped volume and pitch control, and applies real-time DSP effects (lowpass, highpass, bandpass biquad filters, comb-filter reverb, and chorus) via a lock-free `DynamicEffectSource` wrapper that chains effects on the audio thread without blocking the main engine loop.
+The audio module wraps `rodio` into a game-oriented mixing layer. It decodes WAV, OGG Vorbis, FLAC, and MP3 files into static (in-memory) or streaming sources stored in a `SlotMap<SoundKey>`. Per-source playback controls cover volume, pitch, looping, fade in/out, seek, and 2D spatial panning. Real-time DSP (lowpass, highpass, bandpass, reverb, chorus) is applied via a lock-free `DynamicEffectSource` chain on the audio thread. Named buses group sources for batch volume/pitch control.
 
-Each active sound is stored as an `AudioEntry` in a `SlotMap<SoundKey>`. The `Mixer` owns the underlying `rodio::OutputStream` and manages the lifecycle of all `rodio::Sink` handles. Spatial audio is approximated for 2D games: panning is derived from the horizontal offset between a source's world position and the listener position, mapped to a stereo split via a linear panning law. A full 3D listener model (position, orientation, velocity, Doppler scale, distance attenuation model) is exposed for more advanced spatial setups.
-
-A `MidiPlayer` provides synthesised music playback: MIDI events are parsed with `midly` (currently disabled at the crate level) and rendered to PCM at 44100 Hz using additive sine synthesis, supporting per-channel mute, independent volume on each track and channel, bus routing, and real-time tempo scaling. A `Decoder` provides chunked streaming PCM reading for game code that needs frame-by-frame audio processing. `QueueableSource` enables manually-fed streaming audio where game code pushes PCM buffers directly into a playback queue. `SoundData` stores fully decoded f32 PCM samples with per-sample read/write access, used for procedural audio generation and DSP from Lua.
-
-The module falls back gracefully to headless mode (no audio output) when no audio device is available, enabling CI and test environments without crashes.
+`MidiPlayer` synthesises MIDI to PCM at 44100 Hz with per-channel mute and tempo scaling. `Decoder` provides chunked PCM streaming; `QueueableSource` lets game code push raw PCM buffers; `SoundData` stores decoded f32 samples for procedural audio from Lua. Falls back gracefully to headless mode when no audio device is available.
 
 ## Architecture
 

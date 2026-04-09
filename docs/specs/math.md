@@ -30,10 +30,6 @@ The module is organised as 15 flat source files, each owning one cohesive domain
 - **Bézier** — `BezierCurve` (arbitrary-order De Casteljau evaluation, rendering, derivatives, arc length)
 - **Triangulation** — Ear-clipping `triangulate`, `is_convex` predicate
 - **Spatial indexing** — `SpatialHash` (grid-based broad-phase with rect/circle/segment queries)
-- **Tweening** — `Tween` + `TweenValue` (multi-value interpolation with 22+ named easing functions and alias resolution)
-
-**Note on leaf status:** `SpatialHash` imports `crate::engine::log_messages` for log-message constants (no logic dependency). This is the only internal coupling; all other files are fully standalone.
-
 ## Source Files
 
 | File | Contents |
@@ -133,7 +129,7 @@ pub struct Transform { matrix: Mat3 }  // private field
 
 `Mat3` wrapper with a fluent mutation API. Methods: `new` (identity), `from_components(x, y, angle, sx, sy, ox, oy, kx, ky)`, `translate`, `rotate`, `scale`, `shear`, `reset`, `set_transformation`, `transform_point`, `inverse_transform_point`, `inverse`, `matrix()`. All mutation methods return `&mut Self` for chaining. Implements `Copy`, `Clone`.
 
-### Tween / TweenValue
+### Tween
 
 ```rust
 pub struct TweenValue { start: f64, target: f64 }
@@ -141,6 +137,13 @@ pub struct Tween { duration: f64, easing_fn: fn(f32)->f32, easing_name: String, 
 ```
 
 Multi-value interpolation driver. `Tween::new(duration, easing_name)` resolves easing case-insensitively with alias support (e.g. `"inquad"`, `"easeinquad"`, `"inQuad"` all resolve to `ease_in_quad`). Unknown names fall back to `linear`. Methods: `add_value(start, target)` → index, `update(dt)` → bool (complete?), `get_value(i)`, `get_all_values()`, `reset`, `set_time`, `is_complete`, `value_count`, `easing_name`, `duration`, `clock`.
+
+### TweenValue
+
+\ust
+pub struct TweenValue { pub start: f64, pub target: f64 }
+\
+A single interpolated channel inside a Tween. start is the initial value and 	arget is the destination. Managed automatically by Tween::new and Tween::add_value.
 
 ### SpatialHash / SpatialItem
 
@@ -151,7 +154,7 @@ pub struct SpatialHash { cell_size: f32, items: HashMap<String, SpatialItem>, bu
 
 Grid-based broad-phase spatial indexing. Methods: `new(cell_size)`, `insert(id, x, y, w, h)`, `remove(id)`, `update(id, x, y, w, h)`, `clear()`, `query_rect(x, y, w, h)`, `query_circle(cx, cy, radius)`, `query_segment(x1, y1, x2, y2)`, `cell_size()`, `item_count()`. Query methods return deduplicated ID lists.
 
-### Geometry Functions (geometry.rs)
+### Functions (geometry.rs)
 
 Free functions taking raw `f32` coordinates:
 
@@ -172,12 +175,92 @@ Free functions taking raw `f32` coordinates:
 | `convex_hull` | `(points: &[f32]) -> Vec<f32>` | Andrew's monotone chain (flat coords) |
 | `delaunay_triangulate` | `(points: &[(f64,f64)]) -> Vec<[f64;6]>` | Bowyer-Watson triangulation |
 
-### Polygon Functions (polygon.rs)
+### Functions (polygon.rs)
 
 | Function | Signature | Description |
 |----------|-----------|-------------|
 | `triangulate` | `(polygon: &[Vec2]) -> Result<Vec<[Vec2;3]>, String>` | Ear-clipping, auto-CCW |
 | `is_convex` | `(polygon: &[Vec2]) -> bool` | Cross-product sign consistency |
+
+### DistType
+
+```rust
+pub enum DistType { Euclidean, Manhattan, Chebyshev }
+```
+
+Distance metric used by Worley/cellular noise. `Euclidean` uses standard distance, `Manhattan` uses taxicab distance, `Chebyshev` uses chessboard distance.
+
+### FractalType
+
+```rust
+pub enum FractalType { Fbm, Ridged, PingPong, DomainWarpProgressive, DomainWarpIndependent }
+```
+
+Multi-octave fractal combinator type used with `NoiseGenerator`. Controls how successive octaves are combined.
+
+### MapGenOptions
+
+```rust
+pub struct MapGenOptions { /* seed, noise type, fractal type, frequency, octaves, ... */ }
+```
+
+Configuration options for procedural map generation via `NoiseGenerator`. Bundles noise kind, fractal type, frequency, lacunarity, gain, and optional domain warp settings.
+
+### NoiseKind
+
+```rust
+pub enum NoiseKind { Perlin, Simplex }
+```
+
+Selects the base noise algorithm for `NoiseGenerator`: `Perlin` for classic gradient noise, `Simplex` for smoother simplex noise.
+
+### SpatialItem
+
+```rust
+pub struct SpatialItem { pub id: String, pub x: f32, pub y: f32, pub w: f32, pub h: f32 }
+```
+
+An item stored in a `SpatialHash`. `id` is a unique string identifier; `x`, `y`, `w`, `h` define its axis-aligned bounding box.
+
+### DistType
+
+```rust
+pub enum DistType { Euclidean, Manhattan, Chebyshev }
+```
+
+Distance metric used by Worley/cellular noise. `Euclidean` uses standard distance, `Manhattan` uses taxicab distance, `Chebyshev` uses chessboard distance.
+
+### FractalType
+
+```rust
+pub enum FractalType { Fbm, Ridged, PingPong, DomainWarpProgressive, DomainWarpIndependent }
+```
+
+Multi-octave fractal combinator type used with `NoiseGenerator`. Controls how successive octaves are combined.
+
+### MapGenOptions
+
+```rust
+pub struct MapGenOptions { /* seed, noise type, fractal type, frequency, octaves, ... */ }
+```
+
+Configuration options for procedural map generation via `NoiseGenerator`. Bundles noise kind, fractal type, frequency, lacunarity, gain, and optional domain warp settings.
+
+### NoiseKind
+
+```rust
+pub enum NoiseKind { Perlin, Simplex }
+```
+
+Selects the base noise algorithm for `NoiseGenerator`: `Perlin` for classic gradient noise, `Simplex` for smoother simplex noise.
+
+### SpatialItem
+
+```rust
+pub struct SpatialItem { pub id: String, pub x: f32, pub y: f32, pub w: f32, pub h: f32 }
+```
+
+An item stored in a `SpatialHash`. `id` is a unique string identifier; `x`, `y`, `w`, `h` define its axis-aligned bounding box.
 
 ## Architecture Diagram
 
@@ -341,6 +424,47 @@ Registered via `src/lua_api/math_api.rs` as `lurek.math`.
 | `generateMap(w, h, opts?)` | table | Flat row-major noise map |
 | `getSeed()` | integer | Current seed |
 | `setSeed(seed)` | nil | Set seed, rebuild permutation |
+
+
+### Additional API
+
+| Function | Description |
+|---|---|
+| `abs(x)` | Absolute value |
+| `acos(x)` | Arc cosine (radians) |
+| `angleBetween(x1,y1,x2,y2)` | Angle from point 1 to point 2 (radians) |
+| `atan(y, x?)` | Arc tangent; two-arg form = atan2 |
+| `atan2(y, x)` | Arc tangent of y/x (radians) |
+| `bresenham(x0,y0,x1,y1)` | Bresenham line integer grid points |
+| `ceil(x)` | Ceiling (round up to nearest integer) |
+| `circleContainsPoint(cx,cy,r,px,py)` | True if point is inside circle |
+| `circleIntersectsCircle(ax,ay,ar,bx,by,br)` | True if two circles overlap |
+| `circleIntersectsLine(cx,cy,r,x1,y1,x2,y2)` | True if circle intersects infinite line |
+| `circleIntersectsSegment(cx,cy,r,x1,y1,x2,y2)` | True if circle intersects segment |
+| `closestPointOnSegment(px,py,ax,ay,bx,by)` | Nearest point on segment to point |
+| `convexHull(points)` | Convex hull of a point cloud |
+| `cos(x)` | Cosine (radians) |
+| `deg(x)` | Radians to degrees |
+| `delaunayTriangulate(points)` | Delaunay triangulation of point cloud |
+| `distance(x1,y1,x2,y2)` | Euclidean distance between two points |
+| `distanceSq(x1,y1,x2,y2)` | Squared distance (avoids sqrt) |
+| `exp(x)` | e^x |
+| `floor(x)` | Floor (round down to nearest integer) |
+| `fmod(x, y)` | Floating-point modulo |
+| `huge` | Infinity constant (math.huge) |
+| `lerp(a, b, t)` | Linear interpolation from a to b by t |
+| `lineIntersect(ax,ay,bx,by,cx,cy,dx,dy)` | Intersection point of two infinite lines |
+| `log(x, base?)` | Natural log or log base |
+| `pointInPolygon(px,py,vertices)` | True if point is inside polygon |
+| `polygonArea(vertices)` | Signed area of polygon |
+| `polygonCentroid(vertices)` | Centroid (cx, cy) of polygon |
+| `pow(x, y)` | x raised to power y |
+| `segmentIntersectsSegment(ax,ay,bx,by,cx,cy,dx,dy)` | True if two segments intersect |
+| `sign(x)` | Sign of x: -1, 0, or 1 |
+| `simplexNoise(x, y?)` | 1D or 2D simplex noise value |
+| `sqrt(x)` | Square root |
+| `tan(x)` | Tangent (radians) |
+| `tau` | 2*pi constant |
 
 ## Invariants
 

@@ -219,51 +219,6 @@ pub struct LuaChannel {
     /// The shared channel this handle refers to.
     pub(crate) inner: Arc<Channel>,
 }
-
-impl LuaUserData for LuaChannel {
-    fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
-        methods.add_method("type", |_, _, ()| Ok("Channel".to_string()));
-        methods.add_method("typeOf", |_, _, name: String| {
-            Ok("Channel" == name || ["Object"].contains(&name.as_str()))
-        });
-
-        methods.add_method("push", |_, this, value: LuaValue| {
-            let cv = lua_to_channel_value(value)?;
-            let id = this.inner.push(cv);
-            Ok(id)
-        });
-
-        methods.add_method("pop", |lua, this, ()| match this.inner.pop() {
-            Some(cv) => channel_value_to_lua(lua, cv),
-            None => Ok(LuaValue::Nil),
-        });
-
-        methods.add_method("peek", |lua, this, ()| match this.inner.peek() {
-            Some(cv) => channel_value_to_lua(lua, cv),
-            None => Ok(LuaValue::Nil),
-        });
-
-        methods.add_method("demand", |lua, this, timeout: Option<f64>| {
-            match this.inner.demand(timeout) {
-                Some(cv) => channel_value_to_lua(lua, cv),
-                None => Ok(LuaValue::Nil),
-            }
-        });
-
-        methods.add_method("getCount", |_, this, ()| Ok(this.inner.get_count()));
-
-        methods.add_method("clear", |_, this, ()| {
-            this.inner.clear();
-            Ok(())
-        });
-
-        methods.add_method("supply", |_, this, value: LuaValue| {
-            let cv = lua_to_channel_value(value)?;
-            Ok(this.inner.supply(cv))
-        });
-    }
-}
-
 /// Convert a Lua value into a `ChannelValue` for cross-thread transfer.
 ///
 /// # Parameters

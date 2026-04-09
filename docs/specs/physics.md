@@ -19,9 +19,6 @@ The central type is `World`, which owns a `Vec<Body>` sync buffer alongside para
 Four body types cover standard 2D game patterns: `Dynamic` (full simulation), `Static` (immovable terrain), `Kinematic` (script-controlled platforms), and `Sensor` (overlap detection without forces). Five collision shapes are supported: axis-aligned rectangles, circles, convex polygons (max 8 vertices), edges (line segments), and chains (connected polylines, optionally closed). Bodies support multi-fixture attachment via `add_fixture`, enabling compound collision geometry on a single body.
 
 Ten joint types are available: Revolute, Distance, Prismatic, Weld, Rope, Wheel, Friction, Motor, Mouse, plus stubs for Pulley and Gear (which fall back to weld joints with a warning). Joints support motor speed, angular limits, and target position updates. Three raycast variants (brute-force, query-pipeline closest, query-pipeline all) and two spatial queries (AABB intersection, point query) enable line-of-sight checks, hit detection, and area triggers.
-
-The module intentionally exposes a simplified subset of rapier2d. Complex solver parameters, soft bodies, multi-body constraints, and custom integration callbacks are not bound — the design targets 95% of 2D game physics needs with a small, learnable API.
-
 ## Architecture
 
 ```
@@ -282,6 +279,24 @@ Exposed under `lurek.physics.*` by `src/lua_api/physics_api.rs`. The API provide
 | `isSleepingAllowed()` | Can body sleep? |
 | `setSleepingAllowed(allowed)` | Allow/disallow sleeping |
 | `destroy()` | Remove body from world |
+
+
+### Additional API
+
+| Function | Description |
+|---|---|
+| `attachShape(bodyId, shapeId)` | Attach a shape to a body |
+| `bodyA` | First body in a collision contact |
+| `bodyB` | Second body in a collision contact |
+| `destroyWorld()` | Destroy the current physics world |
+| `getCollisions()` | All collision pairs from last step |
+| `isTouching(bodyId1, bodyId2)` | True if two bodies are currently touching |
+| `newChainShape(vertices)` | Create a chain shape from vertex list |
+| `newPolygonShape(vertices)` | Create a convex polygon shape |
+| `normalX` | X component of collision contact normal |
+| `normalY` | Y component of collision contact normal |
+| `setBodyVelocity(bodyId, vx, vy)` | Set body linear velocity directly |
+| `toi` | Time-of-impact value for the contact |
 
 ## Lua Examples
 

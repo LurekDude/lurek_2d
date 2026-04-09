@@ -8,9 +8,10 @@ use std::rc::Rc;
 
 use crate::ai::{
     AIWorld, BTNode, BehaviorTree, Blackboard, CommandQueue, DecisionModel, FormationType,
-    GOAPAction, GOAPGoal, GOAPPlanner, InfluenceMap, ParallelPolicy, QLearner, Squad,
+    GOAPAction, GOAPGoal, GOAPPlanner, ParallelPolicy, QLearner, Squad,
     SteeringManager, UAAction, UtilityAI,
 };
+use crate::pathfinding::InfluenceMap;
 
 // -------------------------------------------------------------------------------
 // LuaAIWorld UserData

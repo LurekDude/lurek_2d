@@ -395,7 +395,7 @@ mod tests {
         let mut m = ChunkMap::new(4);
         m.set_tile(1, 2, 5);
         let (cx, cy) = m.tile_to_chunk(1, 2);
-        let slice = m.iter_chunk(cx, cy).unwrap();
+        let slice = m.iter_chunk(cx, cy).expect("cx/cy in bounds for chunk iteration");
         assert_eq!(slice.len(), 16); // 4×4
     }
 
