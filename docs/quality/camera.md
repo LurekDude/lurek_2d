@@ -63,7 +63,7 @@
 | **D-06** Lua API file docs | ✅ PASS | //! doc comment present |
 | **D-07** @param/@return annotations | ✅ PASS | All bindings have @param/@return annotations |
 | **D-08** No rustdoc in lua_api | ✅ PASS | No rustdoc sections in Lua API file |
-| **D-09** Section separators | ✅ PASS | < 3 bindings — skip |
+| **D-09** Section separators | ✅ PASS | Separators present |
 
 ### Phase 5 — Lua↔Rust Bridge
 

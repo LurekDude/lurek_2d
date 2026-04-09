@@ -1,6 +1,6 @@
 # Module Quality Report: `fx`
 
-> **Status**: 🔴 FAIL  |  **Date**: 2026-04-09  |  **Score**: 39 ✅ / 5 ⚠️ / 4 ❌ / 19 🔵
+> **Status**: 🔴 FAIL  |  **Date**: 2026-04-09  |  **Score**: 41 ✅ / 3 ⚠️ / 4 ❌ / 19 🔵
 
 ---
 
@@ -15,11 +15,9 @@
 
 ### 🟡 Warnings — Should Fix
 
-- [ ] **A-02** — Template structure: Missing recommended sections: Key Types, Lua API Summary
 - [ ] **A-04b** — Source Files completeness (incl. subdirs): Nested .rs files not listed in AGENT.md: mod.rs
 - [ ] **SP-03** — Summary quality: Summary very long (2118 chars)
 - [ ] **B-04** — No business logic in closures: '<closure@1192>' (19 LOC, line 1192) — extract body to src/fx/ | '<closure@1222>' (45 LOC, line 1222) — extract body to src/fx/
-- [ ] **R-01** — Tier placement: Module not in tier registry — verify placement
 
 ## Full Check Results
 
@@ -39,11 +37,11 @@
 | Check | Verdict | Details |
 |-------|---------|---------|
 | **A-01** AGENT.md exists | ✅ PASS | src\fx\AGENT.md |
-| **A-02** Template structure | ⚠️ WARNING | Missing recommended sections: Key Types, Lua API Summary |
+| **A-02** Template structure | ✅ PASS | All sections present |
 | **A-03** Purpose quality | ✅ PASS | Purpose section is 262 chars |
 | **A-04** Content sync | ✅ PASS | All .rs files listed |
 | **A-05** Spec pointer | ✅ PASS | docs/specs/fx.md exists |
-| **A-06** Tier label | ✅ PASS | Tier label present (expected: unassigned) |
+| **A-06** Tier label | ✅ PASS | Tier label present (expected: tier2) |
 | **A-04b** Source Files completeness (incl. subdirs) | ⚠️ WARNING | Nested .rs files not listed in AGENT.md: mod.rs |
 
 ### Phase 3 — Technical Specification
@@ -86,8 +84,8 @@
 
 | Check | Verdict | Details |
 |-------|---------|---------|
-| **R-01** Tier placement | ⚠️ WARNING | Module not in tier registry — verify placement |
-| **R-02** Dependency direction | ✅ PASS | All imports follow unassigned rules |
+| **R-01** Tier placement | ✅ PASS | Tier label matches: tier2 |
+| **R-02** Dependency direction | ✅ PASS | All imports follow tier2 rules |
 | **R-03** No lua_api import | ✅ PASS | No lua_api imports found |
 | **R-04** Design assumptions | 🔵 MANUAL | Verify against docs/architecture/philosophy.md |
 | **R-05** Module overlap | 🔵 MANUAL | Check for scope duplication with other modules |

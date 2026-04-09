@@ -1,6 +1,6 @@
 # Module Quality Report: `window`
 
-> **Status**: 🔴 FAIL  |  **Date**: 2026-04-09  |  **Score**: 44 ✅ / 4 ⚠️ / 0 ❌ / 19 🔵
+> **Status**: 🟢 PASS  |  **Date**: 2026-04-09  |  **Score**: 46 ✅ / 2 ⚠️ / 0 ❌ / 19 🔵
 
 ---
 
@@ -9,8 +9,6 @@
 ### 🟡 Warnings — Should Fix
 
 - [ ] **SP-03** — Summary quality: Summary very long (2176 chars)
-- [ ] **SP-06** — Spec quality: Stub content found: PLACEHOLDER
-- [ ] **D-09** — Section separators: 47 bindings but no // ─── separator comments
 - [ ] **B-04** — No business logic in closures: '<closure@332>' (16 LOC, line 332) — extract body to src/window/ | '<closure@397>' (19 LOC, line 397) — extract body to src/window/ | '<closure@263>' has if/match/for — extract to src/window/ | '<closure@425>' has if/match/for — extract to src/window/
 
 ## Full Check Results
@@ -47,7 +45,7 @@
 | **SP-03** Summary quality | ⚠️ WARNING | Summary very long (2176 chars) |
 | **SP-04** Lua API completeness | ✅ PASS | All 47 bound functions in spec |
 | **SP-05** Key Types accuracy | ✅ PASS | 2 types — spec Key Types in sync |
-| **SP-06** Spec quality | ⚠️ WARNING | Stub content found: PLACEHOLDER |
+| **SP-06** Spec quality | ✅ PASS | No stub content |
 
 ### Phase 4 — Docstrings
 
@@ -61,7 +59,7 @@
 | **D-06** Lua API file docs | ✅ PASS | //! doc comment present |
 | **D-07** @param/@return annotations | ✅ PASS | All bindings have @param/@return annotations |
 | **D-08** No rustdoc in lua_api | ✅ PASS | No rustdoc sections in Lua API file |
-| **D-09** Section separators | ⚠️ WARNING | 47 bindings but no // ─── separator comments |
+| **D-09** Section separators | ✅ PASS | Separators present |
 
 ### Phase 5 — Lua↔Rust Bridge
 

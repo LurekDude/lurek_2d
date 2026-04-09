@@ -1,6 +1,6 @@
 # Module Quality Report: `data`
 
-> **Status**: 🔴 FAIL  |  **Date**: 2026-04-09  |  **Score**: 40 ✅ / 8 ⚠️ / 0 ❌ / 19 🔵
+> **Status**: 🔴 FAIL  |  **Date**: 2026-04-09  |  **Score**: 42 ✅ / 6 ⚠️ / 0 ❌ / 19 🔵
 
 ---
 
@@ -8,11 +8,9 @@
 
 ### 🟡 Warnings — Should Fix
 
-- [ ] **A-02** — Template structure: Missing recommended sections: Key Types, Lua API Summary
 - [ ] **SP-05** — Key Types accuracy: Types not in spec: LuaDataView
 - [ ] **D-03** — Structured doc sections: Missing structured sections: dataview::LuaDataView (# Fields)
 - [ ] **D-04** — Doc quality: Stub/placeholder docs found: byte_data:114, byte_data:130, compress:13, encode:13, hash:14
-- [ ] **D-09** — Section separators: 13 bindings but no // ─── separator comments
 - [ ] **B-04** — No business logic in closures: '<closure@221>' (16 LOC, line 221) — extract body to src/data/
 - [ ] **T-03** — Test naming: test_ prefix found — use <subject>_<scenario>_<expected>: test_lua_parse_toml_basic, test_lua_parse_toml_nested, test_lua_parse_toml_array, test_lua_encode_toml_basic, test_lua_toml_roundtrip (+1 more)
 - [ ] **Q-04** — Error handling: .unwrap() calls: encode:87, encode:94, encode:108, encode:116, hash:92 (+1 more)
@@ -35,7 +33,7 @@
 | Check | Verdict | Details |
 |-------|---------|---------|
 | **A-01** AGENT.md exists | ✅ PASS | src\data\AGENT.md |
-| **A-02** Template structure | ⚠️ WARNING | Missing recommended sections: Key Types, Lua API Summary |
+| **A-02** Template structure | ✅ PASS | All sections present |
 | **A-03** Purpose quality | ✅ PASS | Purpose section is 261 chars |
 | **A-04** Content sync | ✅ PASS | All .rs files listed |
 | **A-05** Spec pointer | ✅ PASS | docs/specs/data.md exists |
@@ -65,7 +63,7 @@
 | **D-06** Lua API file docs | ✅ PASS | //! doc comment present |
 | **D-07** @param/@return annotations | ✅ PASS | All bindings have @param/@return annotations |
 | **D-08** No rustdoc in lua_api | ✅ PASS | No rustdoc sections in Lua API file |
-| **D-09** Section separators | ⚠️ WARNING | 13 bindings but no // ─── separator comments |
+| **D-09** Section separators | ✅ PASS | Separators present |
 
 ### Phase 5 — Lua↔Rust Bridge
 

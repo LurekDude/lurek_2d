@@ -1,6 +1,6 @@
 # Module Quality Report: `procgen`
 
-> **Status**: 🔴 FAIL  |  **Date**: 2026-04-09  |  **Score**: 40 ✅ / 7 ⚠️ / 1 ❌ / 19 🔵
+> **Status**: 🔴 FAIL  |  **Date**: 2026-04-09  |  **Score**: 43 ✅ / 4 ⚠️ / 1 ❌ / 19 🔵
 
 ---
 
@@ -12,13 +12,10 @@
 
 ### 🟡 Warnings — Should Fix
 
-- [ ] **A-02** — Template structure: Missing recommended sections: Key Types, Lua API Summary
 - [ ] **SP-03** — Summary quality: Summary very long (2324 chars)
 - [ ] **SP-05** — Key Types accuracy: Stale in spec: Lcg
 - [ ] **D-04** — Doc quality: Stub/placeholder docs found: flood_fill:6, voronoi:11, voronoi:54
-- [ ] **D-09** — Section separators: 5 bindings but no // ─── separator comments
 - [ ] **B-04** — No business logic in closures: '<closure@129>' (21 LOC, line 129) — extract body to src/procgen/ | '<closure@33>' has if/match/for — extract to src/procgen/ | '<closure@105>' has if/match/for — extract to src/procgen/
-- [ ] **R-01** — Tier placement: Module not in tier registry — verify placement
 
 ## Full Check Results
 
@@ -38,11 +35,11 @@
 | Check | Verdict | Details |
 |-------|---------|---------|
 | **A-01** AGENT.md exists | ✅ PASS | src\procgen\AGENT.md |
-| **A-02** Template structure | ⚠️ WARNING | Missing recommended sections: Key Types, Lua API Summary |
+| **A-02** Template structure | ✅ PASS | All sections present |
 | **A-03** Purpose quality | ✅ PASS | Purpose section is 477 chars |
 | **A-04** Content sync | ✅ PASS | All .rs files listed |
 | **A-05** Spec pointer | ✅ PASS | docs/specs/procgen.md exists |
-| **A-06** Tier label | ✅ PASS | Tier label present (expected: unassigned) |
+| **A-06** Tier label | ✅ PASS | Tier label present (expected: tier2) |
 | **A-04b** Source Files completeness (incl. subdirs) | ✅ PASS | All nested .rs files listed in AGENT.md |
 
 ### Phase 3 — Technical Specification
@@ -68,7 +65,7 @@
 | **D-06** Lua API file docs | ✅ PASS | //! doc comment present |
 | **D-07** @param/@return annotations | ✅ PASS | All bindings have @param/@return annotations |
 | **D-08** No rustdoc in lua_api | ✅ PASS | No rustdoc sections in Lua API file |
-| **D-09** Section separators | ⚠️ WARNING | 5 bindings but no // ─── separator comments |
+| **D-09** Section separators | ✅ PASS | Separators present |
 
 ### Phase 5 — Lua↔Rust Bridge
 
@@ -85,8 +82,8 @@
 
 | Check | Verdict | Details |
 |-------|---------|---------|
-| **R-01** Tier placement | ⚠️ WARNING | Module not in tier registry — verify placement |
-| **R-02** Dependency direction | ✅ PASS | All imports follow unassigned rules |
+| **R-01** Tier placement | ✅ PASS | Tier label matches: tier2 |
+| **R-02** Dependency direction | ✅ PASS | All imports follow tier2 rules |
 | **R-03** No lua_api import | ✅ PASS | No lua_api imports found |
 | **R-04** Design assumptions | 🔵 MANUAL | Verify against docs/architecture/philosophy.md |
 | **R-05** Module overlap | 🔵 MANUAL | Check for scope duplication with other modules |

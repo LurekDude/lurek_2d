@@ -1,6 +1,6 @@
 # Module Quality Report: `thread`
 
-> **Status**: 🔴 FAIL  |  **Date**: 2026-04-09  |  **Score**: 40 ✅ / 6 ⚠️ / 2 ❌ / 19 🔵
+> **Status**: 🔴 FAIL  |  **Date**: 2026-04-09  |  **Score**: 43 ✅ / 3 ⚠️ / 2 ❌ / 19 🔵
 
 ---
 
@@ -13,11 +13,8 @@
 
 ### 🟡 Warnings — Should Fix
 
-- [ ] **A-02** — Template structure: Missing recommended sections: Key Types, Lua API Summary
 - [ ] **D-04** — Doc quality: Stub/placeholder docs found: channel:75
-- [ ] **D-09** — Section separators: 3 bindings but no // ─── separator comments
 - [ ] **T-03** — Test naming: test_ prefix found — use <subject>_<scenario>_<expected>: test_channel_push_pop, test_channel_demand_timeout, test_channel_named_shared, test_channel_value_types, test_channel_supply (+11 more)
-- [ ] **W-05** — Wiki page: No wiki page found (expected docs/wiki/Thread-API.md)
 - [ ] **Q-04** — Error handling: .unwrap() calls: channel:100, channel:102, channel:117, channel:128, channel:143 (+13 more)
 
 ## Full Check Results
@@ -38,7 +35,7 @@
 | Check | Verdict | Details |
 |-------|---------|---------|
 | **A-01** AGENT.md exists | ✅ PASS | src\thread\AGENT.md |
-| **A-02** Template structure | ⚠️ WARNING | Missing recommended sections: Key Types, Lua API Summary |
+| **A-02** Template structure | ✅ PASS | All sections present |
 | **A-03** Purpose quality | ✅ PASS | Purpose section is 306 chars |
 | **A-04** Content sync | ✅ PASS | All .rs files listed |
 | **A-05** Spec pointer | ✅ PASS | docs/specs/thread.md exists |
@@ -68,7 +65,7 @@
 | **D-06** Lua API file docs | ✅ PASS | //! doc comment present |
 | **D-07** @param/@return annotations | ✅ PASS | All bindings have @param/@return annotations |
 | **D-08** No rustdoc in lua_api | ✅ PASS | No rustdoc sections in Lua API file |
-| **D-09** Section separators | ⚠️ WARNING | 3 bindings but no // ─── separator comments |
+| **D-09** Section separators | ✅ PASS | Separators present |
 
 ### Phase 5 — Lua↔Rust Bridge
 
@@ -111,7 +108,7 @@
 | **W-02** API surface coverage | ✅ PASS | All 3 bound functions in example |
 | **W-03** Example comments | 🔵 MANUAL | Verify content/examples/thread.lua has realistic one-line comments per call |
 | **W-04** Example–spec sync | ✅ PASS | Missing spec or example — other checks cover this |
-| **W-05** Wiki page | ⚠️ WARNING | No wiki page found (expected docs/wiki/Thread-API.md) |
+| **W-05** Wiki page | ✅ PASS | docs\wiki\Thread-API.md |
 | **W-06** Changelog entry | 🔵 MANUAL | Verify recent API changes have docs/CHANGELOG.md entries |
 
 ### Phase 9 — Code Quality

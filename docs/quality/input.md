@@ -1,6 +1,6 @@
 # Module Quality Report: `input`
 
-> **Status**: 🔴 FAIL  |  **Date**: 2026-04-09  |  **Score**: 41 ✅ / 4 ⚠️ / 3 ❌ / 19 🔵
+> **Status**: 🔴 FAIL  |  **Date**: 2026-04-09  |  **Score**: 42 ✅ / 3 ⚠️ / 3 ❌ / 19 🔵
 
 ---
 
@@ -14,7 +14,6 @@
 
 ### 🟡 Warnings — Should Fix
 
-- [ ] **A-02** — Template structure: Missing recommended sections: Key Types, Lua API Summary
 - [ ] **A-04b** — Source Files completeness (incl. subdirs): Nested .rs files not listed in AGENT.md: mod.rs
 - [ ] **D-04** — Doc quality: Stub/placeholder docs found: mouse:11, mouse:180, touch:13, touch:32, touch:51 (+1 more)
 - [ ] **B-04** — No business logic in closures: '<closure@289>' (25 LOC, line 289) — extract body to src/input/ | '<closure@419>' has if/match/for — extract to src/input/ | '<closure@672>' has if/match/for — extract to src/input/
@@ -37,7 +36,7 @@
 | Check | Verdict | Details |
 |-------|---------|---------|
 | **A-01** AGENT.md exists | ✅ PASS | src\input\AGENT.md |
-| **A-02** Template structure | ⚠️ WARNING | Missing recommended sections: Key Types, Lua API Summary |
+| **A-02** Template structure | ✅ PASS | All sections present |
 | **A-03** Purpose quality | ✅ PASS | Purpose section is 751 chars |
 | **A-04** Content sync | ✅ PASS | All .rs files listed |
 | **A-05** Spec pointer | ✅ PASS | docs/specs/input.md exists |

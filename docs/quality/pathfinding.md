@@ -1,6 +1,6 @@
 # Module Quality Report: `pathfinding`
 
-> **Status**: 🔴 FAIL  |  **Date**: 2026-04-09  |  **Score**: 35 ✅ / 9 ⚠️ / 4 ❌ / 19 🔵
+> **Status**: 🔴 FAIL  |  **Date**: 2026-04-09  |  **Score**: 37 ✅ / 7 ⚠️ / 4 ❌ / 19 🔵
 
 ---
 
@@ -15,12 +15,10 @@
 
 ### 🟡 Warnings — Should Fix
 
-- [ ] **A-02** — Template structure: Missing recommended sections: Key Types, Lua API Summary
 - [ ] **A-03** — Purpose quality: Purpose too long (2248 chars, target ≤500)
 - [ ] **SP-03** — Summary quality: Summary very long (2248 chars)
 - [ ] **SP-05** — Key Types accuracy: Stale in spec: PathResult, Type
 - [ ] **D-04** — Doc quality: Stub/placeholder docs found: async_pool:142, grid:89, grid:97, nav_grid:240, pathgrid:15 (+2 more)
-- [ ] **D-09** — Section separators: 8 bindings but no // ─── separator comments
 - [ ] **B-04** — No business logic in closures: '<closure@1001>' (30 LOC, line 1001) — extract body to src/pathfinding/
 - [ ] **T-03** — Test naming: test_ prefix found — use <subject>_<scenario>_<expected>: test_nav_grid_new_dimensions, test_nav_grid_new_all_walkable, test_nav_grid_set_get_cost, test_nav_grid_cost_out_of_bounds, test_nav_grid_blocked (+49 more)
 - [ ] **Q-04** — Error handling: .unwrap() calls: grid:259, grid:274, grid:339, grid:354, grid:414 (+16 more)
@@ -43,7 +41,7 @@
 | Check | Verdict | Details |
 |-------|---------|---------|
 | **A-01** AGENT.md exists | ✅ PASS | src\pathfinding\AGENT.md |
-| **A-02** Template structure | ⚠️ WARNING | Missing recommended sections: Key Types, Lua API Summary |
+| **A-02** Template structure | ✅ PASS | All sections present |
 | **A-03** Purpose quality | ⚠️ WARNING | Purpose too long (2248 chars, target ≤500) |
 | **A-04** Content sync | ✅ PASS | All .rs files listed |
 | **A-05** Spec pointer | ✅ PASS | docs/specs/pathfinding.md exists |
@@ -73,7 +71,7 @@
 | **D-06** Lua API file docs | ✅ PASS | //! doc comment present |
 | **D-07** @param/@return annotations | ✅ PASS | All bindings have @param/@return annotations |
 | **D-08** No rustdoc in lua_api | ✅ PASS | No rustdoc sections in Lua API file |
-| **D-09** Section separators | ⚠️ WARNING | 8 bindings but no // ─── separator comments |
+| **D-09** Section separators | ✅ PASS | Separators present |
 
 ### Phase 5 — Lua↔Rust Bridge
 

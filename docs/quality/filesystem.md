@@ -1,6 +1,6 @@
 # Module Quality Report: `filesystem`
 
-> **Status**: 🔴 FAIL  |  **Date**: 2026-04-09  |  **Score**: 39 ✅ / 7 ⚠️ / 2 ❌ / 19 🔵
+> **Status**: 🔴 FAIL  |  **Date**: 2026-04-09  |  **Score**: 41 ✅ / 5 ⚠️ / 2 ❌ / 19 🔵
 
 ---
 
@@ -13,11 +13,9 @@
 
 ### 🟡 Warnings — Should Fix
 
-- [ ] **A-02** — Template structure: Missing recommended sections: Key Types, Lua API Summary
 - [ ] **A-03** — Purpose quality: Purpose too long (1739 chars, target ≤500)
 - [ ] **D-03** — Structured doc sections: Missing structured sections: async_loader::LoadHandle (# Fields)
 - [ ] **D-04** — Doc quality: Stub/placeholder docs found: async_loader:94, file_handle:16, file_handle:95, vfs:17
-- [ ] **D-09** — Section separators: 24 bindings but no // ─── separator comments
 - [ ] **B-04** — No business logic in closures: '<closure@284>' has if/match/for — extract to src/filesystem/
 - [ ] **Q-04** — Error handling: .unwrap() calls: async_loader:199, async_loader:201, async_loader:202, async_loader:245, async_loader:247
 
@@ -39,7 +37,7 @@
 | Check | Verdict | Details |
 |-------|---------|---------|
 | **A-01** AGENT.md exists | ✅ PASS | src\filesystem\AGENT.md |
-| **A-02** Template structure | ⚠️ WARNING | Missing recommended sections: Key Types, Lua API Summary |
+| **A-02** Template structure | ✅ PASS | All sections present |
 | **A-03** Purpose quality | ⚠️ WARNING | Purpose too long (1739 chars, target ≤500) |
 | **A-04** Content sync | ✅ PASS | All .rs files listed |
 | **A-05** Spec pointer | ✅ PASS | docs/specs/filesystem.md exists |
@@ -69,7 +67,7 @@
 | **D-06** Lua API file docs | ✅ PASS | //! doc comment present |
 | **D-07** @param/@return annotations | ✅ PASS | All bindings have @param/@return annotations |
 | **D-08** No rustdoc in lua_api | ✅ PASS | No rustdoc sections in Lua API file |
-| **D-09** Section separators | ⚠️ WARNING | 24 bindings but no // ─── separator comments |
+| **D-09** Section separators | ✅ PASS | Separators present |
 
 ### Phase 5 — Lua↔Rust Bridge
 

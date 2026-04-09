@@ -1,6 +1,6 @@
 # Module Quality Report: `physics`
 
-> **Status**: 🔴 FAIL  |  **Date**: 2026-04-09  |  **Score**: 34 ✅ / 9 ⚠️ / 5 ❌ / 19 🔵
+> **Status**: 🔴 FAIL  |  **Date**: 2026-04-09  |  **Score**: 35 ✅ / 8 ⚠️ / 5 ❌ / 19 🔵
 
 ---
 
@@ -16,7 +16,6 @@
 
 ### 🟡 Warnings — Should Fix
 
-- [ ] **A-02** — Template structure: Missing recommended sections: Key Types, Lua API Summary
 - [ ] **A-04b** — Source Files completeness (incl. subdirs): Nested .rs files not listed in AGENT.md: mod.rs
 - [ ] **SP-03** — Summary quality: Summary very long (2134 chars)
 - [ ] **D-03** — Structured doc sections: Missing structured sections: world::World (# Fields)
@@ -44,7 +43,7 @@
 | Check | Verdict | Details |
 |-------|---------|---------|
 | **A-01** AGENT.md exists | ✅ PASS | src\physics\AGENT.md |
-| **A-02** Template structure | ⚠️ WARNING | Missing recommended sections: Key Types, Lua API Summary |
+| **A-02** Template structure | ✅ PASS | All sections present |
 | **A-03** Purpose quality | ✅ PASS | Purpose section is 285 chars |
 | **A-04** Content sync | ✅ PASS | All .rs files listed |
 | **A-05** Spec pointer | ✅ PASS | docs/specs/physics.md exists |

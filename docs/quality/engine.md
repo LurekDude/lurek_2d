@@ -1,6 +1,6 @@
 # Module Quality Report: `engine`
 
-> **Status**: 🔴 FAIL  |  **Date**: 2026-04-09  |  **Score**: 37 ✅ / 9 ⚠️ / 2 ❌ / 19 🔵
+> **Status**: 🔴 FAIL  |  **Date**: 2026-04-09  |  **Score**: 39 ✅ / 7 ⚠️ / 2 ❌ / 19 🔵
 
 ---
 
@@ -14,10 +14,8 @@
 ### 🟡 Warnings — Should Fix
 
 - [ ] **S-04** — File naming: Potentially misleading names: temp_test.rs
-- [ ] **A-02** — Template structure: Missing recommended sections: Key Types, Lua API Summary
 - [ ] **SP-03** — Summary quality: Summary very long (3946 chars)
 - [ ] **SP-05** — Key Types accuracy: Types not in spec: RendererStats
-- [ ] **SP-06** — Spec quality: Stub content found: PLACEHOLDER
 - [ ] **D-03** — Structured doc sections: Missing structured sections: app_winit::App (# Fields), config::ModulesConfig (# Fields), error_screen::ErrorScreen (# Fields), messages::MessageCatalog (# Fields), resource_keys::TextureKey (# Fields), resource_keys::FontKey (# Fields) (+14 more)
 - [ ] **D-04** — Doc quality: Stub/placeholder docs found: config:45, resource_keys:24, resource_keys:26, resource_keys:28, resource_keys:30 (+1 more)
 - [ ] **T-03** — Test naming: test_ prefix found — use <subject>_<scenario>_<expected>: test_lua_get_arch, test_lua_get_env_existing, test_lua_get_env_missing, test_lua_get_args, test_lua_parse_args_with_table (+3 more)
@@ -41,7 +39,7 @@
 | Check | Verdict | Details |
 |-------|---------|---------|
 | **A-01** AGENT.md exists | ✅ PASS | src\engine\AGENT.md |
-| **A-02** Template structure | ⚠️ WARNING | Missing recommended sections: Key Types, Lua API Summary |
+| **A-02** Template structure | ✅ PASS | All sections present |
 | **A-03** Purpose quality | ✅ PASS | Purpose section is 462 chars |
 | **A-04** Content sync | ✅ PASS | All .rs files listed |
 | **A-05** Spec pointer | ✅ PASS | docs/specs/engine.md exists |
@@ -57,7 +55,7 @@
 | **SP-03** Summary quality | ⚠️ WARNING | Summary very long (3946 chars) |
 | **SP-04** Lua API completeness | ✅ PASS | No Lua API file — skip |
 | **SP-05** Key Types accuracy | ⚠️ WARNING | Types not in spec: RendererStats |
-| **SP-06** Spec quality | ⚠️ WARNING | Stub content found: PLACEHOLDER |
+| **SP-06** Spec quality | ✅ PASS | No stub content |
 
 ### Phase 4 — Docstrings
 

@@ -853,7 +853,8 @@ impl LuaUserData for LuaBlackboard {
         methods.add_method("keys", |lua, this, ()| {
             let keys: Vec<String> = this.board.borrow().keys().iter().map(|s| s.to_string()).collect();
             let tbl = lua.create_table()?;
-            for (i, k) in keys.iter().enumerate() { tbl.set(i + 1, k.as_str())?; }
+            for (i, k) in keys.iter().enumerate() {     // ── Bindings ─────────────────────────────────────────────────────────────────
+tbl.set(i + 1, k.as_str())?; }
             Ok(tbl)
         });
 

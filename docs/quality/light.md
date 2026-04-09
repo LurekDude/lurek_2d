@@ -1,6 +1,6 @@
 # Module Quality Report: `light`
 
-> **Status**: 🔴 FAIL  |  **Date**: 2026-04-09  |  **Score**: 39 ✅ / 6 ⚠️ / 3 ❌ / 19 🔵
+> **Status**: 🔴 FAIL  |  **Date**: 2026-04-09  |  **Score**: 43 ✅ / 2 ⚠️ / 3 ❌ / 19 🔵
 
 ---
 
@@ -14,12 +14,8 @@
 
 ### 🟡 Warnings — Should Fix
 
-- [ ] **A-02** — Template structure: Missing recommended sections: Key Types, Lua API Summary
 - [ ] **D-03** — Structured doc sections: Missing structured sections: light2d::Light2D (# Fields)
-- [ ] **D-09** — Section separators: 16 bindings but no // ─── separator comments
 - [ ] **B-04** — No business logic in closures: '<closure@894>' has if/match/for — extract to src/light/ | '<closure@917>' has if/match/for — extract to src/light/
-- [ ] **R-01** — Tier placement: Module not in tier registry — verify placement
-- [ ] **W-05** — Wiki page: No wiki page found (expected docs/wiki/Light-API.md)
 
 ## Full Check Results
 
@@ -39,11 +35,11 @@
 | Check | Verdict | Details |
 |-------|---------|---------|
 | **A-01** AGENT.md exists | ✅ PASS | src\light\AGENT.md |
-| **A-02** Template structure | ⚠️ WARNING | Missing recommended sections: Key Types, Lua API Summary |
+| **A-02** Template structure | ✅ PASS | All sections present |
 | **A-03** Purpose quality | ✅ PASS | Purpose section is 513 chars |
 | **A-04** Content sync | ✅ PASS | All .rs files listed |
 | **A-05** Spec pointer | ✅ PASS | docs/specs/light.md exists |
-| **A-06** Tier label | ✅ PASS | Tier label present (expected: unassigned) |
+| **A-06** Tier label | ✅ PASS | Tier label present (expected: tier2) |
 | **A-04b** Source Files completeness (incl. subdirs) | ✅ PASS | All nested .rs files listed in AGENT.md |
 
 ### Phase 3 — Technical Specification
@@ -69,7 +65,7 @@
 | **D-06** Lua API file docs | ✅ PASS | //! doc comment present |
 | **D-07** @param/@return annotations | ✅ PASS | All bindings have @param/@return annotations |
 | **D-08** No rustdoc in lua_api | ✅ PASS | No rustdoc sections in Lua API file |
-| **D-09** Section separators | ⚠️ WARNING | 16 bindings but no // ─── separator comments |
+| **D-09** Section separators | ✅ PASS | Separators present |
 
 ### Phase 5 — Lua↔Rust Bridge
 
@@ -86,8 +82,8 @@
 
 | Check | Verdict | Details |
 |-------|---------|---------|
-| **R-01** Tier placement | ⚠️ WARNING | Module not in tier registry — verify placement |
-| **R-02** Dependency direction | ✅ PASS | All imports follow unassigned rules |
+| **R-01** Tier placement | ✅ PASS | Tier label matches: tier2 |
+| **R-02** Dependency direction | ✅ PASS | All imports follow tier2 rules |
 | **R-03** No lua_api import | ✅ PASS | No lua_api imports found |
 | **R-04** Design assumptions | 🔵 MANUAL | Verify against docs/architecture/philosophy.md |
 | **R-05** Module overlap | 🔵 MANUAL | Check for scope duplication with other modules |
@@ -112,7 +108,7 @@
 | **W-02** API surface coverage | ✅ PASS | All 16 bound functions in example |
 | **W-03** Example comments | 🔵 MANUAL | Verify content/examples/light.lua has realistic one-line comments per call |
 | **W-04** Example–spec sync | ✅ PASS | Missing spec or example — other checks cover this |
-| **W-05** Wiki page | ⚠️ WARNING | No wiki page found (expected docs/wiki/Light-API.md) |
+| **W-05** Wiki page | ✅ PASS | docs\wiki\Light-API.md |
 | **W-06** Changelog entry | 🔵 MANUAL | Verify recent API changes have docs/CHANGELOG.md entries |
 
 ### Phase 9 — Code Quality

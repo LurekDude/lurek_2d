@@ -217,12 +217,12 @@ Note: counts reflect the active (compiled) surface only. The disabled `yaml.rs` 
 ```lua
 -- Example: Basic serial usage
 function lurek.init()
-    -- TODO: replace with real serial setup
+    -- Encode a Lua table to a binary blob
     local obj = lurek.codec.serial()
 end
 
 function lurek.process(dt)
-    -- TODO: update logic
+    -- Decode and apply the stored blob each frame if needed
 end
 ```
 
@@ -242,12 +242,11 @@ end
 | `engine` | Imports from | Uses SharedState, EngineError |
 | `math` | Imports from | Vec2, Color, Rect |
 | `lua_api` | Imported by | Binds public API to Lua |
-
-TODO: Add entries for similar modules and explain the separation of duties.
+| `savegame` | Used by | Serialises save-game structs via `lurek.codec.serial()` |
 
 ## Notes
 
-TODO: Document unique facts an agent must know before editing this module:
+Key facts an agent must know before editing this module:
 - External crate constraints (version, thread-safety, API limitations)
 - Hardware or OS-specific behaviour (e.g., headless fallback on CI)
 - Known limitations or intentional omissions

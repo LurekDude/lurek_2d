@@ -1,6 +1,6 @@
 # Module Quality Report: `docs`
 
-> **Status**: 🔴 FAIL  |  **Date**: 2026-04-09  |  **Score**: 39 ✅ / 6 ⚠️ / 3 ❌ / 19 🔵
+> **Status**: 🔴 FAIL  |  **Date**: 2026-04-09  |  **Score**: 41 ✅ / 4 ⚠️ / 3 ❌ / 19 🔵
 
 ---
 
@@ -14,12 +14,10 @@
 
 ### 🟡 Warnings — Should Fix
 
-- [ ] **A-02** — Template structure: Missing recommended sections: Key Types, Lua API Summary
 - [ ] **SP-05** — Key Types accuracy: Types not in spec: FieldRule, FieldType, Schema, SchemaError, SchemaResult
 - [ ] **D-03** — Structured doc sections: Missing structured sections: catalog::Catalog (# Fields), entry::ParamInfo (# Fields), entry::ReturnInfo (# Fields), entry::DocEntry (# Fields), report::ValidationReport (# Fields), report::QualityReport (# Fields)
 - [ ] **D-07** — @param/@return annotations: Missing @param/@return before: phantom, incomplete, stale, current, missing
 - [ ] **B-04** — No business logic in closures: '<closure@794>' (27 LOC, line 794) — extract body to src/docs/ | '<closure@829>' (40 LOC, line 829) — extract body to src/docs/ | '<closure@878>' (27 LOC, line 878) — extract body to src/docs/ | '<closure@914>' (22 LOC, line 914) — extract body to src/docs/ | '<closure@1126>' has if/match/for — extract to src/docs/ | '<closure@1143>' has if/match/for — extract to src/docs/
-- [ ] **R-01** — Tier placement: Module not in tier registry — verify placement
 
 ## Full Check Results
 
@@ -39,11 +37,11 @@
 | Check | Verdict | Details |
 |-------|---------|---------|
 | **A-01** AGENT.md exists | ✅ PASS | src\docs\AGENT.md |
-| **A-02** Template structure | ⚠️ WARNING | Missing recommended sections: Key Types, Lua API Summary |
+| **A-02** Template structure | ✅ PASS | All sections present |
 | **A-03** Purpose quality | ✅ PASS | Purpose section is 659 chars |
 | **A-04** Content sync | ✅ PASS | All .rs files listed |
 | **A-05** Spec pointer | ✅ PASS | docs/specs/docs.md exists |
-| **A-06** Tier label | ✅ PASS | Tier label present (expected: unassigned) |
+| **A-06** Tier label | ✅ PASS | Tier label present (expected: tier1) |
 | **A-04b** Source Files completeness (incl. subdirs) | ✅ PASS | All nested .rs files listed in AGENT.md |
 
 ### Phase 3 — Technical Specification
@@ -86,8 +84,8 @@
 
 | Check | Verdict | Details |
 |-------|---------|---------|
-| **R-01** Tier placement | ⚠️ WARNING | Module not in tier registry — verify placement |
-| **R-02** Dependency direction | ✅ PASS | All imports follow unassigned rules |
+| **R-01** Tier placement | ✅ PASS | Tier label matches: tier1 |
+| **R-02** Dependency direction | ✅ PASS | All imports follow tier1 rules |
 | **R-03** No lua_api import | ✅ PASS | No lua_api imports found |
 | **R-04** Design assumptions | 🔵 MANUAL | Verify against docs/architecture/philosophy.md |
 | **R-05** Module overlap | 🔵 MANUAL | Check for scope duplication with other modules |

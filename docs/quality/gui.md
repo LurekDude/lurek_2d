@@ -1,6 +1,6 @@
 # Module Quality Report: `gui`
 
-> **Status**: 🔴 FAIL  |  **Date**: 2026-04-09  |  **Score**: 37 ✅ / 10 ⚠️ / 1 ❌ / 19 🔵
+> **Status**: 🔴 FAIL  |  **Date**: 2026-04-09  |  **Score**: 40 ✅ / 7 ⚠️ / 1 ❌ / 19 🔵
 
 ---
 
@@ -12,13 +12,10 @@
 
 ### 🟡 Warnings — Should Fix
 
-- [ ] **A-02** — Template structure: Missing recommended sections: Key Types, Lua API Summary
 - [ ] **SP-03** — Summary quality: Summary very long (2144 chars)
 - [ ] **SP-05** — Key Types accuracy: Types not in spec: GuiEvent
-- [ ] **SP-06** — Spec quality: Stub content found: PLACEHOLDER
 - [ ] **D-03** — Structured doc sections: Missing structured sections: context::WidgetKind (# Variants), widget::WidgetType (# Variants), widget::WidgetBase (# Fields)
 - [ ] **D-04** — Doc quality: Stub/placeholder docs found: controls:83, controls:89, extras:176, extras:375, extras:639 (+1 more)
-- [ ] **D-09** — Section separators: 51 bindings but no // ─── separator comments
 - [ ] **B-04** — No business logic in closures: '<closure@1849>' (23 LOC, line 1849) — extract body to src/gui/ | '<closure@3459>' (16 LOC, line 3459) — extract body to src/gui/ | '<closure@3801>' (17 LOC, line 3801) — extract body to src/gui/ | '<closure@4942>' (33 LOC, line 4942) — extract body to src/gui/ | '<closure@58>' has if/match/for — extract to src/gui/ | '<closure@76>' has if/match/for — extract to src/gui/
 - [ ] **B-05** — Rc clone pattern: Possible missing state.clone() before move: line 2053, line 3459
 - [ ] **Q-04** — Error handling: .unwrap() calls: data_graph_renderer:538
@@ -41,7 +38,7 @@
 | Check | Verdict | Details |
 |-------|---------|---------|
 | **A-01** AGENT.md exists | ✅ PASS | src\gui\AGENT.md |
-| **A-02** Template structure | ⚠️ WARNING | Missing recommended sections: Key Types, Lua API Summary |
+| **A-02** Template structure | ✅ PASS | All sections present |
 | **A-03** Purpose quality | ✅ PASS | Purpose section is 237 chars |
 | **A-04** Content sync | ✅ PASS | All .rs files listed |
 | **A-05** Spec pointer | ✅ PASS | docs/specs/gui.md exists |
@@ -57,7 +54,7 @@
 | **SP-03** Summary quality | ⚠️ WARNING | Summary very long (2144 chars) |
 | **SP-04** Lua API completeness | ✅ PASS | All 51 bound functions in spec |
 | **SP-05** Key Types accuracy | ⚠️ WARNING | Types not in spec: GuiEvent |
-| **SP-06** Spec quality | ⚠️ WARNING | Stub content found: PLACEHOLDER |
+| **SP-06** Spec quality | ✅ PASS | No stub content |
 
 ### Phase 4 — Docstrings
 
@@ -71,7 +68,7 @@
 | **D-06** Lua API file docs | ✅ PASS | //! doc comment present |
 | **D-07** @param/@return annotations | ✅ PASS | All bindings have @param/@return annotations |
 | **D-08** No rustdoc in lua_api | ✅ PASS | No rustdoc sections in Lua API file |
-| **D-09** Section separators | ⚠️ WARNING | 51 bindings but no // ─── separator comments |
+| **D-09** Section separators | ✅ PASS | Separators present |
 
 ### Phase 5 — Lua↔Rust Bridge
 

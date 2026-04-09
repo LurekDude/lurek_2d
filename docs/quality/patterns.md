@@ -1,6 +1,6 @@
 # Module Quality Report: `patterns`
 
-> **Status**: 🔴 FAIL  |  **Date**: 2026-04-09  |  **Score**: 39 ✅ / 7 ⚠️ / 2 ❌ / 19 🔵
+> **Status**: 🔴 FAIL  |  **Date**: 2026-04-09  |  **Score**: 42 ✅ / 4 ⚠️ / 2 ❌ / 19 🔵
 
 ---
 
@@ -9,17 +9,14 @@
 ### 🔴 Errors — Must Fix Before Merge
 
 - [ ] **B-03** — impl LuaUserData placement: Move impl LuaUserData for LuaEventBus, LuaObjectPool, LuaCommandStack, LuaServiceLocator, LuaFactory, LuaSimpleState, LuaBlackboard, LuaObserver, LuaThrottle, LuaDebounce, LuaPriorityQueue, LuaRing, LuaFunnel from lua_api/patterns_api.rs → src/patterns/
-- [ ] **B-06** — Flat registration body: tbl.set() inside {} block (anti-pattern): line 782, line 1254, line 1414
+- [ ] **B-06** — Flat registration body: tbl.set() inside {} block (anti-pattern): line 782, line 1255, line 1415
 
 ### 🟡 Warnings — Should Fix
 
-- [ ] **A-02** — Template structure: Missing recommended sections: Key Types, Lua API Summary
 - [ ] **SP-03** — Summary quality: Summary very long (3953 chars)
 - [ ] **SP-05** — Key Types accuracy: Types not in spec: Blackboard, BlackboardValue, CommandEntry, Debounce, Funnel
 - [ ] **D-03** — Structured doc sections: Missing structured sections: simple_state::SimpleState (# Fields)
-- [ ] **R-01** — Tier placement: Module not in tier registry — verify placement
 - [ ] **T-05** — Test adequacy: 34 tests / 121 pub methods (28%) — low coverage
-- [ ] **W-05** — Wiki page: No wiki page found (expected docs/wiki/Patterns-API.md)
 
 ## Full Check Results
 
@@ -39,11 +36,11 @@
 | Check | Verdict | Details |
 |-------|---------|---------|
 | **A-01** AGENT.md exists | ✅ PASS | src\patterns\AGENT.md |
-| **A-02** Template structure | ⚠️ WARNING | Missing recommended sections: Key Types, Lua API Summary |
+| **A-02** Template structure | ✅ PASS | All sections present |
 | **A-03** Purpose quality | ✅ PASS | Purpose section is 1333 chars |
 | **A-04** Content sync | ✅ PASS | All .rs files listed |
 | **A-05** Spec pointer | ✅ PASS | docs/specs/patterns.md exists |
-| **A-06** Tier label | ✅ PASS | Tier label present (expected: unassigned) |
+| **A-06** Tier label | ✅ PASS | Tier label present (expected: tier1) |
 | **A-04b** Source Files completeness (incl. subdirs) | ✅ PASS | All nested .rs files listed in AGENT.md |
 
 ### Phase 3 — Technical Specification
@@ -80,14 +77,14 @@
 | **B-03** impl LuaUserData placement | ❌ ERROR | Move impl LuaUserData for LuaEventBus, LuaObjectPool, LuaCommandStack, LuaServiceLocator, LuaFactory, LuaSimpleState, LuaBlackboard, LuaObserver, LuaThrottle, LuaDebounce, LuaPriorityQueue, LuaRing, LuaFunnel from lua_api/patterns_api.rs → src/patterns/ |
 | **B-04** No business logic in closures | ✅ PASS | Closures appear thin (≤15 LOC, no control flow) |
 | **B-05** Rc clone pattern | ✅ PASS | Rc clone pattern looks correct |
-| **B-06** Flat registration body | ❌ ERROR | tbl.set() inside {} block (anti-pattern): line 782, line 1254, line 1414 |
+| **B-06** Flat registration body | ❌ ERROR | tbl.set() inside {} block (anti-pattern): line 782, line 1255, line 1415 |
 
 ### Phase 6 — Architecture Compliance
 
 | Check | Verdict | Details |
 |-------|---------|---------|
-| **R-01** Tier placement | ⚠️ WARNING | Module not in tier registry — verify placement |
-| **R-02** Dependency direction | ✅ PASS | All imports follow unassigned rules |
+| **R-01** Tier placement | ✅ PASS | Tier label matches: tier1 |
+| **R-02** Dependency direction | ✅ PASS | All imports follow tier1 rules |
 | **R-03** No lua_api import | ✅ PASS | No lua_api imports found |
 | **R-04** Design assumptions | 🔵 MANUAL | Verify against docs/architecture/philosophy.md |
 | **R-05** Module overlap | 🔵 MANUAL | Check for scope duplication with other modules |
@@ -112,7 +109,7 @@
 | **W-02** API surface coverage | ✅ PASS | All 0 bound functions in example |
 | **W-03** Example comments | 🔵 MANUAL | Verify content/examples/patterns.lua has realistic one-line comments per call |
 | **W-04** Example–spec sync | ✅ PASS | Missing spec or example — other checks cover this |
-| **W-05** Wiki page | ⚠️ WARNING | No wiki page found (expected docs/wiki/Patterns-API.md) |
+| **W-05** Wiki page | ✅ PASS | docs\wiki\Patterns-API.md |
 | **W-06** Changelog entry | 🔵 MANUAL | Verify recent API changes have docs/CHANGELOG.md entries |
 
 ### Phase 9 — Code Quality

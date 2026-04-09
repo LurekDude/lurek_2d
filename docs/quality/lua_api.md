@@ -1,6 +1,6 @@
 # Module Quality Report: `lua_api`
 
-> **Status**: 🔴 FAIL  |  **Date**: 2026-04-09  |  **Score**: 34 ✅ / 6 ⚠️ / 8 ❌ / 19 🔵
+> **Status**: 🔴 FAIL  |  **Date**: 2026-04-09  |  **Score**: 35 ✅ / 5 ⚠️ / 8 ❌ / 19 🔵
 
 ---
 
@@ -19,7 +19,6 @@
 
 ### 🟡 Warnings — Should Fix
 
-- [ ] **A-02** — Template structure: Missing recommended sections: Key Types, Lua API Summary
 - [ ] **A-04b** — Source Files completeness (incl. subdirs): Nested .rs files not listed in AGENT.md: ai_api.rs, animation_api.rs, automation_api.rs, camera_api.rs, compute_api.rs, dataframe_api.rs
 - [ ] **D-04** — Doc quality: Stub/placeholder docs found: fx_api:464, fx_api:1098, gui_api:813, gui_api:826, localization_api:243 (+1 more)
 - [ ] **R-01** — Tier placement: No **Tier** row in AGENT.md; expected unassigned
@@ -44,7 +43,7 @@
 | Check | Verdict | Details |
 |-------|---------|---------|
 | **A-01** AGENT.md exists | ✅ PASS | src\lua_api\AGENT.md |
-| **A-02** Template structure | ⚠️ WARNING | Missing recommended sections: Key Types, Lua API Summary |
+| **A-02** Template structure | ✅ PASS | All sections present |
 | **A-03** Purpose quality | ✅ PASS | Purpose section is 378 chars |
 | **A-04** Content sync | ❌ ERROR | Files not in Source Files table: ai_api.rs, animation_api.rs, automation_api.rs, camera_api.rs, compute_api.rs, dataframe_api.rs, debugbridge_api.rs, devtools_api.rs, docs_api.rs, entity_api.rs, fx_api.rs, graph_api.rs, graphics_api.rs, gui_api.rs, light_api.rs, localization_api.rs, log_api.rs, lua_types.rs, minimap_api.rs, modding_api.rs, network_api.rs, pathfinding_api.rs, patterns_api.rs, pipeline_api.rs, procgen_api.rs, raycaster_api.rs, savegame_api.rs, scene_api.rs, serial_api.rs, spine_api.rs, thread_api.rs, tilemap_api.rs, tween_api.rs |
 | **A-05** Spec pointer | ✅ PASS | docs/specs/lua_api.md exists |

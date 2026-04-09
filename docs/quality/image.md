@@ -1,6 +1,6 @@
 # Module Quality Report: `image`
 
-> **Status**: 🔴 FAIL  |  **Date**: 2026-04-09  |  **Score**: 39 ✅ / 6 ⚠️ / 3 ❌ / 19 🔵
+> **Status**: 🔴 FAIL  |  **Date**: 2026-04-09  |  **Score**: 41 ✅ / 4 ⚠️ / 3 ❌ / 19 🔵
 
 ---
 
@@ -17,9 +17,7 @@
 - [ ] **A-04b** — Source Files completeness (incl. subdirs): Nested .rs files not listed in AGENT.md: mod.rs
 - [ ] **SP-05** — Key Types accuracy: Types not in spec: ImageLayer, LayeredImage
 - [ ] **D-04** — Doc quality: Stub/placeholder docs found: image_data:15, image_data:105, image_data:113, image_data:121, image_data:223
-- [ ] **D-09** — Section separators: 7 bindings but no // ─── separator comments
 - [ ] **B-04** — No business logic in closures: '<closure@288>' (36 LOC, line 288) — extract body to src/image/
-- [ ] **W-05** — Wiki page: No wiki page found (expected docs/wiki/Image-API.md)
 
 ## Full Check Results
 
@@ -69,7 +67,7 @@
 | **D-06** Lua API file docs | ✅ PASS | //! doc comment present |
 | **D-07** @param/@return annotations | ✅ PASS | All bindings have @param/@return annotations |
 | **D-08** No rustdoc in lua_api | ✅ PASS | No rustdoc sections in Lua API file |
-| **D-09** Section separators | ⚠️ WARNING | 7 bindings but no // ─── separator comments |
+| **D-09** Section separators | ✅ PASS | Separators present |
 
 ### Phase 5 — Lua↔Rust Bridge
 
@@ -112,7 +110,7 @@
 | **W-02** API surface coverage | ✅ PASS | All 7 bound functions in example |
 | **W-03** Example comments | 🔵 MANUAL | Verify content/examples/image.lua has realistic one-line comments per call |
 | **W-04** Example–spec sync | ✅ PASS | Missing spec or example — other checks cover this |
-| **W-05** Wiki page | ⚠️ WARNING | No wiki page found (expected docs/wiki/Image-API.md) |
+| **W-05** Wiki page | ✅ PASS | docs\wiki\Image-API.md |
 | **W-06** Changelog entry | 🔵 MANUAL | Verify recent API changes have docs/CHANGELOG.md entries |
 
 ### Phase 9 — Code Quality

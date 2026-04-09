@@ -1,6 +1,6 @@
 # Module Quality Report: `dataframe`
 
-> **Status**: 🔴 FAIL  |  **Date**: 2026-04-09  |  **Score**: 38 ✅ / 6 ⚠️ / 4 ❌ / 19 🔵
+> **Status**: 🔴 FAIL  |  **Date**: 2026-04-09  |  **Score**: 40 ✅ / 4 ⚠️ / 4 ❌ / 19 🔵
 
 ---
 
@@ -15,10 +15,8 @@
 
 ### 🟡 Warnings — Should Fix
 
-- [ ] **A-02** — Template structure: Missing recommended sections: Key Types, Lua API Summary
 - [ ] **SP-03** — Summary quality: Summary very long (2248 chars)
 - [ ] **D-04** — Doc quality: Stub/placeholder docs found: frame:137, frame:151, frame:214, frame:226, frame:234 (+8 more)
-- [ ] **D-09** — Section separators: 7 bindings but no // ─── separator comments
 - [ ] **B-04** — No business logic in closures: '<closure@801>' (21 LOC, line 801) — extract body to src/dataframe/ | '<closure@868>' has if/match/for — extract to src/dataframe/
 - [ ] **T-03** — Test naming: test_ prefix found — use <subject>_<scenario>_<expected>: test_cellvalue_nil_is_nil, test_cellvalue_as_number, test_cellvalue_as_text, test_cellvalue_as_bool, test_cellvalue_display_nil (+95 more)
 
@@ -40,7 +38,7 @@
 | Check | Verdict | Details |
 |-------|---------|---------|
 | **A-01** AGENT.md exists | ✅ PASS | src\dataframe\AGENT.md |
-| **A-02** Template structure | ⚠️ WARNING | Missing recommended sections: Key Types, Lua API Summary |
+| **A-02** Template structure | ✅ PASS | All sections present |
 | **A-03** Purpose quality | ✅ PASS | Purpose section is 305 chars |
 | **A-04** Content sync | ✅ PASS | All .rs files listed |
 | **A-05** Spec pointer | ✅ PASS | docs/specs/dataframe.md exists |
@@ -70,7 +68,7 @@
 | **D-06** Lua API file docs | ✅ PASS | //! doc comment present |
 | **D-07** @param/@return annotations | ✅ PASS | All bindings have @param/@return annotations |
 | **D-08** No rustdoc in lua_api | ✅ PASS | No rustdoc sections in Lua API file |
-| **D-09** Section separators | ⚠️ WARNING | 7 bindings but no // ─── separator comments |
+| **D-09** Section separators | ✅ PASS | Separators present |
 
 ### Phase 5 — Lua↔Rust Bridge
 

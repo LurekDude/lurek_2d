@@ -1,6 +1,6 @@
 # Module Quality Report: `graph`
 
-> **Status**: 🔴 FAIL  |  **Date**: 2026-04-09  |  **Score**: 42 ✅ / 5 ⚠️ / 1 ❌ / 19 🔵
+> **Status**: 🔴 FAIL  |  **Date**: 2026-04-09  |  **Score**: 44 ✅ / 3 ⚠️ / 1 ❌ / 19 🔵
 
 ---
 
@@ -12,10 +12,8 @@
 
 ### 🟡 Warnings — Should Fix
 
-- [ ] **A-02** — Template structure: Missing recommended sections: Key Types, Lua API Summary
 - [ ] **D-04** — Doc quality: Stub/placeholder docs found: core:20, item:11, item:82, node:124, node:137 (+2 more)
 - [ ] **T-03** — Test naming: test_ prefix found — use <subject>_<scenario>_<expected>: test_graph_new_is_empty, test_node_add_increments_count_and_returns_unique_ids, test_node_remove_cleans_connected_edges, test_node_remove_nonexistent_returns_false, test_node_get_ids_matches_count (+43 more)
-- [ ] **W-05** — Wiki page: No wiki page found (expected docs/wiki/Graph-API.md)
 - [ ] **Q-04** — Error handling: .unwrap() calls: algorithms:186, algorithms:200, algorithms:201, algorithms:222, algorithms:223 (+122 more)
 
 ## Full Check Results
@@ -36,7 +34,7 @@
 | Check | Verdict | Details |
 |-------|---------|---------|
 | **A-01** AGENT.md exists | ✅ PASS | src\graph\AGENT.md |
-| **A-02** Template structure | ⚠️ WARNING | Missing recommended sections: Key Types, Lua API Summary |
+| **A-02** Template structure | ✅ PASS | All sections present |
 | **A-03** Purpose quality | ✅ PASS | Purpose section is 569 chars |
 | **A-04** Content sync | ✅ PASS | All .rs files listed |
 | **A-05** Spec pointer | ✅ PASS | docs/specs/graph.md exists |
@@ -109,7 +107,7 @@
 | **W-02** API surface coverage | ✅ PASS | All 1 bound functions in example |
 | **W-03** Example comments | 🔵 MANUAL | Verify content/examples/graph.lua has realistic one-line comments per call |
 | **W-04** Example–spec sync | ✅ PASS | Missing spec or example — other checks cover this |
-| **W-05** Wiki page | ⚠️ WARNING | No wiki page found (expected docs/wiki/Graph-API.md) |
+| **W-05** Wiki page | ✅ PASS | docs\wiki\Graph-API.md |
 | **W-06** Changelog entry | 🔵 MANUAL | Verify recent API changes have docs/CHANGELOG.md entries |
 
 ### Phase 9 — Code Quality

@@ -1,6 +1,6 @@
 # Module Quality Report: `scene`
 
-> **Status**: 🔴 FAIL  |  **Date**: 2026-04-09  |  **Score**: 40 ✅ / 6 ⚠️ / 2 ❌ / 19 🔵
+> **Status**: 🔴 FAIL  |  **Date**: 2026-04-09  |  **Score**: 41 ✅ / 5 ⚠️ / 2 ❌ / 19 🔵
 
 ---
 
@@ -13,7 +13,6 @@
 
 ### 🟡 Warnings — Should Fix
 
-- [ ] **A-02** — Template structure: Missing recommended sections: Key Types, Lua API Summary
 - [ ] **SP-03** — Summary quality: Summary very long (2499 chars)
 - [ ] **D-04** — Doc quality: Stub/placeholder docs found: depth_sorter:11, depth_sorter:26, depth_sorter:49, stack:62, stack:98 (+2 more)
 - [ ] **B-04** — No business logic in closures: '<closure@223>' (24 LOC, line 223) — extract body to src/scene/ | '<closure@325>' (21 LOC, line 325) — extract body to src/scene/ | '<closure@304>' has if/match/for — extract to src/scene/ | '<closure@356>' has if/match/for — extract to src/scene/
@@ -38,7 +37,7 @@
 | Check | Verdict | Details |
 |-------|---------|---------|
 | **A-01** AGENT.md exists | ✅ PASS | src\scene\AGENT.md |
-| **A-02** Template structure | ⚠️ WARNING | Missing recommended sections: Key Types, Lua API Summary |
+| **A-02** Template structure | ✅ PASS | All sections present |
 | **A-03** Purpose quality | ✅ PASS | Purpose section is 521 chars |
 | **A-04** Content sync | ✅ PASS | All .rs files listed |
 | **A-05** Spec pointer | ✅ PASS | docs/specs/scene.md exists |

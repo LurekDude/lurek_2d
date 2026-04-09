@@ -1,6 +1,6 @@
 # Module Quality Report: `math`
 
-> **Status**: 🔴 FAIL  |  **Date**: 2026-04-09  |  **Score**: 36 ✅ / 8 ⚠️ / 4 ❌ / 19 🔵
+> **Status**: 🔴 FAIL  |  **Date**: 2026-04-09  |  **Score**: 37 ✅ / 7 ⚠️ / 4 ❌ / 19 🔵
 
 ---
 
@@ -15,7 +15,6 @@
 
 ### 🟡 Warnings — Should Fix
 
-- [ ] **A-02** — Template structure: Missing recommended sections: Key Types, Lua API Summary
 - [ ] **SP-03** — Summary quality: Summary very long (2304 chars)
 - [ ] **SP-05** — Key Types accuracy: Types not in spec: DistType, FractalType, MapGenOptions, NoiseKind, SpatialItem | Stale in spec: Geometry, Polygon
 - [ ] **D-04** — Doc quality: Stub/placeholder docs found: easing:8, easing:79, easing:95, easing:106, geometry:44 (+24 more)
@@ -42,7 +41,7 @@
 | Check | Verdict | Details |
 |-------|---------|---------|
 | **A-01** AGENT.md exists | ✅ PASS | src\math\AGENT.md |
-| **A-02** Template structure | ⚠️ WARNING | Missing recommended sections: Key Types, Lua API Summary |
+| **A-02** Template structure | ✅ PASS | All sections present |
 | **A-03** Purpose quality | ✅ PASS | Purpose section is 271 chars |
 | **A-04** Content sync | ✅ PASS | All .rs files listed |
 | **A-05** Spec pointer | ✅ PASS | docs/specs/math.md exists |

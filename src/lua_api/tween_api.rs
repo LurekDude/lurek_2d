@@ -43,6 +43,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
     /// @param dt : number
     /// @return nil
     let s = engine.clone();
+    // ── Bindings ─────────────────────────────────────────────────────────────────
     tbl.set(
         "update",
         lua.create_function(move |lua, dt: f64| TweenEngine::update(&s, lua, dt))?,

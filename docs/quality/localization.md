@@ -1,6 +1,6 @@
 # Module Quality Report: `localization`
 
-> **Status**: 🔴 FAIL  |  **Date**: 2026-04-09  |  **Score**: 40 ✅ / 6 ⚠️ / 2 ❌ / 19 🔵
+> **Status**: 🔴 FAIL  |  **Date**: 2026-04-09  |  **Score**: 44 ✅ / 2 ⚠️ / 2 ❌ / 19 🔵
 
 ---
 
@@ -13,12 +13,8 @@
 
 ### 🟡 Warnings — Should Fix
 
-- [ ] **A-02** — Template structure: Missing recommended sections: Key Types, Lua API Summary
-- [ ] **SP-06** — Spec quality: Stub content found: PLACEHOLDER
 - [ ] **D-04** — Doc quality: Stub/placeholder docs found: interpolation:3, interpolation:9, interpolation:11, interpolation:12
 - [ ] **B-04** — No business logic in closures: '<closure@105>' (16 LOC, line 105) — extract body to src/localization/ | '<closure@179>' (29 LOC, line 179) — extract body to src/localization/ | '<closure@399>' (35 LOC, line 399) — extract body to src/localization/ | '<closure@125>' has if/match/for — extract to src/localization/ | '<closure@137>' has if/match/for — extract to src/localization/
-- [ ] **R-01** — Tier placement: Module not in tier registry — verify placement
-- [ ] **W-05** — Wiki page: No wiki page found (expected docs/wiki/Localization-API.md)
 
 ## Full Check Results
 
@@ -38,11 +34,11 @@
 | Check | Verdict | Details |
 |-------|---------|---------|
 | **A-01** AGENT.md exists | ✅ PASS | src\localization\AGENT.md |
-| **A-02** Template structure | ⚠️ WARNING | Missing recommended sections: Key Types, Lua API Summary |
+| **A-02** Template structure | ✅ PASS | All sections present |
 | **A-03** Purpose quality | ✅ PASS | Purpose section is 610 chars |
 | **A-04** Content sync | ✅ PASS | All .rs files listed |
 | **A-05** Spec pointer | ✅ PASS | docs/specs/localization.md exists |
-| **A-06** Tier label | ✅ PASS | Tier label present (expected: unassigned) |
+| **A-06** Tier label | ✅ PASS | Tier label present (expected: tier1) |
 | **A-04b** Source Files completeness (incl. subdirs) | ✅ PASS | All nested .rs files listed in AGENT.md |
 
 ### Phase 3 — Technical Specification
@@ -54,7 +50,7 @@
 | **SP-03** Summary quality | ✅ PASS | Summary is 1917 chars |
 | **SP-04** Lua API completeness | ✅ PASS | No tbl.set() bindings found |
 | **SP-05** Key Types accuracy | ✅ PASS | 3 types — spec Key Types in sync |
-| **SP-06** Spec quality | ⚠️ WARNING | Stub content found: PLACEHOLDER |
+| **SP-06** Spec quality | ✅ PASS | No stub content |
 
 ### Phase 4 — Docstrings
 
@@ -85,8 +81,8 @@
 
 | Check | Verdict | Details |
 |-------|---------|---------|
-| **R-01** Tier placement | ⚠️ WARNING | Module not in tier registry — verify placement |
-| **R-02** Dependency direction | ✅ PASS | All imports follow unassigned rules |
+| **R-01** Tier placement | ✅ PASS | Tier label matches: tier1 |
+| **R-02** Dependency direction | ✅ PASS | All imports follow tier1 rules |
 | **R-03** No lua_api import | ✅ PASS | No lua_api imports found |
 | **R-04** Design assumptions | 🔵 MANUAL | Verify against docs/architecture/philosophy.md |
 | **R-05** Module overlap | 🔵 MANUAL | Check for scope duplication with other modules |
@@ -111,7 +107,7 @@
 | **W-02** API surface coverage | ✅ PASS | All 0 bound functions in example |
 | **W-03** Example comments | 🔵 MANUAL | Verify content/examples/localization.lua has realistic one-line comments per call |
 | **W-04** Example–spec sync | ✅ PASS | Missing spec or example — other checks cover this |
-| **W-05** Wiki page | ⚠️ WARNING | No wiki page found (expected docs/wiki/Localization-API.md) |
+| **W-05** Wiki page | ✅ PASS | docs\wiki\Localization-API.md |
 | **W-06** Changelog entry | 🔵 MANUAL | Verify recent API changes have docs/CHANGELOG.md entries |
 
 ### Phase 9 — Code Quality

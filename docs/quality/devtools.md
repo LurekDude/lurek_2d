@@ -1,6 +1,6 @@
 # Module Quality Report: `devtools`
 
-> **Status**: 🔴 FAIL  |  **Date**: 2026-04-09  |  **Score**: 38 ✅ / 7 ⚠️ / 3 ❌ / 19 🔵
+> **Status**: 🔴 FAIL  |  **Date**: 2026-04-09  |  **Score**: 40 ✅ / 5 ⚠️ / 3 ❌ / 19 🔵
 
 ---
 
@@ -14,12 +14,10 @@
 
 ### 🟡 Warnings — Should Fix
 
-- [ ] **A-02** — Template structure: Missing recommended sections: Key Types, Lua API Summary
 - [ ] **SP-03** — Summary quality: Summary very long (2717 chars)
 - [ ] **D-07** — @param/@return annotations: Missing @param/@return before: name, time, selfTime, startTime, children (+3 more)
 - [ ] **B-04** — No business logic in closures: '<closure@159>' (18 LOC, line 159) — extract body to src/devtools/ | '<closure@386>' (19 LOC, line 386) — extract body to src/devtools/ | '<closure@482>' (16 LOC, line 482) — extract body to src/devtools/ | '<closure@503>' (52 LOC, line 503) — extract body to src/devtools/ | '<closure@110>' has if/match/for — extract to src/devtools/ | '<closure@235>' has if/match/for — extract to src/devtools/
 - [ ] **B-05** — Rc clone pattern: Possible missing state.clone() before move: line 428
-- [ ] **R-01** — Tier placement: Module not in tier registry — verify placement
 - [ ] **I-03** — Config integration: Module not in src/engine/config.rs — add to ModulesConfig if toggleable
 
 ## Full Check Results
@@ -40,11 +38,11 @@
 | Check | Verdict | Details |
 |-------|---------|---------|
 | **A-01** AGENT.md exists | ✅ PASS | src\devtools\AGENT.md |
-| **A-02** Template structure | ⚠️ WARNING | Missing recommended sections: Key Types, Lua API Summary |
+| **A-02** Template structure | ✅ PASS | All sections present |
 | **A-03** Purpose quality | ✅ PASS | Purpose section is 962 chars |
 | **A-04** Content sync | ✅ PASS | All .rs files listed |
 | **A-05** Spec pointer | ✅ PASS | docs/specs/devtools.md exists |
-| **A-06** Tier label | ✅ PASS | Tier label present (expected: unassigned) |
+| **A-06** Tier label | ✅ PASS | Tier label present (expected: tier1) |
 | **A-04b** Source Files completeness (incl. subdirs) | ✅ PASS | All nested .rs files listed in AGENT.md |
 
 ### Phase 3 — Technical Specification
@@ -87,8 +85,8 @@
 
 | Check | Verdict | Details |
 |-------|---------|---------|
-| **R-01** Tier placement | ⚠️ WARNING | Module not in tier registry — verify placement |
-| **R-02** Dependency direction | ✅ PASS | All imports follow unassigned rules |
+| **R-01** Tier placement | ✅ PASS | Tier label matches: tier1 |
+| **R-02** Dependency direction | ✅ PASS | All imports follow tier1 rules |
 | **R-03** No lua_api import | ✅ PASS | No lua_api imports found |
 | **R-04** Design assumptions | 🔵 MANUAL | Verify against docs/architecture/philosophy.md |
 | **R-05** Module overlap | 🔵 MANUAL | Check for scope duplication with other modules |

@@ -49,21 +49,20 @@ CRATE_ROOT_EXPORTS = {"log_msg"}
 
 TIER1 = {
     "animation", "audio", "automation", "camera", "compute", "data",
-    "entity", "event", "filesystem", "graphics", "image", "input",
-    "physics", "thread", "timer", "window",
+    "debugbridge", "devtools", "docs", "entity", "event", "filesystem",
+    "graphics", "image", "input", "localization", "log", "patterns",
+    "physics", "thread", "timer", "tween", "window",
 }
 
 TIER2 = {
-    "ai", "dataframe", "graph", "gui", "minimap", "modding",
-    "overlay", "particle", "pathfinding", "postfx", "savegame",
-    "scene", "tilemap",
+    "ai", "dataframe", "fx", "graph", "gui", "light", "minimap", "modding",
+    "network", "overlay", "particle", "pathfinding", "pipeline", "postfx",
+    "procgen", "raycaster", "savegame", "scene", "serial", "spine",
+    "terminal", "tilemap",
 }
 
 # Additional src/ modules not in the official tier table
-EXTRA = {
-    "terminal", "spine", "serial", "raycaster", "procgen",
-    "pipeline", "network", "light", "fx",
-}
+EXTRA = set()  # All modules have been assigned to BASELINE, TIER1, or TIER2
 
 ALL_TIERS = BASELINE | TIER1 | TIER2 | EXTRA
 
@@ -625,8 +624,11 @@ def check_spec_file(module: str) -> List[Check]:
                               "No Key Types section or no public types — skip"))
 
     # SP-06: spec quality (no stubs)
+    # Use exact case matching: PLACEHOLDER and FIXME are all-caps technical markers;
+    # "placeholder" and "todo" as lowercase normally appear in legitimate spec prose
+    # (UI field descriptions, template variable docs, etc.) and should not be flagged.
     stub_hits = [p for p in ["TODO", "FIXME", "PLACEHOLDER", "Coming soon"]
-                 if p.lower() in content.lower()]
+                 if p in content]
     if stub_hits:
         results.append(Check("SP-06", "Spec quality", WARN,
                               f"Stub content found: {', '.join(stub_hits)}"))
@@ -736,8 +738,9 @@ def check_lua_api_docs(module: str) -> List[Check]:
                               "No rustdoc sections in Lua API file"))
 
     # D-09: Section separator comments if \u22653 bindings
+    # Accept both Unicode box-drawing (// \u2500\u2500\u2500) and ASCII dash (// ---) separators
     bound_fns = re.findall(r'tbl\.set\(\s*"[^"]+?"', content)
-    has_sep = bool(re.search(r"// \u2500+", content))
+    has_sep = bool(re.search(r"// [-\u2500]{3,}", content))
     if len(bound_fns) >= 3 and not has_sep:
         results.append(Check("D-09", "Section separators", WARN,
                               f"{len(bound_fns)} bindings but no // \u2500\u2500\u2500 separator comments"))

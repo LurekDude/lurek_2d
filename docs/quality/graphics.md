@@ -1,6 +1,6 @@
 # Module Quality Report: `graphics`
 
-> **Status**: 🔴 FAIL  |  **Date**: 2026-04-09  |  **Score**: 34 ✅ / 9 ⚠️ / 5 ❌ / 19 🔵
+> **Status**: 🔴 FAIL  |  **Date**: 2026-04-09  |  **Score**: 35 ✅ / 8 ⚠️ / 5 ❌ / 19 🔵
 
 ---
 
@@ -16,7 +16,6 @@
 
 ### 🟡 Warnings — Should Fix
 
-- [ ] **A-02** — Template structure: Missing recommended sections: Key Types, Lua API Summary
 - [ ] **A-04b** — Source Files completeness (incl. subdirs): Nested .rs files not listed in AGENT.md: mod.rs
 - [ ] **SP-03** — Summary quality: Summary very long (2475 chars)
 - [ ] **SP-05** — Key Types accuracy: Types not in spec: Color | Stale in spec: Patch, Type
@@ -44,7 +43,7 @@
 | Check | Verdict | Details |
 |-------|---------|---------|
 | **A-01** AGENT.md exists | ✅ PASS | src\graphics\AGENT.md |
-| **A-02** Template structure | ⚠️ WARNING | Missing recommended sections: Key Types, Lua API Summary |
+| **A-02** Template structure | ✅ PASS | All sections present |
 | **A-03** Purpose quality | ✅ PASS | Purpose section is 387 chars |
 | **A-04** Content sync | ✅ PASS | All .rs files listed |
 | **A-05** Spec pointer | ✅ PASS | docs/specs/graphics.md exists |

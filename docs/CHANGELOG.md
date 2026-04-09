@@ -18,6 +18,18 @@ Always update this file **in the same commit** as the change. Use the commit typ
 
 ---
 
+## [0.6.19] — 2026-04-09
+
+### Fixed
+- **Quality: A-02** — Added `## Key Types` and `## Lua API Summary` sections to 39 AGENT.md files missing them (all modules except ai, which already had them) — fixes A-02 WARN in all modules
+- **Quality: D-09** — Broadened section separator detection to accept ASCII `// ---` in addition to Unicode `// ─────`; added minimal separator comments to `patterns_api.rs` and `tween_api.rs` which had none
+- **Quality: SP-06** — Made stub detection case-sensitive (`PLACEHOLDER` all-caps only) to stop false-positive warnings from legitimate documentation uses of the word "placeholder" in `gui.md`, `localization.md`, `window.md`, `engine.md`; fixed 4 genuine `TODO` stubs in `docs/specs/serial.md`
+- **Quality: W-05** — Created 13 stub wiki pages for modules missing them: `Graph-API.md`, `Image-API.md`, `Light-API.md`, `Localization-API.md`, `Log-API.md`, `Minimap-API.md`, `Patterns-API.md`, `Pipeline-API.md`, `Raycaster-API.md`, `Serial-API.md`, `Spine-API.md`, `Thread-API.md`, `Tween-API.md`
+- **Quality: R-01** — Expanded tier registry in `tools/audit/audit_module.py`: added 7 modules to TIER1 (`debugbridge`, `devtools`, `docs`, `localization`, `log`, `patterns`, `tween`) and 9 modules to TIER2 (`fx`, `light`, `network`, `pipeline`, `procgen`, `raycaster`, `serial`, `spine`, `terminal`) — previously these were in EXTRA (unassigned)
+- **Quality audit** — `serial` and `window` modules now fully PASS the automated quality audit (2/46 modules PASS)
+
+---
+
 ## [0.6.18] — 2026-04-09
 
 ### Fixed

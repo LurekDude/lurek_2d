@@ -1,6 +1,6 @@
 # Module Quality Report: `tilemap`
 
-> **Status**: 🔴 FAIL  |  **Date**: 2026-04-09  |  **Score**: 35 ✅ / 8 ⚠️ / 5 ❌ / 19 🔵
+> **Status**: 🔴 FAIL  |  **Date**: 2026-04-09  |  **Score**: 36 ✅ / 7 ⚠️ / 5 ❌ / 19 🔵
 
 ---
 
@@ -17,7 +17,6 @@
 ### 🟡 Warnings — Should Fix
 
 - [ ] **S-03** — File size limits: Files >1500 LOC: tilemap/mapgen.rs (1570 LOC)
-- [ ] **A-02** — Template structure: Missing recommended sections: Key Types, Lua API Summary
 - [ ] **SP-05** — Key Types accuracy: Types not in spec: AutoTileLayout, AutoTileSheet, ChunkMap, Edge, Facing | Stale in spec: Standalone
 - [ ] **D-03** — Structured doc sections: Missing structured sections: autotile_sheet::AutoTileSheet (# Fields), isomap::IsoMap (# Fields), mapgen::ScriptStep (# Fields)
 - [ ] **D-04** — Doc quality: Stub/placeholder docs found: isomap:51, large_map_renderer:213, mapgen:795, polygon_map:18, polygon_map:289 (+10 more)
@@ -43,7 +42,7 @@
 | Check | Verdict | Details |
 |-------|---------|---------|
 | **A-01** AGENT.md exists | ✅ PASS | src\tilemap\AGENT.md |
-| **A-02** Template structure | ⚠️ WARNING | Missing recommended sections: Key Types, Lua API Summary |
+| **A-02** Template structure | ✅ PASS | All sections present |
 | **A-03** Purpose quality | ✅ PASS | Purpose section is 1252 chars |
 | **A-04** Content sync | ✅ PASS | All .rs files listed |
 | **A-05** Spec pointer | ✅ PASS | docs/specs/tilemap.md exists |
